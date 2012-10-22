@@ -1,3 +1,5 @@
+.. _redundant_and_failover_monitoring:
+
 Redundant and Failover Network Monitoring
 *****************************************
 
@@ -15,9 +17,11 @@ network become unreachable.
    If you are just learning how to use Centreon Engine, I would suggest
    not trying to implement redudancy until you have becoming familiar
    with the
-   :ref:`prerequisites <advanced_redundant_and_failover_network_monitoring#redundant_and_failover_network_monitoringprerequisites>`
+   :ref:`prerequisites <redundant_and_failover_monitoring_prerequisites>`
    I've laid out. Redundancy is a relatively complicated issue to
    understand, and even more difficult to implement properly.
+
+.. _redundant_and_failover_monitoring_prerequisites:
 
 Prerequisites
 =============
@@ -30,7 +34,7 @@ Engine, you need to be familiar with the following...
   * Issuing :ref:`external commands <external_commands>` to Centreon
     Engine via shell scripts
   * Executing plugins on remote hosts using either the
-    :ref:`NRPE addon <basics_addons#addonsnrpe>` or some other method
+    :ref:`NRPE addon <addons_nrpe>` or some other method
   * Checking the status of the Centreon Engine process with the
     check_centengine plugin
 
@@ -42,8 +46,7 @@ in the event_handlers/ subdirectory of the Centreon Engine
 distribution. You'll probably need to modify them to work on your
 system...
 
-Scenario 1 - Redundant Monitoring
-=================================
+.. _redundant_and_failover_monitoring_scenario1:
 
 Scenario 1 - Redundant Monitoring
 ---------------------------------
@@ -55,7 +58,7 @@ smarter redundancy, better redundancy across different network segments,
 etc.
 
 Goals
------
+^^^^^
 
 The goal of this type of redundancy implementation is simple. Both the
 "master" and "slave" hosts monitor the same hosts and service on the
@@ -69,7 +72,7 @@ contacts about problems if:
     some reason
 
 Network Layout Diagram
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 The diagram below shows a very simple network setup. For this scenario I
 will be assuming that hosts A and E are both running Centreon Engine and
@@ -79,21 +82,21 @@ are monitoring all the hosts shown. Host A will be considered the
 .. image:: redundancy.png
 
 Initial Program Settings
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The slave host (host E) has its initial
-:ref:`enable_notifications <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationsoption>`
+:ref:`enable_notifications <main_cfg_opt_notifications>`
 directive disabled, thereby preventing it from sending out any host or
 service notifications. You also want to make sure that the slave host
 has its
-:ref:`check_external_commands <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckoption>`
+:ref:`check_external_commands <main_cfg_opt_external_command_check>`
 directive enabled. That was easy enough...
 
 Initial Configuration
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 Next we need to consider the differences between the
-:ref:`object configuration file(s) <basics_object_configuration_overview>`
+:ref:`object configuration file(s) <object_configuration_overview>`
 on the master and slave hosts...
 
 I will assume that you have the master host (host A) setup to monitor
@@ -121,7 +124,7 @@ to. Of course you may be monitoring services on host E from host A, but
 that has nothing to do with the implementation of redundancy...
 
 Event Handler Command Definitions
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We need to stop for a minute and describe what the command definitions
 for the event handlers on the slave host look like. Here is an
@@ -143,7 +146,7 @@ anywhere you wish, but you'll need to modify the examples I've given
 here.
 
 Event Handler Scripts
-=====================
+^^^^^^^^^^^^^^^^^^^^^
 
 Okay, now lets take a look at what the event handler scripts look
 like...
@@ -210,7 +213,7 @@ Service Event Handler (handle-master-proc-event)::
   exit 0
 
 What This Does For Us
-=====================
+^^^^^^^^^^^^^^^^^^^^^
 
 The slave host (host E) initially has notifications disabled, so it
 won't send out any host or service notifications while the Centreon
@@ -246,7 +249,7 @@ notifying contacts of problems to the Centreon Engine process on host A.
 Everything is now as it was when we first started!
 
 Time Lags
----------
+^^^^^^^^^
 
 Redundancy in Centreon Engine is by no means perfect. One of the more
 obvious problems is the lag time between the master host failing and the
@@ -270,7 +273,7 @@ You can minimize this lag by...
     max_check_attempts argument in the host definition.
   * Increase the frequency of :ref:`external command <external_commands>`
     checks on host E. This is done by modifying the
-    :ref:`command_check_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckinterval>`
+    :ref:`command_check_interval <main_cfg_opt_external_command_check_interval>`
     option in the main configuration file.
 
 When Centreon Engine recovers on the host A, there is also some lag time
@@ -289,7 +292,7 @@ at which services are checked, and a lot of pure chance. At any rate,
 its definitely better than nothing.
 
 Special Cases
--------------
+^^^^^^^^^^^^^
 
 Here is one thing you should be aware of... If host A goes down, host E
 will have notifications enabled and take over the responsibilities of
@@ -310,17 +313,17 @@ process on host A. The rest is up to pure chance, but the total
 "blackout" time shouldn't be too bad.
 
 Scenario 2 - FailoverMonitoring
-===============================
+-------------------------------
 
 Introduction
-------------
+^^^^^^^^^^^^
 
 Failover monitoring is similiar to, but slightly different than
 redundant monitoring (as discussed above in
-:ref:`scenario 1 <advanced_redundant_and_failover_network_monitoring#redundant_and_failover_network_monitoringscenario1redundantmonitoring>`).
+:ref:`scenario 1 <redundant_and_failover_monitoring_scenario1>`).
 
 Goals
------
+^^^^^
 
 The basic goal of failover monitoring is to have the Centreon Engine
 process on the slave host sit idle while the Centreon Engine process on
@@ -329,7 +332,7 @@ running (or if the host goes down), the Centreon Engine process on the
 slave host starts monitoring everything.
 
 While the method described in
-:ref:`scenario 1 <advanced_redundant_and_failover_network_monitoring#redundant_and_failover_network_monitoringscenario1redundantmonitoring>`
+:ref:`scenario 1 <redundant_and_failover_monitoring_scenario1>`
 will allow you to continue receive notifications if the master
 monitoring hosts goes down, it does have some pitfalls. The biggest
 problem is that the slave host is monitoring the same hosts and servers
@@ -339,28 +342,28 @@ have a lot of services defined. Here's how you can get around that
 problem...
 
 Initial Program Settings
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Disable active service checks and notifications on the slave host using
-the :ref:`execute_service_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicecheckexecutionoption>`
-and :ref:`enable_notifications <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationsoption>`
+the :ref:`execute_service_checks <main_cfg_opt_service_check_execution>`
+and :ref:`enable_notifications <main_cfg_opt_notifications>`
 directives. This will prevent the slave host from monitoring hosts and
 services and sending out notifications while the Centreon Engine process
 on the master host is still up and running. Make sure you also have the
-:ref:`check_external_commands <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckoption>`
+:ref:`check_external_commands <main_cfg_opt_external_command_check>`
 directive enabled on the slave host.
 
 Master Process Check
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 Set up a cron job on the slave host that periodically (say every minute)
 runs a script that checks the staus of the Centreon Engine process on
 the master host (using the check_nrpe plugin on the slave host and the
-:ref:`nrpe daemon <basics_addons#addonsnrpe>` and check_centengine
+:ref:`nrpe daemon <addons_nrpe>` and check_centengine
 plugin on the master host). The script should check the return code of
 the check_nrpe plugin . If it returns a non-OK state, the script should
 send the appropriate commands to the
-:ref:`external command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`
+:ref:`external command file <main_cfg_opt_external_command_file>`
 to enable both notifications and active service checks. If the plugin
 returns an OK state, the script should send commands to the external
 command file to disable both notifications and active checks.
@@ -371,11 +374,11 @@ everything twice.
 
 Also of note, you don't need to define host and service handlers as
 mentioned in
-:ref:`scenario 1 <advanced_redundant_and_failover_network_monitoring#redundant_and_failover_network_monitoringscenario1redundantmonitoring>`
+:ref:`scenario 1 <redundant_and_failover_monitoring_scenario1>`
 because things are handled differently.
 
 Additional Issues
------------------
+^^^^^^^^^^^^^^^^^
 
 At this point, you have implemented a very basic failover monitoring
 setup. However, there is one more thing you should consider doing to
@@ -385,9 +388,9 @@ The big problem with the way things have been setup thus far is the fact
 that the slave host doesn't have the current status of any services or
 hosts at the time it takes over the job of monitoring. One way to solve
 this problem is to enable the
-:ref:`ocsp command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`
+:ref:`ocsp command <main_cfg_opt_obsessive_compulsive_service_processor_command>`
 on the master host and have it send all service check results to the
-slave host using the :ref:`nsca <basics_addons#addonsnsca>` addon". The
+slave host using the :ref:`nsca <addons_nsca>` addon". The
 slave host will then have up-to-date status information for all services
 at the time it takes over the job of monitoring things. Since active
 service checks are not enabled on the slave host, it will not actively

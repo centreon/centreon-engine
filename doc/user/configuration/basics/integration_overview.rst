@@ -18,31 +18,31 @@ Integration Points
 To monitor new hardware, services, or applications, check out the docs
 on:
 
-  * :ref:`Plugins <get_started/plugins>`
-  * :ref:`Plugin API <advanced_centengine_plugin_api>`
-  * :ref:`Passive Checks <basics_passive_checks>`
-  * :ref:`Event Handlers <advanced_event_handlers>`
+  * :ref:`Plugins <exploit_plugins>`
+  * :ref:`Plugin API <centengine_plugin_api>`
+  * :ref:`Passive Checks <passive_checks>`
+  * :ref:`Event Handlers <event_handlers>`
 
 To get data into Centreon Engine from external applications, check out
 the docs on:
 
-  * :ref:`Passive Checks <basics_passive_checks>`
-  * :ref:`External Commands <advanced_external_commands>`
+  * :ref:`Passive Checks <passive_checks>`
+  * :ref:`External Commands <external_commands>`
 
 To send status, performance, or notification information from Centreon
 Engine to external applications, check out the docs on:
 
-  * :ref:`Event Handlers <advanced_event_handlers>`
-  * :ref:`OCSP <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`    and
-    :ref:`OCHP <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand>`
+  * :ref:`Event Handlers <event_handlers>`
+  * :ref:`OCSP <main_cfg_opt_obsessive_compulsive_service_processor_command>`    and
+    :ref:`OCHP <main_cfg_opt_obsessive_compulsive_host_processor_command>`
     Commands
-  * :ref:`Performance Data <advanced_performance_data>`
-  * :ref:`Notifications <basics_notifications>`
+  * :ref:`Performance Data <performance_data>`
+  * :ref:`Notifications <notifications>`
 
 Integration Examples
 
 I've documented some examples on how to integrate Centreon Engine with
 external applications:
 
-  * :ref:`TCP Wrappers <advanced_tcp_wrapper_integration>` (security alerts)
-  * :ref:`SNMP Traps <advanced_snmp_wrapper_integration>` (Arcserve backup job status)
+  * :ref:`TCP Wrappers <tcp_wrapper_integration>` (security alerts)
+  * :ref:`SNMP Traps <snmp_wrapper_integration>` (Arcserve backup job status)

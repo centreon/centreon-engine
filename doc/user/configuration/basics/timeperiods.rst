@@ -1,10 +1,12 @@
+.. _timeperiods:
+
 Time Periods
 ************
 
 Introduction
 ============
 
-:ref:`Timeperiod <basics_object_definitions#object_definitionsobjecttypestimeperioddefinition>`
+:ref:`Timeperiod <obj_def_timeperiod>`
 definitions allow you to control when various aspects of the monitoring
 and alerting logic can operate. For instance, you can restrict:
 
@@ -16,7 +18,7 @@ and alerting logic can operate. For instance, you can restrict:
 Precedence in Time Periods
 ==========================
 
-Timeperod :ref:`definitions <basics_object_definitions#object_definitionsobjecttypestimeperioddefinition>`
+Timeperod :ref:`definitions <obj_def_timeperiod>`
 may contain multiple types of directives, including weekdays, days of
 the month, and calendar dates. Different types of directives have
 different precendence levels and may override other directives in your
@@ -31,7 +33,7 @@ directives (in descending order) is as follows:
   * Normal weekday (Tuesday)
 
 Examples of different timeperiod directives can be found
-:ref:`here <basics_object_definitions#object_definitionsobjecttypestimeperioddefinition>`.
+:ref:`here <obj_def_timeperiod>`.
 
 How Time Periods Work With Host and Service Checks
 ==================================================
@@ -90,7 +92,7 @@ recovery.
 You can also use timeperiods to control when notifications can be sent
 out to individual contacts. By using the service_notification_period and
 host_notification_period directives in
-:ref:`contact definitions <basics_object_definitions#object_definitionsobjecttypescontactdefinition>`,
+:ref:`contact definitions <obj_def_contact>`,
 you're able to essentially define an "on call" period for each
 contact. Contacts will only receive host and service notifications
 during the times you specify in the notification period directives.
@@ -130,13 +132,13 @@ will only receive host and service notifications during the times you
 specify in the notification period directives.
 
 Examples of how to create timeperiod definitions for use for on-call
-rotations can be found :ref:`here <advanced_on_call_rotations>`.
+rotations can be found :ref:`here <on_call_rotations>`.
 
 How Time Periods Work With Notification Escalations
 ===================================================
 
 Service and host
-:ref:`notification escalations <advanced_notification_escalations>`
+:ref:`notification escalations <notification_escalations>`
 have an optional escalation_period directive that allows you to specify
 a timeperiod when the escalation is valid and can be used. If you do not
 use the escalation_period directive in an escalation definition, the
@@ -149,7 +151,7 @@ How Time Periods Work With Dependencies
 =======================================
 
 Service and host
-:ref:`dependencies <advanced_host_and_service_dependencies>`
+:ref:`dependencies <host_and_service_dependencies>`
 have an optional dependency_period directive that allows you to specify
 a timeperiod when the dependendies are valid and can be used. If you do
 not use the dependency_period directive in a dependency definition, the

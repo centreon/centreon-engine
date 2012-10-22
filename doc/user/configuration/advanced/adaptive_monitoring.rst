@@ -40,7 +40,7 @@ External Commands For Adaptive Monitoring
 In order to change global or host- or service-specific attributes during
 runtime, you must submit the appropriate
 :ref:`external command <external_commands>` to Centreon Engine via the
-:ref:`external command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`.
+:ref:`external command file <main_cfg_opt_external_command_file>`.
 The table below lists the different attributes that may be changed
 during runtime, along with the external command to accomplish the job.
 
@@ -60,4 +60,4 @@ at the following URL: http://XXX/developerinfo/external_commands/
    each other) using bang (!) characters. More information on how
    arguments in command definitions are processed during runtime can be
    found in the documentation on
-   :ref:`macros <basics_understanding_macros_and_how_they_work>`.
+   :ref:`macros <understanding_macros>`.

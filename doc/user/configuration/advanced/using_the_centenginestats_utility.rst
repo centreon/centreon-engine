@@ -1,3 +1,5 @@
+.. _using_the_centenginestats_utility:
+
 Using The Centreon Engine Stats Utility
 ***************************************
 

@@ -1,3 +1,5 @@
+.. _obj_def_tricks:
+
 Time-Saving Tricks For Object Definitions
 *****************************************
 
@@ -6,7 +8,7 @@ Introduction
 
 This documentation attempts to explain how you can exploit the
 (somewhat) hidden features of
-:ref:`template-based object definitions <basics_object_definitions>` to
+:ref:`template-based object definitions <obj_def>` to
 save your sanity. How so, you ask?  Several types of objects allow you
 to specify multiple host names and/or hostgroup names in definitions,
 allowing you to "copy" the object defintion to multiple hosts or
@@ -14,12 +16,12 @@ services. I'll cover each type of object that supports these features
 seperately. For starters, the object types which support this
 time-saving feature are as follows:
 
-  * :ref:`Services <advanced_time_saving_tricks_for_object_definitions#time_saving_tricks_for_object_definitionsservicedefinitions>`
-  * :ref:`Service escalations <advanced_time_saving_tricks_for_object_definitions#time_saving_tricks_for_object_definitionsserviceescalationdefinitions>`
-  * :ref:`Service dependencies <advanced_time_saving_tricks_for_object_definitions#time_saving_tricks_for_object_definitionsservicedependencydefinitions>`
-  * :ref:`Host escalations <advanced_time_saving_tricks_for_object_definitions#time_saving_tricks_for_object_definitionshostescalationdefinitions>`
-  * :ref:`Host dependencies <advanced_time_saving_tricks_for_object_definitions#time_saving_tricks_for_object_definitionshostdependencydefinitions>`
-  * :ref:`Hostgroups <advanced_time_saving_tricks_for_object_definitions#time_saving_tricks_for_object_definitionshostgroups>`
+  * :ref:`Services <obj_def_tricks_service>`
+  * :ref:`Service escalations <obj_def_tricks_service_escalation>`
+  * :ref:`Service dependencies <obj_def_tricks_service_dependency>`
+  * :ref:`Host escalations <obj_def_tricks_host_escalation>`
+  * :ref:`Host dependencies <obj_def_tricks_host_dependency>`
+  * :ref:`Hostgroups <obj_def_tricks_hostgroups>`
 
 Object types that are not listed above (i.e. timeperiods, commands,
 etc.) do not support the features I'm about to describe.
@@ -28,15 +30,15 @@ Regular Expression Matching
 ===========================
 
 The examples I give below use "standard" matching of object names and
-*require* :ref:`use_regexp_matching <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesregularexpressionmatchingoption>`
+*require* :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
 to be *disabled*.
 
 If you wish, you can enable regular expression matching for object names
-by using the :ref:`use_regexp_matching <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesregularexpressionmatchingoption>`
+by using the :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
 config option. By default, regular expression matching will only be used
 in object names that contain -, ?, +, or \.. If you want regular
 expression matching to be used on all object names, enable the
-:ref:`use_true_regexp_matching <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestrueregularexpressionmatchingoption>`
+:ref:`use_true_regexp_matching <main_cfg_opt_true_regular_expression_matching>`
 config option. Regular expressions can be used in any of the fields used
 in the examples below (host names, hostgroup names, service names, and
 servicegroup names).
@@ -48,11 +50,13 @@ servicegroup names).
    want to be interpreted as a regular expression just might be! Any
    problems should become evident once you verify your configuration.
 
+.. _obj_def_tricks_service:
+
 Service Definitions
 ===================
 
 Multiple Hosts: If you want to create identical
-:ref:`services <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`services <obj_def_service>`
 that are assigned to multiple hosts, you can specify multiple hosts in
 the host_name directive. The definition below would create a service
 called SOMESERVICE on hosts HOST1 through HOSTN. All the instances of
@@ -107,11 +111,13 @@ with a ! symbol::
     other service directives ...
   }
 
+.. _obj_def_tricks_service_escalation:
+
 Service Escalation Definitions
 ==============================
 
 Multiple Hosts: If you want to create
-:ref:`service escalations <basics_object_definitions#object_definitionsobjecttypesserviceescalationdefinition>`
+:ref:`service escalations <obj_def_service_escalation>`
 for services of the same name/description that are assigned to multiple
 hosts, you can specify multiple hosts in the host_name directive. The
 definition below would create a service escalation for services called
@@ -168,7 +174,7 @@ the host or hostgroup with a ! symbol::
   }
 
 All Services On Same Host: If you want to create
-:ref:`service escalations <basics_object_definitions#object_definitionsobjecttypesserviceescalationdefinition>`
+:ref:`service escalations <obj_def_service_escalation>`
 for all services assigned to a particular host, you can use a wildcard
 in the service_description directive. The definition below would create
 a service escalation for all services on host HOST1. All the instances
@@ -187,7 +193,7 @@ defined in your configuration files::
   }
 
 Multiple Services On Same Host: If you want to create
-:ref:`service escalations <basics_object_definitions#object_definitionsobjecttypesserviceescalationdefinition>`
+:ref:`service escalations <obj_def_service_escalation>`
 for all multiple services assigned to a particular host, you can use a
 specify more than one service description in the service_description
 directive. The definition below would create a service escalation for
@@ -214,11 +220,13 @@ groups, notification interval, etc.)::
     other escalation directives ...
   }
 
+.. _obj_def_tricks_service_dependency:
+
 Service Dependency Definitions
 ==============================
 
 Multiple Hosts: If you want to create
-:ref:`service dependencies <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`
+:ref:`service dependencies <obj_def_service_dependency>`
 for services of the same name/description that are assigned to multiple
 hosts, you can specify multiple hosts in the host_name and or
 dependent_host_name directives. In the example below, service SERVICE2
@@ -312,11 +320,13 @@ both SERVICE1 and SERVICE2 on HOST2::
     other dependency directives ...
   }
 
+.. _obj_def_tricks_host_escalation:
+
 Host Escalation Definitions
 ===========================
 
 Multiple Hosts: If you want to create
-:ref:`host escalations <basics_object_definitions#object_definitionsobjecttypeshostescalationdefinition>`
+:ref:`host escalations <obj_def_host_escalation>`
 for multiple hosts, you can specify multiple hosts in the host_name
 directive. The definition below would create a host escalation for hosts
 HOST1 through HOSTN. All the instances of the host escalation would be
@@ -364,11 +374,13 @@ hostgroup with a ! symbol::
     other escalation directives ...
   }
 
+.. _obj_def_tricks_host_dependency:
+
 Host Dependency Definitions
 ===========================
 
 Multiple Hosts: If you want to create :ref:`host dependencies
-<basics_object_definitions#object_definitionsobjecttypeshostdependencydefinition>`
+<obj_def_host_dependency>`
 for multiple hosts, you can specify multiple hosts in the host_name
 and/or dependent_host_name directives. The definition below would be
 equivalent to creating six seperate host dependencies. In the example
@@ -396,6 +408,8 @@ host names (i.e. have the same notification failure criteria, etc.)::
     dependent_hostgroup_name HOSTGROUP3,HOSTGROUP4
     other dependency directives ...
   }
+
+.. _obj_def_tricks_hostgroups:
 
 Hostgroups
 ==========

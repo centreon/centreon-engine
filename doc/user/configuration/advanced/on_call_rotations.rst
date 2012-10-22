@@ -1,3 +1,5 @@
+.. _on_call_rotations:
+
 On-Call Rotations
 *****************
 
@@ -17,7 +19,7 @@ responsibility of answering alerts, on-call rotations are often
 setup. Multiple admins will often alternate taking notifications on
 weekends, weeknights, holidays, etc.
 
-I'll show you how you can create :ref:`timeperiod <basics_timeperiods>`
+I'll show you how you can create :ref:`timeperiod <timeperiods>`
 definitions in a way that can facilitate most on-call notification
 rotations. These definitions won't handle human issues that will
 inevitably crop up (admins calling in sick, swapping shifts, or throwing
@@ -267,7 +269,7 @@ Other Scenarios
 
 There are a lot of other on-call notification rotation scenarios that
 you might have. The date exception directive in
-:ref:`timeperiod definitions <basics_object_definitions#object_definitionsobjecttypestimeperioddefinition>`
+:ref:`timeperiod definitions <obj_def_timeperiod>`
 is capable of handling most dates and date ranges that you might need to
 use, so check out the different formats that you can use. If you make a
 mistake when creating timeperiod definitions, always err on the side of

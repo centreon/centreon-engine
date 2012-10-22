@@ -1,3 +1,5 @@
+.. _status_and_reachability_network:
+
 Determining Status and Reachability of Network Hosts
 ****************************************************
 
@@ -50,7 +52,7 @@ Centreon Engine:
 Now that you know what the parent/child relationships look like for
 hosts that are being monitored, how do you configure Centreon Engine to
 reflect them? The parents directive in your
-:ref:`host definitions <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+:ref:`host definitions <obj_def_host>`
 allows you to do this. Here's what the (abbreviated) host definitions
 with parent/child relationships would look like for this example::
 
@@ -143,8 +145,8 @@ is down, you know that everything behind it is unreachable.
 If you want to spare yourself from a flood of UNREACHABLE notifications
 during network outages, you can exclude the unreachable (u) option from
 the notification_options directive in your
-:ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+:ref:`host <obj_def_host>`
 definitions and/or the host_notification_options directive in your
-:ref:`contact <basics_object_definitions#object_definitionsobjecttypescontactdefinition>`
+:ref:`contact <obj_def_contact>`
 definitions.
 

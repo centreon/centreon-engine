@@ -1,3 +1,5 @@
+.. _volatile_services:
+
 Volatile Services
 *****************
 
@@ -26,12 +28,12 @@ What's So Special About Volatile Services?
 
 Volatile services differ from "normal" services in three important
 ways. Each time they are checked when they are in a
-:ref:`hard <basics_state_types>` non-OK state, and the check returns a
+:ref:`hard <state_types>` non-OK state, and the check returns a
 non-OK state (i.e. no state change has occurred)...
 
   * The non-OK service state is logged
   * Contacts are notified about the problem (if that's
-    :ref:`what should be done <basics_notifications>`).
+    :ref:`what should be done <notifications>`).
     .. note::
 
        Notification intervals are ignored for volatile services.
@@ -53,7 +55,7 @@ The Power Of Two
 ================
 
 If you combine the features of volatile services and
-:ref:`passive service checks <basics_passive_checks>`,
+:ref:`passive service checks <passive_checks>`,
 you can do some very useful things. Examples of this include handling
 SNMP traps, security alerts, etc.
 
@@ -69,7 +71,7 @@ Centreon Engine Configuration:
     the host that PortSentry is running on.
   * Set the max_check_attempts directive in the service definition
     to 1. This will tell Centreon Engine to immediate force the service
-    into a :ref:`hard state <basics_state_types>` when a non-OK state is
+    into a :ref:`hard state <state_types>` when a non-OK state is
     reported.
   * Set the active_checks_enabled directive in the service definition
     to 0. This prevents Centreon Engine from actively checking the

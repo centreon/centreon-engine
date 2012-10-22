@@ -1,3 +1,5 @@
+.. _object_inheritance:
+
 Object Inheritance
 ******************
 
@@ -5,7 +7,7 @@ Introduction
 ============
 
 This documentation attempts to explain object inheritance and how it can
-be used in your :ref:`object definitions <object_definitions>`.
+be used in your :ref:`object definitions <obj_def>`.
 
 If you are confused about how recursion and inheritance work after
 reading this, take a look at the sample object config files provided in
@@ -97,7 +99,7 @@ fairly easy concept to understand.
 
    If you would like local string variables to be appended to inherited
    string values, you can do so. Read more about how to accomplish this
-   :ref:`below <basics_object_inheritance#object_inheritanceadditiveinheritanceofstringvalues>`.
+   :ref:`below <object_inheritance_additive_inheritance_string_values>`.
 
 Inheritance Chaining
 ====================
@@ -226,7 +228,7 @@ Custom Object
 
 Variables
 
-Any :ref:`custom object variables <advanced_custom_object_variables>`
+Any :ref:`custom object variables <custom_object_variables>`
 that you define in your host, service, or contact definition templates
 will be inherited just like other standard variables. Take the following
 example::
@@ -286,6 +288,8 @@ resulting effective definition of bighost1 is the following::
     host_name bighost1
     address   192.168.1.3
   }
+
+.. _object_inheritance_additive_inheritance_string_values:
 
 Additive Inheritance of String Values
 =====================================
@@ -377,7 +381,7 @@ Here's an example::
     ...
   }
 
-This is a much simpler equivalent to:
+This is a much simpler equivalent to::
 
   define hostescalation{
     host_name      linux-server
@@ -403,7 +407,7 @@ this important flag allows the custom check_command to be written, but a
 general distributed template can be used to overrule the check_command
 when used on a central Centreon Engine server.
 
-For instance:
+For instance::
 
   # On master
   define service{

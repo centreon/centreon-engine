@@ -1,3 +1,5 @@
+.. _host_checks:
+
 Host Checks
 ***********
 
@@ -13,13 +15,13 @@ Hosts are checked by the Centreon Engine daemon:
 
   * At regular intervals, as defined by the check_interval and
     retry_interval options in your
-    :ref:`host definitions <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`.
+    :ref:`host definitions <obj_def_host>`.
   * On-demand when a service associated with the host changes state.
   * On-demand as needed as part of the
-    :ref:`host reachability <advanced_determining_status_and_reachability_of_network_hosts>`
+    :ref:`host reachability <status_and_reachability_network>`
     logic.
   * On-demand as needed for
-    :ref:`predictive <advanced_host_and_service_dependencies>`
+    :ref:`predictive <host_and_service_dependencies>`
     host dependency checks".
 
 Regularly scheduled host checks are optional. If you set the
@@ -37,14 +39,14 @@ from a CRITICAL to an OK state, it may indicate that the host just
 recovered from a reboot and is now back up and running.
 
 On-demand checks of hosts are also made as part of the
-:ref:`host reachability <advanced_determining_status_and_reachability_of_network_hosts>`
+:ref:`host reachability <status_and_reachability_network>`
 logic. Centreon Engine is designed to detect network outages as quickly
 as possible, and distinguish between DOWN and UNREACHABLE host
 states. These are very different states and can help an admin quickly
 locate the cause of a network outage.
 
 On-demand checks are also performed as part of the
-:ref:`predictive host dependency check <advanced_host_and_service_dependencies>`
+:ref:`predictive host dependency check <host_and_service_dependencies>`
 logic. These checks help ensure that the dependency logic is as accurate
 as possible.
 
@@ -55,17 +57,15 @@ The performance of on-demand host checks can be significantly improved
 by implementing the use of cached checks, which allow Centreon Engine to
 forgo executing a host check if it determines a relatively recent check
 result will do instead. More information on cached checks can be found
-:ref:`here <advanced_cached_checks>`.
+:ref:`here <cached_checks>`.
 
 Dependencies and Checks
 =======================
 
-You can define
-:ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdependencydefinition>`
-execution dependencies" that prevent Centreon Engine from checking the
-status of a host depending on the state of one or more other hosts. More
-information on dependencies can be found
-:ref:`here <[advanced_host_and_service_dependencies>`.
+You can define :ref:`host <obj_def_host_dependency>` execution
+dependencies" that prevent Centreon Engine from checking the status of a
+host depending on the state of one or more other hosts. More information
+on dependencies can be found :ref:`here <host_and_service_dependencies>`.
 
 Parallelization of
 ==================
@@ -90,9 +90,9 @@ host check.
 When Centreon Engine processes the results of scheduled and on-demand
 host checks, it may initiate (secondary) checks of other hosts. These
 checks can be initated for two reasons: :ref:`predictive dependency
-checks <[advanced_host_and_service_dependencies>` and to determining the
+checks <host_and_service_dependencies>` and to determining the
 status of the host using the
-:ref:`network reachability <advanced_determining_status_and_reachability_of_network_hosts>`
+:ref:`network reachability <status_and_reachability_network>`
 logic. The secondary checks that are initiated are usually run in
 parallel. However, there is one big exception that you should be aware
 of, as it can have negative effect on performance...
@@ -102,7 +102,7 @@ of, as it can have negative effect on performance...
    Hosts which have their max_check_attempts value set to 1 can cause
    serious performance problems. The reason? If Centreon Engine needs to
    determine their true state using the
-   :ref:`network reachability <advanced_determining_status_and_reachability_of_network_hosts>`
+   :ref:`network reachability <status_and_reachability_network>`
    logic (to see if they're DOWN or UNREACHABLE), it will have to launch
    serial checks of all of the host's immediate parents. Just to
    reiterate, those checks are run serially, rather than in parallel, so
@@ -122,7 +122,7 @@ Hosts that are checked can be in one of three different states:
 Host State Determination
 ========================
 
-Host checks are performed by :ref:`plugins <get_started/plugins>`, which
+Host checks are performed by :ref:`plugins <exploit_plugins>`, which
 can return a state of OK, WARNING, UNKNOWN, or CRITICAL. How does
 Centreon Engine translate these plugin return codes into host states of
 UP, DOWN, or UNREACHABLE? Lets see...
@@ -144,7 +144,7 @@ CRITICAL      DOWN
 
    WARNING results usually means the host is UP. However, WARNING
    results are interpreted to mean the host is DOWN if the
-   :ref:`use_aggressive_host_checking <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesaggressivehostcheckingoption>`
+   :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
    option is enabled.
 
 If the preliminary host state is DOWN, Centreon Engine will attempt to
@@ -164,7 +164,7 @@ DOWN                   All parents are either DOWN or UNREACHABLE UNREACHABLE
 
 More information on how Centreon Engine distinguishes between DOWN and
 UNREACHABLE states can be found
-:ref:`here <advanced_determining_status_and_reachability_of_network_hosts>`.
+:ref:`here <status_and_reachability_network>`.
 
 Host State Changes
 ==================
@@ -175,7 +175,7 @@ rebooted. When Centreon Engine checks the status of hosts, it will be
 able to detect when a host changes between UP, DOWN, and UNREACHABLE
 states and take appropriate action. These state changes result in
 different :ref:`state types <state_types>` (HARD or SOFT), which can
-trigger :ref:`event handlers <advanced_event_handlers>` to be run and
+trigger :ref:`event handlers <event_handlers>` to be run and
 :ref:`notifications <notifications>` to be sent out. Detecting and
 dealing with state changes is what Centreon Engine is all about.
 
@@ -186,4 +186,4 @@ always a fun scenario to have to deal with. Centreon Engine can detect
 when hosts start flapping, and can suppress notifications until flapping
 stops and the host's state stabilizes. More information on the flap
 detection logic can be found
-:ref:`here <advanced_detection_and_handling_of_state_flapping>`.
+:ref:`here <flapping_detection>`.

@@ -1,3 +1,5 @@
+.. _scheduling_service_and_host:
+
 Service and Host Check Scheduling
 *********************************
 
@@ -14,7 +16,7 @@ Configuration Options
 
 Before we begin, there are several configuration options that affect how
 service checks are scheduled, executed, and processed. For starters, each
-:ref:`service definition <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`service definition <obj_def_service>`
 contains three options that determine when and how each specific service
 check is scheduled and executed. Those three options are:
 
@@ -23,13 +25,13 @@ check is scheduled and executed. Those three options are:
   * check_period
 
 There are also four configuration options in the
-:ref:`main configuration file <main_configuration_file_options>`
+:ref:`main configuration file <main_cfg_opt>`
 that affect service checks. These include:
 
-  * :ref:`service_inter_check_delay_method <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceintercheckdelaymethod>`
-  * :ref:`service_interleave_factor <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceinterleavefactor>`
-  * :ref:`max_concurrent_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesmaximumconcurrentservice_checks>`
-  * :ref:`check_result_reaper_frequency <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablescheckresultreaperfrequency>`
+  * :ref:`service_inter_check_delay_method <main_cfg_opt_service_inter_check_delay_method>`
+  * :ref:`service_interleave_factor <main_cfg_opt_service_interleave_factor>`
+  * :ref:`max_concurrent_checks <main_cfg_opt_maximum_concurrent_service_checks>`
+  * :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
 
 .. note::
 
@@ -80,7 +82,7 @@ As mentioned before, Centreon Engine attempts to equalize the load
 placed on the machine that is running Centreon Engine by equally spacing
 out initial service checks. The spacing between consecutive service
 checks is called the inter-check delay. By giving a value to the
-:ref:`service_inter_check_delay_method <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceintercheckdelaymethod>`
+:ref:`service_inter_check_delay_method <main_cfg_opt_service_inter_check_delay_method>`
 variable in the main config file, you can modify how this delay is
 calculated. We will discuss how the "smart" calculation works, as this
 is the setting you will want to use for normal operation.
@@ -119,7 +121,7 @@ there were a lot of open connections on the same port. Plus, attempting
 to equalize the load on hosts is just a nice thing to do ...
 
 By giving a value to the
-:ref:`service_interleave_factor <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceinterleavefactor>`
+:ref:`service_interleave_factor <main_cfg_opt_service_interleave_factor>`
 variable in the main config file, you can modify how the interleave
 factor is calculated. We will discuss how the "smart" calculation works,
 as this will probably be the setting you will want to use for normal
@@ -171,7 +173,7 @@ In order to prevent Centreon Engine from consuming all of your CPU
 resources, you can restrict the maximum number of concurrent service
 checks that can be running at any given time. This is controlled by
 using the
-:ref:`max_concurrent_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesmaximumconcurrentservice_checks>`
+:ref:`max_concurrent_checks <main_cfg_opt_maximum_concurrent_service_checks>`
 option in the main config file.
 
 The good thing about this setting is that you can regulate Centreo
@@ -339,7 +341,7 @@ explain how things are done.
 
 First off, the **X<sub>n</sub>** events are check result reaper events
 that are scheduled at a frequency specified by the
-:ref:`check_result_reaper_frequency <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablescheckresultreaperfrequency>`
+:ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
 option in the main config file. Check result reaper events do the work
 of gathering and processing service check results. They serve as the
 core logic for Centreon Engine, kicking off host checks, event handlers

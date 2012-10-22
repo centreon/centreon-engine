@@ -1,3 +1,5 @@
+.. _tcp_wrapper_integration:
+
 TCP Wrapper Integration
 ***********************
 
@@ -17,7 +19,7 @@ network.
 These directions assume:
 
   * You are already familiar with
-    :ref:`passive checks <basics_passive_checks>`
+    :ref:`passive checks <passive_checks>`
     and how they work.
   * You are already familiar with
     :ref:`volatile services <volatile_services>`
@@ -27,7 +29,7 @@ These directions assume:
     example). If you want to generate alerts on the same host that
     Centreon Engine is running you will need to make a few modifications
     to the examples I provide.
-  * You have installed the :ref:`NSCA daemon <basics_addons#addonsnsca>`
+  * You have installed the :ref:`NSCA daemon <addons_nsca>`
     on your monitoring server and the NSCA client (send_nsca) on the
     remote machine that you are generating TCP wrapper alerts from.
 
@@ -35,11 +37,11 @@ Defining A Service
 ==================
 
 If you haven't done so already, create a
-:ref:`host definition <basics_object_definitions>`
+:ref:`host definition <obj_def>`
 for the remote host (firestorm).
 
 Next, define a service in one of your
-:ref:`object configuration files <basics_object_configuration_overview>`
+:ref:`object configuration files <object_configuration_overview>`
 for the TCP wrapper alerts on host firestorm. The service definition
 might look something like this::
 

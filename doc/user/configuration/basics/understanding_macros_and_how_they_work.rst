@@ -1,3 +1,5 @@
+.. _understanding_macros:
+
 Understanding Macros and How They Work
 **************************************
 
@@ -68,11 +70,10 @@ so::
   }
 
 In the example above, the service check command has two arguments (which
-can be referenced with
-:ref:`$ARGn$ <basics_standard_macros#standard_macrosmacroavailabilitychartarg>`
-macros). The $ARG1$ macro will be "200.0,80%" and $ARG2$ will be
-"400.0,40%" (both without quotes). Assuming we are using the host
-definition given earlier and a check_ping command defined like this::
+can be referenced with `ARGn` macros). The $ARG1$ macro will be
+"200.0,80%" and $ARG2$ will be "400.0,40%" (both without
+quotes). Assuming we are using the host definition given earlier and a
+check_ping command defined like this::
 
   define command{
     command_name check_ping
@@ -169,7 +170,7 @@ This macro definition will return something that looks like this::
 Custom Variable Macros
 ======================
 
-Any :ref:`custom object variables <advanced_custom_object_variables>`
+Any :ref:`custom object variables <custom_object_variables>`
 that you define in host, service, or contact definitions are also
 available as macros. Custom variable macros are named as follows:
 
@@ -190,7 +191,7 @@ Take the following host definition with a custom variable called
 The _MACADDRESS custom variable would be available in a macro called
 $_HOSTMACADDRESS$. More information on custom object variables and how
 they can be used in macros can be found
-:ref:`here <advanced_custom_object_variables>`.
+:ref:`here <custom_object_variables>`.
 
 Macro Cleansing
 ===============
@@ -198,23 +199,23 @@ Macro Cleansing
 Some macros are stripped of potentially dangerous shell metacharacters
 before being substituted into commands to be executed. Which characters
 are stripped from the macros depends on the setting of the
-:ref:`illegal_macro_output_chars <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesillegalmacrooutputcharacters>`
+:ref:`illegal_macro_output_chars <main_cfg_opt_illegal_macro_output_characters>`
 directive. The following macros are stripped of potentially dangerous
 characters:
 
-  * :ref:`$HOSTOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostoutput>`
-  * :ref:`$LONGHOSTOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartlonghostoutput>`
-  * :ref:`$HOSTPERFDATA$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostperfdata>`
-  * :ref:`$HOSTACKAUTHOR$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostackauthor>`
-  * :ref:`$HOSTACKCOMMENT$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostcheckcommand>`
-  * :ref:`$SERVICEOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceoutput>`
-  * :ref:`$LONGSERVICEOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartlongserviceoutput>`
-  * :ref:`$SERVICEPERFDATA$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceperfdata>`
-  * :ref:`$SERVICEACKAUTHOR$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceackauthor>`
-  * :ref:`$SERVICEACKCOMMENT$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceackcomment>`
+  * `HOSTOUTPUT`_
+  * `LONGHOSTOUTPUT`_
+  * `HOSTPERFDATA`_
+  * `HOSTACKAUTHOR`_
+  * `HOSTACKCOMMENT`_
+  * `SERVICEOUTPUT`_
+  * `LONGSERVICEOUTPUT`_
+  * `SERVICEPERFDATA`_
+  * `SERVICEACKAUTHOR`_
+  * `SERVICEACKCOMMENT`_
 
 Additionally, any macros that contain
-:ref:`custom variables <advanced_custom_object_variables>`
+:ref:`custom variables <custom_object_variables>`
 are stripped for safety and security.
 
 Macros as Environment Variables
@@ -222,15 +223,12 @@ Macros as Environment Variables
 
 Most macros are made available as environment variables for easy
 reference by scripts or commands that are executed by Centreon
-Engine. For purposes of security and sanity,
-:ref:`$USERn$ <basics_standard_macros#standard_macrosmacroavailabilitychartuser>`
-and "on-demand" host and service macros are not made available as
-environment variables.
+Engine. For purposes of security and sanity, `USERn`_ and "on-demand"
+host and service macros are not made available as environment variables.
 
 Environment variables that contain standard macros are named the same as
 their corresponding macro names (listed :ref:`here <standard_macros>`),
-with "NAGIOS_" prepended to their names. For example, the
-:ref:`$HOSTNAME$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostname>`
+with "NAGIOS_" prepended to their names. For example, the `HOSTNAME`
 macro would be available as an environment variable named
 "NAGIOS_HOSTNAME".
 

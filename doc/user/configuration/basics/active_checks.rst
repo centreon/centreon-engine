@@ -1,3 +1,5 @@
+.. _active_checks:
+
 Active Checks
 *************
 
@@ -28,7 +30,7 @@ check and take appropriate action as necessary (e.g. send notifications,
 run event handlers, etc).
 
 More information on how plugins work can be found
-:ref:`here <get_started/plugins>`.
+:ref:`here <exploit_plugins>`.
 
 
 
@@ -43,7 +45,7 @@ Active check are executed:
 
 Regularly scheduled checks occur at intervals equaling either the
 check_interval or the retry_interval in your host or service
-definitions, depending on what :ref:`type of state <basics_state_types>`
+definitions, depending on what :ref:`type of state <state_types>`
 the host or service is in. If a host or service is in a HARD state, it
 will be actively checked at intervals equal to the check_interval
 option. If it is in a SOFT state, it will be checked at intervals equal
@@ -52,11 +54,11 @@ to the retry_interval option.
 On-demand checks are performed whenever Centreon Engine sees a need to
 obtain the latest status information about a particular host or
 service. For example, when Centreon Engine is determining the
-:ref:`reachability <advanced_determining_status_and_reachability_of_network_hosts>`
+:ref:`reachability <status_and_reachability_network>`
 of a host, it will often perform on-demand checks of parent and child
 hosts to accurately determine the status of a particular network
 segment. On-demand checks also occur in the
-:ref:`predictive dependency check <advanced_predictive_dependency_checks>`
+:ref:`predictive dependency check <predictive_dependency_checks>`
 logic in order to ensure Centreon Engine has the most accurate status
 information.
 

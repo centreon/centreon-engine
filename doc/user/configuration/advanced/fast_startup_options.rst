@@ -1,3 +1,5 @@
+.. _fast_startup_options:
+
 Fast Startup Options
 ********************
 
@@ -128,7 +130,7 @@ future use.
 When you run Centreon Engine with the -p command line option, Centreon
 Engine will read your config files in, process them, and save them to a
 pre-cached object config file (specified by the
-:ref:`precached_object_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesprecachedobjectfile>`
+:ref:`precached_object_file <main_cfg_opt_precached_object_file>`
 directive). This pre-cached config file will contain pre-processed
 configuration entries that are easier/faster for Centreon Engine to
 process in the future.

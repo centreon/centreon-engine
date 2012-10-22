@@ -1,3 +1,5 @@
+.. _passive_host_state_translation:
+
 Passive Host State Translation
 ******************************
 
@@ -63,7 +65,7 @@ DOWN/UNREACHABLE states from passive check results. You will need to
 enable this feature if you need and want it.
 
 The automatic translation of passive host check states is controlled by
-the :ref:`translate_passive_host_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestranslatepassivehost_checksoption>`
+the :ref:`translate_passive_host_checks <main_cfg_opt_translate_passive_host_checks>`
 variable. Enable it and Centreon Engine will automatically translate
 DOWN and UNREACHABLE states from remote sources to their correct state
 for the local instance of Centreon Engine.

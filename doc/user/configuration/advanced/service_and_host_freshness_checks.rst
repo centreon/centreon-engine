@@ -1,3 +1,5 @@
+.. _freshness_checks:
+
 Service and Host Freshness Checks
 *********************************
 
@@ -10,10 +12,10 @@ to ensure that host and service checks are being provided passively by
 external applications on a regular basis.
 
 Freshness checking is useful when you want to ensure that
-:ref:`passive checks <basics_passive_checks>` are being received as
+:ref:`passive checks <passive_checks>` are being received as
 frequently as you want. This can be very useful in
 :ref:`distributed <distributed_monitoring>` and
-:ref:`failover <redundant_and_failover_network_monitoring>`
+:ref:`failover <redundant_and_failover_monitoring>`
 monitoring environments.
 
 .. image:: freshness.png
@@ -30,7 +32,7 @@ hosts services that have freshness checking enabled.
   * If the age of the last check result is greater than the freshness
     threshold, the check result is considered "stale".
   * If the check results is found to be stale, Centreon Engine will
-    force an :ref:`active check <basics_active_checks>` of the host or
+    force an :ref:`active check <active_checks>` of the host or
     service by executing the command specified by in the host or service
     definition.
 
@@ -49,11 +51,11 @@ Enabling Freshness Checking
 Here's what you need to do to enable freshness checking...
 
   * Enable freshness checking on a program-wide basis with the
-    :ref:`check_service_freshness <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicefreshnesscheckingoption>`
-    and :ref:`check_host_freshness <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostfreshnesscheckingoption>`
+    :ref:`check_service_freshness <main_cfg_opt_service_freshness_checking>`
+    and :ref:`check_host_freshness <main_cfg_opt_host_freshness_checking>`
     directives.
-  * Use :ref:`service_freshness_check_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicefreshnesscheckinterval>`
-    and :ref:`host_freshness_check_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostfreshnesscheckinterval>`
+  * Use :ref:`service_freshness_check_interval <main_cfg_opt_service_freshness_check_interval>`
+    and :ref:`host_freshness_check_interval <main_cfg_opt_host_freshness_check_interval>`
     options to tell Centreon Engine how often in should check the
     freshness of service and host results.
   * Enable freshness checking on a host- and service-specific basis by

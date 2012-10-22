@@ -13,15 +13,15 @@ Services are checked by the Centreon Engine daemon:
 
   * At regular intervals, as defined by the check_interval and
     retry_interval options in your
-    :ref:`service definitions <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`.
+    :ref:`service definitions <obj_def_service>`.
   * On-demand as needed for
-    :ref:`predictive service dependency checks <advanced_host_and_service_dependencies>`.
+    :ref:`predictive service dependency checks <host_and_service_dependencies>`.
 
 On-demand checks are performed as part of the
-:ref:`predictive service dependency check <advanced_host_and_service_dependencies>`
+:ref:`predictive service dependency check <host_and_service_dependencies>`
 logic. These checks help ensure that the dependency logic is as accurate
 as possible. If you don't make use of
-:ref:`service dependencies <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`,
+:ref:`service dependencies <obj_def_service_dependency>`,
 Centreon Engine won't perform any on-demand service checks.
 
 Cached Service Checks
@@ -32,19 +32,19 @@ improved by implementing the use of cached checks, which allow Centreon
 Engine to forgo executing a service check if it determines a relatively
 recent check result will do instead. Cached checks will only provide a
 performance increase if you are making use of
-:ref:`service dependencies <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`.
+:ref:`service dependencies <obj_def_service_dependency>`.
 More information on cached checks can be found
-:ref:`here <advanced_cached_checks>`.
+:ref:`here <cached_checks>`.
 
 Dependencies and Checks
 =======================
 
 You can define
-:ref:`service execution dependencies <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`
+:ref:`service execution dependencies <obj_def_service_dependency>`
 that prevent Centreon Engine from checking the status of a service
 depending on the state of one or more other services. More information
 on dependencies can be found
-:ref:`here <advanced_host_and_service_dependencies>`.
+:ref:`here <host_and_service_dependencies>`.
 
 Parallelization of Service Checks
 =================================
@@ -77,7 +77,7 @@ Services that are checked can be in one of four different states:
 Service State Determination
 ===========================
 
-Service checks are performed by :ref:`plugins <get_started/plugins>`,
+Service checks are performed by :ref:`plugins <exploit_plugins>`,
 which can return a state of OK, WARNING, UNKNOWN, or CRITICAL. These
 plugin states directly translate to service states. For example, a
 plugin which returns a WARNING state will cause a service to have a
@@ -90,7 +90,7 @@ When Centreon Engine checks the status of services, it will be able to
 detect when a service changes between OK, WARNING, UNKNOWN, and CRITICAL
 states and take appropriate action. These state changes result in
 different :ref:`state types <state_types>` (HARD or SOFT), which can
-trigger :ref:`event handlers <advanced_event_handlers>` to be run and
+trigger :ref:`event handlers <event_handlers>` to be run and
 :ref:`notifications <notifications>` to be sent out. Service state
 changes can also trigger on-demand :ref:`host checks <host_checks>`.
 Detecting and dealing with state changes is what Centreon Engine is all
@@ -100,4 +100,4 @@ When services change state too frequently they are considered to be
 "flapping". Centreon Engine can detect when services start flapping, and
 can suppress notifications until flapping stops and the service's state
 stabilizes. More information on the flap detection logic can be found
-:ref:`here <advanced_detection_and_handling_of_state_flapping>`.
+:ref:`here <flapping_detection>`.

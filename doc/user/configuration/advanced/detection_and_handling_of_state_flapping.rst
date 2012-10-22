@@ -1,3 +1,5 @@
+.. _flapping_detection:
+
 Detection and Handling of State Flapping
 ****************************************
 
@@ -182,7 +184,7 @@ will:
   * Send a "flapping start" notification for the host or service to
     appropriate contacts.
   * Suppress other notifications for the service or host (this is one of
-    the filters in the :ref:`notification logic <basics_notifications>`).
+    the filters in the :ref:`notification logic <notifications>`).
 
 When a service or host stops flapping, Centreon Engine will:
 
@@ -194,7 +196,7 @@ When a service or host stops flapping, Centreon Engine will:
     appropriate contacts.
   * Remove the block on notifications for the service or host
     (notifications will still be bound to the normal
-    :ref:`notification logic <basics_notifications>`).
+    :ref:`notification logic <notifications>`).
 
 Enabling Flap Detection
 =======================
@@ -202,13 +204,13 @@ Enabling Flap Detection
 In order to enable the flap detection features in Centreon Engine,
 you'll need to:
 
-  * Set :ref:`enable_flap_detection <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesflapdetectionoption>`
+  * Set :ref:`enable_flap_detection <main_cfg_opt_flap_detection>`
     directive is set to 1.
   * Set the flap_detection_enabled directive in your host and service
     definitions is set to 1.
 
 If you want to disable flap detection on a global basis, set the
-:ref:`enable_flap_detection <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesflapdetectionoption>`
+:ref:`enable_flap_detection <main_cfg_opt_flap_detection>`
 directive to 0.
 
 If you would like to disable flap detection for just a few hosts or

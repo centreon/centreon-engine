@@ -26,10 +26,10 @@ were used by the program itself to drop privileges when the process was
 started. Centreon Engine delegates this feature to the system
 administrator. However he is not left alone, as Centreon Engine provide
 some startup scripts for various platforms (please refer to
-:ref:`Running Centreon Engine <get_started/running#runningstartstop>`
+:ref:`Running Centreon Engine <running_start_stop>`
 section for more information). User and group used by the init script
 can be configured when compiling Centreon Engine as explained in the
-:ref:`Compiling Centreon Engine <documentation/setup/sources/build>`
+:ref:`Compiling Centreon Engine <user_installation_using_sources_build>`
 section.
 
 Daemonization

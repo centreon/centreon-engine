@@ -250,6 +250,8 @@ See the Centreon Clib `documentation <FIXME>`_.
     $ wget http://download.centreon.com/RPMs/opensuse/i386/gsoap-devel-2.8.4-1.1.i586.rpm
     $ rpm -Uvh libgsoap-2.8.4-1.1.i586.rpm libgsoap-devel-2.8.4-1.1.i586.rpm gsoap-devel-2.8.4-1.1.i586.rpm
 
+.. _user_installation_using_sources_build:
+
 Build
 =====
 

@@ -1,3 +1,5 @@
+.. _host_and_service_dependencies:
+
 Host and Service Dependencies
 *****************************
 
@@ -24,14 +26,14 @@ There are a few things you should know about service dependencies:
     and service notifications to be suppressed under different
     circumstances (OK, WARNING, UNKNOWN, and/or CRITICAL states)
   * Service dependencies might only be valid during specific
-    :ref:`timeperiods <basics_timeperiods>`
+    :ref:`timeperiods <timeperiods>`
 
 Defining Service Dependencies
 =============================
 
 First, the basics. You create service dependencies by adding
-:ref:`service dependency <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`
-definitions" in your :ref:`object config file(s) <basics_object_configuration_overview>`.
+:ref:`service dependency <obj_def_service_dependency>`
+definitions" in your :ref:`object config file(s) <object_configuration_overview>`.
 In each definition you specify the dependent service, the service you
 are depending on, and the criteria (if any) that cause the execution and
 notification dependencies to fail (these are described later).
@@ -140,19 +142,19 @@ been checked or until one dependency check fails.
 .. note::
 
    One important thing to note is that by default, Centreon Engine will
-   use the most current :ref:`hard state <basics_state_types>` of the
+   use the most current :ref:`hard state <state_types>` of the
    service(s) that is/are being depended upon when it does the dependeny
    checks. If you want Centreon Engine to use the most current state of
    the services (regardless of whether its a soft or hard state), enable
-   the :ref:`soft_state_dependencies <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablessoftstatedependenciesoption>`
+   the :ref:`soft_state_dependencies <main_cfg_opt_soft_state_dependencies>`
    option.
 
 Execution Dependencies
 ======================
 
 Execution dependencies are used to restrict when
-:ref:`active checks <basics_active_checks>` of a service can be
-performed. :ref:`Passive checks <basics_passive_checks>` are not
+:ref:`active checks <active_checks>` of a service can be
+performed. :ref:`Passive checks <passive_checks>` are not
 restricted by execution dependencies.
 
 If all of the execution dependency tests for the service passed,
@@ -163,7 +165,7 @@ for that (dependent) service. At some point in the future the execution
 dependency tests for the service may all pass. If this happens, Centreon
 Engine will start checking the service again as it normally would. More
 information on the check scheduling logic can be found
-:ref:`here <basics_service_and_host_check_scheduling>`.
+:ref:`here <scheduling_service_and_host>`.
 
 In the example above, Service E would have failed execution dependencies
 if Service B is in a WARNING or UNKNOWN state. If this was the case, the
@@ -181,7 +183,7 @@ for that (dependent) service. At some point in the future the
 notification dependency tests for the service may all pass. If this
 happens, Centreon Engine will start sending out notifications again as
 it normally would for the service. More information on the notification
-logic can be found :ref:`here <basics_notifications>`.
+logic can be found :ref:`here <notifications>`.
 
 In the example above, Service F would have failed notification
 dependencies if Service C is in a CRITICAL state, and/or Service D is in
@@ -202,7 +204,7 @@ F is not dependent on Service B.
 
 If you do wish to make service dependencies inheritable, you must use
 the inherits_parent directive in the
-:ref:`service dependency <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`
+:ref:`service dependency <obj_def_service_dependency>`
 definition". When this directive is enabled, it indicates that the
 dependency inherits dependencies of the service that is being depended
 upon (also referred to as the master service). In other words, if the
@@ -248,11 +250,11 @@ services.
    Do not confuse host dependencies with parent/child host
    relationships. You should be using parent/child host relationships
    (defined with the parents directive in
-   :ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+   :ref:`host <obj_def_host>`
    definitions) for most cases, rather than host dependencies. A
    description of how parent/child host relationships work can be found
    in the documentation on
-   :ref:`network reachability <determining_status_and_reachability_of_network_hosts>`.
+   :ref:`network reachability <status_and_reachability_network>`.
 
 Here are the basics about host dependencies:
 
@@ -263,7 +265,7 @@ Here are the basics about host dependencies:
     notifications to be suppressed under different circumstances (UP,
     DOWN, and/or UNREACHABLE states)
   * Host dependencies might only be valid during specific
-    :ref:`timeperiods <basics_timeperiods>`
+    :ref:`timeperiods <timeperiods>`
 
 Example Host Dependencies
 =========================
@@ -303,4 +305,4 @@ notifications for that (dependent) host. At some point in the future the
 notification dependency tests for the host may all pass. If this
 happens, Centreon Engine will start sending out notifications again as
 it normally would for the host. More information on the notification
-logic can be found :ref:`here <basics_notifications>`.
+logic can be found :ref:`here <notifications>`.

@@ -1,3 +1,5 @@
+.. _notifications:
+
 Notifications
 *************
 
@@ -11,7 +13,7 @@ will attempt to explain exactly when and how host and service
 notifications are sent out, as well as who receives them.
 
 Notification escalations are explained
-:ref:`here <advanced_notification_escalations>`.
+:ref:`here <notification_escalations>`.
 
 When Do Notifications Occur?
 ============================
@@ -58,7 +60,7 @@ Program-Wide Filter:
 The first filter that notifications must pass is a test of whether or
 not notifications are enabled on a program-wide basis. This is initially
 determined by the
-:ref:`enable_notifications <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationsoption>`
+:ref:`enable_notifications <main_cfg_opt_notifications>`
 directive in the main config file, but may be changed during runtime
 from the web interface. If notifications are disabled on a program-wide
 basis, no host or service notifications can be sent out - period. If
@@ -70,7 +72,7 @@ Service and Host Filters
 
 The first filter for host or service notifications is a check to see if
 the host or service is in a period of
-:ref:`scheduled downtime <advanced_scheduled_downtime>`.
+:ref:`scheduled downtime <scheduled_downtime>`.
 If it is in a scheduled downtime, no one gets notified. If it isn't in a
 period of downtime, it gets passed on to the next filter. As a side
 note, notifications for services are suppressed if the host they're
@@ -78,7 +80,7 @@ associated with is in a period of scheduled downtime.
 
 The second filter for host or service notification is a check to see if
 the host or service is
-:ref:`flapping <advanced_detection_and_handling_of_state_flapping>`
+:ref:`flapping <flapping_detection>`
 (if you enabled flap detection). If the service or host is currently
 flapping, no one gets notified. Otherwise it gets passed to the next
 filter.
@@ -129,7 +131,7 @@ Contact Filters
 
 At this point the notification has passed the program mode filter and
 all host or service filters and Centreon Engine starts to notify
-:ref:`all the people it <basics_object_definitions#object_definitionsobjecttypescontactdefinition>`
+:ref:`all the people it <obj_def_contact>`
 should". Does this mean that each contact is going to receive the
 notification? No! Each contact has their own set of filters that the
 notification must pass before they receive it. Note: Contact filters are
@@ -165,14 +167,14 @@ You can have Centreon Engine notify you of problems and recoveries
 pretty much anyway you want: pager, cellphone, email, instant message,
 audio alert, electric shocker, etc. How notifications are sent depend on
 the
-:ref:`notification commands <basics_object_definitions#object_definitionsobjecttypescommanddefinition>`
+:ref:`notification commands <obj_def_command>`
 that are defined in your
-:ref:`object definition files <configuration_overview>`.
+:ref:`object definition files <object_configuration_overview>`.
 
 .. note::
 
    If you install Centreon Engine according to the
-   :ref:`quickstart guide <get_started/quickstart_installation_guide>`,
+   :ref:`quickstart guide <exploit_quickstart>`,
    it should be configured to send email notifications. You can see the
    email notification commands that are used by viewing the contents of
    the following file: /etc/centreon-engine/objects/commands.cfg.
@@ -195,11 +197,9 @@ Notification Type Macro
 =======================
 
 When crafting your notification commands, you need to take into account
-what type of notification is occurring. The
-:ref:`$NOTIFICATIONTYPE$ <basics_standard_macros#standard_macrosmacroavailabilitychartnotificationtype>`
-macro contains a string that identifies exactly that. The table below
-lists the possible values for the macro and their respective
-descriptions:
+what type of notification is occurring. The `NOTIFICATIONTYPE`_ macro
+contains a string that identifies exactly that. The table below lists
+the possible values for the macro and their respective descriptions:
 
 ================= ========================================================
 Value             Description
@@ -218,16 +218,16 @@ ACKNOWLEDGEMENT   This notification is an acknowledgement notification
                   notifications are initiated via the web interface by
                   contacts for the particular host or service.
 FLAPPINGSTART     The host or service has just started
-                  :ref:`advanced_detection_and_handling_of_state_flapping`
+                  :ref:`flapping_detection`
 FLAPPINGSTOP      The host or service has just stopped
-                  :ref:`advanced_detection_and_handling_of_state_flapping`
+                  :ref:`flapping_detection`
 FLAPPINGDISABLED  The host or service has just stopped
-                  :ref:`advanced_detection_and_handling_of_state_flapping`
+                  :ref:`flapping_detection`
 DOWNTIMESTART     The host or service has just entereda period of
-                  :ref:`advanced_scheduled_downtime`
+                  :ref:`scheduled_downtime`
 DOWNTIMESTOP      The host or service has just exited from a period of
-                  :ref:`advanced:scheduled_downtime`
-DOWNTIMECANCELLED The period of :ref:`advanced_scheduled_downtime`
+                  :ref:`scheduled_downtime`
+DOWNTIMECANCELLED The period of :ref:`scheduled_downtime`
 ================= ========================================================
 
 Helpful Resources

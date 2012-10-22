@@ -1,3 +1,5 @@
+.. _notification_escalations:
+
 Notification Escalations
 ************************
 
@@ -9,9 +11,9 @@ Introduction
 Centreon Engine supports optional escalation of contact notifications
 for hosts and services. Escalation of host and service notifications is
 accomplished by defining
-:ref:`host escalations <basics_object_definitions#object_definitionsobjecttypeshostescalationdefinition>`
-and :ref:`service escalations <basics_object_definitions#object_definitionsobjecttypesserviceescalationdefinition>`
-in your :ref:`object configuration <basics_object_configuration_overview>`
+:ref:`host escalations <obj_def_host_escalation>`
+and :ref:`service escalations <obj_def_service_escalation>`
+in your :ref:`object configuration <object_configuration_overview>`
 file(s)".
 
 .. note::
@@ -278,15 +280,15 @@ Time Period Restrictions
 Under normal circumstances, escalations can be used at any time that a
 notification could normally be sent out for the host or service. This
 "notification time window" is determined by the notification_period
-directive in the :ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
-or :ref:`service <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+directive in the :ref:`host <obj_def_host>`
+or :ref:`service <obj_def_service>`
 definition.
 
 You can optionally restrict escalations so that they are only used
 during specific time periods by using the escalation_period directive in
 the host or service escalation definition. If you use the
 escalation_period directive to specify a
-:ref:`timeperiod <basics_timeperiods>` during which the escalation can
+:ref:`timeperiod <timeperiods>` during which the escalation can
 be used, the escalation will only be used during that time. If you do
 not specify any escalation_period directive, the escalation can be used
 at any time within the "notification time window" for the host or

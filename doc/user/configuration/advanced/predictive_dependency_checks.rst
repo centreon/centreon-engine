@@ -1,3 +1,5 @@
+.. _predictive_dependency_checks:
+
 Predictive Dependency Checks
 ****************************
 
@@ -29,7 +31,7 @@ to a problem state. Centreon Engine needs to determine whether the host
 is DOWN or UNREACHABLE, so it will launch parallel checks of Switch2's
 immediate parents (Firewall1) and children (Comp1, Comp2, and
 Switch3). This is a normal function of the
-:ref:`host reachability <determining_status_and_reachability_of_network_hosts>`
+:ref:`host reachability <status_and_reachability_network>`
 logic.
 
 You will also notice that Switch2 is depending on Monitor1 and File1 for
@@ -63,10 +65,10 @@ overhead imposed by these checks.
 Enabling predictive dependency checks is easy:
 
   * Predictive host dependency checks are controlled by the
-    :ref:`enable_predictive_host_dependency_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespredictivehostdependencychecksoption>`
+    :ref:`enable_predictive_host_dependency_checks <main_cfg_opt_predictive_host_dependency_checks>`
     option.
   * Predictive service dependency checks are controlled by the
-    :ref:`enable_predictive_service_dependency_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespredictiveservicedependencychecksoption>`
+    :ref:`enable_predictive_service_dependency_checks <main_cfg_opt_predictive_service_dependency_checks>`
     option.
 
 

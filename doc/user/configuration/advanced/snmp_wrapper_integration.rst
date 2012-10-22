@@ -1,3 +1,5 @@
+.. _snmp_wrapper_integration:
+
 SNMP Wrapper Integration
 ************************
 

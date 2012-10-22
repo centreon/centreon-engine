@@ -1,3 +1,5 @@
+.. _main_cfg_opt:
+
 Main Configuration File Options
 *******************************
 
@@ -20,7 +22,7 @@ Sample Configuration File
 
    A sample main configuration file
    (/etc/centreon-engine/centengine.cfg) is installed for you when you
-   follow the :ref:`quickstart installation guide <get_started/quickstart_installation_guide>`.
+   follow the :ref:`quickstart installation guide <exploit_quickstart>`.
 
 Config File Location
 ====================
@@ -34,6 +36,8 @@ Configuration File Variables
 Below you will find descriptions of each main Centreon Engine
 configuration file option...
 
+.. _main_cfg_opt_log_file:
+
 Log File
 --------
 
@@ -44,9 +48,11 @@ This variable specifies where Centreon Engine should create its main log
 file. This should be the first variable that you define in your
 configuration file, as Centreon Engine will try to write errors that it
 finds in the rest of your configuration data to this file. If you have
-:ref:`log rotation <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableslogrotationmethod>`
+:ref:`log rotation <main_cfg_opt_log_rotation_method>`
 enabled, this file will automatically be rotated every hour, day, week,
 or month.
+
+.. _main_cfg_opt_object_configuration_file:
 
 Object Configuration File
 -------------------------
@@ -63,6 +69,8 @@ monitoring. Object configuration files contain definitions for hosts,
 host groups, contacts, contact groups, services, commands, etc. You can
 seperate your configuration information into several files and specify
 multiple cfg_file= statements to have each of them processed.
+
+.. _main_cfg_opt_object_configuration_directory:
 
 Object Configuration Directory
 ------------------------------
@@ -82,6 +90,8 @@ seperate your configuration files into different directories and specify
 multiple cfg_dir= statements to have all config files in each directory
 processed.
 
+.. _main_cfg_opt_object_cache_file:
+
 Object Cache File
 -----------------
 
@@ -93,8 +103,10 @@ This directive is used to specify a file in which a cached copy of
 should be stored. The cache file is (re)created every time Centreon
 Engine is (re)started. It is intended to speed up config file caching
 and allow you to edit the source
-:ref:`object config files <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobjectconfigurationfile>`
+:ref:`object config files <main_cfg_opt_object_configuration_file>`
 while Centreon Engine is running without affecting the output displayed.
+
+.. _main_cfg_opt_precached_object_file:
 
 Precached Object File
 ---------------------
@@ -107,7 +119,9 @@ pre-cached copy of :ref:`object definitions <object_configuration_overview>`
 should be stored. This file can be used to drastically improve startup
 times in large/complex Centreon Engine installations. Read more
 information on how to speed up start times
-:ref:`here <advanced_fast_startup_options>`.
+:ref:`here <fast_startup_options>`.
+
+.. _main_cfg_opt_resource_file:
 
 Resource File
 -------------
@@ -116,7 +130,7 @@ Format:  resource_file=<file_name>
 Example: resource_file=/etc/centreon-engine/resource.cfg
 
 This is used to specify an optional resource file that can contain
-$USERn$ :ref:`macro <understanding_macros_and_how_they_work>`
+$USERn$ :ref:`macro <understanding_macros>`
 definitions. $USERn$ macros are useful for storing usernames, passwords,
 and items commonly used in command definitions (like directory
 paths). You can include multiple resource files by adding multiple
@@ -125,12 +139,16 @@ process them all. See the sample resource.cfg file in the sample-config/
 subdirectory of the Centreon Engine distribution for an example of how
 to define $USERn$ macros.
 
+.. _main_cfg_opt_temp_file:
+
 Temp File
 ---------
 
 Format:  temp_file=<file_name>
 
 This is a deprecated and ignored variable.
+
+.. _main_cfg_opt_status_file:
 
 Status File
 -----------
@@ -150,8 +168,10 @@ Example: status_update_interval=15
 
 This setting determines how often (in seconds) that Centreon Engine will
 update status data in the
-:ref:`status file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstatusfile>`.
+:ref:`status file <main_cfg_opt_status_file>`.
 The minimum update interval is 1 second.
+
+.. _main_cfg_opt_notifications:
 
 Notifications Option
 --------------------
@@ -166,20 +186,22 @@ for any host or service.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the :ref:`use_retained_program_state
-   <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>`
+   :ref:`external command <external_commands>`
    or change it via the web interface. Values are as follows:
 
     * 0 = Disable notifications
     * 1 = Enable notifications (default)
+
+.. _main_cfg_opt_service_check_execution:
 
 Service Check Execution Option
 ------------------------------
@@ -192,29 +214,31 @@ service checks when it initially (re)starts. If this option is disabled,
 Centreon Engine will not actively execute any service checks and will
 remain in a sort of "sleep" mode (it can still accept
 :ref:`passive checks <passive_checks>` unless you've
-:ref:`disabled them <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespassiveservicecheckacceptanceoption>`).
+:ref:`disabled them <main_cfg_opt_passive_service_check_acceptance>`).
 This option is most often used when configuring backup monitoring
 servers, as described in the documentation on
-:ref:`redundancy <advanced_redundant_and_failover_network_monitoring>`,
-or when setting up a :ref:`distributed <advanced_distributed_monitoring>`
+:ref:`redundancy <redundant_and_failover_monitoring>`,
+or when setting up a :ref:`distributed <distributed_monitoring>`
 monitoring environment.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the :ref:`use_retained_program_state
-   <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>` or change it via
+   :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
     * 0 = Don't execute service checks
     * 1 = Execute service checks (default)
+
+.. _main_cfg_opt_passive_service_check_acceptance:
 
 Passive Service Check Acceptance Option
 ---------------------------------------
@@ -229,16 +253,16 @@ any passive service checks.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the :ref:`use_retained_program_state
-   <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>` or change it via
+   :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
     * 0 = Don't accept passive service checks
@@ -255,29 +279,31 @@ on-demand and regularly scheduled host checks when it initially
 (re)starts. If this option is disabled, Centreon Engine will not
 actively execute any host checks, although it can still accept
 :ref:`passive host checks <passive_checks>` unless you've
-:ref:`disabled them <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespassivehostcheckacceptanceoption>`).
+:ref:`disabled them <main_cfg_opt_passive_host_check_acceptance>`).
 This option is most often used when configuring backup monitoring
 servers, as described in the documentation on
-:ref:`redundancy <advanced_redundant_and_failover_network_monitoring>`,
-or when setting up a :ref:`distributed <advanced_distributed_monitoring>`
+:ref:`redundancy <redundant_and_failover_monitoring>`,
+or when setting up a :ref:`distributed <distributed_monitoring>`
 monitoring environment.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-    :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the
-   :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>` or change it via
+   :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
     * 0 = Don't execute host checks
     * 1 = Execute host checks (default)
+
+.. _main_cfg_opt_passive_host_check_acceptance:
 
 Passive Host Check Acceptance Option
 ------------------------------------
@@ -292,21 +318,23 @@ any passive host checks.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the
-   :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
    active (and the
-   :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>` or change it via
+   :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
     * 0 = Don't accept passive host checks
     * 1 = Accept passive host checks (default)
+
+.. _main_cfg_opt_event_handler:
 
 Event Handler Option
 --------------------
@@ -315,26 +343,28 @@ Format:  enable_event_handlers=<0/1>
 Example: enable_event_handlers=1
 
 This option determines whether or not Centreon Engine will run
-:ref:`event handlers <advanced_event_handlers>` when it initially
+:ref:`event handlers <event_handlers>` when it initially
 (re)starts. If this option is disabled, Centreon Engine will not run any
 host or service event handlers.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the
-   :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>` or change it via
+   :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
     * 0 = Disable event handlers
     * 1 = Enable event handlers (default)
+
+.. _main_cfg_opt_log_rotation_method:
 
 Log Rotation Method
 -------------------
@@ -350,6 +380,8 @@ Format:  log_archive_path=<path>
 
 This is a deprecated and ignored variable.
 
+.. _main_cfg_opt_external_command_check:
+
 External Command Check Option
 -----------------------------
 
@@ -357,12 +389,14 @@ Format:  check_external_commands=<0/1>
 Example: check_external_commands=1
 
 This option determines whether or not Centreon Engine will check the
-:ref:`command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`
+:ref:`command file <main_cfg_opt_external_command_file>`
 for commands that should be executed. More information on external
-commands can be found :ref:`here <advanced_external_commands>`.
+commands can be found :ref:`here <external_commands>`.
 
   * 0 = Don't check external commands
   * 1 = Check external commands (default)
+
+.. _main_cfg_opt_external_command_check_interval:
 
 External Command Check Interval
 -------------------------------
@@ -374,7 +408,7 @@ If you specify a number with an "s" appended to it (i.e. 30s), this is
 the number of seconds to wait between external command checks. If you
 leave off the "s", this is the number of "time units" to wait between
 external command checks. Unless you've changed the
-:ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+:ref:`interval_length <main_cfg_opt_timing_interval_length>`
 value (as defined below) from the default value of 60, this number will
 mean minutes.
 
@@ -383,9 +417,11 @@ mean minutes.
    By setting this value to -1, Centreon Engine will check for external
    commands as often as possible. Each time Centreon Engine checks for
    external commands it will read and process all commands present in
-   the :ref:`command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`
+   the :ref:`command file <main_cfg_opt_external_command_file>`
    before continuing on with its other duties. More information on
-   external commands can be found :ref:`here <advanced_external_commands>`.
+   external commands can be found :ref:`here <external_commands>`.
+
+.. _main_cfg_opt_external_command_file:
 
 External Command File
 ---------------------
@@ -398,7 +434,9 @@ to process. The external command file is implemented as a named pipe
 (FIFO), which is created when Centreon Engine starts and removed when it
 shuts down. If the file exists when Centreon Engine starts, the Centreon
 Engine process will terminate with an error message. More information on
-external commands can be found :ref:`here <advanced_external_commands>`.
+external commands can be found :ref:`here <external_commands>`.
+
+.. _main_cfg_opt_external_command_buffer_slots:
 
 External Command Buffer Slots
 -----------------------------
@@ -415,8 +453,10 @@ Example: external_command_buffer_slots=512
    deamon. Each slot can hold one external command, so this option
    essentially determines how many commands can be buffered. For
    installations where you process a large number of passive checks
-   (e.g. :ref:`distributed setups <advanced_distributed_monitoring>`),
+   (e.g. :ref:`distributed setups <distributed_monitoring>`),
    you may need to increase this number.
+
+.. _main_cfg_opt_state_retention:
 
 State Retention Option
 ----------------------
@@ -427,13 +467,15 @@ Example: retain_state_information=1
 This option determines whether or not Centreon Engine will retain state
 information for hosts and services between program restarts. If you
 enable this option, you should supply a value for the
-:ref:`state_retention_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`
+:ref:`state_retention_file <main_cfg_opt_state_retention_file>`
 variable. When enabled, Centreon Engine will save all state information
 for hosts and service before it shuts down (or restarts) and will read
 in previously saved state information when it starts up again.
 
   * 0 = Don't retain state information
   * 1 = Retain state information (default)
+
+.. _main_cfg_opt_state_retention_file:
 
 State Retention File
 --------------------
@@ -447,7 +489,7 @@ Engine is restarted it will use the information stored in this file for
 setting the initial states of services and hosts before it starts
 monitoring anything. In order to make Centreon Engine retain state
 information between program restarts, you must enable the
-:ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+:ref:`retain_state_information <main_cfg_opt_state_retention>`
 option.
 
 Automatic State Retention Update Interval
@@ -461,8 +503,10 @@ automatically save retention data during normal operation. If you set
 this value to 0, Centreon Engine will not save retention data at regular
 intervals, but it will still save retention data before shutting down or
 restarting. If you have disabled state retention (with the
-:ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+:ref:`retain_state_information <main_cfg_opt_state_retention>`
 option), this option has no effect.
+
+.. _main_cfg_opt_use_retained_program_state:
 
 Use Retained Program State Option
 ---------------------------------
@@ -474,16 +518,18 @@ This setting determines whether or not Centreon Engine will set various
 program-wide state variables based on the values saved in the retention
 file. Some of these program-wide state variables that are normally saved
 across program restarts if state retention is enabled include the
-:ref:`enable_notifications <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationsoption>`,
-:ref:`enable_flap_detection <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesflapdetectionoption>`,
-:ref:`enable_event_handlers <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandleroption>`,
-:ref:`execute_service_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicecheckexecutionoption>`,
-and :ref:`accept_passive_service_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespassiveservicecheckacceptanceoption>`
-options. If you do not have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+:ref:`enable_notifications <main_cfg_opt_notifications>`,
+:ref:`enable_flap_detection <main_cfg_opt_flap_detection>`,
+:ref:`enable_event_handlers <main_cfg_opt_event_handler>`,
+:ref:`execute_service_checks <main_cfg_opt_service_check_execution>`,
+and :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
+options. If you do not have :ref:`state retention <main_cfg_opt_state_retention>`
 enabled, this option has no effect.
 
   * 0 = Don't use retained program state
   * 1 = Use retained program state (default)
+
+.. _main_cfg_opt_use_retained_scheduling_info:
 
 Use Retained Scheduling Info Option
 -----------------------------------
@@ -563,6 +609,8 @@ notifications from being logged.
   * 0 = Don't log notifications
   * 1 = Log notifications
 
+.. _main_cfg_opt_service_check_retry_logging:
+
 Service Check Retry Logging Option
 ----------------------------------
 
@@ -575,10 +623,12 @@ non-OK state, but you have configured Centreon Engine to retry the
 service more than once before responding to the error. Services in this
 situation are considered to be in "soft" states. Logging service check
 retries is mostly useful when attempting to debug Centreon Engine or
-test out service :ref:`event handlers <advanced_event_handlers>`.
+test out service :ref:`event handlers <event_handlers>`.
 
   * 0 = Don't log service check retries
   * 1 = Log service check retries
+
+.. _main_cfg_opt_host_check_retry_logging:
 
 Host Check Retry Logging Option
 -------------------------------
@@ -589,7 +639,7 @@ Example: log_host_retries=1
 This variable determines whether or not host check retries are
 logged. Logging host check retries is mostly useful when attempting to
 debug Centreon Engine or test out host
-:ref:`event handlers <advanced_event_handlers>`.
+:ref:`event handlers <event_handlers>`.
 
   * 0 = Don't log host check retries
   * 1 = Log host check retries
@@ -601,7 +651,7 @@ Format:  log_event_handlers=<0/1>
 Example: log_event_handlers=1
 
 This variable determines whether or not service and host
-:ref:`event handlers <advanced_event_handlers>` are logged.
+:ref:`event handlers <event_handlers>` are logged.
 
 Event handlers are optional commands that can be run whenever a service
 or hosts changes state. Logging event handlers is most useful when
@@ -634,8 +684,8 @@ Format:  log_external_commands=<0/1>
 Example: log_external_commands=1
 
 This variable determines whether or not Centreon Engine will log
-:ref:`external commands <advanced_external_commands>` that it receives
-from the :ref:`external command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`.
+:ref:`external commands <external_commands>` that it receives
+from the :ref:`external command file <main_cfg_opt_external_command_file>`.
 
 .. note::
 
@@ -643,11 +693,13 @@ from the :ref:`external command file <basics_main_configuration_file_options#mai
    :ref:`passive service checks <passive_checks>`
    (which are a type of external command) get logged. To enable or
    disable logging of passive checks, use the
-   :ref:`log_passive_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespassivecheckloggingoption>`
+   :ref:`log_passive_checks <main_cfg_opt_passive_check_logging>`
    option.
 
     * 0 = Don't log external commands
     * 1 = Log external commands (default)
+
+.. _main_cfg_opt_passive_check_logging:
 
 Passive Check Logging Option
 ----------------------------
@@ -657,15 +709,17 @@ Example: log_passive_checks=1
 
 This variable determines whether or not Centreon Engine will log
 :ref:`passive host and service checks <passive_checks>` that it receives
-from the :ref:`external command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`.
+from the :ref:`external command file <main_cfg_opt_external_command_file>`.
 If you are setting up a
-:ref:`distributed monitoring environment <advanced_distributed_monitoring>`
+:ref:`distributed monitoring environment <distributed_monitoring>`
 or plan on handling a large number of passive checks on a regular basis,
 you may wish to disable this option so your log file doesn't get too
 large.
 
   * 0 = Don't log passive checks
   * 1 = Log passive checks (default)
+
+.. _main_cfg_opt_global_host_event_handler:
 
 Global Host Event Handler Option
 --------------------------------
@@ -680,9 +734,11 @@ specified in each host definition. The command argument is the short
 name of a command that you define in your
 :ref:`object configuration file <object_configuration_overview>`.
 The maximum amount of time that this command can run is controlled by
-the :ref:`event_handler_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandlertimeout>`
+the :ref:`event_handler_timeout <main_cfg_opt_event_handler_timeout>`
 option. More information on event handlers can be found
-:ref:`here <advanced_event_handlers>`.
+:ref:`here <event_handlers>`.
+
+.. _main_cfg_opt_global_service_event_handler:
 
 Global Service Event Handler Option
 -----------------------------------
@@ -697,9 +753,9 @@ specified in each service definition. The command argument is the short
 name of a command that you define in your
 :ref:`object configuration file <object_configuration_overview>`.
 The maximum amount of time that this command can run is controlled by
-the :ref:`event_handler_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandlertimeout>`
+the :ref:`event_handler_timeout <main_cfg_opt_event_handler_timeout>`
 option. More information on event handlers can be found
-:ref:`here <advanced_event_handlers>`.
+:ref:`here <event_handlers>`.
 
 Inter-Check Sleep Time
 ----------------------
@@ -714,6 +770,8 @@ queue should be executed.
 .. note::
 
    That Centreon Engine will only sleep after it "catches up" with queued service checks that have fallen behind.
+
+.. _main_cfg_opt_service_inter_check_delay_method:
 
 Service Inter-Check Delay Method
 --------------------------------
@@ -731,7 +789,7 @@ scheduled for execution at the same time. This means that you will
 generally have large CPU spikes when the services are all executed in
 parallel. More information on how to estimate how the inter-check delay
 affects service check scheduling can be found
-:ref:`here <basics_service_and_host_check_scheduling>`. Values are as
+:ref:`here <scheduling_service_and_host>`. Values are as
 follows:
 
   * n = Don't use any delay - schedule all service checks to run
@@ -750,13 +808,15 @@ Example: max_service_check_spread=30
 This option determines the maximum number of minutes from when Centreon
 Engine starts that all services (that are scheduled to be regularly
 checked) are checked. This option will automatically adjust the
-:ref:`service <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceintercheckdelaymethod>`
+:ref:`service <main_cfg_opt_service_inter_check_delay_method>`
 inter-check delay method" (if necessary) to ensure that the initial
 checks of all services occur within the timeframe you specify. In
 general, this option will not have an affect on service check scheduling
 if scheduling information is being retained using the
-:ref:`use_retained_scheduling_info <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedschedulinginfooption>`
+:ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
 option. Default value is 30 (minutes).
+
+.. _main_cfg_opt_service_interleave_factor:
 
 Service Interleave Factor
 -------------------------
@@ -773,12 +833,14 @@ the service checks (this is how versions of Centreon Engine previous to
 the interleave factor unless you have a specific reason to change
 it. You should see that the service check results are spread out as they
 begin to appear. More information on how interleaving works can be found
-:ref:`here <basics_service_and_host_check_scheduling>`.
+:ref:`here <scheduling_service_and_host>`.
 
   * x = A number greater than or equal to 1 that specifies the
     interleave factor to use. An interleave factor of 1 is equivalent to
     not interleaving the service checks.
   * s = Use a "smart" interleave factor calculation (default)
+
+.. _main_cfg_opt_maximum_concurrent_service_checks:
 
 Maximum Concurrent Service Checks
 ---------------------------------
@@ -796,7 +858,9 @@ machine that runs Centreon Engine, as it directly affects the maximum
 load that will be imposed on the system (processor utilization, memory,
 etc.). More information on how to estimate how many concurrent checks
 you should allow can be found
-:ref:`here <basics_service_and_host_check_scheduling>`.
+:ref:`here <scheduling_service_and_host>`.
+
+.. _main_cfg_opt_check_result_reaper_frequency:
 
 Check Result Reaper Frequency
 -----------------------------
@@ -808,6 +872,8 @@ This option allows you to control the frequency in seconds of check
 result "reaper" events. "Reaper" events process the results from host
 and service checks that have finished executing. These events consitute
 the core of the monitoring logic in Centreon Engine.
+
+.. _main_cfg_opt_maximum_check_result_reaper_time:
 
 Maximum Check Result Reaper Time
 --------------------------------
@@ -825,6 +891,8 @@ limit the amount of time that an individual reaper event will run before
 it hands control back over to Centreon Engine for other portions of the
 monitoring logic.
 
+.. _main_cfg_opt_host_inter_check_delay_method:
+
 Host Inter-Check Delay Method
 -----------------------------
 
@@ -840,7 +908,7 @@ eliminate CPU load spikes. Using no delay is generally not
 recommended. Using no delay will cause all host checks to be scheduled
 for execution at the same time. More information on how to estimate how
 the inter-check delay affects host check scheduling can be found
-:ref:`here <advanced_service_and_host_check_scheduling>`.Values are as
+:ref:`here <scheduling_service_and_host>`.Values are as
 follows:
 
   * n = Don't use any delay - schedule all host checks to run
@@ -859,13 +927,15 @@ Example: max_host_check_spread=30
 This option determines the maximum number of minutes from when Centreon
 Engine starts that all hosts (that are scheduled to be regularly
 checked) are checked. This option will automatically adjust the
-:ref:`host inter-check <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostintercheckdelaymethod>`
+:ref:`host inter-check <main_cfg_opt_host_inter_check_delay_method>`
 delay method" (if necessary) to ensure that the initial checks of all
 hosts occur within the timeframe you specify. In general, this option
 will not have an affect on host check scheduling if scheduling
 information is being retained using the
-:ref:`use_retained_scheduling_info <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedschedulinginfooption>`
+:ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
 option. Default value is 30 (minutes).
+
+.. _main_cfg_opt_timing_interval_length:
 
 Timing Interval Length
 ----------------------
@@ -884,6 +954,8 @@ check, how often to re-notify a contact, etc.
    value" of 1 in the object configuration file will mean 60 seconds (1
    minute). I have not really tested other values for this variable, so
    proceed at your own risk if you decide to do so!
+
+.. _main_cfg_opt_auto_rescheduling:
 
 Auto-Rescheduling Option
 ------------------------
@@ -911,7 +983,7 @@ Example: auto_rescheduling_interval=30
 
 This option determines how often (in seconds) Centreon Engine will
 attempt to automatically reschedule checks. This option only has an
-effect if the :ref:`auto_reschedule_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesautoreschedulingoption>`
+effect if the :ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
 option is enabled. Default is 30 seconds.
 
 .. note::
@@ -930,7 +1002,7 @@ This option determines the "window" of time (in seconds) that Centreon
 Engine will look at when automatically rescheduling checks. Only host
 and service checks that occur in the next X seconds (determined by this
 variable) will be rescheduled. This option only has an effect if the
-:ref:`auto_reschedule_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesautoreschedulingoption>`
+:ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
 option is enabled. Default is 180 seconds (3 minutes).
 
 .. note::
@@ -938,6 +1010,8 @@ option is enabled. Default is 180 seconds (3 minutes).
    This is an experimental feature and may be removed in future
    versions. Enabling the auto-rescheduling option can degrade
    performance - rather than increase it - if used improperly!
+
+.. _main_cfg_opt_aggressive_host_checking:
 
 Aggressive Host Checking Option
 -------------------------------
@@ -956,6 +1030,8 @@ would suggest not enabling this option.
   * 0 = Don't use aggressive host checking (default)
   * 1 = Use aggressive host checking
 
+.. _main_cfg_opt_translate_passive_host_checks:
+
 Translate Passive Host Checks Option
 ------------------------------------
 
@@ -967,10 +1043,12 @@ DOWN/UNREACHABLE passive host check results to their "correct" state
 from the viewpoint of the local Centreon Engine instance. This can be
 very useful in distributed and failover monitoring installations. More
 information on passive check state translation can be found
-:ref:`here <basics_passive_host_state_translation>`.
+:ref:`here <passive_host_state_translation>`.
 
   * 0 = Disable check translation (default)
   * 1 = Enable check translation
+
+.. _main_cfg_opt_passive_host_checks_are_soft:
 
 Passive Host Checks Are SOFT Option
 -----------------------------------
@@ -987,6 +1065,8 @@ enabling this option.
   * 0 = Passive host checks are HARD (default)
   * 1 = Passive host checks are SOFT
 
+.. _main_cfg_opt_predictive_host_dependency_checks:
+
 Predictive Host Dependency Checks Option
 ----------------------------------------
 
@@ -995,14 +1075,16 @@ Example: enable_predictive_host_dependency_checks=1
 
 This option determines whether or not Centreon Engine will execute
 predictive checks of hosts that are being depended upon (as defined in
-:ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdependencydefinition>`
+:ref:`host <obj_def_host_dependency>`
 dependencies") for a particular host when it changes state. Predictive
 checks help ensure that the dependency logic is as accurate as
 possible. More information on how predictive checks work can be found
-:ref:`here <advanced_host_and_service_dependencies>`.
+:ref:`here <host_and_service_dependencies>`.
 
   * 0 = Disable predictive checks
   * 1 = Enable predictive checks (default)
+
+.. _main_cfg_opt_predictive_service_dependency_checks:
 
 Predictive Service Dependency Checks Option
 -------------------------------------------
@@ -1012,14 +1094,16 @@ Example: enable_predictive_service_dependency_checks=1
 
 This option determines whether or not Centreon Engine will execute
 predictive checks of services that are being depended upon (as defined
-in :ref:`service dependencies <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`)
+in :ref:`service dependencies <obj_def_service_dependency>`)
 for a particular service when it changes state. Predictive checks help
 ensure that the dependency logic is as accurate as possible. More
 information on how predictive checks work can be found
-:ref:`here <advanced_host_and_service_dependencies>`.
+:ref:`here <host_and_service_dependencies>`.
 
   * 0 = Disable predictive checks
   * 1 = Enable predictive checks (default)
+
+.. _main_cfg_opt_cached_host_check_horizon:
 
 Cached Host Check Horizon
 -------------------------
@@ -1035,7 +1119,9 @@ immensely. Too high of a value for this option may result in
 (temporarily) inaccurate host states, while a low value may result in a
 performance hit for host checks. Use a value of 0 if you want to disable
 host check caching. More information on cached checks can be found
-:ref:`here <advanced_cached_checks>`.
+:ref:`here <cached_checks>`.
+
+.. _main_cfg_opt_cached_service_check_horizon:
 
 Cached Service Check Horizon
 ----------------------------
@@ -1047,11 +1133,13 @@ This option determines the maximum amount of time (in seconds) that the
 state of a previous service check is considered current. Cached service
 states (from service checks that were performed more recently than the
 time specified by this value) can improve service check performance when
-a lot of :ref:`service dependencies <basics_object_definitions#object_definitionsobjecttypesservicedependencydefinition>`
+a lot of :ref:`service dependencies <obj_def_service_dependency>`
 are used. Too high of a value for this option may result in inaccuracies
 in the service dependency logic. Use a value of 0 if you want to disable
 service check caching. More information on cached checks can be found
-:ref:`here <advanced_cached_checks>`.
+:ref:`here <cached_checks>`.
+
+.. _main_cfg_opt_large_installation_tweaks:
 
 Large Installation Tweaks Option
 --------------------------------
@@ -1062,9 +1150,7 @@ Example: use_large_installation_tweaks=0
 This option determines whether or not the Centreon Engine daemon will
 take several shortcuts to improve performance. These shortcuts result in
 the loss of a few features, but larger installations will likely see a
-lot of benefit from doing so. More information on what optimizations are
-taken when you enable this option can be found
-:ref:`here <advanced_large_installation_tweaks>`.
+lot of benefit from doing so.
 
   * 0 = Don't use tweaks (default)
   * 1 = Use tweaks
@@ -1078,7 +1164,7 @@ Example: free_child_process_memory=0
 This option determines whether or not Centreon Engine will free memory
 in child processes when they are fork()ed off from the main process. By
 default, Centreon Engine frees memory. However, if the
-:ref:`use_large_installation_tweaks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableslarge_installation_tweaksoption>`
+:ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
 option is enabled, it will not. By defining this option in your
 configuration file, you are able to override things to get the behavior
 you want.
@@ -1092,6 +1178,8 @@ Child Processes Fork Twice
 Format:  child_processes_fork_twice=<0/1>
 
 This is a deprecated and ignored variable.
+
+.. _main_cfg_opt_environment_macros:
 
 Environment Macros Option
 -------------------------
@@ -1110,6 +1198,8 @@ environment.
   * 0 = Don't make macros available as environment variables
   * 1 = Make macros available as environment variables (default)
 
+.. _main_cfg_opt_flap_detection:
+
 Flap Detection Option
 ---------------------
 
@@ -1124,25 +1214,27 @@ that a host or service is flapping, it will temporarily suppress
 notifications for that host/service until it stops flapping. Flap
 detection is very experimental at this point, so use this feature with
 caution! More information on how flap detection and handling works can
-be found :ref:`here <advanced_detection_and_handling_of_state_flapping>`.
+be found :ref:`here <flapping_detection>`.
 
 .. note::
 
-   If you have :ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+   If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`),
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
    unless you disable the
-   :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
    active (and the
-   :ref:`use_retained_program_state <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesuseretainedprogramstateoption>`
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <advanced_external_commands>` or change it via
+   :ref:`external command <external_commands>` or change it via
    the web interface.
 
     * 0 = Don't enable flap detection (default)
     * 1 = Enable flap detection
+
+.. _main_cfg_opt_low_service_flap_threshold:
 
 Low Service Flap Threshold
 --------------------------
@@ -1153,7 +1245,9 @@ Example: low_service_flap_threshold=25.0
 This option is used to set the low threshold for detection of service
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
-:ref:`this <advanced_detection_and_handling_of_state_flapping>`.
+:ref:`this <flapping_detection>`.
+
+.. _main_cfg_opt_high_service_flap_threshold:
 
 High Service Flap Threshold
 ---------------------------
@@ -1164,7 +1258,9 @@ Example: high_service_flap_threshold=50.0
 This option is used to set the high threshold for detection of service
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
-:ref:`this <advanced_detection_and_handling_of_state_flapping>`.
+:ref:`this <flapping_detection>`.
+
+.. _main_cfg_opt_low_host_flap_threshold:
 
 Low Host Flap Threshold
 -----------------------
@@ -1175,7 +1271,9 @@ Example: low_host_flap_threshold=25.0
 This option is used to set the low threshold for detection of host
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
-:ref:`this <advanced_detection_and_handling_of_state_flapping>`.
+:ref:`this <flapping_detection>`.
+
+.. _main_cfg_opt_high_host_flap_threshold:
 
 High Host Flap Threshold
 ------------------------
@@ -1186,7 +1284,9 @@ Example: high_host_flap_threshold=50.0
 This option is used to set the high threshold for detection of host
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
-:ref:`this <advanced_detection_and_handling_of_state_flapping>`.
+:ref:`this <flapping_detection>`.
+
+.. _main_cfg_opt_soft_state_dependencies:
 
 Soft State Dependencies Option
 ------------------------------
@@ -1196,7 +1296,7 @@ Example: soft_state_dependencies=0
 
 This option determines whether or not Centreon Engine will use soft
 state information when checking
-:ref:`host and service dependencies <advanced_host_and_service_dependencies>`.
+:ref:`host and service dependencies <host_and_service_dependencies>`.
 Normally Centreon Engine will only use the latest hard host or service
 state when checking dependencies. If you want it to use the latest state
 (regardless of whether its a soft or hard
@@ -1204,6 +1304,8 @@ state when checking dependencies. If you want it to use the latest state
 
   * 0 = Don't use soft state dependencies (default)
   * 1 = Use soft state dependencies
+
+.. _main_cfg_opt_service_check_timeout:
 
 Service Check Timeout
 ---------------------
@@ -1222,6 +1324,8 @@ should be set to something high (like 60 seconds or more), so that each
 service check normally finishes executing within this time limit. If a
 service check runs longer than this limit, Centreon Engine will kill it
 off thinking it is a runaway processes.
+
+.. _main_cfg_opt_host_check_timeout:
 
 Host Check Timeout
 ------------------
@@ -1242,6 +1346,8 @@ host check normally finishes executing within this time limit. If a host
 check runs longer than this limit, Centreon Engine will kill it off
 thinking it is a runaway processes.
 
+.. _main_cfg_opt_event_handler_timeout:
+
 Event Handler Timeout
 ---------------------
 
@@ -1249,7 +1355,7 @@ Format:  event_handler_timeout=<seconds>
 Example: event_handler_timeout=60
 
 This is the maximum number of seconds that Centreon Engine will allow
-:ref:`event handlers <advanced_event_handlers>` to be run. If an event
+:ref:`event handlers <event_handlers>` to be run. If an event
 handler exceeds this time limit it will be killed and a warning will be
 logged.
 
@@ -1260,6 +1366,8 @@ should be set to something high (like 60 seconds or more), so that each
 event handler command normally finishes executing within this time
 limit. If an event handler runs longer than this limit, Centreon Engine
 will kill it off thinking it is a runaway processes.
+
+.. _main_cfg_opt_notification_timeout:
 
 Notification Timeout
 --------------------
@@ -1279,6 +1387,8 @@ notification command finishes executing within this time limit. If a
 notification command runs longer than this limit, Centreon Engine will
 kill it off thinking it is a runaway processes.
 
+.. _main_cfg_opt_obsessive_compulsive_service_processor_timeout:
+
 Obsessive Compulsive Service Processor Timeout
 ----------------------------------------------
 
@@ -1286,9 +1396,11 @@ Format:  ocsp_timeout=<seconds>
 Example: ocsp_timeout=5
 
 This is the maximum number of seconds that Centreon Engine will allow an
-:ref:`obsessive compulsive service processor <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`
+:ref:`obsessive compulsive service processor <main_cfg_opt_obsessive_compulsive_service_processor_command>`
 command" to be run. If a command exceeds this time limit it will be
 killed and a warning will be logged.
+
+.. _main_cfg_opt_obsessive_compulsive_host_processor_timeout:
 
 Obsessive Compulsive Host Processor Timeout
 -------------------------------------------
@@ -1297,7 +1409,7 @@ Format:  ochp_timeout=<seconds>
 Example: ochp_timeout=5
 
 This is the maximum number of seconds that Centreon Engine will allow an
-:ref:`obsessive compulsive host processor <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand>`
+:ref:`obsessive compulsive host processor <main_cfg_opt_obsessive_compulsive_host_processor_command>`
 command" to be run. If a command exceeds this time limit it will be
 killed and a warning will be logged.
 
@@ -1308,11 +1420,13 @@ Format:  perfdata_timeout=<seconds>
 Example: perfdata_timeout=5
 
 This is the maximum number of seconds that Centreon Engine will allow a
-:ref:`host performance data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_dataprocessingcommand>`
+:ref:`host performance data <main_cfg_opt_host_prefdata_processing_command>`
 processor command" or
-:ref:`service performance data processor command <main_configuration_file_optionsconfigurationfilevariablesserviceperformance_dataprocessingcommand>`
+:ref:`service performance data processor command <main_cfg_opt_service_prefdata_processing_command>`
 to be run. If a command exceeds this time limit it will be killed and a
 warning will be logged.
+
+.. _main_cfg_opt_obsess_over_services:
 
 Obsess Over Services Option
 ---------------------------
@@ -1322,14 +1436,16 @@ Example: obsess_over_services=1
 
 This value determines whether or not Centreon Engine will "obsess" over
 service checks results and run the
-:ref:`obsessive compulsive service processor command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`
+:ref:`obsessive compulsive service processor command <main_cfg_opt_obsessive_compulsive_service_processor_command>`
 you define. I know - funny name, but it was all I could think of. This
 option is useful for performing
-:ref:`distributed monitoring <advanced_distributed_monitoring>`.
+:ref:`distributed monitoring <distributed_monitoring>`.
 If you're not doing distributed monitoring, don't enable this option.
 
   * 0 = Don't obsess over services (default)
   * 1 = Obsess over services
+
+.. _main_cfg_opt_obsessive_compulsive_service_processor_command:
 
 Obsessive Compulsive Service Processor Command
 ----------------------------------------------
@@ -1339,19 +1455,21 @@ Example: ocsp_command=obsessive_service_handler
 
 This option allows you to specify a command to be run after every
 service check, which can be useful in
-:ref:`distributed monitoring <advanced_distributed_monitoring>`. This
-command is executed after any :ref:`event handler <advanced_event_handlers>`
+:ref:`distributed monitoring <distributed_monitoring>`. This
+command is executed after any :ref:`event handler <event_handlers>`
 or :ref:`notification <notifications>` commands. The command argument is
-the short name of a :ref:`command definition <basics_object_definitions#object_definitionsobjecttypescommanddefinition>`
+the short name of a :ref:`command definition <obj_def_command>`
 that you define in your object configuration file. The maximum amount of
 time that this command can run is controlled by the
-:ref:`ocsp_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessortimeout>`
+:ref:`ocsp_timeout <main_cfg_opt_obsessive_compulsive_service_processor_timeout>`
 option. More information on distributed monitoring can be found
-:ref:`here <advanced_distributed_monitoring>`. This command is only
-executed if the :ref:`obsess_over_services <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessoverservicesoption>`
+:ref:`here <distributed_monitoring>`. This command is only
+executed if the :ref:`obsess_over_services <main_cfg_opt_obsess_over_services>`
 option is enabled globally and if the obsess_over_service directive in
-the :ref:`service definition <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+the :ref:`service definition <obj_def_service>`
 is enabled.
+
+.. _main_cfg_opt_obsess_over_hosts:
 
 Obsess Over Hosts Option
 ------------------------
@@ -1361,14 +1479,16 @@ Example: obsess_over_hosts=1
 
 This value determines whether or not Centreon Engine will "obsess" over
 host checks results and run the
-:ref:`obsessive compulsive host processor command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand>`
+:ref:`obsessive compulsive host processor command <main_cfg_opt_obsessive_compulsive_host_processor_command>`
 you define. I know - funny name, but it was all I could think of. This
 option is useful for performing
-:ref:`distributed monitoring <advanced_distributed_monitoring>`. If
+:ref:`distributed monitoring <distributed_monitoring>`. If
 you're not doing distributed monitoring, don't enable this option.
 
   * 0 = Don't obsess over hosts (default)
   * 1 = Obsess over hosts
+
+.. _main_cfg_opt_obsessive_compulsive_host_processor_command:
 
 Obsessive Compulsive Host Processor Command
 -------------------------------------------
@@ -1377,19 +1497,21 @@ Format:  ochp_command=<command>
 Example: ochp_command=obsessive_host_handler
 
 This option allows you to specify a command to be run after every host
-check, which can be useful in :ref:`distributed monitoring <advanced_distributed_monitoring>`.
-This command is executed after any :ref:`event handler <advanced_event_handlers>`
+check, which can be useful in :ref:`distributed monitoring <distributed_monitoring>`.
+This command is executed after any :ref:`event handler <event_handlers>`
 or :ref:`notification <notifications>` commands. The command argument is
-the short name of a :ref:`command definition <basics_object_definitions#object_definitionsobjecttypescommanddefinition>`
+the short name of a :ref:`command definition <obj_def_command>`
 that you define in your object configuration file. The maximum amount of
 time that this command can run is controlled by the
-:ref:`ochp_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsivehostprocessortimeout>`
+:ref:`ochp_timeout <main_cfg_opt_obsessive_compulsive_host_processor_timeout>`
 option. More information on distributed monitoring can be found
-:ref:`here <advanced_distributed_monitoring>`. This command is only
-executed if the :ref:`obsess_over_hosts <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessoverhostsoption>`
+:ref:`here <distributed_monitoring>`. This command is only
+executed if the :ref:`obsess_over_hosts <main_cfg_opt_obsess_over_hosts>`
 option is enabled globally and if the obsess_over_host directive in the
-:ref:`host definition <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+:ref:`host definition <obj_def_host>`
 is enabled.
+
+.. _main_cfg_opt_prefdata_processing:
 
 Performance Data Processing Option
 ----------------------------------
@@ -1398,10 +1520,12 @@ Format:  process_performance_data=<0/1>
 Example: process_performance_data=1
 
 This value determines whether or not Centreon Engine will process host
-and service check :ref:`performance data <advanced_performance_data>`.
+and service check :ref:`performance data <performance_data>`.
 
   * 0 = Don't process performance data (default)
   * 1 = Process performance data
+
+.. _main_cfg_opt_host_prefdata_processing_command:
 
 Host Performance Data Processing Command
 ----------------------------------------
@@ -1410,15 +1534,17 @@ Format:  host_perfdata_command=<command>
 Example: host_perfdata_command=process-host-perfdata
 
 This option allows you to specify a command to be run after every host
-check to process host :ref:`performance data <advanced_performance_data>`
+check to process host :ref:`performance data <performance_data>`
 that may be returned from the check. The command argument is the short
-name of a :ref:`command <basics_object_definitions#object_definitionsobjecttypescommanddefinition>`
+name of a :ref:`command <obj_def_command>`
 definition" that you define in your object configuration file. This
 command is only executed if the
-:ref:`process_performance_data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesperformance_dataprocessingoption>`
+:ref:`process_performance_data <main_cfg_opt_prefdata_processing>`
 option is enabled globally and if the process_perf_data directive in the
-:ref:`host definition <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+:ref:`host definition <obj_def_host>`
 is enabled.
+
+.. _main_cfg_opt_service_prefdata_processing_command:
 
 Service Performance Data Processing Command
 -------------------------------------------
@@ -1427,14 +1553,16 @@ Format:  service_perfdata_command=<command>
 Example: service_perfdata_command=process-service-perfdata
 
 This option allows you to specify a command to be run after every
-service check to process service :ref:`performance data <advanced_performance_data>`
+service check to process service :ref:`performance data <performance_data>`
 that may be returned from the check. The command argument is the short
-name of a :ref:`command definition <basics_object_definitions#object_definitionsobjecttypescommanddefinition>`
+name of a :ref:`command definition <obj_def_command>`
 that you define in your object configuration file. This command is only
-executed if the :ref:`process_performance_data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesperformance_dataprocessingoption>`
+executed if the :ref:`process_performance_data <main_cfg_opt_prefdata_processing>`
 option is enabled globally and if the process_perf_data directive in the
-:ref:`service definition <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`service definition <obj_def_service>`
 is enabled.
+
+.. _main_cfg_opt_host_prefdata_file:
 
 Host Performance Data File
 --------------------------
@@ -1443,14 +1571,16 @@ Format:  host_perfdata_file=<file_name>
 Example: host_perfdata_file=/var/log/centreon-engine/host-perfdata.dat
 
 This option allows you to specify a file to which host
-:ref:`performance data <advanced_performance_data>` will be written
+:ref:`performance data <performance_data>` will be written
 after every host check. Data will be written to the performance file as
-specified by the :ref:`host_perfdata_file_template <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafiletemplate>`
+specified by the :ref:`host_perfdata_file_template <main_cfg_opt_host_prefdata_file_template>`
 option. Performance data is only written to this file if the
-:ref:`process_performance_data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesperformance_dataprocessingoption>`
+:ref:`process_performance_data <main_cfg_opt_prefdata_processing>`
 option is enabled globally and if the process_perf_data directive in the
-:ref:`host definition <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+:ref:`host definition <obj_def_host>`
 is enabled.
+
+.. _main_cfg_opt_service_prefdata_file:
 
 Service Performance Data File
 -----------------------------
@@ -1459,14 +1589,16 @@ Format:  service_perfdata_file=<file_name>
 Example: service_perfdata_file=/var/log/centreon-engine/service-perfdata.dat
 
 This option allows you to specify a file to which service
-:ref:`performance data <advanced_performance_data>` will be written
+:ref:`performance data <performance_data>` will be written
 after every service check. Data will be written to the performance file
-as specified by the :ref:`service_perfdata_file_template <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafiletemplate>`
+as specified by the :ref:`service_perfdata_file_template <main_cfg_opt_service_prefdata_file_template>`
 option. Performance data is only written to this file if the
-:ref:`process_performance_data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesperformance_dataprocessingoption>`
+:ref:`process_performance_data <main_cfg_opt_prefdata_processing>`
 option is enabled globally and if the process_perf_data directive in the
-:ref:`service definition <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`service definition <obj_def_service>`
 is enabled.
+
+.. _main_cfg_opt_host_prefdata_file_template:
 
 Host Performance Data File Template
 -----------------------------------
@@ -1475,11 +1607,13 @@ Format:  host_perfdata_file_template=<template>
 Example: host_perfdata_file_template=[HOSTPERFDATA]\\t$TIMET$\\t$HOSTNAME$\\t$HOSTEXECUTIONTIME$\\t$HOSTOUTPUT$\\t$HOSTPERFDATA$
 
 This option determines what (and how) data is written to the
-:ref:`host performance data file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafile>`.
-The template may contain :ref:`macros <understanding_macros_and_how_they_work>`,
+:ref:`host performance data file <main_cfg_opt_host_prefdata_file>`.
+The template may contain :ref:`macros <understanding_macros>`,
 special characters (\t for tab, \r for carriage return, \n for newline)
 and plain text. A newline is automatically added after each write to the
 performance data file.
+
+.. _main_cfg_opt_service_prefdata_file_template:
 
 Service Performance Data File Template
 --------------------------------------
@@ -1488,11 +1622,13 @@ Format:  service_perfdata_file_template=<template>
 Example: service_perfdata_file_template=[SERVICEPERFDATA]\\t$TIMET$\\t$HOSTNAME$\\t$SERVICEDESC$\\t$SERVICEEXECUTIONTIME$\\t$SERVICELATENCY$\\t$SERVICEOUTPUT$\\t$SERVICEPERFDATA$
 
 This option determines what (and how) data is written to the
-:ref:`service performance data file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafile>`.
-The template may contain :ref:`macros <understanding_macros_and_how_they_work>`,
+:ref:`service performance data file <main_cfg_opt_service_prefdata_file>`.
+The template may contain :ref:`macros <understanding_macros>`,
 special characters (\t for tab, \r for carriage return, \n for newline)
 and plain text. A newline is automatically added after each write to the
 performance data file.
+
+.. _main_cfg_opt_host_prefdata_file_mode:
 
 Host Performance Data File Mode
 -------------------------------
@@ -1500,7 +1636,7 @@ Host Performance Data File Mode
 Format:  host_perfdata_file_mode=<mode>
 Example: host_perfdata_file_mode=a
 
-This option determines how the :ref:`host <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafile>`
+This option determines how the :ref:`host <main_cfg_opt_host_prefdata_file>`
 performance data file" is opened. Unless the file is a named pipe you'll
 probably want to use the default mode of append.
 
@@ -1508,6 +1644,8 @@ probably want to use the default mode of append.
   * w = Open file in write mode
   * p = Open in non-blocking read/write mode (useful when writing to
     pipes)
+
+.. _main_cfg_opt_service_prefdata_file_mode:
 
 Service Performance Data File Mode
 ----------------------------------
@@ -1515,7 +1653,7 @@ Service Performance Data File Mode
 Format:  service_perfdata_file_mode=<mode>
 Example: service_perfdata_file_mode=a
 
-This option determines how the :ref:`service <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafile>`
+This option determines how the :ref:`service <main_cfg_opt_service_prefdata_file>`
 performance data file" is opened. Unless the file is a named pipe you'll
 probably want to use the default mode of append.
 
@@ -1523,6 +1661,8 @@ probably want to use the default mode of append.
   * w = Open file in write mode
   * p = Open in non-blocking read/write mode (useful when writing to
     pipes)
+
+.. _main_cfg_opt_host_prefdata_file_processing_interval:
 
 Host Performance Data File Processing Interval
 ----------------------------------------------
@@ -1531,10 +1671,12 @@ Format:  host_perfdata_file_processing_interval=<seconds>
 Example: host_perfdata_file_processing_interval=0
 
 This option allows you to specify the interval (in seconds) at which the
-:ref:`host performance data file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafile>`
-is processed using the :ref:`host performance data file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafileprocessingcommand>`
+:ref:`host performance data file <main_cfg_opt_host_prefdata_file>`
+is processed using the :ref:`host performance data file <main_cfg_opt_host_prefdata_file_processing_command>`
 processing command". A value of 0 indicates that the performance data
 file should not be processed at regular intervals.
+
+.. _main_cfg_opt_service_prefdata_file_processing_interval:
 
 Service Performance Data File Processing Interval
 -------------------------------------------------
@@ -1543,11 +1685,13 @@ Format:  service_perfdata_file_processing_interval=<seconds>
 Example: service_perfdata_file_processing_interval=0
 
 This option allows you to specify the interval (in seconds) at which the
-:ref:`service performance data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafile>`
+:ref:`service performance data <main_cfg_opt_service_prefdata_file>`
 file" is processed using the
-:ref:`service performance data file processing command <main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafileprocessingcommand>`.
+:ref:`service performance data file processing command <main_cfg_opt_service_prefdata_file_processing_command>`.
 A value of 0 indicates that the performance data file should not be
 processed at regular intervals.
+
+.. _main_cfg_opt_host_prefdata_file_processing_command:
 
 Host Performance Data File Processing Command
 ---------------------------------------------
@@ -1556,13 +1700,15 @@ Format:  host_perfdata_file_processing_command=<command>
 Example: host_perfdata_file_processing_command=process-host-perfdata-file
 
 This option allows you to specify the command that should be executed to
-process the :ref:`host performance <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafile>`
+process the :ref:`host performance <main_cfg_opt_host_prefdata_file>`
 data file". The command argument is the short name of a
-:ref:`command definition <object_definitionsobjecttypescommanddefinition>`
+:ref:`command definition <obj_def_command>`
 that you define in your object configuration file. The interval at
 which this command is executed is determined by the
-:ref:`host_perfdata_file_processing_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafileprocessinginterval>`
+:ref:`host_perfdata_file_processing_interval <main_cfg_opt_host_prefdata_file_processing_interval>`
 directive.
+
+.. _main_cfg_opt_service_prefdata_file_processing_command:
 
 Service Performance Data File Processing Command
 ------------------------------------------------
@@ -1571,12 +1717,12 @@ Format:  service_perfdata_file_processing_command=<command>
 Example: service_perfdata_file_processing_command=process-service-perfdata-file
 
 This option allows you to specify the command that should be executed to
-process the :ref:`service <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafile>`
+process the :ref:`service <main_cfg_opt_service_prefdata_file>`
 performance data file". The command argument is the short name of a
-:ref:`command definition <object_definitionsobjecttypescommanddefinition>`
+:ref:`command definition <obj_def_command>`
 that you define in your object configuration file. The interval at which
 this command is executed is determined by the
-:ref:`service_perfdata_file_processing_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafileprocessinginterval>`
+:ref:`service_perfdata_file_processing_interval <main_cfg_opt_service_prefdata_file_processing_interval>`
 directive.
 
 Orphaned Service Check Option
@@ -1625,6 +1771,8 @@ about orphaned hosts.
   * 0 = Don't check for orphaned host checks
   * 1 = Check for orphaned host checks (default)
 
+.. _main_cfg_opt_service_freshness_checking:
+
 Service Freshness Checking Option
 ---------------------------------
 
@@ -1635,10 +1783,12 @@ This option determines whether or not Centreon Engine will periodically
 check the "freshness" of service checks. Enabling this option is useful
 for helping to ensure that :ref:`passive service checks <passive_checks>`
 are received in a timely manner. More information on freshness checking
-can be found :ref:`here <advanced_service_and_host_freshness_checks>`.
+can be found :ref:`here <freshness_checks>`.
 
   * 0 = Don't check service freshness
   * 1 = Check service freshness (default)
+
+.. _main_cfg_opt_service_freshness_check_interval:
 
 Service Freshness Check Interval
 --------------------------------
@@ -1649,9 +1799,11 @@ Example: service_freshness_check_interval=60
 This setting determines how often (in seconds) Centreon Engine will
 periodically check the "freshness" of service check results. If you have
 disabled service freshness checking (with the
-:ref:`check_service_freshness <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicefreshnesscheckingoption>`
+:ref:`check_service_freshness <main_cfg_opt_service_freshness_checking>`
 option), this option has no effect. More information on freshness
-checking can be found :ref:`here <advanced_service_and_host_freshness_checks>`.
+checking can be found :ref:`here <freshness_checks>`.
+
+.. _main_cfg_opt_host_freshness_checking:
 
 Host Freshness Checking Option
 ------------------------------
@@ -1663,10 +1815,12 @@ This option determines whether or not Centreon Engine will periodically
 check the "freshness" of host checks. Enabling this option is useful for
 helping to ensure that :ref:`passive host checks <passive_checks>` are
 received in a timely manner. More information on freshness checking can
-be found :ref:`here <advanced_service_and_host_freshness_checks>`.
+be found :ref:`here <freshness_checks>`.
 
   * 0 = Don't check host freshness
   * 1 = Check host freshness (default)
+
+.. _main_cfg_opt_host_freshness_check_interval:
 
 Host Freshness Check Interval
 -----------------------------
@@ -1677,10 +1831,10 @@ Example: host_freshness_check_interval=60
 This setting determines how often (in seconds) Centreon Engine will
 periodically check the "freshness" of host check results. If you have
 disabled host freshness checking (with the
-:ref:`check_host_freshness <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostfreshnesscheckingoption>`
+:ref:`check_host_freshness <main_cfg_opt_host_freshness_checking>`
 option), this option has no effect. More information on freshness
 checking can be found
-:ref:`here <advanced_service_and_host_freshness_checks>`.
+:ref:`here <freshness_checks>`.
 
 Additional Freshness Threshold Latency Option
 ---------------------------------------------
@@ -1692,7 +1846,9 @@ This option determines the number of seconds Centreon Engine will add to
 any host or services freshness threshold it automatically calculates
 (e.g. those not specified explicity by the user). More information on
 freshness checking can be found
-:ref:`here <advanced_service_and_host_freshness_checks>`.
+:ref:`here <freshness_checks>`.
+
+.. _main_cfg_opt_date_format:
 
 Date Format
 -----------
@@ -1702,7 +1858,7 @@ Example: date_format=us
 
 This option allows you to specify what kind of date/time format Centreon
 Engine should use in the web interface and date/time
-:ref:`macros <understanding_macros_and_how_they_work>`. Possible options
+:ref:`macros <understanding_macros>`. Possible options
 (along with example output) include:
 
 ============== =================== ===================
@@ -1739,6 +1895,8 @@ definitions, but I recommend not using the characters shown in the
 example above. Doing may give you problems in the web interface,
 notification commands, etc.
 
+.. _main_cfg_opt_illegal_macro_output_characters:
+
 Illegal Macro Output Characters
 -------------------------------
 
@@ -1746,7 +1904,7 @@ Format:  illegal_macro_output_chars=<chars...>
 Example: illegal_macro_output_chars=`~$^&"|'<>
 
 This option allows you to specify illegal characters that should be
-stripped from :ref:`macros <understanding_macros_and_how_they_work>`
+stripped from :ref:`macros <understanding_macros>`
 before being used in notifications, event handlers, and other
 commands. This DOES NOT affect macros used in service or host check
 commands. You can choose to not strip out the characters shown in the
@@ -1757,6 +1915,8 @@ characters you specify::
 
   $HOSTOUTPUT$, $HOSTPERFDATA$, $HOSTACKAUTHOR$, $HOSTACKCOMMENT$, $SERVICEOUTPUT$, $SERVICEPERFDATA$, $SERVICEACKAUTHOR$, and $SERVICEACKCOMMENT$
 
+.. _main_cfg_opt_regular_expression_matching:
+
 Regular Expression Matching Option
 ----------------------------------
 
@@ -1766,10 +1926,12 @@ Example: use_regexp_matching=0
 This option determines whether or not various directives in your
 :ref:`object definitions <object_configuration_overview>` will be
 processed as regular expressions. More information on how this works can
-be found :ref:`here <advanced_time_saving_tricks_for_object_definitions>`.
+be found :ref:`here <obj_def_tricks>`.
 
   * 0 = Don't use regular expression matching (default)
   * 1 = Use regular expression matching
+
+.. _main_cfg_opt_true_regular_expression_matching:
 
 True Regular Expression Matching Option
 ---------------------------------------
@@ -1778,17 +1940,19 @@ Format:  use_true_regexp_matching=<0/1>
 Example: use_true_regexp_matching=0
 
 If you've enabled regular expression matching of various object
-directives using the :ref:`use_regexp_matching <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesregularexpressionmatchingoption>`
+directives using the :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
 option, this option will determine when object directives are treated as
 regular expressions. If this option is disabled (the default),
 directives will only be treated as regular expressions if they contain
 *, ?, +, or \.. If this option is enabled, all appropriate directives
 will be treated as regular expression - be careful when enabling this!
 More information on how this works can be found
-:ref:`here <advanced_time_saving_tricks_for_object_definitions>`.
+:ref:`here <obj_def_tricks>`.
 
   * 0 = Don't use true regular expression matching (default)
   * 1 = Use true regular expression matching
+
+.. _main_cfg_opt_administrator_email_address:
 
 Administrator Email Address
 ---------------------------
@@ -1800,7 +1964,9 @@ This is the email address for the administrator of the local machine
 (i.e. the one that Centreon Engine is running on).
 
 This value can be used in notification commands by using the
-$ADMINEMAIL$ :ref:`macro <understanding_macros_and_how_they_work>`.
+$ADMINEMAIL$ :ref:`macro <understanding_macros>`.
+
+.. _main_cfg_opt_administrator_pager:
 
 Administrator Pager
 -------------------
@@ -1811,7 +1977,9 @@ Example: admin_pager=pageroot@localhost.localdomain
 This is the pager number (or pager email gateway) for the administrator
 of the local machine (i.e. the one that Centreon Engine is running
 on). The pager number/address can be used in notification commands by
-using the $ADMINPAGER$ :ref:`macro <understanding_macros_and_how_they_work>`.
+using the $ADMINPAGER$ :ref:`macro <understanding_macros>`.
+
+
 
 Event Broker Options
 --------------------
@@ -1857,29 +2025,33 @@ methods:
   * While Centreon Engine is running... delete the original module file,
     move the new module file into place, restart Centreon Engine
 
-Configuration File Variables
-----------------------------
+.. _main_cfg_opt_debug_file:
+
+Debug File
+----------
 
 Format:  debug_file=<file_name>
 Example: debug_file=/var/log/centreon-engine/centengine.debug
 
 This option determines where Centreon Engine should write debugging
 information. What (if any) information is written is determined by the
-:ref:`debug_level <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariables>`
-and :ref:`debug_verbosity <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariables>`
+:ref:`debug_level <main_cfg_opt_debug_file>`
+and :ref:`debug_verbosity <main_cfg_opt_debug_verbosity>`
 options. You can have Centreon Engine automaticaly rotate the debug file
 when it reaches a certain size by using the
-:ref:`max_debug_file_size <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariables>`
+:ref:`max_debug_file_size <main_cfg_opt_max_debug_file_size>`
 option.
 
-Configuration File Variables
-----------------------------
+.. _main_cfg_opt_debug_level:
+
+Debug Level
+-----------
 
 Format:  debug_level=<#>
 Example: debug_level=24
 
 This option determines what type of information Centreon Engine should
-write to the :ref:`debug_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariables>`.
+write to the :ref:`debug_file <main_cfg_opt_debug_file>`.
 This value is a logical OR of the values below.
 
   * -1 = Log everything
@@ -1892,27 +2064,31 @@ This value is a logical OR of the values below.
   * 32 = Notification information
   * 64 = Event broker information
 
-Configuration File Variables
-----------------------------
+.. _main_cfg_opt_debug_verbosity:
+
+Debug Verbosity
+---------------
 
 Format:  debug_verbosity=<#>
 Example: debug_verbosity=1
 
 This option determines how much debugging information Centreon Engine
-should write to the :ref:`debug_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariables>`.
+should write to the :ref:`debug_file <main_cfg_opt_debug_file>`.
 
   * 0 = Basic information
   * 1 = More detailed information (default)
   * 2 = Highly detailed information
 
-Configuration File Variables
-----------------------------
+.. _main_cfg_opt_max_debug_file_size:
+
+Maximum Debug File Size
+-----------------------
 
 Format:  max_debug_file_size=<#>
 Example: max_debug_file_size=1000000
 
 This option determines the maximum size (in bytes) of the
-:ref:`debug file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariables>`.
+:ref:`debug file <main_cfg_opt_debug_file>`.
 If the file grows larger than this size, it will be renamed with a .old
 extension. If a file already exists with a .old extension it will
 automatically be deleted. This helps ensure your disk space usage

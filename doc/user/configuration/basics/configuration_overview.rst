@@ -14,7 +14,7 @@ worth your time. :-)
 
    Sample configuration files are installed in the /etc/centreon-engine/
    directory when you follow the
-   :ref:`quickstart installation guide <get_started/quickstart_installation_guide>`.
+   :ref:`quickstart installation guide <exploit_quickstart>`.
 
 .. image:: configoverview.png
 
@@ -28,7 +28,7 @@ how the Centreon Engine daemon operates. This is where you're going to
 want to get started in your configuration adventures.
 
 Documentation for the main configuration file can be found
-:ref:`here <main_configuration_file_options>`.
+:ref:`here <main_cfg_opt>`.
 
 Resource File(s)
 ================
@@ -38,7 +38,7 @@ of having resource files is to use them to store sensitive configuration
 information (like passwords).
 
 You can specify one or more optional resource files by using the
-:ref:`resource_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesresourcefile>`
+:ref:`resource_file <main_cfg_opt_resource_file>`
 directive in your main configuration file.
 
 Object
@@ -51,9 +51,9 @@ contacts, contactgroups, commands, etc. This is where you define all the
 things you want monitor and how you want to monitor them.
 
 You can specify one or more object definition files by using the
-:ref:`cfg_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobjectconfigurationfile>`
+:ref:`cfg_file <main_cfg_opt_object_configuration_file>`
 and/or
-:ref:`cfg_dir <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobjectconfigurationdirectory>`
+:ref:`cfg_dir <main_cfg_opt_object_configuration_directory>`
 directives in your main configuration file.
 
 An introduction to object definitions, and how they relate to each

@@ -1,3 +1,5 @@
+.. _distributed_monitoring:
+
 Distributed Monitoring
 **********************
 
@@ -56,7 +58,7 @@ results from one or more distributed servers. Even though services are
 occassionally actively checked from the central server, the active
 checks are only performed in dire circumstances, so lets just say that
 the central server only accepts passive check for now. Since the central
-server is obtaining :ref:`passive service check <basics_passive_checks>`
+server is obtaining :ref:`passive service check <passive_checks>`
 results from one or more distributed servers, it serves as the focal
 point for all monitoring logic (i.e. it sends out notifications, runs
 event handler scripts, determines host states, has the web interface
@@ -70,12 +72,12 @@ to send the service check results from the distributed servers to the
 central server. I've already discussed how to submit passive check
 results to Centreon Engine from same host that Centreon Engine is
 running on (as described in the documentation on
-:ref:`passive checks <basics_passive_checks>`), but I haven't given any
+:ref:`passive checks <passive_checks>`), but I haven't given any
 info on how to submit passive check results from other hosts.
 
 In order to facilitate the submission of passive check results to a
 remote host, I've written the
-:ref:`nsca addon <basics_addons#addonsnsca>`. The addon consists of two
+:ref:`nsca addon <addons_nsca>`. The addon consists of two
 pieces. The first is a client program (send_nsca) which is run from a
 remote host and is used to send the service check results to another
 server. The second piece is the nsca daemon (nsca) which either runs as
@@ -83,7 +85,7 @@ a standalone daemon or under inetd and listens for connections from
 client programs. Upon receiving service check information from a client,
 the daemon will sumbit the check information to Centreon Engine (on the
 central server) by inserting a PROCESS_SVC_CHECK_RESULT command into the
-:ref:`external command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`,
+:ref:`external command file <main_cfg_opt_external_command_file>`,
 along with the check results. The next time Centreon Engine checks for
 :ref:`external commands <external_commands>`, it will find the passive
 service check information that was sent from the distributed server and
@@ -101,15 +103,15 @@ Key configuration changes:
 
   * Only those services and hosts which are being monitored directly by
     the distributed server are defined in the
-    :ref:`object configuration file <basics_object_configuration_overview>`.
+    :ref:`object configuration file <object_configuration_overview>`.
   * The distributed server has its
-    :ref:`enable_notifications <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationsoption>`
+    :ref:`enable_notifications <main_cfg_opt_notifications>`
     directive set to 0. This will prevent any notifications from being
     sent out by the server.
   * The distributed server is configured to
-    :ref:`obsess over services <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessoverservicesoption>`.
+    :ref:`obsess over services <main_cfg_opt_obsess_over_services>`.
   * The distributed server has an
-    :ref:`ocsp command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`
+    :ref:`ocsp command <main_cfg_opt_obsessive_compulsive_service_processor_command>`
     defined (as described below).
 
 In order to make everything come together and work properly, we want the
@@ -118,9 +120,9 @@ Centreon Engine. We could use :ref:`event handlers <event_handlers>` to
 report changes in the state of a service, but that just doesn't cut
 it. In order to force the distributed server to report all service check
 results, you must enabled the
-:ref:`obsess_over_services <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessoverservicesoption>`
+:ref:`obsess_over_services <main_cfg_opt_obsess_over_services>`
 option in the main configuration file and provide a
-:ref:`ocsp_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`
+:ref:`ocsp_command <main_cfg_opt_obsessive_compulsive_service_processor_command>`
 to be run after every service check. We will use the ocsp command to
 send the results of all service checks to the central server, making use
 of the send_nsca client and nsca daemon (as described above) to handle
@@ -189,7 +191,7 @@ numbers in the reference diagram above):
 
   * After the distributed server finishes executing a service check, it
     executes the command you defined by the
-    :ref:`ocsp_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`
+    :ref:`ocsp_command <main_cfg_opt_obsessive_compulsive_service_processor_command>`
     variable. In our example, this is the
     /usr/lib/nagios/plugins/event_handlers/submit_check_result
     script. Note that the definition for the submit_check_result command
@@ -219,14 +221,14 @@ server. It is setup as follows::
 
   * The central server has the web interface installed (optional, but
     recommended)
-  * The central server has its :ref:`enable_notifications <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationsoption>`
+  * The central server has its :ref:`enable_notifications <main_cfg_opt_notifications>`
     directive set to 1. This will enable notifications. (optional, but
     recommended)
-  * The central server has :ref:`active service checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicecheckexecutionoption>`
+  * The central server has :ref:`active service checks <main_cfg_opt_service_check_execution>`
     disabled (optional, but recommended - see notes below)
-  * The central server has :ref:`external command checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckoption>`
+  * The central server has :ref:`external command checks <main_cfg_opt_external_command_check>`
     enabled (required)
-  * The central server has :ref:`passive service checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespassiveservicecheckacceptanceoption>`
+  * The central server has :ref:`passive service checks <main_cfg_opt_passive_service_check_acceptance>`
     enabled (required) There are three other very important things that
     you need to keep in mind when configuring the central server:
   * The central server must have service definitions for all services
@@ -236,7 +238,7 @@ server. It is setup as follows::
   * If you're only using the central server to process services whose
     results are going to be provided by distributed hosts, you can
     simply disable all active service checks on a program-wide basis by
-    setting the :ref:`execute_service_checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicecheckexecutionoption>`
+    setting the :ref:`execute_service_checks <main_cfg_opt_service_check_execution>`
     directive to 0. If you're using the central server to actively
     monitor a few services on its own (without the aid of distributed
     servers), the enable_active_checks option of the defintions for
@@ -274,7 +276,7 @@ Freshness Checking
 
 Centreon Engine supports a feature that does "freshness" checking on the
 results of service checks. More information freshness checking can be
-found :ref:`here <service_and_host_freshness_checks>`. This features
+found :ref:`here <freshness_checks>`. This features
 gives some protection against situations where remote hosts may stop
 sending passive service checks into the central monitoring server. The
 purpose of "freshness" checking is to ensure that service checks are
@@ -307,7 +309,7 @@ than 5 minutes (300 seconds). If you do not specify a value for the
 freshness_threshold option, Centreon Engine will automatically calculate
 a "freshness" threshold by looking at either the normal_check_interval
 or retry_check_interval options (depending on what
-:ref:`type of state <basics_state_types>` the service is in). If the
+:ref:`type of state <state_types>` the service is in). If the
 service results are found to be "stale", Centreon Engine will run the
 service check command specified by the check_command option in the
 service definition, thereby actively checking the service.
@@ -355,7 +357,7 @@ the distributed servers (and the same way you would in a normal,
 non-distributed setup).
 
 Passive host checks are available (read
-:ref:`here <basics_passive_checks>`), so you could use them in your
+:ref:`here <passive_checks>`), so you could use them in your
 distributed monitoring setup, but they suffer from a few problems. The
 biggest problem is that Centreon Engine does not translate passive host
 check problem states (DOWN and UNREACHABLE) when they are
@@ -368,18 +370,18 @@ If you do want to send passive host checks to a central server in your
 distributed monitoring setup, make sure:
 
   * The central server has
-    :ref:`passive host checks <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablespassivehostcheckacceptanceoption>`
+    :ref:`passive host checks <main_cfg_opt_passive_host_check_acceptance>`
     enabled (required)
   * The distributed server is configured to
-    :ref:`obsess over hosts <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessoverhostsoption>`.
+    :ref:`obsess over hosts <main_cfg_opt_obsess_over_hosts>`.
   * The distributed server has an
-    :ref:`ochp command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand>`
+    :ref:`ochp command <main_cfg_opt_obsessive_compulsive_host_processor_command>`
     defined.
 
 The ochp command, which is used for processing host check results, works
 in a similiar manner to the ocsp command, which is used for processing
 service check results (see documentation above). In order to make sure
 passive host check results are up to date, you'll want to enable
-:ref:`freshness checking <service_and_host_freshness_checks>` for hosts
+:ref:`freshness checking <freshness_checks>` for hosts
 (similiar to what is described above for services).
 

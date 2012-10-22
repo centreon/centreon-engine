@@ -1,3 +1,5 @@
+.. _cached_checks:
+
 Cached Checks
 *************
 
@@ -26,7 +28,7 @@ For reference, on-demand host checks occur...
 
   * When a service associated with the host changes state.
   * As needed as part of the
-    :ref:`host reachability <determining_status_and_reachability_of_network_hosts>`
+    :ref:`host reachability <status_and_reachability_network>`
     logic.
   * As needed for :ref:`predictive host dependency checks <host_and_service_dependencies>`.
 
@@ -119,9 +121,9 @@ The following variables determine the timeframes in which a previous
 host or service check result may be used as a cached host or service
 check result:
 
-  * The :ref:`cached_host_check_horizon <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablescachedhostcheckhorizon>`
+  * The :ref:`cached_host_check_horizon <main_cfg_opt_cached_host_check_horizon>`
     variable controls cached host checks.
-  * The :ref:`cached_service_check_horizon <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablescachedservicecheckhorizon>`
+  * The :ref:`cached_service_check_horizon <main_cfg_opt_cached_service_check_horizon>`
     variable controls cached service checks.
 
 Optimizing Cache Effectiveness
@@ -136,11 +138,11 @@ In order to make the most effective use of cached checks, you should:
 
 You can schedule regular checks of your hosts by specifying a value
 greater than 0 for check_interval option in your
-:ref:`host definitions <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`.
+:ref:`host definitions <obj_def_host>`.
 If you do this, make sure that you set the max_check_attempts option to
 a value greater than 1, or it will cause a big performance hit. This
 potential performance hit is describe in detail
-:ref:`here <basics_host_checks>`.
+:ref:`here <host_checks>`.
 
 .. image:: cachedcheckgraphs.png
 
@@ -154,7 +156,7 @@ The monitoring installation which produced the graphs above had:
 
   * A total of 44 hosts, all of which were checked at regular intervals
   * An average (regularly scheduled) host check interval of 5 minutes
-  * A :ref:`cached_host_check_horizon <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablescachedhostcheckhorizon>`
+  * A :ref:`cached_host_check_horizon <main_cfg_opt_cached_host_check_horizon>`
     of 15 seconds
 
 The first MRTG graph shows how many regularly scheduled host checks

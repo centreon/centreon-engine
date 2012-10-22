@@ -1,3 +1,5 @@
+.. _states_talking:
+
 State Stalking
 **************
 
@@ -94,7 +96,7 @@ How Do I Enable Stalking?
 
 You can enable state stalking for hosts and services by using the
 stalking_options directive in
-:ref:`host and service definitions <basics_object_configuration_overview>`.
+:ref:`host and service definitions <object_configuration_overview>`.
 
 How Does Stalking Differ From Volatile Services?
 ================================================

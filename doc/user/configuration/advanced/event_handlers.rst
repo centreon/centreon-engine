@@ -1,3 +1,5 @@
+.. _event_handlers:
+
 Event Handlers
 **************
 
@@ -33,7 +35,7 @@ Event handlers are executed when a service or host:
   * Initially recovers from a SOFT or HARD problem state
 
 SOFT and HARD states are described in detail
-:ref:`here <basics_state_types>` .
+:ref:`here <state_types>` .
 
 Event Handler Types
 ===================
@@ -50,15 +52,15 @@ Global host and service event handlers are run for every host or service
 state change that occurs, immediately prior to any host- or
 service-specific event handler that may be run. You can specify global
 event handler commands by using the
-:ref:`global_host_event_handler <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesglobalhosteventhandleroption>`
-and :ref:`global_service_event_handler <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesglobalserviceeventhandleroption>`
+:ref:`global_host_event_handler <main_cfg_opt_global_host_event_handler>`
+and :ref:`global_service_event_handler <main_cfg_opt_global_service_event_handler>`
 options in your main configuration file.
 
 Individual hosts and services can have their own event handler command
 that should be run to handle state changes. You can specify an event
 handler that should be run by using the event_handler directive in your
-:ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
-and :ref:`service <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`host <obj_def_host>`
+and :ref:`service <obj_def_service>`
 definitions. These host- and service-specific event handlers are
 executed immediately after the (optional) global host or service event
 handler is executed.
@@ -67,15 +69,15 @@ Enabling Event Handlers
 =======================
 
 Event handlers can be enabled or disabled on a program-wide basis by
-using the :ref:`enable_event_handlers <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandleroption>`
+using the :ref:`enable_event_handlers <main_cfg_opt_event_handler>`
 in your main configuration file.
 
 Host-specific and service-specific event handlers can be enabled or
 disabled by using the event_handler_enabled directive in your
-:ref:`host <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
-and :ref:`service <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`host <obj_def_host>`
+and :ref:`service <obj_def_service>`
 definitions. Host- and service-specific event handlers will not be
-executed if the global :ref:`enable_event_handlers <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandleroption>`
+executed if the global :ref:`enable_event_handlers <main_cfg_opt_event_handler>`
 option is disabled.
 
 Event Handler Execution Order
@@ -93,21 +95,17 @@ Writing Event Handler Commands
 Event handler commands will likely be shell or perl scripts, but they
 can be any type of executable that can run from a command prompt. At a
 minimum, the scripts should take the following
-:ref:`macros <basics_understanding_macros_and_how_they_work>` as
+:ref:`macros <understanding_macros>` as
 arguments:
 
-For Services: :ref:`$SERVICESTATE$ <basics_standard_macros#standard_macrosmacroavailabilitychartservicestate>`,
-:ref:`$SERVICESTATETYPE$ <basics_standard_macros#standard_macrosmacroavailabilitychartservicestatetype>`,
-:ref:`$SERVICEATTEMPT$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceattempt>`,
+For Services: `SERVICESTATE`_ `SERVICESTATETYPE`_ `SERVICEATTEMPT`_
 
-For Hosts: :ref:`$HOSTSTATE$ <basics_standard_macros#standard_macrosmacroavailabilitycharthoststate>`,
-:ref:`$HOSTSTATETYPE$ <basics_standard_macros#standard_macrosmacroavailabilitycharthoststatetype>`,
-:ref:`$HOSTATTEMPT$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostattempt>`
+For Hosts: `HOSTSTATE`_ `HOSTSTATETYPE`_ `HOSTATTEMPT`_
 
 The scripts should examine the values of the arguments passed to it and
 take any necessary action based upon those values. The best way to
 understand how event handlers work is to see an example. Lucky for you,
-one is provided :ref:`below <advanced_event_handlers#event_handlersserviceeventhandlerexample>`.
+one is provided :ref:`below <event_handlers_example>`.
 
 .. note::
 
@@ -115,7 +113,7 @@ one is provided :ref:`below <advanced_event_handlers#event_handlersserviceeventh
    contrib/event_handlers/ subdirectory of the Centreon Engine
    distribution. Some of these sample scripts demonstrate the use of
    :ref:`external commands <external_commands>` to implement a
-   :ref:`redundant <redundant_and_failover_network_monitoring>` and
+   :ref:`redundant <redundant_and_failover_monitoring>` and
    :ref:`distributed <distributed_monitoring>` monitoring environments.
 
 Permissions For Event Handler Commands
@@ -131,6 +129,8 @@ Ideally you should evaluate the types of event handlers you will be
 implementing and grant just enough permissions to the Centreon Engine
 user for executing the necessary system commands. You might want to try
 using `sudo <http://www.courtesan.com/sudo/sudo>`_ to accomplish this.
+
+.. _event_handlers_example:
 
 Service Event Handler Example
 =============================

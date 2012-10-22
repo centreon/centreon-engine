@@ -1,3 +1,5 @@
+.. _custom_object_variables:
+
 Custom Object Variables
 ***********************
 
@@ -33,10 +35,10 @@ variables:
   * Custom variable names must begin with an underscore (_) to prevent
     name collision with standard variables
   * Custom variable names are converted to all uppercase before use
-  * Custom variables are :ref:`inherited <basics_object_inheritance>`
+  * Custom variables are :ref:`inherited <object_inheritance>`
     from object templates like normal variables
   * Scripts can reference custom variable values with
-    :ref:`macros and environment variables <basics_understanding_macros_and_how_they_work>`
+    :ref:`macros and environment variables <understanding_macros>`
 
 Examples
 ========
@@ -71,7 +73,7 @@ Custom Variables As Macros
 
 Custom variable values can be referenced in scripts and executables that
 Centreon Engine runs for checks, notifications, etc. by using
-:ref:`macros <basics_understanding_macros_and_how_they_work>` or
+:ref:`macros <understanding_macros>` or
 environment variables. Custom variable macros are trusted (because you
 define them) and therefore not cleaned/sanitized before they are made
 available to scripts.
@@ -97,6 +99,6 @@ Contact     YAHOOID        $_CONTACTYAHOOID$        NAGIOS__CONTACTYAHOOID
 Custom Variables And Inheritance
 ================================
 
-Custom object variables are :ref:`inherited <basics_object_inheritance>`
+Custom object variables are :ref:`inherited <object_inheritance>`
 just like standard host, service, or contact variables.
 

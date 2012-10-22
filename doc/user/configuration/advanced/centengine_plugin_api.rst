@@ -1,3 +1,5 @@
+.. _centengine_plugin_api:
+
 Centreon Engine Plugin API
 **************************
 
@@ -43,12 +45,12 @@ Plugin Return Code Service State Host State
 
 .. note::
 
-   If the :ref:`use_aggressive_host_checking <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesaggressivehostcheckingoption>`
+   If the :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
    option is enabled, return codes of 1 will result in a host state of
    DOWN or UNREACHABLE. Otherwise return codes of 1 will result in a
    host state of UP. The process by which Centreon Engine determines
    whether or not a host is DOWN or UNREACHABLE is discussed
-   :ref:`here toto <determining_status_and_reachability_of_network_hosts>` .
+   :ref:`here toto <status_and_reachability_network>` .
 
 Plugin Output Spec
 ==================
@@ -74,12 +76,10 @@ Let's see some examples of possible plugin output...
   * Case 1: One line of output (text only)
     Assume we have a plugin that returns one line of output that looks like this::
 
-    DISK OK - free space: / 3326 MB (56%);
+      DISK OK - free space: / 3326 MB (56%);
 
     If this plugin was used to perform a service check, the entire line
-    of output will be stored in the
-    :ref:`$SERVICEOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceoutput>`
-    macro.
+    of output will be stored in the `SERVICEOUTPUT`_ macro.
 
   * Case 2: One line of output (text and perfdata)
     A plugin can return optional performance data for use by external
@@ -90,10 +90,8 @@ Let's see some examples of possible plugin output...
 
     If this plugin was used to perform a service check, the first
     portion of output (left of the pipe separator) will be stored in the
-    :ref:`$SERVICEOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceoutput>`
-    macro and the second portion of output (right of the pipe separator)
-    will be stored in the :ref:`$SERVICEPERFDATA$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceperfdata>`
-    macro.
+    `SERVICEOUTPUT`_ macro and the second portion of output (right of
+    the pipe separator) will be stored in the `SERVICEPERFDATA`_ macro.
 
   * Case 3: Multiple lines of output (text and perfdata)
     A plugin optionally return multiple lines of both text output and
@@ -109,16 +107,12 @@ Let's see some examples of possible plugin output...
 
     If this plugin was used to perform a service check, the red portion
     of first line of output (left of the pipe separator) will be stored
-    in the :ref:`$SERVICEOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceoutput>`
-    macro.
+    in the `SERVICEOUTPUT`_ macro.
 
 The orange portions of the first and subsequent lines are concatenated
-(with spaces) are stored in the
-:ref:`$SERVICEPERFDATA$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceperfdata>`
-macro. The blue portions of the 2nd - 5th lines of output will be
-concatenated (with escaped newlines) and stored in
-:ref:`$LONGSERVICEOUTPUT$ <basics_standard_macros#standard_macrosmacroavailabilitychartlongserviceoutput>`
-the macro.
+(with spaces) are stored in the `SERVICEPERFDATA`_ macro. The blue
+portions of the 2nd - 5th lines of output will be concatenated (with
+escaped newlines) and stored in `LONGSERVICEOUTPUT`_ the macro.
 
 The final contents of each macro are listed below:
 
@@ -158,5 +152,5 @@ If you're looking for some example plugins to study, I would recommend
 that you download the official Centreon Engine plugins and look through
 the code for various C, Perl, and shell script plugins. Information on
 obtaining the official Centreon Engine plugins can be found
-:ref:`here <get_started/plugins>`.
+:ref:`here <exploit_plugins>`.
 

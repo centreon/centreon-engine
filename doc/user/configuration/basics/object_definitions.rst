@@ -1,3 +1,5 @@
+.. _obj_def:
+
 Object Definitions
 ******************
 
@@ -12,7 +14,7 @@ you familiarize yourself with object inheritence once you read over the
 documentation presented below, as it will make the job of creating and
 maintaining object definitions much easier than it otherwise would
 be. Also, read up on the
-:ref:`object tricks <advanced_time_saving_tricks_for_object_definitions>`
+:ref:`object tricks <obj_def_tricks>`
 that offer shortcuts for otherwise tedious configuration tasks.
 
 .. note::
@@ -25,6 +27,8 @@ that offer shortcuts for otherwise tedious configuration tasks.
      * Characters that appear after a semicolon (;) in configuration
        lines are treated as comments and are not processed
 
+.. _obj_def_retentionnotes:
+
 Retention Notes
 ===============
 
@@ -32,15 +36,15 @@ It is important to point out that several directives in host, service,
 and contact definitions may not be picked up by Centreon Engine when you
 change them in your configuration files. Object directives that can
 exhibit this behavior are marked with an asterisk
-(:ref:`* <basics_object_definitions#retentionnotes_definition>`).
+(:ref:`* <obj_def_retentionnotes>`).
 The reason for this behavior is due to the fact that Centreon Engine
 chooses to honor values stored in the
-:ref:`state retention file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionfile>`
+:ref:`state retention file <main_cfg_opt_state_retention_file>`
 over values found in the config files, assuming you have
-:ref:`state retention <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+:ref:`state retention <main_cfg_opt_state_retention>`
 enabled on a program-wide basis and the value of the directive is
 changed during runtime with an
-:ref:`external command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckoption>`.
+:ref:`external command <main_cfg_opt_external_command_check>`.
 One way to get around this problem is to disable the retention of
 non-status information using the retain_nonstatus_information directive
 in the host, service, and contact definitions. Disabling this directive
@@ -55,26 +59,28 @@ Sample Configuration Files
 
    Sample object configuration files are installed in the
    /etc/centreon-engine/ directory when you follow the
-   :ref:`quickstart installation guide <get_started/quickstart_installation_guide>`.
+   :ref:`quickstart installation guide <exploit_quickstart>`.
 
 Object Types
 ============
 
-  * :ref:`Host definitions <basics_object_definitions#host_definition>`
-  * :ref:`Host group definitions <basics_object_definitions#hostgroup_definition>`
-  * :ref:`Service definitions <basics_object_definitions#service_definition>`
-  * :ref:`Service group definitions <basics_object_definitions#servicegroup_definition>`
-  * :ref:`Contact definitions <basics_object_definitions#contact_definition>`
-  * :ref:`Contact group definitions <basics_object_definitions#contactgroup_definition>`
-  * :ref:`Time period definitions <basics_object_definitions#timeperiod_definition>`
-  * :ref:`Command definitions <basics_object_definitions#command_definition>`
-  * :ref:`Connector definitions <basics_object_definitions#connector_definition>`
-  * :ref:`Service dependency definitions <basics_object_definitions#servicedependency_definition>`
-  * :ref:`Service escalation definitions <basics_object_definitions#serviceescalation_definition>`
-  * :ref:`Host dependency definitions <basics_object_definitions#hostdependency_definition>`
-  * :ref:`Host escalation definitions <basics_object_definitions#hostescalation_definition>`
-  * :ref:`Extended host information definitions <basics_object_definitions#extendedhostinformation_definition>`
-  * :ref:`Extended service information definitions <basics_object_definitions#extendedserviceinformation_definition>`
+  * :ref:`Host definitions <obj_def_host>`
+  * :ref:`Host group definitions <obj_def_hostgroup>`
+  * :ref:`Service definitions <obj_def_service>`
+  * :ref:`Service group definitions <obj_def_servicegroup>`
+  * :ref:`Contact definitions <obj_def_contact>`
+  * :ref:`Contact group definitions <obj_def_contactgroup>`
+  * :ref:`Time period definitions <obj_def_timeperiod>`
+  * :ref:`Command definitions <obj_def_command>`
+  * :ref:`Connector definitions <obj_def_connector>`
+  * :ref:`Service dependency definitions <obj_def_service_dependency>`
+  * :ref:`Service escalation definitions <obj_def_service_escalation>`
+  * :ref:`Host dependency definitions <obj_def_host_dependency>`
+  * :ref:`Host escalation definitions <obj_def_host_escalation>`
+  * :ref:`Extended host information definitions <obj_def_extended_host_information>`
+  * :ref:`Extended service information definitions <obj_def_extended_service_information>`
+
+.. _obj_def_host:
 
 Host Definition
 ---------------
@@ -169,14 +175,14 @@ Directive Descriptions
 ============================ =========================================================================================================================
 host_name                    This directive is used to define a short name used to identify the host. It is used in host group and service definitions
                              to reference this particular host. Hosts can have multiple services (which are monitored) associated with them. When used
-                             properly, the $HOSTNAME$ :ref:`macro <understanding_macros_and_how_they_work>` will contain this short name.
+                             properly, the $HOSTNAME$ :ref:`macro <understanding_macros>` will contain this short name.
 alias                        This directive is used to define a longer name or description used to identify the host. It is provided in order to allow
                              you to more easily identify a particular host. When used properly, the $HOSTALIAS$
-                             :ref:`macro <understanding_macros_and_how_they_work>` will contain this alias/description.
+                             :ref:`macro <understanding_macros>` will contain this alias/description.
 address                      This directive is used to define the address of the host. Normally, this is an IP address, although it could really be
                              anything you want (so long as it can be used to check the status of the host). You can use a FQDN to identify the host
                              instead of an IP address, but if DNS services are not available this could cause problems. When used properly, the
-                             $HOSTADDRESS$ :ref:`macro <understanding_macros_and_how_they_work>` will contain this address.
+                             $HOSTADDRESS$ :ref:`macro <understanding_macros>` will contain this address.
                              .. note::
 
                                 If you do not specify an address directive in a host definition, the name of the host will be used as its address. A
@@ -188,22 +194,22 @@ parents                      This directive is used to define a comma-delimited 
                              Parent hosts are typically routers, switches, firewalls, etc. that lie between the monitoring host and a remote hosts. A
                              router, switch, etc. which is closest to the remote host is considered to be that host's "parent". Read the "Determining
                              Status and Reachability of Network Hosts" document located
-                             :ref:`here <advanced_determining_status_and_reachability_of_network_hosts>` for more information. If this host is on the
+                             :ref:`here <status_and_reachability_network>` for more information. If this host is on the
                              same network segment as the host doing the monitoring (without any intermediate routers, etc.) the host is considered to
                              be on the local network and will not have a parent host. Leave this value blank if the host does not have a parent host
                              (i.e. it is on the same segment as the Centreon Engine host). The order in which you specify parent hosts has no effect
                              on how things are monitored.
 hostgroups                   This directive is used to identify the short name(s) of the
-                             :ref:`hostgroup(s) <basics_object_definitions#hostgroup_definition>` that the host belongs to. Multiple hostgroups
+                             :ref:`hostgroup(s) <obj_def_hostgroup>` that the host belongs to. Multiple hostgroups
                              should be separated by commas. This directive may be used as an alternative to (or in addition to) using the members
-                             directive in :ref:`hostgroup <basics_object_definitions#hostgroup_definition>` definitions.
-check_command                This directive is used to specify the short name of the :ref:`command <basics_object_definitions#command_definition>`
+                             directive in :ref:`hostgroup <obj_def_hostgroup>` definitions.
+check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
                              that should be used to check if the host is up or down. Typically, this command would try and ping the host to see if it
                              is "alive". The command must return a status of OK (0) or Centreon Engine will assume the host is down. If you leave this
                              argument blank, the host will not be actively checked. Thus, Centreon Engine will likely always assume the host is up (it
                              may show up as being in a "PENDING" state in the web interface). This is useful if you are monitoring printers or other
                              devices that are frequently turned off. The maximum amount of time that the notification command can run is controlled by
-                             the :ref:`host_check_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostchecktimeout>`
+                             the :ref:`host_check_timeout <main_cfg_opt_host_check_timeout>`
                              option.
 initial_state                By default Centreon Engine will assume that all hosts are in UP states when it starts. You can override the initial state
                              for a host by using this directive. Valid options are: o = UP, d = DOWN, and u = UNREACHABLE.
@@ -215,102 +221,102 @@ max_check_attempts           This directive is used to define the number of time
                                 If you do not want to check the status of the host, you must still set this to a minimum value of 1. To bypass the
                                 host check, just leave the check_command option blank.
 check_interval               This directive is used to define the number of "time units" between regularly scheduled checks of the host. Unless you've
-                             changed the :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             changed the :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <service_and_host_check_scheduling>` documentation.
+                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
 retry_interval               This directive is used to define the number of "time units" to wait before scheduling a re-check of the hosts. Hosts are
                              rescheduled at the retry interval when they have changed to a non-UP state. Once the host has been retried
                              max_check_attempts times without a change in its status, it will revert to being scheduled at its "normal" rate as
                              defined by the check_interval value. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <service_and_host_check_scheduling>` documentation.
-active_checks_enabled        :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not active
+                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
+active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active
                              checks (either regularly scheduled or on-demand) of this host are enabled. Values: 0 = disable active host checks,
                              1 = enable active host checks (default).
-passive_checks_enabled       :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not passive
+passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive
                              checks are enabled for this host. Values: 0 = disable passive host checks, 1 = enable passive host checks (default).
 check_period                 This directive is used to specify the short name of the
-                             :ref:`time period <basics_object_definitions#timeperiod_definition>` during which active checks of this host can be made.
-obsess_over_host             :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive determines whether or not checks for the
+                             :ref:`time period <obj_def_timeperiod>` during which active checks of this host can be made.
+obsess_over_host             :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the
                              host will be "obsessed" over using the
-                             :ref:`ochp_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand>`.
-check_freshness              :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not
-                             :ref:`freshness checks <advanced_service_and_host_freshness_checks>` are enabled for this host. Values: 0 = disable
+                             :ref:`ochp_command <main_cfg_opt_obsessive_compulsive_host_processor_command>`.
+check_freshness              :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
+                             :ref:`freshness checks <freshness_checks>` are enabled for this host. Values: 0 = disable
                              freshness checks, 1 = enable freshness checks (default).
 freshness_threshold          This directive is used to specify the freshness threshold (in seconds) for this host. If you set this directive to a
                              value of 0, Centreon Engine will determine a freshness threshold to use automatically.
-event_handler                This directive is used to specify the short name of the :ref:`command <basics_object_definitions#command_definition>`
+event_handler                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
                              that should be run whenever a change in the state of the host is detected (i.e. whenever it goes down or recovers). Read
-                             the documentation on :ref:`event handlers <advanced_event_handlers>` for a more detailed explanation of how to write
+                             the documentation on :ref:`event handlers <event_handlers>` for a more detailed explanation of how to write
                              scripts for handling events. The maximum amount of time that the event handler command can run is controlled by the
-                             :ref:`event_handler_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandlertimeout>`
+                             :ref:`event_handler_timeout <main_cfg_opt_event_handler_timeout>`
                              option.
-event_handler_enabled        :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not the
+event_handler_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
                              event handler for this host is enabled. Values: 0 = disable host event handler, 1 = enable host event handler.
 low_flap_threshold           This directive is used to specify the low state change threshold used in flap detection for this host. More information
-                             on flap detection can be found :ref:`here <advanced_detection_and_handling_of_state_flapping>`. If you set this directive
+                             on flap detection can be found :ref:`here <flapping_detection>`. If you set this directive
                              to a value of 0, the program-wide value specified by the
-                             :ref:`low_host_flap_threshold <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableslowhostflapthreshold>`
+                             :ref:`low_host_flap_threshold <main_cfg_opt_low_host_flap_threshold>`
                              directive will be used.
 high_flap_threshold          This directive is used to specify the high state change threshold used in flap detection for this host. More information
-                             on flap detection can be found :ref:`here <advanced_detection_and_handling_of_state_flapping>`. If you set this directive
+                             on flap detection can be found :ref:`here <flapping_detection>`. If you set this directive
                              to a value of 0, the program-wide value specified by the
-                             :ref:`high_host_flap_threshold <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshighhostflapthreshold>`
+                             :ref:`high_host_flap_threshold <main_cfg_opt_high_host_flap_threshold>`
                              directive will be used.
-flap_detection_enabled       :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not flap
+flap_detection_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not flap
                              detection is enabled for this host. More information on flap detection can be found
-                             :ref:`here <advanced_detection_and_handling_of_state_flapping>`. Values: 0 = disable host flap detection, 1 = enable host
+                             :ref:`here <flapping_detection>`. Values: 0 = disable host flap detection, 1 = enable host
                              flap detection.
 flap_detection_options       This directive is used to determine what host states the
-                             :ref:`flap detection logic <advanced_detection_and_handling_of_state_flapping>` will use for this host. Valid options are
+                             :ref:`flap detection logic <flapping_detection>` will use for this host. Valid options are
                              a combination of one or more of the following: o = UP states, d = DOWN states, u = UNREACHABLE states.
-process_perf_data            :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not the
+process_perf_data            :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
                              processing of performance data is enabled for this host. Values: 0 = disable performance data processing, 1 = enable
                              performance data processing.
 retain_status_information    This directive is used to determine whether or not status-related information about the host is retained across program
                              restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
                              directive. Value: 0 = disable status information retention, 1 = enable status information retention.
 retain_nonstatus_information This directive is used to determine whether or not non-status information about the host is retained across program
                              restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
                              directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
-contacts                     This is a list of the short names of the :ref:`contacts <basics_object_definitions#contact_definition>` that should be
+contacts                     This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be
                              notified whenever there are problems (or recoveries) with this host. Multiple contacts should be separated by commas.
                              Useful if you want notifications to go to just a few people and don't want to configure
-                             :ref:`contact groups <basics_object_definitions#contactgroup_definition>`. You must specify at least one contact or
+                             :ref:`contact groups <obj_def_contactgroup>`. You must specify at least one contact or
                              contact group in each host definition.
-contact_groups               This is a list of the short names of the :ref:`contact groups <basics_object_definitions#contactgroup_definition>` that
+contact_groups               This is a list of the short names of the :ref:`contact groups <obj_def_contactgroup>` that
                              should be notified whenever there are problems (or recoveries) with this host. Multiple contact groups should be
                              separated by commas. You must specify at least one contact or contact group in each host definition.
 notification_interval        This directive is used to define the number of "time units" to wait before re-notifying a contact that this service is
                              still down or unreachable. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
                              not re-notify contacts about problems for this host - only one problem notification will be sent out.
 first_notification_delay     This directive is used to define the number of "time units" to wait before sending out the first problem notification
                              when this host enters a non-UP state. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
                              start sending out notifications immediately.
 notification_period          This directive is used to specify the short name of the
-                             :ref:`time period <basics_object_definitions#timeperiod_definition>` during which notifications of events for this host
+                             :ref:`time period <obj_def_timeperiod>` during which notifications of events for this host
                              can be sent out to contacts. If a host goes down, becomes unreachable, or recoveries during a time which is not covered
                              by the time period, no notifications will be sent out.
 notification_options         This directive is used to determine when notifications for the host should be sent out. Valid options are a combination
                              of one or more of the following: d = send notifications on a DOWN state, u = send notifications on an UNREACHABLE state,
                              r = send notifications on recoveries (OK state), f = send notifications when the host starts and stops
-                             :ref:`flapping <advanced_detection_and_handling_of_state_flapping>`, and s = send notifications when
-                             :ref:`scheduled downtime <advanced_scheduled_downtime>` starts and ends. If you specify n (none) as an option, no host
+                             :ref:`flapping <flapping_detection>`, and s = send notifications when
+                             :ref:`scheduled downtime <scheduled_downtime>` starts and ends. If you specify n (none) as an option, no host
                              notifications will be sent out. If you do not specify any notification options, Centreon Engine will assume that you
                              want notifications to be sent out for all possible states. Example: If you specify d,r in this field, notifications will
                              only be sent out when the host goes DOWN and when it recovers from a DOWN state.
-notifications_enabled        :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not
+notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
                              notifications for this host are enabled. Values: 0 = disable host notifications, 1 = enable host notifications.
 stalking_options             This directive determines which host states "stalking" is enabled for. Valid options are a combination of one or more of
                              the following: o = stalk on UP states, d = stalk on DOWN states, and u = stalk on UNREACHABLE states. More information
-                             on state stalking can be found :ref:`here <advanced_states_talking>`.
+                             on state stalking can be found :ref:`here <states_talking>`.
 notes                        This directive is used to define an optional string of notes pertaining to the host.
 notes_url                    This variable is used to define an optional URL that can be used to provide more information about the host. Any valid
 URL can be used. This can be very useful if you want to make detailed information on the host, emergency contact methods, etc. available to other
@@ -344,6 +350,8 @@ statusmap_image              This variable is used to define the name of an imag
                              side (text takes a little more space). The coordinates you specify here are used as the center of the host cube.
 ============================ =========================================================================================================================
 
+.. _obj_def_hostgroup:
+
 Host Group Definition
 ---------------------
 
@@ -352,7 +360,7 @@ Description
 
 A host group definition is used to group one or more hosts together for
 simplifying configuration with
-:ref:`object tricks <advanced_time_saving_tricks_for_object_definitions>`.
+:ref:`object tricks <obj_def_tricks>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -391,9 +399,9 @@ Directive Descriptions
 hostgroup_name    This directive is used to define a short name used to identify the host group.
 alias             This directive is used to define is a longer name or description used to identify the host group. It is provided in order to allow
                   you to more easily identify a particular host group.
-members           This is a list of the short names of :ref:`hosts <basics_object_definitions#host_definition>` that should be included in this
+members           This is a list of the short names of :ref:`hosts <obj_def_host>` that should be included in this
                   group. Multiple host names should be separated by commas. This directive may be used as an alternative to (or in addition to) the
-                  hostgroups directive in :ref:`host definitions <basics_object_definitions#host_definition>`.
+                  hostgroups directive in :ref:`host definitions <obj_def_host>`.
 hostgroup_members This optional directive can be used to include hosts from other "sub" host groups in this host group. Specify a comma-delimited list
                   of short names of other host groups whose members should be included in this group.
 notes             This directive is used to define an optional string of notes pertaining to the host. If you specify a note here, you will see the
@@ -405,7 +413,9 @@ action_url        This directive is used to define an optional URL that can be u
                   valid URL can be used.
 ================= ====================================================================================================================================
 
-Definition Service
+.. _obj_def_service:
+
+Service Definition
 ------------------
 
 Description
@@ -494,10 +504,10 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================ =========================================================================================================================
-host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <basics_object_definitions#host_definition>`
+host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>`
                              that the service "runs" on or is associated with. Multiple hosts should be separated by commas.
 hostgroup_name               This directive is used to specify the short name(s) of the
-                             :ref:`hostgroup(s) <basics_object_definitions#hostgroup_definition>` that the service "runs" on or is associated with.
+                             :ref:`hostgroup(s) <obj_def_hostgroup>` that the service "runs" on or is associated with.
                              Multiple hostgroups should be separated by commas. The hostgroup_name may be used instead of, or in addition to, the
                              host_name directive.
 service_description;         This directive is used to define the description of the service, which may contain spaces, dashes, and colons
@@ -506,16 +516,16 @@ service_description;         This directive is used to define the description of
 display_name                 This directive is used to define an alternate name that should be displayed in the web interface for this service. If not
                              specified, this defaults to the value you specify for the service_description directive.
 servicegroups                This directive is used to identify the short name(s) of the
-                             :ref:`servicegroup(s) <basics_object_definitions#servicegroup_definition>` that the service belongs to. Multiple
+                             :ref:`servicegroup(s) <obj_def_servicegroup>` that the service belongs to. Multiple
                              servicegroups should be separated by commas. This directive may be used as an alternative to using the members directive
-                             in :ref:`servicegroup <basics_object_definitions#servicegroup_definition>` definitions.
+                             in :ref:`servicegroup <obj_def_servicegroup>` definitions.
 is_volatile                  This directive is used to denote whether the service is "volatile". Services are normally not volatile. More information
-                             on volatile service and how they differ from normal services can be found :ref:`here <advanced_volatile_services>`.
+                             on volatile service and how they differ from normal services can be found :ref:`here <volatile_services>`.
                              Value: 0 = service is not volatile, 1 = service is volatile.
-check_command                This directive is used to specify the short name of the :ref:`command <basics_object_definitions#command_definition>`
+check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
                              that Centreon Engine will run in order to check the status of the service. The maximum amount of time that the service
                              check command can run is controlled by the
-                             :ref:`service_check_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesservicechecktimeout>`
+                             :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>`
                              option.
 initial_state                By default Centreon Engine will assume that all services are in OK states when it starts. You can override the initial
                              state for a service by using this directive. Valid options are: o = OK, w = WARNING, u = UNKNOWN, and c = CRITICAL.
@@ -525,106 +535,106 @@ max_check_attempts           This directive is used to define the number of time
 check_interval               This directive is used to define the number of "time units" to wait before scheduling the next "regular" check of the
                              service. "Regular" checks are those that occur when the service is in an OK state or when the service is in a non-OK
                              state, but has already been rechecked max_check_attempts number of times. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <service_and_host_check_scheduling>` documentation.
+                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
 retry_interval               This directive is used to define the number of "time units" to wait before scheduling a re-check of the service. Services
                              are rescheduled at the retry interval when they have changed to a non-OK state. Once the service has been retried
                              max_check_attempts times without a change in its status, it will revert to being scheduled at its "normal" rate as
                              defined by the check_interval value. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <service_and_host_check_scheduling>` documentation.
-active_checks_enabled        :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not active
+                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
+active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active
                              checks of this service are enabled. Values: 0 = disable active service checks, 1 = enable active service checks
                              (default).
-passive_checks_enabled       :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not passive
+passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive
                              checks of this service are enabled. Values: 0 = disable passive service checks, 1 = enable passive service checks
                              (default).
 check_period                 This directive is used to specify the short name of the
-                             :ref:`time period <basics_object_definitions#timeperiod_definition>` during which active checks of this service can be
+                             :ref:`time period <obj_def_timeperiod>` during which active checks of this service can be
                              made.
-obsess_over_service          :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive determines whether or not checks for the
+obsess_over_service          :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the
                              service will be "obsessed" over using the
-                             :ref:`ocsp_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand>`.
-check_freshness              :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not
-                             :ref:`freshness checks <advanced_service_and_host_freshness_checks>` are enabled for this service. Values: 0 = disable
+                             :ref:`ocsp_command <main_cfg_opt_obsessive_compulsive_service_processor_command>`.
+check_freshness              :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
+                             :ref:`freshness checks <freshness_checks>` are enabled for this service. Values: 0 = disable
                              freshness checks, 1 = enable freshness checks (default).
 freshness_threshold          This directive is used to specify the freshness threshold (in seconds) for this service. If you set this directive to a
                              value of 0, Centreon Engine will determine a freshness threshold to use automatically.
-event_handler                This directive is used to specify the short name of the :ref:`command <basics_object_definitions#command_definition>`
+event_handler                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
                              that should be run whenever a change in the state of the service is detected (i.e. whenever it goes down or recovers).
-                             Read the documentation on:ref:`event handlers <advanced_event_handlers>` for a more detailed explanation of how to write
+                             Read the documentation on:ref:`event handlers <event_handlers>` for a more detailed explanation of how to write
                              scripts for handling events. The maximum amount of time that the event handler command can run is controlled by the
-                             :ref:`event_handler_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableseventhandlertimeout>`
+                             :ref:`event_handler_timeout <main_cfg_opt_event_handler_timeout>`
                              option.
 event_handler_enabled        This directive is used to determine whether or not the event handler for this service is enabled. Values: 0 = disable
                              service event handler, 1 = enable service event handler.
 low_flap_threshold           This directive is used to specify the low state change threshold used in flap detection for this service. More
-                             information on flap detection can be found :ref:`here <advanced_detection_and_handling_of_state_flapping>`. If you set
+                             information on flap detection can be found :ref:`here <flapping_detection>`. If you set
                              this directive to a value of 0, the program-wide value specified by the
-                             :ref:`low_service_flap_threshold <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableslowserviceflapthreshold>`
+                             :ref:`low_service_flap_threshold <main_cfg_opt_low_service_flap_threshold>`
                              directive will be used.
 high_flap_threshold          This directive is used to specify the high state change threshold used in flap detection for this service. More
-                             information on flap detection can be found :ref:`here <advanced_detection_and_handling_of_state_flapping>`. If you set
+                             information on flap detection can be found :ref:`here <flapping_detection>`. If you set
                              this directive to a value of 0, the program-wide value specified by the
-                             :ref:`high_service_flap_threshold <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshighserviceflapthreshold>`
+                             :ref:`high_service_flap_threshold <main_cfg_opt_high_service_flap_threshold>`
                              directive will be used.
-flap_detection_enabled       :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not flap
+flap_detection_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not flap
                              detection is enabled for this service. More information on flap detection can be found
-                             :ref:`here <advanced_detection_and_handling_of_state_flapping>`. Values: 0 = disable service flap detection, 1 = enable
+                             :ref:`here <flapping_detection>`. Values: 0 = disable service flap detection, 1 = enable
                              service flap detection.
 flap_detection_options       This directive is used to determine what service states the
-                             :ref:`flap detection logic <advanced_detection_and_handling_of_state_flapping>` will use for this service. Valid options
+                             :ref:`flap detection logic <flapping_detection>` will use for this service. Valid options
                              are a combination of one or more of the following: o = OK states, w = WARNING states, c = CRITICAL states,
                              u = UNKNOWN states.
-process_perf_data            :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not the
+process_perf_data            :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
                              processing of performance data is enabled for this service. Values: 0 = disable performance data processing,
                              1 = enable performance data processing.
 retain_status_information    This directive is used to determine whether or not status-related information about the service is retained across
                              program restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
                              directive. Value: 0 = disable status information retention, 1 = enable status information retention.
 retain_nonstatus_information This directive is used to determine whether or not non-status information about the service is retained across program
                              restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
                              directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 notification_interval        This directive is used to define the number of "time units" to wait before re-notifying a contact that this service is
                              still in a non-OK state. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
                              not re-notify contacts about problems for this service - only one problem notification will be sent out.
 first_notification_delay     This directive is used to define the number of "time units" to wait before sending out the first problem notification
                              when this service enters a non-OK state. Unless you've changed the
-                             :ref:`interval_length <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablestimingintervallength>`
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
                              start sending out notifications immediately.
 notification_period          This directive is used to specify the short name of the
-                             :ref:`time period <basics_object_definitions#timeperiod_definition>` during which notifications of events for this
+                             :ref:`time period <obj_def_timeperiod>` during which notifications of events for this
                              service can be sent out to contacts. No service notifications will be sent out during times which is not covered by the
                              time period.
 notification_options         This directive is used to determine when notifications for the service should be sent out. Valid options are a
                              combination of one or more of the following: w = send notifications on a WARNING state, u = send notifications on an
                              UNKNOWN state, c = send notifications on a CRITICAL state, r = send notifications on recoveries (OK state), f = send
-                             notifications when the service starts and stops :ref:`flapping <advanced_detection_and_handling_of_state_flapping>`,
-                             and s = send notifications when :ref:`scheduled downtime <advanced_scheduled_downtime>` starts and ends. If you specify n
+                             notifications when the service starts and stops :ref:`flapping <flapping_detection>`,
+                             and s = send notifications when :ref:`scheduled downtime <scheduled_downtime>` starts and ends. If you specify n
                              (none) as an option, no service notifications will be sent out. If you do not specify any notification options, Centreon
                              Engine will assume that you want notifications to be sent out for all possible states. Example: If you specify w,r in
                              this field, notifications will only be sent out when the service goes into a WARNING state and when it recovers from a
                              WARNING state.
-notifications_enabled        :ref:`* <basics_object_definitions#retentionnotes_definition>` This directive is used to determine whether or not
+notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
                              notifications for this service are enabled. Values: 0 = disable service notifications, 1 = enable service notifications.
-contacts                     This is a list of the short names of the :ref:`contacts <basics_object_definitions#contact_definition>` that should be
+contacts                     This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be
                              notified whenever there are problems (or recoveries) with this service. Multiple contacts should be separated by commas.
                              Useful if you want notifications to go to just a few people and don't want to configure
-                             :ref:`contact groups <basics_object_definitions#contactgroup_definition>`. You must specify at least one contact or
+                             :ref:`contact groups <obj_def_contactgroup>`. You must specify at least one contact or
                              contact group in each service definition.
-contact_groups               This is a list of the short names of the :ref:`contact groups <basics_object_definitions#contactgroup_definition>` that
+contact_groups               This is a list of the short names of the :ref:`contact groups <obj_def_contactgroup>` that
                              should be notified whenever there are problems (or recoveries) with this service. Multiple contact groups should be
                              separated by commas. You must specify at least one contact or contact group in each service definition.
 stalking_options             This directive determines which service states "stalking" is enabled for. Valid options are a combination of one or more
                              of the following: o = stalk on OK states, w = stalk on WARNING states, u = stalk on UNKNOWN states, and c = stalk on
-                             CRITICAL states. More information on state stalking can be found :ref:`here <advanced_states_talking>`.
+                             CRITICAL states. More information on state stalking can be found :ref:`here <states_talking>`.
 notes                        This directive is used to define an optional string of notes pertaining to the service.
 notes_url                    This directive is used to define an optional URL that can be used to provide more information about the service. Any
                              valid URL can be used. This can be very useful if you want to make detailed information on the service, emergency
@@ -638,6 +648,8 @@ icon_image_alt               This variable is used to define an optional string 
                              <icon_image> argument.
 ============================ =========================================================================================================================
 
+.. _obj_def_servicegroup:
+
 Service Group Definition
 ------------------------
 
@@ -646,7 +658,7 @@ Description
 
 A service group definition is used to group one or more services
 together for simplifying configuration with
-:ref:`object tricks <advanced_time_saving_tricks_for_object_definitions>`.
+:ref:`object tricks <obj_def_tricks>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -685,9 +697,9 @@ Directive Descriptions
 servicegroup_name    This directive is used to define a short name used to identify the service group.
 alias                This directive is used to define is a longer name or description used to identify the service group. It is provided in order to
                      allow you to more easily identify a particular service group.
-members              This is a list of the descriptions of :ref:`services <basics_object_definitions#service_definition>` (and the names of their
+members              This is a list of the descriptions of :ref:`services <obj_def_service>` (and the names of their
                      corresponding hosts) that should be included in this group. Host and service names should be separated by commas. This directive
-                     may be used as an alternative to the servicegroups directive in :ref:`service <basics_object_definitions#service_definition>`
+                     may be used as an alternative to the servicegroups directive in :ref:`service <obj_def_service>`
                      definitions". The format of the member directive is as follows (note that a host name must precede a service
                      name/description):members=<host1>,<service1>,<host2>,<service2>,...,<hostn>,<servicen>
 servicegroup_members This optional directive can be used to include services from other "sub" service groups in this service group. Specify a
@@ -699,6 +711,8 @@ notes_url            This directive is used to define an optional URL that can b
 action_url           This directive is used to define an optional URL that can be used to provide more actions to be performed on the service group.
                      Any valid URL can be used.
 ==================== =================================================================================================================================
+
+.. _obj_def_contact:
 
 Contact Definition
 ------------------
@@ -769,75 +783,77 @@ Directive Descriptions
 
 ============================= ========================================================================================================================
 contact_name                  This directive is used to define a short name used to identify the contact. It is referenced in
-                              :ref:`contact group <basics_object_definitions#contactgroup_definition>` definitions. Under the right circumstances, the
-                              $CONTACTNAME$ :ref:`macro <understanding_macros_and_how_they_work>` will contain this value.
+                              :ref:`contact group <obj_def_contactgroup>` definitions. Under the right circumstances, the
+                              $CONTACTNAME$ :ref:`macro <understanding_macros>` will contain this value.
 alias                         This directive is used to define a longer name or description for the contact. Under the rights circumstances, the
-                              $CONTACTALIAS$ :ref:`macro <understanding_macros_and_how_they_work>` will contain this value. If not specified, the
+                              $CONTACTALIAS$ :ref:`macro <understanding_macros>` will contain this value. If not specified, the
                               contact_name will be used as the alias.
 contactgroups                 This directive is used to identify the short name(s) of the
-                              :ref:`contactgroup(s) <basics_object_definitions#contactgroup_definition>` that the contact belongs to. Multiple
+                              :ref:`contactgroup(s) <obj_def_contactgroup>` that the contact belongs to. Multiple
                               contactgroups should be separated by commas. This directive may be used as an alternative to (or in addition to) using
-                              the members directive in :ref:`contactgroup <basics_object_definitions#contactgroup_definition>` definitions.
+                              the members directive in :ref:`contactgroup <obj_def_contactgroup>` definitions.
 host_notifications_enabled    This directive is used to determine whether or not the contact will receive notifications about host problems and
                               recoveries. Values: 0 = don't send notifications, 1 = send notifications.
 service_notifications_enabled This directive is used to determine whether or not the contact will receive notifications about service problems and
                               recoveries. Values: 0 = don't send notifications, 1 = send notifications.
 host_notification_period      This directive is used to specify the short name of the
-                              :ref:`time period <basics_object_definitions#timeperiod_definition>` during which the contact can be notified about host
+                              :ref:`time period <obj_def_timeperiod>` during which the contact can be notified about host
                               problems or recoveries. You can think of this as an "on call" time for host notifications for the contact. Read the
                               documentation on :ref:`time periods <timeperiods>` for more information on how this works and potential problems that
                               may result from improper use.
 service_notification_period   This directive is used to specify the short name of the
-                              :ref:`time period <basics_object_definitions#timeperiod_definition>` during which the contact can be notified about
+                              :ref:`time period <obj_def_timeperiod>` during which the contact can be notified about
                               service problems or recoveries. You can think of this as an "on call" time for service notifications for the contact.
                               Read the documentation on :ref:`time periods <timeperiods>` for more information on how this works and potential
                               problems that may result from improper use.
 host_notification_commands    This directive is used to define a list of the short names of the
-                              :ref:`commands <basics_object_definitions#command_definition>` used to notify the contact of a host problem or recovery.
+                              :ref:`commands <obj_def_command>` used to notify the contact of a host problem or recovery.
                               Multiple notification commands should be separated by commas. All notification commands are executed when the contact
                               needs to be notified. The maximum amount of time that a notification command can run is controlled by the
-                              :ref:`notification_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationtimeout>`
+                              :ref:`notification_timeout <main_cfg_opt_notification_timeout>`
                               option.
 host_notification_options     This directive is used to define the host states for which notifications can be sent out to this contact. Valid options
                               are a combination of one or more of the following: d = notify on DOWN host states, u = notify on UNREACHABLE host
                               states, r = notify on host recoveries (UP states), f = notify when the host starts and stops
-                              :ref:`flapping <advanced_detection_and_handling_of_state_flapping>`, and s = send notifications when host or service
-                              :ref:`scheduled downtime <advanced_scheduled_downtime>` starts and ends. If you specify n (none) as an option, the
+                              :ref:`flapping <flapping_detection>`, and s = send notifications when host or service
+                              :ref:`scheduled downtime <scheduled_downtime>` starts and ends. If you specify n (none) as an option, the
                               contact will not receive any type of host notifications.
 service_notification_options  This directive is used to define the service states for which notifications can be sent out to this contact. Valid
                               options are a combination of one or more of the following: w = notify on WARNING service states, u = notify on UNKNOWN
                               service states, c = notify on CRITICAL service states, r = notify on service recoveries (OK states), and f = notify when
-                              the service starts and stops :ref:`flapping <advanced_detection_and_handling_of_state_flapping>`. If you specify n
+                              the service starts and stops :ref:`flapping <flapping_detection>`. If you specify n
                               (none) as an option, the contact will not receive any type of service notifications.
 service_notification_commands This directive is used to define a list of the short names of the
-                              :ref:`commands <basics_object_definitions#command_definition>` used to notify the contact of a service problem or
+                              :ref:`commands <obj_def_command>` used to notify the contact of a service problem or
                               recovery. Multiple notification commands should be separated by commas. All notification commands are executed when the
                               contact needs to be notified. The maximum amount of time that a notification command can run is controlled by the
-                              :ref:`notification_timeout <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesnotificationtimeout>`
+                              :ref:`notification_timeout <main_cfg_opt_notification_timeout>`
                               option.
 email                         This directive is used to define an email address for the contact. Depending on how you configure your notification
                               commands, it can be used to send out an alert email to the contact. Under the right circumstances, the $CONTACTEMAIL$
-                              :ref:`macro <understanding_macros_and_how_they_work>` will contain this value.
+                              :ref:`macro <understanding_macros>` will contain this value.
 pager                         This directive is used to define a pager number for the contact. It can also be an email address to a pager gateway
-                              (i.e. :ref:`pagejoe@pagenet.com <mailto/pagejoe@pagenet.com>`). Depending on how you configure your notification
+                              (i.e. pagejoe@pagenet.com). Depending on how you configure your notification
                               commands, it can be used to send out an alert page to the contact. Under the right circumstances, the $CONTACTPAGER$
-                              :ref:`macro <understanding_macros_and_how_they_work>` will contain this value.
+                              :ref:`macro <understanding_macros>` will contain this value.
 addressx                      Address directives are used to define additional "addresses" for the contact. These addresses can be anything - cell
                               phone numbers, instant messaging addresses, etc. Depending on how you configure your notification commands, they can be
                               used to send out an alert to the contact. Up to six addresses can be defined using these directives (address1 through
-                              address6). The $CONTACTADDRESSx$ :ref:`macro <understanding_macros_and_how_they_work>` will contain this value.
+                              address6). The $CONTACTADDRESSx$ :ref:`macro <understanding_macros>` will contain this value.
 can_submit_commands           This directive is used to determine whether or not the contact can submit
-                              :ref:`external commands <advanced_external_commands>` to Centreon Engine. Values: 0 = don't allow contact to submit
+                              :ref:`external commands <external_commands>` to Centreon Engine. Values: 0 = don't allow contact to submit
                               commands, 1 = allow contact to submit commands.
 retain_status_information     This directive is used to determine whether or not status-related information about the contact is retained across
                               program restarts. This is only useful if you have enabled state retention using the
-                              :ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
                               directive. Value: 0 = disable status information retention, 1 = enable status information retention.
 retain_nonstatus_information  This directive is used to determine whether or not non-status information about the contact is retained across program
                               restarts. This is only useful if you have enabled state retention using the
-                              :ref:`retain_state_information <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesstateretentionoption>`
+                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
                               directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 ============================= ========================================================================================================================
+
+.. _obj_def_contactgroup:
 
 Contact Group Definition
 ------------------------
@@ -846,7 +862,7 @@ Description
 ^^^^^^^^^^^
 
 A contact group definition is used to group one or more
-:ref:`contacts <basics_object_definitions#contact_definition>`
+:ref:`contacts <obj_def_contact>`
 together for the purpose of sending out alert/recovery
 :ref:`notifications <notifications>`.
 
@@ -884,12 +900,14 @@ Directive Descriptions
 contactgroup_name    This directive is a short name used to identify the contact group.
 alias                This directive is used to define a longer name or description used to identify the contact group.
 members              This optional directive is used to define a list of the short names of
-                     :ref:`contacts <basics_object_definitions#contact_definition>` that should be included in this group. Multiple contact names
+                     :ref:`contacts <obj_def_contact>` that should be included in this group. Multiple contact names
                      should be separated by commas. This directive may be used as an alternative to (or in addition to) using the contactgroups
-                     directive in :ref:`contact <basics_object_definitions#contact_definition>` definitions.
+                     directive in :ref:`contact <obj_def_contact>` definitions.
 contactgroup_members This optional directive can be used to include contacts from other "sub" contact groups in this contact group. Specify a
                      comma-delimited list of short names of other contact groups whose members should be included in this group.
 ==================== =================================================================================================================================
+
+.. _obj_def_timeperiod:
 
 Time Period Definition
 ----------------------
@@ -995,6 +1013,8 @@ exclude         This directive is used to specify the short names of other timep
                 timeperiod. Multiple timeperiod names should be separated with a comma.
 =============== ======================================================================================================================================
 
+.. _obj_def_command:
+
 Command Definition
 ------------------
 
@@ -1005,11 +1025,11 @@ A command definition is just that. It defines a command. Commands that
 can be defined include service checks, service notifications, service
 event handlers, host checks, host notifications, and host event
 handlers. Command definitions can contain
-:ref:`macros <understanding_macros_and_how_they_work>`,
+:ref:`macros <understanding_macros>`,
 but you must make sure that you include only those macros that are
 "valid" for the circumstances when the command will be used. More
 information on what macros are available and when they are "valid" can
-be found :ref:`here <understanding_macros_and_how_they_work>`. The
+be found :ref:`here <understanding_macros>`. The
 different arguments to a command definition are outlined below.
 
 Definition Format
@@ -1042,30 +1062,31 @@ Directive Descriptions
 
 ============ =========================================================================================================================================
 command_name This directive is the short name used to identify the command. It is referenced in
-             :ref:`contact <basics_object_definitions#contact_definition>`, :ref:`host <basics_object_definitions#host_definition>`, and
-             :ref:`service <basics_object_definitions#service_definition>` definitions (in notification, check, and event handler directives), among
+             :ref:`contact <obj_def_contact>`, :ref:`host <obj_def_host>`, and
+             :ref:`service <obj_def_service>` definitions (in notification, check, and event handler directives), among
              other places.
 command_line This directive is used to define what is actually executed by Centreon Engine when the command is used for service or host checks,
-             notifications, or :ref:`event handlers <advanced_event_handlers>`. Before the command line is executed, all valid
-             :ref:`macros <understanding_macros_and_how_they_work>` are replaced with their respective values. See the documentation on macros for
+             notifications, or :ref:`event handlers <event_handlers>`. Before the command line is executed, all valid
+             :ref:`macros <understanding_macros>` are replaced with their respective values. See the documentation on macros for
              determining when you can use different macros. Note that the command line is not surrounded in quotes. Also, if you want to pass a dollar
              sign ($) on the command line, you have to escape it with another dollar sign.**Note:**You may not include a semicolon (;) in the
              command_line directive, because everything after it will be ignored as a config file comment. You can work around this limitation by
-             setting one of the :ref:`$USER$ <basics_understanding_macros_and_how_they_work#understanding_macros_and_how_they_workmacrosasenvironmentvariables>`
-             macros in your :ref:`resource file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesresourcefile>`
+             setting one of the :ref:`$USER$ <macros_usern>`
+             macros in your :ref:`resource file <main_cfg_opt_resource_file>`
              to a semicolon and then referencing the appropriate $USER$ macro in the command_line directive in place of the semicolon.If you want to
-             pass arguments to commands during runtime, you can use
-             :ref:`$ARGn$ macros <basics_understanding_macros_and_how_they_work#understanding_macros_and_how_they_workexample2commandargumentmacros>`
+             pass arguments to commands during runtime, you can use :ref:`$ARGn$ macros <macro_argn>`
              in the command_line directive of the command definition and then separate individual arguments from the command name (and from each
              other) using bang (!) characters in the object definition directive (host check command, service event handler command, etc) that
              references the command. More information on how arguments in command definitions are processed during runtime can be found in the
-             documentation on :ref:`macros <understanding_macros_and_how_they_work>`.
+             documentation on :ref:`macros <understanding_macros>`.
              .. note::
 
                 Centreon-Engine does not support the shell commands in command_line. You need to define a command without shell features.
 connector   This directive is used for link a command with a connector. When this directive is not empty, the command is replace by the connector.
             When the connector is call the command_line argument is use.
 =========== ==========================================================================================================================================
+
+.. _obj_def_connector:
 
 Connector Definition
 --------------------
@@ -1083,6 +1104,8 @@ Definition Format
 .. note::
 
    Directives using a bold font are required, while those are optional.
+
+::
 
   define connector{
     @b connector_name connector_name
@@ -1104,10 +1127,12 @@ Directive Descriptions
 
 ============== =======================================================================================================================================
 connector_name This directive is the short name used to identify the connector. It is referenced in
-               :ref:`command <basics_object_definitions#connector_definition>` definitions.
+               :ref:`command <obj_def_connector>` definitions.
 connector_line This directive is used to define the path of the binary connector and the optional argument. It is possible to use the
                Centreon-Engine macros.
 ============== =======================================================================================================================================
+
+.. _obj_def_service_dependency:
 
 Service Dependency Definition
 -----------------------------
@@ -1121,7 +1146,7 @@ on the status of one or more other services. Service dependencies are
 optional and are mainly targeted at advanced users who have complicated
 monitoring setups. More information on how service dependencies work
 (read this!) can be found
-:ref:`here <advanced_host_and_service_dependencies>`.
+:ref:`here <host_and_service_dependencies>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -1165,22 +1190,22 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================= ========================================================================================================================
-dependent_host_name           This directive is used to identify the short name(s) of the :ref:`host(s) <basics_object_definitions#host_definition>`
+dependent_host_name           This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>`
                               that the dependent service "runs" on or is associated with. Multiple hosts should be separated by commas.
 dependent_hostgroup_name      This directive is used to specify the short name(s) of the
-                              :ref:`hostgroup(s) <basics_object_definitions#hostgroup_definition>` that the dependent service "runs" on or is
+                              :ref:`hostgroup(s) <obj_def_hostgroup>` that the dependent service "runs" on or is
                               associated with. Multiple hostgroups should be separated by commas. The dependent_hostgroup may be used instead of, or
                               in addition to, the dependent_host directive.
 dependent_service_description This directive is used to identify the description of the dependent
-                              :ref:`service <basics_object_definitions#service_definition>`.
+                              :ref:`service <obj_def_service>`.
 host_name                     This directive is used to identify the short name(s) of the
-                              :ref:`host(s) <basics_object_definitions#host_definition>` that the service that is being depended upon (also referred
+                              :ref:`host(s) <obj_def_host>` that the service that is being depended upon (also referred
                               to as the master service) "runs" on or is associated with. Multiple hosts should be separated by commas.
 hostgroup_name                This directive is used to identify the short name(s) of the
-                              :ref:`hostgroup(s) <basics_object_definitions#host_definition>` that the service that is being depended upon (also
+                              :ref:`hostgroup(s) <obj_def_host>` that the service that is being depended upon (also
                               referred to as the master service) "runs" on or is associated with. Multiple hostgroups should be separated by
                               commas. The hostgroup_name may be used instead of, or in addition to, the host_name directive.
-service_description           This directive is used to identify the description of the :ref:`service <basics_object_definitions#service_definition>`
+service_description           This directive is used to identify the description of the :ref:`service <obj_def_service>`
                               that is being depended upon (also referred to as the master service).
 inherits_parent               This directive indicates whether or not the dependency inherits dependencies of the service that is being depended upon
                               (also referred to as the master service). In other words, if the master service is dependent upon other services and any
@@ -1202,9 +1227,11 @@ notification_failure_criteria This directive is used to define the criteria that
                               w in this field, the notifications for the dependent service will not be sent out if the master service is in a WARNING
                               state.
 dependency_period             This directive is used to specify the short name of the
-                              :ref:`time period <basics_object_definitions#timeperiod_definition>` during which this dependency is valid. If this
+                              :ref:`time period <obj_def_timeperiod>` during which this dependency is valid. If this
                               directive is not specified, the dependency is considered to be valid during all times.
 ============================= ========================================================================================================================
+
+.. _obj_def_service_escalation:
 
 Service Escalation Definition
 -----------------------------
@@ -1215,7 +1242,7 @@ Description
 Service escalations are completely optional and are used to escalate
 notifications for a particular service. More information on how
 notification escalations work can be found
-:ref:`here <advanced_notification_escalations>`.
+:ref:`here <notification_escalations>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -1257,12 +1284,12 @@ Descriptions Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ===================== ================================================================================================================================
-host_name             This directive is used to identify the short name(s) of the :ref:`host(s) <basics_object_definitions#host_definition>` that the
-                      :ref:`service <basics_object_definitions#service_definition>` escalation should apply to or is associated with.
-hostgroup_name        This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <basics_object_definitions#hostgroup_definition>`
+host_name             This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>` that the
+                      :ref:`service <obj_def_service>` escalation should apply to or is associated with.
+hostgroup_name        This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>`
                       that the service escalation should apply to or is associated with. Multiple hostgroups should be separated by commas. The
                       hostgroup_name may be used instead of, or in addition to, the host_name directive.
-service_description   This directive is used to identify the description of the :ref:`service <basics_object_definitions#service_definition>` the
+service_description   This directive is used to identify the description of the :ref:`service <obj_def_service>` the
                       escalation should apply to.
 first_notification    This directive is a number that identifies the first notification for which this escalation is effective. For instance, if you
                       set this value to 3, this escalation will only be used if the service is in a non-OK state long enough for a third notification
@@ -1270,13 +1297,13 @@ first_notification    This directive is a number that identifies the first notif
 last_notification     This directive is a number that identifies the last notification for which this escalation is effective. For instance, if you
                       set this value to 5, this escalation will not be used if more than five notifications are sent out for the service. Setting this
                       value to 0 means to keep using this escalation entry forever (no matter how many notifications go out).
-contacts              This is a list of the short names of the :ref:`contacts <basics_object_definitions#contact_definition>` that should be notified
+contacts              This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be notified
                       whenever there are problems (or recoveries) with this service. Multiple contacts should be separated by commas. Useful if you
                       want notifications to go to just a few people and don't want to configure
-                      :ref:`contact groups <basics_object_definitions#contactgroup_definition>`. You must specify at least one contact or contact
+                      :ref:`contact groups <obj_def_contactgroup>`. You must specify at least one contact or contact
                       group in each service escalation definition.
 contact_groups        This directive is used to identify the short name of the
-                      :ref:`contact group <basics_object_definitions#contactgroup_definition>` that should be notified when the service notification
+                      :ref:`contact group <obj_def_contactgroup>` that should be notified when the service notification
                       is escalated. Multiple contact groups should be separated by commas. You must specify at least one contact or contact group in
                       each service escalation definition.
 notification_interval This directive is used to determine the interval at which notifications should be made while this escalation is valid. If you
@@ -1287,7 +1314,7 @@ notification_interval This directive is used to determine the interval at which 
 
                          If multiple escalation entries for a host overlap for one or more notification ranges, the smallest notification interval
                          from all escalation entries is used.
-escalation_period     This directive is used to specify the short name of the :ref:`time period <basics_object_definitions#timeperiod_definition>`
+escalation_period     This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>`
                       during which this escalation is valid. If this directive is not specified, the escalation is considered to be valid during all
                       times.
 escalation_options    This directive is used to define the criteria that determine when this service escalation is used. The escalation is used only
@@ -1297,6 +1324,8 @@ escalation_options    This directive is used to define the criteria that determi
                       c = escalate on a CRITICAL state. Example: If you specify w in this field, the escalation will only be used if the service is
                       in a WARNING state.
 ===================== ================================================================================================================================
+
+.. _obj_def_host_dependency:
 
 Host Dependency Definition
 --------------------------
@@ -1309,7 +1338,7 @@ you to suppress notifications for hosts based on the status of one or
 more other hosts. Host dependencies are optional and are mainly targeted
 at advanced users who have complicated monitoring setups. More
 information on how host dependencies work (read this!) can be found
-:ref:`here <advanced_host_and_service_dependencies>`.
+:ref:`here <host_and_service_dependencies>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -1347,13 +1376,13 @@ Directive Descriptions
 
 ============================= ========================================================================================================================
 dependent_host_name           This directive is used to identify the short name(s) of the dependent
-                              :ref:`host(s) <basics_object_definitions#host_definition>`. Multiple hosts should be separated by commas.
+                              :ref:`host(s) <obj_def_host>`. Multiple hosts should be separated by commas.
 dependent_hostgroup_name      This directive is used to identify the short name(s) of the dependent
-                              :ref:`hostgroup(s) <basics_object_definitions#host_definition>`. Multiple hostgroups should be separated by commas. The
+                              :ref:`hostgroup(s) <obj_def_host>`. Multiple hostgroups should be separated by commas. The
                               dependent_hostgroup_name may be used instead of, or in addition to, the dependent_host_name directive.
-host_name                     This directive is used to identify the short name(s) of the :ref:`host(s) <basics_object_definitions#host_definition>`
+host_name                     This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>`
                               that is being depended upon (also referred to as the master host). Multiple hosts should be separated by commas.
-hostgroup_name                This directive is used to identify the short name(s) of the :ref:`hostgroup(s) <basics_object_definitions#host_definition>`
+hostgroup_name                This directive is used to identify the short name(s) of the :ref:`hostgroup(s) <obj_def_host>`
                               that is being depended upon (also referred to as the master host). Multiple hostgroups should be separated by commas.
                               The hostgroup_name may be used instead of, or in addition to, the host_name directive.
 inherits_parent               This directive indicates whether or not the dependency inherits dependencies of the host that is being depended upon
@@ -1374,9 +1403,11 @@ notification_failure_criteria This directive is used to define the criteria that
                               dependent host will always be sent out. Example: If you specify d in this field, the notifications for the dependent
                               host will not be sent out if the master host is in a DOWN state.
 dependency_period             This directive is used to specify the short name of the
-                              :ref:`time period <basics_object_definitions#timeperiod_definition>` during which this dependency is valid. If this
+                              :ref:`time period <obj_def_timeperiod>` during which this dependency is valid. If this
                               directive is not specified, the dependency is considered to be valid during all times.
 ============================= ========================================================================================================================
+
+.. _obj_def_host_escalation:
 
 Host Escalation Definition
 --------------------------
@@ -1387,7 +1418,7 @@ Description
 Host escalations are completely optional and are used to escalate
 notifications for a particular host. More information on how
 notification escalations work can be found
-:ref:`here <advanced_notification_escalations>`.
+:ref:`here <notification_escalations>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -1427,10 +1458,10 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ===================== ================================================================================================================================
-host_name             This directive is used to identify the short name of the :ref:`host <basics_object_definitions#host_definition>` that the
+host_name             This directive is used to identify the short name of the :ref:`host <obj_def_host>` that the
                       escalation should apply to.
 hostgroup_name        This directive is used to identify the short name(s) of the
-                      :ref:`hostgroup(s) <basics_object_definitions#hostgroup_definition>` that the escalation should apply to. Multiple hostgroups
+                      :ref:`hostgroup(s) <obj_def_hostgroup>` that the escalation should apply to. Multiple hostgroups
                       should be separated by commas. If this is used, the escalation will apply to all hosts that are members of the specified
                       hostgroup(s).
 first_notification    This directive is a number that identifies the first notification for which this escalation is effective. For instance, if you
@@ -1439,13 +1470,13 @@ first_notification    This directive is a number that identifies the first notif
 last_notification     This directive is a number that identifies the last notification for which this escalation is effective. For instance, if you
                       set this value to 5, this escalation will not be used if more than five notifications are sent out for the host. Setting this
                       value to 0 means to keep using this escalation entry forever (no matter how many notifications go out).
-contacts              This is a list of the short names of the :ref:`contacts <basics_object_definitions#contact_definition>` that should be notified
+contacts              This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be notified
                       whenever there are problems (or recoveries) with this host. Multiple contacts should be separated by commas. Useful if you want
                       notifications to go to just a few people and don't want to configure
-                      :ref:`contact <basics_object_definitions#contactgroup_definition>` groups". You must specify at least one contact or contact
+                      :ref:`contact <obj_def_contactgroup>` groups". You must specify at least one contact or contact
                       group in each host escalation definition.
 contact_groups        This directive is used to identify the short name of the
-                      :ref:`contact group <basics_object_definitions#contactgroup_definition>` that should be notified when the host notification is
+                      :ref:`contact group <obj_def_contactgroup>` that should be notified when the host notification is
                       escalated. Multiple contact groups should be separated by commas. You must specify at least one contact or contact group in
                       each host escalation definition.
 notification_interval This directive is used to determine the interval at which notifications should be made while this escalation is valid. If you
@@ -1456,7 +1487,7 @@ notification_interval This directive is used to determine the interval at which 
 
                          If multiple escalation entries for a host overlap for one or more notification ranges, the smallest notification interval
                          from all escalation entries is used.
-escalation_period     This directive is used to specify the short name of the :ref:`time period <basics_object_definitions#timeperiod_definition>`
+escalation_period     This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>`
                       during which this escalation is valid. If this directive is not specified, the escalation is considered to be valid during all
                       times.
 escalation_options    This directive is used to define the criteria that determine when this host escalation is used. The escalation is used only if
@@ -1465,6 +1496,8 @@ escalation_options    This directive is used to define the criteria that determi
                       r = escalate on an UP (recovery) state, d = escalate on a DOWN state, and u = escalate on an UNREACHABLE state. Example: If you
                       specify d in this field, the escalation will only be used if the host is in a DOWN state.
 ===================== ================================================================================================================================
+
+.. _obj_def_extended_host_information:
 
 Extended Host Information Definition
 ------------------------------------
@@ -1479,7 +1512,7 @@ output. They have no effect on monitoring and are completely optional.
 
    As of Centreon Engine 1.x, all directives contained in extended host
    information definitions are also available in
-   :ref:`host definitions <basics_object_definitions#host_definition>`.
+   :ref:`host definitions <obj_def_host>`.
    Thus, you can choose to define the directives below in your host
    definitions if it makes your configuration simpler. Separate extended
    host information definitions will continue to be supported for
@@ -1530,7 +1563,7 @@ Variable Descriptions
 ^^^^^^^^^^^^^^^^^^^^^
 
 =============== ======================================================================================================================================
-host_name       This variable is used to identify the short name of the :ref:`host <basics_object_definitions#host_definition>` which the data is
+host_name       This variable is used to identify the short name of the :ref:`host <obj_def_host>` which the data is
                 associated with.
 notes           This directive is used to define an optional string of notes pertaining to the host.
 notes_url       This variable is used to define an optional URL that can be used to provide more information about the host. Any valid URL can be
@@ -1563,6 +1596,8 @@ statusmap_image This variable is used to define the name of an image that should
                 more space). The coordinates you specify here are used as the center of the host cube.
 =============== ======================================================================================================================================
 
+.. _obj_def_extended_service_information:
+
 Extended Service Information Definition
 ---------------------------------------
 
@@ -1576,7 +1611,7 @@ output. They have no effect on monitoring and are completely optional.
 
    As of Centreon Engine 3.x, all directives contained in
    extended service information definitions are also available in
-   :ref:`service definitions <basics_object_definitions#service_definition>`.
+   :ref:`service definitions <obj_def_service>`.
    Thus, you can choose to define the directives below in your service
    definitions if it makes your configuration simpler. Separate extended
    service information definitions will continue to be supported for
@@ -1622,8 +1657,8 @@ Variable Descriptions
 
 =================== ==================================================================================================================================
 host_name           This directive is used to identify the short name of the host that the
-                    :ref:`service <basics_object_definitions#service_definition>` is associated with.
-service_description This directive is description of the :ref:`service <basics_object_definitions#service_definition>` which the data is associated
+                    :ref:`service <obj_def_service>` is associated with.
+service_description This directive is description of the :ref:`service <obj_def_service>` which the data is associated
                     with.
 notes               This directive is used to define an optional string of notes pertaining to the service.
 notes_url           This directive is used to define an optional URL that can be used to provide more information about the service. Any valid URL can

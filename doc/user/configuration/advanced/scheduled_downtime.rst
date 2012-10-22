@@ -1,3 +1,5 @@
+.. _scheduled_downtime:
+
 Scheduled Downtime
 ******************
 

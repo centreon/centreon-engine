@@ -1,3 +1,5 @@
+.. _object_configuration_overview:
+
 Object Configuration Overview
 *****************************
 
@@ -26,14 +28,14 @@ Where Are Objects Defined?
 
 Objects can be defined in one or more configuration files and/or
 directories that you specify using the
-:ref:`cfg_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobjectconfigurationfile>`
+:ref:`cfg_file <main_cfg_opt_object_configuration_file>`
 and/or
-:ref:`cfg_dir <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesobjectconfigurationdirectory>`
+:ref:`cfg_dir <main_cfg_opt_object_configuration_directory>`
 directives in the main configuration file.
 
 .. note::
    When you follow
-   :ref:`quickstart installation guide <get_started/quickstart_installation_guide>`,
+   :ref:`quickstart installation guide <exploit_quickstart>`,
    several sample object configuration files are placed in
    */etc/centreon-engine/objects*/. You can use these sample files to
    see how object inheritance works and learn how to define your own
@@ -45,21 +47,21 @@ How Are Objects Defined?
 Objects are defined in a flexible template format, which can make it
 much easier to manage your Centreon Engine configuration in the long
 term. Basic information on how to define objects in your configuration
-files can be found :ref:`here <object_definitions>`.
+files can be found :ref:`here <obj_def>`.
 
 Once you get familiar with the basics of how to define objects, you
 should read up on :ref:`object inheritance <object_inheritance>`, as it
 will make your configuration more robust for the future. Seasoned users
 can exploit some advanced features of object definitions as described in
 the documentation on
-:ref:`object tricks <advanced_time_saving_tricks_for_object_definitions>`.
+:ref:`object tricks <obj_def_tricks>`.
 
 Objects Explained
 =================
 
 Some of the main object types are explained in greater detail below...
 
-:ref:`Host <basics_object_definitions#object_definitionsobjecttypeshostdefinition>`
+:ref:`Host <obj_def_host>`
 are one of the central objects in the monitoring logic. Important
 attributes of hosts are as follows:
 
@@ -69,18 +71,18 @@ attributes of hosts are as follows:
   * Hosts have one or more more services associated with them.
   * Hosts can have parent/child relationships with other hosts, often
     representing real-world network connections, which is used in the
-    :ref:`network reachability <advanced_determining_status_and_reachability_of_network_hosts>`
+    :ref:`network reachability <status_and_reachability_network>`
     logic.
 
-:ref:`Host Groups <basics_object_definitions#object_definitionsobjecttypeshostgroupdefinition>`
+:ref:`Host Groups <obj_def_hostgroup>`
 are groups of one or more hosts. Host groups can make it easier to (1)
 view the status of related hosts in the Centreon Engine web interface
 and (2) simplify your configuration through the use of
-:ref:`object tricks <advanced_time_saving_tricks_for_object_definitions>`.
+:ref:`object tricks <obj_def_tricks>`.
 
 .. image:: objects-hosts.png
 
-:ref:`Services <basics_object_definitions#object_definitionsobjecttypesservicedefinitionservice>`
+:ref:`Services <obj_def_service>`
 are one of the central objects in the monitoring logic. Services are
 associated with hosts and can be:
 
@@ -88,29 +90,29 @@ associated with hosts and can be:
   * Services provided by the host (HTTP, POP3, FTP, SSH, etc.)
   * Other things associated with the host (DNS records, etc.)
 
-:ref:`Services Groups <basics_object_definitions#object_definitionsobjecttypesservicegroupdefinition>`
+:ref:`Services Groups <obj_def_servicegroup>`
 are groups of one or more services. Service groups can make it easier to
 (1) view the status of related services in the Centreon Engine web
 interface and (2) simplify your configuration through the use of
-:ref:`object tricks <advanced_time_saving_tricks_for_object_definitions>`.
+:ref:`object tricks <obj_def_tricks>`.
 
 .. image:: objects-services.png
 
-:ref:`Contacts <basics_object_definitions#object_definitionsobjecttypescontactdefinition>`
+:ref:`Contacts <obj_def_contact>`
 are people involved in the notification process:
 
   * Contacts have one or more notification methods (cellphone, pager,
     email, instant messaging, etc.)
   * Contacts receive notifications for hosts and service they are
     responsible for
-    :ref:`Contacts Groups <basics_object_definitions#object_definitionsobjecttypescontactgroupdefinition>`
+    :ref:`Contacts Groups <obj_def_contactgroup>`
     are groups of one or more contacts. Contact groups can make it
     easier to define all the people who get notified when certain host
     or service problems occur.
 
 .. image:: objects-contacts.png
 
-:ref:`Timeperiods <basics_object_definitions#object_definitionsobjecttypestimeperioddefinition>`
+:ref:`Timeperiods <obj_def_timeperiod>`
 are are used to control:
 
   * When hosts and services can be monitored
@@ -121,7 +123,7 @@ Information on how timeperiods work can be found
 
 .. image:: objects-timeperiods.png
 
-:ref:`Commands <basics_object_definitions#object_definitionsobjecttypescommanddefinition>`
+:ref:`Commands <obj_def_command>`
 are used to tell Centreon Engine what programs, scripts, etc. it should
 execute to perform:
 

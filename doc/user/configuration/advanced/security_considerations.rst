@@ -101,7 +101,7 @@ Strip Dangerous Characters From Macros
 --------------------------------------
 
 Use the
-:ref:`illegal_macro_output_chars <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesillegalmacrooutputcharacters>`
+:ref:`illegal_macro_output_chars <main_cfg_opt_illegal_macro_output_characters>`
 directive to strip dangerous characters from the $HOSTOUTPUT$,
 $SERVICEOUTPUT$, $HOSTPERFDATA$, and $SERVICEPERFDATA$ macros before
 they're used in notifications, etc. Dangerous characters can be anything

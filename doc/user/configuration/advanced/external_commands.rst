@@ -1,3 +1,5 @@
+.. _external_commands:
+
 External Commands
 *****************
 
@@ -7,7 +9,7 @@ Introduction
 Centreon Engine can process commands from external applications and
 alter various aspects of its monitoring functions based on the commands
 it receives. External applications can submit commands by writing to the
-:ref:`command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`,
+:ref:`command file <main_cfg_opt_external_command_file>`,
 which is periodically processed by the Centreon Engine daemon.
 
 .. image:: external_commands.png
@@ -19,23 +21,23 @@ In order to have Centreon Engine process external commands, make sure
 you do the following::
 
   * enable external command checking with the
-    :ref:`check_external_commands <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckoption>`
+    :ref:`check_external_commands <main_cfg_opt_external_command_check>`
     option
   * set the frequency of command checks with the
-    :ref:`command_check_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckinterval>`
+    :ref:`command_check_interval <main_cfg_opt_external_command_check_interval>`
     option
   * specify the location of the command file with the
-    :ref:`command_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`
+    :ref:`command_file <main_cfg_opt_external_command_file>`
     option
   * setup proper permissions on the directory containing the external
     command file, as described in the
-    :ref:`quickstart guide <get_started/quickstart_installation_guide>`
+    :ref:`quickstart guide <exploit_quickstart>`
 
 When Does Centreon Engine Check For External Commands?
 ======================================================
 
   * At regular intervals specified by the
-    :ref:`command_check_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandcheckinterval>`
+    :ref:`command_check_interval <main_cfg_opt_external_command_check_interval>`
     option in the main configuration file
   * Immediately after :ref:`event handlers <event_handlers>` are
     executed. This is in addtion to the regular cycle of external
@@ -55,7 +57,7 @@ Command Format
 ==============
 
 External commands that are written to the
-:ref:`command file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesexternalcommandfile>`
+:ref:`command file <main_cfg_opt_external_command_file>`
 have the following format::
 
   [time] command_id;command_arguments

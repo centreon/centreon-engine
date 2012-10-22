@@ -1,3 +1,5 @@
+.. _performance_data:
+
 Performance Data
 ****************
 
@@ -5,7 +7,7 @@ Introduction
 ============
 
 Centreon Engine is designed to allow
-:ref:`plugins <get_started/plugins>`
+:ref:`plugins <exploit_plugins>`
 to return optional performance data in addition to normal status data,
 as well as allow you to pass that performance data to external
 applications for processing. A description of the different types of
@@ -26,15 +28,11 @@ execution of a host or service check. This might include things like
 service check latency (i.e. how "late" was the service check from its
 scheduled execution time) and the number of seconds a host or service
 check took to execute. This type of performance data is available for
-all checks that are performed. The
-:ref:`$HOSTEXECUTIONTIME$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostexecutiontime>`
-and :ref:`$SERVICEEXECUTIONTIME$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceexecutiontime>`
-:ref:`macros <basics_understanding_macros_and_how_they_work>` can be
-used to determine the number of seconds a host or service check was
-running and the :ref:`$HOSTLATENCY$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostlatency>`
-and :ref:`$SERVICELATENCY$ <basics_standard_macros#standard_macrosmacroavailabilitychartservicelatency>`
-macros can be used to determine how "late" a regularly-scheduled host or
-service check was.
+all checks that are performed. The `HOSTEXECUTIONTIME`_ and
+`SERVICEEXECUTIONTIME`_ :ref:`macros <understanding_macros>` can be used
+to determine the number of seconds a host or service check was running
+and the `HOSTLATENCY`_ and `SERVICELATENCY`_ macros can be used to
+determine how "late" a regularly-scheduled host or service check was.
 
 Plugin performance data is external data specific to the plugin used to
 perform the host or service check. Plugin-specific data can include
@@ -42,12 +40,10 @@ things like percent packet loss, free disk space, processor load, number
 of current users, etc. - basically any type of metric that the plugin is
 measuring when it executes. Plugin-specific performance data is optional
 and may not be supported by all plugins. Plugin-specific performance
-data (if available) can be obtained by using the :ref:`$HOSTPERFDATA$ <basics_standard_macros#standard_macrosmacroavailabilitycharthostperfdata>`
-and :ref:`$SERVICEPERFDATA$ <basics_standard_macros#standard_macrosmacroavailabilitychartserviceperfdata>`
-:ref:`macros <basics_understanding_macros_and_how_they_work>`. Read on
-for more information on how plugins can return performance data to
-Centreon Engine for inclusion in the $HOSTPERFDATA$ and
-$SERVICEPERFDATA$ macros.
+data (if available) can be obtained by using the `HOSTPERFDATA`_ and
+`SERVICEPERFDATA`_ :ref:`macros <understanding_macros>`. Read on for
+more information on how plugins can return performance data to Centreon
+Engine for inclusion in the $HOSTPERFDATA$ and $SERVICEPERFDATA$ macros.
 
 Plugin Performance Data
 =======================
@@ -61,7 +57,7 @@ like the following::
 
 With this simple type of output, the entire line of text is available in
 the $HOSTOUTPUT$ or $SERVICEOUTPUT$
-:ref:`macros <basics_understanding_macros_and_how_they_work>`
+:ref:`macros <understanding_macros>`
 (depending on whether this plugin was used as a host check or service
 check).
 
@@ -112,7 +108,7 @@ If you want to process the performance data that is available from
 Centreon Engine and the plugins, you'll need to do the following:
 
   * Enable the
-    :ref:`process_performance_data <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesperformance_dataprocessingoption>`
+    :ref:`process_performance_data <main_cfg_opt_prefdata_processing>`
     option.
   * Configure Centreon Engine so that performance data is either written
     to files and/or processed by executing commands.
@@ -128,8 +124,8 @@ Engine execute commands (that you specify) to process or redirect the
 data for later processing by external applications. The commands that
 Centreon Engine executes to process host and service performance data
 are determined by the
-:ref:`host_perfdata_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_dataprocessingcommand>`
-and :ref:`service_perfdata_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_dataprocessingcommand>`
+:ref:`host_perfdata_command <main_cfg_opt_host_prefdata_processing_command>`
+and :ref:`service_perfdata_command <main_cfg_opt_service_prefdata_processing_command>`
 options, respectively.
 
 An example command definition that redirects service check performance
@@ -153,12 +149,12 @@ Writing Performance Data To Files
 =================================
 
 You can have Centreon Engine write all host and service performance data
-directly to text files using the :ref:`host_perfdata_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafile>`
-and :ref:`service_perfdata_file <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafile>`
+directly to text files using the :ref:`host_perfdata_file <main_cfg_opt_host_prefdata_file>`
+and :ref:`service_perfdata_file <main_cfg_opt_service_prefdata_file>`
 options. The format in which host and service performance data is
 written to those files is determined by the
-:ref:`template host_perfdata_file_template <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafile>`
-and :ref:`service_perfdata_file_template <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafiletemplate>`
+:ref:`template host_perfdata_file_template <main_cfg_opt_host_prefdata_file>`
+and :ref:`service_perfdata_file_template <main_cfg_opt_service_prefdata_file_template>`
 options.
 
 An example file format template for service performance data might look
@@ -169,16 +165,16 @@ like this::
 By default, the text files will be opened in "append" mode. If you need
 to change the modes to "write" or "non-blocking read/write" (useful when
 writing to pipes), you can use the
-:ref:`host_perfdata_file_mode <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafilemode>`
-and :ref:`service_perfdata_file_mode <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafilemode>`
+:ref:`host_perfdata_file_mode <main_cfg_opt_host_prefdata_file_mode>`
+and :ref:`service_perfdata_file_mode <main_cfg_opt_service_prefdata_file_mode>`
 options.
 
 Additionally, you can have Centreon Engine periodically execute commands
 to periocially process the performance data files (e.g. rotate them)
-using the :ref:`host_perfdata_file_processing_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafileprocessingcommand>`
-and :ref:`service_perfdata_file_processing_command <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafileprocessingcommand>`
+using the :ref:`host_perfdata_file_processing_command <main_cfg_opt_host_prefdata_file_processing_command>`
+and :ref:`service_perfdata_file_processing_command <main_cfg_opt_service_prefdata_file_processing_command>`
 options. The interval at which these commands are executed are governed
-by the :ref:`host_perfdata_file_processing_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariableshostperformance_datafileprocessinginterval>`
-and :ref:`service_perfdata_file_processing_interval <basics_main_configuration_file_options#main_configuration_file_optionsconfigurationfilevariablesserviceperformance_datafileprocessinginterval>`
+by the :ref:`host_perfdata_file_processing_interval <main_cfg_opt_host_prefdata_file_processing_interval>`
+and :ref:`service_perfdata_file_processing_interval <main_cfg_opt_service_prefdata_file_processing_interval>`
 options, respectively.
 
