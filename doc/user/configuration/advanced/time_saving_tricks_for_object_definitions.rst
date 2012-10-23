@@ -44,7 +44,6 @@ in the examples below (host names, hostgroup names, service names, and
 servicegroup names).
 
 .. note::
-
    Be careful when enabling regular expression matching - you may have
    to change your config file, since some directives that you might not
    want to be interpreted as a regular expression just might be! Any
@@ -56,12 +55,12 @@ Service Definitions
 ===================
 
 Multiple Hosts: If you want to create identical
-:ref:`services <obj_def_service>`
-that are assigned to multiple hosts, you can specify multiple hosts in
-the host_name directive. The definition below would create a service
-called SOMESERVICE on hosts HOST1 through HOSTN. All the instances of
-the SOMESERVICE service would be identical (i.e. have the same check
-command, max check attempts, notification period, etc.)::
+:ref:`services <obj_def_service>` that are assigned to multiple hosts,
+you can specify multiple hosts in the host_name directive. The
+definition below would create a service called SOMESERVICE on hosts
+HOST1 through HOSTN. All the instances of the SOMESERVICE service would
+be identical (i.e. have the same check command, max check attempts,
+notification period, etc.)::
 
   define service{
     host_name           HOST1,HOST2,HOST3,...,HOSTN
@@ -174,11 +173,11 @@ the host or hostgroup with a ! symbol::
   }
 
 All Services On Same Host: If you want to create
-:ref:`service escalations <obj_def_service_escalation>`
-for all services assigned to a particular host, you can use a wildcard
-in the service_description directive. The definition below would create
-a service escalation for all services on host HOST1. All the instances
-of the service escalation would be identical (i.e. have the same contact
+:ref:`service escalations <obj_def_service_escalation>` for all services
+assigned to a particular host, you can use a wildcard in the
+service_description directive. The definition below would create a
+service escalation for all services on host HOST1. All the instances of
+the service escalation would be identical (i.e. have the same contact
 groups, notification interval, etc.).
 
 If you feel like being particularly adventurous, you can specify a
@@ -193,13 +192,13 @@ defined in your configuration files::
   }
 
 Multiple Services On Same Host: If you want to create
-:ref:`service escalations <obj_def_service_escalation>`
-for all multiple services assigned to a particular host, you can use a
-specify more than one service description in the service_description
-directive. The definition below would create a service escalation for
-services SERVICE1 through SERVICEN on host HOST1. All the instances of
-the service escalation would be identical (i.e. have the same contact
-groups, notification interval, etc.)::
+:ref:`service escalations <obj_def_service_escalation>` for all multiple
+services assigned to a particular host, you can use a specify more than
+one service description in the service_description directive. The
+definition below would create a service escalation for services SERVICE1
+through SERVICEN on host HOST1. All the instances of the service
+escalation would be identical (i.e. have the same contact groups,
+notification interval, etc.)::
 
   define serviceescalation{
     host_name           HOST1
@@ -226,14 +225,14 @@ Service Dependency Definitions
 ==============================
 
 Multiple Hosts: If you want to create
-:ref:`service dependencies <obj_def_service_dependency>`
-for services of the same name/description that are assigned to multiple
-hosts, you can specify multiple hosts in the host_name and or
-dependent_host_name directives. In the example below, service SERVICE2
-on hosts HOST3 and HOST4 would be dependent on service SERVICE1 on hosts
-HOST1 and HOST2. All the instances of the service dependencies would be
-identical except for the host names (i.e. have the same notification
-failure criteria, etc.)::
+:ref:`service dependencies <obj_def_service_dependency>` for services of
+the same name/description that are assigned to multiple hosts, you can
+specify multiple hosts in the host_name and or dependent_host_name
+directives. In the example below, service SERVICE2 on hosts HOST3 and
+HOST4 would be dependent on service SERVICE1 on hosts HOST1 and
+HOST2. All the instances of the service dependencies would be identical
+except for the host names (i.e. have the same notification failure
+criteria, etc.)::
 
   define servicedependency{
     host_name                     HOST1,HOST2
@@ -326,12 +325,11 @@ Host Escalation Definitions
 ===========================
 
 Multiple Hosts: If you want to create
-:ref:`host escalations <obj_def_host_escalation>`
-for multiple hosts, you can specify multiple hosts in the host_name
-directive. The definition below would create a host escalation for hosts
-HOST1 through HOSTN. All the instances of the host escalation would be
-identical (i.e. have the same contact groups, notification interval,
-etc.)::
+:ref:`host escalations <obj_def_host_escalation>` for multiple hosts,
+you can specify multiple hosts in the host_name directive. The
+definition below would create a host escalation for hosts HOST1 through
+HOSTN. All the instances of the host escalation would be identical
+(i.e. have the same contact groups, notification interval, etc.)::
 
   define hostescalation{
     host_name HOST1,HOST2,HOST3,...,HOSTN
@@ -379,15 +377,14 @@ hostgroup with a ! symbol::
 Host Dependency Definitions
 ===========================
 
-Multiple Hosts: If you want to create :ref:`host dependencies
-<obj_def_host_dependency>`
-for multiple hosts, you can specify multiple hosts in the host_name
-and/or dependent_host_name directives. The definition below would be
-equivalent to creating six seperate host dependencies. In the example
-above, hosts HOST3, HOST4 and HOST5 would be dependent upon both HOST1
-and HOST2. All the instances of the host dependencies would be identical
-except for the host names (i.e. have the same notification failure
-criteria, etc.)::
+Multiple Hosts: If you want to create
+:ref:`host dependencies <obj_def_host_dependency>` for multiple hosts,
+you can specify multiple hosts in the host_name and/or
+dependent_host_name directives. The definition below would be equivalent
+to creating six seperate host dependencies. In the example above, hosts
+HOST3, HOST4 and HOST5 would be dependent upon both HOST1 and HOST2. All
+the instances of the host dependencies would be identical except for the
+host names (i.e. have the same notification failure criteria, etc.)::
 
   define hostdependency{
     host_name           HOST1,HOST2

@@ -7,7 +7,6 @@ Introduction
 ============
 
 .. note::
-
    Centreon Engine is not designed to be a replacement for a full-blown
    SNMP management application like HP OpenView or `OpenNMS
    <http://www.opennms.org/>`_. However, you can set things up so that

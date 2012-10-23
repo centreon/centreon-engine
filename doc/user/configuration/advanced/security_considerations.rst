@@ -81,7 +81,7 @@ Lock Down The External Command File
 -----------------------------------
 
 If you enable :ref:`external commands <external_commands>`, make sure
-you set proper permissions on the /var/log/centreon-engine/rw
+you set proper permissions on the ``/var/log/centreon-engine/rw``
 directory. You only want the Centreon Engine user (usually centengine)
 and the web server user (usually nobody, httpd, apache2, or www-data) to
 have permissions to write to the command file. If you've installed

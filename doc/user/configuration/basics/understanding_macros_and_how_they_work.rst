@@ -86,7 +86,6 @@ command would look like this:
   $ /usr/lib/nagios/plugins/check_ping -H 192.168.1.2 -w 200.0,80% -c 400.0,40%
 
 .. note::
-
    If you need to pass bang (!) characters in your command arguments,
    you can do so by escaping them with a backslash (\). If you need to
    include backslashes in your command arguments, they should also be
@@ -109,8 +108,8 @@ except for the fact that they contain an identifier for the host or
 service from which they should get their value. Here's the basic format
 for on-demand macros::
 
-  * **HOSTMACRONAME:** ost_name
-  * **SERVICEMACRONAME:** ost_name:service_description
+  * **HOSTMACRONAME:** host_name
+  * **SERVICEMACRONAME:** host_name:service_description
 
 Replace HOSTMACRONAME and SERVICEMACRONAME with the name of one of the
 standard host of service macros found :ref:`here <standard_macros>`.
@@ -121,7 +120,6 @@ identifier consists of both a host name and a service description -
 these are separated by a colon (:) as well.
 
 .. note::
-
    On-demand service macros can contain an empty host name field. In
    this case the name of the host associated with the service will
    automatically be used.

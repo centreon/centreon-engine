@@ -76,15 +76,15 @@ running on (as described in the documentation on
 info on how to submit passive check results from other hosts.
 
 In order to facilitate the submission of passive check results to a
-remote host, I've written the
-:ref:`nsca addon <addons_nsca>`. The addon consists of two
-pieces. The first is a client program (send_nsca) which is run from a
-remote host and is used to send the service check results to another
-server. The second piece is the nsca daemon (nsca) which either runs as
-a standalone daemon or under inetd and listens for connections from
-client programs. Upon receiving service check information from a client,
-the daemon will sumbit the check information to Centreon Engine (on the
-central server) by inserting a PROCESS_SVC_CHECK_RESULT command into the
+remote host, I've written the :ref:`nsca addon <addons_nsca>`. The addon
+consists of two pieces. The first is a client program (send_nsca) which
+is run from a remote host and is used to send the service check results
+to another server. The second piece is the nsca daemon (nsca) which
+either runs as a standalone daemon or under inetd and listens for
+connections from client programs. Upon receiving service check
+information from a client, the daemon will sumbit the check information
+to Centreon Engine (on the central server) by inserting a
+PROCESS_SVC_CHECK_RESULT command into the
 :ref:`external command file <main_cfg_opt_external_command_file>`,
 along with the check results. The next time Centreon Engine checks for
 :ref:`external commands <external_commands>`, it will find the passive
@@ -179,8 +179,8 @@ central_server with the IP address of the central server)::
   /bin/printf "%s\t%s\t%s\t%s\n" "$1" "$2" "$return_code" "$4" | /usr/local/nsca/bin/send_nsca -H central_server -c /etc/centreon-engine/send_nsca.cfg
 
 The script above assumes that you have the send_nsca program and it
-configuration file (send_nsca.cfg) located in the
-/usr/local/nsca/bin/ and /etc/centreon-engine/ directories,
+configuration file (``send_nsca.cfg``) located in the
+``/usr/local/nsca/bin/`` and ``/etc/centreon-engine/`` directories,
 respectively.
 
 That's it! We've sucessfully configured a remote host running Centreon
@@ -193,7 +193,7 @@ numbers in the reference diagram above):
     executes the command you defined by the
     :ref:`ocsp_command <main_cfg_opt_obsessive_compulsive_service_processor_command>`
     variable. In our example, this is the
-    /usr/lib/nagios/plugins/event_handlers/submit_check_result
+    ``/usr/lib/nagios/plugins/event_handlers/submit_check_result``
     script. Note that the definition for the submit_check_result command
     passed four pieces of information to the script: the name of the
     host the service is associated with, the service description, the
@@ -276,15 +276,15 @@ Freshness Checking
 
 Centreon Engine supports a feature that does "freshness" checking on the
 results of service checks. More information freshness checking can be
-found :ref:`here <freshness_checks>`. This features
-gives some protection against situations where remote hosts may stop
-sending passive service checks into the central monitoring server. The
-purpose of "freshness" checking is to ensure that service checks are
-either being provided passively by distributed servers on a regular
-basis or performed actively by the central server if the need arises. If
-the service check results provided by the distributed servers get
-"stale", Centreon Engine can be configured to force active checks of the
-service from the central monitoring host.
+found :ref:`here <freshness_checks>`. This features gives some
+protection against situations where remote hosts may stop sending
+passive service checks into the central monitoring server. The purpose
+of "freshness" checking is to ensure that service checks are either
+being provided passively by distributed servers on a regular basis or
+performed actively by the central server if the need arises. If the
+service check results provided by the distributed servers get "stale",
+Centreon Engine can be configured to force active checks of the service
+from the central monitoring host.
 
 So how do you do this? On the central monitoring server you need to
 configure services that are being monitoring by distributed servers as

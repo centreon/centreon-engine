@@ -6,13 +6,12 @@ Performance Data
 Introduction
 ============
 
-Centreon Engine is designed to allow
-:ref:`plugins <exploit_plugins>`
-to return optional performance data in addition to normal status data,
-as well as allow you to pass that performance data to external
-applications for processing. A description of the different types of
-performance data, as well as information on how to go about processing
-that data is described below...
+Centreon Engine is designed to allow :ref:`plugins <exploit_plugins>` to
+return optional performance data in addition to normal status data, as
+well as allow you to pass that performance data to external applications
+for processing. A description of the different types of performance
+data, as well as information on how to go about processing that data is
+described below...
 
 Types of Performance Data
 =========================
@@ -63,8 +62,7 @@ like the following::
   PING ok - Packet loss = 0%, RTA = 0.80 ms
 
 With this simple type of output, the entire line of text is available in
-the $HOSTOUTPUT$ or $SERVICEOUTPUT$
-:ref:`macros <understanding_macros>`
+the $HOSTOUTPUT$ or $SERVICEOUTPUT$ :ref:`macros <understanding_macros>`
 (depending on whether this plugin was used as a host check or service
 check).
 
@@ -98,7 +96,6 @@ obtained from plugins, as described in the
 :ref:`plugin API documentation <centengine_plugin_api>`.
 
 .. note::
-
    The Centreon Engine daemon doesn't directly process plugin
    performance data, so it doesn't really care what the performance data
    looks like. There aren't really any inherent limitations on the
@@ -145,7 +142,6 @@ below::
   }
 
 .. note::
-
    This method, while flexible, comes with a relatively high CPU
    overhead. If you're processing performance data for a large number of
    hosts and services, you'll probably want Centreon Engine to write

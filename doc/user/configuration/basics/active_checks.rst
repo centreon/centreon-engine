@@ -7,10 +7,10 @@ Introduction
 ============
 
 Centreon Engine is capable of monitoring hosts and services in two ways:
-actively and passively. Passive checks are described :ref:`elsewhere <passive_checks>`,
-so we'll focus on active checks here. Active checks are the most common
-method for monitoring hosts and services. The main features of actives
-checks as as follows:
+actively and passively. Passive checks are described
+:ref:`elsewhere <passive_checks>`, so we'll focus on active checks
+here. Active checks are the most common method for monitoring hosts and
+services. The main features of actives checks as as follows:
 
   * Active checks are initiated by the Centreon Engine process
   * Active checks are run on a regularly scheduled basis

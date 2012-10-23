@@ -16,17 +16,17 @@ Configuration Options
 
 Before we begin, there are several configuration options that affect how
 service checks are scheduled, executed, and processed. For starters, each
-:ref:`service definition <obj_def_service>`
-contains three options that determine when and how each specific service
-check is scheduled and executed. Those three options are:
+:ref:`service definition <obj_def_service>` contains three options that
+determine when and how each specific service check is scheduled and
+executed. Those three options are:
 
   * normal_check_interval
   * retry_check_interval
   * check_period
 
 There are also four configuration options in the
-:ref:`main configuration file <main_cfg_opt>`
-that affect service checks. These include:
+:ref:`main configuration file <main_cfg_opt>` that affect service
+checks. These include:
 
   * :ref:`service_inter_check_delay_method <main_cfg_opt_service_inter_check_delay_method>`
   * :ref:`service_interleave_factor <main_cfg_opt_service_interleave_factor>`
@@ -34,7 +34,6 @@ that affect service checks. These include:
   * :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
 
 .. note::
-
    The last directive affects host checks as well.
 
 We'll go into more detail on how all these options affect service check
@@ -64,7 +63,6 @@ keep the load on the local and remote hosts fairly balanced as time goes
 by ...
 
 .. note::
-
    If you want to view the initial service check scheduling information,
    start Centreon Engine using the -s command line option. Doing so will
    display basic scheduling information (inter-check delay, interleave
@@ -239,17 +237,16 @@ Time Restraints
 ===============
 
 The *check_period* option determines the
-:ref:`time period <timeperiods>`
-during which Centreon Engine can run checks of the service. Regardless
-of what status a particular service is in, if the time that it is
-actually executed is not a valid time within the time period that has
-been specified, the check will not be executed. Instead, Centreon Engine
-will reschedule the service check for the next valid time in the time
-period. If the check can be run (e.g. the time is valid within the time
-period), the service check is executed.
+:ref:`time period <timeperiods>` during which Centreon Engine can run
+checks of the service. Regardless of what status a particular service is
+in, if the time that it is actually executed is not a valid time within
+the time period that has been specified, the check will not be
+executed. Instead, Centreon Engine will reschedule the service check for
+the next valid time in the time period. If the check can be run
+(e.g. the time is valid within the time period), the service check is
+executed.
 
 .. note::
-
    Even though a service check may not be able to be executed at a given
    time, Centreon Engine may still schedule it to be run at that
    time. This is most likely to happen during the initial scheduling of
@@ -345,7 +342,7 @@ explain how things are done.
 .. image:: /_static/images/checktiming.png
    :align: center
 
-First off, the **X<sub>n</sub>** events are check result reaper events
+First off, the **X :sub:`n`** events are check result reaper events
 that are scheduled at a frequency specified by the
 :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
 option in the main config file. Check result reaper events do the work

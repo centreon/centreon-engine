@@ -47,7 +47,6 @@ future checks of the service result in the same non-OK state, no hard
 state change occurs and none of the events mentioned take place again.
 
 .. note::
-
    If you are only interested in logging, consider using
    :ref:`stalking <states_talking>` options instead.
 
@@ -83,7 +82,7 @@ Centreon Engine Configuration:
 PortSentry Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Edit your PortSentry configuration file (portsentry.conf) and define a
+Edit your PortSentry configuration file (``portsentry.conf``) and define a
 command for the KILL_RUN_CMD directive as follows::
 
     KILL_RUN_CMD="/usr/local/Centreon Engine/libexec/event_handlers/submit_check_result host_name 'Port Scans' 2 'Port scan from host $TARGET$ on port $PORT$. Host has been firewalled.'"
@@ -94,7 +93,7 @@ service is associated with.
 Port Scan Script
 ^^^^^^^^^^^^^^^^
 
-Create a shell script in the /usr/lib/nagios/plugins/event_handlers
+Create a shell script in the ``/usr/lib/nagios/plugins/event_handlers``
 directory named submit_check_result. The contents of the shell script
 should be something similiar to the following::
 

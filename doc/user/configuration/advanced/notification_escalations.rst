@@ -18,7 +18,6 @@ in your :ref:`object configuration <object_configuration_overview>`
 file(s)".
 
 .. note::
-
    The examples I provide below all make use of service escalation
    definitions, but host escalations work the same way. Except, of
    course, that they're for hosts instead of services. :-)
@@ -288,15 +287,13 @@ definition.
 You can optionally restrict escalations so that they are only used
 during specific time periods by using the escalation_period directive in
 the host or service escalation definition. If you use the
-escalation_period directive to specify a
-:ref:`timeperiod <timeperiods>` during which the escalation can
-be used, the escalation will only be used during that time. If you do
-not specify any escalation_period directive, the escalation can be used
-at any time within the "notification time window" for the host or
-service.
+escalation_period directive to specify a :ref:`timeperiod <timeperiods>`
+during which the escalation can be used, the escalation will only be
+used during that time. If you do not specify any escalation_period
+directive, the escalation can be used at any time within the
+"notification time window" for the host or service.
 
 .. note::
-
    Escalated notifications are still subject to the normal time
    restrictions imposed by the notification_period directive in a host
    or service definition, so the timeperiod you specify in an escalation

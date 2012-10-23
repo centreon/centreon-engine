@@ -17,10 +17,10 @@ are as follows:
   * Service notifications
   * Host checks
   * Host notifications
-  * Service :ref:`event handlers <event_handlers>` and/or a
-    global service event handler
-  * Host :ref:`event handlers <event_handlers>` and/or a global
-    host event handler
+  * Service :ref:`event handlers <event_handlers>` and/or a global
+    service event handler
+  * Host :ref:`event handlers <event_handlers>` and/or a global host
+    event handler
   * :ref:`OCSP <main_cfg_opt_obsessive_compulsive_service_processor_command>`
     command
   * :ref:`OCHP <main_cfg_opt_obsessive_compulsive_host_processor_command>`
@@ -394,22 +394,18 @@ Host Group Macros
 ============================== =========================================================================================================================
 _`HOSTGROUPALIAS` :sup:`5`     The long name / alias of either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary hostgroup
                                associated with the current host (if not used in the context of an on-demand macro). This value is taken from the alias
-                               directive in the
-                               :ref:`hostgroup definition <obj_def_hostgroup>`.
+                               directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
 _`HOSTGROUPMEMBERS` :sup:`5`   A comma-separated list of all hosts that belong to either 1) the hostgroup name passed as an on-demand macro argument or
                                2) the primary hostgroup associated with the current host (if not used in the context of an on-demand macro).
 _`HOSTGROUPNOTES` :sup:`5`     The notes associated with either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary hostgroup
                                associated with the current host (if not used in the context of an on-demand macro). This value is taken from the notes
-                               directive in the
-                               :ref:`hostgroup definition <obj_def_hostgroup>`.
+                               directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
 _`HOSTGROUPNOTESURL` :sup:`5`  The notes URL associated with either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary
                                hostgroup associated with the current host (if not used in the context of an on-demand macro). This value is taken from
-                               the notes_url directive in the
-                               :ref:`hostgroup definition <obj_def_hostgroup>`.
+                               the notes_url directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
 _`HOSTGROUPACTIONURL` :sup:`5` The action URL associated with either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary
                                hostgroup associated with the current host (if not used in the context of an on-demand macro). This value is taken from
-                               the action_url directive in the
-                               :ref:`hostgroup definition <obj_def_hostgroup>`.
+                               the action_url directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
 ============================== =========================================================================================================================
 
 Service Macros
@@ -417,8 +413,7 @@ Service Macros
 
 ================================= ======================================================================================================================
 _`SERVICEDESC`                    The long name/description of the service (i.e. "Main Website"). This value is taken from the service_description
-                                  directive of the
-                                  :ref:`service definition <obj_def_service>`.
+                                  directive of the :ref:`service definition <obj_def_service>`.
 _`SERVICEDISPLAYNAME`             An alternate display name for the service. This value is taken from the display_name directive in the
                                   :ref:`service definition <obj_def_service>`.
 _`SERVICESTATE`                   A string indicating the current state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").
@@ -534,8 +529,8 @@ _`CONTACTADDRESSn`   Address of the contact being notified. Each contact can hav
                      number). The macros for these addresses are $CONTACTADDRESS1$ - $CONTACTADDRESS6$. This value is taken from the addressx directive
                      in the :ref:`contact definition <obj_def_contact>`.
 _`CONTACTGROUPNAME`  The short name of the contactgroup that this contact is a member of. This value is taken from the contactgroup_name directive in
-                     the :ref:`contactgroup definition <obj_def_contactgroup>`. If the contact
-                     belongs to more than one contactgroup this macro will contain the name of just one of them.
+                     the :ref:`contactgroup definition <obj_def_contactgroup>`. If the contact belongs to more than one contactgroup this macro will
+                     contain the name of just one of them.
 _`CONTACTGROUPNAMES` A comma separated list of the short names of all the contactgroups that this contact is a member of.
 ==================== ===================================================================================================================================
 
@@ -633,8 +628,7 @@ Date/Time Macros
 
 ========================= ===============================================================================================================================
 _`LONGDATETIME`           Current date/time stamp (i.e. Fri Oct 13 00:30:28 CDT 2000). Format of date is determined by
-                          :ref:`date_format <main_cfg_opt_date_format>`
-                          directive.
+                          :ref:`date_format <main_cfg_opt_date_format>` directive.
 _`SHORTDATETIME`          Current date/time stamp (i.e. 10-13-2000 00:30:28). Format of date is determined by
                           :ref:`date_format <main_cfg_opt_date_format>` directive.
 _`DATE`                   Date stamp (i.e. 10-13-2000). Format of date is determined by :ref:`date_format <main_cfg_opt_date_format>` directive.

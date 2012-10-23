@@ -148,9 +148,7 @@ is down, you know that everything behind it is unreachable.
 
 If you want to spare yourself from a flood of UNREACHABLE notifications
 during network outages, you can exclude the unreachable (u) option from
-the notification_options directive in your
-:ref:`host <obj_def_host>`
+the notification_options directive in your :ref:`host <obj_def_host>`
 definitions and/or the host_notification_options directive in your
-:ref:`contact <obj_def_contact>`
-definitions.
+:ref:`contact <obj_def_contact>` definitions.
 

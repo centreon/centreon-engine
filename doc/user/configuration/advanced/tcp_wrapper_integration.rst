@@ -19,12 +19,10 @@ network.
 
 These directions assume:
 
-  * You are already familiar with
-    :ref:`passive checks <passive_checks>`
+  * You are already familiar with :ref:`passive checks <passive_checks>`
     and how they work.
   * You are already familiar with
-    :ref:`volatile services <volatile_services>`
-    and how they work.
+    :ref:`volatile services <volatile_services>` and how they work.
   * The host which you are generating alerts for (i.e. the host you are
     using TCP wrappers on) is a remote host (called firestorm in this
     example). If you want to generate alerts on the same host that
@@ -38,8 +36,7 @@ Defining A Service
 ==================
 
 If you haven't done so already, create a
-:ref:`host definition <obj_def>`
-for the remote host (firestorm).
+:ref:`host definition <obj_def>` for the remote host (firestorm).
 
 Next, define a service in one of your
 :ref:`object configuration files <object_configuration_overview>`
@@ -72,7 +69,7 @@ definition:
 Configuring TCP Wrappers
 ========================
 
-Now you're going to have to modify the /etc/hosts.deny file on
+Now you're going to have to modify the ``/etc/hosts.deny`` file on
 firestorm. In order to have the TCP wrappers send an alert to the
 monitoring host whenever a connection attempt is denied, you'll have to
 add a line similiar to the following::
@@ -80,7 +77,7 @@ add a line similiar to the following::
   ALL: ALL: RFC931: twist (/usr/lib/nagios/plugins/event_handlers/handle_tcp_wrapper %h %d) &
 
 This line assumes that there is a script called handle_tcp_wrapper in
-the /usr/lib/nagios/plugins/event_handlers/ directory on
+the ``/usr/lib/nagios/plugins/event_handlers/`` directory on
 firestorm. We'll write that script next.
 
 Writing The Script

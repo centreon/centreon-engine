@@ -50,7 +50,6 @@ Centreon Engine-A) for Router-C and Router-D should be flipped from the
 viewpoint of Centreon Engine-B.
 
 .. note::
-
    There may be some situations where you do not want Centreon Engine to
    translate DOWN/UNREACHABLE states from remote sources to their
    "correct" state from the viewpoint of the local Centreon Engine

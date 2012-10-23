@@ -13,7 +13,6 @@ primary host that runs Centreon Engine fails or when portions of your
 network become unreachable.
 
 .. note::
-
    If you are just learning how to use Centreon Engine, I would suggest
    not trying to implement redudancy until you have becoming familiar
    with the
@@ -42,7 +41,7 @@ Sample Scripts
 ==============
 
 All of the sample scripts that I use in this documentation can be found
-in the event_handlers/ subdirectory of the Centreon Engine
+in the ``event_handlers/`` subdirectory of the Centreon Engine
 distribution. You'll probably need to modify them to work on your
 system...
 
@@ -142,7 +141,7 @@ example::
   }
 
 This assumes that you have placed the event handler scripts in the
-/usr/lib/nagios/plugins/event_handlers directory. You may place them
+``/usr/lib/nagios/plugins/event_handlers`` directory. You may place them
 anywhere you wish, but you'll need to modify the examples I've given
 here.
 

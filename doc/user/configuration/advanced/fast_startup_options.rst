@@ -156,7 +156,6 @@ option::
   $ /usr/sbin/centengine -ud /etc/centreon-engine/centengine.cfg
 
 .. note::
-
    If you modify your configuration files, you will need to re-verify
    and re-cache your configuration files before restarting Centreon
    Engine. If you don't re-generate the precached object file, Centreon
@@ -191,7 +190,6 @@ you can add the -x command line option like this::
   $ /usr/sbin/centengine -xd /etc/centreon-engine/centengine.cfg
 
 .. note::
-
    It is of utmost importance that you verify your configuration before
    starting/restarting Centreon Engine when skipping circular path
    checks. Failure to do so could lead to deadlocks in the Centreon

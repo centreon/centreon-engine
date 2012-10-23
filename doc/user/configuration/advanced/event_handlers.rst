@@ -35,8 +35,7 @@ Event handlers are executed when a service or host:
   * Initially goes into a HARD problem state
   * Initially recovers from a SOFT or HARD problem state
 
-SOFT and HARD states are described in detail
-:ref:`here <state_types>` .
+SOFT and HARD states are described in detail :ref:`here <state_types>`.
 
 Event Handler Types
 ===================
@@ -60,8 +59,7 @@ options in your main configuration file.
 Individual hosts and services can have their own event handler command
 that should be run to handle state changes. You can specify an event
 handler that should be run by using the event_handler directive in your
-:ref:`host <obj_def_host>`
-and :ref:`service <obj_def_service>`
+:ref:`host <obj_def_host>` and :ref:`service <obj_def_service>`
 definitions. These host- and service-specific event handlers are
 executed immediately after the (optional) global host or service event
 handler is executed.
@@ -75,11 +73,11 @@ in your main configuration file.
 
 Host-specific and service-specific event handlers can be enabled or
 disabled by using the event_handler_enabled directive in your
-:ref:`host <obj_def_host>`
-and :ref:`service <obj_def_service>`
+:ref:`host <obj_def_host>` and :ref:`service <obj_def_service>`
 definitions. Host- and service-specific event handlers will not be
-executed if the global :ref:`enable_event_handlers <main_cfg_opt_event_handler>`
-option is disabled.
+executed if the global
+:ref:`enable_event_handlers <main_cfg_opt_event_handler>` option is
+disabled.
 
 Event Handler Execution Order
 =============================
@@ -96,12 +94,11 @@ Writing Event Handler Commands
 Event handler commands will likely be shell or perl scripts, but they
 can be any type of executable that can run from a command prompt. At a
 minimum, the scripts should take the following
-:ref:`macros <understanding_macros>` as
-arguments:
+:ref:`macros <understanding_macros>` as arguments:
 
-For Services: :ref:`SERVICESTATE SERVICESTATETYPE SERVICEATTEMPT <user_configuration_macros_service>`
+* For Services: :ref:`SERVICESTATE SERVICESTATETYPE SERVICEATTEMPT <user_configuration_macros_service>`
 
-For Hosts: :ref:`HOSTSTATE HOSTSTATETYPE HOSTATTEMPT <user_configuration_macros_host>`
+* For Hosts: :ref:`HOSTSTATE HOSTSTATETYPE HOSTATTEMPT <user_configuration_macros_host>`
 
 The scripts should examine the values of the arguments passed to it and
 take any necessary action based upon those values. The best way to
@@ -109,9 +106,8 @@ understand how event handlers work is to see an example. Lucky for you,
 one is provided :ref:`below <event_handlers_example>`.
 
 .. note::
-
    Additional sample event handler scripts can be found in the
-   contrib/event_handlers/ subdirectory of the Centreon Engine
+   ``contrib/event_handlers/`` subdirectory of the Centreon Engine
    distribution. Some of these sample scripts demonstrate the use of
    :ref:`external commands <external_commands>` to implement a
    :ref:`redundant <redundant_and_failover_monitoring>` and
@@ -163,7 +159,7 @@ I am passing to the event handler script - these are important::
   }
 
 Now, let's actually write the event handler script (this is the
-/usr/lib/nagios/plugins/event_handlers/restart-httpd script)::
+``/usr/lib/nagios/plugins/event_handlers/restart-httpd`` script)::
 
   #!/bin/sh
   #

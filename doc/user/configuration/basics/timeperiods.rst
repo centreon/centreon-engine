@@ -6,9 +6,9 @@ Time Periods
 Introduction
 ============
 
-:ref:`Timeperiod <obj_def_timeperiod>`
-definitions allow you to control when various aspects of the monitoring
-and alerting logic can operate. For instance, you can restrict:
+:ref:`Timeperiod <obj_def_timeperiod>` definitions allow you to control
+when various aspects of the monitoring and alerting logic can
+operate. For instance, you can restrict:
 
   * When regularly scheduled host and service checks can be performed
   * When notifications can be sent out
@@ -18,12 +18,12 @@ and alerting logic can operate. For instance, you can restrict:
 Precedence in Time Periods
 ==========================
 
-Timeperod :ref:`definitions <obj_def_timeperiod>`
-may contain multiple types of directives, including weekdays, days of
-the month, and calendar dates. Different types of directives have
-different precendence levels and may override other directives in your
-timeperiod definitions. The order of precedence for different types of
-directives (in descending order) is as follows:
+Timeperod :ref:`definitions <obj_def_timeperiod>` may contain multiple
+types of directives, including weekdays, days of the month, and calendar
+dates. Different types of directives have different precendence levels
+and may override other directives in your timeperiod definitions. The
+order of precedence for different types of directives (in descending
+order) is as follows:
 
   * Calendar date (2008-01-01)
   * Specific month date (January 1st)
@@ -59,7 +59,6 @@ the host or service may not get checked again for another hour, day, or
 week, etc.
 
 .. note::
-
    On-demand checks and passive checks are not restricted by the
    timeperiod you specify in the check_period directive. Only regularly
    scheduled active checks are restricted.
@@ -92,10 +91,10 @@ recovery.
 You can also use timeperiods to control when notifications can be sent
 out to individual contacts. By using the service_notification_period and
 host_notification_period directives in
-:ref:`contact definitions <obj_def_contact>`,
-you're able to essentially define an "on call" period for each
-contact. Contacts will only receive host and service notifications
-during the times you specify in the notification period directives.
+:ref:`contact definitions <obj_def_contact>`, you're able to essentially
+define an "on call" period for each contact. Contacts will only receive
+host and service notifications during the times you specify in the
+notification period directives.
 
 Examples of how to create timeperiod definitions for use for on-call
 rotations can be found here.
@@ -138,9 +137,9 @@ How Time Periods Work With Notification Escalations
 ===================================================
 
 Service and host
-:ref:`notification escalations <notification_escalations>`
-have an optional escalation_period directive that allows you to specify
-a timeperiod when the escalation is valid and can be used. If you do not
+:ref:`notification escalations <notification_escalations>` have an
+optional escalation_period directive that allows you to specify a
+timeperiod when the escalation is valid and can be used. If you do not
 use the escalation_period directive in an escalation definition, the
 escalation is considered valid at all times. If you specify a timeperiod
 in the escalation_period directive, Centreon Engine will only use the
@@ -150,8 +149,7 @@ definition.
 How Time Periods Work With Dependencies
 =======================================
 
-Service and host
-:ref:`dependencies <host_and_service_dependencies>`
+Service and host :ref:`dependencies <host_and_service_dependencies>`
 have an optional dependency_period directive that allows you to specify
 a timeperiod when the dependendies are valid and can be used. If you do
 not use the dependency_period directive in a dependency definition, the

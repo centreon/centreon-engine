@@ -38,9 +38,8 @@ hosts services that have freshness checking enabled.
     definition.
 
 .. note::
-
-  An active check is executed even if active checks are disabled on a
-  program-wide or host- or service-specific basis.
+   An active check is executed even if active checks are disabled on a
+   program-wide or host- or service-specific basis.
 
 For example, if you have a freshness threshold of 60 for one of your
 services, Centreon Engine will consider that service to be stale if its
@@ -72,7 +71,6 @@ Here's what you need to do to enable freshness checking...
     checked for freshness, so make sure it is set to a valid timeperiod.
 
 .. note::
-
    If you do not specify a host- or service-specific freshness_threshold
    value (or you set it to zero), Centreon Engine will automatically
    calculate a threshold automatically, based on a how often you monitor

@@ -96,7 +96,6 @@ would normally be inherited from a template object. That should be a
 fairly easy concept to understand.
 
 .. note::
-
    If you would like local string variables to be appended to inherited
    string values, you can do so. Read more about how to accomplish this
    :ref:`below <object_inheritance_additive_inheritance_string_values>`.

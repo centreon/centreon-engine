@@ -78,10 +78,9 @@ service.
 
 Using the images above, lets do a calculation of percent state change
 for the service. You will notice that there are a total of 7 state
-changes (at t<sub>3</sub>, t<sub>4</sub>, t<sub>5</sub>, t<sub>9</sub>,
-t<sub>12</sub>, t<sub>16</sub>, and t<sub>19</sub>). Without any
-weighting of the state changes over time, this would give us a total
-state change of 35%:
+changes (at t :sub:`3`, t :sub:`4`, t :sub:`5`, t :sub:`9`, t :sub:`12`,
+t :sub:`16` and t :sub:`19`). Without any weighting of the state changes
+over time, this would give us a total state change of 35%:
 
 (7 observed state changes / possible 20 state changes) * 100 = 35 %
 
@@ -164,7 +163,6 @@ a host or service, regardless of the check result (host/service state),
 for use in the flap detection logic.
 
 .. note::
-
    You can exclude certain host or service states from use in flap
    detection logic by using the flap_detection_options directive in your
    host or service definitions. This directive allows you to specify

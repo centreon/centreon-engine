@@ -141,7 +141,6 @@ This cycle continues until either all dependencies for the service have
 been checked or until one dependency check fails.
 
 .. note::
-
    One important thing to note is that by default, Centreon Engine will
    use the most current :ref:`hard state <state_types>` of the
    service(s) that is/are being depended upon when it does the dependeny
@@ -247,11 +246,9 @@ to service dependencies. The difference is that they're for hosts, not
 services.
 
 .. note::
-
    Do not confuse host dependencies with parent/child host
    relationships. You should be using parent/child host relationships
-   (defined with the parents directive in
-   :ref:`host <obj_def_host>`
+   (defined with the parents directive in :ref:`host <obj_def_host>`
    definitions) for most cases, rather than host dependencies. A
    description of how parent/child host relationships work can be found
    in the documentation on

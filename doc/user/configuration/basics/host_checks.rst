@@ -22,7 +22,7 @@ Hosts are checked by the Centreon Engine daemon:
     logic.
   * On-demand as needed for
     :ref:`predictive <host_and_service_dependencies>`
-    host dependency checks".
+    host dependency checks.
 
 Regularly scheduled host checks are optional. If you set the
 check_interval option in your host definition to zero (0), Centreon
@@ -89,16 +89,15 @@ host check.
 
 When Centreon Engine processes the results of scheduled and on-demand
 host checks, it may initiate (secondary) checks of other hosts. These
-checks can be initated for two reasons: :ref:`predictive dependency
-checks <host_and_service_dependencies>` and to determining the
-status of the host using the
-:ref:`network reachability <status_and_reachability_network>`
-logic. The secondary checks that are initiated are usually run in
+checks can be initated for two reasons:
+:ref:`predictive dependency checks <host_and_service_dependencies>` and
+to determining the status of the host using the
+:ref:`network reachability <status_and_reachability_network>` logic. The
+secondary checks that are initiated are usually run in
 parallel. However, there is one big exception that you should be aware
 of, as it can have negative effect on performance...
 
 .. note::
-
    Hosts which have their max_check_attempts value set to 1 can cause
    serious performance problems. The reason? If Centreon Engine needs to
    determine their true state using the
@@ -141,7 +140,6 @@ CRITICAL      DOWN
 ============= ======================
 
 .. note::
-
    WARNING results usually means the host is UP. However, WARNING
    results are interpreted to mean the host is DOWN if the
    :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
@@ -185,5 +183,4 @@ spontaneously rebooting as soon as the operating system loads. That's
 always a fun scenario to have to deal with. Centreon Engine can detect
 when hosts start flapping, and can suppress notifications until flapping
 stops and the host's state stabilizes. More information on the flap
-detection logic can be found
-:ref:`here <flapping_detection>`.
+detection logic can be found :ref:`here <flapping_detection>`.

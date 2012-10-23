@@ -13,12 +13,10 @@ can be found :ref:`here <object_inheritance>`. I strongly suggest that
 you familiarize yourself with object inheritence once you read over the
 documentation presented below, as it will make the job of creating and
 maintaining object definitions much easier than it otherwise would
-be. Also, read up on the
-:ref:`object tricks <obj_def_tricks>`
-that offer shortcuts for otherwise tedious configuration tasks.
+be. Also, read up on the :ref:`object tricks <obj_def_tricks>` that
+offer shortcuts for otherwise tedious configuration tasks.
 
 .. note::
-
    When creating and/or editing configuration files, keep the following in mind:
 
      * Lines that start with a '#' character are taken to be comments
@@ -39,26 +37,25 @@ exhibit this behavior are marked with an asterisk
 (:ref:`* <obj_def_retentionnotes>`).
 The reason for this behavior is due to the fact that Centreon Engine
 chooses to honor values stored in the
-:ref:`state retention file <main_cfg_opt_state_retention_file>`
-over values found in the config files, assuming you have
-:ref:`state retention <main_cfg_opt_state_retention>`
-enabled on a program-wide basis and the value of the directive is
-changed during runtime with an
-:ref:`external command <main_cfg_opt_external_command_check>`.
-One way to get around this problem is to disable the retention of
-non-status information using the retain_nonstatus_information directive
-in the host, service, and contact definitions. Disabling this directive
-will cause Centreon Engine to take the initial values for these
-directives from your config files, rather than from the state retention
-file when it (re)starts.
+:ref:`state retention file <main_cfg_opt_state_retention_file>` over
+values found in the config files, assuming you have
+:ref:`state retention <main_cfg_opt_state_retention>` enabled on a
+program-wide basis and the value of the directive is changed during
+runtime with an
+:ref:`external command <main_cfg_opt_external_command_check>`.  One way
+to get around this problem is to disable the retention of non-status
+information using the retain_nonstatus_information directive in the
+host, service, and contact definitions. Disabling this directive will
+cause Centreon Engine to take the initial values for these directives
+from your config files, rather than from the state retention file when
+it (re)starts.
 
 Sample Configuration Files
 ==========================
 
 .. note::
-
    Sample object configuration files are installed in the
-   /etc/centreon-engine/ directory when you follow the
+   ``/etc/centreon-engine/`` directory when you follow the
    :ref:`quickstart installation guide <exploit_quickstart>`.
 
 Object Types
@@ -95,7 +92,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -324,20 +320,21 @@ URL can be used. This can be very useful if you want to make detailed informatio
 action_url                   This directive is used to define an optional URL that can be used to provide more actions to be performed on the host.
                              Any valid URL can be used.
 icon_image                   This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. The image
-                             will look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the logos/ subdirectory in your HTML
-                             images directory (i.e. /usr/local/centengine/share/images/logos).
+                             will look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/`` subdirectory in your
+                             HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
 icon_image_alt               This variable is used to define an optional string that is used in the ALT tag of the image specified by the <icon_image>
                              argument.
 vrml_image                   This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. This image
                              will be used as the texture map for the specified host. Unlike the image you use for the <icon_image> variable, this one
                              should probably not have any transparency. If it does, the host object will look a bit wierd. Images for hosts are
-                             assumed to be in the logos/ subdirectory in your HTML images directory (i.e. /usr/local/centengine/share/images/logos).
+                             assumed to be in the ``logos/`` subdirectory in your HTML images directory (i.e.
+                             ``/usr/local/centengine/share/images/logos``).
 statusmap_image              This variable is used to define the name of an image that should be associated with this host. You can specify a JPEG,
                              PNG, and GIF image if you want, although I would strongly suggest using a GD2 format image, as other image formats will
                              result in a lot of wasted CPU time when the statusmap image is generated. GD2 images can be created from PNG images by
                              using the pngtogd2 utility supplied with Thomas Boutell's `gd library <http://www.boutell.com/gd/>`_. The GD2 images
                              should be created in uncompressed format in order to minimize CPU load. Images for hosts are assumed to be in the
-                             logos/ subdirectory in your HTML images directory (i.e. /usr/local/centengine/share/images/logos).
+                             ``logos/`` subdirectory in your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
 2d_coords                    This variable is used to define coordinates to use when drawing the host. Coordinates should be given in positive
                              integers, as they correspond to physical pixels in the generated image. The origin for drawing (0,0) is in the upper
                              left hand corner of the image and extends in the positive x direction (to the right) along the top of the image and
@@ -359,14 +356,12 @@ Description
 ^^^^^^^^^^^
 
 A host group definition is used to group one or more hosts together for
-simplifying configuration with
-:ref:`object tricks <obj_def_tricks>`.
+simplifying configuration with :ref:`object tricks <obj_def_tricks>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -399,9 +394,9 @@ Directive Descriptions
 hostgroup_name    This directive is used to define a short name used to identify the host group.
 alias             This directive is used to define is a longer name or description used to identify the host group. It is provided in order to allow
                   you to more easily identify a particular host group.
-members           This is a list of the short names of :ref:`hosts <obj_def_host>` that should be included in this
-                  group. Multiple host names should be separated by commas. This directive may be used as an alternative to (or in addition to) the
-                  hostgroups directive in :ref:`host definitions <obj_def_host>`.
+members           This is a list of the short names of :ref:`hosts <obj_def_host>` that should be included in this group. Multiple host names should
+                  be separated by commas. This directive may be used as an alternative to (or in addition to) the hostgroups directive in
+                  :ref:`host definitions <obj_def_host>`.
 hostgroup_members This optional directive can be used to include hosts from other "sub" host groups in this host group. Specify a comma-delimited list
                   of short names of other host groups whose members should be included in this group.
 notes             This directive is used to define an optional string of notes pertaining to the host. If you specify a note here, you will see the
@@ -432,7 +427,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -504,10 +498,9 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================ =========================================================================================================================
-host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>`
-                             that the service "runs" on or is associated with. Multiple hosts should be separated by commas.
-hostgroup_name               This directive is used to specify the short name(s) of the
-                             :ref:`hostgroup(s) <obj_def_hostgroup>` that the service "runs" on or is associated with.
+host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is                                   associated with. Multiple hosts should be separated by commas.
+hostgroup_name               This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>` that the service
+                             "runs" on or is associated with.
                              Multiple hostgroups should be separated by commas. The hostgroup_name may be used instead of, or in addition to, the
                              host_name directive.
 service_description;         This directive is used to define the description of the service, which may contain spaces, dashes, and colons
@@ -515,18 +508,15 @@ service_description;         This directive is used to define the description of
                              the same description. Services are uniquely identified with their host_name and service_description directives.
 display_name                 This directive is used to define an alternate name that should be displayed in the web interface for this service. If not
                              specified, this defaults to the value you specify for the service_description directive.
-servicegroups                This directive is used to identify the short name(s) of the
-                             :ref:`servicegroup(s) <obj_def_servicegroup>` that the service belongs to. Multiple
-                             servicegroups should be separated by commas. This directive may be used as an alternative to using the members directive
-                             in :ref:`servicegroup <obj_def_servicegroup>` definitions.
+servicegroups                This directive is used to identify the short name(s) of the :ref:`servicegroup(s) <obj_def_servicegroup>` that the
+                             service belongs to. Multiple servicegroups should be separated by commas. This directive may be used as an alternative
+                             to using the members directive in :ref:`servicegroup <obj_def_servicegroup>` definitions.
 is_volatile                  This directive is used to denote whether the service is "volatile". Services are normally not volatile. More information
                              on volatile service and how they differ from normal services can be found :ref:`here <volatile_services>`.
                              Value: 0 = service is not volatile, 1 = service is volatile.
-check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
-                             that Centreon Engine will run in order to check the status of the service. The maximum amount of time that the service
-                             check command can run is controlled by the
-                             :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>`
-                             option.
+check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>` that Centreon Engine will run in
+                             order to check the status of the service. The maximum amount of time that the service check command can run is controlled
+                             by the :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>` option.
 initial_state                By default Centreon Engine will assume that all services are in OK states when it starts. You can override the initial
                              state for a service by using this directive. Valid options are: o = OK, w = WARNING, u = UNKNOWN, and c = CRITICAL.
 max_check_attempts           This directive is used to define the number of times that Centreon Engine will retry the service check command if it
@@ -535,31 +525,27 @@ max_check_attempts           This directive is used to define the number of time
 check_interval               This directive is used to define the number of "time units" to wait before scheduling the next "regular" check of the
                              service. "Regular" checks are those that occur when the service is in an OK state or when the service is in a non-OK
                              state, but has already been rechecked max_check_attempts number of times. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>` directive from the default value of 60, this number will
+                             mean minutes. More information on this value can be found in the :ref:`check scheduling <scheduling_service_and_host>`
+                             documentation.
 retry_interval               This directive is used to define the number of "time units" to wait before scheduling a re-check of the service. Services
                              are rescheduled at the retry interval when they have changed to a non-OK state. Once the service has been retried
                              max_check_attempts times without a change in its status, it will revert to being scheduled at its "normal" rate as
                              defined by the check_interval value. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
-active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active
-                             checks of this service are enabled. Values: 0 = disable active service checks, 1 = enable active service checks
-                             (default).
-passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive
-                             checks of this service are enabled. Values: 0 = disable passive service checks, 1 = enable passive service checks
-                             (default).
-check_period                 This directive is used to specify the short name of the
-                             :ref:`time period <obj_def_timeperiod>` during which active checks of this service can be
-                             made.
-obsess_over_service          :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the
-                             service will be "obsessed" over using the
-                             :ref:`ocsp_command <main_cfg_opt_obsessive_compulsive_service_processor_command>`.
+                             :ref:`interval_length <main_cfg_opt_timing_interval_length>` directive from the default value of 60, this number will
+                             mean minutes. More information on this value can be found in the :ref:`check scheduling <scheduling_service_and_host>`
+                             documentation.
+active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active checks of this service are
+                             enabled. Values: 0 = disable active service checks, 1 = enable active service checks (default).
+passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive checks of this service are
+                             enabled. Values: 0 = disable passive service checks, 1 = enable passive service checks (default).
+check_period                 This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>` during which active
+                             checks of this service can be made.
+obsess_over_service          :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the service will be "obsessed"
+                             over using the :ref:`ocsp_command <main_cfg_opt_obsessive_compulsive_service_processor_command>`.
 check_freshness              :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
-                             :ref:`freshness checks <freshness_checks>` are enabled for this service. Values: 0 = disable
-                             freshness checks, 1 = enable freshness checks (default).
+                             :ref:`freshness checks <freshness_checks>` are enabled for this service. Values: 0 = disable freshness checks, 1 = enable
+                             freshness checks (default).
 freshness_threshold          This directive is used to specify the freshness threshold (in seconds) for this service. If you set this directive to a
                              value of 0, Centreon Engine will determine a freshness threshold to use automatically.
 event_handler                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
@@ -642,8 +628,8 @@ notes_url                    This directive is used to define an optional URL th
 action_url                   This directive is used to define an optional URL that can be used to provide more actions to be performed on the
                              service. Any valid URL can be used.
 icon_image                   This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this service. The
-                             image will look best if it is 40x40 pixels in size. Images for services are assumed to be in the logos/ subdirectory in
-                             your HTML images directory (i.e. /usr/local/centengine/share/images/logos).
+                             image will look best if it is 40x40 pixels in size. Images for services are assumed to be in the ``logos/`` subdirectory
+                             in your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
 icon_image_alt               This variable is used to define an optional string that is used in the ALT tag of the image specified by the
                              <icon_image> argument.
 ============================ =========================================================================================================================
@@ -664,7 +650,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -729,7 +714,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -779,7 +763,6 @@ Example Definition
 
 Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
-
 
 ============================= ========================================================================================================================
 contact_name                  This directive is used to define a short name used to identify the contact. It is referenced in
@@ -862,15 +845,13 @@ Description
 ^^^^^^^^^^^
 
 A contact group definition is used to group one or more
-:ref:`contacts <obj_def_contact>`
-together for the purpose of sending out alert/recovery
-:ref:`notifications <notifications>`.
+:ref:`contacts <obj_def_contact>` together for the purpose of sending
+out alert/recovery :ref:`notifications <notifications>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -926,7 +907,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -1025,18 +1005,17 @@ A command definition is just that. It defines a command. Commands that
 can be defined include service checks, service notifications, service
 event handlers, host checks, host notifications, and host event
 handlers. Command definitions can contain
-:ref:`macros <understanding_macros>`,
-but you must make sure that you include only those macros that are
-"valid" for the circumstances when the command will be used. More
-information on what macros are available and when they are "valid" can
-be found :ref:`here <understanding_macros>`. The
-different arguments to a command definition are outlined below.
+:ref:`macros <understanding_macros>`, but you must make sure that you
+include only those macros that are "valid" for the circumstances when
+the command will be used. More information on what macros are available
+and when they are "valid" can be found
+:ref:`here <understanding_macros>`. The different arguments to a command
+definition are outlined below.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -1103,7 +1082,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -1127,10 +1105,9 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============== =======================================================================================================================================
-connector_name This directive is the short name used to identify the connector. It is referenced in
-               :ref:`command <obj_def_connector>` definitions.
-connector_line This directive is used to define the path of the binary connector and the optional argument. It is possible to use the
-               Centreon-Engine macros.
+connector_name This directive is the short name used to identify the connector. It is referenced in :ref:`command <obj_def_connector>` definitions.
+connector_line This directive is used to define the path of the binary connector and the optional argument. It is possible to use the Centreon-Engine
+               macros.
 ============== =======================================================================================================================================
 
 .. _obj_def_service_dependency:
@@ -1146,14 +1123,12 @@ allow you to suppress notifications and active checks of services based
 on the status of one or more other services. Service dependencies are
 optional and are mainly targeted at advanced users who have complicated
 monitoring setups. More information on how service dependencies work
-(read this!) can be found
-:ref:`here <host_and_service_dependencies>`.
+(read this!) can be found :ref:`here <host_and_service_dependencies>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are
    optional. However, you must supply at least one type of criteria for
    the definition to be of much use.
@@ -1197,8 +1172,7 @@ dependent_hostgroup_name      This directive is used to specify the short name(s
                               :ref:`hostgroup(s) <obj_def_hostgroup>` that the dependent service "runs" on or is
                               associated with. Multiple hostgroups should be separated by commas. The dependent_hostgroup may be used instead of, or
                               in addition to, the dependent_host directive.
-dependent_service_description This directive is used to identify the description of the dependent
-                              :ref:`service <obj_def_service>`.
+dependent_service_description This directive is used to identify the description of the dependent :ref:`service <obj_def_service>`.
 host_name                     This directive is used to identify the short name(s) of the
                               :ref:`host(s) <obj_def_host>` that the service that is being depended upon (also referred
                               to as the master service) "runs" on or is associated with. Multiple hosts should be separated by commas.
@@ -1249,7 +1223,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -1345,7 +1318,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -1425,7 +1397,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Directives using a bold font are required, while those are optional.
 
 ::
@@ -1510,20 +1481,17 @@ Extended host information entries are basically used to make the
 output. They have no effect on monitoring and are completely optional.
 
 .. note::
-
    As of Centreon Engine 1.x, all directives contained in extended host
    information definitions are also available in
-   :ref:`host definitions <obj_def_host>`.
-   Thus, you can choose to define the directives below in your host
-   definitions if it makes your configuration simpler. Separate extended
-   host information definitions will continue to be supported for
-   backward compatability.
+   :ref:`host definitions <obj_def_host>`.  Thus, you can choose to
+   define the directives below in your host definitions if it makes your
+   configuration simpler. Separate extended host information definitions
+   will continue to be supported for backward compatability.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Variables in red are required, while those in black are
    optional. However, you need to supply at least one optional variable
    in each definition for it to be of much use.
@@ -1573,19 +1541,19 @@ notes_url       This variable is used to define an optional URL that can be used
 action_url      This directive is used to define an optional URL that can be used to provide more actions to be performed on the host. Any valid URL
                 can be used.
 icon_image      This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. The image will look
-                best if it is 40x40 pixels in size. Images for hosts are assumed to be in the logos/ subdirectory in your HTML images directory
-                (i.e. /usr/local/centengine/share/images/logos).
+                best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/`` subdirectory in your HTML images directory
+                (i.e. ``/usr/local/centengine/share/images/logos``).
 icon_image_alt  This variable is used to define an optional string that is used in the ALT tag of the image specified by the <icon_image> argument.
 vrml_image      This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. This image will be used
                 as the texture map for the specified host. Unlike the image you use for the <icon_image> variable, this one should probably not have
-                any transparency. If it does, the host object will look a bit wierd. Images for hosts are assumed to be in the logos/ subdirectory in
-                your HTML images directory (i.e. /usr/local/centengine/share/images/logos).
+                any transparency. If it does, the host object will look a bit wierd. Images for hosts are assumed to be in the ``logos/`` subdirectory in
+                your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
 statusmap_image This variable is used to define the name of an image that should be associated with this host. You can specify a JPEG, PNG, and GIF
                 image if you want, although I would strongly suggest using a GD2 format image, as other image formats will result in a lot of wasted
                 CPU time when the statusmap image is generated. GD2 images can be created from PNG images by using the pngtogd2 utility supplied with
                 Thomas Boutell's `gd library <http://www.boutell.com/gd/>`_. The GD2 images should be created in uncompressed format in order to
-                minimize CPU load. The image will look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the logos/
-                subdirectory in your HTML images directory (i.e. /usr/local/centengine/share/images/logos).
+                minimize CPU load. The image will look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/``
+                subdirectory in your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
 2d_coords       This variable is used to define coordinates to use when drawing the host. Coordinates should be given in positive integers, as they
                 correspond to physical pixels in the generated image. The origin for drawing (0,0) is in the upper left hand corner of the image and
                 extends in the positive x direction (to the right) along the top of the image and in the positive y direction (down) along the left
@@ -1609,7 +1577,6 @@ Extended service information entries are basically used to make the
 output. They have no effect on monitoring and are completely optional.
 
 .. note::
-
    As of Centreon Engine 3.x, all directives contained in
    extended service information definitions are also available in
    :ref:`service definitions <obj_def_service>`.
@@ -1622,7 +1589,6 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-
    Variables in red are required, while those in black are
    optional. However, you need to supply at least one optional variable
    in each definition for it to be of much use.
@@ -1657,10 +1623,8 @@ Variable Descriptions
 ^^^^^^^^^^^^^^^^^^^^^
 
 =================== ==================================================================================================================================
-host_name           This directive is used to identify the short name of the host that the
-                    :ref:`service <obj_def_service>` is associated with.
-service_description This directive is description of the :ref:`service <obj_def_service>` which the data is associated
-                    with.
+host_name           This directive is used to identify the short name of the host that the :ref:`service <obj_def_service>` is associated with.
+service_description This directive is description of the :ref:`service <obj_def_service>` which the data is associated with.
 notes               This directive is used to define an optional string of notes pertaining to the service.
 notes_url           This directive is used to define an optional URL that can be used to provide more information about the service. Any valid URL can
                     be used. This can be very useful if you want to make detailed information on the service, emergency contact methods, etc.
@@ -1668,8 +1632,8 @@ notes_url           This directive is used to define an optional URL that can be
 action_url          This directive is used to define an optional URL that can be used to provide more actions to be performed on the service. Any
                     valid URL can be used.
 icon_image          This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. The image will
-                    look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the logos/ subdirectory in your HTML images
-                    directory (i.e. /usr/local/centengine/share/images/logos).
+                    look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/`` subdirectory in your HTML images
+                    directory (i.e. ``/usr/local/centengine/share/images/logos``).
 icon_image_alt      This variable is used to define an optional string that is used in the ALT tag of the image specified by the <icon_image>
                     argument.
 =================== ==================================================================================================================================

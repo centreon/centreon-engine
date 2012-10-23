@@ -28,8 +28,7 @@ you do the following::
     :ref:`command_check_interval <main_cfg_opt_external_command_check_interval>`
     option
   * specify the location of the command file with the
-    :ref:`command_file <main_cfg_opt_external_command_file>`
-    option
+    :ref:`command_file <main_cfg_opt_external_command_file>` option
   * setup proper permissions on the directory containing the external
     command file, as described in the
     :ref:`quickstart guide <exploit_quickstart>`
@@ -69,7 +68,6 @@ values for the command_id and command_arguments arguments will depend on
 what command is being submitted to Centreon Engine.
 
 A full listing of external commands that can be used (along with
-examples of how to use them) can be found online at the following URL:
-
-http://XXX/developerinfo/external_commands/
+examples of how to use them) can be found online at the following
+`URL <http://www.nagios.org/developerinfo/externalcommands/>`_
 

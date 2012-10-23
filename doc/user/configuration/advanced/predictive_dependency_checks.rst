@@ -50,7 +50,6 @@ information for the hosts that take part in the dependency.
 That's how predictive dependency checks work. Simple, eh?
 
 .. note::
-
    Predictive service dependency checks work in a similiar manner to
    what is described above. Except, of course, they deal with services
    instead of hosts.

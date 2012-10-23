@@ -116,7 +116,6 @@ where...
     plugin output)
 
 .. note::
-
    A service must be defined in Centreon Engine before you can submit
    passive check results for it! Centreon Engine will ignore all check
    results for services that had not been configured before it was last
@@ -146,7 +145,6 @@ where...
   * plugin_output is the text output of the host check
 
 .. note::
-
    A host must be defined in Centreon Engine before you can submit
    passive check results for it! Centreon Engine will ignore all check
    results for hosts that had not been configured before it was last
@@ -173,7 +171,6 @@ variable. More information on how this works can be found
 :ref:`here <passive_host_state_translation>`.
 
 .. note::
-
    Passive host checks are normally treated as
    :ref:`HARD states <state_types>`, unless the
    :ref:`passive_host_checks_are_soft <main_cfg_opt_passive_host_checks_are_soft>`

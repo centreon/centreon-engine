@@ -46,10 +46,9 @@ during runtime, along with the external command to accomplish the job.
 
 A full listing of external commands that can be used for adaptive
 monitoring (along with examples of how to use them) can be found online
-at the following URL: http://XXX/developerinfo/external_commands/
+at the following `URL <http://www.nagios.org/developerinfo/externalcommands/>`_
 
 .. note::
-
    When changing check commands, check timeperiods, or event handler
    commands, it is important to note that the new values for these
    options must have been defined before Centreon Engine was
@@ -59,5 +58,4 @@ at the following URL: http://XXX/developerinfo/external_commands/
    just seperate individual arguments from the command name (and from
    each other) using bang (!) characters. More information on how
    arguments in command definitions are processed during runtime can be
-   found in the documentation on
-   :ref:`macros <understanding_macros>`.
+   found in the documentation on :ref:`macros <understanding_macros>`.

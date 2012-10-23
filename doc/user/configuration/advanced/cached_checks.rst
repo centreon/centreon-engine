@@ -38,7 +38,6 @@ And on-demand service checks occur...
   * As needed for :ref:`predictive service dependency checks <host_and_service_dependencies>`.
 
 .. note::
-
    Unless you make use of service dependencies, Centreon Engine will not
    be able to use cached check results to improve the performance of
    service checks. Don't worry about that - its normal. Cached host

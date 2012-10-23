@@ -19,16 +19,15 @@ Sample Configuration File
 =========================
 
 .. note::
-
    A sample main configuration file
-   (/etc/centreon-engine/centengine.cfg) is installed for you when you
+   ``/etc/centreon-engine/centengine.cfg`` is installed for you when you
    follow the :ref:`quickstart installation guide <exploit_quickstart>`.
 
 Config File Location
 ====================
 
 The main configuration file is usually named centengine.cfg and located
-in the /etc/centreon-engine/ directory.
+in the ``/etc/centreon-engine/`` directory.
 
 Configuration File Variables
 ============================
@@ -45,9 +44,8 @@ This variable specifies where Centreon Engine should create its main log
 file. This should be the first variable that you define in your
 configuration file, as Centreon Engine will try to write errors that it
 finds in the rest of your configuration data to this file. If you have
-:ref:`log rotation <main_cfg_opt_log_rotation_method>`
-enabled, this file will automatically be rotated every hour, day, week,
-or month.
+:ref:`log rotation <main_cfg_opt_log_rotation_method>` enabled, this
+file will automatically be rotated every hour, day, week, or month.
 
 =========== ================================================
 **Format**  log_file=<file_name>
@@ -137,14 +135,13 @@ Resource File
 -------------
 
 This is used to specify an optional resource file that can contain
-$USERn$ :ref:`macro <understanding_macros>`
-definitions. $USERn$ macros are useful for storing usernames, passwords,
-and items commonly used in command definitions (like directory
-paths). You can include multiple resource files by adding multiple
-resource_file statements to the main config file - Centreon Engine will
-process them all. See the sample resource.cfg file in the sample-config/
-subdirectory of the Centreon Engine distribution for an example of how
-to define $USERn$ macros.
+$USERn$ :ref:`macro <understanding_macros>` definitions. $USERn$ macros
+are useful for storing usernames, passwords, and items commonly used in
+command definitions (like directory paths). You can include multiple
+resource files by adding multiple resource_file statements to the main
+config file - Centreon Engine will process them all. See the sample
+resource.cfg file in the ``sample-config/`` subdirectory of the Centreon
+Engine distribution for an example of how to define $USERn$ macros.
 
 =========== ===============================================
 **Format**  resource_file=<file_name>
@@ -204,7 +201,6 @@ for any host or service.
 =========== ==========================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -212,10 +208,11 @@ for any host or service.
    unless you disable the :ref:`use_retained_program_state
    <main_cfg_opt_use_retained_program_state>`
    option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
+   active (and the
+   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
    is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>`
-   or change it via the web interface. Values are as follows:
+   :ref:`external command <external_commands>` or change it via the web
+   interface. Values are as follows:
 
     * 0 = Disable notifications
     * 1 = Enable notifications (default)
@@ -243,7 +240,6 @@ monitoring environment.
 =========== ============================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -275,7 +271,6 @@ any passive service checks.
 =========== ===================================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -312,7 +307,6 @@ monitoring environment.
 =========== =====================================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -344,7 +338,6 @@ any passive host checks.
 =========== ================================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -377,7 +370,6 @@ host or service event handlers.
 =========== ===========================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -440,9 +432,9 @@ If you specify a number with an "s" appended to it (i.e. 30s), this is
 the number of seconds to wait between external command checks. If you
 leave off the "s", this is the number of "time units" to wait between
 external command checks. Unless you've changed the
-:ref:`interval_length <main_cfg_opt_timing_interval_length>`
-value (as defined below) from the default value of 60, this number will
-mean minutes.
+:ref:`interval_length <main_cfg_opt_timing_interval_length>` value (as
+defined below) from the default value of 60, this number will mean
+minutes.
 
 =========== ===============================
 **Format**  command_check_interval=<xxx>[s]
@@ -450,7 +442,6 @@ mean minutes.
 =========== ===============================
 
 .. note::
-
    By setting this value to -1, Centreon Engine will check for external
    commands as often as possible. Each time Centreon Engine checks for
    external commands it will read and process all commands present in
@@ -486,7 +477,6 @@ External Command Buffer Slots
 =========== =================================
 
 .. note::
-
    This is an advanced feature. This option determines how many buffer
    slots Centreon Engine will reserve for caching external commands that
    have been read from the external command file by a worker thread, but
@@ -636,7 +626,6 @@ process attributes are retained.
 =========== ================================================
 
 .. note::
-
    This is an advanced feature. You'll need to read the Centreon Engine
    source code to use this option effectively.
 
@@ -759,7 +748,6 @@ from the :ref:`external command file <main_cfg_opt_external_command_file>`.
 =========== ===========================
 
 .. note::
-
    This option does not control whether or not
    :ref:`passive service checks <passive_checks>`
    (which are a type of external command) get logged. To enable or
@@ -847,7 +835,6 @@ queue should be executed.
 =========== ====================
 
 .. note::
-
    That Centreon Engine will only sleep after it "catches up" with
    queued service checks that have fallen behind.
 
@@ -866,8 +853,7 @@ scheduled for execution at the same time. This means that you will
 generally have large CPU spikes when the services are all executed in
 parallel. More information on how to estimate how the inter-check delay
 affects service check scheduling can be found
-:ref:`here <scheduling_service_and_host>`. Values are as
-follows:
+:ref:`here <scheduling_service_and_host>`. Values are as follows:
 
   * n = Don't use any delay - schedule all service checks to run
     immediately (i.e. at the same time!)
@@ -940,8 +926,7 @@ this value based on the system resources you have available on the
 machine that runs Centreon Engine, as it directly affects the maximum
 load that will be imposed on the system (processor utilization, memory,
 etc.). More information on how to estimate how many concurrent checks
-you should allow can be found
-:ref:`here <scheduling_service_and_host>`.
+you should allow can be found :ref:`here <scheduling_service_and_host>`.
 
 =========== ==================================
 **Format**  max_concurrent_checks=<max_checks>
@@ -997,8 +982,7 @@ eliminate CPU load spikes. Using no delay is generally not
 recommended. Using no delay will cause all host checks to be scheduled
 for execution at the same time. More information on how to estimate how
 the inter-check delay affects host check scheduling can be found
-:ref:`here <scheduling_service_and_host>`.Values are as
-follows:
+:ref:`here <scheduling_service_and_host>`.Values are as follows:
 
   * n = Don't use any delay - schedule all host checks to run
     immediately (i.e. at the same time!)
@@ -1047,7 +1031,6 @@ check, how often to re-notify a contact, etc.
 =========== =========================
 
 .. note::
-
    The default value for this is set to 60, which means that a "unit
    value" of 1 in the object configuration file will mean 60 seconds (1
    minute). I have not really tested other values for this variable, so
@@ -1070,7 +1053,6 @@ consistent, at the expense of executing checks on a more rigid schedule.
 =========== ============================
 
 .. note::
-
    This is an experimental feature and may be removed in future
    versions. Enabling this option can degrade performance - rather than
    increase it - if used improperly!
@@ -1089,7 +1071,6 @@ option is enabled. Default is 30 seconds.
 =========== ====================================
 
 .. note::
-
    This is an experimental feature and may be removed in future
    versions. Enabling the auto-rescheduling option can degrade
    performance - rather than increase it - if used improperly!
@@ -1110,7 +1091,6 @@ option is enabled. Default is 180 seconds (3 minutes).
 =========== ==================================
 
 .. note::
-
    This is an experimental feature and may be removed in future
    versions. Enabling the auto-rescheduling option can degrade
    performance - rather than increase it - if used improperly!
@@ -1182,10 +1162,10 @@ Predictive Host Dependency Checks Option
 
 This option determines whether or not Centreon Engine will execute
 predictive checks of hosts that are being depended upon (as defined in
-:ref:`host <obj_def_host_dependency>`
-dependencies") for a particular host when it changes state. Predictive
-checks help ensure that the dependency logic is as accurate as
-possible. More information on how predictive checks work can be found
+:ref:`host <obj_def_host_dependency>` dependencies") for a particular
+host when it changes state. Predictive checks help ensure that the
+dependency logic is as accurate as possible. More information on how
+predictive checks work can be found
 :ref:`here <host_and_service_dependencies>`.
 
   * 0 = Disable predictive checks
@@ -1345,7 +1325,6 @@ be found :ref:`here <flapping_detection>`.
 =========== ===========================
 
 .. note::
-
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
@@ -2107,14 +2086,13 @@ Illegal Macro Output Characters
 -------------------------------
 
 This option allows you to specify illegal characters that should be
-stripped from :ref:`macros <understanding_macros>`
-before being used in notifications, event handlers, and other
-commands. This DOES NOT affect macros used in service or host check
-commands. You can choose to not strip out the characters shown in the
-example above, but I recommend you do not do this. Some of these
-characters are interpreted by the shell (i.e. the backtick) and can lead
-to security problems. The following macros are stripped of the
-characters you specify::
+stripped from :ref:`macros <understanding_macros>` before being used in
+notifications, event handlers, and other commands. This DOES NOT affect
+macros used in service or host check commands. You can choose to not
+strip out the characters shown in the example above, but I recommend you
+do not do this. Some of these characters are interpreted by the shell
+(i.e. the backtick) and can lead to security problems. The following
+macros are stripped of the characters you specify::
 
   $HOSTOUTPUT$, $HOSTPERFDATA$, $HOSTACKAUTHOR$, $HOSTACKCOMMENT$, $SERVICEOUTPUT$, $SERVICEPERFDATA$, $SERVICEACKAUTHOR$, and $SERVICEACKCOMMENT$
 
@@ -2229,7 +2207,6 @@ the module at startup are seperated from the module path by a space.
 =========== ================================================
 
 .. note::
-
    Do NOT overwrite modules while they are being used by Centreon Engine
    or Centreon Engine will crash in a fiery display of SEGFAULT
    glory. This is a bug/limitation either in dlopen(), the kernel,
@@ -2250,12 +2227,11 @@ Debug File
 
 This option determines where Centreon Engine should write debugging
 information. What (if any) information is written is determined by the
-:ref:`debug_level <main_cfg_opt_debug_file>`
-and :ref:`debug_verbosity <main_cfg_opt_debug_verbosity>`
-options. You can have Centreon Engine automaticaly rotate the debug file
-when it reaches a certain size by using the
-:ref:`max_debug_file_size <main_cfg_opt_max_debug_file_size>`
-option.
+:ref:`debug_level <main_cfg_opt_debug_file>` and
+:ref:`debug_verbosity <main_cfg_opt_debug_verbosity>` options. You can
+have Centreon Engine automaticaly rotate the debug file when it reaches
+a certain size by using the
+:ref:`max_debug_file_size <main_cfg_opt_max_debug_file_size>` option.
 
 =========== ====================================================
 **Format**  debug_file=<file_name>
@@ -2268,8 +2244,8 @@ Debug Level
 -----------
 
 This option determines what type of information Centreon Engine should
-write to the :ref:`debug_file <main_cfg_opt_debug_file>`.
-This value is a logical OR of the values below.
+write to the :ref:`debug_file <main_cfg_opt_debug_file>`.  This value is
+a logical OR of the values below.
 
   * -1 = Log everything
   * 0 = Log nothing (default)
@@ -2309,11 +2285,11 @@ Maximum Debug File Size
 -----------------------
 
 This option determines the maximum size (in bytes) of the
-:ref:`debug file <main_cfg_opt_debug_file>`.
-If the file grows larger than this size, it will be renamed with a .old
-extension. If a file already exists with a .old extension it will
-automatically be deleted. This helps ensure your disk space usage
-doesn't get out of control when debugging Centreon Engine.
+:ref:`debug file <main_cfg_opt_debug_file>`.  If the file grows larger
+than this size, it will be renamed with a .old extension. If a file
+already exists with a .old extension it will automatically be
+deleted. This helps ensure your disk space usage doesn't get out of
+control when debugging Centreon Engine.
 
 =========== ===========================
 **Format**  max_debug_file_size=<#>

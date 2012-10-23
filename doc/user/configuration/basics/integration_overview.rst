@@ -34,7 +34,8 @@ To send status, performance, or notification information from Centreon
 Engine to external applications, check out the docs on:
 
   * :ref:`Event Handlers <event_handlers>`
-  * :ref:`OCSP <main_cfg_opt_obsessive_compulsive_service_processor_command>`    and
+  * :ref:`OCSP <main_cfg_opt_obsessive_compulsive_service_processor_command>`
+    and
     :ref:`OCHP <main_cfg_opt_obsessive_compulsive_host_processor_command>`
     Commands
   * :ref:`Performance Data <performance_data>`

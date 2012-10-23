@@ -287,41 +287,41 @@ using CMake's variable system. Variables can be set like this::
 
 Here's the list of variables available and their description:
 
-============================== ================================================ ======================================
+============================== ================================================ ============================================
 Variable                       Description                                      Default value
-============================== ================================================ ======================================
+============================== ================================================ ============================================
 WITH_CENTREON_CLIB_INCLUDE_DIR Set the directory path of centreon-clib include. auto detection
 WITH_CENTREON_CLIB_LIBRARIES   Set the centreon-clib library to use.            auto detection
 WITH_CENTREON_CLIB_LIBRARY_DIR Set the centreon-clib library directory (don't   auto detection
                                use it if you use WITH_CENTREON_CLIB_LIBRARIES).
 WITH_GROUP                     Set the group for Centreon Engine installation.  root
-WITH_LOCK_FILE                 Used by the startup script.                      /var/lock/subsys/centengine.lock
-WITH_LOG_ARCHIVE_DIR           Use to archive log files that have been rotated. ${WITH_VAR_DIR}/archives
-WITH_LOGROTATE_DIR             Use to install logrotate files.                  /etc/logrorate.d/
+WITH_LOCK_FILE                 Used by the startup script.                      ``/var/lock/subsys/centengine.lock``
+WITH_LOG_ARCHIVE_DIR           Use to archive log files that have been rotated. ``${WITH_VAR_DIR}/archives``
+WITH_LOGROTATE_DIR             Use to install logrotate files.                  ``/etc/logrorate.d/``
 WITH_LOGROTATE_SCRIPT          Enable or disable install logrotate files.       OFF
-WITH_PID_FILE                  This file contains the process id (PID) number   /var/run/centengine.pid
+WITH_PID_FILE                  This file contains the process id (PID) number   ``/var/run/centengine.pid``
                                of the running Centreon Engine process.
-WITH_PKGCONFIG_DIR             Use to install pkg-config files.                 ${WITH_PREFIX_LIB}/pkgconfig
+WITH_PKGCONFIG_DIR             Use to install pkg-config files.                 ``${WITH_PREFIX_LIB}/pkgconfig``
 WITH_PKGCONFIG_SCRIPT          Enable or disable install pkg-config files.      ON
-WITH_PREFIX                    Base directory for Centreon Engine installation. /usr/local
+WITH_PREFIX                    Base directory for Centreon Engine installation. ``/usr/local``
                                If other prefixes are expressed as relative
                                paths, they are relative to this path.
-WITH_PREFIX_BIN                Define specific directory for Centreon Engine    ${WITH_PREFIX}/bin
+WITH_PREFIX_BIN                Define specific directory for Centreon Engine    ``${WITH_PREFIX}/bin``
                                binary.
-WITH_PREFIX_CONF               Define specific directory for Centreon Engine    ${WITH_PREFIX}/etc
+WITH_PREFIX_CONF               Define specific directory for Centreon Engine    ``${WITH_PREFIX}/etc``
                                configuration.
-WITH_PREFIX_INC                Define specific directory for Centreon Engine    ${WITH_PREFIX}/include/centreon-engine
+WITH_PREFIX_INC                Define specific directory for Centreon Engine    ``${WITH_PREFIX}/include/centreon-engine``
                                headers.
-WITH_PREFIX_LIB                Define specific directory for Centreon Engine    ${WITH_PREFIX}/lib/centreon-engine
+WITH_PREFIX_LIB                Define specific directory for Centreon Engine    ``${WITH_PREFIX}/lib/centreon-engine``
                                modules.
-WITH_RW_DIR                    Use for files to need read/write access.         ${WITH_VAR_DIR}/rw
+WITH_RW_DIR                    Use for files to need read/write access.         ``${WITH_VAR_DIR}/rw``
 WITH_SAMPLE_CONFIG             Install sample configuration files.              ON
 WITH_SSL                       Enable or disable SSL support in web service.    OFF
-WITH_STARTUP_DIR               Define the startup directory.                    Generaly in /etc/init.d or /etc/init
+WITH_STARTUP_DIR               Define the startup directory.                    Generaly in ``/etc/init.d`` or ``/etc/init``
 WITH_STARTUP_SCRIPT            Generate and install startup script.             auto
 WITH_TESTING                   Build unit test.                                 OFF
 WITH_USER                      Set the user for Centreon Engine installation.   root
-WITH_VAR_DIR                   Define specific directory for temporary Centreon ${WITH_PREFIX}/var
+WITH_VAR_DIR                   Define specific directory for temporary Centreon ``${WITH_PREFIX}/var``
                                Engine files.
 WITH_WEBSERVICE                Enable or disable web service option.            OFF
 WITH_XERCESC_INCLUDE_DIR       Set the directory path of xerces-c include.      auto detection
@@ -329,7 +329,7 @@ WITH_XERCESC_LIBRARIES         Set the xerces-c library to use.                 
 WITH_XERCESC_LIBRARY_DIR       Set the xercess-c library directory (don't use   auto detection
                                it if you use WITH_XERCESC_LIBRARIES).
 WITH_ZLIB                      Enable or disable compression in web service.    ON
-============================== ================================================ ======================================
+============================== ================================================ ============================================
 
 Example::
 
@@ -374,17 +374,17 @@ Check-Up
 After a successful installation, you should check for the existence of
 some of the following files.
 
-============================================ =========================================
-File                                         Description
-============================================ =========================================
-${WITH_PREFIX_BIN}/centengine                Centreon Engine daemon.
-${WITH_PREFIX_BIN}/centenginestats           Centreon Engine statistic.
-${WITH_PREFIX_BIN}/centenginews              Centreon Engine Web Service command line.
-${WITH_PREFIX_CONF}/                         Centreon Engine sample configuration.
-${WITH_PREFIX_LIB}/libexternalcmd.so         External commands module.
-${WITH_PREFIX_LIB}/libwebservice.so          Webservice module.
-${WITH_SCRIPT_DIR}/centengine.conf           Startup script for ubuntu.
-${WITH_SCRIPT_DIR}/centengine                Startup script for other os.
-${WITH_INCLUDE_DIR}/include/centreon-engine/ All devel Centreon Engine's include.
-${WITH_PKGCONFIG_DIR}/centengine.pc          Centreon Engine pkg-config file.
-============================================ =========================================
+================================================ =========================================
+File                                             Description
+================================================ =========================================
+``${WITH_PREFIX_BIN}/centengine``                Centreon Engine daemon.
+``${WITH_PREFIX_BIN}/centenginestats``           Centreon Engine statistic.
+``${WITH_PREFIX_BIN}/centenginews``              Centreon Engine Web Service command line.
+``${WITH_PREFIX_CONF}/``                         Centreon Engine sample configuration.
+``${WITH_PREFIX_LIB}/libexternalcmd.so``         External commands module.
+``${WITH_PREFIX_LIB}/libwebservice.so``          Webservice module.
+``${WITH_SCRIPT_DIR}/centengine.conf``           Startup script for ubuntu.
+``${WITH_SCRIPT_DIR}/centengine``                Startup script for other os.
+``${WITH_INCLUDE_DIR}/include/centreon-engine/`` All devel Centreon Engine's include.
+``${WITH_PKGCONFIG_DIR}/centengine.pc``          Centreon Engine pkg-config file.
+================================================ =========================================

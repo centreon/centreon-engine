@@ -39,7 +39,7 @@ Centreon Engine is licensed under the terms of the `GNU General Public
 License <http://www.gnu.org/licenses/old-licenses/gpl-2.0>`_ Version 2
 as published by the `Free Software Foundation <http://www.fsf.org/>`_.
 This gives you legal permission to copy, distribute and/or modify
-Centreon Engine under certain conditions. Read the 'license.txt' file in
+Centreon Engine under certain conditions. Read the ``license.txt`` file in
 the Centreon Engine distribution or read the `online version of the
 license <http://www.gnu.org/licenses/old-licenses/gpl-2.0>`_ for more
 details.

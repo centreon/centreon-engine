@@ -55,13 +55,12 @@ cached results of cluster elements. Although you could re-check all
 elements of the cluster to determine the cluster's status, why waste
 bandwidth and resources when you already have the results cached? Where
 are the results cached? Cached results for cluster elements can be found
-in the
-:ref:`status file <main_cfg_opt_status_file>`
-(assuming you are monitoring each element). The check_cluster plugin is
-designed specifically for checking cached host and service states in the
-status file. Important: Although you didn't enable notifications for
-individual elements of the cluster, you will want them enabled for the
-overall cluster status check.
+in the :ref:`status file <main_cfg_opt_status_file>` (assuming you are
+monitoring each element). The check_cluster plugin is designed
+specifically for checking cached host and service states in the status
+file. Important: Although you didn't enable notifications for individual
+elements of the cluster, you will want them enabled for the overall
+cluster status check.
 
 Using the check_cluster Plugin
 ==============================
@@ -108,8 +107,7 @@ the cluster are OK, the cluster check will return an OK state as well::
   }
 
 It is important to notice that we are passing a comma-delimited list of
-on-demand service state
-:ref:`macros <understanding_macros>` to the
+on-demand service state :ref:`macros <understanding_macros>` to the
 $ARG4$ macro in the cluster check command. That's important! Centreon
 Engine will fill those on-demand macros in with the current service
 state IDs (numerical values, rather than text strings) of the individual
@@ -152,12 +150,11 @@ cluster might look something like this::
   }
 
 It is important to notice that we are passing a comma-delimited list of
-on-demand host state
-:ref:`macros <understanding_macros>` to the
-$ARG4$ macro in the cluster check command. That's important! Centreon
-Engine will fill those on-demand macros in with the current host state
-IDs (numerical values, rather than text strings) of the individual
-members of the cluster.
+on-demand host state :ref:`macros <understanding_macros>` to the $ARG4$
+macro in the cluster check command. That's important! Centreon Engine
+will fill those on-demand macros in with the current host state IDs
+(numerical values, rather than text strings) of the individual members
+of the cluster.
 
 That's it! Centreon Engine will periodically check the status of the
 host cluster and send notifications to you when its status is degraded

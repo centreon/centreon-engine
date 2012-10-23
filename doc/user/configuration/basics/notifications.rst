@@ -61,30 +61,28 @@ Program-Wide Filter:
 The first filter that notifications must pass is a test of whether or
 not notifications are enabled on a program-wide basis. This is initially
 determined by the
-:ref:`enable_notifications <main_cfg_opt_notifications>`
-directive in the main config file, but may be changed during runtime
-from the web interface. If notifications are disabled on a program-wide
-basis, no host or service notifications can be sent out - period. If
-they are enabled on a program-wide basis, there are still other tests
-that must be passed...
+:ref:`enable_notifications <main_cfg_opt_notifications>` directive in
+the main config file, but may be changed during runtime from the web
+interface. If notifications are disabled on a program-wide basis, no
+host or service notifications can be sent out - period. If they are
+enabled on a program-wide basis, there are still other tests that must
+be passed...
 
 Service and Host Filters
 ========================
 
 The first filter for host or service notifications is a check to see if
 the host or service is in a period of
-:ref:`scheduled downtime <scheduled_downtime>`.
-If it is in a scheduled downtime, no one gets notified. If it isn't in a
-period of downtime, it gets passed on to the next filter. As a side
-note, notifications for services are suppressed if the host they're
-associated with is in a period of scheduled downtime.
+:ref:`scheduled downtime <scheduled_downtime>`.  If it is in a scheduled
+downtime, no one gets notified. If it isn't in a period of downtime, it
+gets passed on to the next filter. As a side note, notifications for
+services are suppressed if the host they're associated with is in a
+period of scheduled downtime.
 
 The second filter for host or service notification is a check to see if
-the host or service is
-:ref:`flapping <flapping_detection>`
-(if you enabled flap detection). If the service or host is currently
-flapping, no one gets notified. Otherwise it gets passed to the next
-filter.
+the host or service is :ref:`flapping <flapping_detection>` (if you
+enabled flap detection). If the service or host is currently flapping,
+no one gets notified. Otherwise it gets passed to the next filter.
 
 The third host or service filter that must be passed is the host- or
 service-specific notification options. Each service definition contains
@@ -132,12 +130,11 @@ Contact Filters
 
 At this point the notification has passed the program mode filter and
 all host or service filters and Centreon Engine starts to notify
-:ref:`all the people it <obj_def_contact>`
-should". Does this mean that each contact is going to receive the
-notification? No! Each contact has their own set of filters that the
-notification must pass before they receive it. Note: Contact filters are
-specific to each contact and do not affect whether or not other contacts
-receive notifications.
+:ref:`all the people it <obj_def_contact>` should". Does this mean that
+each contact is going to receive the notification? No! Each contact has
+their own set of filters that the notification must pass before they
+receive it. Note: Contact filters are specific to each contact and do
+not affect whether or not other contacts receive notifications.
 
 The first filter that must be passed for each contact are the
 notification options. Each contact definition contains options that
@@ -167,18 +164,15 @@ Notification Methods
 You can have Centreon Engine notify you of problems and recoveries
 pretty much anyway you want: pager, cellphone, email, instant message,
 audio alert, electric shocker, etc. How notifications are sent depend on
-the
-:ref:`notification commands <obj_def_command>`
-that are defined in your
-:ref:`object definition files <object_configuration_overview>`.
+the :ref:`notification commands <obj_def_command>` that are defined in
+your :ref:`object definition files <object_configuration_overview>`.
 
 .. note::
-
    If you install Centreon Engine according to the
-   :ref:`quickstart guide <exploit_quickstart>`,
-   it should be configured to send email notifications. You can see the
-   email notification commands that are used by viewing the contents of
-   the following file: /etc/centreon-engine/objects/commands.cfg.
+   :ref:`quickstart guide <exploit_quickstart>`, it should be configured
+   to send email notifications. You can see the email notification
+   commands that are used by viewing the contents of the following file:
+   ``/etc/centreon-engine/objects/commands.cfg``.
 
 Specific notification methods (paging, etc.) are not directly
 incorporated into the Centreon Engine code as it just doesn't make much
