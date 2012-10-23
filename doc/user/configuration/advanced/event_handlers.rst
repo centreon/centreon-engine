@@ -6,7 +6,7 @@ Event Handlers
 Introduction
 ============
 
-.. image:: event_handlers.png
+.. image:: /_static/images/event_handlers.png
 
 Event handlers are optional system commands (scripts or executables)
 that are run whenever a host or service state change occurs.
@@ -98,9 +98,9 @@ minimum, the scripts should take the following
 :ref:`macros <understanding_macros>` as
 arguments:
 
-For Services: `SERVICESTATE`_ `SERVICESTATETYPE`_ `SERVICEATTEMPT`_
+For Services: :ref:`SERVICESTATE SERVICESTATETYPE SERVICEATTEMPT <user_configuration_macros_service>`
 
-For Hosts: `HOSTSTATE`_ `HOSTSTATETYPE`_ `HOSTATTEMPT`_
+For Hosts: :ref:`HOSTSTATE HOSTSTATETYPE HOSTATTEMPT <user_configuration_macros_host>`
 
 The scripts should examine the values of the arguments passed to it and
 take any necessary action based upon those values. The best way to

@@ -4,7 +4,7 @@ Security Considerations
 Introduction
 ============
 
-.. image:: security.png
+.. image:: /_static/images/security.png
 
 This is intended to be a brief overview of some things you should keep
 in mind when installing Centreon Engine, so as set it up in a secure
@@ -57,7 +57,7 @@ firewalls, allowing users access to your monitoring server can be a
 security risk. Remember, its always easier to gain root access through a
 system security hole if you have a local account on a box.
 
-.. image:: security3.png
+.. image:: /_static/images/security3.png
 
 Don't Run Centreon Engine As Root
 ---------------------------------
@@ -121,7 +121,7 @@ everyone to be able to query your systems for status information. This
 information could be used by an attacker to execute remote event handler
 scripts or to determine the best times to go unnoticed.
 
-.. image:: security1.png
+.. image:: /_static/images/security1.png
 
 Secure Communication Channels
 -----------------------------
@@ -133,4 +133,4 @@ to sniff status information going across your network. This information
 could be used by an attacker to determine the best times to go
 unnoticed.
 
-.. image:: security2.png
+.. image:: /_static/images/security2.png

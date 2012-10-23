@@ -203,34 +203,35 @@ are stripped from the macros depends on the setting of the
 directive. The following macros are stripped of potentially dangerous
 characters:
 
-  * `HOSTOUTPUT`_
-  * `LONGHOSTOUTPUT`_
-  * `HOSTPERFDATA`_
-  * `HOSTACKAUTHOR`_
-  * `HOSTACKCOMMENT`_
-  * `SERVICEOUTPUT`_
-  * `LONGSERVICEOUTPUT`_
-  * `SERVICEPERFDATA`_
-  * `SERVICEACKAUTHOR`_
-  * `SERVICEACKCOMMENT`_
+  * :ref:`HOSTOUTPUT <user_configuration_macros_host>`
+  * :ref:`LONGHOSTOUTPUT <user_configuration_macros_host>`
+  * :ref:`HOSTPERFDATA <user_configuration_macros_host>`
+  * :ref:`HOSTACKAUTHOR <user_configuration_macros_host>`
+  * :ref:`HOSTACKCOMMENT <user_configuration_macros_host>`
+  * :ref:`SERVICEOUTPUT <user_configuration_macros_service>`
+  * :ref:`LONGSERVICEOUTPUT <user_configuration_macros_service>`
+  * :ref:`SERVICEPERFDATA <user_configuration_macros_service>`
+  * :ref:`SERVICEACKAUTHOR <user_configuration_macros_service>`
+  * :ref:`SERVICEACKCOMMENT <user_configuration_macros_service>`
 
 Additionally, any macros that contain
-:ref:`custom variables <custom_object_variables>`
-are stripped for safety and security.
+:ref:`custom variables <custom_object_variables>` are stripped for
+safety and security.
 
 Macros as Environment Variables
 ===============================
 
 Most macros are made available as environment variables for easy
 reference by scripts or commands that are executed by Centreon
-Engine. For purposes of security and sanity, `USERn`_ and "on-demand"
-host and service macros are not made available as environment variables.
+Engine. For purposes of security and sanity,
+:ref:`USERn <user_configuration_macros_misc>` and "on-demand" host and
+service macros are not made available as environment variables.
 
 Environment variables that contain standard macros are named the same as
 their corresponding macro names (listed :ref:`here <standard_macros>`),
-with "NAGIOS_" prepended to their names. For example, the `HOSTNAME`
-macro would be available as an environment variable named
-"NAGIOS_HOSTNAME".
+with NAGIOS\_ prepended to their names. For example, the
+:ref:`HOSTNAME <user_configuration_macros_host>` macro would be
+available as an environment variable named NAGIOS_HOSTNAME.
 
 Available Macros
 ================

@@ -6,7 +6,7 @@ Notification Escalations
 Introduction
 ============
 
-.. image:: objects-contacts.png
+.. image:: /_static/images/objects-contacts.png
 
 Centreon Engine supports optional escalation of contact notifications
 for hosts and services. Escalation of host and service notifications is

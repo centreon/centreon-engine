@@ -28,11 +28,15 @@ execution of a host or service check. This might include things like
 service check latency (i.e. how "late" was the service check from its
 scheduled execution time) and the number of seconds a host or service
 check took to execute. This type of performance data is available for
-all checks that are performed. The `HOSTEXECUTIONTIME`_ and
-`SERVICEEXECUTIONTIME`_ :ref:`macros <understanding_macros>` can be used
-to determine the number of seconds a host or service check was running
-and the `HOSTLATENCY`_ and `SERVICELATENCY`_ macros can be used to
-determine how "late" a regularly-scheduled host or service check was.
+all checks that are performed. The
+:ref:`HOSTEXECUTIONTIME <user_configuration_macros_host>` and
+:ref:`SERVICEEXECUTIONTIME <user_configuration_macros_service>`
+:ref:`macros <understanding_macros>` can be used to determine the number
+of seconds a host or service check was running and the
+:ref:`HOSTLATENCY <user_configuration_macros_host>` and
+:ref:`SERVICELATENCY <user_configuration_macros_service>` macros can be
+used to determine how "late" a regularly-scheduled host or service check
+was.
 
 Plugin performance data is external data specific to the plugin used to
 perform the host or service check. Plugin-specific data can include
@@ -40,10 +44,13 @@ things like percent packet loss, free disk space, processor load, number
 of current users, etc. - basically any type of metric that the plugin is
 measuring when it executes. Plugin-specific performance data is optional
 and may not be supported by all plugins. Plugin-specific performance
-data (if available) can be obtained by using the `HOSTPERFDATA`_ and
-`SERVICEPERFDATA`_ :ref:`macros <understanding_macros>`. Read on for
-more information on how plugins can return performance data to Centreon
-Engine for inclusion in the $HOSTPERFDATA$ and $SERVICEPERFDATA$ macros.
+data (if available) can be obtained by using the
+:ref:`HOSTPERFDATA <user_configuration_macros_host>` and
+:ref:`SERVICEPERFDATA <user_configuration_macros_service>`
+:ref:`macros <understanding_macros>`. Read on for more information on
+how plugins can return performance data to Centreon Engine for inclusion
+in the :ref:`HOSTPERFDATA <user_configuration_macros_host>` and
+:ref:`SERVICEPERFDATA <user_configuration_macros_service>` macros.
 
 Plugin Performance Data
 =======================

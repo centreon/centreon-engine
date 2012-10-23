@@ -46,6 +46,8 @@ No      The macro is not available
 **Yes** The macro is available
 ======= ==========================
 
+.. _user_configuration_macros_host:
+
 Host Macros :sup:`3`
 --------------------
 
@@ -110,6 +112,8 @@ Macro Name                     Service Checks Service Notifications Host Checks 
 `HOSTGROUPNOTESURL`_ :sup:`5`  **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTGROUPACTIONURL`_ :sup:`5` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
+
+.. _user_configuration_macros_service:
 
 Service Macros
 --------------
@@ -220,6 +224,8 @@ Macro Name                                  Service Checks Service Notifications
 `TOTALSERVICEPROBLEMSUNHANDLED`_ :sup:`10`  **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
 =========================================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
+.. _user_configuration_macros_notification:
+
 Notification Macros
 -------------------
 
@@ -274,6 +280,8 @@ Macro Name             Service Checks Service Notifications Host Checks Host Not
 `HOSTPERFDATAFILE`_    **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `SERVICEPERFDATAFILE`_ **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ====================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
+
+.. _user_configuration_macros_misc:
 
 Misc Macros
 -----------
@@ -492,23 +500,23 @@ _`SERVICENOTES`                   Notes for the service. This macro may contain 
 Service Group Macros
 --------------------
 
-================================ =======================================================================================================================
-_`SERVICEGROUPALIAS` :sup:`6`    The long name / alias of either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                 servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                 taken from the alias directive in the :ref:`servicegroup <obj_def_servicegroup>` definition".
-_`SERVICEGROUPMEMBERS` :sup:`6`  A comma-separated list of all services that belong to either 1) the servicegroup name passed as an on-demand macro
-                                 argument or 2) the primary servicegroup associated with the current service (if not used in the context of an
-                                 on-demand macro).
-_`SERVICEGROUPNOTES` :sup:`6`    The notes associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                 servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                 taken from the notes directive in the :ref:`servicegroup definition <obj_def_servicegroup>`.
-_`SERVICEGROUPNOTESURL` :sup:`6` The notes URL associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                 servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                 taken from the notes_url directive in the :ref:`servicegroup definition <obj_def_servicegroup>`.
-_`SERVICEGROUPNOTES` :sup:`6`    The action URL associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                 servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                 taken from the action_url directive in the :ref:`servicegroup definition <obj_def_servicegroup>`..
-================================ =======================================================================================================================
+================================= ======================================================================================================================
+_`SERVICEGROUPALIAS` :sup:`6`     The long name / alias of either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
+                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
+                                  taken from the alias directive in the :ref:`servicegroup <obj_def_servicegroup>` definition".
+_`SERVICEGROUPMEMBERS` :sup:`6`   A comma-separated list of all services that belong to either 1) the servicegroup name passed as an on-demand macro
+                                  argument or 2) the primary servicegroup associated with the current service (if not used in the context of an
+                                  on-demand macro).
+_`SERVICEGROUPNOTES` :sup:`6`     The notes associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
+                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
+                                  taken from the notes directive in the :ref:`servicegroup definition <obj_def_servicegroup>`.
+_`SERVICEGROUPNOTESURL` :sup:`6`  The notes URL associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
+                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
+                                  taken from the notes_url directive in the :ref:`servicegroup definition <obj_def_servicegroup>`.
+_`SERVICEGROUPACTIONURL` :sup:`6` The action URL associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
+                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
+                                  taken from the action_url directive in the :ref:`servicegroup definition <obj_def_servicegroup>`..
+================================= ======================================================================================================================
 
 Contact Macros
 --------------
@@ -634,12 +642,14 @@ _`TIME`                   Current time stamp (i.e. 00:30:28).
 _`TIMET`                  Current time stamp in time_t format (seconds since the UNIX epoch).
 _`ISVALIDTIME` :sup:`9`   This is a special on-demand macro that returns a 1 or 0 depending on whether or not a particular time is valid within a
                           specified timeperiod. There are two ways of using this macro:
+
                             * $ISVALIDTIME:24x7$ will be set to "1" if the current time is valid within the "24x7" timeperiod. If not, it will be set to
                               "0".
                             * $ISVALIDTIME:24x7:timestamp$ will be set to "1" if the time specified by the "timestamp" argument (which must be in time_t
-                           format) is valid within the "24x7" timeperiod. If not, it will be set to "0".
+                              format) is valid within the "24x7" timeperiod. If not, it will be set to "0".
 _`NEXTVALIDTIME` :sup:`9` This is a special on-demand macro that returns the next valid time (in time_t format) for a specified timeperiod. There are two
                           ways of using this macro:
+
                             * $NEXTVALIDTIME:24x7$ will return the next valid time from and including the current time in the "24x7" timeperiod.
                             * $NEXTVALIDTIME:24x7:timestamp$ will return the next valid time from and including the time specified by the "timestamp"
                               argument (which must be specified in time_t format) in the "24x7" timeperiod.If a next valid time cannot be found in the

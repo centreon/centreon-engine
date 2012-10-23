@@ -80,7 +80,7 @@ view the status of related hosts in the Centreon Engine web interface
 and (2) simplify your configuration through the use of
 :ref:`object tricks <obj_def_tricks>`.
 
-.. image:: objects-hosts.png
+.. image:: /_static/images/objects-hosts.png
 
 :ref:`Services <obj_def_service>`
 are one of the central objects in the monitoring logic. Services are
@@ -96,7 +96,7 @@ are groups of one or more services. Service groups can make it easier to
 interface and (2) simplify your configuration through the use of
 :ref:`object tricks <obj_def_tricks>`.
 
-.. image:: objects-services.png
+.. image:: /_static/images/objects-services.png
 
 :ref:`Contacts <obj_def_contact>`
 are people involved in the notification process:
@@ -110,7 +110,7 @@ are people involved in the notification process:
     easier to define all the people who get notified when certain host
     or service problems occur.
 
-.. image:: objects-contacts.png
+.. image:: /_static/images/objects-contacts.png
 
 :ref:`Timeperiods <obj_def_timeperiod>`
 are are used to control:
@@ -121,7 +121,7 @@ are are used to control:
 Information on how timeperiods work can be found
 :ref:`here <timeperiods>`.
 
-.. image:: objects-timeperiods.png
+.. image:: /_static/images/objects-timeperiods.png
 
 :ref:`Commands <obj_def_command>`
 are used to tell Centreon Engine what programs, scripts, etc. it should
@@ -132,4 +132,4 @@ execute to perform:
   * Event handlers
   * and more...
 
-.. image:: objects-commands.png
+.. image:: /_static/images/objects-commands.png

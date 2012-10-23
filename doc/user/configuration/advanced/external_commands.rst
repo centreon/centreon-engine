@@ -12,7 +12,7 @@ it receives. External applications can submit commands by writing to the
 :ref:`command file <main_cfg_opt_external_command_file>`,
 which is periodically processed by the Centreon Engine daemon.
 
-.. image:: external_commands.png
+.. image:: /_static/images/external_commands.png
 
 Enabling External Commands
 ==========================

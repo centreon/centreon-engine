@@ -60,10 +60,12 @@ execution of event handlers. Using event handlers can be particularly
 useful if you want to try and proactively fix a problem before it turns
 into a HARD state.
 
-The `HOSTSTATETYPE`_ or `SERVICESTATETYPE`_ macros will have a value of
-"SOFT" when event handlers are executed, which allows your event handler
-scripts to know when they should take corrective action. More
-information on event handlers can be found :ref:`here <event_handlers>`.
+The :ref:`HOSTSTATETYPE <user_configuration_macros_host>` or
+:ref:`SERVICESTATETYPE <user_configuration_macros_service>` macros will
+have a value of "SOFT" when event handlers are executed, which allows
+your event handler scripts to know when they should take corrective
+action. More information on event handlers can be found
+:ref:`here <event_handlers>`.
 
 Hard States
 ===========
@@ -92,10 +94,12 @@ changes:
   * Event handlers are executed to handle the HARD state.
   * Contacts are notifified of the host or service problem or recovery.
 
-The `HOSTSTATETYPE`_ or `SERVICESTATETYPE`_ macros will have a value of
-"HARD" when event handlers are executed, which allows your event handler
-scripts to know when they should take corrective action. More
-information on event handlers can be found :ref:`here <event_handlers>`.
+The :ref:`HOSTSTATETYPE <user_configuration_macros_host>` or
+:ref:`SERVICESTATETYPE <user_configuration_macros_service>` macros will
+have a value of "HARD" when event handlers are executed, which allows
+your event handler scripts to know when they should take corrective
+action. More information on event handlers can be found
+:ref:`here <event_handlers>`.
 
 Example
 =======

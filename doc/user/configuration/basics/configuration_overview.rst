@@ -16,7 +16,7 @@ worth your time. :-)
    directory when you follow the
    :ref:`quickstart installation guide <exploit_quickstart>`.
 
-.. image:: configoverview.png
+.. image:: /_static/images/configoverview.png
 
 Main
 ====

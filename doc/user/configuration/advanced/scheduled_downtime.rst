@@ -11,7 +11,7 @@ hosts and service that you're monitoring. This is useful in the event
 that you actually know you're going to be taking a server down for an
 upgrade, etc.
 
-.. image:: downtime.png
+.. image:: /_static/images/downtime.png
 
 Scheduling Downtime
 ===================

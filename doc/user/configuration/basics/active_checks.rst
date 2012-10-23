@@ -15,7 +15,7 @@ checks as as follows:
   * Active checks are initiated by the Centreon Engine process
   * Active checks are run on a regularly scheduled basis
 
-.. image:: active_checks.png
+.. image:: /_static/images/active_checks.png
 
 How Are Active Checks Performed?
 ================================

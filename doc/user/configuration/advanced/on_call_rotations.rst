@@ -6,7 +6,7 @@ On-Call Rotations
 Introduction
 ============
 
-.. image:: objects-contacts.png
+.. image:: /_static/images/objects-contacts.png
 
 Admins often have to shoulder the burden of answering pagers, cell phone
 calls, etc. when they least desire them. No one likes to be woken up at

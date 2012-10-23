@@ -467,7 +467,7 @@ configurations, as shown below::
     ...
   }
 
-.. image:: multiple-templates1.png
+.. image:: /_static/images/multiple-templates1.png
 
 In the example above, devweb1 is inheriting variables/values from two
 sources: generic-host and development-server. You'll notice that a
@@ -512,5 +512,5 @@ are shown to the right.
 Testing, trial, and error will help you better understand exactly how
 things work in complex inheritance situations like this. :-)
 
-.. image:: multiple-templates2.png
+.. image:: /_static/images/multiple-templates2.png
 

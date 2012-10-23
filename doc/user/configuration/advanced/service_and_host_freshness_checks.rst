@@ -18,7 +18,7 @@ frequently as you want. This can be very useful in
 :ref:`failover <redundant_and_failover_monitoring>`
 monitoring environments.
 
-.. image:: freshness.png
+.. image:: /_static/images/freshness.png
 
 How Does Freshness Checking Work?
 =================================

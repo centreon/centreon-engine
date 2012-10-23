@@ -1061,30 +1061,31 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============ =========================================================================================================================================
-command_name This directive is the short name used to identify the command. It is referenced in
-             :ref:`contact <obj_def_contact>`, :ref:`host <obj_def_host>`, and
-             :ref:`service <obj_def_service>` definitions (in notification, check, and event handler directives), among
-             other places.
+command_name This directive is the short name used to identify the command. It is referenced in :ref:`contact <obj_def_contact>`,
+             :ref:`host <obj_def_host>`, and :ref:`service <obj_def_service>` definitions (in notification, check, and event handler directives),
+             among other places.
 command_line This directive is used to define what is actually executed by Centreon Engine when the command is used for service or host checks,
              notifications, or :ref:`event handlers <event_handlers>`. Before the command line is executed, all valid
              :ref:`macros <understanding_macros>` are replaced with their respective values. See the documentation on macros for
              determining when you can use different macros. Note that the command line is not surrounded in quotes. Also, if you want to pass a dollar
-             sign ($) on the command line, you have to escape it with another dollar sign.**Note:**You may not include a semicolon (;) in the
-             command_line directive, because everything after it will be ignored as a config file comment. You can work around this limitation by
-             setting one of the :ref:`$USER$ <macros_usern>`
-             macros in your :ref:`resource file <main_cfg_opt_resource_file>`
-             to a semicolon and then referencing the appropriate $USER$ macro in the command_line directive in place of the semicolon.If you want to
-             pass arguments to commands during runtime, you can use :ref:`$ARGn$ macros <macro_argn>`
-             in the command_line directive of the command definition and then separate individual arguments from the command name (and from each
-             other) using bang (!) characters in the object definition directive (host check command, service event handler command, etc) that
-             references the command. More information on how arguments in command definitions are processed during runtime can be found in the
-             documentation on :ref:`macros <understanding_macros>`.
+             sign ($)on the command line, you have to escape it with another dollar sign.
+             .. note::
+
+                You may not include a semicolon (;) in the command_line directive, because everything after it will be ignored as a config file
+                comment. You can work around this limitation by setting one of the :ref:`$USER$ <user_configuration_macros_misc>` macros in your
+                :ref:`resource file <main_cfg_opt_resource_file>` to a semicolon and then referencing the appropriate $USER$ macro in the
+                command_line directive in place of the semicolon.If you want to pass arguments to commands during runtime, you can use
+                :ref:`$ARGn$ macros <user_configuration_macros_misc>` in the command_line directive of the command definition and then separate
+                individual arguments from the command name (and from each other) using bang (!) characters in the object definition directive
+                (host check command, service event handler command, etc) that references the command. More information on how arguments in command
+                definitions are processed during runtime can be found in the documentation on :ref:`macros <understanding_macros>`.
+
              .. note::
 
                 Centreon-Engine does not support the shell commands in command_line. You need to define a command without shell features.
-connector   This directive is used for link a command with a connector. When this directive is not empty, the command is replace by the connector.
-            When the connector is call the command_line argument is use.
-=========== ==========================================================================================================================================
+connector    his directive is used for link a command with a connector. When this directive is not empty, the command is replace by the connector.
+             When the connector is call the command_line argument is use.
+============ =========================================================================================================================================
 
 .. _obj_def_connector:
 

@@ -47,7 +47,7 @@ monitoring installations.
 How Passive Checks Work
 =======================
 
-.. image:: passive_checks.png
+.. image:: /_static/images/passive_checks.png
 
 Here's how passive checks work in more detail...
 
@@ -181,7 +181,7 @@ variable. More information on how this works can be found
 Submitting Passive Check Results From Remote Hosts
 ==================================================
 
-.. image:: nsca.png
+.. image:: /_static/images/nsca.png
 
 If an application that resides on the same host as Centreon Engine is
 sending passive host or service check results, it can simply write the

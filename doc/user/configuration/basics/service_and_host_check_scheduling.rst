@@ -153,18 +153,18 @@ interleaved with the service_interleave_factor variable equal to 4.
 Non-Interleaved Checks
 ----------------------
 
-.. image:: noninterleaved1.png
+.. image:: /_static/images/noninterleaved1.png
 
-.. image:: noninterleaved2.png
+.. image:: /_static/images/noninterleaved2.png
 
 Interleaved Checks
 ------------------
 
-.. image:: interleaved1.png
+.. image:: /_static/images/interleaved1.png
 
-.. image:: interleaved2.png
+.. image:: /_static/images/interleaved2.png
 
-.. image:: interleaved3.png
+.. image:: /_static/images/interleaved3.png
 
 Maximum Concurrent Service Checks
 =================================
@@ -337,7 +337,7 @@ their results can be a bit difficult to understand, so let's look at a
 simple example. Look at the diagram below - we'll refer to it as we
 explain how things are done.
 
-.. image:: checktiming.png
+.. image:: /_static/images/checktiming.png
 
 First off, the **X<sub>n</sub>** events are check result reaper events
 that are scheduled at a frequency specified by the

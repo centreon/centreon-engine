@@ -30,7 +30,7 @@ developed for Centreon Engine...
 NRPE
 ====
 
-.. image:: nrpe.png
+.. image:: /_static/images/nrpe.png
 
 NRPE is an addon that allows you to execute :ref:`plugins <exploit_plugins>`
 on remote Linux/Unix hosts. This is useful if you need to monitor local
@@ -47,7 +47,7 @@ The NRPE addon and documentation can be found at http://www.nagios.org/.
 NSCA
 ====
 
-.. image:: nsca.png
+.. image:: /_static/images/nsca.png
 
 NSCA is an addon that allows you to send
 :ref:`passive check <passive_checks>`
@@ -62,7 +62,7 @@ The NSCA addon can be found at http://www.nagios.org/.
 NDOUtils
 ========
 
-.. image:: ndoutils.png
+.. image:: /_static/images/ndoutils.png
 
 NDOUtils is an addon that allows you to store all status information
 from Centreon Engine in a MySQL database. Multiple instances of Centreon

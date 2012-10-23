@@ -41,9 +41,6 @@ configuration file option...
 Log File
 --------
 
-Format:  log_file=<file_name>
-Example: log_file=/var/log/centreon-engine/centengine.log
-
 This variable specifies where Centreon Engine should create its main log
 file. This should be the first variable that you define in your
 configuration file, as Centreon Engine will try to write errors that it
@@ -52,15 +49,15 @@ finds in the rest of your configuration data to this file. If you have
 enabled, this file will automatically be rotated every hour, day, week,
 or month.
 
+=========== ================================================
+**Format**  log_file=<file_name>
+**Example** log_file=/var/log/centreon-engine/centengine.log
+=========== ================================================
+
 .. _main_cfg_opt_object_configuration_file:
 
 Object Configuration File
 -------------------------
-
-Format:  cfg_file=<file_name>
-Example: cfg_file=/etc/centreon-engine/hosts.cfg
-         cfg_file=/etc/centreon-engine/services.cfg
-         cfg_file=/etc/centreon-engine/commands.cfg
 
 This directive is used to specify an
 :ref:`object configuration file <object_configuration_overview>`
@@ -70,15 +67,17 @@ host groups, contacts, contact groups, services, commands, etc. You can
 seperate your configuration information into several files and specify
 multiple cfg_file= statements to have each of them processed.
 
+=========== ==========================================
+**Format**  cfg_file=<file_name>
+**Example** cfg_file=/etc/centreon-engine/hosts.cfg
+            cfg_file=/etc/centreon-engine/services.cfg
+            cfg_file=/etc/centreon-engine/commands.cfg
+=========== ==========================================
+
 .. _main_cfg_opt_object_configuration_directory:
 
 Object Configuration Directory
 ------------------------------
-
-Format:  cfg_dir=<directory_name>
-Example: cfg_dir=/etc/centreon-engine/commands
-         cfg_dir=/etc/centreon-engine/services
-         cfg_dir=/etc/centreon-engine/hosts
 
 This directive is used to specify a directory which contains
 :ref:`object configuration files <object_configuration_overview>`
@@ -90,13 +89,17 @@ seperate your configuration files into different directories and specify
 multiple cfg_dir= statements to have all config files in each directory
 processed.
 
+=========== =====================================
+**Format**  cfg_dir=<directory_name>
+**Example** cfg_dir=/etc/centreon-engine/commands
+            cfg_dir=/etc/centreon-engine/services
+            cfg_dir=/etc/centreon-engine/hosts
+=========== =====================================
+
 .. _main_cfg_opt_object_cache_file:
 
 Object Cache File
 -----------------
-
-Format:  object_cache_file=<file_name>
-Example: object_cache_file=/var/log/centreon-engine/objects.cache
 
 This directive is used to specify a file in which a cached copy of
 :ref:`object definitions <object_configuration_overview>`
@@ -106,13 +109,15 @@ and allow you to edit the source
 :ref:`object config files <main_cfg_opt_object_configuration_file>`
 while Centreon Engine is running without affecting the output displayed.
 
+=========== ========================================================
+**Format**  object_cache_file=<file_name>
+**Example** object_cache_file=/var/log/centreon-engine/objects.cache
+=========== ========================================================
+
 .. _main_cfg_opt_precached_object_file:
 
 Precached Object File
 ---------------------
-
-Format:  precached_object_file=<file_name>
-Example: precached_object_file=/var/log/centreon-engine/objects.precache
 
 This directive is used to specify a file in which a pre-processed,
 pre-cached copy of :ref:`object definitions <object_configuration_overview>`
@@ -121,13 +126,15 @@ times in large/complex Centreon Engine installations. Read more
 information on how to speed up start times
 :ref:`here <fast_startup_options>`.
 
+=========== ===============================================================
+**Format**  precached_object_file=<file_name>
+**Example** precached_object_file=/var/log/centreon-engine/objects.precache
+=========== ===============================================================
+
 .. _main_cfg_opt_resource_file:
 
 Resource File
 -------------
-
-Format:  resource_file=<file_name>
-Example: resource_file=/etc/centreon-engine/resource.cfg
 
 This is used to specify an optional resource file that can contain
 $USERn$ :ref:`macro <understanding_macros>`
@@ -139,50 +146,62 @@ process them all. See the sample resource.cfg file in the sample-config/
 subdirectory of the Centreon Engine distribution for an example of how
 to define $USERn$ macros.
 
+=========== ===============================================
+**Format**  resource_file=<file_name>
+**Example** resource_file=/etc/centreon-engine/resource.cfg
+=========== ===============================================
+
 .. _main_cfg_opt_temp_file:
 
 Temp File
 ---------
 
-Format:  temp_file=<file_name>
-
 This is a deprecated and ignored variable.
+
+=========== =====================
+**Format**  temp_file=<file_name>
+=========== =====================
 
 .. _main_cfg_opt_status_file:
 
 Status File
 -----------
 
-Format:  status_file=<file_name>
-Example: status_file=/var/log/centreon-engine/status.dat
-
 This is the file that Centreon Engine uses to store the current status,
 comment, and downtime information. This file is deleted every time
 Centreon Engine stops and recreated when it starts.
 
+=========== ===============================================
+**Format**  status_file=<file_name>
+**Example** status_file=/var/log/centreon-engine/status.dat
+=========== ===============================================
+
 Status File Update Interval
 ---------------------------
 
-Format:  status_update_interval=<seconds>
-Example: status_update_interval=15
-
 This setting determines how often (in seconds) that Centreon Engine will
-update status data in the
-:ref:`status file <main_cfg_opt_status_file>`.
+update status data in the :ref:`status file <main_cfg_opt_status_file>`.
 The minimum update interval is 1 second.
+
+=========== ================================
+**Format**  status_update_interval=<seconds>
+**Example** status_update_interval=15
+=========== ================================
 
 .. _main_cfg_opt_notifications:
 
 Notifications Option
 --------------------
 
-Format:  enable_notifications=<0/1>
-Example: enable_notifications=1
-
 This option determines whether or not Centreon Engine will send out
 :ref:`notifications <notifications>` when it initially (re)starts. If
 this option is disabled, Centreon Engine will not send out notifications
 for any host or service.
+
+=========== ==========================
+**Format**  enable_notifications=<0/1>
+**Example** enable_notifications=1
+=========== ==========================
 
 .. note::
 
@@ -206,9 +225,6 @@ for any host or service.
 Service Check Execution Option
 ------------------------------
 
-Format:  execute_service_checks=<0/1>
-Example: execute_service_checks=1
-
 This option determines whether or not Centreon Engine will execute
 service checks when it initially (re)starts. If this option is disabled,
 Centreon Engine will not actively execute any service checks and will
@@ -220,6 +236,11 @@ servers, as described in the documentation on
 :ref:`redundancy <redundant_and_failover_monitoring>`,
 or when setting up a :ref:`distributed <distributed_monitoring>`
 monitoring environment.
+
+=========== ============================
+**Format**  execute_service_checks=<0/1>
+**Example** execute_service_checks=1
+=========== ============================
 
 .. note::
 
@@ -243,13 +264,15 @@ monitoring environment.
 Passive Service Check Acceptance Option
 ---------------------------------------
 
-Format:  accept_passive_service_checks=<0/1>
-Example: accept_passive_service_checks=1
-
 This option determines whether or not Centreon Engine will accept
 :ref:`passive service checks <passive_checks>` when it initially
 (re)starts. If this option is disabled, Centreon Engine will not accept
 any passive service checks.
+
+=========== ===================================
+**Format**  accept_passive_service_checks=<0/1>
+**Example** accept_passive_service_checks=1
+=========== ===================================
 
 .. note::
 
@@ -271,9 +294,6 @@ any passive service checks.
 Host Check Execution Option
 ---------------------------
 
-Format:  execute_host_checks=<0/1>
-Example: execute_host_checks=1
-
 This option determines whether or not Centreon Engine will execute
 on-demand and regularly scheduled host checks when it initially
 (re)starts. If this option is disabled, Centreon Engine will not
@@ -285,6 +305,11 @@ servers, as described in the documentation on
 :ref:`redundancy <redundant_and_failover_monitoring>`,
 or when setting up a :ref:`distributed <distributed_monitoring>`
 monitoring environment.
+
+=========== =====================================
+**Format**  execute_host_checks=<0/1>
+**Example** execute_host_checks=1
+=========== =====================================
 
 .. note::
 
@@ -308,13 +333,15 @@ monitoring environment.
 Passive Host Check Acceptance Option
 ------------------------------------
 
-Format: accept_passive_host_checks=<0/1>
-Example: accept_passive_host_checks=1
-
 This option determines whether or not Centreon Engine will accept
 :ref:`passive host checks <passive_checks>` when it initially
 (re)starts. If this option is disabled, Centreon Engine will not accept
 any passive host checks.
+
+=========== ================================
+**Format**  accept_passive_host_checks=<0/1>
+**Example** accept_passive_host_checks=1
+=========== ================================
 
 .. note::
 
@@ -339,13 +366,15 @@ any passive host checks.
 Event Handler Option
 --------------------
 
-Format:  enable_event_handlers=<0/1>
-Example: enable_event_handlers=1
-
 This option determines whether or not Centreon Engine will run
 :ref:`event handlers <event_handlers>` when it initially
 (re)starts. If this option is disabled, Centreon Engine will not run any
 host or service event handlers.
+
+=========== ===========================
+**Format**  enable_event_handlers=<0/1>
+**Example** enable_event_handlers=1
+=========== ===========================
 
 .. note::
 
@@ -369,24 +398,25 @@ host or service event handlers.
 Log Rotation Method
 -------------------
 
-Format:  log_rotation_method=<n/h/d/w/m>
-
 This is a deprecated and ignored variable. Use logrotate daemon.
+
+=========== ===============================
+**Format**  log_rotation_method=<n/h/d/w/m>
+=========== ===============================
 
 Log Archive Path
 ----------------
 
-Format:  log_archive_path=<path>
-
 This is a deprecated and ignored variable.
+
+=========== =======================
+**Format**  log_archive_path=<path>
+=========== =======================
 
 .. _main_cfg_opt_external_command_check:
 
 External Command Check Option
 -----------------------------
-
-Format:  check_external_commands=<0/1>
-Example: check_external_commands=1
 
 This option determines whether or not Centreon Engine will check the
 :ref:`command file <main_cfg_opt_external_command_file>`
@@ -396,13 +426,15 @@ commands can be found :ref:`here <external_commands>`.
   * 0 = Don't check external commands
   * 1 = Check external commands (default)
 
+=========== =============================
+**Format**  check_external_commands=<0/1>
+**Example** check_external_commands=1
+=========== =============================
+
 .. _main_cfg_opt_external_command_check_interval:
 
 External Command Check Interval
 -------------------------------
-
-Format:  command_check_interval=<xxx>[s]
-Example: command_check_interval=1
 
 If you specify a number with an "s" appended to it (i.e. 30s), this is
 the number of seconds to wait between external command checks. If you
@@ -411,6 +443,11 @@ external command checks. Unless you've changed the
 :ref:`interval_length <main_cfg_opt_timing_interval_length>`
 value (as defined below) from the default value of 60, this number will
 mean minutes.
+
+=========== ===============================
+**Format**  command_check_interval=<xxx>[s]
+**Example** command_check_interval=1
+=========== ===============================
 
 .. note::
 
@@ -426,9 +463,6 @@ mean minutes.
 External Command File
 ---------------------
 
-Format:  command_file=<file_name>
-Example: command_file=/var/log/centreon-engine/rw/centengine.cmd
-
 This is the file that Centreon Engine will check for external commands
 to process. The external command file is implemented as a named pipe
 (FIFO), which is created when Centreon Engine starts and removed when it
@@ -436,13 +470,20 @@ shuts down. If the file exists when Centreon Engine starts, the Centreon
 Engine process will terminate with an error message. More information on
 external commands can be found :ref:`here <external_commands>`.
 
+=========== =======================================================
+**Format**  command_file=<file_name>
+**Example** command_file=/var/log/centreon-engine/rw/centengine.cmd
+=========== =======================================================
+
 .. _main_cfg_opt_external_command_buffer_slots:
 
 External Command Buffer Slots
 -----------------------------
 
-Format:  external_command_buffer_slots=<#>
-Example: external_command_buffer_slots=512
+=========== =================================
+**Format**  external_command_buffer_slots=<#>
+**Example** external_command_buffer_slots=512
+=========== =================================
 
 .. note::
 
@@ -461,9 +502,6 @@ Example: external_command_buffer_slots=512
 State Retention Option
 ----------------------
 
-Format:  retain_state_information=<0/1>
-Example: retain_state_information=1
-
 This option determines whether or not Centreon Engine will retain state
 information for hosts and services between program restarts. If you
 enable this option, you should supply a value for the
@@ -475,13 +513,15 @@ in previously saved state information when it starts up again.
   * 0 = Don't retain state information
   * 1 = Retain state information (default)
 
+=========== ==============================
+**Format**  retain_state_information=<0/1>
+**Example** retain_state_information=1
+=========== ==============================
+
 .. _main_cfg_opt_state_retention_file:
 
 State Retention File
 --------------------
-
-Format:  state_retention_file=<file_name>
-Example: state_retention_file=/var/log/centreon-engine/retention.dat
 
 This is the file that Centreon Engine will use for storing status,
 downtime, and comment information before it shuts down. When Centreon
@@ -492,11 +532,13 @@ information between program restarts, you must enable the
 :ref:`retain_state_information <main_cfg_opt_state_retention>`
 option.
 
+=========== ===========================================================
+**Format**  state_retention_file=<file_name>
+**Example** state_retention_file=/var/log/centreon-engine/retention.dat
+=========== ===========================================================
+
 Automatic State Retention Update Interval
 -----------------------------------------
-
-Format:  retention_update_interval=<minutes>
-Example: retention_update_interval=60
 
 This setting determines how often (in minutes) that Centreon Engine will
 automatically save retention data during normal operation. If you set
@@ -506,13 +548,15 @@ restarting. If you have disabled state retention (with the
 :ref:`retain_state_information <main_cfg_opt_state_retention>`
 option), this option has no effect.
 
+=========== ===================================
+**Format**  retention_update_interval=<minutes>
+**Example** retention_update_interval=60
+=========== ===================================
+
 .. _main_cfg_opt_use_retained_program_state:
 
 Use Retained Program State Option
 ---------------------------------
-
-Format:  use_retained_program_state=<0/1>
-Example: use_retained_program_state=1
 
 This setting determines whether or not Centreon Engine will set various
 program-wide state variables based on the values saved in the retention
@@ -529,13 +573,15 @@ enabled, this option has no effect.
   * 0 = Don't use retained program state
   * 1 = Use retained program state (default)
 
+=========== ================================
+**Format**  use_retained_program_state=<0/1>
+**Example** use_retained_program_state=1
+=========== ================================
+
 .. _main_cfg_opt_use_retained_scheduling_info:
 
 Use Retained Scheduling Info Option
 -----------------------------------
-
-Format:  use_retained_scheduling_info=<0/1>
-Example: use_retained_scheduling_info=1
 
 This setting determines whether or not Centreon Engine will retain
 scheduling info (next check times) for hosts and services when it
@@ -547,47 +593,55 @@ checks. Otherwise you will probably want to leave it enabled.
   * 0 = Don't use retained scheduling info
   * 1 = Use retained scheduling info (default)
 
+=========== ==================================
+**Format**  use_retained_scheduling_info=<0/1>
+**Example** use_retained_scheduling_info=1
+=========== ==================================
+
 Retained Host and Service Attribute Masks
 -----------------------------------------
 
-Format:  retained_host_attribute_mask=<number>
-         retained_service_attribute_mask=<number>
-
 They are a deprecated and ignered variables.
+
+=========== ========================================
+**Format**  retained_host_attribute_mask=<number>
+            retained_service_attribute_mask=<number>
+=========== ========================================
 
 Retained Process Attribute Masks
 --------------------------------
 
-Format:  retained_process_host_attribute_mask=<number>
-         retained_process_service_attribute_mask=<number>
-
 They are a deprecated and ignered variables.
+
+=========== ================================================
+**Format**  retained_process_host_attribute_mask=<number>
+            retained_process_service_attribute_mask=<number>
+=========== ================================================
 
 Retained Contact Attribute Masks
 --------------------------------
 
-Format:  retained_contact_host_attribute_mask=<number>
-         retained_contact_service_attribute_mask=<number>
-Example: retained_contact_host_attribute_mask=0
-         retained_contact_service_attribute_mask=0
+These options determine which contact attributes are NOT retained across
+program restarts. There are two masks because there are often separate
+host and service contact attributes that can be changed. The values for
+these options are a bitwise AND of values specified by the "MODATTR\_"
+definitions in the include/common.h source code file. By default, all
+process attributes are retained.
+
+=========== ================================================
+**Format**  retained_contact_host_attribute_mask=<number>
+            retained_contact_service_attribute_mask=<number>
+**Example** retained_contact_host_attribute_mask=0
+            retained_contact_service_attribute_mask=0
+=========== ================================================
 
 .. note::
 
    This is an advanced feature. You'll need to read the Centreon Engine
    source code to use this option effectively.
 
-These options determine which contact attributes are NOT retained across
-program restarts. There are two masks because there are often separate
-host and service contact attributes that can be changed. The values for
-these options are a bitwise AND of values specified by the "MODATTR_"
-definitions in the include/common.h source code file. By default, all
-process attributes are retained.
-
 Syslog Logging Option
 ---------------------
-
-Format:  use_syslog=<0/1>
-Example: use_syslog=1
 
 This variable determines whether messages are logged to the syslog
 facility on your local host. Values are as follows:
@@ -595,11 +649,13 @@ facility on your local host. Values are as follows:
   * 0 = Don't use syslog facility
   * 1 = Use syslog facility
 
+=========== ================
+**Format**  use_syslog=<0/1>
+**Example** use_syslog=1
+=========== ================
+
 Notification Logging Option
 ---------------------------
-
-Format:  log_notifications=<0/1>
-Example: log_notifications=1
 
 This variable determines whether or not notification messages are
 logged. If you have a lot of contacts or regular service failures your
@@ -609,13 +665,15 @@ notifications from being logged.
   * 0 = Don't log notifications
   * 1 = Log notifications
 
+=========== =======================
+**Format**  log_notifications=<0/1>
+**Example** log_notifications=1
+=========== =======================
+
 .. _main_cfg_opt_service_check_retry_logging:
 
 Service Check Retry Logging Option
 ----------------------------------
-
-Format:  log_service_retries=<0/1>
-Example: log_service_retries=1
 
 This variable determines whether or not service check retries are
 logged. Service check retries occur when a service check results in a
@@ -628,13 +686,15 @@ test out service :ref:`event handlers <event_handlers>`.
   * 0 = Don't log service check retries
   * 1 = Log service check retries
 
+=========== =========================
+**Format**  log_service_retries=<0/1>
+**Example** log_service_retries=1
+=========== =========================
+
 .. _main_cfg_opt_host_check_retry_logging:
 
 Host Check Retry Logging Option
 -------------------------------
-
-Format:  log_host_retries=<0/1>
-Example: log_host_retries=1
 
 This variable determines whether or not host check retries are
 logged. Logging host check retries is mostly useful when attempting to
@@ -644,11 +704,13 @@ debug Centreon Engine or test out host
   * 0 = Don't log host check retries
   * 1 = Log host check retries
 
+=========== ======================
+**Format**  log_host_retries=<0/1>
+**Example** log_host_retries=1
+=========== ======================
+
 Event Handler Logging Option
 ----------------------------
-
-Format:  log_event_handlers=<0/1>
-Example: log_event_handlers=1
 
 This variable determines whether or not service and host
 :ref:`event handlers <event_handlers>` are logged.
@@ -661,11 +723,13 @@ scripts.
   * 0 = Don't log event handlers
   * 1 = Log event handlers
 
+=========== ========================
+**Format**  log_event_handlers=<0/1>
+**Example** log_event_handlers=1
+=========== ========================
+
 Initial States Logging Option
 -----------------------------
-
-Format:  log_initial_states=<0/1>
-Example: log_initial_states=1
 
 This variable determines whether or not Centreon Engine will force all
 initial host and service states to be logged, even if they result in an
@@ -677,15 +741,22 @@ long-term state statistics for services and hosts.
   * 0 = Don't log initial states (default)
   * 1 = Log initial states
 
+=========== ========================
+**Format**  log_initial_states=<0/1>
+**Example** log_initial_states=1
+=========== ========================
+
 External Command Logging Option
 -------------------------------
-
-Format:  log_external_commands=<0/1>
-Example: log_external_commands=1
 
 This variable determines whether or not Centreon Engine will log
 :ref:`external commands <external_commands>` that it receives
 from the :ref:`external command file <main_cfg_opt_external_command_file>`.
+
+=========== ===========================
+**Format**  log_external_commands=<0/1>
+**Example** log_external_commands=1
+=========== ===========================
 
 .. note::
 
@@ -704,9 +775,6 @@ from the :ref:`external command file <main_cfg_opt_external_command_file>`.
 Passive Check Logging Option
 ----------------------------
 
-Format:  log_passive_checks=<0/1>
-Example: log_passive_checks=1
-
 This variable determines whether or not Centreon Engine will log
 :ref:`passive host and service checks <passive_checks>` that it receives
 from the :ref:`external command file <main_cfg_opt_external_command_file>`.
@@ -719,13 +787,15 @@ large.
   * 0 = Don't log passive checks
   * 1 = Log passive checks (default)
 
+=========== ========================
+**Format**  log_passive_checks=<0/1>
+**Example** log_passive_checks=1
+=========== ========================
+
 .. _main_cfg_opt_global_host_event_handler:
 
 Global Host Event Handler Option
 --------------------------------
-
-Format:  global_host_event_handler=<command>
-Example: global_host_event_handler=log-host-event-to-db
 
 This option allows you to specify a host event handler command that is
 to be run for every host state change. The global event handler is
@@ -738,13 +808,15 @@ the :ref:`event_handler_timeout <main_cfg_opt_event_handler_timeout>`
 option. More information on event handlers can be found
 :ref:`here <event_handlers>`.
 
+=========== ==============================================
+**Format**  global_host_event_handler=<command>
+**Example** global_host_event_handler=log-host-event-to-db
+=========== ==============================================
+
 .. _main_cfg_opt_global_service_event_handler:
 
 Global Service Event Handler Option
 -----------------------------------
-
-Format:  global_service_event_handler=<command>
-Example: global_service_event_handler=log-service-event-to-db
 
 This option allows you to specify a service event handler command that
 is to be run for every service state change. The global event handler is
@@ -757,27 +829,32 @@ the :ref:`event_handler_timeout <main_cfg_opt_event_handler_timeout>`
 option. More information on event handlers can be found
 :ref:`here <event_handlers>`.
 
+=========== ====================================================
+**Format**  global_service_event_handler=<command>
+**Example** global_service_event_handler=log-service-event-to-db
+=========== ====================================================
+
 Inter-Check Sleep Time
 ----------------------
-
-Format:  sleep_time=<seconds>
-Example: sleep_time=1
 
 This is the number of seconds that Centreon Engine will sleep before
 checking to see if the next service or host check in the scheduling
 queue should be executed.
 
+=========== ====================
+**Format**  sleep_time=<seconds>
+**Example** sleep_time=1
+=========== ====================
+
 .. note::
 
-   That Centreon Engine will only sleep after it "catches up" with queued service checks that have fallen behind.
+   That Centreon Engine will only sleep after it "catches up" with
+   queued service checks that have fallen behind.
 
 .. _main_cfg_opt_service_inter_check_delay_method:
 
 Service Inter-Check Delay Method
 --------------------------------
-
-Format:  service_inter_check_delay_method=<n/d/s/x.xx>
-Example: service_inter_check_delay_method=s
 
 This option allows you to control how service checks are initially
 "spread out" in the event queue. Using a "smart" delay calculation (the
@@ -799,11 +876,13 @@ follows:
     evenly (default)
   * x.xx = Use a user-supplied inter-check delay of x.xx seconds
 
+=========== =============================================
+**Format**  service_inter_check_delay_method=<n/d/s/x.xx>
+**Example** service_inter_check_delay_method=s
+=========== =============================================
+
 Maximum Service Check Spread
 ----------------------------
-
-Format:  max_service_check_spread=<minutes>
-Example: max_service_check_spread=30
 
 This option determines the maximum number of minutes from when Centreon
 Engine starts that all services (that are scheduled to be regularly
@@ -816,13 +895,15 @@ if scheduling information is being retained using the
 :ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
 option. Default value is 30 (minutes).
 
+=========== ==================================
+**Format**  max_service_check_spread=<minutes>
+**Example** max_service_check_spread=30
+=========== ==================================
+
 .. _main_cfg_opt_service_interleave_factor:
 
 Service Interleave Factor
 -------------------------
-
-Format:  service_interleave_factor=<s|x>
-Example: service_interleave_factor=s
 
 This variable determines how service checks are
 interleaved. Interleaving allows for a more even distribution of service
@@ -840,13 +921,15 @@ begin to appear. More information on how interleaving works can be found
     not interleaving the service checks.
   * s = Use a "smart" interleave factor calculation (default)
 
+=========== ===============================
+**Format**  service_interleave_factor=<s|x>
+**Example** service_interleave_factor=s
+=========== ===============================
+
 .. _main_cfg_opt_maximum_concurrent_service_checks:
 
 Maximum Concurrent Service Checks
 ---------------------------------
-
-Format:  max_concurrent_checks=<max_checks>
-Example: max_concurrent_checks=20
 
 This option allows you to specify the maximum number of service checks
 that can be run in parallel at any given time. Specifying a value of 1
@@ -860,26 +943,30 @@ etc.). More information on how to estimate how many concurrent checks
 you should allow can be found
 :ref:`here <scheduling_service_and_host>`.
 
+=========== ==================================
+**Format**  max_concurrent_checks=<max_checks>
+**Example** max_concurrent_checks=20
+=========== ==================================
+
 .. _main_cfg_opt_check_result_reaper_frequency:
 
 Check Result Reaper Frequency
 -----------------------------
-
-Format:  check_result_reaper_frequency=<frequency_in_seconds>
-Example: check_result_reaper_frequency=5
 
 This option allows you to control the frequency in seconds of check
 result "reaper" events. "Reaper" events process the results from host
 and service checks that have finished executing. These events consitute
 the core of the monitoring logic in Centreon Engine.
 
+=========== ====================================================
+**Format**  check_result_reaper_frequency=<frequency_in_seconds>
+**Example** check_result_reaper_frequency=5
+=========== ====================================================
+
 .. _main_cfg_opt_maximum_check_result_reaper_time:
 
 Maximum Check Result Reaper Time
 --------------------------------
-
-Format:  max_check_result_reaper_time=<seconds>
-Example: max_check_result_reaper_time=30
 
 This option allows you to control the maximum amount of time in seconds
 that host and service check result "reaper" events are allowed to
@@ -891,13 +978,15 @@ limit the amount of time that an individual reaper event will run before
 it hands control back over to Centreon Engine for other portions of the
 monitoring logic.
 
+=========== ======================================
+**Format**  max_check_result_reaper_time=<seconds>
+**Example** max_check_result_reaper_time=30
+=========== ======================================
+
 .. _main_cfg_opt_host_inter_check_delay_method:
 
 Host Inter-Check Delay Method
 -----------------------------
-
-Format:  host_inter_check_delay_method=<n/d/s/x.xx>
-Example: host_inter_check_delay_method=s
 
 This option allows you to control how host checks that are scheduled to
 be checked on a regular basis are initially "spread out" in the event
@@ -918,11 +1007,13 @@ follows:
     (default)
   * x.xx = Use a user-supplied inter-check delay of x.xx seconds
 
+=========== ==========================================
+**Format**  host_inter_check_delay_method=<n/d/s/x.xx>
+**Example** host_inter_check_delay_method=s
+=========== ==========================================
+
 Maximum Host Check Spread
 -------------------------
-
-Format:  max_host_check_spread=<minutes>
-Example: max_host_check_spread=30
 
 This option determines the maximum number of minutes from when Centreon
 Engine starts that all hosts (that are scheduled to be regularly
@@ -935,18 +1026,25 @@ information is being retained using the
 :ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
 option. Default value is 30 (minutes).
 
+=========== ===============================
+**Format**  max_host_check_spread=<minutes>
+**Example** max_host_check_spread=30
+=========== ===============================
+
 .. _main_cfg_opt_timing_interval_length:
 
 Timing Interval Length
 ----------------------
 
-Format:  interval_length=<seconds>
-Example: interval_length=60
-
 This is the number of seconds per "unit interval" used for timing in the
 scheduling queue, re-notifications, etc. "Units intervals" are used in
 the object configuration file to determine how often to run a service
 check, how often to re-notify a contact, etc.
+
+=========== =========================
+**Format**  interval_length=<seconds>
+**Example** interval_length=60
+=========== =========================
 
 .. note::
 
@@ -960,14 +1058,16 @@ check, how often to re-notify a contact, etc.
 Auto-Rescheduling Option
 ------------------------
 
-Format:  auto_reschedule_checks=<0/1>
-Example: auto_reschedule_checks=1
-
 This option determines whether or not Centreon Engine will attempt to
 automatically reschedule active host and service checks to "smooth" them
 out over time. This can help to balance the load on the monitoring
 server, as it will attempt to keep the time between consecutive checks
 consistent, at the expense of executing checks on a more rigid schedule.
+
+=========== ============================
+**Format**  auto_reschedule_checks=<0/1>
+**Example** auto_reschedule_checks=1
+=========== ============================
 
 .. note::
 
@@ -978,13 +1078,15 @@ consistent, at the expense of executing checks on a more rigid schedule.
 Auto-Rescheduling Interval
 --------------------------
 
-Format:  auto_rescheduling_interval=<seconds>
-Example: auto_rescheduling_interval=30
-
 This option determines how often (in seconds) Centreon Engine will
 attempt to automatically reschedule checks. This option only has an
 effect if the :ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
 option is enabled. Default is 30 seconds.
+
+=========== ====================================
+**Format**  auto_rescheduling_interval=<seconds>
+**Example** auto_rescheduling_interval=30
+=========== ====================================
 
 .. note::
 
@@ -995,15 +1097,17 @@ option is enabled. Default is 30 seconds.
 Auto-Rescheduling Window
 ------------------------
 
-Format:  auto_rescheduling_window=<seconds>
-Example: auto_rescheduling_window=180
-
 This option determines the "window" of time (in seconds) that Centreon
 Engine will look at when automatically rescheduling checks. Only host
 and service checks that occur in the next X seconds (determined by this
 variable) will be rescheduled. This option only has an effect if the
 :ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
 option is enabled. Default is 180 seconds (3 minutes).
+
+=========== ==================================
+**Format**  auto_rescheduling_window=<seconds>
+**Example** auto_rescheduling_window=180
+=========== ==================================
 
 .. note::
 
@@ -1016,9 +1120,6 @@ option is enabled. Default is 180 seconds (3 minutes).
 Aggressive Host Checking Option
 -------------------------------
 
-Format:  use_aggressive_host_checking=<0/1>
-Example: use_aggressive_host_checking=0
-
 Centreon Engine tries to be smart about how and when it checks the
 status of hosts. In general, disabling this option will allow Centreon
 Engine to make some smarter decisions and check hosts a bit
@@ -1030,13 +1131,15 @@ would suggest not enabling this option.
   * 0 = Don't use aggressive host checking (default)
   * 1 = Use aggressive host checking
 
+=========== ==================================
+**Format**  use_aggressive_host_checking=<0/1>
+**Example** use_aggressive_host_checking=0
+=========== ==================================
+
 .. _main_cfg_opt_translate_passive_host_checks:
 
 Translate Passive Host Checks Option
 ------------------------------------
-
-Format:  translate_passive_host_checks=<0/1>
-Example: translate_passive_host_checks=1
 
 This option determines whether or not Centreon Engine will translate
 DOWN/UNREACHABLE passive host check results to their "correct" state
@@ -1048,13 +1151,15 @@ information on passive check state translation can be found
   * 0 = Disable check translation (default)
   * 1 = Enable check translation
 
+=========== ===================================
+**Format**  translate_passive_host_checks=<0/1>
+**Example** translate_passive_host_checks=1
+=========== ===================================
+
 .. _main_cfg_opt_passive_host_checks_are_soft:
 
 Passive Host Checks Are SOFT Option
 -----------------------------------
-
-Format:  passive_host_checks_are_soft=<0/1>
-Example: passive_host_checks_are_soft=1
 
 This option determines whether or not Centreon Engine will treat
 :ref:`passive host checks <passive_checks>` as HARD states or SOFT
@@ -1065,13 +1170,15 @@ enabling this option.
   * 0 = Passive host checks are HARD (default)
   * 1 = Passive host checks are SOFT
 
+=========== ==================================
+**Format**  passive_host_checks_are_soft=<0/1>
+**Example** passive_host_checks_are_soft=1
+=========== ==================================
+
 .. _main_cfg_opt_predictive_host_dependency_checks:
 
 Predictive Host Dependency Checks Option
 ----------------------------------------
-
-Format:  enable_predictive_host_dependency_checks=<0/1>
-Example: enable_predictive_host_dependency_checks=1
 
 This option determines whether or not Centreon Engine will execute
 predictive checks of hosts that are being depended upon (as defined in
@@ -1084,13 +1191,15 @@ possible. More information on how predictive checks work can be found
   * 0 = Disable predictive checks
   * 1 = Enable predictive checks (default)
 
+=========== ==============================================
+**Format**  enable_predictive_host_dependency_checks=<0/1>
+**Example** enable_predictive_host_dependency_checks=1
+=========== ==============================================
+
 .. _main_cfg_opt_predictive_service_dependency_checks:
 
 Predictive Service Dependency Checks Option
 -------------------------------------------
-
-Format:  enable_predictive_service_dependency_checks=<0/1>
-Example: enable_predictive_service_dependency_checks=1
 
 This option determines whether or not Centreon Engine will execute
 predictive checks of services that are being depended upon (as defined
@@ -1103,13 +1212,15 @@ information on how predictive checks work can be found
   * 0 = Disable predictive checks
   * 1 = Enable predictive checks (default)
 
+=========== =================================================
+**Format**  enable_predictive_service_dependency_checks=<0/1>
+**Example** enable_predictive_service_dependency_checks=1
+=========== =================================================
+
 .. _main_cfg_opt_cached_host_check_horizon:
 
 Cached Host Check Horizon
 -------------------------
-
-Format:  cached_host_check_horizon=<seconds>
-Example: cached_host_check_horizon=15
 
 This option determines the maximum amount of time (in seconds) that the
 state of a previous host check is considered current. Cached host states
@@ -1121,13 +1232,15 @@ performance hit for host checks. Use a value of 0 if you want to disable
 host check caching. More information on cached checks can be found
 :ref:`here <cached_checks>`.
 
+=========== ===================================
+**Format**  cached_host_check_horizon=<seconds>
+**Example** cached_host_check_horizon=15
+=========== ===================================
+
 .. _main_cfg_opt_cached_service_check_horizon:
 
 Cached Service Check Horizon
 ----------------------------
-
-Format:  cached_service_check_horizon=<seconds>
-Example: cached_service_check_horizon=15
 
 This option determines the maximum amount of time (in seconds) that the
 state of a previous service check is considered current. Cached service
@@ -1139,13 +1252,15 @@ in the service dependency logic. Use a value of 0 if you want to disable
 service check caching. More information on cached checks can be found
 :ref:`here <cached_checks>`.
 
+=========== ======================================
+**Format**  cached_service_check_horizon=<seconds>
+**Example** cached_service_check_horizon=15
+=========== ======================================
+
 .. _main_cfg_opt_large_installation_tweaks:
 
 Large Installation Tweaks Option
 --------------------------------
-
-Format:  use_large_installation_tweaks=<0/1>
-Example: use_large_installation_tweaks=0
 
 This option determines whether or not the Centreon Engine daemon will
 take several shortcuts to improve performance. These shortcuts result in
@@ -1155,11 +1270,13 @@ lot of benefit from doing so.
   * 0 = Don't use tweaks (default)
   * 1 = Use tweaks
 
+=========== ===================================
+**Format**  use_large_installation_tweaks=<0/1>
+**Example** use_large_installation_tweaks=0
+=========== ===================================
+
 Child Process Memory Option
 ---------------------------
-
-Format:  free_child_process_memory=<0/1>
-Example: free_child_process_memory=0
 
 This option determines whether or not Centreon Engine will free memory
 in child processes when they are fork()ed off from the main process. By
@@ -1172,20 +1289,24 @@ you want.
   * 0 = Don't free memory
   * 1 = Free memory
 
+=========== ===============================
+**Format**  free_child_process_memory=<0/1>
+**Example** free_child_process_memory=0
+=========== ===============================
+
 Child Processes Fork Twice
 --------------------------
 
-Format:  child_processes_fork_twice=<0/1>
-
 This is a deprecated and ignored variable.
+
+=========== ================================
+**Format**  child_processes_fork_twice=<0/1>
+=========== ================================
 
 .. _main_cfg_opt_environment_macros:
 
 Environment Macros Option
 -------------------------
-
-Format:  enable_environment_macros=<0/1>
-Example: enable_environment_macros=0
 
 This option determines whether or not the Centreon Engine daemon will
 make all standard :ref:`macros <standard_macros>` available as
@@ -1198,13 +1319,15 @@ environment.
   * 0 = Don't make macros available as environment variables
   * 1 = Make macros available as environment variables (default)
 
+=========== ===============================
+**Format**  enable_environment_macros=<0/1>
+**Example** enable_environment_macros=0
+=========== ===============================
+
 .. _main_cfg_opt_flap_detection:
 
 Flap Detection Option
 ---------------------
-
-Format:  enable_flap_detection=<0/1>
-Example: enable_flap_detection=0
 
 This option determines whether or not Centreon Engine will try and
 detect hosts and services that are "flapping". Flapping occurs when a
@@ -1215,6 +1338,11 @@ notifications for that host/service until it stops flapping. Flap
 detection is very experimental at this point, so use this feature with
 caution! More information on how flap detection and handling works can
 be found :ref:`here <flapping_detection>`.
+
+=========== ===========================
+**Format**  enable_flap_detection=<0/1>
+**Example** enable_flap_detection=0
+=========== ===========================
 
 .. note::
 
@@ -1239,60 +1367,65 @@ be found :ref:`here <flapping_detection>`.
 Low Service Flap Threshold
 --------------------------
 
-Format:  low_service_flap_threshold=<percent>
-Example: low_service_flap_threshold=25.0
-
 This option is used to set the low threshold for detection of service
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
 :ref:`this <flapping_detection>`.
+
+=========== ====================================
+**Format**  low_service_flap_threshold=<percent>
+**Example** low_service_flap_threshold=25.0
+=========== ====================================
 
 .. _main_cfg_opt_high_service_flap_threshold:
 
 High Service Flap Threshold
 ---------------------------
 
-Format:  high_service_flap_threshold=<percent>
-Example: high_service_flap_threshold=50.0
-
 This option is used to set the high threshold for detection of service
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
 :ref:`this <flapping_detection>`.
+
+=========== =====================================
+**Format**  high_service_flap_threshold=<percent>
+**Example** high_service_flap_threshold=50.0
+=========== =====================================
 
 .. _main_cfg_opt_low_host_flap_threshold:
 
 Low Host Flap Threshold
 -----------------------
 
-Format:  low_host_flap_threshold=<percent>
-Example: low_host_flap_threshold=25.0
-
 This option is used to set the low threshold for detection of host
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
 :ref:`this <flapping_detection>`.
+
+=========== =================================
+**Format**  low_host_flap_threshold=<percent>
+**Example** low_host_flap_threshold=25.0
+=========== =================================
 
 .. _main_cfg_opt_high_host_flap_threshold:
 
 High Host Flap Threshold
 ------------------------
 
-Format:  high_host_flap_threshold=<percent>
-Example: high_host_flap_threshold=50.0
-
 This option is used to set the high threshold for detection of host
 flapping. For more information on how flap detection and handling works
 (and how this option affects things) read
 :ref:`this <flapping_detection>`.
 
+=========== ==================================
+**Format**  high_host_flap_threshold=<percent>
+**Example** high_host_flap_threshold=50.0
+=========== ==================================
+
 .. _main_cfg_opt_soft_state_dependencies:
 
 Soft State Dependencies Option
 ------------------------------
-
-Format:  soft_state_dependencies=<0/1>
-Example: soft_state_dependencies=0
 
 This option determines whether or not Centreon Engine will use soft
 state information when checking
@@ -1305,13 +1438,15 @@ state when checking dependencies. If you want it to use the latest state
   * 0 = Don't use soft state dependencies (default)
   * 1 = Use soft state dependencies
 
+=========== =============================
+**Format**  soft_state_dependencies=<0/1>
+**Example** soft_state_dependencies=0
+=========== =============================
+
 .. _main_cfg_opt_service_check_timeout:
 
 Service Check Timeout
 ---------------------
-
-Format:  service_check_timeout=<seconds>
-Example: service_check_timeout=60
 
 This is the maximum number of seconds that Centreon Engine will allow
 service checks to run. If checks exceed this limit, they are killed and
@@ -1325,13 +1460,15 @@ service check normally finishes executing within this time limit. If a
 service check runs longer than this limit, Centreon Engine will kill it
 off thinking it is a runaway processes.
 
+=========== ===============================
+**Format**  service_check_timeout=<seconds>
+**Example** service_check_timeout=60
+=========== ===============================
+
 .. _main_cfg_opt_host_check_timeout:
 
 Host Check Timeout
 ------------------
-
-Format:  host_check_timeout=<seconds>
-Example: host_check_timeout=60
 
 This is the maximum number of seconds that Centreon Engine will allow
 host checks to run. If checks exceed this limit, they are killed and a
@@ -1346,13 +1483,15 @@ host check normally finishes executing within this time limit. If a host
 check runs longer than this limit, Centreon Engine will kill it off
 thinking it is a runaway processes.
 
+=========== ============================
+**Format**  host_check_timeout=<seconds>
+**Example** host_check_timeout=60
+=========== ============================
+
 .. _main_cfg_opt_event_handler_timeout:
 
 Event Handler Timeout
 ---------------------
-
-Format:  event_handler_timeout=<seconds>
-Example: event_handler_timeout=60
 
 This is the maximum number of seconds that Centreon Engine will allow
 :ref:`event handlers <event_handlers>` to be run. If an event
@@ -1367,13 +1506,15 @@ event handler command normally finishes executing within this time
 limit. If an event handler runs longer than this limit, Centreon Engine
 will kill it off thinking it is a runaway processes.
 
+=========== ===============================
+**Format**  event_handler_timeout=<seconds>
+**Example** event_handler_timeout=60
+=========== ===============================
+
 .. _main_cfg_opt_notification_timeout:
 
 Notification Timeout
 --------------------
-
-Format:  notification_timeout=<seconds>
-Example: notification_timeout=60
 
 This is the maximum number of seconds that Centreon Engine will allow
 notification commands to be run. If a notification command exceeds this
@@ -1387,37 +1528,43 @@ notification command finishes executing within this time limit. If a
 notification command runs longer than this limit, Centreon Engine will
 kill it off thinking it is a runaway processes.
 
+=========== ==============================
+**Format**  notification_timeout=<seconds>
+**Example** notification_timeout=60
+=========== ==============================
+
 .. _main_cfg_opt_obsessive_compulsive_service_processor_timeout:
 
 Obsessive Compulsive Service Processor Timeout
 ----------------------------------------------
-
-Format:  ocsp_timeout=<seconds>
-Example: ocsp_timeout=5
 
 This is the maximum number of seconds that Centreon Engine will allow an
 :ref:`obsessive compulsive service processor <main_cfg_opt_obsessive_compulsive_service_processor_command>`
 command" to be run. If a command exceeds this time limit it will be
 killed and a warning will be logged.
 
+=========== ======================
+**Format**  ocsp_timeout=<seconds>
+**Example** ocsp_timeout=5
+=========== ======================
+
 .. _main_cfg_opt_obsessive_compulsive_host_processor_timeout:
 
 Obsessive Compulsive Host Processor Timeout
 -------------------------------------------
-
-Format:  ochp_timeout=<seconds>
-Example: ochp_timeout=5
 
 This is the maximum number of seconds that Centreon Engine will allow an
 :ref:`obsessive compulsive host processor <main_cfg_opt_obsessive_compulsive_host_processor_command>`
 command" to be run. If a command exceeds this time limit it will be
 killed and a warning will be logged.
 
+=========== ======================
+**Format**  ochp_timeout=<seconds>
+**Example** ochp_timeout=5
+=========== ======================
+
 Performance Data Processor Command Timeout
 ------------------------------------------
-
-Format:  perfdata_timeout=<seconds>
-Example: perfdata_timeout=5
 
 This is the maximum number of seconds that Centreon Engine will allow a
 :ref:`host performance data <main_cfg_opt_host_prefdata_processing_command>`
@@ -1426,13 +1573,15 @@ processor command" or
 to be run. If a command exceeds this time limit it will be killed and a
 warning will be logged.
 
+=========== ==========================
+**Format**  perfdata_timeout=<seconds>
+**Example** perfdata_timeout=5
+=========== ==========================
+
 .. _main_cfg_opt_obsess_over_services:
 
 Obsess Over Services Option
 ---------------------------
-
-Format:  obsess_over_services=<0/1>
-Example: obsess_over_services=1
 
 This value determines whether or not Centreon Engine will "obsess" over
 service checks results and run the
@@ -1445,13 +1594,15 @@ If you're not doing distributed monitoring, don't enable this option.
   * 0 = Don't obsess over services (default)
   * 1 = Obsess over services
 
+=========== ==========================
+**Format**  obsess_over_services=<0/1>
+**Example** obsess_over_services=1
+=========== ==========================
+
 .. _main_cfg_opt_obsessive_compulsive_service_processor_command:
 
 Obsessive Compulsive Service Processor Command
 ----------------------------------------------
-
-Format:  ocsp_command=<command>
-Example: ocsp_command=obsessive_service_handler
 
 This option allows you to specify a command to be run after every
 service check, which can be useful in
@@ -1469,13 +1620,15 @@ option is enabled globally and if the obsess_over_service directive in
 the :ref:`service definition <obj_def_service>`
 is enabled.
 
+=========== ======================================
+**Format**  ocsp_command=<command>
+**Example** ocsp_command=obsessive_service_handler
+=========== ======================================
+
 .. _main_cfg_opt_obsess_over_hosts:
 
 Obsess Over Hosts Option
 ------------------------
-
-Format:  obsess_over_hosts=<0/1>
-Example: obsess_over_hosts=1
 
 This value determines whether or not Centreon Engine will "obsess" over
 host checks results and run the
@@ -1488,13 +1641,15 @@ you're not doing distributed monitoring, don't enable this option.
   * 0 = Don't obsess over hosts (default)
   * 1 = Obsess over hosts
 
+=========== =======================
+**Format**  obsess_over_hosts=<0/1>
+**Example** obsess_over_hosts=1
+=========== =======================
+
 .. _main_cfg_opt_obsessive_compulsive_host_processor_command:
 
 Obsessive Compulsive Host Processor Command
 -------------------------------------------
-
-Format:  ochp_command=<command>
-Example: ochp_command=obsessive_host_handler
 
 This option allows you to specify a command to be run after every host
 check, which can be useful in :ref:`distributed monitoring <distributed_monitoring>`.
@@ -1511,13 +1666,15 @@ option is enabled globally and if the obsess_over_host directive in the
 :ref:`host definition <obj_def_host>`
 is enabled.
 
+=========== ===================================
+**Format**  ochp_command=<command>
+**Example** ochp_command=obsessive_host_handler
+=========== ===================================
+
 .. _main_cfg_opt_prefdata_processing:
 
 Performance Data Processing Option
 ----------------------------------
-
-Format:  process_performance_data=<0/1>
-Example: process_performance_data=1
 
 This value determines whether or not Centreon Engine will process host
 and service check :ref:`performance data <performance_data>`.
@@ -1525,13 +1682,15 @@ and service check :ref:`performance data <performance_data>`.
   * 0 = Don't process performance data (default)
   * 1 = Process performance data
 
+=========== ==============================
+**Format**  process_performance_data=<0/1>
+**Example** process_performance_data=1
+=========== ==============================
+
 .. _main_cfg_opt_host_prefdata_processing_command:
 
 Host Performance Data Processing Command
 ----------------------------------------
-
-Format:  host_perfdata_command=<command>
-Example: host_perfdata_command=process-host-perfdata
 
 This option allows you to specify a command to be run after every host
 check to process host :ref:`performance data <performance_data>`
@@ -1544,13 +1703,15 @@ option is enabled globally and if the process_perf_data directive in the
 :ref:`host definition <obj_def_host>`
 is enabled.
 
+=========== ===========================================
+**Format**  host_perfdata_command=<command>
+**Example** host_perfdata_command=process-host-perfdata
+=========== ===========================================
+
 .. _main_cfg_opt_service_prefdata_processing_command:
 
 Service Performance Data Processing Command
 -------------------------------------------
-
-Format:  service_perfdata_command=<command>
-Example: service_perfdata_command=process-service-perfdata
 
 This option allows you to specify a command to be run after every
 service check to process service :ref:`performance data <performance_data>`
@@ -1562,13 +1723,15 @@ option is enabled globally and if the process_perf_data directive in the
 :ref:`service definition <obj_def_service>`
 is enabled.
 
+=========== =================================================
+**Format**  service_perfdata_command=<command>
+**Example** service_perfdata_command=process-service-perfdata
+=========== =================================================
+
 .. _main_cfg_opt_host_prefdata_file:
 
 Host Performance Data File
 --------------------------
-
-Format:  host_perfdata_file=<file_name>
-Example: host_perfdata_file=/var/log/centreon-engine/host-perfdata.dat
 
 This option allows you to specify a file to which host
 :ref:`performance data <performance_data>` will be written
@@ -1580,13 +1743,15 @@ option is enabled globally and if the process_perf_data directive in the
 :ref:`host definition <obj_def_host>`
 is enabled.
 
+=========== =============================================================
+**Format**  host_perfdata_file=<file_name>
+**Example** host_perfdata_file=/var/log/centreon-engine/host-perfdata.dat
+=========== =============================================================
+
 .. _main_cfg_opt_service_prefdata_file:
 
 Service Performance Data File
 -----------------------------
-
-Format:  service_perfdata_file=<file_name>
-Example: service_perfdata_file=/var/log/centreon-engine/service-perfdata.dat
 
 This option allows you to specify a file to which service
 :ref:`performance data <performance_data>` will be written
@@ -1598,13 +1763,15 @@ option is enabled globally and if the process_perf_data directive in the
 :ref:`service definition <obj_def_service>`
 is enabled.
 
+=========== ===================================================================
+**Format**  service_perfdata_file=<file_name>
+**Example** service_perfdata_file=/var/log/centreon-engine/service-perfdata.dat
+=========== ===================================================================
+
 .. _main_cfg_opt_host_prefdata_file_template:
 
 Host Performance Data File Template
 -----------------------------------
-
-Format:  host_perfdata_file_template=<template>
-Example: host_perfdata_file_template=[HOSTPERFDATA]\\t$TIMET$\\t$HOSTNAME$\\t$HOSTEXECUTIONTIME$\\t$HOSTOUTPUT$\\t$HOSTPERFDATA$
 
 This option determines what (and how) data is written to the
 :ref:`host performance data file <main_cfg_opt_host_prefdata_file>`.
@@ -1613,13 +1780,15 @@ special characters (\t for tab, \r for carriage return, \n for newline)
 and plain text. A newline is automatically added after each write to the
 performance data file.
 
+=========== =======================================================================================
+**Format**  host_perfdata_file_template=<template>
+**Example** host_perfdata_file_template=[HOSTPERFDATA]\\t$HOSTNAME$\\t$HOSTOUTPUT$\\t$HOSTPERFDATA$
+=========== =======================================================================================
+
 .. _main_cfg_opt_service_prefdata_file_template:
 
 Service Performance Data File Template
 --------------------------------------
-
-Format:  service_perfdata_file_template=<template>
-Example: service_perfdata_file_template=[SERVICEPERFDATA]\\t$TIMET$\\t$HOSTNAME$\\t$SERVICEDESC$\\t$SERVICEEXECUTIONTIME$\\t$SERVICELATENCY$\\t$SERVICEOUTPUT$\\t$SERVICEPERFDATA$
 
 This option determines what (and how) data is written to the
 :ref:`service performance data file <main_cfg_opt_service_prefdata_file>`.
@@ -1628,13 +1797,15 @@ special characters (\t for tab, \r for carriage return, \n for newline)
 and plain text. A newline is automatically added after each write to the
 performance data file.
 
+=========== ===================================================================================================================
+**Format**  service_perfdata_file_template=<template>
+**Example** service_perfdata_file_template=[SERVICEPERFDATA]\\t$HOSTNAME$\\t$SERVICEDESC$\\t$SERVICEOUTPUT$\\t$SERVICEPERFDATA$
+=========== ===================================================================================================================
+
 .. _main_cfg_opt_host_prefdata_file_mode:
 
 Host Performance Data File Mode
 -------------------------------
-
-Format:  host_perfdata_file_mode=<mode>
-Example: host_perfdata_file_mode=a
 
 This option determines how the :ref:`host <main_cfg_opt_host_prefdata_file>`
 performance data file" is opened. Unless the file is a named pipe you'll
@@ -1645,13 +1816,15 @@ probably want to use the default mode of append.
   * p = Open in non-blocking read/write mode (useful when writing to
     pipes)
 
+=========== ==============================
+**Format**  host_perfdata_file_mode=<mode>
+**Example** host_perfdata_file_mode=a
+=========== ==============================
+
 .. _main_cfg_opt_service_prefdata_file_mode:
 
 Service Performance Data File Mode
 ----------------------------------
-
-Format:  service_perfdata_file_mode=<mode>
-Example: service_perfdata_file_mode=a
 
 This option determines how the :ref:`service <main_cfg_opt_service_prefdata_file>`
 performance data file" is opened. Unless the file is a named pipe you'll
@@ -1662,13 +1835,15 @@ probably want to use the default mode of append.
   * p = Open in non-blocking read/write mode (useful when writing to
     pipes)
 
+=========== =================================
+**Format**  service_perfdata_file_mode=<mode>
+**Example** service_perfdata_file_mode=a
+=========== =================================
+
 .. _main_cfg_opt_host_prefdata_file_processing_interval:
 
 Host Performance Data File Processing Interval
 ----------------------------------------------
-
-Format:  host_perfdata_file_processing_interval=<seconds>
-Example: host_perfdata_file_processing_interval=0
 
 This option allows you to specify the interval (in seconds) at which the
 :ref:`host performance data file <main_cfg_opt_host_prefdata_file>`
@@ -1676,13 +1851,15 @@ is processed using the :ref:`host performance data file <main_cfg_opt_host_prefd
 processing command". A value of 0 indicates that the performance data
 file should not be processed at regular intervals.
 
+=========== ================================================
+**Format**  host_perfdata_file_processing_interval=<seconds>
+**Example** host_perfdata_file_processing_interval=0
+=========== ================================================
+
 .. _main_cfg_opt_service_prefdata_file_processing_interval:
 
 Service Performance Data File Processing Interval
 -------------------------------------------------
-
-Format:  service_perfdata_file_processing_interval=<seconds>
-Example: service_perfdata_file_processing_interval=0
 
 This option allows you to specify the interval (in seconds) at which the
 :ref:`service performance data <main_cfg_opt_service_prefdata_file>`
@@ -1691,13 +1868,15 @@ file" is processed using the
 A value of 0 indicates that the performance data file should not be
 processed at regular intervals.
 
+=========== ===================================================
+**Format**  service_perfdata_file_processing_interval=<seconds>
+**Example** service_perfdata_file_processing_interval=0
+=========== ===================================================
+
 .. _main_cfg_opt_host_prefdata_file_processing_command:
 
 Host Performance Data File Processing Command
 ---------------------------------------------
-
-Format:  host_perfdata_file_processing_command=<command>
-Example: host_perfdata_file_processing_command=process-host-perfdata-file
 
 This option allows you to specify the command that should be executed to
 process the :ref:`host performance <main_cfg_opt_host_prefdata_file>`
@@ -1708,13 +1887,15 @@ which this command is executed is determined by the
 :ref:`host_perfdata_file_processing_interval <main_cfg_opt_host_prefdata_file_processing_interval>`
 directive.
 
+=========== ================================================================
+**Format**  host_perfdata_file_processing_command=<command>
+**Example** host_perfdata_file_processing_command=process-host-perfdata-file
+=========== ================================================================
+
 .. _main_cfg_opt_service_prefdata_file_processing_command:
 
 Service Performance Data File Processing Command
 ------------------------------------------------
-
-Format:  service_perfdata_file_processing_command=<command>
-Example: service_perfdata_file_processing_command=process-service-perfdata-file
 
 This option allows you to specify the command that should be executed to
 process the :ref:`service <main_cfg_opt_service_prefdata_file>`
@@ -1725,11 +1906,13 @@ this command is executed is determined by the
 :ref:`service_perfdata_file_processing_interval <main_cfg_opt_service_prefdata_file_processing_interval>`
 directive.
 
+=========== ======================================================================
+**Format**  service_perfdata_file_processing_command=<command>
+**Example** service_perfdata_file_processing_command=process-service-perfdata-file
+=========== ======================================================================
+
 Orphaned Service Check Option
 -----------------------------
-
-Format:  check_for_orphaned_services=<0/1>
-Example: check_for_orphaned_services=1
 
 This option allows you to enable or disable checks for orphaned service
 checks. Orphaned service checks are checks which have been executed and
@@ -1748,11 +1931,13 @@ you notice any log messages about orphaned services.
   * 0 = Don't check for orphaned service checks
   * 1 = Check for orphaned service checks (default)
 
+=========== =================================
+**Format**  check_for_orphaned_services=<0/1>
+**Example** check_for_orphaned_services=1
+=========== =================================
+
 Orphaned Host Check Option
 --------------------------
-
-Format:  check_for_orphaned_hosts=<0/1>
-Example: check_for_orphaned_hosts=1
 
 This option allows you to enable or disable checks for orphaned hoste
 checks. Orphaned host checks are checks which have been executed and
@@ -1771,13 +1956,15 @@ about orphaned hosts.
   * 0 = Don't check for orphaned host checks
   * 1 = Check for orphaned host checks (default)
 
+=========== ==============================
+**Format**  check_for_orphaned_hosts=<0/1>
+**Example** check_for_orphaned_hosts=1
+=========== ==============================
+
 .. _main_cfg_opt_service_freshness_checking:
 
 Service Freshness Checking Option
 ---------------------------------
-
-Format:  check_service_freshness=<0/1>
-Example: check_service_freshness=0
 
 This option determines whether or not Centreon Engine will periodically
 check the "freshness" of service checks. Enabling this option is useful
@@ -1788,13 +1975,15 @@ can be found :ref:`here <freshness_checks>`.
   * 0 = Don't check service freshness
   * 1 = Check service freshness (default)
 
+=========== =============================
+**Format**  check_service_freshness=<0/1>
+**Example** check_service_freshness=0
+=========== =============================
+
 .. _main_cfg_opt_service_freshness_check_interval:
 
 Service Freshness Check Interval
 --------------------------------
-
-Format:  service_freshness_check_interval=<seconds>
-Example: service_freshness_check_interval=60
 
 This setting determines how often (in seconds) Centreon Engine will
 periodically check the "freshness" of service check results. If you have
@@ -1803,13 +1992,15 @@ disabled service freshness checking (with the
 option), this option has no effect. More information on freshness
 checking can be found :ref:`here <freshness_checks>`.
 
+=========== ==========================================
+**Format**  service_freshness_check_interval=<seconds>
+**Example** service_freshness_check_interval=60
+=========== ==========================================
+
 .. _main_cfg_opt_host_freshness_checking:
 
 Host Freshness Checking Option
 ------------------------------
-
-Format:  check_host_freshness=<0/1>
-Example: check_host_freshness=0
 
 This option determines whether or not Centreon Engine will periodically
 check the "freshness" of host checks. Enabling this option is useful for
@@ -1820,13 +2011,15 @@ be found :ref:`here <freshness_checks>`.
   * 0 = Don't check host freshness
   * 1 = Check host freshness (default)
 
+=========== ==========================
+**Format**  check_host_freshness=<0/1>
+**Example** check_host_freshness=0
+=========== ==========================
+
 .. _main_cfg_opt_host_freshness_check_interval:
 
 Host Freshness Check Interval
 -----------------------------
-
-Format:  host_freshness_check_interval=<seconds>
-Example: host_freshness_check_interval=60
 
 This setting determines how often (in seconds) Centreon Engine will
 periodically check the "freshness" of host check results. If you have
@@ -1836,11 +2029,13 @@ option), this option has no effect. More information on freshness
 checking can be found
 :ref:`here <freshness_checks>`.
 
+=========== =======================================
+**Format**  host_freshness_check_interval=<seconds>
+**Example** host_freshness_check_interval=60
+=========== =======================================
+
 Additional Freshness Threshold Latency Option
 ---------------------------------------------
-
-Format:  additional_freshness_latency=<#>
-Example: additional_freshness_latency=15
 
 This option determines the number of seconds Centreon Engine will add to
 any host or services freshness threshold it automatically calculates
@@ -1848,13 +2043,15 @@ any host or services freshness threshold it automatically calculates
 freshness checking can be found
 :ref:`here <freshness_checks>`.
 
+=========== ================================
+**Format**  additional_freshness_latency=<#>
+**Example** additional_freshness_latency=15
+=========== ================================
+
 .. _main_cfg_opt_date_format:
 
 Date Format
 -----------
-
-Format:  date_format=<option>
-Example: date_format=us
 
 This option allows you to specify what kind of date/time format Centreon
 Engine should use in the web interface and date/time
@@ -1870,11 +2067,13 @@ iso8601        YYYY-MM-DD HH:MM:SS 2002-06-30 03:15:00
 strict-iso8601 YYYY-MM-DDTHH:MM:SS 2002-06-30T03:15:00
 ============== =================== ===================
 
+=========== ====================
+**Format**  date_format=<option>
+**Example** date_format=us
+=========== ====================
+
 Timezone Option
 ---------------
-
-Format:  use_timezone=<tz>
-Example: use_timezone=US/Mountain
 
 This option allows you to override the default timezone that this
 instance of Centreon Engine runs in. Useful if you have multiple
@@ -1882,11 +2081,13 @@ instances of Centreon Engine that need to run from the same server, but
 have different local times associated with them. If not specified,
 Centreon Engine will use the system configured timezone.
 
+=========== ========================
+**Format**  use_timezone=<tz>
+**Example** use_timezone=US/Mountain
+=========== ========================
+
 Illegal Object Name Characters
 ------------------------------
-
-Format:  illegal_object_name_chars=<chars...>
-Example: illegal_object_name_chars=`~!$%^&*"|'<>?,()=
 
 This option allows you to specify illegal characters that cannot be used
 in host names, service descriptions, or names of other object
@@ -1895,13 +2096,15 @@ definitions, but I recommend not using the characters shown in the
 example above. Doing may give you problems in the web interface,
 notification commands, etc.
 
+=========== =============================================
+**Format**  illegal_object_name_chars=<chars...>
+**Example** illegal_object_name_chars=`~!$%^&*"\|'<>?,()=
+=========== =============================================
+
 .. _main_cfg_opt_illegal_macro_output_characters:
 
 Illegal Macro Output Characters
 -------------------------------
-
-Format:  illegal_macro_output_chars=<chars...>
-Example: illegal_macro_output_chars=`~$^&"|'<>
 
 This option allows you to specify illegal characters that should be
 stripped from :ref:`macros <understanding_macros>`
@@ -1915,13 +2118,15 @@ characters you specify::
 
   $HOSTOUTPUT$, $HOSTPERFDATA$, $HOSTACKAUTHOR$, $HOSTACKCOMMENT$, $SERVICEOUTPUT$, $SERVICEPERFDATA$, $SERVICEACKAUTHOR$, and $SERVICEACKCOMMENT$
 
+=========== ======================================
+**Format**  illegal_macro_output_chars=<chars...>
+**Example** illegal_macro_output_chars=`~$^&"\|'<>
+=========== ======================================
+
 .. _main_cfg_opt_regular_expression_matching:
 
 Regular Expression Matching Option
 ----------------------------------
-
-Format:  use_regexp_matching=<0/1>
-Example: use_regexp_matching=0
 
 This option determines whether or not various directives in your
 :ref:`object definitions <object_configuration_overview>` will be
@@ -1931,20 +2136,22 @@ be found :ref:`here <obj_def_tricks>`.
   * 0 = Don't use regular expression matching (default)
   * 1 = Use regular expression matching
 
+=========== =========================
+**Format**  use_regexp_matching=<0/1>
+**Example** use_regexp_matching=0
+=========== =========================
+
 .. _main_cfg_opt_true_regular_expression_matching:
 
 True Regular Expression Matching Option
 ---------------------------------------
-
-Format:  use_true_regexp_matching=<0/1>
-Example: use_true_regexp_matching=0
 
 If you've enabled regular expression matching of various object
 directives using the :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
 option, this option will determine when object directives are treated as
 regular expressions. If this option is disabled (the default),
 directives will only be treated as regular expressions if they contain
-*, ?, +, or \.. If this option is enabled, all appropriate directives
+\*, ?, +, or \\.. If this option is enabled, all appropriate directives
 will be treated as regular expression - be careful when enabling this!
 More information on how this works can be found
 :ref:`here <obj_def_tricks>`.
@@ -1952,13 +2159,15 @@ More information on how this works can be found
   * 0 = Don't use true regular expression matching (default)
   * 1 = Use true regular expression matching
 
+=========== ==============================
+**Format**  use_true_regexp_matching=<0/1>
+**Example** use_true_regexp_matching=0
+=========== ==============================
+
 .. _main_cfg_opt_administrator_email_address:
 
 Administrator Email Address
 ---------------------------
-
-Format:  admin_email=<email_address>
-Example: admin_email=root@localhost.localdomain
 
 This is the email address for the administrator of the local machine
 (i.e. the one that Centreon Engine is running on).
@@ -1966,26 +2175,28 @@ This is the email address for the administrator of the local machine
 This value can be used in notification commands by using the
 $ADMINEMAIL$ :ref:`macro <understanding_macros>`.
 
+=========== ======================================
+**Format**  admin_email=<email_address>
+**Example** admin_email=root@localhost.localdomain
+=========== ======================================
+
 .. _main_cfg_opt_administrator_pager:
 
 Administrator Pager
 -------------------
-
-Format:  admin_pager=<pager_number_or_pager_email_gateway>
-Example: admin_pager=pageroot@localhost.localdomain
 
 This is the pager number (or pager email gateway) for the administrator
 of the local machine (i.e. the one that Centreon Engine is running
 on). The pager number/address can be used in notification commands by
 using the $ADMINPAGER$ :ref:`macro <understanding_macros>`.
 
-
+=========== =================================================
+**Format**  admin_pager=<pager_number_or_pager_email_gateway>
+**Example** admin_pager=pageroot@localhost.localdomain
+=========== =================================================
 
 Event Broker Options
 --------------------
-
-Format:  event_broker_options=<#>
-Example: event_broker_options=-1
 
 This option controls what (if any) data gets sent to the event broker
 and, in turn, to any loaded event broker modules. This is an advanced
@@ -1998,17 +2209,24 @@ values are shown below.
   * # = See BROKER_* definitions in source code (include/broker.h) for
       other values that can be OR'ed together
 
+=========== ========================
+**Format**  event_broker_options=<#>
+**Example** event_broker_options=-1
+=========== ========================
+
 Event Broker Modules
 --------------------
-
-Format:  broker_module=<modulepath> [moduleargs]
-Example: broker_module=/usr/local/centengine/bin/ndomod.o
-         cfg_file=/etc/centreon-engine/ndomod.cfg
 
 This directive is used to specify an event broker module that should by
 loaded by Centreon Engine at startup. Use multiple directives if you
 want to load more than one module. Arguments that should be passed to
 the module at startup are seperated from the module path by a space.
+
+=========== ================================================
+**Format**  broker_module=<modulepath> [moduleargs]
+**Example** broker_module=/usr/local/centengine/bin/ndomod.o
+            cfg_file=/etc/centreon-engine/ndomod.cfg
+=========== ================================================
 
 .. note::
 
@@ -2030,9 +2248,6 @@ methods:
 Debug File
 ----------
 
-Format:  debug_file=<file_name>
-Example: debug_file=/var/log/centreon-engine/centengine.debug
-
 This option determines where Centreon Engine should write debugging
 information. What (if any) information is written is determined by the
 :ref:`debug_level <main_cfg_opt_debug_file>`
@@ -2042,13 +2257,15 @@ when it reaches a certain size by using the
 :ref:`max_debug_file_size <main_cfg_opt_max_debug_file_size>`
 option.
 
+=========== ====================================================
+**Format**  debug_file=<file_name>
+**Example** debug_file=/var/log/centreon-engine/centengine.debug
+=========== ====================================================
+
 .. _main_cfg_opt_debug_level:
 
 Debug Level
 -----------
-
-Format:  debug_level=<#>
-Example: debug_level=24
 
 This option determines what type of information Centreon Engine should
 write to the :ref:`debug_file <main_cfg_opt_debug_file>`.
@@ -2064,13 +2281,15 @@ This value is a logical OR of the values below.
   * 32 = Notification information
   * 64 = Event broker information
 
+=========== ===============
+**Format**  debug_level=<#>
+**Example** debug_level=24
+=========== ===============
+
 .. _main_cfg_opt_debug_verbosity:
 
 Debug Verbosity
 ---------------
-
-Format:  debug_verbosity=<#>
-Example: debug_verbosity=1
 
 This option determines how much debugging information Centreon Engine
 should write to the :ref:`debug_file <main_cfg_opt_debug_file>`.
@@ -2079,13 +2298,15 @@ should write to the :ref:`debug_file <main_cfg_opt_debug_file>`.
   * 1 = More detailed information (default)
   * 2 = Highly detailed information
 
+=========== ===================
+**Format**  debug_verbosity=<#>
+**Example** debug_verbosity=1
+=========== ===================
+
 .. _main_cfg_opt_max_debug_file_size:
 
 Maximum Debug File Size
 -----------------------
-
-Format:  max_debug_file_size=<#>
-Example: max_debug_file_size=1000000
 
 This option determines the maximum size (in bytes) of the
 :ref:`debug file <main_cfg_opt_debug_file>`.
@@ -2093,3 +2314,8 @@ If the file grows larger than this size, it will be renamed with a .old
 extension. If a file already exists with a .old extension it will
 automatically be deleted. This helps ensure your disk space usage
 doesn't get out of control when debugging Centreon Engine.
+
+=========== ===========================
+**Format**  max_debug_file_size=<#>
+**Example** max_debug_file_size=1000000
+=========== ===========================

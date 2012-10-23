@@ -79,7 +79,7 @@ will be assuming that hosts A and E are both running Centreon Engine and
 are monitoring all the hosts shown. Host A will be considered the
 "master" host and host E will be considered the "slave" host.
 
-.. image:: redundancy.png
+.. image:: /_static/images/redundancy.png
 
 Initial Program Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^

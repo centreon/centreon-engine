@@ -79,19 +79,22 @@ Let's see some examples of possible plugin output...
       DISK OK - free space: / 3326 MB (56%);
 
     If this plugin was used to perform a service check, the entire line
-    of output will be stored in the `SERVICEOUTPUT`_ macro.
+    of output will be stored in the
+    :ref:`SERVICEOUTPUT <user_configuration_macros_service>` macro.
 
   * Case 2: One line of output (text and perfdata)
     A plugin can return optional performance data for use by external
     applications. To do this, the performance data must be separated
-    from the text output with a pipe (|) symbol like such::
+    from the text output with a pipe | symbol like such::
 
       DISK OK - free space: / 3326 MB (56%);|/=2643MB;5948;5958;0;5968
 
     If this plugin was used to perform a service check, the first
     portion of output (left of the pipe separator) will be stored in the
-    `SERVICEOUTPUT`_ macro and the second portion of output (right of
-    the pipe separator) will be stored in the `SERVICEPERFDATA`_ macro.
+    :ref:`SERVICEOUTPUT <user_configuration_macros_service>` macro and
+    the second portion of output (right of the pipe separator) will be
+    stored in the
+    :ref:`SERVICEPERFDATA <user_configuration_macros_service>` macro.
 
   * Case 3: Multiple lines of output (text and perfdata)
     A plugin optionally return multiple lines of both text output and
@@ -107,12 +110,15 @@ Let's see some examples of possible plugin output...
 
     If this plugin was used to perform a service check, the red portion
     of first line of output (left of the pipe separator) will be stored
-    in the `SERVICEOUTPUT`_ macro.
+    in the :ref:`SERVICEOUTPUT <user_configuration_macros_service>`
+    macro.
 
 The orange portions of the first and subsequent lines are concatenated
-(with spaces) are stored in the `SERVICEPERFDATA`_ macro. The blue
-portions of the 2nd - 5th lines of output will be concatenated (with
-escaped newlines) and stored in `LONGSERVICEOUTPUT`_ the macro.
+(with spaces) are stored in the
+:ref:`SERVICEPERFDATA <user_configuration_macros_service>` macro. The
+blue portions of the 2nd - 5th lines of output will be concatenated
+(with escaped newlines) and stored in
+:ref:`LONGSERVICEOUTPUT <user_configuration_macros_service>` the macro.
 
 The final contents of each macro are listed below:
 

@@ -13,7 +13,7 @@ application that you might have.
 
 Integration Points
 
-.. image:: integration_overview.png
+.. image:: /_static/images/integration_overview.png
 
 To monitor new hardware, services, or applications, check out the docs
 on:

@@ -6,7 +6,7 @@ Notifications
 Introduction
 ============
 
-.. image:: objects-contacts.png
+.. image:: /_static/images/objects-contacts.png
 
 I've had a lot of questions as to exactly how notifications work. This
 will attempt to explain exactly when and how host and service
@@ -197,7 +197,8 @@ Notification Type Macro
 =======================
 
 When crafting your notification commands, you need to take into account
-what type of notification is occurring. The `NOTIFICATIONTYPE`_ macro
+what type of notification is occurring. The
+:ref:`NOTIFICATIONTYPE <user_configuration_macros_notification>` macro
 contains a string that identifies exactly that. The table below lists
 the possible values for the macro and their respective descriptions:
 
