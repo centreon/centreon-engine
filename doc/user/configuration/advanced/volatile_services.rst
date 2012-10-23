@@ -48,7 +48,7 @@ state change occurs and none of the events mentioned take place again.
 
 .. note::
    If you are only interested in logging, consider using
-   :ref:`stalking <states_talking>` options instead.
+   :ref:`stalking <state_stalking>` options instead.
 
 The Power Of Two
 ================

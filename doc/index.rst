@@ -66,6 +66,7 @@ the Centreon Engine distribution.
 Contents:
 
 .. toctree::
+   :maxdepth: 2
 
    installation/index
    user/index

@@ -151,7 +151,7 @@ potential performance hit is describe in detail
 A good way to determine the proper value for the cached check horizon
 options is to compare how many on-demand checks Centreon Engine has to
 actually run versus how may it can use cached values for. The
-:ref:`centenginetats <using_the_centenginestats_utility>` utility can
+:ref:`centenginetats <centenginestats_utility>` utility can
 produce information on cached checks.
 
 The monitoring installation which produced the graphs above had:

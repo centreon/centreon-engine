@@ -92,54 +92,54 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define host{
-    @b host_name                 host_name
-    @b alias                     alias
-    display_name                 display_name
-    @b address                   address
-    parents                      host_names
-    hostgroups                   hostgroup_names
-    check_command                command_name
-    initial_state                [o,d,u]
-    @b max_check_attempts        #
-    check_interval               #
-    retry_interval               #
-    active_checks_enabled        [0/1]
-    passive_checks_enabled       [0/1]
-    @b check_period              timeperiod_name
-    obsess_over_host             [0/1]
-    check_freshness              [0/1]
-    freshness_threshold          #
-    event_handler                command_name
-    event_handler_enabled        [0/1]
-    low_flap_threshold           #
-    high_flap_threshold          #
-    flap_detection_enabled       [0/1]
-    flap_detection_options       [o,d,u]
-    process_perf_data            [0/1]
-    retain_status_information    [0/1]
-    retain_nonstatus_information [0/1]
-    @b contacts                  contacts
-    @b contact_groups            contact_groups
-    @b notification_interval     #
-    first_notification_delay     #
-    @e notification_period       timeperiod_name
-    notification_options         [d,u,r,f,s]
-    notifications_enabled        [0/1]
-    stalking_options             [o,d,u]
-    notes                        note_string
-    notes_url                    url
-    action_url                   url
-    icon_image                   image_file
-    icon_image_alt               alt_string
-    vrml_image                   image_file
-    statusmap_image              image_file
-    2d_coords                    x_coord,y_coord
-    3d_coords                    x_coord,y_coord,z_coord
+    host_name                      host_name
+    alias                          alias
+    # display_name                 display_name
+    address                        address
+    # parents                      host_names
+    # hostgroups                   hostgroup_names
+    # check_command                command_name
+    # initial_state                [o,d,u]
+    max_check_attempts             #
+    # check_interval               #
+    # retry_interval               #
+    # active_checks_enabled        [0/1]
+    # passive_checks_enabled       [0/1]
+    check_period                   timeperiod_name
+    # obsess_over_host             [0/1]
+    # check_freshness              [0/1]
+    # freshness_threshold          #
+    # event_handler                command_name
+    # event_handler_enabled        [0/1]
+    # low_flap_threshold           #
+    # high_flap_threshold          #
+    # flap_detection_enabled       [0/1]
+    # flap_detection_options       [o,d,u]
+    # process_perf_data            [0/1]
+    # retain_status_information    [0/1]
+    # retain_nonstatus_information [0/1]
+    contacts                       contacts
+    contact_groups                 contact_groups
+    notification_interval          #
+    # first_notification_delay     #
+    notification_period            timeperiod_name
+    # notification_options         [d,u,r,f,s]
+    # notifications_enabled        [0/1]
+    # stalking_options             [o,d,u]
+    # notes                        note_string
+    # notes_url                    url
+    # action_url                   url
+    # icon_image                   image_file
+    # icon_image_alt               alt_string
+    # vrml_image                   image_file
+    # statusmap_image              image_file
+    # 2d_coords                    x_coord,y_coord
+    # 3d_coords                    x_coord,y_coord,z_coord
   }
 
 Example Definition
@@ -312,7 +312,7 @@ notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is
                              notifications for this host are enabled. Values: 0 = disable host notifications, 1 = enable host notifications.
 stalking_options             This directive determines which host states "stalking" is enabled for. Valid options are a combination of one or more of
                              the following: o = stalk on UP states, d = stalk on DOWN states, and u = stalk on UNREACHABLE states. More information
-                             on state stalking can be found :ref:`here <states_talking>`.
+                             on state stalking can be found :ref:`here <state_stalking>`.
 notes                        This directive is used to define an optional string of notes pertaining to the host.
 notes_url                    This variable is used to define an optional URL that can be used to provide more information about the host. Any valid
 URL can be used. This can be very useful if you want to make detailed information on the host, emergency contact methods, etc. available to other
@@ -362,18 +362,18 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define hostgroup{
-    @b hostgroup_name hostgroup_name
-    @b alias          alias
-    members           hosts
-    hostgroup_members hostgroups
-    notes             note_string
-    notes_url         url
-    action_url        url
+    hostgroup_name      hostgroup_name
+    alias               alias
+    # members           hosts
+    # hostgroup_members hostgroups
+    # notes             note_string
+    # notes_url         url
+    # action_url        url
   }
 
 Example Definition
@@ -427,50 +427,50 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define service{
-    @b host_name                 host_name
-    hostgroup_name               hostgroup_name
-    @b service_description       service_description
-    display_name                 display_name
-    servicegroups                servicegroup_names
-    is_volatile                  [0/1]
-    @b check_command             command_name
-    initial_state                [o,w,u,c]
-    @b max_check_attempts        #
-    @b check_interval            #
-    @b retry_interval            #
-    active_checks_enabled        [0/1]
-    passive_checks_enabled       [0/1]
-    @b check_period              timeperiod_name
-    obsess_over_service          [0/1]
-    check_freshness              [0/1]
-    freshness_threshold          #
-    event_handler                command_name
-    event_handler_enabled        [0/1]
-    low_flap_threshold           #
-    high_flap_threshold          #
-    flap_detection_enabled       [0/1]
-    flap_detection_options       [o,w,c,u]
-    process_perf_data            [0/1]
-    retain_status_information    [0/1]
-    retain_nonstatus_information [0/1]
-    @b notification_interval     #
-    first_notification_delay     #
-    @b notification_period       timeperiod_name
-    notification_options         [w,u,c,r,f,s]
-    notifications_enabled        [0/1]
-    @b contacts                  contacts
-    @b contact_groups            contact_groups
-    stalking_options             [o,w,u,c]
-    notes                        note_string
-    notes_url                    url
-    action_url                   url
-    icon_image                   image_file
-    icon_image_alt               alt_string
+    host_name                      host_name
+    # hostgroup_name               hostgroup_name
+    service_description            service_description
+    # display_name                 display_name
+    # servicegroups                servicegroup_names
+    # is_volatile                  [0/1]
+    check_command                  command_name
+    # initial_state                [o,w,u,c]
+    max_check_attempts             #
+    check_interval                 #
+    retry_interval                 #
+    # active_checks_enabled        [0/1]
+    # passive_checks_enabled       [0/1]
+    check_period                   timeperiod_name
+    # obsess_over_service          [0/1]
+    # check_freshness              [0/1]
+    # freshness_threshold          #
+    # event_handler                command_name
+    # event_handler_enabled        [0/1]
+    # low_flap_threshold           #
+    # high_flap_threshold          #
+    # flap_detection_enabled       [0/1]
+    # flap_detection_options       [o,w,c,u]
+    # process_perf_data            [0/1]
+    # retain_status_information    [0/1]
+    # retain_nonstatus_information [0/1]
+    notification_interval          #
+    # first_notification_delay     #
+    notification_period            timeperiod_name
+    # notification_options         [w,u,c,r,f,s]
+    # notifications_enabled        [0/1]
+    contacts                       contacts
+    contact_groups                 contact_groups
+    # stalking_options             [o,w,u,c]
+    # notes                        note_string
+    # notes_url                    url
+    # action_url                   url
+    # icon_image                   image_file
+    # icon_image_alt               alt_string
   }
 
 Example Definition
@@ -620,7 +620,7 @@ contact_groups               This is a list of the short names of the :ref:`cont
                              separated by commas. You must specify at least one contact or contact group in each service definition.
 stalking_options             This directive determines which service states "stalking" is enabled for. Valid options are a combination of one or more
                              of the following: o = stalk on OK states, w = stalk on WARNING states, u = stalk on UNKNOWN states, and c = stalk on
-                             CRITICAL states. More information on state stalking can be found :ref:`here <states_talking>`.
+                             CRITICAL states. More information on state stalking can be found :ref:`here <state_stalking>`.
 notes                        This directive is used to define an optional string of notes pertaining to the service.
 notes_url                    This directive is used to define an optional URL that can be used to provide more information about the service. Any
                              valid URL can be used. This can be very useful if you want to make detailed information on the service, emergency
@@ -650,18 +650,18 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define servicegroup{
-    @b servicegroup_name servicegroup_name
-    @b alias             alias
-    members              services
-    servicegroup_members servicegroups
-    notes                note_string
-    notes_url            url
-    action_url           url
+    servicegroup_name      servicegroup_name
+    alias                  alias
+    # members              services
+    # servicegroup_members servicegroups
+    # notes                note_string
+    # notes_url            url
+    # action_url           url
   }
 
 Example Definition
@@ -714,28 +714,28 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define contact{
-    @b contact_name                  contact_name
-    alias                            alias
-    @b contactgroups                 contactgroup_names
-    @b host_notifications_enabled    [0/1]
-    @b service_notifications_enabled [0/1]
-    @b host_notification_period      timeperiod_name
-    @b service_notification_period   timeperiod_name
-    @b host_notification_options     [d,u,r,f,s,n]
-    @b service_notification_options  [w,u,c,r,f,s,n]
-    @b host_notification_commands    command_name
-    @b service_notification_commands command_name
-    email                            email_address
-    pager                            pager_number or pager_email_gateway
-    addressx                         additional_contact_address
-    can_submit_commands              [0/1]
-    retain_status_information        [0/1]
-    retain_nonstatus_information     [0/1]
+    contact_name                       contact_name
+    # alias                            alias
+    contactgroups                      contactgroup_names
+    host_notifications_enabled         [0/1]
+    service_notifications_enabled      [0/1]
+    host_notification_period           timeperiod_name
+    service_notification_period        timeperiod_name
+    host_notification_options          [d,u,r,f,s,n]
+    service_notification_options       [w,u,c,r,f,s,n]
+    host_notification_commands         command_name
+    service_notification_commands      command_name
+    # email                            email_address
+    # pager                            pager_number or pager_email_gateway
+    # addressx                         additional_contact_address
+    # can_submit_commands              [0/1]
+    # retain_status_information        [0/1]
+    # retain_nonstatus_information     [0/1]
   }
 
 Example Definition
@@ -852,15 +852,15 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define contactgroup{
-    @b contactgroup_name contactgroup_name
-    @b alias             alias
-    members              contacts
-    contactgroup_members contactgroups
+    contactgroup_name      contactgroup_name
+    alias                  alias
+    # members              contacts
+    # contactgroup_members contactgroups
   }
 
 Example Definition
@@ -907,16 +907,16 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define timeperiod{
-    @b timeperiod_name timeperiod_name
-    @b alias           alias
-    [weekday]          timeranges
-    [exception]        timeranges
-    exclude            [timeperiod1,timeperiod2,...,timeperiodn]
+    timeperiod_name      timeperiod_name
+    alias                alias
+    # [weekday]          timeranges
+    # [exception]        timeranges
+    # exclude            [timeperiod1,timeperiod2,...,timeperiodn]
   }
 
 Example Definitions
@@ -1016,14 +1016,14 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define command{
-    @b command_name command_name
-    @b command_line command_line
-    connector    connector_name
+    command_name   command_name
+    command_line   command_line
+    # connector    connector_name
   }
 
 Example Definition
@@ -1082,13 +1082,13 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define connector{
-    @b connector_name connector_name
-    @b connector_line connector_line
+    connector_name connector_name
+    connector_line connector_line
   }
 
 Example Definition
@@ -1129,23 +1129,23 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are
-   optional. However, you must supply at least one type of criteria for
-   the definition to be of much use.
+   Optional directives are comment (line start with #). However, you
+   must supply at least one type of criteria for the definition to be of
+   much use.
 
 ::
 
   define servicedependency{
-    @b dependent_host_name           host_name
-    dependent_hostgroup_name         hostgroup_name
-    @b dependent_service_description service_description
-    @b host_name                     host_name
-    hostgroup_name                   hostgroup_name
-    @b service_description           service_description
-    inherits_parent                  [0/1]
-    execution_failure_criteria       [o,w,u,c,p,n]
-    notification_failure_criteria    [o,w,u,c,p,n]
-    dependency_period                timeperiod_name
+    dependent_host_name                host_name
+    # dependent_hostgroup_name         hostgroup_name
+    dependent_service_description      service_description
+    host_name                          host_name
+    # hostgroup_name                   hostgroup_name
+    service_description                service_description
+    # inherits_parent                  [0/1]
+    # execution_failure_criteria       [o,w,u,c,p,n]
+    # notification_failure_criteria    [o,w,u,c,p,n]
+    # dependency_period                timeperiod_name
   }
 
 Example Definition
@@ -1223,21 +1223,21 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define serviceescalation{
-    @b host_name             host_name
-    hostgroup_name           hostgroup_name
-    @b service_description   service_description
-    @b contacts              contacts
-    @b contact_groups        contactgroup_name
-    @b first_notification    #
-    @b last_notification     #
-    @b notification_interval #
-    escalation_period        timeperiod_name
-    escalation_options       [w,u,c,r]
+    host_name                  host_name
+    # hostgroup_name           hostgroup_name
+    service_description        service_description
+    contacts                   contacts
+    contact_groups             contactgroup_name
+    first_notification         #
+    last_notification          #
+    notification_interval      #
+    # escalation_period        timeperiod_name
+    # escalation_options       [w,u,c,r]
   }
 
 Example Definition
@@ -1318,19 +1318,19 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define hostdependency{
-    @b dependent_host_name        host_name
-    dependent_hostgroup_name      hostgroup_name
-    @b host_name                  host_name
-    hostgroup_name                hostgroup_name
-    inherits_parent               [0/1]
-    execution_failure_criteria    [o,d,u,p,n]
-    notification_failure_criteria [o,d,u,p,n]
-    dependency_period             timeperiod_name
+    dependent_host_name             host_name
+    # dependent_hostgroup_name      hostgroup_name
+    host_name                       host_name
+    # hostgroup_name                hostgroup_name
+    # inherits_parent               [0/1]
+    # execution_failure_criteria    [o,d,u,p,n]
+    # notification_failure_criteria [o,d,u,p,n]
+    # dependency_period             timeperiod_name
   }
 
 Example Definition
@@ -1397,20 +1397,20 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Directives using a bold font are required, while those are optional.
+   Optional directives are comment (line start with #).
 
 ::
 
   define hostescalation{
-    @b host_name             host_name
-    hostgroup_name           hostgroup_name
-    @b contacts              contacts
-    @b contact_groups        contactgroup_name
-    @b first_notification    #
-    @b last_notification     #
-    @b notification_interval #
-    escalation_period        timeperiod_name
-    escalation_options       [d,u,r]
+    host_name                  host_name
+    # hostgroup_name           hostgroup_name
+    contacts                   contacts
+    contact_groups             contactgroup_name
+    first_notification         #
+    last_notification          #
+    notification_interval      #
+    # escalation_period        timeperiod_name
+    # escalation_options       [d,u,r]
   }
 
 Example Definition
@@ -1492,23 +1492,23 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Variables in red are required, while those in black are
-   optional. However, you need to supply at least one optional variable
-   in each definition for it to be of much use.
+   Optional directives are comment (line start with #). However, you
+   need to supply at least one optional variable in each definition for
+   it to be of much use.
 
 ::
 
   define hostextinfo{
-    @b host_name    host_name
-    notes           note_string
-    notes_url       url
-    action_url      url
-    icon_image      image_file
-    icon_image_alt  alt_string
-    vrml_image      image_file
-    statusmap_image image_file
-    2d_coords       x_coord,y_coord
-    3d_coords       x_coord,y_coord,z_coord
+    host_name         host_name
+    # notes           note_string
+    # notes_url       url
+    # action_url      url
+    # icon_image      image_file
+    # icon_image_alt  alt_string
+    # vrml_image      image_file
+    # statusmap_image image_file
+    # 2d_coords       x_coord,y_coord
+    # 3d_coords       x_coord,y_coord,z_coord
   }
 
 Example Definition
@@ -1589,20 +1589,20 @@ Definition Format
 ^^^^^^^^^^^^^^^^^
 
 .. note::
-   Variables in red are required, while those in black are
-   optional. However, you need to supply at least one optional variable
-   in each definition for it to be of much use.
+   Optional directives are comment (line start with #). However, you
+   need to supply at least one optional variable in each definition for
+   it to be of much use.
 
 ::
 
   define serviceextinfo{
-    @b host_name           host_name
-    @b service_description service_description
-    notes                  note_string
-    notes_url              url
-    action_url             url
-    icon_image             image_file
-    icon_image_alt         alt_string
+    host_name                host_name
+    service_description      service_description
+    # notes                  note_string
+    # notes_url              url
+    # action_url             url
+    # icon_image             image_file
+    # icon_image_alt         alt_string
   }
 
 Example Definition
