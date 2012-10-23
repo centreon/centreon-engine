@@ -146,6 +146,7 @@ larger than the sum of the sizes of your object config files. This is
 normal and by design.
 
 .. image:: /_static/images/fast-startup1.png
+   :align: center
 
 Once the precached object configuration file have been created, you can
 start Centreon Engine and tell it to use the precached config file
@@ -164,6 +165,7 @@ option::
    configuration files.
 
 .. image:: /_static/images/fast-startup2.png
+   :align: center
 
 Skipping Circular Path Tests
 ============================

@@ -5,6 +5,7 @@ Introduction
 ============
 
 .. image:: /_static/images/security.png
+   :align: center
 
 This is intended to be a brief overview of some things you should keep
 in mind when installing Centreon Engine, so as set it up in a secure
@@ -58,6 +59,7 @@ security risk. Remember, its always easier to gain root access through a
 system security hole if you have a local account on a box.
 
 .. image:: /_static/images/security3.png
+   :align: center
 
 Don't Run Centreon Engine As Root
 ---------------------------------
@@ -122,6 +124,7 @@ information could be used by an attacker to execute remote event handler
 scripts or to determine the best times to go unnoticed.
 
 .. image:: /_static/images/security1.png
+   :align: center
 
 Secure Communication Channels
 -----------------------------
@@ -134,3 +137,4 @@ could be used by an attacker to determine the best times to go
 unnoticed.
 
 .. image:: /_static/images/security2.png
+   :align: center

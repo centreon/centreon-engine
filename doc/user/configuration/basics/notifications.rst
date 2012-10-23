@@ -7,6 +7,7 @@ Introduction
 ============
 
 .. image:: /_static/images/objects-contacts.png
+   :align: center
 
 I've had a lot of questions as to exactly how notifications work. This
 will attempt to explain exactly when and how host and service

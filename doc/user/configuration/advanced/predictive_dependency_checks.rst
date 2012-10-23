@@ -45,6 +45,7 @@ notification) and it wants to make sure it has the most current status
 information for the hosts that take part in the dependency.
 
 .. image:: /_static/images/predictive-dependency-checks.png
+   :align: center
 
 That's how predictive dependency checks work. Simple, eh?
 

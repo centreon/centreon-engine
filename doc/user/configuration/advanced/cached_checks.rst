@@ -7,6 +7,7 @@ Introduction
 ============
 
 .. image:: /_static/images/cached_checks1.png
+   :align: center
 
 The performance of Centreon Engine' monitoring logic can be
 significantly improved by implementing the use of cached checks. Cached
@@ -48,6 +49,7 @@ How Caching Works
 =================
 
 .. image:: /_static/images/cached_checks.png
+   :align: center
 
 When Centreon Engine needs to perform an on-demand host or service
 check, it will make a determination as to whether it can used a cached
@@ -145,6 +147,7 @@ potential performance hit is describe in detail
 :ref:`here <host_checks>`.
 
 .. image:: /_static/images/cachedcheckgraphs.png
+   :align: center
 
 A good way to determine the proper value for the cached check horizon
 options is to compare how many on-demand checks Centreon Engine has to

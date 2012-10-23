@@ -7,6 +7,7 @@ Introduction
 ============
 
 .. image:: /_static/images/tcpwrappers.png
+   :align: center
 
 This document explains how to easily generate alerts in Centreon Engine
 for connection attempts that are rejected by TCP wrappers. For example,

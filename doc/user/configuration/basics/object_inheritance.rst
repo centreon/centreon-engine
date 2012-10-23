@@ -468,6 +468,7 @@ configurations, as shown below::
   }
 
 .. image:: /_static/images/multiple-templates1.png
+   :align: center
 
 In the example above, devweb1 is inheriting variables/values from two
 sources: generic-host and development-server. You'll notice that a
@@ -513,4 +514,5 @@ Testing, trial, and error will help you better understand exactly how
 things work in complex inheritance situations like this. :-)
 
 .. image:: /_static/images/multiple-templates2.png
+   :align: center
 

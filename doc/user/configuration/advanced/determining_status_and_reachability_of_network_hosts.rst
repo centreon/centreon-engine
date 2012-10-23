@@ -32,6 +32,7 @@ that are pictured. Centreon Engine is installed and running on the
 Centreon Engine host.
 
 .. image:: /_static/images/reachability1.png
+   :align: center
 
 Defining Parent/Child Relationships
 ===================================
@@ -48,6 +49,7 @@ what the host parent/child relationships look like from the viewpoint of
 Centreon Engine:
 
 .. image:: /_static/images/reachability2.png
+   :align: center
 
 Now that you know what the parent/child relationships look like for
 hosts that are being monitored, how do you configure Centreon Engine to
@@ -113,6 +115,7 @@ relationships for your hosts, let's see what happen when problems
 arise. Assume that two hosts - Web and Router1 - go offline...
 
 .. image:: /_static/images/reachability3.png
+   :align: center
 
 When hosts change state (i.e. from UP to DOWN), the host reachability
 logic in Centreon Engine kicks in. The reachability logic will initiate
@@ -121,6 +124,7 @@ state. This allows Centreon Engine to quickly determine the current
 status of your network infrastructure when changes occur.
 
 .. image:: /_static/images/reachability4.png
+   :align: center
 
 In this example, Centreon Engine will determine that Web and Router1 are
 both in DOWN states because the "path" to those hosts is not being

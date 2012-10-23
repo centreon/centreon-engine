@@ -31,6 +31,7 @@ NRPE
 ====
 
 .. image:: /_static/images/nrpe.png
+   :align: center
 
 NRPE is an addon that allows you to execute :ref:`plugins <exploit_plugins>`
 on remote Linux/Unix hosts. This is useful if you need to monitor local
@@ -48,6 +49,7 @@ NSCA
 ====
 
 .. image:: /_static/images/nsca.png
+   :align: center
 
 NSCA is an addon that allows you to send
 :ref:`passive check <passive_checks>`
@@ -63,6 +65,7 @@ NDOUtils
 ========
 
 .. image:: /_static/images/ndoutils.png
+   :align: center
 
 NDOUtils is an addon that allows you to store all status information
 from Centreon Engine in a MySQL database. Multiple instances of Centreon

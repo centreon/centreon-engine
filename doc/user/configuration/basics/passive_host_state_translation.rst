@@ -27,6 +27,7 @@ The image below shows a simplified view of a failover monitoring setup.
   * Both Router-C and Router-D have suffered failures and are offline.
 
 .. image:: /_static/images/passivehosttranslation.png
+   :align: center
 
 What states are Router-C and Router-D currently in? The answer depends
 on which Centreon Engine instance you ask.

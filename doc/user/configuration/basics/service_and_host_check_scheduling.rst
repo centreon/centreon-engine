@@ -154,17 +154,22 @@ Non-Interleaved Checks
 ----------------------
 
 .. image:: /_static/images/noninterleaved1.png
+   :align: center
 
 .. image:: /_static/images/noninterleaved2.png
+   :align: center
 
 Interleaved Checks
 ------------------
 
 .. image:: /_static/images/interleaved1.png
+   :align: center
 
 .. image:: /_static/images/interleaved2.png
+   :align: center
 
 .. image:: /_static/images/interleaved3.png
+   :align: center
 
 Maximum Concurrent Service Checks
 =================================
@@ -338,6 +343,7 @@ simple example. Look at the diagram below - we'll refer to it as we
 explain how things are done.
 
 .. image:: /_static/images/checktiming.png
+   :align: center
 
 First off, the **X<sub>n</sub>** events are check result reaper events
 that are scheduled at a frequency specified by the

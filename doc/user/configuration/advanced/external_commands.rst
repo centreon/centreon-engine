@@ -13,6 +13,7 @@ it receives. External applications can submit commands by writing to the
 which is periodically processed by the Centreon Engine daemon.
 
 .. image:: /_static/images/external_commands.png
+   :align: center
 
 Enabling External Commands
 ==========================

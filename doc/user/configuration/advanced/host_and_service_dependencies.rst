@@ -50,6 +50,7 @@ and execution dependencies. Different services are dependent on other
 services for notifications and check execution.
 
 .. image:: /_static/images/service-dependencies.png
+   :align: center
 
 In this example, the dependency definitions for Service F on Host C
 would be defined as follows::
@@ -275,6 +276,7 @@ notification dependencies. Different hosts are dependent on other hosts
 for notifications.
 
 .. image:: /_static/images/host-dependencies.png
+   :align: center
 
 In the example above, the dependency definitions for Host C would be
 defined as follows::

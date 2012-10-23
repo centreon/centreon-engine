@@ -80,6 +80,7 @@ are monitoring all the hosts shown. Host A will be considered the
 "master" host and host E will be considered the "slave" host.
 
 .. image:: /_static/images/redundancy.png
+   :align: center
 
 Initial Program Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^

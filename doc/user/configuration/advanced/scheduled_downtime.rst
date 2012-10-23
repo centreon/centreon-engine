@@ -12,6 +12,7 @@ that you actually know you're going to be taking a server down for an
 upgrade, etc.
 
 .. image:: /_static/images/downtime.png
+   :align: center
 
 Scheduling Downtime
 ===================

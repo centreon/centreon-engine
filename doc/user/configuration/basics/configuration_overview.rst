@@ -17,6 +17,7 @@ worth your time. :-)
    :ref:`quickstart installation guide <exploit_quickstart>`.
 
 .. image:: /_static/images/configoverview.png
+   :align: center
 
 Main
 ====

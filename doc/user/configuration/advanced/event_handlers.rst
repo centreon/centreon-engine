@@ -7,6 +7,7 @@ Introduction
 ============
 
 .. image:: /_static/images/event_handlers.png
+   :align: center
 
 Event handlers are optional system commands (scripts or executables)
 that are run whenever a host or service state change occurs.

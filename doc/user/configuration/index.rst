@@ -4,5 +4,6 @@ Configuration
 
 .. toctree::
 
-   basics
-   advanced
+   basics/index
+   advanced/index
+   migrating

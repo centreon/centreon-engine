@@ -48,6 +48,7 @@ How Passive Checks Work
 =======================
 
 .. image:: /_static/images/passive_checks.png
+   :align: center
 
 Here's how passive checks work in more detail...
 
@@ -182,6 +183,7 @@ Submitting Passive Check Results From Remote Hosts
 ==================================================
 
 .. image:: /_static/images/nsca.png
+   :align: center
 
 If an application that resides on the same host as Centreon Engine is
 sending passive host or service check results, it can simply write the

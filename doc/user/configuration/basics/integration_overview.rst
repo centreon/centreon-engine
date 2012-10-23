@@ -14,6 +14,7 @@ application that you might have.
 Integration Points
 
 .. image:: /_static/images/integration_overview.png
+   :align: center
 
 To monitor new hardware, services, or applications, check out the docs
 on:

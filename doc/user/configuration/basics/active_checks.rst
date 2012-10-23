@@ -16,6 +16,7 @@ checks as as follows:
   * Active checks are run on a regularly scheduled basis
 
 .. image:: /_static/images/active_checks.png
+   :align: center
 
 How Are Active Checks Performed?
 ================================
@@ -31,8 +32,6 @@ run event handlers, etc).
 
 More information on how plugins work can be found
 :ref:`here <exploit_plugins>`.
-
-
 
 When Are Active Checks Executed?
 ================================

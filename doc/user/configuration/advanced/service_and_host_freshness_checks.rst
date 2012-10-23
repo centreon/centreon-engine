@@ -19,6 +19,7 @@ frequently as you want. This can be very useful in
 monitoring environments.
 
 .. image:: /_static/images/freshness.png
+   :align: center
 
 How Does Freshness Checking Work?
 =================================
