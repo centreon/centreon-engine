@@ -61,7 +61,7 @@
 #include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/shared_ptr.hh"
 
-using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 // Error message when configuration parsing fail.
@@ -107,15 +107,15 @@ int main(int argc, char* argv[]) {
 #endif // HAVE_GETOPT_H
 
   // Load singletons.
-  clib::load();
-  engine::configuration::state::load();
-  engine::logging::engine::load();
-  engine::configuration::applier::logging::load();
-  engine::commands::set::load();
-  engine::checks::checker::load();
-  engine::events::loop::load();
-  engine::broker::loader::load();
-  engine::broker::compatibility::load();
+  com::centreon::clib::load();
+  com::centreon::engine::configuration::state::load();
+  com::centreon::engine::logging::engine::load();
+  com::centreon::engine::configuration::applier::logging::load();
+  com::centreon::engine::commands::set::load();
+  com::centreon::engine::checks::checker::load();
+  com::centreon::engine::events::loop::load();
+  com::centreon::engine::broker::loader::load();
+  com::centreon::engine::broker::compatibility::load();
 
   int retval(EXIT_FAILURE);
   try {
@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
       if (config_file[0] != '/') {
         // Get absolute path of current working directory.
         std::string
-          buffer(io::directory_entry::current_path());
+          buffer(com::centreon::io::directory_entry::current_path());
         buffer.append("/");
         buffer.append(config_file);
         delete[] config_file;
@@ -291,13 +291,13 @@ int main(int argc, char* argv[]) {
       // Read in the configuration files (main config file and all host config files).
       try {
         config->parse(config_file);
-        engine::configuration::applier::logging::instance().apply(*config);
-        engine::logging::engine::obj_info
+        configuration::applier::logging::instance().apply(*config);
+        logging::engine::obj_info
           obj(
-              shared_ptr<engine::logging::object>(new engine::logging::broker),
+            com::centreon::shared_ptr<logging::object>(new logging::broker),
             log_all,
             basic);
-        engine::logging::engine::instance().add_object(obj);
+        logging::engine::instance().add_object(obj);
 
         // Read object config files.
         result = read_all_object_data(config_file);
@@ -353,12 +353,12 @@ int main(int argc, char* argv[]) {
       // and resource config files).
       try {
         config->parse(config_file);
-        engine::configuration::applier::logging::instance().apply(*config);
-        engine::logging::engine::obj_info obj(
-                                            shared_ptr<engine::logging::object>(new engine::logging::broker),
-                                            log_all,
-                                            basic);
-        engine::logging::engine::instance().add_object(obj);
+        configuration::applier::logging::instance().apply(*config);
+        engine::obj_info obj(
+          com::centreon::shared_ptr<logging::object>(new logging::broker),
+          log_all,
+          basic);
+        logging::engine::instance().add_object(obj);
         result = OK;
       }
       catch (std::exception const &e) {
@@ -378,8 +378,8 @@ int main(int argc, char* argv[]) {
       neb_init_modules();
       neb_init_callback_list();
       try {
-        engine::broker::loader& loader(
-                                  engine::broker::loader::instance());
+        com::centreon::engine::broker::loader& loader(
+          com::centreon::engine::broker::loader::instance());
         std::string const& mod_dir(config->get_broker_module_directory());
         if (!mod_dir.empty())
           loader.load_directory(mod_dir);
@@ -512,8 +512,7 @@ int main(int argc, char* argv[]) {
 
       /***** Start monitoring all services. *****/
       // (doesn't return until a restart or shutdown signal is encountered).
-      engine::events::loop& loop(engine::events::loop::instance());
-      loop.run();
+      com::centreon::engine::events::loop::instance().run();
 
       /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
       // Did we catch a signal ?
@@ -592,15 +591,15 @@ int main(int argc, char* argv[]) {
       << "error: " << e.what();
   }
 
-  engine::events::loop::unload();
-  engine::commands::set::unload();
-  engine::checks::checker::unload();
-  engine::broker::compatibility::unload();
-  engine::broker::loader::unload();
-  engine::configuration::applier::logging::unload();
-  engine::configuration::state::unload();
-  engine::logging::engine::unload();
-  clib::unload();
+  com::centreon::engine::events::loop::unload();
+  com::centreon::engine::commands::set::unload();
+  com::centreon::engine::checks::checker::unload();
+  com::centreon::engine::broker::compatibility::unload();
+  com::centreon::engine::broker::loader::unload();
+  com::centreon::engine::configuration::applier::logging::unload();
+  com::centreon::engine::configuration::state::unload();
+  com::centreon::engine::logging::engine::unload();
+  com::centreon::clib::unload();
 
   return (retval);
 }
