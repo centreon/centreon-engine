@@ -592,11 +592,11 @@ int main(int argc, char* argv[]) {
       << "error: " << e.what();
   }
 
-  engine::broker::compatibility::unload();
-  engine::broker::loader::unload();
   engine::events::loop::unload();
   engine::commands::set::unload();
   engine::checks::checker::unload();
+  engine::broker::compatibility::unload();
+  engine::broker::loader::unload();
   engine::configuration::applier::logging::unload();
   engine::configuration::state::unload();
   engine::logging::engine::unload();

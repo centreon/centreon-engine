@@ -124,7 +124,7 @@ void loop::_dispatching() {
 
     // If we don't have any events to handle, exit.
     if (!event_list_high && !event_list_low) {
-      logger(dbg_events, basic)
+      logger(log_runtime_error, basic)
         << "There aren't any events that need to be handled! "
         << "Exiting...";
       quit = true;
