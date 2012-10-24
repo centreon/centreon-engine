@@ -1495,7 +1495,6 @@ void setup_sighandler() {
 
   /* initialize signal handling */
   signal(SIGPIPE, SIG_IGN);
-  signal(SIGQUIT, sighandler);
   signal(SIGTERM, sighandler);
   signal(SIGHUP, sighandler);
   return;
@@ -1504,7 +1503,6 @@ void setup_sighandler() {
 /* reset signal handling... */
 void reset_sighandler() {
   /* set signal handling to default actions */
-  signal(SIGQUIT, SIG_DFL);
   signal(SIGTERM, SIG_DFL);
   signal(SIGHUP, SIG_DFL);
   signal(SIGPIPE, SIG_DFL);
@@ -1528,7 +1526,7 @@ void sighandler(int sig) {
   if (sig == SIGHUP)
     sighup = true;
   /* else begin shutting down... */
-  else if (sig < 16)
+  else
     sigshutdown = true;
   return;
 }

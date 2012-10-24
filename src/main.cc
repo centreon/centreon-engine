@@ -521,7 +521,7 @@ int main(int argc, char* argv[]) {
 
         /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
         // Did we catch a signal ?
-        if (sigshutdown == TRUE) {
+        if (sigshutdown == true) {
           try {
             std::ostringstream oss;
             oss << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
@@ -594,16 +594,23 @@ int main(int argc, char* argv[]) {
   // Memory cleanup.
   cleanup();
   delete[] config_file;
+  config_file = NULL;
   delete[] mac->x[MACRO_OBJECTCACHEFILE];
+  mac->x[MACRO_OBJECTCACHEFILE] = NULL;
   delete[] mac->x[MACRO_PROCESSSTARTTIME];
+  mac->x[MACRO_PROCESSSTARTTIME] = NULL;
   delete[] mac->x[MACRO_EVENTSTARTTIME];
+  mac->x[MACRO_EVENTSTARTTIME] = NULL;
   delete[] mac->x[MACRO_RETENTIONDATAFILE];
+  mac->x[MACRO_RETENTIONDATAFILE] = NULL;
   delete[] mac->x[MACRO_STATUSDATAFILE];
+  mac->x[MACRO_STATUSDATAFILE] = NULL;
+
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::events::loop::unload();
-  com::centreon::engine::checks::checker::unload();
   com::centreon::engine::commands::set::unload();
+  com::centreon::engine::checks::checker::unload();
   com::centreon::engine::configuration::applier::logging::unload();
   com::centreon::engine::configuration::state::unload();
   com::centreon::engine::logging::engine::unload();
