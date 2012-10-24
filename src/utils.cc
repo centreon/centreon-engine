@@ -1486,7 +1486,7 @@ time_t calculate_time_from_weekday_of_month(
 /* trap signals so we can exit gracefully */
 void setup_sighandler() {
   /* reset the shutdown flag */
-  sigshutdown = FALSE;
+  sigshutdown = false;
 
   /* remove buffering from stderr, stdin, and stdout */
   setbuf(stdin, (char*)NULL);
@@ -2088,7 +2088,7 @@ void cleanup() {
     neb_free_callback_list();
     neb_unload_all_modules(
       NEBMODULE_FORCE_UNLOAD,
-      (TRUE == sigshutdown)
+      (true == sigshutdown)
       ? NEBMODULE_NEB_SHUTDOWN
       : NEBMODULE_NEB_RESTART);
     neb_free_module_list();
@@ -2097,13 +2097,6 @@ void cleanup() {
 
   // Free all allocated memory - including macros.
   free_memory(get_global_macros());
-
-  // Unload singletons.
-  broker::compatibility::unload();
-  broker::loader::unload();
-  events::loop::unload();
-  checks::checker::unload();
-  commands::set::unload();
   return;
 }
 
