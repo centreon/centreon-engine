@@ -19,7 +19,7 @@ Enabling External Commands
 ==========================
 
 In order to have Centreon Engine process external commands, make sure
-you do the following::
+you do the following:
 
   * enable external command checking with the
     :ref:`check_external_commands <main_cfg_opt_external_command_check>`

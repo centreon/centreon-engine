@@ -151,19 +151,22 @@ Optimization Tips
     where the buffers are always full. This results in child processes
     (external scripts, NSCA daemon, etc.) blocking when they attempt to
     write to the external command file.
-  * Optimize hardware for maximum performance. NOTE: Hardware
-    performance shouldn't be an issue unless: 1) you're monitoring
-    thousands of services, 2) you're doing a lot of post-processing of
-    performance data, etc. Your system configuration and your hardware
-    setup are going to directly affect how your operating system
-    performs, so they'll affect how Centreon Engine performs. The most
-    common hardware optimization you can make is with your hard
-    drives. CPU and memory speed are obviously factors that affect
-    performance, but disk access is going to be your biggest
-    bottleneck. Don't store plugins, the status log, etc on slow drives
-    (i.e. old IDE drives or NFS mounts). If you've got them, use
-    UltraSCSI drives or fast IDE drives. An important note for IDE/Linux
-    users is that many Linux installations do not attempt to optimize
-    disk access. If you don't change the disk access parameters (by
-    using a utility like hdparam), you'll loose out on a lot of the
-    speedy features of the new IDE drives.
+  * Optimize hardware for maximum performance.
+
+    .. note::
+       Hardware performance shouldn't be an issue unless: 1) you're
+       monitoring thousands of services, 2) you're doing a lot of
+       post-processing of performance data, etc. Your system
+       configuration and your hardware setup are going to directly
+       affect how your operating system performs, so they'll affect how
+       Centreon Engine performs. The most common hardware optimization
+       you can make is with your hard drives. CPU and memory speed are
+       obviously factors that affect performance, but disk access is
+       going to be your biggest bottleneck. Don't store plugins, the
+       status log, etc on slow drives (i.e. old IDE drives or NFS
+       mounts). If you've got them, use UltraSCSI drives or fast IDE
+       drives. An important note for IDE/Linux users is that many Linux
+       installations do not attempt to optimize disk access. If you
+       don't change the disk access parameters (by using a utility like
+       hdparam), you'll loose out on a lot of the speedy features of the
+       new IDE drives.

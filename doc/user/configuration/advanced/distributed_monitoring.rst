@@ -217,7 +217,7 @@ Central Server Configuration
 We've looked at how distributed monitoring servers should be configured,
 so let's turn to the central server. For all intensive purposes, the
 central is configured as you would normally configure a standalone
-server. It is setup as follows::
+server. It is setup as follows:
 
   * The central server has the web interface installed (optional, but
     recommended)

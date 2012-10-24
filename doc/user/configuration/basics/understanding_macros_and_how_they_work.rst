@@ -81,7 +81,7 @@ check_ping command defined like this::
   }
 
 The expanded/final command line to be executed for the service's check
-command would look like this:
+command would look like this::
 
   $ /usr/lib/nagios/plugins/check_ping -H 192.168.1.2 -w 200.0,80% -c 400.0,40%
 
