@@ -21,7 +21,6 @@
 #  define CCE_MODULES_LOADER_HH
 
 #  include <list>
-#  include <map>
 #  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -43,7 +42,7 @@ namespace                  broker {
                              std::string const& args = "");
     void                   del_module(
                              shared_ptr<handle> const& mod);
-    std::list<shared_ptr<handle> >
+    std::list<shared_ptr<handle> > const&
                            get_modules() const;
     static loader&         instance();
     static void            load();
@@ -58,7 +57,7 @@ namespace                  broker {
     loader&                operator=(loader const& right);
     void                   _internal_copy(loader const& right);
 
-    std::multimap<std::string, shared_ptr<handle> >
+    std::list<shared_ptr<handle> >
                            _modules;
   };
 }

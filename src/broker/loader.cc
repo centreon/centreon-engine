@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <map>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -52,7 +53,8 @@ shared_ptr<broker::handle> loader::add_module(
                                      std::string const& filename,
                                      std::string const& args) {
   shared_ptr<handle> module(new handle(filename, args));
-  return (_modules.insert(std::make_pair(filename, module))->second);
+  _modules.push_back(module);
+  return (module);
 }
 
 /**
@@ -61,11 +63,11 @@ shared_ptr<broker::handle> loader::add_module(
  *  @param[in] mod Module to remove.
  */
 void loader::del_module(shared_ptr<handle> const& module) {
-  for (std::multimap<std::string, shared_ptr<handle> >::iterator
-         it(_modules.find(module->get_name())), end(_modules.end());
+  for (std::list<shared_ptr<handle> >::iterator
+         it(_modules.begin()), end(_modules.end());
        it != end;
        ++it)
-    if (it->second.get() == module.get()) {
+    if (it->get() == module.get()) {
       _modules.erase(it);
       break;
     }
@@ -77,14 +79,8 @@ void loader::del_module(shared_ptr<handle> const& module) {
  *
  *  @return All modules in a list.
  */
-std::list<shared_ptr<broker::handle> > loader::get_modules() const {
-  std::list<shared_ptr<handle> > lst;
-  for (std::multimap<std::string, shared_ptr<handle> >::const_iterator
-         it(_modules.begin()), end(_modules.end());
-       it != end;
-       ++it)
-    lst.push_back(it->second);
-  return (lst);
+std::list<shared_ptr<broker::handle> > const& loader::get_modules() const {
+  return (_modules);
 }
 
 /**
@@ -117,21 +113,31 @@ unsigned int loader::load_directory(std::string const& dir) {
   io::directory_entry directory(dir);
   std::list<io::file_entry> const& files(directory.entry_list("*.so"));
 
-  // Load modules.
-  unsigned int loaded(0);
+  // Sort by file name.
+  std::multimap<std::string, io::file_entry> sort_files;
   for (std::list<io::file_entry>::const_iterator
          it(files.begin()), end(files.end());
        it != end;
+       ++it)
+    sort_files.insert(std::make_pair(it->file_name(), *it));
+
+
+  // Load modules.
+  unsigned int loaded(0);
+  for (std::multimap<std::string, io::file_entry>::const_iterator
+         it(sort_files.begin()), end(sort_files.end());
+       it != end;
        ++it) {
-    std::string config_file(dir + "/" + it->base_name() + ".cfg");
+    io::file_entry const& f(it->second);
+    std::string config_file(dir + "/" + f.base_name() + ".cfg");
     if (io::file_stream::exists(config_file.c_str()) == false)
       config_file = "";
     shared_ptr<handle> module;
     try {
-      module = add_module(dir + "/" + it->file_name(), config_file);
+      module = add_module(dir + "/" + f.file_name(), config_file);
       module->open();
       logger(log_info_message, basic)
-        << "Event broker module '" << it->file_name()
+        << "Event broker module '" << f.file_name()
         << "' initialized successfully.";
       ++loaded;
     }
@@ -139,7 +145,7 @@ unsigned int loader::load_directory(std::string const& dir) {
       del_module(module);
       logger(log_runtime_error, basic)
         << "Error: Could not load module '"
-        << it->file_name() << "' -> " << e.what();
+        << f.file_name() << "' -> " << e.what();
     }
   }
   return (loaded);
@@ -158,16 +164,16 @@ void loader::unload() {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (std::multimap<std::string, shared_ptr<handle> >::iterator
+  for (std::list<shared_ptr<handle> >::iterator
          it(_modules.begin()), end(_modules.end());
        it != end;
        ++it) {
     try {
-      it->second->close();
+      (*it)->close();
     }
     catch (...) {}
     logger(dbg_eventbroker, basic)
-      << "Module '" << it->second->get_filename()
+      << "Module '" << (*it)->get_filename()
       << "' unloaded successfully.";
   }
   _modules.clear();
