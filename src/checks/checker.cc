@@ -230,7 +230,7 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (engine_error() << "check host viability failure");
+    return;
 
   // Don't execute a new host check if one is already running.
   if (hst->is_executing
@@ -462,7 +462,7 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (engine_error() << "check service viability failure.");
+    return;
 
   // Send broker event.
   timeval start_time;
