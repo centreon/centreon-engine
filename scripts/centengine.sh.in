@@ -28,6 +28,7 @@ pid_file=@PID_FILE@
 user=@USER@
 group=@GROUP@
 timeout=300
+debug=0
 
 servicename=$(basename "$0")
 command="$1"
@@ -66,8 +67,7 @@ if [ ! -x $binary ]; then
     fi
 fi
 
-check_configuration()
-{
+check_configuration() {
 # Check if we can find the configuration file.
     if [ ! -r $config_file ]; then
 	log_failure_msg "$servicename: configuration file $config_file not found: $command request failed"
@@ -81,8 +81,7 @@ check_configuration()
     fi
 }
 
-service_start()
-{
+service_start() {
     if [ -f $pid_file ] && [ ! -d "/proc/$(cat $pid_file)" ]; then
 	rm -f $pid_file > /dev/null 2>&1
     fi
@@ -92,21 +91,30 @@ service_start()
 
 	su - $user -c "touch $var_dir/centengine.log $retention_file"
 
-	su - $user -c "$binary $config_file > /dev/null  2>&1 &"
+	if [ $debug -eq 1 ]; then
+	    echo "/tmp/%e.core.%t.%u.%p" > /proc/sys/kernel/core_pattern
+	    su - $user -c "ulimit -c unlimited; $binary $config_file >> $var_dir/init.debug 2>&1 &"
+	else
+	    su - $user -c "$binary $config_file > /dev/null  2>&1 &"
+	fi
+
 	sleep 2
-	pid=$(pidofproc $binary)
-	if [ $? -ne 0 ]; then
+        pid=$(pidofproc $binary)
+        if [ $? -ne 0 ]; then
 	    log_failure_msg "$servicename $command: failed."
     	    exit 1
 	fi
 	echo $pid > $pid_file
-
         touch $lock_file;
+
+	if [ $debug -eq 1 ]; then
+	    su - $user -c "echo pid=$pid >> $var_dir/init.debug"
+	    # strace -fF -p $pid 2>&1 >> "$var_dir/init.debug" &
+	fi
     fi
 }
 
-service_stop()
-{
+service_stop() {
     pid=$(pidofproc $binary)
     if [ $? -eq 0 ]; then
 	kill $pid
@@ -128,8 +136,7 @@ service_stop()
     rm -f $lock_file $command_file $pid_file
 }
 
-service_reload()
-{
+service_reload() {
     check_configuration
     pid=$(pidofproc $binary)
     if [ $? -ne 0 ]; then
@@ -139,8 +146,7 @@ service_reload()
     kill -HUP $pid
 }
 
-service_force_reload()
-{
+service_force_reload() {
     check_configuration
     pid=$(pidofproc $binary)
     if [ $? -ne 0 ]; then
@@ -150,8 +156,7 @@ service_force_reload()
     fi
 }
 
-service_status()
-{
+service_status() {
     pidofproc $binary > /dev/null 2>&1
     if [ $? -eq 0 ]; then
     	log_success_msg "$servicename $command: running"
