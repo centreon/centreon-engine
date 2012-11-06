@@ -400,7 +400,7 @@ void connector::_connector_close() {
     // Ask connector to quit properly.
     _send_query_quit();
 
-    // Waiting connector quit, or 1 seconds.
+    // Waiting connector quit.
     bool is_timeout(!_cv_query.wait(
                        &_lock,
                        config->get_service_check_timeout() * 1000));
