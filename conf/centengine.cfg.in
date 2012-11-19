@@ -184,25 +184,6 @@ event_broker_options=-1
 #broker_module=/somewhere/module2.o arg1 arg2=3 debug=0
 
 
-# var:    log_rotation_method
-# brief:  This is the log rotation method that Centreon Engine should use to
-#         rotate the main log file.
-# values: n = None - don't rotate the log.
-#         h = Hourly rotation (top of the hour).
-#         d = Daily rotation (midnight every day).
-#         w = Weekly rotation (midnight on Saturday evening).
-#         m = Monthly rotation (midnight last day of month).
-
-log_rotation_method=d
-
-
-# var: log_archive_path
-# brief:  This is the directory where archived (rotated) log files should be
-#         placed (assuming you've chosen to do log rotation).
-
-log_archive_path=@LOG_ARCHIVE_DIR@
-
-
 # var:    use_syslog
 # brief:  If you want messages logged to the syslog facility, as well as the
 #         Centreon Engine log file, enable this option.
@@ -583,15 +564,11 @@ use_retained_scheduling_info=1
 # This mask determines what host attributes are not retained
 retained_host_attribute_mask=0
 
-# This mask determines what service attributes are not retained
-retained_service_attribute_mask=0
-
 # These two masks determine what process attributes are not retained. There are
 # two masks, because some process attributes have host and service options. For
 # example, you can disable active host checks, but leave active service checks
 # enabled.
 retained_process_host_attribute_mask=0
-retained_process_service_attribute_mask=0
 
 # These two masks determine what contact attributes are not retained. There are
 # two masks, because some contact attributes have host and service options. For
