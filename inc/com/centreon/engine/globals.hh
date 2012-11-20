@@ -245,7 +245,6 @@ extern float low_host_flap_threshold;
 extern float high_host_flap_threshold;
 extern unsigned int date_format;
 extern char* use_timezone;
-extern char* p1_file;
 extern unsigned long event_broker_options;
 extern char* illegal_object_chars;
 extern char* illegal_output_chars;

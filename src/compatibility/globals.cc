@@ -22,14 +22,14 @@
 #include "globals.h"
 
 // Log rotation.
-char* log_archive_path(NULL);
+char const* log_archive_path("");
 unsigned int log_rotation_method(0);
 
 // Features now handled by startup script.
 int daemon_dumps_core(0);
-char* lock_file(NULL);
-char* nagios_user(NULL);
-char* nagios_group(NULL);
+char const* lock_file("");
+char const* nagios_user("");
+char const* nagios_group("");
 
 // Process options.
 int nagios_pid(0);
@@ -40,8 +40,8 @@ int bare_update_checks(0);
 int check_for_updates(0);
 int update_available(0);
 unsigned long update_uid(0);
-char* last_program_version(NULL);
-char* new_program_version(NULL);
+char const* last_program_version("");
+char const* new_program_version("");
 
 // Retention flags.
 unsigned long retained_process_service_attribute_mask(0);
@@ -60,5 +60,5 @@ unsigned int use_embedded_perl_implicitly(false);
 
 // Old path.
 char const* check_result_path("/tmp");
-char const* p1_file(NULL);
+char const* p1_file("");
 char const* temp_path("/tmp");

@@ -24,14 +24,14 @@
 #  include "com/centreon/engine/circular_buffer.hh"
 
 // Log rotation.
-extern char* log_archive_path;
+extern char const* log_archive_path;
 extern unsigned int log_rotation_method;
 
 // Features now handled by startup script.
 extern int daemon_dumps_core;
-extern char* lock_file;
-extern char* nagios_user;
-extern char* nagios_group;
+extern char const* lock_file;
+extern char const* nagios_user;
+extern char const* nagios_group;
 
 // Process options.
 extern int nagios_pid;
@@ -42,8 +42,8 @@ extern int bare_update_checks;
 extern int check_for_updates;
 extern int update_available;
 extern unsigned long update_uid;
-extern char* last_program_version;
-extern char* new_program_version;
+extern char const* last_program_version;
+extern char const* new_program_version;
 
 // Retention flags.
 extern unsigned long retained_process_service_attribute_mask;
@@ -62,6 +62,7 @@ extern unsigned int use_embedded_perl_implicitly;
 
 // Old path.
 extern char const* check_result_path;
+extern char const* p1_file;
 extern char const* temp_path;
 
 #endif // !CCE_COMPATIBILITY_GLOBALS_H
