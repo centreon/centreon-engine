@@ -83,7 +83,6 @@ if (WITH_CENTREON_CLIB_INCLUDE_DIR)
   endif ()
   include_directories("${WITH_CENTREON_CLIB_INCLUDE_DIR}")
   set(CLIB_INCLUDE_DIR "${WITH_CENTREON_CLIB_INCLUDE_DIR}")
-  message(STATUS "1: ${CLIB_INCLUDE_DIR}")
 elseif (CLIB_FOUND) # Was Centreon Clib detected with pkg-config ?
   if (CMAKE_CXX_FLAGS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLIB_CFLAGS}")

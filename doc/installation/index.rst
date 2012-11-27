@@ -77,7 +77,7 @@ On all systems the commands to create a user and a group both named
 **centreon-engine** are as follow (need to run these as root)::
 
   $ groupadd centreon-engine
-  $ useradd -g centreon-engine -m -r -d /var/lib/centreon-engine -s /bin/false centreon-engine
+  $ useradd -g centreon-engine -m -r -d /var/lib/centreon-engine centreon-engine
 
 Please note that these user and group will be used in the next steps. If
 you decide to change user and/or group name here, please do so in
