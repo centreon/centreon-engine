@@ -176,7 +176,7 @@ Optional packages was need for use web service module:
 =========================== =================== ================================
 Software                    Package Name        Description
 =========================== =================== ================================
-gSOAP **(>= 2.7)**          gsoap-dev           SOAP Web Services and XML-Based
+gSOAP **(>= 2.7)**          gsoap               SOAP Web Services and XML-Based
                                                 Applications.
 Zlib                        zlib1g-dev          Used for data compression.
 SSL                         libssl-dev          Implementing SSL and TLS
@@ -381,10 +381,10 @@ File                                             Description
 ``${WITH_PREFIX_BIN}/centenginestats``           Centreon Engine statistic.
 ``${WITH_PREFIX_BIN}/centenginews``              Centreon Engine Web Service command line.
 ``${WITH_PREFIX_CONF}/``                         Centreon Engine sample configuration.
-``${WITH_PREFIX_LIB}/libexternalcmd.so``         External commands module.
-``${WITH_PREFIX_LIB}/libwebservice.so``          Webservice module.
-``${WITH_SCRIPT_DIR}/centengine.conf``           Startup script for ubuntu.
-``${WITH_SCRIPT_DIR}/centengine``                Startup script for other os.
-``${WITH_INCLUDE_DIR}/include/centreon-engine/`` All devel Centreon Engine's include.
+``${WITH_PREFIX_LIB}/externalcmd.so``            External commands module.
+``${WITH_PREFIX_LIB}/webservice.so``             Webservice module.
+``${WITH_STARTUP_DIR}/centengine.conf``          Startup script for ubuntu.
+``${WITH_STARTUP_DIR}/centengine``               Startup script for other os.
+``${WITH_PREFIX_INC}/include/centreon-engine/``  All devel Centreon Engine's include.
 ``${WITH_PKGCONFIG_DIR}/centengine.pc``          Centreon Engine pkg-config file.
 ================================================ =========================================
