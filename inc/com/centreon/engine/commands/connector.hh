@@ -68,7 +68,6 @@ namespace                commands {
     public:
                          restart(connector* c);
                          ~restart() throw ();
-      void               clear();
 
     private:
                          restart(restart const& right);
