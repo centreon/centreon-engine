@@ -244,9 +244,12 @@ static void _exec_event_user_function(timed_event* event) {
 
   /* run a user-defined function */
   if (event->event_data != NULL) {
-    void (*userfunc)(void*);
-    *(void**)(&userfunc) = event->event_data;
-    (*userfunc)(event->event_args);
+    union {
+      void (*func)(void*);
+      void* data;
+    } user;
+    user.data = event->event_data;
+    (*user.func)(event->event_args);
   }
   return;
 }
@@ -1258,9 +1261,6 @@ void reschedule_event(
        timed_event* event,
        timed_event** event_list,
        timed_event** event_list_tail) {
-  time_t current_time = 0L;
-  time_t (*timingfunc)(void);
-
   logger(dbg_functions, basic)
     << "reschedule_event()";
 
@@ -1269,12 +1269,17 @@ void reschedule_event(
 
     /* use custom timing function */
     if (event->timing_func != NULL) {
-      *(void**)(&timingfunc) = event->timing_func;
-      event->run_time = (*timingfunc) ();
+      union {
+        time_t (*func)(void);
+        void* data;
+      } timing;
+      timing.data = event->timing_func;
+      event->run_time = (*timing.func)();
     }
 
     /* normal recurring events */
     else {
+      time_t current_time(0L);
       event->run_time = event->run_time + event->event_interval;
       time(&current_time);
       if (event->run_time < current_time)
@@ -1675,7 +1680,6 @@ void compensate_for_system_time_change(
   int hours = 0;
   int minutes = 0;
   int seconds = 0;
-  time_t (*timingfunc)(void);
 
   logger(dbg_functions, basic)
     << "compensate_for_system_time_change()";
@@ -1725,8 +1729,12 @@ void compensate_for_system_time_change(
 
     /* use custom timing function */
     if (temp_event->timing_func != NULL) {
-      *(void**)(&timingfunc) = temp_event->timing_func;
-      temp_event->run_time = (*timingfunc)();
+      union {
+        time_t (*func)(void);
+        void* data;
+      } timing;
+      timing.data = temp_event->timing_func;
+      temp_event->run_time = (*timing.func)();
     }
 
     /* else use standard adjustment */
@@ -1752,8 +1760,12 @@ void compensate_for_system_time_change(
 
     /* use custom timing function */
     if (temp_event->timing_func != NULL) {
-      *(void**)(&timingfunc) = temp_event->timing_func;
-      temp_event->run_time = (*timingfunc) ();
+      union {
+        time_t (*func)(void);
+        void* data;
+      } timing;
+      timing.data = temp_event->timing_func;
+      temp_event->run_time = (*timing.func)();
     }
 
     /* else use standard adjustment */

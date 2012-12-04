@@ -408,15 +408,12 @@ int handle_async_service_check_result(
     }
 
     logger(dbg_checks, most)
-      << "Parsing check output...";
-    logger(dbg_checks, most)
-      << "Short Output: "
-      << (temp_service->plugin_output == NULL ? "NULL" : temp_service->plugin_output);
-    logger(dbg_checks, most)
-      << "Long Output:  "
-      << (temp_service->long_plugin_output ==  NULL ? "NULL" : temp_service->long_plugin_output);
-    logger(dbg_checks, most)
-      << "Perf Data:    "
+      << "Parsing check output...\n"
+      << "Short Output:\n"
+      << (temp_service->plugin_output == NULL ? "NULL" : temp_service->plugin_output) << "\n"
+      << "Long Output:\n"
+      << (temp_service->long_plugin_output ==  NULL ? "NULL" : temp_service->long_plugin_output) << "\n"
+      << "Perf Data:\n"
       << (temp_service->perf_data == NULL ? "NULL" : temp_service->perf_data);
 
     /* grab the return code */
@@ -2187,7 +2184,7 @@ int is_host_result_fresh(
       << "Check results for host '" << temp_host->name
       << "' are stale by " << days << "d " << hours << "h " << minutes
       << "m " << seconds << "s (threshold=" << tdays << "d " << thours
-      << "h " << tminutes << "m " << tseconds << "s).  " \
+      << "h " << tminutes << "m " << tseconds << "s).  "
       "Forcing an immediate check of the host...";
 
     return (FALSE);
@@ -2430,28 +2427,20 @@ int handle_async_host_check_result_3x(
 
   logger(dbg_checks, most)
     << "\tCheck Type:         "
-    << (queued_check_result->check_type == HOST_CHECK_ACTIVE ? "Active" : "Passive");
-  logger(dbg_checks, most)
+    << (queued_check_result->check_type == HOST_CHECK_ACTIVE ? "Active" : "Passive") << "\n"
     << "\tCheck Options:      "
-    << queued_check_result->check_options;
-  logger(dbg_checks, most)
+    << queued_check_result->check_options << "\n"
     << "\tScheduled Check?:   "
-    << (queued_check_result->scheduled_check == true ? "Yes" : "No");
-  logger(dbg_checks, most)
+    << (queued_check_result->scheduled_check == true ? "Yes" : "No") << "\n"
     << "\tReschedule Check?:  "
-    << (queued_check_result->reschedule_check == true ? "Yes" : "No");
-  logger(dbg_checks, most)
+    << (queued_check_result->reschedule_check == true ? "Yes" : "No") << "\n"
     << "\tExited OK?:         "
-    << (queued_check_result->exited_ok == true ? "Yes" : "No");
-  logger(dbg_checks, most)
+    << (queued_check_result->exited_ok == true ? "Yes" : "No") << "\n"
     << fixed << setprecision(3)
-    << "\tExec Time:          " << execution_time;
-  logger(dbg_checks, most)
+    << "\tExec Time:          " << execution_time << "\n"
     << fixed << setprecision(3)
-    << "\tLatency:            " << queued_check_result->latency;
-  logger(dbg_checks, most)
-    << "\treturn Status:      " << queued_check_result->return_code;
-  logger(dbg_checks, most)
+    << "\tLatency:            " << queued_check_result->latency << "\n"
+    << "\treturn Status:      " << queued_check_result->return_code << "\n"
     << "\tOutput:             " << queued_check_result->output;
 
   /* decrement the number of host checks still out there... */
@@ -2569,15 +2558,12 @@ int handle_async_host_check_result_3x(
   }
 
   logger(dbg_checks, most)
-    << "Parsing check output...";
-  logger(dbg_checks, most)
-    << "Short Output: "
-    << (temp_host->plugin_output == NULL ? "NULL" : temp_host->plugin_output);
-  logger(dbg_checks, most)
-    << "Long Output:  "
-    << (temp_host->long_plugin_output == NULL ? "NULL" : temp_host->long_plugin_output);
-  logger(dbg_checks, most)
-    << "Perf Data:    "
+    << "Parsing check output...\n"
+    << "Short Output:\n"
+    << (temp_host->plugin_output == NULL ? "NULL" : temp_host->plugin_output) << "\n"
+    << "Long Output:\n"
+    << (temp_host->long_plugin_output == NULL ? "NULL" : temp_host->long_plugin_output) << "\n"
+    << "Perf Data:\n"
     << (temp_host->perf_data == NULL ? "NULL" : temp_host->perf_data);
 
   /* get the unprocessed return code */

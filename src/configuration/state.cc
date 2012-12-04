@@ -2879,7 +2879,7 @@ void state::_set_retained_process_service_attribute_mask(std::string const& valu
 void state::_set_aggregate_status_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: aggregate_status_updates directive ignored: all" \
+    << "warning: aggregate_status_updates directive ignored: all"
        " status file updates are now aggregated";
   return;
 }

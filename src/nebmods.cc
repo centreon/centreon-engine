@@ -305,12 +305,18 @@ int neb_register_callback(
     return (NEBERROR_CALLBACKBOUNDS);
   }
 
+  union {
+    int (*func)(int, void*);
+    void* data;
+  } callback;
+  callback.func = callback_func;
+
   /* allocate memory */
   new_callback = new nebcallback;
 
   new_callback->priority = priority;
   new_callback->module_handle = (void*)mod_handle;
-  new_callback->callback_func = *(void**)(&callback_func);
+  new_callback->callback_func = callback.data;
 
   /* add new function to callback list, sorted by priority (first come, first served for same priority) */
   new_callback->next = NULL;
@@ -355,10 +361,16 @@ int neb_deregister_module_callbacks(void* mod) {
          temp_callback != NULL;
          temp_callback = next_callback) {
       next_callback = temp_callback->next;
-      if ((void*)temp_callback->module_handle == (void*)mod)
+      if ((void*)temp_callback->module_handle == (void*)mod) {
+        union {
+          int (*func)(int, void*);
+          void* data;
+        } callback;
+        callback.data = temp_callback->callback_func;
         neb_deregister_callback(
           callback_type,
-          (int (*)(int, void*))temp_callback->callback_func);
+          callback.func);
+      }
     }
   }
   return (OK);
