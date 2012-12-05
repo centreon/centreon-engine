@@ -487,32 +487,6 @@ else ()
   set(GROUP "root")
 endif ()
 
-# logrotate directory.
-option(WITH_LOGROTATE_SCRIPT "Generate and install logrotate script." OFF)
-if (WITH_LOGROTATE_SCRIPT)
-  # Generate logrotate file.
-  message(STATUS "Generating logrorate file.")
-  configure_file(
-    "${SCRIPT_DIR}/logrotate.conf.in"
-    "${SCRIPT_DIR}/logrotate.conf"
-    @ONLY)
-
-  # logrotate file install directory.
-  if (WITH_LOGROTATE_DIR)
-    set(LOGROTATE_DIR "${WITH_LOGROTATE_DIR}")
-  else ()
-    set(LOGROTATE_DIR "/etc/logrotate.d")
-  endif ()
-
-  # Install rule.
-  install(
-    FILES "${SCRIPT_DIR}/logrotate.conf"
-    DESTINATION "${LOGROTATE_DIR}"
-    COMPONENT "runtime"
-    RENAME "centengine"
-  )
-endif ()
-
 # Check OS distributor.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   message(STATUS "Attempting to determine OS distributor.")
@@ -613,6 +587,39 @@ else ()
   # Default.
   message(STATUS "Invalid value for option WITH_STARTUP_SCRIPT (must be one of 'auto', 'sysv' or 'upstart').")
   set(STARTUP_SCRIPT "disabled")
+endif ()
+
+# logrotate directory.
+option(WITH_LOGROTATE_SCRIPT "Generate and install logrotate script." OFF)
+if (WITH_LOGROTATE_SCRIPT)
+  # Generate logrotate file.
+  message(STATUS "Generating logrorate file.")
+  if (WITH_STARTUP_SCRIPT STREQUAL "upstart")
+    configure_file(
+      "${SCRIPT_DIR}/logrotate_upstart.conf.in"
+      "${SCRIPT_DIR}/logrotate.conf"
+      @ONLY)
+  else ()
+    configure_file(
+      "${SCRIPT_DIR}/logrotate_sysv.conf.in"
+      "${SCRIPT_DIR}/logrotate.conf"
+      @ONLY)
+  endif ()
+
+  # logrotate file install directory.
+  if (WITH_LOGROTATE_DIR)
+    set(LOGROTATE_DIR "${WITH_LOGROTATE_DIR}")
+  else ()
+    set(LOGROTATE_DIR "/etc/logrotate.d")
+  endif ()
+
+  # Install rule.
+  install(
+    FILES "${SCRIPT_DIR}/logrotate.conf"
+    DESTINATION "${LOGROTATE_DIR}"
+    COMPONENT "runtime"
+    RENAME "centengine"
+    )
 endif ()
 
 # Unit test.
