@@ -443,7 +443,7 @@ if (WITH_PKGCONFIG_SCRIPT)
   if (WITH_PKGCONFIG_DIR)
     set(PKGCONFIG_DIR "${WITH_PKGCONFIG_DIR}")
   else ()
-    set(PKGCONFIG_DIR "${WITH_PREFIX_LIB}/pkgconfig")
+    set(PKGCONFIG_DIR "${PREFIX_LIB}/pkgconfig")
   endif ()
 
   # Install rule.
