@@ -1088,7 +1088,7 @@ int grab_macro_value_r(
 
   /* we already found the macro... */
   if (x < MACRO_X_COUNT)
-    x = x;
+    ;
   /***** ARGV MACROS *****/
   else if (strstr(macro_name, "ARG") == macro_name) {
     /* which arg do we want? */
