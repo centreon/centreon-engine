@@ -2075,6 +2075,29 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   return (OK);
 }
 
+/**
+ *  Set the close-on-exec flag on the file descriptor.
+ *
+ *  @param[in] fd The file descriptor to set close on exec.
+ *
+ *  @return True on succes, otherwise false.
+ */
+bool set_cloexec(int fd) {
+  int flags(0);
+  while ((flags = fcntl(fd, F_GETFD)) < 0) {
+    if (errno == EINTR)
+      continue;
+    return (false);
+  }
+  int ret(0);
+  while ((ret = fcntl(fd, F_SETFD, flags | FD_CLOEXEC)) < 0) {
+    if (errno == EINTR)
+      continue;
+    return (false);
+  }
+  return (true);
+}
+
 /******************************************************************/
 /*********************** CLEANUP FUNCTIONS ************************/
 /******************************************************************/

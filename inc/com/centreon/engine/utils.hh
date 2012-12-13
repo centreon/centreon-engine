@@ -127,6 +127,8 @@ int my_fcopy(char const* source, char const* dest);
 int dbuf_init(dbuf* db, int chunk_size);
 int dbuf_free(dbuf* db);
 int dbuf_strcat(dbuf* db, char const* buf);
+bool set_cloexec(int fd);
+
 
 // Cleanup Functions
 

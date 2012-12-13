@@ -156,6 +156,7 @@ int xsddefault_initialize_status_data(char* config_file) {
         << xsddefault_status_log << "': " << strerror(errno);
       return (ERROR);
     }
+    set_cloexec(xsddefault_status_log_fd);
   }
 
   return (OK);

@@ -154,6 +154,7 @@ int xrddefault_initialize_retention_data(char* config_file) {
         << xrddefault_retention_file << "': " << strerror(errno);
       return (ERROR);
     }
+    set_cloexec(xrddefault_retention_file_fd);
   }
 
   return (OK);
