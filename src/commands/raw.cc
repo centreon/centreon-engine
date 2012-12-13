@@ -296,6 +296,12 @@ void raw::finished(process& p) throw () {
     // Get process output.
     p.read(res.output);
 
+    // Release process, put into the free list.
+    {
+      concurrency::locker lock(&_lock);
+      _processes_free.push_back(&p);
+    }
+
     // Set result informations.
     res.command_id = command_id;
     res.start_time = p.start_time();
@@ -328,11 +334,11 @@ void raw::finished(process& p) throw () {
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
       << "error: process finish failed: " << e.what();
-  }
 
-  // Put the process into the free list.
-  concurrency::locker lock(&_lock);
-  _processes_free.push_back(&p);
+    // Release process, put into the free list.
+    concurrency::locker lock(&_lock);
+    _processes_free.push_back(&p);
+  }
   return;
 }
 
