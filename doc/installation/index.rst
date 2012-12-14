@@ -264,6 +264,12 @@ installed this is just a matter of::
 
   $ git clone http://git.centreon.com/centreon-engine
 
+Or You can get the latest Centreon Engine's sources from its
+`download website <http://www.centreon.com/Content-Download/download-centreon-engine-centreon>`_
+Once downloaded, extract it::
+
+  $ tar xzf centreon-engine.tar.gz
+
 Configuration
 -------------
 
