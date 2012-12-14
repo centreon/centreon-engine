@@ -134,7 +134,7 @@ xerces-c                    xerces-c-devel      Used for parsing XML
 
 #. Install Centreon Clib
 
-See the Centreon Clib `documentation <FIXME>`_.
+See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
 #. Install optional tools::
 
@@ -191,7 +191,7 @@ xerces-c                    libxerces-c-dev     Used for parsing XML
 
 #. Install Centreon Clib
 
-See the Centreon Clib `documentation <FIXME>`_.
+See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
 #. Install optional tools::
 
@@ -237,7 +237,7 @@ xerces-c                    libxerces-c-devel   Used for parsing XML
 
 #. Install Centreon Clib
 
-See the Centreon Clib `documentation <FIXME>`_.
+See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
 #. Install optional tools::
 
