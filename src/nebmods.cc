@@ -424,7 +424,6 @@ int neb_deregister_callback(
 int neb_make_callbacks(int callback_type, void* data) {
   nebcallback* temp_callback;
   nebcallback* next_callback;
-  int (*callbackfunc) (int, void*);
   int cbresult = 0;
   int total_callbacks = 0;
 
@@ -440,8 +439,14 @@ int neb_make_callbacks(int callback_type, void* data) {
        temp_callback != NULL;
        temp_callback = next_callback) {
     next_callback = temp_callback->next;
-    *(void**)(&callbackfunc) = temp_callback->callback_func;
-    cbresult = callbackfunc(callback_type, data);
+
+    union {
+      int (*func)(int, void*);
+      void* data;
+    } neb;
+    neb.data = temp_callback->callback_func;
+    cbresult = (*neb.func)(callback_type, data);
+
     temp_callback = next_callback;
 
     total_callbacks++;
