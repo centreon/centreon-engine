@@ -252,7 +252,6 @@ extern unsigned int use_regexp_matches;
 extern unsigned int use_true_regexp_matching;
 extern unsigned int use_large_installation_tweaks;
 extern unsigned int enable_environment_macros;
-extern unsigned int free_child_process_memory;
 extern int external_command_buffer_slots;
 /* auth_file; */
 

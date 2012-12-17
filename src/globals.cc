@@ -242,5 +242,4 @@ unsigned int use_regexp_matches;
 unsigned int use_true_regexp_matching;
 unsigned int use_large_installation_tweaks;
 unsigned int enable_environment_macros;
-unsigned int free_child_process_memory;
 int external_command_buffer_slots;

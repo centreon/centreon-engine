@@ -1255,23 +1255,37 @@ lot of benefit from doing so.
 **Example** use_large_installation_tweaks=0
 =========== ===================================
 
+.. _main_cfg_opt_use_setpgid:
+
+Use Setpgid
+-----------
+
+This option allow to change plugin process group into they own process
+group id. This option protect Centreon Engine process from child miss
+used or bug.
+
+For example, if we use nagios check_ping, check_dns, check_dig or
+check_rbl, don't disable this option, because, these checks can call
+kill -KILL 0 on timeout (this is a bug from these plugins) and kill the
+engine if the PGID is the same as the engine.
+
+For maximum performance, this option must be disable.
+
+  * 0 = Don't use setpgid
+  * 1 = Use setpgid (default)
+
+=========== =================
+**Format**  use_setpgid=<0/1>
+**Example** use_setpgid=1
+=========== =================
+
 Child Process Memory Option
 ---------------------------
 
-This option determines whether or not Centreon Engine will free memory
-in child processes when they are fork()ed off from the main process. By
-default, Centreon Engine frees memory. However, if the
-:ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
-option is enabled, it will not. By defining this option in your
-configuration file, you are able to override things to get the behavior
-you want.
-
-  * 0 = Don't free memory
-  * 1 = Free memory
+This is a deprecated and ignored variable.
 
 =========== ===============================
 **Format**  free_child_process_memory=<0/1>
-**Example** free_child_process_memory=0
 =========== ===============================
 
 Child Processes Fork Twice

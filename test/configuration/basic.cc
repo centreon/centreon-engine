@@ -216,7 +216,6 @@ static std::map<std::string, std::string> build_configuration(
   var["use_true_regexp_matching"] = obj2str(my_rand(0, 1));
   var["use_large_installation_tweaks"] = obj2str(my_rand(0, 1));
   var["enable_environment_macros"] = obj2str(my_rand(0, 1));
-  var["free_child_process_memory"] = obj2str(my_rand(0, 1));
   var["child_processes_fork_twice"] = obj2str(my_rand(0, 1));
   var["enable_embedded_perl"] = obj2str(my_rand(0, 1));
   var["use_embedded_perl_implicitly"] = obj2str(my_rand(0, 1));
@@ -496,9 +495,6 @@ void test_configuration(
   }
   if (my_conf["enable_environment_macros"] != obj2str(config->get_enable_environment_macros())) {
     throw (engine_error() << "enable_environment_macros: init with '" << my_conf["enable_environment_macros"] << "'");
-  }
-  if (my_conf["free_child_process_memory"] != obj2str(config->get_free_child_process_memory())) {
-    throw (engine_error() << "free_child_process_memory: init with '" << my_conf["free_child_process_memory"] << "'");
   }
   if (my_conf["external_command_buffer_slots"] != obj2str(config->get_external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");

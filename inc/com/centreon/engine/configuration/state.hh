@@ -176,7 +176,6 @@ namespace               configuration {
     bool                get_use_true_regexp_matching() const throw ();
     bool                get_use_large_installation_tweaks() const throw ();
     bool                get_enable_environment_macros() const throw ();
-    bool                get_free_child_process_memory() const throw ();
     bool                get_child_processes_fork_twice() const throw ();
     bool                get_allow_empty_hostgroup_assignment() const throw ();
     float               get_sleep_time() const throw ();
@@ -188,6 +187,7 @@ namespace               configuration {
     e_inter_check_delay get_service_inter_check_delay_method() const throw ();
     e_inter_check_delay get_host_inter_check_delay_method() const throw ();
     e_interleave_factor get_service_interleave_factor_method() const throw ();
+    bool                get_use_setpgid() const throw ();
 
     void                set_log_file(std::string const& value);
     void                set_broker_module_directory(std::string const& value);
@@ -300,6 +300,7 @@ namespace               configuration {
     void                set_host_inter_check_delay_method(std::string const& value);
     void                set_service_interleave_factor_method(e_interleave_factor value);
     void                set_service_interleave_factor_method(std::string const& value);
+    void                set_use_setpgid(bool value);
 
   private:
     /**
@@ -367,7 +368,6 @@ namespace               configuration {
       child_processes_fork_twice,
       command_check_interval,
       external_command_buffer_slots,
-      free_child_process_memory,
       perfdata_timeout,
       max_int
     };
@@ -449,6 +449,7 @@ namespace               configuration {
       use_retained_scheduling_info,
       use_syslog,
       use_true_regexp_matching,
+      use_setpgid,
       max_bool
     };
 
@@ -557,7 +558,6 @@ namespace               configuration {
     static const int                 DEFAULT_DEBUG_VERBOSITY                             = 1;
     static const int                 DEFAULT_COMMAND_CHECK_INTERVAL                      = -1;
     static const int                 DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS               = 4096;
-    static const int                 DEFAULT_FREE_CHILD_PROCESS_MEMORY                   = -1;
     static const int                 DEFAULT_CHILD_PROCESSES_FORK_TWICE                  = -1;
     static const unsigned int        DEFAULT_SERVICE_CHECK_SPREAD                        = 30;
     static const unsigned int        DEFAULT_HOST_CHECK_SPREAD                           = 30;
@@ -592,6 +592,7 @@ namespace               configuration {
     static const unsigned long       DEFAULT_CACHED_HOST_CHECK_HORIZON                   = 15;
     static const unsigned long       DEFAULT_CACHED_SERVICE_CHECK_HORIZON                = 15;
     static const unsigned long       DEFAULT_EVENT_BROKER_OPTIONS                        = static_cast<unsigned long>(-1);
+    static const bool                DEFAULT_USE_SETPGID                                 = true;
     static const bool                DEFAULT_USE_SYSLOG                                  = true;
     static const bool                DEFAULT_NOTIFICATION_LOGGING                        = true;
     static const bool                DEFAULT_LOG_SERVICE_RETRIES                         = false;
@@ -599,7 +600,7 @@ namespace               configuration {
     static const bool                DEFAULT_LOG_EVENT_HANDLERS                          = true;
     static const bool                DEFAULT_LOG_EXTERNAL_COMMANDS                       = true;
     static const bool                DEFAULT_LOG_PASSIVE_CHECKS                          = true;
-    static const bool                DEFAULT_LOG_INITIAL_STATE                          = false;
+    static const bool                DEFAULT_LOG_INITIAL_STATE                           = false;
     static const bool                DEFAULT_RETAIN_STATE_INFORMATION                    = false;
     static const bool                DEFAULT_USE_RETAINED_PROGRAM_STATE                  = true;
     static const bool                DEFAULT_USE_RETAINED_SCHEDULING_INFO                = false;

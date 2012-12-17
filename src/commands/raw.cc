@@ -600,6 +600,7 @@ process* raw::_get_free_process() {
   if (_processes_free.empty()) {
     process* p(new process(this));
     p->enable_stream(process::err, false);
+    p->setpgid_on_exec(config->get_use_setpgid());
     return (p);
   }
   // Get a free process.

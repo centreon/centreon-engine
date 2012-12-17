@@ -27,6 +27,9 @@
 extern char const* log_archive_path;
 extern unsigned int log_rotation_method;
 
+// Free memory option.
+extern unsigned int free_child_process_memory;
+
 // Features now handled by startup script.
 extern int daemon_dumps_core;
 extern char const* lock_file;

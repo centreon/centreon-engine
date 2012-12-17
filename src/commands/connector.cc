@@ -57,6 +57,8 @@ connector::connector(
     _try_to_restart(true) {
   // Disable stderr.
   _process.enable_stream(process::err, false);
+  // Set use setpgid.
+  _process.setpgid_on_exec(config->get_use_setpgid());
 
   if (config->get_enable_environment_macros())
     logger(log_runtime_warning, basic)

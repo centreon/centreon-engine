@@ -25,6 +25,9 @@
 char const* log_archive_path("");
 unsigned int log_rotation_method(0);
 
+// Free memory option.
+unsigned int free_child_process_memory(-1);
+
 // Features now handled by startup script.
 int daemon_dumps_core(0);
 char const* lock_file("");

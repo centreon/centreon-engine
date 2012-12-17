@@ -151,6 +151,9 @@ Optimization Tips
     where the buffers are always full. This results in child processes
     (external scripts, NSCA daemon, etc.) blocking when they attempt to
     write to the external command file.
+  * Disable use setpgid. When you enable setpgid, we force Centreon
+    Engine to use low performance create process. See
+    :ref:`this <main_cfg_opt_use_setpgid>` documentation.
   * Optimize hardware for maximum performance.
 
     .. note::
