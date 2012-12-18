@@ -190,8 +190,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.get_execute_service_checks() << std::endl
     << "external_command_buffer_slots="
     << obj.get_external_command_buffer_slots() << std::endl
-    << "free_child_process_memory="
-    << obj.get_free_child_process_memory() << std::endl
     << "global_host_event_handler="
     << obj.get_global_host_event_handler() << std::endl
     << "global_service_event_handler="
