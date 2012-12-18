@@ -1,3 +1,5 @@
+.. _top:
+
 Welcome to Centreon Engine's documentation!
 ===========================================
 
