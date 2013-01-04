@@ -49,8 +49,8 @@ unsigned long             next_problem_id = 0L;
 unsigned long             next_notification_id = 0L;
 
 int                       sighup = true;
-int                       sigshutdown = FALSE;
-int                       sigrestart = FALSE;
+int                       sigshutdown = false;
+int                       sigrestart = false;
 
 char const*               sigs[35] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",
@@ -62,16 +62,16 @@ char const*               sigs[35] = {
   "PWR", "UNUSED", "ZERR", "DEBUG", NULL
 };
 
-int                       caught_signal = FALSE;
+int                       caught_signal = false;
 int                       sig_id = 0;
 
-int                       restarting = FALSE;
+int                       restarting = false;
 
-int                       verify_config = FALSE;
-int                       verify_circular_paths = TRUE;
-int                       test_scheduling = FALSE;
-int                       precache_objects = FALSE;
-int                       use_precached_objects = FALSE;
+int                       verify_config = false;
+int                       verify_circular_paths = true;
+int                       test_scheduling = false;
+int                       precache_objects = false;
+int                       use_precached_objects = false;
 
 unsigned int              currently_running_service_checks = 0;
 unsigned int              currently_running_host_checks = 0;

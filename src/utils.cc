@@ -1485,9 +1485,6 @@ time_t calculate_time_from_weekday_of_month(
 
 /* trap signals so we can exit gracefully */
 void setup_sighandler() {
-  /* reset the shutdown flag */
-  sigshutdown = false;
-
   /* remove buffering from stderr, stdin, and stdout */
   setbuf(stdin, (char*)NULL);
   setbuf(stdout, (char*)NULL);
