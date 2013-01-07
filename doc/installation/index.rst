@@ -4,7 +4,7 @@
 Installation
 ############
 
-Merethis recommend using its official packages from the Centreon
+Merethis recommends using its official packages from the Centreon
 Entreprise Server (CES) repository. Most of Merethis' endorsed
 software are available as RPM packages.
 
@@ -21,22 +21,25 @@ repository.
 
 These packages have been successfully tested with CentOS 5 and RedHat 5.
 
+.. _user_installation_packages_prerequisites:
+
 Prerequisites
 =============
 
 In order to use RPM from the CES repository, you have to install the
 appropriate repo file. Run the following command as privileged user ::
 
-  $ wget http://yum.centreon.com/standard/ces-standard.repo -O /etc/yum.repos.d/ces-standard.repo
+  $ wget http://yum.centreon.com/standard/2.2/ces-standard.repo -O /etc/yum.repos.d/ces-standard.repo
 
-The repo file is now installed.
+The repo file is now installed. Don't forget to cleanup ::
+
+  $ yum clean all
 
 Install
 =======
 
 Run the following commands as privileged user ::
 
-  $ yum clean all
   $ yum install centreon-engine
 
 All dependencies are automatically installed from Merethis repositories.
@@ -109,7 +112,7 @@ Optional packages was need for use web service module:
 =========================== =================== ================================
 Software                    Package Name        Description
 =========================== =================== ================================
-gSOAP **(>= 2.7)**          not available       SOAP Web Services and XML-Based
+gSOAP **(>= 2.7)**          gsoap gsoap-devel   SOAP Web Services and XML-Based
                                                 Applications.
 Zlib                        zlib-devel          Used for data compression.
 SSL                         openssl-devel       Implementing SSL and TLS
@@ -120,36 +123,29 @@ xerces-c                    xerces-c-devel      Used for parsing XML
 
 #. Install basic compilation tools ::
 
-     $ yum install gcc gcc-c++ make
+   $ yum install gcc gcc-c++ make
 
-#. Get and install cmake
+#. Install Merethis repository
 
-   For CentOS 5 ::
+   You need to install Centreon Entreprise Server (CES) repos file as
+   explained :ref:`user_installation_packages_prerequisites` to use some
+   specific package version.
 
-     $ ARCH=`uname -m`
-     $ wget http://apt.sw.be/redhat/el5/en/${ARCH}/extras/RPMS/cmake-2.8.8-1.el5.rfx.${ARCH}.rpm
-     $ rpm -Uvh cmake-2.8.8-1.el5.rfx.${ARCH}.rpm
+#. Install cmake ::
 
-   For CentOS 6 ::
+   $ yum install cmake
 
-     $ ARCH=`uname -m`
-     $ wget http://apt.sw.be/redhat/el6/en/${ARCH}/extras/RPMS/cmake-2.8.8-1.el6.rfx.${ARCH}.rpm
-     $ rpm -Uvh cmake-2.8.8-1.el6.rfx.${ARCH}.rpm
-
-#. Install Centreon Clib
+#. Install Centreon Clib ::
 
    See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
 #. Install optional tools ::
 
-     $ yum install zlib-devel openssl-devel xerces-c-devel
+   $ yum install zlib-devel openssl-devel xerces-c-devel
 
-#. Install gSOAP from merethis server ::
+#. Install gSOAP ::
 
-     $ ARCH=`uname -m`
-     $ wget http://download.centreon.com/RPMs/centos5/${ARCH}/gsoap-2.7.13-4.el5.${ARCH}.rpm
-     $ wget http://download.centreon.com/RPMs/centos5/${ARCH}/gsoap-devel-2.7.13-4.el5.${ARCH}.rpm
-     $ rpm -Uvh gsoap-2.7.13-4.el5.${ARCH}.rpm gsoap-devel-2.7.13-4.el5.${ARCH}.rpm
+   $ yum install gsoap gsoap-devel
 
 Debian/Ubuntu
 -------------
