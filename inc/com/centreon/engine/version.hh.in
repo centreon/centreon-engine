@@ -1,5 +1,5 @@
 /*
-** Copyright 2012 Merethis
+** Copyright 2012-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **

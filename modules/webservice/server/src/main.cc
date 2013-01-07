@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -153,7 +153,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 		      "Merethis");
   neb_set_module_info(gl_mod_handle,
 		      NEBMODULE_MODINFO_COPYRIGHT,
-		      "Copyright 2011 Merethis");
+		      "Copyright 2011-2013 Merethis");
   neb_set_module_info(gl_mod_handle,
 		      NEBMODULE_MODINFO_VERSION,
 		      "1.0.0");

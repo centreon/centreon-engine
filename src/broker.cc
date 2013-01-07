@@ -1,7 +1,7 @@
 /*
 ** Copyright 2002-2010 Ethan Galstad
 ** Copyright 2010      Nagios Core Development Team
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **

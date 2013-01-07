@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -197,7 +197,7 @@ int main(int argc, char* argv[]) {
         << "\n"
         << "Copyright 1999-2009 Ethan Galstad\n"
         << "Copyright 2009-2010 Nagios Core Development Team and Community Contributors\n"
-        << "Copyright 2011-2012 Merethis\n"
+        << "Copyright 2011-2013 Merethis\n"
         << "\n"
         << "This program is free software: you can redistribute it and/or\n"
         << "modify it under the terms of the GNU General Public License version 2\n"

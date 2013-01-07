@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2006 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **

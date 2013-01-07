@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2008 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -281,7 +281,7 @@ int main(int argc, char* argv[]) {
               << CENTREON_ENGINE_VERSION_STRING << "\n"
               << "\n"
               << "Copyright 2003-2008 Ethan Galstad\n"
-              << "Copyright 2011-2012 Merethis\n"
+              << "Copyright 2011-2013 Merethis\n"
               << "License: GPLv2\n\n";
 
     // Just display the license.

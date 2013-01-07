@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2000-2007, Robert van Engelen, Genivia Inc. All Rights Reserved.
-** Copyright 2011 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
