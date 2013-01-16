@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
@@ -284,15 +283,6 @@ compatibility::compatibility() {
 }
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-compatibility::compatibility(compatibility const& right) {
-  _internal_copy(right);
-}
-
-/**
  *  Destructor.
  */
 compatibility::~compatibility() throw () {
@@ -302,28 +292,4 @@ compatibility::~compatibility() throw () {
         static_cast<broker::handle*>(neb_module_list->module_handle));
   }
   catch (...) {}
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-compatibility& compatibility::operator=(compatibility const& right) {
-  _internal_copy(right);
-  return (*this);
-}
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void compatibility::_internal_copy(compatibility const& right) {
-  (void)right;
-  assert(!"broker compatibility layer is not copyable");
-  abort();
-  return;
 }

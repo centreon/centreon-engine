@@ -19,7 +19,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
@@ -435,37 +434,4 @@ void loop::_dispatching() {
  */
 loop::loop() {
 
-}
-
-/**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-loop::loop(loop const& right) {
-  _internal_copy(right);
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-loop& loop::operator=(loop const& right) {
-  _internal_copy(right);
-  return (*this);
-}
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void loop::_internal_copy(loop const& right) {
-  (void)right;
-  assert(!"event loop is not copyable");
-  abort();
-  return;
 }

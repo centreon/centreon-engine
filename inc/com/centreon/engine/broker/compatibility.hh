@@ -54,8 +54,6 @@ namespace                 broker {
                           compatibility(compatibility const& right);
     virtual               ~compatibility() throw ();
     compatibility&        operator=(compatibility const& right);
-    void                  _internal_copy(
-                            compatibility const& right);
   };
 }
 

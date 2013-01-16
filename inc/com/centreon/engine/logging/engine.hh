@@ -86,7 +86,6 @@ namespace                    logging {
                              engine();
                              engine(engine const& right);
     engine&                  operator=(engine const& right);
-    void                     _internal_copy(engine const& right);
 
     unsigned long            _id;
     std::vector<obj_info>    _objects;

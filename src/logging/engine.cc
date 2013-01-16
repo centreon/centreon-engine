@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include "com/centreon/concurrency/read_locker.hh"
@@ -308,41 +307,8 @@ engine::engine() : _id(0) {
 }
 
 /**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- */
-engine::engine(engine const& right) {
-  _internal_copy(right);
-}
-
-/**
  *  Destructor.
  */
 engine::~engine() throw () {
 
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-engine& engine::operator=(engine const& right) {
-  _internal_copy(right);
-  return (*this);
-}
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void engine::_internal_copy(engine const& right) {
-  (void)right;
-  assert(!"logging engine is not copyable");
-  abort();
-  return;
 }

@@ -53,7 +53,6 @@ namespace       commands {
                 set(set const& right);
                 ~set() throw ();
     set&        operator=(set const& right);
-    void        _internal_copy(set const& right);
 
     umap<std::string, shared_ptr<command> >
                 _list;

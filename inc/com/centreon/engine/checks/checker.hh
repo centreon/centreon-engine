@@ -80,7 +80,6 @@ namespace                checks {
     checker&             operator=(checker const& right);
     void                 finished(commands::result const& res) throw ();
     int                  _execute_sync(host* hst);
-    void                 _internal_copy(checker const& right);
 
     umap<unsigned long, check_result>
                          _list_id;

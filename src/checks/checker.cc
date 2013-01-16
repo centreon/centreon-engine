@@ -18,7 +18,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
@@ -834,16 +833,6 @@ checker::checker()
 }
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-checker::checker(checker const& right)
-  : commands::command_listener(right) {
-  _internal_copy(right);
-}
-
-/**
  *  Default destructor.
  */
 checker::~checker() throw () {
@@ -855,18 +844,6 @@ checker::~checker() throw () {
     }
   }
   catch (...) {}
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-checker& checker::operator=(checker const& right) {
-  _internal_copy(right);
-  return (*this);
 }
 
 /**
@@ -1193,16 +1170,4 @@ int checker::_execute_sync(host* hst) {
   logger(dbg_checks, basic)
     << "** Sync host check done: state=" << return_result;
   return (return_result);
-}
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void checker::_internal_copy(checker const& right) {
-  (void)right;
-  assert(!"checker is not copyable");
-  abort();
-  return;
 }

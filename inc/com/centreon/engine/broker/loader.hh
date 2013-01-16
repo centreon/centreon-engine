@@ -55,7 +55,6 @@ namespace                  broker {
                            loader(loader const& right);
     virtual                ~loader() throw ();
     loader&                operator=(loader const& right);
-    void                   _internal_copy(loader const& right);
 
     std::list<shared_ptr<handle> >
                            _modules;
