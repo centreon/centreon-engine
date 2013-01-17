@@ -58,20 +58,21 @@ webservice::webservice(
 
 #ifdef WITH_OPENSSL
   if (ssl_enable == true) {
-    char const* key = (keyfile != "" ? keyfile.toStdString().c_str() : NULL);
-    char const* pass = (password != "" ? password.toStdString().c_str() : NULL);
-    char const* pem = (cacert != "" ? cacert.toStdString().c_str() : NULL);
-    int flags = (key == NULL && password == NULL && pem == NULL
-		 ? SOAP_SSL_NO_AUTHENTICATION
-		 : SOAP_SSL_DEFAULT);
-    if (soap_ssl_client_context(&_soap_ctx,
-				flags,
-				key,
-				pass,
-				pem,
-				NULL,
-				NULL)) {
-      throw (error("create ssl context failed"));
+    char const* key = (keyfile.empty() ? NULL : keyfile.c_str());
+    char const* pass = (password.empty() ? NULL : password.c_str());
+    char const* pem = (cacert.empty() ? NULL : cacert.c_str());
+    int flags(keyfile.empty() && password.empty() && cacert.empty()
+              ? SOAP_SSL_NO_AUTHENTICATION
+              : SOAP_SSL_DEFAULT);
+    if (soap_ssl_client_context(
+          &_soap_ctx,
+          flags,
+          key,
+          pass,
+          pem,
+          NULL,
+          NULL)) {
+      throw (error("ssl context creation failed"));
     }
   }
 #endif // !WITH_OPENSSL

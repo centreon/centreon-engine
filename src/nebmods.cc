@@ -398,8 +398,13 @@ int neb_deregister_callback(
     next_callback = temp_callback->next;
 
     /* we found it */
-    if (temp_callback->callback_func == *(void**)(&callback_func))
-      break;
+    union {
+      void* data;
+      int (* code)(int, void*);
+    } temp_callback_func;
+    temp_callback_func.data = temp_callback->callback_func;
+    if (temp_callback_func.code == callback_func)
+      break ;
 
     last_callback = temp_callback;
   }
