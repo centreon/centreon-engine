@@ -541,40 +541,46 @@ processing::processing() {
 
 processing::~processing() throw () {}
 
-bool processing::execute(std::string const& cmd) const {
+bool processing::execute(char const* cmd) const {
   logger(dbg_functions, basic) << "processing external command";
 
-  // Trim command.
-  char* command(my_strdup(cmd.substr(cmd.find_first_not_of(
-                                           " \t\n\r")).c_str()));
-  {
-    size_t len;
-    while (*command && isspace(command[(len = strlen(command) - 1)]))
-      command[len] = '\0';
-  }
+  if (!cmd)
+    return (false);
+
+  // Trim command
+  while (*cmd && isspace(*cmd))
+    ++cmd;
+  unsigned int len(strlen(cmd));
+  unsigned int end(len);
+  while (end && isspace(cmd[end - 1]))
+    --end;
+  char* command(new char[end + 1]);
+  memcpy(command, cmd, end);
+  command[end] = 0;
 
   logger(dbg_external_command, most) << "raw command: " << command;
 
-  unsigned int size(0);
-  unsigned int pos(0);
-  while (command[size])
-    if (command[size++] == ';' && !pos)
-      pos = size - 1;
-
-  if (size < 15 || command[0] != '['
-      || command[11] != ']' || command[12] != ' ')
+  if (end < 15
+      || command[0] != '['
+      || command[11] != ']'
+      || command[12] != ' ') {
+    delete[] command;
     return (false);
+  }
 
-  command[11] = 0;
+  unsigned int start(13);
+  while (command[start]) {
+    if (command[start] == ';') {
+      command[start] = 0;
+      ++start;
+      break;
+    }
+    ++start;
+  }
 
-  if (!pos)
-    pos = size - 1;
-  else
-    command[pos] = 0;
-
-  time_t entry_time = static_cast<time_t>(strtoul(command + 1, NULL, 10));
+  time_t entry_time(static_cast<time_t>(strtoul(command + 1, NULL, 10)));
   char* command_name(command + 13);
-  char* args(command + pos + 1);
+  char* args(command + start);
   int command_id(CMD_CUSTOM_COMMAND);
 
   std::map<std::string, command_info>::const_iterator
@@ -608,27 +614,29 @@ bool processing::execute(std::string const& cmd) const {
   logger(dbg_external_command, more) << "Command arguments: " << args;
 
   // send data to event broker.
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_START,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          command_id,
-                          entry_time,
-                          command_name,
-                          args,
-                          NULL);
+  broker_external_command(
+    NEBTYPE_EXTERNALCOMMAND_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    command_id,
+    entry_time,
+    command_name,
+    args,
+    NULL);
 
   if (it != _lst_command.end())
     (*it->second.func)(command_id, entry_time, args);
 
   // send data to event broker.
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_END,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          command_id,
-                          entry_time,
-                          command_name,
-                          args,
-                          NULL);
+  broker_external_command(
+    NEBTYPE_EXTERNALCOMMAND_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    command_id,
+    entry_time,
+    command_name,
+    args,
+    NULL);
 
   delete[] command;
   return (true);

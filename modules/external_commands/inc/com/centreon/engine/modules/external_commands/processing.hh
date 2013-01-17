@@ -32,7 +32,7 @@ namespace         modules {
     public:
                   processing();
                   ~processing() throw ();
-      bool        execute(std::string const& cmd) const;
+      bool        execute(char const* cmd) const;
 
     private:
       struct      command_info {
