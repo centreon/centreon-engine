@@ -542,11 +542,11 @@ int process_external_command1(char* cmd) {
   if (command_type == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_type == CMD_PROCESS_HOST_CHECK_RESULT) {
     /* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
-    if (config->get_log_passive_checks() == true)
+    if (config->get_log_passive_checks())
       logger(log_passive_check, basic) << oss.str();
   }
   else {
-    if (config->get_log_external_commands() == true)
+    if (config->get_log_external_commands())
       logger(log_external_command, basic) << oss.str();
   }
 
@@ -604,7 +604,7 @@ int process_external_command2(int cmd,
     break;
 
   case CMD_SAVE_STATE_INFORMATION:
-    save_state_information(FALSE);
+    save_state_information(false);
     break;
 
   case CMD_READ_STATE_INFORMATION:
@@ -1103,19 +1103,19 @@ int process_host_command(int cmd,
     break;
 
   case CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS:
-    enable_and_propagate_notifications(temp_host, 0, TRUE, TRUE, FALSE);
+    enable_and_propagate_notifications(temp_host, 0, true, true, false);
     break;
 
   case CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS:
-    disable_and_propagate_notifications(temp_host, 0, TRUE, TRUE, FALSE);
+    disable_and_propagate_notifications(temp_host, 0, true, true, false);
     break;
 
   case CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST:
-    enable_and_propagate_notifications(temp_host, 0, FALSE, TRUE, TRUE);
+    enable_and_propagate_notifications(temp_host, 0, false, true, true);
     break;
 
   case CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST:
-    disable_and_propagate_notifications(temp_host, 0, FALSE, TRUE, TRUE);
+    disable_and_propagate_notifications(temp_host, 0, false, true, true);
     break;
 
   case CMD_ENABLE_HOST_SVC_NOTIFICATIONS:

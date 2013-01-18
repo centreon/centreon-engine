@@ -64,7 +64,8 @@ static void* gl_mod_handle(NULL);
 int callback_external_command(int callback_type, void* data) {
   (void)callback_type;
 
-  nebstruct_external_command_data* neb_data = static_cast<nebstruct_external_command_data*>(data);
+  nebstruct_external_command_data* neb_data
+    = static_cast<nebstruct_external_command_data*>(data);
   if (neb_data->type != NEBTYPE_EXTERNALCOMMAND_CHECK
       || neb_data->flags != NEBFLAG_NONE
       || neb_data->attr != NEBATTR_NONE
@@ -105,8 +106,9 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
   (void)reason;
 
   try {
-    neb_deregister_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-    			    callback_external_command);
+    neb_deregister_callback(
+      NEBCALLBACK_EXTERNAL_COMMAND_DATA,
+      callback_external_command);
 
     // Close and delete the external command file FIFO.
     shutdown_command_file_worker_thread();
@@ -136,7 +138,10 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
  *
  *  @return 0 on success, any other value on failure.
  */
-extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
+extern "C" int nebmodule_init(
+                 int flags,
+                 char const* args,
+                 void* handle) {
   (void)args;
   (void)flags;
 
@@ -144,25 +149,31 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
   gl_mod_handle = handle;
 
   // Set module informations.
-  neb_set_module_info(gl_mod_handle,
-		      NEBMODULE_MODINFO_TITLE,
-		      "Centreon-Engine's external command");
-  neb_set_module_info(gl_mod_handle,
-		      NEBMODULE_MODINFO_AUTHOR,
-		      "Merethis");
-  neb_set_module_info(gl_mod_handle,
-		      NEBMODULE_MODINFO_COPYRIGHT,
-		      "Copyright 2011 Merethis");
-  neb_set_module_info(gl_mod_handle,
-		      NEBMODULE_MODINFO_VERSION,
-		      "1.0.0");
-  neb_set_module_info(gl_mod_handle,
-		      NEBMODULE_MODINFO_LICENSE,
-		      "GPL version 2");
-  neb_set_module_info(gl_mod_handle,
-		      NEBMODULE_MODINFO_DESC,
-		      "Centreon-Engine's external command provide system to " \
-		      "execute commands over a pipe.");
+  neb_set_module_info(
+    gl_mod_handle,
+    NEBMODULE_MODINFO_TITLE,
+    "Centreon-Engine's external command");
+  neb_set_module_info(
+    gl_mod_handle,
+    NEBMODULE_MODINFO_AUTHOR,
+    "Merethis");
+  neb_set_module_info(
+    gl_mod_handle,
+    NEBMODULE_MODINFO_COPYRIGHT,
+    "Copyright 2011 Merethis");
+  neb_set_module_info(
+    gl_mod_handle,
+    NEBMODULE_MODINFO_VERSION,
+    "1.0.0");
+  neb_set_module_info(
+    gl_mod_handle,
+    NEBMODULE_MODINFO_LICENSE,
+    "GPL version 2");
+  neb_set_module_info(
+    gl_mod_handle,
+    NEBMODULE_MODINFO_DESC,
+    "Centreon-Engine's external command provide system to "
+    "execute commands over a pipe.");
 
   try {
     // Open the command file (named pipe) for reading.
@@ -175,10 +186,11 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     }
 
     // Register callbacks.
-    if (neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-    			      gl_mod_handle,
-    			      0,
-    			      callback_external_command) != 0) {
+    if (neb_register_callback(
+          NEBCALLBACK_EXTERNAL_COMMAND_DATA,
+          gl_mod_handle,
+          0,
+          callback_external_command)) {
       throw (engine_error() << "register callback failed");
     }
   }

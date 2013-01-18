@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/logging/engine.hh"
 #include "test/macros/minimal_setup.hh"
 
 using namespace com::centreon::engine;

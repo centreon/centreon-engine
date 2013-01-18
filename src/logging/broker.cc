@@ -21,7 +21,8 @@
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/broker.hh"
-#include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/exceptions/basic.hh"
 #include "com/centreon/unique_array_ptr.hh"
 
 using namespace com::centreon;
@@ -36,7 +37,8 @@ using namespace com::centreon::engine::logging;
 /**
  *  Default constructor.
  */
-broker::broker() {
+broker::broker()
+  : backend(false, false, com::centreon::logging::none, false) {
   memset(&_thread, 0, sizeof(_thread));
 }
 
@@ -45,15 +47,19 @@ broker::broker() {
  *
  *  @param[in] right Object to copy.
  */
-broker::broker(broker const& right) : object(right) {
-  concurrency::locker lock(&right._mutex);
+broker::broker(broker const& right)
+  : backend(right),
+    _enable(false) {
+  concurrency::locker lock(&right._lock);
   _thread = right._thread;
 }
 
 /**
  *  Destructor.
  */
-broker::~broker() throw () {}
+broker::~broker() throw () {
+
+}
 
 /**
  *  Assignment operator.
@@ -64,34 +70,46 @@ broker::~broker() throw () {}
  */
 broker& broker::operator=(broker const& right) {
   if (this != &right) {
-    concurrency::locker lock1(&_mutex);
-    concurrency::locker lock2(&right._mutex);
+    backend::operator=(right);
+    concurrency::locker lock1(&_lock);
+    concurrency::locker lock2(&right._lock);
     _thread = right._thread;
+    _enable = right._enable;
   }
   return (*this);
 }
 
 /**
+ *  Close broker log.
+ */
+void broker::close() throw () {
+  concurrency::locker lock(&_lock);
+  _enable = false;
+}
+
+/**
  *  Send message to broker.
  *
- *  @param[in] message   Message to log.
- *  @param[in] type      Logging types.
- *  @param[in] verbosity Unused.
+ *  @param[in] type     Logging types.
+ *  @param[in] verbose  Verbosity level.
+ *  @param[in] message  Message to log.
+ *  @param[in] size     Message length.
  */
 void broker::log(
+               unsigned long long types,
+               unsigned int verbose,
                char const* message,
-               unsigned long long type,
-               unsigned int verbosity) throw () {
-  (void)verbosity;
+               unsigned int size) throw () {
+  (void)verbose;
 
   // Broker is only notified of non-debug log messages.
-  if (message && (type & dbg_all) == 0) {
-    concurrency::locker lock(&_mutex);
+  if (message && _enable) {
+    concurrency::locker lock(&_lock);
     if (_thread != concurrency::thread::get_current_id()) {
       _thread = concurrency::thread::get_current_id();
 
       // Copy message because broker module might modify it.
-      unique_array_ptr<char> copy(new char[strlen(message) + 1]);
+      unique_array_ptr<char> copy(new char[size + 1]);
       strcpy(copy.get(), message);
 
       // Event broker callback.
@@ -100,7 +118,7 @@ void broker::log(
         NEBFLAG_NONE,
         NEBATTR_NONE,
         copy.get(),
-        static_cast<unsigned long>(type),
+        types,
         time(NULL),
         NULL);
 
@@ -109,4 +127,53 @@ void broker::log(
     }
   }
   return;
+}
+
+/**
+ *  Open broker log.
+ */
+void broker::open() {
+  concurrency::locker lock(&_lock);
+  _enable = true;
+}
+
+/**
+ *  Open borker log.
+ */
+void broker::reopen() {
+  concurrency::locker lock(&_lock);
+  _enable = true;
+}
+
+/**
+ *  Set show pid.
+ *
+ *  @param[in] enable  Unused.
+ */
+void broker::show_pid(bool enable) {
+  (void)enable;
+  throw (basic_error()
+         << "unable to set show pid for broker backend");
+}
+
+/**
+ *  Set show timestamp.
+ *
+ *  @param[in] val  Unused.
+ */
+void broker::show_timestamp(com::centreon::logging::time_precision val) {
+  (void)val;
+  throw (basic_error()
+         << "unable to set show timestamp for broker backend");
+}
+
+/**
+ *  Set show thread id.
+ *
+ *  @param[in] enable  Unused.
+ */
+void broker::show_thread_id(bool enable) {
+  (void)enable;
+  throw (basic_error()
+         << "unable to set show thread id for broker backend");
 }

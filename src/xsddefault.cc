@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
@@ -38,7 +39,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
-using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine;
 
 static char* xsddefault_status_log = NULL;
 static int   xsddefault_status_log_fd = -1;
@@ -151,7 +152,7 @@ int xsddefault_initialize_status_data(char* config_file) {
                                       xsddefault_status_log,
                                       O_WRONLY | O_CREAT,
                                       S_IRUSR | S_IWUSR | S_IRGRP)) == -1) {
-      logger(log_runtime_error, basic)
+      logger(logging::log_runtime_error, logging::basic)
         << "Error: Unable to open status data file '"
         << xsddefault_status_log << "': " << strerror(errno);
       return (ERROR);
@@ -195,7 +196,7 @@ int xsddefault_save_status_data() {
   int used_external_command_buffer_slots = 0;
   int high_external_command_buffer_slots = 0;
 
-  logger(dbg_functions, basic)
+  logger(logging::dbg_functions, logging::basic)
     << "save_status_data()";
 
   /* get number of items in the command buffer */
@@ -541,7 +542,7 @@ int xsddefault_save_status_data() {
       || (fsync(xsddefault_status_log_fd) == -1)
       || (lseek(xsddefault_status_log_fd, 0, SEEK_SET) == (off_t)-1)) {
     char const* msg(strerror(errno));
-    logger(log_runtime_error, basic)
+    logger(logging::log_runtime_error, logging::basic)
       << "Error: Unable to update status data file '"
       << xsddefault_status_log << "': " << msg;
     return (ERROR);
@@ -555,7 +556,7 @@ int xsddefault_save_status_data() {
     ssize_t wb(write(xsddefault_status_log_fd, data_ptr, size));
     if (wb <= 0) {
       char const* msg(strerror(errno));
-      logger(log_runtime_error, basic)
+      logger(logging::log_runtime_error, logging::basic)
         << "Error: Unable to update status data file '"
         << xsddefault_status_log << "': " << msg;
       return (ERROR);

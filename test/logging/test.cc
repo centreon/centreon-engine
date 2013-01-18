@@ -60,7 +60,7 @@ test::test(
 /**
  *  Destructor
  */
-test::~test() {
+test::~test() throw () {
   --_nb_instance;
   if (_total_call != _nb_call) {
     throw (engine_error() << _total_call
@@ -69,6 +69,20 @@ test::~test() {
            << " " << _verbosity
            << " bad lob call.");
   }
+}
+
+/**
+ *  Need by backend but not used.
+ */
+void test::close() throw () {
+
+}
+
+/**
+ *  Need by backend but not used.
+ */
+void test::flush() throw () {
+
 }
 
 /**
@@ -83,17 +97,35 @@ unsigned int test::get_nb_instance() {
 /**
  *  Log message.
  *
- *  @param[in] message   The message.
  *  @param[in] type      The logging types.
  *  @param[in] verbosity The verbosity level.
+ *  @param[in] message   The message.
+ *  @param[in] size      The message lenght.
  */
 void test::log(
-             char const* message,
              unsigned long long type,
-             unsigned int verbosity) throw () {
+             unsigned int verbosity,
+             char const* message,
+             unsigned int size) throw () {
+  (void)size;
   if ((message == _msg)
       && (type & _type)
       && (verbosity <= _verbosity))
     ++_nb_call;
   return ;
 }
+
+/**
+ *  Need by backend but not used.
+ */
+void test::open() {
+
+}
+
+/**
+ *  Need by backend but not used.
+ */
+void test::reopen() {
+
+}
+

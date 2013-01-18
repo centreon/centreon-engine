@@ -601,11 +601,11 @@ bool processing::execute(char const* cmd) const {
   if (command_id == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_id == CMD_PROCESS_HOST_CHECK_RESULT) {
     // passive checks are logged in checks.c.
-    if (config->get_log_passive_checks() == true)
+    if (config->get_log_passive_checks())
       logger(log_passive_check, basic)
         << "EXTERNAL COMMAND: " << command_name << ';' << args;
   }
-  else if (config->get_log_external_commands() == true)
+  else if (config->get_log_external_commands())
     logger(log_external_command, basic)
       << "EXTERNAL COMMAND: " << command_name << ';' << args;
 
@@ -647,19 +647,19 @@ void processing::_wrapper_save_state_information() {
 }
 
 void processing::_wrapper_enable_host_and_child_notifications(host* hst) {
-  enable_and_propagate_notifications(hst, 0, TRUE, TRUE, FALSE);
+  enable_and_propagate_notifications(hst, 0, true, true, false);
 }
 
 void processing::_wrapper_disable_host_and_child_notifications(host* hst) {
-  disable_and_propagate_notifications(hst, 0, TRUE, TRUE, FALSE);
+  disable_and_propagate_notifications(hst, 0, true, true, false);
 }
 
 void processing::_wrapper_enable_all_notifications_beyond_host(host* hst) {
-  enable_and_propagate_notifications(hst, 0, FALSE, TRUE, TRUE);
+  enable_and_propagate_notifications(hst, 0, false, true, true);
 }
 
 void processing::_wrapper_disable_all_notifications_beyond_host(host* hst) {
-  disable_and_propagate_notifications(hst, 0, FALSE, TRUE, TRUE);
+  disable_and_propagate_notifications(hst, 0, false, true, true);
 }
 
 void processing::_wrapper_enable_host_svc_notifications(host* hst) {

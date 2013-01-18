@@ -25,9 +25,9 @@
 #include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/logging/engine.hh"
 
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
@@ -131,7 +131,7 @@ void loop::_dispatching() {
     }
 
     if (sighup) {
-      file::reopen();
+      com::centreon::logging::engine::instance().reopen();
       sighup = false;
     }
 

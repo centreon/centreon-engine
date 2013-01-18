@@ -23,11 +23,9 @@
 #  include <string>
 #  include "com/centreon/engine/configuration/applier/base.hh"
 #  include "com/centreon/engine/configuration/state.hh"
-#  include "com/centreon/engine/logging/file.hh"
-#  include "com/centreon/engine/logging/object.hh"
-#  include "com/centreon/engine/logging/standard.hh"
-#  include "com/centreon/engine/logging/syslog.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/file.hh"
+#  include "com/centreon/logging/syslogger.hh"
 
 CCE_BEGIN()
 
@@ -63,17 +61,18 @@ namespace                configuration {
       void               _del_stdout();
       void               _del_stderr();
 
-      std::string        _debug_file;
-      unsigned long      _debug_id;
+      com::centreon::logging::file*
+                         _debug;
       unsigned long      _debug_level;
-      unsigned long      _debug_limit;
       unsigned int       _debug_verbosity;
-      std::string        _log_file;
-      unsigned long      _log_id;
-      unsigned long      _log_limit;
-      unsigned long      _stderr_id;
-      unsigned long      _stdout_id;
-      unsigned long      _syslog_id;
+      com::centreon::logging::file*
+                         _log;
+      com::centreon::logging::file*
+                         _stderr;
+      com::centreon::logging::file*
+                         _stdout;
+      com::centreon::logging::syslogger*
+                         _syslog;
     };
   }
 }

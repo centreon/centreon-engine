@@ -2436,9 +2436,8 @@ int handle_async_host_check_result_3x(
     << (queued_check_result->reschedule_check == true ? "Yes" : "No") << "\n"
     << "\tExited OK?:         "
     << (queued_check_result->exited_ok == true ? "Yes" : "No") << "\n"
-    << fixed << setprecision(3)
+    << com::centreon::logging::setprecision(3)
     << "\tExec Time:          " << execution_time << "\n"
-    << fixed << setprecision(3)
     << "\tLatency:            " << queued_check_result->latency << "\n"
     << "\treturn Status:      " << queued_check_result->return_code << "\n"
     << "\tOutput:             " << queued_check_result->output;

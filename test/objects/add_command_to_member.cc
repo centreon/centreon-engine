@@ -21,7 +21,7 @@
 #include <exception>
 #include <iostream>
 #include "com/centreon/engine/commands/set.hh"
-#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/utils.hh"
 #include "test/objects/add_object_to_member.hh"

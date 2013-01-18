@@ -41,7 +41,6 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
@@ -123,7 +122,7 @@ int my_system_r(
   int result(res.exit_code);
 
   logger(dbg_commands, more)
-    << fixed << setprecision(3)
+    << com::centreon::logging::setprecision(3)
     << "Execution time=" << *exectime
     << " sec, early timeout=" << *early_timeout
     << ", result=" << result << ", output="

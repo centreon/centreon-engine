@@ -29,7 +29,6 @@
 #  include "com/centreon/engine/commands/set.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/loop.hh"
-#  include "com/centreon/engine/logging/engine.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -87,7 +86,6 @@ private:
     try {
       com::centreon::clib::load();
       configuration::state::load();
-      logging::engine::load();
       commands::set::load();
       checks::checker::load();
       events::loop::load();
@@ -114,7 +112,6 @@ private:
       events::loop::unload();
       checks::checker::unload();
       commands::set::unload();
-      logging::engine::unload();
       configuration::state::unload();
       com::centreon::clib::unload();
     }

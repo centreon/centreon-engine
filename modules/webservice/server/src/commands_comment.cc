@@ -60,7 +60,7 @@ int centreonengine__commentAddToHost(
         comment->text.c_str(),
         comment->persistent,
         COMMENTSOURCE_EXTERNAL,
-        FALSE,
+        false,
         0,
         &comment_id) < 0) {
     std::string* error(soap_new_std__string(s, 1));
@@ -117,7 +117,7 @@ int centreonengine__commentAddToService(
         comment->text.c_str(),
         comment->persistent,
         COMMENTSOURCE_EXTERNAL,
-        FALSE,
+        false,
         0,
         &comment_id) < 0) {
     std::string* error(soap_new_std__string(s, 1));

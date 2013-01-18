@@ -20,8 +20,8 @@
 #ifndef TEST_LOGGING_COMMON_HH
 #  define TEST_LOGGING_COMMON_HH
 
-#  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/backend.hh"
 
 CCE_BEGIN()
 
@@ -32,19 +32,25 @@ namespace               logging {
    *
    *  Simple Class for testing logging system.
    */
-  class                 test : public object {
+  class                 test
+    : public com::centreon::logging::backend {
   public:
                         test(
                           std::string const& msg,
                           unsigned long long type,
                           unsigned int verbosity,
                           unsigned int total_call);
-                        ~test();
+                        ~test() throw ();
+    void                close() throw ();
+    void                flush() throw ();
     static unsigned int get_nb_instance();
     void                log(
-                          char const* message,
                           unsigned long long type,
-                          unsigned int verbosity) throw ();
+                          unsigned int verbosity,
+                          char const* message,
+                          unsigned int size) throw ();
+    void                open();
+    void                reopen();
 
   private:
     std::string         _msg;

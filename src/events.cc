@@ -29,7 +29,6 @@
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/events.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sretention.hh"
@@ -481,11 +480,11 @@ void init_timing_loop() {
       << "Total scheduled service checks:  "
       << scheduling_info.total_scheduled_services;
     logger(dbg_events, more)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Average service check interval:  "
       << scheduling_info.average_service_check_interval << " sec";
     logger(dbg_events, more)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Service inter-check delay:       "
       << scheduling_info.service_inter_check_delay << " sec";
   }
@@ -534,7 +533,7 @@ void init_timing_loop() {
     << "Total service interleave blocks: "
     << total_interleave_blocks;
   logger(dbg_events, more)
-    << fixed << setprecision(1)
+    << com::centreon::logging::setprecision(1)
     << "Service inter-check delay: "
     << scheduling_info.service_inter_check_delay;
 
@@ -746,11 +745,11 @@ void init_timing_loop() {
       << "Host check interval total:    "
       << scheduling_info.host_check_interval_total;
     logger(dbg_events, most)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Average host check interval:  "
       << scheduling_info.average_host_check_interval << " sec";
     logger(dbg_events, most)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Host inter-check delay:       "
       << scheduling_info.host_inter_check_delay << " sec";
   }

@@ -22,7 +22,7 @@
 #include <iostream>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/create_object.hh"
 #include "test/objects/release.hh"

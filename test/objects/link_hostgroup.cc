@@ -21,7 +21,7 @@
 #include <exception>
 #include <iostream>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostgroup.hh"
