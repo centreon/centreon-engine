@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -41,7 +41,6 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
@@ -123,7 +122,7 @@ int my_system_r(
   int result(res.exit_code);
 
   logger(dbg_commands, more)
-    << fixed << setprecision(3)
+    << com::centreon::logging::setprecision(3)
     << "Execution time=" << *exectime
     << " sec, early timeout=" << *early_timeout
     << ", result=" << result << ", output="
@@ -1485,9 +1484,6 @@ time_t calculate_time_from_weekday_of_month(
 
 /* trap signals so we can exit gracefully */
 void setup_sighandler() {
-  /* reset the shutdown flag */
-  sigshutdown = false;
-
   /* remove buffering from stderr, stdin, and stdout */
   setbuf(stdin, (char*)NULL);
   setbuf(stdout, (char*)NULL);
@@ -2073,6 +2069,29 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   db->used_size += buflen;
 
   return (OK);
+}
+
+/**
+ *  Set the close-on-exec flag on the file descriptor.
+ *
+ *  @param[in] fd The file descriptor to set close on exec.
+ *
+ *  @return True on succes, otherwise false.
+ */
+bool set_cloexec(int fd) {
+  int flags(0);
+  while ((flags = fcntl(fd, F_GETFD)) < 0) {
+    if (errno == EINTR)
+      continue;
+    return (false);
+  }
+  int ret(0);
+  while ((ret = fcntl(fd, F_SETFD, flags | FD_CLOEXEC)) < 0) {
+    if (errno == EINTR)
+      continue;
+    return (false);
+  }
+  return (true);
 }
 
 /******************************************************************/

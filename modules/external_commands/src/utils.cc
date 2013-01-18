@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,7 +50,7 @@ int open_command_file(void) {
     return (OK);
 
   /* the command file was already created */
-  if (command_file_created == TRUE)
+  if (command_file_created)
     return (OK);
 
   /* reset umask (group needs write permissions) */
@@ -66,8 +66,8 @@ int open_command_file(void) {
       logger(log_runtime_error, basic)
         << "Error: Could not create external command file '"
         << config->get_command_file() << "' as named pipe: (" << errno
-        << ") -> " << strerror(errno) << ".  If this file already exists and " \
-        "you are sure that another copy of Centreon Engine is not running, " \
+        << ") -> " << strerror(errno) << ".  If this file already exists and "
+        "you are sure that another copy of Centreon Engine is not running, "
         "you should delete this file.";
       return (ERROR);
     }
@@ -77,7 +77,7 @@ int open_command_file(void) {
   /* NOTE: file must be opened read-write for poll() to work */
   if ((command_file_fd = open(config->get_command_file().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
     logger(log_runtime_error, basic)
-      << "Error: Could not open external command file for reading " \
+      << "Error: Could not open external command file for reading "
       "via open(): (" << errno << ") -> " << strerror(errno);
     return (ERROR);
   }
@@ -88,14 +88,14 @@ int open_command_file(void) {
     flags = fcntl(command_file_fd, F_GETFL);
     if (flags < 0) {
       logger(log_runtime_error, basic)
-        << "Error: Could not get file descriptor flags on external " \
+        << "Error: Could not get file descriptor flags on external "
         "command via fcntl(): (" << errno << ") -> " << strerror(errno);
       return (ERROR);
     }
     flags |= FD_CLOEXEC;
     if (fcntl(command_file_fd, F_SETFL, flags) == -1) {
       logger(log_runtime_error, basic)
-        << "Error: Could not set close-on-exec flag on external " \
+        << "Error: Could not set close-on-exec flag on external "
         "command via fcntl(): (" << errno << ") -> " << strerror(errno);
       return (ERROR);
     }
@@ -104,7 +104,7 @@ int open_command_file(void) {
   /* re-open the FIFO for use with fgets() */
   if ((command_file_fp = (FILE*)fdopen(command_file_fd, "r")) == NULL) {
     logger(log_runtime_error, basic)
-      << "Error: Could not open external command file for " \
+      << "Error: Could not open external command file for "
       "reading via fdopen(): (" << errno << ") -> " << strerror(errno);
     return (ERROR);
   }
@@ -124,7 +124,7 @@ int open_command_file(void) {
   }
 
   /* set a flag to remember we already created the file */
-  command_file_created = TRUE;
+  command_file_created = true;
 
   return (OK);
 }

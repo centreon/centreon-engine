@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -134,7 +134,7 @@ void check_for_service_flapping(
   svc->percent_state_change = curved_percent_change;
 
   logger(dbg_flapping, most)
-    << fixed << setprecision(2)
+    << com::centreon::logging::setprecision(2)
     << "LFT=" << low_threshold
     << ", HFT=" << high_threshold
     << ", CPC=" << curved_percent_change
@@ -162,7 +162,7 @@ void check_for_service_flapping(
     is_flapping = TRUE;
 
   logger(dbg_flapping, more)
-    << fixed << setprecision(2)
+    << com::centreon::logging::setprecision(2)
     << "Service " << (is_flapping == true ? "is" : "is not")
     << " flapping (" << curved_percent_change << "% state change).";
 
@@ -301,7 +301,7 @@ void check_for_host_flapping(
   hst->percent_state_change = curved_percent_change;
 
   logger(dbg_flapping, most)
-    << fixed << setprecision(2)
+    << com::centreon::logging::setprecision(2)
     << "LFT=" << low_threshold
     << ", HFT=" << high_threshold
     << ", CPC=" << curved_percent_change
@@ -376,7 +376,7 @@ void set_service_flap(
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_runtime_warning, basic)
-    << fixed << setprecision(1)
+    << com::centreon::logging::setprecision(1)
     << "SERVICE FLAPPING ALERT: " << svc->host_name
     << ";" << svc->description
     << ";STARTED; Service appears to have started flapping ("
@@ -457,7 +457,7 @@ void clear_service_flap(
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_info_message, basic)
-    << fixed << setprecision(1)
+    << com::centreon::logging::setprecision(1)
     << "SERVICE FLAPPING ALERT: " << svc->host_name
     << ";" << svc->description
     << ";STOPPED; Service appears to have stopped flapping ("
@@ -525,7 +525,7 @@ void set_host_flap(
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_runtime_warning, basic)
-    << fixed << setprecision(1)
+    << com::centreon::logging::setprecision(1)
     << "HOST FLAPPING ALERT: " << hst->name
     << ";STARTED; Host appears to have started flapping ("
     << percent_change << "% change > "
@@ -603,7 +603,7 @@ void clear_host_flap(
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_info_message, basic)
-    << fixed << setprecision(1)
+    << com::centreon::logging::setprecision(1)
     << "HOST FLAPPING ALERT: " << hst->name
     << ";STOPPED; Host appears to have stopped flapping ("
     << percent_change << "% change < "

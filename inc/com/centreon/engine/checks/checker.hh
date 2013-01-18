@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -80,7 +80,6 @@ namespace                checks {
     checker&             operator=(checker const& right);
     void                 finished(commands::result const& res) throw ();
     int                  _execute_sync(host* hst);
-    void                 _internal_copy(checker const& right);
 
     umap<unsigned long, check_result>
                          _list_id;

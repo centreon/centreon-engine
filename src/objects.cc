@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1914,7 +1914,7 @@ service* add_service(
       || (retry_interval <= 0)
       || (notification_interval < 0)) {
     logger(log_config_error, basic)
-      << "Error: Invalid max_attempts, check_interval, retry_interval" \
+      << "Error: Invalid max_attempts, check_interval, retry_interval"
          ", or notification_interval value for service '"
       << description << "' on host '" << host_name << "'";
     return (NULL);
@@ -2163,7 +2163,7 @@ servicedependency* add_service_dependency(
       || !service_description
       || !service_description[0]) {
     logger(log_config_error, basic)
-      << "Error: NULL master service description/host " \
+      << "Error: NULL master service description/host "
          "name in service dependency definition";
     return (NULL);
   }
@@ -2172,7 +2172,7 @@ servicedependency* add_service_dependency(
       || !dependent_service_description
       || !dependent_service_description[0]) {
     logger(log_config_error, basic)
-      << "Error: NULL dependent service description/host " \
+      << "Error: NULL dependent service description/host "
          "name in service dependency definition";
     return (NULL);
   }
@@ -5353,7 +5353,7 @@ int is_contact_member_of_contactgroup(
  *  particular host.
  *
  *  @param[in] hst   Target host.
- *  @param[in] cntct Target contact. 
+ *  @param[in] cntct Target contact.
  *
  *  @return TRUE or FALSE.
  */

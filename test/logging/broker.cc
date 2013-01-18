@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,14 +24,12 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/broker.hh"
-#include "com/centreon/engine/logging/engine.hh"
-#include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/logging/engine.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;
-using namespace com::centreon::engine;
-using namespace com::centreon::engine::broker;
 
 /**************************************
 *                                     *
@@ -60,33 +58,32 @@ int main_test(int argc, char** argv) {
   config->set_event_broker_options(BROKER_LOGGED_DATA);
 
   // Get instance of the module loader.
-  broker::loader& loader(broker::loader::instance());
+  engine::broker::loader& loader(engine::broker::loader::instance());
 
   // Load dummy module.
-  shared_ptr<handle> mod(loader.add_module("./dummymod.so"));
+  shared_ptr<engine::broker::handle> mod(loader.add_module("./dummymod.so"));
   mod->open();
 
   // Get instance of logging engine.
-  logging::engine& engine(logging::engine::instance());
+  logging::engine& e(logging::engine::instance());
 
   // Add new object (broker) to log into engine.
-  com::centreon::shared_ptr<logging::object> obj(new logging::broker);
-  logging::engine::obj_info info(
-                              obj,
-                              logging::log_all,
-                              logging::most);
-  unsigned int id(engine.add_object(info));
+  engine::logging::broker obj;
+  e.add(
+      &obj,
+      engine::logging::log_all,
+      engine::logging::most);
 
   // Send message on all different logging type.
   for (unsigned int i(0); i < NB_LOG_TYPE; ++i)
-    engine.log(LOG_MESSAGE, 1ull << i, 0);
+    e.log(i, 0, LOG_MESSAGE, sizeof(LOG_MESSAGE));
 
   // Send message on all different debug logging type.
   for (unsigned int i(0); i < NB_DBG_TYPE; ++i)
-    engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
+    e.log(i + 32, 0, LOG_MESSAGE, sizeof(LOG_MESSAGE));
 
   // Remove object (broker).
-  engine.remove_object(id);
+  e.remove(&obj);
 
   return (0);
 }
@@ -95,6 +92,6 @@ int main_test(int argc, char** argv) {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  unittest utest(argc, argv, &main_test);
+  engine::unittest utest(argc, argv, &main_test);
   return (utest.run());
 }

@@ -1,8 +1,10 @@
+.. _user_installation:
+
 ############
 Installation
 ############
 
-Merethis recommend using its official packages from the Centreon
+Merethis recommends using its official packages from the Centreon
 Entreprise Server (CES) repository. Most of Merethis' endorsed
 software are available as RPM packages.
 
@@ -19,22 +21,25 @@ repository.
 
 These packages have been successfully tested with CentOS 5 and RedHat 5.
 
+.. _user_installation_packages_prerequisites:
+
 Prerequisites
 =============
 
 In order to use RPM from the CES repository, you have to install the
-appropriate repo file. Run the following command as privileged user::
+appropriate repo file. Run the following command as privileged user ::
 
-  $ wget http://yum.centreon.com/standard/ces-standard.repo -O /etc/yum.repos.d/ces-standard.repo
+  $ wget http://yum.centreon.com/standard/2.2/ces-standard.repo -O /etc/yum.repos.d/ces-standard.repo
 
-The repo file is now installed.
+The repo file is now installed. Don't forget to cleanup ::
+
+  $ yum clean all
 
 Install
 =======
 
-Run the following commands as privileged user::
+Run the following commands as privileged user ::
 
-  $ yum clean all
   $ yum install centreon-engine
 
 All dependencies are automatically installed from Merethis repositories.
@@ -74,19 +79,19 @@ recommand that you create dedicated system user and group for
 security purposes.
 
 On all systems the commands to create a user and a group both named
-**centreon-engine** are as follow (need to run these as root)::
+**centreon-engine** are as follow (need to run these as root) ::
 
   $ groupadd centreon-engine
-  $ useradd -g centreon-engine -m -r -d /var/lib/centreon-engine -s /bin/false centreon-engine
+  $ useradd -g centreon-engine -m -r -d /var/lib/centreon-engine centreon-engine
 
 Please note that these user and group will be used in the next steps. If
 you decide to change user and/or group name here, please do so in
 further steps too.
 
-CentOS 5.x
-----------
+CentOS
+------
 
-In CentOS 5.x you need to add manually cmake. After that you can
+In CentOS you need to add manually cmake. After that you can
 install binary packages. Either use the Package Manager or the
 yum tool to install them. You should check packages version when
 necessary.
@@ -107,7 +112,7 @@ Optional packages was need for use web service module:
 =========================== =================== ================================
 Software                    Package Name        Description
 =========================== =================== ================================
-gSOAP **(>= 2.7)**          not available       SOAP Web Services and XML-Based
+gSOAP **(>= 2.7)**          gsoap gsoap-devel   SOAP Web Services and XML-Based
                                                 Applications.
 Zlib                        zlib-devel          Used for data compression.
 SSL                         openssl-devel       Implementing SSL and TLS
@@ -116,40 +121,31 @@ xerces-c                    xerces-c-devel      Used for parsing XML
                                                 configuration files.
 =========================== =================== ================================
 
-#. Get and install cmake form official website::
+#. Install basic compilation tools ::
 
-    $ wget http://www.cmake.org/files/v2.8/cmake-2.8.6-Linux-i386.sh
-    $ sh cmake-2.8.6-Linux-i386.sh
-    $ y
-    $ y
-    $ mv cmake-2.8.6-Linux-i386 /usr/local/cmake
+   $ yum install gcc gcc-c++ make
 
-#. Add cmake directory into the PATH environment variable::
+#. Install Merethis repository
 
-    $ export PATH="$PATH:/usr/local/cmake/bin"
+   You need to install Centreon Entreprise Server (CES) repos file as
+   explained :ref:`user_installation_packages_prerequisites` to use some
+   specific package version.
 
-#. Install basic compilation tools::
+#. Install cmake ::
 
-    $ yum install gcc gcc-c++ make
+   $ yum install cmake
 
 #. Install Centreon Clib
 
-See the Centreon Clib `documentation <FIXME>`_.
+   See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
-#. Install optional tools::
+#. Install optional tools ::
 
-    $ yum install zlib-devel openssl-devel xerces-c-devel
+   $ yum install zlib-devel openssl-devel xerces-c-devel
 
-#. Install gSOAP from merethis server::
+#. Install gSOAP ::
 
-    $ wget http://download.centreon.com/RPMs/centos5/i386/gsoap-2.7.13-4.el5.i386.rpm
-    $ wget http://download.centreon.com/RPMs/centos5/i386/gsoap-devel-2.7.13-4.el5.i386.rpm
-    $ rpm -Uvh gsoap-2.7.13-4.el5.i386.rpm gsoap-devel-2.7.13-4.el5.i386.rpm
-
-CentOS 6.x
-----------
-
-FIXME
+   $ yum install gsoap gsoap-devel
 
 Debian/Ubuntu
 -------------
@@ -176,7 +172,7 @@ Optional packages was need for use web service module:
 =========================== =================== ================================
 Software                    Package Name        Description
 =========================== =================== ================================
-gSOAP **(>= 2.7)**          gsoap-dev           SOAP Web Services and XML-Based
+gSOAP **(>= 2.7)**          gsoap               SOAP Web Services and XML-Based
                                                 Applications.
 Zlib                        zlib1g-dev          Used for data compression.
 SSL                         libssl-dev          Implementing SSL and TLS
@@ -185,17 +181,17 @@ xerces-c                    libxerces-c-dev     Used for parsing XML
                                                 configuration files.
 =========================== =================== ================================
 
-#. Install compilation tools::
+#. Install compilation tools ::
 
-    $ apt-get install build-essential cmake
+     $ apt-get install build-essential cmake
 
 #. Install Centreon Clib
 
-See the Centreon Clib `documentation <FIXME>`_.
+   See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
-#. Install optional tools::
+#. Install optional tools ::
 
-   $ apt-get install gsoap-dev zlib1g-dev libssl-dev libxerces-c-dev
+     $ apt-get install gsoap-dev zlib1g-dev libssl-dev libxerces-c-dev
 
 OpenSUSE
 --------
@@ -231,24 +227,25 @@ xerces-c                    libxerces-c-devel   Used for parsing XML
                                                 configuration files.
 =========================== =================== ================================
 
-#. Install compilation tools::
+#. Install compilation tools ::
 
-    $ zypper install gcc gcc-c++ make cmake
+     $ zypper install gcc gcc-c++ make cmake
 
 #. Install Centreon Clib
 
-See the Centreon Clib `documentation <FIXME>`_.
+   See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
-#. Install optional tools::
+#. Install optional tools ::
 
-    $ zypper install zlib1g-dev libssl-dev libxerces-c-dev
+     $ zypper install zlib1g-dev libssl-dev libxerces-c-dev
 
-#. Install gSOAP from merethis server::
+#. Install gSOAP from merethis server ::
 
-    $ wget http://download.centreon.com/RPMs/opensuse/i386/libgsoap-2.8.4-1.1.i586.rpm
-    $ wget http://download.centreon.com/RPMs/opensuse/i386/libgsoap-devel-2.8.4-1.1.i586.rpm
-    $ wget http://download.centreon.com/RPMs/opensuse/i386/gsoap-devel-2.8.4-1.1.i586.rpm
-    $ rpm -Uvh libgsoap-2.8.4-1.1.i586.rpm libgsoap-devel-2.8.4-1.1.i586.rpm gsoap-devel-2.8.4-1.1.i586.rpm
+     $ ARCH=`uname -m`
+     $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/libgsoap-2.8.4-1.1.${ARCH}.rpm
+     $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/libgsoap-devel-2.8.4-1.1.${ARCH}.rpm
+     $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/gsoap-devel-2.8.4-1.1.${ARCH}.rpm
+     $ rpm -Uvh libgsoap-2.8.4-1.1.${ARCH}.rpm libgsoap-devel-2.8.4-1.1.${ARCH}.rpm gsoap-devel-2.8.4-1.1.${ARCH}.rpm
 
 .. _user_installation_using_sources_build:
 
@@ -260,28 +257,27 @@ Get sources
 
 Centreon Engine can be checked out from Merethis's git server at
 http://git.centreon.com/centreon-engine. On a Linux box with git
-installed this is just a matter of::
+installed this is just a matter of ::
 
   $ git clone http://git.centreon.com/centreon-engine
+
+Or You can get the latest Centreon Engine's sources from its
+`download website <http://www.centreon.com/Content-Download/download-centreon-engine-centreon>`_
+Once downloaded, extract it ::
+
+  $ tar xzf centreon-engine.tar.gz
 
 Configuration
 -------------
 
 At the root of the project directory you'll find a build directory
 which holds build scripts. Generate the Makefile by running the
-following command::
+following command ::
 
   $ cd /path_to_centreon_engine/build
-  $ cmake .
-
-Checking of necessary components is performed and if successfully
-executed a summary of your configuration is printed.
-
-Variables
-~~~~~~~~~
 
 Your Centreon Engine can be tweaked to your particular needs
-using CMake's variable system. Variables can be set like this::
+using CMake's variable system. Variables can be set like this ::
 
   $ cmake -D<variable1>=<value1> [-D<variable2>=<value2>] .
 
@@ -331,7 +327,7 @@ WITH_XERCESC_LIBRARY_DIR       Set the xercess-c library directory (don't use   
 WITH_ZLIB                      Enable or disable compression in web service.    ON
 ============================== ================================================ ============================================
 
-Example::
+Example ::
 
   $ cmake \
      -DWITH_PREFIX=/usr \
@@ -349,10 +345,20 @@ Example::
      -DWITH_TESTING=0 \
      -DWITH_WEBSERVICE=1 .
 
+At this step, the software will check for existence and usability of the
+rerequisites. If one cannot be found, an appropriate error message will
+be printed. Otherwise an installation summary will be printed.
+
+.. note::
+  If you need to change the options you used to compile your software,
+  you might want to remove the *CMakeCache.txt* file that is in the
+  *build* directory. This will remove cache entries that might have been
+  computed during the last configuration step.
+
 Compilation
 -----------
 
-Once properly configured, the compilation process is really simple::
+Once properly configured, the compilation process is really simple ::
 
   $ make
 
@@ -362,7 +368,7 @@ Install
 =======
 
 Once compiled, the following command must be run as privileged user to
-finish installation::
+finish installation ::
 
   $ make install
 
@@ -381,10 +387,10 @@ File                                             Description
 ``${WITH_PREFIX_BIN}/centenginestats``           Centreon Engine statistic.
 ``${WITH_PREFIX_BIN}/centenginews``              Centreon Engine Web Service command line.
 ``${WITH_PREFIX_CONF}/``                         Centreon Engine sample configuration.
-``${WITH_PREFIX_LIB}/libexternalcmd.so``         External commands module.
-``${WITH_PREFIX_LIB}/libwebservice.so``          Webservice module.
-``${WITH_SCRIPT_DIR}/centengine.conf``           Startup script for ubuntu.
-``${WITH_SCRIPT_DIR}/centengine``                Startup script for other os.
-``${WITH_INCLUDE_DIR}/include/centreon-engine/`` All devel Centreon Engine's include.
+``${WITH_PREFIX_LIB}/externalcmd.so``            External commands module.
+``${WITH_PREFIX_LIB}/webservice.so``             Webservice module.
+``${WITH_STARTUP_DIR}/centengine.conf``          Startup script for ubuntu.
+``${WITH_STARTUP_DIR}/centengine``               Startup script for other os.
+``${WITH_PREFIX_INC}/include/centreon-engine/``  All devel Centreon Engine's include.
 ``${WITH_PKGCONFIG_DIR}/centengine.pc``          Centreon Engine pkg-config file.
 ================================================ =========================================

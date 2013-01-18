@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,7 +29,6 @@
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/events.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sretention.hh"
@@ -244,9 +243,12 @@ static void _exec_event_user_function(timed_event* event) {
 
   /* run a user-defined function */
   if (event->event_data != NULL) {
-    void (*userfunc)(void*);
-    *(void**)(&userfunc) = event->event_data;
-    (*userfunc)(event->event_args);
+    union {
+      void (*func)(void*);
+      void* data;
+    } user;
+    user.data = event->event_data;
+    (*user.func)(event->event_args);
   }
   return;
 }
@@ -478,11 +480,11 @@ void init_timing_loop() {
       << "Total scheduled service checks:  "
       << scheduling_info.total_scheduled_services;
     logger(dbg_events, more)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Average service check interval:  "
       << scheduling_info.average_service_check_interval << " sec";
     logger(dbg_events, more)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Service inter-check delay:       "
       << scheduling_info.service_inter_check_delay << " sec";
   }
@@ -531,7 +533,7 @@ void init_timing_loop() {
     << "Total service interleave blocks: "
     << total_interleave_blocks;
   logger(dbg_events, more)
-    << fixed << setprecision(1)
+    << com::centreon::logging::setprecision(1)
     << "Service inter-check delay: "
     << scheduling_info.service_inter_check_delay;
 
@@ -743,11 +745,11 @@ void init_timing_loop() {
       << "Host check interval total:    "
       << scheduling_info.host_check_interval_total;
     logger(dbg_events, most)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Average host check interval:  "
       << scheduling_info.average_host_check_interval << " sec";
     logger(dbg_events, most)
-      << fixed << setprecision(2)
+      << com::centreon::logging::setprecision(2)
       << "Host inter-check delay:       "
       << scheduling_info.host_inter_check_delay << " sec";
   }
@@ -1258,9 +1260,6 @@ void reschedule_event(
        timed_event* event,
        timed_event** event_list,
        timed_event** event_list_tail) {
-  time_t current_time = 0L;
-  time_t (*timingfunc)(void);
-
   logger(dbg_functions, basic)
     << "reschedule_event()";
 
@@ -1269,12 +1268,17 @@ void reschedule_event(
 
     /* use custom timing function */
     if (event->timing_func != NULL) {
-      *(void**)(&timingfunc) = event->timing_func;
-      event->run_time = (*timingfunc) ();
+      union {
+        time_t (*func)(void);
+        void* data;
+      } timing;
+      timing.data = event->timing_func;
+      event->run_time = (*timing.func)();
     }
 
     /* normal recurring events */
     else {
+      time_t current_time(0L);
       event->run_time = event->run_time + event->event_interval;
       time(&current_time);
       if (event->run_time < current_time)
@@ -1675,7 +1679,6 @@ void compensate_for_system_time_change(
   int hours = 0;
   int minutes = 0;
   int seconds = 0;
-  time_t (*timingfunc)(void);
 
   logger(dbg_functions, basic)
     << "compensate_for_system_time_change()";
@@ -1725,8 +1728,12 @@ void compensate_for_system_time_change(
 
     /* use custom timing function */
     if (temp_event->timing_func != NULL) {
-      *(void**)(&timingfunc) = temp_event->timing_func;
-      temp_event->run_time = (*timingfunc)();
+      union {
+        time_t (*func)(void);
+        void* data;
+      } timing;
+      timing.data = temp_event->timing_func;
+      temp_event->run_time = (*timing.func)();
     }
 
     /* else use standard adjustment */
@@ -1752,8 +1759,12 @@ void compensate_for_system_time_change(
 
     /* use custom timing function */
     if (temp_event->timing_func != NULL) {
-      *(void**)(&timingfunc) = temp_event->timing_func;
-      temp_event->run_time = (*timingfunc) ();
+      union {
+        time_t (*func)(void);
+        void* data;
+      } timing;
+      timing.data = temp_event->timing_func;
+      temp_event->run_time = (*timing.func)();
     }
 
     /* else use standard adjustment */

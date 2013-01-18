@@ -1,5 +1,5 @@
 /*
-** Copyright 2012 Merethis
+** Copyright 2012-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -33,7 +33,12 @@
  *  @return out.
  */
 std::ostream& operator<<(std::ostream& out, void (* ptr)()) {
-  return (out << *(void**)ptr);
+  union {
+    void (*func)();
+    void* data;
+  } type;
+  type.func = ptr;
+  return (out << type.data);
 }
 
 extern "C" {

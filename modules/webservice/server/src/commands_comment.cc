@@ -1,5 +1,5 @@
 /*
-** Copyright 2012 Merethis
+** Copyright 2012-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -60,7 +60,7 @@ int centreonengine__commentAddToHost(
         comment->text.c_str(),
         comment->persistent,
         COMMENTSOURCE_EXTERNAL,
-        FALSE,
+        false,
         0,
         &comment_id) < 0) {
     std::string* error(soap_new_std__string(s, 1));
@@ -117,7 +117,7 @@ int centreonengine__commentAddToService(
         comment->text.c_str(),
         comment->persistent,
         COMMENTSOURCE_EXTERNAL,
-        FALSE,
+        false,
         0,
         &comment_id) < 0) {
     std::string* error(soap_new_std__string(s, 1));

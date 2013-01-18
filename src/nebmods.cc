@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2008 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -305,12 +305,18 @@ int neb_register_callback(
     return (NEBERROR_CALLBACKBOUNDS);
   }
 
+  union {
+    int (*func)(int, void*);
+    void* data;
+  } callback;
+  callback.func = callback_func;
+
   /* allocate memory */
   new_callback = new nebcallback;
 
   new_callback->priority = priority;
   new_callback->module_handle = (void*)mod_handle;
-  new_callback->callback_func = *(void**)(&callback_func);
+  new_callback->callback_func = callback.data;
 
   /* add new function to callback list, sorted by priority (first come, first served for same priority) */
   new_callback->next = NULL;
@@ -355,10 +361,16 @@ int neb_deregister_module_callbacks(void* mod) {
          temp_callback != NULL;
          temp_callback = next_callback) {
       next_callback = temp_callback->next;
-      if ((void*)temp_callback->module_handle == (void*)mod)
+      if ((void*)temp_callback->module_handle == (void*)mod) {
+        union {
+          int (*func)(int, void*);
+          void* data;
+        } callback;
+        callback.data = temp_callback->callback_func;
         neb_deregister_callback(
           callback_type,
-          (int (*)(int, void*))temp_callback->callback_func);
+          callback.func);
+      }
     }
   }
   return (OK);
@@ -386,8 +398,13 @@ int neb_deregister_callback(
     next_callback = temp_callback->next;
 
     /* we found it */
-    if (temp_callback->callback_func == *(void**)(&callback_func))
-      break;
+    union {
+      void* data;
+      int (* code)(int, void*);
+    } temp_callback_func;
+    temp_callback_func.data = temp_callback->callback_func;
+    if (temp_callback_func.code == callback_func)
+      break ;
 
     last_callback = temp_callback;
   }
@@ -412,7 +429,6 @@ int neb_deregister_callback(
 int neb_make_callbacks(int callback_type, void* data) {
   nebcallback* temp_callback;
   nebcallback* next_callback;
-  int (*callbackfunc) (int, void*);
   int cbresult = 0;
   int total_callbacks = 0;
 
@@ -428,8 +444,14 @@ int neb_make_callbacks(int callback_type, void* data) {
        temp_callback != NULL;
        temp_callback = next_callback) {
     next_callback = temp_callback->next;
-    *(void**)(&callbackfunc) = temp_callback->callback_func;
-    cbresult = callbackfunc(callback_type, data);
+
+    union {
+      int (*func)(int, void*);
+      void* data;
+    } neb;
+    neb.data = temp_callback->callback_func;
+    cbresult = (*neb.func)(callback_type, data);
+
     temp_callback = next_callback;
 
     total_callbacks++;

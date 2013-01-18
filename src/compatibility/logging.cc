@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,13 +24,12 @@
 #include <sys/time.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/file.hh"
+#include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/logging/object.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/statusdata.hh"
-#include "logging.h"
+#include "com/centreon/logging/file.hh"
 
 // using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

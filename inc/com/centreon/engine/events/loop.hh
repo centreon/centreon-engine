@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,7 @@
 #ifndef CCE_EVENTS_LOOP_HH
 #  define CCE_EVENTS_LOOP_HH
 
-#  include <time.h>
+#  include <ctime>
 #  include "com/centreon/engine/events.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -49,7 +49,6 @@ namespace             events {
                       ~loop() throw ();
     loop&             operator=(loop const& right);
     void              _dispatching();
-    void              _internal_copy(loop const& right);
 
     time_t            _last_status_update;
     time_t            _last_time;

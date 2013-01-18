@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -317,9 +317,15 @@ int xpddefault_initialize_performance_data(char* config_file) {
       = temp_command;
   }
 
+  union {
+    int (*func)();
+    void* data;
+  } type;
+
   /* periodically process the host perfdata file */
   if (xpddefault_host_perfdata_file_processing_interval > 0
-      && xpddefault_host_perfdata_file_processing_command != NULL)
+      && xpddefault_host_perfdata_file_processing_command != NULL) {
+    type.func = xpddefault_process_host_perfdata_file;
     schedule_new_event(
       EVENT_USER_FUNCTION,
       TRUE,
@@ -328,13 +334,15 @@ int xpddefault_initialize_performance_data(char* config_file) {
       xpddefault_host_perfdata_file_processing_interval,
       NULL,
       TRUE,
-      (void*)xpddefault_process_host_perfdata_file,
+      type.data,
       NULL,
       0);
+  }
 
   /* periodically process the service perfdata file */
   if (xpddefault_service_perfdata_file_processing_interval > 0
-      && xpddefault_service_perfdata_file_processing_command != NULL)
+      && xpddefault_service_perfdata_file_processing_command != NULL) {
+    type.func = xpddefault_process_service_perfdata_file;
     schedule_new_event(
       EVENT_USER_FUNCTION,
       TRUE,
@@ -343,9 +351,10 @@ int xpddefault_initialize_performance_data(char* config_file) {
       xpddefault_service_perfdata_file_processing_interval,
       NULL,
       TRUE,
-      (void*)xpddefault_process_service_perfdata_file,
+      type.data,
       NULL,
       0);
+  }
 
   /* save the host perf data file macro */
   delete[] mac->x[MACRO_HOSTPERFDATAFILE];

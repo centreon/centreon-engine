@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
@@ -42,7 +43,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xrddefault.hh"
 
-using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine;
 
 static char* xrddefault_retention_file = NULL;
 static int   xrddefault_retention_file_fd = -1;
@@ -60,7 +61,7 @@ int xrddefault_grab_config_info(char* main_config_file) {
 
   /* open the main config file for reading */
   if ((thefile = mmap_fopen(main_config_file)) == NULL) {
-    logger(dbg_retentiondata, most)
+    logger(logging::dbg_retentiondata, logging::most)
       << "Error: Cannot open main configuration file '"
       << main_config_file << "' for reading!";
 
@@ -149,11 +150,12 @@ int xrddefault_initialize_retention_data(char* config_file) {
                                           xrddefault_retention_file,
                                           O_WRONLY | O_CREAT,
                                           S_IRUSR | S_IWUSR)) == -1) {
-      logger(log_runtime_error, basic)
+      logger(logging::log_runtime_error, logging::basic)
         << "Error: Unable to open retention file '"
         << xrddefault_retention_file << "': " << strerror(errno);
       return (ERROR);
     }
+    set_cloexec(xrddefault_retention_file_fd);
   }
 
   return (OK);
@@ -180,13 +182,13 @@ int xrddefault_cleanup_retention_data(char* config_file) {
 /******************************************************************/
 
 int xrddefault_save_state_information() {
-  logger(dbg_functions, basic)
+  logger(logging::dbg_functions, logging::basic)
     << "xrddefault_save_state_information()";
 
   /* make sure we have everything */
   if (xrddefault_retention_file == NULL
       || xrddefault_retention_file_fd == -1) {
-    logger(log_runtime_error, basic)
+    logger(logging::log_runtime_error, logging::basic)
       << "Error: We don't have the required file names to store "
       "retention data!";
     return (ERROR);
@@ -260,7 +262,7 @@ int xrddefault_save_state_information() {
            << "notification_period=" << (temp_host->notification_period ? temp_host->notification_period : "") << "\n"
            << "event_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
            << "has_been_checked=" << temp_host->has_been_checked << "\n"
-           << "check_execution_time=" << std::setprecision(3) << std::fixed<< temp_host->execution_time << std::setprecision(ss) << "\n"
+           << "check_execution_time=" << std::setprecision(3) << std::fixed << temp_host->execution_time << std::setprecision(ss) << "\n"
            << "check_latency=" << std::setprecision(3) << std::fixed << temp_host->latency << std::setprecision(ss) << "\n"
            << "check_type=" << temp_host->check_type << "\n"
            << "current_state=" << temp_host->current_state << "\n"
@@ -490,7 +492,7 @@ int xrddefault_save_state_information() {
       || (lseek(xrddefault_retention_file_fd, 0, SEEK_SET)
           == (off_t)-1)) {
     char const* msg(strerror(errno));
-    logger(log_runtime_error, basic)
+    logger(logging::log_runtime_error, logging::basic)
       << "Error: Unable to update retention file '"
       << xrddefault_retention_file << "': " << msg;
     return (ERROR);
@@ -504,7 +506,7 @@ int xrddefault_save_state_information() {
     ssize_t wb(write(xrddefault_retention_file_fd, data_ptr, size));
     if (wb <= 0) {
       char const* msg(strerror(errno));
-      logger(log_runtime_error, basic)
+      logger(logging::log_runtime_error, logging::basic)
         << "Error: Unable to update retention file '"
         << xrddefault_retention_file << "': " << msg;
       return (ERROR);
@@ -574,12 +576,12 @@ int xrddefault_read_state_information() {
   double runtime[2];
   int found_directive = FALSE;
 
-  logger(dbg_functions, basic)
+  logger(logging::dbg_functions, logging::basic)
     << "xrddefault_read_state_information()";
 
   /* make sure we have what we need */
   if (xrddefault_retention_file == NULL) {
-    logger(log_runtime_error, basic)
+    logger(logging::log_runtime_error, logging::basic)
       << "Error: We don't have a filename for retention data!";
     return (ERROR);
   }

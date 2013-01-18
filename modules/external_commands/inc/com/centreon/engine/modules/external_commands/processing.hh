@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,7 +32,7 @@ namespace         modules {
     public:
                   processing();
                   ~processing() throw ();
-      bool        execute(std::string const& cmd) const;
+      bool        execute(char const* cmd) const;
 
     private:
       struct      command_info {

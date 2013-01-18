@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2012 Merethis
+## Copyright 2011-2013 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -24,20 +24,10 @@ set(INC_DIR "${INC_DIR}/com/centreon/engine/logging")
 # cce_logging target.
 add_library("cce_logging"
   STATIC
-  "${SRC_DIR}/standard.cc"
-  "${SRC_DIR}/file.cc"
-  "${SRC_DIR}/syslog.cc"
-  "${SRC_DIR}/logger.cc"
   "${SRC_DIR}/broker.cc"
-  "${SRC_DIR}/engine.cc"
   # "${SRC_DIR}/dumpers.cc"
-  "${INC_DIR}/object.hh"
-  "${INC_DIR}/standard.hh"
-  "${INC_DIR}/file.hh"
-  "${INC_DIR}/syslog.hh"
   "${INC_DIR}/logger.hh"
   "${INC_DIR}/broker.hh"
-  "${INC_DIR}/engine.hh"
   # "${INC_DIR}/dumpers.hh"
 )
 
@@ -48,14 +38,6 @@ if (WITH_TESTING)
   # Set directories.
   set(TEST_DIR "${TEST_DIR}/logging")
 
-  # Test engine.
-  add_executable("logging_engine"
-    "${TEST_DIR}/engine.cc"
-    "${TEST_DIR}/test.cc"
-    "${TEST_DIR}/test.hh")
-  target_link_libraries("logging_engine" "cce_core")
-  add_test("logging_engine" "logging_engine")
-
   # Test broker.
   add_library("dummymod" SHARED "${TEST_DIR}/dummymod.cc")
   set_target_properties("dummymod" PROPERTIES PREFIX "")
@@ -63,8 +45,4 @@ if (WITH_TESTING)
   target_link_libraries("logging_broker" "cce_core")
   add_test("logging_broker" "logging_broker")
 
-  # Test file.
-  add_executable("logging_file" "${TEST_DIR}/file.cc")
-  target_link_libraries("logging_file" "cce_core")
-  add_test("logging_file" "logging_file")
 endif ()

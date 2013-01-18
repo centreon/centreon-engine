@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -147,7 +147,7 @@ extern "C" {
     // File created okay.
     int result(0);
     if (output_file_fd >= 0) {
-      logging::logger(logging::dbg_checks, logging::most)
+      logger(logging::dbg_checks, logging::most)
         << "Moving temp check result file '" << checkresult_file
         << "' to queue file '" << output_file << "'...";
 
@@ -191,7 +191,7 @@ extern "C" {
 
     // Log a warning on errors.
     if (result != 0)
-      logging::logger(logging::log_runtime_warning, logging::basic)
+      logger(logging::log_runtime_warning, logging::basic)
         << "Warning: Unable to move file '" << checkresult_file
         << "' to check results queue.";
 
@@ -214,7 +214,7 @@ extern "C" {
       return (ERROR);
 
     // Log message.
-    logging::logger(logging::dbg_checks, logging::more)
+    logger(logging::dbg_checks, logging::more)
       << "Processing check result file: '" << fname << "'";
 
     // Open the file for reading.
@@ -364,7 +364,7 @@ extern "C" {
 
     // Make sure we have what we need.
     if (!dirname) {
-      logging::logger(logging::log_config_error, logging::basic)
+      logger(logging::log_config_error, logging::basic)
         << "Error: No check result queue directory specified.";
       return (ERROR);
     }
@@ -372,14 +372,14 @@ extern "C" {
     // Open the directory for reading.
     DIR* dirp(NULL);
     if ((dirp = opendir(dirname)) == NULL) {
-      logging::logger(logging::log_config_error, logging::basic)
+      logger(logging::log_config_error, logging::basic)
         << "Error: Could not open check result queue directory '"
         << dirname << "' for reading.";
       return (ERROR);
     }
 
     // Process all files in the directory...
-    logging::logger(logging::dbg_checks, logging::more)
+    logger(logging::dbg_checks, logging::more)
       << "Starting to read check result queue '" << dirname << "'...";
     struct dirent* dirfile(NULL);
     while ((dirfile = readdir(dirp)) != NULL) {
@@ -394,7 +394,7 @@ extern "C" {
       int x(strlen(dirfile->d_name));
       if (x == 7 && dirfile->d_name[0] == 'c') {
         if (stat(file, &stat_buf) == -1) {
-          logging::logger(logging::log_runtime_warning, logging::basic)
+          logger(logging::log_runtime_warning, logging::basic)
             << "Warning: Could not stat() check result file '"
             << file << "'.";
           continue;

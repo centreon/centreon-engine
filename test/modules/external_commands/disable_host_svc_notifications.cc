@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,7 +21,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;

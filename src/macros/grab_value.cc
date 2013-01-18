@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1088,7 +1088,7 @@ int grab_macro_value_r(
 
   /* we already found the macro... */
   if (x < MACRO_X_COUNT)
-    x = x;
+    ;
   /***** ARGV MACROS *****/
   else if (strstr(macro_name, "ARG") == macro_name) {
     /* which arg do we want? */

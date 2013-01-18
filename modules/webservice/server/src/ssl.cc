@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2000-2007, Robert van Engelen, Genivia Inc. All Rights Reserved.
-** Copyright 2011 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,7 +27,7 @@
 
 # if defined(WIN32)
 #  define MUTEX_TYPE             HANDLE
-#  define MUTEX_SETUP(x)         (x) = CreateMutex(NULL, FALSE, NULL)
+#  define MUTEX_SETUP(x)         (x) = CreateMutex(NULL, false, NULL)
 #  define MUTEX_CLEANUP(x)       CloseHandle(x)
 #  define MUTEX_LOCK(x)          WaitForSingleObject((x), INFINITE)
 #  define MUTEX_UNLOCK(x)        ReleaseMutex(x)

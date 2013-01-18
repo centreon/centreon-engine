@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include <list>
 #include "com/centreon/concurrency/locker.hh"
@@ -57,6 +56,8 @@ connector::connector(
     _try_to_restart(true) {
   // Disable stderr.
   _process.enable_stream(process::err, false);
+  // Set use setpgid.
+  _process.setpgid_on_exec(config->get_use_setpgid());
 
   if (config->get_enable_environment_macros())
     logger(log_runtime_warning, basic)
@@ -79,10 +80,10 @@ connector::connector(connector const& right)
  *  Destructor.
  */
 connector::~connector() throw() {
+  // Wait restart thread.
+  _restart.wait();
   // Close connector properly.
   _connector_close();
-  // Clear restart thread.
-  _restart.clear();
 }
 
 /**
@@ -146,7 +147,8 @@ unsigned long connector::run(
           throw (engine_error() << "restart failed");
         _queries[command_id] = info;
         try {
-          _restart.exec();
+          if (_restart.wait(0))
+            _restart.exec();
         }
         catch (std::exception const& e) {
           (void)e;
@@ -358,12 +360,16 @@ void connector::finished(process& p) throw () {
     // The connector is stop, restart it if necessary.
     if (_try_to_restart) {
       try {
-        _restart.exec();
+        if (_restart.wait(0))
+          _restart.exec();
       }
       catch (std::exception const& e) {
         (void)e;
       }
     }
+    // Connector probably quit without sending exit return.
+    else
+      _cv_query.wake_all();
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -795,14 +801,6 @@ connector::restart::restart(connector* c)
  */
 connector::restart::~restart() throw () {
 
-}
-
-/**
- *  Clear thread.
- */
-void connector::restart::clear() {
-  wait();
-  return;
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -128,11 +128,6 @@ void state::parse(std::string const& filename) {
     set_environment_var("TZ", get_use_timezone().c_str(), 1);
   }
   tzset();
-
-  // adjust tweaks
-  if (_tab_int[free_child_process_memory] == -1) {
-    _tab_int[free_child_process_memory] = !_tab_bool[use_large_installation_tweaks];
-  }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
@@ -910,14 +905,6 @@ bool state::get_enable_environment_macros() const throw() {
 }
 
 /**
- *  Get the free child process memory.
- *  @return The free child process memory.
- */
-bool state::get_free_child_process_memory() const throw() {
-  return (_tab_int[free_child_process_memory]);
-}
-
-/**
  *  Get the allow empty hostgroup assignment.
  *  @return The allow empty hostgroup assignment.
  */
@@ -995,6 +982,14 @@ state::e_inter_check_delay state::get_host_inter_check_delay_method() const thro
  */
 state::e_interleave_factor state::get_service_interleave_factor_method() const throw() {
   return (static_cast<e_interleave_factor>(_tab_uint[service_interleave_factor_method]));
+}
+
+/**
+ *  Get if use setpgid.
+ *  @return True if use setpgid, otherwise false.
+ */
+bool state::get_use_setpgid() const throw () {
+  return (_tab_bool[use_setpgid]);
 }
 
 /**
@@ -2069,8 +2064,9 @@ void state::set_enable_environment_macros(bool value) {
  *  @param[in] value The free child process memory.
  */
 void state::set_free_child_process_memory(bool value) {
-  _tab_int[free_child_process_memory] = value;
-  ::free_child_process_memory = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: free_child_process_memory variable ignored";
   return;
 }
 
@@ -2330,6 +2326,14 @@ void state::set_service_interleave_factor_method(std::string const& value) {
   return;
 }
 
+/**
+ *  Set use setpgid.
+ *  @param[in] value True to enable use setpgid.
+ */
+void state::set_use_setpgid(bool value) {
+  _tab_bool[use_setpgid] = value;
+}
+
 /**************************************
  *                                     *
  *           Private Methods           *
@@ -2367,6 +2371,7 @@ state::state()
   _lst_method["ochp_command"]                                = &cpp_suck<std::string const&, &state::set_ochp_command>::set_generic;
   _lst_method["admin_email"]                                 = &cpp_suck<std::string const&, &state::_set_admin_email>::set_generic;
   _lst_method["admin_pager"]                                 = &cpp_suck<std::string const&, &state::_set_admin_pager>::set_generic;
+  _lst_method["use_setpgid"]                                 = &cpp_suck<bool, &state::set_use_setpgid>::set_generic;
   _lst_method["use_syslog"]                                  = &cpp_suck<bool, &state::set_use_syslog>::set_generic;
   _lst_method["log_notifications"]                           = &cpp_suck<bool, &state::set_log_notifications>::set_generic;
   _lst_method["log_service_retries"]                         = &cpp_suck<bool, &state::set_log_service_retries>::set_generic;
@@ -2627,6 +2632,8 @@ void state::_reset() {
   set_use_regexp_matches(DEFAULT_USE_REGEXP_MATCHES);
   set_use_true_regexp_matching(DEFAULT_USE_TRUE_REGEXP_MATCHING);
 
+  set_use_setpgid(DEFAULT_USE_SETPGID);
+
   set_use_syslog(DEFAULT_USE_SYSLOG);
   set_log_service_retries(DEFAULT_LOG_SERVICE_RETRIES);
   set_log_host_retries(DEFAULT_LOG_HOST_RETRIES);
@@ -2716,7 +2723,6 @@ void state::_reset() {
 
   set_use_large_installation_tweaks(DEFAULT_USE_LARGE_INSTALLATION_TWEAKS);
   set_enable_environment_macros(DEFAULT_ENABLE_ENVIRONMENT_MACROS);
-  set_free_child_process_memory(DEFAULT_FREE_CHILD_PROCESS_MEMORY);
 
   set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
 
@@ -2879,7 +2885,7 @@ void state::_set_retained_process_service_attribute_mask(std::string const& valu
 void state::_set_aggregate_status_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: aggregate_status_updates directive ignored: all" \
+    << "warning: aggregate_status_updates directive ignored: all"
        " status file updates are now aggregated";
   return;
 }

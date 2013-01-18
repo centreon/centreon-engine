@@ -54,14 +54,6 @@ shown below. For this example, I'm using a Centreon Engine config that
 has 25 hosts defined and just over 10,000 services::
 
   $ /usr/sbin/centengine -s /etc/centreon-engine/centengine.cfg
-
-  Centreon Engine 3.0-prealpha
-
-  Copyright (c) 1999-2007 Ethan Galstad
-  (http://www.centengine.org)
-  Last Modified: 01-27-2007
-  License: GPL
-
   Timing information on object configuration processing is listed
   below. You can use this information to see if precaching your
   object configuration would be useful.

@@ -1,5 +1,5 @@
 /*
-** Copyright 2012 Merethis
+** Copyright 2012-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"
 
@@ -42,7 +43,7 @@ NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 int log_callback(int type, void* data) {
   (void)type;
   (void)data;
-  exit(0);
+  sigshutdown = true;
   return (0);
 }
 

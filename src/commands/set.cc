@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
@@ -129,41 +128,8 @@ set::set() {
 }
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-set::set(set const& right) {
-  _internal_copy(right);
-}
-
-/**
  *  Destructor.
  */
 set::~set() throw () {
 
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-set& set::operator=(set const& right) {
-  _internal_copy(right);
-  return (*this);
-}
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void set::_internal_copy(set const& right) {
-  (void)right;
-  assert(!"command set is not copyable");
-  abort();
-  return;
 }

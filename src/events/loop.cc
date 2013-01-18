@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,16 +19,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
 #include <cstdlib>
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/logging/engine.hh"
 
 using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
@@ -132,7 +131,7 @@ void loop::_dispatching() {
     }
 
     if (sighup) {
-      file::reopen();
+      com::centreon::logging::engine::instance().reopen();
       sighup = false;
     }
 
@@ -435,37 +434,4 @@ void loop::_dispatching() {
  */
 loop::loop() {
 
-}
-
-/**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-loop::loop(loop const& right) {
-  _internal_copy(right);
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-loop& loop::operator=(loop const& right) {
-  _internal_copy(right);
-  return (*this);
-}
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void loop::_internal_copy(loop const& right) {
-  (void)right;
-  assert(!"event loop is not copyable");
-  abort();
-  return;
 }

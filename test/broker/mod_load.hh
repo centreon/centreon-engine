@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,7 @@
 
 static const char* MOD_TITLE       = "Module testing";
 static const char* MOD_AUTHOR      = "Merethis";
-static const char* MOD_COPYRIGHT   = "Copyright 2011 Merethis";
+static const char* MOD_COPYRIGHT   = "Copyright 2011-2013 Merethis";
 static const char* MOD_VERSION     = "1.0.0";
 static const char* MOD_LICENSE     = "GPL version 2";
 static const char* MOD_DESCRIPTION = "Test the module load system.";

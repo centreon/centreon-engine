@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -54,8 +54,6 @@ namespace                 broker {
                           compatibility(compatibility const& right);
     virtual               ~compatibility() throw ();
     compatibility&        operator=(compatibility const& right);
-    void                  _internal_copy(
-                            compatibility const& right);
   };
 }
 

@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -245,7 +245,6 @@ extern float low_host_flap_threshold;
 extern float high_host_flap_threshold;
 extern unsigned int date_format;
 extern char* use_timezone;
-extern char* p1_file;
 extern unsigned long event_broker_options;
 extern char* illegal_object_chars;
 extern char* illegal_output_chars;
@@ -253,7 +252,6 @@ extern unsigned int use_regexp_matches;
 extern unsigned int use_true_regexp_matching;
 extern unsigned int use_large_installation_tweaks;
 extern unsigned int enable_environment_macros;
-extern unsigned int free_child_process_memory;
 extern int external_command_buffer_slots;
 /* auth_file; */
 

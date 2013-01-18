@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -6910,7 +6910,7 @@ int xodtemplate_resolve_command(xodtemplate_command* this_command) {
     template_command = xodtemplate_find_command(temp_ptr);
     if (template_command == NULL) {
       logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in command " \
+        << "Error: Template '" << temp_ptr << "' specified in command "
         "definition could not be not found (config file '"
         << xodtemplate_config_file_name(this_command->_config_file)
         << "', starting on line " << this_command->_start_line << ")";

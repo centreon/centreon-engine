@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,11 +21,11 @@
 #include <iostream>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
 
-using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine;
 
 /**************************************
 *                                     *
@@ -75,7 +75,7 @@ int callback(int callback_type, void* data) {
   if (static_cast<unsigned long long>(neb_log->data_type)
         != (1ull << index++)
       || strcmp(neb_log->data, LOG_MESSAGE)
-      || (neb_log->data_type & log_all) == 0) {
+      || (neb_log->data_type & logging::log_all) == 0) {
     std::cerr << "error: bad value in module" << std::endl;
     exit(EXIT_FAILURE);
   }

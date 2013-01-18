@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -367,11 +367,17 @@ static void check_event_expire_comment() {
  *  Check the event user function.
  */
 static void check_event_user_function() {
+  union {
+    void (*func)(void*);
+    void* data;
+  } user;
+  user.func = user_function;
+
   // create fake event.
   timed_event event;
   memset(&event, 0, sizeof(event));
   event.event_type = EVENT_USER_FUNCTION;
-  event.event_data = reinterpret_cast<void*>(&user_function);
+  event.event_data = user.data;
   event.event_args = static_cast<void*>(&event);
 
   handle_timed_event(&event);

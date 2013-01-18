@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -49,7 +49,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/broker.hh"
-#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
@@ -59,10 +58,10 @@
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
+#include "com/centreon/logging/engine.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::logging;
 
 // Error message when configuration parsing fail.
 #define ERROR_CONFIGURATION \
@@ -109,13 +108,15 @@ int main(int argc, char* argv[]) {
   // Load singletons.
   com::centreon::clib::load();
   com::centreon::engine::configuration::state::load();
-  com::centreon::engine::logging::engine::load();
+  com::centreon::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
   com::centreon::engine::commands::set::load();
   com::centreon::engine::checks::checker::load();
   com::centreon::engine::events::loop::load();
   com::centreon::engine::broker::loader::load();
   com::centreon::engine::broker::compatibility::load();
+
+  logging::broker backend_broker_log;
 
   int retval(EXIT_FAILURE);
   try {
@@ -192,12 +193,12 @@ int main(int argc, char* argv[]) {
 
     // Just display the license.
     if (display_license) {
-      logger(log_info_message, basic)
+      logger(logging::log_info_message, logging::basic)
         << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING << "\n"
         << "\n"
         << "Copyright 1999-2009 Ethan Galstad\n"
         << "Copyright 2009-2010 Nagios Core Development Team and Community Contributors\n"
-        << "Copyright 2011-2012 Merethis\n"
+        << "Copyright 2011-2013 Merethis\n"
         << "\n"
         << "This program is free software: you can redistribute it and/or\n"
         << "modify it under the terms of the GNU General Public License version 2\n"
@@ -215,7 +216,7 @@ int main(int argc, char* argv[]) {
     }
     // If requested or if an error occured, print usage.
     else if (error || display_help) {
-      logger(log_info_message, basic)
+      logger(logging::log_info_message, logging::basic)
         << "Usage: " << argv[0] << " [options] <main_config_file>\n"
         << "\n"
         << "Basics:\n"
@@ -246,7 +247,7 @@ int main(int argc, char* argv[]) {
       // resource and object config files).
       try {
         // Read main config file.
-        logger(log_info_message, basic)
+        logger(logging::log_info_message, logging::basic)
           << "reading main config file";
         config->parse(config_file);
 
@@ -257,23 +258,23 @@ int main(int argc, char* argv[]) {
           result = ERROR;
       }
       catch (std::exception const &e) {
-        logger(log_config_error, basic)
+        logger(logging::log_config_error, logging::basic)
           << "error while processing a config file: " << e.what();
         result = ERROR;
       }
 
       // There was a problem reading the config files.
       if (result != OK)
-        logger(log_config_error, basic)
+        logger(logging::log_config_error, logging::basic)
           << "\n    One or more problems occurred while processing the config files.\n\n"
           << ERROR_CONFIGURATION;
       // The config files were okay, so run the pre-flight check.
       else {
-        logger(log_info_message, basic)
+        logger(logging::log_info_message, logging::basic)
           << "running pre-flight check on configuration data";
         result = pre_flight_check();
         if (result != OK)
-          logger(log_config_error, basic)
+          logger(logging::log_config_error, logging::basic)
             << "\n    One or more problem occurred during the pre-flight check.\n\n"
             << ERROR_CONFIGURATION;
       }
@@ -292,18 +293,15 @@ int main(int argc, char* argv[]) {
       try {
         config->parse(config_file);
         configuration::applier::logging::instance().apply(*config);
-        logging::engine::obj_info
-          obj(
-            com::centreon::shared_ptr<logging::object>(new logging::broker),
-            log_all,
-            basic);
-        logging::engine::instance().add_object(obj);
-
+        com::centreon::logging::engine::instance().add(
+                                                     &backend_broker_log,
+                                                     logging::log_all,
+                                                     logging::basic);
         // Read object config files.
         result = read_all_object_data(config_file);
       }
       catch (std::exception const &e) {
-        logger(log_config_error, basic)
+        logger(logging::log_config_error, logging::basic)
           << "error while processing a config file: " << e.what();
       }
 
@@ -314,13 +312,13 @@ int main(int argc, char* argv[]) {
       }
 
       if (result != OK) {
-        logger(log_config_error, basic)
+        logger(logging::log_config_error, logging::basic)
           << "\n    One or more problems occurred while processing the config files.\n";
       }
 
       // Run the pre-flight check to make sure everything looks okay.
       if ((OK == result) && ((result = pre_flight_check()) != OK)) {
-        logger(log_config_error, basic)
+        logger(logging::log_config_error, logging::basic)
           << "\n    One or more problems occurred during the pre-flight check.\n";
       }
 
@@ -332,7 +330,7 @@ int main(int argc, char* argv[]) {
         display_scheduling_info();
 
         if (precache_objects == TRUE)
-          logger(log_info_message, basic)
+          logger(logging::log_info_message, logging::basic)
             << "\n"
             << "OBJECT PRECACHING\n"
             << "-----------------\n"
@@ -354,15 +352,14 @@ int main(int argc, char* argv[]) {
       try {
         config->parse(config_file);
         configuration::applier::logging::instance().apply(*config);
-        engine::obj_info obj(
-          com::centreon::shared_ptr<logging::object>(new logging::broker),
-          log_all,
-          basic);
-        logging::engine::instance().add_object(obj);
+        com::centreon::logging::engine::instance().add(
+                                                     &backend_broker_log,
+                                                     logging::log_all,
+                                                     logging::basic);
         result = OK;
       }
       catch (std::exception const &e) {
-        logger(log_config_error, basic)
+        logger(logging::log_config_error, logging::basic)
           << "error while processing a config file: " << e.what();
       }
 
@@ -385,14 +382,14 @@ int main(int argc, char* argv[]) {
           loader.load_directory(mod_dir);
       }
       catch (std::exception const& e) {
-        logger(log_info_message, basic)
-          << "error: event broker module initialization failed: "
+        logger(logging::log_info_message, logging::basic)
+          << "event broker module initialization failed: "
           << e.what();
         result = ERROR;
       }
 
       // This must be logged after we read config data, as user may have changed location of main log file.
-      logger(log_process_info, basic)
+      logger(logging::log_process_info, logging::basic)
         << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
         << " starting ... (PID=" << getpid() << ")";
 
@@ -404,11 +401,8 @@ int main(int argc, char* argv[]) {
         sizeof(datestring),
         "%a %b %d %H:%M:%S %Z %Y",
         tm);
-      logger(log_process_info, basic)
-        << "Local time is " << datestring;
-
-      // Write log version/info.
-      logger(log_process_info, basic)
+      logger(logging::log_process_info, logging::basic)
+        << "Local time is " << datestring << "\n"
         <<  "LOG VERSION: " << LOG_VERSION_2;
 
       // Load modules.
@@ -427,12 +421,12 @@ int main(int argc, char* argv[]) {
 
       // There was a problem reading the config files.
       if (result != OK)
-        logger(log_process_info | log_runtime_error | log_config_error, basic)
+        logger(logging::log_process_info | logging::log_runtime_error | logging::log_config_error, logging::basic)
           << "Bailing out due to one or more errors encountered in the configuration files. "
           << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
       // Run the pre-flight check to make sure everything looks okay.
       else if ((result = pre_flight_check()) != OK)
-        logger(log_process_info | log_runtime_error | log_verification_error, basic)
+        logger(logging::log_process_info | logging::log_runtime_error | logging::log_verification_error, logging::basic)
           << "Bailing out due to errors encountered while running the pre-flight check.  "
           << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
 
@@ -444,7 +438,7 @@ int main(int argc, char* argv[]) {
           NEBFLAG_PROCESS_INITIATED,
           NEBATTR_SHUTDOWN_ABNORMAL,
           NULL);
-        throw (engine_error()
+        throw (engine_error ()
                << "Shutting down because of an early failure");
       }
 
@@ -518,7 +512,7 @@ int main(int argc, char* argv[]) {
       // Did we catch a signal ?
       if (sigshutdown) {
         try {
-          logger(log_process_info, basic)
+          logger(logging::log_process_info, logging::basic)
             << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
         }
         catch (...) {
@@ -563,7 +557,7 @@ int main(int argc, char* argv[]) {
       // Shutdown stuff.
       if (sigshutdown) {
         // Log a shutdown message.
-        logger(log_process_info, basic)
+        logger(logging::log_process_info, logging::basic)
           << "Successfully shutdown ... (PID=" << getpid() << ")";
       }
 
@@ -587,7 +581,7 @@ int main(int argc, char* argv[]) {
     mac->x[MACRO_STATUSDATAFILE] = NULL;
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
+    logger(logging::log_runtime_error, logging::basic)
       << "error: " << e.what();
   }
 
@@ -598,7 +592,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::logging::unload();
   com::centreon::engine::configuration::state::unload();
-  com::centreon::engine::logging::engine::unload();
+  com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 
   return (retval);

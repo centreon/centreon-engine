@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -49,8 +49,8 @@ unsigned long             next_problem_id = 0L;
 unsigned long             next_notification_id = 0L;
 
 int                       sighup = true;
-int                       sigshutdown = FALSE;
-int                       sigrestart = FALSE;
+int                       sigshutdown = false;
+int                       sigrestart = false;
 
 char const*               sigs[35] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",
@@ -62,16 +62,16 @@ char const*               sigs[35] = {
   "PWR", "UNUSED", "ZERR", "DEBUG", NULL
 };
 
-int                       caught_signal = FALSE;
+int                       caught_signal = false;
 int                       sig_id = 0;
 
-int                       restarting = FALSE;
+int                       restarting = false;
 
-int                       verify_config = FALSE;
-int                       verify_circular_paths = TRUE;
-int                       test_scheduling = FALSE;
-int                       precache_objects = FALSE;
-int                       use_precached_objects = FALSE;
+int                       verify_config = false;
+int                       verify_circular_paths = true;
+int                       test_scheduling = false;
+int                       precache_objects = false;
+int                       use_precached_objects = false;
 
 unsigned int              currently_running_service_checks = 0;
 unsigned int              currently_running_host_checks = 0;
@@ -242,5 +242,4 @@ unsigned int use_regexp_matches;
 unsigned int use_true_regexp_matching;
 unsigned int use_large_installation_tweaks;
 unsigned int enable_environment_macros;
-unsigned int free_child_process_memory;
 int external_command_buffer_slots;

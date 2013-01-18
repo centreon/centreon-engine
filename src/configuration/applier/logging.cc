@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,8 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <syslog.h>
 #include "com/centreon/engine/configuration/applier/logging.hh"
-#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/logging/engine.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
@@ -60,16 +62,15 @@ void applier::logging::unload() {
  */
 void applier::logging::apply(state const& config) {
   // Syslog.
-  if (config.get_use_syslog() == true && _syslog_id == 0)
+  if (config.get_use_syslog() == true && !_syslog)
     _add_syslog();
-  else if (config.get_use_syslog() == false && _syslog_id != 0)
+  else if (config.get_use_syslog() == false && _syslog)
     _del_syslog();
 
   // Standard log file.
   if (config.get_log_file() == "")
     _del_log_file();
-  else if (config.get_log_file() != _log_file
-           || config.get_max_log_file_size() != _log_limit) {
+  else if (!_log || config.get_log_file() != _log->filename()) {
     _add_log_file(config);
     _del_stdout();
     _del_stderr();
@@ -80,14 +81,13 @@ void applier::logging::apply(state const& config) {
       || !config.get_debug_level()
       || !config.get_debug_verbosity()) {
     _del_debug();
-    _debug_file = config.get_debug_file();
     _debug_level = config.get_debug_level();
     _debug_verbosity = config.get_debug_verbosity();
   }
-  else if ((config.get_debug_file() != _debug_file)
-           || (config.get_max_debug_file_size() != _debug_limit)
-           || (config.get_debug_level() != _debug_level)
-           || (config.get_debug_verbosity() != _debug_verbosity))
+  else if (!_debug
+           || config.get_debug_file() != _debug->filename()
+           || config.get_debug_level() != _debug_level
+           || config.get_debug_verbosity() != _debug_verbosity)
     _add_debug(config);
   return;
 }
@@ -96,15 +96,13 @@ void applier::logging::apply(state const& config) {
  *  Default constructor.
  */
 applier::logging::logging()
-  : _debug_id(0),
+  : _debug(NULL),
     _debug_level(0),
-    _debug_limit(0),
     _debug_verbosity(0),
-    _log_id(0),
-    _log_limit(0),
-    _stderr_id(0),
-    _stdout_id(0),
-    _syslog_id(0) {
+    _log(NULL),
+    _stderr(NULL),
+    _stdout(NULL),
+    _syslog(NULL) {
   _add_stdout();
   _add_stderr();
 }
@@ -115,15 +113,13 @@ applier::logging::logging()
  *  @param[in] config The initial confiuration.
  */
 applier::logging::logging(state const& config)
-  : _debug_id(0),
+  : _debug(NULL),
     _debug_level(0),
-    _debug_limit(0),
     _debug_verbosity(0),
-    _log_id(0),
-    _log_limit(0),
-    _stderr_id(0),
-    _stdout_id(0),
-    _syslog_id(0) {
+    _log(NULL),
+    _stderr(NULL),
+    _stdout(NULL),
+    _syslog(NULL) {
   _add_stdout();
   _add_stderr();
   apply(config);
@@ -136,15 +132,13 @@ applier::logging::logging(state const& config)
  */
 applier::logging::logging(applier::logging& right)
   : base(right),
-    _debug_id(0),
+    _debug(NULL),
     _debug_level(0),
-    _debug_limit(0),
     _debug_verbosity(0),
-    _log_id(0),
-    _log_limit(0),
-    _stderr_id(0),
-    _stdout_id(0),
-    _syslog_id(0) {
+    _log(NULL),
+    _stderr(NULL),
+    _stdout(NULL),
+    _syslog(NULL) {
   operator=(right);
 }
 
@@ -166,23 +160,19 @@ applier::logging::~logging() throw() {
  */
 applier::logging& applier::logging::operator=(applier::logging& right) {
   if (this != &right) {
-    _debug_file = right._debug_file;
-    _debug_id = right._debug_id;
+    _debug = right._debug;
     _debug_level = right._debug_level;
-    _debug_limit = right._debug_limit;
     _debug_verbosity = right._debug_verbosity;
-    _log_file = right._log_file;
-    _log_id = right._log_id;
-    _log_limit = right._log_limit;
-    _stderr_id = right._stderr_id;
-    _stdout_id = right._stdout_id;
-    _syslog_id = right._syslog_id;
+    _log = right._log;
+    _stderr = right._stderr;
+    _stdout = right._stdout;
+    _syslog = right._syslog;
 
-    right._stdout_id = 0;
-    right._stderr_id = 0;
-    right._syslog_id = 0;
-    right._log_id = 0;
-    right._debug_id = 0;
+    right._debug = NULL;
+    right._log = NULL;
+    right._stderr = NULL;
+    right._stdout = NULL;
+    right._syslog = NULL;
   }
   return (*this);
 }
@@ -191,11 +181,10 @@ applier::logging& applier::logging::operator=(applier::logging& right) {
  *  Add stdout object logging.
  */
 void applier::logging::_add_stdout() {
-  if (_stdout_id == 0) {
-    shared_ptr<engine::logging::object>
-      obj(new engine::logging::standard());
+  if (!_stdout) {
+    _stdout = new com::centreon::logging::file(stdout);
     unsigned long long type(
-                         engine::logging::log_process_info
+                           engine::logging::log_process_info
                          | engine::logging::log_verification_error
                          | engine::logging::log_verification_warning
                          | engine::logging::log_config_error
@@ -213,11 +202,10 @@ void applier::logging::_add_stdout() {
                          | engine::logging::log_info_message
                          | engine::logging::log_host_notification
                          | engine::logging::log_service_notification);
-    engine::logging::engine::obj_info info(
-                                        obj,
-                                        type,
-                                        engine::logging::most);
-    _stdout_id = engine::logging::engine::instance().add_object(info);
+    com::centreon::logging::engine::instance().add(
+                                                 _stdout,
+                                                 type,
+                                                 engine::logging::most);
   }
   return;
 }
@@ -226,18 +214,15 @@ void applier::logging::_add_stdout() {
  *  Add stderr object logging.
  */
 void applier::logging::_add_stderr() {
-  if (_stderr_id == 0) {
-    shared_ptr<engine::logging::object>
-      obj(new engine::logging::standard(false));
+  if (!_stderr) {
+    _stderr = new com::centreon::logging::file(stderr);
     unsigned long long type(
                          engine::logging::log_runtime_error
                          | engine::logging::log_runtime_warning);
-
-    engine::logging::engine::obj_info info(
-                                        obj,
-                                        type,
-                                        engine::logging::most);
-    _stderr_id = engine::logging::engine::instance().add_object(info);
+    com::centreon::logging::engine::instance().add(
+                                                 _stderr,
+                                                 type,
+                                                 engine::logging::most);
   }
   return;
 }
@@ -245,13 +230,15 @@ void applier::logging::_add_stderr() {
  *  Add syslog object logging.
  */
 void applier::logging::_add_syslog() {
-  shared_ptr<engine::logging::object>
-    obj(new engine::logging::syslog);
-  engine::logging::engine::obj_info info(
-                                       obj,
-                                       engine::logging::log_all,
-                                       engine::logging::basic);
-  _syslog_id = engine::logging::engine::instance().add_object(info);
+  if (!_syslog) {
+    _syslog = new com::centreon::logging::syslogger(
+                                            "centreon-engine",
+                                            LOG_USER);
+    com::centreon::logging::engine::instance().add(
+                                                 _syslog,
+                                                 engine::logging::log_all,
+                                                 engine::logging::basic);
+  }
   return;
 }
 
@@ -260,15 +247,11 @@ void applier::logging::_add_syslog() {
  */
 void applier::logging::_add_log_file(state const& config) {
   _del_log_file();
-  shared_ptr<engine::logging::object>
-    obj(new engine::logging::file(
-                               config.get_log_file(),
-                               config.get_max_log_file_size()));
-  engine::logging::engine::obj_info info(
-                                      obj,
-                                      engine::logging::log_all,
-                                      engine::logging::most);
-  _log_id = engine::logging::engine::instance().add_object(info);
+  _log = new com::centreon::logging::file(config.get_log_file());
+  com::centreon::logging::engine::instance().add(
+                                               _log,
+                                               engine::logging::log_all,
+                                               engine::logging::most);
   return;
 }
 
@@ -277,15 +260,11 @@ void applier::logging::_add_log_file(state const& config) {
  */
 void applier::logging::_add_debug(state const& config) {
   _del_debug();
-  shared_ptr<engine::logging::object>
-    obj(new engine::logging::file(
-                               config.get_debug_file(),
-                               config.get_max_debug_file_size()));
-  engine::logging::engine::obj_info info(
-                                      obj,
-                                      config.get_debug_level(),
-                                      config.get_debug_verbosity());
-  _debug_id = engine::logging::engine::instance().add_object(info);
+  _debug = new com::centreon::logging::file(config.get_debug_file());
+  com::centreon::logging::engine::instance().add(
+                                               _debug,
+                                               config.get_debug_level(),
+                                               config.get_debug_verbosity());
   return;
 }
 
@@ -293,9 +272,10 @@ void applier::logging::_add_debug(state const& config) {
  *  Remove syslog object logging.
  */
 void applier::logging::_del_syslog() {
-  if (_syslog_id != 0) {
-    engine::logging::engine::instance().remove_object(_syslog_id);
-    _syslog_id = 0;
+  if (_syslog) {
+    com::centreon::logging::engine::instance().remove(_syslog);
+    delete _syslog;
+    _syslog = NULL;
   }
   return;
 }
@@ -304,9 +284,10 @@ void applier::logging::_del_syslog() {
  *  Remove file object logging.
  */
 void applier::logging::_del_log_file() {
-  if (_log_id != 0) {
-    engine::logging::engine::instance().remove_object(_log_id);
-    _log_id = 0;
+  if (_log) {
+    com::centreon::logging::engine::instance().remove(_log);
+    delete _log;
+    _log = NULL;
   }
   return;
 }
@@ -315,9 +296,10 @@ void applier::logging::_del_log_file() {
  *  Remove debug object logging.
  */
 void applier::logging::_del_debug() {
-  if (_debug_id != 0) {
-    engine::logging::engine::instance().remove_object(_debug_id);
-    _debug_id = 0;
+  if (_debug) {
+    com::centreon::logging::engine::instance().remove(_debug);
+    delete _debug;
+    _debug = NULL;
   }
   return;
 }
@@ -326,9 +308,10 @@ void applier::logging::_del_debug() {
  *  Remove stdout object logging.
  */
 void applier::logging::_del_stdout() {
-  if (_stdout_id != 0) {
-    engine::logging::engine::instance().remove_object(_stdout_id);
-    _stdout_id = 0;
+  if (_stdout) {
+    com::centreon::logging::engine::instance().remove(_stdout);
+    delete _stdout;
+    _stdout = NULL;
   }
   return;
 }
@@ -337,9 +320,10 @@ void applier::logging::_del_stdout() {
  *  Remove stderr object logging.
  */
 void applier::logging::_del_stderr() {
-  if (_stderr_id != 0) {
-    engine::logging::engine::instance().remove_object(_stderr_id);
-    _stderr_id = 0;
+  if (_stderr) {
+    com::centreon::logging::engine::instance().remove(_stderr);
+    delete _stderr;
+    _stderr = NULL;
   }
   return;
 }

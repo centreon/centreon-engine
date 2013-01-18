@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,7 +32,7 @@ using namespace com::centreon::engine::script;
 
 static char const* copyright =
   "/*\n"
-  "** Copyright 2011-2012 Merethis\n"
+  "** Copyright 2011-2013 Merethis\n"
   "**\n"
   "** This file is part of Centreon Engine.\n"
   "**\n"

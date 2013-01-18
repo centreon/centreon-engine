@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -55,7 +55,6 @@ namespace                  broker {
                            loader(loader const& right);
     virtual                ~loader() throw ();
     loader&                operator=(loader const& right);
-    void                   _internal_copy(loader const& right);
 
     std::list<shared_ptr<handle> >
                            _modules;
