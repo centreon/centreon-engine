@@ -135,7 +135,7 @@ xerces-c                    xerces-c-devel      Used for parsing XML
 
    $ yum install cmake
 
-#. Install Centreon Clib ::
+#. Install Centreon Clib
 
    See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
 
