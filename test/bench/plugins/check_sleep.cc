@@ -42,9 +42,10 @@ int main (int argc, char **argv) {
   char* appname(basename(argv[0]));
   int status(-1);
   int timeout(-1);
+  int last_state(STATUS_UNKNOWN);
 
   int opt;
-  while ((opt = getopt(argc, argv, "s:t:")) != -1) {
+  while ((opt = getopt(argc, argv, "s:t:l:")) != -1) {
     switch (opt) {
     case 's':
       status = atoi(optarg);
@@ -52,6 +53,12 @@ int main (int argc, char **argv) {
 
     case 't':
       timeout = atoi(optarg);
+      break;
+
+    case 'l':
+      last_state = atoi(optarg);
+      if (last_state > STATUS_UNKNOWN || last_state < STATUS_OK)
+	last_state = STATUS_UNKNOWN;
       break;
 
     default:
@@ -63,8 +70,19 @@ int main (int argc, char **argv) {
   srand(getpid());
 
   if (status == -1) {
-    if ((status = rand() % 10) > STATUS_UNKNOWN)
-      status = STATUS_OK;
+    if (last_state && (rand() % 9))
+      status = last_state;
+    else {
+      int randomval(rand() % 100);
+      if (randomval < 2)
+	status = STATUS_UNKNOWN;
+      else if (randomval < 4)
+	status = STATUS_WARNING;
+      else if (randomval < 6)
+	status = STATUS_CRITICAL;
+      else
+	status = STATUS_OK;
+    }
   }
   if (timeout == -1)
     timeout = ((rand() % 9) % 6);
