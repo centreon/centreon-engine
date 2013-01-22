@@ -20,7 +20,6 @@
 # Minimal configuration set.
 cfg_file=minimal.cfg
 log_file=nagios.log
-log_archive_path=.
 interval_length=1
 
 # Content.
