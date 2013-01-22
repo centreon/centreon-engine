@@ -51,8 +51,7 @@ broker::broker()
 broker::broker(broker const& right)
   : backend(right),
     _enable(false) {
-  concurrency::locker lock(&right._lock);
-  _thread = right._thread;
+  operator=(right);
 }
 
 /**
