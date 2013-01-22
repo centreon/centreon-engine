@@ -38,7 +38,8 @@ using namespace com::centreon::engine::logging;
  *  Default constructor.
  */
 broker::broker()
-  : backend(false, false, com::centreon::logging::none, false) {
+  : backend(false, false, com::centreon::logging::none, false),
+    _enable(false) {
   memset(&_thread, 0, sizeof(_thread));
 }
 

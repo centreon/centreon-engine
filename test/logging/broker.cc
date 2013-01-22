@@ -37,9 +37,9 @@ using namespace com::centreon;
 *                                     *
 **************************************/
 
-static const unsigned int NB_DBG_TYPE  = 18;
-static const unsigned int NB_LOG_TYPE  = 21;
-static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
+static unsigned int const NB_DBG_TYPE  = 18;
+static unsigned int const NB_LOG_TYPE  = 21;
+static char const*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
 *                                     *
