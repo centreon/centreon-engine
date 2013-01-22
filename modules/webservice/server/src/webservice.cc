@@ -116,6 +116,7 @@ void  webservice::_run() {
     // Add task to thread pool.
     std::auto_ptr<concurrency::runnable>
       t(new webservice::query(soap_cpy));
+    t->set_auto_delete(true);
     pool.start(t.get());
     t.release();
   }
@@ -284,9 +285,5 @@ void webservice::query::run() {
     soap_end(_soap);
     soap_free(_soap);
   }
-
-  // Self deletion.
-  delete this;
-
   return ;
 }
