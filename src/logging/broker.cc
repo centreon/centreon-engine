@@ -41,6 +41,7 @@ broker::broker()
   : backend(false, false, com::centreon::logging::none, false),
     _enable(false) {
   memset(&_thread, 0, sizeof(_thread));
+  open();
 }
 
 /**
@@ -58,7 +59,7 @@ broker::broker(broker const& right)
  *  Destructor.
  */
 broker::~broker() throw () {
-
+  close();
 }
 
 /**
