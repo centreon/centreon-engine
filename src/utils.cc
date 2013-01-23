@@ -275,7 +275,7 @@ int get_raw_command_line(
       char* cmd,
       char** full_command,
       int macro_options) {
-  nagios_macros *mac = get_global_macros();
+  nagios_macros* mac = get_global_macros();
   return (get_raw_command_line_r(
             mac,
             cmd_ptr,

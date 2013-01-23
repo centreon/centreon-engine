@@ -36,6 +36,35 @@ using namespace com::centreon::engine::logging;
 
 static const unsigned int BUFFER_SIZE = 4096;
 
+static char const* tab_state_type[] = {
+  "SOFT",
+  "HARD"
+};
+
+static char const* tab_initial_state[] = {
+  "UNKNOWN",
+  "INITIAL",
+  "CURRENT"
+};
+
+static struct {
+  unsigned long id;
+  char const* str;
+} tab_host_states[] = {
+  { NSLOG_HOST_UP,          "UP"          },
+  { NSLOG_HOST_DOWN,        "DOWN"        },
+  { NSLOG_HOST_UNREACHABLE, "UNREACHABLE" }
+};
+
+static struct {
+  unsigned long id;
+  char const* str;
+} tab_service_states[] = {
+  { NSLOG_SERVICE_OK,       "OK"       },
+  { NSLOG_SERVICE_WARNING,  "WARNING"  },
+  { NSLOG_SERVICE_CRITICAL, "CRITICAL" }
+};
+
 /**
  *  The main logging function.
  *  This function has been DEPRECATED.
@@ -131,9 +160,8 @@ int write_to_log(
       time_t* timestamp) {
   (void)timestamp;
 
-  if (buffer != NULL) {
+  if (buffer)
     logger(type, basic) << buffer;
-  }
   return (OK);
 }
 
@@ -147,9 +175,8 @@ int write_to_log(
  *  @return Return true.
  */
 int write_to_syslog(char const* buffer, unsigned long type) {
-  if (buffer != NULL) {
+  if (buffer)
     logger(type, basic) << buffer;
-  }
   return (OK);
 }
 
@@ -161,48 +188,32 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  *
  *  @return Return true on success.
  */
-int log_service_event(service* svc) {
+int log_service_event(service const* svc) {
   if (svc->state_type == SOFT_STATE
-      && !config->get_log_service_retries()) {
+      && !config->get_log_service_retries())
     return (OK);
-  }
 
-  if (svc->host_ptr == NULL
-      || svc->host_name == NULL
-      || svc->description == NULL) {
+  if (!svc->host_ptr || !svc->host_name || !svc->description)
     return (ERROR);
+
+  unsigned long log_options(NSLOG_SERVICE_UNKNOWN);
+  char const* state("UNKNOWN");
+  if (svc->current_state >= 0
+      && (unsigned int)svc->current_state
+      < sizeof(tab_service_states) / sizeof(*tab_service_states)) {
+    log_options = tab_service_states[svc->current_state].id;
+    state = tab_service_states[svc->current_state].str;
   }
+  char const* state_type(tab_state_type[svc->state_type]);
+  char const* output(svc->plugin_output ? svc->plugin_output : "");
 
-  unsigned long log_options = NSLOG_SERVICE_OK;
-  unsigned long nslog_options[] = {
-    NSLOG_SERVICE_OK,
-    NSLOG_SERVICE_WARNING,
-    NSLOG_SERVICE_CRITICAL,
-    NSLOG_SERVICE_UNKNOWN
-  };
+  std::ostringstream oss;
+  oss
+    << "SERVICE ALERT: " << svc->host_name << ";" << svc->description
+    << ";" << state << ";" << state_type << ";" << svc->current_attempt
+    << ";" << output;
 
-  if (svc->current_state > 0
-      && (unsigned int)svc->current_state < sizeof(nslog_options) / sizeof(*nslog_options)) {
-    log_options = nslog_options[svc->current_state];
-  }
-
-  nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, svc->host_ptr);
-  grab_service_macros_r(&mac, svc);
-
-  std::string buffer = "SERVICE ALERT: " + std::string(svc->host_name) + ";"
-    + svc->description + ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-    + (svc->plugin_output ? svc->plugin_output : "");
-
-  char* processed_buffer = NULL;
-  process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
-  clear_host_macros_r(&mac);
-  clear_service_macros_r(&mac);
-
-  logger(log_options, basic) << processed_buffer;
-
-  delete[] processed_buffer;
+  logger(log_options, basic) << oss.str();
   return (OK);
 }
 
@@ -214,38 +225,26 @@ int log_service_event(service* svc) {
  *
  *  @return Return true on success.
  */
-int log_host_event(host* hst) {
-  if (hst == NULL || hst->name == NULL) {
+int log_host_event(host const* hst) {
+  if (!hst || !hst->name)
     return (ERROR);
-  }
 
-  nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros_r(&mac, hst);
-
-  unsigned long log_options = NSLOG_HOST_UP;
-  unsigned long nslog_options[] = {
-    NSLOG_HOST_UP,
-    NSLOG_HOST_DOWN,
-    NSLOG_HOST_UNREACHABLE
-  };
-
+  unsigned long log_options(NSLOG_HOST_UP);
+  char const* state("UP");
   if (hst->current_state > 0
-      && (unsigned int)hst->current_state < sizeof(nslog_options) / sizeof(*nslog_options)) {
-    log_options = nslog_options[hst->current_state];
+      && (unsigned int)hst->current_state
+      < sizeof(tab_host_states) / sizeof(*tab_host_states)) {
+    log_options = tab_host_states[hst->current_state].id;
+    state = tab_host_states[hst->current_state].str;
   }
+  char const* state_type(tab_state_type[hst->state_type]);
+  char const* output(hst->plugin_output ? hst->plugin_output : "");
 
-  std::string buffer = "HOST ALERT: " + std::string(hst->name)
-    + ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-    + (hst->plugin_output ? hst->plugin_output : "");
+  std::ostringstream oss;
+  oss << "HOST ALERT: " << hst->name << ";" << state << ";"
+      << state_type << ";" << hst->current_attempt << ";" << output;
 
-  char* processed_buffer = NULL;
-  process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
-
-  logger(log_options, basic) << processed_buffer;
-
-  clear_host_macros_r(&mac);
-  delete[] processed_buffer;
+  logger(log_options, basic) << oss.str();
   return (OK);
 }
 
@@ -261,34 +260,29 @@ int log_host_event(host* hst) {
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES
-      && config->get_log_initial_state() == false) {
+  if (type == INITIAL_STATES && !config->get_log_initial_state())
     return (OK);
-  }
 
-  nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
-  for (host* host = host_list;
-       host != NULL;
-       host = host->next) {
-    if (host->name == NULL) {
+  char const* type_str(tab_initial_state[type]);
+  for (host* hst = host_list; hst; hst = hst->next) {
+    if (!hst->name)
       continue;
-    }
 
-    grab_host_macros_r(&mac, host);
+    char const* state("UP");
+    if (hst->current_state > 0
+        && (unsigned int)hst->current_state
+        < sizeof(tab_host_states) / sizeof(*tab_host_states))
+      state = tab_host_states[hst->current_state].str;
 
-    std::string buffer = (type == INITIAL_STATES ? "INITIAL" : "CURRENT")
-      + std::string(" HOST STATE: ") + std::string(host->name)
-      + ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-      + (host->plugin_output ? host->plugin_output : "");
+    char const* state_type(tab_state_type[hst->state_type]);
+    char const* output(hst->plugin_output ? hst->plugin_output : "");
 
-    char* processed_buffer = NULL;
-    process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
+    std::ostringstream oss;
+    oss << type_str << " HOST STATE: " << hst->name << ";" << state
+        << ";" << state_type << ";" << hst->current_attempt << ";"
+        << output;
 
-    logger(log_info_message, basic) << processed_buffer;
-
-    clear_host_macros_r(&mac);
-    delete[] processed_buffer;
+    logger(log_info_message, basic) << oss.str();
   }
   return (OK);
 }
@@ -305,39 +299,29 @@ int log_host_states(unsigned int type, time_t* timestamp) {
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES && config->get_log_initial_state() == false) {
+  if (type == INITIAL_STATES && !config->get_log_initial_state())
     return (OK);
-  }
 
-  nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
-  for (service* service = service_list;
-       service != NULL;
-       service = service->next) {
-
-    if (service->host_ptr == NULL
-	|| service->host_name == NULL
-	|| service->description == NULL) {
+  char const* type_str(tab_initial_state[type]);
+  for (service* svc = service_list; svc; svc = svc->next) {
+    if (!svc->host_ptr || !svc->host_name || !svc->description)
       continue;
-    }
 
-    grab_host_macros_r(&mac, service->host_ptr);
-    grab_service_macros_r(&mac, service);
+    char const* state("UNKNOWN");
+    if (svc->current_state >= 0
+        && (unsigned int)svc->current_state
+        < sizeof(tab_service_states) / sizeof(*tab_service_states))
+      state = tab_service_states[svc->current_state].str;
 
-    std::string buffer = (type == INITIAL_STATES ? "INITIAL" : "CURRENT")
-      + std::string(" SERVICE STATE: ") + std::string(service->host_name)
-      + ';' + service->description
-      + ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-      + (service->plugin_output != NULL ? service->plugin_output : "");
+    char const* state_type(tab_state_type[svc->state_type]);
+    char const* output(svc->plugin_output ? svc->plugin_output : "");
 
-    char* processed_buffer = NULL;
-    process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
+    std::ostringstream oss;
+    oss << type_str << " SERVICE STATE: " << svc->host_name << ";"
+        << svc->description << ";" << state << ";" << state_type
+        << ";" << svc->current_attempt << ";" << output;
 
-    logger(log_info_message, basic) << processed_buffer;
-
-    clear_host_macros_r(&mac);
-    clear_service_macros_r(&mac);
-    delete[] processed_buffer;
+    logger(log_info_message, basic) << oss.str();
   }
   return (OK);
 }

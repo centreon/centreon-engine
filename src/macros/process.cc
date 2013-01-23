@@ -245,9 +245,8 @@ int process_macros_r(
   delete[] save_buffer;
 
   logger(dbg_macros, more)
-    << "  Done.  Final output: '" << *output_buffer << "'";
-  logger(dbg_macros, more)
-    << "**** END MACRO PROCESSING *************";
+    << "  Done.  Final output: '" << *output_buffer << "'\n"
+    "**** END MACRO PROCESSING *************";
   return (OK);
 }
 

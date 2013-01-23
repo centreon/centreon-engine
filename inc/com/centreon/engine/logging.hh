@@ -107,9 +107,9 @@ int write_to_log(
 // write a string to the syslog facility
 int write_to_syslog(char const* buffer, unsigned long data_type);
 // logs a service event
-int log_service_event(service* svc);
+int log_service_event(service const* svc);
 // logs a host event
-int log_host_event(host* hst);
+int log_host_event(host const* hst);
 // logs initial/current host states
 int log_host_states(unsigned int type, time_t* timestamp);
 // logs initial/current service states
