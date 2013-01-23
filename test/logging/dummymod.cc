@@ -57,8 +57,6 @@ static const char* LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
  *  @return 0 on success.
  */
 int callback(int callback_type, void* data) {
-  static unsigned int index = 0;
-
   (void)callback_type;
 
   nebstruct_log_data* neb_log = static_cast<nebstruct_log_data*>(data);
@@ -68,13 +66,7 @@ int callback(int callback_type, void* data) {
     return (0);
   }
 
-  if (index == 8) {
-    ++index;
-  }
-
-  if (static_cast<unsigned long long>(neb_log->data_type)
-        != (1ull << index++)
-      || strcmp(neb_log->data, LOG_MESSAGE)
+  if (strcmp(neb_log->data, LOG_MESSAGE)
       || (neb_log->data_type & logging::log_all) == 0) {
     std::cerr << "error: bad value in module" << std::endl;
     exit(EXIT_FAILURE);
