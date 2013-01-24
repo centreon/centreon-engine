@@ -1574,7 +1574,7 @@ int parse_check_output(
     *perf_data = NULL;
 
   /* nothing to do */
-  if (buf == NULL || !strcmp(buf, ""))
+  if (buf == NULL || *buf == 0)
     return (OK);
 
   used_buf = strlen(buf) + 1;
