@@ -34,7 +34,7 @@ using namespace com::centreon::engine::modules::webservice;
  *
  *  @return Class instance.
  */
-sync& sync::instance() {
+engine::modules::webservice::sync& sync::instance() {
   static sync instance;
   return (instance);
 }
