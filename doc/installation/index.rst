@@ -343,7 +343,7 @@ Example ::
      -DWITH_PKGCONFIG_SCRIPT=1 \
      -DWITH_PKGCONFIG_DIR=/usr/lib/pkgconfig \
      -DWITH_TESTING=0 \
-     -DWITH_WEBSERVICE=1 .
+     -DWITH_WEBSERVICE=0 .
 
 At this step, the software will check for existence and usability of the
 rerequisites. If one cannot be found, an appropriate error message will
