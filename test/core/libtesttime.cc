@@ -17,14 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctime>
+#include <time.h>
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/utils.hh"
 #include "test/core/libtesttime.hh"
 
+#ifndef __THROW
+#  define __THROW
+#endif // !__THROW
+
 // overload of libc time function.
 // always return "Mon Jan 28 13:00:00 CET 2013"
-extern "C" time_t time(time_t *t) throw () {
+extern "C" time_t time(time_t *t) __THROW {
   if (t)
     *t = 1359370800;
   return (1359370800);
