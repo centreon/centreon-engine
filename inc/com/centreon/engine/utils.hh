@@ -87,7 +87,7 @@ void get_next_valid_time(
        time_t pref_time,
        time_t* valid_time,
        timeperiod* tperiod);
-int is_daterange_single_day(daterange* dr);
+int is_daterange_single_day(daterange const* dr);
 // calculate_time_from_day_of_month
 time_t calculate_time_from_day_of_month(
          int year,

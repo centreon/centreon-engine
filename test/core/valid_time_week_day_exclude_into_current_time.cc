@@ -55,7 +55,7 @@ int main_test(int argc, char** argv) {
   exclude.push_back(ename);
   core::build_week_days(range, "00:00-24:00");
   timeperiod* p(core::build_timeperiod(name, range, exclude));
-  bool ret(core::check_valid_time(p, now, now));
+  bool ret(core::check_valid_time(p, now, now + HOUR(1) + SEC(1)));
   objects::release(p);
   objects::release(e);
 
