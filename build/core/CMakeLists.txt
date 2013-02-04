@@ -57,6 +57,110 @@ if (WITH_TESTING)
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 
 
+  # last_monday_exception_after_range
+  set(TEST_NAME "last_monday_exception_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # last_monday_exception_before_range
+  set(TEST_NAME "last_monday_exception_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # last_monday_exception_into_range
+  set(TEST_NAME "last_monday_exception_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # last_monday_exception_exclude_after_range
+  set(TEST_NAME "last_monday_exception_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # last_monday_exception_exclude_before_range
+  set(TEST_NAME "last_monday_exception_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # last_monday_exception_exclude_into_range
+  set(TEST_NAME "last_monday_exception_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # four_monday_exception_after_range
+  set(TEST_NAME "four_monday_exception_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # four_monday_exception_before_range
+  set(TEST_NAME "four_monday_exception_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # four_monday_exception_into_range
+  set(TEST_NAME "four_monday_exception_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # four_monday_exception_exclude_after_range
+  set(TEST_NAME "four_monday_exception_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # four_monday_exception_exclude_before_range
+  set(TEST_NAME "four_monday_exception_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # four_monday_exception_exclude_into_range
+  set(TEST_NAME "four_monday_exception_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # skip_in_day_exception_after_range
+  set(TEST_NAME "skip_in_day_exception_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_before_range
+  set(TEST_NAME "skip_in_day_exception_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_into_range
+  set(TEST_NAME "skip_in_day_exception_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # skip_in_day_exception_exclude_after_range
+  set(TEST_NAME "skip_in_day_exception_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_exclude_before_range
+  set(TEST_NAME "skip_in_day_exception_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_exclude_into_range
+  set(TEST_NAME "skip_in_day_exception_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # skip_out_day_exception_after_range
+  set(TEST_NAME "skip_out_day_exception_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_out_day_exception_before_range
+  set(TEST_NAME "skip_out_day_exception_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_out_day_exception_into_range
+  set(TEST_NAME "skip_out_day_exception_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # skip_out_day_exception_exclude_after_range
+  set(TEST_NAME "skip_out_day_exception_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_out_day_exception_exclude_before_range
+  set(TEST_NAME "skip_out_day_exception_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_out_day_exception_exclude_into_range
+  set(TEST_NAME "skip_out_day_exception_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
   # speday_exception_after_range
   set(TEST_NAME "speday_exception_after_range")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
