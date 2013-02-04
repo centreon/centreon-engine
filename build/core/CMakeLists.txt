@@ -135,6 +135,32 @@ if (WITH_TESTING)
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 
 
+  # skip_in_day_exception_after_range_2
+  set(TEST_NAME "skip_in_day_exception_after_range_2")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_before_range_2
+  set(TEST_NAME "skip_in_day_exception_before_range_2")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_into_range_2
+  set(TEST_NAME "skip_in_day_exception_into_range_2")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # skip_in_day_exception_exclude_after_range_2
+  set(TEST_NAME "skip_in_day_exception_exclude_after_range_2")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_exclude_before_range_2
+  set(TEST_NAME "skip_in_day_exception_exclude_before_range_2")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # skip_in_day_exception_exclude_into_range_2
+  set(TEST_NAME "skip_in_day_exception_exclude_into_range_2")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
   # skip_out_day_exception_after_range
   set(TEST_NAME "skip_out_day_exception_after_range")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
