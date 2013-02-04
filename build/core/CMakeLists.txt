@@ -24,45 +24,87 @@
 if (WITH_TESTING)
   # Set directories.
   set(TEST_DIR "${TEST_DIR}/core")
+  set(CONF_DIR "${TEST_DIR}/configuration")
 
-  # Create test time library.
-  add_library("testtime" STATIC "${TEST_DIR}/libtesttime.cc")
-  set_target_properties("testtime" PROPERTIES PREFIX "")
-  target_link_libraries("testtime" "cce_core")
+  # get_next_valid_time
+  set(TEST_BIN_NAME "get_next_valid_time")
+  add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/${TEST_BIN_NAME}.cc")
+  target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
-  # valid_time_week_day_after_current_time
-  set(TEST_NAME "valid_time_week_day_after_current_time")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/${TEST_NAME}.cc")
-  target_link_libraries("${TEST_NAME}" "testtime")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # day_exception_after_range
+  set(TEST_NAME "day_exception_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 
-  # valid_time_week_day_before_current_time
-  set(TEST_NAME "valid_time_week_day_before_current_time")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/${TEST_NAME}.cc")
-  target_link_libraries("${TEST_NAME}" "testtime")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # day_exception_before_range
+  set(TEST_NAME "day_exception_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 
-  # valid_time_week_day_exclude_after_current_time
-  set(TEST_NAME "valid_time_week_day_exclude_after_current_time")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/${TEST_NAME}.cc")
-  target_link_libraries("${TEST_NAME}" "testtime")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # day_exception_into_range
+  set(TEST_NAME "day_exception_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 
-  # valid_time_week_day_exclude_before_current_time
-  set(TEST_NAME "valid_time_week_day_exclude_before_current_time")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/${TEST_NAME}.cc")
-  target_link_libraries("${TEST_NAME}" "testtime")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
 
-  # valid_time_week_day_exclude_into_current_time
-  set(TEST_NAME "valid_time_week_day_exclude_into_current_time")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/${TEST_NAME}.cc")
-  target_link_libraries("${TEST_NAME}" "testtime")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # day_exception_exclude_after_range
+  set(TEST_NAME "day_exception_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 
-  # valid_time_week_day_into_current_time
-  set(TEST_NAME "valid_time_week_day_into_current_time")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/${TEST_NAME}.cc")
-  target_link_libraries("${TEST_NAME}" "testtime")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # day_exception_exclude_before_range
+  set(TEST_NAME "day_exception_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # day_exception_exclude_into_range
+  set(TEST_NAME "day_exception_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # speday_exception_after_range
+  set(TEST_NAME "speday_exception_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # speday_exception_before_range
+  set(TEST_NAME "speday_exception_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # speday_exception_into_range
+  set(TEST_NAME "speday_exception_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # speday_exception_exclude_after_range
+  set(TEST_NAME "speday_exception_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # speday_exception_exclude_before_range
+  set(TEST_NAME "speday_exception_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # speday_exception_exclude_into_range
+  set(TEST_NAME "speday_exception_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # weekday_after_range
+  set(TEST_NAME "weekday_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # weekday_before_range
+  set(TEST_NAME "weekday_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # weekday_into_range
+  set(TEST_NAME "weekday_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+
+  # weekday_exclude_after_range
+  set(TEST_NAME "weekday_exclude_after_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # weekday_exclude_before_range
+  set(TEST_NAME "weekday_exclude_before_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+
+  # weekday_exclude_into_range
+  set(TEST_NAME "weekday_exclude_into_range")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
 endif ()
