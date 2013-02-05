@@ -24,217 +24,334 @@
 if (WITH_TESTING)
   # Set directories.
   set(TEST_DIR "${TEST_DIR}/core")
-  set(CONF_DIR "${TEST_DIR}/configuration")
 
   # get_next_valid_time
   set(TEST_BIN_NAME "get_next_valid_time")
   add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/${TEST_BIN_NAME}.cc")
   target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
-  # day_exception_after_range
-  set(TEST_NAME "day_exception_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  #
+  # exception
+  #
 
-  # day_exception_before_range
-  set(TEST_NAME "day_exception_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  ## calendar_date
+  set(CONF_DIR "${TEST_DIR}/configuration/exception/calendar_date")
 
-  # day_exception_into_range
-  set(TEST_NAME "day_exception_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_after_period
+  set(TEST_NAME "exception_calendar_date_date_after_period")
+  set(TEST_CONF_FILE "date_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_calendar_date_date_before_period
+  set(TEST_NAME "exception_calendar_date_date_before_period")
+  set(TEST_CONF_FILE "date_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # day_exception_exclude_after_range
-  set(TEST_NAME "day_exception_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_into_period
+  set(TEST_NAME "exception_calendar_date_date_into_period")
+  set(TEST_CONF_FILE "date_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # day_exception_exclude_before_range
-  set(TEST_NAME "day_exception_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_into_period_with_exclude_after
+  set(TEST_NAME "exception_calendar_date_date_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "date_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # day_exception_exclude_into_range
-  set(TEST_NAME "day_exception_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_into_period_with_exclude_before
+  set(TEST_NAME "exception_calendar_date_date_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "date_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_calendar_date_date_into_period_with_exclude_into
+  set(TEST_NAME "exception_calendar_date_date_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "date_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # last_monday_exception_after_range
-  set(TEST_NAME "last_monday_exception_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_skip_in_after_period
+  set(TEST_NAME "exception_calendar_date_date_skip_in_after_period")
+  set(TEST_CONF_FILE "date_skip_in_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # last_monday_exception_before_range
-  set(TEST_NAME "last_monday_exception_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_skip_in_before_period
+  set(TEST_NAME "exception_calendar_date_date_skip_in_before_period")
+  set(TEST_CONF_FILE "date_skip_in_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # last_monday_exception_into_range
-  set(TEST_NAME "last_monday_exception_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_skip_in_into_period
+  set(TEST_NAME "exception_calendar_date_date_skip_in_into_period")
+  set(TEST_CONF_FILE "date_skip_in_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_calendar_date_date_skip_in_into_period_with_exclude_after
+  set(TEST_NAME "exception_calendar_date_date_skip_in_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "date_skip_in_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # last_monday_exception_exclude_after_range
-  set(TEST_NAME "last_monday_exception_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_skip_in_into_period_with_exclude_before
+  set(TEST_NAME "exception_calendar_date_date_skip_in_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "date_skip_in_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # last_monday_exception_exclude_before_range
-  set(TEST_NAME "last_monday_exception_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_date_skip_in_into_period_with_exclude_into
+  set(TEST_NAME "exception_calendar_date_date_skip_in_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "date_skip_in_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # last_monday_exception_exclude_into_range
-  set(TEST_NAME "last_monday_exception_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_in_after_period
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_in_after_period")
+  set(TEST_CONF_FILE "start_end_date_skip_in_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_calendar_date_start_end_date_skip_in_before_period
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_in_before_period")
+  set(TEST_CONF_FILE "start_end_date_skip_in_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # four_monday_exception_after_range
-  set(TEST_NAME "four_monday_exception_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_in_into_period
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_in_into_period")
+  set(TEST_CONF_FILE "start_end_date_skip_in_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # four_monday_exception_before_range
-  set(TEST_NAME "four_monday_exception_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_in_into_period_with_exclude_after
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_in_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "start_end_date_skip_in_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # four_monday_exception_into_range
-  set(TEST_NAME "four_monday_exception_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_in_into_period_with_exclude_before
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_in_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "start_end_date_skip_in_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_calendar_date_start_end_date_skip_in_into_period_with_exclude_into
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_in_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "start_end_date_skip_in_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # four_monday_exception_exclude_after_range
-  set(TEST_NAME "four_monday_exception_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_out_after_period
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_out_after_period")
+  set(TEST_CONF_FILE "start_end_date_skip_out_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # four_monday_exception_exclude_before_range
-  set(TEST_NAME "four_monday_exception_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_out_before_period
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_out_before_period")
+  set(TEST_CONF_FILE "start_end_date_skip_out_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # four_monday_exception_exclude_into_range
-  set(TEST_NAME "four_monday_exception_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_out_into_period
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_out_into_period")
+  set(TEST_CONF_FILE "start_end_date_skip_out_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_calendar_date_start_end_date_skip_out_after_period_with_exclude_after
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_out_after_period_with_exclude_after")
+  set(TEST_CONF_FILE "start_end_date_skip_out_after_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # skip_in_day_exception_after_range
-  set(TEST_NAME "skip_in_day_exception_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_out_after_period_with_exclude_before
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_out_after_period_with_exclude_before")
+  set(TEST_CONF_FILE "start_end_date_skip_out_after_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # skip_in_day_exception_before_range
-  set(TEST_NAME "skip_in_day_exception_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_into_range
-  set(TEST_NAME "skip_in_day_exception_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-
-  # skip_in_day_exception_exclude_after_range
-  set(TEST_NAME "skip_in_day_exception_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_exclude_before_range
-  set(TEST_NAME "skip_in_day_exception_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_exclude_into_range
-  set(TEST_NAME "skip_in_day_exception_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-
-  # skip_in_day_exception_after_range_2
-  set(TEST_NAME "skip_in_day_exception_after_range_2")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_before_range_2
-  set(TEST_NAME "skip_in_day_exception_before_range_2")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_into_range_2
-  set(TEST_NAME "skip_in_day_exception_into_range_2")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-
-  # skip_in_day_exception_exclude_after_range_2
-  set(TEST_NAME "skip_in_day_exception_exclude_after_range_2")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_exclude_before_range_2
-  set(TEST_NAME "skip_in_day_exception_exclude_before_range_2")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # skip_in_day_exception_exclude_into_range_2
-  set(TEST_NAME "skip_in_day_exception_exclude_into_range_2")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_calendar_date_start_end_date_skip_out_after_period_with_exclude_into
+  set(TEST_NAME "exception_calendar_date_start_end_date_skip_out_after_period_with_exclude_into")
+  set(TEST_CONF_FILE "start_end_date_skip_out_after_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 
-  # skip_out_day_exception_after_range
-  set(TEST_NAME "skip_out_day_exception_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  ## month_day
+  set(CONF_DIR "${TEST_DIR}/configuration/exception/month_day")
 
-  # skip_out_day_exception_before_range
-  set(TEST_NAME "skip_out_day_exception_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_day_day_after_period
+  set(TEST_NAME "exception_month_day_day_after_period")
+  set(TEST_CONF_FILE "day_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # skip_out_day_exception_into_range
-  set(TEST_NAME "skip_out_day_exception_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_day_day_before_period
+  set(TEST_NAME "exception_month_day_day_before_period")
+  set(TEST_CONF_FILE "day_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # exception_month_day_day_into_period
+  set(TEST_NAME "exception_month_day_day_into_period")
+  set(TEST_CONF_FILE "day_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # skip_out_day_exception_exclude_after_range
-  set(TEST_NAME "skip_out_day_exception_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_day_day_into_period_with_exclude_after
+  set(TEST_NAME "exception_month_day_day_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "day_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # skip_out_day_exception_exclude_before_range
-  set(TEST_NAME "skip_out_day_exception_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_day_day_into_period_with_exclude_before
+  set(TEST_NAME "exception_month_day_day_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "day_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # skip_out_day_exception_exclude_into_range
-  set(TEST_NAME "skip_out_day_exception_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-
-  # speday_exception_after_range
-  set(TEST_NAME "speday_exception_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # speday_exception_before_range
-  set(TEST_NAME "speday_exception_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-
-  # speday_exception_into_range
-  set(TEST_NAME "speday_exception_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_day_day_into_period_with_exclude_into
+  set(TEST_NAME "exception_month_day_day_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "day_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 
-  # speday_exception_exclude_after_range
-  set(TEST_NAME "speday_exception_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  ## month_week_day
+  set(CONF_DIR "${TEST_DIR}/configuration/exception/month_week_day")
 
-  # speday_exception_exclude_before_range
-  set(TEST_NAME "speday_exception_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_week_day_4_weekday_month_after_period
+  set(TEST_NAME "exception_month_week_day_4_weekday_month_after_period")
+  set(TEST_CONF_FILE "4_weekday_month_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # speday_exception_exclude_into_range
-  set(TEST_NAME "speday_exception_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_month_week_day_4_weekday_month_before_period
+  set(TEST_NAME "exception_month_week_day_4_weekday_month_before_period")
+  set(TEST_CONF_FILE "4_weekday_month_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_4_weekday_month_into_period
+  set(TEST_NAME "exception_month_week_day_4_weekday_month_into_period")
+  set(TEST_CONF_FILE "4_weekday_month_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_4_weekday_month_into_period_with_exclude_after
+  set(TEST_NAME "exception_month_week_day_4_weekday_month_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "4_weekday_month_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_4_weekday_month_into_period_with_exclude_before
+  set(TEST_NAME "exception_month_week_day_4_weekday_month_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "4_weekday_month_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_4_weekday_month_into_period_with_exclude_into
+  set(TEST_NAME "exception_month_week_day_4_weekday_month_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "4_weekday_month_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_last_weekday_month_after_period
+  set(TEST_NAME "exception_month_week_day_last_weekday_month_after_period")
+  set(TEST_CONF_FILE "last_weekday_month_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_last_weekday_month_before_period
+  set(TEST_NAME "exception_month_week_day_last_weekday_month_before_period")
+  set(TEST_CONF_FILE "last_weekday_month_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_last_weekday_month_into_period
+  set(TEST_NAME "exception_month_week_day_last_weekday_month_into_period")
+  set(TEST_CONF_FILE "last_weekday_month_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_last_weekday_month_into_period_with_exclude_after
+  set(TEST_NAME "exception_month_week_day_last_weekday_month_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "last_weekday_month_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_last_weekday_month_into_period_with_exclude_before
+  set(TEST_NAME "exception_month_week_day_last_weekday_month_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "last_weekday_month_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_month_week_day_last_weekday_month_into_period_with_exclude_into
+  set(TEST_NAME "exception_month_week_day_last_weekday_month_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "last_weekday_month_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 
-  # weekday_after_range
-  set(TEST_NAME "weekday_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  ## week_day
+  set(CONF_DIR "${TEST_DIR}/configuration/exception/week_day")
 
-  # weekday_before_range
-  set(TEST_NAME "weekday_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_week_day_4_weekday_after_period
+  set(TEST_NAME "exception_week_day_4_weekday_after_period")
+  set(TEST_CONF_FILE "4_weekday_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # weekday_into_range
-  set(TEST_NAME "weekday_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # exception_week_day_4_weekday_before_period
+  set(TEST_NAME "exception_week_day_4_weekday_before_period")
+  set(TEST_CONF_FILE "4_weekday_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_4_weekday_into_period
+  set(TEST_NAME "exception_week_day_4_weekday_into_period")
+  set(TEST_CONF_FILE "4_weekday_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_4_weekday_into_period_with_exclude_after
+  set(TEST_NAME "exception_week_day_4_weekday_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "4_weekday_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_4_weekday_into_period_with_exclude_before
+  set(TEST_NAME "exception_week_day_4_weekday_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "4_weekday_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_4_weekday_into_period_with_exclude_into
+  set(TEST_NAME "exception_week_day_4_weekday_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "4_weekday_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_last_weekday_after_period
+  set(TEST_NAME "exception_week_day_last_weekday_after_period")
+  set(TEST_CONF_FILE "last_weekday_after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_last_weekday_before_period
+  set(TEST_NAME "exception_week_day_last_weekday_before_period")
+  set(TEST_CONF_FILE "last_weekday_before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_last_weekday_into_period
+  set(TEST_NAME "exception_week_day_last_weekday_into_period")
+  set(TEST_CONF_FILE "last_weekday_into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_last_weekday_into_period_with_exclude_after
+  set(TEST_NAME "exception_week_day_last_weekday_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "last_weekday_into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_last_weekday_into_period_with_exclude_before
+  set(TEST_NAME "exception_week_day_last_weekday_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "last_weekday_into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # exception_week_day_last_weekday_into_period_with_exclude_into
+  set(TEST_NAME "exception_week_day_last_weekday_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "last_weekday_into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 
-  # weekday_exclude_after_range
-  set(TEST_NAME "weekday_exclude_after_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  #
+  # weekday
+  #
+  set(CONF_DIR "${TEST_DIR}/configuration/weekday")
 
-  # weekday_exclude_before_range
-  set(TEST_NAME "weekday_exclude_before_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
+  # weekday_after_period
+  set(TEST_NAME "weekday_after_period")
+  set(TEST_CONF_FILE "after_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # weekday_exclude_into_range
-  set(TEST_NAME "weekday_exclude_into_range")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_NAME}.conf")
-endif ()
+  # weekday_before_period
+  set(TEST_NAME "weekday_before_period")
+  set(TEST_CONF_FILE "before_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # weekday_into_period
+  set(TEST_NAME "weekday_into_period")
+  set(TEST_CONF_FILE "into_period.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # weekday_into_period_with_exclude_after
+  set(TEST_NAME "weekday_into_period_with_exclude_after")
+  set(TEST_CONF_FILE "into_period_with_exclude_after.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # weekday_into_period_with_exclude_before
+  set(TEST_NAME "weekday_into_period_with_exclude_before")
+  set(TEST_CONF_FILE "into_period_with_exclude_before.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # weekday_into_period_with_exclude_into
+  set(TEST_NAME "weekday_into_period_with_exclude_into")
+  set(TEST_CONF_FILE "into_period_with_exclude_into.conf")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+endif()
