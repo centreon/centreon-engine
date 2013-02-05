@@ -30,6 +30,8 @@
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/loop.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/logging/backend.hh"
+#  include "com/centreon/logging/engine.hh"
 
 CCE_BEGIN()
 
@@ -39,7 +41,7 @@ CCE_BEGIN()
  *  engine needs to make unit test and run
  *  unit test.
  */
-class    unittest {
+class     unittest {
 public:
   /**
    *  Constructor.
@@ -50,20 +52,20 @@ public:
    *
    *  @return Return value of func.
    */
-         unittest(int argc, char** argv, int (* func)(int, char**))
+          unittest(int argc, char** argv, int (* func)(int, char**))
     : _argc(argc), _argv(argv), _func(func) {}
 
   /**
    *  Destructor.
    */
-         ~unittest() throw () {}
+          ~unittest() throw () {}
 
   /**
    *  Entry point.
    *
    *  @return Return value of unit test routine.
    */
-  int    run() {
+  int     run() {
     int ret(EXIT_FAILURE);
     if (!_init())
       return (ret);
@@ -82,9 +84,28 @@ public:
   }
 
 private:
-  bool   _init() {
+  class   nothing
+    : public logging::backend {
+  public:
+    void  close() throw () {}
+    void  log(
+            unsigned long long types,
+            unsigned int verbose,
+            char const* msg,
+            unsigned int size) throw () {
+      (void)types;
+      (void)verbose;
+      (void)msg;
+      (void)size;
+    }
+    void  open() {}
+    void  reopen() {}
+  };
+
+  bool    _init() {
     try {
       com::centreon::clib::load();
+      com::centreon::logging::engine::instance().add(&_log, 0, 0);
       configuration::state::load();
       commands::set::load();
       checks::checker::load();
@@ -105,7 +126,7 @@ private:
     return (true);
   }
 
-  bool   _deinit() {
+  bool    _deinit() {
     try {
       broker::compatibility::unload();
       broker::loader::unload();
@@ -128,9 +149,10 @@ private:
     return (true);
   }
 
-  int    _argc;
-  char** _argv;
-  int    (*_func)(int, char**);
+  int     _argc;
+  char**  _argv;
+  int     (*_func)(int, char**);
+  nothing _log;
 };
 
 CCE_END()
