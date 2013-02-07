@@ -191,7 +191,7 @@ xerces-c                    libxerces-c-dev     Used for parsing XML
 
 #. Install optional tools ::
 
-     $ apt-get install gsoap-dev zlib1g-dev libssl-dev libxerces-c-dev
+     $ apt-get install gsoap zlib1g-dev libssl-dev libxerces-c-dev
 
 OpenSUSE
 --------
