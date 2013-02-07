@@ -85,7 +85,7 @@ public:
 
 private:
   class   nothing
-    : public logging::backend {
+    : public com::centreon::logging::backend {
   public:
     void  close() throw () {}
     void  log(
