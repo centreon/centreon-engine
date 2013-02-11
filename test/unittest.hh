@@ -29,6 +29,7 @@
 #  include "com/centreon/engine/commands/set.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/loop.hh"
+#  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/logging/backend.hh"
 #  include "com/centreon/logging/engine.hh"
@@ -105,7 +106,11 @@ private:
   bool    _init() {
     try {
       com::centreon::clib::load();
-      com::centreon::logging::engine::instance().add(&_log, 0, 0);
+      com::centreon::logging::engine::instance()
+        .add(
+           &_log,
+           com::centreon::engine::logging::all,
+           com::centreon::engine::logging::most);
       configuration::state::load();
       commands::set::load();
       checks::checker::load();
