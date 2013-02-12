@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
 #include <ctime>
 #include <exception>
 #include <iostream>
@@ -62,6 +63,7 @@ extern "C" time_t time(time_t *t) __THROW {
 
 static time_t string_to_time_t(std::string const& data) {
   tm t;
+  memset(&t, 0, sizeof(t));
   if (!strptime(data.c_str(), "%Y-%m-%d %H:%M:%S", &t))
     throw (engine_error() << "invalid date format");
   return (mktime(&t));
