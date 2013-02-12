@@ -43,6 +43,9 @@
 extern "C" {
 #  endif /* C++ */
 
+extern unsigned long             max_check_result_file_age;
+extern char*                     check_result_path;
+
 extern com::centreon::engine::configuration::state* config;
 extern char*                     config_file;
 

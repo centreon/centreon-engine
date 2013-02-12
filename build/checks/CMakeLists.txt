@@ -32,4 +32,4 @@ add_library("cce_checks" STATIC
   "${INC_DIR}/stats.hh")
 
 # Link target with required libraries.
-target_link_libraries("cce_checks" "cce_commands")
+target_link_libraries("cce_checks" "cce_commands" "cce_compatibility")

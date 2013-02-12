@@ -84,6 +84,7 @@ namespace               configuration {
     std::string const&  get_broker_module_directory() const throw ();
     std::string const&  get_debug_file() const throw ();
     std::string const&  get_command_file() const throw ();
+    std::string const&  get_check_result_path() const throw ();
     std::string const&  get_global_host_event_handler() const throw ();
     std::string const&  get_global_service_event_handler() const throw ();
     std::string const&  get_ocsp_command() const throw ();
@@ -131,6 +132,7 @@ namespace               configuration {
     unsigned int        get_ochp_timeout() const throw ();
     unsigned long       get_max_debug_file_size() const throw ();
     unsigned long       get_max_log_file_size() const throw ();
+    unsigned long       get_max_check_result_file_age() const throw ();
     unsigned long       get_retained_host_attribute_mask() const throw ();
     unsigned long       get_retained_process_host_attribute_mask() const throw ();
     unsigned long       get_retained_contact_host_attribute_mask() const throw ();
@@ -178,6 +180,7 @@ namespace               configuration {
     bool                get_enable_environment_macros() const throw ();
     bool                get_child_processes_fork_twice() const throw ();
     bool                get_allow_empty_hostgroup_assignment() const throw ();
+    bool                get_use_check_result_path() const throw ();
     float               get_sleep_time() const throw ();
     float               get_low_service_flap_threshold() const throw ();
     float               get_high_service_flap_threshold() const throw ();
@@ -286,6 +289,7 @@ namespace               configuration {
     void                set_enable_embedded_perl(bool value);
     void                set_use_embedded_perl_implicitly(bool value);
     void                set_allow_empty_hostgroup_assignment(bool value);
+    void                set_use_check_result_path(bool value);
     void                set_sleep_time(float value);
     void                set_low_service_flap_threshold(float value);
     void                set_high_service_flap_threshold(float value);
@@ -325,6 +329,7 @@ namespace               configuration {
       state_retention_file,
       status_file,
       use_timezone,
+      check_result_path,
       max_string
     };
 
@@ -343,6 +348,7 @@ namespace               configuration {
       retained_process_host_attribute_mask,
       retained_contact_host_attribute_mask,
       retained_contact_service_attribute_mask,
+      max_check_result_file_age,
       max_ulong
     };
 
@@ -450,6 +456,7 @@ namespace               configuration {
       use_syslog,
       use_true_regexp_matching,
       use_setpgid,
+      use_check_result_path,
       max_bool
     };
 
@@ -579,6 +586,7 @@ namespace               configuration {
     static const unsigned int        DEFAULT_OCSP_TIMEOUT                                = 15;
     static const unsigned int        DEFAULT_OCHP_TIMEOUT                                = 15;
     static const unsigned int        DEFAULT_LOG_ROTATION                                = 0;
+    static const unsigned int        DEFAULT_MAX_CHECK_RESULT_FILE_AGE                   = 3600;
     static const e_date_format       DEFAULT_DATE_FORMAT                                 = us;
     static const e_inter_check_delay DEFAULT_SERVICE_INTER_CHECK_DELAY_METHOD            = icd_smart;
     static const e_inter_check_delay DEFAULT_HOST_INTER_CHECK_DELAY_METHOD               = icd_smart;
@@ -632,6 +640,7 @@ namespace               configuration {
     static const bool                DEFAULT_USE_LARGE_INSTALLATION_TWEAKS               = false;
     static const bool                DEFAULT_ENABLE_ENVIRONMENT_MACROS                   = false;
     static const bool                DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT            = false;
+    static const bool                DEFAULT_USE_CHECK_RESULT_PATH                       = false;
     static const float               DEFAULT_SLEEP_TIME;
     static const float               DEFAULT_LOW_SERVICE_FLAP_THRESHOLD;
     static const float               DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD;

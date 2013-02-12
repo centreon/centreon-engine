@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include "check_result.h"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/utils.hh"
 #include "globals.h"
@@ -139,7 +140,6 @@ extern "C" {
 
     // Create a safe temp file.
     std::ostringstream oss;
-    extern char const* check_result_path;
     oss << check_result_path << "/cXXXXXX";
     char* output_file(my_strdup(oss.str().c_str()));
     int output_file_fd(mkstemp(output_file));
@@ -226,6 +226,8 @@ extern "C" {
       return (ERROR);
     }
 
+    time_t current_time(time(NULL));
+
     // Read in all lines from the file.
     char* input(NULL);
     check_result* new_cr(NULL);
@@ -269,6 +271,18 @@ extern "C" {
         continue;
       if ((val = my_strtok(NULL, "\n")) == NULL)
         continue;
+
+      // if file is too old, remove it.
+      if (!strcmp(var, "file_time")
+          && config->get_max_check_result_file_age() > 0) {
+        unsigned long diff(current_time - strtoul(val, NULL, 0));
+        if (diff > config->get_max_check_result_file_age()) {
+          free_check_result(new_cr);
+          delete new_cr;
+          new_cr = NULL;
+          break;
+        }
+      }
 
       // Allocate new check result if necessary.
       if (!new_cr) {

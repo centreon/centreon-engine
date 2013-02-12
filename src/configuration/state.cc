@@ -28,16 +28,17 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/io/file_entry.hh"
+#include "compatibility/locations.h"
 
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
-const float state::DEFAULT_SLEEP_TIME                  = 0.5;
-const float state::DEFAULT_LOW_SERVICE_FLAP_THRESHOLD  = 20.0;
-const float state::DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD = 30.0;
-const float state::DEFAULT_LOW_HOST_FLAP_THRESHOLD     = 20.0;
-const float state::DEFAULT_HIGH_HOST_FLAP_THRESHOLD    = 30.0;
-const char* const state::DEFAULT_ILLEGAL_OUTPUT_CHARS  = "`~$&|'\"<>";
+float const state::DEFAULT_SLEEP_TIME                  = 0.5;
+float const state::DEFAULT_LOW_SERVICE_FLAP_THRESHOLD  = 20.0;
+float const state::DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD = 30.0;
+float const state::DEFAULT_LOW_HOST_FLAP_THRESHOLD     = 20.0;
+float const state::DEFAULT_HIGH_HOST_FLAP_THRESHOLD    = 30.0;
+char const* const state::DEFAULT_ILLEGAL_OUTPUT_CHARS  = "`~$&|'\"<>";
 
 static state* _instance = NULL;
 
@@ -198,6 +199,14 @@ std::string const& state::get_debug_file() const throw() {
  */
 std::string const& state::get_command_file() const throw() {
   return (_tab_string[command_file]);
+}
+
+/**
+ *  Get the check result path.
+ *  @return The path.
+ */
+std::string const& state::get_check_result_path() const throw() {
+  return (_tab_string[check_result_path]);
 }
 
 /**
@@ -542,6 +551,14 @@ unsigned long state::get_max_debug_file_size() const throw() {
  */
 unsigned long state::get_max_log_file_size() const throw() {
   return (_tab_ulong[max_log_file_size]);
+}
+
+/**
+ *  Get the max check result file age.
+ *  @return The max file aage.
+ */
+unsigned long state::get_max_check_result_file_age() const throw() {
+  return (_tab_ulong[max_check_result_file_age]);
 }
 
 /**
@@ -913,6 +930,14 @@ bool state::get_allow_empty_hostgroup_assignment() const throw() {
 }
 
 /**
+ *  Get if use the check result path.
+ *  @return True if using compatibility check result path.
+ */
+bool state::get_use_check_result_path() const throw() {
+  return (_tab_bool[use_check_result_path]);
+}
+
+/**
  *  Get the sleep time.
  *  @return The sleep time.
  */
@@ -1070,9 +1095,13 @@ void state::set_temp_path(std::string const& value) {
  *  @param[in] value Unused.
  */
 void state::set_check_result_path(std::string const& value) {
-  (void)value;
   logger(log_config_warning, basic)
-    << "warning: check_result_path variable ignored";
+    << "warning: check_result_path is deprecated";
+
+  _tab_string[check_result_path] = value;
+
+  delete[] ::check_result_path;
+  ::check_result_path = my_strdup(value.c_str());
   return;
 }
 
@@ -1589,9 +1618,10 @@ void state::set_max_log_file_size(unsigned long value) {
  *  @param[in] value Unused.
  */
 void state::set_max_check_result_file_age(unsigned long value) {
-  (void)value;
   logger(log_config_warning, basic)
-    << "warning: max_check_result_file_age variable ignored";
+    << "warning: max_check_result_file_age is deprecated";
+  _tab_ulong[max_check_result_file_age] = value;
+  ::max_check_result_file_age = value;
   return;
 }
 
@@ -2114,6 +2144,15 @@ void state::set_allow_empty_hostgroup_assignment(bool value) {
 }
 
 /**
+ *  Set the compatibility mode to use check result path.
+ *  @param[in] value True to enable compatibility mode.
+ */
+void state::set_use_check_result_path(bool value) {
+  _tab_bool[use_check_result_path] = value;
+  return;
+}
+
+/**
  *  Set the sleep time.
  *  @param[in] value The sleep time.
  */
@@ -2363,6 +2402,7 @@ state::state()
   _lst_method["command_file"]                                = &cpp_suck<std::string const&, &state::set_command_file>::set_generic;
   _lst_method["temp_file"]                                   = &cpp_suck<std::string const&, &state::set_temp_file>::set_generic;
   _lst_method["temp_path"]                                   = &cpp_suck<std::string const&, &state::set_temp_path>::set_generic;
+  _lst_method["use_check_result_path"]                       = &cpp_suck<bool, &state::set_use_check_result_path>::set_generic;
   _lst_method["check_result_path"]                           = &cpp_suck<std::string const&, &state::set_check_result_path>::set_generic;
   _lst_method["max_check_result_file_age"]                   = &cpp_suck<unsigned long, &state::set_max_check_result_file_age>::set_generic;
   _lst_method["global_host_event_handler"]                   = &cpp_suck<std::string const&, &state::set_global_host_event_handler>::set_generic;
@@ -2530,6 +2570,7 @@ state::~state() throw() {
   delete[] ::illegal_object_chars;
   delete[] ::illegal_output_chars;
   delete[] ::use_timezone;
+  delete[] ::check_result_path;
 
   for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
     delete[] macro_user[i];
@@ -2625,6 +2666,10 @@ std::string& state::_trim(std::string& str) throw() {
  *  Reset variable
  */
 void state::_reset() {
+  set_use_check_result_path(DEFAULT_USE_CHECK_RESULT_PATH);
+  set_check_result_path(DEFAULT_CHECK_RESULT_PATH);
+  set_max_check_result_file_age(DEFAULT_MAX_CHECK_RESULT_FILE_AGE);
+
   set_log_file(DEFAULT_LOG_FILE);
   set_command_file(DEFAULT_COMMAND_FILE);
   set_debug_file(DEFAULT_DEBUG_FILE);

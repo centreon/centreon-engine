@@ -55,13 +55,11 @@ circular_buffer check_result_buffer;
 check_result check_result_info;
 check_result* check_result_list(NULL);
 unsigned int child_processes_fork_twice(UINT_MAX);
-unsigned long max_check_result_file_age(ULONG_MAX);
 
 // Embedded Perl.
 unsigned int enable_embedded_perl(false);
 unsigned int use_embedded_perl_implicitly(false);
 
 // Old path.
-char const* check_result_path("/tmp");
 char const* p1_file("");
 char const* temp_path("/tmp");

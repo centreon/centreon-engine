@@ -57,14 +57,12 @@ extern circular_buffer check_result_buffer;
 extern check_result check_result_info;
 extern check_result* check_result_list;
 extern unsigned int child_processes_fork_twice;
-extern unsigned long max_check_result_file_age;
 
 // Embedded Perl.
 extern unsigned int enable_embedded_perl;
 extern unsigned int use_embedded_perl_implicitly;
 
 // Old path.
-extern char const* check_result_path;
 extern char const* p1_file;
 extern char const* temp_path;
 

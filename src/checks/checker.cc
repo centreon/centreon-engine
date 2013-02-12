@@ -34,6 +34,7 @@
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "compatibility/check_result.h"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::logging;
@@ -89,6 +90,11 @@ void checker::reap() {
   // Time to start reaping.
   time_t reaper_start_time;
   time(&reaper_start_time);
+
+  if (config->get_use_check_result_path()) {
+    std::string const& path(config->get_check_result_path());
+    process_check_result_queue(path.c_str());
+  }
 
   // Reap check results.
   unsigned int reaped_checks(0);
