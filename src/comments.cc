@@ -555,10 +555,6 @@ int add_comment(
       int expires,
       time_t expire_time,
       int source) {
-  comment* new_comment = NULL;
-  comment* last_comment = NULL;
-  comment* temp_comment = NULL;
-
   /* make sure we have the data we need */
   if (host_name == NULL
       || author == NULL
@@ -568,7 +564,7 @@ int add_comment(
     return (ERROR);
 
   /* allocate memory for the comment */
-  new_comment = new comment;
+  comment* new_comment(new comment);
   memset(new_comment, 0, sizeof(*new_comment));
 
   /* duplicate vars */
@@ -596,7 +592,8 @@ int add_comment(
   }
   else {
     /* add new comment to comment list, sorted by comment id */
-    last_comment = comment_list;
+    comment* last_comment(comment_list);
+    comment* temp_comment(NULL);
     for (temp_comment = comment_list;
 	 temp_comment != NULL;
          temp_comment = temp_comment->next) {

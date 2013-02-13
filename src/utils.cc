@@ -291,22 +291,19 @@ int get_raw_command_line(
 
 /* sets or unsets an environment variable */
 int set_environment_var(char const* name, char const* value, int set) {
-  char* env_string = NULL;
-
   /* we won't mess with null variable names */
   if (name == NULL)
     return (ERROR);
 
   /* set the environment variable */
-  if (set == true) {
-
-    setenv(name, (value == NULL) ? "" : value, 1);
+  if (set) {
+    setenv(name, (value ? value : ""), 1);
 
     /* needed for Solaris and systems that don't have setenv() */
     /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
     std::string val(name);
     val.append("=").append(value ? value : "");
-    env_string = my_strdup(val.c_str());
+    char* env_string(my_strdup(val.c_str()));
     putenv(env_string);
   }
   /* clear the variable */
@@ -1821,14 +1818,14 @@ int parse_check_output(
       int escape_newlines_please,
       int newlines_are_escaped) {
   int current_line = 0;
-  int found_newline = false;
-  int eof = false;
+  bool found_newline = false;
+  bool eof = false;
   int used_buf = 0;
   int dbuf_chunk = 1024;
   dbuf db1;
   dbuf db2;
   char* ptr = NULL;
-  int in_perf_data = false;
+  bool in_perf_data = false;
   char* tempbuf = NULL;
   int x = 0;
   int y = 0;
@@ -1852,7 +1849,7 @@ int parse_check_output(
   dbuf_init(&db2, dbuf_chunk);
 
   /* unescape newlines and escaped backslashes first */
-  if (newlines_are_escaped == true) {
+  if (newlines_are_escaped) {
     for (x = 0, y = 0; buf[x] != '\x0'; x++) {
       if (buf[x] == '\\' && buf[x + 1] == '\\') {
         x++;
@@ -1869,7 +1866,7 @@ int parse_check_output(
   }
 
   /* process each line of input */
-  for (x = 0; eof == false; x++) {
+  for (x = 0; !eof; x++) {
 
     /* we found the end of a line */
     if (buf[x] == '\n')
@@ -1913,7 +1910,7 @@ int parse_check_output(
       else {
 
         /* rest of the output is perf data */
-        if (in_perf_data == true) {
+        if (in_perf_data) {
           dbuf_strcat(&db2, tempbuf);
           dbuf_strcat(&db2, " ");
         }
@@ -2302,21 +2299,17 @@ int dbuf_free(dbuf* db) {
 
 /* dynamically expands a string */
 int dbuf_strcat(dbuf* db, char const* buf) {
-  unsigned long buflen = 0L;
-  unsigned long new_size = 0L;
-  unsigned long memory_needed = 0L;
-
   if (db == NULL || buf == NULL)
     return (ERROR);
 
   /* how much memory should we allocate (if any)? */
-  buflen = strlen(buf);
-  new_size = db->used_size + buflen + 1;
+  unsigned long buflen(strlen(buf));
+  unsigned long new_size(db->used_size + buflen + 1);
 
   /* we need more memory */
   if (db->allocated_size < new_size) {
 
-    memory_needed
+    unsigned long memory_needed
       = static_cast<unsigned long>((ceil(new_size / db->chunk_size) + 1)
                                    * db->chunk_size);
 
@@ -2353,8 +2346,7 @@ bool set_cloexec(int fd) {
       continue;
     return (false);
   }
-  int ret(0);
-  while ((ret = fcntl(fd, F_SETFD, flags | FD_CLOEXEC)) < 0) {
+  while (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) < 0) {
     if (errno == EINTR)
       continue;
     return (false);
@@ -2371,13 +2363,11 @@ bool set_cloexec(int fd) {
  */
 void cleanup() {
   // Unload modules.
-  if ((false == test_scheduling) && (false == verify_config)) {
+  if (!test_scheduling && !verify_config) {
     neb_free_callback_list();
     neb_unload_all_modules(
       NEBMODULE_FORCE_UNLOAD,
-      (true == sigshutdown)
-      ? NEBMODULE_NEB_SHUTDOWN
-      : NEBMODULE_NEB_RESTART);
+      sigshutdown ? NEBMODULE_NEB_SHUTDOWN : NEBMODULE_NEB_RESTART);
     neb_free_module_list();
     neb_deinit_modules();
   }

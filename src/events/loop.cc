@@ -214,10 +214,10 @@ void loop::_dispatching() {
              && (current_time >= event_list_low->run_time)) {
       // Default action is to execute the event.
       run_event = true;
-      int nudge_seconds(0);
 
       // Run a few checks before executing a service check...
       if (event_list_low->event_type == EVENT_SERVICE_CHECK) {
+        int nudge_seconds(0);
         service* temp_service(
                    static_cast<service*>(event_list_low->event_data));
 

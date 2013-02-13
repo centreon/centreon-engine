@@ -190,12 +190,9 @@ extern "C" {
 
     // Do some sanity checks on the age of the stats data before we
     // start... and get the new current bucket number.
-    unsigned long minutes(0);
-    int new_current_bucket(0);
-    int this_bucket(0);
-    minutes
+    unsigned long minutes
       = ((unsigned long)check_time - (unsigned long)program_start) / 60;
-    new_current_bucket = minutes % CHECK_STATS_BUCKETS;
+    int new_current_bucket(minutes % CHECK_STATS_BUCKETS);
 
     // Its been more than 15 minutes since
     // stats were updated, so clear the stats.
@@ -214,7 +211,7 @@ extern "C" {
       for (unsigned int x(check_statistics[check_type].current_bucket);
            x < (CHECK_STATS_BUCKETS * 2);
            ++x) {
-        this_bucket
+        int this_bucket
           = (x + CHECK_STATS_BUCKETS + 1) % CHECK_STATS_BUCKETS;
         if (this_bucket == new_current_bucket)
           break;

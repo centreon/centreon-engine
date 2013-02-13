@@ -1180,9 +1180,6 @@ int add_downtime(
       unsigned long triggered_by,
       unsigned long duration,
       unsigned long downtime_id) {
-  scheduled_downtime* new_downtime = NULL;
-  scheduled_downtime* last_downtime = NULL;
-  scheduled_downtime* temp_downtime = NULL;
 
   /* don't add triggered downtimes that don't have a valid parent */
   if (triggered_by > 0
@@ -1195,7 +1192,7 @@ int add_downtime(
     return (ERROR);
 
   /* allocate memory for the downtime */
-  new_downtime = new scheduled_downtime;
+  scheduled_downtime* new_downtime(new scheduled_downtime);
   memset(new_downtime, 0, sizeof(*new_downtime));
 
   /* duplicate vars */
@@ -1222,7 +1219,8 @@ int add_downtime(
   }
   else {
     /* add new downtime to downtime list, sorted by start time */
-    last_downtime = scheduled_downtime_list;
+    scheduled_downtime* last_downtime(scheduled_downtime_list);
+    scheduled_downtime* temp_downtime(NULL);
     for (temp_downtime = scheduled_downtime_list;
          temp_downtime != NULL;
          temp_downtime = temp_downtime->next) {

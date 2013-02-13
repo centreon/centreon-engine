@@ -368,37 +368,6 @@ int pre_flight_object_check(int* w, int* e) {
   int warnings = 0;
   int errors = 0;
 
-#ifdef TEST
-  void* ptr = NULL;
-  char* buf1 = "";
-  char* buf2 = "";
-  buf1 = "temptraxe1";
-  buf2 = "Probe 2";
-  for (temp_se = get_first_serviceescalation_by_service(buf1, buf2, &ptr);
-       temp_se != NULL;
-       temp_se = get_next_serviceescalation_by_service(buf1, buf2, &ptr)) {
-    printf(
-      "FOUND ESCALATION FOR SVC '%s'/'%s': %d-%d/%.3f, PTR=%p\n",
-      buf1,
-      buf2,
-      temp_se->first_notification,
-      temp_se->last_notification,
-      temp_se->notification_interval,
-      ptr);
-  }
-  for (temp_he = get_first_host_escalation_by_host(buf1, &ptr);
-       temp_he != NULL;
-       temp_he = get_next_host_escalation_by_host(buf1, &ptr)) {
-    printf(
-      "FOUND ESCALATION FOR HOST '%s': %d-%d/%d, PTR=%p\n",
-      buf1,
-      temp_he->first_notification,
-      temp_he->last_notification,
-      temp_he->notification_interval,
-      ptr);
-  }
-#endif
-
   /*****************************************/
   /* check each service...                 */
   /*****************************************/

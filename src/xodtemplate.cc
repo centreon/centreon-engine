@@ -122,15 +122,7 @@ int xodtemplate_read_config_data(
       int options,
       int cache,
       int precache) {
-  char* config_file = NULL;
-  char* config_base_dir = NULL;
-  char* input = NULL;
-  char* var = NULL;
-  char* val = NULL;
-  char* temp_buffer = NULL;
   struct timeval tv[14];
-  double runtime[14];
-  mmapfile* thefile = NULL;
   int result = OK;
 
   if (main_config_file == NULL) {
@@ -181,12 +173,13 @@ int xodtemplate_read_config_data(
   /* process object config files normally... */
   else {
     /* determine the directory of the main config file */
-    config_file = my_strdup(main_config_file);
-    config_base_dir = my_strdup(dirname(config_file));
+    char* config_file(my_strdup(main_config_file));
+    char* config_base_dir(my_strdup(dirname(config_file)));
     delete[] config_file;
 
     /* open the main config file for reading (we need to find all the config files to read) */
-    if ((thefile = mmap_fopen(main_config_file)) == NULL) {
+    mmapfile* thefile(mmap_fopen(main_config_file));
+    if (!thefile) {
       delete[] config_base_dir;
       delete[] xodtemplate_config_files;
       xodtemplate_config_files = NULL;
@@ -198,6 +191,7 @@ int xodtemplate_read_config_data(
 
     /* daemon reads all config files/dirs specified in the main config file */
     /* read in all lines from the main config file */
+    char* input(NULL);
     while (1) {
       /* free memory */
       delete[] input;
@@ -213,16 +207,18 @@ int xodtemplate_read_config_data(
       if (input[0] == '#' || input[0] == ';' || input[0] == '\x0')
         continue;
 
-      if ((var = strtok(input, "=")) == NULL)
+      char* var(strtok(input, "="));
+      if (!var)
         continue;
 
-      if ((val = strtok(NULL, "\n")) == NULL)
+      char* val(strtok(NULL, "\n"));
+      if (!val)
         continue;
 
       /* process a single config file */
       if (!strcmp(var, "xodtemplate_config_file")
           || !strcmp(var, "cfg_file")) {
-        temp_buffer = my_strdup(val);
+        char* temp_buffer(my_strdup(val));
         if (config_base_dir != NULL && val[0] != '/') {
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
@@ -244,7 +240,7 @@ int xodtemplate_read_config_data(
       /* process all files in a config directory */
       else if (!strcmp(var, "xodtemplate_config_dir")
                || !strcmp(var, "cfg_dir")) {
-        temp_buffer = my_strdup(val);
+        char* temp_buffer(my_strdup(val));
         if (config_base_dir != NULL && val[0] != '/') {
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
@@ -370,7 +366,7 @@ int xodtemplate_read_config_data(
   xodtemplate_precache_file = NULL;
 
   if (test_scheduling == TRUE) {
-
+    double runtime[14];
     runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
                           + (double)((tv[1].tv_usec - tv[0].tv_usec)
                                      / 1000.0) / 1000.0);
@@ -842,7 +838,7 @@ int xodtemplate_process_config_file(char* filename, int options) {
     new_##type->_start_line = start_line;                               \
 									\
     /* precached object files are already sorted, so add to tail */	\
-    if (presorted_objects == true) {					\
+    if (presorted_objects) {                                            \
 									\
       if (xodtemplate_##type##_list == NULL) {				\
 	xodtemplate_##type##_list = new_##type;				\
@@ -3699,7 +3695,6 @@ int xodtemplate_parse_timeperiod_directive(
       char const* val) {
   char* input = NULL;
   char temp_buffer[5][MAX_INPUT_BUFFER] = { "", "", "", "", "" };
-  int items = 0;
   int result = OK;
   int syear = 0;
   int smon = 0;
@@ -3727,17 +3722,17 @@ int xodtemplate_parse_timeperiod_directive(
   if (0)
     return (OK);
   /* calendar dates */
-  else if ((items = sscanf(
-                      input,
-                      "%4d-%2d-%2d - %4d-%2d-%2d / %d %[0-9:, -]",
-                      &syear,
-                      &smon,
-                      &smday,
-                      &eyear,
-                      &emon,
-                      &emday,
-                      &skip_interval,
-                      temp_buffer[0])) == 8) {
+  else if (sscanf(
+             input,
+             "%4d-%2d-%2d - %4d-%2d-%2d / %d %[0-9:, -]",
+             &syear,
+             &smon,
+             &smday,
+             &eyear,
+             &emon,
+             &emday,
+             &skip_interval,
+             temp_buffer[0]) == 8) {
     /* add timerange exception */
     if (xodtemplate_add_exception_to_timeperiod(
           tperiod,
@@ -3756,14 +3751,14 @@ int xodtemplate_parse_timeperiod_directive(
           temp_buffer[0]) == NULL)
       result = ERROR;
   }
-  else  if ((items = sscanf(
-                       input,
-                       "%4d-%2d-%2d / %d %[0-9:, -]",
-                       &syear,
-                       &smon,
-                       &smday,
-                       &skip_interval,
-                       temp_buffer[0])) == 5) {
+  else  if (sscanf(
+              input,
+              "%4d-%2d-%2d / %d %[0-9:, -]",
+              &syear,
+              &smon,
+              &smday,
+              &skip_interval,
+              temp_buffer[0]) == 5) {
     eyear = syear;
     emon = smon;
     emday = smday;
@@ -3785,16 +3780,16 @@ int xodtemplate_parse_timeperiod_directive(
           temp_buffer[0]) == NULL)
       result = ERROR;
   }
-  else if ((items = sscanf(
-                      input,
-                      "%4d-%2d-%2d - %4d-%2d-%2d %[0-9:, -]",
-                      &syear,
-                      &smon,
-                      &smday,
-                      &eyear,
-                      &emon,
-                      &emday,
-                      temp_buffer[0])) == 7) {
+  else if (sscanf(
+             input,
+             "%4d-%2d-%2d - %4d-%2d-%2d %[0-9:, -]",
+             &syear,
+             &smon,
+             &smday,
+             &eyear,
+             &emon,
+             &emday,
+             temp_buffer[0]) == 7) {
     /* add timerange exception */
     if (xodtemplate_add_exception_to_timeperiod(
           tperiod,
@@ -3813,13 +3808,13 @@ int xodtemplate_parse_timeperiod_directive(
           temp_buffer[0]) == NULL)
       result = ERROR;
   }
-  else if ((items = sscanf(
-                      input,
-                      "%4d-%2d-%2d %[0-9:, -]",
-                      &syear,
-                      &smon,
-                      &smday,
-                      temp_buffer[0])) == 4) {
+  else if (sscanf(
+             input,
+             "%4d-%2d-%2d %[0-9:, -]",
+             &syear,
+             &smon,
+             &smday,
+             temp_buffer[0]) == 4) {
     eyear = syear;
     emon = smon;
     emday = smday;
@@ -3842,17 +3837,17 @@ int xodtemplate_parse_timeperiod_directive(
       result = ERROR;
   }
   /* other types... */
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d %[a-z] - %[a-z] %d %[a-z] / %d %[0-9:, -]",
-                      temp_buffer[0],
-                      &swday_offset,
-                      temp_buffer[1],
-                      temp_buffer[2],
-                      &ewday_offset,
-                      temp_buffer[3],
-                      &skip_interval,
-                      temp_buffer[4])) == 8) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d %[a-z] - %[a-z] %d %[a-z] / %d %[0-9:, -]",
+             temp_buffer[0],
+             &swday_offset,
+             temp_buffer[1],
+             temp_buffer[2],
+             &ewday_offset,
+             temp_buffer[3],
+             &skip_interval,
+             temp_buffer[4]) == 8) {
     /* wednesday 1 january - thursday 2 july / 3 */
     if ((result = xodtemplate_get_weekday_from_string(temp_buffer[0], &swday)) == OK
         && (result = xodtemplate_get_month_from_string(temp_buffer[1], &smon)) == OK
@@ -3877,15 +3872,15 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d - %[a-z] %d / %d %[0-9:, -]",
-                      temp_buffer[0],
-                      &smday,
-                      temp_buffer[1],
-                      &emday,
-                      &skip_interval,
-                      temp_buffer[2])) == 6) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d - %[a-z] %d / %d %[0-9:, -]",
+             temp_buffer[0],
+             &smday,
+             temp_buffer[1],
+             &emday,
+             &skip_interval,
+             temp_buffer[2]) == 6) {
     /* february 1 - march 15 / 3 */
     /* monday 2 - thursday 3 / 2 */
     /* day 4 - day 6 / 2 */
@@ -3956,14 +3951,14 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d - %d / %d %[0-9:, -]",
-                      temp_buffer[0],
-                      &smday,
-                      &emday,
-                      &skip_interval,
-                      temp_buffer[1])) == 5) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d - %d / %d %[0-9:, -]",
+             temp_buffer[0],
+             &smday,
+             &emday,
+             &skip_interval,
+             temp_buffer[1]) == 5) {
     /* february 1 - 15 / 3 */
     /* monday 2 - 3 / 2 */
     /* day 1 - 25 / 4 */
@@ -4037,16 +4032,16 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d %[a-z] - %[a-z] %d %[a-z] %[0-9:, -]",
-                      temp_buffer[0],
-                      &swday_offset,
-                      temp_buffer[1],
-                      temp_buffer[2],
-                      &ewday_offset,
-                      temp_buffer[3],
-                      temp_buffer[4])) == 7) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d %[a-z] - %[a-z] %d %[a-z] %[0-9:, -]",
+             temp_buffer[0],
+             &swday_offset,
+             temp_buffer[1],
+             temp_buffer[2],
+             &ewday_offset,
+             temp_buffer[3],
+             temp_buffer[4]) == 7) {
     /* wednesday 1 january - thursday 2 july */
     if ((result = xodtemplate_get_weekday_from_string(temp_buffer[0], &swday)) == OK
         && (result = xodtemplate_get_month_from_string(temp_buffer[1], &smon)) == OK
@@ -4071,13 +4066,13 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d - %d %[0-9:, -]",
-                      temp_buffer[0],
-                      &smday,
-                      &emday,
-                      temp_buffer[1])) == 4) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d - %d %[0-9:, -]",
+             temp_buffer[0],
+             &smday,
+             &emday,
+             temp_buffer[1]) == 4) {
     /* february 3 - 5 */
     /* thursday 2 - 4 */
     /* day 1 - 4 */
@@ -4151,14 +4146,14 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d - %[a-z] %d %[0-9:, -]",
-                      temp_buffer[0],
-                      &smday,
-                      temp_buffer[1],
-                      &emday,
-                      temp_buffer[2])) == 5) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d - %[a-z] %d %[0-9:, -]",
+             temp_buffer[0],
+             &smday,
+             temp_buffer[1],
+             &emday,
+             temp_buffer[2]) == 5) {
     /* february 1 - march 15 */
     /* monday 2 - thursday 3 */
     /* day 1 - day 5 */
@@ -4229,12 +4224,12 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d%*[ \t]%[0-9:, -]",
-                      temp_buffer[0],
-                      &smday,
-                      temp_buffer[1])) == 3) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d%*[ \t]%[0-9:, -]",
+             temp_buffer[0],
+             &smday,
+             temp_buffer[1]) == 3) {
     /* february 3 */
     /* thursday 2 */
     /* day 1 */
@@ -4310,13 +4305,13 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %d %[a-z] %[0-9:, -]",
-                      temp_buffer[0],
-                      &swday_offset,
-                      temp_buffer[1],
-                      temp_buffer[2])) == 4) {
+  else if (sscanf(
+             input,
+             "%[a-z] %d %[a-z] %[0-9:, -]",
+             temp_buffer[0],
+             &swday_offset,
+             temp_buffer[1],
+             temp_buffer[2]) == 4) {
     /* thursday 3 february */
     if ((result = xodtemplate_get_weekday_from_string(temp_buffer[0], &swday)) == OK
         && (result = xodtemplate_get_month_from_string(temp_buffer[1], &smon)) == OK) {
@@ -4342,11 +4337,11 @@ int xodtemplate_parse_timeperiod_directive(
         result = ERROR;
     }
   }
-  else if ((items = sscanf(
-                      input,
-                      "%[a-z] %[0-9:, -]",
-                      temp_buffer[0],
-                      temp_buffer[1])) == 2) {
+  else if (sscanf(
+             input,
+             "%[a-z] %[0-9:, -]",
+             temp_buffer[0],
+             temp_buffer[1]) == 2) {
     /* monday */
     if ((result = xodtemplate_get_weekday_from_string(
                     temp_buffer[0],
@@ -8960,14 +8955,8 @@ int xodtemplate_recombobulate_contactgroups() {
 }
 
 int xodtemplate_recombobulate_contactgroup_subgroups(
-      xodtemplate_contactgroup* temp_contactgroup, char** members) {
-  xodtemplate_contactgroup* sub_group = NULL;
-  char* orig_cgmembers = NULL;
-  char* cgmembers = NULL;
-  char* newmembers = NULL;
-  char* buf = NULL;
-  char* ptr = NULL;
-
+      xodtemplate_contactgroup* temp_contactgroup,
+      char** members) {
   if (temp_contactgroup == NULL)
     return (ERROR);
 
@@ -8975,13 +8964,14 @@ int xodtemplate_recombobulate_contactgroup_subgroups(
   if (temp_contactgroup->contactgroup_members != NULL) {
 
     /* save members, null pointer so we don't recurse into infinite hell */
-    orig_cgmembers = temp_contactgroup->contactgroup_members;
+    char* orig_cgmembers(temp_contactgroup->contactgroup_members);
     temp_contactgroup->contactgroup_members = NULL;
 
     /* make new working copy of members */
-    cgmembers = my_strdup(orig_cgmembers);
+    char* cgmembers(my_strdup(orig_cgmembers));
 
-    ptr = cgmembers;
+    char* buf(NULL);
+    char* ptr(cgmembers);
     while ((buf = ptr) != NULL) {
 
       /* get next member for next run */
@@ -8994,6 +8984,7 @@ int xodtemplate_recombobulate_contactgroup_subgroups(
       strip(buf);
 
       /* find subgroup and recurse */
+      xodtemplate_contactgroup* sub_group(NULL);
       if ((sub_group = xodtemplate_find_real_contactgroup(buf)) == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not find member group '" << buf
@@ -9003,6 +8994,8 @@ int xodtemplate_recombobulate_contactgroup_subgroups(
           << ")";
         return (ERROR);
       }
+
+      char* newmembers(NULL);
       xodtemplate_recombobulate_contactgroup_subgroups(
         sub_group,
         &newmembers);
@@ -9218,12 +9211,7 @@ int xodtemplate_recombobulate_hostgroups() {
 int xodtemplate_recombobulate_hostgroup_subgroups(
       xodtemplate_hostgroup* temp_hostgroup,
       char** members) {
-  xodtemplate_hostgroup* sub_group = NULL;
-  char* orig_hgmembers = NULL;
-  char* hgmembers = NULL;
-  char* newmembers = NULL;
-  char* buf = NULL;
-  char* ptr = NULL;
+
 
   if (temp_hostgroup == NULL)
     return (ERROR);
@@ -9232,13 +9220,14 @@ int xodtemplate_recombobulate_hostgroup_subgroups(
   if (temp_hostgroup->hostgroup_members != NULL) {
 
     /* save members, null pointer so we don't recurse into infinite hell */
-    orig_hgmembers = temp_hostgroup->hostgroup_members;
+    char* orig_hgmembers(temp_hostgroup->hostgroup_members);
     temp_hostgroup->hostgroup_members = NULL;
 
     /* make new working copy of members */
-    hgmembers = my_strdup(orig_hgmembers);
+    char* hgmembers(my_strdup(orig_hgmembers));
 
-    ptr = hgmembers;
+    char* buf(NULL);
+    char* ptr(hgmembers);
     while ((buf = ptr) != NULL) {
 
       /* get next member for next run */
@@ -9251,6 +9240,7 @@ int xodtemplate_recombobulate_hostgroup_subgroups(
       strip(buf);
 
       /* find subgroup and recurse */
+      xodtemplate_hostgroup* sub_group(NULL);
       if ((sub_group = xodtemplate_find_real_hostgroup(buf)) == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not find member group '" << buf
@@ -9260,6 +9250,8 @@ int xodtemplate_recombobulate_hostgroup_subgroups(
           << ")";
         return (ERROR);
       }
+
+      char* newmembers(NULL);
       xodtemplate_recombobulate_hostgroup_subgroups(
         sub_group,
         &newmembers);
@@ -9512,13 +9504,6 @@ int xodtemplate_recombobulate_servicegroups() {
 int xodtemplate_recombobulate_servicegroup_subgroups(
       xodtemplate_servicegroup* temp_servicegroup,
       char** members) {
-  xodtemplate_servicegroup* sub_group = NULL;
-  char* orig_sgmembers = NULL;
-  char* sgmembers = NULL;
-  char* newmembers = NULL;
-  char* buf = NULL;
-  char* ptr = NULL;
-
   if (temp_servicegroup == NULL)
     return (ERROR);
 
@@ -9526,13 +9511,14 @@ int xodtemplate_recombobulate_servicegroup_subgroups(
   if (temp_servicegroup->servicegroup_members != NULL) {
 
     /* save members, null pointer so we don't recurse into infinite hell */
-    orig_sgmembers = temp_servicegroup->servicegroup_members;
+    char* orig_sgmembers(temp_servicegroup->servicegroup_members);
     temp_servicegroup->servicegroup_members = NULL;
 
     /* make new working copy of members */
-    sgmembers = my_strdup(orig_sgmembers);
+    char* sgmembers(my_strdup(orig_sgmembers));
 
-    ptr = sgmembers;
+    char* buf(NULL);
+    char* ptr(sgmembers);
     while ((buf = ptr) != NULL) {
 
       /* get next member for next run */
@@ -9545,6 +9531,7 @@ int xodtemplate_recombobulate_servicegroup_subgroups(
       strip(buf);
 
       /* find subgroup and recurse */
+      xodtemplate_servicegroup* sub_group(NULL);
       if ((sub_group = xodtemplate_find_real_servicegroup(buf)) == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not find member group '" << buf
@@ -9554,6 +9541,7 @@ int xodtemplate_recombobulate_servicegroup_subgroups(
           << ")";
         return (ERROR);
       }
+      char* newmembers(NULL);
       xodtemplate_recombobulate_servicegroup_subgroups(
         sub_group,
         &newmembers);
@@ -9863,7 +9851,6 @@ xodtemplate_service* xodtemplate_find_real_service(
 
 /* registers object definitions */
 int xodtemplate_register_objects() {
-  int result(OK);
   void* ptr(NULL);
 
   // Register timeperiods.
@@ -9890,7 +9877,7 @@ int xodtemplate_register_objects() {
   for (temp_connector = (xodtemplate_connector*)skiplist_get_first(xobject_skiplists[X_CONNECTOR_SKIPLIST], &ptr);
        temp_connector;
        temp_connector = (xodtemplate_connector*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_connector(temp_connector)) == ERROR)
+    if (xodtemplate_register_connector(temp_connector) == ERROR)
       return (ERROR);
   }
 
@@ -9900,7 +9887,7 @@ int xodtemplate_register_objects() {
   for (temp_command = (xodtemplate_command*)skiplist_get_first(xobject_skiplists[X_COMMAND_SKIPLIST], &ptr);
        temp_command;
        temp_command = (xodtemplate_command*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_command(temp_command)) == ERROR)
+    if (xodtemplate_register_command(temp_command) == ERROR)
       return (ERROR);
   }
 
@@ -9910,7 +9897,7 @@ int xodtemplate_register_objects() {
   for (temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_first(xobject_skiplists[X_CONTACTGROUP_SKIPLIST], &ptr);
        temp_contactgroup;
        temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_contactgroup(temp_contactgroup)) == ERROR)
+    if (xodtemplate_register_contactgroup(temp_contactgroup) == ERROR)
       return (ERROR);
   }
 
@@ -9920,7 +9907,7 @@ int xodtemplate_register_objects() {
   for (temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_first(xobject_skiplists[X_HOSTGROUP_SKIPLIST], &ptr);
        temp_hostgroup;
        temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_hostgroup(temp_hostgroup)) == ERROR)
+    if (xodtemplate_register_hostgroup(temp_hostgroup) == ERROR)
       return (ERROR);
   }
 
@@ -9930,7 +9917,7 @@ int xodtemplate_register_objects() {
   for (temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_first(xobject_skiplists[X_SERVICEGROUP_SKIPLIST], &ptr);
        temp_servicegroup;
        temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_servicegroup(temp_servicegroup)) == ERROR)
+    if (xodtemplate_register_servicegroup(temp_servicegroup) == ERROR)
       return (ERROR);
   }
 
@@ -9940,7 +9927,7 @@ int xodtemplate_register_objects() {
   for (temp_contact = (xodtemplate_contact*)skiplist_get_first(xobject_skiplists[X_CONTACT_SKIPLIST], &ptr);
        temp_contact;
        temp_contact = (xodtemplate_contact*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_contact(temp_contact)) == ERROR)
+    if (xodtemplate_register_contact(temp_contact) == ERROR)
       return (ERROR);
   }
 
@@ -9950,7 +9937,7 @@ int xodtemplate_register_objects() {
   for (temp_host = (xodtemplate_host*)skiplist_get_first(xobject_skiplists[X_HOST_SKIPLIST], &ptr);
        temp_host;
        temp_host = (xodtemplate_host*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_host(temp_host)) == ERROR)
+    if (xodtemplate_register_host(temp_host) == ERROR)
       return (ERROR);
   }
 
@@ -9961,7 +9948,7 @@ int xodtemplate_register_objects() {
        temp_service;
        temp_service = (xodtemplate_service*)skiplist_get_next(&ptr)) {
 
-    if ((result = xodtemplate_register_service(temp_service)) == ERROR)
+    if (xodtemplate_register_service(temp_service) == ERROR)
       return (ERROR);
   }
 
@@ -9971,7 +9958,7 @@ int xodtemplate_register_objects() {
   for (temp_servicedependency = (xodtemplate_servicedependency*)skiplist_get_first(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST], &ptr);
        temp_servicedependency;
        temp_servicedependency = (xodtemplate_servicedependency*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_servicedependency(temp_servicedependency)) == ERROR)
+    if (xodtemplate_register_servicedependency(temp_servicedependency) == ERROR)
       return (ERROR);
   }
 
@@ -9981,7 +9968,7 @@ int xodtemplate_register_objects() {
   for (temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_first(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST], &ptr);
        temp_serviceescalation;
        temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_serviceescalation(temp_serviceescalation)) == ERROR)
+    if (xodtemplate_register_serviceescalation(temp_serviceescalation) == ERROR)
       return (ERROR);
   }
 
@@ -9991,7 +9978,7 @@ int xodtemplate_register_objects() {
   for (temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_first(xobject_skiplists[X_HOSTDEPENDENCY_SKIPLIST], &ptr);
        temp_hostdependency;
        temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_hostdependency(temp_hostdependency)) == ERROR)
+    if (xodtemplate_register_hostdependency(temp_hostdependency) == ERROR)
       return (ERROR);
   }
 
@@ -10001,7 +9988,7 @@ int xodtemplate_register_objects() {
   for (temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_first(xobject_skiplists[X_HOSTESCALATION_SKIPLIST], &ptr);
        temp_hostescalation;
        temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_hostescalation(temp_hostescalation)) == ERROR)
+    if (xodtemplate_register_hostescalation(temp_hostescalation) == ERROR)
       return (ERROR);
   }
 
@@ -10369,18 +10356,15 @@ int xodtemplate_register_connector(xodtemplate_connector* this_connector) {
 /* registers a contactgroup definition */
 int xodtemplate_register_contactgroup(
       xodtemplate_contactgroup* this_contactgroup) {
-  contactgroup* new_contactgroup = NULL;
-  contactsmember* new_contactsmember = NULL;
-  char* contact_name = NULL;
-
   /* bail out if we shouldn't register this object */
   if (this_contactgroup->register_object == FALSE)
     return (OK);
 
   /* add the contact group */
-  new_contactgroup = add_contactgroup(
-                       this_contactgroup->contactgroup_name,
-                       this_contactgroup->alias);
+  contactgroup* new_contactgroup
+    = add_contactgroup(
+        this_contactgroup->contactgroup_name,
+        this_contactgroup->alias);
 
   /* return with an error if we couldn't add the contactgroup */
   if (new_contactgroup == NULL) {
@@ -10394,13 +10378,14 @@ int xodtemplate_register_contactgroup(
 
   /* Need to check for NULL because strtok could use a NULL value to check the previous string's token value */
   if (this_contactgroup->members != NULL) {
-    for (contact_name = strtok(this_contactgroup->members, ",");
+    for (char* contact_name(strtok(this_contactgroup->members, ","));
          contact_name != NULL;
 	 contact_name = strtok(NULL, ",")) {
       strip(contact_name);
-      new_contactsmember = add_contact_to_contactgroup(
-                             new_contactgroup,
-                             contact_name);
+      contactsmember* new_contactsmember
+        = add_contact_to_contactgroup(
+            new_contactgroup,
+            contact_name);
       if (new_contactsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add contact '" << contact_name
@@ -10419,21 +10404,18 @@ int xodtemplate_register_contactgroup(
 /* registers a hostgroup definition */
 int xodtemplate_register_hostgroup(
       xodtemplate_hostgroup* this_hostgroup) {
-  hostgroup* new_hostgroup = NULL;
-  hostsmember* new_hostsmember = NULL;
-  char* host_name = NULL;
-
   /* bail out if we shouldn't register this object */
   if (this_hostgroup->register_object == FALSE)
     return (OK);
 
   /* add the  host group */
-  new_hostgroup = add_hostgroup(
-                    this_hostgroup->hostgroup_name,
-                    this_hostgroup->alias,
-                    this_hostgroup->notes,
-                    this_hostgroup->notes_url,
-                    this_hostgroup->action_url);
+  hostgroup* new_hostgroup
+    = add_hostgroup(
+        this_hostgroup->hostgroup_name,
+        this_hostgroup->alias,
+        this_hostgroup->notes,
+        this_hostgroup->notes_url,
+        this_hostgroup->action_url);
 
   /* return with an error if we couldn't add the hostgroup */
   if (new_hostgroup == NULL) {
@@ -10446,11 +10428,12 @@ int xodtemplate_register_hostgroup(
   }
 
   if (this_hostgroup->members != NULL) {
-    for (host_name = strtok(this_hostgroup->members, ",");
+    for (char* host_name(strtok(this_hostgroup->members, ","));
          host_name != NULL;
 	 host_name = strtok(NULL, ",")) {
       strip(host_name);
-      new_hostsmember = add_host_to_hostgroup(new_hostgroup, host_name);
+      hostsmember* new_hostsmember
+        = add_host_to_hostgroup(new_hostgroup, host_name);
       if (new_hostsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add host '" << host_name
@@ -10469,22 +10452,18 @@ int xodtemplate_register_hostgroup(
 /* registers a servicegroup definition */
 int xodtemplate_register_servicegroup(
       xodtemplate_servicegroup* this_servicegroup) {
-  servicegroup* new_servicegroup = NULL;
-  servicesmember* new_servicesmember = NULL;
-  char* host_name = NULL;
-  char* svc_description = NULL;
-
   /* bail out if we shouldn't register this object */
   if (this_servicegroup->register_object == FALSE)
     return (OK);
 
   /* add the  service group */
-  new_servicegroup = add_servicegroup(
-                       this_servicegroup->servicegroup_name,
-                       this_servicegroup->alias,
-                       this_servicegroup->notes,
-                       this_servicegroup->notes_url,
-                       this_servicegroup->action_url);
+  servicegroup* new_servicegroup
+    = add_servicegroup(
+        this_servicegroup->servicegroup_name,
+        this_servicegroup->alias,
+        this_servicegroup->notes,
+        this_servicegroup->notes_url,
+        this_servicegroup->action_url);
 
   /* return with an error if we couldn't add the servicegroup */
   if (new_servicegroup == NULL) {
@@ -10497,11 +10476,11 @@ int xodtemplate_register_servicegroup(
   }
 
   if (this_servicegroup->members != NULL) {
-    for (host_name = strtok(this_servicegroup->members, ",");
+    for (char* host_name(strtok(this_servicegroup->members, ","));
          host_name != NULL;
 	 host_name = strtok(NULL, ",")) {
       strip(host_name);
-      svc_description = strtok(NULL, ",");
+      char* svc_description(strtok(NULL, ","));
       if (svc_description == NULL) {
         logger(log_config_error, basic)
           << "Error: Missing service name in servicegroup definition "
@@ -10513,10 +10492,11 @@ int xodtemplate_register_servicegroup(
       }
       strip(svc_description);
 
-      new_servicesmember = add_service_to_servicegroup(
-                             new_servicegroup,
-                             host_name,
-                             svc_description);
+      servicesmember* new_servicesmember
+        = add_service_to_servicegroup(
+            new_servicegroup,
+            host_name,
+            svc_description);
       if (new_servicesmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add service '" << svc_description
@@ -10612,12 +10592,6 @@ int xodtemplate_register_servicedependency(
 /* registers a serviceescalation definition */
 int xodtemplate_register_serviceescalation(
       xodtemplate_serviceescalation* this_serviceescalation) {
-  serviceescalation* new_serviceescalation = NULL;
-  contactsmember* new_contactsmember = NULL;
-  contactgroupsmember* new_contactgroupsmember = NULL;
-  char* contact_name = NULL;
-  char* contact_group = NULL;
-
   /* bail out if we shouldn't register this object */
   if (this_serviceescalation->register_object == FALSE)
     return (OK);
@@ -10631,17 +10605,18 @@ int xodtemplate_register_serviceescalation(
   }
 
   /* add the serviceescalation */
-  new_serviceescalation = add_service_escalation(
-                            this_serviceescalation->host_name,
-                            this_serviceescalation->service_description,
-                            this_serviceescalation->first_notification,
-                            this_serviceescalation->last_notification,
-                            this_serviceescalation->notification_interval,
-                            this_serviceescalation->escalation_period,
-                            this_serviceescalation->escalate_on_warning,
-                            this_serviceescalation->escalate_on_unknown,
-                            this_serviceescalation->escalate_on_critical,
-                            this_serviceescalation->escalate_on_recovery);
+  serviceescalation* new_serviceescalation
+    = add_service_escalation(
+        this_serviceescalation->host_name,
+        this_serviceescalation->service_description,
+        this_serviceescalation->first_notification,
+        this_serviceescalation->last_notification,
+        this_serviceescalation->notification_interval,
+        this_serviceescalation->escalation_period,
+        this_serviceescalation->escalate_on_warning,
+        this_serviceescalation->escalate_on_unknown,
+        this_serviceescalation->escalate_on_critical,
+        this_serviceescalation->escalate_on_recovery);
 
   /* return with an error if we couldn't add the serviceescalation */
   if (new_serviceescalation == NULL) {
@@ -10655,14 +10630,15 @@ int xodtemplate_register_serviceescalation(
 
   /* add the contact groups */
   if (this_serviceescalation->contact_groups != NULL) {
-    for (contact_group = strtok(this_serviceescalation->contact_groups, ",");
+    for (char* contact_group(strtok(this_serviceescalation->contact_groups, ","));
          contact_group != NULL;
 	 contact_group = strtok(NULL, ", ")) {
 
       strip(contact_group);
-      new_contactgroupsmember = add_contactgroup_to_serviceescalation(
-                                  new_serviceescalation,
-                                  contact_group);
+      contactgroupsmember* new_contactgroupsmember
+        = add_contactgroup_to_serviceescalation(
+            new_serviceescalation,
+            contact_group);
       if (new_contactgroupsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add contactgroup '" << contact_group
@@ -10677,14 +10653,15 @@ int xodtemplate_register_serviceescalation(
 
   /* add the contacts */
   if (this_serviceescalation->contacts != NULL) {
-    for (contact_name = strtok(this_serviceescalation->contacts, ",");
+    for (char* contact_name(strtok(this_serviceescalation->contacts, ","));
          contact_name != NULL;
 	 contact_name = strtok(NULL, ", ")) {
 
       strip(contact_name);
-      new_contactsmember = add_contact_to_serviceescalation(
-                             new_serviceescalation,
-                             contact_name);
+      contactsmember* new_contactsmember
+        = add_contact_to_serviceescalation(
+            new_serviceescalation,
+            contact_name);
       if (new_contactsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add contact '" << contact_name
@@ -11178,12 +11155,6 @@ int xodtemplate_register_hostdependency(
 /* registers a hostescalation definition */
 int xodtemplate_register_hostescalation(
       xodtemplate_hostescalation* this_hostescalation) {
-  hostescalation* new_hostescalation = NULL;
-  contactsmember* new_contactsmember = NULL;
-  contactgroupsmember* new_contactgroupsmember = NULL;
-  char* contact_name = NULL;
-  char* contact_group = NULL;
-
   /* bail out if we shouldn't register this object */
   if (this_hostescalation->register_object == FALSE)
     return (OK);
@@ -11196,15 +11167,16 @@ int xodtemplate_register_hostescalation(
   }
 
   /* add the hostescalation */
-  new_hostescalation = add_host_escalation(
-                         this_hostescalation->host_name,
-                         this_hostescalation->first_notification,
-                         this_hostescalation->last_notification,
-                         this_hostescalation->notification_interval,
-                         this_hostescalation->escalation_period,
-                         this_hostescalation->escalate_on_down,
-                         this_hostescalation->escalate_on_unreachable,
-                         this_hostescalation->escalate_on_recovery);
+  hostescalation* new_hostescalation
+    = add_host_escalation(
+        this_hostescalation->host_name,
+        this_hostescalation->first_notification,
+        this_hostescalation->last_notification,
+        this_hostescalation->notification_interval,
+        this_hostescalation->escalation_period,
+        this_hostescalation->escalate_on_down,
+        this_hostescalation->escalate_on_unreachable,
+        this_hostescalation->escalate_on_recovery);
 
   /* return with an error if we couldn't add the hostescalation */
   if (new_hostescalation == NULL) {
@@ -11219,14 +11191,15 @@ int xodtemplate_register_hostescalation(
   /* add all contact groups */
   if (this_hostescalation->contact_groups != NULL) {
 
-    for (contact_group = strtok(this_hostescalation->contact_groups, ",");
+    for (char* contact_group(strtok(this_hostescalation->contact_groups, ","));
          contact_group != NULL;
 	 contact_group = strtok(NULL, ",")) {
 
       strip(contact_group);
-      new_contactgroupsmember = add_contactgroup_to_host_escalation(
-                                  new_hostescalation,
-                                  contact_group);
+      contactgroupsmember* new_contactgroupsmember
+        = add_contactgroup_to_host_escalation(
+            new_hostescalation,
+            contact_group);
       if (new_contactgroupsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add contactgroup '" << contact_group
@@ -11242,14 +11215,15 @@ int xodtemplate_register_hostescalation(
   /* add the contacts */
   if (this_hostescalation->contacts != NULL) {
 
-    for (contact_name = strtok(this_hostescalation->contacts, ",");
+    for (char* contact_name(strtok(this_hostescalation->contacts, ","));
          contact_name != NULL;
 	 contact_name = strtok(NULL, ", ")) {
 
       strip(contact_name);
-      new_contactsmember = add_contact_to_host_escalation(
-                             new_hostescalation,
-                             contact_name);
+      contactsmember* new_contactsmember
+        = add_contact_to_host_escalation(
+            new_hostescalation,
+            contact_name);
       if (new_contactsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add contact '" << contact_name
@@ -11358,7 +11332,6 @@ int xodtemplate_compare_strings2(
       char* string2a,
       char* string2b) {
   int result;
-
   if ((result = xodtemplate_compare_strings1(string1a, string2a)) == 0)
     result = xodtemplate_compare_strings1(string1b, string2b);
   return (result);

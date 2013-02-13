@@ -573,7 +573,6 @@ int xrddefault_read_state_information() {
   int was_flapping = FALSE;
   int allow_flapstart_notification = TRUE;
   struct timeval tv[2];
-  double runtime[2];
   int found_directive = FALSE;
 
   logger(logging::dbg_functions, logging::basic)
@@ -1785,6 +1784,7 @@ int xrddefault_read_state_information() {
     gettimeofday(&tv[1], NULL);
 
   if (test_scheduling == TRUE) {
+    double runtime[2];
     runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec) +
                           (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
 

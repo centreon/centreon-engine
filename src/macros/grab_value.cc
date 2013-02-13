@@ -1094,7 +1094,7 @@ int grab_macro_value_r(
     /* which arg do we want? */
     x = atoi(macro_name + 3);
 
-    if (x <= 0 || x > MAX_COMMAND_ARGUMENTS) {
+    if (!x || x > MAX_COMMAND_ARGUMENTS) {
       delete[] buf;
       return (ERROR);
     }
@@ -1108,7 +1108,7 @@ int grab_macro_value_r(
     /* which macro do we want? */
     x = atoi(macro_name + 4);
 
-    if (x <= 0 || x > MAX_USER_MACROS) {
+    if (!x || x > MAX_USER_MACROS) {
       delete[] buf;
       return (ERROR);
     }

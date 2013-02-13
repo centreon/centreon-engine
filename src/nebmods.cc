@@ -290,10 +290,6 @@ int neb_register_callback(
       void* mod_handle,
       int priority,
       int (*callback_func) (int, void*)) {
-  nebcallback* new_callback = NULL;
-  nebcallback* temp_callback = NULL;
-  nebcallback* last_callback = NULL;
-
   if (callback_func == NULL)
     return (NEBERROR_NOCALLBACKFUNC);
 
@@ -312,7 +308,7 @@ int neb_register_callback(
   callback.func = callback_func;
 
   /* allocate memory */
-  new_callback = new nebcallback;
+  nebcallback* new_callback(new nebcallback);
 
   new_callback->priority = priority;
   new_callback->module_handle = (void*)mod_handle;
@@ -323,7 +319,8 @@ int neb_register_callback(
   if (neb_callback_list[callback_type] == NULL)
     neb_callback_list[callback_type] = new_callback;
   else {
-    last_callback = NULL;
+    nebcallback* last_callback(NULL);
+    nebcallback* temp_callback(NULL);
     for (temp_callback = neb_callback_list[callback_type];
          temp_callback != NULL;
          temp_callback = temp_callback->next) {

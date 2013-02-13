@@ -412,12 +412,11 @@ int skiplist_delete_first(skiplist* list, void const* data) {
 
 /* delete all matching items from list */
 int skiplist_delete_all(skiplist* list, void const* data) {
-  int deleted = 0;
-  int total_deleted = 0;
+  int total_deleted(0);
 
   /* NOTE: there is a more efficient way to do this... */
-  while ((deleted = skiplist_delete_first(list, data)) == 1)
-    total_deleted++;
+  while (skiplist_delete_first(list, data) == 1)
+    ++total_deleted;
   return (total_deleted);
 }
 

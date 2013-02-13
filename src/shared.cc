@@ -425,39 +425,27 @@ void get_datetime_string(
        char* buffer,
        int buffer_length,
        int type) {
-  time_t t;
-  struct tm* tm_ptr, tm_s;
-  int hour;
-  int minute;
-  int second;
-  int month;
-  int day;
-  int year;
-  char const* weekdays[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-  char const* months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
-  char const* tzone = "";
+  static char const* weekdays[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+  static char const* months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
 
-  if (raw_time == NULL)
-    time(&t);
-  else
-    t = *raw_time;
-
+  time_t t(raw_time ? *raw_time : time(NULL));
+  tm tm_s;
   if (type == HTTP_DATE_TIME)
-    tm_ptr = gmtime_r(&t, &tm_s);
+    gmtime_r(&t, &tm_s);
   else
-    tm_ptr = localtime_r(&t, &tm_s);
+    localtime_r(&t, &tm_s);
 
-  hour = tm_ptr->tm_hour;
-  minute = tm_ptr->tm_min;
-  second = tm_ptr->tm_sec;
-  month = tm_ptr->tm_mon + 1;
-  day = tm_ptr->tm_mday;
-  year = tm_ptr->tm_year + 1900;
+  int hour(tm_s.tm_hour);
+  int minute(tm_s.tm_min);
+  int second(tm_s.tm_sec);
+  int month(tm_s.tm_mon + 1);
+  int day(tm_s.tm_mday);
+  int year(tm_s.tm_year + 1900);
 
 #ifdef HAVE_TM_ZONE
-  tzone = (char*)(tm_ptr->tm_zone);
+  char const* tzone(tm_s.tm_zone);
 #elif HAVE_TZNAME
-  tzone = tm_ptr->tm_isdst ? tzname[1] : tzname[0];
+  char const* tzone(tm_s.tm_isdst ? tzname[1] : tzname[0]);
 #endif /* HAVE_TM_ZONE || HAVE_TZNAME */
 
   /* ctime() style date/time */
@@ -466,8 +454,8 @@ void get_datetime_string(
       buffer,
       buffer_length,
       "%s %s %d %02d:%02d:%02d %s %d",
-      weekdays[tm_ptr->tm_wday],
-      months[tm_ptr->tm_mon],
+      weekdays[tm_s.tm_wday],
+      months[tm_s.tm_mon],
       day,
       hour,
       minute,
@@ -549,9 +537,9 @@ void get_datetime_string(
       buffer,
       buffer_length,
       "%s, %02d %s %d %02d:%02d:%02d GMT",
-      weekdays[tm_ptr->tm_wday],
+      weekdays[tm_s.tm_wday],
       day,
-      months[tm_ptr->tm_mon],
+      months[tm_s.tm_mon],
       year,
       hour,
       minute,

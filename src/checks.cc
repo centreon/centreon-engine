@@ -114,8 +114,7 @@ int run_scheduled_service_check(
       /* determine next time we should check the service if needed */
       /* if service has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
-        preferred_time = current_time
-          + static_cast<time_t>((svc->check_interval <= 0) ? 300 : (svc->check_interval * config->get_interval_length()));
+        preferred_time = current_time + static_cast<time_t>(svc->check_interval <= 0 ? 300 : svc->check_interval * config->get_interval_length());
 
       /* make sure we rescheduled the next service check at a valid time */
       get_next_valid_time(
@@ -1213,10 +1212,6 @@ int handle_async_service_check_result(
 
 /* schedules an immediate or delayed service check */
 void schedule_service_check(service* svc, time_t check_time, int options) {
-  timed_event* temp_event = NULL;
-  timed_event* new_event = NULL;
-  int use_original_event = TRUE;
-
   logger(dbg_functions, basic)
     << "schedule_service_check()";
 
@@ -1237,12 +1232,12 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
     return;
   }
   /* default is to use the new event */
-  use_original_event = FALSE;
+  int use_original_event(FALSE);
 
-  temp_event = quick_timed_event.find(
-                                   hash_timed_event::low,
-                                   hash_timed_event::service_check,
-                                   svc);
+  timed_event* temp_event = quick_timed_event.find(
+                              hash_timed_event::low,
+                              hash_timed_event::service_check,
+                              svc);
 
   /* we found another service check event for this service in the queue - what should we do? */
   if (temp_event != NULL) {
@@ -1307,30 +1302,29 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
 
     /* allocate memory for a new event item */
     try {
-      new_event = new timed_event;
+      timed_event* new_event(new timed_event);
+
+      /* set the next service check time */
+      svc->next_check = check_time;
+
+      /* place the new event in the event queue */
+      new_event->event_type = EVENT_SERVICE_CHECK;
+      new_event->event_data = (void*)svc;
+      new_event->event_args = (void*)NULL;
+      new_event->event_options = options;
+      new_event->run_time = svc->next_check;
+      new_event->recurring = FALSE;
+      new_event->event_interval = 0L;
+      new_event->timing_func = NULL;
+      new_event->compensate_for_time_change = TRUE;
+      reschedule_event(new_event, &event_list_low, &event_list_low_tail);
     }
     catch (...) {
       /* update the status log */
       update_service_status(svc, FALSE);
       throw;
     }
-
-    /* set the next service check time */
-    svc->next_check = check_time;
-
-    /* place the new event in the event queue */
-    new_event->event_type = EVENT_SERVICE_CHECK;
-    new_event->event_data = (void*)svc;
-    new_event->event_args = (void*)NULL;
-    new_event->event_options = options;
-    new_event->run_time = svc->next_check;
-    new_event->recurring = FALSE;
-    new_event->event_interval = 0L;
-    new_event->timing_func = NULL;
-    new_event->compensate_for_time_change = TRUE;
-    reschedule_event(new_event, &event_list_low, &event_list_low_tail);
   }
-
   else {
     /* reset the next check time (it may be out of sync) */
     if (temp_event != NULL)

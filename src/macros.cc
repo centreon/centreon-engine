@@ -103,13 +103,10 @@ int grab_custom_macro_value_r(
       char const* arg1,
       char const* arg2,
       char** output) {
-  host* temp_host = NULL;
   hostgroup* temp_hostgroup = NULL;
   hostsmember* temp_hostsmember = NULL;
-  service* temp_service = NULL;
   servicegroup* temp_servicegroup = NULL;
   servicesmember* temp_servicesmember = NULL;
-  contact* temp_contact = NULL;
   contactgroup* temp_contactgroup = NULL;
   contactsmember* temp_contactsmember = NULL;
   int delimiter_len = 0;
@@ -121,6 +118,7 @@ int grab_custom_macro_value_r(
 
   /***** CUSTOM HOST MACRO *****/
   if (strstr(macro_name, "_HOST") == macro_name) {
+    host* temp_host(NULL);
     /* a standard host macro */
     if (arg2 == NULL) {
       /* find the host for on-demand macros */
@@ -182,6 +180,8 @@ int grab_custom_macro_value_r(
   }
   /***** CUSTOM SERVICE MACRO *****/
   else if (strstr(macro_name, "_SERVICE") == macro_name) {
+    service* temp_service(NULL);
+
     /* use saved service pointer */
     if (arg1 == NULL && arg2 == NULL) {
       if ((temp_service = mac->service_ptr) == NULL)
@@ -253,6 +253,8 @@ int grab_custom_macro_value_r(
   }
   /***** CUSTOM CONTACT VARIABLE *****/
   else if (strstr(macro_name, "_CONTACT") == macro_name) {
+    contact* temp_contact(NULL);
+
     /* a standard contact macro */
     if (arg2 == NULL) {
       /* find the contact for on-demand macros */
@@ -888,22 +890,18 @@ int grab_custom_object_macro(
 
 /* cleans illegal characters in macros before output */
 char const* clean_macro_chars(char* macro, int options) {
-  int x = 0;
-  int y = 0;
-  int ch = 0;
-  int len = 0;
-
   if (macro == NULL)
     return ("");
 
-  len = (int)strlen(macro);
+  int len((int)strlen(macro));
 
   /* strip illegal characters out of macro */
   if (options & STRIP_ILLEGAL_MACRO_CHARS) {
-    for (y = 0, x = 0; x < len; x++) {
+    int y(0);
+    for (int x(0); x < len; x++) {
       /*ch=(int)macro[x]; */
       /* allow non-ASCII characters (Japanese, etc) */
-      ch = macro[x] & 0xff;
+      int ch(macro[x] & 0xff);
 
       /* illegal ASCII characters */
       if (ch < 32 || ch == 127)
@@ -916,12 +914,6 @@ char const* clean_macro_chars(char* macro, int options) {
 
     macro[y++] = '\x0';
   }
-
-#ifdef ON_HOLD_FOR_NOW
-  /* escape nasty character in macro */
-  if (options & ESCAPE_MACRO_CHARS) {
-  }
-#endif
   return (macro);
 }
 

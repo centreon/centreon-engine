@@ -71,7 +71,6 @@ int service_notification(
   struct timeval start_time;
   struct timeval end_time;
   int escalated = FALSE;
-  int result = OK;
   int contacts_notified = 0;
   int increment_notification_number = FALSE;
   nagios_macros mac;
@@ -272,15 +271,15 @@ int service_notification(
       clear_summary_macros_r(&mac);
 
       /* notify this contact */
-      result = notify_contact_of_service(
-                 &mac,
-                 temp_notification->cntct,
-                 svc,
-                 type,
-                 not_author,
-                 not_data,
-                 options,
-                 escalated);
+      int result = notify_contact_of_service(
+                     &mac,
+                     temp_notification->cntct,
+                     svc,
+                     type,
+                     not_author,
+                     not_data,
+                     options,
+                     escalated);
 
       /* keep track of how many contacts were notified */
       if (result == OK)
@@ -1323,7 +1322,6 @@ int host_notification(
   struct timeval start_time;
   struct timeval end_time;
   int escalated = FALSE;
-  int result = OK;
   int contacts_notified = 0;
   int increment_notification_number = FALSE;
   nagios_macros mac;
@@ -1522,15 +1520,15 @@ int host_notification(
       clear_summary_macros_r(&mac);
 
       /* notify this contact */
-      result = notify_contact_of_host(
-                 &mac,
-                 temp_notification->cntct,
-                 hst,
-                 type,
-                 not_author,
-                 not_data,
-                 options,
-                 escalated);
+      int result = notify_contact_of_host(
+                     &mac,
+                     temp_notification->cntct,
+                     hst,
+                     type,
+                     not_author,
+                     not_data,
+                     options,
+                     escalated);
 
       /* keep track of how many contacts were notified */
       if (result == OK)
@@ -2660,9 +2658,6 @@ notification* find_notification(contact* cntct) {
 
 /* add a new notification to the list in memory */
 int add_notification(nagios_macros* mac, contact* cntct) {
-  notification* new_notification = NULL;
-  notification* temp_notification = NULL;
-
   logger(dbg_functions, basic)
     << "add_notification()";
 
@@ -2673,11 +2668,11 @@ int add_notification(nagios_macros* mac, contact* cntct) {
     << "Adding contact '" << cntct->name << "' to notification list.";
 
   /* don't add anything if this contact is already on the notification list */
-  if ((temp_notification = find_notification(cntct)) != NULL)
+  if (find_notification(cntct))
     return (OK);
 
   /* allocate memory for a new contact in the notification list */
-  new_notification = new notification;
+  notification* new_notification(new notification);
 
   /* fill in the contact info */
   new_notification->cntct = cntct;

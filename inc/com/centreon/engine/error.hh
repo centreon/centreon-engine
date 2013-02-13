@@ -52,16 +52,14 @@ public:
   error&       operator<<(long long ll) throw ();
   error&       operator<<(unsigned long long ull) throw ();
   error&       operator<<(std::string const& str) throw ();
-  bool         is_fatal() const throw ();
-  void         set_fatal(bool fatal) throw ();
   char const*  what() const throw ();
 
 private:
-  mutable char _buffer[4096];
-  unsigned int _current;
-  bool         _fatal;
   template     <typename T>
   void         _insert_with_snprintf(T t, char const* format);
+
+  mutable char _buffer[4096];
+  unsigned int _current;
 };
 
 CCE_END()
