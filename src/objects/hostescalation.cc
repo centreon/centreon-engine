@@ -135,10 +135,10 @@ void objects::release(hostescalation const* obj) {
     return;
 
   contactgroupsmember const* cgmember = obj->contact_groups;
-  while ((cgmember = release(cgmember)));
+  while ((cgmember = release(cgmember))) {}
 
   contactsmember const* cntctmember = obj->contacts;
-  while ((cntctmember = release(cntctmember)));
+  while ((cntctmember = release(cntctmember))) {}
 
   skiplist_delete(object_skiplists[HOSTESCALATION_SKIPLIST], obj);
   remove_object_list(

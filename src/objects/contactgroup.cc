@@ -150,7 +150,7 @@ void objects::release(contactgroup const* obj) {
     return;
 
   contactsmember const* member = obj->members;
-  while ((member = release(member)));
+  while ((member = release(member))) {}
 
   skiplist_delete(object_skiplists[CONTACTGROUP_SKIPLIST], obj);
   remove_object_list(obj, &contactgroup_list, &contactgroup_list_tail);

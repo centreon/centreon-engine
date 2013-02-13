@@ -1472,10 +1472,8 @@ int set_macrox_environment_vars(int set) {
 
 /* sets or unsets argv macro environment variables */
 int set_argv_macro_environment_vars_r(nagios_macros* mac, int set) {
-  unsigned int x = 0;
-
   /* set each of the argv macro environment variables */
-  for (x = 0; x < MAX_COMMAND_ARGUMENTS; x++) {
+  for (unsigned int x(0); x < MAX_COMMAND_ARGUMENTS; x++) {
     std::ostringstream oss;
     oss << "ARG" << x + 1;
     set_macro_environment_var(oss.str().c_str(), mac->argv[x], set);
@@ -1501,11 +1499,11 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
     for (temp_customvariablesmember = temp_host->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
-      std::ostringstream oss;
-      oss << "_HOST" << temp_customvariablesmember->variable_name;
+      std::string var("_HOST");
+      var.append(temp_customvariablesmember->variable_name);
       add_custom_variable_to_object(
         &mac->custom_host_vars,
-        oss.str().c_str(),
+        var.c_str(),
         temp_customvariablesmember->variable_value);
     }
   }
@@ -1527,11 +1525,11 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
     for (temp_customvariablesmember = temp_service->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
-      std::ostringstream oss;
-      oss << "_SERVICE" << temp_customvariablesmember->variable_name;
+      std::string var("_SERVICE");
+      var.append(temp_customvariablesmember->variable_name);
       add_custom_variable_to_object(
         &mac->custom_service_vars,
-        oss.str().c_str(),
+        var.c_str(),
         temp_customvariablesmember->variable_value);
     }
   }
@@ -1552,11 +1550,11 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
     for (temp_customvariablesmember = temp_contact->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
-      std::ostringstream oss;
-      oss << "_CONTACT" << temp_customvariablesmember->variable_name;
+      std::string var("_CONTACT");
+      var.append(temp_customvariablesmember->variable_name);
       add_custom_variable_to_object(
         &mac->custom_contact_vars,
-        oss.str().c_str(),
+        var.c_str(),
         temp_customvariablesmember->variable_value);
     }
   }
@@ -1584,13 +1582,11 @@ int set_custom_macro_environment_vars(int set) {
 int set_contact_address_environment_vars_r(
       nagios_macros* mac,
       int set) {
-  unsigned int x;
-
   /* these only get set during notifications */
   if (mac->contact_ptr == NULL)
     return (OK);
 
-  for (x = 0; x < MAX_CONTACT_ADDRESSES; x++) {
+  for (unsigned int x(0); x < MAX_CONTACT_ADDRESSES; x++) {
     std::ostringstream oss;
     oss << "CONTACTADDRESS" << x;
     set_macro_environment_var(
@@ -1618,11 +1614,11 @@ int set_macro_environment_var(
     return (ERROR);
 
   /* create environment var name */
-  std::ostringstream oss;
-  oss << MACRO_ENV_VAR_PREFIX << name;
+  std::string var(MACRO_ENV_VAR_PREFIX);
+  var.append(name);
 
   /* set or unset the environment variable */
-  set_environment_var(oss.str().c_str(), value, set);
+  set_environment_var(var.c_str(), value, set);
 
   return (OK);
 }

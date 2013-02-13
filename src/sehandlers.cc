@@ -341,7 +341,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description
         << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-        << config->get_global_service_event_handler() << std::endl;
+        << config->get_global_service_event_handler();
     process_macros_r(
       mac,
       oss.str().c_str(),
@@ -494,7 +494,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     oss << "SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-	<< svc->event_handler << std::endl;
+	<< svc->event_handler;
     process_macros_r(
       mac,
       oss.str().c_str(),
@@ -706,7 +706,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     std::ostringstream oss;
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-	<< config->get_global_host_event_handler() << std::endl;
+	<< config->get_global_host_event_handler();
     process_macros_r(
       mac,
       oss.str().c_str(),
@@ -855,7 +855,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     std::ostringstream oss;
     oss << "HOST EVENT HANDLER: " << hst->name
 	<< ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-	<< hst->event_handler << std::endl;
+	<< hst->event_handler;
     process_macros_r(
       mac,
       oss.str().c_str(),

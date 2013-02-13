@@ -152,7 +152,7 @@ void objects::release(hostgroup const* obj) {
     return;
 
   hostsmember const* member = obj->members;
-  while ((member = release(member)));
+  while ((member = release(member))) {}
 
   skiplist_delete(object_skiplists[HOSTGROUP_SKIPLIST], obj);
   remove_object_list(obj, &hostgroup_list, &hostgroup_list_tail);

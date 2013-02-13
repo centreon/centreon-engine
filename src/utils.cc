@@ -29,7 +29,6 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <iomanip>
-#include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -305,9 +304,9 @@ int set_environment_var(char const* name, char const* value, int set) {
 
     /* needed for Solaris and systems that don't have setenv() */
     /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
-    std::ostringstream oss;
-    oss << name << '=' << (value ? value : "");
-    env_string = my_strdup(oss.str().c_str());
+    std::string val(name);
+    val.append("=").append(value ? value : "");
+    env_string = my_strdup(val.c_str());
     putenv(env_string);
   }
   /* clear the variable */
@@ -1782,7 +1781,7 @@ void sighandler(int sig) {
     sig = -sig;
 
   int x;
-  for (x = 0; sigs[x] != (char*)NULL; ++x);
+  for (x = 0; sigs[x]; ++x) {}
   sig %= x;
 
   sig_id = sig;

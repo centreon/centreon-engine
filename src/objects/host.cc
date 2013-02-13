@@ -209,22 +209,22 @@ void objects::release(host const* obj) {
     return;
 
   hostsmember const* hstmember = obj->parent_hosts;
-  while ((hstmember = release(hstmember)));
+  while ((hstmember = release(hstmember))) {}
 
   hstmember = obj->child_hosts;
-  while ((hstmember = release(hstmember)));
+  while ((hstmember = release(hstmember))) {}
 
   servicesmember const* svcmember = obj->services;
-  while ((svcmember = release(svcmember)));
+  while ((svcmember = release(svcmember))) {}
 
   contactgroupsmember const* cgmember = obj->contact_groups;
-  while ((cgmember = release(cgmember)));
+  while ((cgmember = release(cgmember))) {}
 
   contactsmember const* cntctmember = obj->contacts;
-  while ((cntctmember = release(cntctmember)));
+  while ((cntctmember = release(cntctmember))) {}
 
   customvariablesmember const* varmember = obj->custom_variables;
-  while ((varmember = release(varmember)));
+  while ((varmember = release(varmember))) {}
 
   release(obj->hostgroups_ptr);
   skiplist_delete(object_skiplists[HOST_SKIPLIST], obj);

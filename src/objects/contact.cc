@@ -160,13 +160,13 @@ void objects::release(contact const* obj) {
     return;
 
   commandsmember const* cmdmember = obj->host_notification_commands;
-  while ((cmdmember = release(cmdmember)));
+  while ((cmdmember = release(cmdmember))) {}
 
   cmdmember = obj->service_notification_commands;
-  while ((cmdmember = release(cmdmember)));
+  while ((cmdmember = release(cmdmember))) {}
 
   customvariablesmember const* varmember = obj->custom_variables;
-  while ((varmember = release(varmember)));
+  while ((varmember = release(varmember))) {}
 
   release(obj->contactgroups_ptr);
   skiplist_delete(object_skiplists[CONTACT_SKIPLIST], obj);

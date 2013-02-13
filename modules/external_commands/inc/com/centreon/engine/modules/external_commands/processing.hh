@@ -22,7 +22,7 @@
 
 #  include <map>
 #  include <string>
-#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -283,7 +283,7 @@ namespace         modules {
             (*fptr)(member->contact_ptr);
       }
 
-      std::map<std::string, command_info> _lst_command;
+      umap<std::string, command_info> _lst_command;
     };
   }
 }

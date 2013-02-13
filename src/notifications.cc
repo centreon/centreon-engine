@@ -19,7 +19,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <sstream>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -30,6 +29,29 @@
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine::logging;
+
+static char const* tab_notification_str[] = {
+  "NORMAL",
+  "ACKNOWLEDGEMENT",
+  "FLAPPINGSTART",
+  "FLAPPINGSTOP",
+  "FLAPPINGDISABLED",
+  "DOWNTIMESTART",
+  "DOWNTIMEEND",
+  "DOWNTIMECANCELLED",
+};
+
+static char const* tab_host_state_str[] = {
+  "UP",
+  "DOWN",
+  "UNREACHABLE"
+};
+
+static char const* tab_service_state_str[] = {
+  "OK",
+  "WARNING",
+  "CRITICAL"
+};
 
 /******************************************************************/
 /***************** SERVICE NOTIFICATION FUNCTIONS *****************/
@@ -847,7 +869,6 @@ int notify_contact_of_service(
   char* command_name_ptr = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
-  char* processed_buffer = NULL;
   int early_timeout = FALSE;
   double exectime;
   struct timeval start_time, end_time;
@@ -961,79 +982,33 @@ int notify_contact_of_service(
 
     /* log the notification to program log file */
     if (config->get_log_notifications() == true) {
-      std::ostringstream oss;
+      char const* service_state_str("UNKNOWN");
+      if ((unsigned int)svc->current_state < sizeof(tab_service_state_str) / sizeof(*tab_service_state_str))
+        service_state_str = tab_service_state_str[svc->current_state];
+
+      char const* notification_str("");
+      if ((unsigned int)type < sizeof(tab_notification_str) / sizeof(*tab_notification_str))
+        notification_str = tab_notification_str[type];
+
+      std::string info;
       switch (type) {
       case NOTIFICATION_CUSTOM:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";CUSTOM ($SEVICESTATE$);" << command_name_ptr
-            << ";$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
-            << std::endl;
-        break;
+        notification_str = "CUSTOM";
 
       case NOTIFICATION_ACKNOWLEDGEMENT:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";ACKNOWLEDGEMENT ($SERVICESTATE$);" << command_name_ptr
-            << ";$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
-            << std::endl;
-        break;
-
-      case NOTIFICATION_FLAPPINGSTART:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";FLAPPINGSTART ($SERVICESTATE$);" << command_name_ptr
-            << ";$SERVICEOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_FLAPPINGSTOP:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";FLAPPINGSTOP ($SERVICESTATE$);"
-            << command_name_ptr << ";$SERVICEOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_FLAPPINGDISABLED:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";FLAPPINGDISABLED ($SERVICESTATE$);"
-            << command_name_ptr << ";$SERVICEOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_DOWNTIMESTART:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";DOWNTIMESTART ($SERVICESTATE$);" << command_name_ptr
-            << ";$SERVICEOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_DOWNTIMEEND:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";DOWNTIMEEND ($SERVICESTATE$);" << command_name_ptr
-            << ";$SERVICEOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_DOWNTIMECANCELLED:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";DOWNTIMECANCELLED ($SERVICESTATE$);"
-            << command_name_ptr << ";$SERVICEOUTPUT$" << std::endl;
-        break;
-
-      default:
-        oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
-            << svc->host_name << ';' << svc->description
-            << ";$SERVICESTATE$;" << command_name_ptr
-            << ";$SERVICEOUTPUT$" << std::endl;
+        info
+          .append(";").append(not_author ? not_author : "")
+          .append(";").append(not_data ? not_data : "");
         break;
       }
 
-      process_macros_r(mac, oss.str().c_str(), &processed_buffer, 0);
       logger(log_service_notification, basic)
-        << processed_buffer;
-
-      delete[] processed_buffer;
+        << "SERVICE NOTIFICATION: " << cntct->name << ';'
+        << svc->host_name << ';' << svc->description << ';'
+        << notification_str << " (" << service_state_str << ");"
+        << command_name_ptr << ';'
+        << (svc->plugin_output ? svc->plugin_output : "")
+        << info;
     }
 
     /* run the notification command */
@@ -2072,7 +2047,6 @@ int notify_contact_of_host(
   commandsmember* temp_commandsmember = NULL;
   char* command_name = NULL;
   char* command_name_ptr = NULL;
-  char* processed_buffer = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
   int early_timeout = FALSE;
@@ -2190,79 +2164,32 @@ int notify_contact_of_host(
 
     /* log the notification to program log file */
     if (config->get_log_notifications() == true) {
-      std::ostringstream oss;
+      char const* host_state_str("UP");
+      if ((unsigned int)hst->current_state < sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
+        host_state_str = tab_host_state_str[hst->current_state];
+
+      char const* notification_str("");
+      if ((unsigned int)type < sizeof(tab_notification_str) / sizeof(*tab_notification_str))
+        notification_str = tab_notification_str[type];
+
+      std::string info;
       switch (type) {
       case NOTIFICATION_CUSTOM:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";CUSTOM ($HOSTSTATE$);"
-            << command_name_ptr
-            << ";$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
-            << std::endl;
-        break;
+        notification_str = "CUSTOM";
 
       case NOTIFICATION_ACKNOWLEDGEMENT:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";ACKNOWLEDGEMENT ($HOSTSTATE$);"
-            << command_name_ptr
-            << ";$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
-            << std::endl;
-        break;
-
-      case NOTIFICATION_FLAPPINGSTART:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";FLAPPINGSTART ($HOSTSTATE$);"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_FLAPPINGSTOP:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";FLAPPINGSTOP ($HOSTSTATE$);"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_FLAPPINGDISABLED:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";FLAPPINGDISABLED ($HOSTSTATE$);"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_DOWNTIMESTART:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";DOWNTIMESTART ($HOSTSTATE$);"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_DOWNTIMEEND:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";DOWNTIMEEND ($HOSTSTATE$);"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        break;
-
-      case NOTIFICATION_DOWNTIMECANCELLED:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name
-            << ";DOWNTIMECANCELLED ($HOSTSTATE$);"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        break;
-
-      default:
-        oss << "HOST NOTIFICATION: " << cntct->name
-            << ';' << hst->name << ";$HOSTSTATE$;"
-            << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
+        info
+          .append(";").append(not_author ? not_author : "")
+          .append(";").append(not_data ? not_data : "");
         break;
       }
 
-      process_macros_r(mac, oss.str().c_str(), &processed_buffer, 0);
       logger(log_host_notification, basic)
-        << processed_buffer;
-      delete[] processed_buffer;
+        << "HOST NOTIFICATION: " << cntct->name
+        << ';' << hst->name << ';' << notification_str
+        << " (" << host_state_str << ");" << command_name_ptr
+        << ';' << (hst->plugin_output ? hst->plugin_output : "")
+        << info;
     }
 
     /* run the notification command */

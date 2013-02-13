@@ -760,8 +760,12 @@ target_link_libraries("cce_core"
 add_executable("centengine"
   "${SRC_DIR}/main.cc")
 if (CMAKE_COMPILER_IS_GNUCXX)
-  target_link_libraries("centengine"
-    "-Wl,-whole-archive -lcce_objects -L./objects -lcce_compatibility -L./compatibility -Wl,-no-whole-archive")
+  if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_link_libraries("centengine" "-all_load")
+  else ()
+    target_link_libraries("centengine"
+      "-Wl,-whole-archive -lcce_objects -L./objects -lcce_compatibility -L./compatibility -Wl,-no-whole-archive")
+  endif ()
 endif ()
 get_property(CENTENGINE_BINARY
     TARGET "centengine"

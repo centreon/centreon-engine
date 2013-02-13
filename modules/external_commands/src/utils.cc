@@ -17,14 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <csignal>
+#include <cstdio>
+#include <cstring>
 #include <fcntl.h>
 #include <poll.h>
 #include <pthread.h>
-#include <signal.h>
 #include <sstream>
-#include <stdio.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -310,11 +310,6 @@ void* command_file_worker_thread(void* arg) {
     buffer_items = external_command_buffer.items;
     pthread_mutex_unlock(&external_command_buffer.buffer_lock);
 
-#ifdef DEBUG_CFWT
-    printf("(CFWT) BUFFER ITEMS: %d/%d\n", buffer_items,
-           config->get_external_command_buffer_slots());
-#endif
-
     /* 10-15-08 Fix for OS X by Jonathan Saggau - see http://www.jonathansaggau.com/blog/2008/09/using_shark_and_custom_dtrace.html */
     /* Not sure if this would have negative effects on other OSes... */
     if (buffer_items == 0) {
@@ -333,11 +328,6 @@ void* command_file_worker_thread(void* arg) {
 
       /* read and process the next command in the file */
       while (fgets(input_buffer, (int)(sizeof(input_buffer) - 1), command_file_fp) != NULL) {
-
-#ifdef DEBUG_CFWT
-        printf("(CFWT) READ: %s", input_buffer);
-#endif
-
         /* submit the external command for processing (retry if buffer is full) */
         while ((result = submit_external_command(input_buffer, &buffer_items)) == ERROR
                && buffer_items == config->get_external_command_buffer_slots()) {
@@ -350,13 +340,6 @@ void* command_file_worker_thread(void* arg) {
           /* should we shutdown? */
           pthread_testcancel();
         }
-
-#ifdef DEBUG_CFWT
-        printf("(CFWT) RES: %d, BUFFER_ITEMS: %d/%d\n",
-               result,
-               buffer_items,
-               external_comand_buffer_slots);
-#endif
 
         /* bail if the circular buffer is full */
         if (buffer_items == config->get_external_command_buffer_slots())

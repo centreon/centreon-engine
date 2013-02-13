@@ -202,13 +202,13 @@ void objects::release(service const* obj) {
     return;
 
   contactgroupsmember const* cgmember = obj->contact_groups;
-  while ((cgmember = release(cgmember)));
+  while ((cgmember = release(cgmember))) {}
 
   contactsmember const* cntctmember = obj->contacts;
-  while ((cntctmember = release(cntctmember)));
+  while ((cntctmember = release(cntctmember))) {}
 
   customvariablesmember const* varmember = obj->custom_variables;
-  while ((varmember = release(varmember)));
+  while ((varmember = release(varmember))) {}
 
   release(obj->servicegroups_ptr);
   skiplist_delete(object_skiplists[SERVICE_SKIPLIST], obj);

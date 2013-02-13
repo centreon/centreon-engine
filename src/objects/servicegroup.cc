@@ -160,7 +160,7 @@ void objects::release(servicegroup const* obj) {
     return;
 
   servicesmember const* member = obj->members;
-  while ((member = release(member)));
+  while ((member = release(member))) {}
 
   skiplist_delete(object_skiplists[SERVICEGROUP_SKIPLIST], obj);
   remove_object_list(obj, &servicegroup_list, &servicegroup_list_tail);

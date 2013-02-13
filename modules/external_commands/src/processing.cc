@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -583,7 +583,7 @@ bool processing::execute(char const* cmd) const {
   char* args(command + start);
   int command_id(CMD_CUSTOM_COMMAND);
 
-  std::map<std::string, command_info>::const_iterator
+  umap<std::string, command_info>::const_iterator
     it(_lst_command.find(command_name));
   if (it != _lst_command.end())
     command_id = it->second.id;
@@ -609,9 +609,10 @@ bool processing::execute(char const* cmd) const {
     logger(log_external_command, basic)
       << "EXTERNAL COMMAND: " << command_name << ';' << args;
 
-  logger(dbg_external_command, more) << "External command id: " << command_id;
-  logger(dbg_external_command, more) << "Command entry time: " << entry_time;
-  logger(dbg_external_command, more) << "Command arguments: " << args;
+  logger(dbg_external_command, more)
+    << "External command id: " << command_id
+    << "\nCommand entry time: " << entry_time
+    << "\nCommand arguments: " << args;
 
   // send data to event broker.
   broker_external_command(
@@ -694,23 +695,26 @@ void processing::_wrapper_enable_host_svc_checks(host* hst) {
       enable_service_checks(member->service_ptr);
 }
 
-void processing::_wrapper_set_host_notification_number(host* hst,
-                                                       char* args) {
+void processing::_wrapper_set_host_notification_number(
+       host* hst,
+       char* args) {
   if (args)
     set_host_notification_number(hst, atoi(args));
 }
 
-void processing::_wrapper_send_custom_host_notification(host* hst,
-                                                        char* args) {
+void processing::_wrapper_send_custom_host_notification(
+       host* hst,
+       char* args) {
   char* buf[3] = { NULL, NULL, NULL };
   if ((buf[0] = my_strtok(args, ";"))
       && (buf[1] = my_strtok(NULL, ";"))
       && (buf[2] = my_strtok(NULL, ";"))) {
-    host_notification(hst,
-                      NOTIFICATION_CUSTOM,
-                      buf[1],
-                      buf[2],
-                      atoi(buf[0]));
+    host_notification(
+      hst,
+      NOTIFICATION_CUSTOM,
+      buf[1],
+      buf[2],
+      atoi(buf[0]));
   }
 }
 
@@ -762,23 +766,26 @@ void processing::_wrapper_disable_passive_service_checks(host* hst) {
       disable_passive_service_checks(member->service_ptr);
 }
 
-void processing::_wrapper_set_service_notification_number(service* svc,
-                                                          char* args) {
+void processing::_wrapper_set_service_notification_number(
+       service* svc,
+       char* args) {
   char* str(my_strtok(args, ";"));
   if (str)
     set_service_notification_number(svc, atoi(str));
 }
 
-void processing::_wrapper_send_custom_service_notification(service* svc,
-                                                           char* args) {
+void processing::_wrapper_send_custom_service_notification(
+       service* svc,
+       char* args) {
   char* buf[3] = { NULL, NULL, NULL };
   if ((buf[0] = my_strtok(args, ";"))
       && (buf[1] = my_strtok(NULL, ";"))
       && (buf[2] = my_strtok(NULL, ";"))) {
-    service_notification(svc,
-                         NOTIFICATION_CUSTOM,
-                         buf[1],
-                         buf[2],
-                         atoi(buf[0]));
+    service_notification(
+      svc,
+      NOTIFICATION_CUSTOM,
+      buf[1],
+      buf[2],
+      atoi(buf[0]));
   }
 }
