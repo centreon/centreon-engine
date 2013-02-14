@@ -31,7 +31,6 @@ int main() {
   // Base object.
   error e1;
   e1 << "foo " << "bar" << 42u;
-  e1.set_fatal(false);
 
   // Copy object.
   error e2;
@@ -40,11 +39,8 @@ int main() {
 
   // Change object object.
   e1 << 3612;
-  e1.set_fatal(true);
 
   // Check.
   return (strcmp(e1.what(), "foo bar423612")
-          || (e1.is_fatal() != true)
-          || strcmp(e2.what(), "foo bar42")
-          || (e2.is_fatal() != false));
+          || strcmp(e2.what(), "foo bar42"));
 }
