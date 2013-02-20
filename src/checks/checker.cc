@@ -96,6 +96,16 @@ void checker::reap() {
     process_check_result_queue(path.c_str());
   }
 
+  // Keep compatibility with old check result list.
+  if (check_result_list) {
+    concurrency::locker lock(&_mut_reap);
+    check_result* cr(NULL);
+    while ((cr = read_check_result())) {
+      _to_reap.push(*cr);
+      delete cr;
+    }
+  }
+
   // Reap check results.
   unsigned int reaped_checks(0);
   { // Scope to release mutex in all termination cases.
