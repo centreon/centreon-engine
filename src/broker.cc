@@ -1039,7 +1039,7 @@ int broker_host_check(
   char* command_buf(NULL);
   char* command_name(NULL);
   char* command_args(NULL);
-  if (!cmd) {
+  if (cmd) {
     command_buf = my_strdup(cmd);
     command_name = strtok(command_buf, "!");
     command_args = strtok(NULL, "\x0");
