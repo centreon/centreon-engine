@@ -1317,6 +1317,7 @@ void broker_program_status(
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.program_start = program_start;
   ds.pid = getpid();
+  ds.daemon_mode=0;
   ds.last_command_check = last_command_check;
   ds.last_log_rotation = last_log_rotation;
   ds.notifications_enabled = config->get_enable_notifications();
