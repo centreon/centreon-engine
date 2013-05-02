@@ -231,6 +231,7 @@ void loop::_dispatching() {
           nudge_seconds = 5 + (rand() % 10);
           logger(dbg_events | dbg_checks, basic)
             << "**WARNING** Max concurrent service checks ("
+            << currently_running_service_checks << "/"
             << config->get_max_parallel_service_checks()
             << ") has been reached!  Nudging "
             << temp_service->host_name << ":"
@@ -238,6 +239,7 @@ void loop::_dispatching() {
             << nudge_seconds << " seconds...";
           logger(log_runtime_warning, basic)
             << "\tMax concurrent service checks ("
+            << currently_running_service_checks << "/"
             << config->get_max_parallel_service_checks()
             << ") has been reached.  Nudging "
             << temp_service->host_name << ":"
