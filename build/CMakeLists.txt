@@ -734,6 +734,7 @@ add_subdirectory("core")
 add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")
+add_subdirectory("misc")
 add_subdirectory("modules")
 add_subdirectory("objects")
 add_subdirectory("scripts")
@@ -751,6 +752,7 @@ target_link_libraries("cce_core"
   "cce_configuration"
   "cce_checks"
   "cce_macros"
+  "cce_misc"
   "cce_commands"
   "cce_compatibility"
   "cce_objects"

@@ -27,8 +27,44 @@ add_subdirectory("applier")
 # cce_configuration target.
 add_library("cce_configuration"
   STATIC
+  "${SRC_DIR}/command.cc"
+  "${SRC_DIR}/connector.cc"
+  "${SRC_DIR}/contact.cc"
+  "${SRC_DIR}/contactgroup.cc"
+  "${SRC_DIR}/host.cc"
+  "${SRC_DIR}/hostdependency.cc"
+  "${SRC_DIR}/hostescalation.cc"
+  "${SRC_DIR}/hostextinfo.cc"
+  "${SRC_DIR}/hostgroup.cc"
+  "${SRC_DIR}/object.cc"
+  "${SRC_DIR}/parser.cc"
   "${SRC_DIR}/state.cc"
-  "${INC_DIR}/state.hh")
+  "${SRC_DIR}/service.cc"
+  "${SRC_DIR}/servicedependency.cc"
+  "${SRC_DIR}/serviceescalation.cc"
+  "${SRC_DIR}/serviceextinfo.cc"
+  "${SRC_DIR}/servicegroup.cc"
+  "${SRC_DIR}/timeperiod.cc"
+  "${INC_DIR}/command.hh"
+  "${INC_DIR}/connector.hh"
+  "${INC_DIR}/contactgroup.hh"
+  "${INC_DIR}/contact.hh"
+  "${INC_DIR}/host.hh"
+  "${INC_DIR}/hostdependency.hh"
+  "${INC_DIR}/hostescalation.hh"
+  "${INC_DIR}/hostextinfo.hh"
+  "${INC_DIR}/hostgroup.hh"
+  "${INC_DIR}/object.hh"
+  "${INC_DIR}/parser.hh"
+  "${INC_DIR}/servicedependency.hh"
+  "${INC_DIR}/serviceescalation.hh"
+  "${INC_DIR}/serviceextinfo.hh"
+  "${INC_DIR}/servicegroup.hh"
+  "${INC_DIR}/service.hh"
+  "${INC_DIR}/state.hh"
+  "${INC_DIR}/timeperiod.hh")
+
+
 
 # Link target with subdirectory's library.
 target_link_libraries("cce_configuration"
@@ -48,6 +84,12 @@ if (WITH_TESTING)
   # Parsing test.
   set(TEST_NAME "configuration_parsing")
   add_executable("${TEST_NAME}" "${TEST_DIR}/parsing.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+
+  # Parsing test.
+  set(TEST_NAME "configuration_parser")
+  add_executable("${TEST_NAME}" "${TEST_DIR}/parser.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()
