@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_OBJECT_HH
 #  define CCE_CONFIGURATION_OBJECT_HH
 
+#  include <algorithm>
 #  include <list>
 #  include <sstream>
 #  include <string>
@@ -43,13 +44,14 @@ namespace                  configuration {
     static shared_ptr<object>
                            create(std::string const& type);
     bool                   is_template() const throw ();
+    virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
-    // void               resolve_template(
-    //                      umap<std::string, shared_ptr<object> >& templates);
     virtual bool           parse(
                              std::string const& key,
                              std::string const& value);
     virtual bool           parse(std::string const& line);
+    void                   resolve_template(
+                             umap<std::string, shared_ptr<object> >& templates);
     std::string const&     type() const throw ();
 
   protected:
@@ -79,6 +81,7 @@ namespace                  configuration {
     void                   _set_name(std::string const& value);
     void                   _set_templates(std::string const& value);
 
+    bool                   _is_resolve;
     bool                   _is_template;
     std::string            _name;
     std::list<std::string> _templates;
@@ -89,6 +92,15 @@ namespace                  configuration {
 }
 
 CCE_END()
+
+#  define MRG_DEFAULT(prop) \
+  if (prop == default##prop && tmpl.prop != prop) prop = tmpl.prop
+#  define MRG_INHERIT(prop) \
+  if (prop.empty() && tmpl.prop != prop) prop.set(tmpl.prop)
+#  define MRG_MAP(prop) \
+  prop.insert(tmpl.prop.begin(), tmpl.prop.end())
+#  define MRG_STRING(prop) \
+  if (prop.empty() && tmpl.prop != prop) prop = tmpl.prop
 
 #endif // !CCE_CONFIGURATION_OBJECT_HH
 

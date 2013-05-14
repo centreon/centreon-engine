@@ -23,15 +23,15 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<connector, type, &connector::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(connector&, std::string const&);
 } gl_setters[] = {
-  { "connector_line", setter(std::string const&, _set_connector_line) },
-  { "connector_name", setter(std::string const&, _set_connector_name) }
+  { "connector_line", SETTER(std::string const&, _set_connector_line) },
+  { "connector_name", SETTER(std::string const&, _set_connector_name) }
 };
 
 /**
@@ -69,6 +69,8 @@ connector::~connector() throw () {
 connector& connector::operator=(connector const& right) {
   if (this != &right) {
     object::operator=(right);
+    _connector_line = right._connector_line;
+    _connector_name = right._connector_name;
   }
   return (*this);
 }
@@ -81,7 +83,9 @@ connector& connector::operator=(connector const& right) {
  *  @return True if is the same connector, otherwise false.
  */
 bool connector::operator==(connector const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _connector_line == right._connector_line
+          && _connector_name == right._connector_name);
 }
 
 /**
@@ -93,6 +97,19 @@ bool connector::operator==(connector const& right) const throw () {
  */
 bool connector::operator!=(connector const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void connector::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  connector const& tmpl(static_cast<connector const&>(obj));
+
+  MRG_STRING(_connector_line);
 }
 
 /**
@@ -111,7 +128,7 @@ bool connector::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void connector::_set_connector_line(std::string const& value) {

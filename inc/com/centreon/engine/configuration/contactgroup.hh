@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_CONTACTGROUP_HH
 #  define CCE_CONFIGURATION_CONTACTGROUP_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -46,6 +47,7 @@ namespace                  configuration {
                            members() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -57,12 +59,14 @@ namespace                  configuration {
     void                   _set_members(std::string const& value);
 
     std::string            _alias;
-    std::list<std::string> _contactgroup_members;
+    group                  _contactgroup_members;
     std::string            _contactgroup_name;
-    std::list<std::string> _members;
+    group                  _members;
   };
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_CONTACTGROUP_HH
+
+

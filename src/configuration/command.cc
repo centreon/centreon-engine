@@ -23,16 +23,16 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<command, type, &command::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(command&, std::string const&);
 } gl_setters[] = {
-  { "command_line", setter(std::string const&, _set_command_line) },
-  { "command_name", setter(std::string const&, _set_command_name) },
-  { "connector",    setter(std::string const&, _set_connector) }
+  { "command_line", SETTER(std::string const&, _set_command_line) },
+  { "command_name", SETTER(std::string const&, _set_command_name) },
+  { "connector",    SETTER(std::string const&, _set_connector) }
 };
 
 /**
@@ -70,6 +70,9 @@ command::~command() throw () {
 command& command::operator=(command const& right) {
   if (this != &right) {
     object::operator=(right);
+    _command_line = right._command_line;
+    _command_name = right._command_name;
+    _connector = right._connector;
   }
   return (*this);
 }
@@ -82,7 +85,10 @@ command& command::operator=(command const& right) {
  *  @return True if is the same command, otherwise false.
  */
 bool command::operator==(command const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _command_line == right._command_line
+          && _command_name == right._command_name
+          && _connector == right._connector);
 }
 
 /**
@@ -94,6 +100,21 @@ bool command::operator==(command const& right) const throw () {
  */
 bool command::operator!=(command const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void command::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  command const& tmpl(static_cast<command const&>(obj));
+
+  MRG_STRING(_command_line);
+  MRG_STRING(_command_name);
+  MRG_STRING(_connector);
 }
 
 /**
@@ -110,7 +131,7 @@ bool command::parse(std::string const& key, std::string const& value) {
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void command::_set_command_line(std::string const& value) {

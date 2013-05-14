@@ -20,7 +20,10 @@
 #ifndef CCE_CONFIGURATION_HOSTEXTINFO_HH
 #  define CCE_CONFIGURATION_HOSTEXTINFO_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/point_2d.hh"
+#  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -38,8 +41,8 @@ namespace                  configuration {
     bool                   operator!=(
                              hostextinfo const& right) const throw ();
     /*
-    int                    2d_coords() const throw ();
-    int                    3d_coords() const throw ();
+    point_2d const&        2d_coords() const throw ();
+    point_3d const&        3d_coords() const throw ();
     std::string const&     action_url() const throw ();
     std::string const&     gd2_image() const throw ();
     std::list<std::string> const&
@@ -54,13 +57,14 @@ namespace                  configuration {
     std::string const&     vrml_image() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
 
   private:
-    void                   _set_2d_coords(int value);
-    void                   _set_3d_coords(int value);
+    void                   _set_2d_coords(std::string const& value);
+    void                   _set_3d_coords(std::string const& value);
     void                   _set_action_url(std::string const& value);
     void                   _set_gd2_image(std::string const& value);
     void                   _set_hostgroups(std::string const& value);
@@ -72,12 +76,12 @@ namespace                  configuration {
     void                   _set_statusmap_image(std::string const& value);
     void                   _set_vrml_image(std::string const& value);
 
-    int                    _2d_coords;
-    int                    _3d_coords;
+    point_2d               _2d_coords;
+    point_3d               _3d_coords;
     std::string            _action_url;
     std::string            _gd2_image;
-    std::list<std::string> _hostgroups;
-    std::list<std::string> _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     std::string            _icon_image;
     std::string            _icon_image_alt;
     std::string            _notes;
@@ -90,4 +94,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOSTEXTINFO_HH
-

@@ -39,16 +39,16 @@
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<object, type, &object::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(object&, std::string const&);
 } gl_setters[] = {
-  { "use",      setter(std::string const&, _set_templates) },
-  { "name",     setter(std::string const&, _set_name) },
-  { "register", setter(bool, _set_is_template) }
+  { "use",      SETTER(std::string const&, _set_templates) },
+  { "name",     SETTER(std::string const&, _set_name) },
+  { "register", SETTER(bool, _set_is_template) }
 };
 
 /**
@@ -57,7 +57,8 @@ static struct {
  *  @param[in] type The object type name.
  */
 object::object(std::string const& type)
-  : _is_template(false),
+  : _is_resolve(false),
+    _is_template(false),
     _type(type) {
 
 }
@@ -87,6 +88,7 @@ object::~object() throw () {
  */
 object& object::operator=(object const& right) {
   if (this != &right) {
+    _is_resolve = right._is_resolve;
     _is_template = right._is_template;
     _name = right._name;
     _type = right._type;
@@ -104,6 +106,7 @@ object& object::operator=(object const& right) {
 bool object::operator==(object const& right) const throw () {
   return (_name == right._name
           && _type == right._type
+          && _is_resolve == right._is_resolve
           && _is_template == right._is_template);
 }
 
@@ -208,7 +211,11 @@ bool object::parse(std::string const& line) {
     return (false);
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
-  return (parse(key, misc::trim(value)));
+  misc::trim(value);
+
+  if (!object::parse(key, value))
+    return (parse(key, value));
+  return (true);
 }
 
 /**
@@ -216,40 +223,24 @@ bool object::parse(std::string const& line) {
  *
  *  @param[in, out] templates The template list.
  */
-// void object::resolve_template(objects& templates) {
-  // // Find if this object has template to resolve.
-  // properties::iterator it_use(_properties.find("use"));
-  // if (it_use == _properties.end())
-  //   return;
+void object::resolve_template(
+       umap<std::string, shared_ptr<object> >& templates) {
+  if (_is_resolve)
+    return;
 
-  // // Split template string into a list.
-  // std::list<std::string> lst_template;
-  // misc::split(it_use->second, lst_template, ',');
-
-  // // Remove template property.
-  // _properties.erase(it_use);
-
-  // // Foreach tempalte, merge properties.
-  // for (std::list<std::string>::const_iterator
-  //        it(lst_template.begin()), end(lst_template.end());
-  //      it != end;
-  //      ++it) {
-  //   objects::iterator it_template(templates.find(*it));
-  //   if (it_template == templates.end())
-  //     throw (engine_error() << "configuration: resolve template "
-  //            "failed: invalid property 'use': " << *it
-  //            << " template not found into " << _name);
-  //   it_template->second->resolve_template(templates);
-
-  //   properties merge_properties(it_template->second->_properties);
-  //   for (properties::const_iterator it(_properties.begin()),
-  //          end(_properties.end());
-  //        it != end;
-  //        ++it)
-  //     merge_properties[it->first] = it->second;
-  //   _properties.swap(merge_properties);
-  // }
-// }
+  _is_resolve = true;
+  for (std::list<std::string>::const_iterator it(_templates.begin()),
+         end(_templates.end());
+       it != end;
+       ++it) {
+    umap<std::string, shared_ptr<object> >::iterator
+      tmpl(templates.find(*it));
+    if (tmpl == templates.end())
+      throw (engine_error() << "XXX: todo");
+    tmpl->second->resolve_template(templates);
+    merge(*tmpl->second);
+  }
+}
 
 /**
  *  Get the object type name.

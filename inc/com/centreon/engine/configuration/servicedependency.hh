@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
 #  define CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,6 +30,14 @@ namespace                  configuration {
   class                    servicedependency
     : public object {
   public:
+    enum                   action_on {
+      none = 0,
+      ok = (1 << 0),
+      unknown = (1 << 1),
+      warning = (1 << 2),
+      critical = (1 << 3)
+    };
+
                            servicedependency();
                            servicedependency(
                              servicedependency const& right);
@@ -46,7 +55,8 @@ namespace                  configuration {
                            dependent_hosts() const throw ();
     std::list<std::string> const&
                            dependent_servicegroups() const throw ();
-    std::string const&     dependent_service_description() const throw ();
+    std::list<std::string> const&
+                           dependent_service_description() const throw ();
     unsigned int           execution_failure_options() const throw ();
     bool                   inherits_parent() const throw ();
     std::list<std::string> const&
@@ -56,9 +66,11 @@ namespace                  configuration {
     unsigned int           notification_failure_options() const throw ();
     std::list<std::string> const&
                            servicegroups() const throw ();
-    std::string const&     service_description() const throw ();
+    std::list<std::string> const&
+                           service_description() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -78,20 +90,21 @@ namespace                  configuration {
     void                   _set_service_description(std::string const& value);
 
     std::string            _dependency_period;
-    std::list<std::string> _dependent_hostgroups;
-    std::list<std::string> _dependent_hosts;
-    std::list<std::string> _dependent_servicegroups;
-    std::string            _dependent_service_description;
+    group                  _dependent_hostgroups;
+    group                  _dependent_hosts;
+    group                  _dependent_servicegroups;
+    group                  _dependent_service_description;
     unsigned int           _execution_failure_options;
     bool                   _inherits_parent;
-    std::list<std::string> _hostgroups;
-    std::list<std::string> _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     unsigned int           _notification_failure_options;
-    std::list<std::string> _servicegroups;
-    std::string            _service_description;
+    group                  _servicegroups;
+    group                  _service_description;
   };
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
+

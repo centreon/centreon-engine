@@ -23,37 +23,45 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<hostdependency, type, &hostdependency::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(hostdependency&, std::string const&);
 } gl_setters[] = {
-  { "hostgroup",                     setter(std::string const&, _set_hostgroups) },
-  { "hostgroups",                    setter(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",                setter(std::string const&, _set_hostgroups) },
-  { "host",                          setter(std::string const&, _set_hosts) },
-  { "host_name",                     setter(std::string const&, _set_hosts) },
-  { "master_host",                   setter(std::string const&, _set_hosts) },
-  { "master_host_name",              setter(std::string const&, _set_hosts) },
-  { "dependent_hostgroup",           setter(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_hostgroups",          setter(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_hostgroup_name",      setter(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_host",                setter(std::string const&, _set_dependent_hosts) },
-  { "dependent_host_name",           setter(std::string const&, _set_dependent_hosts) },
-  { "inherits_parent",               setter(bool, _set_inherits_parent) },
-  { "notification_failure_options",  setter(std::string const&, _set_notification_failure_options) },
-  { "notification_failure_criteria", setter(std::string const&, _set_notification_failure_options) },
-  { "execution_failure_options",     setter(std::string const&, _set_execution_failure_options) },
-  { "execution_failure_criteria",    setter(std::string const&, _set_execution_failure_options) }
+  { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroup_name",                SETTER(std::string const&, _set_hostgroups) },
+  { "host",                          SETTER(std::string const&, _set_hosts) },
+  { "host_name",                     SETTER(std::string const&, _set_hosts) },
+  { "master_host",                   SETTER(std::string const&, _set_hosts) },
+  { "master_host_name",              SETTER(std::string const&, _set_hosts) },
+  { "dependent_hostgroup",           SETTER(std::string const&, _set_dependent_hostgroups) },
+  { "dependent_hostgroups",          SETTER(std::string const&, _set_dependent_hostgroups) },
+  { "dependent_hostgroup_name",      SETTER(std::string const&, _set_dependent_hostgroups) },
+  { "dependent_host",                SETTER(std::string const&, _set_dependent_hosts) },
+  { "dependent_host_name",           SETTER(std::string const&, _set_dependent_hosts) },
+  { "inherits_parent",               SETTER(bool, _set_inherits_parent) },
+  { "notification_failure_options",  SETTER(std::string const&, _set_notification_failure_options) },
+  { "notification_failure_criteria", SETTER(std::string const&, _set_notification_failure_options) },
+  { "execution_failure_options",     SETTER(std::string const&, _set_execution_failure_options) },
+  { "execution_failure_criteria",    SETTER(std::string const&, _set_execution_failure_options) }
 };
+
+// Default values.
+static unsigned int const default_execution_failure_options(hostdependency::none);
+static bool const         default_inherits_parent(false);
+static unsigned int const default_notification_failure_options(hostdependency::none);
 
 /**
  *  Default constructor.
  */
 hostdependency::hostdependency()
-  : object("hostdependency") {
+  : object("hostdependency"),
+    _execution_failure_options(default_execution_failure_options),
+    _inherits_parent(default_inherits_parent),
+    _notification_failure_options(default_notification_failure_options) {
 
 }
 
@@ -84,6 +92,14 @@ hostdependency::~hostdependency() throw () {
 hostdependency& hostdependency::operator=(hostdependency const& right) {
   if (this != &right) {
     object::operator=(right);
+    _dependency_period = right._dependency_period;
+    _dependent_hostgroups = right._dependent_hostgroups;
+    _dependent_hosts = right._dependent_hosts;
+    _execution_failure_options = right._execution_failure_options;
+    _hostgroups = right._hostgroups;
+    _hosts = right._hosts;
+    _inherits_parent = right._inherits_parent;
+    _notification_failure_options = right._notification_failure_options;
   }
   return (*this);
 }
@@ -96,7 +112,15 @@ hostdependency& hostdependency::operator=(hostdependency const& right) {
  *  @return True if is the same hostdependency, otherwise false.
  */
 bool hostdependency::operator==(hostdependency const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _dependency_period == right._dependency_period
+          && _dependent_hostgroups == right._dependent_hostgroups
+          && _dependent_hosts == right._dependent_hosts
+          && _execution_failure_options == right._execution_failure_options
+          && _hostgroups == right._hostgroups
+          && _hosts == right._hosts
+          && _inherits_parent == right._inherits_parent
+          && _notification_failure_options == right._notification_failure_options);
 }
 
 /**
@@ -108,6 +132,26 @@ bool hostdependency::operator==(hostdependency const& right) const throw () {
  */
 bool hostdependency::operator!=(hostdependency const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void hostdependency::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  hostdependency const& tmpl(static_cast<hostdependency const&>(obj));
+
+  MRG_STRING(_dependency_period);
+  MRG_INHERIT(_dependent_hostgroups);
+  MRG_INHERIT(_dependent_hosts);
+  MRG_DEFAULT(_execution_failure_options);
+  MRG_INHERIT(_hostgroups);
+  MRG_INHERIT(_hosts);
+  MRG_DEFAULT(_inherits_parent);
+  MRG_DEFAULT(_notification_failure_options);
 }
 
 /**
@@ -126,7 +170,7 @@ bool hostdependency::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void hostdependency::_set_dependency_period(std::string const& value) {
@@ -135,12 +179,12 @@ void hostdependency::_set_dependency_period(std::string const& value) {
 
 void hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.clear();
-  misc::split(value, _dependent_hostgroups, ',');
+  misc::split(value, _dependent_hostgroups.get(), ',');
 }
 
 void hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.clear();
-  misc::split(value, _dependent_hosts, ',');
+  misc::split(value, _dependent_hosts.get(), ',');
 }
 
 void hostdependency::_set_execution_failure_options(std::string const& value) {
@@ -149,12 +193,12 @@ void hostdependency::_set_execution_failure_options(std::string const& value) {
 
 void hostdependency::_set_hostgroups(std::string const& value) {
   _hostgroups.clear();
-  misc::split(value, _hostgroups, ',');
+  misc::split(value, _hostgroups.get(), ',');
 }
 
 void hostdependency::_set_hosts(std::string const& value) {
   _hosts.clear();
-  misc::split(value, _hosts, ',');
+  misc::split(value, _hosts.get(), ',');
 }
 
 void hostdependency::_set_inherits_parent(bool value) {

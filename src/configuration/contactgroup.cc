@@ -23,17 +23,17 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<contactgroup, type, &contactgroup::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(contactgroup&, std::string const&);
 } gl_setters[] = {
-  { "contactgroup_name",    setter(std::string const&, _set_contactgroup_name) },
-  { "alias",                setter(std::string const&, _set_alias) },
-  { "members",              setter(std::string const&, _set_members) },
-  { "contactgroup_members", setter(std::string const&, _set_contactgroup_members) }
+  { "contactgroup_name",    SETTER(std::string const&, _set_contactgroup_name) },
+  { "alias",                SETTER(std::string const&, _set_alias) },
+  { "members",              SETTER(std::string const&, _set_members) },
+  { "contactgroup_members", SETTER(std::string const&, _set_contactgroup_members) }
 };
 
 /**
@@ -71,6 +71,10 @@ contactgroup::~contactgroup() throw () {
 contactgroup& contactgroup::operator=(contactgroup const& right) {
   if (this != &right) {
     object::operator=(right);
+    _alias = right._alias;
+    _contactgroup_members = right._contactgroup_members;
+    _contactgroup_name = right._contactgroup_name;
+    _members = right._members;
   }
   return (*this);
 }
@@ -83,7 +87,11 @@ contactgroup& contactgroup::operator=(contactgroup const& right) {
  *  @return True if is the same contactgroup, otherwise false.
  */
 bool contactgroup::operator==(contactgroup const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _alias == right._alias
+          && _contactgroup_members == right._contactgroup_members
+          && _contactgroup_name == right._contactgroup_name
+          && _members == right._members);
 }
 
 /**
@@ -95,6 +103,22 @@ bool contactgroup::operator==(contactgroup const& right) const throw () {
  */
 bool contactgroup::operator!=(contactgroup const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void contactgroup::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  contactgroup const& tmpl(static_cast<contactgroup const&>(obj));
+
+  MRG_STRING(_alias);
+  MRG_INHERIT(_contactgroup_members);
+  MRG_STRING(_contactgroup_name);
+  MRG_INHERIT(_members);
 }
 
 /**
@@ -113,7 +137,7 @@ bool contactgroup::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void contactgroup::_set_alias(std::string const& value) {
@@ -122,7 +146,7 @@ void contactgroup::_set_alias(std::string const& value) {
 
 void contactgroup::_set_contactgroup_members(std::string const& value) {
   _contactgroup_members.clear();
-  misc::split(value, _contactgroup_members, ',');
+  misc::split(value, _contactgroup_members.get(), ',');
 }
 
 void contactgroup::_set_contactgroup_name(std::string const& value) {
@@ -131,5 +155,5 @@ void contactgroup::_set_contactgroup_name(std::string const& value) {
 
 void contactgroup::_set_members(std::string const& value) {
   _members.clear();
-  misc::split(value, _members, ',');
+  misc::split(value, _members.get(), ',');
 }

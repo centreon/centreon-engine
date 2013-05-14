@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_HOSTDEPENDENCY_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,6 +30,14 @@ namespace                  configuration {
   class                    hostdependency
     : public object {
   public:
+    enum                   action_on {
+      none = 0,
+      up = (1 << 0),
+      down = (1 << 1),
+      unreachable = (1 << 2),
+      pending = (1 << 3)
+    };
+
                            hostdependency();
                            hostdependency(hostdependency const& right);
                            ~hostdependency() throw ();
@@ -52,6 +61,7 @@ namespace                  configuration {
     unsigned int           notification_failure_options() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -67,11 +77,11 @@ namespace                  configuration {
     void                   _set_notification_failure_options(std::string const& value);
 
     std::string            _dependency_period;
-    std::list<std::string> _dependent_hostgroups;
-    std::list<std::string> _dependent_hosts;
+    group                  _dependent_hostgroups;
+    group                  _dependent_hosts;
     unsigned int           _execution_failure_options;
-    std::list<std::string> _hostgroups;
-    std::list<std::string> _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     bool                   _inherits_parent;
     unsigned int           _notification_failure_options;
   };
@@ -80,4 +90,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOSTDEPENDENCY_HH
-

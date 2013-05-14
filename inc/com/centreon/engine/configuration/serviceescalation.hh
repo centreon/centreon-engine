@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEESCALATION_HH
 #  define CCE_CONFIGURATION_SERVICEESCALATION_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,6 +30,13 @@ namespace                  configuration {
   class                    serviceescalation
     : public object {
   public:
+    enum                   action_on {
+      none = 0,
+      unknown = (1 << 1),
+      warning = (1 << 2),
+      critical = (1 << 3),
+      pending = (1 << 4)
+    };
                            serviceescalation();
                            serviceescalation(
                              serviceescalation const& right);
@@ -54,9 +62,11 @@ namespace                  configuration {
     unsigned int           notification_interval() const throw ();
     std::list<std::string> const&
                            servicegroups() const throw ();
-    std::string const&     service_description() const throw ();
+    std::list<std::string> const&
+                           service_description() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -74,20 +84,21 @@ namespace                  configuration {
     void                   _set_servicegroups(std::string const& value);
     void                   _set_service_description(std::string const& value);
 
-    std::list<std::string> _contactgroups;
-    std::list<std::string> _contacts;
+    group                  _contactgroups;
+    group                  _contacts;
     unsigned int           _escalation_options;
     std::string            _escalation_period;
     unsigned int           _first_notification;
-    std::list<std::string> _hostgroups;
-    std::list<std::string> _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     unsigned int           _last_notification;
     unsigned int           _notification_interval;
-    std::list<std::string> _servicegroups;
-    std::string            _service_description;
+    group                  _servicegroups;
+    group                  _service_description;
   };
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICEESCALATION_HH
+

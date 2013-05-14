@@ -20,8 +20,11 @@
 #ifndef CCE_CONFIGURATION_CONTACT_HH
 #  define CCE_CONFIGURATION_CONTACT_HH
 
+#  include <vector>
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -45,23 +48,29 @@ namespace                  configuration {
     std::string const&     contact_name() const throw ();
     std::string const&     email() const throw ();
     bool                   host_notifications_enabled() const throw ();
-    std::string const&     host_notification_commands() const throw ();
+    std::list<std::string> const&
+                           host_notification_commands() const throw ();
     unsigned int           host_notification_options() const throw ();
     std::string const&     host_notification_period() const throw ();
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     std::string const&     pager() const throw ();
-    std::string const&     service_notification_commands() const throw ();
+    std::list<std::string> const&
+                           service_notification_commands() const throw ();
     unsigned int           service_notification_options() const throw ();
     std::string const&     service_notification_period() const throw ();
     bool                   service_notifications_enabled() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
 
   private:
+    void                   _set_address(
+                             std::string const& key,
+                             std::string const& value);
     void                   _set_alias(std::string const& value);
     void                   _set_can_submit_commands(bool value);
     void                   _set_contactgroups(std::string const& value);
@@ -79,19 +88,23 @@ namespace                  configuration {
     void                   _set_service_notification_period(std::string const& value);
     void                   _set_service_notifications_enabled(bool value);
 
+    std::vector<std::string>
+                           _address;
     std::string            _alias;
     bool                   _can_submit_commands;
-    std::list<std::string> _contactgroups;
+    group                  _contactgroups;
     std::string            _contact_name;
+    umap<std::string, std::string>
+                           _customvariables;
     std::string            _email;
     bool                   _host_notifications_enabled;
-    std::string            _host_notification_commands;
+    group                  _host_notification_commands;
     unsigned int           _host_notification_options;
     std::string            _host_notification_period;
     bool                   _retain_nonstatus_information;
     bool                   _retain_status_information;
     std::string            _pager;
-    std::string            _service_notification_commands;
+    group                  _service_notification_commands;
     unsigned int           _service_notification_options;
     std::string            _service_notification_period;
     bool                   _service_notifications_enabled;

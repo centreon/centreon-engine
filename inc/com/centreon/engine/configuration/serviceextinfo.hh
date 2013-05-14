@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_SERVICEEXTINFO_HH
 
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -50,6 +51,7 @@ namespace                  configuration {
     std::string const&     service_description() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -67,8 +69,8 @@ namespace                  configuration {
     std::string            _action_url;
     std::string            _icon_image;
     std::string            _icon_image_alt;
-    std::list<std::string> _hosts;
-    std::list<std::string> _hostgroups;
+    group                  _hosts;
+    group                  _hostgroups;
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;
@@ -78,3 +80,4 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICEEXTINFO_HH
+

@@ -23,37 +23,47 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<serviceescalation, type, &serviceescalation::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(serviceescalation&, std::string const&);
 } gl_setters[] = {
-  { "host",                  setter(std::string const&, _set_hosts) },
-  { "host_name",             setter(std::string const&, _set_hosts) },
-  { "description",           setter(std::string const&, _set_service_description) },
-  { "service_description",   setter(std::string const&, _set_service_description) },
-  { "servicegroup",          setter(std::string const&, _set_servicegroups) },
-  { "servicegroups",         setter(std::string const&, _set_servicegroups) },
-  { "servicegroup_name",     setter(std::string const&, _set_servicegroups) },
-  { "hostgroup",             setter(std::string const&, _set_hostgroups) },
-  { "hostgroups",            setter(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",        setter(std::string const&, _set_hostgroups) },
-  { "contact_groups",        setter(std::string const&, _set_contactgroups) },
-  { "contacts",              setter(std::string const&, _set_contacts) },
-  { "escalation_period",     setter(std::string const&, _set_escalation_period) },
-  { "first_notification",    setter(unsigned int, _set_first_notification) },
-  { "last_notification",     setter(unsigned int, _set_last_notification) },
-  { "notification_interval", setter(unsigned int, _set_notification_interval) },
-  { "escalation_options",    setter(std::string const&, _set_escalation_options) }
+  { "host",                  SETTER(std::string const&, _set_hosts) },
+  { "host_name",             SETTER(std::string const&, _set_hosts) },
+  { "description",           SETTER(std::string const&, _set_service_description) },
+  { "service_description",   SETTER(std::string const&, _set_service_description) },
+  { "servicegroup",          SETTER(std::string const&, _set_servicegroups) },
+  { "servicegroups",         SETTER(std::string const&, _set_servicegroups) },
+  { "servicegroup_name",     SETTER(std::string const&, _set_servicegroups) },
+  { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
+  { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
+  { "contacts",              SETTER(std::string const&, _set_contacts) },
+  { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
+  { "first_notification",    SETTER(unsigned int, _set_first_notification) },
+  { "last_notification",     SETTER(unsigned int, _set_last_notification) },
+  { "notification_interval", SETTER(unsigned int, _set_notification_interval) },
+  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) }
 };
+
+// Default values.
+static unsigned int const default_escalation_options(serviceescalation::none);
+static unsigned int const default_first_notification(-2);
+static unsigned int const default_last_notification(-2);
+static unsigned int const default_notification_interval(0);
 
 /**
  *  Default constructor.
  */
 serviceescalation::serviceescalation()
-  : object("serviceescalation") {
+  : object("serviceescalation"),
+    _escalation_options(default_escalation_options),
+    _first_notification(default_first_notification),
+    _last_notification(default_last_notification),
+    _notification_interval(default_notification_interval) {
 
 }
 
@@ -84,7 +94,16 @@ serviceescalation::~serviceescalation() throw () {
 serviceescalation& serviceescalation::operator=(serviceescalation const& right) {
   if (this != &right) {
     object::operator=(right);
+    _contactgroups = right._contactgroups;
+    _contacts = right._contacts;
+    _escalation_options = right._escalation_options;
+    _escalation_period = right._escalation_period;
+    _first_notification = right._first_notification;
+    _hostgroups = right._hostgroups;
     _hosts = right._hosts;
+    _last_notification = right._last_notification;
+    _notification_interval = right._notification_interval;
+    _servicegroups = right._servicegroups;
     _service_description = right._service_description;
   }
   return (*this);
@@ -99,7 +118,16 @@ serviceescalation& serviceescalation::operator=(serviceescalation const& right) 
  */
 bool serviceescalation::operator==(serviceescalation const& right) const throw () {
   return (object::operator==(right)
+          && _contactgroups == right._contactgroups
+          && _contacts == right._contacts
+          && _escalation_options == right._escalation_options
+          && _escalation_period == right._escalation_period
+          && _first_notification == right._first_notification
+          && _hostgroups == right._hostgroups
           && _hosts == right._hosts
+          && _last_notification == right._last_notification
+          && _notification_interval == right._notification_interval
+          && _servicegroups == right._servicegroups
           && _service_description == right._service_description);
 }
 
@@ -112,6 +140,29 @@ bool serviceescalation::operator==(serviceescalation const& right) const throw (
  */
 bool serviceescalation::operator!=(serviceescalation const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void serviceescalation::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  serviceescalation const& tmpl(static_cast<serviceescalation const&>(obj));
+
+  MRG_INHERIT(_contactgroups);
+  MRG_INHERIT(_contacts);
+  MRG_DEFAULT(_escalation_options);
+  MRG_STRING(_escalation_period);
+  MRG_DEFAULT(_first_notification);
+  MRG_INHERIT(_hostgroups);
+  MRG_INHERIT(_hosts);
+  MRG_DEFAULT(_last_notification);
+  MRG_DEFAULT(_notification_interval);
+  MRG_INHERIT(_servicegroups);
+  MRG_INHERIT(_service_description);
 }
 
 /**
@@ -130,17 +181,17 @@ bool serviceescalation::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void serviceescalation::_set_contactgroups(std::string const& value) {
   _contactgroups.clear();
-  misc::split(value, _contactgroups, ',');
+  misc::split(value, _contactgroups.get(), ',');
 }
 
 void serviceescalation::_set_contacts(std::string const& value) {
   _contacts.clear();
-  misc::split(value, _contacts, ',');
+  misc::split(value, _contacts.get(), ',');
 }
 
 void serviceescalation::_set_escalation_options(std::string const& value) {
@@ -157,12 +208,12 @@ void serviceescalation::_set_first_notification(unsigned int value) {
 
 void serviceescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.clear();
-  misc::split(value, _hostgroups, ',');
+  misc::split(value, _hostgroups.get(), ',');
 }
 
 void serviceescalation::_set_hosts(std::string const& value) {
   _hosts.clear();
-  misc::split(value, _hosts, ',');
+  misc::split(value, _hosts.get(), ',');
 }
 
 void serviceescalation::_set_last_notification(unsigned int value) {
@@ -175,9 +226,10 @@ void serviceescalation::_set_notification_interval(unsigned int value) {
 
 void serviceescalation::_set_servicegroups(std::string const& value) {
   _servicegroups.clear();
-  misc::split(value, _servicegroups, ',');
+  misc::split(value, _servicegroups.get(), ',');
 }
 
 void serviceescalation::_set_service_description(std::string const& value) {
-  _service_description = value;
+  _service_description.clear();
+  misc::split(value, _service_description.get(), ',');
 }

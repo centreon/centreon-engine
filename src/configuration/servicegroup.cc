@@ -23,20 +23,20 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<servicegroup, type, &servicegroup::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(servicegroup&, std::string const&);
 } gl_setters[] = {
-  { "servicegroup_name",    setter(std::string const&, _set_servicegroup_name) },
-  { "alias",                setter(std::string const&, _set_alias) },
-  { "members",              setter(std::string const&, _set_members) },
-  { "servicegroup_members", setter(std::string const&, _set_servicegroup_members) },
-  { "notes",                setter(std::string const&, _set_notes) },
-  { "notes_url",            setter(std::string const&, _set_notes_url) },
-  { "action_url",           setter(std::string const&, _set_action_url) }
+  { "servicegroup_name",    SETTER(std::string const&, _set_servicegroup_name) },
+  { "alias",                SETTER(std::string const&, _set_alias) },
+  { "members",              SETTER(std::string const&, _set_members) },
+  { "servicegroup_members", SETTER(std::string const&, _set_servicegroup_members) },
+  { "notes",                SETTER(std::string const&, _set_notes) },
+  { "notes_url",            SETTER(std::string const&, _set_notes_url) },
+  { "action_url",           SETTER(std::string const&, _set_action_url) }
 };
 
 
@@ -75,6 +75,13 @@ servicegroup::~servicegroup() throw () {
 servicegroup& servicegroup::operator=(servicegroup const& right) {
   if (this != &right) {
     object::operator=(right);
+    _action_url = right._action_url;
+    _alias = right._alias;
+    _members = right._members;
+    _notes = right._notes;
+    _notes_url = right._notes_url;
+    _servicegroup_members = right._servicegroup_members;
+    _servicegroup_name = right._servicegroup_name;
   }
   return (*this);
 }
@@ -87,7 +94,14 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
  *  @return True if is the same servicegroup, otherwise false.
  */
 bool servicegroup::operator==(servicegroup const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _action_url == right._action_url
+          && _alias == right._alias
+          && _members == right._members
+          && _notes == right._notes
+          && _notes_url == right._notes_url
+          && _servicegroup_members == right._servicegroup_members
+          && _servicegroup_name == right._servicegroup_name);
 }
 
 /**
@@ -99,6 +113,25 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
  */
 bool servicegroup::operator!=(servicegroup const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void servicegroup::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  servicegroup const& tmpl(static_cast<servicegroup const&>(obj));
+
+  MRG_STRING(_action_url);
+  MRG_STRING(_alias);
+  MRG_INHERIT(_members);
+  MRG_STRING(_notes);
+  MRG_STRING(_notes_url);
+  MRG_INHERIT(_servicegroup_members);
+  MRG_STRING(_servicegroup_name);
 }
 
 /**
@@ -117,7 +150,7 @@ bool servicegroup::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void servicegroup::_set_action_url(std::string const& value) {
@@ -130,7 +163,7 @@ void servicegroup::_set_alias(std::string const& value) {
 
 void servicegroup::_set_members(std::string const& value) {
   _members.clear();
-  misc::split(value, _members, ',');
+  misc::split(value, _members.get(), ',');
 }
 
 void servicegroup::_set_notes(std::string const& value) {
@@ -143,7 +176,7 @@ void servicegroup::_set_notes_url(std::string const& value) {
 
 void servicegroup::_set_servicegroup_members(std::string const& value) {
   _servicegroup_members.clear();
-  misc::split(value, _servicegroup_members, ',');
+  misc::split(value, _servicegroup_members.get(), ',');
 }
 
 void servicegroup::_set_servicegroup_name(std::string const& value) {

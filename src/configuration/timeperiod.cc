@@ -23,16 +23,16 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<timeperiod, type, &timeperiod::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(timeperiod&, std::string const&);
 } gl_setters[] = {
-  { "alias",           setter(std::string const&, _set_alias) },
-  { "exclude",         setter(std::string const&, _set_exclude) },
-  { "timeperiod_name", setter(std::string const&, _set_timeperiod_name) }
+  { "alias",           SETTER(std::string const&, _set_alias) },
+  { "exclude",         SETTER(std::string const&, _set_exclude) },
+  { "timeperiod_name", SETTER(std::string const&, _set_timeperiod_name) }
 };
 
 /**
@@ -70,6 +70,9 @@ timeperiod::~timeperiod() throw () {
 timeperiod& timeperiod::operator=(timeperiod const& right) {
   if (this != &right) {
     object::operator=(right);
+    _alias = right._alias;
+    _exclude = right._exclude;
+    _timeperiod_name = right._timeperiod_name;
   }
   return (*this);
 }
@@ -82,7 +85,10 @@ timeperiod& timeperiod::operator=(timeperiod const& right) {
  *  @return True if is the same timeperiod, otherwise false.
  */
 bool timeperiod::operator==(timeperiod const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _alias == right._alias
+          && _exclude == right._exclude
+          && _timeperiod_name == right._timeperiod_name);
 }
 
 /**
@@ -94,6 +100,21 @@ bool timeperiod::operator==(timeperiod const& right) const throw () {
  */
 bool timeperiod::operator!=(timeperiod const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void timeperiod::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  timeperiod const& tmpl(static_cast<timeperiod const&>(obj));
+
+  MRG_STRING(_alias);
+  // MERGE_TAB(_exclude);
+  MRG_STRING(_timeperiod_name);
 }
 
 /**
@@ -112,7 +133,8 @@ bool timeperiod::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+
+  return (false);
 }
 
 /**

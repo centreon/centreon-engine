@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEGROUP_HH
 #  define CCE_CONFIGURATION_SERVICEGROUP_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -49,6 +50,7 @@ namespace                  configuration {
     std::string const&     servicegroup_name() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -64,10 +66,10 @@ namespace                  configuration {
 
     std::string            _action_url;
     std::string            _alias;
-    std::list<std::string> _members;
+    group                  _members;
     std::string            _notes;
     std::string            _notes_url;
-    std::list<std::string> _servicegroup_members;
+    group                  _servicegroup_members;
     std::string            _servicegroup_name;
   };
 }

@@ -43,6 +43,7 @@ namespace                  configuration {
     std::string const&     connector() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -61,4 +62,5 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_COMMAND_HH
+
 

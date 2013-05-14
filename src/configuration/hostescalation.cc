@@ -23,32 +23,40 @@
 
 using namespace com::centreon::engine::configuration;
 
-#define setter(type, method) \
+#define SETTER(type, method) \
   &object::setter<hostescalation, type, &hostescalation::method>::generic
 
 static struct {
   std::string const name;
   bool (*func)(hostescalation&, std::string const&);
 } gl_setters[] = {
-  { "hostgroup",             setter(std::string const&, _set_hostgroups) },
-  { "hostgroups",            setter(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",        setter(std::string const&, _set_hostgroups) },
-  { "host",                  setter(std::string const&, _set_hosts) },
-  { "host_name",             setter(std::string const&, _set_hosts) },
-  { "contact_groups",        setter(std::string const&, _set_contactgroups) },
-  { "contacts",              setter(std::string const&, _set_contacts) },
-  { "escalation_period",     setter(std::string const&, _set_escalation_period) },
-  { "first_notification",    setter(unsigned int, _set_first_notification) },
-  { "last_notification",     setter(unsigned int, _set_last_notification) },
-  { "notification_interval", setter(unsigned int, _set_notification_interval) },
-  { "escalation_options",    setter(std::string const&, _set_escalation_options) }
+  { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
+  { "host",                  SETTER(std::string const&, _set_hosts) },
+  { "host_name",             SETTER(std::string const&, _set_hosts) },
+  { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
+  { "contacts",              SETTER(std::string const&, _set_contacts) },
+  { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
+  { "first_notification",    SETTER(unsigned int, _set_first_notification) },
+  { "last_notification",     SETTER(unsigned int, _set_last_notification) },
+  { "notification_interval", SETTER(unsigned int, _set_notification_interval) },
+  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) }
 };
+
+// Default values.
+static unsigned int const default_first_notification(-2);
+static unsigned int const default_last_notification(-2);
+static unsigned int const default_notification_interval(0);
 
 /**
  *  Default constructor.
  */
 hostescalation::hostescalation()
-  : object("hostescalation") {
+  : object("hostescalation"),
+    _first_notification(default_first_notification),
+    _last_notification(default_last_notification),
+    _notification_interval(default_notification_interval) {
 
 }
 
@@ -79,6 +87,15 @@ hostescalation::~hostescalation() throw () {
 hostescalation& hostescalation::operator=(hostescalation const& right) {
   if (this != &right) {
     object::operator=(right);
+    _contactgroups = right._contactgroups;
+    _contacts = right._contacts;
+    _escalation_options = right._escalation_options;
+    _escalation_period = right._escalation_period;
+    _first_notification = right._first_notification;
+    _hostgroups = right._hostgroups;
+    _hosts = right._hosts;
+    _last_notification = right._last_notification;
+    _notification_interval = right._notification_interval;
   }
   return (*this);
 }
@@ -91,7 +108,16 @@ hostescalation& hostescalation::operator=(hostescalation const& right) {
  *  @return True if is the same hostescalation, otherwise false.
  */
 bool hostescalation::operator==(hostescalation const& right) const throw () {
-  return (object::operator==(right));
+  return (object::operator==(right)
+          && _contactgroups == right._contactgroups
+          && _contacts == right._contacts
+          && _escalation_options == right._escalation_options
+          && _escalation_period == right._escalation_period
+          && _first_notification == right._first_notification
+          && _hostgroups == right._hostgroups
+          && _hosts == right._hosts
+          && _last_notification == right._last_notification
+          && _notification_interval == right._notification_interval);
 }
 
 /**
@@ -103,6 +129,27 @@ bool hostescalation::operator==(hostescalation const& right) const throw () {
  */
 bool hostescalation::operator!=(hostescalation const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void hostescalation::merge(object const& obj) {
+  if (obj.type() != _type)
+    throw (engine_error() << "XXX: todo");
+  hostescalation const& tmpl(static_cast<hostescalation const&>(obj));
+
+  MRG_INHERIT(_contactgroups);
+  MRG_INHERIT(_contacts);
+  MRG_STRING(_escalation_options);
+  MRG_STRING(_escalation_period);
+  MRG_DEFAULT(_first_notification);
+  MRG_INHERIT(_hostgroups);
+  MRG_INHERIT(_hosts);
+  MRG_DEFAULT(_last_notification);
+  MRG_DEFAULT(_notification_interval);
 }
 
 /**
@@ -121,17 +168,17 @@ bool hostescalation::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  return (object::parse(key, value));
+  return (false);
 }
 
 void hostescalation::_set_contactgroups(std::string const& value) {
   _contactgroups.clear();
-  misc::split(value, _contactgroups, ',');
+  misc::split(value, _contactgroups.get(), ',');
 }
 
 void hostescalation::_set_contacts(std::string const& value) {
   _contacts.clear();
-  misc::split(value, _contacts, ',');
+  misc::split(value, _contacts.get(), ',');
 }
 
 void hostescalation::_set_escalation_options(std::string const& value) {
@@ -148,12 +195,12 @@ void hostescalation::_set_first_notification(unsigned int value) {
 
 void hostescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.clear();
-  misc::split(value, _hostgroups, ',');
+  misc::split(value, _hostgroups.get(), ',');
 }
 
 void hostescalation::_set_hosts(std::string const& value) {
   _hosts.clear();
-  misc::split(value, _hosts, ',');
+  misc::split(value, _hosts.get(), ',');
 }
 
 void hostescalation::_set_last_notification(unsigned int value) {

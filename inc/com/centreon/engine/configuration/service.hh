@@ -20,8 +20,11 @@
 #ifndef CCE_CONFIGURATION_SERVICE_HH
 #  define CCE_CONFIGURATION_SERVICE_HH
 
+#  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -29,6 +32,17 @@ namespace                  configuration {
   class                    service
     : public object {
   public:
+    enum                   action_on {
+      none = 0,
+      ok = (1 << 0),
+      warning = (1 << 1),
+      unknown = (1 << 2),
+      critical = (1 << 3),
+      recovery = (1 << 4),
+      flapping = (1 << 5),
+      downtime = (1 << 6)
+    };
+
                            service();
                            service(service const& right);
                            ~service() throw ();
@@ -51,8 +65,6 @@ namespace                  configuration {
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
     bool                   event_handler_enabled() const throw ();
-    bool                   failure_prediction_enabled() const throw ();
-    unsigned int           failure_prediction_options() const throw ();
     unsigned int           first_notification_delay() const throw ();
     bool                   flap_detection_enabled() const throw ();
     unsigned int           flap_detection_options() const throw ();
@@ -85,6 +97,7 @@ namespace                  configuration {
     unsigned int           stalking_options() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -134,26 +147,27 @@ namespace                  configuration {
     void                   _set_stalking_options(std::string const& value);
 
     std::string            _action_url;
-    std::string            _check_command;
     bool                   _checks_active;
     bool                   _checks_passive;
+    std::string            _check_command;
+    bool                   _check_command_is_important;
     bool                   _check_freshness;
     unsigned int           _check_interval;
     std::string            _check_period;
-    std::list<std::string> _contactgroups;
-    std::list<std::string> _contacts;
+    group                  _contactgroups;
+    group                  _contacts;
+    umap<std::string, std::string>
+                           _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
     bool                   _event_handler_enabled;
-    bool                   _failure_prediction_enabled;
-    unsigned int           _failure_prediction_options;
     unsigned int           _first_notification_delay;
     bool                   _flap_detection_enabled;
     unsigned int           _flap_detection_options;
     unsigned int           _freshness_threshold;
     unsigned int           _high_flap_threshold;
-    std::list<std::string> _hostgroups;
-    std::list<std::string> _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     std::string            _icon_image;
     std::string            _icon_image_alt;
     unsigned int           _initial_state;
@@ -171,12 +185,13 @@ namespace                  configuration {
     bool                   _retain_nonstatus_information;
     bool                   _retain_status_information;
     unsigned int           _retry_interval;
-    std::list<std::string> _servicegroups;
+    group                  _servicegroups;
     std::string            _service_description;
     unsigned int           _stalking_options;
-  };
+ };
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICE_HH
+

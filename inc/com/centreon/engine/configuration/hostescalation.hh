@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_HOSTESCALATION_HH
 
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -53,6 +54,7 @@ namespace                  configuration {
     unsigned int           notification_interval() const throw ();
     */
 
+    void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
@@ -68,13 +70,13 @@ namespace                  configuration {
     void                   _set_last_notification(unsigned int value);
     void                   _set_notification_interval(unsigned int value);
 
-    std::list<std::string> _contactgroups;
-    std::list<std::string> _contacts;
+    group                  _contactgroups;
+    group                  _contacts;
     std::string            _escalation_options;
     std::string            _escalation_period;
     unsigned int           _first_notification;
-    std::list<std::string> _hostgroups;
-    std::list<std::string> _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     unsigned int           _last_notification;
     unsigned int           _notification_interval;
   };
