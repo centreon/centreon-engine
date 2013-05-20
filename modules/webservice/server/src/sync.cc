@@ -21,7 +21,7 @@
 #include "com/centreon/engine/modules/webservice/sync.hh"
 
 using namespace com::centreon;
-using namespace com::centreon::engine::modules::webservice;
+using namespace com::centreon::engine::modules;
 
 /**************************************
 *                                     *
@@ -34,7 +34,7 @@ using namespace com::centreon::engine::modules::webservice;
  *
  *  @return Class instance.
  */
-engine::modules::webservice::sync& sync::instance() {
+engine::modules::webservice::sync& webservice::sync::instance() {
   static sync instance;
   return (instance);
 }
@@ -42,7 +42,7 @@ engine::modules::webservice::sync& sync::instance() {
 /**
  *  Wait for global thread safeness.
  */
-void sync::wait_thread_safeness() {
+void webservice::sync::wait_thread_safeness() {
   concurrency::locker lock(&_mtx_worker);
   ++_thread_count;
   _cnd_worker.wait(&_mtx_worker);
@@ -55,7 +55,7 @@ void sync::wait_thread_safeness() {
  *  This method will not return before all workers have finished
  *  executing.
  */
-void sync::wakeup_workers() {
+void webservice::sync::wakeup_workers() {
   concurrency::locker main_lock(&_mtx_main);
   concurrency::locker worker_lock(&_mtx_worker);
   while (_thread_count) {
@@ -73,7 +73,7 @@ void sync::wakeup_workers() {
  *
  *  @see sync_locker
  */
-void sync::worker_finish() {
+void webservice::sync::worker_finish() {
   --_thread_count;
   concurrency::locker lock(&_mtx_main);
   _cnd_main.wake_all();
@@ -89,9 +89,9 @@ void sync::worker_finish() {
 /**
  *  Default constructor.
  */
-sync::sync() : _thread_count(0) {}
+webservice::sync::sync() : _thread_count(0) {}
 
 /**
  *  Destructor,
  */
-sync::~sync() throw () {}
+webservice::sync::~sync() throw () {}
