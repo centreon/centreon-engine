@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -53,9 +54,7 @@ static point_3d const default_3d_coords(0.0, 0.0, 0.0);
  *  Default constructor.
  */
 hostextinfo::hostextinfo()
-  : object("hostextinfo"),
-    _2d_coords(default_2d_coords),
-    _3d_coords(default_3d_coords) {
+  : object("hostextinfo") {
 
 }
 
@@ -179,50 +178,95 @@ bool hostextinfo::parse(
   return (false);
 }
 
-void hostextinfo::_set_2d_coords(std::string const& value) {
-  // XXX:
+bool hostextinfo::_set_2d_coords(std::string const& value) {
+  std::list<std::string> coords;
+  misc::split(value, coords, ',');
+  if (coords.size() != 2)
+    return (false);
+
+  int x;
+  if (!misc::to(misc::trim(coords.front()), x))
+    return (false);
+  coords.pop_front();
+
+  int y;
+  if (!misc::to(misc::trim(coords.front()), y))
+    return (false);
+
+  _2d_coords = point_2d(x, y);
+  return (true);
 }
 
-void hostextinfo::_set_3d_coords(std::string const& value) {
-  // XXX:
+bool hostextinfo::_set_3d_coords(std::string const& value) {
+  std::list<std::string> coords;
+  misc::split(value, coords, ',');
+  if (coords.size() != 2)
+    return (false);
+
+  double x;
+  if (!misc::to(misc::trim(coords.front()), x))
+    return (false);
+  coords.pop_front();
+
+  double y;
+  if (!misc::to(misc::trim(coords.front()), y))
+    return (false);
+  coords.pop_front();
+
+  double z;
+  if (!misc::to(misc::trim(coords.front()), z))
+    return (false);
+
+  _3d_coords = point_3d(x, y, z);
+  return (true);
 }
 
-void hostextinfo::_set_action_url(std::string const& value) {
+bool hostextinfo::_set_action_url(std::string const& value) {
   _action_url = value;
+  return (true);
 }
 
-void hostextinfo::_set_gd2_image(std::string const& value) {
+bool hostextinfo::_set_gd2_image(std::string const& value) {
   _gd2_image = value;
+  return (true);
 }
 
-void hostextinfo::_set_hostgroups(std::string const& value) {
+bool hostextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void hostextinfo::_set_hosts(std::string const& value) {
+bool hostextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void hostextinfo::_set_icon_image(std::string const& value) {
+bool hostextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
+  return (true);
 }
 
-void hostextinfo::_set_icon_image_alt(std::string const& value) {
+bool hostextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
+  return (true);
 }
 
-void hostextinfo::_set_notes(std::string const& value) {
+bool hostextinfo::_set_notes(std::string const& value) {
   _notes = value;
+  return (true);
 }
 
-void hostextinfo::_set_notes_url(std::string const& value) {
+bool hostextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
 }
 
-void hostextinfo::_set_statusmap_image(std::string const& value) {
+bool hostextinfo::_set_statusmap_image(std::string const& value) {
   _statusmap_image = value;
+  return (true);
 }
 
-void hostextinfo::_set_vrml_image(std::string const& value) {
+bool hostextinfo::_set_vrml_image(std::string const& value) {
   _vrml_image = value;
+  return (true);
 }

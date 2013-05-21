@@ -133,14 +133,17 @@ bool command::parse(std::string const& key, std::string const& value) {
   return (false);
 }
 
-void command::_set_command_line(std::string const& value) {
+bool command::_set_command_line(std::string const& value) {
   _command_line = value;
+  return (true);
 }
 
-void command::_set_command_name(std::string const& value) {
+bool command::_set_command_name(std::string const& value) {
   _command_name = value;
+  return (true);
 }
 
-void command::_set_connector(std::string const& value) {
+bool command::_set_connector(std::string const& value) {
   _connector = value;
+  return (true);
 }

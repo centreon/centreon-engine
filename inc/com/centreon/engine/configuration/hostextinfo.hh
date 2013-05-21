@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/configuration/point_2d.hh"
 #  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -63,21 +64,21 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_2d_coords(std::string const& value);
-    void                   _set_3d_coords(std::string const& value);
-    void                   _set_action_url(std::string const& value);
-    void                   _set_gd2_image(std::string const& value);
-    void                   _set_hostgroups(std::string const& value);
-    void                   _set_hosts(std::string const& value);
-    void                   _set_icon_image(std::string const& value);
-    void                   _set_icon_image_alt(std::string const& value);
-    void                   _set_notes(std::string const& value);
-    void                   _set_notes_url(std::string const& value);
-    void                   _set_statusmap_image(std::string const& value);
-    void                   _set_vrml_image(std::string const& value);
+    bool                   _set_2d_coords(std::string const& value);
+    bool                   _set_3d_coords(std::string const& value);
+    bool                   _set_action_url(std::string const& value);
+    bool                   _set_gd2_image(std::string const& value);
+    bool                   _set_hostgroups(std::string const& value);
+    bool                   _set_hosts(std::string const& value);
+    bool                   _set_icon_image(std::string const& value);
+    bool                   _set_icon_image_alt(std::string const& value);
+    bool                   _set_notes(std::string const& value);
+    bool                   _set_notes_url(std::string const& value);
+    bool                   _set_statusmap_image(std::string const& value);
+    bool                   _set_vrml_image(std::string const& value);
 
-    point_2d               _2d_coords;
-    point_3d               _3d_coords;
+    opt<point_2d>          _2d_coords;
+    opt<point_3d>          _3d_coords;
     std::string            _action_url;
     std::string            _gd2_image;
     group                  _hostgroups;

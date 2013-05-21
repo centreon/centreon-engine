@@ -152,30 +152,37 @@ bool servicegroup::parse(
   return (false);
 }
 
-void servicegroup::_set_action_url(std::string const& value) {
+bool servicegroup::_set_action_url(std::string const& value) {
   _action_url = value;
+  return (true);
 }
 
-void servicegroup::_set_alias(std::string const& value) {
+bool servicegroup::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
 }
 
-void servicegroup::_set_members(std::string const& value) {
+bool servicegroup::_set_members(std::string const& value) {
   _members.set(value);
+  return (true);
 }
 
-void servicegroup::_set_notes(std::string const& value) {
+bool servicegroup::_set_notes(std::string const& value) {
   _notes = value;
+  return (true);
 }
 
-void servicegroup::_set_notes_url(std::string const& value) {
+bool servicegroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
 }
 
-void servicegroup::_set_servicegroup_members(std::string const& value) {
+bool servicegroup::_set_servicegroup_members(std::string const& value) {
   _servicegroup_members.set(value);
+  return (true);
 }
 
-void servicegroup::_set_servicegroup_name(std::string const& value) {
+bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
+  return (true);
 }

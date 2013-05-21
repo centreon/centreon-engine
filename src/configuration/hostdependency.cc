@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -49,18 +50,15 @@ static struct {
 };
 
 // Default values.
-static unsigned int const default_execution_failure_options(hostdependency::none);
-static bool const         default_inherits_parent(false);
-static unsigned int const default_notification_failure_options(hostdependency::none);
+static unsigned short const default_execution_failure_options(hostdependency::none);
+static bool const           default_inherits_parent(false);
+static unsigned short const default_notification_failure_options(hostdependency::none);
 
 /**
  *  Default constructor.
  */
 hostdependency::hostdependency()
-  : object("hostdependency"),
-    _execution_failure_options(default_execution_failure_options),
-    _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {
+  : object("hostdependency") {
 
 }
 
@@ -172,34 +170,88 @@ bool hostdependency::parse(
   return (false);
 }
 
-void hostdependency::_set_dependency_period(std::string const& value) {
+bool hostdependency::_set_dependency_period(std::string const& value) {
   _dependency_period = value;
+  return (true);
 }
 
-void hostdependency::_set_dependent_hostgroups(std::string const& value) {
+bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
+  return (true);
 }
 
-void hostdependency::_set_dependent_hosts(std::string const& value) {
+bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
+  return (true);
 }
 
-void hostdependency::_set_execution_failure_options(std::string const& value) {
-  _execution_failure_options = 0; // XXX:
+bool hostdependency::_set_execution_failure_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "up")
+      options |= up;
+    else if (*it == "d" || *it == "down")
+      options |= down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= unreachable;
+    else if (*it == "p" || *it == "pending")
+      options |= pending;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = up | down | unreachable | pending;
+    else
+      return (false);
+  }
+  _execution_failure_options = options;
+  return (true);
 }
 
-void hostdependency::_set_hostgroups(std::string const& value) {
+bool hostdependency::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void hostdependency::_set_hosts(std::string const& value) {
+bool hostdependency::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void hostdependency::_set_inherits_parent(bool value) {
+bool hostdependency::_set_inherits_parent(bool value) {
   _inherits_parent = value;
+  return (true);
 }
 
-void hostdependency::_set_notification_failure_options(std::string const& value) {
-  _notification_failure_options = 0; // XXX:
+bool hostdependency::_set_notification_failure_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "up")
+      options |= up;
+    else if (*it == "d" || *it == "down")
+      options |= down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= unreachable;
+    else if (*it == "p" || *it == "pending")
+      options |= pending;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = up | down | unreachable | pending;
+    else
+      return (false);
+  }
+  _notification_failure_options = options;
+  return (true);
 }

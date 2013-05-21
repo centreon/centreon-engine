@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -51,28 +52,21 @@ static struct {
 };
 
 // Default values.
-static bool const         default_can_submit_commands(true);
-static bool const         default_host_notifications_enabled(true);
-static unsigned int const default_host_notification_options(host::none);
-static bool const         default_retain_nonstatus_information(true);
-static bool const         default_retain_status_information(true);
-static unsigned int const default_service_notification_options(service::none);
-static bool const         default_service_notifications_enabled(true);
+static bool const           default_can_submit_commands(true);
+static bool const           default_host_notifications_enabled(true);
+static unsigned short const default_host_notification_options(host::none);
+static bool const           default_retain_nonstatus_information(true);
+static bool const           default_retain_status_information(true);
+static unsigned short const default_service_notification_options(service::none);
+static bool const           default_service_notifications_enabled(true);
 
-static unsigned int const MAX_ADDRESSES(6);
+static unsigned int const   MAX_ADDRESSES(6);
 
 /**
  *  Default constructor.
  */
 contact::contact()
-  : object("contact"),
-    _can_submit_commands(default_can_submit_commands),
-    _host_notifications_enabled(default_host_notifications_enabled),
-    _host_notification_options(default_host_notification_options),
-    _retain_nonstatus_information(default_retain_nonstatus_information),
-    _retain_status_information(default_retain_status_information),
-    _service_notification_options(default_service_notification_options),
-    _service_notifications_enabled(default_service_notifications_enabled) {
+  : object("contact") {
   _address.reserve(MAX_ADDRESSES);
 }
 
@@ -175,7 +169,7 @@ void contact::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   contact const& tmpl(static_cast<contact const&>(obj));
 
-  // MERGE_TAB(_address);
+  MRG_ADDRESS(_address);
   MRG_STRING(_alias);
   MRG_DEFAULT(_can_submit_commands);
   MRG_INHERIT(_contactgroups);
@@ -209,79 +203,158 @@ bool contact::parse(std::string const& key, std::string const& value) {
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  if (key.find("address") == 0) {
-    _set_address(key, value);
-    return (true);
-  }
+  if (key.find("address") == 0)
+    return (_set_address(key, value));
   return (false);
 }
 
-void contact::_set_address(
+bool contact::_set_address(
        std::string const& key,
        std::string const& value) {
-  // XXX:
+  unsigned int id;
+  if (!misc::to(key, id) || id < 1 || id > MAX_ADDRESSES)
+    return (false);
+  _address[id] = value;
+  return (true);
 }
 
-void contact::_set_alias(std::string const& value) {
+bool contact::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
 }
 
-void contact::_set_can_submit_commands(bool value) {
+bool contact::_set_can_submit_commands(bool value) {
   _can_submit_commands = value;
+  return (true);
 }
 
-void contact::_set_contactgroups(std::string const& value) {
+bool contact::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
+  return (true);
 }
 
-void contact::_set_contact_name(std::string const& value) {
+bool contact::_set_contact_name(std::string const& value) {
   _contact_name = value;
+  return (true);
 }
 
-void contact::_set_email(std::string const& value) {
+bool contact::_set_email(std::string const& value) {
   _email = value;
+  return (true);
 }
 
-void contact::_set_host_notifications_enabled(bool value) {
+bool contact::_set_host_notifications_enabled(bool value) {
   _host_notifications_enabled = value;
+  return (true);
 }
 
-void contact::_set_host_notification_commands(std::string const& value) {
+bool contact::_set_host_notification_commands(std::string const& value) {
   _host_notification_commands.set(value);
+  return (true);
 }
 
-void contact::_set_host_notification_options(std::string const& value) {
-  _host_notification_options = 0; // XXX:
+bool contact::_set_host_notification_options(std::string const& value) {
+  unsigned short options(host::none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "d" || *it == "down")
+      options |= host::down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= host::unreachable;
+    else if (*it == "r" || *it == "recovery")
+      options |= host::recovery;
+    else if (*it == "f" || *it == "flapping")
+      options |= host::flapping;
+    else if (*it == "s" || *it == "downtime")
+      options |= host::downtime;
+    else if (*it == "n" || *it == "none")
+      options = host::none;
+    else if (*it == "a" || *it == "all")
+      options = host::down
+        | host::unreachable
+        | host::recovery
+        | host::flapping
+        | host::downtime;
+    else
+      return (false);
+  }
+  _host_notification_options = options;
+  return (true);
 }
 
-void contact::_set_host_notification_period(std::string const& value) {
+bool contact::_set_host_notification_period(std::string const& value) {
   _host_notification_period = value;
+  return (true);
 }
 
-void contact::_set_retain_nonstatus_information(bool value) {
+bool contact::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
+  return (true);
 }
 
-void contact::_set_retain_status_information(bool value) {
+bool contact::_set_retain_status_information(bool value) {
   _retain_status_information = value;
+  return (true);
 }
 
-void contact::_set_pager(std::string const& value) {
+bool contact::_set_pager(std::string const& value) {
   _pager = value;
+  return (true);
 }
 
-void contact::_set_service_notification_commands(std::string const& value) {
+bool contact::_set_service_notification_commands(std::string const& value) {
   _service_notification_commands.set(value);
+  return (true);
 }
 
-void contact::_set_service_notification_options(std::string const& value) {
-  _service_notification_options = 0; // XXX:
+bool contact::_set_service_notification_options(std::string const& value) {
+  unsigned short options(service::none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "u" || *it == "unknown")
+      options |= service::unknown;
+    else if (*it == "w" || *it == "warning")
+      options |= service::warning;
+    else if (*it == "c" || *it == "critical")
+      options |= service::critical;
+    else if (*it == "r" || *it == "recovery")
+      options |= service::recovery;
+    else if (*it == "f" || *it == "flapping")
+      options |= service::flapping;
+    else if (*it == "s" || *it == "downtime")
+      options |= service::downtime;
+    else if (*it == "n" || *it == "none")
+      options = service::none;
+    else if (*it == "a" || *it == "all")
+      options = service::unknown
+        | service::warning
+        | service::critical
+        | service::recovery
+        | service::flapping
+        | service::downtime;
+    else
+      return (false);
+  }
+  _service_notification_options = options;
+  return (true);
 }
 
-void contact::_set_service_notification_period(std::string const& value) {
+bool contact::_set_service_notification_period(std::string const& value) {
   _service_notification_period = value;
+  return (true);
 }
 
-void contact::_set_service_notifications_enabled(bool value) {
+bool contact::_set_service_notifications_enabled(bool value) {
   _service_notifications_enabled = value;
+  return (true);
 }

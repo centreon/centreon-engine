@@ -130,10 +130,12 @@ bool connector::parse(
   return (false);
 }
 
-void connector::_set_connector_line(std::string const& value) {
+bool connector::_set_connector_line(std::string const& value) {
   _connector_line = value;
+  return (true);
 }
 
-void connector::_set_connector_name(std::string const& value) {
+bool connector::_set_connector_name(std::string const& value) {
   _connector_name = value;
+  return (true);
 }

@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -30,6 +31,13 @@ namespace                  configuration {
   class                    hostescalation
     : public object {
   public:
+    enum                   action_on {
+      none = 0,
+      down = (1 << 0),
+      unreachable = (1 << 1),
+      recovery = (1 << 2)
+    };
+
                            hostescalation();
                            hostescalation(hostescalation const& right);
                            ~hostescalation() throw ();
@@ -43,7 +51,7 @@ namespace                  configuration {
                            contactgroups() const throw ();
     std::list<std::string> const&
                            contacts() const throw ();
-    std::string const&     escalation_options() const throw ();
+    unsigned short         escalation_options() const throw ();
     std::string const&     escalation_period() const throw ();
     unsigned int           first_notification() const throw ();
     std::list<std::string> const&
@@ -60,25 +68,25 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_contactgroups(std::string const& value);
-    void                   _set_contacts(std::string const& value);
-    void                   _set_escalation_options(std::string const& value);
-    void                   _set_escalation_period(std::string const& value);
-    void                   _set_first_notification(unsigned int value);
-    void                   _set_hostgroups(std::string const& value);
-    void                   _set_hosts(std::string const& value);
-    void                   _set_last_notification(unsigned int value);
-    void                   _set_notification_interval(unsigned int value);
+    bool                   _set_contactgroups(std::string const& value);
+    bool                   _set_contacts(std::string const& value);
+    bool                   _set_escalation_options(std::string const& value);
+    bool                   _set_escalation_period(std::string const& value);
+    bool                   _set_first_notification(unsigned int value);
+    bool                   _set_hostgroups(std::string const& value);
+    bool                   _set_hosts(std::string const& value);
+    bool                   _set_last_notification(unsigned int value);
+    bool                   _set_notification_interval(unsigned int value);
 
     group                  _contactgroups;
     group                  _contacts;
-    std::string            _escalation_options;
+    opt<unsigned short>    _escalation_options;
     std::string            _escalation_period;
-    unsigned int           _first_notification;
+    opt<unsigned int>      _first_notification;
     group                  _hostgroups;
     group                  _hosts;
-    unsigned int           _last_notification;
-    unsigned int           _notification_interval;
+    opt<unsigned int>      _last_notification;
+    opt<unsigned int>      _notification_interval;
   };
 }
 

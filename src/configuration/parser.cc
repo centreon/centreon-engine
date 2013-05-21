@@ -113,7 +113,7 @@ void parser::_parse_main_configuration(std::string const& path) {
     _parse_object_definitions(input);
   }
 
-  // _resolve_template();
+  _resolve_template();
 }
 
 /**
@@ -121,7 +121,6 @@ void parser::_parse_main_configuration(std::string const& path) {
  *
  *  @param[in] path The object definitions path.
  */
-#include <iostream>
 void parser::_parse_object_definitions(std::string const& path) {
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
@@ -154,7 +153,6 @@ void parser::_parse_object_definitions(std::string const& path) {
     }
     // Check if is the not the end of the current object.
     else if (input != "}") {
-      // XXX:
       if (!obj->parse(input))
         throw (engine_error() << "configuration: parse object "
                "definitions failed: invalid line "
@@ -181,7 +179,6 @@ void parser::_parse_object_definitions(std::string const& path) {
  *  Resolve template for register objects.
  */
 void parser::_resolve_template() {
-  /*
   for (umap<std::string, objects>::iterator
          it(_objects[1].begin()), end(_objects[1].end());
          ++it != end;
@@ -193,5 +190,4 @@ void parser::_resolve_template() {
          ++it)
       it->second->resolve_template(templates);
   }
-  */
 }

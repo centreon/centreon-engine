@@ -113,7 +113,7 @@ void timeperiod::merge(object const& obj) {
   timeperiod const& tmpl(static_cast<timeperiod const&>(obj));
 
   MRG_STRING(_alias);
-  // MERGE_TAB(_exclude);
+  // XXX: MERGE_TAB(_exclude);
   MRG_STRING(_timeperiod_name);
 }
 
@@ -150,15 +150,19 @@ bool timeperiod::parse(std::string const& line) {
   return (false);
 }
 
-void timeperiod::_set_alias(std::string const& value) {
+bool timeperiod::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
 }
 
-void timeperiod::_set_exclude(std::string const& value) {
+bool timeperiod::_set_exclude(std::string const& value) {
   _exclude.clear();
   misc::split(value, _exclude, ',');
+  // XXX:
+  return (false);
 }
 
-void timeperiod::_set_timeperiod_name(std::string const& value) {
+bool timeperiod::_set_timeperiod_name(std::string const& value) {
   _timeperiod_name = value;
+  return (true);
 }

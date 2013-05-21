@@ -48,8 +48,8 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_connector_line(std::string const& value);
-    void                   _set_connector_name(std::string const& value);
+    bool                   _set_connector_line(std::string const& value);
+    bool                   _set_connector_name(std::string const& value);
 
     std::string            _connector_line;
     std::string            _connector_name;

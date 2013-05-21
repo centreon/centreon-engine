@@ -57,14 +57,14 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_action_url(std::string const& value);
-    void                   _set_icon_image(std::string const& value);
-    void                   _set_icon_image_alt(std::string const& value);
-    void                   _set_hosts(std::string const& value);
-    void                   _set_hostgroups(std::string const& value);
-    void                   _set_notes(std::string const& value);
-    void                   _set_notes_url(std::string const& value);
-    void                   _set_service_description(std::string const& value);
+    bool                   _set_action_url(std::string const& value);
+    bool                   _set_icon_image(std::string const& value);
+    bool                   _set_icon_image_alt(std::string const& value);
+    bool                   _set_hosts(std::string const& value);
+    bool                   _set_hostgroups(std::string const& value);
+    bool                   _set_notes(std::string const& value);
+    bool                   _set_notes_url(std::string const& value);
+    bool                   _set_service_description(std::string const& value);
 
     std::string            _action_url;
     std::string            _icon_image;

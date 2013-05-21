@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -41,28 +42,24 @@ static struct {
   { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
   { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
   { "contacts",              SETTER(std::string const&, _set_contacts) },
+  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
   { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
   { "first_notification",    SETTER(unsigned int, _set_first_notification) },
   { "last_notification",     SETTER(unsigned int, _set_last_notification) },
-  { "notification_interval", SETTER(unsigned int, _set_notification_interval) },
-  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) }
+  { "notification_interval", SETTER(unsigned int, _set_notification_interval) }
 };
 
 // Default values.
-static unsigned int const default_escalation_options(serviceescalation::none);
-static unsigned int const default_first_notification(-2);
-static unsigned int const default_last_notification(-2);
-static unsigned int const default_notification_interval(0);
+static unsigned short const default_escalation_options(serviceescalation::none);
+static unsigned int const   default_first_notification(-2);
+static unsigned int const   default_last_notification(-2);
+static unsigned int const   default_notification_interval(0);
 
 /**
  *  Default constructor.
  */
 serviceescalation::serviceescalation()
-  : object("serviceescalation"),
-    _escalation_options(default_escalation_options),
-    _first_notification(default_first_notification),
-    _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {
+  : object("serviceescalation") {
 
 }
 
@@ -183,46 +180,80 @@ bool serviceescalation::parse(
   return (false);
 }
 
-void serviceescalation::_set_contactgroups(std::string const& value) {
+bool serviceescalation::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
+  return (true);
 }
 
-void serviceescalation::_set_contacts(std::string const& value) {
+bool serviceescalation::_set_contacts(std::string const& value) {
   _contacts.set(value);
+  return (true);
 }
 
-void serviceescalation::_set_escalation_options(std::string const& value) {
-  _escalation_options = 0; // XXX:
+bool serviceescalation::_set_escalation_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "w" || *it == "warning")
+      options |= warning;
+    else if (*it == "u" || *it == "unknown")
+      options |= unknown;
+    else if (*it == "c" || *it == "critical")
+      options |= critical;
+    else if (*it == "r" || *it == "recovery")
+      options |= recovery;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = warning | unknown | critical | recovery;
+    else
+      return (false);
+  }
+  _escalation_options = options;
+  return (true);
 }
 
-void serviceescalation::_set_escalation_period(std::string const& value) {
+bool serviceescalation::_set_escalation_period(std::string const& value) {
   _escalation_period = value;
+  return (true);
 }
 
-void serviceescalation::_set_first_notification(unsigned int value) {
+bool serviceescalation::_set_first_notification(unsigned int value) {
   _first_notification = value;
+  return (true);
 }
 
-void serviceescalation::_set_hostgroups(std::string const& value) {
+bool serviceescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void serviceescalation::_set_hosts(std::string const& value) {
+bool serviceescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void serviceescalation::_set_last_notification(unsigned int value) {
+bool serviceescalation::_set_last_notification(unsigned int value) {
   _last_notification = value;
+  return (true);
 }
 
-void serviceescalation::_set_notification_interval(unsigned int value) {
+bool serviceescalation::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
+  return (true);
 }
 
-void serviceescalation::_set_servicegroups(std::string const& value) {
+bool serviceescalation::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
+  return (true);
 }
 
-void serviceescalation::_set_service_description(std::string const& value) {
+bool serviceescalation::_set_service_description(std::string const& value) {
   _service_description.set(value);
+  return (true);
 }

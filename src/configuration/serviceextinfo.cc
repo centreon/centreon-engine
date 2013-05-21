@@ -156,34 +156,42 @@ bool serviceextinfo::parse(
   return (false);
 }
 
-void serviceextinfo::_set_action_url(std::string const& value) {
+bool serviceextinfo::_set_action_url(std::string const& value) {
   _action_url = value;
+  return (true);
 }
 
-void serviceextinfo::_set_icon_image(std::string const& value) {
+bool serviceextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
+  return (true);
 }
 
-void serviceextinfo::_set_icon_image_alt(std::string const& value) {
+bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
+  return (true);
 }
 
-void serviceextinfo::_set_hosts(std::string const& value) {
+bool serviceextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void serviceextinfo::_set_hostgroups(std::string const& value) {
+bool serviceextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void serviceextinfo::_set_notes(std::string const& value) {
+bool serviceextinfo::_set_notes(std::string const& value) {
   _notes = value;
+  return (true);
 }
 
-void serviceextinfo::_set_notes_url(std::string const& value) {
+bool serviceextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
 }
 
-void serviceextinfo::_set_service_description(std::string const& value) {
+bool serviceextinfo::_set_service_description(std::string const& value) {
   _service_description = value;
+  return (true);
 }

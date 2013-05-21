@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -62,18 +63,15 @@ static struct {
 };
 
 // Default values.
-static unsigned int const default_execution_failure_options(servicedependency::none);
-static bool const         default_inherits_parent(false);
-static unsigned int const default_notification_failure_options(servicedependency::none);
+static unsigned short const default_execution_failure_options(servicedependency::none);
+static bool const           default_inherits_parent(false);
+static unsigned short const default_notification_failure_options(servicedependency::none);
 
 /**
  *  Default constructor.
  */
 servicedependency::servicedependency()
-  : object("servicedependency"),
-    _execution_failure_options(default_execution_failure_options),
-    _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {
+  : object("servicedependency") {
 
 }
 
@@ -197,50 +195,112 @@ bool servicedependency::parse(
   return (false);
 }
 
-void servicedependency::_set_dependency_period(std::string const& value) {
+bool servicedependency::_set_dependency_period(std::string const& value) {
   _dependency_period = value;
+  return (true);
 }
 
-void servicedependency::_set_dependent_hostgroups(std::string const& value) {
+bool servicedependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
+  return (true);
 }
 
-void servicedependency::_set_dependent_hosts(std::string const& value) {
+bool servicedependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
+  return (true);
 }
 
-void servicedependency::_set_dependent_servicegroups(std::string const& value) {
+bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
   _dependent_servicegroups.set(value);
+  return (true);
 }
 
-void servicedependency::_set_dependent_service_description(std::string const& value) {
+bool servicedependency::_set_dependent_service_description(std::string const& value) {
   _dependent_service_description.set(value);
+  return (true);
 }
 
-void servicedependency::_set_execution_failure_options(std::string const& value) {
-  _execution_failure_options = 0; // XXX:
+bool servicedependency::_set_execution_failure_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "ok")
+      options |= ok;
+    else if (*it == "d" || *it == "unknown")
+      options |= unknown;
+    else if (*it == "w" || *it == "warning")
+      options |= warning;
+    else if (*it == "w" || *it == "critical")
+      options |= critical;
+    else if (*it == "p" || *it == "pending")
+      options |= pending;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = ok | unknown | warning | critical | pending;
+    else
+      return (false);
+  }
+  _execution_failure_options = options;
+  return (true);
 }
 
-void servicedependency::_set_inherits_parent(bool value) {
+bool servicedependency::_set_inherits_parent(bool value) {
   _inherits_parent = value;
+  return (true);
 }
 
-void servicedependency::_set_hostgroups(std::string const& value) {
+bool servicedependency::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void servicedependency::_set_hosts(std::string const& value) {
+bool servicedependency::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void servicedependency::_set_notification_failure_options(std::string const& value) {
-  _notification_failure_options = 0; // XXX:
+bool servicedependency::_set_notification_failure_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "ok")
+      options |= ok;
+    else if (*it == "d" || *it == "unknown")
+      options |= unknown;
+    else if (*it == "w" || *it == "warning")
+      options |= warning;
+    else if (*it == "w" || *it == "critical")
+      options |= critical;
+    else if (*it == "p" || *it == "pending")
+      options |= pending;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = ok | unknown | warning | critical | pending;
+    else
+      return (false);
+  }
+  _notification_failure_options = options;
+  return (true);
 }
 
-void servicedependency::_set_servicegroups(std::string const& value) {
+bool servicedependency::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
+  return (true);
 }
 
-void servicedependency::_set_service_description(std::string const& value) {
+bool servicedependency::_set_service_description(std::string const& value) {
   _service_description.set(value);
+  return (true);
 }

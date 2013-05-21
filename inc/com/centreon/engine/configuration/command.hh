@@ -49,9 +49,9 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_command_line(std::string const& value);
-    void                   _set_command_name(std::string const& value);
-    void                   _set_connector(std::string const& value);
+    bool                   _set_command_line(std::string const& value);
+    bool                   _set_command_name(std::string const& value);
+    bool                   _set_connector(std::string const& value);
 
     std::string            _command_line;
     std::string            _command_name;

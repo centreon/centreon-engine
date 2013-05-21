@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -35,8 +36,10 @@ namespace                  configuration {
       unknown = (1 << 1),
       warning = (1 << 2),
       critical = (1 << 3),
-      pending = (1 << 4)
+      pending = (1 << 4),
+      recovery = (1 << 5)
     };
+
                            serviceescalation();
                            serviceescalation(
                              serviceescalation const& right);
@@ -51,7 +54,7 @@ namespace                  configuration {
                            contactgroups() const throw ();
     std::list<std::string> const&
                            contacts() const throw ();
-    unsigned int           escalation_options() const throw ();
+    unsigned short         escalation_options() const throw ();
     std::string const&     escalation_period() const throw ();
     unsigned int           first_notification() const throw ();
     std::list<std::string> const&
@@ -72,27 +75,27 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_contactgroups(std::string const& value);
-    void                   _set_contacts(std::string const& value);
-    void                   _set_escalation_options(std::string const& value);
-    void                   _set_escalation_period(std::string const& value);
-    void                   _set_first_notification(unsigned int value);
-    void                   _set_hostgroups(std::string const& value);
-    void                   _set_hosts(std::string const& value);
-    void                   _set_last_notification(unsigned int value);
-    void                   _set_notification_interval(unsigned int value);
-    void                   _set_servicegroups(std::string const& value);
-    void                   _set_service_description(std::string const& value);
+    bool                   _set_contactgroups(std::string const& value);
+    bool                   _set_contacts(std::string const& value);
+    bool                   _set_escalation_options(std::string const& value);
+    bool                   _set_escalation_period(std::string const& value);
+    bool                   _set_first_notification(unsigned int value);
+    bool                   _set_hostgroups(std::string const& value);
+    bool                   _set_hosts(std::string const& value);
+    bool                   _set_last_notification(unsigned int value);
+    bool                   _set_notification_interval(unsigned int value);
+    bool                   _set_servicegroups(std::string const& value);
+    bool                   _set_service_description(std::string const& value);
 
     group                  _contactgroups;
     group                  _contacts;
-    unsigned int           _escalation_options;
+    opt<unsigned short>    _escalation_options;
     std::string            _escalation_period;
-    unsigned int           _first_notification;
+    opt<unsigned int>      _first_notification;
     group                  _hostgroups;
     group                  _hosts;
-    unsigned int           _last_notification;
-    unsigned int           _notification_interval;
+    opt<unsigned int>      _last_notification;
+    opt<unsigned int>      _notification_interval;
     group                  _servicegroups;
     group                  _service_description;
   };

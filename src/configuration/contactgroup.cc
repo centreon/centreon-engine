@@ -139,18 +139,22 @@ bool contactgroup::parse(
   return (false);
 }
 
-void contactgroup::_set_alias(std::string const& value) {
+bool contactgroup::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
 }
 
-void contactgroup::_set_contactgroup_members(std::string const& value) {
+bool contactgroup::_set_contactgroup_members(std::string const& value) {
   _contactgroup_members.set(value);
+  return (true);
 }
 
-void contactgroup::_set_contactgroup_name(std::string const& value) {
+bool contactgroup::_set_contactgroup_name(std::string const& value) {
   _contactgroup_name = value;
+  return (true);
 }
 
-void contactgroup::_set_members(std::string const& value) {
+bool contactgroup::_set_members(std::string const& value) {
   _members.set(value);
+  return (true);
 }

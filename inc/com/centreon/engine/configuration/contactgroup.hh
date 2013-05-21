@@ -53,10 +53,10 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_alias(std::string const& value);
-    void                   _set_contactgroup_members(std::string const& value);
-    void                   _set_contactgroup_name(std::string const& value);
-    void                   _set_members(std::string const& value);
+    bool                   _set_alias(std::string const& value);
+    bool                   _set_contactgroup_members(std::string const& value);
+    bool                   _set_contactgroup_name(std::string const& value);
+    bool                   _set_members(std::string const& value);
 
     std::string            _alias;
     group                  _contactgroup_members;

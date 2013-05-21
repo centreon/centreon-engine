@@ -50,9 +50,9 @@ namespace                  configuration {
     bool                   parse(std::string const& line);
 
   private:
-    void                   _set_alias(std::string const& value);
-    void                   _set_exclude(std::string const& value);
-    void                   _set_timeperiod_name(std::string const& value);
+    bool                   _set_alias(std::string const& value);
+    bool                   _set_exclude(std::string const& value);
+    bool                   _set_timeperiod_name(std::string const& value);
 
     std::string            _alias;
     std::list<std::string> _exclude;

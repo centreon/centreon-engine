@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -35,7 +36,8 @@ namespace                  configuration {
       ok = (1 << 0),
       unknown = (1 << 1),
       warning = (1 << 2),
-      critical = (1 << 3)
+      critical = (1 << 3),
+      pending = (1 << 4)
     };
 
                            servicedependency();
@@ -76,29 +78,29 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_dependency_period(std::string const& value);
-    void                   _set_dependent_hostgroups(std::string const& value);
-    void                   _set_dependent_hosts(std::string const& value);
-    void                   _set_dependent_servicegroups(std::string const& value);
-    void                   _set_dependent_service_description(std::string const& value);
-    void                   _set_execution_failure_options(std::string const& value);
-    void                   _set_inherits_parent(bool value);
-    void                   _set_hostgroups(std::string const& value);
-    void                   _set_hosts(std::string const& value);
-    void                   _set_notification_failure_options(std::string const& value);
-    void                   _set_servicegroups(std::string const& value);
-    void                   _set_service_description(std::string const& value);
+    bool                   _set_dependency_period(std::string const& value);
+    bool                   _set_dependent_hostgroups(std::string const& value);
+    bool                   _set_dependent_hosts(std::string const& value);
+    bool                   _set_dependent_servicegroups(std::string const& value);
+    bool                   _set_dependent_service_description(std::string const& value);
+    bool                   _set_execution_failure_options(std::string const& value);
+    bool                   _set_inherits_parent(bool value);
+    bool                   _set_hostgroups(std::string const& value);
+    bool                   _set_hosts(std::string const& value);
+    bool                   _set_notification_failure_options(std::string const& value);
+    bool                   _set_servicegroups(std::string const& value);
+    bool                   _set_service_description(std::string const& value);
 
     std::string            _dependency_period;
     group                  _dependent_hostgroups;
     group                  _dependent_hosts;
     group                  _dependent_servicegroups;
     group                  _dependent_service_description;
-    unsigned int           _execution_failure_options;
-    bool                   _inherits_parent;
+    opt<unsigned int>      _execution_failure_options;
+    opt<bool>              _inherits_parent;
     group                  _hostgroups;
     group                  _hosts;
-    unsigned int           _notification_failure_options;
+    opt<unsigned int>      _notification_failure_options;
     group                  _servicegroups;
     group                  _service_description;
   };

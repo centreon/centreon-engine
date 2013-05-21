@@ -56,13 +56,13 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_action_url(std::string const& value);
-    void                   _set_alias(std::string const& value);
-    void                   _set_hostgroup_members(std::string const& value);
-    void                   _set_hostgroup_name(std::string const& value);
-    void                   _set_members(std::string const& value);
-    void                   _set_notes(std::string const& value);
-    void                   _set_notes_url(std::string const& value);
+    bool                   _set_action_url(std::string const& value);
+    bool                   _set_alias(std::string const& value);
+    bool                   _set_hostgroup_members(std::string const& value);
+    bool                   _set_hostgroup_name(std::string const& value);
+    bool                   _set_members(std::string const& value);
+    bool                   _set_notes(std::string const& value);
+    bool                   _set_notes_url(std::string const& value);
 
     std::string            _action_url;
     std::string            _alias;

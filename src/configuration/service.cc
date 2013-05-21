@@ -19,8 +19,11 @@
 
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<service, type, &service::method>::generic
@@ -82,59 +85,35 @@ static struct {
 };
 
 // Default values.
-static bool const         default_checks_active(true);
-static bool const         default_checks_passive(true);
-static bool const         default_check_freshness(0);
-static unsigned int const default_check_interval(5);
-static bool const         default_event_handler_enabled(true);
-static unsigned int const default_first_notification_delay(0);
-static bool const         default_flap_detection_enabled(true);
-static unsigned int const default_flap_detection_options(service::ok | service::warning | service::unknown | service::critical);
-static unsigned int const default_freshness_threshold(0);
-static unsigned int const default_high_flap_threshold(0);
-static unsigned int const default_initial_state(STATE_OK);
-static bool const         default_is_volatile(false);
-static unsigned int const default_low_flap_threshold(0);
-static unsigned int const default_max_check_attempts(0);
-static bool const         default_notifications_enabled(true);
-static unsigned int const default_notification_interval(30);
-static unsigned int const default_notification_options(service::none);
-static bool const         default_obsess_over_service(true);
-static bool const         default_process_perf_data(true);
-static bool const         default_retain_nonstatus_information(true);
-static bool const         default_retain_status_information(true);
-static unsigned int const default_retry_interval(1);
-static unsigned int const default_stalking_options(service::none);
+static bool const           default_checks_active(true);
+static bool const           default_checks_passive(true);
+static bool const           default_check_freshness(0);
+static unsigned int const   default_check_interval(5);
+static bool const           default_event_handler_enabled(true);
+static unsigned int const   default_first_notification_delay(0);
+static bool const           default_flap_detection_enabled(true);
+static unsigned short const default_flap_detection_options(service::ok | service::warning | service::unknown | service::critical);
+static unsigned int const   default_freshness_threshold(0);
+static unsigned int const   default_high_flap_threshold(0);
+static unsigned int const   default_initial_state(STATE_OK);
+static bool const           default_is_volatile(false);
+static unsigned int const   default_low_flap_threshold(0);
+static unsigned int const   default_max_check_attempts(0);
+static bool const           default_notifications_enabled(true);
+static unsigned int const   default_notification_interval(30);
+static unsigned short const default_notification_options(service::none);
+static bool const           default_obsess_over_service(true);
+static bool const           default_process_perf_data(true);
+static bool const           default_retain_nonstatus_information(true);
+static bool const           default_retain_status_information(true);
+static unsigned int const   default_retry_interval(1);
+static unsigned short const default_stalking_options(service::none);
 
 /**
  *  Default constructor.
  */
 service::service()
-  : object("service"),
-    _checks_active(default_checks_active),
-    _checks_passive(default_checks_passive),
-    _check_command_is_important(false),
-    _check_freshness(default_check_freshness),
-    _check_interval(default_check_interval),
-    _event_handler_enabled(default_event_handler_enabled),
-    _first_notification_delay(default_first_notification_delay),
-    _flap_detection_enabled(default_flap_detection_enabled),
-    _flap_detection_options(default_flap_detection_options),
-    _freshness_threshold(default_freshness_threshold),
-    _high_flap_threshold(default_high_flap_threshold),
-    _initial_state(default_initial_state),
-    _is_volatile(default_is_volatile),
-    _low_flap_threshold(default_low_flap_threshold),
-    _max_check_attempts(default_max_check_attempts),
-    _notifications_enabled(default_notifications_enabled),
-    _notification_interval(default_notification_interval),
-    _notification_options(default_notification_options),
-    _obsess_over_service(default_obsess_over_service),
-    _process_perf_data(default_process_perf_data),
-    _retain_nonstatus_information(default_retain_nonstatus_information),
-    _retain_status_information(default_retain_status_information),
-    _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {
+  : object("service") {
 
 }
 
@@ -284,7 +263,7 @@ void service::merge(object const& obj) {
   service const& tmpl(static_cast<service const&>(obj));
 
   MRG_STRING(_action_url);
-  // XXX: is important -> MRG_STRING(_check_command);
+  MRG_IMPORTANT(_check_command);
   MRG_DEFAULT(_checks_active);
   MRG_DEFAULT(_checks_passive);
   MRG_DEFAULT(_check_freshness);
@@ -343,175 +322,307 @@ bool service::parse(std::string const& key, std::string const& value) {
   return (false);
 }
 
-void service::_set_action_url(std::string const& value) {
+bool service::_set_action_url(std::string const& value) {
   _action_url = value;
+  return (true);
 }
 
-void service::_set_check_command(std::string const& value) {
+bool service::_set_check_command(std::string const& value) {
   if (!value.empty() && value[0] == '!') {
     _check_command_is_important = true;
     _check_command = value.substr(1);
   }
   else
     _check_command = value;
+  return (true);
 }
 
-void service::_set_checks_active(bool value) {
+bool service::_set_checks_active(bool value) {
   _checks_active = value;
+  return (true);
 }
 
-void service::_set_checks_passive(bool value) {
+bool service::_set_checks_passive(bool value) {
   _checks_passive = value;
+  return (true);
 }
 
-void service::_set_check_freshness(bool value) {
+bool service::_set_check_freshness(bool value) {
   _check_freshness = value;
+  return (true);
 }
 
-void service::_set_check_interval(unsigned int value) {
+bool service::_set_check_interval(unsigned int value) {
   _check_interval = value;
+  return (true);
 }
 
-void service::_set_check_period(std::string const& value) {
+bool service::_set_check_period(std::string const& value) {
   _check_period = value;
+  return (true);
 }
 
-void service::_set_contactgroups(std::string const& value) {
+bool service::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
+  return (true);
 }
 
-void service::_set_contacts(std::string const& value) {
+bool service::_set_contacts(std::string const& value) {
   _contacts.set(value);
+  return (true);
 }
 
-void service::_set_display_name(std::string const& value) {
+bool service::_set_display_name(std::string const& value) {
   _display_name = value;
+  return (true);
 }
 
-void service::_set_event_handler(std::string const& value) {
+bool service::_set_event_handler(std::string const& value) {
   _event_handler = value;
+  return (true);
 }
 
-void service::_set_event_handler_enabled(bool value) {
+bool service::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
+  return (true);
 }
 
-void service::_set_failure_prediction_enabled(bool value) {
-  // XXX: service::_set_failure_prediction_enabled
+bool service::_set_failure_prediction_enabled(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: service failure_prediction_enabled was ignored";
+  return (true);
 }
 
-void service::_set_failure_prediction_options(std::string const& value) {
-  // XXX: service::_set_failure_prediction_options
+bool service::_set_failure_prediction_options(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: service failure_prediction_options was ignored";
+  return (true);
 }
 
-void service::_set_first_notification_delay(unsigned int value) {
+bool service::_set_first_notification_delay(unsigned int value) {
   _first_notification_delay = value;
+  return (true);
 }
 
-void service::_set_flap_detection_enabled(bool value) {
+bool service::_set_flap_detection_enabled(bool value) {
   _flap_detection_enabled = value;
+  return (true);
 }
 
-void service::_set_flap_detection_options(std::string const& value) {
-  _flap_detection_options = 0; // XXX:
+bool service::_set_flap_detection_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "ok")
+      options |= ok;
+    else if (*it == "w" || *it == "warning")
+      options |= warning;
+    else if (*it == "u" || *it == "unknown")
+      options |= unknown;
+    else if (*it == "c" || *it == "critical")
+      options |= critical;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = ok | warning | unknown | critical;
+    else
+      return (false);
+  }
+  _flap_detection_options = options;
+  return (true);
 }
 
-void service::_set_freshness_threshold(unsigned int value) {
+bool service::_set_freshness_threshold(unsigned int value) {
   _freshness_threshold = value;
+  return (true);
 }
 
-void service::_set_high_flap_threshold(unsigned int value) {
+bool service::_set_high_flap_threshold(unsigned int value) {
   _high_flap_threshold = value;
+  return (true);
 }
 
-void service::_set_hostgroups(std::string const& value) {
+bool service::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void service::_set_hosts(std::string const& value) {
+bool service::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void service::_set_icon_image(std::string const& value) {
+bool service::_set_icon_image(std::string const& value) {
   _icon_image = value;
+  return (true);
 }
 
-void service::_set_icon_image_alt(std::string const& value) {
+bool service::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
+  return (true);
 }
 
-void service::_set_initial_state(std::string const& value) {
-  _initial_state = 0; // XXX:
+bool service::_set_initial_state(std::string const& value) {
+  std::string data(value);
+  misc::trim(data);
+  if (data == "o" || data == "ok")
+    _initial_state = STATE_OK;
+  else if (data == "w" || data == "warning")
+    _initial_state = STATE_WARNING;
+  else if (data == "u" || data == "unknown")
+    _initial_state = STATE_UNKNOWN;
+  else if (data == "c" || data == "critical")
+    _initial_state = STATE_CRITICAL;
+  else
+    return (false);
+  return (true);
 }
 
-void service::_set_is_volatile(bool value) {
+bool service::_set_is_volatile(bool value) {
   _is_volatile = value;
+  return (true);
 }
 
-void service::_set_low_flap_threshold(unsigned int value) {
+bool service::_set_low_flap_threshold(unsigned int value) {
   _low_flap_threshold = value;
+  return (true);
 }
 
-void service::_set_max_check_attempts(unsigned int value) {
+bool service::_set_max_check_attempts(unsigned int value) {
   _max_check_attempts = value;
+  return (true);
 }
 
-void service::_set_notes(std::string const& value) {
+bool service::_set_notes(std::string const& value) {
   _notes = value;
+  return (true);
 }
 
-void service::_set_notes_url(std::string const& value) {
+bool service::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
 }
 
-void service::_set_notifications_enabled(bool value) {
+bool service::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
+  return (true);
 }
 
-void service::_set_notification_options(std::string const& value) {
-  _notification_options = 0; // XXX:
+bool service::_set_notification_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "u" || *it == "unknown")
+      options |= unknown;
+    else if (*it == "w" || *it == "warning")
+      options |= warning;
+    else if (*it == "c" || *it == "critical")
+      options |= critical;
+    else if (*it == "r" || *it == "recovery")
+      options |= recovery;
+    else if (*it == "f" || *it == "flapping")
+      options |= flapping;
+    else if (*it == "s" || *it == "downtime")
+      options |= downtime;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = unknown | warning | critical | recovery | flapping | downtime;
+    else
+      return (false);
+  }
+  _notification_options = options;
+  return (true);
 }
 
-void service::_set_notification_interval(unsigned int value) {
+bool service::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
+  return (true);
 }
 
-void service::_set_notification_period(std::string const& value) {
+bool service::_set_notification_period(std::string const& value) {
   _notification_period = value;
+  return (true);
 }
 
-void service::_set_obsess_over_service(bool value) {
+bool service::_set_obsess_over_service(bool value) {
   _obsess_over_service = value;
+  return (true);
 }
 
-void service::_set_parallelize_check(bool value) {
-  // XXX: service::_set_parallelize_check
+bool service::_set_parallelize_check(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: service parallelize_check was ignored";
+  return (true);
 }
 
-void service::_set_process_perf_data(bool value) {
+bool service::_set_process_perf_data(bool value) {
   _process_perf_data = value;
+  return (true);
 }
 
-void service::_set_retain_nonstatus_information(bool value) {
+bool service::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
+  return (true);
 }
 
-void service::_set_retain_status_information(bool value) {
+bool service::_set_retain_status_information(bool value) {
   _retain_status_information = value;
+  return (true);
 }
 
-void service::_set_retry_interval(unsigned int value) {
+bool service::_set_retry_interval(unsigned int value) {
   _retry_interval = value;
+  return (true);
 }
 
-void service::_set_servicegroups(std::string const& value) {
+bool service::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
+  return (true);
 }
 
-void service::_set_service_description(std::string const& value) {
+bool service::_set_service_description(std::string const& value) {
   _service_description = value;
+  return (true);
 }
 
-void service::_set_stalking_options(std::string const& value) {
-  _stalking_options = 0; // XXX:
+bool service::_set_stalking_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "ok")
+      options |= ok;
+    else if (*it == "w" || *it == "warning")
+      options |= warning;
+    else if (*it == "u" || *it == "unknown")
+      options |= unknown;
+    else if (*it == "c" || *it == "critical")
+      options |= critical;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = ok | warning | unknown | critical;
+    else
+      return (false);
+  }
+  _stalking_options = options;
+  return (true);
 }

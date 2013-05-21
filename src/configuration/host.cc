@@ -19,8 +19,11 @@
 
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<host, type, &host::method>::generic
@@ -82,60 +85,36 @@ static struct {
 };
 
 // Default values.
-static point_2d const     default_2d_coords(-1, -1);
-static point_3d const     default_3d_coords(0.0, 0.0, 0.0);
-static bool const         default_checks_active(true);
-static bool const         default_checks_passive(true);
-static bool const         default_check_freshness(false);
-static unsigned int const default_check_interval(5);
-static bool const         default_event_handler_enabled(true);
-static unsigned int const default_first_notification_delay(0);
-static bool const         default_flap_detection_enabled(true);
-static unsigned int const default_flap_detection_options(host::up | host::down | host::unreachable);
-static unsigned int const default_freshness_threshold(0);
-static unsigned int const default_high_flap_threshold(0);
-static unsigned int const default_initial_state(HOST_UP);
-static unsigned int const default_low_flap_threshold(0);
-static unsigned int const default_max_check_attempts(0);
-static bool const         default_notifications_enabled(true);
-static unsigned int const default_notification_interval(30);
-static unsigned int const default_notification_options(host::none);
-static bool const         default_obsess_over_host(true);
-static bool const         default_process_perf_data(true);
-static bool const         default_retain_nonstatus_information(true);
-static bool const         default_retain_status_information(true);
-static unsigned int const default_retry_interval(1);
-static unsigned int const default_stalking_options(host::none);
+static point_2d const       default_2d_coords(-1, -1);
+static point_3d const       default_3d_coords(0.0, 0.0, 0.0);
+static bool const           default_checks_active(true);
+static bool const           default_checks_passive(true);
+static bool const           default_check_freshness(false);
+static unsigned int const   default_check_interval(5);
+static bool const           default_event_handler_enabled(true);
+static unsigned int const   default_first_notification_delay(0);
+static bool const           default_flap_detection_enabled(true);
+static unsigned short const default_flap_detection_options(host::up | host::down | host::unreachable);
+static unsigned int const   default_freshness_threshold(0);
+static unsigned int const   default_high_flap_threshold(0);
+static unsigned short const default_initial_state(HOST_UP);
+static unsigned int const   default_low_flap_threshold(0);
+static unsigned int const   default_max_check_attempts(0);
+static bool const           default_notifications_enabled(true);
+static unsigned int const   default_notification_interval(30);
+static unsigned short const default_notification_options(host::none);
+static bool const           default_obsess_over_host(true);
+static bool const           default_process_perf_data(true);
+static bool const           default_retain_nonstatus_information(true);
+static bool const           default_retain_status_information(true);
+static unsigned int const   default_retry_interval(1);
+static unsigned short const default_stalking_options(host::none);
 
 /**
  *  Default constructor.
  */
 host::host()
-  : object("host"),
-    _2d_coords(default_2d_coords),
-    _3d_coords(default_3d_coords),
-    _checks_active(default_checks_active),
-    _checks_passive(default_checks_passive),
-    _check_freshness(default_check_freshness),
-    _check_interval(default_check_interval),
-    _event_handler_enabled(default_event_handler_enabled),
-    _first_notification_delay(default_first_notification_delay),
-    _flap_detection_enabled(default_flap_detection_enabled),
-    _flap_detection_options(default_flap_detection_options),
-    _freshness_threshold(default_freshness_threshold),
-    _high_flap_threshold(default_high_flap_threshold),
-    _initial_state(default_initial_state),
-    _low_flap_threshold(default_low_flap_threshold),
-    _max_check_attempts(default_max_check_attempts),
-    _notifications_enabled(default_notifications_enabled),
-    _notification_interval(default_notification_interval),
-    _notification_options(default_notification_options),
-    _obsess_over_host(default_obsess_over_host),
-    _process_perf_data(default_process_perf_data),
-    _retain_nonstatus_information(default_retain_nonstatus_information),
-    _retain_status_information(default_retain_status_information),
-    _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {
+  : object("host") {
 
 }
 
@@ -353,190 +332,348 @@ bool host::parse(std::string const& key, std::string const& value) {
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-
   return (false);
 }
 
-void host::_set_2d_coords(std::string const& value) {
-  // XXX:
+bool host::_set_2d_coords(std::string const& value) {
+  std::list<std::string> coords;
+  misc::split(value, coords, ',');
+  if (coords.size() != 2)
+    return (false);
+
+  int x;
+  if (!misc::to(misc::trim(coords.front()), x))
+    return (false);
+  coords.pop_front();
+
+  int y;
+  if (!misc::to(misc::trim(coords.front()), y))
+    return (false);
+
+  _2d_coords = point_2d(x, y);
+  return (true);
 }
 
-void host::_set_3d_coords(std::string const& value) {
-  // XXX:
+bool host::_set_3d_coords(std::string const& value) {
+  std::list<std::string> coords;
+  misc::split(value, coords, ',');
+  if (coords.size() != 2)
+    return (false);
+
+  double x;
+  if (!misc::to(misc::trim(coords.front()), x))
+    return (false);
+  coords.pop_front();
+
+  double y;
+  if (!misc::to(misc::trim(coords.front()), y))
+    return (false);
+  coords.pop_front();
+
+  double z;
+  if (!misc::to(misc::trim(coords.front()), z))
+    return (false);
+
+  _3d_coords = point_3d(x, y, z);
+  return (true);
 }
 
-void host::_set_action_url(std::string const& value) {
+bool host::_set_action_url(std::string const& value) {
   _action_url = value;
+  return (true);
 }
 
-void host::_set_address(std::string const& value) {
+bool host::_set_address(std::string const& value) {
   _address = value;
+  return (true);
 }
 
-void host::_set_alias(std::string const& value) {
+bool host::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
 }
 
-void host::_set_checks_active(bool value) {
+bool host::_set_checks_active(bool value) {
   _checks_active = value;
+  return (true);
 }
 
-void host::_set_checks_passive(bool value) {
+bool host::_set_checks_passive(bool value) {
   _checks_passive = value;
+  return (true);
 }
 
-void host::_set_check_command(std::string const& value) {
+bool host::_set_check_command(std::string const& value) {
   _check_command = value;
+  return (true);
 }
 
-void host::_set_check_freshness(bool value) {
+bool host::_set_check_freshness(bool value) {
   _check_freshness = value;
+  return (true);
 }
 
-void host::_set_check_interval(unsigned int value) {
+bool host::_set_check_interval(unsigned int value) {
   _check_interval = value;
+  return (true);
 }
 
-void host::_set_check_period(std::string const& value) {
+bool host::_set_check_period(std::string const& value) {
   _check_period = value;
+  return (true);
 }
 
-void host::_set_contactgroups(std::string const& value) {
+bool host::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
+  return (true);
 }
 
-void host::_set_contacts(std::string const& value) {
+bool host::_set_contacts(std::string const& value) {
   _contacts.set(value);
+  return (true);
 }
 
-void host::_set_display_name(std::string const& value) {
+bool host::_set_display_name(std::string const& value) {
   _display_name = value;
+  return (true);
 }
 
-void host::_set_event_handler(std::string const& value) {
+bool host::_set_event_handler(std::string const& value) {
   _event_handler = value;
+  return (true);
 }
 
-void host::_set_event_handler_enabled(bool value) {
+bool host::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
+  return (true);
 }
 
-void host::_set_failure_prediction_enabled(bool value) {
-  // XXX:
+bool host::_set_failure_prediction_enabled(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: host failure_prediction_enabled was ignored";
+  return (true);
 }
 
-void host::_set_failure_prediction_options(std::string const& value) {
-  // XXX:
+bool host::_set_failure_prediction_options(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: service failure_prediction_options was ignored";
+  return (true);
 }
 
-void host::_set_first_notification_delay(unsigned int value) {
+bool host::_set_first_notification_delay(unsigned int value) {
   _first_notification_delay = value;
+  return (true);
 }
 
-void host::_set_flap_detection_enabled(bool value) {
+bool host::_set_flap_detection_enabled(bool value) {
   _flap_detection_enabled = value;
+  return (true);
 }
 
-void host::_set_flap_detection_options(std::string const& value) {
-  _flap_detection_options = 0; // XXX:
+bool host::_set_flap_detection_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "up")
+      options |= up;
+    else if (*it == "d" || *it == "down")
+      options |= down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= unreachable;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = up | down | unreachable;
+    else
+      return (false);
+  }
+  _flap_detection_options = options;
+  return (true);
 }
 
-void host::_set_freshness_threshold(unsigned int value) {
+bool host::_set_freshness_threshold(unsigned int value) {
   _freshness_threshold = value;
+  return (true);
 }
 
-void host::_set_gd2_image(std::string const& value) {
+bool host::_set_gd2_image(std::string const& value) {
   _gd2_image = value;
+  return (true);
 }
 
-void host::_set_high_flap_threshold(unsigned int value) {
+bool host::_set_high_flap_threshold(unsigned int value) {
   _high_flap_threshold = value;
+  return (true);
 }
 
-void host::_set_host_name(std::string const& value) {
+bool host::_set_host_name(std::string const& value) {
   _host_name = value;
+  return (true);
 }
 
-void host::_set_hostgroups(std::string const& value) {
+bool host::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void host::_set_icon_image(std::string const& value) {
+bool host::_set_icon_image(std::string const& value) {
   _icon_image = value;
+  return (true);
 }
 
-void host::_set_icon_image_alt(std::string const& value) {
+bool host::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
+  return (true);
 }
 
-void host::_set_initial_state(std::string const& value) {
-  _initial_state = 0; // XXX:
+bool host::_set_initial_state(std::string const& value) {
+  std::string data(value);
+  misc::trim(data);
+  if (data == "o" || data == "up")
+    _initial_state = HOST_UP;
+  else if (data == "d" || data == "down")
+    _initial_state = HOST_DOWN;
+  else if (data == "u" || data == "unreachable")
+    _initial_state = HOST_UNREACHABLE;
+  else
+    return (false);
+  return (true);
 }
 
-void host::_set_low_flap_threshold(unsigned int value) {
+bool host::_set_low_flap_threshold(unsigned int value) {
   _low_flap_threshold = value;
+  return (true);
 }
 
-void host::_set_max_check_attempts(unsigned int value) {
+bool host::_set_max_check_attempts(unsigned int value) {
   _max_check_attempts = value;
+  return (true);
 }
 
-void host::_set_notes(std::string const& value) {
+bool host::_set_notes(std::string const& value) {
   _notes = value;
+  return (true);
 }
 
-void host::_set_notes_url(std::string const& value) {
+bool host::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
 }
 
-void host::_set_notifications_enabled(bool value) {
+bool host::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
+  return (true);
 }
 
-void host::_set_notification_interval(unsigned int value) {
+bool host::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
+  return (true);
 }
 
-void host::_set_notification_options(std::string const& value) {
-  _notification_options = 0; // XXX:
+bool host::_set_notification_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "d" || *it == "down")
+      options |= down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= unreachable;
+    else if (*it == "r" || *it == "recovery")
+      options |= recovery;
+    else if (*it == "f" || *it == "flapping")
+      options |= flapping;
+    else if (*it == "s" || *it == "downtime")
+      options |= downtime;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = down | unreachable | recovery | flapping | downtime;
+    else
+      return (false);
+  }
+  _notification_options = options;
+  return (true);
 }
 
-void host::_set_notification_period(std::string const& value) {
+bool host::_set_notification_period(std::string const& value) {
   _notification_period = value;
+  return (true);
 }
 
-void host::_set_obsess_over_host(bool value) {
+bool host::_set_obsess_over_host(bool value) {
   _obsess_over_host = value;
+  return (true);
 }
 
-void host::_set_parents(std::string const& value) {
+bool host::_set_parents(std::string const& value) {
   _parents.set(value);
+  return (true);
 }
 
-void host::_set_process_perf_data(bool value) {
+bool host::_set_process_perf_data(bool value) {
   _process_perf_data = value;
+  return (true);
 }
 
-void host::_set_retain_nonstatus_information(bool value) {
+bool host::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
+  return (true);
 }
 
-void host::_set_retain_status_information(bool value) {
+bool host::_set_retain_status_information(bool value) {
   _retain_status_information = value;
+  return (true);
 }
 
-void host::_set_retry_interval(unsigned int value) {
+bool host::_set_retry_interval(unsigned int value) {
   _retry_interval = value;
+  return (true);
 }
 
-void host::_set_stalking_options(std::string const& value) {
-  _stalking_options = 0; // XXX:
+bool host::_set_stalking_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "o" || *it == "up")
+      options |= up;
+    else if (*it == "d" || *it == "down")
+      options |= down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= unreachable;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = up | down | unreachable;
+    else
+      return (false);
+  }
+  _stalking_options = options;
+  return (true);
 }
 
-void host::_set_statusmap_image(std::string const& value) {
+bool host::_set_statusmap_image(std::string const& value) {
   _statusmap_image = value;
+  return (true);
 }
 
-void host::_set_vrml_image(std::string const& value) {
+bool host::_set_vrml_image(std::string const& value) {
   _vrml_image = value;
+  return (true);
 }

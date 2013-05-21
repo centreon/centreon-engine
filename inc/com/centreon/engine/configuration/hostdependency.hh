@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -67,23 +68,23 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_dependency_period(std::string const& value);
-    void                   _set_dependent_hostgroups(std::string const& value);
-    void                   _set_dependent_hosts(std::string const& value);
-    void                   _set_execution_failure_options(std::string const& value);
-    void                   _set_hostgroups(std::string const& value);
-    void                   _set_hosts(std::string const& value);
-    void                   _set_inherits_parent(bool value);
-    void                   _set_notification_failure_options(std::string const& value);
+    bool                   _set_dependency_period(std::string const& value);
+    bool                   _set_dependent_hostgroups(std::string const& value);
+    bool                   _set_dependent_hosts(std::string const& value);
+    bool                   _set_execution_failure_options(std::string const& value);
+    bool                   _set_hostgroups(std::string const& value);
+    bool                   _set_hosts(std::string const& value);
+    bool                   _set_inherits_parent(bool value);
+    bool                   _set_notification_failure_options(std::string const& value);
 
     std::string            _dependency_period;
     group                  _dependent_hostgroups;
     group                  _dependent_hosts;
-    unsigned int           _execution_failure_options;
+    opt<unsigned int>      _execution_failure_options;
     group                  _hostgroups;
     group                  _hosts;
-    bool                   _inherits_parent;
-    unsigned int           _notification_failure_options;
+    opt<bool>              _inherits_parent;
+    opt<unsigned int>      _notification_failure_options;
   };
 }
 

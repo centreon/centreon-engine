@@ -251,15 +251,18 @@ std::string const& object::type() const throw () {
   return (_type);
 }
 
-void object::_set_is_template(bool value) {
+bool object::_set_is_template(bool value) {
   _is_template = value;
+  return (true);
 }
 
-void object::_set_name(std::string const& value) {
+bool object::_set_name(std::string const& value) {
   _name = value;
+  return (true);
 }
 
-void object::_set_templates(std::string const& value) {
+bool object::_set_templates(std::string const& value) {
   _templates.clear();
   misc::split(value, _templates, ',');
+  return (true);
 }

@@ -55,31 +55,27 @@ namespace                  configuration {
     std::string const&     type() const throw ();
 
   protected:
-    template<typename T, typename U, void (T::*ptr)(U)>
+    template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
       static bool generic(T& obj, std::string const& value) {
-
         U val;
         std::istringstream iss(value);
         if (!(iss >> val))
           return (false);
-        (obj.*ptr)(val);
-
-        return (true);
+        return ((obj.*ptr)(val));
       }
     };
 
-    template<typename T, void (T::*ptr)(std::string const&)>
+    template<typename T, bool (T::*ptr)(std::string const&)>
     struct              setter<T, std::string const&, ptr> {
       static bool       generic(T& obj, std::string const& value) {
-        (obj.*ptr)(value);
-        return (true);
+        return ((obj.*ptr)(value));
       }
     };
 
-    void                   _set_is_template(bool value);
-    void                   _set_name(std::string const& value);
-    void                   _set_templates(std::string const& value);
+    bool                   _set_is_template(bool value);
+    bool                   _set_name(std::string const& value);
+    bool                   _set_templates(std::string const& value);
 
     bool                   _is_resolve;
     bool                   _is_template;
@@ -93,14 +89,30 @@ namespace                  configuration {
 
 CCE_END()
 
+#  define MRG_ADDRESS(prop) \
+  do { \
+    for (unsigned int i(0), end(prop.size()); \
+         i < end; \
+         ++i) \
+      if (prop[i].empty()) prop[i] = tmpl.prop[i]; \
+  } while (false)
 #  define MRG_DEFAULT(prop) \
-  if (prop == default##prop && tmpl.prop != prop) prop = tmpl.prop
+  do { \
+    if (!prop.is_set()) { \
+      if (tmpl.prop.is_set()) \
+        prop = tmpl.prop; \
+      else \
+        prop = default##prop; \
+    } \
+  } while (false)
+#  define MRG_IMPORTANT(prop) \
+  if (prop.empty() || tmpl.prop##_is_important) prop = tmpl.prop
 #  define MRG_INHERIT(prop) \
-  if (prop.empty() && tmpl.prop != prop) prop.set(tmpl.prop)
+  if (prop.empty()) prop.set(tmpl.prop)
 #  define MRG_MAP(prop) \
   prop.insert(tmpl.prop.begin(), tmpl.prop.end())
 #  define MRG_STRING(prop) \
-  if (prop.empty() && tmpl.prop != prop) prop = tmpl.prop
+  if (prop.empty()) prop = tmpl.prop
 
 #endif // !CCE_CONFIGURATION_OBJECT_HH
 

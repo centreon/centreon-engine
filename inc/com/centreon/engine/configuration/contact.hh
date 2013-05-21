@@ -23,6 +23,7 @@
 #  include <vector>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/unordered_hash.hh"
 
@@ -68,46 +69,46 @@ namespace                  configuration {
                              std::string const& value);
 
   private:
-    void                   _set_address(
+    bool                   _set_address(
                              std::string const& key,
                              std::string const& value);
-    void                   _set_alias(std::string const& value);
-    void                   _set_can_submit_commands(bool value);
-    void                   _set_contactgroups(std::string const& value);
-    void                   _set_contact_name(std::string const& value);
-    void                   _set_email(std::string const& value);
-    void                   _set_host_notifications_enabled(bool value);
-    void                   _set_host_notification_commands(std::string const& value);
-    void                   _set_host_notification_options(std::string const& value);
-    void                   _set_host_notification_period(std::string const& value);
-    void                   _set_retain_nonstatus_information(bool value);
-    void                   _set_retain_status_information(bool value);
-    void                   _set_pager(std::string const& value);
-    void                   _set_service_notification_commands(std::string const& value);
-    void                   _set_service_notification_options(std::string const& value);
-    void                   _set_service_notification_period(std::string const& value);
-    void                   _set_service_notifications_enabled(bool value);
+    bool                   _set_alias(std::string const& value);
+    bool                   _set_can_submit_commands(bool value);
+    bool                   _set_contactgroups(std::string const& value);
+    bool                   _set_contact_name(std::string const& value);
+    bool                   _set_email(std::string const& value);
+    bool                   _set_host_notifications_enabled(bool value);
+    bool                   _set_host_notification_commands(std::string const& value);
+    bool                   _set_host_notification_options(std::string const& value);
+    bool                   _set_host_notification_period(std::string const& value);
+    bool                   _set_retain_nonstatus_information(bool value);
+    bool                   _set_retain_status_information(bool value);
+    bool                   _set_pager(std::string const& value);
+    bool                   _set_service_notification_commands(std::string const& value);
+    bool                   _set_service_notification_options(std::string const& value);
+    bool                   _set_service_notification_period(std::string const& value);
+    bool                   _set_service_notifications_enabled(bool value);
 
     std::vector<std::string>
                            _address;
     std::string            _alias;
-    bool                   _can_submit_commands;
+    opt<bool>              _can_submit_commands;
     group                  _contactgroups;
     std::string            _contact_name;
     umap<std::string, std::string>
                            _customvariables;
     std::string            _email;
-    bool                   _host_notifications_enabled;
+    opt<bool>              _host_notifications_enabled;
     group                  _host_notification_commands;
-    unsigned int           _host_notification_options;
+    opt<unsigned int>      _host_notification_options;
     std::string            _host_notification_period;
-    bool                   _retain_nonstatus_information;
-    bool                   _retain_status_information;
+    opt<bool>              _retain_nonstatus_information;
+    opt<bool>              _retain_status_information;
     std::string            _pager;
     group                  _service_notification_commands;
-    unsigned int           _service_notification_options;
+    opt<unsigned int>      _service_notification_options;
     std::string            _service_notification_period;
-    bool                   _service_notifications_enabled;
+    opt<bool>              _service_notifications_enabled;
   };
 }
 

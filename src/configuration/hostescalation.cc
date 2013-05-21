@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -36,26 +37,24 @@ static struct {
   { "host_name",             SETTER(std::string const&, _set_hosts) },
   { "contact_groups",        SETTER(std::string const&, _set_contactgroups) },
   { "contacts",              SETTER(std::string const&, _set_contacts) },
+  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) },
   { "escalation_period",     SETTER(std::string const&, _set_escalation_period) },
   { "first_notification",    SETTER(unsigned int, _set_first_notification) },
   { "last_notification",     SETTER(unsigned int, _set_last_notification) },
-  { "notification_interval", SETTER(unsigned int, _set_notification_interval) },
-  { "escalation_options",    SETTER(std::string const&, _set_escalation_options) }
+  { "notification_interval", SETTER(unsigned int, _set_notification_interval) }
 };
 
 // Default values.
-static unsigned int const default_first_notification(-2);
-static unsigned int const default_last_notification(-2);
-static unsigned int const default_notification_interval(0);
+static unsigned short const default_escalation_options(hostescalation::none);
+static unsigned int const   default_first_notification(-2);
+static unsigned int const   default_last_notification(-2);
+static unsigned int const   default_notification_interval(0);
 
 /**
  *  Default constructor.
  */
 hostescalation::hostescalation()
-  : object("hostescalation"),
-    _first_notification(default_first_notification),
-    _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {
+  : object("hostescalation") {
 
 }
 
@@ -142,7 +141,7 @@ void hostescalation::merge(object const& obj) {
 
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
-  MRG_STRING(_escalation_options);
+  MRG_DEFAULT(_escalation_options);
   MRG_STRING(_escalation_period);
   MRG_DEFAULT(_first_notification);
   MRG_INHERIT(_hostgroups);
@@ -170,38 +169,68 @@ bool hostescalation::parse(
   return (false);
 }
 
-void hostescalation::_set_contactgroups(std::string const& value) {
+bool hostescalation::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
+  return (true);
 }
 
-void hostescalation::_set_contacts(std::string const& value) {
+bool hostescalation::_set_contacts(std::string const& value) {
   _contacts.set(value);
+  return (true);
 }
 
-void hostescalation::_set_escalation_options(std::string const& value) {
-  _escalation_options = value; // XXX:
+bool hostescalation::_set_escalation_options(std::string const& value) {
+  unsigned short options(none);
+  std::list<std::string> values;
+  misc::split(value, values, ',');
+  for (std::list<std::string>::iterator
+         it(values.begin()), end(values.end());
+       it != end;
+       ++it) {
+    misc::trim(*it);
+    if (*it == "d" || *it == "down")
+      options |= down;
+    else if (*it == "u" || *it == "unreachable")
+      options |= unreachable;
+    else if (*it == "r" || *it == "recovery")
+      options |= recovery;
+    else if (*it == "n" || *it == "none")
+      options = none;
+    else if (*it == "a" || *it == "all")
+      options = down | unreachable | recovery;
+    else
+      return (false);
+  }
+  _escalation_options = options;
+  return (true);
 }
 
-void hostescalation::_set_escalation_period(std::string const& value) {
+bool hostescalation::_set_escalation_period(std::string const& value) {
   _escalation_period = value;
+  return (true);
 }
 
-void hostescalation::_set_first_notification(unsigned int value) {
+bool hostescalation::_set_first_notification(unsigned int value) {
   _first_notification = value;
+  return (true);
 }
 
-void hostescalation::_set_hostgroups(std::string const& value) {
+bool hostescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  return (true);
 }
 
-void hostescalation::_set_hosts(std::string const& value) {
+bool hostescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  return (true);
 }
 
-void hostescalation::_set_last_notification(unsigned int value) {
+bool hostescalation::_set_last_notification(unsigned int value) {
   _last_notification = value;
+  return (true);
 }
 
-void hostescalation::_set_notification_interval(unsigned int value) {
+bool hostescalation::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
+  return (true);
 }

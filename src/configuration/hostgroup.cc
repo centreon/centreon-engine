@@ -151,30 +151,37 @@ bool hostgroup::parse(
   return (false);
 }
 
-void hostgroup::_set_action_url(std::string const& value) {
+bool hostgroup::_set_action_url(std::string const& value) {
   _action_url = value;
+  return (true);
 }
 
-void hostgroup::_set_alias(std::string const& value) {
+bool hostgroup::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
 }
 
-void hostgroup::_set_hostgroup_members(std::string const& value) {
+bool hostgroup::_set_hostgroup_members(std::string const& value) {
   _hostgroup_members.set(value);
+  return (true);
 }
 
-void hostgroup::_set_hostgroup_name(std::string const& value) {
+bool hostgroup::_set_hostgroup_name(std::string const& value) {
   _hostgroup_name = value;
+  return (true);
 }
 
-void hostgroup::_set_members(std::string const& value) {
+bool hostgroup::_set_members(std::string const& value) {
   _members.set(value);
+  return (true);
 }
 
-void hostgroup::_set_notes(std::string const& value) {
+bool hostgroup::_set_notes(std::string const& value) {
   _notes = value;
+  return (true);
 }
 
-void hostgroup::_set_notes_url(std::string const& value) {
+bool hostgroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
 }
