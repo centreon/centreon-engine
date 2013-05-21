@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -109,7 +108,7 @@ bool command::operator!=(command const& right) const throw () {
  */
 void command::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   command const& tmpl(static_cast<command const&>(obj));
 
   MRG_STRING(_command_line);

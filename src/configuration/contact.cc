@@ -21,7 +21,6 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -173,7 +172,7 @@ bool contact::operator!=(contact const& right) const throw () {
  */
 void contact::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   contact const& tmpl(static_cast<contact const&>(obj));
 
   // MERGE_TAB(_address);
@@ -232,8 +231,7 @@ void contact::_set_can_submit_commands(bool value) {
 }
 
 void contact::_set_contactgroups(std::string const& value) {
-  _contactgroups.clear();
-  misc::split(value, _contactgroups.get(), ',');
+  _contactgroups.set(value);
 }
 
 void contact::_set_contact_name(std::string const& value) {
@@ -249,8 +247,7 @@ void contact::_set_host_notifications_enabled(bool value) {
 }
 
 void contact::_set_host_notification_commands(std::string const& value) {
-  _host_notification_commands.clear();
-  misc::split(value, _host_notification_commands.get(), ',');
+  _host_notification_commands.set(value);
 }
 
 void contact::_set_host_notification_options(std::string const& value) {
@@ -274,8 +271,7 @@ void contact::_set_pager(std::string const& value) {
 }
 
 void contact::_set_service_notification_commands(std::string const& value) {
-  _service_notification_commands.clear();
-  misc::split(value, _service_notification_commands.get(), ',');
+  _service_notification_commands.set(value);
 }
 
 void contact::_set_service_notification_options(std::string const& value) {

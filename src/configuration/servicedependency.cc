@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -162,7 +161,7 @@ bool servicedependency::operator!=(servicedependency const& right) const throw (
  */
 void servicedependency::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   servicedependency const& tmpl(static_cast<servicedependency const&>(obj));
 
   MRG_STRING(_dependency_period);
@@ -203,23 +202,19 @@ void servicedependency::_set_dependency_period(std::string const& value) {
 }
 
 void servicedependency::_set_dependent_hostgroups(std::string const& value) {
-  _dependent_hostgroups.clear();
-  misc::split(value, _dependent_hostgroups.get(), ',');
+  _dependent_hostgroups.set(value);
 }
 
 void servicedependency::_set_dependent_hosts(std::string const& value) {
-  _dependent_hosts.clear();
-  misc::split(value, _dependent_hosts.get(), ',');
+  _dependent_hosts.set(value);
 }
 
 void servicedependency::_set_dependent_servicegroups(std::string const& value) {
-  _dependent_servicegroups.clear();
-  misc::split(value, _dependent_servicegroups.get(), ',');
+  _dependent_servicegroups.set(value);
 }
 
 void servicedependency::_set_dependent_service_description(std::string const& value) {
-  _dependent_service_description.clear();
-  misc::split(value, _dependent_service_description.get(), ',');
+  _dependent_service_description.set(value);
 }
 
 void servicedependency::_set_execution_failure_options(std::string const& value) {
@@ -231,13 +226,11 @@ void servicedependency::_set_inherits_parent(bool value) {
 }
 
 void servicedependency::_set_hostgroups(std::string const& value) {
-  _hostgroups.clear();
-  misc::split(value, _hostgroups.get(), ',');
+  _hostgroups.set(value);
 }
 
 void servicedependency::_set_hosts(std::string const& value) {
-  _hosts.clear();
-  misc::split(value, _hosts.get(), ',');
+  _hosts.set(value);
 }
 
 void servicedependency::_set_notification_failure_options(std::string const& value) {
@@ -245,11 +238,9 @@ void servicedependency::_set_notification_failure_options(std::string const& val
 }
 
 void servicedependency::_set_servicegroups(std::string const& value) {
-  _servicegroups.clear();
-  misc::split(value, _servicegroups.get(), ',');
+  _servicegroups.set(value);
 }
 
 void servicedependency::_set_service_description(std::string const& value) {
-  _service_description.clear();
-  misc::split(value, _service_description.get(), ',');
+  _service_description.set(value);
 }

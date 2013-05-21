@@ -109,7 +109,7 @@ bool timeperiod::operator!=(timeperiod const& right) const throw () {
  */
 void timeperiod::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   timeperiod const& tmpl(static_cast<timeperiod const&>(obj));
 
   MRG_STRING(_alias);
@@ -145,7 +145,7 @@ bool timeperiod::parse(
  *  @return True on success, otherwise false.
  */
 bool timeperiod::parse(std::string const& line) {
-  // XXX:
+  // XXX: timeperiod parser
   // parse(key, misc::trim(value));
   return (false);
 }

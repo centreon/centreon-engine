@@ -36,6 +36,9 @@ std::list<std::string>& misc::split(
                           std::string const& data,
                           std::list<std::string>& out,
                           char delim) {
+  if (data.empty())
+    return (out);
+
   std::size_t last(0);
   std::size_t current(0);
   while ((current = data.find(delim, current)) != std::string::npos) {

@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -141,7 +140,7 @@ bool hostdependency::operator!=(hostdependency const& right) const throw () {
  */
 void hostdependency::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   hostdependency const& tmpl(static_cast<hostdependency const&>(obj));
 
   MRG_STRING(_dependency_period);
@@ -178,13 +177,11 @@ void hostdependency::_set_dependency_period(std::string const& value) {
 }
 
 void hostdependency::_set_dependent_hostgroups(std::string const& value) {
-  _dependent_hostgroups.clear();
-  misc::split(value, _dependent_hostgroups.get(), ',');
+  _dependent_hostgroups.set(value);
 }
 
 void hostdependency::_set_dependent_hosts(std::string const& value) {
-  _dependent_hosts.clear();
-  misc::split(value, _dependent_hosts.get(), ',');
+  _dependent_hosts.set(value);
 }
 
 void hostdependency::_set_execution_failure_options(std::string const& value) {
@@ -192,13 +189,11 @@ void hostdependency::_set_execution_failure_options(std::string const& value) {
 }
 
 void hostdependency::_set_hostgroups(std::string const& value) {
-  _hostgroups.clear();
-  misc::split(value, _hostgroups.get(), ',');
+  _hostgroups.set(value);
 }
 
 void hostdependency::_set_hosts(std::string const& value) {
-  _hosts.clear();
-  misc::split(value, _hosts.get(), ',');
+  _hosts.set(value);
 }
 
 void hostdependency::_set_inherits_parent(bool value) {

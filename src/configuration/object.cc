@@ -236,7 +236,7 @@ void object::resolve_template(
     umap<std::string, shared_ptr<object> >::iterator
       tmpl(templates.find(*it));
     if (tmpl == templates.end())
-      throw (engine_error() << "XXX: todo");
+      throw (engine_error() << "merge failed: invalid object type");
     tmpl->second->resolve_template(templates);
     merge(*tmpl->second);
   }

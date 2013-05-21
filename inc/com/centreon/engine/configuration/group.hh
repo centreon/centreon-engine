@@ -44,6 +44,7 @@ namespace  configuration {
     bool   is_add_inherit() const throw ();
     void   is_add_inherit(bool enable) throw ();
     void   set(group const& grp);
+    void   set(std::string const& value);
 
   private:
     std::list<std::string>

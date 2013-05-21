@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -112,7 +111,7 @@ bool contactgroup::operator!=(contactgroup const& right) const throw () {
  */
 void contactgroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   contactgroup const& tmpl(static_cast<contactgroup const&>(obj));
 
   MRG_STRING(_alias);
@@ -145,8 +144,7 @@ void contactgroup::_set_alias(std::string const& value) {
 }
 
 void contactgroup::_set_contactgroup_members(std::string const& value) {
-  _contactgroup_members.clear();
-  misc::split(value, _contactgroup_members.get(), ',');
+  _contactgroup_members.set(value);
 }
 
 void contactgroup::_set_contactgroup_name(std::string const& value) {
@@ -154,6 +152,5 @@ void contactgroup::_set_contactgroup_name(std::string const& value) {
 }
 
 void contactgroup::_set_members(std::string const& value) {
-  _members.clear();
-  misc::split(value, _members.get(), ',');
+  _members.set(value);
 }

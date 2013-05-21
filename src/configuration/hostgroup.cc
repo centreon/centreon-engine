@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -121,7 +120,7 @@ bool hostgroup::operator!=(hostgroup const& right) const throw () {
  */
 void hostgroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
 
   MRG_STRING(_action_url);
@@ -161,8 +160,7 @@ void hostgroup::_set_alias(std::string const& value) {
 }
 
 void hostgroup::_set_hostgroup_members(std::string const& value) {
-  _hostgroup_members.clear();
-  misc::split(value, _hostgroup_members.get(), ',');
+  _hostgroup_members.set(value);
 }
 
 void hostgroup::_set_hostgroup_name(std::string const& value) {
@@ -170,8 +168,7 @@ void hostgroup::_set_hostgroup_name(std::string const& value) {
 }
 
 void hostgroup::_set_members(std::string const& value) {
-  _members.clear();
-  misc::split(value, _members.get(), ',');
+  _members.set(value);
 }
 
 void hostgroup::_set_notes(std::string const& value) {

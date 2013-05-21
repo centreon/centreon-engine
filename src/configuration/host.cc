@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -290,7 +289,7 @@ bool host::operator!=(host const& right) const throw () {
  */
 void host::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   host const& tmpl(static_cast<host const&>(obj));
 
   MRG_DEFAULT(_2d_coords);
@@ -379,11 +378,11 @@ void host::_set_alias(std::string const& value) {
 }
 
 void host::_set_checks_active(bool value) {
-  _checks_active = value; // XXX:
+  _checks_active = value;
 }
 
 void host::_set_checks_passive(bool value) {
-  _checks_passive = value; // XXX:
+  _checks_passive = value;
 }
 
 void host::_set_check_command(std::string const& value) {
@@ -403,13 +402,11 @@ void host::_set_check_period(std::string const& value) {
 }
 
 void host::_set_contactgroups(std::string const& value) {
-  _contactgroups.clear();
-  misc::split(value, _contactgroups.get(), ',');
+  _contactgroups.set(value);
 }
 
 void host::_set_contacts(std::string const& value) {
-  _contacts.clear();
-  misc::split(value, _contacts.get(), ',');
+  _contacts.set(value);
 }
 
 void host::_set_display_name(std::string const& value) {
@@ -461,8 +458,7 @@ void host::_set_host_name(std::string const& value) {
 }
 
 void host::_set_hostgroups(std::string const& value) {
-  _hostgroups.clear();
-  misc::split(value, _hostgroups.get(), ',');
+  _hostgroups.set(value);
 }
 
 void host::_set_icon_image(std::string const& value) {
@@ -514,8 +510,7 @@ void host::_set_obsess_over_host(bool value) {
 }
 
 void host::_set_parents(std::string const& value) {
-  _parents.clear();
-  misc::split(value, _parents.get(), ',');
+  _parents.set(value);
 }
 
 void host::_set_process_perf_data(bool value) {

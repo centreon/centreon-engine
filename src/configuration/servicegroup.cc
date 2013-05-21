@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -122,7 +121,7 @@ bool servicegroup::operator!=(servicegroup const& right) const throw () {
  */
 void servicegroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   servicegroup const& tmpl(static_cast<servicegroup const&>(obj));
 
   MRG_STRING(_action_url);
@@ -162,8 +161,7 @@ void servicegroup::_set_alias(std::string const& value) {
 }
 
 void servicegroup::_set_members(std::string const& value) {
-  _members.clear();
-  misc::split(value, _members.get(), ',');
+  _members.set(value);
 }
 
 void servicegroup::_set_notes(std::string const& value) {
@@ -175,8 +173,7 @@ void servicegroup::_set_notes_url(std::string const& value) {
 }
 
 void servicegroup::_set_servicegroup_members(std::string const& value) {
-  _servicegroup_members.clear();
-  misc::split(value, _servicegroup_members.get(), ',');
+  _servicegroup_members.set(value);
 }
 
 void servicegroup::_set_servicegroup_name(std::string const& value) {

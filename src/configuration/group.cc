@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/configuration/group.hh"
+#include "com/centreon/engine/misc/string.hh"
 
 using namespace  com::centreon::engine::configuration;
 
@@ -147,4 +148,23 @@ void group::set(group const& grp) {
     std::copy(grp._group.begin(), grp._group.end(), _group.begin());
   else
     _group = grp._group;
+}
+
+/**
+ *  Set group contents with string argument.
+ *
+ *  @param[in] value The string arguments.
+ */
+void group::set(std::string const& value) {
+  _group.clear();
+  if (!value.empty()) {
+    if (value[0] == '+') {
+      _is_add_inherit = true;
+      misc::split(value.substr(1), _group, ',');
+    }
+    else {
+      _is_add_inherit = false;
+      misc::split(value, _group, ',');
+    }
+  }
 }

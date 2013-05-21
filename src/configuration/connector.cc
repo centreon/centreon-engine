@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -106,7 +105,7 @@ bool connector::operator!=(connector const& right) const throw () {
  */
 void connector::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   connector const& tmpl(static_cast<connector const&>(obj));
 
   MRG_STRING(_connector_line);

@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -281,7 +280,7 @@ bool service::operator!=(service const& right) const throw () {
  */
 void service::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "XXX: todo");
+    throw (engine_error() << "merge failed: invalid object type");
   service const& tmpl(static_cast<service const&>(obj));
 
   MRG_STRING(_action_url);
@@ -358,11 +357,11 @@ void service::_set_check_command(std::string const& value) {
 }
 
 void service::_set_checks_active(bool value) {
-  _checks_active = value; // XXX:
+  _checks_active = value;
 }
 
 void service::_set_checks_passive(bool value) {
-  _checks_passive = value; // XXX:
+  _checks_passive = value;
 }
 
 void service::_set_check_freshness(bool value) {
@@ -378,13 +377,11 @@ void service::_set_check_period(std::string const& value) {
 }
 
 void service::_set_contactgroups(std::string const& value) {
-  _contactgroups.clear();
-  misc::split(value, _contactgroups.get(), ',');
+  _contactgroups.set(value);
 }
 
 void service::_set_contacts(std::string const& value) {
-  _contacts.clear();
-  misc::split(value, _contacts.get(), ',');
+  _contacts.set(value);
 }
 
 void service::_set_display_name(std::string const& value) {
@@ -400,11 +397,11 @@ void service::_set_event_handler_enabled(bool value) {
 }
 
 void service::_set_failure_prediction_enabled(bool value) {
-  // XXX:
+  // XXX: service::_set_failure_prediction_enabled
 }
 
 void service::_set_failure_prediction_options(std::string const& value) {
-  // XXX:
+  // XXX: service::_set_failure_prediction_options
 }
 
 void service::_set_first_notification_delay(unsigned int value) {
@@ -428,13 +425,11 @@ void service::_set_high_flap_threshold(unsigned int value) {
 }
 
 void service::_set_hostgroups(std::string const& value) {
-  _hostgroups.clear();
-  misc::split(value, _hostgroups.get(), ',');
+  _hostgroups.set(value);
 }
 
 void service::_set_hosts(std::string const& value) {
-  _hosts.clear();
-  misc::split(value, _hosts.get(), ',');
+  _hosts.set(value);
 }
 
 void service::_set_icon_image(std::string const& value) {
@@ -490,7 +485,7 @@ void service::_set_obsess_over_service(bool value) {
 }
 
 void service::_set_parallelize_check(bool value) {
-  // XXX:
+  // XXX: service::_set_parallelize_check
 }
 
 void service::_set_process_perf_data(bool value) {
@@ -510,8 +505,7 @@ void service::_set_retry_interval(unsigned int value) {
 }
 
 void service::_set_servicegroups(std::string const& value) {
-  _servicegroups.clear();
-  misc::split(value, _servicegroups.get(), ',');
+  _servicegroups.set(value);
 }
 
 void service::_set_service_description(std::string const& value) {
