@@ -282,7 +282,7 @@ static void _update_schedule_info(service const* svc) {
     scheduling_info.last_service_check = svc->next_check;
 
   scheduling_info.service_check_interval_total
-    += (unsigned long)(svc->check_interval * config->get_interval_length());
+    += (unsigned long)(svc->check_interval * config->interval_length());
   scheduling_info.average_service_check_interval
     = (double)scheduling_info.service_check_interval_total
     / (double)scheduling_info.total_scheduled_services;
@@ -302,10 +302,10 @@ static void _update_schedule_info(service const* svc) {
     / (double)scheduling_info.total_hosts;
 
   scheduling_info.max_service_check_spread
-    = config->get_max_service_check_spread();
+    = config->max_service_check_spread();
 
   // we determine the service inter-check delay.
-  if (config->get_service_inter_check_delay_method() == configuration::state::icd_smart
+  if (config->service_inter_check_delay_method() == configuration::state::icd_smart
       && scheduling_info.service_check_interval_total > 0) {
 
     scheduling_info.average_service_inter_check_delay
@@ -332,7 +332,7 @@ static void _update_schedule_info(service const* svc) {
   }
 
   // we determine the service interleave factor.
-  if (config->get_service_interleave_factor_method() == configuration::state::ilf_smart) {
+  if (config->service_interleave_factor_method() == configuration::state::ilf_smart) {
     scheduling_info.service_interleave_factor
       = (int)(ceil(scheduling_info.average_scheduled_services_per_host));
 

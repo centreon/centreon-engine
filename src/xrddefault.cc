@@ -196,12 +196,12 @@ int xrddefault_save_state_information() {
 
   /* what attributes should be masked out? */
   /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-  unsigned long process_host_attribute_mask = config->get_retained_process_host_attribute_mask();
-  unsigned long process_service_attribute_mask = config->get_retained_process_host_attribute_mask();
-  unsigned long host_attribute_mask = config->get_retained_host_attribute_mask();
-  unsigned long service_attribute_mask = config->get_retained_host_attribute_mask();
-  unsigned long contact_host_attribute_mask = config->get_retained_contact_host_attribute_mask();
-  unsigned long contact_service_attribute_mask = config->get_retained_contact_service_attribute_mask();
+  unsigned long process_host_attribute_mask = config->retained_process_host_attribute_mask();
+  unsigned long process_service_attribute_mask = config->retained_process_host_attribute_mask();
+  unsigned long host_attribute_mask = config->retained_host_attribute_mask();
+  unsigned long service_attribute_mask = config->retained_host_attribute_mask();
+  unsigned long contact_host_attribute_mask = config->retained_contact_host_attribute_mask();
+  unsigned long contact_service_attribute_mask = config->retained_contact_service_attribute_mask();
   unsigned long contact_attribute_mask = 0L;
 
   std::ostringstream stream;
@@ -227,21 +227,21 @@ int xrddefault_save_state_information() {
   stream << "program {\n"
          << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
          << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
-         << "enable_notifications=" << config->get_enable_notifications() << "\n"
-         << "active_service_checks_enabled=" << config->get_execute_service_checks() << "\n"
-         << "passive_service_checks_enabled=" << config->get_accept_passive_service_checks() << "\n"
-         << "active_host_checks_enabled=" << config->get_execute_host_checks() << "\n"
-         << "passive_host_checks_enabled=" << config->get_accept_passive_host_checks() << "\n"
-         << "enable_event_handlers=" << config->get_enable_event_handlers() << "\n"
-         << "obsess_over_services=" << config->get_obsess_over_services() << "\n"
-         << "obsess_over_hosts=" << config->get_obsess_over_hosts() << "\n"
-         << "check_service_freshness=" << config->get_check_service_freshness() << "\n"
-         << "check_host_freshness=" << config->get_check_host_freshness() << "\n"
-         << "enable_flap_detection=" << config->get_enable_flap_detection() << "\n"
-         << "enable_failure_prediction=" << config->get_enable_failure_prediction() << "\n"
-         << "process_performance_data=" << config->get_process_performance_data() << "\n"
-         << "global_host_event_handler=" << config->get_global_host_event_handler().c_str() << "\n"
-         << "global_service_event_handler=" << config->get_global_service_event_handler().c_str() << "\n"
+         << "enable_notifications=" << config->enable_notifications() << "\n"
+         << "active_service_checks_enabled=" << config->execute_service_checks() << "\n"
+         << "passive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
+         << "active_host_checks_enabled=" << config->execute_host_checks() << "\n"
+         << "passive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
+         << "enable_event_handlers=" << config->enable_event_handlers() << "\n"
+         << "obsess_over_services=" << config->obsess_over_services() << "\n"
+         << "obsess_over_hosts=" << config->obsess_over_hosts() << "\n"
+         << "check_service_freshness=" << config->check_service_freshness() << "\n"
+         << "check_host_freshness=" << config->check_host_freshness() << "\n"
+         << "enable_flap_detection=" << config->enable_flap_detection() << "\n"
+         << "enable_failure_prediction=" << config->enable_failure_prediction() << "\n"
+         << "process_performance_data=" << config->process_performance_data() << "\n"
+         << "global_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
+         << "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
          << "next_comment_id=" << next_comment_id << "\n"
          << "next_downtime_id=" << next_downtime_id << "\n"
          << "next_event_id=" << next_event_id << "\n"
@@ -594,12 +594,12 @@ int xrddefault_read_state_information() {
 
   /* what attributes should be masked out? */
   /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-  process_host_attribute_mask = config->get_retained_process_host_attribute_mask();
-  process_service_attribute_mask = config->get_retained_process_host_attribute_mask();
-  host_attribute_mask = config->get_retained_host_attribute_mask();
-  service_attribute_mask = config->get_retained_host_attribute_mask();
-  contact_host_attribute_mask = config->get_retained_contact_host_attribute_mask();
-  contact_service_attribute_mask = config->get_retained_contact_service_attribute_mask();
+  process_host_attribute_mask = config->retained_process_host_attribute_mask();
+  process_service_attribute_mask = config->retained_process_host_attribute_mask();
+  host_attribute_mask = config->retained_host_attribute_mask();
+  service_attribute_mask = config->retained_host_attribute_mask();
+  contact_host_attribute_mask = config->retained_contact_host_attribute_mask();
+  contact_service_attribute_mask = config->retained_contact_service_attribute_mask();
 
   /* Big speedup when reading retention.dat in bulk */
   defer_downtime_sorting = 1;
@@ -647,7 +647,7 @@ int xrddefault_read_state_information() {
 
       case XRDDEFAULT_PROGRAMSTATUS_DATA:
         /* adjust modified attributes if necessary */
-        if (config->get_use_retained_program_state() == false) {
+        if (config->use_retained_program_state() == false) {
           modified_host_process_attributes = MODATTR_NONE;
           modified_service_process_attributes = MODATTR_NONE;
         }
@@ -682,7 +682,7 @@ int xrddefault_read_state_information() {
             temp_host->current_attempt = temp_host->max_attempts;
 
           /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (config->get_use_large_installation_tweaks() == true)
+          if (config->use_large_installation_tweaks() == true)
             temp_host->is_flapping = was_flapping;
           /* else use normal startup flap detection logic */
           else {
@@ -758,7 +758,7 @@ int xrddefault_read_state_information() {
 
 
           /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (config->get_use_large_installation_tweaks() == true)
+          if (config->use_large_installation_tweaks() == true)
             temp_service->is_flapping = was_flapping;
           /* else use normal startup flap detection logic */
           else {
@@ -969,7 +969,7 @@ int xrddefault_read_state_information() {
           creation_time = strtoul(val, NULL, 10);
           time(&current_time);
           if ((current_time - creation_time)
-              < static_cast<time_t>(config->get_retention_scheduling_horizon()))
+              < static_cast<time_t>(config->retention_scheduling_horizon()))
             scheduling_info_is_ok = TRUE;
           else
             scheduling_info_is_ok = FALSE;
@@ -995,58 +995,58 @@ int xrddefault_read_state_information() {
           /* mask out attributes we don't want to retain */
           modified_service_process_attributes &= ~process_service_attribute_mask;
         }
-        if (config->get_use_retained_program_state() == true) {
+        if (config->use_retained_program_state() == true) {
           if (!strcmp(var, "enable_notifications")) {
             if (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-              config->set_enable_notifications((atoi(val) > 0) ? TRUE : FALSE);
+              config->enable_notifications((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "active_service_checks_enabled")) {
             if (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-              config->set_execute_service_checks((atoi(val) > 0) ? TRUE : FALSE);
+              config->execute_service_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "passive_service_checks_enabled")) {
             if (modified_service_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-              config->set_accept_passive_service_checks((atoi(val) > 0) ? TRUE : FALSE);
+              config->accept_passive_service_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "active_host_checks_enabled")) {
             if (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-              config->set_execute_host_checks((atoi(val) > 0) ? TRUE : FALSE);
+              config->execute_host_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "passive_host_checks_enabled")) {
             if (modified_host_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-              config->set_accept_passive_host_checks((atoi(val) > 0) ? TRUE : FALSE);
+              config->accept_passive_host_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "enable_event_handlers")) {
             if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-              config->set_enable_event_handlers((atoi(val) > 0) ? TRUE : FALSE);
+              config->enable_event_handlers((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "obsess_over_services")) {
             if (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-              config->set_obsess_over_services((atoi(val) > 0) ? TRUE : FALSE);
+              config->obsess_over_services((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "obsess_over_hosts")) {
             if (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-              config->set_obsess_over_hosts((atoi(val) > 0) ? TRUE : FALSE);
+              config->obsess_over_hosts((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "check_service_freshness")) {
             if (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-              config->set_check_service_freshness((atoi(val) > 0) ? TRUE : FALSE);
+              config->check_service_freshness((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "check_host_freshness")) {
             if (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-              config->set_check_host_freshness((atoi(val) > 0) ? TRUE : FALSE);
+              config->check_host_freshness((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "enable_flap_detection")) {
             if (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-              config->set_enable_flap_detection((atoi(val) > 0) ? TRUE : FALSE);
+              config->enable_flap_detection((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "enable_failure_prediction")) {
             if (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-              config->set_enable_failure_prediction((atoi(val) > 0) ? TRUE : FALSE);
+              config->enable_failure_prediction((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "process_performance_data")) {
             if (modified_host_process_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
-              config->set_process_performance_data((atoi(val) > 0) ? TRUE : FALSE);
+              config->process_performance_data((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "global_host_event_handler")) {
             if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
@@ -1058,7 +1058,7 @@ int xrddefault_read_state_information() {
               delete[] tempval;
 
               if (temp_command != NULL && temp_ptr != NULL) {
-                config->set_global_host_event_handler(temp_ptr);
+                config->global_host_event_handler(temp_ptr);
               }
             }
           }
@@ -1072,7 +1072,7 @@ int xrddefault_read_state_information() {
               delete[] tempval;
 
               if (temp_command != NULL && temp_ptr != NULL) {
-                config->set_global_service_event_handler(temp_ptr);
+                config->global_service_event_handler(temp_ptr);
               }
             }
           }
@@ -1136,12 +1136,12 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "last_check"))
               temp_host->last_check = strtoul(val, NULL, 10);
             else if (!strcmp(var, "next_check")) {
-              if (config->get_use_retained_scheduling_info() == true
+              if (config->use_retained_scheduling_info() == true
                   && scheduling_info_is_ok == TRUE)
                 temp_host->next_check = strtoul(val, NULL, 10);
             }
             else if (!strcmp(var, "check_options")) {
-              if (config->get_use_retained_scheduling_info() == true
+              if (config->use_retained_scheduling_info() == true
                   && scheduling_info_is_ok == TRUE)
                 temp_host->check_options = atoi(val);
             }
@@ -1425,12 +1425,12 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "last_check"))
               temp_service->last_check = strtoul(val, NULL, 10);
             else if (!strcmp(var, "next_check")) {
-              if (config->get_use_retained_scheduling_info() == true
+              if (config->use_retained_scheduling_info() == true
                   && scheduling_info_is_ok == TRUE)
                 temp_service->next_check = strtoul(val, NULL, 10);
             }
             else if (!strcmp(var, "check_options")) {
-              if (config->get_use_retained_scheduling_info() == true
+              if (config->use_retained_scheduling_info() == true
                   && scheduling_info_is_ok == TRUE)
                 temp_service->check_options = atoi(val);
             }

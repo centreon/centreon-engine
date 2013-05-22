@@ -54,13 +54,13 @@ int obsessive_compulsive_service_check_processor(service* svc) {
     return (ERROR);
 
   /* bail out if we shouldn't be obsessing */
-  if (config->get_obsess_over_services() == false)
+  if (config->obsess_over_services() == false)
     return (OK);
   if (svc->obsess_over_service == FALSE)
     return (OK);
 
   /* if there is no valid command, exit */
-  if (config->get_ocsp_command().empty())
+  if (config->ocsp_command().empty())
     return (ERROR);
 
   /* find the associated host */
@@ -76,7 +76,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   get_raw_command_line_r(
     &mac,
     ocsp_command_ptr,
-    config->get_ocsp_command().c_str(),
+    config->ocsp_command().c_str(),
     &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros_r(&mac);
@@ -106,7 +106,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   my_system_r(
     &mac,
     processed_command,
-    config->get_ocsp_timeout(),
+    config->ocsp_timeout(),
     &early_timeout,
     &exectime,
     NULL,
@@ -120,7 +120,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
       << "Warning: OCSP command '" << processed_command
       << "' for service '" << svc->description << "' on host '"
       << svc->host_name << "' timed out after "
-      << config->get_ocsp_timeout() << " seconds";
+      << config->ocsp_timeout() << " seconds";
 
   /* free memory */
   delete[] raw_command;
@@ -145,13 +145,13 @@ int obsessive_compulsive_host_check_processor(host* hst) {
     return (ERROR);
 
   /* bail out if we shouldn't be obsessing */
-  if (config->get_obsess_over_hosts() == false)
+  if (config->obsess_over_hosts() == false)
     return (OK);
   if (hst->obsess_over_host == FALSE)
     return (OK);
 
   /* if there is no valid command, exit */
-  if (config->get_ochp_command().empty())
+  if (config->ochp_command().empty())
     return (ERROR);
 
   /* update macros */
@@ -162,7 +162,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   get_raw_command_line_r(
     &mac,
     ochp_command_ptr,
-    config->get_ochp_command().c_str(),
+    config->ochp_command().c_str(),
     &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros_r(&mac);
@@ -192,7 +192,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   my_system_r(
     &mac,
     processed_command,
-    config->get_ochp_timeout(),
+    config->ochp_timeout(),
     &early_timeout,
     &exectime,
     NULL,
@@ -204,7 +204,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
     logger(log_runtime_warning, basic)
       << "Warning: OCHP command '" << processed_command
       << "' for host '" << hst->name << "' timed out after "
-      << config->get_ochp_timeout() << " seconds";
+      << config->ochp_timeout() << " seconds";
 
   /* free memory */
   delete[] raw_command;
@@ -242,7 +242,7 @@ int handle_service_event(service* svc) {
     NULL);
 
   /* bail out if we shouldn't be running event handlers */
-  if (config->get_enable_event_handlers() == false)
+  if (config->enable_event_handlers() == false)
     return (OK);
   if (svc->event_handler_enabled == FALSE)
     return (OK);
@@ -299,11 +299,11 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     return (ERROR);
 
   /* bail out if we shouldn't be running event handlers */
-  if (config->get_enable_event_handlers() == false)
+  if (config->enable_event_handlers() == false)
     return (OK);
 
   /* a global service event handler command has not been defined */
-  if (config->get_global_service_event_handler().empty())
+  if (config->global_service_event_handler().empty())
     return (ERROR);
 
   logger(dbg_eventhandlers, more)
@@ -317,7 +317,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   get_raw_command_line_r(
     mac,
     global_service_event_handler_ptr,
-    config->get_global_service_event_handler().c_str(),
+    config->global_service_event_handler().c_str(),
     &raw_command,
     macro_options);
   if (raw_command == NULL) {
@@ -336,12 +336,12 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     << "Processed global service event handler "
     "command line: " << processed_command;
 
-  if (config->get_log_event_handlers() == true) {
+  if (config->log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description
         << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-        << config->get_global_service_event_handler();
+        << config->global_service_event_handler();
     process_macros_r(
       mac,
       oss.str().c_str(),
@@ -365,10 +365,10 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     start_time,
     end_time,
     exectime,
-    config->get_event_handler_timeout(),
+    config->event_handler_timeout(),
     early_timeout,
     result,
-    config->get_global_service_event_handler().c_str(),
+    config->global_service_event_handler().c_str(),
     processed_command,
     NULL,
     NULL);
@@ -386,7 +386,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   result = my_system_r(
              mac,
              processed_command,
-             config->get_event_handler_timeout(),
+             config->event_handler_timeout(),
              &early_timeout,
              &exectime,
              &command_output,
@@ -397,7 +397,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Global service event handler command '"
       << processed_command << "' timed out after "
-      << config->get_event_handler_timeout() << " seconds";
+      << config->event_handler_timeout() << " seconds";
 
   /* get end time */
   gettimeofday(&end_time, NULL);
@@ -414,10 +414,10 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     start_time,
     end_time,
     exectime,
-    config->get_event_handler_timeout(),
+    config->event_handler_timeout(),
     early_timeout,
     result,
-    config->get_global_service_event_handler().c_str(),
+    config->global_service_event_handler().c_str(),
     processed_command,
     command_output,
     NULL);
@@ -489,7 +489,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     << "Processed service event handler command line: "
     << processed_command;
 
-  if (config->get_log_event_handlers() == true) {
+  if (config->log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description
@@ -518,7 +518,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
                  start_time,
                  end_time,
                  exectime,
-                 config->get_event_handler_timeout(),
+                 config->event_handler_timeout(),
                  early_timeout,
                  result,
                  svc->event_handler,
@@ -539,7 +539,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   result = my_system_r(
              mac,
              processed_command,
-             config->get_event_handler_timeout(),
+             config->event_handler_timeout(),
              &early_timeout,
              &exectime,
              &command_output,
@@ -549,7 +549,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   if (early_timeout == TRUE)
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Service event handler command '" << processed_command
-      << "' timed out after " << config->get_event_handler_timeout()
+      << "' timed out after " << config->event_handler_timeout()
       << " seconds";
 
   /* get end time */
@@ -567,7 +567,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     start_time,
     end_time,
     exectime,
-    config->get_event_handler_timeout(),
+    config->event_handler_timeout(),
     early_timeout,
     result,
     svc->event_handler,
@@ -612,7 +612,7 @@ int handle_host_event(host* hst) {
     NULL);
 
   /* bail out if we shouldn't be running event handlers */
-  if (config->get_enable_event_handlers() == false)
+  if (config->enable_event_handlers() == false)
     return (OK);
   if (hst->event_handler_enabled == FALSE)
     return (OK);
@@ -663,11 +663,11 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     return (ERROR);
 
   /* bail out if we shouldn't be running event handlers */
-  if (config->get_enable_event_handlers() == false)
+  if (config->enable_event_handlers() == false)
     return (OK);
 
   /* no global host event handler command is defined */
-  if (config->get_global_host_event_handler() == "")
+  if (config->global_host_event_handler() == "")
     return (ERROR);
 
   logger(dbg_eventhandlers, more)
@@ -680,7 +680,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   get_raw_command_line_r(
     mac,
     global_host_event_handler_ptr,
-    config->get_global_host_event_handler().c_str(),
+    config->global_host_event_handler().c_str(),
     &raw_command,
     macro_options);
   if (raw_command == NULL)
@@ -702,11 +702,11 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     << "Processed global host event handler "
     "command line: " << processed_command;
 
-  if (config->get_log_event_handlers() == true) {
+  if (config->log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-	<< config->get_global_host_event_handler();
+	<< config->global_host_event_handler();
     process_macros_r(
       mac,
       oss.str().c_str(),
@@ -730,9 +730,9 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
                  start_time,
                  end_time,
                  exectime,
-                 config->get_event_handler_timeout(),
+                 config->event_handler_timeout(),
                  early_timeout, result,
-                 config->get_global_host_event_handler().c_str(),
+                 config->global_host_event_handler().c_str(),
                  processed_command,
                  NULL,
                  NULL);
@@ -750,7 +750,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   result = my_system_r(
              mac,
              processed_command,
-             config->get_event_handler_timeout(),
+             config->event_handler_timeout(),
              &early_timeout,
              &exectime,
              &command_output,
@@ -761,7 +761,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Global host event handler command '"
       << processed_command << "' timed out after "
-      << config->get_event_handler_timeout() << " seconds";
+      << config->event_handler_timeout() << " seconds";
 
   /* get end time */
   gettimeofday(&end_time, NULL);
@@ -778,10 +778,10 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     start_time,
     end_time,
     exectime,
-    config->get_event_handler_timeout(),
+    config->event_handler_timeout(),
     early_timeout,
     result,
-    config->get_global_host_event_handler().c_str(),
+    config->global_host_event_handler().c_str(),
     processed_command,
     command_output,
     NULL);
@@ -851,7 +851,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     << "Processed host event handler command line: "
     << processed_command;
 
-  if (config->get_log_event_handlers() == true) {
+  if (config->log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "HOST EVENT HANDLER: " << hst->name
 	<< ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
@@ -879,7 +879,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
                  start_time,
                  end_time,
                  exectime,
-                 config->get_event_handler_timeout(),
+                 config->event_handler_timeout(),
                  early_timeout,
                  result,
                  hst->event_handler,
@@ -900,7 +900,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   result = my_system_r(
              mac,
              processed_command,
-             config->get_event_handler_timeout(),
+             config->event_handler_timeout(),
              &early_timeout,
              &exectime,
              &command_output,
@@ -910,7 +910,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   if (early_timeout == TRUE)
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Host event handler command '" << processed_command
-      << "' timed out after " << config->get_event_handler_timeout()
+      << "' timed out after " << config->event_handler_timeout()
       << " seconds";
 
   /* get end time */
@@ -928,7 +928,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     start_time,
     end_time,
     exectime,
-    config->get_event_handler_timeout(),
+    config->event_handler_timeout(),
     early_timeout,
     result,
     hst->event_handler,
@@ -1047,7 +1047,7 @@ int handle_host_state(host* hst) {
     /* write the host state change to the main log file */
     if (hst->state_type == HARD_STATE
         || (hst->state_type == SOFT_STATE
-            && config->get_log_host_retries() == true))
+            && config->log_host_retries() == true))
       log_host_event(hst);
 
     /* check for start of flexible (non-fixed) scheduled downtime */
@@ -1095,7 +1095,7 @@ int handle_host_state(host* hst) {
 
     /* if we're in a soft state and we should log host retries, do so now... */
     if (hst->state_type == SOFT_STATE
-        && config->get_log_host_retries() == true)
+        && config->log_host_retries() == true)
       log_host_event(hst);
   }
 

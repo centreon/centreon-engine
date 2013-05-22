@@ -773,7 +773,7 @@ int centreonengine__setCommandCheckInterval(soap* s,
       << "Webservice: " << __func__ << "(" << value << ", " << is_second << ")";
 
     try {
-      config->set_command_check_interval(value, is_second);
+      config->command_check_interval(value, is_second);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -817,7 +817,7 @@ int centreonengine__setCheckExternalCommands(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_check_external_commands(value);
+    config->check_external_commands(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -850,7 +850,7 @@ int centreonengine__setUseAggressiveHostChecking(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_use_aggressive_host_checking(value);
+    config->use_aggressive_host_checking(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -883,7 +883,7 @@ int centreonengine__setGlobalHostEventHandler(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << command->command << ")";
 
-    config->set_global_host_event_handler(command->command.c_str());
+    config->global_host_event_handler(command->command.c_str());
 
     webservice::sync::instance().worker_finish();
   }
@@ -917,7 +917,7 @@ int centreonengine__setGlobalServiceEventHandler(soap* s,
       << "Webservice: " << __func__ << "(" << command->command << ")";
 
     try {
-      config->set_global_service_event_handler(command->command.c_str());
+      config->global_service_event_handler(command->command.c_str());
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -961,7 +961,7 @@ int centreonengine__setSoftStateDependencies(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_soft_state_dependencies(value);
+    config->soft_state_dependencies(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -995,7 +995,7 @@ int centreonengine__setServiceFreshnessChecksEnabled(
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_check_service_freshness(value);
+    config->check_service_freshness(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1029,7 +1029,7 @@ int centreonengine__setServiceFreshnessCheckInterval(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_service_freshness_check_interval(value);
+    config->service_freshness_check_interval(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1063,7 +1063,7 @@ int centreonengine__setHostFreshnessChecksEnabled(
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_check_host_freshness(value);
+    config->check_host_freshness(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1098,7 +1098,7 @@ int centreonengine__setHostFreshnessCheckInterval(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_host_freshness_check_interval(value);
+      config->host_freshness_check_interval(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1143,7 +1143,7 @@ int centreonengine__setAdditionalFreshnessLatency(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_additional_freshness_latency(value);
+      config->additional_freshness_latency(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1189,7 +1189,7 @@ int centreonengine__setLowServiceFlapThreshold(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_low_service_flap_threshold(value);
+      config->low_service_flap_threshold(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1235,7 +1235,7 @@ int centreonengine__setHighServiceFlapThreshold(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_high_service_flap_threshold(value);
+      config->high_service_flap_threshold(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1281,7 +1281,7 @@ int centreonengine__setLowHostFlapThreshold(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_low_host_flap_threshold(value);
+      config->low_host_flap_threshold(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1327,7 +1327,7 @@ int centreonengine__setHighHostFlapThreshold(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_high_host_flap_threshold(value);
+      config->high_host_flap_threshold(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1371,7 +1371,7 @@ int centreonengine__setLogNotifications(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_notifications(value);
+    config->log_notifications(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1404,7 +1404,7 @@ int centreonengine__setLogServiceRetries(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_service_retries(value);
+    config->log_service_retries(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1437,7 +1437,7 @@ int centreonengine__setLogHostRetries(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_host_retries(value);
+    config->log_host_retries(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1470,7 +1470,7 @@ int centreonengine__setLogEventHandlers(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_event_handlers(value);
+    config->log_event_handlers(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1503,7 +1503,7 @@ int centreonengine__setLogInitialState(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_initial_state(value);
+    config->log_initial_state(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1536,7 +1536,7 @@ int centreonengine__setLogExternalCommands(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_external_commands(value);
+    config->log_external_commands(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1569,7 +1569,7 @@ int centreonengine__setLogPassiveChecks(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_log_passive_checks(value);
+    config->log_passive_checks(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -1604,7 +1604,7 @@ int centreonengine__setServiceCheckTimeout(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_service_check_timeout(value);
+      config->service_check_timeout(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1650,7 +1650,7 @@ int centreonengine__setHostCheckTimeout(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_host_check_timeout(value);
+      config->host_check_timeout(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1696,7 +1696,7 @@ int centreonengine__setEventHandlerTimeout(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_event_handler_timeout(value);
+      config->event_handler_timeout(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1742,7 +1742,7 @@ int centreonengine__setNotificationTimeout(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_notification_timeout(value);
+      config->notification_timeout(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1788,7 +1788,7 @@ int centreonengine__setOcspTimeout(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_ocsp_timeout(value);
+      config->ocsp_timeout(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1834,7 +1834,7 @@ int centreonengine__setOchpTimeout(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_ochp_timeout(value);
+      config->ochp_timeout(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1880,8 +1880,8 @@ int centreonengine__setRetentionUpdateInterval(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      unsigned int interval(config->get_retention_update_interval() * 60);
-      config->set_retention_update_interval(value);
+      unsigned int interval(config->retention_update_interval() * 60);
+      config->retention_update_interval(value);
       value *= 60;
 
       std::list<timed_event*> lst_events;
@@ -1943,7 +1943,7 @@ int centreonengine__setSleepTime(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_sleep_time(value);
+      config->sleep_time(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -1989,7 +1989,7 @@ int centreonengine__setServiceInterleaveFactor(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << is_smart << ")";
 
-    config->set_service_interleave_factor_method(is_smart ? state::ilf_smart : state::ilf_user);
+    config->service_interleave_factor_method(is_smart ? state::ilf_smart : state::ilf_user);
 
     webservice::sync::instance().worker_finish();
   }
@@ -2023,7 +2023,7 @@ int centreonengine__setMaxConcurrentChecks(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_max_parallel_service_checks(value);
+      config->max_parallel_service_checks(value);
     }
     catch (std::exception const& e) {
       std::string* error = soap_new_std__string(s, 1);
@@ -2069,8 +2069,8 @@ int centreonengine__setCheckResultReaperFrequency(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      unsigned int interval(config->get_check_reaper_interval());
-      config->set_check_reaper_interval(value);
+      unsigned int interval(config->check_reaper_interval());
+      config->check_reaper_interval(value);
 
       std::list<timed_event*> lst_events;
       for (timed_event* event(event_list_high); event != NULL; event = event->next)
@@ -2129,7 +2129,7 @@ int centreonengine__setUseLargeInstallationTweaks(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_use_large_installation_tweaks(value);
+    config->use_large_installation_tweaks(value);
 
     webservice::sync::instance().worker_finish();
   }
@@ -2163,7 +2163,7 @@ int centreonengine__setDebugVerbosity(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_debug_verbosity(value);
+      config->debug_verbosity(value);
       com::centreon::engine::configuration::applier::logging::instance().apply(*config);
     }
     catch (std::exception const& e) {
@@ -2208,7 +2208,7 @@ int centreonengine__setDebugLevel(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->set_debug_level(value);
+    config->debug_level(value);
     com::centreon::engine::configuration::applier::logging::instance().apply(*config);
 
     webservice::sync::instance().worker_finish();
@@ -2243,7 +2243,7 @@ int centreonengine__setMaxDebugFileSize(soap* s,
       << "Webservice: " << __func__ << "(" << value << ")";
 
     try {
-      config->set_max_debug_file_size(value);
+      config->max_debug_file_size(value);
       com::centreon::engine::configuration::applier::logging::instance().apply(*config);
     }
     catch (std::exception const& e) {

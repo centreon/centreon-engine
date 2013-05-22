@@ -147,7 +147,7 @@ void loop::_dispatching() {
     // Else if the time advanced over the specified threshold,
     // try and compensate...
     else if ((current_time - _last_time)
-             >= static_cast<time_t>(config->get_time_change_threshold()))
+             >= static_cast<time_t>(config->time_change_threshold()))
       compensate_for_system_time_change(
         static_cast<unsigned long>(_last_time),
         static_cast<unsigned long>(current_time));
@@ -175,7 +175,7 @@ void loop::_dispatching() {
     logger(dbg_events, more)
       << "Current/Max Service Checks: "
       << currently_running_service_checks << '/'
-      << config->get_max_parallel_service_checks();
+      << config->max_parallel_service_checks();
 
     // Update status information occassionally - NagVis watches the
     // NDOUtils DB to see if Engine is alive.
@@ -223,22 +223,22 @@ void loop::_dispatching() {
 
         // Don't run a service check if we're already maxed out on the
         // number of parallel service checks...
-        if (config->get_max_parallel_service_checks() != 0
+        if (config->max_parallel_service_checks() != 0
             && (currently_running_service_checks
-                >= config->get_max_parallel_service_checks())) {
+                >= config->max_parallel_service_checks())) {
           // Move it at least 5 seconds (to overcome the current peak),
           // with a random 10 seconds (to spread the load).
           nudge_seconds = 5 + (rand() % 10);
           logger(dbg_events | dbg_checks, basic)
             << "**WARNING** Max concurrent service checks ("
-            << config->get_max_parallel_service_checks()
+            << config->max_parallel_service_checks()
             << ") has been reached!  Nudging "
             << temp_service->host_name << ":"
             << temp_service->description << " by "
             << nudge_seconds << " seconds...";
           logger(log_runtime_warning, basic)
             << "\tMax concurrent service checks ("
-            << config->get_max_parallel_service_checks()
+            << config->max_parallel_service_checks()
             << ") has been reached.  Nudging "
             << temp_service->host_name << ":"
             << temp_service->description << " by "
@@ -247,7 +247,7 @@ void loop::_dispatching() {
         }
 
         // Don't run a service check if active checks are disabled.
-        if (!config->get_execute_service_checks()) {
+        if (!config->execute_service_checks()) {
           logger(dbg_events | dbg_checks, more)
             << "We're not executing service checks right now, "
             << "so we'll skip this event.";
@@ -283,12 +283,12 @@ void loop::_dispatching() {
               temp_service->next_check
                 = (time_t)(temp_service->next_check
                            + (temp_service->retry_interval
-                              * config->get_interval_length()));
+                              * config->interval_length()));
             else
               temp_service->next_check
                 = (time_t)(temp_service->next_check
                            + (temp_service->check_interval
-                              * config->get_interval_length()));
+                              * config->interval_length()));
           }
           temp_event->run_time = temp_service->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
@@ -303,7 +303,7 @@ void loop::_dispatching() {
         host* temp_host(static_cast<host*>(event_list_low->event_data));
 
         // Don't run a host check if active checks are disabled.
-        if (!config->get_execute_host_checks()) {
+        if (!config->execute_host_checks()) {
           logger(dbg_events | dbg_checks, more)
             << "We're not executing host checks right now, "
             << "so we'll skip this event.";
@@ -332,12 +332,12 @@ void loop::_dispatching() {
             temp_host->next_check
               = (time_t)(temp_host->next_check
                          + (temp_host->retry_interval
-                            * config->get_interval_length()));
+                            * config->interval_length()));
           else
             temp_host->next_check
               = (time_t)(temp_host->next_check
                          + (temp_host->check_interval
-                            * config->get_interval_length()));
+                            * config->interval_length()));
           temp_event->run_time = temp_host->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
           update_host_status(temp_host, false);
@@ -375,7 +375,7 @@ void loop::_dispatching() {
         logger(dbg_events, most)
           << "Did not execute scheduled event. Idling for a bit...";
         concurrency::thread::nsleep(
-          (unsigned long)(config->get_sleep_time() * 1000000000l));
+          (unsigned long)(config->sleep_time() * 1000000000l));
       }
     }
     // We don't have anything to do at this moment in time...
@@ -389,7 +389,7 @@ void loop::_dispatching() {
 
         // Check for external commands if we're supposed to check as
         // often as possible.
-        if (config->get_command_check_interval() == -1) {
+        if (config->command_check_interval() == -1) {
           // Send data to event broker.
           broker_external_command(
             NEBTYPE_EXTERNALCOMMAND_CHECK,
@@ -404,9 +404,9 @@ void loop::_dispatching() {
 
         // Set time to sleep so we don't hog the CPU...
         timespec sleep_time;
-        sleep_time.tv_sec = (time_t)config->get_sleep_time();
+        sleep_time.tv_sec = (time_t)config->sleep_time();
         sleep_time.tv_nsec
-          = (long)((config->get_sleep_time()
+          = (long)((config->sleep_time()
                     - (double)sleep_time.tv_sec) * 1000000000ull);
 
         // Populate fake "sleep" event.
@@ -423,7 +423,7 @@ void loop::_dispatching() {
 
         // Wait a while so we don't hog the CPU...
         concurrency::thread::nsleep(
-          (unsigned long)(config->get_sleep_time() * 1000000000l));
+          (unsigned long)(config->sleep_time() * 1000000000l));
       }
   }
   return;

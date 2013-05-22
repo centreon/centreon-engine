@@ -57,7 +57,7 @@ void broker_acknowledgement_data(
        int persistent_comment,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_ACKNOWLEDGEMENT_DATA))
+  if (!(config->event_broker_options() & BROKER_ACKNOWLEDGEMENT_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -123,7 +123,7 @@ void broker_adaptive_contact_data(
        unsigned long modsattrs,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
+  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -168,7 +168,7 @@ void broker_adaptive_host_data(
        unsigned long modattrs,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
+  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -211,7 +211,7 @@ void broker_adaptive_program_data(
        unsigned long modsattrs,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
+  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -253,7 +253,7 @@ void broker_adaptive_service_data(
        unsigned long modattrs,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
+  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -286,7 +286,7 @@ void broker_aggregated_status_data(
        int attr,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
+  if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -320,7 +320,7 @@ void broker_command_data(
        char const* cmd_line,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_COMMAND_DATA))
+  if (!(config->event_broker_options() & BROKER_COMMAND_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -374,7 +374,7 @@ void broker_comment_data(
        unsigned long comment_id,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_COMMENT_DATA))
+  if (!(config->event_broker_options() & BROKER_COMMENT_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -434,7 +434,7 @@ int broker_contact_notification_data(
       int escalated,
       struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_NOTIFICATIONS))
+  if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
     return (OK);
 
   // Fill struct with relevant data.
@@ -512,7 +512,7 @@ int broker_contact_notification_method_data(
       int escalated,
       struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_NOTIFICATIONS))
+  if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
     return (OK);
 
   // Get command name/args.
@@ -588,7 +588,7 @@ void broker_contact_status(
        contact* cntct,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
+  if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -623,7 +623,7 @@ void broker_custom_variable(
        char const* varvalue,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_CUSTOMVARIABLE_DATA))
+  if (!(config->event_broker_options() & BROKER_CUSTOMVARIABLE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -683,7 +683,7 @@ void broker_downtime_data(
        unsigned long downtime_id,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_DOWNTIME_DATA))
+  if (!(config->event_broker_options() & BROKER_DOWNTIME_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -753,7 +753,7 @@ int broker_event_handler(
       char* output,
       struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_EVENT_HANDLERS))
+  if (!(config->event_broker_options() & BROKER_EVENT_HANDLERS))
     return (OK);
   if (!data)
     return (ERROR);
@@ -833,7 +833,7 @@ void broker_external_command(
        char* command_args,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_EXTERNALCOMMAND_DATA))
+  if (!(config->event_broker_options() & BROKER_EXTERNALCOMMAND_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -877,7 +877,7 @@ void broker_flapping_data(
        double low_threshold,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_FLAPPING_DATA))
+  if (!(config->event_broker_options() & BROKER_FLAPPING_DATA))
     return;
   if (!data)
     return;
@@ -929,7 +929,7 @@ void broker_group(
        void* data,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_GROUP_DATA))
+  if (!(config->event_broker_options() & BROKER_GROUP_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -964,7 +964,7 @@ void broker_group_member(
        void* group,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_GROUP_MEMBER_DATA))
+  if (!(config->event_broker_options() & BROKER_GROUP_MEMBER_DATA))
     return;
 
   // Fill struct will relevant data.
@@ -1030,7 +1030,7 @@ int broker_host_check(
       char* perfdata,
       struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_HOST_CHECKS))
+  if (!(config->event_broker_options() & BROKER_HOST_CHECKS))
     return (OK);
   if (!hst)
     return (ERROR);
@@ -1097,7 +1097,7 @@ void broker_host_status(
        host* hst,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
+  if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1133,7 +1133,7 @@ void broker_log_data(
        time_t entry_time,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_LOGGED_DATA))
+  if (!(config->event_broker_options() & BROKER_LOGGED_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1169,7 +1169,7 @@ void broker_module_data(
        char const* args,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_MODULE_DATA))
+  if (!(config->event_broker_options() & BROKER_MODULE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1224,7 +1224,7 @@ int broker_notification_data(
       int contacts_notified,
       struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_NOTIFICATIONS))
+  if (!(config->event_broker_options() & BROKER_NOTIFICATIONS))
     return (OK);
 
   // Fill struct with relevant data.
@@ -1277,7 +1277,7 @@ void broker_program_state(
        int attr,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_PROGRAM_STATE))
+  if (!(config->event_broker_options() & BROKER_PROGRAM_STATE))
     return;
 
   // Fill struct with relevant data.
@@ -1306,7 +1306,7 @@ void broker_program_status(
        int attr,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
+  if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1320,27 +1320,27 @@ void broker_program_status(
   ds.daemon_mode=0;
   ds.last_command_check = last_command_check;
   ds.last_log_rotation = last_log_rotation;
-  ds.notifications_enabled = config->get_enable_notifications();
+  ds.notifications_enabled = config->enable_notifications();
   ds.active_service_checks_enabled
-    = config->get_execute_service_checks();
+    = config->execute_service_checks();
   ds.passive_service_checks_enabled
-    = config->get_accept_passive_service_checks();
-  ds.active_host_checks_enabled = config->get_execute_host_checks();
+    = config->accept_passive_service_checks();
+  ds.active_host_checks_enabled = config->execute_host_checks();
   ds.passive_host_checks_enabled
-    = config->get_accept_passive_host_checks();
-  ds.event_handlers_enabled = config->get_enable_event_handlers();
-  ds.flap_detection_enabled = config->get_enable_flap_detection();
+    = config->accept_passive_host_checks();
+  ds.event_handlers_enabled = config->enable_event_handlers();
+  ds.flap_detection_enabled = config->enable_flap_detection();
   ds.failure_prediction_enabled
-    = config->get_enable_failure_prediction();
-  ds.process_performance_data = config->get_process_performance_data();
-  ds.obsess_over_hosts = config->get_obsess_over_hosts();
-  ds.obsess_over_services = config->get_obsess_over_services();
+    = config->enable_failure_prediction();
+  ds.process_performance_data = config->process_performance_data();
+  ds.obsess_over_hosts = config->obsess_over_hosts();
+  ds.obsess_over_services = config->obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
   ds.global_host_event_handler
-    = my_strdup(config->get_global_host_event_handler().c_str());
+    = my_strdup(config->global_host_event_handler().c_str());
   ds.global_service_event_handler
-    = my_strdup(config->get_global_service_event_handler().c_str());
+    = my_strdup(config->global_service_event_handler().c_str());
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, &ds);
@@ -1383,7 +1383,7 @@ void broker_relation_data(
        char const* notification_failure_options,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_RELATION_DATA))
+  if (!(config->event_broker_options() & BROKER_RELATION_DATA))
     return;
   if (!hst || !dep_hst)
     return;
@@ -1422,7 +1422,7 @@ void broker_retention_data(
        int attr,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_RETENTION_DATA))
+  if (!(config->event_broker_options() & BROKER_RETENTION_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1475,7 +1475,7 @@ int broker_service_check(
       char* cmdline,
       struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_SERVICE_CHECKS))
+  if (!(config->event_broker_options() & BROKER_SERVICE_CHECKS))
     return (OK);
   if (!svc)
     return (ERROR);
@@ -1545,7 +1545,7 @@ void broker_service_status(
        service* svc,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
+  if (!(config->event_broker_options() & BROKER_STATUS_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1587,7 +1587,7 @@ void broker_statechange_data(
        int max_attempts,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_STATECHANGE_DATA))
+  if (!(config->event_broker_options() & BROKER_STATECHANGE_DATA))
     return;
 
   // Fill struct with relevant data.
@@ -1652,7 +1652,7 @@ void broker_system_command(
        char* output,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_SYSTEM_COMMANDS))
+  if (!(config->event_broker_options() & BROKER_SYSTEM_COMMANDS))
     return;
   if (!cmd)
     return;
@@ -1693,7 +1693,7 @@ void broker_timed_event(
        timed_event* event,
        struct timeval const* timestamp) {
   // Config check.
-  if (!(config->get_event_broker_options() & BROKER_TIMED_EVENTS))
+  if (!(config->event_broker_options() & BROKER_TIMED_EVENTS))
     return;
   if (!event)
     return;

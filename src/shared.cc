@@ -465,7 +465,7 @@ void get_datetime_string(
 
   /* short date/time */
   else if (type == SHORT_DATE_TIME) {
-    if (config->get_date_format() == DATE_FORMAT_EURO)
+    if (config->date_format() == DATE_FORMAT_EURO)
       snprintf(
         buffer,
         buffer_length,
@@ -476,8 +476,8 @@ void get_datetime_string(
         hour,
         minute,
         second);
-    else if (config->get_date_format() == DATE_FORMAT_ISO8601
-             || config->get_date_format() == DATE_FORMAT_STRICT_ISO8601)
+    else if (config->date_format() == DATE_FORMAT_ISO8601
+             || config->date_format() == DATE_FORMAT_STRICT_ISO8601)
       snprintf(
         buffer,
         buffer_length,
@@ -485,7 +485,7 @@ void get_datetime_string(
         year,
         month,
         day,
-        (config->get_date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
+        (config->date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
         hour,
         minute,
         second);
@@ -504,7 +504,7 @@ void get_datetime_string(
 
   /* short date */
   else if (type == SHORT_DATE) {
-    if (config->get_date_format() == DATE_FORMAT_EURO)
+    if (config->date_format() == DATE_FORMAT_EURO)
       snprintf(
         buffer,
         buffer_length,
@@ -512,8 +512,8 @@ void get_datetime_string(
         day,
         month,
         year);
-    else if (config->get_date_format() == DATE_FORMAT_ISO8601
-             || config->get_date_format() == DATE_FORMAT_STRICT_ISO8601)
+    else if (config->date_format() == DATE_FORMAT_ISO8601
+             || config->date_format() == DATE_FORMAT_STRICT_ISO8601)
       snprintf(
         buffer,
         buffer_length,

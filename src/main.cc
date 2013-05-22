@@ -45,6 +45,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]) {
 
   // Load singletons.
   com::centreon::clib::load();
-  com::centreon::engine::configuration::state::load();
+  // XXX: com::centreon::engine::configuration::state::load();
   com::centreon::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
   com::centreon::engine::commands::set::load();
@@ -249,7 +250,7 @@ int main(int argc, char* argv[]) {
         // Read main config file.
         logger(logging::log_info_message, logging::basic)
           << "reading main config file";
-        config->parse(config_file);
+        // XXX: config->parse(config_file);
 
         // Read object config files.
         if ((result = read_all_object_data(config_file)) == OK)
@@ -291,7 +292,7 @@ int main(int argc, char* argv[]) {
 
       // Read in the configuration files (main config file and all host config files).
       try {
-        config->parse(config_file);
+        // XXX: config->parse(config_file);
         configuration::applier::logging::instance().apply(*config);
         com::centreon::logging::engine::instance().add(
                                                      &backend_broker_log,
@@ -350,7 +351,7 @@ int main(int argc, char* argv[]) {
       // Read in the configuration files (main
       // and resource config files).
       try {
-        config->parse(config_file);
+        // XXX: config->parse(config_file);
         configuration::applier::logging::instance().apply(*config);
         com::centreon::logging::engine::instance().add(
                                                      &backend_broker_log,
@@ -377,7 +378,7 @@ int main(int argc, char* argv[]) {
       try {
         com::centreon::engine::broker::loader& loader(
           com::centreon::engine::broker::loader::instance());
-        std::string const& mod_dir(config->get_broker_module_directory());
+        std::string const& mod_dir(config->broker_module_directory());
         if (!mod_dir.empty())
           loader.load_directory(mod_dir);
       }
@@ -591,7 +592,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::logging::unload();
-  com::centreon::engine::configuration::state::unload();
+  // com::centreon::engine::configuration::state::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 

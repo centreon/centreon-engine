@@ -195,10 +195,10 @@ int pre_flight_check() {
   if (verify_config == TRUE)
     printf("Checking global event handlers...\n");
 
-  if (config->get_global_host_event_handler() != "") {
+  if (config->global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config->get_global_host_event_handler().c_str());
+    buf = my_strdup(config->global_host_event_handler().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -217,10 +217,10 @@ int pre_flight_check() {
     delete[] buf;
   }
 
-  if (config->get_global_service_event_handler() != "") {
+  if (config->global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config->get_global_service_event_handler().c_str());
+    buf = my_strdup(config->global_service_event_handler().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -245,9 +245,9 @@ int pre_flight_check() {
   if (verify_config == TRUE)
     printf("Checking obsessive compulsive processor commands...\n");
 
-  if (!config->get_ocsp_command().empty()) {
+  if (!config->ocsp_command().empty()) {
 
-    buf = my_strdup(config->get_ocsp_command().c_str());
+    buf = my_strdup(config->ocsp_command().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -266,9 +266,9 @@ int pre_flight_check() {
     delete[] buf;
   }
 
-  if (!config->get_ochp_command().empty()) {
+  if (!config->ochp_command().empty()) {
 
-    buf = my_strdup(config->get_ochp_command().c_str());
+    buf = my_strdup(config->ochp_command().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -1394,7 +1394,7 @@ int check_host(host* hst, int* w, int* e) {
   /* make sure each host has at least one service associated with it */
   /* 02/21/08 NOTE: this is extremely inefficient */
   if (use_precached_objects == FALSE
-      && config->get_use_large_installation_tweaks() == false) {
+      && config->use_large_installation_tweaks() == false) {
 
     bool found = false;
     for (service* temp_service = service_list;

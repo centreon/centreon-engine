@@ -60,7 +60,7 @@ namespace                  configuration {
       static bool generic(T& obj, std::string const& value) {
         U val;
         std::istringstream iss(value);
-        if (!(iss >> val))
+        if (!(iss >> val) || !iss.eof())
           return (false);
         return ((obj.*ptr)(val));
       }

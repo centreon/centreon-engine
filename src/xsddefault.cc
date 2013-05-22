@@ -200,7 +200,7 @@ int xsddefault_save_status_data() {
     << "save_status_data()";
 
   // get number of items in the command buffer
-  if (config->get_check_external_commands() == true) {
+  if (config->check_external_commands() == true) {
     pthread_mutex_lock(&external_command_buffer.buffer_lock);
     used_external_command_buffer_slots = external_command_buffer.items;
     high_external_command_buffer_slots = external_command_buffer.high;
@@ -237,27 +237,27 @@ int xsddefault_save_status_data() {
        "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
        "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
        "\tlast_log_rotation=" << static_cast<unsigned long>(last_log_rotation) << "\n"
-       "\tenable_notifications=" << config->get_enable_notifications() << "\n"
-       "\tactive_service_checks_enabled=" << config->get_execute_service_checks() << "\n"
-       "\tpassive_service_checks_enabled=" << config->get_accept_passive_service_checks() << "\n"
-       "\tactive_host_checks_enabled=" << config->get_execute_host_checks() << "\n"
-       "\tpassive_host_checks_enabled=" << config->get_accept_passive_host_checks() << "\n"
-       "\tenable_event_handlers=" << config->get_enable_event_handlers() << "\n"
-       "\tobsess_over_services=" << config->get_obsess_over_services() << "\n"
-       "\tobsess_over_hosts=" << config->get_obsess_over_hosts() << "\n"
-       "\tcheck_service_freshness=" << config->get_check_service_freshness() << "\n"
-       "\tcheck_host_freshness=" << config->get_check_host_freshness() << "\n"
-       "\tenable_flap_detection=" << config->get_enable_flap_detection() << "\n"
-       "\tenable_failure_prediction=" << config->get_enable_failure_prediction() << "\n"
-       "\tprocess_performance_data=" << config->get_process_performance_data() << "\n"
-       "\tglobal_host_event_handler=" << config->get_global_host_event_handler().c_str() << "\n"
-       "\tglobal_service_event_handler=" << config->get_global_service_event_handler().c_str() << "\n"
+       "\tenable_notifications=" << config->enable_notifications() << "\n"
+       "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
+       "\tpassive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
+       "\tactive_host_checks_enabled=" << config->execute_host_checks() << "\n"
+       "\tpassive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
+       "\tenable_event_handlers=" << config->enable_event_handlers() << "\n"
+       "\tobsess_over_services=" << config->obsess_over_services() << "\n"
+       "\tobsess_over_hosts=" << config->obsess_over_hosts() << "\n"
+       "\tcheck_service_freshness=" << config->check_service_freshness() << "\n"
+       "\tcheck_host_freshness=" << config->check_host_freshness() << "\n"
+       "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
+       "\tenable_failure_prediction=" << config->enable_failure_prediction() << "\n"
+       "\tprocess_performance_data=" << config->process_performance_data() << "\n"
+       "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
+       "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_comment_id=" << next_comment_id << "\n"
        "\tnext_downtime_id=" << next_downtime_id << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
        "\tnext_notification_id=" << next_notification_id << "\n"
-       "\ttotal_external_command_buffer_slots=" << config->get_external_command_buffer_slots() << "\n"
+       "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
        "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
        "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
        "\tactive_scheduled_host_check_stats="

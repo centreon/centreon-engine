@@ -2049,7 +2049,7 @@ int contains_illegal_object_chars(char* name) {
 
   std::string tmp(name);
   std::string const& illegal_object_chars
-    = config->get_illegal_object_chars();
+    = config->illegal_object_chars();
 
   if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
     return (false);
@@ -2452,7 +2452,7 @@ void free_notification_list() {
 
 /* reset all system-wide variables, so when we've receive a SIGHUP we can restart cleanly */
 int reset_variables() {
-  config->reset();
+  // XXX: config->reset();
 
   logging_options =
     log_runtime_error | log_runtime_warning |

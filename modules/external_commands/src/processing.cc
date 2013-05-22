@@ -601,11 +601,11 @@ bool processing::execute(char const* cmd) const {
   if (command_id == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_id == CMD_PROCESS_HOST_CHECK_RESULT) {
     // passive checks are logged in checks.c.
-    if (config->get_log_passive_checks())
+    if (config->log_passive_checks())
       logger(log_passive_check, basic)
         << "EXTERNAL COMMAND: " << command_name << ';' << args;
   }
-  else if (config->get_log_external_commands())
+  else if (config->log_external_commands())
     logger(log_external_command, basic)
       << "EXTERNAL COMMAND: " << command_name << ';' << args;
 

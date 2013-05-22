@@ -62,32 +62,32 @@ void applier::logging::unload() {
  */
 void applier::logging::apply(state const& config) {
   // Syslog.
-  if (config.get_use_syslog() == true && !_syslog)
+  if (config.use_syslog() == true && !_syslog)
     _add_syslog();
-  else if (config.get_use_syslog() == false && _syslog)
+  else if (config.use_syslog() == false && _syslog)
     _del_syslog();
 
   // Standard log file.
-  if (config.get_log_file() == "")
+  if (config.log_file() == "")
     _del_log_file();
-  else if (!_log || config.get_log_file() != _log->filename()) {
+  else if (!_log || config.log_file() != _log->filename()) {
     _add_log_file(config);
     _del_stdout();
     _del_stderr();
   }
 
   // Debug file.
-  if ((config.get_debug_file() == "")
-      || !config.get_debug_level()
-      || !config.get_debug_verbosity()) {
+  if ((config.debug_file() == "")
+      || !config.debug_level()
+      || !config.debug_verbosity()) {
     _del_debug();
-    _debug_level = config.get_debug_level();
-    _debug_verbosity = config.get_debug_verbosity();
+    _debug_level = config.debug_level();
+    _debug_verbosity = config.debug_verbosity();
   }
   else if (!_debug
-           || config.get_debug_file() != _debug->filename()
-           || config.get_debug_level() != _debug_level
-           || config.get_debug_verbosity() != _debug_verbosity)
+           || config.debug_file() != _debug->filename()
+           || config.debug_level() != _debug_level
+           || config.debug_verbosity() != _debug_verbosity)
     _add_debug(config);
   return;
 }
@@ -247,7 +247,7 @@ void applier::logging::_add_syslog() {
  */
 void applier::logging::_add_log_file(state const& config) {
   _del_log_file();
-  _log = new com::centreon::logging::file(config.get_log_file());
+  _log = new com::centreon::logging::file(config.log_file());
   com::centreon::logging::engine::instance().add(
                                                _log,
                                                engine::logging::log_all,
@@ -260,11 +260,11 @@ void applier::logging::_add_log_file(state const& config) {
  */
 void applier::logging::_add_debug(state const& config) {
   _del_debug();
-  _debug = new com::centreon::logging::file(config.get_debug_file());
+  _debug = new com::centreon::logging::file(config.debug_file());
   com::centreon::logging::engine::instance().add(
                                                _debug,
-                                               config.get_debug_level(),
-                                               config.get_debug_verbosity());
+                                               config.debug_level(),
+                                               config.debug_verbosity());
   return;
 }
 

@@ -274,9 +274,9 @@ extern "C" {
 
       // if file is too old, remove it.
       if (!strcmp(var, "file_time")
-          && config->get_max_check_result_file_age() > 0) {
+          && config->max_check_result_file_age() > 0) {
         unsigned long diff(current_time - strtoul(val, NULL, 0));
-        if (diff > config->get_max_check_result_file_age()) {
+        if (diff > config->max_check_result_file_age()) {
           free_check_result(new_cr);
           delete new_cr;
           new_cr = NULL;

@@ -334,7 +334,7 @@ static void _update_schedule_info(host const* hst) {
 
   scheduling_info.host_check_interval_total
     += (unsigned long)(hst->check_interval
-                       * config->get_interval_length());
+                       * config->interval_length());
   scheduling_info.average_services_per_host
     = (double)scheduling_info.total_services
     / (double)scheduling_info.total_hosts;
@@ -343,10 +343,10 @@ static void _update_schedule_info(host const* hst) {
     / (double)scheduling_info.total_hosts;
 
   scheduling_info.max_host_check_spread
-    = config->get_max_host_check_spread();
+    = config->max_host_check_spread();
 
   // we determine the host inter-check delay.
-  if (config->get_host_inter_check_delay_method() == configuration::state::icd_smart
+  if (config->host_inter_check_delay_method() == configuration::state::icd_smart
       && scheduling_info.host_check_interval_total > 0) {
 
     scheduling_info.average_host_check_interval

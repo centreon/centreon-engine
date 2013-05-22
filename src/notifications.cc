@@ -398,7 +398,7 @@ int check_service_notification_viability(
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config->get_enable_notifications() == false) {
+  if (config->enable_notifications() == false) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so service notifications will "
       "not be sent out.";
@@ -649,7 +649,7 @@ int check_service_notification_viability(
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(svc->first_notification_delay
-                              * config->get_interval_length()))) {
+                              * config->interval_length()))) {
       logger(dbg_notifications, more)
         << "Not enough time has elapsed since the service changed to a "
         "non-OK state, so we should not notify about this problem yet";
@@ -980,7 +980,7 @@ int notify_contact_of_service(
       << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->get_log_notifications() == true) {
+    if (config->log_notifications() == true) {
       char const* service_state_str("UNKNOWN");
       if ((unsigned int)svc->current_state < sizeof(tab_service_state_str) / sizeof(*tab_service_state_str))
         service_state_str = tab_service_state_str[svc->current_state];
@@ -1014,7 +1014,7 @@ int notify_contact_of_service(
     my_system_r(
       mac,
       processed_command,
-      config->get_notification_timeout(),
+      config->notification_timeout(),
       &early_timeout,
       &exectime,
       NULL,
@@ -1025,7 +1025,7 @@ int notify_contact_of_service(
       logger(log_service_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' service notification command '" << processed_command
-        << "' timed out after " << config->get_notification_timeout()
+        << "' timed out after " << config->notification_timeout()
         << " seconds";
     }
 
@@ -1645,7 +1645,7 @@ int check_host_notification_viability(
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config->get_enable_notifications() == false) {
+  if (config->enable_notifications() == false) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so host notifications will not "
       "be sent out.";
@@ -1857,7 +1857,7 @@ int check_host_notification_viability(
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(hst->first_notification_delay
-                              * config->get_interval_length()))) {
+                              * config->interval_length()))) {
       logger(dbg_notifications, more)
         << "Not enough time has elapsed since the host changed to a "
         "non-UP state (or since program start), so we shouldn't notify "
@@ -2161,7 +2161,7 @@ int notify_contact_of_host(
       << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->get_log_notifications() == true) {
+    if (config->log_notifications() == true) {
       char const* host_state_str("UP");
       if ((unsigned int)hst->current_state < sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
         host_state_str = tab_host_state_str[hst->current_state];
@@ -2194,7 +2194,7 @@ int notify_contact_of_host(
     my_system_r(
       mac,
       processed_command,
-      config->get_notification_timeout(),
+      config->notification_timeout(),
       &early_timeout,
       &exectime,
       NULL,
@@ -2205,7 +2205,7 @@ int notify_contact_of_host(
       logger(log_host_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' host notification command '" << processed_command
-        << "' timed out after " << config->get_notification_timeout()
+        << "' timed out after " << config->notification_timeout()
         << " seconds";
     }
 
@@ -2560,7 +2560,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
     "notification time: " << interval_to_use;
 
   /* calculate next notification time */
-  next_notification = offset + static_cast<time_t>(interval_to_use * config->get_interval_length());
+  next_notification = offset + static_cast<time_t>(interval_to_use * config->interval_length());
   return (next_notification);
 }
 
@@ -2628,7 +2628,7 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
 
   /* calculate next notification time */
   next_notification = static_cast<time_t>(offset
-                                          + (interval_to_use * config->get_interval_length()));
+                                          + (interval_to_use * config->interval_length()));
 
   return (next_notification);
 }

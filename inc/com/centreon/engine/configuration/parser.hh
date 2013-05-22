@@ -23,21 +23,18 @@
 #  include <fstream>
 #  include <string>
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
 namespace             configuration {
-  typedef umap<std::string, std::string> properties;
-
   class               parser {
   public:
                       parser();
                       ~parser() throw ();
-    void              parse(std::string const& path);
-    objects const&    get_objects(std::string const& type) const;
-    properties const& get_globals() const throw ();
+    void              parse(std::string const& path, state& config);
 
   private:
                       parser(parser const& right);
@@ -46,15 +43,17 @@ namespace             configuration {
                         std::ifstream& stream,
                         std::string& line,
                         unsigned int& current_pos);
-    void              _parse_main_configuration(
-                        std::string const& path);
+    void              _parse_global_configuration(
+                        std::string const& path,
+                        state& config);
     void              _parse_object_definitions(
+                        std::string const& path);
+    void              _parse_resource_file(
                         std::string const& path);
     void              _resolve_template();
 
     umap<std::string, objects>
                       _objects[2];
-    properties        _properties;
   };
 }
 

@@ -4502,7 +4502,7 @@ int xodtemplate_duplicate_services() {
           xodtemplate_free_memberlist(&temp_memberlist);
         else {
           /* User is ok with hostgroup -> service mappings with no hosts */
-          if (config->get_allow_empty_hostgroup_assignment() == 1) {
+          if (config->allow_empty_hostgroup_assignment() == 1) {
             continue;
           }
         }
@@ -14508,8 +14508,8 @@ int xodtemplate_expand_contactgroups(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -14650,8 +14650,8 @@ int xodtemplate_expand_contacts(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -14914,8 +14914,8 @@ int xodtemplate_expand_hostgroups(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -15055,8 +15055,8 @@ int xodtemplate_expand_hosts(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -15312,8 +15312,8 @@ int xodtemplate_expand_servicegroups(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -15457,8 +15457,8 @@ int xodtemplate_expand_services(
     return (OK);
 
   /* should we use regular expression matching for the host name? */
-  if (config->get_use_regexp_matches() == true
-      && (config->get_use_true_regexp_matching() == true
+  if (config->use_regexp_matches() == true
+      && (config->use_true_regexp_matching() == true
           || strstr(host_name, "*") || strstr(host_name, "?")
           || strstr(host_name, "+") || strstr(host_name, "\\.")))
     use_regexp_host = TRUE;
@@ -15487,8 +15487,8 @@ int xodtemplate_expand_services(
     strip(temp_ptr);
 
     /* should we use regular expression matching for the service description? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp_service = TRUE;
@@ -15797,8 +15797,8 @@ int xodtemplate_get_hostgroup_names(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -16009,8 +16009,8 @@ int xodtemplate_get_contactgroup_names(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;
@@ -16228,8 +16228,8 @@ int xodtemplate_get_servicegroup_names(
     strip(temp_ptr);
 
     /* should we use regular expression matching? */
-    if (config->get_use_regexp_matches() == true
-        && (config->get_use_true_regexp_matching() == true
+    if (config->use_regexp_matches() == true
+        && (config->use_true_regexp_matching() == true
             || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
             || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
       use_regexp = TRUE;

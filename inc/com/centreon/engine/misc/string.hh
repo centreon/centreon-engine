@@ -35,7 +35,7 @@ namespace misc {
   template<typename T>
   bool                    to(std::string const& str, T& data) {
     std::istringstream iss(str);
-    return (iss >> data);
+    return ((iss >> data) && iss.eof());
   }
   std::string&            trim(std::string& str) throw ();
   std::string&            trim_left(std::string& str) throw ();

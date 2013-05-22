@@ -46,7 +46,7 @@ int open_command_file(void) {
   int result = 0;
 
   /* if we're not checking external commands, don't do anything */
-  if (config->get_check_external_commands() == false)
+  if (config->check_external_commands() == false)
     return (OK);
 
   /* the command file was already created */
@@ -57,15 +57,15 @@ int open_command_file(void) {
   umask(S_IWOTH);
 
   /* use existing FIFO if possible */
-  if (!(stat(config->get_command_file().c_str(), &st) != -1
+  if (!(stat(config->command_file().c_str(), &st) != -1
         && (st.st_mode & S_IFIFO))) {
 
     /* create the external command file as a named pipe (FIFO) */
-    if ((result = mkfifo(config->get_command_file().c_str(),
+    if ((result = mkfifo(config->command_file().c_str(),
                          S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
       logger(log_runtime_error, basic)
         << "Error: Could not create external command file '"
-        << config->get_command_file() << "' as named pipe: (" << errno
+        << config->command_file() << "' as named pipe: (" << errno
         << ") -> " << strerror(errno) << ".  If this file already exists and "
         "you are sure that another copy of Centreon Engine is not running, "
         "you should delete this file.";
@@ -75,7 +75,7 @@ int open_command_file(void) {
 
   /* open the command file for reading (non-blocked) - O_TRUNC flag cannot be used due to errors on some systems */
   /* NOTE: file must be opened read-write for poll() to work */
-  if ((command_file_fd = open(config->get_command_file().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
+  if ((command_file_fd = open(config->command_file().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
     logger(log_runtime_error, basic)
       << "Error: Could not open external command file for reading "
       "via open(): (" << errno << ") -> " << strerror(errno);
@@ -118,7 +118,7 @@ int open_command_file(void) {
     fclose(command_file_fp);
 
     /* delete the named pipe */
-    unlink(config->get_command_file().c_str());
+    unlink(config->command_file().c_str());
 
     return (ERROR);
   }
@@ -132,7 +132,7 @@ int open_command_file(void) {
 /* closes the external command file FIFO and deletes it */
 int close_command_file(void) {
   /* if we're not checking external commands, don't do anything */
-  if (config->get_check_external_commands() == false)
+  if (config->check_external_commands() == false)
     return (OK);
 
   /* the command file wasn't created or was already cleaned up */
@@ -159,7 +159,7 @@ int init_command_file_worker_thread(void) {
   external_command_buffer.items = 0;
   external_command_buffer.high = 0;
   external_command_buffer.overflow = 0L;
-  external_command_buffer.buffer = new void*[config->get_external_command_buffer_slots()];
+  external_command_buffer.buffer = new void*[config->external_command_buffer_slots()];
   if (external_command_buffer.buffer == NULL)
     return (ERROR);
 
@@ -224,7 +224,7 @@ void cleanup_command_file_worker_thread(void* arg) {
   /* release memory allocated to circular buffer */
   for (x = external_command_buffer.tail;
        x != external_command_buffer.head;
-       x = (x + 1) % config->get_external_command_buffer_slots()) {
+       x = (x + 1) % config->external_command_buffer_slots()) {
     delete[] ((char**)external_command_buffer.buffer)[x];
     ((char**)external_command_buffer.buffer)[x] = NULL;
   }
@@ -320,7 +320,7 @@ void* command_file_worker_thread(void* arg) {
     }
 
     /* process all commands in the file (named pipe) if there's some space in the buffer */
-    if (buffer_items < config->get_external_command_buffer_slots()) {
+    if (buffer_items < config->external_command_buffer_slots()) {
 
       /* clear EOF condition from prior run (FreeBSD fix) */
       /* FIXME: use_poll_on_cmd_pipe: Still needed? */
@@ -330,7 +330,7 @@ void* command_file_worker_thread(void* arg) {
       while (fgets(input_buffer, (int)(sizeof(input_buffer) - 1), command_file_fp) != NULL) {
         /* submit the external command for processing (retry if buffer is full) */
         while ((result = submit_external_command(input_buffer, &buffer_items)) == ERROR
-               && buffer_items == config->get_external_command_buffer_slots()) {
+               && buffer_items == config->external_command_buffer_slots()) {
 
           /* wait a bit */
           tv.tv_sec = 0;
@@ -342,7 +342,7 @@ void* command_file_worker_thread(void* arg) {
         }
 
         /* bail if the circular buffer is full */
-        if (buffer_items == config->get_external_command_buffer_slots())
+        if (buffer_items == config->external_command_buffer_slots())
           break;
 
         /* should we shutdown? */
@@ -370,14 +370,14 @@ int submit_external_command(char const* cmd, int* buffer_items) {
   /* obtain a lock for writing to the buffer */
   pthread_mutex_lock(&external_command_buffer.buffer_lock);
 
-  if (external_command_buffer.items < config->get_external_command_buffer_slots()) {
+  if (external_command_buffer.items < config->external_command_buffer_slots()) {
 
     /* save the line in the buffer */
     ((char**)external_command_buffer.buffer)[external_command_buffer.head] = my_strdup(cmd);
 
     /* increment the head counter and items */
     external_command_buffer.head = (external_command_buffer.head + 1)
-      % config->get_external_command_buffer_slots();
+      % config->external_command_buffer_slots();
     external_command_buffer.items++;
     if (external_command_buffer.items > external_command_buffer.high)
       external_command_buffer.high = external_command_buffer.items;

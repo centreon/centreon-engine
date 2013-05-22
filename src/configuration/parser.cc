@@ -40,35 +40,46 @@ parser::~parser() throw () {
 /**
  *  Parse configuration file.
  *
- *  @param[in]  path The configuration file path.
+ *  @param[in] path   The configuration file path.
+ *  @param[in] config The state configuration to fill.
  */
-void parser::parse(std::string const& path) {
-  _parse_main_configuration(path);
-}
+void parser::parse(std::string const& path, state& config) {
+  // parse the global configuration file.
+  _parse_global_configuration(path, config);
 
-/**
- *  Get object by type name.
- *
- *  @param[in] type The type name (service, host, command...).
- *
- *  @return Map object with properties or throw exception.
- */
-objects const& parser::get_objects(std::string const& type) const {
-  umap<std::string, objects>::const_iterator
-    it(_objects[1].find(type));
-  if (it != _objects[1].end())
-    throw (engine_error() << "configuration: get objects failed: "
-           "unknown type '" << type << "'");
-  return (it->second);
-}
+  // parse all configuration file define into the global configuration.
+  std::list<std::string> const& cfg_file(config.cfg_file());
+  for (std::list<std::string>::const_iterator
+         it(cfg_file.begin()), end(cfg_file.end());
+       it != end;
+       ++it)
+    _parse_object_definitions(*it);
 
-/**
- *  Get global properties.
- *
- *  @return Global properties.
- */
-properties const& parser::get_globals() const throw () {
-  return (_properties);
+  // parse all configuration directory define into the
+  // global configuration.
+  std::list<std::string> const& cfg_dir(config.cfg_dir());
+  for (std::list<std::string>::const_iterator
+         it(cfg_dir.begin()), end(cfg_dir.end());
+       it != end;
+       ++it)
+    ; // XXX: _parse_object_definitions(*it);
+
+  // parse all resource file define into the global configuration.
+  std::list<std::string> const& cfg_resource(config.resource_file());
+  for (std::list<std::string>::const_iterator
+         it(cfg_resource.begin()), end(cfg_resource.end());
+       it != end;
+       ++it)
+    _parse_resource_file(*it);
+
+  // Apply template.
+  _resolve_template();
+
+  // cleanup.
+  for (unsigned int i(0);
+       i < sizeof(_objects) / sizeof(_objects[0]);
+       ++i)
+    _objects[i].clear();
 }
 
 /**
@@ -97,23 +108,36 @@ bool parser::_get_next_line(
 }
 
 /**
- *  Parse the main configuration file.
+ *  Parse the global configuration file.
  *
- *  @param[in] path The configuration path.
+ *  @param[in] path   The configuration path.
+ *  @param[in] config The state configuration to fill.
  */
-void parser::_parse_main_configuration(std::string const& path) {
+void parser::_parse_global_configuration(
+       std::string const& path,
+       state& config) {
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
-    throw (engine_error() << "configuration: parse main "
+    throw (engine_error() << "configuration: parse global "
            "configuration failed: can't open file '" << path << "'");
 
   unsigned int current_line(0);
   std::string input;
   while (_get_next_line(stream, input, current_line)) {
-    _parse_object_definitions(input);
+    std::size_t pos(input.find_first_of("=", 0));
+    if (pos == std::string::npos)
+      throw (engine_error() << "configuration: parse global "
+             "configuration failed: invalid line "
+             "'" << input << "' in file '" << path << "' "
+             "on line " << current_line);
+    std::string key(input.substr(0, pos));
+    std::string value(input.substr(pos + 1));
+    if (!config.set(misc::trim(key), misc::trim(value)))
+      throw (engine_error() << "configuration: parse global "
+             "configuration failed: invalid line "
+             "'" << input << "' in file '" << path << "' "
+             "on line " << current_line);
   }
-
-  _resolve_template();
 }
 
 /**
@@ -173,6 +197,15 @@ void parser::_parse_object_definitions(std::string const& path) {
       obj.clear();
     }
   }
+}
+
+/**
+ *  Parse the resource file.
+ *
+ *  @param[in] path The resource file path.
+ */
+void parser::_parse_resource_file(std::string const& path) {
+  // XXX:
 }
 
 /**

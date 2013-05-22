@@ -70,9 +70,9 @@ void check_for_service_flapping(
 
   /* what threshold values should we use (global or service-specific)? */
   low_threshold = (svc->low_flap_threshold <= 0.0)
-    ? config->get_low_service_flap_threshold() : svc->low_flap_threshold;
+    ? config->low_service_flap_threshold() : svc->low_flap_threshold;
   high_threshold = (svc->high_flap_threshold <= 0.0)
-    ? config->get_high_service_flap_threshold() : svc->high_flap_threshold;
+    ? config->high_service_flap_threshold() : svc->high_flap_threshold;
 
   update_history = update;
 
@@ -141,7 +141,7 @@ void check_for_service_flapping(
     << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide basis */
-  if (config->get_enable_flap_detection() == false)
+  if (config->enable_flap_detection() == false)
     return;
 
   /* don't do anything if we don't have flap detection enabled for this service */
@@ -220,11 +220,11 @@ void check_for_host_flapping(
   if (hst->total_services == 0)
     wait_threshold
       = static_cast<unsigned long>(hst->notification_interval
-                                   * config->get_interval_length());
+                                   * config->interval_length());
   else
     wait_threshold
       = static_cast<unsigned long>((hst->total_service_check_interval
-                                    * config->get_interval_length())
+                                    * config->interval_length())
                                    / hst->total_services);
 
   update_history = update;
@@ -250,9 +250,9 @@ void check_for_host_flapping(
 
   /* what thresholds should we use (global or host-specific)? */
   low_threshold = (hst->low_flap_threshold <= 0.0)
-    ? config->get_low_host_flap_threshold() : hst->low_flap_threshold;
+    ? config->low_host_flap_threshold() : hst->low_flap_threshold;
   high_threshold = (hst->high_flap_threshold <= 0.0)
-    ? config->get_high_host_flap_threshold() : hst->high_flap_threshold;
+    ? config->high_host_flap_threshold() : hst->high_flap_threshold;
 
   /* record current host state */
   if (update_history == TRUE) {
@@ -308,7 +308,7 @@ void check_for_host_flapping(
     << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide basis */
-  if (config->get_enable_flap_detection() == false)
+  if (config->enable_flap_detection() == false)
     return;
 
   /* don't do anything if we don't have flap detection enabled for this host */
@@ -666,7 +666,7 @@ void enable_flap_detection_routines() {
     << "enable_flap_detection_routines()";
 
   /* bail out if we're already set */
-  if (config->get_enable_flap_detection() == true)
+  if (config->enable_flap_detection() == true)
     return;
 
   /* set the attribute modified flag */
@@ -674,7 +674,7 @@ void enable_flap_detection_routines() {
   modified_service_process_attributes |= attr;
 
   /* set flap detection flag */
-  config->set_enable_flap_detection(true);
+  config->enable_flap_detection(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -712,7 +712,7 @@ void disable_flap_detection_routines() {
     << "disable_flap_detection_routines()";
 
   /* bail out if we're already set */
-  if (config->get_enable_flap_detection() == false)
+  if (config->enable_flap_detection() == false)
     return;
 
   /* set the attribute modified flag */
@@ -720,7 +720,7 @@ void disable_flap_detection_routines() {
   modified_service_process_attributes |= attr;
 
   /* set flap detection flag */
-  config->set_enable_flap_detection(false);
+  config->enable_flap_detection(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
