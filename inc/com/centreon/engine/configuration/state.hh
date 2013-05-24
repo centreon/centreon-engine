@@ -23,6 +23,8 @@
 #  include <list>
 #  include <sstream>
 #  include <string>
+#  include <vector>
+#  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -274,6 +276,11 @@ namespace              configuration {
     void               time_change_threshold(unsigned int value);
     bool               translate_passive_host_checks() const throw ();
     void               translate_passive_host_checks(bool value);
+    std::vector<std::string> const&
+                       user() const throw ();
+    void               user(std::vector<std::string> const& value);
+    void               user(std::string const& key, std::string const& value);
+    void               user(unsigned int key, std::string const& value);
     bool               use_aggressive_host_checking() const throw ();
     void               use_aggressive_host_checking(bool value);
     bool               use_check_result_path() const throw ();
@@ -339,7 +346,8 @@ namespace              configuration {
           (obj.*ptr)(val);
         }
         catch (std::exception const& e) {
-          // XXX: logger!
+          logger(logging::log_config_error, logging::basic)
+            << e.what();
           return (false);
         }
         return (true);
@@ -353,7 +361,8 @@ namespace              configuration {
           (obj.*ptr)(value);
         }
         catch (std::exception const& e) {
-          // XXX: logger!
+          logger(logging::log_config_error, logging::basic)
+            << e.what();
           return (false);
         }
         return (true);
@@ -463,6 +472,8 @@ namespace              configuration {
     unsigned int       _status_update_interval;
     unsigned int       _time_change_threshold;
     bool               _translate_passive_host_checks;
+    std::vector<std::string>
+                       _users;
     bool               _use_aggressive_host_checking;
     bool               _use_check_result_path;
     bool               _use_large_installation_tweaks;

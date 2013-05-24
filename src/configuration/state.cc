@@ -23,7 +23,6 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/string.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -385,8 +384,8 @@ state::state()
     _use_syslog(default_use_syslog),
     _use_timezone(default_use_timezone),
     _use_true_regexp_matching(default_use_true_regexp_matching) {
-
-    }
+  _users.reserve(10);
+}
 
 /**
  *  Copy constructor.
@@ -2480,7 +2479,8 @@ bool state::set(std::string const& key, std::string const& value) {
         return ((gl_setters[i].func)(*this, value));
   }
   catch (std::exception const& e) {
-    // XXX: log exception !
+    logger(log_config_error, basic)
+      << e.what();
     return (false);
   }
   return (true);
@@ -2523,6 +2523,63 @@ bool state::translate_passive_host_checks() const throw () {
  */
 void state::translate_passive_host_checks(bool value) {
   _translate_passive_host_checks = value;
+}
+
+/**
+ *  Get user resources.
+ *
+ *  @return The users resources list.
+ */
+std::vector<std::string> const& state::user() const throw () {
+  return (_users);
+}
+
+/**
+ *  Set the user resources.
+ *
+ *  @param[in] value The new users list.
+ */
+void state::user(std::vector<std::string> const& value) {
+  _users = value;
+}
+
+/**
+ *  Set the user resources.
+ *
+ *  @param[in] key   The user key.
+ *  @param[in] value The user value.
+ */
+void state::user(std::string const& key, std::string const& value) {
+  std::size_t pos(key.find("$USER"));
+  if (pos != 0)
+    throw (engine_error()
+           << "configuration: invalid user key '" << key << "'");
+  std::string tmp(key.substr(5));
+
+  pos = tmp.size();
+  if (!pos || tmp[pos - 1] != '$')
+    throw (engine_error()
+           << "configuration: invalid user key '" << key << "'");
+  tmp.erase(pos - 1);
+
+  unsigned int idx;
+  if (!misc::to(tmp, idx) || idx >= MAX_USER_MACROS)
+    throw (engine_error()
+           << "configuration: invalid user key '" << key << "'");
+
+  user(idx, value);
+}
+
+/**
+ *  Set the user resources.
+ *
+ *  @param[in] key   The user key.
+ *  @param[in] value The user value.
+ */
+void state::user(unsigned int key, std::string const& value) {
+  if (key > _users.capacity())
+    _users.reserve(key + 1);
+  _users[key] = value;
 }
 
 /**

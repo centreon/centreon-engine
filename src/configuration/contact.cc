@@ -133,7 +133,7 @@ bool contact::operator==(contact const& right) const throw () {
           && _can_submit_commands == right._can_submit_commands
           && _contactgroups == right._contactgroups
           && _contact_name == right._contact_name
-          // XXX: && _customvariables == right._customvariables
+          && std::operator==(_customvariables, right._customvariables)
           && _email == right._email
           && _host_notifications_enabled == right._host_notifications_enabled
           && _host_notification_commands == right._host_notification_commands
@@ -170,23 +170,23 @@ void contact::merge(object const& obj) {
   contact const& tmpl(static_cast<contact const&>(obj));
 
   MRG_ADDRESS(_address);
-  MRG_STRING(_alias);
-  MRG_DEFAULT(_can_submit_commands);
+  MRG_DEFAULT(_alias);
+  MRG_OPTION(_can_submit_commands);
   MRG_INHERIT(_contactgroups);
-  MRG_STRING(_contact_name);
+  MRG_DEFAULT(_contact_name);
   MRG_MAP(_customvariables);
-  MRG_STRING(_email);
-  MRG_DEFAULT(_host_notifications_enabled);
+  MRG_DEFAULT(_email);
+  MRG_OPTION(_host_notifications_enabled);
   MRG_INHERIT(_host_notification_commands);
-  MRG_DEFAULT(_host_notification_options);
-  MRG_STRING(_host_notification_period);
-  MRG_DEFAULT(_retain_nonstatus_information);
-  MRG_DEFAULT(_retain_status_information);
-  MRG_STRING(_pager);
+  MRG_OPTION(_host_notification_options);
+  MRG_DEFAULT(_host_notification_period);
+  MRG_OPTION(_retain_nonstatus_information);
+  MRG_OPTION(_retain_status_information);
+  MRG_DEFAULT(_pager);
   MRG_INHERIT(_service_notification_commands);
-  MRG_DEFAULT(_service_notification_options);
-  MRG_STRING(_service_notification_period);
-  MRG_DEFAULT(_service_notifications_enabled);
+  MRG_OPTION(_service_notification_options);
+  MRG_DEFAULT(_service_notification_period);
+  MRG_OPTION(_service_notifications_enabled);
 }
 
 /**
@@ -218,41 +218,97 @@ bool contact::_set_address(
   return (true);
 }
 
+/**
+ *  Set alias value.
+ *
+ *  @param[in] value The new alias value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
 
+/**
+ *  Set can_submit_commands value.
+ *
+ *  @param[in] value The new can_submit_commands value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_can_submit_commands(bool value) {
   _can_submit_commands = value;
   return (true);
 }
 
+/**
+ *  Set contactgroups value.
+ *
+ *  @param[in] value The new contactgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set contact_name value.
+ *
+ *  @param[in] value The new contact_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_contact_name(std::string const& value) {
   _contact_name = value;
   return (true);
 }
 
+/**
+ *  Set email value.
+ *
+ *  @param[in] value The new email value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_email(std::string const& value) {
   _email = value;
   return (true);
 }
 
+/**
+ *  Set host_notifications_enabled value.
+ *
+ *  @param[in] value The new host_notifications_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_host_notifications_enabled(bool value) {
   _host_notifications_enabled = value;
   return (true);
 }
 
+/**
+ *  Set host_notification_commands value.
+ *
+ *  @param[in] value The new host_notification_commands value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_host_notification_commands(std::string const& value) {
   _host_notification_commands.set(value);
   return (true);
 }
 
+/**
+ *  Set host_notification_options value.
+ *
+ *  @param[in] value The new host_notification_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_host_notification_options(std::string const& value) {
   unsigned short options(host::none);
   std::list<std::string> values;
@@ -287,31 +343,73 @@ bool contact::_set_host_notification_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set host_notification_period value.
+ *
+ *  @param[in] value The new host_notification_period value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_host_notification_period(std::string const& value) {
   _host_notification_period = value;
   return (true);
 }
 
+/**
+ *  Set retain_nonstatus_information value.
+ *
+ *  @param[in] value The new retain_nonstatus_information value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
   return (true);
 }
 
+/**
+ *  Set retain_status_information value.
+ *
+ *  @param[in] value The new retain_status_information value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_retain_status_information(bool value) {
   _retain_status_information = value;
   return (true);
 }
 
+/**
+ *  Set pager value.
+ *
+ *  @param[in] value The new pager value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_pager(std::string const& value) {
   _pager = value;
   return (true);
 }
 
+/**
+ *  Set service_notification_commands value.
+ *
+ *  @param[in] value The new service_notification_commands value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_service_notification_commands(std::string const& value) {
   _service_notification_commands.set(value);
   return (true);
 }
 
+/**
+ *  Set service_notification_options value.
+ *
+ *  @param[in] value The new service_notification_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_service_notification_options(std::string const& value) {
   unsigned short options(service::none);
   std::list<std::string> values;
@@ -349,11 +447,25 @@ bool contact::_set_service_notification_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set service_notification_period value.
+ *
+ *  @param[in] value The new service_notification_period value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_service_notification_period(std::string const& value) {
   _service_notification_period = value;
   return (true);
 }
 
+/**
+ *  Set service_notifications_enabled value.
+ *
+ *  @param[in] value The new service_notifications_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contact::_set_service_notifications_enabled(bool value) {
   _service_notifications_enabled = value;
   return (true);

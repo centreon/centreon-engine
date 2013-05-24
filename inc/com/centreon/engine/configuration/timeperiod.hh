@@ -20,6 +20,10 @@
 #ifndef CCE_CONFIGURATION_TIMEPERIOD_HH
 #  define CCE_CONFIGURATION_TIMEPERIOD_HH
 
+#  include <list>
+#  include <string>
+#  include <vector>
+#  include "com/centreon/engine/configuration/daterange.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -50,13 +54,28 @@ namespace                  configuration {
     bool                   parse(std::string const& line);
 
   private:
+    bool                   _add_calendar_date(std::string const& line);
+    bool                   _add_other_date(std::string const& line);
+    bool                   _add_week_day(
+                             std::string const& key,
+                             std::string const& value);
+    static bool            _get_month_id(
+                             std::string const& name,
+                             unsigned int& id);
+    static bool            _get_day_id(
+                             std::string const& name,
+                             unsigned int& id);
     bool                   _set_alias(std::string const& value);
     bool                   _set_exclude(std::string const& value);
     bool                   _set_timeperiod_name(std::string const& value);
 
     std::string            _alias;
+    std::vector<std::list<daterange> >
+                           _exceptions;
     std::list<std::string> _exclude;
     std::string            _timeperiod_name;
+    std::vector<std::list<std::string> >
+                           _timeranges;
   };
 }
 

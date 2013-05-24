@@ -20,13 +20,16 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/io/directory_entry.hh"
 
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::io;
 
 /**
  *  Default constructor.
  */
-parser::parser() {
+parser::parser()
+  : _config(NULL) {
 
 }
 
@@ -44,33 +47,17 @@ parser::~parser() throw () {
  *  @param[in] config The state configuration to fill.
  */
 void parser::parse(std::string const& path, state& config) {
+  _config = &config;
+
   // parse the global configuration file.
-  _parse_global_configuration(path, config);
+  _parse_global_configuration(path);
 
-  // parse all configuration file define into the global configuration.
-  std::list<std::string> const& cfg_file(config.cfg_file());
-  for (std::list<std::string>::const_iterator
-         it(cfg_file.begin()), end(cfg_file.end());
-       it != end;
-       ++it)
-    _parse_object_definitions(*it);
-
-  // parse all configuration directory define into the
-  // global configuration.
-  std::list<std::string> const& cfg_dir(config.cfg_dir());
-  for (std::list<std::string>::const_iterator
-         it(cfg_dir.begin()), end(cfg_dir.end());
-       it != end;
-       ++it)
-    ; // XXX: _parse_object_definitions(*it);
-
-  // parse all resource file define into the global configuration.
-  std::list<std::string> const& cfg_resource(config.resource_file());
-  for (std::list<std::string>::const_iterator
-         it(cfg_resource.begin()), end(cfg_resource.end());
-       it != end;
-       ++it)
-    _parse_resource_file(*it);
+  // parse configuration files.
+  _apply(config.cfg_file(), &parser::_parse_object_definitions);
+  // parse resource files.
+  _apply(config.resource_file(), &parser::_parse_resource_file);
+  // parse configuration directories.
+  _apply(config.cfg_dir(), &parser::_parse_directory_configuration);
 
   // Apply template.
   _resolve_template();
@@ -80,6 +67,47 @@ void parser::parse(std::string const& path, state& config) {
        i < sizeof(_objects) / sizeof(_objects[0]);
        ++i)
     _objects[i].clear();
+}
+
+/**
+ *  Apply parse method into list.
+ *
+ *  @param[in] lst   The list to apply action.
+ *  @param[in] pfunc The method to apply.
+ */
+void parser::_apply(
+       std::list<std::string> const& lst,
+       void (parser::*pfunc)(std::string const&)) {
+  for (std::list<std::string>::const_iterator
+         it(lst.begin()), end(lst.end());
+       it != end;
+       ++it)
+    (this->*pfunc)(*it);
+}
+
+/**
+ *  Get key and value from line.
+ *
+ *  @param[in]  line  The line to extract data.
+ *  @param[out] key   The key to fill.
+ *  @param[out] value The value to fill.
+ *  @param[in]  delim The delimiter.
+ */
+bool parser::_get_data(
+       std::string const& line,
+       std::string& key,
+       std::string& value,
+       char const* delim) {
+  std::size_t pos(line.find_first_of(delim, 0));
+  if (pos == std::string::npos)
+    return (false);
+
+  key = line.substr(0, pos);
+  misc::trim(key);
+
+  value = line.substr(pos + 1);
+  misc::trim(value);
+  return (true);
 }
 
 /**
@@ -108,14 +136,26 @@ bool parser::_get_next_line(
 }
 
 /**
+ *  Parse the directory configuration.
+ *
+ *  @param[in] path The directory path.
+ */
+void parser::_parse_directory_configuration(std::string const& path) {
+  directory_entry dir(path);
+  std::list<file_entry> const& lst(dir.entry_list("*.cfg"));
+  for (std::list<file_entry>::const_iterator
+         it(lst.begin()), end(lst.end());
+       it != end;
+       ++it)
+    _parse_object_definitions(it->path());
+}
+
+/**
  *  Parse the global configuration file.
  *
- *  @param[in] path   The configuration path.
- *  @param[in] config The state configuration to fill.
+ *  @param[in] path The configuration path.
  */
-void parser::_parse_global_configuration(
-       std::string const& path,
-       state& config) {
+void parser::_parse_global_configuration(std::string const& path) {
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
     throw (engine_error() << "configuration: parse global "
@@ -124,15 +164,9 @@ void parser::_parse_global_configuration(
   unsigned int current_line(0);
   std::string input;
   while (_get_next_line(stream, input, current_line)) {
-    std::size_t pos(input.find_first_of("=", 0));
-    if (pos == std::string::npos)
-      throw (engine_error() << "configuration: parse global "
-             "configuration failed: invalid line "
-             "'" << input << "' in file '" << path << "' "
-             "on line " << current_line);
-    std::string key(input.substr(0, pos));
-    std::string value(input.substr(pos + 1));
-    if (!config.set(misc::trim(key), misc::trim(value)))
+    std::string key;
+    std::string value;
+    if (!_get_data(input, key, value, "=") || !_config->set(key, value))
       throw (engine_error() << "configuration: parse global "
              "configuration failed: invalid line "
              "'" << input << "' in file '" << path << "' "
@@ -205,7 +239,29 @@ void parser::_parse_object_definitions(std::string const& path) {
  *  @param[in] path The resource file path.
  */
 void parser::_parse_resource_file(std::string const& path) {
-  // XXX:
+  std::ifstream stream(path.c_str());
+  if (!stream.is_open())
+    throw (engine_error() << "configuration: parse resources "
+           "configuration failed: can't open file '" << path << "'");
+
+  unsigned int current_line(0);
+  std::string input;
+  while (_get_next_line(stream, input, current_line)) {
+    try {
+      std::string key;
+      std::string value;
+      if (!_get_data(input, key, value, "="))
+        throw (engine_error());
+      _config->user(key, value);
+    }
+    catch (std::exception const& e) {
+      (void)e;
+      throw (engine_error() << "configuration: parse resources "
+             "configuration failed: invalid line "
+             "'" << input << "' in file '" << path << "' "
+             "on line " << current_line);
+    }
+  }
 }
 
 /**

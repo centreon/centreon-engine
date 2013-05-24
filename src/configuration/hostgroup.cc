@@ -123,13 +123,13 @@ void hostgroup::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
 
-  MRG_STRING(_action_url);
-  MRG_STRING(_alias);
+  MRG_DEFAULT(_action_url);
+  MRG_DEFAULT(_alias);
   MRG_INHERIT(_hostgroup_members);
-  MRG_STRING(_hostgroup_name);
+  MRG_DEFAULT(_hostgroup_name);
   MRG_INHERIT(_members);
-  MRG_STRING(_notes);
-  MRG_STRING(_notes_url);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
 }
 
 /**
@@ -151,36 +151,85 @@ bool hostgroup::parse(
   return (false);
 }
 
+/**
+ *  Set action_url value.
+ *
+ *  @param[in] value The new action_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
 
+/**
+ *  Set alias value.
+ *
+ *  @param[in] value The new alias value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
 
+/**
+ *  Set hostgroup_members value.
+ *
+ *  @param[in] value The new hostgroup_members value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_hostgroup_members(std::string const& value) {
   _hostgroup_members.set(value);
   return (true);
 }
 
+/**
+ *  Set hostgroup_name value.
+ *
+ *  @param[in] value The new hostgroup_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_hostgroup_name(std::string const& value) {
   _hostgroup_name = value;
   return (true);
 }
 
+/**
+ *  Set members value.
+ *
+ *  @param[in] value The new members value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_members(std::string const& value) {
   _members.set(value);
   return (true);
 }
 
+/**
+ *  Set notes value.
+ *
+ *  @param[in] value The new notes value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
 
+/**
+ *  Set notes_url value.
+ *
+ *  @param[in] value The new notes_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostgroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);

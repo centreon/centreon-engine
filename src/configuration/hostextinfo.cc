@@ -145,18 +145,18 @@ void hostextinfo::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   hostextinfo const& tmpl(static_cast<hostextinfo const&>(obj));
 
-  MRG_DEFAULT(_2d_coords);
-  MRG_DEFAULT(_3d_coords);
-  MRG_STRING(_action_url);
-  MRG_STRING(_gd2_image);
+  MRG_OPTION(_2d_coords);
+  MRG_OPTION(_3d_coords);
+  MRG_DEFAULT(_action_url);
+  MRG_DEFAULT(_gd2_image);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
-  MRG_STRING(_icon_image);
-  MRG_STRING(_icon_image_alt);
-  MRG_STRING(_notes);
-  MRG_STRING(_notes_url);
-  MRG_STRING(_statusmap_image);
-  MRG_STRING(_vrml_image);
+  MRG_DEFAULT(_icon_image);
+  MRG_DEFAULT(_icon_image_alt);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
+  MRG_DEFAULT(_statusmap_image);
+  MRG_DEFAULT(_vrml_image);
 }
 
 /**
@@ -178,6 +178,13 @@ bool hostextinfo::parse(
   return (false);
 }
 
+/**
+ *  Set 2d_coords value.
+ *
+ *  @param[in] value The new 2d_coords value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_2d_coords(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
@@ -197,6 +204,13 @@ bool hostextinfo::_set_2d_coords(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set 3d_coords value.
+ *
+ *  @param[in] value The new 3d_coords value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_3d_coords(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
@@ -221,51 +235,121 @@ bool hostextinfo::_set_3d_coords(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set action_url value.
+ *
+ *  @param[in] value The new action_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
 
+/**
+ *  Set gd2_image value.
+ *
+ *  @param[in] value The new gd2_image value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_gd2_image(std::string const& value) {
   _gd2_image = value;
   return (true);
 }
 
+/**
+ *  Set hostgroups value.
+ *
+ *  @param[in] value The new hostgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set hosts value.
+ *
+ *  @param[in] value The new hosts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
   return (true);
 }
 
+/**
+ *  Set icon_image value.
+ *
+ *  @param[in] value The new icon_image value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
 
+/**
+ *  Set icon_image_alt value.
+ *
+ *  @param[in] value The new icon_image_alt value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
 
+/**
+ *  Set notes value.
+ *
+ *  @param[in] value The new notes value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
 
+/**
+ *  Set notes_url value.
+ *
+ *  @param[in] value The new notes_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
 
+/**
+ *  Set statusmap_image value.
+ *
+ *  @param[in] value The new statusmap_image value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_statusmap_image(std::string const& value) {
   _statusmap_image = value;
   return (true);
 }
 
+/**
+ *  Set vrml_image value.
+ *
+ *  @param[in] value The new vrml_image value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostextinfo::_set_vrml_image(std::string const& value) {
   _vrml_image = value;
   return (true);

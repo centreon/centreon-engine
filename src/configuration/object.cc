@@ -251,16 +251,37 @@ std::string const& object::type() const throw () {
   return (_type);
 }
 
+/**
+ *  Set is template value.
+ *
+ *  @param[in] value The new is template value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool object::_set_is_template(bool value) {
   _is_template = value;
   return (true);
 }
 
+/**
+ *  Set name value.
+ *
+ *  @param[in] value The new name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool object::_set_name(std::string const& value) {
   _name = value;
   return (true);
 }
 
+/**
+ *  Set templates value.
+ *
+ *  @param[in] value The new templates value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool object::_set_templates(std::string const& value) {
   _templates.clear();
   misc::split(value, _templates, ',');

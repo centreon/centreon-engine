@@ -114,9 +114,9 @@ void contactgroup::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   contactgroup const& tmpl(static_cast<contactgroup const&>(obj));
 
-  MRG_STRING(_alias);
+  MRG_DEFAULT(_alias);
   MRG_INHERIT(_contactgroup_members);
-  MRG_STRING(_contactgroup_name);
+  MRG_DEFAULT(_contactgroup_name);
   MRG_INHERIT(_members);
 }
 
@@ -139,21 +139,49 @@ bool contactgroup::parse(
   return (false);
 }
 
+/**
+ *  Set alias value.
+ *
+ *  @param[in] value The new alias value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contactgroup::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
 
+/**
+ *  Set contactgroup_members value.
+ *
+ *  @param[in] value The new contactgroup_members value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contactgroup::_set_contactgroup_members(std::string const& value) {
   _contactgroup_members.set(value);
   return (true);
 }
 
+/**
+ *  Set contactgroup_name value.
+ *
+ *  @param[in] value The new contactgroup_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contactgroup::_set_contactgroup_name(std::string const& value) {
   _contactgroup_name = value;
   return (true);
 }
 
+/**
+ *  Set members value.
+ *
+ *  @param[in] value The new members value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool contactgroup::_set_members(std::string const& value) {
   _members.set(value);
   return (true);

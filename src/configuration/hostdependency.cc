@@ -141,14 +141,14 @@ void hostdependency::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   hostdependency const& tmpl(static_cast<hostdependency const&>(obj));
 
-  MRG_STRING(_dependency_period);
+  MRG_DEFAULT(_dependency_period);
   MRG_INHERIT(_dependent_hostgroups);
   MRG_INHERIT(_dependent_hosts);
-  MRG_DEFAULT(_execution_failure_options);
+  MRG_OPTION(_execution_failure_options);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
-  MRG_DEFAULT(_inherits_parent);
-  MRG_DEFAULT(_notification_failure_options);
+  MRG_OPTION(_inherits_parent);
+  MRG_OPTION(_notification_failure_options);
 }
 
 /**
@@ -170,21 +170,49 @@ bool hostdependency::parse(
   return (false);
 }
 
+/**
+ *  Set dependency_period value.
+ *
+ *  @param[in] value The new dependency_period value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_dependency_period(std::string const& value) {
   _dependency_period = value;
   return (true);
 }
 
+/**
+ *  Set dependent_hostgroups value.
+ *
+ *  @param[in] value The new dependent_hostgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set dependent_hosts value.
+ *
+ *  @param[in] value The new dependent_hosts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
   return (true);
 }
 
+/**
+ *  Set execution_failure_options value.
+ *
+ *  @param[in] value The new execution_failure_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_execution_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
@@ -213,21 +241,49 @@ bool hostdependency::_set_execution_failure_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set hostgroups value.
+ *
+ *  @param[in] value The new hostgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set hosts value.
+ *
+ *  @param[in] value The new hosts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_hosts(std::string const& value) {
   _hosts.set(value);
   return (true);
 }
 
+/**
+ *  Set inherits_parent value.
+ *
+ *  @param[in] value The new inherits_parent value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_inherits_parent(bool value) {
   _inherits_parent = value;
   return (true);
 }
 
+/**
+ *  Set notification_failure_options value.
+ *
+ *  @param[in] value The new notification_failure_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool hostdependency::_set_notification_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;

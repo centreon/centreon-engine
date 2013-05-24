@@ -97,6 +97,14 @@ CCE_END()
       if (prop[i].empty()) prop[i] = tmpl.prop[i]; \
   } while (false)
 #  define MRG_DEFAULT(prop) \
+  if (prop.empty()) prop = tmpl.prop
+#  define MRG_IMPORTANT(prop) \
+  if (prop.empty() || tmpl.prop##_is_important) prop = tmpl.prop
+#  define MRG_INHERIT(prop) \
+  if (prop.empty()) prop.set(tmpl.prop)
+#  define MRG_MAP(prop) \
+  prop.insert(tmpl.prop.begin(), tmpl.prop.end())
+#  define MRG_OPTION(prop) \
   do { \
     if (!prop.is_set()) { \
       if (tmpl.prop.is_set()) \
@@ -105,14 +113,6 @@ CCE_END()
         prop = default##prop; \
     } \
   } while (false)
-#  define MRG_IMPORTANT(prop) \
-  if (prop.empty() || tmpl.prop##_is_important) prop = tmpl.prop
-#  define MRG_INHERIT(prop) \
-  if (prop.empty()) prop.set(tmpl.prop)
-#  define MRG_MAP(prop) \
-  prop.insert(tmpl.prop.begin(), tmpl.prop.end())
-#  define MRG_STRING(prop) \
-  if (prop.empty()) prop = tmpl.prop
 
 #endif // !CCE_CONFIGURATION_OBJECT_HH
 

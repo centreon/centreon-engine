@@ -208,7 +208,7 @@ bool service::operator==(service const& right) const throw () {
           && _check_period == right._check_period
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
-          // XXX: && _customvariables == right._customvariables
+          && std::operator==(_customvariables, right._customvariables)
           && _display_name == right._display_name
           && _event_handler == right._event_handler
           && _event_handler_enabled == right._event_handler_enabled
@@ -262,46 +262,46 @@ void service::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   service const& tmpl(static_cast<service const&>(obj));
 
-  MRG_STRING(_action_url);
+  MRG_DEFAULT(_action_url);
   MRG_IMPORTANT(_check_command);
-  MRG_DEFAULT(_checks_active);
-  MRG_DEFAULT(_checks_passive);
-  MRG_DEFAULT(_check_freshness);
-  MRG_DEFAULT(_check_interval);
-  MRG_STRING(_check_period);
+  MRG_OPTION(_checks_active);
+  MRG_OPTION(_checks_passive);
+  MRG_OPTION(_check_freshness);
+  MRG_OPTION(_check_interval);
+  MRG_DEFAULT(_check_period);
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
   MRG_MAP(_customvariables);
-  MRG_STRING(_display_name);
-  MRG_STRING(_event_handler);
-  MRG_DEFAULT(_event_handler_enabled);
-  MRG_DEFAULT(_first_notification_delay);
-  MRG_DEFAULT(_flap_detection_enabled);
-  MRG_DEFAULT(_flap_detection_options);
-  MRG_DEFAULT(_freshness_threshold);
-  MRG_DEFAULT(_high_flap_threshold);
+  MRG_DEFAULT(_display_name);
+  MRG_DEFAULT(_event_handler);
+  MRG_OPTION(_event_handler_enabled);
+  MRG_OPTION(_first_notification_delay);
+  MRG_OPTION(_flap_detection_enabled);
+  MRG_OPTION(_flap_detection_options);
+  MRG_OPTION(_freshness_threshold);
+  MRG_OPTION(_high_flap_threshold);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
-  MRG_STRING(_icon_image);
-  MRG_STRING(_icon_image_alt);
-  MRG_DEFAULT(_initial_state);
-  MRG_DEFAULT(_is_volatile);
-  MRG_DEFAULT(_low_flap_threshold);
-  MRG_DEFAULT(_max_check_attempts);
-  MRG_STRING(_notes);
-  MRG_STRING(_notes_url);
-  MRG_DEFAULT(_notifications_enabled);
-  MRG_DEFAULT(_notification_interval);
-  MRG_DEFAULT(_notification_options);
-  MRG_STRING(_notification_period);
-  MRG_DEFAULT(_obsess_over_service);
-  MRG_DEFAULT(_process_perf_data);
-  MRG_DEFAULT(_retain_nonstatus_information);
-  MRG_DEFAULT(_retain_status_information);
-  MRG_DEFAULT(_retry_interval);
+  MRG_DEFAULT(_icon_image);
+  MRG_DEFAULT(_icon_image_alt);
+  MRG_OPTION(_initial_state);
+  MRG_OPTION(_is_volatile);
+  MRG_OPTION(_low_flap_threshold);
+  MRG_OPTION(_max_check_attempts);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
+  MRG_OPTION(_notifications_enabled);
+  MRG_OPTION(_notification_interval);
+  MRG_OPTION(_notification_options);
+  MRG_DEFAULT(_notification_period);
+  MRG_OPTION(_obsess_over_service);
+  MRG_OPTION(_process_perf_data);
+  MRG_OPTION(_retain_nonstatus_information);
+  MRG_OPTION(_retain_status_information);
+  MRG_OPTION(_retry_interval);
   MRG_INHERIT(_servicegroups);
-  MRG_STRING(_service_description);
-  MRG_DEFAULT(_stalking_options);
+  MRG_DEFAULT(_service_description);
+  MRG_OPTION(_stalking_options);
 }
 
 /**
@@ -322,11 +322,25 @@ bool service::parse(std::string const& key, std::string const& value) {
   return (false);
 }
 
+/**
+ *  Set action_url value.
+ *
+ *  @param[in] value The new action_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
 
+/**
+ *  Set check_command value.
+ *
+ *  @param[in] value The new check_command value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_check_command(std::string const& value) {
   if (!value.empty() && value[0] == '!') {
     _check_command_is_important = true;
@@ -337,56 +351,133 @@ bool service::_set_check_command(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set checks_active value.
+ *
+ *  @param[in] value The new checks_active value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_checks_active(bool value) {
   _checks_active = value;
   return (true);
 }
 
+/**
+ *  Set checks_passive value.
+ *
+ *  @param[in] value The new checks_passive value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_checks_passive(bool value) {
   _checks_passive = value;
   return (true);
 }
 
+/**
+ *  Set check_freshness value.
+ *
+ *  @param[in] value The new check_freshness value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_check_freshness(bool value) {
   _check_freshness = value;
   return (true);
 }
 
+/**
+ *  Set check_interval value.
+ *
+ *  @param[in] value The new check_interval value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_check_interval(unsigned int value) {
   _check_interval = value;
   return (true);
 }
 
+/**
+ *  Set check_period value.
+ *
+ *  @param[in] value The new check_period value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_check_period(std::string const& value) {
   _check_period = value;
   return (true);
 }
 
+/**
+ *  Set contactgroups value.
+ *
+ *  @param[in] value The new contactgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set contacts value.
+ *
+ *  @param[in] value The new contacts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_contacts(std::string const& value) {
   _contacts.set(value);
   return (true);
 }
 
+/**
+ *  Set display_name value.
+ *
+ *  @param[in] value The new display_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_display_name(std::string const& value) {
   _display_name = value;
   return (true);
 }
 
+/**
+ *  Set event_handler value.
+ *
+ *  @param[in] value The new event_handler value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_event_handler(std::string const& value) {
   _event_handler = value;
   return (true);
 }
 
+/**
+ *  Set event_handler_enabled value.
+ *
+ *  @param[in] value The new event_handler_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
   return (true);
 }
 
+/**
+ *  Set failure_prediction_enabled value.
+ *
+ *  @param[in] value The new failure_prediction_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
@@ -394,6 +485,13 @@ bool service::_set_failure_prediction_enabled(bool value) {
   return (true);
 }
 
+/**
+ *  Set failure_prediction_options value.
+ *
+ *  @param[in] value The new failure_prediction_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_failure_prediction_options(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
@@ -401,16 +499,37 @@ bool service::_set_failure_prediction_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set first_notification_delay value.
+ *
+ *  @param[in] value The new first_notification_delay value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_first_notification_delay(unsigned int value) {
   _first_notification_delay = value;
   return (true);
 }
 
+/**
+ *  Set flap_detection_enabled value.
+ *
+ *  @param[in] value The new flap_detection_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_flap_detection_enabled(bool value) {
   _flap_detection_enabled = value;
   return (true);
 }
 
+/**
+ *  Set flap_detection_options value.
+ *
+ *  @param[in] value The new flap_detection_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_flap_detection_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
@@ -439,36 +558,85 @@ bool service::_set_flap_detection_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set freshness_threshold value.
+ *
+ *  @param[in] value The new freshness_threshold value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_freshness_threshold(unsigned int value) {
   _freshness_threshold = value;
   return (true);
 }
 
+/**
+ *  Set high_flap_threshold value.
+ *
+ *  @param[in] value The new high_flap_threshold value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_high_flap_threshold(unsigned int value) {
   _high_flap_threshold = value;
   return (true);
 }
 
+/**
+ *  Set hostgroups value.
+ *
+ *  @param[in] value The new hostgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set hosts value.
+ *
+ *  @param[in] value The new hosts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_hosts(std::string const& value) {
   _hosts.set(value);
   return (true);
 }
 
+/**
+ *  Set icon_image value.
+ *
+ *  @param[in] value The new icon_image value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
 
+/**
+ *  Set icon_image_alt value.
+ *
+ *  @param[in] value The new icon_image_alt value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
 
+/**
+ *  Set initial_state value.
+ *
+ *  @param[in] value The new initial_state value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_initial_state(std::string const& value) {
   std::string data(value);
   misc::trim(data);
@@ -485,36 +653,85 @@ bool service::_set_initial_state(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set is_volatile value.
+ *
+ *  @param[in] value The new is_volatile value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_is_volatile(bool value) {
   _is_volatile = value;
   return (true);
 }
 
+/**
+ *  Set low_flap_threshold value.
+ *
+ *  @param[in] value The new low_flap_threshold value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_low_flap_threshold(unsigned int value) {
   _low_flap_threshold = value;
   return (true);
 }
 
+/**
+ *  Set max_check_attempts value.
+ *
+ *  @param[in] value The new max_check_attempts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_max_check_attempts(unsigned int value) {
   _max_check_attempts = value;
   return (true);
 }
 
+/**
+ *  Set notes value.
+ *
+ *  @param[in] value The new notes value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
 
+/**
+ *  Set notes_url value.
+ *
+ *  @param[in] value The new notes_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
 
+/**
+ *  Set notifications_enabled value.
+ *
+ *  @param[in] value The new notifications_enabled value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
   return (true);
 }
 
+/**
+ *  Set notification_options value.
+ *
+ *  @param[in] value The new notification_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_notification_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
@@ -547,21 +764,49 @@ bool service::_set_notification_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set notification_interval value.
+ *
+ *  @param[in] value The new notification_interval value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
   return (true);
 }
 
+/**
+ *  Set notification_period value.
+ *
+ *  @param[in] value The new notification_period value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_notification_period(std::string const& value) {
   _notification_period = value;
   return (true);
 }
 
+/**
+ *  Set obsess_over_service value.
+ *
+ *  @param[in] value The new obsess_over_service value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_obsess_over_service(bool value) {
   _obsess_over_service = value;
   return (true);
 }
 
+/**
+ *  Set parallelize_check value.
+ *
+ *  @param[in] value The new parallelize_check value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_parallelize_check(bool value) {
   (void)value;
   logger(log_config_warning, basic)
@@ -569,36 +814,85 @@ bool service::_set_parallelize_check(bool value) {
   return (true);
 }
 
+/**
+ *  Set process_perf_data value.
+ *
+ *  @param[in] value The new process_perf_data value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_process_perf_data(bool value) {
   _process_perf_data = value;
   return (true);
 }
 
+/**
+ *  Set retain_nonstatus_information value.
+ *
+ *  @param[in] value The new retain_nonstatus_information value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
   return (true);
 }
 
+/**
+ *  Set retain_status_information value.
+ *
+ *  @param[in] value The new retain_status_information value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_retain_status_information(bool value) {
   _retain_status_information = value;
   return (true);
 }
 
+/**
+ *  Set retry_interval value.
+ *
+ *  @param[in] value The new retry_interval value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_retry_interval(unsigned int value) {
   _retry_interval = value;
   return (true);
 }
 
+/**
+ *  Set servicegroups value.
+ *
+ *  @param[in] value The new servicegroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
   return (true);
 }
 
+/**
+ *  Set service_description value.
+ *
+ *  @param[in] value The new service_description value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_service_description(std::string const& value) {
   _service_description = value;
   return (true);
 }
 
+/**
+ *  Set stalking_options value.
+ *
+ *  @param[in] value The new stalking_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_stalking_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;

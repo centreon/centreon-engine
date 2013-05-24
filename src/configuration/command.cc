@@ -111,9 +111,9 @@ void command::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   command const& tmpl(static_cast<command const&>(obj));
 
-  MRG_STRING(_command_line);
-  MRG_STRING(_command_name);
-  MRG_STRING(_connector);
+  MRG_DEFAULT(_command_line);
+  MRG_DEFAULT(_command_name);
+  MRG_DEFAULT(_connector);
 }
 
 /**
@@ -133,16 +133,37 @@ bool command::parse(std::string const& key, std::string const& value) {
   return (false);
 }
 
+/**
+ *  Set command_line value.
+ *
+ *  @param[in] value The new command_line value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool command::_set_command_line(std::string const& value) {
   _command_line = value;
   return (true);
 }
 
+/**
+ *  Set command_name value.
+ *
+ *  @param[in] value The new command_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool command::_set_command_name(std::string const& value) {
   _command_name = value;
   return (true);
 }
 
+/**
+ *  Set connector value.
+ *
+ *  @param[in] value The new connector value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool command::_set_connector(std::string const& value) {
   _connector = value;
   return (true);

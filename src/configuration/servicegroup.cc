@@ -124,13 +124,13 @@ void servicegroup::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   servicegroup const& tmpl(static_cast<servicegroup const&>(obj));
 
-  MRG_STRING(_action_url);
-  MRG_STRING(_alias);
+  MRG_DEFAULT(_action_url);
+  MRG_DEFAULT(_alias);
   MRG_INHERIT(_members);
-  MRG_STRING(_notes);
-  MRG_STRING(_notes_url);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
   MRG_INHERIT(_servicegroup_members);
-  MRG_STRING(_servicegroup_name);
+  MRG_DEFAULT(_servicegroup_name);
 }
 
 /**
@@ -152,36 +152,85 @@ bool servicegroup::parse(
   return (false);
 }
 
+/**
+ *  Set action_url value.
+ *
+ *  @param[in] value The new action_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
 
+/**
+ *  Set alias value.
+ *
+ *  @param[in] value The new alias value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
 
+/**
+ *  Set members value.
+ *
+ *  @param[in] value The new members value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_members(std::string const& value) {
   _members.set(value);
   return (true);
 }
 
+/**
+ *  Set notes value.
+ *
+ *  @param[in] value The new notes value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
 
+/**
+ *  Set notes_url value.
+ *
+ *  @param[in] value The new notes_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
 
+/**
+ *  Set servicegroup_members value.
+ *
+ *  @param[in] value The new servicegroup_members value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_servicegroup_members(std::string const& value) {
   _servicegroup_members.set(value);
   return (true);
 }
 
+/**
+ *  Set servicegroup_name value.
+ *
+ *  @param[in] value The new servicegroup_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
   return (true);

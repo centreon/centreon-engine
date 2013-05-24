@@ -127,14 +127,14 @@ void serviceextinfo::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   serviceextinfo const& tmpl(static_cast<serviceextinfo const&>(obj));
 
-  MRG_STRING(_action_url);
-  MRG_STRING(_icon_image);
-  MRG_STRING(_icon_image_alt);
+  MRG_DEFAULT(_action_url);
+  MRG_DEFAULT(_icon_image);
+  MRG_DEFAULT(_icon_image_alt);
   MRG_INHERIT(_hosts);
   MRG_INHERIT(_hostgroups);
-  MRG_STRING(_notes);
-  MRG_STRING(_notes_url);
-  MRG_STRING(_service_description);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
+  MRG_DEFAULT(_service_description);
 }
 
 /**
@@ -156,41 +156,97 @@ bool serviceextinfo::parse(
   return (false);
 }
 
+/**
+ *  Set action_url value.
+ *
+ *  @param[in] value The new action_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
 
+/**
+ *  Set icon_image value.
+ *
+ *  @param[in] value The new icon_image value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
 
+/**
+ *  Set icon_image_alt value.
+ *
+ *  @param[in] value The new icon_image_alt value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
 
+/**
+ *  Set hosts value.
+ *
+ *  @param[in] value The new hosts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
   return (true);
 }
 
+/**
+ *  Set hostgroups value.
+ *
+ *  @param[in] value The new hostgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set notes value.
+ *
+ *  @param[in] value The new notes value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
 
+/**
+ *  Set notes_url value.
+ *
+ *  @param[in] value The new notes_url value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
 
+/**
+ *  Set service_description value.
+ *
+ *  @param[in] value The new service_description value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceextinfo::_set_service_description(std::string const& value) {
   _service_description = value;
   return (true);

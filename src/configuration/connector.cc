@@ -108,7 +108,7 @@ void connector::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   connector const& tmpl(static_cast<connector const&>(obj));
 
-  MRG_STRING(_connector_line);
+  MRG_DEFAULT(_connector_line);
 }
 
 /**
@@ -130,11 +130,25 @@ bool connector::parse(
   return (false);
 }
 
+/**
+ *  Set connector_line value.
+ *
+ *  @param[in] value The new connector_line value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool connector::_set_connector_line(std::string const& value) {
   _connector_line = value;
   return (true);
 }
 
+/**
+ *  Set connector_name value.
+ *
+ *  @param[in] value The new connector_name value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool connector::_set_connector_name(std::string const& value) {
   _connector_name = value;
   return (true);

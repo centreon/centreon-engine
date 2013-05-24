@@ -150,13 +150,13 @@ void serviceescalation::merge(object const& obj) {
 
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
-  MRG_DEFAULT(_escalation_options);
-  MRG_STRING(_escalation_period);
-  MRG_DEFAULT(_first_notification);
+  MRG_OPTION(_escalation_options);
+  MRG_DEFAULT(_escalation_period);
+  MRG_OPTION(_first_notification);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
-  MRG_DEFAULT(_last_notification);
-  MRG_DEFAULT(_notification_interval);
+  MRG_OPTION(_last_notification);
+  MRG_OPTION(_notification_interval);
   MRG_INHERIT(_servicegroups);
   MRG_INHERIT(_service_description);
 }
@@ -180,16 +180,37 @@ bool serviceescalation::parse(
   return (false);
 }
 
+/**
+ *  Set contactgroups value.
+ *
+ *  @param[in] value The new contactgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set contacts value.
+ *
+ *  @param[in] value The new contacts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_contacts(std::string const& value) {
   _contacts.set(value);
   return (true);
 }
 
+/**
+ *  Set escalation_options value.
+ *
+ *  @param[in] value The new escalation_options value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_escalation_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
@@ -218,41 +239,97 @@ bool serviceescalation::_set_escalation_options(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set escalation_period value.
+ *
+ *  @param[in] value The new escalation_period value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_escalation_period(std::string const& value) {
   _escalation_period = value;
   return (true);
 }
 
+/**
+ *  Set first_notification value.
+ *
+ *  @param[in] value The new first_notification value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_first_notification(unsigned int value) {
   _first_notification = value;
   return (true);
 }
 
+/**
+ *  Set hostgroups value.
+ *
+ *  @param[in] value The new hostgroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
 
+/**
+ *  Set hosts value.
+ *
+ *  @param[in] value The new hosts value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
   return (true);
 }
 
+/**
+ *  Set last_notification value.
+ *
+ *  @param[in] value The new last_notification value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_last_notification(unsigned int value) {
   _last_notification = value;
   return (true);
 }
 
+/**
+ *  Set notification_interval value.
+ *
+ *  @param[in] value The new notification_interval value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
   return (true);
 }
 
+/**
+ *  Set servicegroups value.
+ *
+ *  @param[in] value The new servicegroups value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
   return (true);
 }
 
+/**
+ *  Set service_description value.
+ *
+ *  @param[in] value The new service_description value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool serviceescalation::_set_service_description(std::string const& value) {
   _service_description.set(value);
   return (true);
