@@ -41,7 +41,6 @@ namespace          configuration {
                    base(base const& b);
       virtual      ~base() throw ();
       base&        operator=(base const& b);
-
       virtual void apply(state const& config) = 0;
     };
   }

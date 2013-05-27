@@ -114,7 +114,7 @@ static unsigned short const default_stalking_options(host::none);
  *  Default constructor.
  */
 host::host()
-  : object("host") {
+  : object(object::host, "host") {
 
 }
 
@@ -259,6 +259,15 @@ bool host::operator==(host const& right) const throw () {
  */
 bool host::operator!=(host const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t host::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -690,6 +699,7 @@ bool host::_set_high_flap_threshold(unsigned int value) {
  */
 bool host::_set_host_name(std::string const& value) {
   _host_name = value;
+  _id = _hash(value);
   return (true);
 }
 

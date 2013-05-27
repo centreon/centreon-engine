@@ -58,7 +58,7 @@ static unsigned short const default_notification_failure_options(hostdependency:
  *  Default constructor.
  */
 hostdependency::hostdependency()
-  : object("hostdependency") {
+  : object(object::hostdependency, "hostdependency") {
 
 }
 
@@ -129,6 +129,15 @@ bool hostdependency::operator==(hostdependency const& right) const throw () {
  */
 bool hostdependency::operator!=(hostdependency const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t hostdependency::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -203,6 +212,8 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
+  _id = 0;
+  _hash(_id, _dependent_hosts.get());
   return (true);
 }
 

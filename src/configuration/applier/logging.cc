@@ -126,23 +126,6 @@ applier::logging::logging(state const& config)
 }
 
 /**
- *  Default copy constructor.
- *
- *  @param[in,out] right The class to copy.
- */
-applier::logging::logging(applier::logging& right)
-  : base(right),
-    _debug(NULL),
-    _debug_level(0),
-    _debug_verbosity(0),
-    _log(NULL),
-    _stderr(NULL),
-    _stdout(NULL),
-    _syslog(NULL) {
-  operator=(right);
-}
-
-/**
  *  Default destructor.
  */
 applier::logging::~logging() throw() {
@@ -151,30 +134,6 @@ applier::logging::~logging() throw() {
   _del_syslog();
   _del_log_file();
   _del_debug();
-}
-
-/**
- *  Default copy operator.
- *
- *  @param[in,out] right The class to copy.
- */
-applier::logging& applier::logging::operator=(applier::logging& right) {
-  if (this != &right) {
-    _debug = right._debug;
-    _debug_level = right._debug_level;
-    _debug_verbosity = right._debug_verbosity;
-    _log = right._log;
-    _stderr = right._stderr;
-    _stdout = right._stdout;
-    _syslog = right._syslog;
-
-    right._debug = NULL;
-    right._log = NULL;
-    right._stderr = NULL;
-    right._stdout = NULL;
-    right._syslog = NULL;
-  }
-  return (*this);
 }
 
 /**

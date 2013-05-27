@@ -39,7 +39,7 @@ static struct {
  *  Default constructor.
  */
 contactgroup::contactgroup()
-  : object("contactgroup") {
+  : object(object::contactgroup, "contactgroup") {
 
 }
 
@@ -102,6 +102,15 @@ bool contactgroup::operator==(contactgroup const& right) const throw () {
  */
 bool contactgroup::operator!=(contactgroup const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t contactgroup::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -172,6 +181,7 @@ bool contactgroup::_set_contactgroup_members(std::string const& value) {
  */
 bool contactgroup::_set_contactgroup_name(std::string const& value) {
   _contactgroup_name = value;
+  _id = _hash(value);
   return (true);
 }
 

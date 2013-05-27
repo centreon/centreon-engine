@@ -41,9 +41,9 @@ static struct {
  *  Default constructor.
  */
 timeperiod::timeperiod()
-  : object("timeperiod") {
-  _exceptions.reserve(DATERANGE_TYPES);
-  _timeranges.reserve(7);
+  : object(object::timeperiod, "timeperiod") {
+  _exceptions.resize(DATERANGE_TYPES);
+  _timeranges.resize(7);
 }
 
 /**
@@ -103,6 +103,15 @@ bool timeperiod::operator==(timeperiod const& right) const throw () {
  */
 bool timeperiod::operator!=(timeperiod const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t timeperiod::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -594,5 +603,6 @@ bool timeperiod::_set_exclude(std::string const& value) {
  */
 bool timeperiod::_set_timeperiod_name(std::string const& value) {
   _timeperiod_name = value;
+  _id = _hash(value);
   return (true);
 }

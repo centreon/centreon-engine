@@ -24,8 +24,24 @@
 #  include <sstream>
 #  include <string>
 #  include <vector>
+#  include "com/centreon/engine/configuration/command.hh"
+#  include "com/centreon/engine/configuration/connector.hh"
+#  include "com/centreon/engine/configuration/contact.hh"
+#  include "com/centreon/engine/configuration/contactgroup.hh"
+#  include "com/centreon/engine/configuration/host.hh"
+#  include "com/centreon/engine/configuration/hostdependency.hh"
+#  include "com/centreon/engine/configuration/hostescalation.hh"
+#  include "com/centreon/engine/configuration/hostextinfo.hh"
+#  include "com/centreon/engine/configuration/hostgroup.hh"
+#  include "com/centreon/engine/configuration/service.hh"
+#  include "com/centreon/engine/configuration/servicedependency.hh"
+#  include "com/centreon/engine/configuration/serviceescalation.hh"
+#  include "com/centreon/engine/configuration/serviceextinfo.hh"
+#  include "com/centreon/engine/configuration/servicegroup.hh"
+#  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -107,6 +123,8 @@ namespace              configuration {
                        cfg_dir() const throw ();
     std::list<std::string> const&
                        cfg_file() const throw ();
+    std::string const& cfg_main() const throw ();
+    void               cfg_main(std::string const& value);
     bool               check_external_commands() const throw ();
     void               check_external_commands(bool value);
     bool               check_host_freshness() const throw ();
@@ -121,11 +139,27 @@ namespace              configuration {
     void               check_result_path(std::string const& value);
     bool               check_service_freshness() const throw ();
     void               check_service_freshness(bool value);
+    umap<std::size_t, shared_ptr<command> > const&
+                       commands() const throw ();
+    umap<std::size_t, shared_ptr<command> >&
+                       commands() throw ();
     int                command_check_interval() const throw ();
     void               command_check_interval(int value);
     void               command_check_interval(int value, bool is_second);
     std::string const& command_file() const throw ();
     void               command_file(std::string const& value);
+    umap<std::size_t, shared_ptr<connector> > const&
+                       connectors() const throw ();
+    umap<std::size_t, shared_ptr<connector> >&
+                       connectors() throw ();
+    umap<std::size_t, shared_ptr<contact> > const&
+                       contacts() const throw ();
+    umap<std::size_t, shared_ptr<contact> >&
+                       contacts() throw ();
+    umap<std::size_t, shared_ptr<contactgroup> > const&
+                       contactgroups() const throw ();
+    umap<std::size_t, shared_ptr<contactgroup> >&
+                       contactgroups() throw ();
     date_type          date_format() const throw ();
     void               date_format(date_type value);
     std::string const& debug_file() const throw ();
@@ -166,6 +200,26 @@ namespace              configuration {
     void               high_host_flap_threshold(float value);
     float              high_service_flap_threshold() const throw ();
     void               high_service_flap_threshold(float value);
+    umap<std::size_t, shared_ptr<hostdependency> > const&
+                       hostdependencies() const throw ();
+    umap<std::size_t, shared_ptr<hostdependency> >&
+                       hostdependencies() throw ();
+    umap<std::size_t, shared_ptr<hostescalation> > const&
+                       hostescalations() const throw ();
+    umap<std::size_t, shared_ptr<hostescalation> >&
+                       hostescalations() throw ();
+    umap<std::size_t, shared_ptr<hostextinfo> > const&
+                       hostextinfos() const throw ();
+    umap<std::size_t, shared_ptr<hostextinfo> >&
+                       hostextinfos() throw ();
+    umap<std::size_t, shared_ptr<hostgroup> > const&
+                       hostgroups() const throw ();
+    umap<std::size_t, shared_ptr<hostgroup> >&
+                       hostgroups() throw ();
+    umap<std::size_t, shared_ptr<host> > const&
+                       hosts() const throw ();
+    umap<std::size_t, shared_ptr<host> >&
+                       hosts() throw ();
     unsigned int       host_check_timeout() const throw ();
     void               host_check_timeout(unsigned int value);
     unsigned int       host_freshness_check_interval() const throw ();
@@ -253,6 +307,26 @@ namespace              configuration {
     void               retention_scheduling_horizon(unsigned int value);
     unsigned int       retention_update_interval() const throw ();
     void               retention_update_interval(unsigned int value);
+    umap<std::size_t, shared_ptr<servicedependency> > const&
+                       servicedependencies() const throw ();
+    umap<std::size_t, shared_ptr<servicedependency> >&
+                       servicedependencies() throw ();
+    umap<std::size_t, shared_ptr<serviceescalation> > const&
+                       serviceescalations() const throw ();
+    umap<std::size_t, shared_ptr<serviceescalation> >&
+                       serviceescalations() throw ();
+    umap<std::size_t, shared_ptr<serviceextinfo> > const&
+                       serviceextinfos() const throw ();
+    umap<std::size_t, shared_ptr<serviceextinfo> >&
+                       serviceextinfos() throw ();
+    umap<std::size_t, shared_ptr<servicegroup> > const&
+                       servicegroups() const throw ();
+    umap<std::size_t, shared_ptr<servicegroup> >&
+                       servicegroups() throw ();
+    umap<std::size_t, shared_ptr<service> > const&
+                       services() const throw ();
+    umap<std::size_t, shared_ptr<service> >&
+                       services() throw ();
     unsigned int       service_check_timeout() const throw ();
     void               service_check_timeout(unsigned int value);
     unsigned int       service_freshness_check_interval() const throw ();
@@ -272,6 +346,10 @@ namespace              configuration {
     unsigned int       status_update_interval() const throw ();
     void               status_update_interval(unsigned int value);
     bool               set(std::string const& key, std::string const& value);
+    umap<std::size_t, shared_ptr<timeperiod> > const&
+                       timeperiods() const throw ();
+    umap<std::size_t, shared_ptr<timeperiod> >&
+                       timeperiods() throw ();
     unsigned int       time_change_threshold() const throw ();
     void               time_change_threshold(unsigned int value);
     bool               translate_passive_host_checks() const throw ();
@@ -387,6 +465,7 @@ namespace              configuration {
                        _cfg_dir;
     std::list<std::string>
                        _cfg_file;
+    std::string        _cfg_main;
     bool               _check_external_commands;
     bool               _check_host_freshness;
     bool               _check_orphaned_hosts;
@@ -394,9 +473,17 @@ namespace              configuration {
     unsigned int       _check_reaper_interval;
     std::string        _check_result_path;
     bool               _check_service_freshness;
+    umap<std::size_t, shared_ptr<command> >
+                       _commands;
     int                _command_check_interval;
     bool               _command_check_interval_is_seconds;
     std::string        _command_file;
+    umap<std::size_t, shared_ptr<connector> >
+                       _connectors;
+    umap<std::size_t, shared_ptr<contactgroup> >
+                       _contactgroups;
+    umap<std::size_t, shared_ptr<contact> >
+                       _contacts;
     date_type          _date_format;
     std::string        _debug_file;
     unsigned long      _debug_level;
@@ -417,6 +504,16 @@ namespace              configuration {
     std::string        _global_service_event_handler;
     float              _high_host_flap_threshold;
     float              _high_service_flap_threshold;
+    umap<std::size_t, shared_ptr<hostdependency> >
+                       _hostdependencies;
+    umap<std::size_t, shared_ptr<hostescalation> >
+                       _hostescalations;
+    umap<std::size_t, shared_ptr<hostextinfo> >
+                       _hostextinfos;
+    umap<std::size_t, shared_ptr<hostgroup> >
+                       _hostgroups;
+    umap<std::size_t, shared_ptr<host> >
+                       _hosts;
     unsigned int       _host_check_timeout;
     unsigned int       _host_freshness_check_interval;
     inter_check_delay  _host_inter_check_delay_method;
@@ -461,6 +558,16 @@ namespace              configuration {
     bool               _retain_state_information;
     unsigned int       _retention_scheduling_horizon;
     unsigned int       _retention_update_interval;
+    umap<std::size_t, shared_ptr<servicedependency> >
+                       _servicedependencies;
+    umap<std::size_t, shared_ptr<serviceescalation> >
+                       _serviceescalations;
+    umap<std::size_t, shared_ptr<serviceextinfo> >
+                       _serviceextinfos;
+    umap<std::size_t, shared_ptr<servicegroup> >
+                       _servicegroups;
+    umap<std::size_t, shared_ptr<service> >
+                       _services;
     unsigned int       _service_check_timeout;
     unsigned int       _service_freshness_check_interval;
     inter_check_delay  _service_inter_check_delay_method;
@@ -470,6 +577,8 @@ namespace              configuration {
     std::string        _state_retention_file;
     std::string        _status_file;
     unsigned int       _status_update_interval;
+    umap<std::size_t, shared_ptr<timeperiod> >
+                       _timeperiods;
     unsigned int       _time_change_threshold;
     bool               _translate_passive_host_checks;
     std::vector<std::string>
@@ -490,7 +599,3 @@ namespace              configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_STATE_HH
-
-
-
-

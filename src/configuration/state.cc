@@ -25,6 +25,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/misc/string.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -384,7 +386,7 @@ state::state()
     _use_syslog(default_use_syslog),
     _use_timezone(default_use_timezone),
     _use_true_regexp_matching(default_use_true_regexp_matching) {
-  _users.reserve(10);
+  _users.resize(10);
 }
 
 /**
@@ -431,9 +433,13 @@ state& state::operator=(state const& right) {
     _check_reaper_interval = right._check_reaper_interval;
     _check_result_path = right._check_result_path;
     _check_service_freshness = right._check_service_freshness;
+    _commands = right._commands;
     _command_check_interval = right._command_check_interval;
     _command_check_interval_is_seconds = right._command_check_interval_is_seconds;
     _command_file = right._command_file;
+    _connectors = right._connectors;
+    _contactgroups = right._contactgroups;
+    _contacts = right._contacts;
     _date_format = right._date_format;
     _debug_file = right._debug_file;
     _debug_level = right._debug_level;
@@ -454,6 +460,11 @@ state& state::operator=(state const& right) {
     _global_service_event_handler = right._global_service_event_handler;
     _high_host_flap_threshold = right._high_host_flap_threshold;
     _high_service_flap_threshold = right._high_service_flap_threshold;
+    _hostdependencies = right._hostdependencies;
+    _hostescalations = right._hostescalations;
+    _hostextinfos = right._hostextinfos;
+    _hostgroups = right._hostgroups;
+    _hosts = right._hosts;
     _host_check_timeout = right._host_check_timeout;
     _host_freshness_check_interval = right._host_freshness_check_interval;
     _host_inter_check_delay_method = right._host_inter_check_delay_method;
@@ -496,6 +507,11 @@ state& state::operator=(state const& right) {
     _retain_state_information = right._retain_state_information;
     _retention_scheduling_horizon = right._retention_scheduling_horizon;
     _retention_update_interval = right._retention_update_interval;
+    _servicedependencies = right._servicedependencies;
+    _serviceescalations = right._serviceescalations;
+    _serviceextinfos = right._serviceextinfos;
+    _servicegroups = right._servicegroups;
+    _services = right._services;
     _service_check_timeout = right._service_check_timeout;
     _service_freshness_check_interval = right._service_freshness_check_interval;
     _service_inter_check_delay_method = right._service_inter_check_delay_method;
@@ -505,8 +521,10 @@ state& state::operator=(state const& right) {
     _state_retention_file = right._state_retention_file;
     _status_file = right._status_file;
     _status_update_interval = right._status_update_interval;
+    _timeperiods = right._timeperiods;
     _time_change_threshold = right._time_change_threshold;
     _translate_passive_host_checks = right._translate_passive_host_checks;
+    _users = right._users;
     _use_aggressive_host_checking = right._use_aggressive_host_checking;
     _use_check_result_path = right._use_check_result_path;
     _use_large_installation_tweaks = right._use_large_installation_tweaks;
@@ -548,9 +566,13 @@ bool state::operator==(state const& right) const throw () {
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
+          // XXX: && _commands == right._commands
           && _command_check_interval == right._command_check_interval
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
+          // XXX: && _connectors == right._connectors
+          // XXX: && _contactgroups == right._contactgroups
+          // XXX: && _contacts == right._contacts
           && _date_format == right._date_format
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
@@ -571,6 +593,11 @@ bool state::operator==(state const& right) const throw () {
           && _global_service_event_handler == right._global_service_event_handler
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
+          // XXX: && _hostdependencies == right._hostdependencies
+          // XXX: && _hostescalations == right._hostescalations
+          // XXX: && _hostextinfos == right._hostextinfos
+          // XXX: && _hostgroups == right._hostgroups
+          // XXX: && _hosts == right._hosts
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
           && _host_inter_check_delay_method == right._host_inter_check_delay_method
@@ -613,6 +640,11 @@ bool state::operator==(state const& right) const throw () {
           && _retain_state_information == right._retain_state_information
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
+          // XXX: && _servicedependencies == right._servicedependencies
+          // XXX: && _serviceescalations == right._serviceescalations
+          // XXX: && _serviceextinfos == right._serviceextinfos
+          // XXX: && _servicegroups == right._servicegroups
+          // XXX: && _services == right._services
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
           && _service_inter_check_delay_method == right._service_inter_check_delay_method
@@ -622,8 +654,10 @@ bool state::operator==(state const& right) const throw () {
           && _state_retention_file == right._state_retention_file
           && _status_file == right._status_file
           && _status_update_interval == right._status_update_interval
+          // XXX: && _timeperiods == right._timeperiods
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
+          && _users == right._users
           && _use_aggressive_host_checking == right._use_aggressive_host_checking
           && _use_check_result_path == right._use_check_result_path
           && _use_large_installation_tweaks == right._use_large_installation_tweaks
@@ -915,6 +949,24 @@ bool state::check_external_commands() const throw () {
 }
 
 /**
+ *  Set cfg_main value.
+ *
+ *  @param[in] value The new cfg_main value.
+ */
+void state::cfg_main(std::string const& value) {
+  _cfg_main = value;
+}
+
+/**
+ *  Get cfg_main value.
+ *
+ *  @return The cfg_main value.
+ */
+std::string const& state::cfg_main() const throw () {
+  return (_cfg_main);
+}
+
+/**
  *  Set check_external_commands value.
  *
  *  @param[in] value The new check_external_commands value.
@@ -938,9 +990,6 @@ bool state::check_host_freshness() const throw () {
  *  @param[in] value The new check_host_freshness value.
  */
 void state::check_host_freshness(bool value) {
-  if (!value)
-    throw (engine_error()
-             << "host_freshness_check_interval: invalid value");
   _check_host_freshness = value;
 }
 
@@ -1039,6 +1088,24 @@ void state::check_service_freshness(bool value) {
 }
 
 /**
+ *  Get all engine commands.
+ *
+ *  @return All engine commands.
+ */
+umap<std::size_t, shared_ptr<configuration::command> > const& state::commands() const throw () {
+  return (_commands);
+}
+
+/**
+ *  Get all engine commands.
+ *
+ *  @return All engine commands.
+ */
+umap<std::size_t, shared_ptr<configuration::command> >& state::commands() throw () {
+  return (_commands);
+}
+
+/**
  *  Get command_check_interval value.
  *
  *  @return The command_check_interval value.
@@ -1091,6 +1158,60 @@ std::string const& state::command_file() const throw () {
  */
 void state::command_file(std::string const& value) {
   _command_file = value;
+}
+
+/**
+ *  Get all engine connectors.
+ *
+ *  @return All engine connectors.
+ */
+umap<std::size_t, shared_ptr<configuration::connector> > const& state::connectors() const throw () {
+  return (_connectors);
+}
+
+/**
+ *  Get all engine connectors.
+ *
+ *  @return All engine connectors.
+ */
+umap<std::size_t, shared_ptr<configuration::connector> >& state::connectors() throw () {
+  return (_connectors);
+}
+
+/**
+ *  Get all engine contacts.
+ *
+ *  @return All engine contacts.
+ */
+umap<std::size_t, shared_ptr<configuration::contact> > const& state::contacts() const throw () {
+  return (_contacts);
+}
+
+/**
+ *  Get all engine contacts.
+ *
+ *  @return All engine contacts.
+ */
+umap<std::size_t, shared_ptr<configuration::contact> >& state::contacts() throw () {
+  return (_contacts);
+}
+
+/**
+ *  Get all engine contactgroups.
+ *
+ *  @return All engine contactgroups.
+ */
+umap<std::size_t, shared_ptr<configuration::contactgroup> > const& state::contactgroups() const throw () {
+  return (_contactgroups);
+}
+
+/**
+ *  Get all engine contactgroups.
+ *
+ *  @return All engine contactgroups.
+ */
+umap<std::size_t, shared_ptr<configuration::contactgroup> >& state::contactgroups() throw () {
+  return (_contactgroups);
 }
 
 /**
@@ -1469,6 +1590,96 @@ void state::high_service_flap_threshold(float value) {
     throw (engine_error()
              << "high_service_flap_threshold: invalid value.");
   _high_service_flap_threshold = value;
+}
+
+/**
+ *  Get all engine hostdependencies.
+ *
+ *  @return All engine hostdependencies.
+ */
+umap<std::size_t, shared_ptr<configuration::hostdependency> > const& state::hostdependencies() const throw () {
+  return (_hostdependencies);
+}
+
+/**
+ *  Get all engine hostdependencies.
+ *
+ *  @return All engine hostdependencies.
+ */
+umap<std::size_t, shared_ptr<configuration::hostdependency> >& state::hostdependencies() throw () {
+  return (_hostdependencies);
+}
+
+/**
+ *  Get all engine hostescalations.
+ *
+ *  @return All engine hostescalations.
+ */
+umap<std::size_t, shared_ptr<configuration::hostescalation> > const& state::hostescalations() const throw () {
+  return (_hostescalations);
+}
+
+/**
+ *  Get all engine hostescalations.
+ *
+ *  @return All engine hostescalations.
+ */
+umap<std::size_t, shared_ptr<configuration::hostescalation> >& state::hostescalations() throw () {
+  return (_hostescalations);
+}
+
+/**
+ *  Get all engine hostextinfos.
+ *
+ *  @return All engine hostextinfos.
+ */
+umap<std::size_t, shared_ptr<configuration::hostextinfo> > const& state::hostextinfos() const throw () {
+  return (_hostextinfos);
+}
+
+/**
+ *  Get all engine hostextinfos.
+ *
+ *  @return All engine hostextinfos.
+ */
+umap<std::size_t, shared_ptr<configuration::hostextinfo> >& state::hostextinfos() throw () {
+  return (_hostextinfos);
+}
+
+/**
+ *  Get all engine hostgroups.
+ *
+ *  @return All engine hostgroups.
+ */
+umap<std::size_t, shared_ptr<configuration::hostgroup> > const& state::hostgroups() const throw () {
+  return (_hostgroups);
+}
+
+/**
+ *  Get all engine hostgroups.
+ *
+ *  @return All engine hostgroups.
+ */
+umap<std::size_t, shared_ptr<configuration::hostgroup> >& state::hostgroups() throw () {
+  return (_hostgroups);
+}
+
+/**
+ *  Get all engine hosts.
+ *
+ *  @return All engine hosts.
+ */
+umap<std::size_t, shared_ptr<configuration::host> > const& state::hosts() const throw () {
+  return (_hosts);
+}
+
+/**
+ *  Get all engine hosts.
+ *
+ *  @return All engine hosts.
+ */
+umap<std::size_t, shared_ptr<configuration::host> >& state::hosts() throw () {
+  return (_hosts);
 }
 
 /**
@@ -2290,6 +2501,96 @@ void state::retention_update_interval(unsigned int value) {
 }
 
 /**
+ *  Get all engine servicedependencies.
+ *
+ *  @return All engine servicedependencies.
+ */
+umap<std::size_t, shared_ptr<configuration::servicedependency> > const& state::servicedependencies() const throw () {
+  return (_servicedependencies);
+}
+
+/**
+ *  Get all engine servicedependencies.
+ *
+ *  @return All engine servicedependencies.
+ */
+umap<std::size_t, shared_ptr<configuration::servicedependency> >& state::servicedependencies() throw () {
+  return (_servicedependencies);
+}
+
+/**
+ *  Get all engine serviceescalations.
+ *
+ *  @return All engine serviceescalations.
+ */
+umap<std::size_t, shared_ptr<configuration::serviceescalation> > const& state::serviceescalations() const throw () {
+  return (_serviceescalations);
+}
+
+/**
+ *  Get all engine serviceescalations.
+ *
+ *  @return All engine serviceescalations.
+ */
+umap<std::size_t, shared_ptr<configuration::serviceescalation> >& state::serviceescalations() throw () {
+  return (_serviceescalations);
+}
+
+/**
+ *  Get all engine serviceextinfos.
+ *
+ *  @return All engine serviceextinfos.
+ */
+umap<std::size_t, shared_ptr<configuration::serviceextinfo> > const& state::serviceextinfos() const throw () {
+  return (_serviceextinfos);
+}
+
+/**
+ *  Get all engine serviceextinfos.
+ *
+ *  @return All engine serviceextinfos.
+ */
+umap<std::size_t, shared_ptr<configuration::serviceextinfo> >& state::serviceextinfos() throw () {
+  return (_serviceextinfos);
+}
+
+/**
+ *  Get all engine servicegroups.
+ *
+ *  @return All engine servicegroups.
+ */
+umap<std::size_t, shared_ptr<configuration::servicegroup> > const& state::servicegroups() const throw () {
+  return (_servicegroups);
+}
+
+/**
+ *  Get all engine servicegroups.
+ *
+ *  @return All engine servicegroups.
+ */
+umap<std::size_t, shared_ptr<configuration::servicegroup> >& state::servicegroups() throw () {
+  return (_servicegroups);
+}
+
+/**
+ *  Get all engine services.
+ *
+ *  @return All engine services.
+ */
+umap<std::size_t, shared_ptr<configuration::service> > const& state::services() const throw () {
+  return (_services);
+}
+
+/**
+ *  Get all engine services.
+ *
+ *  @return All engine services.
+ */
+umap<std::size_t, shared_ptr<configuration::service> >& state::services() throw () {
+  return (_services);
+}
+
+/**
  *  Get service_check_timeout value.
  *
  *  @return The service_check_timeout value.
@@ -2487,6 +2788,24 @@ bool state::set(std::string const& key, std::string const& value) {
 }
 
 /**
+ *  Get all engine timeperiods.
+ *
+ *  @return All engine timeperiods.
+ */
+umap<std::size_t, shared_ptr<configuration::timeperiod> > const& state::timeperiods() const throw () {
+  return (_timeperiods);
+}
+
+/**
+ *  Get all engine timeperiods.
+ *
+ *  @return All engine timeperiods.
+ */
+umap<std::size_t, shared_ptr<configuration::timeperiod> >& state::timeperiods() throw () {
+  return (_timeperiods);
+}
+
+/**
  *  Get time_change_threshold value.
  *
  *  @return The time_change_threshold value.
@@ -2578,7 +2897,7 @@ void state::user(std::string const& key, std::string const& value) {
  */
 void state::user(unsigned int key, std::string const& value) {
   if (key > _users.capacity())
-    _users.reserve(key + 1);
+    _users.resize(key + 1);
   _users[key] = value;
 }
 

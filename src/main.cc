@@ -42,8 +42,9 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/configuration/parser.hh"
+#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/loop.hh"
@@ -351,6 +352,16 @@ int main(int argc, char* argv[]) {
       // Read in the configuration files (main
       // and resource config files).
       try {
+
+        // XXX: -> TESTING start !!!
+        {
+          configuration::state config;
+          configuration::parser p;
+          p.parse("/tmp/engine/configuration.cfg", config);
+          return (0);
+        }
+
+
         // XXX: config->parse(config_file);
         configuration::applier::logging::instance().apply(*config);
         com::centreon::logging::engine::instance().add(

@@ -43,7 +43,7 @@ static struct {
  *  Default constructor.
  */
 servicegroup::servicegroup()
-  : object("servicegroup") {
+  : object(object::servicegroup, "servicegroup") {
 
 }
 
@@ -112,6 +112,15 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
  */
 bool servicegroup::operator!=(servicegroup const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t servicegroup::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -233,5 +242,6 @@ bool servicegroup::_set_servicegroup_members(std::string const& value) {
  */
 bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
+  _id = _hash(value);
   return (true);
 }

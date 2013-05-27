@@ -45,7 +45,7 @@ std::list<std::string>& misc::split(
     out.push_back(data.substr(last, current - last));
     last = ++current;
   }
-  out.push_back(data.substr(last));
+  out.push_back(last ? data.substr(last) : data);
   return (out);
 }
 

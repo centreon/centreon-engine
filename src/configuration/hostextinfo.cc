@@ -54,7 +54,7 @@ static point_3d const default_3d_coords(0.0, 0.0, 0.0);
  *  Default constructor.
  */
 hostextinfo::hostextinfo()
-  : object("hostextinfo") {
+  : object(object::hostextinfo, "hostextinfo") {
 
 }
 
@@ -133,6 +133,15 @@ bool hostextinfo::operator==(hostextinfo const& right) const throw () {
  */
 bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t hostextinfo::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -280,6 +289,8 @@ bool hostextinfo::_set_hostgroups(std::string const& value) {
  */
 bool hostextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  _id = 0;
+  _hash(_id, _hosts.get());
   return (true);
 }
 

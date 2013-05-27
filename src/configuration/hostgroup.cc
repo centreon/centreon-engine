@@ -29,7 +29,7 @@ static struct {
   std::string const name;
   bool (*func)(hostgroup&, std::string const&);
 } gl_setters[] = {
-  { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_members) },
+  { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
   { "alias",             SETTER(std::string const&, _set_alias) },
   { "members",           SETTER(std::string const&, _set_members) },
   { "hostgroup_members", SETTER(std::string const&, _set_hostgroup_members) },
@@ -42,7 +42,7 @@ static struct {
  *  Default constructor.
  */
 hostgroup::hostgroup()
-  : object("hostgroup") {
+  : object(object::hostgroup, "hostgroup") {
 
 }
 
@@ -111,6 +111,15 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
  */
 bool hostgroup::operator!=(hostgroup const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t hostgroup::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -196,6 +205,7 @@ bool hostgroup::_set_hostgroup_members(std::string const& value) {
  */
 bool hostgroup::_set_hostgroup_name(std::string const& value) {
   _hostgroup_name = value;
+  _id = _hash(value);
   return (true);
 }
 

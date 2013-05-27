@@ -54,12 +54,15 @@ static struct {
 /**
  *  Constructor.
  *
- *  @param[in] type The object type name.
+ *  @param[in] type      The object type.
+ *  @param[in] type_name The object type name.
  */
-object::object(std::string const& type)
-  : _is_resolve(false),
+object::object(object::object_type type, std::string const& type_name)
+  : _id(0),
+    _is_resolve(false),
     _is_template(false),
-    _type(type) {
+    _type(type),
+    _type_name(type_name) {
 
 }
 
@@ -88,10 +91,13 @@ object::~object() throw () {
  */
 object& object::operator=(object const& right) {
   if (this != &right) {
+    _id = right._id;
     _is_resolve = right._is_resolve;
     _is_template = right._is_template;
     _name = right._name;
+    _templates = right._templates;
     _type = right._type;
+    _type_name = right._type_name;
   }
   return (*this);
 }
@@ -104,10 +110,13 @@ object& object::operator=(object const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool object::operator==(object const& right) const throw () {
-  return (_name == right._name
+  return (_id == right._id
+          && _name == right._name
           && _type == right._type
+          && _type_name == right._type_name
           && _is_resolve == right._is_resolve
-          && _is_template == right._is_template);
+          && _is_template == right._is_template
+          && _templates == right._templates);
 }
 
 /**
@@ -124,42 +133,42 @@ bool object::operator!=(object const& right) const throw () {
 /**
  *  Create object with object type.
  *
- *  @param[in] type The object type.
+ *  @param[in] type_name The object type name.
  *
  *  @return New object.
  */
-shared_ptr<object> object::create(std::string const& type) {
+shared_ptr<object> object::create(std::string const& type_name) {
   shared_ptr<object> obj;
-  if (type == "command")
-    obj = shared_ptr<object>(new command());
-  else if (type == "connector")
-    obj = shared_ptr<object>(new connector());
-  else if (type == "contactgroup")
-    obj = shared_ptr<object>(new contactgroup());
-  else if (type == "contact")
-    obj = shared_ptr<object>(new contact());
-  else if (type == "hostdependency")
-    obj = shared_ptr<object>(new hostdependency());
-  else if (type == "hostescalation")
-    obj = shared_ptr<object>(new hostescalation());
-  else if (type == "hostextinfo")
-    obj = shared_ptr<object>(new hostextinfo());
-  else if (type == "hostgroup")
-    obj = shared_ptr<object>(new hostgroup());
-  else if (type == "host")
-    obj = shared_ptr<object>(new host());
-  else if (type == "servicedependency")
-    obj = shared_ptr<object>(new servicedependency());
-  else if (type == "serviceescalation")
-    obj = shared_ptr<object>(new serviceescalation());
-  else if (type == "serviceextinfo")
-    obj = shared_ptr<object>(new serviceextinfo());
-  else if (type == "servicegroup")
-    obj = shared_ptr<object>(new servicegroup());
-  else if (type == "service")
-    obj = shared_ptr<object>(new service());
-  else if (type == "timeperiod")
-    obj = shared_ptr<object>(new timeperiod());
+  if (type_name == "command")
+    obj = shared_ptr<object>(new configuration::command());
+  else if (type_name == "connector")
+    obj = shared_ptr<object>(new configuration::connector());
+  else if (type_name == "contactgroup")
+    obj = shared_ptr<object>(new configuration::contactgroup());
+  else if (type_name == "contact")
+    obj = shared_ptr<object>(new configuration::contact());
+  else if (type_name == "hostdependency")
+    obj = shared_ptr<object>(new configuration::hostdependency());
+  else if (type_name == "hostescalation")
+    obj = shared_ptr<object>(new configuration::hostescalation());
+  else if (type_name == "hostextinfo")
+    obj = shared_ptr<object>(new configuration::hostextinfo());
+  else if (type_name == "hostgroup")
+    obj = shared_ptr<object>(new configuration::hostgroup());
+  else if (type_name == "host")
+    obj = shared_ptr<object>(new configuration::host());
+  else if (type_name == "servicedependency")
+    obj = shared_ptr<object>(new configuration::servicedependency());
+  else if (type_name == "serviceescalation")
+    obj = shared_ptr<object>(new configuration::serviceescalation());
+  else if (type_name == "serviceextinfo")
+    obj = shared_ptr<object>(new configuration::serviceextinfo());
+  else if (type_name == "servicegroup")
+    obj = shared_ptr<object>(new configuration::servicegroup());
+  else if (type_name == "service")
+    obj = shared_ptr<object>(new configuration::service());
+  else if (type_name == "timeperiod")
+    obj = shared_ptr<object>(new configuration::timeperiod());
   return (obj);
 }
 
@@ -243,12 +252,65 @@ void object::resolve_template(
 }
 
 /**
+ *  Get the object type.
+ *
+ *  @return The object type.
+ */
+object::object_type object::type() const throw () {
+  return (_type);
+}
+
+/**
  *  Get the object type name.
  *
  *  @return The object type name.
  */
-std::string const& object::type() const throw () {
-  return (_type);
+std::string const& object::type_name() const throw () {
+  return (_type_name);
+}
+
+/**
+ *  Get the string hash.
+ *
+ *  @param[in] data The string to hash.
+ *
+ *  @return The string hash.
+ */
+std::size_t object::_hash(std::string const& data) throw () {
+  std::size_t hash(0);
+  _hash(hash, data);
+  return (hash);
+}
+
+/**
+ *  Get the list of string hash.
+ *
+ *  @param[in,out] hash The hash to fill.
+ *  @param[in]     data The data to hash.
+ */
+void object::_hash(
+       std::size_t& hash,
+       std::list<std::string> const& data) throw () {
+  for (std::list<std::string>::const_iterator
+         it(data.begin()), end(data.end());
+       it != end;
+       ++it)
+    _hash(hash, *it);
+}
+
+/**
+ *  Get the string hash.
+ *
+ *  @param[in,out] hash The hash to fill.
+ *  @param[in]     data The string to hash.
+ */
+void object::_hash(std::size_t& hash, std::string const& data) throw () {
+  for (std::string::const_iterator it(data.begin()), end(data.end());
+       it != end;
+       ++it) {
+    std::size_t val(static_cast<std::size_t>(*it));
+    hash ^= val + 0x9e3779b9 + (hash<<6) + (hash>>2);
+  }
 }
 
 /**

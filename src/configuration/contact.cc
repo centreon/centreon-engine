@@ -66,8 +66,8 @@ static unsigned int const   MAX_ADDRESSES(6);
  *  Default constructor.
  */
 contact::contact()
-  : object("contact") {
-  _address.reserve(MAX_ADDRESSES);
+  : object(object::contact, "contact") {
+  _address.resize(MAX_ADDRESSES);
 }
 
 /**
@@ -157,6 +157,15 @@ bool contact::operator==(contact const& right) const throw () {
  */
 bool contact::operator!=(contact const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t contact::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -263,6 +272,7 @@ bool contact::_set_contactgroups(std::string const& value) {
  */
 bool contact::_set_contact_name(std::string const& value) {
   _contact_name = value;
+  _id = _hash(value);
   return (true);
 }
 

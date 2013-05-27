@@ -22,6 +22,7 @@
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/io/directory_entry.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::io;
 
@@ -62,11 +63,25 @@ void parser::parse(std::string const& path, state& config) {
   // Apply template.
   _resolve_template();
 
+  _insert(_objects[object::command], config.commands());
+  _insert(_objects[object::connector], config.connectors());
+  _insert(_objects[object::contact], config.contacts());
+  _insert(_objects[object::contactgroup], config.contactgroups());
+  _insert(_objects[object::hostdependency], config.hostdependencies());
+  _insert(_objects[object::hostescalation], config.hostescalations());
+  _insert(_objects[object::hostextinfo], config.hostextinfos());
+  _insert(_objects[object::hostgroup], config.hostgroups());
+  _insert(_objects[object::host], config.hosts());
+  _insert(_objects[object::servicedependency], config.servicedependencies());
+  _insert(_objects[object::serviceescalation], config.serviceescalations());
+  _insert(_objects[object::serviceextinfo], config.serviceextinfos());
+  _insert(_objects[object::servicegroup], config.servicegroups());
+  _insert(_objects[object::service], config.services());
+  _insert(_objects[object::timeperiod], config.timeperiods());
+
   // cleanup.
-  for (unsigned int i(0);
-       i < sizeof(_objects) / sizeof(_objects[0]);
-       ++i)
-    _objects[i].clear();
+  _objects.clear();
+  _templates.clear();
 }
 
 /**
@@ -83,6 +98,23 @@ void parser::_apply(
        it != end;
        ++it)
     (this->*pfunc)(*it);
+}
+
+/**
+ *  Insert objects into type T map.
+ *
+ *  @param[in]  from The objects source.
+ *  @param[out] to   The objects destination.
+ */
+template<typename T>
+void parser::_insert(
+       umap<std::size_t, shared_ptr<object> > const& from,
+       umap<std::size_t, shared_ptr<T> >& to) {
+  for (umap<std::size_t, shared_ptr<object> >::const_iterator
+         it(from.begin()), end(from.end());
+       it != end;
+       ++it)
+    to[it->first] = it->second;
 }
 
 /**
@@ -161,6 +193,8 @@ void parser::_parse_global_configuration(std::string const& path) {
     throw (engine_error() << "configuration: parse global "
            "configuration failed: can't open file '" << path << "'");
 
+  _config->cfg_main(path);
+
   unsigned int current_line(0);
   std::string input;
   while (_get_next_line(stream, input, current_line)) {
@@ -219,15 +253,25 @@ void parser::_parse_object_definitions(std::string const& path) {
     }
     // End of the current object.
     else {
-      std::string const& name(obj->name());
-      if (name.empty())
-        throw (engine_error() << "configuration: parse object "
-               "definition failed: property 'name' is missing in "
-               "file '" << path << "' on line " << current_line);
-
-      std::string const& type(obj->type());
-      bool is_template(obj->is_template());
-      _objects[is_template][type][name] = obj;
+      object::object_type type(obj->type());
+      // Add template.
+      if (obj->is_template()) {
+        std::string const& name(obj->name());
+        if (name.empty())
+          throw (engine_error() << "configuration: parse object "
+                 "definition failed: property 'name' is missing in "
+                 "file '" << path << "' on line " << current_line);
+        _templates[type][name] = obj;
+      }
+      // Add object.
+      else {
+        std::size_t id(obj->id());
+        if (!id)
+          throw (engine_error() << "configuration: parse object "
+                 "definition failed: property missing in "
+                 "file '" << path << "' on line " << current_line);
+        _objects[type][id] = obj;
+      }
       obj.clear();
     }
   }
@@ -268,13 +312,14 @@ void parser::_parse_resource_file(std::string const& path) {
  *  Resolve template for register objects.
  */
 void parser::_resolve_template() {
-  for (umap<std::string, objects>::iterator
-         it(_objects[1].begin()), end(_objects[1].end());
-         ++it != end;
-         ++it) {
-    objects& templates(_objects[0][it->first]);
-    objects& objects(it->second);
-    for (objects::iterator it(objects.begin()), end(objects.end());
+  for (umap<std::size_t, umap<std::size_t, shared_ptr<object> > >::iterator
+         it(_objects.begin()), end(_objects.end());
+       it != end;
+       ++it) {
+    umap<std::string, shared_ptr<object> >& templates(_templates[it->first]);
+    umap<std::size_t, shared_ptr<object> >& objects(it->second);
+    for (umap<std::size_t, shared_ptr<object> >::iterator
+           it(objects.begin()), end(objects.end());
          it != end;
          ++it)
       it->second->resolve_template(templates);

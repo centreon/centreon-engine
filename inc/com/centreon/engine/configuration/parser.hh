@@ -29,37 +29,43 @@
 
 CCE_BEGIN()
 
-namespace   configuration {
-  class     parser {
+namespace       configuration {
+  class         parser {
   public:
-            parser();
-            ~parser() throw ();
-    void    parse(std::string const& path, state& config);
+                parser();
+                ~parser() throw ();
+    void        parse(std::string const& path, state& config);
 
   private:
-            parser(parser const& right);
-    parser& operator=(parser const& right);
-    void    _apply(
-              std::list<std::string> const& lst,
-              void (parser::*pfunc)(std::string const&));
-    bool    _get_data(
-              std::string const& line,
-              std::string& key,
-              std::string& value,
-              char const* delim);
-    bool    _get_next_line(
-              std::ifstream& stream,
-              std::string& line,
-              unsigned int& current_pos);
-    void    _parse_directory_configuration(std::string const& path);
-    void    _parse_global_configuration(std::string const& path);
-    void    _parse_object_definitions(std::string const& path);
-    void    _parse_resource_file(std::string const& path);
-    void    _resolve_template();
+                parser(parser const& right);
+    parser&     operator=(parser const& right);
+    void        _apply(
+                  std::list<std::string> const& lst,
+                  void (parser::*pfunc)(std::string const&));
+    template<typename T>
+    static void _insert(
+                  umap<std::size_t, shared_ptr<object> > const& from,
+                  umap<std::size_t, shared_ptr<T> >& to);
+    bool        _get_data(
+                  std::string const& line,
+                  std::string& key,
+                  std::string& value,
+                  char const* delim);
+    bool        _get_next_line(
+                  std::ifstream& stream,
+                  std::string& line,
+                  unsigned int& current_pos);
+    void        _parse_directory_configuration(std::string const& path);
+    void        _parse_global_configuration(std::string const& path);
+    void        _parse_object_definitions(std::string const& path);
+    void        _parse_resource_file(std::string const& path);
+    void        _resolve_template();
 
-    state*  _config;
-    umap<std::string, objects>
-            _objects[2];
+    state*      _config;
+    umap<std::size_t, umap<std::size_t, shared_ptr<object> > >
+                _objects;
+    umap<std::size_t, umap<std::string, shared_ptr<object> > >
+                _templates;
   };
 }
 

@@ -69,6 +69,7 @@ namespace                  configuration {
                            service_description() const throw ();
     */
 
+    std::size_t            id() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

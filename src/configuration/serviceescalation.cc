@@ -59,7 +59,7 @@ static unsigned int const   default_notification_interval(0);
  *  Default constructor.
  */
 serviceescalation::serviceescalation()
-  : object("serviceescalation") {
+  : object(object::serviceescalation, "serviceescalation") {
 
 }
 
@@ -136,6 +136,19 @@ bool serviceescalation::operator==(serviceescalation const& right) const throw (
  */
 bool serviceescalation::operator!=(serviceescalation const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t serviceescalation::id() const throw () {
+  if (!_id) {
+    _hash(_id, _hosts.get());
+    _hash(_id, _service_description.get());
+  }
+  return (_id);
 }
 
 /**
@@ -284,6 +297,7 @@ bool serviceescalation::_set_hostgroups(std::string const& value) {
  */
 bool serviceescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -332,5 +346,6 @@ bool serviceescalation::_set_servicegroups(std::string const& value) {
  */
 bool serviceescalation::_set_service_description(std::string const& value) {
   _service_description.set(value);
+  _id = 0;
   return (true);
 }

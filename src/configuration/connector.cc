@@ -37,7 +37,7 @@ static struct {
  *  Default constructor.
  */
 connector::connector()
-  : object("connector") {
+  : object(object::connector, "connector") {
 
 }
 
@@ -99,6 +99,15 @@ bool connector::operator!=(connector const& right) const throw () {
 }
 
 /**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t connector::id() const throw () {
+  return (_id);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.
@@ -151,5 +160,6 @@ bool connector::_set_connector_line(std::string const& value) {
  */
 bool connector::_set_connector_name(std::string const& value) {
   _connector_name = value;
+  _id = _hash(value);
   return (true);
 }

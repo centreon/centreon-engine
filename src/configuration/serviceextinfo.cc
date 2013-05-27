@@ -44,7 +44,7 @@ static struct {
  *  Default constructor.
  */
 serviceextinfo::serviceextinfo()
-  : object("serviceextinfo") {
+  : object(object::serviceextinfo, "serviceextinfo") {
 
 }
 
@@ -115,6 +115,19 @@ bool serviceextinfo::operator==(serviceextinfo const& right) const throw () {
  */
 bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t serviceextinfo::id() const throw () {
+  if (!_id) {
+    _hash(_id, _hosts.get());
+    _hash(_id, _service_description);
+  }
+  return (_id);
 }
 
 /**
@@ -201,6 +214,7 @@ bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
  */
 bool serviceextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -249,5 +263,6 @@ bool serviceextinfo::_set_notes_url(std::string const& value) {
  */
 bool serviceextinfo::_set_service_description(std::string const& value) {
   _service_description = value;
+  _id = 0;
   return (true);
 }

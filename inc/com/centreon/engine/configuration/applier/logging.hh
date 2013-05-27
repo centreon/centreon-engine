@@ -47,9 +47,9 @@ namespace                configuration {
     private:
                          logging();
                          logging(state const& config);
-                         logging(logging& right);
+                         logging(logging const&);
                          ~logging() throw ();
-      logging&           operator=(logging& right);
+      logging&           operator=(logging const&);
       void               _add_stdout();
       void               _add_stderr();
       void               _add_syslog();

@@ -33,7 +33,27 @@ CCE_BEGIN()
 namespace                  configuration {
   class                    object {
   public:
-                           object(std::string const& type);
+    enum                   object_type {
+      command,
+      connector,
+      contactgroup,
+      contact,
+      hostdependency,
+      hostescalation,
+      hostextinfo,
+      hostgroup,
+      host,
+      servicedependency,
+      serviceescalation,
+      serviceextinfo,
+      servicegroup,
+      service,
+      timeperiod
+    };
+
+                           object(
+                             object_type type,
+                             std::string const& type_name);
                            object(object const& right);
     virtual                ~object() throw ();
     object&                operator=(object const& right);
@@ -42,7 +62,8 @@ namespace                  configuration {
     bool                   operator!=(
                              object const& right) const throw ();
     static shared_ptr<object>
-                           create(std::string const& type);
+                           create(std::string const& type_name);
+    virtual std::size_t    id() const throw () = 0;
     bool                   is_template() const throw ();
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
@@ -52,7 +73,8 @@ namespace                  configuration {
     virtual bool           parse(std::string const& line);
     void                   resolve_template(
                              umap<std::string, shared_ptr<object> >& templates);
-    std::string const&     type() const throw ();
+    object_type            type() const throw ();
+    std::string const&     type_name() const throw ();
 
   protected:
     template<typename T, typename U, bool (T::*ptr)(U)>
@@ -73,18 +95,25 @@ namespace                  configuration {
       }
     };
 
+    static std::size_t     _hash(std::string const& data) throw ();
+    static void            _hash(
+                             std::size_t& id,
+                             std::list<std::string> const& lst) throw ();
+    static void            _hash(
+                             std::size_t& hash,
+                             std::string const& data) throw ();
     bool                   _set_is_template(bool value);
     bool                   _set_name(std::string const& value);
     bool                   _set_templates(std::string const& value);
 
+    mutable std::size_t    _id;
     bool                   _is_resolve;
     bool                   _is_template;
     std::string            _name;
     std::list<std::string> _templates;
-    std::string            _type;
+    object_type            _type;
+    std::string            _type_name;
   };
-
-  typedef umap<std::string, shared_ptr<object> > objects;
 }
 
 CCE_END()

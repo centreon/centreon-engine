@@ -50,6 +50,7 @@ namespace                  configuration {
     std::string const&     servicegroup_name() const throw ();
     */
 
+    std::size_t            id() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

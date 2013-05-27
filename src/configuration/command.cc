@@ -38,7 +38,7 @@ static struct {
  *  Default constructor.
  */
 command::command()
-  : object("command") {
+  : object(object::command, "command") {
 
 }
 
@@ -102,6 +102,15 @@ bool command::operator!=(command const& right) const throw () {
 }
 
 /**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t command::id() const throw () {
+  return (_id);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.
@@ -154,6 +163,7 @@ bool command::_set_command_line(std::string const& value) {
  */
 bool command::_set_command_name(std::string const& value) {
   _command_name = value;
+  _id = _hash(value);
   return (true);
 }
 

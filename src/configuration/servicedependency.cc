@@ -71,7 +71,7 @@ static unsigned short const default_notification_failure_options(servicedependen
  *  Default constructor.
  */
 servicedependency::servicedependency()
-  : object("servicedependency") {
+  : object(object::servicedependency, "servicedependency") {
 
 }
 
@@ -153,6 +153,19 @@ bool servicedependency::operator!=(servicedependency const& right) const throw (
 }
 
 /**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t servicedependency::id() const throw () {
+  if (!_id) {
+    _hash(_id, _dependent_hosts.get());
+    _hash(_id, _dependent_service_description.get());
+  }
+  return (_id);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.
@@ -228,6 +241,7 @@ bool servicedependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool servicedependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -252,6 +266,7 @@ bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
  */
 bool servicedependency::_set_dependent_service_description(std::string const& value) {
   _dependent_service_description.set(value);
+  _id = 0;
   return (true);
 }
 

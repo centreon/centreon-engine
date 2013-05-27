@@ -54,7 +54,7 @@ static unsigned int const   default_notification_interval(0);
  *  Default constructor.
  */
 hostescalation::hostescalation()
-  : object("hostescalation") {
+  : object(object::hostescalation, "hostescalation") {
 
 }
 
@@ -127,6 +127,15 @@ bool hostescalation::operator==(hostescalation const& right) const throw () {
  */
 bool hostescalation::operator!=(hostescalation const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Get the unique object id.
+ *
+ *  @return The object id.
+ */
+std::size_t hostescalation::id() const throw () {
+  return (_id);
 }
 
 /**
@@ -271,6 +280,8 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  */
 bool hostescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
+  _id = 0;
+  _hash(_id, _hosts.get());
   return (true);
 }
 

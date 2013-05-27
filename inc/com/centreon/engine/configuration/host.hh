@@ -100,6 +100,7 @@ namespace                  configuration {
     std::string const&     vrml_image() const throw ();
     */
 
+    std::size_t            id() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
