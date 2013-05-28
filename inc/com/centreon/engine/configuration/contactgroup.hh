@@ -38,16 +38,8 @@ namespace                  configuration {
                              contactgroup const& right) const throw ();
     bool                   operator!=(
                              contactgroup const& right) const throw ();
-    /*
-    std::string const&     alias() const throw ();
-    std::list<std::string> const&
-                           contactgroup_members() const throw ();
-    std::string const&     contactgroup_name() const throw ();
-    std::list<std::string> const&
-                           members() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -64,6 +56,8 @@ namespace                  configuration {
     std::string            _contactgroup_name;
     group                  _members;
   };
+
+  typedef umap<std::size_t, shared_ptr<contactgroup> > map_contactgroup;
 }
 
 CCE_END()

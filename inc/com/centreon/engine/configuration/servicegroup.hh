@@ -38,19 +38,8 @@ namespace                  configuration {
                              servicegroup const& right) const throw ();
     bool                   operator!=(
                              servicegroup const& right) const throw ();
-    /*
-    std::string const&     action_url() const throw ();
-    std::string const&     alias() const throw ();
-    std::list<std::string> const&
-                           members() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
-    std::list<std::string> const&
-                           servicegroup_members() const throw ();
-    std::string const&     servicegroup_name() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -73,6 +62,8 @@ namespace                  configuration {
     group                  _servicegroup_members;
     std::string            _servicegroup_name;
   };
+
+  typedef umap<std::size_t, shared_ptr<servicegroup> > map_servicegroup;
 }
 
 CCE_END()

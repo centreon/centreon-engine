@@ -25,13 +25,19 @@ set(INC_DIR "${INC_DIR}/applier")
 add_library("cce_configuration_applier"
   STATIC
   "${SRC_DIR}/base.cc"
+  "${SRC_DIR}/command.cc"
+  "${SRC_DIR}/connector.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/macros.cc"
+  "${SRC_DIR}/timeperiod.cc"
   "${INC_DIR}/base.hh"
+  "${INC_DIR}/command.hh"
+  "${INC_DIR}/connector.hh"
   "${INC_DIR}/globals.hh"
   "${INC_DIR}/logging.hh"
-  "${INC_DIR}/macros.hh")
+  "${INC_DIR}/macros.hh"
+  "${INC_DIR}/timeperiod.hh")
 
 # Link target with required libraries.
 target_link_libraries("cce_configuration_applier" "cce_logging")

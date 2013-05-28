@@ -49,27 +49,8 @@ namespace                  configuration {
                              serviceescalation const& right) const throw ();
     bool                   operator!=(
                              serviceescalation const& right) const throw ();
-    /*
-    std::list<std::string> const&
-                           contactgroups() const throw ();
-    std::list<std::string> const&
-                           contacts() const throw ();
-    unsigned short         escalation_options() const throw ();
-    std::string const&     escalation_period() const throw ();
-    unsigned int           first_notification() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::list<std::string> const&
-                           hosts() const throw ();
-    unsigned int           last_notification() const throw ();
-    unsigned int           notification_interval() const throw ();
-    std::list<std::string> const&
-                           servicegroups() const throw ();
-    std::list<std::string> const&
-                           service_description() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -100,6 +81,8 @@ namespace                  configuration {
     group                  _servicegroups;
     group                  _service_description;
   };
+
+  typedef umap<std::size_t, shared_ptr<serviceescalation> > map_serviceescalation;
 }
 
 CCE_END()

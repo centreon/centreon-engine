@@ -17,17 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/error.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 
 #define SETTER(type, method) \
-  &object::setter<connector, type, &connector::method>::generic
+  &configuration::object::setter< \
+     configuration::connector, \
+     type, \
+     &configuration::connector::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(connector&, std::string const&);
+  bool (*func)(configuration::connector&, std::string const&);
 } gl_setters[] = {
   { "connector_line", SETTER(std::string const&, _set_connector_line) },
   { "connector_name", SETTER(std::string const&, _set_connector_name) }
@@ -36,7 +40,7 @@ static struct {
 /**
  *  Default constructor.
  */
-connector::connector()
+configuration::connector::connector()
   : object(object::connector, "connector") {
 
 }
@@ -46,7 +50,7 @@ connector::connector()
  *
  *  @param[in] right The connector to copy.
  */
-connector::connector(connector const& right)
+configuration::connector::connector(connector const& right)
   : object(right) {
   operator=(right);
 }
@@ -54,7 +58,7 @@ connector::connector(connector const& right)
 /**
  *  Destructor.
  */
-connector::~connector() throw () {
+configuration::connector::~connector() throw () {
 
 }
 
@@ -65,7 +69,8 @@ connector::~connector() throw () {
  *
  *  @return This connector.
  */
-connector& connector::operator=(connector const& right) {
+configuration::connector& configuration::connector::operator=(
+                            connector const& right) {
   if (this != &right) {
     object::operator=(right);
     _connector_line = right._connector_line;
@@ -81,7 +86,8 @@ connector& connector::operator=(connector const& right) {
  *
  *  @return True if is the same connector, otherwise false.
  */
-bool connector::operator==(connector const& right) const throw () {
+bool configuration::connector::operator==(
+       connector const& right) const throw () {
   return (object::operator==(right)
           && _connector_line == right._connector_line
           && _connector_name == right._connector_name);
@@ -94,8 +100,32 @@ bool connector::operator==(connector const& right) const throw () {
  *
  *  @return True if is not the same connector, otherwise false.
  */
-bool connector::operator!=(connector const& right) const throw () {
+bool configuration::connector::operator!=(
+       connector const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Create new connector.
+ *
+ *  @return The new connector.
+ */
+commands::connector* configuration::connector::create() const {
+  char* command_line(NULL);
+  nagios_macros* macros(get_global_macros());
+
+  process_macros_r(
+    macros,
+    _connector_line.c_str(),
+    &command_line,
+    0);
+  std::string processed_cmd(command_line);
+  delete[] command_line;
+
+  return (new commands::connector(
+                _connector_name,
+                processed_cmd,
+                &checks::checker::instance()));
 }
 
 /**
@@ -103,8 +133,18 @@ bool connector::operator!=(connector const& right) const throw () {
  *
  *  @return The object id.
  */
-std::size_t connector::id() const throw () {
+std::size_t configuration::connector::id() const throw () {
   return (_id);
+}
+
+/**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::connector::is_valid() const throw () {
+  return (!_connector_name.empty()
+          && !_connector_line.empty());
 }
 
 /**
@@ -112,7 +152,7 @@ std::size_t connector::id() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void connector::merge(object const& obj) {
+void configuration::connector::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   connector const& tmpl(static_cast<connector const&>(obj));
@@ -128,7 +168,7 @@ void connector::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool connector::parse(
+bool configuration::connector::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -146,7 +186,8 @@ bool connector::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool connector::_set_connector_line(std::string const& value) {
+bool configuration::connector::_set_connector_line(
+       std::string const& value) {
   _connector_line = value;
   return (true);
 }
@@ -158,7 +199,8 @@ bool connector::_set_connector_line(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool connector::_set_connector_name(std::string const& value) {
+bool configuration::connector::_set_connector_name(
+       std::string const& value) {
   _connector_name = value;
   _id = _hash(value);
   return (true);

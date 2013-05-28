@@ -49,30 +49,8 @@ namespace                  configuration {
                              servicedependency const& right) const throw ();
     bool                   operator!=(
                              servicedependency const& right) const throw ();
-    /*
-    std::string const&     dependency_period() const throw ();
-    std::list<std::string> const&
-                           dependent_hostgroups() const throw ();
-    std::list<std::string> const&
-                           dependent_hosts() const throw ();
-    std::list<std::string> const&
-                           dependent_servicegroups() const throw ();
-    std::list<std::string> const&
-                           dependent_service_description() const throw ();
-    unsigned int           execution_failure_options() const throw ();
-    bool                   inherits_parent() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::list<std::string> const&
-                           hosts() const throw ();
-    unsigned int           notification_failure_options() const throw ();
-    std::list<std::string> const&
-                           servicegroups() const throw ();
-    std::list<std::string> const&
-                           service_description() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -105,6 +83,8 @@ namespace                  configuration {
     group                  _servicegroups;
     group                  _service_description;
   };
+
+  typedef umap<std::size_t, shared_ptr<servicedependency> > map_servicedependency;
 }
 
 CCE_END()

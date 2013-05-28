@@ -29,33 +29,6 @@ using namespace com::centreon::engine::configuration;
 static applier::logging* _instance = NULL;
 
 /**
- *  Get the singleton instance of logging applier.
- *
- *  @return Singleton instance.
- */
-applier::logging& applier::logging::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load logging applier singleton.
- */
-void applier::logging::load() {
-  if (!_instance)
-    _instance = new applier::logging;
-  return;
-}
-
-/**
- *  Unload logging applier singleton.
- */
-void applier::logging::unload() {
-  delete _instance;
-  _instance = NULL;
-  return;
-}
-
-/**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
@@ -89,6 +62,33 @@ void applier::logging::apply(state const& config) {
            || config.debug_level() != _debug_level
            || config.debug_verbosity() != _debug_verbosity)
     _add_debug(config);
+  return;
+}
+
+/**
+ *  Get the singleton instance of logging applier.
+ *
+ *  @return Singleton instance.
+ */
+applier::logging& applier::logging::instance() {
+  return (*_instance);
+}
+
+/**
+ *  Load logging applier singleton.
+ */
+void applier::logging::load() {
+  if (!_instance)
+    _instance = new applier::logging;
+  return;
+}
+
+/**
+ *  Unload logging applier singleton.
+ */
+void applier::logging::unload() {
+  delete _instance;
+  _instance = NULL;
   return;
 }
 

@@ -46,23 +46,8 @@ namespace                  configuration {
                              hostescalation const& right) const throw ();
     bool                   operator!=(
                              hostescalation const& right) const throw ();
-    /*
-    std::list<std::string> const&
-                           contactgroups() const throw ();
-    std::list<std::string> const&
-                           contacts() const throw ();
-    unsigned short         escalation_options() const throw ();
-    std::string const&     escalation_period() const throw ();
-    unsigned int           first_notification() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::list<std::string> const&
-                           hosts() const throw ();
-    unsigned int           last_notification() const throw ();
-    unsigned int           notification_interval() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -89,6 +74,8 @@ namespace                  configuration {
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
   };
+
+  typedef umap<std::size_t, shared_ptr<hostescalation> > map_hostescalation;
 }
 
 CCE_END()

@@ -47,22 +47,8 @@ namespace                  configuration {
                              hostdependency const& right) const throw ();
     bool                   operator!=(
                              hostdependency const& right) const throw ();
-    /*
-    std::string const&     dependency_period() const throw ();
-    std::list<std::string> const&
-                           dependent_hostgroups() const throw ();
-    std::list<std::string> const&
-                           dependent_hosts() const throw ();
-    unsigned int           execution_failure_options() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::list<std::string> const&
-                           hosts() const throw ();
-    bool                   inherits_parent() const throw ();
-    unsigned int           notification_failure_options() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -87,6 +73,8 @@ namespace                  configuration {
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
   };
+
+  typedef umap<std::size_t, shared_ptr<hostdependency> > map_hostdependency;
 }
 
 CCE_END()

@@ -108,10 +108,9 @@ void parser::_apply(
  */
 template<typename T>
 void parser::_insert(
-       umap<std::size_t, shared_ptr<object> > const& from,
+       map_object const& from,
        umap<std::size_t, shared_ptr<T> >& to) {
-  for (umap<std::size_t, shared_ptr<object> >::const_iterator
-         it(from.begin()), end(from.end());
+  for (map_object::const_iterator it(from.begin()), end(from.end());
        it != end;
        ++it)
     to[it->first] = it->second;
@@ -312,14 +311,13 @@ void parser::_parse_resource_file(std::string const& path) {
  *  Resolve template for register objects.
  */
 void parser::_resolve_template() {
-  for (umap<std::size_t, umap<std::size_t, shared_ptr<object> > >::iterator
+  for (umap<std::size_t, map_object>::iterator
          it(_objects.begin()), end(_objects.end());
        it != end;
        ++it) {
-    umap<std::string, shared_ptr<object> >& templates(_templates[it->first]);
-    umap<std::size_t, shared_ptr<object> >& objects(it->second);
-    for (umap<std::size_t, shared_ptr<object> >::iterator
-           it(objects.begin()), end(objects.end());
+    map_template& templates(_templates[it->first]);
+    map_object& objects(it->second);
+    for (map_object::iterator it(objects.begin()), end(objects.end());
          it != end;
          ++it)
       it->second->resolve_template(templates);

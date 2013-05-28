@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/commands/connector.hh"
 
 CCE_BEGIN()
 
@@ -37,12 +38,9 @@ namespace                  configuration {
                              connector const& right) const throw ();
     bool                   operator!=(
                              connector const& right) const throw ();
-    /*
-    std::string const&     connector_line() const throw ();
-    std::string const&     connector_name() const throw ();
-    */
-
+    commands::connector*   create() const;
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -55,6 +53,8 @@ namespace                  configuration {
     std::string            _connector_line;
     std::string            _connector_name;
   };
+
+  typedef umap<std::size_t, shared_ptr<connector> > map_connector;
 }
 
 CCE_END()

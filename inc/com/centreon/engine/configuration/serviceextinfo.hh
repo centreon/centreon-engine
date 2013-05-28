@@ -38,20 +38,8 @@ namespace                  configuration {
                              serviceextinfo const& right) const throw ();
     bool                   operator!=(
                              serviceextinfo const& right) const throw ();
-    /*
-    std::string const&     action_url() const throw ();
-    std::string const&     icon_image() const throw ();
-    std::string const&     icon_image_alt() const throw ();
-    std::list<std::string> const&
-                           hosts() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
-    std::string const&     service_description() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -76,6 +64,8 @@ namespace                  configuration {
     std::string            _notes_url;
     std::string            _service_description;
   };
+
+  typedef umap<std::size_t, shared_ptr<serviceextinfo> > map_serviceextinfo;
 }
 
 CCE_END()

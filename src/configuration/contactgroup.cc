@@ -20,14 +20,17 @@
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/error.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 
 #define SETTER(type, method) \
-  &object::setter<contactgroup, type, &contactgroup::method>::generic
+  &configuration::object::setter< \
+     configuration::contactgroup, \
+     type, \
+     &configuration::contactgroup::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(contactgroup&, std::string const&);
+  bool (*func)(configuration::contactgroup&, std::string const&);
 } gl_setters[] = {
   { "contactgroup_name",    SETTER(std::string const&, _set_contactgroup_name) },
   { "alias",                SETTER(std::string const&, _set_alias) },
@@ -38,7 +41,7 @@ static struct {
 /**
  *  Default constructor.
  */
-contactgroup::contactgroup()
+configuration::contactgroup::contactgroup()
   : object(object::contactgroup, "contactgroup") {
 
 }
@@ -48,7 +51,7 @@ contactgroup::contactgroup()
  *
  *  @param[in] right The contactgroup to copy.
  */
-contactgroup::contactgroup(contactgroup const& right)
+configuration::contactgroup::contactgroup(contactgroup const& right)
   : object(right) {
   operator=(right);
 }
@@ -56,7 +59,7 @@ contactgroup::contactgroup(contactgroup const& right)
 /**
  *  Destructor.
  */
-contactgroup::~contactgroup() throw () {
+configuration::contactgroup::~contactgroup() throw () {
 
 }
 
@@ -67,7 +70,8 @@ contactgroup::~contactgroup() throw () {
  *
  *  @return This contactgroup.
  */
-contactgroup& contactgroup::operator=(contactgroup const& right) {
+configuration::contactgroup& configuration::contactgroup::operator=(
+                               contactgroup const& right) {
   if (this != &right) {
     object::operator=(right);
     _alias = right._alias;
@@ -85,7 +89,8 @@ contactgroup& contactgroup::operator=(contactgroup const& right) {
  *
  *  @return True if is the same contactgroup, otherwise false.
  */
-bool contactgroup::operator==(contactgroup const& right) const throw () {
+bool configuration::contactgroup::operator==(
+       contactgroup const& right) const throw () {
   return (object::operator==(right)
           && _alias == right._alias
           && _contactgroup_members == right._contactgroup_members
@@ -100,7 +105,8 @@ bool contactgroup::operator==(contactgroup const& right) const throw () {
  *
  *  @return True if is not the same contactgroup, otherwise false.
  */
-bool contactgroup::operator!=(contactgroup const& right) const throw () {
+bool configuration::contactgroup::operator!=(
+       contactgroup const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -109,8 +115,17 @@ bool contactgroup::operator!=(contactgroup const& right) const throw () {
  *
  *  @return The object id.
  */
-std::size_t contactgroup::id() const throw () {
+std::size_t configuration::contactgroup::id() const throw () {
   return (_id);
+}
+
+/**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::contactgroup::is_valid() const throw () {
+  return (!_contactgroup_name.empty());
 }
 
 /**
@@ -118,7 +133,7 @@ std::size_t contactgroup::id() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void contactgroup::merge(object const& obj) {
+void configuration::contactgroup::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   contactgroup const& tmpl(static_cast<contactgroup const&>(obj));
@@ -137,7 +152,7 @@ void contactgroup::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool contactgroup::parse(
+bool configuration::contactgroup::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -155,7 +170,7 @@ bool contactgroup::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool contactgroup::_set_alias(std::string const& value) {
+bool configuration::contactgroup::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
@@ -167,7 +182,8 @@ bool contactgroup::_set_alias(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool contactgroup::_set_contactgroup_members(std::string const& value) {
+bool configuration::contactgroup::_set_contactgroup_members(
+       std::string const& value) {
   _contactgroup_members.set(value);
   return (true);
 }
@@ -179,7 +195,8 @@ bool contactgroup::_set_contactgroup_members(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool contactgroup::_set_contactgroup_name(std::string const& value) {
+bool configuration::contactgroup::_set_contactgroup_name(
+       std::string const& value) {
   _contactgroup_name = value;
   _id = _hash(value);
   return (true);
@@ -192,7 +209,8 @@ bool contactgroup::_set_contactgroup_name(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool contactgroup::_set_members(std::string const& value) {
+bool configuration::contactgroup::_set_members(
+       std::string const& value) {
   _members.set(value);
   return (true);
 }

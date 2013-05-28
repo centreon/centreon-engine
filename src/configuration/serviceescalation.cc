@@ -21,14 +21,17 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 
 #define SETTER(type, method) \
-  &object::setter<serviceescalation, type, &serviceescalation::method>::generic
+  &configuration::object::setter< \
+     configuration::serviceescalation, \
+     type, \
+     &configuration::serviceescalation::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(serviceescalation&, std::string const&);
+  bool (*func)(configuration::serviceescalation&, std::string const&);
 } gl_setters[] = {
   { "host",                  SETTER(std::string const&, _set_hosts) },
   { "host_name",             SETTER(std::string const&, _set_hosts) },
@@ -50,7 +53,7 @@ static struct {
 };
 
 // Default values.
-static unsigned short const default_escalation_options(serviceescalation::none);
+static unsigned short const default_escalation_options(configuration::serviceescalation::none);
 static unsigned int const   default_first_notification(-2);
 static unsigned int const   default_last_notification(-2);
 static unsigned int const   default_notification_interval(0);
@@ -58,7 +61,7 @@ static unsigned int const   default_notification_interval(0);
 /**
  *  Default constructor.
  */
-serviceescalation::serviceescalation()
+configuration::serviceescalation::serviceescalation()
   : object(object::serviceescalation, "serviceescalation") {
 
 }
@@ -68,7 +71,8 @@ serviceescalation::serviceescalation()
  *
  *  @param[in] right The serviceescalation to copy.
  */
-serviceescalation::serviceescalation(serviceescalation const& right)
+configuration::serviceescalation::serviceescalation(
+  serviceescalation const& right)
   : object(right) {
   operator=(right);
 }
@@ -76,7 +80,7 @@ serviceescalation::serviceescalation(serviceescalation const& right)
 /**
  *  Destructor.
  */
-serviceescalation::~serviceescalation() throw () {
+configuration::serviceescalation::~serviceescalation() throw () {
 
 }
 
@@ -87,7 +91,8 @@ serviceescalation::~serviceescalation() throw () {
  *
  *  @return This serviceescalation.
  */
-serviceescalation& serviceescalation::operator=(serviceescalation const& right) {
+configuration::serviceescalation& configuration::serviceescalation::operator=(
+                                    serviceescalation const& right) {
   if (this != &right) {
     object::operator=(right);
     _contactgroups = right._contactgroups;
@@ -112,7 +117,8 @@ serviceescalation& serviceescalation::operator=(serviceescalation const& right) 
  *
  *  @return True if is the same serviceescalation, otherwise false.
  */
-bool serviceescalation::operator==(serviceescalation const& right) const throw () {
+bool configuration::serviceescalation::operator==(
+       serviceescalation const& right) const throw () {
   return (object::operator==(right)
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
@@ -134,7 +140,8 @@ bool serviceescalation::operator==(serviceescalation const& right) const throw (
  *
  *  @return True if is not the same serviceescalation, otherwise false.
  */
-bool serviceescalation::operator!=(serviceescalation const& right) const throw () {
+bool configuration::serviceescalation::operator!=(
+       serviceescalation const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -143,7 +150,7 @@ bool serviceescalation::operator!=(serviceescalation const& right) const throw (
  *
  *  @return The object id.
  */
-std::size_t serviceescalation::id() const throw () {
+std::size_t configuration::serviceescalation::id() const throw () {
   if (!_id) {
     _hash(_id, _hosts.get());
     _hash(_id, _service_description.get());
@@ -152,11 +159,23 @@ std::size_t serviceescalation::id() const throw () {
 }
 
 /**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::serviceescalation::is_valid() const throw () {
+  return ((!_service_description.empty() || !_servicegroups.empty())
+          && (!_hosts.empty() || !_hostgroups.empty())
+          && (!_contacts.empty() || !_contactgroups.empty())
+          && !_escalation_period.empty());
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.
  */
-void serviceescalation::merge(object const& obj) {
+void configuration::serviceescalation::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   serviceescalation const& tmpl(static_cast<serviceescalation const&>(obj));
@@ -182,7 +201,7 @@ void serviceescalation::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::parse(
+bool configuration::serviceescalation::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -200,7 +219,8 @@ bool serviceescalation::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_contactgroups(std::string const& value) {
+bool configuration::serviceescalation::_set_contactgroups(
+       std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
@@ -212,7 +232,8 @@ bool serviceescalation::_set_contactgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_contacts(std::string const& value) {
+bool configuration::serviceescalation::_set_contacts(
+       std::string const& value) {
   _contacts.set(value);
   return (true);
 }
@@ -224,7 +245,8 @@ bool serviceescalation::_set_contacts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_escalation_options(std::string const& value) {
+bool configuration::serviceescalation::_set_escalation_options(
+       std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -259,7 +281,8 @@ bool serviceescalation::_set_escalation_options(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_escalation_period(std::string const& value) {
+bool configuration::serviceescalation::_set_escalation_period(
+       std::string const& value) {
   _escalation_period = value;
   return (true);
 }
@@ -271,7 +294,8 @@ bool serviceescalation::_set_escalation_period(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_first_notification(unsigned int value) {
+bool configuration::serviceescalation::_set_first_notification(
+       unsigned int value) {
   _first_notification = value;
   return (true);
 }
@@ -283,7 +307,8 @@ bool serviceescalation::_set_first_notification(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_hostgroups(std::string const& value) {
+bool configuration::serviceescalation::_set_hostgroups(
+       std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -295,7 +320,8 @@ bool serviceescalation::_set_hostgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_hosts(std::string const& value) {
+bool configuration::serviceescalation::_set_hosts(
+       std::string const& value) {
   _hosts.set(value);
   _id = 0;
   return (true);
@@ -308,7 +334,8 @@ bool serviceescalation::_set_hosts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_last_notification(unsigned int value) {
+bool configuration::serviceescalation::_set_last_notification(
+       unsigned int value) {
   _last_notification = value;
   return (true);
 }
@@ -320,7 +347,8 @@ bool serviceescalation::_set_last_notification(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_notification_interval(unsigned int value) {
+bool configuration::serviceescalation::_set_notification_interval(
+       unsigned int value) {
   _notification_interval = value;
   return (true);
 }
@@ -332,7 +360,8 @@ bool serviceescalation::_set_notification_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_servicegroups(std::string const& value) {
+bool configuration::serviceescalation::_set_servicegroups(
+       std::string const& value) {
   _servicegroups.set(value);
   return (true);
 }
@@ -344,7 +373,8 @@ bool serviceescalation::_set_servicegroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::_set_service_description(std::string const& value) {
+bool configuration::serviceescalation::_set_service_description(
+       std::string const& value) {
   _service_description.set(value);
   _id = 0;
   return (true);

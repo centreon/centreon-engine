@@ -20,14 +20,17 @@
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 
 #define SETTER(type, method) \
-  &object::setter<hostgroup, type, &hostgroup::method>::generic
+  &configuration::object::setter< \
+     configuration::hostgroup, \
+     type, \
+     &configuration::hostgroup::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(hostgroup&, std::string const&);
+  bool (*func)(configuration::hostgroup&, std::string const&);
 } gl_setters[] = {
   { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
   { "alias",             SETTER(std::string const&, _set_alias) },
@@ -41,7 +44,7 @@ static struct {
 /**
  *  Default constructor.
  */
-hostgroup::hostgroup()
+configuration::hostgroup::hostgroup()
   : object(object::hostgroup, "hostgroup") {
 
 }
@@ -51,7 +54,7 @@ hostgroup::hostgroup()
  *
  *  @param[in] right The hostgroup to copy.
  */
-hostgroup::hostgroup(hostgroup const& right)
+configuration::hostgroup::hostgroup(hostgroup const& right)
   : object(right) {
   operator=(right);
 }
@@ -59,7 +62,7 @@ hostgroup::hostgroup(hostgroup const& right)
 /**
  *  Destructor.
  */
-hostgroup::~hostgroup() throw () {
+configuration::hostgroup::~hostgroup() throw () {
 
 }
 
@@ -70,7 +73,8 @@ hostgroup::~hostgroup() throw () {
  *
  *  @return This hostgroup.
  */
-hostgroup& hostgroup::operator=(hostgroup const& right) {
+configuration::hostgroup& configuration::hostgroup::operator=(
+                            hostgroup const& right) {
   if (this != &right) {
     object::operator=(right);
     _action_url = right._action_url;
@@ -91,7 +95,8 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
  *
  *  @return True if is the same hostgroup, otherwise false.
  */
-bool hostgroup::operator==(hostgroup const& right) const throw () {
+bool configuration::hostgroup::operator==(
+       hostgroup const& right) const throw () {
   return (object::operator==(right)
           && _action_url == right._action_url
           && _alias == right._alias
@@ -109,7 +114,8 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
  *
  *  @return True if is not the same hostgroup, otherwise false.
  */
-bool hostgroup::operator!=(hostgroup const& right) const throw () {
+bool configuration::hostgroup::operator!=(
+       hostgroup const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -118,8 +124,17 @@ bool hostgroup::operator!=(hostgroup const& right) const throw () {
  *
  *  @return The object id.
  */
-std::size_t hostgroup::id() const throw () {
+std::size_t configuration::hostgroup::id() const throw () {
   return (_id);
+}
+
+/**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::hostgroup::is_valid() const throw () {
+  return (!_hostgroup_name.empty());
 }
 
 /**
@@ -127,7 +142,7 @@ std::size_t hostgroup::id() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void hostgroup::merge(object const& obj) {
+void configuration::hostgroup::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
@@ -149,7 +164,7 @@ void hostgroup::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::parse(
+bool configuration::hostgroup::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -167,7 +182,8 @@ bool hostgroup::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_action_url(std::string const& value) {
+bool configuration::hostgroup::_set_action_url(
+       std::string const& value) {
   _action_url = value;
   return (true);
 }
@@ -179,7 +195,7 @@ bool hostgroup::_set_action_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_alias(std::string const& value) {
+bool configuration::hostgroup::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
@@ -191,7 +207,8 @@ bool hostgroup::_set_alias(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_hostgroup_members(std::string const& value) {
+bool configuration::hostgroup::_set_hostgroup_members(
+       std::string const& value) {
   _hostgroup_members.set(value);
   return (true);
 }
@@ -203,7 +220,8 @@ bool hostgroup::_set_hostgroup_members(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_hostgroup_name(std::string const& value) {
+bool configuration::hostgroup::_set_hostgroup_name(
+       std::string const& value) {
   _hostgroup_name = value;
   _id = _hash(value);
   return (true);
@@ -216,7 +234,7 @@ bool hostgroup::_set_hostgroup_name(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_members(std::string const& value) {
+bool configuration::hostgroup::_set_members(std::string const& value) {
   _members.set(value);
   return (true);
 }
@@ -228,7 +246,8 @@ bool hostgroup::_set_members(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_notes(std::string const& value) {
+bool configuration::hostgroup::_set_notes(
+       std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -240,7 +259,8 @@ bool hostgroup::_set_notes(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::_set_notes_url(std::string const& value) {
+bool configuration::hostgroup::_set_notes_url(
+       std::string const& value) {
   _notes_url = value;
   return (true);
 }

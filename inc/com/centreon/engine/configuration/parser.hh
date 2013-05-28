@@ -44,7 +44,7 @@ namespace       configuration {
                   void (parser::*pfunc)(std::string const&));
     template<typename T>
     static void _insert(
-                  umap<std::size_t, shared_ptr<object> > const& from,
+                  map_object const& from,
                   umap<std::size_t, shared_ptr<T> >& to);
     bool        _get_data(
                   std::string const& line,
@@ -62,9 +62,9 @@ namespace       configuration {
     void        _resolve_template();
 
     state*      _config;
-    umap<std::size_t, umap<std::size_t, shared_ptr<object> > >
+    umap<std::size_t, map_object>
                 _objects;
-    umap<std::size_t, umap<std::string, shared_ptr<object> > >
+    umap<std::size_t, map_template>
                 _templates;
   };
 }

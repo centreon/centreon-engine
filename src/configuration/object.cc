@@ -232,18 +232,16 @@ bool object::parse(std::string const& line) {
  *
  *  @param[in, out] templates The template list.
  */
-void object::resolve_template(
-       umap<std::string, shared_ptr<object> >& templates) {
+void object::resolve_template(map_template& templates) {
   if (_is_resolve)
     return;
 
   _is_resolve = true;
-  for (std::list<std::string>::const_iterator it(_templates.begin()),
-         end(_templates.end());
+  for (std::list<std::string>::const_iterator
+         it(_templates.begin()), end(_templates.end());
        it != end;
        ++it) {
-    umap<std::string, shared_ptr<object> >::iterator
-      tmpl(templates.find(*it));
+    map_template::iterator tmpl(templates.find(*it));
     if (tmpl == templates.end())
       throw (engine_error() << "merge failed: invalid object type");
     tmpl->second->resolve_template(templates);

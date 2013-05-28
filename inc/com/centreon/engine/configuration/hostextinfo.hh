@@ -41,24 +41,8 @@ namespace                  configuration {
                              hostextinfo const& right) const throw ();
     bool                   operator!=(
                              hostextinfo const& right) const throw ();
-    /*
-    point_2d const&        2d_coords() const throw ();
-    point_3d const&        3d_coords() const throw ();
-    std::string const&     action_url() const throw ();
-    std::string const&     gd2_image() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::list<std::string> const&
-                           host_name() const throw ();
-    std::string const&     icon_image() const throw ();
-    std::string const&     icon_image_alt() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
-    std::string const&     statusmap_image() const throw ();
-    std::string const&     vrml_image() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -91,6 +75,8 @@ namespace                  configuration {
     std::string            _statusmap_image;
     std::string            _vrml_image;
   };
+
+  typedef umap<std::size_t, shared_ptr<hostextinfo> > map_hostextinfo;
 }
 
 CCE_END()

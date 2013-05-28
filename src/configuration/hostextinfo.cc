@@ -21,14 +21,17 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 
 #define SETTER(type, method) \
-  &object::setter<hostextinfo, type, &hostextinfo::method>::generic
+  &configuration::object::setter< \
+     configuration::hostextinfo, \
+     type, \
+     &configuration::hostextinfo::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(hostextinfo&, std::string const&);
+  bool (*func)(configuration::hostextinfo&, std::string const&);
 } gl_setters[] = {
   { "host_name",       SETTER(std::string const&, _set_hosts) },
   { "hostgroup",       SETTER(std::string const&, _set_hostgroups) },
@@ -46,14 +49,13 @@ static struct {
 };
 
 // Default values.
-static point_2d const default_2d_coords(-1, -1);
-static point_3d const default_3d_coords(0.0, 0.0, 0.0);
-
+static configuration::point_2d const default_2d_coords(-1, -1);
+static configuration::point_3d const default_3d_coords(0.0, 0.0, 0.0);
 
 /**
  *  Default constructor.
  */
-hostextinfo::hostextinfo()
+configuration::hostextinfo::hostextinfo()
   : object(object::hostextinfo, "hostextinfo") {
 
 }
@@ -63,7 +65,7 @@ hostextinfo::hostextinfo()
  *
  *  @param[in] right The hostextinfo to copy.
  */
-hostextinfo::hostextinfo(hostextinfo const& right)
+configuration::hostextinfo::hostextinfo(hostextinfo const& right)
   : object(right) {
   operator=(right);
 }
@@ -71,7 +73,7 @@ hostextinfo::hostextinfo(hostextinfo const& right)
 /**
  *  Destructor.
  */
-hostextinfo::~hostextinfo() throw () {
+configuration::hostextinfo::~hostextinfo() throw () {
 
 }
 
@@ -82,7 +84,8 @@ hostextinfo::~hostextinfo() throw () {
  *
  *  @return This hostextinfo.
  */
-hostextinfo& hostextinfo::operator=(hostextinfo const& right) {
+configuration::hostextinfo& configuration::hostextinfo::operator=(
+                              hostextinfo const& right) {
   if (this != &right) {
     object::operator=(right);
     _2d_coords = right._2d_coords;
@@ -108,7 +111,8 @@ hostextinfo& hostextinfo::operator=(hostextinfo const& right) {
  *
  *  @return True if is the same hostextinfo, otherwise false.
  */
-bool hostextinfo::operator==(hostextinfo const& right) const throw () {
+bool configuration::hostextinfo::operator==(
+       hostextinfo const& right) const throw () {
   return (object::operator==(right)
           && _2d_coords == right._2d_coords
           && _3d_coords == right._3d_coords
@@ -131,7 +135,8 @@ bool hostextinfo::operator==(hostextinfo const& right) const throw () {
  *
  *  @return True if is not the same hostextinfo, otherwise false.
  */
-bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
+bool configuration::hostextinfo::operator!=(
+       hostextinfo const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -140,8 +145,17 @@ bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
  *
  *  @return The object id.
  */
-std::size_t hostextinfo::id() const throw () {
+std::size_t configuration::hostextinfo::id() const throw () {
   return (_id);
+}
+
+/**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::hostextinfo::is_valid() const throw () {
+  return ((!_hostgroups.empty() || !_hosts.empty()));
 }
 
 /**
@@ -149,7 +163,7 @@ std::size_t hostextinfo::id() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void hostextinfo::merge(object const& obj) {
+void configuration::hostextinfo::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   hostextinfo const& tmpl(static_cast<hostextinfo const&>(obj));
@@ -176,7 +190,7 @@ void hostextinfo::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::parse(
+bool configuration::hostextinfo::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -194,7 +208,8 @@ bool hostextinfo::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_2d_coords(std::string const& value) {
+bool configuration::hostextinfo::_set_2d_coords(
+       std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
   if (coords.size() != 2)
@@ -220,7 +235,8 @@ bool hostextinfo::_set_2d_coords(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_3d_coords(std::string const& value) {
+bool configuration::hostextinfo::_set_3d_coords(
+       std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
   if (coords.size() != 2)
@@ -251,7 +267,8 @@ bool hostextinfo::_set_3d_coords(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_action_url(std::string const& value) {
+bool configuration::hostextinfo::_set_action_url(
+       std::string const& value) {
   _action_url = value;
   return (true);
 }
@@ -263,7 +280,8 @@ bool hostextinfo::_set_action_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_gd2_image(std::string const& value) {
+bool configuration::hostextinfo::_set_gd2_image(
+       std::string const& value) {
   _gd2_image = value;
   return (true);
 }
@@ -275,7 +293,8 @@ bool hostextinfo::_set_gd2_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_hostgroups(std::string const& value) {
+bool configuration::hostextinfo::_set_hostgroups(
+       std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -287,7 +306,7 @@ bool hostextinfo::_set_hostgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_hosts(std::string const& value) {
+bool configuration::hostextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
   _id = 0;
   _hash(_id, _hosts.get());
@@ -301,7 +320,8 @@ bool hostextinfo::_set_hosts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_icon_image(std::string const& value) {
+bool configuration::hostextinfo::_set_icon_image(
+       std::string const& value) {
   _icon_image = value;
   return (true);
 }
@@ -313,7 +333,8 @@ bool hostextinfo::_set_icon_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_icon_image_alt(std::string const& value) {
+bool configuration::hostextinfo::_set_icon_image_alt(
+       std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
@@ -325,7 +346,7 @@ bool hostextinfo::_set_icon_image_alt(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_notes(std::string const& value) {
+bool configuration::hostextinfo::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -337,7 +358,8 @@ bool hostextinfo::_set_notes(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_notes_url(std::string const& value) {
+bool configuration::hostextinfo::_set_notes_url(
+       std::string const& value) {
   _notes_url = value;
   return (true);
 }
@@ -349,7 +371,8 @@ bool hostextinfo::_set_notes_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_statusmap_image(std::string const& value) {
+bool configuration::hostextinfo::_set_statusmap_image(
+       std::string const& value) {
   _statusmap_image = value;
   return (true);
 }
@@ -361,7 +384,8 @@ bool hostextinfo::_set_statusmap_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::_set_vrml_image(std::string const& value) {
+bool configuration::hostextinfo::_set_vrml_image(
+       std::string const& value) {
   _vrml_image = value;
   return (true);
 }

@@ -52,53 +52,8 @@ namespace                  configuration {
                              service const& right) const throw ();
     bool                   operator!=(
                              service const& right) const throw ();
-    /*
-    std::string const&     action_url() const throw ();
-    std::string const&     check_command() const throw ();
-    bool                   checks_enabled() const throw ();
-    bool                   check_freshness() const throw ();
-    unsigned int           check_interval() const throw ();
-    std::string const&     check_period() const throw ();
-    std::list<std::string> const&
-                           contactgroups() const throw ();
-    std::list<std::string> const&
-                           contacts() const throw ();
-    std::string const&     display_name() const throw ();
-    std::string const&     event_handler() const throw ();
-    bool                   event_handler_enabled() const throw ();
-    unsigned int           first_notification_delay() const throw ();
-    bool                   flap_detection_enabled() const throw ();
-    unsigned short         flap_detection_options() const throw ();
-    unsigned int           freshness_threshold() const throw ();
-    unsigned int           high_flap_threshold() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::list<std::string> const&
-                           hosts() const throw ();
-    std::string const&     icon_image() const throw ();
-    std::string const&     icon_image_alt() const throw ();
-    unsigned int           initial_state() const throw ();
-    bool                   is_volatile() const throw ();
-    unsigned int           low_flap_threshold() const throw ();
-    unsigned int           max_check_attempts() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
-    bool                   notifications_enabled() const throw ();
-    unsigned int           notification_interval() const throw ();
-    unsigned short         notification_options() const throw ();
-    std::string const&     notification_period() const throw ();
-    bool                   obsess_over_service() const throw ();
-    bool                   process_perf_data() const throw ();
-    bool                   retain_nonstatus_information() const throw ();
-    bool                   retain_status_information() const throw ();
-    unsigned int           retry_interval() const throw ();
-    std::list<std::string> const&
-                           servicegroups() const throw ();
-    std::string const&     service_description() const throw ();
-    unsigned short         stalking_options() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -191,6 +146,8 @@ namespace                  configuration {
     std::string            _service_description;
     opt<unsigned short>    _stalking_options;
  };
+
+  typedef umap<std::size_t, shared_ptr<service> > map_service;
 }
 
 CCE_END()

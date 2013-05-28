@@ -1092,7 +1092,7 @@ void state::check_service_freshness(bool value) {
  *
  *  @return All engine commands.
  */
-umap<std::size_t, shared_ptr<configuration::command> > const& state::commands() const throw () {
+map_command const& state::commands() const throw () {
   return (_commands);
 }
 
@@ -1101,7 +1101,7 @@ umap<std::size_t, shared_ptr<configuration::command> > const& state::commands() 
  *
  *  @return All engine commands.
  */
-umap<std::size_t, shared_ptr<configuration::command> >& state::commands() throw () {
+map_command& state::commands() throw () {
   return (_commands);
 }
 
@@ -1165,7 +1165,7 @@ void state::command_file(std::string const& value) {
  *
  *  @return All engine connectors.
  */
-umap<std::size_t, shared_ptr<configuration::connector> > const& state::connectors() const throw () {
+map_connector const& state::connectors() const throw () {
   return (_connectors);
 }
 
@@ -1174,7 +1174,7 @@ umap<std::size_t, shared_ptr<configuration::connector> > const& state::connector
  *
  *  @return All engine connectors.
  */
-umap<std::size_t, shared_ptr<configuration::connector> >& state::connectors() throw () {
+map_connector& state::connectors() throw () {
   return (_connectors);
 }
 
@@ -1183,7 +1183,7 @@ umap<std::size_t, shared_ptr<configuration::connector> >& state::connectors() th
  *
  *  @return All engine contacts.
  */
-umap<std::size_t, shared_ptr<configuration::contact> > const& state::contacts() const throw () {
+map_contact const& state::contacts() const throw () {
   return (_contacts);
 }
 
@@ -1192,7 +1192,7 @@ umap<std::size_t, shared_ptr<configuration::contact> > const& state::contacts() 
  *
  *  @return All engine contacts.
  */
-umap<std::size_t, shared_ptr<configuration::contact> >& state::contacts() throw () {
+map_contact& state::contacts() throw () {
   return (_contacts);
 }
 
@@ -1201,7 +1201,7 @@ umap<std::size_t, shared_ptr<configuration::contact> >& state::contacts() throw 
  *
  *  @return All engine contactgroups.
  */
-umap<std::size_t, shared_ptr<configuration::contactgroup> > const& state::contactgroups() const throw () {
+map_contactgroup const& state::contactgroups() const throw () {
   return (_contactgroups);
 }
 
@@ -1210,7 +1210,7 @@ umap<std::size_t, shared_ptr<configuration::contactgroup> > const& state::contac
  *
  *  @return All engine contactgroups.
  */
-umap<std::size_t, shared_ptr<configuration::contactgroup> >& state::contactgroups() throw () {
+map_contactgroup& state::contactgroups() throw () {
   return (_contactgroups);
 }
 
@@ -1597,7 +1597,7 @@ void state::high_service_flap_threshold(float value) {
  *
  *  @return All engine hostdependencies.
  */
-umap<std::size_t, shared_ptr<configuration::hostdependency> > const& state::hostdependencies() const throw () {
+map_hostdependency const& state::hostdependencies() const throw () {
   return (_hostdependencies);
 }
 
@@ -1606,7 +1606,7 @@ umap<std::size_t, shared_ptr<configuration::hostdependency> > const& state::host
  *
  *  @return All engine hostdependencies.
  */
-umap<std::size_t, shared_ptr<configuration::hostdependency> >& state::hostdependencies() throw () {
+map_hostdependency& state::hostdependencies() throw () {
   return (_hostdependencies);
 }
 
@@ -1615,7 +1615,7 @@ umap<std::size_t, shared_ptr<configuration::hostdependency> >& state::hostdepend
  *
  *  @return All engine hostescalations.
  */
-umap<std::size_t, shared_ptr<configuration::hostescalation> > const& state::hostescalations() const throw () {
+map_hostescalation const& state::hostescalations() const throw () {
   return (_hostescalations);
 }
 
@@ -1624,7 +1624,7 @@ umap<std::size_t, shared_ptr<configuration::hostescalation> > const& state::host
  *
  *  @return All engine hostescalations.
  */
-umap<std::size_t, shared_ptr<configuration::hostescalation> >& state::hostescalations() throw () {
+map_hostescalation& state::hostescalations() throw () {
   return (_hostescalations);
 }
 
@@ -1633,7 +1633,7 @@ umap<std::size_t, shared_ptr<configuration::hostescalation> >& state::hostescala
  *
  *  @return All engine hostextinfos.
  */
-umap<std::size_t, shared_ptr<configuration::hostextinfo> > const& state::hostextinfos() const throw () {
+map_hostextinfo const& state::hostextinfos() const throw () {
   return (_hostextinfos);
 }
 
@@ -1642,7 +1642,7 @@ umap<std::size_t, shared_ptr<configuration::hostextinfo> > const& state::hostext
  *
  *  @return All engine hostextinfos.
  */
-umap<std::size_t, shared_ptr<configuration::hostextinfo> >& state::hostextinfos() throw () {
+map_hostextinfo& state::hostextinfos() throw () {
   return (_hostextinfos);
 }
 
@@ -1651,7 +1651,7 @@ umap<std::size_t, shared_ptr<configuration::hostextinfo> >& state::hostextinfos(
  *
  *  @return All engine hostgroups.
  */
-umap<std::size_t, shared_ptr<configuration::hostgroup> > const& state::hostgroups() const throw () {
+map_hostgroup const& state::hostgroups() const throw () {
   return (_hostgroups);
 }
 
@@ -1660,7 +1660,7 @@ umap<std::size_t, shared_ptr<configuration::hostgroup> > const& state::hostgroup
  *
  *  @return All engine hostgroups.
  */
-umap<std::size_t, shared_ptr<configuration::hostgroup> >& state::hostgroups() throw () {
+map_hostgroup& state::hostgroups() throw () {
   return (_hostgroups);
 }
 
@@ -1669,7 +1669,7 @@ umap<std::size_t, shared_ptr<configuration::hostgroup> >& state::hostgroups() th
  *
  *  @return All engine hosts.
  */
-umap<std::size_t, shared_ptr<configuration::host> > const& state::hosts() const throw () {
+map_host const& state::hosts() const throw () {
   return (_hosts);
 }
 
@@ -1678,7 +1678,7 @@ umap<std::size_t, shared_ptr<configuration::host> > const& state::hosts() const 
  *
  *  @return All engine hosts.
  */
-umap<std::size_t, shared_ptr<configuration::host> >& state::hosts() throw () {
+map_host& state::hosts() throw () {
   return (_hosts);
 }
 
@@ -2505,7 +2505,7 @@ void state::retention_update_interval(unsigned int value) {
  *
  *  @return All engine servicedependencies.
  */
-umap<std::size_t, shared_ptr<configuration::servicedependency> > const& state::servicedependencies() const throw () {
+map_servicedependency const& state::servicedependencies() const throw () {
   return (_servicedependencies);
 }
 
@@ -2514,7 +2514,7 @@ umap<std::size_t, shared_ptr<configuration::servicedependency> > const& state::s
  *
  *  @return All engine servicedependencies.
  */
-umap<std::size_t, shared_ptr<configuration::servicedependency> >& state::servicedependencies() throw () {
+map_servicedependency& state::servicedependencies() throw () {
   return (_servicedependencies);
 }
 
@@ -2523,7 +2523,7 @@ umap<std::size_t, shared_ptr<configuration::servicedependency> >& state::service
  *
  *  @return All engine serviceescalations.
  */
-umap<std::size_t, shared_ptr<configuration::serviceescalation> > const& state::serviceescalations() const throw () {
+map_serviceescalation const& state::serviceescalations() const throw () {
   return (_serviceescalations);
 }
 
@@ -2532,7 +2532,7 @@ umap<std::size_t, shared_ptr<configuration::serviceescalation> > const& state::s
  *
  *  @return All engine serviceescalations.
  */
-umap<std::size_t, shared_ptr<configuration::serviceescalation> >& state::serviceescalations() throw () {
+map_serviceescalation& state::serviceescalations() throw () {
   return (_serviceescalations);
 }
 
@@ -2541,7 +2541,7 @@ umap<std::size_t, shared_ptr<configuration::serviceescalation> >& state::service
  *
  *  @return All engine serviceextinfos.
  */
-umap<std::size_t, shared_ptr<configuration::serviceextinfo> > const& state::serviceextinfos() const throw () {
+map_serviceextinfo const& state::serviceextinfos() const throw () {
   return (_serviceextinfos);
 }
 
@@ -2550,7 +2550,7 @@ umap<std::size_t, shared_ptr<configuration::serviceextinfo> > const& state::serv
  *
  *  @return All engine serviceextinfos.
  */
-umap<std::size_t, shared_ptr<configuration::serviceextinfo> >& state::serviceextinfos() throw () {
+map_serviceextinfo& state::serviceextinfos() throw () {
   return (_serviceextinfos);
 }
 
@@ -2559,7 +2559,7 @@ umap<std::size_t, shared_ptr<configuration::serviceextinfo> >& state::serviceext
  *
  *  @return All engine servicegroups.
  */
-umap<std::size_t, shared_ptr<configuration::servicegroup> > const& state::servicegroups() const throw () {
+map_servicegroup const& state::servicegroups() const throw () {
   return (_servicegroups);
 }
 
@@ -2568,7 +2568,7 @@ umap<std::size_t, shared_ptr<configuration::servicegroup> > const& state::servic
  *
  *  @return All engine servicegroups.
  */
-umap<std::size_t, shared_ptr<configuration::servicegroup> >& state::servicegroups() throw () {
+map_servicegroup& state::servicegroups() throw () {
   return (_servicegroups);
 }
 
@@ -2577,7 +2577,7 @@ umap<std::size_t, shared_ptr<configuration::servicegroup> >& state::servicegroup
  *
  *  @return All engine services.
  */
-umap<std::size_t, shared_ptr<configuration::service> > const& state::services() const throw () {
+map_service const& state::services() const throw () {
   return (_services);
 }
 
@@ -2586,7 +2586,7 @@ umap<std::size_t, shared_ptr<configuration::service> > const& state::services() 
  *
  *  @return All engine services.
  */
-umap<std::size_t, shared_ptr<configuration::service> >& state::services() throw () {
+map_service& state::services() throw () {
   return (_services);
 }
 
@@ -2792,7 +2792,7 @@ bool state::set(std::string const& key, std::string const& value) {
  *
  *  @return All engine timeperiods.
  */
-umap<std::size_t, shared_ptr<configuration::timeperiod> > const& state::timeperiods() const throw () {
+map_timeperiod const& state::timeperiods() const throw () {
   return (_timeperiods);
 }
 
@@ -2801,7 +2801,7 @@ umap<std::size_t, shared_ptr<configuration::timeperiod> > const& state::timeperi
  *
  *  @return All engine timeperiods.
  */
-umap<std::size_t, shared_ptr<configuration::timeperiod> >& state::timeperiods() throw () {
+map_timeperiod& state::timeperiods() throw () {
   return (_timeperiods);
 }
 

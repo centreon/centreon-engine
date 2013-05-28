@@ -26,6 +26,7 @@
 #  include "com/centreon/engine/configuration/daterange.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/objects.hh"
 
 CCE_BEGIN()
 
@@ -41,13 +42,9 @@ namespace                  configuration {
                              timeperiod const& right) const throw ();
     bool                   operator!=(
                              timeperiod const& right) const throw ();
-    /*
-    std::string const&     alias() const throw ();
-    std::list<std::string> const&
-                           exclude() const throw ();
-    std::string const&     timeperiod_name() const throw ();
-    */
+    ::timeperiod*          create() const;
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -78,6 +75,8 @@ namespace                  configuration {
     std::vector<std::list<std::string> >
                            _timeranges;
   };
+
+  typedef umap<std::size_t, shared_ptr<timeperiod> > map_timeperiod;
 }
 
 CCE_END()

@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/objects.hh"
 
 CCE_BEGIN()
 
@@ -37,18 +38,13 @@ namespace                  configuration {
                              command const& right) const throw ();
     bool                   operator!=(
                              command const& right) const throw ();
-    /*
-    std::string const&     command_line() const throw ();
-    std::string const&     command_name() const throw ();
-    std::string const&     connector() const throw ();
-    */
-
+    ::command*             create() const;
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
-
   private:
     bool                   _set_command_line(std::string const& value);
     bool                   _set_command_name(std::string const& value);
@@ -58,6 +54,8 @@ namespace                  configuration {
     std::string            _command_name;
     std::string            _connector;
   };
+
+  typedef umap<std::size_t, shared_ptr<command> > map_command;
 }
 
 CCE_END()

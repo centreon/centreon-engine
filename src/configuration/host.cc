@@ -22,15 +22,18 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
-  &object::setter<host, type, &host::method>::generic
+  &configuration::object::setter< \
+     configuration::host, \
+     type, \
+     &configuration::host::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(host&, std::string const&);
+  bool (*func)(configuration::host&, std::string const&);
 } gl_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_host_name) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
@@ -84,36 +87,40 @@ static struct {
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
 };
 
+// XXX: check all default value from xodtemplate_inherit_object_properties !
 // Default values.
-static point_2d const       default_2d_coords(-1, -1);
-static point_3d const       default_3d_coords(0.0, 0.0, 0.0);
-static bool const           default_checks_active(true);
-static bool const           default_checks_passive(true);
-static bool const           default_check_freshness(false);
-static unsigned int const   default_check_interval(5);
-static bool const           default_event_handler_enabled(true);
-static unsigned int const   default_first_notification_delay(0);
-static bool const           default_flap_detection_enabled(true);
-static unsigned short const default_flap_detection_options(host::up | host::down | host::unreachable);
-static unsigned int const   default_freshness_threshold(0);
-static unsigned int const   default_high_flap_threshold(0);
-static unsigned short const default_initial_state(HOST_UP);
-static unsigned int const   default_low_flap_threshold(0);
-static unsigned int const   default_max_check_attempts(0);
-static bool const           default_notifications_enabled(true);
-static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(host::none);
-static bool const           default_obsess_over_host(true);
-static bool const           default_process_perf_data(true);
-static bool const           default_retain_nonstatus_information(true);
-static bool const           default_retain_status_information(true);
-static unsigned int const   default_retry_interval(1);
-static unsigned short const default_stalking_options(host::none);
+static configuration::point_2d const default_2d_coords(-1, -1);
+static configuration::point_3d const default_3d_coords(0.0, 0.0, 0.0);
+static bool const                    default_checks_active(true);
+static bool const                    default_checks_passive(true);
+static bool const                    default_check_freshness(false);
+static unsigned int const            default_check_interval(5);
+static bool const                    default_event_handler_enabled(true);
+static unsigned int const            default_first_notification_delay(0);
+static bool const                    default_flap_detection_enabled(true);
+static unsigned short const          default_flap_detection_options(
+                                       configuration::host::up
+                                       | configuration::host::down
+                                       | configuration::host::unreachable);
+static unsigned int const            default_freshness_threshold(0);
+static unsigned int const            default_high_flap_threshold(0);
+static unsigned short const          default_initial_state(HOST_UP);
+static unsigned int const            default_low_flap_threshold(0);
+static unsigned int const            default_max_check_attempts(0);
+static bool const                    default_notifications_enabled(true);
+static unsigned int const            default_notification_interval(30);
+static unsigned short const          default_notification_options(configuration::host::none);
+static bool const                    default_obsess_over_host(true);
+static bool const                    default_process_perf_data(true);
+static bool const                    default_retain_nonstatus_information(true);
+static bool const                    default_retain_status_information(true);
+static unsigned int const            default_retry_interval(1);
+static unsigned short const          default_stalking_options(configuration::host::none);
 
 /**
  *  Default constructor.
  */
-host::host()
+configuration::host::host()
   : object(object::host, "host") {
 
 }
@@ -123,7 +130,7 @@ host::host()
  *
  *  @param[in] right The host to copy.
  */
-host::host(host const& right)
+configuration::host::host(host const& right)
   : object(right) {
   operator=(right);
 }
@@ -131,7 +138,7 @@ host::host(host const& right)
 /**
  *  Destructor.
  */
-host::~host() throw () {
+configuration::host::~host() throw () {
 
 }
 
@@ -142,7 +149,7 @@ host::~host() throw () {
  *
  *  @return This host.
  */
-host& host::operator=(host const& right) {
+configuration::host& configuration::host::operator=(host const& right) {
   if (this != &right) {
     object::operator=(right);
     _2d_coords = right._2d_coords;
@@ -201,7 +208,7 @@ host& host::operator=(host const& right) {
  *
  *  @return True if is the same host, otherwise false.
  */
-bool host::operator==(host const& right) const throw () {
+bool configuration::host::operator==(host const& right) const throw () {
   return (object::operator==(right)
           && _2d_coords == right._2d_coords
           && _3d_coords == right._3d_coords
@@ -257,7 +264,7 @@ bool host::operator==(host const& right) const throw () {
  *
  *  @return True if is not the same host, otherwise false.
  */
-bool host::operator!=(host const& right) const throw () {
+bool configuration::host::operator!=(host const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -266,8 +273,18 @@ bool host::operator!=(host const& right) const throw () {
  *
  *  @return The object id.
  */
-std::size_t host::id() const throw () {
+std::size_t configuration::host::id() const throw () {
   return (_id);
+}
+
+/**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::host::is_valid() const throw () {
+  return (!_host_name.empty()
+          && !_address.empty());
 }
 
 /**
@@ -275,7 +292,7 @@ std::size_t host::id() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void host::merge(object const& obj) {
+void configuration::host::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   host const& tmpl(static_cast<host const&>(obj));
@@ -335,7 +352,9 @@ void host::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::parse(std::string const& key, std::string const& value) {
+bool configuration::host::parse(
+       std::string const& key,
+       std::string const& value) {
   for (unsigned int i(0);
        i < sizeof(gl_setters) / sizeof(gl_setters[0]);
        ++i)
@@ -351,7 +370,7 @@ bool host::parse(std::string const& key, std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_2d_coords(std::string const& value) {
+bool configuration::host::_set_2d_coords(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
   if (coords.size() != 2)
@@ -377,7 +396,7 @@ bool host::_set_2d_coords(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_3d_coords(std::string const& value) {
+bool configuration::host::_set_3d_coords(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
   if (coords.size() != 2)
@@ -408,7 +427,7 @@ bool host::_set_3d_coords(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_action_url(std::string const& value) {
+bool configuration::host::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
@@ -420,7 +439,7 @@ bool host::_set_action_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_address(std::string const& value) {
+bool configuration::host::_set_address(std::string const& value) {
   _address = value;
   return (true);
 }
@@ -432,7 +451,7 @@ bool host::_set_address(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_alias(std::string const& value) {
+bool configuration::host::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
@@ -444,7 +463,7 @@ bool host::_set_alias(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_checks_active(bool value) {
+bool configuration::host::_set_checks_active(bool value) {
   _checks_active = value;
   return (true);
 }
@@ -456,7 +475,7 @@ bool host::_set_checks_active(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_checks_passive(bool value) {
+bool configuration::host::_set_checks_passive(bool value) {
   _checks_passive = value;
   return (true);
 }
@@ -468,7 +487,7 @@ bool host::_set_checks_passive(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_check_command(std::string const& value) {
+bool configuration::host::_set_check_command(std::string const& value) {
   _check_command = value;
   return (true);
 }
@@ -480,7 +499,7 @@ bool host::_set_check_command(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_check_freshness(bool value) {
+bool configuration::host::_set_check_freshness(bool value) {
   _check_freshness = value;
   return (true);
 }
@@ -492,7 +511,7 @@ bool host::_set_check_freshness(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_check_interval(unsigned int value) {
+bool configuration::host::_set_check_interval(unsigned int value) {
   _check_interval = value;
   return (true);
 }
@@ -504,7 +523,7 @@ bool host::_set_check_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_check_period(std::string const& value) {
+bool configuration::host::_set_check_period(std::string const& value) {
   _check_period = value;
   return (true);
 }
@@ -516,7 +535,7 @@ bool host::_set_check_period(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_contactgroups(std::string const& value) {
+bool configuration::host::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
@@ -528,7 +547,7 @@ bool host::_set_contactgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_contacts(std::string const& value) {
+bool configuration::host::_set_contacts(std::string const& value) {
   _contacts.set(value);
   return (true);
 }
@@ -540,7 +559,7 @@ bool host::_set_contacts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_display_name(std::string const& value) {
+bool configuration::host::_set_display_name(std::string const& value) {
   _display_name = value;
   return (true);
 }
@@ -552,7 +571,7 @@ bool host::_set_display_name(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_event_handler(std::string const& value) {
+bool configuration::host::_set_event_handler(std::string const& value) {
   _event_handler = value;
   return (true);
 }
@@ -564,7 +583,7 @@ bool host::_set_event_handler(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_event_handler_enabled(bool value) {
+bool configuration::host::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
   return (true);
 }
@@ -576,7 +595,7 @@ bool host::_set_event_handler_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_failure_prediction_enabled(bool value) {
+bool configuration::host::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: host failure_prediction_enabled was ignored";
@@ -590,7 +609,8 @@ bool host::_set_failure_prediction_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_failure_prediction_options(std::string const& value) {
+bool configuration::host::_set_failure_prediction_options(
+       std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: service failure_prediction_options was ignored";
@@ -604,7 +624,8 @@ bool host::_set_failure_prediction_options(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_first_notification_delay(unsigned int value) {
+bool configuration::host::_set_first_notification_delay(
+       unsigned int value) {
   _first_notification_delay = value;
   return (true);
 }
@@ -616,7 +637,7 @@ bool host::_set_first_notification_delay(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_flap_detection_enabled(bool value) {
+bool configuration::host::_set_flap_detection_enabled(bool value) {
   _flap_detection_enabled = value;
   return (true);
 }
@@ -628,7 +649,8 @@ bool host::_set_flap_detection_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_flap_detection_options(std::string const& value) {
+bool configuration::host::_set_flap_detection_options(
+       std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -661,7 +683,7 @@ bool host::_set_flap_detection_options(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_freshness_threshold(unsigned int value) {
+bool configuration::host::_set_freshness_threshold(unsigned int value) {
   _freshness_threshold = value;
   return (true);
 }
@@ -673,7 +695,7 @@ bool host::_set_freshness_threshold(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_gd2_image(std::string const& value) {
+bool configuration::host::_set_gd2_image(std::string const& value) {
   _gd2_image = value;
   return (true);
 }
@@ -685,7 +707,7 @@ bool host::_set_gd2_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_high_flap_threshold(unsigned int value) {
+bool configuration::host::_set_high_flap_threshold(unsigned int value) {
   _high_flap_threshold = value;
   return (true);
 }
@@ -697,7 +719,7 @@ bool host::_set_high_flap_threshold(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_host_name(std::string const& value) {
+bool configuration::host::_set_host_name(std::string const& value) {
   _host_name = value;
   _id = _hash(value);
   return (true);
@@ -710,7 +732,7 @@ bool host::_set_host_name(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_hostgroups(std::string const& value) {
+bool configuration::host::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -722,7 +744,7 @@ bool host::_set_hostgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_icon_image(std::string const& value) {
+bool configuration::host::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
@@ -734,7 +756,8 @@ bool host::_set_icon_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_icon_image_alt(std::string const& value) {
+bool configuration::host::_set_icon_image_alt(
+       std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
@@ -746,7 +769,7 @@ bool host::_set_icon_image_alt(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_initial_state(std::string const& value) {
+bool configuration::host::_set_initial_state(std::string const& value) {
   std::string data(value);
   misc::trim(data);
   if (data == "o" || data == "up")
@@ -767,7 +790,7 @@ bool host::_set_initial_state(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_low_flap_threshold(unsigned int value) {
+bool configuration::host::_set_low_flap_threshold(unsigned int value) {
   _low_flap_threshold = value;
   return (true);
 }
@@ -779,7 +802,9 @@ bool host::_set_low_flap_threshold(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_max_check_attempts(unsigned int value) {
+bool configuration::host::_set_max_check_attempts(unsigned int value) {
+  if (!value)
+    return (false);
   _max_check_attempts = value;
   return (true);
 }
@@ -791,7 +816,7 @@ bool host::_set_max_check_attempts(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notes(std::string const& value) {
+bool configuration::host::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -803,7 +828,7 @@ bool host::_set_notes(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notes_url(std::string const& value) {
+bool configuration::host::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
@@ -815,7 +840,7 @@ bool host::_set_notes_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notifications_enabled(bool value) {
+bool configuration::host::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
   return (true);
 }
@@ -827,7 +852,8 @@ bool host::_set_notifications_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notification_interval(unsigned int value) {
+bool configuration::host::_set_notification_interval(
+       unsigned int value) {
   _notification_interval = value;
   return (true);
 }
@@ -839,7 +865,8 @@ bool host::_set_notification_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notification_options(std::string const& value) {
+bool configuration::host::_set_notification_options(
+       std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -876,7 +903,8 @@ bool host::_set_notification_options(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_notification_period(std::string const& value) {
+bool configuration::host::_set_notification_period(
+       std::string const& value) {
   _notification_period = value;
   return (true);
 }
@@ -888,7 +916,7 @@ bool host::_set_notification_period(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_obsess_over_host(bool value) {
+bool configuration::host::_set_obsess_over_host(bool value) {
   _obsess_over_host = value;
   return (true);
 }
@@ -900,7 +928,7 @@ bool host::_set_obsess_over_host(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_parents(std::string const& value) {
+bool configuration::host::_set_parents(std::string const& value) {
   _parents.set(value);
   return (true);
 }
@@ -912,7 +940,7 @@ bool host::_set_parents(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_process_perf_data(bool value) {
+bool configuration::host::_set_process_perf_data(bool value) {
   _process_perf_data = value;
   return (true);
 }
@@ -924,7 +952,8 @@ bool host::_set_process_perf_data(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_retain_nonstatus_information(bool value) {
+bool configuration::host::_set_retain_nonstatus_information(
+       bool value) {
   _retain_nonstatus_information = value;
   return (true);
 }
@@ -936,7 +965,7 @@ bool host::_set_retain_nonstatus_information(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_retain_status_information(bool value) {
+bool configuration::host::_set_retain_status_information(bool value) {
   _retain_status_information = value;
   return (true);
 }
@@ -948,7 +977,7 @@ bool host::_set_retain_status_information(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_retry_interval(unsigned int value) {
+bool configuration::host::_set_retry_interval(unsigned int value) {
   _retry_interval = value;
   return (true);
 }
@@ -960,7 +989,8 @@ bool host::_set_retry_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_stalking_options(std::string const& value) {
+bool configuration::host::_set_stalking_options(
+       std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -993,7 +1023,8 @@ bool host::_set_stalking_options(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_statusmap_image(std::string const& value) {
+bool configuration::host::_set_statusmap_image(
+       std::string const& value) {
   _statusmap_image = value;
   return (true);
 }
@@ -1005,7 +1036,7 @@ bool host::_set_statusmap_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_vrml_image(std::string const& value) {
+bool configuration::host::_set_vrml_image(std::string const& value) {
   _vrml_image = value;
   return (true);
 }

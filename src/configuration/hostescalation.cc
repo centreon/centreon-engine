@@ -21,14 +21,17 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine;
 
 #define SETTER(type, method) \
-  &object::setter<hostescalation, type, &hostescalation::method>::generic
+  &configuration::object::setter< \
+     configuration::hostescalation, \
+     type, \
+     &configuration::hostescalation::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(hostescalation&, std::string const&);
+  bool (*func)(configuration::hostescalation&, std::string const&);
 } gl_setters[] = {
   { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
@@ -45,7 +48,7 @@ static struct {
 };
 
 // Default values.
-static unsigned short const default_escalation_options(hostescalation::none);
+static unsigned short const default_escalation_options(configuration::hostescalation::none);
 static unsigned int const   default_first_notification(-2);
 static unsigned int const   default_last_notification(-2);
 static unsigned int const   default_notification_interval(0);
@@ -53,7 +56,7 @@ static unsigned int const   default_notification_interval(0);
 /**
  *  Default constructor.
  */
-hostescalation::hostescalation()
+configuration::hostescalation::hostescalation()
   : object(object::hostescalation, "hostescalation") {
 
 }
@@ -63,7 +66,8 @@ hostescalation::hostescalation()
  *
  *  @param[in] right The hostescalation to copy.
  */
-hostescalation::hostescalation(hostescalation const& right)
+configuration::hostescalation::hostescalation(
+  hostescalation const& right)
   : object(right) {
   operator=(right);
 }
@@ -71,7 +75,7 @@ hostescalation::hostescalation(hostescalation const& right)
 /**
  *  Destructor.
  */
-hostescalation::~hostescalation() throw () {
+configuration::hostescalation::~hostescalation() throw () {
 
 }
 
@@ -82,7 +86,8 @@ hostescalation::~hostescalation() throw () {
  *
  *  @return This hostescalation.
  */
-hostescalation& hostescalation::operator=(hostescalation const& right) {
+configuration::hostescalation& configuration::hostescalation::operator=(
+                                 hostescalation const& right) {
   if (this != &right) {
     object::operator=(right);
     _contactgroups = right._contactgroups;
@@ -105,7 +110,8 @@ hostescalation& hostescalation::operator=(hostescalation const& right) {
  *
  *  @return True if is the same hostescalation, otherwise false.
  */
-bool hostescalation::operator==(hostescalation const& right) const throw () {
+bool configuration::hostescalation::operator==(
+       hostescalation const& right) const throw () {
   return (object::operator==(right)
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
@@ -125,7 +131,8 @@ bool hostescalation::operator==(hostescalation const& right) const throw () {
  *
  *  @return True if is not the same hostescalation, otherwise false.
  */
-bool hostescalation::operator!=(hostescalation const& right) const throw () {
+bool configuration::hostescalation::operator!=(
+       hostescalation const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -134,8 +141,19 @@ bool hostescalation::operator!=(hostescalation const& right) const throw () {
  *
  *  @return The object id.
  */
-std::size_t hostescalation::id() const throw () {
+std::size_t configuration::hostescalation::id() const throw () {
   return (_id);
+}
+
+/**
+ *  Check if the object is valid.
+ *
+ *  @return True if is a valid object, otherwise false.
+ */
+bool configuration::hostescalation::is_valid() const throw () {
+  return ((!_hosts.empty() || !_hostgroups.empty())
+          && (!_contacts.empty() || !_contactgroups.empty())
+          && !_escalation_period.empty());
 }
 
 /**
@@ -143,7 +161,7 @@ std::size_t hostescalation::id() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void hostescalation::merge(object const& obj) {
+void configuration::hostescalation::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   hostescalation const& tmpl(static_cast<hostescalation const&>(obj));
@@ -167,7 +185,7 @@ void hostescalation::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::parse(
+bool configuration::hostescalation::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -185,7 +203,8 @@ bool hostescalation::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_contactgroups(std::string const& value) {
+bool configuration::hostescalation::_set_contactgroups(
+       std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
@@ -197,7 +216,8 @@ bool hostescalation::_set_contactgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_contacts(std::string const& value) {
+bool configuration::hostescalation::_set_contacts(
+       std::string const& value) {
   _contacts.set(value);
   return (true);
 }
@@ -209,7 +229,8 @@ bool hostescalation::_set_contacts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_escalation_options(std::string const& value) {
+bool configuration::hostescalation::_set_escalation_options(
+       std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -242,7 +263,8 @@ bool hostescalation::_set_escalation_options(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_escalation_period(std::string const& value) {
+bool configuration::hostescalation::_set_escalation_period(
+       std::string const& value) {
   _escalation_period = value;
   return (true);
 }
@@ -254,7 +276,8 @@ bool hostescalation::_set_escalation_period(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_first_notification(unsigned int value) {
+bool configuration::hostescalation::_set_first_notification(
+       unsigned int value) {
   _first_notification = value;
   return (true);
 }
@@ -266,7 +289,8 @@ bool hostescalation::_set_first_notification(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_hostgroups(std::string const& value) {
+bool configuration::hostescalation::_set_hostgroups(
+       std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -278,7 +302,8 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_hosts(std::string const& value) {
+bool configuration::hostescalation::_set_hosts(
+       std::string const& value) {
   _hosts.set(value);
   _id = 0;
   _hash(_id, _hosts.get());
@@ -292,7 +317,8 @@ bool hostescalation::_set_hosts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_last_notification(unsigned int value) {
+bool configuration::hostescalation::_set_last_notification(
+       unsigned int value) {
   _last_notification = value;
   return (true);
 }
@@ -304,7 +330,8 @@ bool hostescalation::_set_last_notification(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::_set_notification_interval(unsigned int value) {
+bool configuration::hostescalation::_set_notification_interval(
+       unsigned int value) {
   _notification_interval = value;
   return (true);
 }

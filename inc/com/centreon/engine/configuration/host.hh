@@ -51,56 +51,8 @@ namespace                  configuration {
     host&                  operator=(host const& right);
     bool                   operator==(host const& right) const throw ();
     bool                   operator!=(host const& right) const throw ();
-    /*
-    point_2d const&        2d_coords() const throw ();
-    point_3d const&        3d_coords() const throw ();
-    std::string const&     action_url() const throw ();
-    std::string const&     address() const throw ();
-    std::string const&     alias() const throw ();
-    std::string const&     check_command() const throw ();
-    bool                   check_freshness() const throw ();
-    unsigned int           check_interval() const throw ();
-    std::string            check_period() const throw ();
-    std::list<std::string> const&
-                           contactgroups() const throw ();
-    std::list<std::string> const&
-                           contacts() const throw ();
-    std::string const&     display_name() const throw ();
-    std::string const&     event_handler() const throw ();
-    bool                   event_handler_enabled() const throw ();
-    unsigned int           first_notification_delay() const throw ();
-    bool                   flap_detection_enabled() const throw ();
-    unsigned int           flap_detection_options() const throw ();
-    unsigned int           freshness_threshold() const throw ();
-    std::string const&     gd2_image() const throw ();
-    unsigned int           high_flap_threshold() const throw ();
-    std::list<std::string> const&
-                           hostgroups() const throw ();
-    std::string const&     host_name() const throw ();
-    std::string const&     icon_image() const throw ();
-    std::string const&     icon_image_alt() const throw ();
-    unsigned int           initial_state() const throw ();
-    unsigned int           low_flap_threshold() const throw ();
-    unsigned int           max_check_attempts() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
-    bool                   notifications_enabled() const throw ();
-    unsigned int           notification_interval() const throw ();
-    unsigned int           notification_options() const throw ();
-    std::string const&     notification_period() const throw ();
-    bool                   obsess_over_host() const throw ();
-    std::list<std::string> const&
-                           parents() const throw ();
-    bool                   process_perf_data() const throw ();
-    bool                   retain_nonstatus_information() const throw ();
-    bool                   retain_status_information() const throw ();
-    unsigned int           retry_interval() const throw ();
-    unsigned int           stalking_options() const throw ();
-    std::string const&     statusmap_image() const throw ();
-    std::string const&     vrml_image() const throw ();
-    */
-
     std::size_t            id() const throw ();
+    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
@@ -201,6 +153,8 @@ namespace                  configuration {
     std::string            _statusmap_image;
     std::string            _vrml_image;
   };
+
+  typedef umap<std::size_t, shared_ptr<host> > map_host;
 }
 
 CCE_END()

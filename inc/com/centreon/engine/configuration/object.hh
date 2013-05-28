@@ -64,6 +64,7 @@ namespace                  configuration {
     static shared_ptr<object>
                            create(std::string const& type_name);
     virtual std::size_t    id() const throw () = 0;
+    virtual bool           is_valid() const throw () = 0;
     bool                   is_template() const throw ();
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
@@ -114,6 +115,9 @@ namespace                  configuration {
     object_type            _type;
     std::string            _type_name;
   };
+
+  typedef umap<std::size_t, shared_ptr<object> > map_object;
+  typedef umap<std::string, shared_ptr<object> > map_template;
 }
 
 CCE_END()

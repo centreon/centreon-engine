@@ -25,31 +25,6 @@ using namespace com::centreon::engine::configuration;
 static applier::globals* _instance = NULL;
 
 /**
- *  Get the singleton instance of globals applier.
- *
- *  @return Singleton instance.
- */
-applier::globals& applier::globals::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load globals applier singleton.
- */
-void applier::globals::load() {
-  if (!_instance)
-    _instance = new applier::globals;
-}
-
-/**
- *  Unload globals applier singleton.
- */
-void applier::globals::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
-/**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
@@ -149,6 +124,31 @@ void applier::globals::apply(state const& config) {
   ::use_retained_scheduling_info = config.use_retained_scheduling_info();
   ::use_syslog = config.use_syslog();
   ::use_true_regexp_matching = config.use_true_regexp_matching();
+}
+
+/**
+ *  Get the singleton instance of globals applier.
+ *
+ *  @return Singleton instance.
+ */
+applier::globals& applier::globals::instance() {
+  return (*_instance);
+}
+
+/**
+ *  Load globals applier singleton.
+ */
+void applier::globals::load() {
+  if (!_instance)
+    _instance = new applier::globals;
+}
+
+/**
+ *  Unload globals applier singleton.
+ */
+void applier::globals::unload() {
+  delete _instance;
+  _instance = NULL;
 }
 
 /**

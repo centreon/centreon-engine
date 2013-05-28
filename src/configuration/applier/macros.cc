@@ -29,6 +29,21 @@ using namespace com::centreon::engine::configuration;
 static applier::macros* _instance = NULL;
 
 /**
+ *  Apply new configuration.
+ *
+ *  @param[in] config The new configuration.
+ */
+void applier::macros::apply(state const& config) {
+  _set_macro(MACRO_ADMINEMAIL, config.admin_email());
+  _set_macro(MACRO_ADMINPAGER, config.admin_pager());
+  _set_macro(MACRO_COMMANDFILE, config.command_file());
+  _set_macro(MACRO_LOGFILE, config.log_file());
+  _set_macro(MACRO_MAINCONFIGFILE, config.cfg_main());
+  if (config.resource_file().size() > 0)
+    _set_macro(MACRO_RESOURCEFILE, config.resource_file().front());
+}
+
+/**
  *  Get the singleton instance of macros applier.
  *
  *  @return Singleton instance.
@@ -51,21 +66,6 @@ void applier::macros::load() {
 void applier::macros::unload() {
   delete _instance;
   _instance = NULL;
-}
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::macros::apply(state const& config) {
-  _set_macro(MACRO_ADMINEMAIL, config.admin_email());
-  _set_macro(MACRO_ADMINPAGER, config.admin_pager());
-  _set_macro(MACRO_COMMANDFILE, config.command_file());
-  _set_macro(MACRO_LOGFILE, config.log_file());
-  _set_macro(MACRO_MAINCONFIGFILE, config.cfg_main());
-  if (config.resource_file().size() > 0)
-    _set_macro(MACRO_RESOURCEFILE, config.resource_file().front());
 }
 
 /**
