@@ -21,17 +21,14 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::hostdependency, \
-     type, \
-     &configuration::hostdependency::method>::generic
+  &object::setter<hostdependency, type, &hostdependency::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::hostdependency&, std::string const&);
+  bool (*func)(hostdependency&, std::string const&);
 } gl_setters[] = {
   { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
@@ -53,14 +50,14 @@ static struct {
 };
 
 // Default values.
-static unsigned short const default_execution_failure_options(configuration::hostdependency::none);
+static unsigned short const default_execution_failure_options(hostdependency::none);
 static bool const           default_inherits_parent(false);
-static unsigned short const default_notification_failure_options(configuration::hostdependency::none);
+static unsigned short const default_notification_failure_options(hostdependency::none);
 
 /**
  *  Default constructor.
  */
-configuration::hostdependency::hostdependency()
+hostdependency::hostdependency()
   : object(object::hostdependency, "hostdependency") {
 
 }
@@ -70,8 +67,7 @@ configuration::hostdependency::hostdependency()
  *
  *  @param[in] right The hostdependency to copy.
  */
-configuration::hostdependency::hostdependency(
-  hostdependency const& right)
+hostdependency::hostdependency(hostdependency const& right)
   : object(right) {
   operator=(right);
 }
@@ -79,7 +75,7 @@ configuration::hostdependency::hostdependency(
 /**
  *  Destructor.
  */
-configuration::hostdependency::~hostdependency() throw () {
+hostdependency::~hostdependency() throw () {
 
 }
 
@@ -90,8 +86,7 @@ configuration::hostdependency::~hostdependency() throw () {
  *
  *  @return This hostdependency.
  */
-configuration::hostdependency& configuration::hostdependency::operator=(
-                                 hostdependency const& right) {
+hostdependency& hostdependency::operator=(hostdependency const& right) {
   if (this != &right) {
     object::operator=(right);
     _dependency_period = right._dependency_period;
@@ -113,8 +108,7 @@ configuration::hostdependency& configuration::hostdependency::operator=(
  *
  *  @return True if is the same hostdependency, otherwise false.
  */
-bool configuration::hostdependency::operator==(
-       hostdependency const& right) const throw () {
+bool hostdependency::operator==(hostdependency const& right) const throw () {
   return (object::operator==(right)
           && _dependency_period == right._dependency_period
           && _dependent_hostgroups == right._dependent_hostgroups
@@ -133,8 +127,7 @@ bool configuration::hostdependency::operator==(
  *
  *  @return True if is not the same hostdependency, otherwise false.
  */
-bool configuration::hostdependency::operator!=(
-       hostdependency const& right) const throw () {
+bool hostdependency::operator!=(hostdependency const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -143,7 +136,7 @@ bool configuration::hostdependency::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::hostdependency::id() const throw () {
+std::size_t hostdependency::id() const throw () {
   return (_id);
 }
 
@@ -152,10 +145,16 @@ std::size_t configuration::hostdependency::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::hostdependency::is_valid() const throw () {
-  return ((!_hosts.empty() || !_hostgroups.empty())
-          && (!_dependent_hosts.empty() || !_dependent_hostgroups.empty())
-          && !_dependency_period.empty());
+void hostdependency::check_validity() const {
+  if (_hosts.empty() && _hostgroups.empty())
+    throw (engine_error() << "configuration: invalid hostdependency "
+           "property host or hostgroup is missing");
+  if (_dependent_hosts.empty() && _dependent_hostgroups.empty())
+    throw (engine_error() << "configuration: invalid hostdependency "
+           "property dependent_host or dependent_hostgroup is missing");
+  if (_dependency_period.empty())
+    throw (engine_error() << "configuration: invalid hostdependency "
+           "property dependency_period is missing");
 }
 
 /**
@@ -163,7 +162,7 @@ bool configuration::hostdependency::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::hostdependency::merge(object const& obj) {
+void hostdependency::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   hostdependency const& tmpl(static_cast<hostdependency const&>(obj));
@@ -186,7 +185,7 @@ void configuration::hostdependency::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::parse(
+bool hostdependency::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -198,14 +197,85 @@ bool configuration::hostdependency::parse(
 }
 
 /**
+ *  Get dependency_period.
+ *
+ *  @return The dependency_period.
+ */
+std::string const& hostdependency::dependency_period() const throw () {
+  return (_dependency_period);
+}
+
+/**
+ *  Get dependent_hostgroups.
+ *
+ *  @return The dependent_hostgroups.
+ */
+list_string const& hostdependency::dependent_hostgroups() const throw () {
+  return (_dependent_hostgroups.get());
+}
+
+/**
+ *  Get dependent_hosts.
+ *
+ *  @return The dependent_hosts.
+ */
+list_string const& hostdependency::dependent_hosts() const throw () {
+  return (_dependent_hosts.get());
+}
+
+/**
+ *  Get execution_failure_options.
+ *
+ *  @return The execution_failure_options.
+ */
+unsigned int hostdependency::execution_failure_options() const throw () {
+  return (_execution_failure_options);
+}
+
+/**
+ *  Get hostgroups.
+ *
+ *  @return The hostgroups.
+ */
+list_string const& hostdependency::hostgroups() const throw () {
+  return (_hostgroups.get());
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string const& hostdependency::hosts() const throw () {
+  return (_hosts.get());
+}
+
+/**
+ *  Get inherits_parent.
+ *
+ *  @return The inherits_parent.
+ */
+bool hostdependency::inherits_parent() const throw () {
+  return (_inherits_parent);
+}
+
+/**
+ *  Get notification_failure_options.
+ *
+ *  @return The notification_failure_options.
+ */
+unsigned int hostdependency::notification_failure_options() const throw () {
+  return (_notification_failure_options);
+}
+
+/**
  *  Set dependency_period value.
  *
  *  @param[in] value The new dependency_period value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_dependency_period(
-       std::string const& value) {
+bool hostdependency::_set_dependency_period(std::string const& value) {
   _dependency_period = value;
   return (true);
 }
@@ -217,8 +287,7 @@ bool configuration::hostdependency::_set_dependency_period(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_dependent_hostgroups(
-       std::string const& value) {
+bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
   return (true);
 }
@@ -230,8 +299,7 @@ bool configuration::hostdependency::_set_dependent_hostgroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_dependent_hosts(
-       std::string const& value) {
+bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
   _id = 0;
   _hash(_id, _dependent_hosts.get());
@@ -245,8 +313,7 @@ bool configuration::hostdependency::_set_dependent_hosts(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_execution_failure_options(
-       std::string const& value) {
+bool hostdependency::_set_execution_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -281,8 +348,7 @@ bool configuration::hostdependency::_set_execution_failure_options(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_hostgroups(
-       std::string const& value) {
+bool hostdependency::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -294,8 +360,7 @@ bool configuration::hostdependency::_set_hostgroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_hosts(
-       std::string const& value) {
+bool hostdependency::_set_hosts(std::string const& value) {
   _hosts.set(value);
   return (true);
 }
@@ -307,7 +372,7 @@ bool configuration::hostdependency::_set_hosts(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_inherits_parent(bool value) {
+bool hostdependency::_set_inherits_parent(bool value) {
   _inherits_parent = value;
   return (true);
 }
@@ -319,8 +384,7 @@ bool configuration::hostdependency::_set_inherits_parent(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostdependency::_set_notification_failure_options(
-       std::string const& value) {
+bool hostdependency::_set_notification_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');

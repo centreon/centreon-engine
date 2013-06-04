@@ -279,6 +279,29 @@ static std::string const              default_use_timezone("");
 static bool const                     default_use_true_regexp_matching(false);
 
 /**
+ *  Compare list with the pointer content.
+ *
+ *  @param[in] l1 The first list.
+ *  @param[in] l2 The second list.
+ *
+ *  @return True on success, otherwise false.
+ */
+template<typename T>
+static bool cmp_list_ptr(
+       std::list<shared_ptr<T> > const& l1,
+       std::list<shared_ptr<T> > const& l2) {
+  if (l1.size() != l2.size())
+    return (false);
+  typename std::list<shared_ptr<T> >::const_iterator it1(l1.begin()), end(l1.end());
+  typename std::list<shared_ptr<T> >::const_iterator it2(l2.begin());
+  while (it1 != end) {
+    if (**it1++ != **it2++)
+      return (false);
+  }
+  return (true);
+}
+
+/**
  *  Default constructor.
  */
 state::state()
@@ -462,7 +485,6 @@ state& state::operator=(state const& right) {
     _high_service_flap_threshold = right._high_service_flap_threshold;
     _hostdependencies = right._hostdependencies;
     _hostescalations = right._hostescalations;
-    _hostextinfos = right._hostextinfos;
     _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _host_check_timeout = right._host_check_timeout;
@@ -509,7 +531,6 @@ state& state::operator=(state const& right) {
     _retention_update_interval = right._retention_update_interval;
     _servicedependencies = right._servicedependencies;
     _serviceescalations = right._serviceescalations;
-    _serviceextinfos = right._serviceextinfos;
     _servicegroups = right._servicegroups;
     _services = right._services;
     _service_check_timeout = right._service_check_timeout;
@@ -566,13 +587,13 @@ bool state::operator==(state const& right) const throw () {
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
-          // XXX: && _commands == right._commands
+          && cmp_list_ptr(_commands, right._commands)
           && _command_check_interval == right._command_check_interval
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
-          // XXX: && _connectors == right._connectors
-          // XXX: && _contactgroups == right._contactgroups
-          // XXX: && _contacts == right._contacts
+          && cmp_list_ptr(_connectors, right._connectors)
+          && cmp_list_ptr(_contactgroups, right._contactgroups)
+          && cmp_list_ptr(_contacts, right._contacts)
           && _date_format == right._date_format
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
@@ -593,11 +614,10 @@ bool state::operator==(state const& right) const throw () {
           && _global_service_event_handler == right._global_service_event_handler
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
-          // XXX: && _hostdependencies == right._hostdependencies
-          // XXX: && _hostescalations == right._hostescalations
-          // XXX: && _hostextinfos == right._hostextinfos
-          // XXX: && _hostgroups == right._hostgroups
-          // XXX: && _hosts == right._hosts
+          && cmp_list_ptr(_hostdependencies, right._hostdependencies)
+          && cmp_list_ptr(_hostescalations, right._hostescalations)
+          && cmp_list_ptr(_hostgroups, right._hostgroups)
+          && cmp_list_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
           && _host_inter_check_delay_method == right._host_inter_check_delay_method
@@ -640,11 +660,10 @@ bool state::operator==(state const& right) const throw () {
           && _retain_state_information == right._retain_state_information
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
-          // XXX: && _servicedependencies == right._servicedependencies
-          // XXX: && _serviceescalations == right._serviceescalations
-          // XXX: && _serviceextinfos == right._serviceextinfos
-          // XXX: && _servicegroups == right._servicegroups
-          // XXX: && _services == right._services
+          && cmp_list_ptr(_servicedependencies, right._servicedependencies)
+          && cmp_list_ptr(_serviceescalations, right._serviceescalations)
+          && cmp_list_ptr(_servicegroups, right._servicegroups)
+          && cmp_list_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
           && _service_inter_check_delay_method == right._service_inter_check_delay_method
@@ -654,7 +673,7 @@ bool state::operator==(state const& right) const throw () {
           && _state_retention_file == right._state_retention_file
           && _status_file == right._status_file
           && _status_update_interval == right._status_update_interval
-          // XXX: && _timeperiods == right._timeperiods
+          && cmp_list_ptr(_timeperiods, right._timeperiods)
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
@@ -1092,7 +1111,7 @@ void state::check_service_freshness(bool value) {
  *
  *  @return All engine commands.
  */
-map_command const& state::commands() const throw () {
+list_command const& state::commands() const throw () {
   return (_commands);
 }
 
@@ -1101,7 +1120,7 @@ map_command const& state::commands() const throw () {
  *
  *  @return All engine commands.
  */
-map_command& state::commands() throw () {
+list_command& state::commands() throw () {
   return (_commands);
 }
 
@@ -1165,7 +1184,7 @@ void state::command_file(std::string const& value) {
  *
  *  @return All engine connectors.
  */
-map_connector const& state::connectors() const throw () {
+list_connector const& state::connectors() const throw () {
   return (_connectors);
 }
 
@@ -1174,7 +1193,7 @@ map_connector const& state::connectors() const throw () {
  *
  *  @return All engine connectors.
  */
-map_connector& state::connectors() throw () {
+list_connector& state::connectors() throw () {
   return (_connectors);
 }
 
@@ -1183,7 +1202,7 @@ map_connector& state::connectors() throw () {
  *
  *  @return All engine contacts.
  */
-map_contact const& state::contacts() const throw () {
+list_contact const& state::contacts() const throw () {
   return (_contacts);
 }
 
@@ -1192,7 +1211,7 @@ map_contact const& state::contacts() const throw () {
  *
  *  @return All engine contacts.
  */
-map_contact& state::contacts() throw () {
+list_contact& state::contacts() throw () {
   return (_contacts);
 }
 
@@ -1201,7 +1220,7 @@ map_contact& state::contacts() throw () {
  *
  *  @return All engine contactgroups.
  */
-map_contactgroup const& state::contactgroups() const throw () {
+list_contactgroup const& state::contactgroups() const throw () {
   return (_contactgroups);
 }
 
@@ -1210,7 +1229,7 @@ map_contactgroup const& state::contactgroups() const throw () {
  *
  *  @return All engine contactgroups.
  */
-map_contactgroup& state::contactgroups() throw () {
+list_contactgroup& state::contactgroups() throw () {
   return (_contactgroups);
 }
 
@@ -1597,7 +1616,7 @@ void state::high_service_flap_threshold(float value) {
  *
  *  @return All engine hostdependencies.
  */
-map_hostdependency const& state::hostdependencies() const throw () {
+list_hostdependency const& state::hostdependencies() const throw () {
   return (_hostdependencies);
 }
 
@@ -1606,7 +1625,7 @@ map_hostdependency const& state::hostdependencies() const throw () {
  *
  *  @return All engine hostdependencies.
  */
-map_hostdependency& state::hostdependencies() throw () {
+list_hostdependency& state::hostdependencies() throw () {
   return (_hostdependencies);
 }
 
@@ -1615,7 +1634,7 @@ map_hostdependency& state::hostdependencies() throw () {
  *
  *  @return All engine hostescalations.
  */
-map_hostescalation const& state::hostescalations() const throw () {
+list_hostescalation const& state::hostescalations() const throw () {
   return (_hostescalations);
 }
 
@@ -1624,26 +1643,8 @@ map_hostescalation const& state::hostescalations() const throw () {
  *
  *  @return All engine hostescalations.
  */
-map_hostescalation& state::hostescalations() throw () {
+list_hostescalation& state::hostescalations() throw () {
   return (_hostescalations);
-}
-
-/**
- *  Get all engine hostextinfos.
- *
- *  @return All engine hostextinfos.
- */
-map_hostextinfo const& state::hostextinfos() const throw () {
-  return (_hostextinfos);
-}
-
-/**
- *  Get all engine hostextinfos.
- *
- *  @return All engine hostextinfos.
- */
-map_hostextinfo& state::hostextinfos() throw () {
-  return (_hostextinfos);
 }
 
 /**
@@ -1651,7 +1652,7 @@ map_hostextinfo& state::hostextinfos() throw () {
  *
  *  @return All engine hostgroups.
  */
-map_hostgroup const& state::hostgroups() const throw () {
+list_hostgroup const& state::hostgroups() const throw () {
   return (_hostgroups);
 }
 
@@ -1660,7 +1661,7 @@ map_hostgroup const& state::hostgroups() const throw () {
  *
  *  @return All engine hostgroups.
  */
-map_hostgroup& state::hostgroups() throw () {
+list_hostgroup& state::hostgroups() throw () {
   return (_hostgroups);
 }
 
@@ -1669,7 +1670,7 @@ map_hostgroup& state::hostgroups() throw () {
  *
  *  @return All engine hosts.
  */
-map_host const& state::hosts() const throw () {
+list_host const& state::hosts() const throw () {
   return (_hosts);
 }
 
@@ -1678,7 +1679,7 @@ map_host const& state::hosts() const throw () {
  *
  *  @return All engine hosts.
  */
-map_host& state::hosts() throw () {
+list_host& state::hosts() throw () {
   return (_hosts);
 }
 
@@ -2505,7 +2506,7 @@ void state::retention_update_interval(unsigned int value) {
  *
  *  @return All engine servicedependencies.
  */
-map_servicedependency const& state::servicedependencies() const throw () {
+list_servicedependency const& state::servicedependencies() const throw () {
   return (_servicedependencies);
 }
 
@@ -2514,7 +2515,7 @@ map_servicedependency const& state::servicedependencies() const throw () {
  *
  *  @return All engine servicedependencies.
  */
-map_servicedependency& state::servicedependencies() throw () {
+list_servicedependency& state::servicedependencies() throw () {
   return (_servicedependencies);
 }
 
@@ -2523,7 +2524,7 @@ map_servicedependency& state::servicedependencies() throw () {
  *
  *  @return All engine serviceescalations.
  */
-map_serviceescalation const& state::serviceescalations() const throw () {
+list_serviceescalation const& state::serviceescalations() const throw () {
   return (_serviceescalations);
 }
 
@@ -2532,26 +2533,8 @@ map_serviceescalation const& state::serviceescalations() const throw () {
  *
  *  @return All engine serviceescalations.
  */
-map_serviceescalation& state::serviceescalations() throw () {
+list_serviceescalation& state::serviceescalations() throw () {
   return (_serviceescalations);
-}
-
-/**
- *  Get all engine serviceextinfos.
- *
- *  @return All engine serviceextinfos.
- */
-map_serviceextinfo const& state::serviceextinfos() const throw () {
-  return (_serviceextinfos);
-}
-
-/**
- *  Get all engine serviceextinfos.
- *
- *  @return All engine serviceextinfos.
- */
-map_serviceextinfo& state::serviceextinfos() throw () {
-  return (_serviceextinfos);
 }
 
 /**
@@ -2559,7 +2542,7 @@ map_serviceextinfo& state::serviceextinfos() throw () {
  *
  *  @return All engine servicegroups.
  */
-map_servicegroup const& state::servicegroups() const throw () {
+list_servicegroup const& state::servicegroups() const throw () {
   return (_servicegroups);
 }
 
@@ -2568,7 +2551,7 @@ map_servicegroup const& state::servicegroups() const throw () {
  *
  *  @return All engine servicegroups.
  */
-map_servicegroup& state::servicegroups() throw () {
+list_servicegroup& state::servicegroups() throw () {
   return (_servicegroups);
 }
 
@@ -2577,7 +2560,7 @@ map_servicegroup& state::servicegroups() throw () {
  *
  *  @return All engine services.
  */
-map_service const& state::services() const throw () {
+list_service const& state::services() const throw () {
   return (_services);
 }
 
@@ -2586,7 +2569,7 @@ map_service const& state::services() const throw () {
  *
  *  @return All engine services.
  */
-map_service& state::services() throw () {
+list_service& state::services() throw () {
   return (_services);
 }
 
@@ -2792,7 +2775,7 @@ bool state::set(std::string const& key, std::string const& value) {
  *
  *  @return All engine timeperiods.
  */
-map_timeperiod const& state::timeperiods() const throw () {
+list_timeperiod const& state::timeperiods() const throw () {
   return (_timeperiods);
 }
 
@@ -2801,7 +2784,7 @@ map_timeperiod const& state::timeperiods() const throw () {
  *
  *  @return All engine timeperiods.
  */
-map_timeperiod& state::timeperiods() throw () {
+list_timeperiod& state::timeperiods() throw () {
   return (_timeperiods);
 }
 

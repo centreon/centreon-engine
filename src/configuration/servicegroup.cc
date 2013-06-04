@@ -20,17 +20,14 @@
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/error.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::servicegroup, \
-     type, \
-     &configuration::servicegroup::method>::generic
+  &object::setter<servicegroup, type, &servicegroup::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::servicegroup&, std::string const&);
+  bool (*func)(servicegroup&, std::string const&);
 } gl_setters[] = {
   { "servicegroup_name",    SETTER(std::string const&, _set_servicegroup_name) },
   { "alias",                SETTER(std::string const&, _set_alias) },
@@ -45,7 +42,7 @@ static struct {
 /**
  *  Default constructor.
  */
-configuration::servicegroup::servicegroup()
+servicegroup::servicegroup()
   : object(object::servicegroup, "servicegroup") {
 
 }
@@ -55,7 +52,7 @@ configuration::servicegroup::servicegroup()
  *
  *  @param[in] right The servicegroup to copy.
  */
-configuration::servicegroup::servicegroup(servicegroup const& right)
+servicegroup::servicegroup(servicegroup const& right)
   : object(right) {
   operator=(right);
 }
@@ -63,7 +60,7 @@ configuration::servicegroup::servicegroup(servicegroup const& right)
 /**
  *  Destructor.
  */
-configuration::servicegroup::~servicegroup() throw () {
+servicegroup::~servicegroup() throw () {
 
 }
 
@@ -74,8 +71,7 @@ configuration::servicegroup::~servicegroup() throw () {
  *
  *  @return This servicegroup.
  */
-configuration::servicegroup& configuration::servicegroup::operator=(
-                               servicegroup const& right) {
+servicegroup& servicegroup::operator=(servicegroup const& right) {
   if (this != &right) {
     object::operator=(right);
     _action_url = right._action_url;
@@ -96,8 +92,7 @@ configuration::servicegroup& configuration::servicegroup::operator=(
  *
  *  @return True if is the same servicegroup, otherwise false.
  */
-bool configuration::servicegroup::operator==(
-       servicegroup const& right) const throw () {
+bool servicegroup::operator==(servicegroup const& right) const throw () {
   return (object::operator==(right)
           && _action_url == right._action_url
           && _alias == right._alias
@@ -115,8 +110,7 @@ bool configuration::servicegroup::operator==(
  *
  *  @return True if is not the same servicegroup, otherwise false.
  */
-bool configuration::servicegroup::operator!=(
-       servicegroup const& right) const throw () {
+bool servicegroup::operator!=(servicegroup const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -125,7 +119,7 @@ bool configuration::servicegroup::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::servicegroup::id() const throw () {
+std::size_t servicegroup::id() const throw () {
   return (_id);
 }
 
@@ -134,8 +128,10 @@ std::size_t configuration::servicegroup::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::servicegroup::is_valid() const throw () {
-  return (!_servicegroup_name.empty());
+void servicegroup::check_validity() const {
+  if (_servicegroup_name.empty())
+    throw (engine_error() << "configuration: invalid servicegroup "
+           "property servicegroup_name is missing");
 }
 
 /**
@@ -143,7 +139,7 @@ bool configuration::servicegroup::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::servicegroup::merge(object const& obj) {
+void servicegroup::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   servicegroup const& tmpl(static_cast<servicegroup const&>(obj));
@@ -165,7 +161,7 @@ void configuration::servicegroup::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::parse(
+bool servicegroup::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -177,14 +173,76 @@ bool configuration::servicegroup::parse(
 }
 
 /**
+ *  Get action_url.
+ *
+ *  @return The action_url.
+ */
+std::string const& servicegroup::action_url() const throw () {
+  return (_action_url);
+}
+
+/**
+ *  Get alias.
+ *
+ *  @return The alias.
+ */
+std::string const& servicegroup::alias() const throw () {
+  return (_alias);
+}
+
+/**
+ *  Get members.
+ *
+ *  @return The members.
+ */
+list_string const& servicegroup::members() const throw () {
+  return (_members.get());
+}
+
+/**
+ *  Get notes.
+ *
+ *  @return The notes.
+ */
+std::string const& servicegroup::notes() const throw () {
+  return (_notes);
+}
+
+/**
+ *  Get notes_url.
+ *
+ *  @return The notes_url.
+ */
+std::string const& servicegroup::notes_url() const throw () {
+  return (_notes_url);
+}
+
+/**
+ *  Get servicegroup_members.
+ *
+ *  @return The servicegroup_members.
+ */
+list_string const& servicegroup::servicegroup_members() const throw () {
+  return (_servicegroup_members.get());
+}
+
+/**
+ *  Get servicegroup_name.
+ *
+ *  @return The servicegroup_name.
+ */
+std::string const& servicegroup::servicegroup_name() const throw () {
+  return (_servicegroup_name);
+}
+
+/**
  *  Set action_url value.
  *
  *  @param[in] value The new action_url value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_action_url(
-       std::string const& value) {
+bool servicegroup::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
@@ -196,8 +254,7 @@ bool configuration::servicegroup::_set_action_url(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_alias(
-       std::string const& value) {
+bool servicegroup::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
@@ -209,8 +266,7 @@ bool configuration::servicegroup::_set_alias(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_members(
-       std::string const& value) {
+bool servicegroup::_set_members(std::string const& value) {
   _members.set(value);
   return (true);
 }
@@ -222,8 +278,7 @@ bool configuration::servicegroup::_set_members(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_notes(
-       std::string const& value) {
+bool servicegroup::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -235,8 +290,7 @@ bool configuration::servicegroup::_set_notes(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_notes_url(
-       std::string const& value) {
+bool servicegroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
@@ -248,8 +302,7 @@ bool configuration::servicegroup::_set_notes_url(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_servicegroup_members(
-       std::string const& value) {
+bool servicegroup::_set_servicegroup_members(std::string const& value) {
   _servicegroup_members.set(value);
   return (true);
 }
@@ -261,8 +314,7 @@ bool configuration::servicegroup::_set_servicegroup_members(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::servicegroup::_set_servicegroup_name(
-       std::string const& value) {
+bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
   _id = _hash(value);
   return (true);

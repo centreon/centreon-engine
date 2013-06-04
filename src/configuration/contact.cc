@@ -23,17 +23,14 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::contact, \
-     type, \
-     &configuration::contact::method>::generic
+  &object::setter<contact, type, &contact::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::contact&, std::string const&);
+  bool (*func)(contact&, std::string const&);
 } gl_setters[] = {
   { "contact_name",                  SETTER(std::string const&, _set_contact_name) },
   { "alias",                         SETTER(std::string const&, _set_alias) },
@@ -57,10 +54,10 @@ static struct {
 // Default values.
 static bool const           default_can_submit_commands(true);
 static bool const           default_host_notifications_enabled(true);
-static unsigned short const default_host_notification_options(configuration::host::none);
+static unsigned short const default_host_notification_options(host::none);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
-static unsigned short const default_service_notification_options(configuration::service::none);
+static unsigned short const default_service_notification_options(service::none);
 static bool const           default_service_notifications_enabled(true);
 
 static unsigned int const   MAX_ADDRESSES(6);
@@ -68,7 +65,7 @@ static unsigned int const   MAX_ADDRESSES(6);
 /**
  *  Default constructor.
  */
-configuration::contact::contact()
+contact::contact()
   : object(object::contact, "contact") {
   _address.resize(MAX_ADDRESSES);
 }
@@ -78,7 +75,7 @@ configuration::contact::contact()
  *
  *  @param[in] right The contact to copy.
  */
-configuration::contact::contact(contact const& right)
+contact::contact(contact const& right)
   : object(right) {
   operator=(right);
 }
@@ -86,7 +83,7 @@ configuration::contact::contact(contact const& right)
 /**
  *  Destructor.
  */
-configuration::contact::~contact() throw () {
+contact::~contact() throw () {
 
 }
 
@@ -97,7 +94,7 @@ configuration::contact::~contact() throw () {
  *
  *  @return This contact.
  */
-configuration::contact& configuration::contact::operator=(contact const& right) {
+contact& contact::operator=(contact const& right) {
   if (this != &right) {
     object::operator=(right);
     _address = right._address;
@@ -129,8 +126,7 @@ configuration::contact& configuration::contact::operator=(contact const& right) 
  *
  *  @return True if is the same contact, otherwise false.
  */
-bool configuration::contact::operator==(
-       contact const& right) const throw () {
+bool contact::operator==(contact const& right) const throw () {
   return (object::operator==(right)
           && _address == right._address
           && _alias == right._alias
@@ -159,8 +155,7 @@ bool configuration::contact::operator==(
  *
  *  @return True if is not the same contact, otherwise false.
  */
-bool configuration::contact::operator!=(
-       contact const& right) const throw () {
+bool contact::operator!=(contact const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -169,7 +164,7 @@ bool configuration::contact::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::contact::id() const throw () {
+std::size_t contact::id() const throw () {
   return (_id);
 }
 
@@ -178,8 +173,10 @@ std::size_t configuration::contact::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::contact::is_valid() const throw () {
-  return (!_contact_name.empty());
+void contact::check_validity() const {
+  if (_contact_name.empty())
+    throw (engine_error() << "configuration: invalid contact property "
+           "contact_name is missing");
 }
 
 /**
@@ -187,7 +184,7 @@ bool configuration::contact::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::contact::merge(object const& obj) {
+void contact::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   contact const& tmpl(static_cast<contact const&>(obj));
@@ -220,7 +217,7 @@ void configuration::contact::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::parse(
+bool contact::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -233,7 +230,177 @@ bool configuration::contact::parse(
   return (false);
 }
 
-bool configuration::contact::_set_address(
+/**
+ *  Get address.
+ *
+ *  @return The address.
+ */
+tab_string const& contact::address() const throw () {
+  return (_address);
+}
+
+/**
+ *  Get alias.
+ *
+ *  @return The alias.
+ */
+std::string const& contact::alias() const throw () {
+  return (_alias);
+}
+
+/**
+ *  Get can_submit_commands.
+ *
+ *  @return The can_submit_commands.
+ */
+bool contact::can_submit_commands() const throw () {
+  return (_can_submit_commands);
+}
+
+/**
+ *  Get contactgroups.
+ *
+ *  @return The contactgroups.
+ */
+list_string const& contact::contactgroups() const throw () {
+  return (_contactgroups.get());
+}
+
+/**
+ *  Get contact_name.
+ *
+ *  @return The contact_name.
+ */
+std::string const& contact::contact_name() const throw () {
+  return (_contact_name);
+}
+
+/**
+ *  Get customvariables.
+ *
+ *  @return The customvariables.
+ */
+properties const& contact::customvariables() const throw () {
+  return (_customvariables);
+}
+
+/**
+ *  Get email.
+ *
+ *  @return The email.
+ */
+std::string const& contact::email() const throw () {
+  return (_email);
+}
+
+/**
+ *  Get host_notifications_enabled.
+ *
+ *  @return The host_notifications_enabled.
+ */
+bool contact::host_notifications_enabled() const throw () {
+  return (_host_notifications_enabled);
+}
+
+/**
+ *  Get host_notification_commands.
+ *
+ *  @return The host_notification_commands.
+ */
+list_string const& contact::host_notification_commands() const throw () {
+  return (_host_notification_commands.get());
+}
+
+/**
+ *  Get host_notification_options.
+ *
+ *  @return The host_notification_options.
+ */
+unsigned int contact::host_notification_options() const throw () {
+  return (_host_notification_options);
+}
+
+/**
+ *  Get host_notification_period.
+ *
+ *  @return The host_notification_period.
+ */
+std::string const& contact::host_notification_period() const throw () {
+  return (_host_notification_period);
+}
+
+/**
+ *  Get retain_nonstatus_information.
+ *
+ *  @return The retain_nonstatus_information.
+ */
+bool contact::retain_nonstatus_information() const throw () {
+  return (_retain_nonstatus_information);
+}
+
+/**
+ *  Get retain_status_information.
+ *
+ *  @return The retain_status_information.
+ */
+bool contact::retain_status_information() const throw () {
+  return (_retain_status_information);
+}
+
+/**
+ *  Get pager.
+ *
+ *  @return The pager.
+ */
+std::string const& contact::pager() const throw () {
+  return (_pager);
+}
+
+/**
+ *  Get service_notification_commands.
+ *
+ *  @return The service_notification_commands.
+ */
+list_string const& contact::service_notification_commands() const throw () {
+  return (_service_notification_commands.get());
+}
+
+/**
+ *  Get service_notification_options.
+ *
+ *  @return The service_notification_options.
+ */
+unsigned int contact::service_notification_options() const throw () {
+  return (_service_notification_options);
+}
+
+/**
+ *  Get service_notification_period.
+ *
+ *  @return The service_notification_period.
+ */
+std::string const& contact::service_notification_period() const throw () {
+  return (_service_notification_period);
+}
+
+/**
+ *  Get service_notifications_enabled.
+ *
+ *  @return The service_notifications_enabled.
+ */
+bool contact::service_notifications_enabled() const throw () {
+  return (_service_notifications_enabled);
+}
+
+/**
+ *  Set new contact address.
+ *
+ *  @param[in] key   The address key.
+ *  @param[in] value The address value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool contact::_set_address(
        std::string const& key,
        std::string const& value) {
   unsigned int id;
@@ -250,7 +417,7 @@ bool configuration::contact::_set_address(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_alias(std::string const& value) {
+bool contact::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
@@ -262,7 +429,7 @@ bool configuration::contact::_set_alias(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_can_submit_commands(bool value) {
+bool contact::_set_can_submit_commands(bool value) {
   _can_submit_commands = value;
   return (true);
 }
@@ -274,8 +441,7 @@ bool configuration::contact::_set_can_submit_commands(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_contactgroups(
-       std::string const& value) {
+bool contact::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
@@ -287,8 +453,7 @@ bool configuration::contact::_set_contactgroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_contact_name(
-       std::string const& value) {
+bool contact::_set_contact_name(std::string const& value) {
   _contact_name = value;
   _id = _hash(value);
   return (true);
@@ -301,7 +466,7 @@ bool configuration::contact::_set_contact_name(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_email(std::string const& value) {
+bool contact::_set_email(std::string const& value) {
   _email = value;
   return (true);
 }
@@ -313,8 +478,7 @@ bool configuration::contact::_set_email(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_host_notifications_enabled(
-       bool value) {
+bool contact::_set_host_notifications_enabled(bool value) {
   _host_notifications_enabled = value;
   return (true);
 }
@@ -326,8 +490,7 @@ bool configuration::contact::_set_host_notifications_enabled(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_host_notification_commands(
-       std::string const& value) {
+bool contact::_set_host_notification_commands(std::string const& value) {
   _host_notification_commands.set(value);
   return (true);
 }
@@ -339,8 +502,7 @@ bool configuration::contact::_set_host_notification_commands(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_host_notification_options(
-       std::string const& value) {
+bool contact::_set_host_notification_options(std::string const& value) {
   unsigned short options(host::none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -381,8 +543,7 @@ bool configuration::contact::_set_host_notification_options(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_host_notification_period(
-       std::string const& value) {
+bool contact::_set_host_notification_period(std::string const& value) {
   _host_notification_period = value;
   return (true);
 }
@@ -394,8 +555,7 @@ bool configuration::contact::_set_host_notification_period(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_retain_nonstatus_information(
-       bool value) {
+bool contact::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
   return (true);
 }
@@ -407,8 +567,7 @@ bool configuration::contact::_set_retain_nonstatus_information(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_retain_status_information(
-       bool value) {
+bool contact::_set_retain_status_information(bool value) {
   _retain_status_information = value;
   return (true);
 }
@@ -420,7 +579,7 @@ bool configuration::contact::_set_retain_status_information(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_pager(std::string const& value) {
+bool contact::_set_pager(std::string const& value) {
   _pager = value;
   return (true);
 }
@@ -432,8 +591,7 @@ bool configuration::contact::_set_pager(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_service_notification_commands(
-       std::string const& value) {
+bool contact::_set_service_notification_commands(std::string const& value) {
   _service_notification_commands.set(value);
   return (true);
 }
@@ -445,8 +603,7 @@ bool configuration::contact::_set_service_notification_commands(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_service_notification_options(
-       std::string const& value) {
+bool contact::_set_service_notification_options(std::string const& value) {
   unsigned short options(service::none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -490,8 +647,7 @@ bool configuration::contact::_set_service_notification_options(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_service_notification_period(
-       std::string const& value) {
+bool contact::_set_service_notification_period(std::string const& value) {
   _service_notification_period = value;
   return (true);
 }
@@ -503,8 +659,7 @@ bool configuration::contact::_set_service_notification_period(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::contact::_set_service_notifications_enabled(
-       bool value) {
+bool contact::_set_service_notifications_enabled(bool value) {
   _service_notifications_enabled = value;
   return (true);
 }

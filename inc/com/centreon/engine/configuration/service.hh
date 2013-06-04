@@ -20,12 +20,12 @@
 #ifndef CCE_CONFIGURATION_SERVICE_HH
 #  define CCE_CONFIGURATION_SERVICE_HH
 
+#  include <list>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -52,12 +52,54 @@ namespace                  configuration {
                              service const& right) const throw ();
     bool                   operator!=(
                              service const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    std::string const&     action_url() const throw ();
+    bool                   checks_active() const throw ();
+    bool                   checks_passive() const throw ();
+    std::string const&     check_command() const throw ();
+    bool                   check_command_is_important() const throw ();
+    bool                   check_freshness() const throw ();
+    unsigned int           check_interval() const throw ();
+    std::string const&     check_period() const throw ();
+    list_string const&     contactgroups() const throw ();
+    list_string const&     contacts() const throw ();
+    properties const&      customvariables() const throw ();
+    std::string const&     display_name() const throw ();
+    std::string const&     event_handler() const throw ();
+    bool                   event_handler_enabled() const throw ();
+    unsigned int           first_notification_delay() const throw ();
+    bool                   flap_detection_enabled() const throw ();
+    unsigned short         flap_detection_options() const throw ();
+    unsigned int           freshness_threshold() const throw ();
+    unsigned int           high_flap_threshold() const throw ();
+    list_string const&     hostgroups() const throw ();
+    list_string const&     hosts() const throw ();
+    std::string const&     icon_image() const throw ();
+    std::string const&     icon_image_alt() const throw ();
+    unsigned int           initial_state() const throw ();
+    bool                   is_volatile() const throw ();
+    unsigned int           low_flap_threshold() const throw ();
+    unsigned int           max_check_attempts() const throw ();
+    std::string const&     notes() const throw ();
+    std::string const&     notes_url() const throw ();
+    bool                   notifications_enabled() const throw ();
+    unsigned int           notification_interval() const throw ();
+    unsigned short         notification_options() const throw ();
+    std::string const&     notification_period() const throw ();
+    bool                   obsess_over_service() const throw ();
+    bool                   process_perf_data() const throw ();
+    bool                   retain_nonstatus_information() const throw ();
+    bool                   retain_status_information() const throw ();
+    unsigned int           retry_interval() const throw ();
+    list_string const&     servicegroups() const throw ();
+    std::string const&     service_description() const throw ();
+    unsigned short         stalking_options() const throw ();
 
   private:
     bool                   _set_action_url(std::string const& value);
@@ -113,8 +155,7 @@ namespace                  configuration {
     std::string            _check_period;
     group                  _contactgroups;
     group                  _contacts;
-    umap<std::string, std::string>
-                           _customvariables;
+    properties             _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
     opt<bool>              _event_handler_enabled;
@@ -147,10 +188,10 @@ namespace                  configuration {
     opt<unsigned short>    _stalking_options;
  };
 
-  typedef umap<std::size_t, shared_ptr<service> > map_service;
+  typedef shared_ptr<service>    service_ptr;
+  typedef std::list<service_ptr> list_service;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICE_HH
-

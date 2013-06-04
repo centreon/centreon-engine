@@ -33,6 +33,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "compatibility/check_result.h"
 

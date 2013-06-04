@@ -22,18 +22,15 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::service, \
-     type, \
-     &configuration::service::method>::generic
+  &object::setter<service, type, &service::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::service&, std::string const&);
+  bool (*func)(service&, std::string const&);
 } gl_setters[] = {
   { "host",                         SETTER(std::string const&, _set_hosts) },
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
@@ -95,10 +92,7 @@ static unsigned int const   default_check_interval(5);
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
-static unsigned short const default_flap_detection_options(configuration::service::ok
-                                                           | configuration::service::warning
-                                                           | configuration::service::unknown
-                                                           | configuration::service::critical);
+static unsigned short const default_flap_detection_options(service::ok | service::warning | service::unknown | service::critical);
 static unsigned int const   default_freshness_threshold(0);
 static unsigned int const   default_high_flap_threshold(0);
 static unsigned int const   default_initial_state(STATE_OK);
@@ -107,18 +101,18 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(configuration::service::none);
+static unsigned short const default_notification_options(service::none);
 static bool const           default_obsess_over_service(true);
 static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
-static unsigned short const default_stalking_options(configuration::service::none);
+static unsigned short const default_stalking_options(service::none);
 
 /**
  *  Default constructor.
  */
-configuration::service::service()
+service::service()
   : object(object::service, "service") {
 
 }
@@ -128,7 +122,7 @@ configuration::service::service()
  *
  *  @param[in] right The service to copy.
  */
-configuration::service::service(service const& right)
+service::service(service const& right)
   : object(right) {
   operator=(right);
 }
@@ -136,7 +130,7 @@ configuration::service::service(service const& right)
 /**
  *  Destructor.
  */
-configuration::service::~service() throw () {
+service::~service() throw () {
 
 }
 
@@ -147,8 +141,7 @@ configuration::service::~service() throw () {
  *
  *  @return This service.
  */
-configuration::service& configuration::service::operator=(
-                          service const& right) {
+service& service::operator=(service const& right) {
   if (this != &right) {
     object::operator=(right);
     _action_url = right._action_url;
@@ -203,8 +196,7 @@ configuration::service& configuration::service::operator=(
  *
  *  @return True if is the same service, otherwise false.
  */
-bool configuration::service::operator==(
-       service const& right) const throw () {
+bool service::operator==(service const& right) const throw () {
   return (object::operator==(right)
           && _action_url == right._action_url
           && _checks_active == right._checks_active
@@ -256,8 +248,7 @@ bool configuration::service::operator==(
  *
  *  @return True if is not the same service, otherwise false.
  */
-bool configuration::service::operator!=(
-       service const& right) const throw () {
+bool service::operator!=(service const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -266,7 +257,7 @@ bool configuration::service::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::service::id() const throw () {
+std::size_t service::id() const throw () {
   if (!_id) {
     _hash(_id, _hosts.get());
     _hash(_id, _service_description);
@@ -279,10 +270,16 @@ std::size_t configuration::service::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::service::is_valid() const throw () {
-  return (!_service_description.empty()
-          && (!_hosts.empty() || !_hostgroups.empty())
-          && !_check_command.empty());
+void service::check_validity() const {
+  if (_service_description.empty())
+    throw (engine_error() << "configuration: invalid service property "
+           "service_description is missing");
+  if (_hosts.empty() && _hostgroups.empty())
+    throw (engine_error() << "configuration: invalid service property "
+           "host or hostgroup is missing");
+  if (_check_command.empty())
+    throw (engine_error() << "configuration: invalid service property "
+           "check_command is missing");
 }
 
 /**
@@ -290,7 +287,7 @@ bool configuration::service::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::service::merge(object const& obj) {
+void service::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   service const& tmpl(static_cast<service const&>(obj));
@@ -345,7 +342,7 @@ void configuration::service::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::parse(
+bool service::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -358,13 +355,382 @@ bool configuration::service::parse(
 }
 
 /**
+ *  Get action_url.
+ *
+ *  @return The action_url.
+ */
+std::string const& service::action_url() const throw () {
+  return (_action_url);
+}
+
+/**
+ *  Get checks_active.
+ *
+ *  @return The checks_active.
+ */
+bool service::checks_active() const throw () {
+  return (_checks_active);
+}
+
+/**
+ *  Get checks_passive.
+ *
+ *  @return The checks_passive.
+ */
+bool service::checks_passive() const throw () {
+  return (_checks_passive);
+}
+
+/**
+ *  Get check_command.
+ *
+ *  @return The check_command.
+ */
+std::string const& service::check_command() const throw () {
+  return (_check_command);
+}
+
+/**
+ *  Get check_command_is_important.
+ *
+ *  @return The check_command_is_important.
+ */
+bool service::check_command_is_important() const throw () {
+  return (_check_command_is_important);
+}
+
+/**
+ *  Get check_freshness.
+ *
+ *  @return The check_freshness.
+ */
+bool service::check_freshness() const throw () {
+  return (_check_freshness);
+}
+
+/**
+ *  Get check_interval.
+ *
+ *  @return The check_interval.
+ */
+unsigned int service::check_interval() const throw () {
+  return (_check_interval);
+}
+
+/**
+ *  Get check_period.
+ *
+ *  @return The check_period.
+ */
+std::string const& service::check_period() const throw () {
+  return (_check_period);
+}
+
+/**
+ *  Get contactgroups.
+ *
+ *  @return The contactgroups.
+ */
+list_string const& service::contactgroups() const throw () {
+  return (_contactgroups.get());
+}
+
+/**
+ *  Get contacts.
+ *
+ *  @return The contacts.
+ */
+list_string const& service::contacts() const throw () {
+  return (_contacts.get());
+}
+
+/**
+ *  Get customvariables.
+ *
+ *  @return The customvariables.
+ */
+properties const& service::customvariables() const throw () {
+  return (_customvariables);
+}
+
+/**
+ *  Get display_name.
+ *
+ *  @return The display_name.
+ */
+std::string const& service::display_name() const throw () {
+  return (_display_name);
+}
+
+/**
+ *  Get event_handler.
+ *
+ *  @return The event_handler.
+ */
+std::string const& service::event_handler() const throw () {
+  return (_event_handler);
+}
+
+/**
+ *  Get event_handler_enabled.
+ *
+ *  @return The event_handler_enabled.
+ */
+bool service::event_handler_enabled() const throw () {
+  return (_event_handler_enabled);
+}
+
+/**
+ *  Get first_notification_delay.
+ *
+ *  @return The first_notification_delay.
+ */
+unsigned int service::first_notification_delay() const throw () {
+  return (_first_notification_delay);
+}
+
+/**
+ *  Get flap_detection_enabled.
+ *
+ *  @return The flap_detection_enabled.
+ */
+bool service::flap_detection_enabled() const throw () {
+  return (_flap_detection_enabled);
+}
+
+/**
+ *  Get flap_detection_options.
+ *
+ *  @return The flap_detection_options.
+ */
+unsigned short service::flap_detection_options() const throw () {
+  return (_flap_detection_options);
+}
+
+/**
+ *  Get freshness_threshold.
+ *
+ *  @return The freshness_threshold.
+ */
+unsigned int service::freshness_threshold() const throw () {
+  return (_freshness_threshold);
+}
+
+/**
+ *  Get high_flap_threshold.
+ *
+ *  @return The high_flap_threshold.
+ */
+unsigned int service::high_flap_threshold() const throw () {
+  return (_high_flap_threshold);
+}
+
+/**
+ *  Get hostgroups.
+ *
+ *  @return The hostgroups.
+ */
+list_string const& service::hostgroups() const throw () {
+  return (_hostgroups.get());
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string const& service::hosts() const throw () {
+  return (_hosts.get());
+}
+
+/**
+ *  Get icon_image.
+ *
+ *  @return The icon_image.
+ */
+std::string const& service::icon_image() const throw () {
+  return (_icon_image);
+}
+
+/**
+ *  Get icon_image_alt.
+ *
+ *  @return The icon_image_alt.
+ */
+std::string const& service::icon_image_alt() const throw () {
+  return (_icon_image_alt);
+}
+
+/**
+ *  Get initial_state.
+ *
+ *  @return The initial_state.
+ */
+unsigned int service::initial_state() const throw () {
+  return (_initial_state);
+}
+
+/**
+ *  Get is_volatile.
+ *
+ *  @return The is_volatile.
+ */
+bool service::is_volatile() const throw () {
+  return (_is_volatile);
+}
+
+/**
+ *  Get low_flap_threshold.
+ *
+ *  @return The low_flap_threshold.
+ */
+unsigned int service::low_flap_threshold() const throw () {
+  return (_low_flap_threshold);
+}
+
+/**
+ *  Get max_check_attempts.
+ *
+ *  @return The max_check_attempts.
+ */
+unsigned int service::max_check_attempts() const throw () {
+  return (_max_check_attempts);
+}
+
+/**
+ *  Get notes.
+ *
+ *  @return The notes.
+ */
+std::string const& service::notes() const throw () {
+  return (_notes);
+}
+
+/**
+ *  Get notes_url.
+ *
+ *  @return The notes_url.
+ */
+std::string const& service::notes_url() const throw () {
+  return (_notes_url);
+}
+
+/**
+ *  Get notifications_enabled.
+ *
+ *  @return The notifications_enabled.
+ */
+bool service::notifications_enabled() const throw () {
+  return (_notifications_enabled);
+}
+
+/**
+ *  Get notification_interval.
+ *
+ *  @return The notification_interval.
+ */
+unsigned int service::notification_interval() const throw () {
+  return (_notification_interval);
+}
+
+/**
+ *  Get notification_options.
+ *
+ *  @return The notification_options.
+ */
+unsigned short service::notification_options() const throw () {
+  return (_notification_options);
+}
+
+/**
+ *  Get notification_period.
+ *
+ *  @return The notification_period.
+ */
+std::string const& service::notification_period() const throw () {
+  return (_notification_period);
+}
+
+/**
+ *  Get obsess_over_service.
+ *
+ *  @return The obsess_over_service.
+ */
+bool service::obsess_over_service() const throw () {
+  return (_obsess_over_service);
+}
+
+/**
+ *  Get process_perf_data.
+ *
+ *  @return The process_perf_data.
+ */
+bool service::process_perf_data() const throw () {
+  return (_process_perf_data);
+}
+
+/**
+ *  Get retain_nonstatus_information.
+ *
+ *  @return The retain_nonstatus_information.
+ */
+bool service::retain_nonstatus_information() const throw () {
+  return (_retain_nonstatus_information);
+}
+
+/**
+ *  Get retain_status_information.
+ *
+ *  @return The retain_status_information.
+ */
+bool service::retain_status_information() const throw () {
+  return (_retain_status_information);
+}
+
+/**
+ *  Get retry_interval.
+ *
+ *  @return The retry_interval.
+ */
+unsigned int service::retry_interval() const throw () {
+  return (_retry_interval);
+}
+
+/**
+ *  Get servicegroups.
+ *
+ *  @return The servicegroups.
+ */
+list_string const& service::servicegroups() const throw () {
+  return (_servicegroups.get());
+}
+
+/**
+ *  Get service_description.
+ *
+ *  @return The service_description.
+ */
+std::string const& service::service_description() const throw () {
+  return (_service_description);
+}
+
+/**
+ *  Get stalking_options.
+ *
+ *  @return The stalking_options.
+ */
+unsigned short service::stalking_options() const throw () {
+  return (_stalking_options);
+}
+
+/**
  *  Set action_url value.
  *
  *  @param[in] value The new action_url value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_action_url(std::string const& value) {
+bool service::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
@@ -376,7 +742,7 @@ bool configuration::service::_set_action_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_check_command(std::string const& value) {
+bool service::_set_check_command(std::string const& value) {
   if (!value.empty() && value[0] == '!') {
     _check_command_is_important = true;
     _check_command = value.substr(1);
@@ -393,7 +759,7 @@ bool configuration::service::_set_check_command(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_checks_active(bool value) {
+bool service::_set_checks_active(bool value) {
   _checks_active = value;
   return (true);
 }
@@ -405,7 +771,7 @@ bool configuration::service::_set_checks_active(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_checks_passive(bool value) {
+bool service::_set_checks_passive(bool value) {
   _checks_passive = value;
   return (true);
 }
@@ -417,7 +783,7 @@ bool configuration::service::_set_checks_passive(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_check_freshness(bool value) {
+bool service::_set_check_freshness(bool value) {
   _check_freshness = value;
   return (true);
 }
@@ -429,7 +795,7 @@ bool configuration::service::_set_check_freshness(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_check_interval(unsigned int value) {
+bool service::_set_check_interval(unsigned int value) {
   _check_interval = value;
   return (true);
 }
@@ -441,8 +807,7 @@ bool configuration::service::_set_check_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_check_period(
-       std::string const& value) {
+bool service::_set_check_period(std::string const& value) {
   _check_period = value;
   return (true);
 }
@@ -454,8 +819,7 @@ bool configuration::service::_set_check_period(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_contactgroups(
-       std::string const& value) {
+bool service::_set_contactgroups(std::string const& value) {
   _contactgroups.set(value);
   return (true);
 }
@@ -467,7 +831,7 @@ bool configuration::service::_set_contactgroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_contacts(std::string const& value) {
+bool service::_set_contacts(std::string const& value) {
   _contacts.set(value);
   return (true);
 }
@@ -479,8 +843,7 @@ bool configuration::service::_set_contacts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_display_name(
-       std::string const& value) {
+bool service::_set_display_name(std::string const& value) {
   _display_name = value;
   return (true);
 }
@@ -492,8 +855,7 @@ bool configuration::service::_set_display_name(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_event_handler(
-       std::string const& value) {
+bool service::_set_event_handler(std::string const& value) {
   _event_handler = value;
   return (true);
 }
@@ -505,7 +867,7 @@ bool configuration::service::_set_event_handler(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_event_handler_enabled(bool value) {
+bool service::_set_event_handler_enabled(bool value) {
   _event_handler_enabled = value;
   return (true);
 }
@@ -517,8 +879,7 @@ bool configuration::service::_set_event_handler_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_failure_prediction_enabled(
-       bool value) {
+bool service::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: service failure_prediction_enabled was ignored";
@@ -532,8 +893,7 @@ bool configuration::service::_set_failure_prediction_enabled(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_failure_prediction_options(
-       std::string const& value) {
+bool service::_set_failure_prediction_options(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: service failure_prediction_options was ignored";
@@ -547,8 +907,7 @@ bool configuration::service::_set_failure_prediction_options(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_first_notification_delay(
-       unsigned int value) {
+bool service::_set_first_notification_delay(unsigned int value) {
   _first_notification_delay = value;
   return (true);
 }
@@ -560,7 +919,7 @@ bool configuration::service::_set_first_notification_delay(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_flap_detection_enabled(bool value) {
+bool service::_set_flap_detection_enabled(bool value) {
   _flap_detection_enabled = value;
   return (true);
 }
@@ -572,8 +931,7 @@ bool configuration::service::_set_flap_detection_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_flap_detection_options(
-       std::string const& value) {
+bool service::_set_flap_detection_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -608,8 +966,7 @@ bool configuration::service::_set_flap_detection_options(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_freshness_threshold(
-       unsigned int value) {
+bool service::_set_freshness_threshold(unsigned int value) {
   _freshness_threshold = value;
   return (true);
 }
@@ -621,8 +978,7 @@ bool configuration::service::_set_freshness_threshold(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_high_flap_threshold(
-       unsigned int value) {
+bool service::_set_high_flap_threshold(unsigned int value) {
   _high_flap_threshold = value;
   return (true);
 }
@@ -634,7 +990,7 @@ bool configuration::service::_set_high_flap_threshold(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_hostgroups(std::string const& value) {
+bool service::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -646,8 +1002,7 @@ bool configuration::service::_set_hostgroups(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_hosts(
-       std::string const& value) {
+bool service::_set_hosts(std::string const& value) {
   _hosts.set(value);
   _id = 0;
   return (true);
@@ -660,7 +1015,7 @@ bool configuration::service::_set_hosts(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_icon_image(std::string const& value) {
+bool service::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
@@ -672,8 +1027,7 @@ bool configuration::service::_set_icon_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_icon_image_alt(
-       std::string const& value) {
+bool service::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
@@ -685,8 +1039,7 @@ bool configuration::service::_set_icon_image_alt(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_initial_state(
-       std::string const& value) {
+bool service::_set_initial_state(std::string const& value) {
   std::string data(value);
   misc::trim(data);
   if (data == "o" || data == "ok")
@@ -709,7 +1062,7 @@ bool configuration::service::_set_initial_state(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_is_volatile(bool value) {
+bool service::_set_is_volatile(bool value) {
   _is_volatile = value;
   return (true);
 }
@@ -721,8 +1074,7 @@ bool configuration::service::_set_is_volatile(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_low_flap_threshold(
-       unsigned int value) {
+bool service::_set_low_flap_threshold(unsigned int value) {
   _low_flap_threshold = value;
   return (true);
 }
@@ -734,8 +1086,7 @@ bool configuration::service::_set_low_flap_threshold(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_max_check_attempts(
-       unsigned int value) {
+bool service::_set_max_check_attempts(unsigned int value) {
   if (value <= 0)
     return (false);
   _max_check_attempts = value;
@@ -749,7 +1100,7 @@ bool configuration::service::_set_max_check_attempts(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_notes(std::string const& value) {
+bool service::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -761,7 +1112,7 @@ bool configuration::service::_set_notes(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_notes_url(std::string const& value) {
+bool service::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
@@ -773,7 +1124,7 @@ bool configuration::service::_set_notes_url(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_notifications_enabled(bool value) {
+bool service::_set_notifications_enabled(bool value) {
   _notifications_enabled = value;
   return (true);
 }
@@ -785,8 +1136,7 @@ bool configuration::service::_set_notifications_enabled(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_notification_options(
-       std::string const& value) {
+bool service::_set_notification_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');
@@ -825,8 +1175,7 @@ bool configuration::service::_set_notification_options(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_notification_interval(
-       unsigned int value) {
+bool service::_set_notification_interval(unsigned int value) {
   _notification_interval = value;
   return (true);
 }
@@ -838,8 +1187,7 @@ bool configuration::service::_set_notification_interval(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_notification_period(
-       std::string const& value) {
+bool service::_set_notification_period(std::string const& value) {
   _notification_period = value;
   return (true);
 }
@@ -851,7 +1199,7 @@ bool configuration::service::_set_notification_period(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_obsess_over_service(bool value) {
+bool service::_set_obsess_over_service(bool value) {
   _obsess_over_service = value;
   return (true);
 }
@@ -863,7 +1211,7 @@ bool configuration::service::_set_obsess_over_service(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_parallelize_check(bool value) {
+bool service::_set_parallelize_check(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: service parallelize_check was ignored";
@@ -877,7 +1225,7 @@ bool configuration::service::_set_parallelize_check(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_process_perf_data(bool value) {
+bool service::_set_process_perf_data(bool value) {
   _process_perf_data = value;
   return (true);
 }
@@ -889,8 +1237,7 @@ bool configuration::service::_set_process_perf_data(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_retain_nonstatus_information(
-       bool value) {
+bool service::_set_retain_nonstatus_information(bool value) {
   _retain_nonstatus_information = value;
   return (true);
 }
@@ -902,8 +1249,7 @@ bool configuration::service::_set_retain_nonstatus_information(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_retain_status_information(
-       bool value) {
+bool service::_set_retain_status_information(bool value) {
   _retain_status_information = value;
   return (true);
 }
@@ -915,7 +1261,7 @@ bool configuration::service::_set_retain_status_information(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_retry_interval(unsigned int value) {
+bool service::_set_retry_interval(unsigned int value) {
   if (!value)
     return (false);
   _retry_interval = value;
@@ -929,8 +1275,7 @@ bool configuration::service::_set_retry_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_servicegroups(
-       std::string const& value) {
+bool service::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
   return (true);
 }
@@ -942,8 +1287,7 @@ bool configuration::service::_set_servicegroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_service_description(
-       std::string const& value) {
+bool service::_set_service_description(std::string const& value) {
   _service_description = value;
   _id = 0;
   return (true);
@@ -956,8 +1300,7 @@ bool configuration::service::_set_service_description(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::service::_set_stalking_options(
-       std::string const& value) {
+bool service::_set_stalking_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   misc::split(value, values, ',');

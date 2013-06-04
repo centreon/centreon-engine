@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTGROUP_HH
 #  define CCE_CONFIGURATION_HOSTGROUP_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -38,12 +39,20 @@ namespace                  configuration {
                              hostgroup const& right) const throw ();
     bool                   operator!=(
                              hostgroup const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    std::string const&     action_url() const throw ();
+    std::string const&     alias() const throw ();
+    list_string const&     hostgroup_members() const throw ();
+    std::string const&     hostgroup_name() const throw ();
+    list_string const&     members() const throw ();
+    std::string const&     notes() const throw ();
+    std::string const&     notes_url() const throw ();
 
   private:
     bool                   _set_action_url(std::string const& value);
@@ -63,11 +72,10 @@ namespace                  configuration {
     std::string            _notes_url;
   };
 
-  typedef umap<std::size_t, shared_ptr<hostgroup> > map_hostgroup;
+  typedef shared_ptr<hostgroup>    hostgroup_ptr;
+  typedef std::list<hostgroup_ptr> list_hostgroup;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOSTGROUP_HH
-
-

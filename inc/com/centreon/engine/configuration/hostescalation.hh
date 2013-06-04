@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_HOSTESCALATION_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -46,12 +47,22 @@ namespace                  configuration {
                              hostescalation const& right) const throw ();
     bool                   operator!=(
                              hostescalation const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    list_string const&     contactgroups() const throw ();
+    list_string const&     contacts() const throw ();
+    unsigned short         escalation_options() const throw ();
+    std::string const&     escalation_period() const throw ();
+    unsigned int           first_notification() const throw ();
+    list_string const&     hostgroups() const throw ();
+    list_string const&     hosts() const throw ();
+    unsigned int           last_notification() const throw ();
+    unsigned int           notification_interval() const throw ();
 
   private:
     bool                   _set_contactgroups(std::string const& value);
@@ -75,7 +86,8 @@ namespace                  configuration {
     opt<unsigned int>      _notification_interval;
   };
 
-  typedef umap<std::size_t, shared_ptr<hostescalation> > map_hostescalation;
+  typedef shared_ptr<hostescalation>    hostescalation_ptr;
+  typedef std::list<hostescalation_ptr> list_hostescalation;
 }
 
 CCE_END()

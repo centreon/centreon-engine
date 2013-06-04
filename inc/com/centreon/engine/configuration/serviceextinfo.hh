@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEEXTINFO_HH
 #  define CCE_CONFIGURATION_SERVICEEXTINFO_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -38,12 +39,21 @@ namespace                  configuration {
                              serviceextinfo const& right) const throw ();
     bool                   operator!=(
                              serviceextinfo const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    std::string const&     action_url() const throw ();
+    std::string const&     icon_image() const throw ();
+    std::string const&     icon_image_alt() const throw ();
+    list_string const&     hostgroups() const throw ();
+    list_string const&     hosts() const throw ();
+    std::string const&     notes() const throw ();
+    std::string const&     notes_url() const throw ();
+    std::string const&     service_description() const throw ();
 
   private:
     bool                   _set_action_url(std::string const& value);
@@ -58,14 +68,15 @@ namespace                  configuration {
     std::string            _action_url;
     std::string            _icon_image;
     std::string            _icon_image_alt;
-    group                  _hosts;
     group                  _hostgroups;
+    group                  _hosts;
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;
   };
 
-  typedef umap<std::size_t, shared_ptr<serviceextinfo> > map_serviceextinfo;
+  typedef shared_ptr<serviceextinfo>    serviceextinfo_ptr;
+  typedef std::list<serviceextinfo_ptr> list_serviceextinfo;
 }
 
 CCE_END()

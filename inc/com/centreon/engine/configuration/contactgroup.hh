@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_CONTACTGROUP_HH
 #  define CCE_CONFIGURATION_CONTACTGROUP_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -38,12 +39,17 @@ namespace                  configuration {
                              contactgroup const& right) const throw ();
     bool                   operator!=(
                              contactgroup const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    std::string const&     alias() const throw ();
+    list_string const&     contactgroup_members() const throw ();
+    std::string const&     contactgroup_name() const throw ();
+    list_string const&     members() const throw ();
 
   private:
     bool                   _set_alias(std::string const& value);
@@ -57,11 +63,10 @@ namespace                  configuration {
     group                  _members;
   };
 
-  typedef umap<std::size_t, shared_ptr<contactgroup> > map_contactgroup;
+  typedef shared_ptr<contactgroup>    contactgroup_ptr;
+  typedef std::list<contactgroup_ptr> list_contactgroup;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_CONTACTGROUP_HH
-
-

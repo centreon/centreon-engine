@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTEXTINFO_HH
 #  define CCE_CONFIGURATION_HOSTEXTINFO_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -41,18 +42,29 @@ namespace                  configuration {
                              hostextinfo const& right) const throw ();
     bool                   operator!=(
                              hostextinfo const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
 
+    std::string const&     action_url() const throw ();
+    point_2d const&        coords_2d() const throw ();
+    point_3d const&        coords_3d() const throw ();
+    list_string const&     hostgroups() const throw ();
+    list_string const&     hosts() const throw ();
+    std::string const&     icon_image() const throw ();
+    std::string const&     icon_image_alt() const throw ();
+    std::string const&     notes() const throw ();
+    std::string const&     notes_url() const throw ();
+    std::string const&     statusmap_image() const throw ();
+    std::string const&     vrml_image() const throw ();
+
   private:
-    bool                   _set_2d_coords(std::string const& value);
-    bool                   _set_3d_coords(std::string const& value);
     bool                   _set_action_url(std::string const& value);
-    bool                   _set_gd2_image(std::string const& value);
+    bool                   _set_coords_2d(std::string const& value);
+    bool                   _set_coords_3d(std::string const& value);
     bool                   _set_hostgroups(std::string const& value);
     bool                   _set_hosts(std::string const& value);
     bool                   _set_icon_image(std::string const& value);
@@ -62,10 +74,9 @@ namespace                  configuration {
     bool                   _set_statusmap_image(std::string const& value);
     bool                   _set_vrml_image(std::string const& value);
 
-    opt<point_2d>          _2d_coords;
-    opt<point_3d>          _3d_coords;
     std::string            _action_url;
-    std::string            _gd2_image;
+    opt<point_2d>          _coords_2d;
+    opt<point_3d>          _coords_3d;
     group                  _hostgroups;
     group                  _hosts;
     std::string            _icon_image;
@@ -76,9 +87,11 @@ namespace                  configuration {
     std::string            _vrml_image;
   };
 
-  typedef umap<std::size_t, shared_ptr<hostextinfo> > map_hostextinfo;
+  typedef shared_ptr<hostextinfo>    hostextinfo_ptr;
+  typedef std::list<hostextinfo_ptr> list_hostextinfo;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOSTEXTINFO_HH
+

@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEESCALATION_HH
 #  define CCE_CONFIGURATION_SERVICEESCALATION_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -49,12 +50,24 @@ namespace                  configuration {
                              serviceescalation const& right) const throw ();
     bool                   operator!=(
                              serviceescalation const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    list_string const&     contactgroups() const throw ();
+    list_string const&     contacts() const throw ();
+    unsigned short         escalation_options() const throw ();
+    std::string const&     escalation_period() const throw ();
+    unsigned int           first_notification() const throw ();
+    list_string const&     hostgroups() const throw ();
+    list_string const&     hosts() const throw ();
+    unsigned int           last_notification() const throw ();
+    unsigned int           notification_interval() const throw ();
+    list_string const&     servicegroups() const throw ();
+    list_string const&     service_description() const throw ();
 
   private:
     bool                   _set_contactgroups(std::string const& value);
@@ -82,10 +95,10 @@ namespace                  configuration {
     group                  _service_description;
   };
 
-  typedef umap<std::size_t, shared_ptr<serviceescalation> > map_serviceescalation;
+  typedef shared_ptr<serviceescalation>    serviceescalation_ptr;
+  typedef std::list<serviceescalation_ptr> list_serviceescalation;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICEESCALATION_HH
-

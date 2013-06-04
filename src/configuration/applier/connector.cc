@@ -31,17 +31,17 @@ static applier::connector* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::connector::apply(state const& config) {
-  map_connector const& old_connectors(::config->connectors());
-  map_connector const& new_connectors(config.connectors());
+  // list_connector const& old_connectors(::config->connectors());
+  // list_connector const& new_connectors(config.connectors());
 
-  misc::difference<map_connector> diff(old_connectors, new_connectors);
-  map_connector const& added(diff.added());
-  map_connector const& deleted(diff.deleted());
-  map_connector const& modified(diff.modified());
+  // misc::difference<list_connector> diff(old_connectors, new_connectors);
+  // list_connector const& added(diff.added());
+  // list_connector const& deleted(diff.deleted());
+  // list_connector const& modified(diff.modified());
 
-  _add_connectors(added);
-  _remove_connectors(deleted);
-  _modify_connectors(modified);
+  // _add_connectors(added);
+  // _remove_connectors(deleted);
+  // _modify_connectors(modified);
 }
 
 /**
@@ -88,12 +88,12 @@ applier::connector::~connector() throw () {
  *
  *  @param[in] data All connector to add into the monitoring engine.
  */
-void applier::connector::_add_connectors(map_connector const& data) {
-  for (map_connector::const_iterator
+void applier::connector::_add_connectors(list_connector const& data) {
+  for (list_connector::const_iterator
          it(data.begin()), end(data.end());
        it != end;
        ++it) {
-    commands::connector* obj(it->second->create());
+    // commands::connector* obj(it->second->create());
     // XXX: todo.
   }
 }
@@ -103,7 +103,7 @@ void applier::connector::_add_connectors(map_connector const& data) {
  *
  *  @param[in] data All connector to modify into the monitoring engine.
  */
-void applier::connector::_modify_connectors(map_connector const& data) {
+void applier::connector::_modify_connectors(list_connector const& data) {
 
 }
 
@@ -112,6 +112,6 @@ void applier::connector::_modify_connectors(map_connector const& data) {
  *
  *  @param[in] data All connector to remove from the monitoring engine.
  */
-void applier::connector::_remove_connectors(map_connector const& data) {
+void applier::connector::_remove_connectors(list_connector const& data) {
 
 }

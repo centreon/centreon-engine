@@ -31,12 +31,10 @@
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
 #  include "com/centreon/engine/configuration/hostescalation.hh"
-#  include "com/centreon/engine/configuration/hostextinfo.hh"
 #  include "com/centreon/engine/configuration/hostgroup.hh"
 #  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/configuration/servicedependency.hh"
 #  include "com/centreon/engine/configuration/serviceescalation.hh"
-#  include "com/centreon/engine/configuration/serviceextinfo.hh"
 #  include "com/centreon/engine/configuration/servicegroup.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/logging/logger.hh"
@@ -139,21 +137,23 @@ namespace              configuration {
     void               check_result_path(std::string const& value);
     bool               check_service_freshness() const throw ();
     void               check_service_freshness(bool value);
-    map_command const& commands() const throw ();
-    map_command&       commands() throw ();
+    list_command const&
+                       commands() const throw ();
+    list_command&      commands() throw ();
     int                command_check_interval() const throw ();
     void               command_check_interval(int value);
     void               command_check_interval(int value, bool is_second);
     std::string const& command_file() const throw ();
     void               command_file(std::string const& value);
-    map_connector const&
+    list_connector const&
                        connectors() const throw ();
-    map_connector&     connectors() throw ();
-    map_contact const& contacts() const throw ();
-    map_contact&       contacts() throw ();
-    map_contactgroup const&
+    list_connector&    connectors() throw ();
+    list_contact const&
+                       contacts() const throw ();
+    list_contact&      contacts() throw ();
+    list_contactgroup const&
                        contactgroups() const throw ();
-    map_contactgroup&  contactgroups() throw ();
+    list_contactgroup& contactgroups() throw ();
     date_type          date_format() const throw ();
     void               date_format(date_type value);
     std::string const& debug_file() const throw ();
@@ -194,22 +194,19 @@ namespace              configuration {
     void               high_host_flap_threshold(float value);
     float              high_service_flap_threshold() const throw ();
     void               high_service_flap_threshold(float value);
-    map_hostdependency const&
+    list_hostdependency const&
                        hostdependencies() const throw ();
-    map_hostdependency&
+    list_hostdependency&
                        hostdependencies() throw ();
-    map_hostescalation const&
+    list_hostescalation const&
                        hostescalations() const throw ();
-    map_hostescalation&
+    list_hostescalation&
                        hostescalations() throw ();
-    map_hostextinfo const&
-                       hostextinfos() const throw ();
-    map_hostextinfo&  hostextinfos() throw ();
-    map_hostgroup const&
+    list_hostgroup const&
                        hostgroups() const throw ();
-    map_hostgroup&     hostgroups() throw ();
-    map_host const&    hosts() const throw ();
-    map_host&          hosts() throw ();
+    list_hostgroup&    hostgroups() throw ();
+    list_host const&   hosts() const throw ();
+    list_host&         hosts() throw ();
     unsigned int       host_check_timeout() const throw ();
     void               host_check_timeout(unsigned int value);
     unsigned int       host_freshness_check_interval() const throw ();
@@ -297,23 +294,20 @@ namespace              configuration {
     void               retention_scheduling_horizon(unsigned int value);
     unsigned int       retention_update_interval() const throw ();
     void               retention_update_interval(unsigned int value);
-    map_servicedependency const&
+    list_servicedependency const&
                        servicedependencies() const throw ();
-    map_servicedependency&
+    list_servicedependency&
                        servicedependencies() throw ();
-    map_serviceescalation const&
+    list_serviceescalation const&
                        serviceescalations() const throw ();
-    map_serviceescalation&
+    list_serviceescalation&
                        serviceescalations() throw ();
-    map_serviceextinfo const&
-                       serviceextinfos() const throw ();
-    map_serviceextinfo&
-                       serviceextinfos() throw ();
-    map_servicegroup const&
+    list_servicegroup const&
                        servicegroups() const throw ();
-    map_servicegroup&  servicegroups() throw ();
-    map_service const& services() const throw ();
-    map_service&       services() throw ();
+    list_servicegroup& servicegroups() throw ();
+    list_service const&
+                       services() const throw ();
+    list_service&      services() throw ();
     unsigned int       service_check_timeout() const throw ();
     void               service_check_timeout(unsigned int value);
     unsigned int       service_freshness_check_interval() const throw ();
@@ -333,9 +327,9 @@ namespace              configuration {
     unsigned int       status_update_interval() const throw ();
     void               status_update_interval(unsigned int value);
     bool               set(std::string const& key, std::string const& value);
-    map_timeperiod const&
+    list_timeperiod const&
                        timeperiods() const throw ();
-    map_timeperiod&    timeperiods() throw ();
+    list_timeperiod&   timeperiods() throw ();
     unsigned int       time_change_threshold() const throw ();
     void               time_change_threshold(unsigned int value);
     bool               translate_passive_host_checks() const throw ();
@@ -459,13 +453,13 @@ namespace              configuration {
     unsigned int       _check_reaper_interval;
     std::string        _check_result_path;
     bool               _check_service_freshness;
-    map_command        _commands;
+    list_command       _commands;
     int                _command_check_interval;
     bool               _command_check_interval_is_seconds;
     std::string        _command_file;
-    map_connector      _connectors;
-    map_contactgroup   _contactgroups;
-    map_contact        _contacts;
+    list_connector     _connectors;
+    list_contactgroup  _contactgroups;
+    list_contact       _contacts;
     date_type          _date_format;
     std::string        _debug_file;
     unsigned long      _debug_level;
@@ -486,11 +480,12 @@ namespace              configuration {
     std::string        _global_service_event_handler;
     float              _high_host_flap_threshold;
     float              _high_service_flap_threshold;
-    map_hostdependency _hostdependencies;
-    map_hostescalation _hostescalations;
-    map_hostextinfo    _hostextinfos;
-    map_hostgroup      _hostgroups;
-    map_host           _hosts;
+    list_hostdependency
+                       _hostdependencies;
+    list_hostescalation
+                       _hostescalations;
+    list_hostgroup     _hostgroups;
+    list_host          _hosts;
     unsigned int       _host_check_timeout;
     unsigned int       _host_freshness_check_interval;
     inter_check_delay  _host_inter_check_delay_method;
@@ -535,13 +530,12 @@ namespace              configuration {
     bool               _retain_state_information;
     unsigned int       _retention_scheduling_horizon;
     unsigned int       _retention_update_interval;
-    map_servicedependency
+    list_servicedependency
                        _servicedependencies;
-    map_serviceescalation
+    list_serviceescalation
                        _serviceescalations;
-    map_serviceextinfo _serviceextinfos;
-    map_servicegroup   _servicegroups;
-    map_service        _services;
+    list_servicegroup  _servicegroups;
+    list_service       _services;
     unsigned int       _service_check_timeout;
     unsigned int       _service_freshness_check_interval;
     inter_check_delay  _service_inter_check_delay_method;
@@ -551,7 +545,7 @@ namespace              configuration {
     std::string        _state_retention_file;
     std::string        _status_file;
     unsigned int       _status_update_interval;
-    map_timeperiod     _timeperiods;
+    list_timeperiod    _timeperiods;
     unsigned int       _time_change_threshold;
     bool               _translate_passive_host_checks;
     std::vector<std::string>

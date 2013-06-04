@@ -41,9 +41,9 @@ namespace                configuration {
                          timeperiod(timeperiod const&);
                          ~timeperiod() throw ();
       timeperiod&        operator=(timeperiod const&);
-      void               _add_timeperiods(map_timeperiod const& data);
-      void               _modify_timeperiods(map_timeperiod const& data);
-      void               _remove_timeperiods(map_timeperiod const& data);
+      void               _add_timeperiods(list_timeperiod const& data);
+      void               _modify_timeperiods(list_timeperiod const& data);
+      void               _remove_timeperiods(list_timeperiod const& data);
     };
   }
 }

@@ -31,17 +31,17 @@ static applier::command* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::command::apply(state const& config) {
-  map_command const& old_commands(::config->commands());
-  map_command const& new_commands(config.commands());
+  // list_command const& old_commands(::config->commands());
+  // list_command const& new_commands(config.commands());
 
-  misc::difference<map_command> diff(old_commands, new_commands);
-  map_command const& added(diff.added());
-  map_command const& deleted(diff.deleted());
-  map_command const& modified(diff.modified());
+  // misc::difference<list_command> diff(old_commands, new_commands);
+  // list_command const& added(diff.added());
+  // list_command const& deleted(diff.deleted());
+  // list_command const& modified(diff.modified());
 
-  _add_commands(added);
-  _remove_commands(deleted);
-  _modify_commands(modified);
+  // _add_commands(added);
+  // _remove_commands(deleted);
+  // _modify_commands(modified);
 }
 
 /**
@@ -88,7 +88,7 @@ applier::command::~command() throw () {
  *
  *  @param[in] data All command to add into the monitoring engine.
  */
-void applier::command::_add_commands(map_command const& data) {
+void applier::command::_add_commands(list_command const& data) {
 
 }
 
@@ -97,7 +97,7 @@ void applier::command::_add_commands(map_command const& data) {
  *
  *  @param[in] data All command to modify into the monitoring engine.
  */
-void applier::command::_modify_commands(map_command const& data) {
+void applier::command::_modify_commands(list_command const& data) {
 
 }
 
@@ -106,6 +106,6 @@ void applier::command::_modify_commands(map_command const& data) {
  *
  *  @param[in] data All command to remove from the monitoring engine.
  */
-void applier::command::_remove_commands(map_command const& data) {
+void applier::command::_remove_commands(list_command const& data) {
 
 }

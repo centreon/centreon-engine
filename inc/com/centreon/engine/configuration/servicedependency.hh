@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
 #  define CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
 
+#  include <list>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -49,12 +50,25 @@ namespace                  configuration {
                              servicedependency const& right) const throw ();
     bool                   operator!=(
                              servicedependency const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    std::string const&     dependency_period() const throw ();
+    list_string const&     dependent_hostgroups() const throw ();
+    list_string const&     dependent_hosts() const throw ();
+    list_string const&     dependent_servicegroups() const throw ();
+    list_string const&     dependent_service_description() const throw ();
+    unsigned int           execution_failure_options() const throw ();
+    bool                   inherits_parent() const throw ();
+    list_string const&     hostgroups() const throw ();
+    list_string const&     hosts() const throw ();
+    unsigned int           notification_failure_options() const throw ();
+    list_string const&     servicegroups() const throw ();
+    list_string const&     service_description() const throw ();
 
   private:
     bool                   _set_dependency_period(std::string const& value);
@@ -84,10 +98,10 @@ namespace                  configuration {
     group                  _service_description;
   };
 
-  typedef umap<std::size_t, shared_ptr<servicedependency> > map_servicedependency;
+  typedef shared_ptr<servicedependency>    servicedependency_ptr;
+  typedef std::list<servicedependency_ptr> list_servicedependency;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
-

@@ -18,24 +18,17 @@
 */
 
 #include <memory>
-#include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/commands/forward.hh"
-#include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/error.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::command, \
-     type, \
-     &configuration::command::method>::generic
+  &object::setter<command, type, &command::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::command&, std::string const&);
+  bool (*func)(command&, std::string const&);
 } gl_setters[] = {
   { "command_line", SETTER(std::string const&, _set_command_line) },
   { "command_name", SETTER(std::string const&, _set_command_name) },
@@ -45,7 +38,7 @@ static struct {
 /**
  *  Default constructor.
  */
-configuration::command::command()
+command::command()
   : object(object::command, "command") {
 
 }
@@ -55,7 +48,7 @@ configuration::command::command()
  *
  *  @param[in] right The command to copy.
  */
-configuration::command::command(command const& right)
+command::command(command const& right)
   : object(right) {
   operator=(right);
 }
@@ -63,7 +56,7 @@ configuration::command::command(command const& right)
 /**
  *  Destructor.
  */
-configuration::command::~command() throw () {
+command::~command() throw () {
 
 }
 
@@ -74,8 +67,7 @@ configuration::command::~command() throw () {
  *
  *  @return This command.
  */
-configuration::command& configuration::command::operator=(
-                          command const& right) {
+command& command::operator=(command const& right) {
   if (this != &right) {
     object::operator=(right);
     _command_line = right._command_line;
@@ -92,8 +84,7 @@ configuration::command& configuration::command::operator=(
  *
  *  @return True if is the same command, otherwise false.
  */
-bool configuration::command::operator==(
-       command const& right) const throw () {
+bool command::operator==(command const& right) const throw () {
   return (object::operator==(right)
           && _command_line == right._command_line
           && _command_name == right._command_name
@@ -107,50 +98,8 @@ bool configuration::command::operator==(
  *
  *  @return True if is not the same command, otherwise false.
  */
-bool configuration::command::operator!=(
-       command const& right) const throw () {
+bool command::operator!=(command const& right) const throw () {
   return (!operator==(right));
-}
-
-/**
- *  Create new command.
- *
- *  @return The new command.
- */
-::command* configuration::command::create() const {
-  if (!is_valid())
-    throw (engine_error() << "configuration: invalid command name "
-           << _command_name << " property missing");
-
-  commands::set& cmd_set(commands::set::instance());
-
-  // Without connector.
-  if (_connector.empty()) {
-    shared_ptr<commands::command>
-      cmd(new commands::raw(
-                _command_name,
-                _command_line,
-                &checks::checker::instance()));
-    cmd_set.add_command(cmd);
-  }
-  // With connector.
-  else {
-    shared_ptr<commands::command>
-      cmd_forward(cmd_set.get_command(_connector));
-
-    shared_ptr<commands::command>
-      cmd(new commands::forward(
-                _command_name,
-                _command_line,
-                *cmd_forward));
-    cmd_set.add_command(cmd);
-  }
-
-  std::auto_ptr< ::command> obj(new ::command);
-  memset(obj.get(), 0, sizeof(*obj));
-  obj->name = my_strdup(_command_name.c_str());
-  obj->command_line = my_strdup(_command_line.c_str());
-  return (obj.release());
 }
 
 /**
@@ -158,7 +107,7 @@ bool configuration::command::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::command::id() const throw () {
+std::size_t command::id() const throw () {
   return (_id);
 }
 
@@ -167,9 +116,13 @@ std::size_t configuration::command::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::command::is_valid() const throw () {
-  return (!_command_name.empty()
-          && !_command_line.empty());
+void command::check_validity() const {
+  if (_command_name.empty())
+    throw (engine_error() << "configuration: invalid command property "
+           "command_name is missing");
+  if (_command_line.empty())
+    throw (engine_error() << "configuration: invalid command property "
+           "command_line is missing");
 }
 
 /**
@@ -177,9 +130,9 @@ bool configuration::command::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::command::merge(object const& obj) {
+void command::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "configuration: merge failed: invalid object type");
   command const& tmpl(static_cast<command const&>(obj));
 
   MRG_DEFAULT(_command_line);
@@ -195,7 +148,7 @@ void configuration::command::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::command::parse(
+bool command::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -207,14 +160,40 @@ bool configuration::command::parse(
 }
 
 /**
+ *  Get command_line.
+ *
+ *  @return The command_line.
+ */
+std::string const& command::command_line() const throw () {
+  return (_command_line);
+}
+
+/**
+ *  Get command_name.
+ *
+ *  @return The command_name.
+ */
+std::string const& command::command_name() const throw () {
+  return (_command_name);
+}
+
+/**
+ *  Get connector.
+ *
+ *  @return The connector.
+ */
+std::string const& command::connector() const throw () {
+  return (_connector);
+}
+
+/**
  *  Set command_line value.
  *
  *  @param[in] value The new command_line value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::command::_set_command_line(
-       std::string const& value) {
+bool command::_set_command_line(std::string const& value) {
   _command_line = value;
   return (true);
 }
@@ -226,8 +205,7 @@ bool configuration::command::_set_command_line(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::command::_set_command_name(
-       std::string const& value) {
+bool command::_set_command_name(std::string const& value) {
   _command_name = value;
   _id = _hash(value);
   return (true);
@@ -240,8 +218,7 @@ bool configuration::command::_set_command_name(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::command::_set_connector(
-       std::string const& value) {
+bool command::_set_connector(std::string const& value) {
   _connector = value;
   return (true);
 }

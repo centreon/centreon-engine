@@ -41,9 +41,9 @@ namespace               configuration {
                         connector(connector const&);
                         ~connector() throw ();
       connector&        operator=(connector const&);
-      void              _add_connectors(map_connector const& data);
-      void              _modify_connectors(map_connector const& data);
-      void              _remove_connectors(map_connector const& data);
+      void              _add_connectors(list_connector const& data);
+      void              _modify_connectors(list_connector const& data);
+      void              _remove_connectors(list_connector const& data);
     };
   }
 }

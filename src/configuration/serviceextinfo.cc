@@ -20,17 +20,14 @@
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::serviceextinfo, \
-     type, \
-     &configuration::serviceextinfo::method>::generic
+  &object::setter<serviceextinfo, type, &serviceextinfo::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::serviceextinfo&, std::string const&);
+  bool (*func)(serviceextinfo&, std::string const&);
 } gl_setters[] = {
   { "host_name",           SETTER(std::string const&, _set_hosts) },
   { "hostgroup",           SETTER(std::string const&, _set_hostgroups) },
@@ -46,7 +43,7 @@ static struct {
 /**
  *  Default constructor.
  */
-configuration::serviceextinfo::serviceextinfo()
+serviceextinfo::serviceextinfo()
   : object(object::serviceextinfo, "serviceextinfo") {
 
 }
@@ -56,8 +53,7 @@ configuration::serviceextinfo::serviceextinfo()
  *
  *  @param[in] right The serviceextinfo to copy.
  */
-configuration::serviceextinfo::serviceextinfo(
-  serviceextinfo const& right)
+serviceextinfo::serviceextinfo(serviceextinfo const& right)
   : object(right) {
   operator=(right);
 }
@@ -65,7 +61,7 @@ configuration::serviceextinfo::serviceextinfo(
 /**
  *  Destructor.
  */
-configuration::serviceextinfo::~serviceextinfo() throw () {
+serviceextinfo::~serviceextinfo() throw () {
 
 }
 
@@ -76,8 +72,7 @@ configuration::serviceextinfo::~serviceextinfo() throw () {
  *
  *  @return This serviceextinfo.
  */
-configuration::serviceextinfo& configuration::serviceextinfo::operator=(
-                  serviceextinfo const& right) {
+serviceextinfo& serviceextinfo::operator=(serviceextinfo const& right) {
   if (this != &right) {
     object::operator=(right);
     _action_url = right._action_url;
@@ -99,8 +94,7 @@ configuration::serviceextinfo& configuration::serviceextinfo::operator=(
  *
  *  @return True if is the same serviceextinfo, otherwise false.
  */
-bool configuration::serviceextinfo::operator==(
-       serviceextinfo const& right) const throw () {
+bool serviceextinfo::operator==(serviceextinfo const& right) const throw () {
   return (object::operator==(right)
           && _action_url == right._action_url
           && _icon_image == right._icon_image
@@ -119,8 +113,7 @@ bool configuration::serviceextinfo::operator==(
  *
  *  @return True if is not the same serviceextinfo, otherwise false.
  */
-bool configuration::serviceextinfo::operator!=(
-       serviceextinfo const& right) const throw () {
+bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -129,7 +122,7 @@ bool configuration::serviceextinfo::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::serviceextinfo::id() const throw () {
+std::size_t serviceextinfo::id() const throw () {
   if (!_id) {
     _hash(_id, _hosts.get());
     _hash(_id, _service_description);
@@ -142,9 +135,13 @@ std::size_t configuration::serviceextinfo::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::serviceextinfo::is_valid() const throw () {
-  return (!_service_description.empty()
-          && (!_hosts.empty() || !_hostgroups.empty()));
+void serviceextinfo::check_validity() const {
+  if (_service_description.empty())
+    throw (engine_error() << "configuration: invalid serviceextinfo "
+           "property service_description is missing");
+  if (_hosts.empty() && _hostgroups.empty())
+    throw (engine_error() << "configuration: invalid serviceextinfo "
+           "property host or hostgroup is missing");
 }
 
 /**
@@ -152,7 +149,7 @@ bool configuration::serviceextinfo::is_valid() const throw () {
  *
   *  @param[in] obj The object to merge.
  */
-void configuration::serviceextinfo::merge(object const& obj) {
+void serviceextinfo::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   serviceextinfo const& tmpl(static_cast<serviceextinfo const&>(obj));
@@ -175,7 +172,7 @@ void configuration::serviceextinfo::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::parse(
+bool serviceextinfo::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -187,14 +184,85 @@ bool configuration::serviceextinfo::parse(
 }
 
 /**
+ *  Get action_url.
+ *
+ *  @return The action_url.
+ */
+std::string const& serviceextinfo::action_url() const throw () {
+  return (_action_url);
+}
+
+/**
+ *  Get icon_image.
+ *
+ *  @return The icon_image.
+ */
+std::string const& serviceextinfo::icon_image() const throw () {
+  return (_icon_image);
+}
+
+/**
+ *  Get icon_image_alt.
+ *
+ *  @return The icon_image_alt.
+ */
+std::string const& serviceextinfo::icon_image_alt() const throw () {
+  return (_icon_image_alt);
+}
+
+/**
+ *  Get hostgroups.
+ *
+ *  @return The hostgroups.
+ */
+list_string const& serviceextinfo::hostgroups() const throw () {
+  return (_hostgroups.get());
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string const& serviceextinfo::hosts() const throw () {
+  return (_hosts.get());
+}
+
+/**
+ *  Get notes.
+ *
+ *  @return The notes.
+ */
+std::string const& serviceextinfo::notes() const throw () {
+  return (_notes);
+}
+
+/**
+ *  Get notes_url.
+ *
+ *  @return The notes_url.
+ */
+std::string const& serviceextinfo::notes_url() const throw () {
+  return (_notes_url);
+}
+
+/**
+ *  Get service_description.
+ *
+ *  @return The service_description.
+ */
+std::string const& serviceextinfo::service_description() const throw () {
+  return (_service_description);
+}
+
+/**
  *  Set action_url value.
  *
  *  @param[in] value The new action_url value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_action_url(
-       std::string const& value) {
+bool serviceextinfo::_set_action_url(std::string const& value) {
   _action_url = value;
   return (true);
 }
@@ -206,8 +274,7 @@ bool configuration::serviceextinfo::_set_action_url(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_icon_image(
-       std::string const& value) {
+bool serviceextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
@@ -219,8 +286,7 @@ bool configuration::serviceextinfo::_set_icon_image(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_icon_image_alt(
-       std::string const& value) {
+bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
@@ -232,8 +298,7 @@ bool configuration::serviceextinfo::_set_icon_image_alt(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_hosts(
-       std::string const& value) {
+bool serviceextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
   _id = 0;
   return (true);
@@ -246,8 +311,7 @@ bool configuration::serviceextinfo::_set_hosts(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_hostgroups(
-       std::string const& value) {
+bool serviceextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -259,8 +323,7 @@ bool configuration::serviceextinfo::_set_hostgroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_notes(
-       std::string const& value) {
+bool serviceextinfo::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -272,8 +335,7 @@ bool configuration::serviceextinfo::_set_notes(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_notes_url(
-       std::string const& value) {
+bool serviceextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
@@ -285,8 +347,7 @@ bool configuration::serviceextinfo::_set_notes_url(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::serviceextinfo::_set_service_description(
-       std::string const& value) {
+bool serviceextinfo::_set_service_description(std::string const& value) {
   _service_description = value;
   _id = 0;
   return (true);

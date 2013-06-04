@@ -28,27 +28,30 @@
 #  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
+typedef std::list<std::string>         list_string;
+typedef umap<std::string, std::string> properties;
+
 CCE_BEGIN()
 
 namespace                  configuration {
   class                    object {
   public:
     enum                   object_type {
-      command,
-      connector,
-      contactgroup,
-      contact,
-      hostdependency,
-      hostescalation,
-      hostextinfo,
-      hostgroup,
-      host,
-      servicedependency,
-      serviceescalation,
-      serviceextinfo,
-      servicegroup,
-      service,
-      timeperiod
+      command = 0,
+      connector = 1,
+      contactgroup = 2,
+      contact = 3,
+      hostdependency = 4,
+      hostescalation = 5,
+      hostextinfo = 6,
+      hostgroup = 7,
+      host = 8,
+      servicedependency = 9,
+      serviceescalation = 10,
+      serviceextinfo = 11,
+      servicegroup = 12,
+      service = 13,
+      timeperiod = 14
     };
 
                            object(
@@ -61,10 +64,10 @@ namespace                  configuration {
                              object const& right) const throw ();
     bool                   operator!=(
                              object const& right) const throw ();
+    virtual void           check_validity() const = 0;
     static shared_ptr<object>
                            create(std::string const& type_name);
     virtual std::size_t    id() const throw () = 0;
-    virtual bool           is_valid() const throw () = 0;
     bool                   is_template() const throw ();
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
@@ -99,7 +102,7 @@ namespace                  configuration {
     static std::size_t     _hash(std::string const& data) throw ();
     static void            _hash(
                              std::size_t& id,
-                             std::list<std::string> const& lst) throw ();
+                             list_string const& lst) throw ();
     static void            _hash(
                              std::size_t& hash,
                              std::string const& data) throw ();
@@ -111,13 +114,14 @@ namespace                  configuration {
     bool                   _is_resolve;
     bool                   _is_template;
     std::string            _name;
-    std::list<std::string> _templates;
+    list_string            _templates;
     object_type            _type;
     std::string            _type_name;
   };
 
-  typedef umap<std::size_t, shared_ptr<object> > map_object;
-  typedef umap<std::string, shared_ptr<object> > map_template;
+  typedef shared_ptr<object>            object_ptr;
+  typedef std::list<object_ptr>         list_object;
+  typedef umap<std::string, object_ptr> map_object;
 }
 
 CCE_END()

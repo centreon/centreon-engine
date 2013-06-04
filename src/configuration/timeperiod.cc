@@ -23,17 +23,14 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-    configuration::timeperiod, \
-    type, \
-    &configuration::timeperiod::method>::generic
+  &object::setter<timeperiod, type, &timeperiod::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::timeperiod&, std::string const&);
+  bool (*func)(timeperiod&, std::string const&);
 } gl_setters[] = {
   { "alias",           SETTER(std::string const&, _set_alias) },
   { "exclude",         SETTER(std::string const&, _set_exclude) },
@@ -43,7 +40,7 @@ static struct {
 /**
  *  Default constructor.
  */
-configuration::timeperiod::timeperiod()
+timeperiod::timeperiod()
   : object(object::timeperiod, "timeperiod") {
   _exceptions.resize(DATERANGE_TYPES);
   _timeranges.resize(7);
@@ -54,7 +51,7 @@ configuration::timeperiod::timeperiod()
  *
  *  @param[in] right The timeperiod to copy.
  */
-configuration::timeperiod::timeperiod(timeperiod const& right)
+timeperiod::timeperiod(timeperiod const& right)
   : object(right) {
   operator=(right);
 }
@@ -62,7 +59,7 @@ configuration::timeperiod::timeperiod(timeperiod const& right)
 /**
  *  Destructor.
  */
-configuration::timeperiod::~timeperiod() throw () {
+timeperiod::~timeperiod() throw () {
 
 }
 
@@ -73,7 +70,7 @@ configuration::timeperiod::~timeperiod() throw () {
  *
  *  @return This timeperiod.
  */
-configuration::timeperiod& configuration::timeperiod::operator=(timeperiod const& right) {
+timeperiod& timeperiod::operator=(timeperiod const& right) {
   if (this != &right) {
     object::operator=(right);
     _alias = right._alias;
@@ -90,7 +87,7 @@ configuration::timeperiod& configuration::timeperiod::operator=(timeperiod const
  *
  *  @return True if is the same timeperiod, otherwise false.
  */
-bool configuration::timeperiod::operator==(timeperiod const& right) const throw () {
+bool timeperiod::operator==(timeperiod const& right) const throw () {
   return (object::operator==(right)
           && _alias == right._alias
           && _exclude == right._exclude
@@ -104,17 +101,8 @@ bool configuration::timeperiod::operator==(timeperiod const& right) const throw 
  *
  *  @return True if is not the same timeperiod, otherwise false.
  */
-bool configuration::timeperiod::operator!=(timeperiod const& right) const throw () {
+bool timeperiod::operator!=(timeperiod const& right) const throw () {
   return (!operator==(right));
-}
-
-/**
- *  Create new timeperiod.
- *
- *  @return The new timeperiod.
- */
-::timeperiod* configuration::timeperiod::create() const {
-  return (NULL);
 }
 
 /**
@@ -122,7 +110,7 @@ bool configuration::timeperiod::operator!=(timeperiod const& right) const throw 
  *
  *  @return The object id.
  */
-std::size_t configuration::timeperiod::id() const throw () {
+std::size_t timeperiod::id() const throw () {
   return (_id);
 }
 
@@ -131,8 +119,10 @@ std::size_t configuration::timeperiod::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::timeperiod::is_valid() const throw () {
-  return (false);
+void timeperiod::check_validity() const {
+  if (_timeperiod_name.empty())
+    throw (engine_error() << "configuration: invalid timeperiod "
+           "property timeperiod_name is missing");
 }
 
 /**
@@ -140,7 +130,7 @@ bool configuration::timeperiod::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::timeperiod::merge(object const& obj) {
+void timeperiod::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   timeperiod const& tmpl(static_cast<timeperiod const&>(obj));
@@ -160,7 +150,7 @@ void configuration::timeperiod::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::parse(
+bool timeperiod::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -178,7 +168,7 @@ bool configuration::timeperiod::parse(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::parse(std::string const& line) {
+bool timeperiod::parse(std::string const& line) {
   std::size_t pos(line.find_first_of(" \t\r", 0));
   if (pos == std::string::npos)
     return (false);
@@ -195,13 +185,59 @@ bool configuration::timeperiod::parse(std::string const& line) {
 }
 
 /**
+ *  Get alias value.
+ *
+ *  @return The alias value.
+ */
+std::string const& timeperiod::alias() const throw () {
+  return (_alias);
+}
+
+/**
+ *  Get exceptions value.
+ *
+ *  @return The exceptions value.
+ */
+std::vector<std::list<daterange> > const& timeperiod::exceptions() const throw () {
+  return (_exceptions);
+}
+
+/**
+ *  Get exclude value.
+ *
+ *  @return The exclude value.
+ */
+list_string const& timeperiod::exclude() const throw () {
+  return (_exclude);
+}
+
+/**
+ *  Get timeperiod_name value.
+ *
+ *  @return The timeperiod_name value.
+ */
+std::string const& timeperiod::timeperiod_name() const throw () {
+  return (_timeperiod_name);
+}
+
+/**
+ *  Get timeranges.
+ *
+ *  @return The timeranges list.
+ */
+std::vector<list_string> const& timeperiod::timeranges() const throw () {
+  return (_timeranges);
+}
+
+
+/**
  *  Add a calendar date.
  *
  *  @param[in] line The line to parse.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_add_calendar_date(std::string const& line) {
+bool timeperiod::_add_calendar_date(std::string const& line) {
   int ret(0);
   int pos(0);
   bool fill_missing(false);
@@ -287,7 +323,7 @@ bool configuration::timeperiod::_add_calendar_date(std::string const& line) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_add_other_date(std::string const& line) {
+bool timeperiod::_add_other_date(std::string const& line) {
   int pos(0);
   daterange::type_range type(daterange::none);
   unsigned int month_start(0);
@@ -523,7 +559,7 @@ bool configuration::timeperiod::_add_other_date(std::string const& line) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_add_week_day(
+bool timeperiod::_add_week_day(
        std::string const& key,
        std::string const& value) {
   unsigned int day_id;
@@ -541,7 +577,7 @@ bool configuration::timeperiod::_add_week_day(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_get_month_id(
+bool timeperiod::_get_month_id(
        std::string const& name,
        unsigned int& id) {
   static std::string const months[] = {
@@ -572,7 +608,7 @@ bool configuration::timeperiod::_get_month_id(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_get_day_id(
+bool timeperiod::_get_day_id(
        std::string const& name,
        unsigned int& id) {
   static std::string const days[] = {
@@ -597,7 +633,7 @@ bool configuration::timeperiod::_get_day_id(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_set_alias(std::string const& value) {
+bool timeperiod::_set_alias(std::string const& value) {
   _alias = value;
   return (true);
 }
@@ -609,7 +645,7 @@ bool configuration::timeperiod::_set_alias(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_set_exclude(std::string const& value) {
+bool timeperiod::_set_exclude(std::string const& value) {
   _exclude.clear();
   misc::split(value, _exclude, ',');
   return (false);
@@ -622,7 +658,7 @@ bool configuration::timeperiod::_set_exclude(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::timeperiod::_set_timeperiod_name(std::string const& value) {
+bool timeperiod::_set_timeperiod_name(std::string const& value) {
   _timeperiod_name = value;
   _id = _hash(value);
   return (true);

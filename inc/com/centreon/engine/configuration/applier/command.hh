@@ -41,9 +41,9 @@ namespace             configuration {
                       command(command const&);
                       ~command() throw ();
       command&        operator=(command const&);
-      void            _add_commands(map_command const& data);
-      void            _modify_commands(map_command const& data);
-      void            _remove_commands(map_command const& data);
+      void            _add_commands(list_command const& data);
+      void            _modify_commands(list_command const& data);
+      void            _remove_commands(list_command const& data);
     };
   }
 }

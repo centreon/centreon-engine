@@ -137,38 +137,38 @@ bool object::operator!=(object const& right) const throw () {
  *
  *  @return New object.
  */
-shared_ptr<object> object::create(std::string const& type_name) {
-  shared_ptr<object> obj;
+object_ptr object::create(std::string const& type_name) {
+  object_ptr obj;
   if (type_name == "command")
-    obj = shared_ptr<object>(new configuration::command());
+    obj = object_ptr(new configuration::command());
   else if (type_name == "connector")
-    obj = shared_ptr<object>(new configuration::connector());
+    obj = object_ptr(new configuration::connector());
   else if (type_name == "contactgroup")
-    obj = shared_ptr<object>(new configuration::contactgroup());
+    obj = object_ptr(new configuration::contactgroup());
   else if (type_name == "contact")
-    obj = shared_ptr<object>(new configuration::contact());
+    obj = object_ptr(new configuration::contact());
   else if (type_name == "hostdependency")
-    obj = shared_ptr<object>(new configuration::hostdependency());
+    obj = object_ptr(new configuration::hostdependency());
   else if (type_name == "hostescalation")
-    obj = shared_ptr<object>(new configuration::hostescalation());
+    obj = object_ptr(new configuration::hostescalation());
   else if (type_name == "hostextinfo")
-    obj = shared_ptr<object>(new configuration::hostextinfo());
+    obj = object_ptr(new configuration::hostextinfo());
   else if (type_name == "hostgroup")
-    obj = shared_ptr<object>(new configuration::hostgroup());
+    obj = object_ptr(new configuration::hostgroup());
   else if (type_name == "host")
-    obj = shared_ptr<object>(new configuration::host());
+    obj = object_ptr(new configuration::host());
   else if (type_name == "servicedependency")
-    obj = shared_ptr<object>(new configuration::servicedependency());
+    obj = object_ptr(new configuration::servicedependency());
   else if (type_name == "serviceescalation")
-    obj = shared_ptr<object>(new configuration::serviceescalation());
+    obj = object_ptr(new configuration::serviceescalation());
   else if (type_name == "serviceextinfo")
-    obj = shared_ptr<object>(new configuration::serviceextinfo());
+    obj = object_ptr(new configuration::serviceextinfo());
   else if (type_name == "servicegroup")
-    obj = shared_ptr<object>(new configuration::servicegroup());
+    obj = object_ptr(new configuration::servicegroup());
   else if (type_name == "service")
-    obj = shared_ptr<object>(new configuration::service());
+    obj = object_ptr(new configuration::service());
   else if (type_name == "timeperiod")
-    obj = shared_ptr<object>(new configuration::timeperiod());
+    obj = object_ptr(new configuration::timeperiod());
   return (obj);
 }
 
@@ -232,7 +232,7 @@ bool object::parse(std::string const& line) {
  *
  *  @param[in, out] templates The template list.
  */
-void object::resolve_template(map_template& templates) {
+void object::resolve_template(map_object& templates) {
   if (_is_resolve)
     return;
 
@@ -241,7 +241,7 @@ void object::resolve_template(map_template& templates) {
          it(_templates.begin()), end(_templates.end());
        it != end;
        ++it) {
-    map_template::iterator tmpl(templates.find(*it));
+    map_object::iterator tmpl(templates.find(*it));
     if (tmpl == templates.end())
       throw (engine_error() << "merge failed: invalid object type");
     tmpl->second->resolve_template(templates);

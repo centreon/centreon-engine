@@ -20,9 +20,10 @@
 #ifndef CCE_CONFIGURATION_CONNECTOR_HH
 #  define CCE_CONFIGURATION_CONNECTOR_HH
 
+#  include <list>
+#  include "com/centreon/engine/commands/connector.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/commands/connector.hh"
 
 CCE_BEGIN()
 
@@ -38,13 +39,15 @@ namespace                  configuration {
                              connector const& right) const throw ();
     bool                   operator!=(
                              connector const& right) const throw ();
-    commands::connector*   create() const;
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
+
+    std::string const&     connector_line() const throw ();
+    std::string const&     connector_name() const throw ();
 
   private:
     bool                   _set_connector_line(std::string const& value);
@@ -54,7 +57,8 @@ namespace                  configuration {
     std::string            _connector_name;
   };
 
-  typedef umap<std::size_t, shared_ptr<connector> > map_connector;
+  typedef shared_ptr<connector>    connector_ptr;
+  typedef std::list<connector_ptr> list_connector;
 }
 
 CCE_END()

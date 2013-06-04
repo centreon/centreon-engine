@@ -21,17 +21,14 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
-  &configuration::object::setter< \
-     configuration::hostextinfo, \
-     type, \
-     &configuration::hostextinfo::method>::generic
+  &object::setter<hostextinfo, type, &hostextinfo::method>::generic
 
 static struct {
   std::string const name;
-  bool (*func)(configuration::hostextinfo&, std::string const&);
+  bool (*func)(hostextinfo&, std::string const&);
 } gl_setters[] = {
   { "host_name",       SETTER(std::string const&, _set_hosts) },
   { "hostgroup",       SETTER(std::string const&, _set_hostgroups) },
@@ -42,20 +39,20 @@ static struct {
   { "icon_image",      SETTER(std::string const&, _set_icon_image) },
   { "icon_image_alt",  SETTER(std::string const&, _set_icon_image_alt) },
   { "vrml_image",      SETTER(std::string const&, _set_vrml_image) },
-  { "gd2_image",       SETTER(std::string const&, _set_gd2_image) },
+  { "gd2_image",       SETTER(std::string const&, _set_statusmap_image) },
   { "statusmap_image", SETTER(std::string const&, _set_statusmap_image) },
-  { "2d_coords",       SETTER(std::string const&, _set_2d_coords) },
-  { "3d_coords",       SETTER(std::string const&, _set_3d_coords) }
+  { "2d_coords",       SETTER(std::string const&, _set_coords_2d) },
+  { "3d_coords",       SETTER(std::string const&, _set_coords_3d) }
 };
 
 // Default values.
-static configuration::point_2d const default_2d_coords(-1, -1);
-static configuration::point_3d const default_3d_coords(0.0, 0.0, 0.0);
+static point_2d const default_coords_2d(-1, -1);
+static point_3d const default_coords_3d(0.0, 0.0, 0.0);
 
 /**
  *  Default constructor.
  */
-configuration::hostextinfo::hostextinfo()
+hostextinfo::hostextinfo()
   : object(object::hostextinfo, "hostextinfo") {
 
 }
@@ -65,7 +62,7 @@ configuration::hostextinfo::hostextinfo()
  *
  *  @param[in] right The hostextinfo to copy.
  */
-configuration::hostextinfo::hostextinfo(hostextinfo const& right)
+hostextinfo::hostextinfo(hostextinfo const& right)
   : object(right) {
   operator=(right);
 }
@@ -73,7 +70,7 @@ configuration::hostextinfo::hostextinfo(hostextinfo const& right)
 /**
  *  Destructor.
  */
-configuration::hostextinfo::~hostextinfo() throw () {
+hostextinfo::~hostextinfo() throw () {
 
 }
 
@@ -84,14 +81,12 @@ configuration::hostextinfo::~hostextinfo() throw () {
  *
  *  @return This hostextinfo.
  */
-configuration::hostextinfo& configuration::hostextinfo::operator=(
-                              hostextinfo const& right) {
+hostextinfo& hostextinfo::operator=(hostextinfo const& right) {
   if (this != &right) {
     object::operator=(right);
-    _2d_coords = right._2d_coords;
-    _3d_coords = right._3d_coords;
     _action_url = right._action_url;
-    _gd2_image = right._gd2_image;
+    _coords_2d = right._coords_2d;
+    _coords_3d = right._coords_3d;
     _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _icon_image = right._icon_image;
@@ -111,13 +106,11 @@ configuration::hostextinfo& configuration::hostextinfo::operator=(
  *
  *  @return True if is the same hostextinfo, otherwise false.
  */
-bool configuration::hostextinfo::operator==(
-       hostextinfo const& right) const throw () {
+bool hostextinfo::operator==(hostextinfo const& right) const throw () {
   return (object::operator==(right)
-          && _2d_coords == right._2d_coords
-          && _3d_coords == right._3d_coords
           && _action_url == right._action_url
-          && _gd2_image == right._gd2_image
+          && _coords_2d == right._coords_2d
+          && _coords_3d == right._coords_3d
           && _hostgroups == right._hostgroups
           && _hosts == right._hosts
           && _icon_image == right._icon_image
@@ -135,8 +128,7 @@ bool configuration::hostextinfo::operator==(
  *
  *  @return True if is not the same hostextinfo, otherwise false.
  */
-bool configuration::hostextinfo::operator!=(
-       hostextinfo const& right) const throw () {
+bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -145,7 +137,7 @@ bool configuration::hostextinfo::operator!=(
  *
  *  @return The object id.
  */
-std::size_t configuration::hostextinfo::id() const throw () {
+std::size_t hostextinfo::id() const throw () {
   return (_id);
 }
 
@@ -154,8 +146,10 @@ std::size_t configuration::hostextinfo::id() const throw () {
  *
  *  @return True if is a valid object, otherwise false.
  */
-bool configuration::hostextinfo::is_valid() const throw () {
-  return ((!_hostgroups.empty() || !_hosts.empty()));
+void hostextinfo::check_validity() const {
+  if (_hostgroups.empty() && _hosts.empty())
+    throw (engine_error() << "configuration: invalid hostextinfo "
+           "property hostgroup or host is missing");
 }
 
 /**
@@ -163,15 +157,14 @@ bool configuration::hostextinfo::is_valid() const throw () {
  *
  *  @param[in] obj The object to merge.
  */
-void configuration::hostextinfo::merge(object const& obj) {
+void hostextinfo::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   hostextinfo const& tmpl(static_cast<hostextinfo const&>(obj));
 
-  MRG_OPTION(_2d_coords);
-  MRG_OPTION(_3d_coords);
   MRG_DEFAULT(_action_url);
-  MRG_DEFAULT(_gd2_image);
+  MRG_OPTION(_coords_2d);
+  MRG_OPTION(_coords_3d);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
   MRG_DEFAULT(_icon_image);
@@ -190,7 +183,7 @@ void configuration::hostextinfo::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::parse(
+bool hostextinfo::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
@@ -202,14 +195,124 @@ bool configuration::hostextinfo::parse(
 }
 
 /**
- *  Set 2d_coords value.
+ *  Get action_url.
  *
- *  @param[in] value The new 2d_coords value.
+ *  @return The action_url.
+ */
+std::string const& hostextinfo::action_url() const throw () {
+  return (_action_url);
+}
+
+/**
+ *  Get coords_2d.
+ *
+ *  @return The coords_2d.
+ */
+point_2d const& hostextinfo::coords_2d() const throw () {
+  return (_coords_2d.get());
+}
+
+/**
+ *  Get 3d_coords.
+ *
+ *  @return The 3d_coords.
+ */
+point_3d const& hostextinfo::coords_3d() const throw () {
+  return (_coords_3d.get());
+}
+
+/**
+ *  Get hostgroups.
+ *
+ *  @return The hostgroups.
+ */
+list_string const& hostextinfo::hostgroups() const throw () {
+  return (_hostgroups.get());
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string const& hostextinfo::hosts() const throw () {
+  return (_hosts.get());
+}
+
+/**
+ *  Get icon_image.
+ *
+ *  @return The icon_image.
+ */
+std::string const& hostextinfo::icon_image() const throw () {
+  return (_icon_image);
+}
+
+/**
+ *  Get icon_image_alt.
+ *
+ *  @return The icon_image_alt.
+ */
+std::string const& hostextinfo::icon_image_alt() const throw () {
+  return (_icon_image_alt);
+}
+
+/**
+ *  Get notes.
+ *
+ *  @return The notes.
+ */
+std::string const& hostextinfo::notes() const throw () {
+  return (_notes);
+}
+
+/**
+ *  Get notes_url.
+ *
+ *  @return The notes_url.
+ */
+std::string const& hostextinfo::notes_url() const throw () {
+  return (_notes_url);
+}
+
+/**
+ *  Get statusmap_image.
+ *
+ *  @return The statusmap_image.
+ */
+std::string const& hostextinfo::statusmap_image() const throw () {
+  return (_statusmap_image);
+}
+
+/**
+ *  Get vrml_image.
+ *
+ *  @return The vrml_image.
+ */
+std::string const& hostextinfo::vrml_image() const throw () {
+  return (_vrml_image);
+}
+
+/**
+ *  Set action_url value.
+ *
+ *  @param[in] value The new action_url value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_2d_coords(
-       std::string const& value) {
+bool hostextinfo::_set_action_url(std::string const& value) {
+  _action_url = value;
+  return (true);
+}
+
+/**
+ *  Set coords_2s value.
+ *
+ *  @param[in] value The new coords_2d value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool hostextinfo::_set_coords_2d(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
   if (coords.size() != 2)
@@ -224,19 +327,18 @@ bool configuration::hostextinfo::_set_2d_coords(
   if (!misc::to(misc::trim(coords.front()), y))
     return (false);
 
-  _2d_coords = point_2d(x, y);
+  _coords_2d = point_2d(x, y);
   return (true);
 }
 
 /**
- *  Set 3d_coords value.
+ *  Set coords_3d value.
  *
- *  @param[in] value The new 3d_coords value.
+ *  @param[in] value The new coords_3d value.
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_3d_coords(
-       std::string const& value) {
+bool hostextinfo::_set_coords_3d(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
   if (coords.size() != 2)
@@ -256,33 +358,7 @@ bool configuration::hostextinfo::_set_3d_coords(
   if (!misc::to(misc::trim(coords.front()), z))
     return (false);
 
-  _3d_coords = point_3d(x, y, z);
-  return (true);
-}
-
-/**
- *  Set action_url value.
- *
- *  @param[in] value The new action_url value.
- *
- *  @return True on success, otherwise false.
- */
-bool configuration::hostextinfo::_set_action_url(
-       std::string const& value) {
-  _action_url = value;
-  return (true);
-}
-
-/**
- *  Set gd2_image value.
- *
- *  @param[in] value The new gd2_image value.
- *
- *  @return True on success, otherwise false.
- */
-bool configuration::hostextinfo::_set_gd2_image(
-       std::string const& value) {
-  _gd2_image = value;
+  _coords_3d = point_3d(x, y, z);
   return (true);
 }
 
@@ -293,8 +369,7 @@ bool configuration::hostextinfo::_set_gd2_image(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_hostgroups(
-       std::string const& value) {
+bool hostextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
   return (true);
 }
@@ -306,7 +381,7 @@ bool configuration::hostextinfo::_set_hostgroups(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_hosts(std::string const& value) {
+bool hostextinfo::_set_hosts(std::string const& value) {
   _hosts.set(value);
   _id = 0;
   _hash(_id, _hosts.get());
@@ -320,8 +395,7 @@ bool configuration::hostextinfo::_set_hosts(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_icon_image(
-       std::string const& value) {
+bool hostextinfo::_set_icon_image(std::string const& value) {
   _icon_image = value;
   return (true);
 }
@@ -333,8 +407,7 @@ bool configuration::hostextinfo::_set_icon_image(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_icon_image_alt(
-       std::string const& value) {
+bool hostextinfo::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
@@ -346,7 +419,7 @@ bool configuration::hostextinfo::_set_icon_image_alt(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_notes(std::string const& value) {
+bool hostextinfo::_set_notes(std::string const& value) {
   _notes = value;
   return (true);
 }
@@ -358,8 +431,7 @@ bool configuration::hostextinfo::_set_notes(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_notes_url(
-       std::string const& value) {
+bool hostextinfo::_set_notes_url(std::string const& value) {
   _notes_url = value;
   return (true);
 }
@@ -371,8 +443,7 @@ bool configuration::hostextinfo::_set_notes_url(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_statusmap_image(
-       std::string const& value) {
+bool hostextinfo::_set_statusmap_image(std::string const& value) {
   _statusmap_image = value;
   return (true);
 }
@@ -384,8 +455,7 @@ bool configuration::hostextinfo::_set_statusmap_image(
  *
  *  @return True on success, otherwise false.
  */
-bool configuration::hostextinfo::_set_vrml_image(
-       std::string const& value) {
+bool hostextinfo::_set_vrml_image(std::string const& value) {
   _vrml_image = value;
   return (true);
 }

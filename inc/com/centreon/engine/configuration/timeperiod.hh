@@ -26,7 +26,6 @@
 #  include "com/centreon/engine/configuration/daterange.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
 
 CCE_BEGIN()
 
@@ -42,14 +41,21 @@ namespace                  configuration {
                              timeperiod const& right) const throw ();
     bool                   operator!=(
                              timeperiod const& right) const throw ();
-    ::timeperiod*          create() const;
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
     bool                   parse(std::string const& line);
+
+    std::string const&     alias() const throw ();
+    std::vector<std::list<daterange> > const&
+                           exceptions() const throw ();
+    list_string const&     exclude() const throw ();
+    std::string const&     timeperiod_name() const throw ();
+    std::vector<list_string> const&
+                           timeranges() const throw ();
 
   private:
     bool                   _add_calendar_date(std::string const& line);
@@ -70,17 +76,16 @@ namespace                  configuration {
     std::string            _alias;
     std::vector<std::list<daterange> >
                            _exceptions;
-    std::list<std::string> _exclude;
+    list_string            _exclude;
     std::string            _timeperiod_name;
-    std::vector<std::list<std::string> >
+    std::vector<list_string>
                            _timeranges;
   };
 
-  typedef umap<std::size_t, shared_ptr<timeperiod> > map_timeperiod;
+  typedef shared_ptr<timeperiod>    timeperiod_ptr;
+  typedef std::list<timeperiod_ptr> list_timeperiod;
 }
 
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_TIMEPERIOD_HH
-
-

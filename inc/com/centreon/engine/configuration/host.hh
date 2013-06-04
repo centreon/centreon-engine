@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOST_HH
 #  define CCE_CONFIGURATION_HOST_HH
 
+#  include <list>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -27,11 +28,12 @@
 #  include "com/centreon/engine/configuration/point_2d.hh"
 #  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
 namespace                  configuration {
+  class                    hostextinfo;
+
   class                    host
     : public object {
   public:
@@ -51,16 +53,60 @@ namespace                  configuration {
     host&                  operator=(host const& right);
     bool                   operator==(host const& right) const throw ();
     bool                   operator!=(host const& right) const throw ();
+    void                   check_validity() const;
     std::size_t            id() const throw ();
-    bool                   is_valid() const throw ();
+    void                   merge(configuration::hostextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,
                              std::string const& value);
 
+    std::string const&     action_url() const throw ();
+    std::string const&     address() const throw ();
+    std::string const&     alias() const throw ();
+    bool                   checks_active() const throw ();
+    bool                   checks_passive() const throw ();
+    std::string const&     check_command() const throw ();
+    bool                   check_freshness() const throw ();
+    unsigned int           check_interval() const throw ();
+    std::string const&     check_period() const throw ();
+    list_string const&     contactgroups() const throw ();
+    list_string const&     contacts() const throw ();
+    point_2d const&        coords_2d() const throw ();
+    point_3d const&        coords_3d() const throw ();
+    properties const&      customvariables() const throw ();
+    std::string const&     display_name() const throw ();
+    std::string const&     event_handler() const throw ();
+    bool                   event_handler_enabled() const throw ();
+    unsigned int           first_notification_delay() const throw ();
+    bool                   flap_detection_enabled() const throw ();
+    unsigned int           flap_detection_options() const throw ();
+    unsigned int           freshness_threshold() const throw ();
+    unsigned int           high_flap_threshold() const throw ();
+    list_string const&     hostgroups() const throw ();
+    std::string const&     host_name() const throw ();
+    std::string const&     icon_image() const throw ();
+    std::string const&     icon_image_alt() const throw ();
+    unsigned int           initial_state() const throw ();
+    unsigned int           low_flap_threshold() const throw ();
+    unsigned int           max_check_attempts() const throw ();
+    std::string const&     notes() const throw ();
+    std::string const&     notes_url() const throw ();
+    bool                   notifications_enabled() const throw ();
+    unsigned int           notification_interval() const throw ();
+    unsigned int           notification_options() const throw ();
+    std::string const&     notification_period() const throw ();
+    bool                   obsess_over_host() const throw ();
+    list_string const&     parents() const throw ();
+    bool                   process_perf_data() const throw ();
+    bool                   retain_nonstatus_information() const throw ();
+    bool                   retain_status_information() const throw ();
+    unsigned int           retry_interval() const throw ();
+    unsigned int           stalking_options() const throw ();
+    std::string const&     statusmap_image() const throw ();
+    std::string const&     vrml_image() const throw ();
+
   private:
-    bool                   _set_2d_coords(std::string const& value);
-    bool                   _set_3d_coords(std::string const& value);
     bool                   _set_action_url(std::string const& value);
     bool                   _set_address(std::string const& value);
     bool                   _set_alias(std::string const& value);
@@ -72,6 +118,8 @@ namespace                  configuration {
     bool                   _set_check_period(std::string const& value);
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
+    bool                   _set_coords_2d(std::string const& value);
+    bool                   _set_coords_3d(std::string const& value);
     bool                   _set_display_name(std::string const& value);
     bool                   _set_event_handler(std::string const& value);
     bool                   _set_event_handler_enabled(bool value);
@@ -81,7 +129,6 @@ namespace                  configuration {
     bool                   _set_flap_detection_enabled(bool value);
     bool                   _set_flap_detection_options(std::string const& value);
     bool                   _set_freshness_threshold(unsigned int value);
-    bool                   _set_gd2_image(std::string const& value);
     bool                   _set_high_flap_threshold(unsigned int value);
     bool                   _set_host_name(std::string const& value);
     bool                   _set_hostgroups(std::string const& value);
@@ -106,8 +153,6 @@ namespace                  configuration {
     bool                   _set_statusmap_image(std::string const& value);
     bool                   _set_vrml_image(std::string const& value);
 
-    opt<point_2d>          _2d_coords;
-    opt<point_3d>          _3d_coords;
     std::string            _action_url;
     std::string            _address;
     std::string            _alias;
@@ -119,8 +164,9 @@ namespace                  configuration {
     std::string            _check_period;
     group                  _contactgroups;
     group                  _contacts;
-    umap<std::string, std::string>
-                           _customvariables;
+    opt<point_2d>          _coords_2d;
+    opt<point_3d>          _coords_3d;
+    properties             _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
     opt<bool>              _event_handler_enabled;
@@ -128,7 +174,6 @@ namespace                  configuration {
     opt<bool>              _flap_detection_enabled;
     opt<unsigned int>      _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
-    std::string            _gd2_image;
     opt<unsigned int>      _high_flap_threshold;
     group                  _hostgroups;
     std::string            _host_name;
@@ -154,7 +199,8 @@ namespace                  configuration {
     std::string            _vrml_image;
   };
 
-  typedef umap<std::size_t, shared_ptr<host> > map_host;
+  typedef shared_ptr<host>    host_ptr;
+  typedef std::list<host_ptr> list_host;
 }
 
 CCE_END()
