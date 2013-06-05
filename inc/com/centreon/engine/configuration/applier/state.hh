@@ -25,6 +25,7 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
+// Forward declaration.
 struct command_struct;
 struct contact_struct;
 struct contactgroup_struct;
@@ -39,6 +40,11 @@ struct servicegroup_struct;
 struct timeperiod_struct;
 
 CCE_BEGIN()
+
+// Forward declaration.
+namespace commands {
+  class   connector;
+}
 
 namespace           configuration {
   namespace         applier {
@@ -60,10 +66,10 @@ namespace           configuration {
                     commands() const throw ();
       umap<std::string, shared_ptr<command_struct> >&
                     commands() throw ();
-      // umap<std::string, shared_ptr<connector_struct> > const&
-      //               connectors() const throw ();
-      // umap<std::string, shared_ptr<connector_struct> >&
-      //               connectors() throw ();
+      umap<std::string, shared_ptr<commands::connector> > const&
+                    connectors() const throw ();
+      umap<std::string, shared_ptr<commands::connector> >&
+                    connectors() throw ();
       umap<std::string, shared_ptr<contact_struct> > const&
                     contacts() const throw ();
       umap<std::string, shared_ptr<contact_struct> >&
@@ -119,8 +125,8 @@ namespace           configuration {
 
       umap<std::string, shared_ptr<command_struct> >
                     _commands;
-      // umap<std::string, shared_ptr<connector_struct> >
-      //               _connectors;
+      umap<std::string, shared_ptr<commands::connector> >
+                    _connectors;
       umap<std::string, shared_ptr<contact_struct> >
                     _contacts;
       umap<std::string, shared_ptr<contactgroup_struct> >

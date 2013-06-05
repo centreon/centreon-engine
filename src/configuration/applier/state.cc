@@ -17,10 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/objects.hh"
 
 using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 static applier::state* _instance = NULL;
@@ -92,23 +94,23 @@ umap<std::string, shared_ptr<command_struct> >& applier::state::commands() throw
   return (_commands);
 }
 
-// /**
-//  *  Get the current connectors.
-//  *
-//  *  @return The current connectors.
-//  */
-// umap<std::string, shared_ptr<connector_struct> > const& applier::state::connectors() const throw () {
-//   return (_connectors);
-// }
+/**
+ *  Get the current connectors.
+ *
+ *  @return The current connectors.
+ */
+umap<std::string, shared_ptr<commands::connector> > const& applier::state::connectors() const throw () {
+  return (_connectors);
+}
 
-// /**
-//  *  Get the current connectors.
-//  *
-//  *  @return The current connectors.
-//  */
-// umap<std::string, shared_ptr<connector_struct> >& applier::state::connectors() throw () {
-//   return (_connectors);
-// }
+/**
+ *  Get the current connectors.
+ *
+ *  @return The current connectors.
+ */
+umap<std::string, shared_ptr<commands::connector> >& applier::state::connectors() throw () {
+  return (_connectors);
+}
 
 /**
  *  Get the current contacts.
