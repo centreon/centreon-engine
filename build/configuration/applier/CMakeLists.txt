@@ -30,6 +30,7 @@ add_library("cce_configuration_applier"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/macros.cc"
+  "${SRC_DIR}/state.cc"
   "${SRC_DIR}/timeperiod.cc"
   "${INC_DIR}/base.hh"
   "${INC_DIR}/command.hh"
@@ -39,6 +40,7 @@ add_library("cce_configuration_applier"
   "${INC_DIR}/logging.hh"
   "${INC_DIR}/macros.hh"
   "${INC_DIR}/object.hh"
+  "${INC_DIR}/state.hh"
   "${INC_DIR}/timeperiod.hh")
 
 # Link target with required libraries.
