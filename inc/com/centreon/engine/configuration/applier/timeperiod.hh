@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 
 #  include "com/centreon/engine/configuration/applier/base.hh"
+#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,7 +30,8 @@ CCE_BEGIN()
 namespace                configuration {
   namespace              applier {
     class                timeperiod
-      : public base {
+      : public base,
+        public object<configuration::timeperiod> {
     public:
       void               apply(state const& config);
       static timeperiod& instance();
@@ -41,9 +43,9 @@ namespace                configuration {
                          timeperiod(timeperiod const&);
                          ~timeperiod() throw ();
       timeperiod&        operator=(timeperiod const&);
-      void               _add_timeperiods(list_timeperiod const& data);
-      void               _modify_timeperiods(list_timeperiod const& data);
-      void               _remove_timeperiods(list_timeperiod const& data);
+      void               _add_object(timeperiod_ptr obj);
+      void               _modify_object(timeperiod_ptr obj);
+      void               _remove_object(timeperiod_ptr obj);
     };
   }
 }

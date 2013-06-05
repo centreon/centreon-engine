@@ -672,7 +672,18 @@ void parser::_get_objects_by_list_name(
 }
 
 /**
- *  Insert objects into type T list.
+ *  Compare two shared pointer object id.
+ *
+ *  @return True if the first object id is smaller than
+ *          the second object id.
+ */
+template<typename T>
+static bool smaller_id(shared_ptr<T> const& c1, shared_ptr<T> const& c2) {
+  return (c1->id() < c2->id());
+}
+
+/**
+ *  Insert objects into type T list and sort the new list by object id.
  *
  *  @param[in]  from The objects source.
  *  @param[out] to   The objects destination.
@@ -685,10 +696,11 @@ void parser::_insert(
        it != end;
        ++it)
     to.push_back(*it);
+  to.sort(&smaller_id<T>);
 }
 
 /**
- *  Insert objects into type T list.
+ *  Insert objects into type T list and sort the new list by object id.
  *
  *  @param[in]  from The objects source.
  *  @param[out] to   The objects destination.
@@ -701,6 +713,7 @@ void parser::_insert(
        it != end;
        ++it)
     to.push_back(it->second);
+  to.sort(&smaller_id<T>);
 }
 
 /**

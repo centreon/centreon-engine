@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_COMMAND_HH
 
 #  include "com/centreon/engine/configuration/applier/base.hh"
+#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,7 +30,8 @@ CCE_BEGIN()
 namespace             configuration {
   namespace           applier {
     class             command
-      : public base {
+      : public base,
+        public object<configuration::command> {
     public:
       void            apply(state const& config);
       static command& instance();
@@ -41,9 +43,9 @@ namespace             configuration {
                       command(command const&);
                       ~command() throw ();
       command&        operator=(command const&);
-      void            _add_commands(list_command const& data);
-      void            _modify_commands(list_command const& data);
-      void            _remove_commands(list_command const& data);
+      void            _add_object(command_ptr obj);
+      void            _modify_object(command_ptr obj);
+      void            _remove_object(command_ptr obj);
     };
   }
 }

@@ -17,44 +17,44 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/connector.hh"
+#include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::connector* _instance = NULL;
+static applier::timeperiod* _instance = NULL;
 
 /**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
  */
-void applier::connector::apply(state const& config) {
-  _diff(::config->connectors(), config.connectors());
+void applier::timeperiod::apply(state const& config) {
+  _diff(::config->timeperiods(), config.timeperiods());
 }
 
 /**
- *  Get the singleton instance of connector applier.
+ *  Get the singleton instance of timeperiod applier.
  *
  *  @return Singleton instance.
  */
-applier::connector& applier::connector::instance() {
+applier::timeperiod& applier::timeperiod::instance() {
   return (*_instance);
 }
 
 /**
- *  Load connector applier singleton.
+ *  Load timeperiod applier singleton.
  */
-void applier::connector::load() {
+void applier::timeperiod::load() {
   if (!_instance)
-    _instance = new applier::connector;
+    _instance = new applier::timeperiod;
 }
 
 /**
- *  Unload connector applier singleton.
+ *  Unload timeperiod applier singleton.
  */
-void applier::connector::unload() {
+void applier::timeperiod::unload() {
   delete _instance;
   _instance = NULL;
 }
@@ -62,40 +62,40 @@ void applier::connector::unload() {
 /**
  *  Default constructor.
  */
-applier::connector::connector() {
+applier::timeperiod::timeperiod() {
 
 }
 
 /**
  *  Destructor.
  */
-applier::connector::~connector() throw () {
+applier::timeperiod::~timeperiod() throw () {
 
 }
 
 /**
- *  Add new connector.
+ *  Add new timeperiod.
  *
- *  @param[in] obj The new connector to add into the monitoring engine.
+ *  @param[in] obj The new timeperiod to add into the monitoring engine.
  */
-void applier::connector::_add_object(connector_ptr obj) {
+void applier::timeperiod::_add_object(timeperiod_ptr obj) {
 
 }
 
 /**
- *  Modified connector.
+ *  modified timeperiod.
  *
- *  @param[in] obj The new connector to modify into the monitoring engine.
+ *  @param[in] obj The new timeperiod to modify into the monitoring engine.
  */
-void applier::connector::_modify_object(connector_ptr obj) {
+void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
 
 }
 
 /**
- *  Remove old connector.
+ *  Remove old timeperiod.
  *
- *  @param[in] obj The new connector to remove from the monitoring engine.
+ *  @param[in] obj The new timeperiod to remove from the monitoring engine.
  */
-void applier::connector::_remove_object(connector_ptr obj) {
+void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
 
 }

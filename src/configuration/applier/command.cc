@@ -18,8 +18,8 @@
 */
 
 #include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/difference.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -31,17 +31,7 @@ static applier::command* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::command::apply(state const& config) {
-  // list_command const& old_commands(::config->commands());
-  // list_command const& new_commands(config.commands());
-
-  // misc::difference<list_command> diff(old_commands, new_commands);
-  // list_command const& added(diff.added());
-  // list_command const& deleted(diff.deleted());
-  // list_command const& modified(diff.modified());
-
-  // _add_commands(added);
-  // _remove_commands(deleted);
-  // _modify_commands(modified);
+  _diff(::config->commands(), config.commands());
 }
 
 /**
@@ -84,28 +74,28 @@ applier::command::~command() throw () {
 }
 
 /**
- *  Add new commands.
+ *  Add new command.
  *
- *  @param[in] data All command to add into the monitoring engine.
+ *  @param[in] obj The new command to add into the monitoring engine.
  */
-void applier::command::_add_commands(list_command const& data) {
+void applier::command::_add_object(command_ptr obj) {
 
 }
 
 /**
- *  Modified commands.
+ *  Modified command.
  *
- *  @param[in] data All command to modify into the monitoring engine.
+ *  @param[in] obj The new command to modify into the monitoring engine.
  */
-void applier::command::_modify_commands(list_command const& data) {
+void applier::command::_modify_object(command_ptr obj) {
 
 }
 
 /**
- *  Remove old commands.
+ *  Remove old command.
  *
- *  @param[in] data All command to remove from the monitoring engine.
+ *  @param[in] obj The new command to remove from the monitoring engine.
  */
-void applier::command::_remove_commands(list_command const& data) {
+void applier::command::_remove_object(command_ptr obj) {
 
 }

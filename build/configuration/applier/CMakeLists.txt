@@ -34,9 +34,11 @@ add_library("cce_configuration_applier"
   "${INC_DIR}/base.hh"
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
+  "${INC_DIR}/difference.hh"
   "${INC_DIR}/globals.hh"
   "${INC_DIR}/logging.hh"
   "${INC_DIR}/macros.hh"
+  "${INC_DIR}/object.hh"
   "${INC_DIR}/timeperiod.hh")
 
 # Link target with required libraries.
