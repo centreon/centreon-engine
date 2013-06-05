@@ -17,44 +17,44 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::timeperiod* _instance = NULL;
+static applier::contact* _instance = NULL;
 
 /**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
  */
-void applier::timeperiod::apply(state const& config) {
-  _diff(::config->timeperiods(), config.timeperiods());
+void applier::contact::apply(state const& config) {
+  _diff(::config->contacts(), config.contacts());
 }
 
 /**
- *  Get the singleton instance of timeperiod applier.
+ *  Get the singleton instance of contact applier.
  *
  *  @return Singleton instance.
  */
-applier::timeperiod& applier::timeperiod::instance() {
+applier::contact& applier::contact::instance() {
   return (*_instance);
 }
 
 /**
- *  Load timeperiod applier singleton.
+ *  Load contact applier singleton.
  */
-void applier::timeperiod::load() {
+void applier::contact::load() {
   if (!_instance)
-    _instance = new applier::timeperiod;
+    _instance = new applier::contact;
 }
 
 /**
- *  Unload timeperiod applier singleton.
+ *  Unload contact applier singleton.
  */
-void applier::timeperiod::unload() {
+void applier::contact::unload() {
   delete _instance;
   _instance = NULL;
 }
@@ -62,40 +62,40 @@ void applier::timeperiod::unload() {
 /**
  *  Default constructor.
  */
-applier::timeperiod::timeperiod() {
+applier::contact::contact() {
 
 }
 
 /**
  *  Destructor.
  */
-applier::timeperiod::~timeperiod() throw () {
+applier::contact::~contact() throw () {
 
 }
 
 /**
- *  Add new timeperiod.
+ *  Add new contact.
  *
- *  @param[in] obj The new timeperiod to add into the monitoring engine.
+ *  @param[in] obj The new contact to add into the monitoring engine.
  */
-void applier::timeperiod::_add_object(timeperiod_ptr obj) {
+void applier::contact::_add_object(contact_ptr obj) {
 
 }
 
 /**
- *  Modified timeperiod.
+ *  Modified contact.
  *
- *  @param[in] obj The new timeperiod to modify into the monitoring engine.
+ *  @param[in] obj The new contact to modify into the monitoring engine.
  */
-void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
+void applier::contact::_modify_object(contact_ptr obj) {
 
 }
 
 /**
- *  Remove old timeperiod.
+ *  Remove old contact.
  *
- *  @param[in] obj The new timeperiod to remove from the monitoring engine.
+ *  @param[in] obj The new contact to remove from the monitoring engine.
  */
-void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
+void applier::contact::_remove_object(contact_ptr obj) {
 
 }
