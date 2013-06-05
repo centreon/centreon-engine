@@ -17,44 +17,44 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::timeperiod* _instance = NULL;
+static applier::hostgroup* _instance = NULL;
 
 /**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
  */
-void applier::timeperiod::apply(state const& config) {
-  _diff(::config->timeperiods(), config.timeperiods());
+void applier::hostgroup::apply(state const& config) {
+  _diff(::config->hostgroups(), config.hostgroups());
 }
 
 /**
- *  Get the singleton instance of timeperiod applier.
+ *  Get the singleton instance of hostgroup applier.
  *
  *  @return Singleton instance.
  */
-applier::timeperiod& applier::timeperiod::instance() {
+applier::hostgroup& applier::hostgroup::instance() {
   return (*_instance);
 }
 
 /**
- *  Load timeperiod applier singleton.
+ *  Load hostgroup applier singleton.
  */
-void applier::timeperiod::load() {
+void applier::hostgroup::load() {
   if (!_instance)
-    _instance = new applier::timeperiod;
+    _instance = new applier::hostgroup;
 }
 
 /**
- *  Unload timeperiod applier singleton.
+ *  Unload hostgroup applier singleton.
  */
-void applier::timeperiod::unload() {
+void applier::hostgroup::unload() {
   delete _instance;
   _instance = NULL;
 }
@@ -62,40 +62,40 @@ void applier::timeperiod::unload() {
 /**
  *  Default constructor.
  */
-applier::timeperiod::timeperiod() {
+applier::hostgroup::hostgroup() {
 
 }
 
 /**
  *  Destructor.
  */
-applier::timeperiod::~timeperiod() throw () {
+applier::hostgroup::~hostgroup() throw () {
 
 }
 
 /**
- *  Add new timeperiod.
+ *  Add new hostgroup.
  *
- *  @param[in] obj The new timeperiod to add into the monitoring engine.
+ *  @param[in] obj The new hostgroup to add into the monitoring engine.
  */
-void applier::timeperiod::_add_object(timeperiod_ptr obj) {
+void applier::hostgroup::_add_object(hostgroup_ptr obj) {
 
 }
 
 /**
- *  Modified timeperiod.
+ *  Modified hostgroup.
  *
- *  @param[in] obj The new timeperiod to modify into the monitoring engine.
+ *  @param[in] obj The new hostgroup to modify into the monitoring engine.
  */
-void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
+void applier::hostgroup::_modify_object(hostgroup_ptr obj) {
 
 }
 
 /**
- *  Remove old timeperiod.
+ *  Remove old hostgroup.
  *
- *  @param[in] obj The new timeperiod to remove from the monitoring engine.
+ *  @param[in] obj The new hostgroup to remove from the monitoring engine.
  */
-void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
+void applier::hostgroup::_remove_object(hostgroup_ptr obj) {
 
 }

@@ -17,44 +17,44 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/timeperiod.hh"
+#include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::timeperiod* _instance = NULL;
+static applier::servicegroup* _instance = NULL;
 
 /**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
  */
-void applier::timeperiod::apply(state const& config) {
-  _diff(::config->timeperiods(), config.timeperiods());
+void applier::servicegroup::apply(state const& config) {
+  _diff(::config->servicegroups(), config.servicegroups());
 }
 
 /**
- *  Get the singleton instance of timeperiod applier.
+ *  Get the singleton instance of servicegroup applier.
  *
  *  @return Singleton instance.
  */
-applier::timeperiod& applier::timeperiod::instance() {
+applier::servicegroup& applier::servicegroup::instance() {
   return (*_instance);
 }
 
 /**
- *  Load timeperiod applier singleton.
+ *  Load servicegroup applier singleton.
  */
-void applier::timeperiod::load() {
+void applier::servicegroup::load() {
   if (!_instance)
-    _instance = new applier::timeperiod;
+    _instance = new applier::servicegroup;
 }
 
 /**
- *  Unload timeperiod applier singleton.
+ *  Unload servicegroup applier singleton.
  */
-void applier::timeperiod::unload() {
+void applier::servicegroup::unload() {
   delete _instance;
   _instance = NULL;
 }
@@ -62,40 +62,40 @@ void applier::timeperiod::unload() {
 /**
  *  Default constructor.
  */
-applier::timeperiod::timeperiod() {
+applier::servicegroup::servicegroup() {
 
 }
 
 /**
  *  Destructor.
  */
-applier::timeperiod::~timeperiod() throw () {
+applier::servicegroup::~servicegroup() throw () {
 
 }
 
 /**
- *  Add new timeperiod.
+ *  Add new servicegroup.
  *
- *  @param[in] obj The new timeperiod to add into the monitoring engine.
+ *  @param[in] obj The new servicegroup to add into the monitoring engine.
  */
-void applier::timeperiod::_add_object(timeperiod_ptr obj) {
+void applier::servicegroup::_add_object(servicegroup_ptr obj) {
 
 }
 
 /**
- *  Modified timeperiod.
+ *  Modified servicegroup.
  *
- *  @param[in] obj The new timeperiod to modify into the monitoring engine.
+ *  @param[in] obj The new servicegroup to modify into the monitoring engine.
  */
-void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
+void applier::servicegroup::_modify_object(servicegroup_ptr obj) {
 
 }
 
 /**
- *  Remove old timeperiod.
+ *  Remove old servicegroup.
  *
- *  @param[in] obj The new timeperiod to remove from the monitoring engine.
+ *  @param[in] obj The new servicegroup to remove from the monitoring engine.
  */
-void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
+void applier::servicegroup::_remove_object(servicegroup_ptr obj) {
 
 }
