@@ -20,9 +20,11 @@
 #ifndef CCE_CONFIGURATION_APPLIER_OBJECT_HH
 #  define CCE_CONFIGURATION_APPLIER_OBJECT_HH
 
+#  include <cstring>
 #  include <list>
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/shared.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
@@ -63,6 +65,24 @@ namespace          configuration {
       virtual void _modify_object(shared_ptr<T> obj) = 0;
       virtual void _remove_object(shared_ptr<T> obj) = 0;
     };
+
+    template <typename T>
+    void modify_if_different(T& t1, T t2) {
+      if (t1 != t2)
+	t1 = t2;
+      return ;
+    }
+
+    void modify_if_different(char*& s1, char const* s2) {
+      if (strcmp(s1, s2)) {
+	delete [] s1;
+	s1 = NULL;
+	s1 = my_strdup(s2);
+      }
+      return ;
+    }
+
+# define TRUE_if_true(expr) ((expr) ? TRUE : FALSE)
   }
 }
 

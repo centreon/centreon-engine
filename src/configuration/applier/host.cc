@@ -25,6 +25,8 @@ using namespace com::centreon::engine::configuration;
 
 static applier::host* _instance = NULL;
 
+// XXX : update the event_list_low and event_list_high
+
 /**
  *  Apply new configuration.
  *
