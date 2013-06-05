@@ -26,7 +26,15 @@
  *  @param[in] ptr The servicesmember to delete.
  */
 void deleter::servicesmember(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   servicesmember_struct* obj(static_cast<servicesmember_struct*>(ptr));
+
+  delete[] obj->host_name;
+  obj->host_name = NULL;
+  delete[] obj->service_description;
+  obj->service_description = NULL;
 
   delete obj;
 }

@@ -17,8 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/deleter/command.hh"
 #include "com/centreon/engine/objects.hh"
+
+using namespace com::centreon::engine;
 
 /**
  *  Delete command.
@@ -26,7 +29,22 @@
  *  @param[in] ptr The command to delete.
  */
 void deleter::command(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   command_struct* obj(static_cast<command_struct*>(ptr));
+
+  try {
+    // update command executon system.
+    commands::set::instance().remove_command(obj->name);
+  }
+  catch (...) {
+  }
+
+  delete[] obj->name;
+  obj->name = NULL;
+  delete[] obj->command_line;
+  obj->command_line = NULL;
 
   delete obj;
 }

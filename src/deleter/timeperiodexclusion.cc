@@ -26,7 +26,13 @@
  *  @param[in] ptr The timeperiodexclusion to delete.
  */
 void deleter::timeperiodexclusion(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   timeperiodexclusion_struct* obj(static_cast<timeperiodexclusion_struct*>(ptr));
+
+  delete[] obj->timeperiod_name;
+  obj->timeperiod_name = NULL;
 
   delete obj;
 }

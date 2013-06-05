@@ -26,7 +26,17 @@
  *  @param[in] ptr The hostdependency to delete.
  */
 void deleter::hostdependency(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   hostdependency_struct* obj(static_cast<hostdependency_struct*>(ptr));
+
+  delete[] obj->dependent_host_name;
+  obj->dependent_host_name = NULL;
+  delete[] obj->host_name;
+  obj->host_name = NULL;
+  delete[] obj->dependency_period;
+  obj->dependency_period = NULL;
 
   delete obj;
 }

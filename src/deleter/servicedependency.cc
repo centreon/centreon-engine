@@ -26,7 +26,21 @@
  *  @param[in] ptr The servicedependency to delete.
  */
 void deleter::servicedependency(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   servicedependency_struct* obj(static_cast<servicedependency_struct*>(ptr));
+
+  delete[] obj->dependent_host_name;
+  obj->dependent_host_name = NULL;
+  delete[] obj->dependent_service_description;
+  obj->dependent_service_description = NULL;
+  delete[] obj->host_name;
+  obj->host_name = NULL;
+  delete[] obj->service_description;
+  obj->service_description = NULL;
+  delete[] obj->dependency_period;
+  obj->dependency_period = NULL;
 
   delete obj;
 }

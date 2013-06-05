@@ -17,7 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/timeperiodexclusion.hh"
 #include "com/centreon/engine/deleter/timeperiod.hh"
+#include "com/centreon/engine/deleter/timerange.hh"
 #include "com/centreon/engine/objects.hh"
 
 /**
@@ -26,7 +29,24 @@
  *  @param[in] ptr The timeperiod to delete.
  */
 void deleter::timeperiod(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   timeperiod_struct* obj(static_cast<timeperiod_struct*>(ptr));
+
+  for (unsigned int i(0);
+       i < sizeof(obj->days) / sizeof(obj->days[0]);
+       ++i)
+    listmember(obj->days[i], &timerange);
+  for (unsigned int i(0);
+       i < sizeof(obj->exceptions) / sizeof(obj->exceptions[0]);
+       ++i)
+    listmember(obj->exceptions[i], &timeperiodexclusion);
+
+  delete[] obj->name;
+  obj->name = NULL;
+  delete[] obj->alias;
+  obj->alias = NULL;
 
   delete obj;
 }

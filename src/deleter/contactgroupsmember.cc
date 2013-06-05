@@ -26,7 +26,13 @@
  *  @param[in] ptr The contactgroupsmember to delete.
  */
 void deleter::contactgroupsmember(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   contactgroupsmember_struct* obj(static_cast<contactgroupsmember_struct*>(ptr));
+
+  delete[] obj->group_name;
+  obj->group_name = NULL;
 
   delete obj;
 }

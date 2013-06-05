@@ -26,7 +26,15 @@
  *  @param[in] ptr The customvariablesmember to delete.
  */
 void deleter::customvariablesmember(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   customvariablesmember_struct* obj(static_cast<customvariablesmember_struct*>(ptr));
+
+  delete[] obj->variable_name;
+  obj->variable_name = NULL;
+  delete[] obj->variable_value;
+  obj->variable_value = NULL;
 
   delete obj;
 }

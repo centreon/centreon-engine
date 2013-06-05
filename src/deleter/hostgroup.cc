@@ -18,6 +18,8 @@
 */
 
 #include "com/centreon/engine/deleter/hostgroup.hh"
+#include "com/centreon/engine/deleter/hostsmember.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/objects.hh"
 
 /**
@@ -26,7 +28,23 @@
  *  @param[in] ptr The hostgroup to delete.
  */
 void deleter::hostgroup(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   hostgroup_struct* obj(static_cast<hostgroup_struct*>(ptr));
+
+  listmember(obj->members, &hostsmember);
+
+  delete[] obj->group_name;
+  obj->group_name = NULL;
+  delete[] obj->alias;
+  obj->alias = NULL;
+  delete[] obj->notes;
+  obj->notes = NULL;
+  delete[] obj->notes_url;
+  obj->notes_url = NULL;
+  delete[] obj->action_url;
+  obj->action_url = NULL;
 
   delete obj;
 }

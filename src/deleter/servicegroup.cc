@@ -17,6 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/deleter/servicegroup.hh"
 #include "com/centreon/engine/objects.hh"
 
@@ -26,7 +28,23 @@
  *  @param[in] ptr The servicegroup to delete.
  */
 void deleter::servicegroup(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   servicegroup_struct* obj(static_cast<servicegroup_struct*>(ptr));
+
+  listmember(obj->members, &servicesmember);
+
+  delete[] obj->group_name;
+  obj->group_name = NULL;
+  delete[] obj->alias;
+  obj->alias = NULL;
+  delete[] obj->notes;
+  obj->notes = NULL;
+  delete[] obj->notes_url;
+  obj->notes_url = NULL;
+  delete[] obj->action_url;
+  obj->action_url = NULL;
 
   delete obj;
 }

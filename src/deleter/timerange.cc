@@ -26,6 +26,9 @@
  *  @param[in] ptr The timerange to delete.
  */
 void deleter::timerange(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   timerange_struct* obj(static_cast<timerange_struct*>(ptr));
 
   delete obj;

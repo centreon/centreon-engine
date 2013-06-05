@@ -26,7 +26,12 @@
  *  @param[in] ptr The daterange to delete.
  */
 void deleter::daterange(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   daterange_struct* obj(static_cast<daterange_struct*>(ptr));
+
+  // XXX: release(obj->times);
 
   delete obj;
 }

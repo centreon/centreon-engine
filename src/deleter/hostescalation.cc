@@ -17,7 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/contactgroupsmember.hh"
+#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/hostescalation.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/objects.hh"
 
 /**
@@ -26,7 +29,21 @@
  *  @param[in] ptr The hostescalation to delete.
  */
 void deleter::hostescalation(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   hostescalation_struct* obj(static_cast<hostescalation_struct*>(ptr));
+
+  listmember(obj->contact_groups, &contactgroupsmember);
+  listmember(obj->contacts, &contactsmember);
+
+  // host_ptr not free.
+  // escalation_period_ptr not free.
+
+  delete[] obj->host_name;
+  obj->host_name = NULL;
+  delete[] obj->escalation_period;
+  obj->escalation_period = NULL;
 
   delete obj;
 }

@@ -26,7 +26,13 @@
  *  @param[in] ptr The commandsmember to delete.
  */
 void deleter::commandsmember(void* ptr) throw () {
+  if (!ptr)
+    return;
+
   commandsmember_struct* obj(static_cast<commandsmember_struct*>(ptr));
+
+  delete[] obj->cmd;
+  obj->cmd = NULL;
 
   delete obj;
 }
