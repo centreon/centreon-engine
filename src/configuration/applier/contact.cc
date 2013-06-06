@@ -91,9 +91,9 @@ void applier::contact::_add_object(contact_ptr obj) {
   shared_ptr<contact_struct> c(new contact_struct);
   memset(c.get(), 0, sizeof(*c));
   c->name = my_strdup(obj->contact_name().c_str());
-  c->alias = my_strdup(obj->alias().c_str());
-  c->email = my_strdup(obj->email().c_str());
-  c->pager = my_strdup(obj->pager().c_str());
+  c->alias = obj->alias().empty() ? NULL : my_strdup(obj->alias().c_str());
+  c->email = obj->email().empty() ? NULL : my_strdup(obj->email().c_str());
+  c->pager = obj->pager().empty() ? NULL : my_strdup(obj->pager().c_str());
   {
     memset(c->address, 0, sizeof(c->address));
     unsigned int i(0);
@@ -130,7 +130,12 @@ void applier::contact::_add_object(contact_ptr obj) {
   c->can_submit_commands = obj->can_submit_commands();
   c->retain_status_information = obj->retain_status_information();
   c->retain_nonstatus_information = obj->retain_nonstatus_information();
-  // XXX : custom_variables
+  for (properties::const_iterator
+	 it(obj->customvariables().begin()),
+	 end(obj->customvariables().end());
+       it != end;
+       ++it)
+    add_custom_variable_to_contact(c.get(), it->first.c_str(), it->second.c_str());
   // XXX : c->last_host_notification = obj->last_host_notification();
   // XXX : c->last_service_notification = obj->last_service_notification();
   // XXX : c->modified_attributes = obj->modified_attributes();
