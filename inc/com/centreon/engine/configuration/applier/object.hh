@@ -84,10 +84,6 @@ namespace          configuration {
       return ;
     }
 
-    void modify_if_different(char** l1, std::list<std::string> const& l2) {
-      // XXX
-    }
-
     void modify_if_different(char** t1, std::vector<std::string> const& t2, unsigned int size) {
       unsigned int i(0);
       for (std::vector<std::string>::const_iterator it(t2.begin()), end(t2.end());
