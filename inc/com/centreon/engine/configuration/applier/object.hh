@@ -22,6 +22,8 @@
 
 #  include <cstring>
 #  include <list>
+#  include <string>
+#  include <vector>
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/shared.hh"
@@ -82,7 +84,27 @@ namespace          configuration {
       return ;
     }
 
-# define TRUE_if_true(expr) ((expr) ? TRUE : FALSE)
+    void modify_if_different(char** l1, std::list<std::string> const& l2) {
+      // XXX
+    }
+
+    void modify_if_different(char** t1, std::vector<std::string> const& t2, unsigned int size) {
+      unsigned int i(0);
+      for (std::vector<std::string>::const_iterator it(t2.begin()), end(t2.end());
+           (it != end) && (i < size);
+           ++it, ++i)
+        if (!t1[i] || strcmp(t1[i], it->c_str())) {
+          delete [] t1[i];
+          t1[i] = NULL;
+          t1[i] = my_strdup(it->c_str());
+        }
+      while (i < size) {
+        delete [] t1[i];
+        t1[i] = NULL;
+	++i;
+      }
+      return ;
+    }
   }
 }
 
