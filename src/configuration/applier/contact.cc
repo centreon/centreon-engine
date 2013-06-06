@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -103,8 +104,14 @@ void applier::contact::_add_object(contact_ptr obj) {
 	 ++it, ++i)
       c->address[i] = my_strdup(it->c_str());
   }
-  // XXX : host_notification_commands
-  // XXX : service_notification_commands
+  add_members<command_struct, commandsmember_struct>(
+    applier::state::instance().commands(),
+    obj->host_notification_commands(),
+    c->host_notification_commands);
+  add_members<command_struct, commandsmember_struct>(
+    applier::state::instance().commands(),
+    obj->service_notification_commands(),
+    c->service_notification_commands);
   c->notify_on_service_unknown = static_cast<bool>(obj->service_notification_options() & service::unknown);
   c->notify_on_service_warning = static_cast<bool>(obj->service_notification_options() & service::warning);
   c->notify_on_service_critical = static_cast<bool>(obj->service_notification_options() & service::critical);

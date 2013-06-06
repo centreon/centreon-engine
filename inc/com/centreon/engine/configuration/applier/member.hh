@@ -26,6 +26,8 @@
 #  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
+struct command_struct;
+struct commandsmember_struct;
 struct contact_struct;
 struct contactsmember_struct;
 
@@ -33,6 +35,15 @@ CCE_BEGIN()
 
 namespace             configuration {
   namespace           applier {
+    void    add_member(
+              umap<std::string, shared_ptr<contact_struct> > const& contacts,
+              std::string const& name,
+              contactsmember_struct*& members);
+    void    add_member(
+              umap<std::string, shared_ptr<command_struct> > const& commands,
+              std::string const& name,
+              commandsmember_struct*& members);
+
     template<typename T, typename U>
     void    add_members(
               umap<std::string, shared_ptr<T> > const& objects,
@@ -44,10 +55,7 @@ namespace             configuration {
            ++it)
         add_member(objects, *it, members);
     }
-    void    add_member(
-              umap<std::string, shared_ptr<contact_struct> > const& contacts,
-              std::string const& name,
-              contactsmember_struct*& members);
+
     template<typename T, char* T::*member>
     bool    members_has_change(
               std::list<std::string> const& lst,

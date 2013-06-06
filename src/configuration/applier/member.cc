@@ -27,11 +27,11 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration;
 
 /**
- *  Add new contact into contact memeber struct.
+ *  Add new contact into contact member struct.
  *
  *  @param[in] contacts The contacts list.
  *  @param[in] name     The contacts name to add.
- *  @param[in] memebers The contact memebers to fill.
+ *  @param[in] members  The contact members to fill.
  */
 void applier::add_member(
        umap<std::string, shared_ptr<contact_struct> > const& contacts,
@@ -47,13 +47,46 @@ void applier::add_member(
     return;
   }
 
-  // Create and fill the new memeber.
+  // Create and fill the new member.
   std::auto_ptr<contactsmember_struct> obj(new contactsmember_struct);
   memset(obj.get(), 0, sizeof(*obj));
   obj->contact_name = my_strdup(name.c_str());
   obj->contact_ptr = &(*it->second);
   obj->next = members;
-  members = obj.get();
+  members = obj.release();
+
+  // Notify event broker.
+  // XXX
+}
+
+/**
+ *  Add new command into command member struct.
+ *
+ *  @param[in] contacts The command list.
+ *  @param[in] name     The commands name to add.
+ *  @param[in] members  The command members to fill.
+ */
+void applier::add_member(
+       umap<std::string, shared_ptr<command_struct> > const& commands,
+       std::string const& name,
+       commandsmember_struct*& members) {
+  // Find command to add.
+  umap<std::string, shared_ptr<command_struct> >::const_iterator
+    it(commands.find(name));
+  if (it == commands.end()) {
+    logger(log_config_error, basic)
+      << "configuration: add command into commandsmember failed: "
+         "command '" << name << "' not found";
+    return ;
+  }
+
+  // Create and fill the new member.
+  std::auto_ptr<commandsmember_struct> obj(new commandsmember_struct);
+  memset(obj.get(), 0, sizeof(*obj));
+  obj->cmd = my_strdup(name.c_str());
+  obj->command_ptr = &(*it->second);
+  obj->next = members;
+  members = obj.release();
 
   // Notify event broker.
   // XXX
