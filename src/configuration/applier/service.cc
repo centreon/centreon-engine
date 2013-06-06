@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -32,7 +33,7 @@ static applier::service* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::service::apply(state const& config) {
+void applier::service::apply(configuration::state const& config) {
   _diff(::config->services(), config.services());
 }
 
@@ -81,6 +82,9 @@ applier::service::~service() throw () {
  *  @param[in] obj The new service to add into the monitoring engine.
  */
 void applier::service::_add_object(service_ptr obj) {
+  // Logging.
+  // logger(logging::dbg_config, logging::more)
+  //   << "Creating new service '" << obj->service_description() << "'.";
 
 }
 
@@ -90,6 +94,9 @@ void applier::service::_add_object(service_ptr obj) {
  *  @param[in] obj The new service to modify into the monitoring engine.
  */
 void applier::service::_modify_object(service_ptr obj) {
+  // // Logging.
+  // logger(logging::dbg_config, logging::more)
+  //   << "Modifying service '" << obj->service_description() << "'.";
 
 }
 

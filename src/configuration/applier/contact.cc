@@ -93,27 +93,36 @@ void applier::contact::_add_object(contact_ptr obj) {
   c->alias = my_strdup(obj->alias().c_str());
   c->email = my_strdup(obj->email().c_str());
   c->pager = my_strdup(obj->pager().c_str());
-  // XXX : address
+  {
+    memset(c->address, 0, sizeof(c->address));
+    unsigned int i(0);
+    for (tab_string::const_iterator
+	   it(obj->address().begin()),
+	   end(obj->address().end());
+	 it != end;
+	 ++it, ++i)
+      c->address[i] = my_strdup(it->c_str());
+  }
   // XXX : host_notification_commands
   // XXX : service_notification_commands
-  c->notify_on_service_unknown = TRUE_if_true(obj->service_notification_options() & service::unknown);
-  c->notify_on_service_warning = TRUE_if_true(obj->service_notification_options() & service::warning);
-  c->notify_on_service_critical = TRUE_if_true(obj->service_notification_options() & service::critical);
-  c->notify_on_service_recovery = TRUE_if_true(obj->service_notification_options() & service::recovery);
-  c->notify_on_service_flapping = TRUE_if_true(obj->service_notification_options() & service::flapping);
-  c->notify_on_service_downtime = TRUE_if_true(obj->service_notification_options() & service::downtime);
-  c->notify_on_host_down = TRUE_if_true(obj->host_notification_options() & host::down);
-  c->notify_on_host_unreachable = TRUE_if_true(obj->host_notification_options() & host::unreachable);
-  c->notify_on_host_recovery = TRUE_if_true(obj->host_notification_options() & host::recovery);
-  c->notify_on_host_flapping = TRUE_if_true(obj->host_notification_options() & host::flapping);
-  c->notify_on_host_downtime = TRUE_if_true(obj->host_notification_options() & host::downtime);
+  c->notify_on_service_unknown = static_cast<bool>(obj->service_notification_options() & service::unknown);
+  c->notify_on_service_warning = static_cast<bool>(obj->service_notification_options() & service::warning);
+  c->notify_on_service_critical = static_cast<bool>(obj->service_notification_options() & service::critical);
+  c->notify_on_service_recovery = static_cast<bool>(obj->service_notification_options() & service::recovery);
+  c->notify_on_service_flapping = static_cast<bool>(obj->service_notification_options() & service::flapping);
+  c->notify_on_service_downtime = static_cast<bool>(obj->service_notification_options() & service::downtime);
+  c->notify_on_host_down = static_cast<bool>(obj->host_notification_options() & host::down);
+  c->notify_on_host_unreachable = static_cast<bool>(obj->host_notification_options() & host::unreachable);
+  c->notify_on_host_recovery = static_cast<bool>(obj->host_notification_options() & host::recovery);
+  c->notify_on_host_flapping = static_cast<bool>(obj->host_notification_options() & host::flapping);
+  c->notify_on_host_downtime = static_cast<bool>(obj->host_notification_options() & host::downtime);
   c->host_notification_period = my_strdup(obj->host_notification_period().c_str());
   c->service_notification_period = my_strdup(obj->service_notification_period().c_str());
-  c->host_notifications_enabled = TRUE_if_true(obj->host_notifications_enabled());
-  c->service_notifications_enabled = TRUE_if_true(obj->service_notifications_enabled());
-  c->can_submit_commands = TRUE_if_true(obj->can_submit_commands());
-  c->retain_status_information = TRUE_if_true(obj->retain_status_information());
-  c->retain_nonstatus_information = TRUE_if_true(obj->retain_nonstatus_information());
+  c->host_notifications_enabled = obj->host_notifications_enabled();
+  c->service_notifications_enabled = obj->service_notifications_enabled();
+  c->can_submit_commands = obj->can_submit_commands();
+  c->retain_status_information = obj->retain_status_information();
+  c->retain_nonstatus_information = obj->retain_nonstatus_information();
   // XXX : custom_variables
   // XXX : c->last_host_notification = obj->last_host_notification();
   // XXX : c->last_service_notification = obj->last_service_notification();
@@ -148,61 +157,61 @@ void applier::contact::_modify_object(contact_ptr obj) {
   modify_if_different(c->alias, obj->alias().c_str());
   modify_if_different(c->email, obj->email().c_str());
   modify_if_different(c->pager, obj->pager().c_str());
-  // XXX : address
+  modify_if_different(c->address, obj->address(), MAX_CONTACT_ADDRESSES);
   // XXX : host_notification_commands
   // XXX : service_notification_commands
   modify_if_different(
     c->notify_on_service_unknown,
-    TRUE_if_true(obj->service_notification_options() & service::unknown));
+    static_cast<int>(obj->service_notification_options() & service::unknown));
   modify_if_different(
     c->notify_on_service_warning,
-    TRUE_if_true(obj->service_notification_options() & service::warning));
+    static_cast<int>(obj->service_notification_options() & service::warning));
   modify_if_different(
     c->notify_on_service_critical,
-    TRUE_if_true(obj->service_notification_options() & service::critical));
+    static_cast<int>(obj->service_notification_options() & service::critical));
   modify_if_different(
     c->notify_on_service_recovery,
-    TRUE_if_true(obj->service_notification_options() & service::recovery));
+    static_cast<int>(obj->service_notification_options() & service::recovery));
   modify_if_different(
     c->notify_on_service_flapping,
-    TRUE_if_true(obj->service_notification_options() & service::flapping));
+    static_cast<int>(obj->service_notification_options() & service::flapping));
   modify_if_different(
     c->notify_on_service_downtime,
-    TRUE_if_true(obj->service_notification_options() & service::downtime));
+    static_cast<int>(obj->service_notification_options() & service::downtime));
   modify_if_different(
     c->notify_on_host_down,
-    TRUE_if_true(obj->host_notification_options() & host::down));
+    static_cast<int>(obj->host_notification_options() & host::down));
   modify_if_different(
     c->notify_on_host_unreachable,
-    TRUE_if_true(obj->host_notification_options() & host::unreachable));
+    static_cast<int>(obj->host_notification_options() & host::unreachable));
   modify_if_different(
     c->notify_on_host_recovery,
-    TRUE_if_true(obj->host_notification_options() & host::recovery));
+    static_cast<int>(obj->host_notification_options() & host::recovery));
   modify_if_different(
     c->notify_on_host_flapping,
-    TRUE_if_true(obj->host_notification_options() & host::flapping));
+    static_cast<int>(obj->host_notification_options() & host::flapping));
   modify_if_different(
     c->notify_on_host_downtime,
-    TRUE_if_true(obj->host_notification_options() & host::downtime));
+    static_cast<int>(obj->host_notification_options() & host::downtime));
   modify_if_different(c->host_notification_period, obj->host_notification_period().c_str());
   c->host_notification_period_ptr = applier::state::instance().timeperiods()[c->host_notification_period].get();
   modify_if_different(c->service_notification_period, obj->service_notification_period().c_str());
   c->service_notification_period_ptr = applier::state::instance().timeperiods()[c->service_notification_period].get();
   modify_if_different(
     c->host_notifications_enabled,
-    TRUE_if_true(obj->host_notifications_enabled()));
+    static_cast<int>(obj->host_notifications_enabled()));
   modify_if_different(
     c->service_notifications_enabled,
-    TRUE_if_true(obj->service_notifications_enabled()));
+    static_cast<int>(obj->service_notifications_enabled()));
   modify_if_different(
     c->can_submit_commands,
-    TRUE_if_true(obj->can_submit_commands()));
+    static_cast<int>(obj->can_submit_commands()));
   modify_if_different(
     c->retain_status_information,
-    TRUE_if_true(obj->retain_status_information()));
+    static_cast<int>(obj->retain_status_information()));
   modify_if_different(
     c->retain_nonstatus_information,
-    TRUE_if_true(obj->retain_nonstatus_information()));
+    static_cast<int>(obj->retain_nonstatus_information()));
   // XXX : custom_variable
   // XXX : c->last_host_notification = obj->last_host_notification();
   // XXX : c->last_service_notification = obj->last_service_notification();

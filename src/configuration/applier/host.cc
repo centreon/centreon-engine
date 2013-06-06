@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -32,7 +33,7 @@ static applier::host* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::host::apply(state const& config) {
+void applier::host::apply(configuration::state const& config) {
   _diff(::config->hosts(), config.hosts());
 }
 
@@ -81,6 +82,9 @@ applier::host::~host() throw () {
  *  @param[in] obj The new host to add into the monitoring engine.
  */
 void applier::host::_add_object(host_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Creating new host '" << obj->host_name() << "'.";
 
 }
 
@@ -90,6 +94,9 @@ void applier::host::_add_object(host_ptr obj) {
  *  @param[in] obj The new host to modify into the monitoring engine.
  */
 void applier::host::_modify_object(host_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Modifying host '" << obj->host_name() << "'.";
 
 }
 
@@ -99,5 +106,13 @@ void applier::host::_modify_object(host_ptr obj) {
  *  @param[in] obj The new host to remove from the monitoring engine.
  */
 void applier::host::_remove_object(host_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing host '" << obj->host_name() << "'.";
 
+  // Unregister host.
+  unregister_object<host_struct, &host_struct::name>(
+    &host_list,
+    obj->host_name().c_str());
+  applier::state::instance().hosts().erase(obj->host_name());
 }
