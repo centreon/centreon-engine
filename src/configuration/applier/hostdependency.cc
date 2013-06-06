@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -30,7 +31,7 @@ static applier::hostdependency* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::hostdependency::apply(state const& config) {
+void applier::hostdependency::apply(configuration::state const& config) {
   _diff(::config->hostdependencies(), config.hostdependencies());
 }
 

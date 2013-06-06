@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -30,7 +31,7 @@ static applier::servicedependency* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::servicedependency::apply(state const& config) {
+void applier::servicedependency::apply(configuration::state const& config) {
   _diff(::config->servicedependencies(), config.servicedependencies());
 }
 

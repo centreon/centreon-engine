@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -30,7 +31,7 @@ static applier::serviceescalation* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::serviceescalation::apply(state const& config) {
+void applier::serviceescalation::apply(configuration::state const& config) {
   _diff(::config->serviceescalations(), config.serviceescalations());
 }
 

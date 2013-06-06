@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -30,7 +31,7 @@ static applier::connector* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::connector::apply(state const& config) {
+void applier::connector::apply(configuration::state const& config) {
   _diff(::config->connectors(), config.connectors());
 }
 
@@ -79,6 +80,9 @@ applier::connector::~connector() throw () {
  *  @param[in] obj The new connector to add into the monitoring engine.
  */
 void applier::connector::_add_object(connector_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Creating new connector '" << obj->connector_name() << "'.";
 
 }
 
@@ -88,6 +92,9 @@ void applier::connector::_add_object(connector_ptr obj) {
  *  @param[in] obj The new connector to modify into the monitoring engine.
  */
 void applier::connector::_modify_object(connector_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Modifying connector '" << obj->connector_name() << "'.";
 
 }
 
@@ -97,5 +104,8 @@ void applier::connector::_modify_object(connector_ptr obj) {
  *  @param[in] obj The new connector to remove from the monitoring engine.
  */
 void applier::connector::_remove_object(connector_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing connector '" << obj->connector_name() << "'.";
 
 }

@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -30,7 +31,7 @@ static applier::servicegroup* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::servicegroup::apply(state const& config) {
+void applier::servicegroup::apply(configuration::state const& config) {
   _diff(::config->servicegroups(), config.servicegroups());
 }
 
@@ -79,6 +80,9 @@ applier::servicegroup::~servicegroup() throw () {
  *  @param[in] obj The new servicegroup to add into the monitoring engine.
  */
 void applier::servicegroup::_add_object(servicegroup_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
 
 }
 
@@ -88,6 +92,9 @@ void applier::servicegroup::_add_object(servicegroup_ptr obj) {
  *  @param[in] obj The new servicegroup to modify into the monitoring engine.
  */
 void applier::servicegroup::_modify_object(servicegroup_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
 
 }
 
@@ -97,5 +104,13 @@ void applier::servicegroup::_modify_object(servicegroup_ptr obj) {
  *  @param[in] obj The new servicegroup to remove from the monitoring engine.
  */
 void applier::servicegroup::_remove_object(servicegroup_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
 
+  // Unregister host.
+  unregister_object<servicegroup_struct, &servicegroup_struct::group_name>(
+    &servicegroup_list,
+    obj->servicegroup_name().c_str());
+  applier::state::instance().servicegroups().erase(obj->servicegroup_name());
 }

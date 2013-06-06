@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -30,7 +31,7 @@ static applier::timeperiod* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::timeperiod::apply(state const& config) {
+void applier::timeperiod::apply(configuration::state const& config) {
   _diff(::config->timeperiods(), config.timeperiods());
 }
 
@@ -79,6 +80,9 @@ applier::timeperiod::~timeperiod() throw () {
  *  @param[in] obj The new timeperiod to add into the monitoring engine.
  */
 void applier::timeperiod::_add_object(timeperiod_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Creating new timeperiod '" << obj->timeperiod_name() << "'.";
 
 }
 
@@ -88,6 +92,9 @@ void applier::timeperiod::_add_object(timeperiod_ptr obj) {
  *  @param[in] obj The new timeperiod to modify into the monitoring engine.
  */
 void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Modifying timeperiod '" << obj->timeperiod_name() << "'.";
 
 }
 
@@ -97,5 +104,13 @@ void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
  *  @param[in] obj The new timeperiod to remove from the monitoring engine.
  */
 void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing timeperiod '" << obj->timeperiod_name() << "'.";
 
+  // Unregister host.
+  unregister_object<timeperiod_struct, &timeperiod_struct::name>(
+    &timeperiod_list,
+    obj->timeperiod_name().c_str());
+  applier::state::instance().timeperiods().erase(obj->timeperiod_name());
 }

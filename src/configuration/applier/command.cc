@@ -115,6 +115,8 @@ void applier::command::_modify_object(command_ptr obj) {
     c(applier::state::instance().commands()[obj->command_name()]);
   modify_if_different(c->command_line, obj->command_line().c_str());
 
+  // XXX: todo.
+
   return ;
 }
 
