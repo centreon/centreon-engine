@@ -82,6 +82,17 @@ namespace          configuration {
       return ;
     }
 
+    template<typename T, char* T::*member>
+    void unregister_object(T** lst, char const* name) {
+      for (T** node(lst); *node; node = &(*node)->next)
+        if (!strcmp((*node)->*member, name)) {
+          (*node) = (*node)->next;
+          break ;
+        }
+    }
+
+
+
 # define TRUE_if_true(expr) ((expr) ? TRUE : FALSE)
   }
 }
