@@ -87,60 +87,97 @@ void applier::contact::_add_object(contact_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Creating new contact '" << obj->contact_name() << "'.";
 
-  // Create contact.
-  shared_ptr<contact_struct> c(new contact_struct);
-  memset(c.get(), 0, sizeof(*c));
-  c->name = my_strdup(obj->contact_name().c_str());
-  c->alias = obj->alias().empty() ? NULL : my_strdup(obj->alias().c_str());
-  c->email = obj->email().empty() ? NULL : my_strdup(obj->email().c_str());
-  c->pager = obj->pager().empty() ? NULL : my_strdup(obj->pager().c_str());
+  // Create address list.
+  char const* addresses[MAX_CONTACT_ADDRESSES];
+  memset(addresses, 0, sizeof(addresses));
   {
-    memset(c->address, 0, sizeof(c->address));
     unsigned int i(0);
     for (tab_string::const_iterator
-	   it(obj->address().begin()),
-	   end(obj->address().end());
-	 it != end;
-	 ++it, ++i)
-      c->address[i] = my_strdup(it->c_str());
+           it(obj->address().begin()),
+           end(obj->address().end());
+         it != end;
+         ++it, ++i)
+      addresses[i] = it->c_str();
   }
-  add_members<command_struct, commandsmember_struct>(
-    applier::state::instance().commands(),
-    obj->host_notification_commands(),
-    c->host_notification_commands);
-  add_members<command_struct, commandsmember_struct>(
-    applier::state::instance().commands(),
-    obj->service_notification_commands(),
-    c->service_notification_commands);
-  c->notify_on_service_unknown = static_cast<bool>(obj->service_notification_options() & service::unknown);
-  c->notify_on_service_warning = static_cast<bool>(obj->service_notification_options() & service::warning);
-  c->notify_on_service_critical = static_cast<bool>(obj->service_notification_options() & service::critical);
-  c->notify_on_service_recovery = static_cast<bool>(obj->service_notification_options() & service::recovery);
-  c->notify_on_service_flapping = static_cast<bool>(obj->service_notification_options() & service::flapping);
-  c->notify_on_service_downtime = static_cast<bool>(obj->service_notification_options() & service::downtime);
-  c->notify_on_host_down = static_cast<bool>(obj->host_notification_options() & host::down);
-  c->notify_on_host_unreachable = static_cast<bool>(obj->host_notification_options() & host::unreachable);
-  c->notify_on_host_recovery = static_cast<bool>(obj->host_notification_options() & host::recovery);
-  c->notify_on_host_flapping = static_cast<bool>(obj->host_notification_options() & host::flapping);
-  c->notify_on_host_downtime = static_cast<bool>(obj->host_notification_options() & host::downtime);
-  c->host_notification_period = my_strdup(obj->host_notification_period().c_str());
-  c->service_notification_period = my_strdup(obj->service_notification_period().c_str());
-  c->host_notifications_enabled = obj->host_notifications_enabled();
-  c->service_notifications_enabled = obj->service_notifications_enabled();
-  c->can_submit_commands = obj->can_submit_commands();
-  c->retain_status_information = obj->retain_status_information();
-  c->retain_nonstatus_information = obj->retain_nonstatus_information();
-  for (properties::const_iterator
-	 it(obj->customvariables().begin()),
-	 end(obj->customvariables().end());
+
+  // Create contact.
+  shared_ptr<contact_struct> c;
+  memset(c.get(), 0, sizeof(*c));
+  c = shared_ptr<contact_struct>(
+        add_contact(
+          obj->contact_name().c_str(),
+          obj->alias().c_str(),
+          obj->email().c_str(),
+          obj->pager().c_str(),
+          addresses,
+          obj->service_notification_period().c_str(),
+          obj->host_notification_period().c_str(),
+          static_cast<bool>(obj->service_notification_options() & service::ok),
+          static_cast<bool>(obj->service_notification_options() & service::critical),
+          static_cast<bool>(obj->service_notification_options() & service::warning),
+          static_cast<bool>(obj->service_notification_options() & service::unknown),
+          static_cast<bool>(obj->service_notification_options() & service::flapping),
+          static_cast<bool>(obj->service_notification_options() & service::downtime),
+          static_cast<bool>(obj->host_notification_options() & host::up),
+          static_cast<bool>(obj->host_notification_options() & host::down),
+          static_cast<bool>(obj->host_notification_options() & host::unreachable),
+          static_cast<bool>(obj->host_notification_options() & host::flapping),
+          static_cast<bool>(obj->host_notification_options() & host::downtime),
+          obj->host_notifications_enabled(),
+          obj->service_notifications_enabled(),
+          obj->can_submit_commands(),
+          obj->retain_status_information(),
+          obj->retain_nonstatus_information()));
+  if (!c.get())
+    throw (engine_error() << "Error: Could not register contact '"
+           << obj->contact_name() << "'.");
+
+  // Add all the host notification commands.
+  for (tab_string::const_iterator
+         it(obj->host_notification_commands().begin()),
+         end(obj->host_notification_commands().end());
        it != end;
        ++it)
-    add_custom_variable_to_contact(c.get(), it->first.c_str(), it->second.c_str());
+    if (!add_host_notification_command_to_contact(
+           c.get(),
+           it->c_str()))
+      throw (engine_error()
+             << "Error: Could not add host notification command '"
+             << *it << "' to contact '" << obj->contact_name() << "'.");
+
+  // Add all the service notification commands.
+  for (tab_string::const_iterator
+	 it(obj->service_notification_commands().begin()),
+	 end(obj->service_notification_commands().end());
+       it != end;
+       ++it)
+    if (!add_service_notification_command_to_contact(
+           c.get(),
+	   it->c_str()))
+      throw (engine_error()
+	     << "Error: Could not add service notification command '"
+	     << *it << "' to contact '" << obj->contact_name() << "'.");
+
+  // Add all custom variables.
+  for (properties::const_iterator
+           it(obj->customvariables().begin()),
+           end(obj->customvariables().end());
+       it != end;
+       ++it)
+    if (!add_custom_variable_to_contact(
+           c.get(),
+	   it->first.c_str(),
+	   it->second.c_str()))
+      throw (engine_error()
+	     << "Error: Could not add custom variable '" << it->first
+	     << "' to contact '" << obj->contact_name() << "'.");
+
   // XXX : c->last_host_notification = obj->last_host_notification();
   // XXX : c->last_service_notification = obj->last_service_notification();
   // XXX : c->modified_attributes = obj->modified_attributes();
   // XXX : c->modified_host_attributes = obj->modified_host_attributes();
   // XXX : c->modified_service_attributes = obj->modified_service_attributes();
+
   // XXX : host_notification_period_ptr
   // XXX : service_notification_period_ptr
   // XXX : contactgroups_ptr
