@@ -17,8 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -132,4 +134,69 @@ void applier::command::remove_object(command_ptr obj) {
 void applier::command::resolve_object(command_ptr obj) {
   (void)obj;
   return ;
+}
+
+/**
+ *  Compare a commandsmember list with a list of string.
+ *
+ *  @param[in] left  First list.
+ *  @param[in] right Second list.
+ *
+ *  @return True if both lists contain the same entries.
+ */
+bool operator==(
+       commandsmember_struct const* left,
+       std::list<std::string> const& right) {
+  std::list<std::string>::const_iterator
+    it(right.begin()),
+    end(right.end());
+  while (left && (it != end)) {
+    if (strcmp(left->cmd, it->c_str()))
+      return (false);
+    left = left->next;
+    ++it;
+  }
+  return (!left && (it == end));
+}
+
+/**
+ *  Compare a list of string with a commandsmember list.
+ *
+ *  @param[in] left  First list.
+ *  @param[in] right Second list.
+ *
+ *  @return True if both lists contain the same entries.
+ */
+bool operator==(
+       std::list<std::string> const& left,
+       commandsmember_struct const* right) {
+  return (operator==(right, left));
+}
+
+/**
+ *  Compare a commandsmember list with a list of string.
+ *
+ *  @param[in] left  First list.
+ *  @param[in] right Second list.
+ *
+ *  @return False if both lists contain the same entries.
+ */
+bool operator!=(
+       commandsmember_struct const* left,
+       std::list<std::string> const& right) {
+  return (!operator==(left, right));
+}
+
+/**
+ *  Compare a list of string with a commandsmember list.
+ *
+ *  @param[in] left  First list.
+ *  @param[in] right Second list.
+ *
+ *  @return False if both lists contain the same entries.
+ */
+bool operator!=(
+       std::list<std::string> const& left,
+       commandsmember_struct const* right) {
+  return (!operator==(left, right));
 }
