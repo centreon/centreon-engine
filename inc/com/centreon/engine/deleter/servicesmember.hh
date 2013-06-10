@@ -22,8 +22,12 @@
 
 #  include "com/centreon/engine/namespace.hh"
 
+CCE_BEGIN()
+
 namespace deleter {
   void servicesmember(void* ptr) throw ();
 }
 
-#endif /* !CCE_DELETER_SERVICESMEMBER_HH */
+CCE_END()
+
+#endif // !CCE_DELETER_SERVICESMEMBER_HH

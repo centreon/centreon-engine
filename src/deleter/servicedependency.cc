@@ -20,6 +20,8 @@
 #include "com/centreon/engine/deleter/servicedependency.hh"
 #include "com/centreon/engine/objects.hh"
 
+using namespace com::centreon::engine;
+
 /**
  *  Delete servicedependency.
  *

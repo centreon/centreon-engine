@@ -20,6 +20,8 @@
 #ifndef CCE_CONFIGURATION_APPLIER_STATE_HH
 #  define CCE_CONFIGURATION_APPLIER_STATE_HH
 
+#  include <string>
+#  include <utility>
 #  include "com/centreon/engine/configuration/applier/base.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -82,29 +84,29 @@ namespace           configuration {
                     hosts() const throw ();
       umap<std::string, shared_ptr<host_struct> >&
                     hosts() throw ();
-      umap<std::string, shared_ptr<hostdependency_struct> > const&
+      umultimap<std::string, shared_ptr<hostdependency_struct> > const&
                     hostdependencies() const throw ();
-      umap<std::string, shared_ptr<hostdependency_struct> >&
+      umultimap<std::string, shared_ptr<hostdependency_struct> >&
                     hostdependencies() throw ();
-      umap<std::string, shared_ptr<hostescalation_struct> > const&
+      umultimap<std::string, shared_ptr<hostescalation_struct> > const&
                     hostescalations() const throw ();
-      umap<std::string, shared_ptr<hostescalation_struct> >&
+      umultimap<std::string, shared_ptr<hostescalation_struct> >&
                     hostescalations() throw ();
       umap<std::string, shared_ptr<hostgroup_struct> > const&
                     hostgroups() const throw ();
       umap<std::string, shared_ptr<hostgroup_struct> >&
                     hostgroups() throw ();
-      umap<std::string, shared_ptr<service_struct> > const&
+      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
                     services() const throw ();
-      umap<std::string, shared_ptr<service_struct> >&
+      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >&
                     services() throw ();
-      umap<std::string, shared_ptr<servicedependency_struct> > const&
+      umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> > const&
                     servicedependencies() const throw ();
-      umap<std::string, shared_ptr<servicedependency_struct> >&
+      umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >&
                     servicedependencies() throw ();
-      umap<std::string, shared_ptr<serviceescalation_struct> > const&
+      umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > const&
                     serviceescalations() const throw ();
-      umap<std::string, shared_ptr<serviceescalation_struct> >&
+      umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >&
                     serviceescalations() throw ();
       umap<std::string, shared_ptr<servicegroup_struct> > const&
                     servicegroups() const throw ();
@@ -133,17 +135,17 @@ namespace           configuration {
                     _contactgroups;
       umap<std::string, shared_ptr<host_struct> >
                     _hosts;
-      umap<std::string, shared_ptr<hostdependency_struct> >
+      umultimap<std::string, shared_ptr<hostdependency_struct> >
                     _hostdependencies;
-      umap<std::string, shared_ptr<hostescalation_struct> >
+      umultimap<std::string, shared_ptr<hostescalation_struct> >
                     _hostescalations;
       umap<std::string, shared_ptr<hostgroup_struct> >
                     _hostgroups;
-      umap<std::string, shared_ptr<service_struct> >
+      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >
                     _services;
-      umap<std::string, shared_ptr<servicedependency_struct> >
+      umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >
                     _servicedependencies;
-      umap<std::string, shared_ptr<serviceescalation_struct> >
+      umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >
                     _serviceescalations;
       umap<std::string, shared_ptr<servicegroup_struct> >
                     _servicegroups;

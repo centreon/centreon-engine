@@ -34,10 +34,10 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/skiplist.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xsddefault.hh"
+#include "skiplist.h"
 
 using namespace com::centreon::engine;
 

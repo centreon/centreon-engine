@@ -171,7 +171,7 @@ umap<std::string, shared_ptr<host_struct> >& applier::state::hosts() throw () {
  *
  *  @return The current hostdependencies.
  */
-umap<std::string, shared_ptr<hostdependency_struct> > const& applier::state::hostdependencies() const throw () {
+umultimap<std::string, shared_ptr<hostdependency_struct> > const& applier::state::hostdependencies() const throw () {
   return (_hostdependencies);
 }
 
@@ -180,7 +180,7 @@ umap<std::string, shared_ptr<hostdependency_struct> > const& applier::state::hos
  *
  *  @return The current hostdependencies.
  */
-umap<std::string, shared_ptr<hostdependency_struct> >& applier::state::hostdependencies() throw () {
+umultimap<std::string, shared_ptr<hostdependency_struct> >& applier::state::hostdependencies() throw () {
   return (_hostdependencies);
 }
 
@@ -189,7 +189,7 @@ umap<std::string, shared_ptr<hostdependency_struct> >& applier::state::hostdepen
  *
  *  @return The current hostescalations.
  */
-umap<std::string, shared_ptr<hostescalation_struct> > const& applier::state::hostescalations() const throw () {
+umultimap<std::string, shared_ptr<hostescalation_struct> > const& applier::state::hostescalations() const throw () {
   return (_hostescalations);
 }
 
@@ -198,7 +198,7 @@ umap<std::string, shared_ptr<hostescalation_struct> > const& applier::state::hos
  *
  *  @return The current hostescalations.
  */
-umap<std::string, shared_ptr<hostescalation_struct> >& applier::state::hostescalations() throw () {
+umultimap<std::string, shared_ptr<hostescalation_struct> >& applier::state::hostescalations() throw () {
   return (_hostescalations);
 }
 
@@ -225,7 +225,7 @@ umap<std::string, shared_ptr<hostgroup_struct> >& applier::state::hostgroups() t
  *
  *  @return The current services.
  */
-umap<std::string, shared_ptr<service_struct> > const& applier::state::services() const throw () {
+umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const& applier::state::services() const throw () {
   return (_services);
 }
 
@@ -234,7 +234,7 @@ umap<std::string, shared_ptr<service_struct> > const& applier::state::services()
  *
  *  @return The current services.
  */
-umap<std::string, shared_ptr<service_struct> >& applier::state::services() throw () {
+umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >& applier::state::services() throw () {
   return (_services);
 }
 
@@ -243,7 +243,7 @@ umap<std::string, shared_ptr<service_struct> >& applier::state::services() throw
  *
  *  @return The current servicedependencies.
  */
-umap<std::string, shared_ptr<servicedependency_struct> > const& applier::state::servicedependencies() const throw () {
+umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> > const& applier::state::servicedependencies() const throw () {
   return (_servicedependencies);
 }
 
@@ -252,7 +252,7 @@ umap<std::string, shared_ptr<servicedependency_struct> > const& applier::state::
  *
  *  @return The current servicedependencies.
  */
-umap<std::string, shared_ptr<servicedependency_struct> >& applier::state::servicedependencies() throw () {
+umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >& applier::state::servicedependencies() throw () {
   return (_servicedependencies);
 }
 
@@ -261,7 +261,7 @@ umap<std::string, shared_ptr<servicedependency_struct> >& applier::state::servic
  *
  *  @return The current serviceescalations.
  */
-umap<std::string, shared_ptr<serviceescalation_struct> > const& applier::state::serviceescalations() const throw () {
+umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > const& applier::state::serviceescalations() const throw () {
   return (_serviceescalations);
 }
 
@@ -270,7 +270,7 @@ umap<std::string, shared_ptr<serviceescalation_struct> > const& applier::state::
  *
  *  @return The current serviceescalations.
  */
-umap<std::string, shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
+umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
   return (_serviceescalations);
 }
 

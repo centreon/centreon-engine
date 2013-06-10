@@ -40,9 +40,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects.hh"
-#include "com/centreon/engine/skiplist.hh"
 #include "com/centreon/engine/xodtemplate.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "skiplist.h"
 
 using namespace com::centreon::engine::logging;
 

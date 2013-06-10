@@ -22,8 +22,12 @@
 
 #  include "com/centreon/engine/namespace.hh"
 
+CCE_BEGIN()
+
 namespace deleter {
   void contactgroupsmember(void* ptr) throw ();
 }
 
-#endif /* !CCE_DELETER_CONTACTGROUPSMEMBER_HH */
+CCE_END()
+
+#endif // !CCE_DELETER_CONTACTGROUPSMEMBER_HH

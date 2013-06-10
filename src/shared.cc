@@ -43,6 +43,11 @@ extern char* tzname[2];
  * core.
  */
 
+char* my_strdup(std::string const& str) {
+  char* new_str = new char[str.size() + 1];
+  return (strcpy(new_str, str.c_str()));
+}
+
 char* my_strdup(char const* str) {
   char* new_str = new char[strlen(str) + 1];
   return (strcpy(new_str, str));

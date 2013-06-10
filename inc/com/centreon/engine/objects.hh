@@ -23,6 +23,7 @@
 
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
+#  include "find.hh"
 
 /*
 ** Current object revision, Increment when changes are made to data
@@ -943,26 +944,6 @@ int number_of_total_child_hosts(host* hst);
 int number_of_total_parent_hosts(host* hst);
 
 /*
-** Object search functions.
-*/
-/* Finds a command object. */
-command*      find_command(char const* name);
-/* Finds a contact object. */
-contact*      find_contact(char const* name);
-/* Finds a contactgroup object. */
-contactgroup* find_contactgroup(char const* name);
-/* Finds a host object. */
-host*         find_host(char const* name);
-/* Finds a hostgroup object. */
-hostgroup*    find_hostgroup(char const* name);
-/* Finds a service object. */
-service*      find_service(char const* host_name, char const* svc_desc);
-/* Finds a servicegroup object. */
-servicegroup* find_servicegroup(char const* name);
-/* Finds a timeperiod object. */
-timeperiod*   find_timeperiod(char const* name);
-
-/*
 ** Object traversal functions.
 */
 hostdependency*    get_first_host_dependency_by_dependent_host(
@@ -1039,29 +1020,6 @@ int check_for_circular_servicedependency_path(
       servicedependency* root_dep,
       servicedependency* dep,
       int dependency_type);
-
-/*
-** Object skiplist functions.
-*/
-int free_object_skiplists();
-int init_object_skiplists();
-int skiplist_compare_command(void const* a, void const* b);
-int skiplist_compare_contact(void const* a, void const* b);
-int skiplist_compare_contactgroup(void const* a, void const* b);
-int skiplist_compare_host(void const* a, void const* b);
-int skiplist_compare_hostdependency(void const* a, void const* b);
-int skiplist_compare_hostescalation(void const* a, void const* b);
-int skiplist_compare_hostgroup(void const* a, void const* b);
-int skiplist_compare_service(void const* a, void const* b);
-int skiplist_compare_servicedependency(void const* a, void const* b);
-int skiplist_compare_serviceescalation(void const* a, void const* b);
-int skiplist_compare_servicegroup(void const* a, void const* b);
-int skiplist_compare_text(
-      char const* val1a,
-      char const* val1b,
-      char const* val2a,
-      char const* val2b);
-int skiplist_compare_timeperiod(void const* a, void const* b);
 
 /*
 ** Object lists functions.

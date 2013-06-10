@@ -20,7 +20,9 @@
 
 #include <cstdlib>
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/skiplist.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects.hh"
+#include "skiplist.h"
 
 skiplist* skiplist_new(
             int max_levels,
@@ -493,4 +495,368 @@ int skiplist_delete_node(skiplist* list, void const* node_ptr) {
   /* free memory */
   delete[] update;
   return (deleted);
+}
+
+/**
+ *  Free all object skiplists.
+ *
+ *  @return OK.
+ */
+int free_object_skiplists() {
+  for (unsigned int x(0); x < NUM_OBJECT_SKIPLISTS; ++x)
+    skiplist_free(&object_skiplists[x]);
+  return (OK);
+}
+
+/**
+ *  Initialize all object skiplists.
+ *
+ *  @return OK on successful initialization.
+ */
+int init_object_skiplists() {
+  // Reset pointers.
+  for (unsigned int x(0); x < NUM_OBJECT_SKIPLISTS; ++x)
+    object_skiplists[x] = NULL;
+
+  // Allocate skiplists.
+  object_skiplists[HOST_SKIPLIST]
+    = skiplist_new(15, 0.5, false, false, skiplist_compare_host);
+  object_skiplists[SERVICE_SKIPLIST]
+    = skiplist_new(15, 0.5, false, false, skiplist_compare_service);
+  object_skiplists[COMMAND_SKIPLIST]
+    = skiplist_new(10, 0.5, false, false, skiplist_compare_command);
+  object_skiplists[TIMEPERIOD_SKIPLIST]
+    = skiplist_new(10, 0.5, false, false, skiplist_compare_timeperiod);
+  object_skiplists[CONTACT_SKIPLIST]
+    = skiplist_new(10, 0.5, false, false, skiplist_compare_contact);
+  object_skiplists[CONTACTGROUP_SKIPLIST]
+    = skiplist_new(10, 0.5, false, false, skiplist_compare_contactgroup);
+  object_skiplists[HOSTGROUP_SKIPLIST]
+    = skiplist_new(10, 0.5, false, false, skiplist_compare_hostgroup);
+  object_skiplists[SERVICEGROUP_SKIPLIST]
+    = skiplist_new(10, 0.5, false, false, skiplist_compare_servicegroup);
+  object_skiplists[HOSTESCALATION_SKIPLIST]
+    = skiplist_new(15, 0.5, true, false, skiplist_compare_hostescalation);
+  object_skiplists[SERVICEESCALATION_SKIPLIST]
+    = skiplist_new(15, 0.5, true, false, skiplist_compare_serviceescalation);
+  object_skiplists[HOSTDEPENDENCY_SKIPLIST]
+    = skiplist_new(15, 0.5, true, false, skiplist_compare_hostdependency);
+  object_skiplists[SERVICEDEPENDENCY_SKIPLIST]
+    = skiplist_new(15, 0.5, true, false, skiplist_compare_servicedependency);
+
+  return (OK);
+}
+
+/**
+ *  Compare two commands.
+ *
+ *  @param[in] a Uncasted command #1.
+ *  @param[in] b Uncasted command #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_command(void const* a, void const* b) {
+  command const* oa(static_cast<command const*>(a));
+  command const* ob(static_cast<command const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
+}
+
+/**
+ *  Compare two contacts.
+ *
+ *  @param[in] a Uncasted command #1.
+ *  @param[in] b Uncasted command #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_contact(void const* a, void const* b) {
+  contact const* oa(static_cast<contact const*>(a));
+  contact const* ob(static_cast<contact const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
+}
+
+/**
+ *  Compare two contact groups.
+ *
+ *  @param[in] a Uncasted contactgroup #1.
+ *  @param[in] b Uncasted contactgroup #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_contactgroup(void const* a, void const* b) {
+  contactgroup const* oa(static_cast<contactgroup const*>(a));
+  contactgroup const* ob(static_cast<contactgroup const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->group_name,
+            NULL,
+            ob->group_name,
+            NULL));
+}
+
+/**
+ *  Compare two hosts.
+ *
+ *  @param[in] a Uncasted host #1.
+ *  @param[in] b Uncasted host #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_host(void const* a, void const* b) {
+  host const* oa(static_cast<host const*>(a));
+  host const* ob(static_cast<host const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
+}
+
+/**
+ *  Compare two host dependencies.
+ *
+ *  @param[in] a Uncasted host dependency #1.
+ *  @param[in] b Uncasted host dependency #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_hostdependency(void const* a, void const* b) {
+  hostdependency const* oa(static_cast<hostdependency const*>(a));
+  hostdependency const* ob(static_cast<hostdependency const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->dependent_host_name,
+            NULL,
+            ob->dependent_host_name,
+            NULL));
+}
+
+/**
+ *  Compare two host escalations.
+ *
+ *  @param[in] a Uncasted host escalation #1.
+ *  @param[in] b Uncasted host escalation #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_hostescalation(void const* a, void const* b) {
+  hostescalation const* oa(static_cast<hostescalation const*>(a));
+  hostescalation const* ob(static_cast<hostescalation const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->host_name,
+            NULL,
+            ob->host_name,
+            NULL));
+}
+
+/**
+ *  Compare two host groups.
+ *
+ *  @param[in] a Uncasted host group #1.
+ *  @param[in] b Uncasted host group #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_hostgroup(void const* a, void const* b) {
+  hostgroup const* oa(static_cast<hostgroup const*>(a));
+  hostgroup const* ob(static_cast<hostgroup const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->group_name,
+            NULL,
+            ob->group_name,
+            NULL));
+}
+
+/**
+ *  Compare two services.
+ *
+ *  @param[in] a Uncasted service #1.
+ *  @param[in] b Uncasted service #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_service(void const* a, void const* b) {
+  service const* oa(static_cast<service const*>(a));
+  service const* ob(static_cast<service const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->host_name,
+            oa->description,
+            ob->host_name,
+            ob->description));
+}
+
+/**
+ *  Compare two service dependencies.
+ *
+ *  @param[in] a Uncasted service #1.
+ *  @param[in] b Uncasted service #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_servicedependency(void const* a, void const* b) {
+  servicedependency const* oa(static_cast<servicedependency const*>(a));
+  servicedependency const* ob(static_cast<servicedependency const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->dependent_host_name,
+            oa->dependent_service_description,
+            ob->dependent_host_name,
+            ob->dependent_service_description));
+}
+
+/**
+ *  Compare two service escalations.
+ *
+ *  @param[in] a Uncasted service escalation #1.
+ *  @param[in] b Uncasted service escalation #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_serviceescalation(void const* a, void const* b) {
+  serviceescalation const* oa(static_cast<serviceescalation const*>(a));
+  serviceescalation const* ob(static_cast<serviceescalation const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->host_name,
+            oa->description,
+            ob->host_name,
+            ob->description));
+}
+
+/**
+ *  Compare two service groups.
+ *
+ *  @param[in] a Uncasted service group #1.
+ *  @param[in] b Uncasted service group #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_servicegroup(void const* a, void const* b) {
+  servicegroup const* oa(static_cast<servicegroup const*>(a));
+  servicegroup const* ob(static_cast<servicegroup const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(
+            oa->group_name,
+            NULL,
+            ob->group_name,
+            NULL));
+}
+
+/**
+ *  Compare four strings, two by two.
+ *
+ *  @param[in] val1a Compared to val2a.
+ *  @param[in] val1b Compared to val2b.
+ *  @param[in] val2a Compared to val1a.
+ *  @param[in] val2b Compared to val1b.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_text(
+      char const* val1a,
+      char const* val1b,
+      char const* val2a,
+      char const* val2b) {
+  int result(0);
+
+  // Check first name.
+  if (!val1a && !val2a)
+    result = 0;
+  else if (!val1a)
+    result = 1;
+  else if (!val2a)
+    result = -1;
+  else
+    result = strcmp(val1a, val2a);
+
+  // Check second name if necessary.
+  if (result == 0) {
+    if (!val1b && !val2b)
+      result = 0;
+    else if (!val1b)
+      result = 1;
+    else if (!val2b)
+      result = -1;
+    else
+      result = strcmp(val1b, val2b);
+  }
+
+  return (result);
+}
+
+/**
+ *  Compare two timeperiods.
+ *
+ *  @param[in] a Uncasted timeperiod #1.
+ *  @param[in] b Uncasted timeperiod #2.
+ *
+ *  @return Similar to strcmp.
+ */
+int skiplist_compare_timeperiod(void const* a, void const* b) {
+  timeperiod const* oa(static_cast<timeperiod const*>(a));
+  timeperiod const* ob(static_cast<timeperiod const*>(b));
+  if (!oa && !ob)
+    return (0);
+  if (!oa)
+    return (1);
+  if (!ob)
+    return (-1);
+  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
