@@ -26,54 +26,36 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
-static applier::command* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::command::apply(configuration::state const& config) {
-  _diff(::config->commands(), config.commands());
-}
-
-/**
- *  Get the singleton instance of command applier.
- *
- *  @return Singleton instance.
- */
-applier::command& applier::command::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load command applier singleton.
- */
-void applier::command::load() {
-  if (!_instance)
-    _instance = new applier::command;
-}
-
-/**
- *  Unload command applier singleton.
- */
-void applier::command::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::command::command() {
+applier::command::command() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::command::command(applier::command const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::command::~command() throw () {
+applier::command::~command() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::command& applier::command::operator=(
+                                      applier::command const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -81,7 +63,7 @@ applier::command::~command() throw () {
  *
  *  @param[in] obj The new command to add into the monitoring engine.
  */
-void applier::command::_add_object(command_ptr obj) {
+void applier::command::add_object(command_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new command '" << obj->command_name() << "'.";
@@ -105,7 +87,7 @@ void applier::command::_add_object(command_ptr obj) {
  *
  *  @param[in] obj The new command to modify into the monitoring engine.
  */
-void applier::command::_modify_object(command_ptr obj) {
+void applier::command::modify_object(command_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying command '" << obj->command_name() << "'.";
@@ -115,8 +97,6 @@ void applier::command::_modify_object(command_ptr obj) {
     c(applier::state::instance().commands()[obj->command_name()]);
   modify_if_different(c->command_line, obj->command_line().c_str());
 
-  // XXX: todo.
-
   return ;
 }
 
@@ -125,7 +105,7 @@ void applier::command::_modify_object(command_ptr obj) {
  *
  *  @param[in] obj The new command to remove from the monitoring engine.
  */
-void applier::command::_remove_object(command_ptr obj) {
+void applier::command::remove_object(command_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing command '" << obj->command_name() << "'.";
@@ -138,5 +118,18 @@ void applier::command::_remove_object(command_ptr obj) {
     }
   applier::state::instance().commands().erase(obj->command_name());
 
+  return ;
+}
+
+/**
+ *  @brief Resolve a command object.
+ *
+ *  This method does nothing, as command objects do not require
+ *  resolution.
+ *
+ *  @param[in] obj Object to resolve.
+ */
+void applier::command::resolve_object(command_ptr obj) {
+  (void)obj;
   return ;
 }

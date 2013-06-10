@@ -29,23 +29,16 @@ CCE_BEGIN()
 
 namespace             configuration {
   namespace           applier {
-    class             command
-      : public base,
-        public object<configuration::command> {
+    class             command {
     public:
-      void            apply(state const& config);
-      static command& instance();
-      static void     load();
-      static void     unload();
-
-    private:
                       command();
-                      command(command const&);
+                      command(command const& right);
                       ~command() throw ();
-      command&        operator=(command const&);
-      void            _add_object(command_ptr obj);
-      void            _modify_object(command_ptr obj);
-      void            _remove_object(command_ptr obj);
+      command&        operator=(command const& right);
+      void            add_object(command_ptr obj);
+      void            modify_object(command_ptr obj);
+      void            remove_object(command_ptr obj);
+      void            resolve_object(command_ptr obj);
     };
   }
 }
