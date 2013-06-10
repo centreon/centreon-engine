@@ -676,7 +676,6 @@ add_library("cce_core" STATIC
   "${SRC_DIR}/macros.cc"
   "${SRC_DIR}/objects.cc"
   "${SRC_DIR}/shared.cc"
-  "${SRC_DIR}/skiplist.cc"
   "${SRC_DIR}/statusdata.cc"
   "${SRC_DIR}/error.cc"
   "${SRC_DIR}/xcddefault.cc"
@@ -710,7 +709,6 @@ add_library("cce_core" STATIC
   "${INC_DIR}/com/centreon/engine/perfdata.hh"
   "${INC_DIR}/com/centreon/engine/sehandlers.hh"
   "${INC_DIR}/com/centreon/engine/shared.hh"
-  "${INC_DIR}/com/centreon/engine/skiplist.hh"
   "${INC_DIR}/com/centreon/engine/sretention.hh"
   "${INC_DIR}/com/centreon/engine/statusdata.hh"
   "${INC_DIR}/com/centreon/engine/utils.hh"
@@ -737,7 +735,7 @@ add_subdirectory("logging")
 add_subdirectory("macros")
 add_subdirectory("misc")
 add_subdirectory("modules")
-add_subdirectory("objects")
+# XXX: remove all file from objects -> add_subdirectory("objects")
 add_subdirectory("scripts")
 
 # Link target with required libraries.
@@ -757,6 +755,7 @@ target_link_libraries("cce_core"
   "cce_commands"
   "cce_compatibility"
   "cce_objects"
+  "cce_deleter"
 )
 
 # centengine target.

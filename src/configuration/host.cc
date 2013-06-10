@@ -566,6 +566,24 @@ unsigned int host::freshness_threshold() const throw () {
 }
 
 /**
+ *  Get if host has coords 2d.
+ *
+ *  @return True if coords 2d exist, otherwise false.
+ */
+bool host::have_coords_2d() const throw () {
+  return (_coords_2d.is_set());
+}
+
+/**
+ *  Get if host has coords 3d.
+ *
+ *  @return True if coords 3d exist, otherwise false.
+ */
+bool host::have_coords_3d() const throw () {
+  return (_coords_3d.is_set());
+}
+
+/**
  *  Get high_flap_threshold.
  *
  *  @return The high_flap_threshold.

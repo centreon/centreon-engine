@@ -39,6 +39,9 @@ typedef struct  mmapfile_struct {
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
 #  ifdef __cplusplus
+#    include <string>
+char* my_strdup(std::string const& str);
+
 extern "C" {
 #  endif // C++
 

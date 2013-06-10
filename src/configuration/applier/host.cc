@@ -17,8 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -85,7 +87,6 @@ void applier::host::_add_object(host_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new host '" << obj->host_name() << "'.";
-
 }
 
 /**

@@ -20,6 +20,8 @@
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/objects.hh"
 
+using namespace com::centreon::engine;
+
 /**
  *  Delete contactgroupsmember.
  *

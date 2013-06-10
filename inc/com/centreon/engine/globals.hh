@@ -36,8 +36,8 @@
 #  include "com/centreon/engine/nebmods.hh"
 #  include "com/centreon/engine/notifications.hh"
 #  include "com/centreon/engine/objects.hh"
-#  include "com/centreon/engine/skiplist.hh"
 #  include "com/centreon/engine/utils.hh"
+#  include "skiplist.h"
 
 #  ifdef __cplusplus
 extern "C" {

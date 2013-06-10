@@ -22,6 +22,8 @@
 
 #  include "com/centreon/engine/namespace.hh"
 
+CCE_BEGIN()
+
 namespace deleter {
   template <typename T>
   void    listmember(T* ptr, void (*release)(void*)) throw () {
@@ -31,4 +33,6 @@ namespace deleter {
   }
 }
 
-#endif /* !CCE_DELETER_LISTMEMBER_HH */
+CCE_END()
+
+#endif // !CCE_DELETER_LISTMEMBER_HH

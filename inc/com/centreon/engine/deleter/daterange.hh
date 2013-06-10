@@ -22,8 +22,12 @@
 
 #  include "com/centreon/engine/namespace.hh"
 
+CCE_BEGIN()
+
 namespace deleter {
   void daterange(void* ptr) throw ();
 }
 
-#endif /* !CCE_DELETER_DATERANGE_HH */
+CCE_END()
+
+#endif // !CCE_DELETER_DATERANGE_HH

@@ -20,6 +20,8 @@
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/objects.hh"
 
+using namespace com::centreon::engine;
+
 /**
  *  Delete contactsmember.
  *

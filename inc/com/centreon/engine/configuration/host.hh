@@ -82,6 +82,8 @@ namespace                  configuration {
     bool                   flap_detection_enabled() const throw ();
     unsigned int           flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
+    bool                   have_coords_2d() const throw ();
+    bool                   have_coords_3d() const throw ();
     unsigned int           high_flap_threshold() const throw ();
     list_string const&     hostgroups() const throw ();
     std::string const&     host_name() const throw ();
