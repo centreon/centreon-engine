@@ -24,56 +24,38 @@
 
 using namespace com::centreon::engine::configuration;
 
-static applier::service* _instance = NULL;
-
 // XXX : update the event_list_low and event_list_high
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::service::apply(configuration::state const& config) {
-  _diff(::config->services(), config.services());
-}
-
-/**
- *  Get the singleton instance of service applier.
- *
- *  @return Singleton instance.
- */
-applier::service& applier::service::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load service applier singleton.
- */
-void applier::service::load() {
-  if (!_instance)
-    _instance = new applier::service;
-}
-
-/**
- *  Unload service applier singleton.
- */
-void applier::service::unload() {
-  delete _instance;
-  _instance = NULL;
-}
 
 /**
  *  Default constructor.
  */
-applier::service::service() {
+applier::service::service() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::service::service(applier::service const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::service::~service() throw () {
+applier::service::~service() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::service& applier::service::operator=(
+                                      applier::service const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -81,11 +63,15 @@ applier::service::~service() throw () {
  *
  *  @param[in] obj The new service to add into the monitoring engine.
  */
-void applier::service::_add_object(service_ptr obj) {
+void applier::service::add_object(service_ptr obj) {
   // Logging.
   // logger(logging::dbg_config, logging::more)
-  //   << "Creating new service '" << obj->service_description() << "'.";
+  //   << "Creating new service '" << obj->service_description()
+  //   << "' of host '" << obj->host_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -93,11 +79,15 @@ void applier::service::_add_object(service_ptr obj) {
  *
  *  @param[in] obj The new service to modify into the monitoring engine.
  */
-void applier::service::_modify_object(service_ptr obj) {
-  // // Logging.
+void applier::service::modify_object(service_ptr obj) {
+  // Logging.
   // logger(logging::dbg_config, logging::more)
-  //   << "Modifying service '" << obj->service_description() << "'.";
+  //   << "Modifying service '" << obj->service_description()
+  //   << "' of host '" << obj->host_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -105,6 +95,29 @@ void applier::service::_modify_object(service_ptr obj) {
  *
  *  @param[in] obj The new service to remove from the monitoring engine.
  */
-void applier::service::_remove_object(service_ptr obj) {
+void applier::service::remove_object(service_ptr obj) {
+  // Logging.
+  // logger(logging::dbg_config, logging::more)
+  //   << "Removing service '" << obj->service_description()
+  //   << "' of host '" << obj->host_name() << "'.";
 
+  // XXX
+
+  return ;
+}
+
+/**
+ *  Resolve a service.
+ *
+ *  @param[in] obj Service object.
+ */
+void applier::service::resolve_object(service_ptr obj) {
+  // Logging.
+  // logger(logging::dbg_config, logging::more)
+  //   << "Resolving service '" << obj->service_description()
+  //   << "' of host '" << obj->host_name () << "'.";
+
+  // XXX
+
+  return ;
 }
