@@ -24,54 +24,37 @@
 
 using namespace com::centreon::engine::configuration;
 
-static applier::hostdependency* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::hostdependency::apply(configuration::state const& config) {
-  _diff(::config->hostdependencies(), config.hostdependencies());
-}
-
-/**
- *  Get the singleton instance of hostdependency applier.
- *
- *  @return Singleton instance.
- */
-applier::hostdependency& applier::hostdependency::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load hostdependency applier singleton.
- */
-void applier::hostdependency::load() {
-  if (!_instance)
-    _instance = new applier::hostdependency;
-}
-
-/**
- *  Unload hostdependency applier singleton.
- */
-void applier::hostdependency::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::hostdependency::hostdependency() {
+applier::hostdependency::hostdependency() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::hostdependency::hostdependency(
+                           applier::hostdependency const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::hostdependency::~hostdependency() throw () {
+applier::hostdependency::~hostdependency() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::hostdependency& applier::hostdependency::operator=(
+                           applier::hostdependency const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,8 +62,8 @@ applier::hostdependency::~hostdependency() throw () {
  *
  *  @param[in] obj The new hostdependency to add into the monitoring engine.
  */
-void applier::hostdependency::_add_object(hostdependency_ptr obj) {
-
+void applier::hostdependency::add_object(hostdependency_ptr obj) {
+  // XXX
 }
 
 /**
@@ -88,8 +71,8 @@ void applier::hostdependency::_add_object(hostdependency_ptr obj) {
  *
  *  @param[in] obj The new hostdependency to modify into the monitoring engine.
  */
-void applier::hostdependency::_modify_object(hostdependency_ptr obj) {
-
+void applier::hostdependency::modify_object(hostdependency_ptr obj) {
+  // XXX
 }
 
 /**
@@ -97,6 +80,15 @@ void applier::hostdependency::_modify_object(hostdependency_ptr obj) {
  *
  *  @param[in] obj The new hostdependency to remove from the monitoring engine.
  */
-void applier::hostdependency::_remove_object(hostdependency_ptr obj) {
+void applier::hostdependency::remove_object(hostdependency_ptr obj) {
+  // XXX
+}
 
+/**
+ *  Resolve a hostdependency.
+ *
+ *  @param[in] obj Hostdependency object.
+ */
+void applier::hostdependency::resolve_object(hostdependency_ptr obj) {
+  // XXX
 }

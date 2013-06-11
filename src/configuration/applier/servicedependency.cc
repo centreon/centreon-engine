@@ -24,54 +24,37 @@
 
 using namespace com::centreon::engine::configuration;
 
-static applier::servicedependency* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::servicedependency::apply(configuration::state const& config) {
-  _diff(::config->servicedependencies(), config.servicedependencies());
-}
-
-/**
- *  Get the singleton instance of servicedependency applier.
- *
- *  @return Singleton instance.
- */
-applier::servicedependency& applier::servicedependency::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load servicedependency applier singleton.
- */
-void applier::servicedependency::load() {
-  if (!_instance)
-    _instance = new applier::servicedependency;
-}
-
-/**
- *  Unload servicedependency applier singleton.
- */
-void applier::servicedependency::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::servicedependency::servicedependency() {
+applier::servicedependency::servicedependency() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::servicedependency::servicedependency(
+                              applier::servicedependency const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::servicedependency::~servicedependency() throw () {
+applier::servicedependency::~servicedependency() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::servicedependency& applier::servicedependency::operator=(
+                              applier::servicedependency const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,8 +62,8 @@ applier::servicedependency::~servicedependency() throw () {
  *
  *  @param[in] obj The new servicedependency to add into the monitoring engine.
  */
-void applier::servicedependency::_add_object(servicedependency_ptr obj) {
-
+void applier::servicedependency::add_object(servicedependency_ptr obj) {
+  // XXX
 }
 
 /**
@@ -88,8 +71,8 @@ void applier::servicedependency::_add_object(servicedependency_ptr obj) {
  *
  *  @param[in] obj The new servicedependency to modify into the monitoring engine.
  */
-void applier::servicedependency::_modify_object(servicedependency_ptr obj) {
-
+void applier::servicedependency::modify_object(servicedependency_ptr obj) {
+  // XXX
 }
 
 /**
@@ -97,6 +80,15 @@ void applier::servicedependency::_modify_object(servicedependency_ptr obj) {
  *
  *  @param[in] obj The new servicedependency to remove from the monitoring engine.
  */
-void applier::servicedependency::_remove_object(servicedependency_ptr obj) {
+void applier::servicedependency::remove_object(servicedependency_ptr obj) {
+  // XXX
+}
 
+/**
+ *  Resolve a servicedependency.
+ *
+ *  @param[in] obj Servicedependency object.
+ */
+void applier::servicedependency::resolve_object(servicedependency_ptr obj) {
+  // XXX
 }

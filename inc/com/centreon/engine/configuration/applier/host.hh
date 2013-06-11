@@ -20,8 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOST_HH
 #  define CCE_CONFIGURATION_APPLIER_HOST_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,23 +27,16 @@ CCE_BEGIN()
 
 namespace          configuration {
   namespace        applier {
-    class          host
-      : public base,
-        public object<configuration::host> {
+    class          host {
     public:
-      void         apply(state const& config);
-      static host& instance();
-      static void  load();
-      static void  unload();
-
-    private:
                    host();
-                   host(host const&);
+                   host(host const& right);
                    ~host() throw ();
-      host&        operator=(host const&);
-      void         _add_object(host_ptr obj);
-      void         _modify_object(host_ptr obj);
-      void         _remove_object(host_ptr obj);
+      host&        operator=(host const& right);
+      void         add_object(host_ptr obj);
+      void         modify_object(host_ptr obj);
+      void         remove_object(host_ptr obj);
+      void         resolve_object(host_ptr obj);
     };
   }
 }

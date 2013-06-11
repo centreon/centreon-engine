@@ -20,32 +20,24 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICEDEPENDENCY_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICEDEPENDENCY_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/servicedependency.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                       configuration {
-  namespace                     applier {
-    class                       servicedependency
-      : public base,
-        public object<configuration::servicedependency> {
+namespace                configuration {
+  namespace              applier {
+    class                servicedependency {
     public:
-      void                      apply(state const& config);
-      static servicedependency& instance();
-      static void               load();
-      static void               unload();
-
-    private:
-                                servicedependency();
-                                servicedependency(servicedependency const&);
-                                ~servicedependency() throw ();
-      servicedependency&        operator=(servicedependency const&);
-      void                      _add_object(servicedependency_ptr obj);
-      void                      _modify_object(servicedependency_ptr obj);
-      void                      _remove_object(servicedependency_ptr obj);
+                         servicedependency();
+                         servicedependency(
+                           servicedependency const& right);
+                         ~servicedependency() throw ();
+      servicedependency& operator=(servicedependency const& right);
+      void               add_object(servicedependency_ptr obj);
+      void               modify_object(servicedependency_ptr obj);
+      void               remove_object(servicedependency_ptr obj);
+      void               resolve_object(servicedependency_ptr obj);
     };
   }
 }

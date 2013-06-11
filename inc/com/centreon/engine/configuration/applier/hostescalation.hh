@@ -20,32 +20,23 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTESCALATION_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/hostescalation.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                    configuration {
-  namespace                  applier {
-    class             hostescalation
-      : public base,
-        public object<configuration::hostescalation> {
+namespace             configuration {
+  namespace           applier {
+    class             hostescalation {
     public:
-      void                   apply(state const& config);
-      static hostescalation& instance();
-      static void            load();
-      static void            unload();
-
-    private:
-                             hostescalation();
-                             hostescalation(hostescalation const&);
-                             ~hostescalation() throw ();
-      hostescalation&        operator=(hostescalation const&);
-      void                   _add_object(hostescalation_ptr obj);
-      void                   _modify_object(hostescalation_ptr obj);
-      void                   _remove_object(hostescalation_ptr obj);
+                      hostescalation();
+                      hostescalation(hostescalation const& right);
+                      ~hostescalation() throw ();
+      hostescalation& operator=(hostescalation const& right);
+      void            add_object(hostescalation_ptr obj);
+      void            modify_object(hostescalation_ptr obj);
+      void            remove_object(hostescalation_ptr obj);
+      void            resolve_object(hostescalation_ptr obj);
     };
   }
 }

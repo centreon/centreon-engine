@@ -20,36 +20,44 @@
 #ifndef CCE_CONFIGURATION_APPLIER_COMMAND_HH
 #  define CCE_CONFIGURATION_APPLIER_COMMAND_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
+#  include <list>
+#  include <string>
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/namespace.hh"
+
+struct commandsmember_struct;
 
 CCE_BEGIN()
 
 namespace             configuration {
   namespace           applier {
-    class             command
-      : public base,
-        public object<configuration::command> {
+    class             command {
     public:
-      void            apply(state const& config);
-      static command& instance();
-      static void     load();
-      static void     unload();
-
-    private:
                       command();
-                      command(command const&);
+                      command(command const& right);
                       ~command() throw ();
-      command&        operator=(command const&);
-      void            _add_object(command_ptr obj);
-      void            _modify_object(command_ptr obj);
-      void            _remove_object(command_ptr obj);
+      command&        operator=(command const& right);
+      void            add_object(command_ptr obj);
+      void            modify_object(command_ptr obj);
+      void            remove_object(command_ptr obj);
+      void            resolve_object(command_ptr obj);
     };
   }
 }
 
 CCE_END()
+
+bool                  operator==(
+                        commandsmember_struct const* left,
+                        std::list<std::string> const& right);
+bool                  operator==(
+                        std::list<std::string> const& left,
+                        commandsmember_struct const* right);
+bool                  operator!=(
+                        commandsmember_struct const* left,
+                        std::list<std::string> const& right);
+bool                  operator!=(
+                        std::list<std::string> const& left,
+                        commandsmember_struct const* right);
 
 #endif // !CCE_CONFIGURATION_APPLIER_COMMAND_HH

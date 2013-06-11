@@ -20,60 +20,44 @@
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/member.hh"
+#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/shared.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::contactgroup* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::contactgroup::apply(configuration::state const& config) {
-  _diff(::config->contactgroups(), config.contactgroups());
-}
-
-/**
- *  Get the singleton instance of contactgroup applier.
- *
- *  @return Singleton instance.
- */
-applier::contactgroup& applier::contactgroup::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load contactgroup applier singleton.
- */
-void applier::contactgroup::load() {
-  if (!_instance)
-    _instance = new applier::contactgroup;
-}
-
-/**
- *  Unload contactgroup applier singleton.
- */
-void applier::contactgroup::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::contactgroup::contactgroup() {
+applier::contactgroup::contactgroup() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::contactgroup::contactgroup(
+                         applier::contactgroup const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::contactgroup::~contactgroup() throw () {
+applier::contactgroup::~contactgroup() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::contactgroup& applier::contactgroup::operator=(
+                         applier::contactgroup const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -81,7 +65,7 @@ applier::contactgroup::~contactgroup() throw () {
  *
  *  @param[in] obj The new contactgroup to add into the monitoring engine.
  */
-void applier::contactgroup::_add_object(contactgroup_ptr obj) {
+void applier::contactgroup::add_object(contactgroup_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new contactgroup '"
@@ -103,6 +87,8 @@ void applier::contactgroup::_add_object(contactgroup_ptr obj) {
   g->next = contactgroup_list;
   applier::state::instance().contactgroups()[obj->contactgroup_name()] = g;
   contactgroup_list = g.get();
+
+  return ;
 }
 
 /**
@@ -110,7 +96,7 @@ void applier::contactgroup::_add_object(contactgroup_ptr obj) {
  *
  *  @param[in] obj The new contactgroup to modify into the monitoring engine.
  */
-void applier::contactgroup::_modify_object(contactgroup_ptr obj) {
+void applier::contactgroup::modify_object(contactgroup_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying contactgroup '" << obj->contactgroup_name() << "'.";
@@ -128,7 +114,7 @@ void applier::contactgroup::_modify_object(contactgroup_ptr obj) {
  *
  *  @param[in] obj The new contactgroup to remove from the monitoring engine.
  */
-void applier::contactgroup::_remove_object(contactgroup_ptr obj) {
+void applier::contactgroup::remove_object(contactgroup_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing contactgroup '" << obj->contactgroup_name() << "'.";
@@ -138,4 +124,19 @@ void applier::contactgroup::_remove_object(contactgroup_ptr obj) {
     &contactgroup_list,
     obj->contactgroup_name().c_str());
   applier::state::instance().contactgroups().erase(obj->contactgroup_name());
+}
+
+/**
+ *  Resolve contactgroup.
+ *
+ *  @param[in] obj Contactgroup object.
+ */
+void applier::contactgroup::resolve_object(contactgroup_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving contactgroup '" << obj->contactgroup_name() << "'.";
+
+  // XXX
+
+  return ;
 }

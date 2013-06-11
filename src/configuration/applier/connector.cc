@@ -24,54 +24,36 @@
 
 using namespace com::centreon::engine::configuration;
 
-static applier::connector* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::connector::apply(configuration::state const& config) {
-  _diff(::config->connectors(), config.connectors());
-}
-
-/**
- *  Get the singleton instance of connector applier.
- *
- *  @return Singleton instance.
- */
-applier::connector& applier::connector::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load connector applier singleton.
- */
-void applier::connector::load() {
-  if (!_instance)
-    _instance = new applier::connector;
-}
-
-/**
- *  Unload connector applier singleton.
- */
-void applier::connector::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::connector::connector() {
+applier::connector::connector() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::connector::connector(applier::connector const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::connector::~connector() throw () {
+applier::connector::~connector() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::connector& applier::connector::operator=(
+                      applier::connector const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,11 +61,14 @@ applier::connector::~connector() throw () {
  *
  *  @param[in] obj The new connector to add into the monitoring engine.
  */
-void applier::connector::_add_object(connector_ptr obj) {
+void applier::connector::add_object(connector_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new connector '" << obj->connector_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -91,11 +76,14 @@ void applier::connector::_add_object(connector_ptr obj) {
  *
  *  @param[in] obj The new connector to modify into the monitoring engine.
  */
-void applier::connector::_modify_object(connector_ptr obj) {
+void applier::connector::modify_object(connector_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying connector '" << obj->connector_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -103,9 +91,27 @@ void applier::connector::_modify_object(connector_ptr obj) {
  *
  *  @param[in] obj The new connector to remove from the monitoring engine.
  */
-void applier::connector::_remove_object(connector_ptr obj) {
+void applier::connector::remove_object(connector_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing connector '" << obj->connector_name() << "'.";
 
+  // XXX
+
+  return ;
+}
+
+/**
+ *  Resolve a connector.
+ *
+ *  @param[in] obj Connector object.
+ */
+void applier::connector::resolve_object(connector_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving connector '" << obj->connector_name() << "'.";
+
+  // XXX
+
+  return ;
 }

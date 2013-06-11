@@ -20,8 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/hostgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,23 +27,16 @@ CCE_BEGIN()
 
 namespace               configuration {
   namespace             applier {
-    class               hostgroup
-      : public base,
-        public object<configuration::hostgroup> {
+    class               hostgroup {
     public:
-      void              apply(state const& config);
-      static hostgroup& instance();
-      static void       load();
-      static void       unload();
-
-    private:
                         hostgroup();
-                        hostgroup(hostgroup const&);
+                        hostgroup(hostgroup const& right);
                         ~hostgroup() throw ();
-      hostgroup&        operator=(hostgroup const&);
-      void              _add_object(hostgroup_ptr obj);
-      void              _modify_object(hostgroup_ptr obj);
-      void              _remove_object(hostgroup_ptr obj);
+      hostgroup&        operator=(hostgroup const& right);
+      void              add_object(hostgroup_ptr obj);
+      void              modify_object(hostgroup_ptr obj);
+      void              remove_object(hostgroup_ptr obj);
+      void              resolve_object(hostgroup_ptr obj);
     };
   }
 }

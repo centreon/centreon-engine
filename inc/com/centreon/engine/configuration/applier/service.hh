@@ -20,8 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICE_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICE_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,23 +27,16 @@ CCE_BEGIN()
 
 namespace             configuration {
   namespace           applier {
-    class             service
-      : public base,
-        public object<configuration::service> {
+    class             service {
     public:
-      void            apply(state const& config);
-      static service& instance();
-      static void     load();
-      static void     unload();
-
-    private:
                       service();
-                      service(service const&);
+                      service(service const& right);
                       ~service() throw ();
-      service&        operator=(service const&);
-      void            _add_object(service_ptr obj);
-      void            _modify_object(service_ptr obj);
-      void            _remove_object(service_ptr obj);
+      service&        operator=(service const& right);
+      void            add_object(service_ptr obj);
+      void            modify_object(service_ptr obj);
+      void            remove_object(service_ptr obj);
+      void            resolve_object(service_ptr obj);
     };
   }
 }
