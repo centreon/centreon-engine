@@ -29,6 +29,8 @@
 #  include "com/centreon/engine/shared.hh"
 #  include "com/centreon/shared_ptr.hh"
 
+#  define NULL_IF_EMPTY(str) ((str).empty() ? NULL : (str).c_str())
+
 CCE_BEGIN()
 
 namespace          configuration {

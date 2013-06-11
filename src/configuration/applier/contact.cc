@@ -89,16 +89,15 @@ void applier::contact::add_object(contact_ptr obj) {
 
   // Create contact.
   shared_ptr<contact_struct> c;
-  memset(c.get(), 0, sizeof(*c));
   c = shared_ptr<contact_struct>(
         add_contact(
           obj->contact_name().c_str(),
-          obj->alias().c_str(),
-          obj->email().c_str(),
-          obj->pager().c_str(),
+          NULL_IF_EMPTY(obj->alias()),
+          NULL_IF_EMPTY(obj->email()),
+          NULL_IF_EMPTY(obj->pager()),
           addresses,
-          obj->service_notification_period().c_str(),
-          obj->host_notification_period().c_str(),
+          NULL_IF_EMPTY(obj->service_notification_period()),
+          NULL_IF_EMPTY(obj->host_notification_period()),
           static_cast<bool>(
             obj->service_notification_options() & service::ok),
           static_cast<bool>(
@@ -197,63 +196,63 @@ void applier::contact::modify_object(contact_ptr obj) {
   // Modify command.
   shared_ptr<contact_struct>&
     c(applier::state::instance().contacts()[obj->contact_name()]);
-  modify_if_different(c->alias, obj->alias().c_str());
-  modify_if_different(c->email, obj->email().c_str());
-  modify_if_different(c->pager, obj->pager().c_str());
+  modify_if_different(c->alias, NULL_IF_EMPTY(obj->alias()));
+  modify_if_different(c->email, NULL_IF_EMPTY(obj->email()));
+  modify_if_different(c->pager, NULL_IF_EMPTY(obj->pager()));
   modify_if_different(
     c->address,
     obj->address(),
     MAX_CONTACT_ADDRESSES);
   modify_if_different(
     c->notify_on_service_unknown,
-    static_cast<int>(
-      obj->service_notification_options() & service::unknown));
+    static_cast<int>(static_cast<bool>(
+      obj->service_notification_options() & service::unknown)));
   modify_if_different(
     c->notify_on_service_warning,
-    static_cast<int>(
-      obj->service_notification_options() & service::warning));
+    static_cast<int>(static_cast<bool>(
+      obj->service_notification_options() & service::warning)));
   modify_if_different(
     c->notify_on_service_critical,
-    static_cast<int>(
-      obj->service_notification_options() & service::critical));
+    static_cast<int>(static_cast<bool>(
+      obj->service_notification_options() & service::critical)));
   modify_if_different(
     c->notify_on_service_recovery,
-    static_cast<int>(
-      obj->service_notification_options() & service::recovery));
+    static_cast<int>(static_cast<bool>(
+      obj->service_notification_options() & service::recovery)));
   modify_if_different(
     c->notify_on_service_flapping,
-    static_cast<int>(
-      obj->service_notification_options() & service::flapping));
+    static_cast<int>(static_cast<bool>(
+      obj->service_notification_options() & service::flapping)));
   modify_if_different(
     c->notify_on_service_downtime,
-    static_cast<int>(
-      obj->service_notification_options() & service::downtime));
+    static_cast<int>(static_cast<bool>(
+      obj->service_notification_options() & service::downtime)));
   modify_if_different(
     c->notify_on_host_down,
-    static_cast<int>(
-      obj->host_notification_options() & host::down));
+    static_cast<int>(static_cast<bool>(
+      obj->host_notification_options() & host::down)));
   modify_if_different(
     c->notify_on_host_unreachable,
-    static_cast<int>(
-      obj->host_notification_options() & host::unreachable));
+    static_cast<int>(static_cast<bool>(
+      obj->host_notification_options() & host::unreachable)));
   modify_if_different(
     c->notify_on_host_recovery,
-    static_cast<int>(
-      obj->host_notification_options() & host::recovery));
+    static_cast<int>(static_cast<bool>(
+      obj->host_notification_options() & host::recovery)));
   modify_if_different(
     c->notify_on_host_flapping,
-    static_cast<int>(
-      obj->host_notification_options() & host::flapping));
+    static_cast<int>(static_cast<bool>(
+      obj->host_notification_options() & host::flapping)));
   modify_if_different(
     c->notify_on_host_downtime,
-    static_cast<int>(
-      obj->host_notification_options() & host::downtime));
+    static_cast<int>(static_cast<bool>(
+      obj->host_notification_options() & host::downtime)));
   modify_if_different(
     c->host_notification_period,
-    obj->host_notification_period().c_str());
+    NULL_IF_EMPTY(obj->host_notification_period()));
   modify_if_different(
     c->service_notification_period,
-    obj->service_notification_period().c_str());
+    NULL_IF_EMPTY(obj->service_notification_period()));
   modify_if_different(
     c->host_notifications_enabled,
     static_cast<int>(obj->host_notifications_enabled()));
@@ -357,11 +356,9 @@ void applier::contact::remove_object(contact_ptr obj) {
     << "Removing contact '" << obj->contact_name() << "'.";
 
   // Unregister contact.
-  for (contact_struct** cs(&contact_list); *cs; cs = &(*cs)->next)
-    if (!strcmp((*cs)->name, obj->contact_name().c_str())) {
-      (*cs) = (*cs)->next;
-      break ;
-    }
+  unregister_object<contact_struct, &contact_struct::name>(
+    &contact_list,
+    obj->contact_name().c_str());
   applier::state::instance().contacts().erase(obj->contact_name());
 
   return ;
@@ -381,12 +378,13 @@ void applier::contact::resolve_object(contact_ptr obj) {
   umap<std::string, shared_ptr<contact_struct> >::iterator
     it(applier::state::instance().contacts().find(obj->contact_name()));
   if (applier::state::instance().contacts().end() == it)
-    throw (engine_error() << "Cannot resolve non-existing contact '"
+    throw (engine_error()
+           << "Error: Cannot resolve non-existing contact '"
            << obj->contact_name() << "'.");
 
   // Resolve contact.
   if (!check_contact(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Cannot resolve contact '"
+    throw (engine_error() << "Error: Cannot resolve contact '"
            << obj->contact_name());
 
   return ;
