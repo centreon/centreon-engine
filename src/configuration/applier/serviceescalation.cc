@@ -24,54 +24,37 @@
 
 using namespace com::centreon::engine::configuration;
 
-static applier::serviceescalation* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::serviceescalation::apply(configuration::state const& config) {
-  _diff(::config->serviceescalations(), config.serviceescalations());
-}
-
-/**
- *  Get the singleton instance of serviceescalation applier.
- *
- *  @return Singleton instance.
- */
-applier::serviceescalation& applier::serviceescalation::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load serviceescalation applier singleton.
- */
-void applier::serviceescalation::load() {
-  if (!_instance)
-    _instance = new applier::serviceescalation;
-}
-
-/**
- *  Unload serviceescalation applier singleton.
- */
-void applier::serviceescalation::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::serviceescalation::serviceescalation() {
+applier::serviceescalation::serviceescalation() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::serviceescalation::serviceescalation(
+                              applier::serviceescalation const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::serviceescalation::~serviceescalation() throw () {
+applier::serviceescalation::~serviceescalation() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::serviceescalation& applier::serviceescalation::operator=(
+                              applier::serviceescalation const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,8 +62,8 @@ applier::serviceescalation::~serviceescalation() throw () {
  *
  *  @param[in] obj The new serviceescalation to add into the monitoring engine.
  */
-void applier::serviceescalation::_add_object(serviceescalation_ptr obj) {
-
+void applier::serviceescalation::add_object(serviceescalation_ptr obj) {
+  // XXX
 }
 
 /**
@@ -88,8 +71,8 @@ void applier::serviceescalation::_add_object(serviceescalation_ptr obj) {
  *
  *  @param[in] obj The new serviceescalation to modify into the monitoring engine.
  */
-void applier::serviceescalation::_modify_object(serviceescalation_ptr obj) {
-
+void applier::serviceescalation::modify_object(serviceescalation_ptr obj) {
+  // XXX
 }
 
 /**
@@ -97,6 +80,15 @@ void applier::serviceescalation::_modify_object(serviceescalation_ptr obj) {
  *
  *  @param[in] obj The new serviceescalation to remove from the monitoring engine.
  */
-void applier::serviceescalation::_remove_object(serviceescalation_ptr obj) {
+void applier::serviceescalation::remove_object(serviceescalation_ptr obj) {
+  // XXX
+}
 
+/**
+ *  Resolve a serviceescalation.
+ *
+ *  @param[in] obj Serviceescalation object.
+ */
+void applier::serviceescalation::resolve_object(serviceescalation_ptr obj) {
+  // XXX
 }

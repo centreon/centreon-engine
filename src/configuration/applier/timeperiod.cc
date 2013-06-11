@@ -19,59 +19,40 @@
 
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::timeperiod* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::timeperiod::apply(configuration::state const& config) {
-  _diff(::config->timeperiods(), config.timeperiods());
-}
-
-/**
- *  Get the singleton instance of timeperiod applier.
- *
- *  @return Singleton instance.
- */
-applier::timeperiod& applier::timeperiod::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load timeperiod applier singleton.
- */
-void applier::timeperiod::load() {
-  if (!_instance)
-    _instance = new applier::timeperiod;
-}
-
-/**
- *  Unload timeperiod applier singleton.
- */
-void applier::timeperiod::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::timeperiod::timeperiod() {
+applier::timeperiod::timeperiod() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::timeperiod::timeperiod(applier::timeperiod const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::timeperiod::~timeperiod() throw () {
+applier::timeperiod::~timeperiod() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::timeperiod& applier::timeperiod::operator=(
+                       applier::timeperiod const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,11 +60,14 @@ applier::timeperiod::~timeperiod() throw () {
  *
  *  @param[in] obj The new timeperiod to add into the monitoring engine.
  */
-void applier::timeperiod::_add_object(timeperiod_ptr obj) {
+void applier::timeperiod::add_object(timeperiod_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new timeperiod '" << obj->timeperiod_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -91,11 +75,14 @@ void applier::timeperiod::_add_object(timeperiod_ptr obj) {
  *
  *  @param[in] obj The new timeperiod to modify into the monitoring engine.
  */
-void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
+void applier::timeperiod::modify_object(timeperiod_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying timeperiod '" << obj->timeperiod_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -103,7 +90,7 @@ void applier::timeperiod::_modify_object(timeperiod_ptr obj) {
  *
  *  @param[in] obj The new timeperiod to remove from the monitoring engine.
  */
-void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
+void applier::timeperiod::remove_object(timeperiod_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing timeperiod '" << obj->timeperiod_name() << "'.";
@@ -113,4 +100,18 @@ void applier::timeperiod::_remove_object(timeperiod_ptr obj) {
     &timeperiod_list,
     obj->timeperiod_name().c_str());
   applier::state::instance().timeperiods().erase(obj->timeperiod_name());
+
+  return ;
+}
+
+/**
+ *  Resolve a timeperiod.
+ *
+ *  @param[in] obj Timeperiod object.
+ */
+void applier::timeperiod::resolve_object(timeperiod_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving timeperiod '" << obj->timeperiod_name() << "'.";
+  return ;
 }

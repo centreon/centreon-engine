@@ -19,59 +19,43 @@
 
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
 
-static applier::servicegroup* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::servicegroup::apply(configuration::state const& config) {
-  _diff(::config->servicegroups(), config.servicegroups());
-}
-
-/**
- *  Get the singleton instance of servicegroup applier.
- *
- *  @return Singleton instance.
- */
-applier::servicegroup& applier::servicegroup::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load servicegroup applier singleton.
- */
-void applier::servicegroup::load() {
-  if (!_instance)
-    _instance = new applier::servicegroup;
-}
-
-/**
- *  Unload servicegroup applier singleton.
- */
-void applier::servicegroup::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::servicegroup::servicegroup() {
+applier::servicegroup::servicegroup() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::servicegroup::servicegroup(
+                         applier::servicegroup const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::servicegroup::~servicegroup() throw () {
+applier::servicegroup::~servicegroup() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::servicegroup& applier::servicegroup::operator=(
+                         applier::servicegroup const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,23 +63,29 @@ applier::servicegroup::~servicegroup() throw () {
  *
  *  @param[in] obj The new servicegroup to add into the monitoring engine.
  */
-void applier::servicegroup::_add_object(servicegroup_ptr obj) {
+void applier::servicegroup::add_object(servicegroup_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
- *  Modified servicegroup.
+ *  Modify servicegroup.
  *
  *  @param[in] obj The new servicegroup to modify into the monitoring engine.
  */
-void applier::servicegroup::_modify_object(servicegroup_ptr obj) {
+void applier::servicegroup::modify_object(servicegroup_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
 
+  // XXX
+
+  return ;
 }
 
 /**
@@ -103,7 +93,7 @@ void applier::servicegroup::_modify_object(servicegroup_ptr obj) {
  *
  *  @param[in] obj The new servicegroup to remove from the monitoring engine.
  */
-void applier::servicegroup::_remove_object(servicegroup_ptr obj) {
+void applier::servicegroup::remove_object(servicegroup_ptr obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
@@ -113,4 +103,21 @@ void applier::servicegroup::_remove_object(servicegroup_ptr obj) {
     &servicegroup_list,
     obj->servicegroup_name().c_str());
   applier::state::instance().servicegroups().erase(obj->servicegroup_name());
+
+  return ;
+}
+
+/**
+ *  Resolve a servicegroup.
+ *
+ *  @param[in] obj Servicegroup object.
+ */
+void applier::servicegroup::resolve_object(servicegroup_ptr obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving servicegroup '" << obj->servicegroup_name() << "'.";
+
+  // XXX
+
+  return ;
 }

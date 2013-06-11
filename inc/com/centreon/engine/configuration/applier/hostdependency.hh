@@ -20,32 +20,23 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                    configuration {
-  namespace                  applier {
-    class                    hostdependency
-      : public base,
-        public object<configuration::hostdependency> {
+namespace             configuration {
+  namespace           applier {
+    class             hostdependency {
     public:
-      void                   apply(state const& config);
-      static hostdependency& instance();
-      static void            load();
-      static void            unload();
-
-    private:
-                             hostdependency();
-                             hostdependency(hostdependency const&);
-                             ~hostdependency() throw ();
-      hostdependency&        operator=(hostdependency const&);
-      void                   _add_object(hostdependency_ptr obj);
-      void                   _modify_object(hostdependency_ptr obj);
-      void                   _remove_object(hostdependency_ptr obj);
+                      hostdependency();
+                      hostdependency(hostdependency const& right);
+                      ~hostdependency() throw ();
+      hostdependency& operator=(hostdependency const& right);
+      void            add_object(hostdependency_ptr obj);
+      void            modify_object(hostdependency_ptr obj);
+      void            remove_object(hostdependency_ptr obj);
+      void            resolve_object(hostdependency_ptr obj);
     };
   }
 }

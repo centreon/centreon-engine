@@ -20,32 +20,24 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICEESCALATION_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICEESCALATION_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/serviceescalation.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                       configuration {
-  namespace                     applier {
-    class                       serviceescalation
-      : public base,
-        public object<configuration::serviceescalation> {
+namespace                configuration {
+  namespace              applier {
+    class                serviceescalation {
     public:
-      void                      apply(state const& config);
-      static serviceescalation& instance();
-      static void               load();
-      static void               unload();
-
-    private:
-                                serviceescalation();
-                                serviceescalation(serviceescalation const&);
-                                ~serviceescalation() throw ();
-      serviceescalation&        operator=(serviceescalation const&);
-      void                      _add_object(serviceescalation_ptr obj);
-      void                      _modify_object(serviceescalation_ptr obj);
-      void                      _remove_object(serviceescalation_ptr obj);
+                         serviceescalation();
+                         serviceescalation(
+                           serviceescalation const& right);
+                         ~serviceescalation() throw ();
+      serviceescalation& operator=(serviceescalation const& right);
+      void               add_object(serviceescalation_ptr obj);
+      void               modify_object(serviceescalation_ptr obj);
+      void               remove_object(serviceescalation_ptr obj);
+      void               resolve_object(serviceescalation_ptr obj);
     };
   }
 }

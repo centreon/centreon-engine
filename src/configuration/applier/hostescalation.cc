@@ -24,54 +24,37 @@
 
 using namespace com::centreon::engine::configuration;
 
-static applier::hostescalation* _instance = NULL;
-
-/**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::hostescalation::apply(configuration::state const& config) {
-  _diff(::config->hostescalations(), config.hostescalations());
-}
-
-/**
- *  Get the singleton instance of hostescalation applier.
- *
- *  @return Singleton instance.
- */
-applier::hostescalation& applier::hostescalation::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load hostescalation applier singleton.
- */
-void applier::hostescalation::load() {
-  if (!_instance)
-    _instance = new applier::hostescalation;
-}
-
-/**
- *  Unload hostescalation applier singleton.
- */
-void applier::hostescalation::unload() {
-  delete _instance;
-  _instance = NULL;
-}
-
 /**
  *  Default constructor.
  */
-applier::hostescalation::hostescalation() {
+applier::hostescalation::hostescalation() {}
 
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+applier::hostescalation::hostescalation(
+                           applier::hostescalation const& right) {
+  (void)right;
 }
 
 /**
  *  Destructor.
  */
-applier::hostescalation::~hostescalation() throw () {
+applier::hostescalation::~hostescalation() throw () {}
 
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+applier::hostescalation& applier::hostescalation::operator=(
+                           applier::hostescalation const& right) {
+  (void)right;
+  return (*this);
 }
 
 /**
@@ -79,8 +62,8 @@ applier::hostescalation::~hostescalation() throw () {
  *
  *  @param[in] obj The new hostescalation to add into the monitoring engine.
  */
-void applier::hostescalation::_add_object(hostescalation_ptr obj) {
-
+void applier::hostescalation::add_object(hostescalation_ptr obj) {
+  // XXX
 }
 
 /**
@@ -88,8 +71,8 @@ void applier::hostescalation::_add_object(hostescalation_ptr obj) {
  *
  *  @param[in] obj The new hostescalation to modify into the monitoring engine.
  */
-void applier::hostescalation::_modify_object(hostescalation_ptr obj) {
-
+void applier::hostescalation::modify_object(hostescalation_ptr obj) {
+  // XXX
 }
 
 /**
@@ -97,6 +80,15 @@ void applier::hostescalation::_modify_object(hostescalation_ptr obj) {
  *
  *  @param[in] obj The new hostescalation to remove from the monitoring engine.
  */
-void applier::hostescalation::_remove_object(hostescalation_ptr obj) {
+void applier::hostescalation::remove_object(hostescalation_ptr obj) {
+  // XXX
+}
 
+/**
+ *  Resolve a hostescalation.
+ *
+ *  @param[in] obj Hostescalation object.
+ */
+void applier::hostescalation::resolve_object(hostescalation_ptr obj) {
+  // XXX
 }

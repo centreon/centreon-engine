@@ -20,8 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_CONNECTOR_HH
 #  define CCE_CONFIGURATION_APPLIER_CONNECTOR_HH
 
-#  include "com/centreon/engine/configuration/applier/base.hh"
-#  include "com/centreon/engine/configuration/applier/object.hh"
 #  include "com/centreon/engine/configuration/connector.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -29,23 +27,16 @@ CCE_BEGIN()
 
 namespace               configuration {
   namespace             applier {
-    class               connector
-      : public base,
-        public object<configuration::connector> {
+    class               connector {
     public:
-      void              apply(state const& config);
-      static connector& instance();
-      static void       load();
-      static void       unload();
-
-    private:
                         connector();
-                        connector(connector const&);
+                        connector(connector const& right);
                         ~connector() throw ();
-      connector&        operator=(connector const&);
-      void              _add_object(connector_ptr obj);
-      void              _modify_object(connector_ptr obj);
-      void              _remove_object(connector_ptr obj);
+      connector&        operator=(connector const& right);
+      void              add_object(connector_ptr obj);
+      void              modify_object(connector_ptr obj);
+      void              remove_object(connector_ptr obj);
+      void              resolve_object(connector_ptr obj);
     };
   }
 }
