@@ -944,38 +944,6 @@ int number_of_total_child_hosts(host* hst);
 int number_of_total_parent_hosts(host* hst);
 
 /*
-** Object traversal functions.
-*/
-hostdependency*    get_first_host_dependency_by_dependent_host(
-                     char const* host_name,
-                     void** ptr);
-hostescalation*    get_first_host_escalation_by_host(
-                     char const* host_name,
-                     void** ptr);
-servicedependency* get_first_service_dependency_by_dependent_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr);
-serviceescalation* get_first_service_escalation_by_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr);
-hostdependency*    get_next_host_dependency_by_dependent_host(
-                     char const* host_name,
-                     void** ptr);
-hostescalation*    get_next_host_escalation_by_host(
-                     char const* host_name,
-                     void** ptr);
-servicedependency* get_next_service_dependency_by_dependent_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr);
-serviceescalation* get_next_service_escalation_by_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr);
-
-/*
 ** Object query functions.
 */
 /* Tests whether or not a contact is a contact member for a specific host. */

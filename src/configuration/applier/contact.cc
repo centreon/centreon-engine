@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
@@ -133,7 +134,7 @@ void applier::contact::_add_object(contact_ptr obj) {
            << obj->contact_name() << "'.");
 
   // Add all the host notification commands.
-  for (tab_string::const_iterator
+  for (list_string::const_iterator
          it(obj->host_notification_commands().begin()),
          end(obj->host_notification_commands().end());
        it != end;
@@ -146,7 +147,7 @@ void applier::contact::_add_object(contact_ptr obj) {
              << *it << "' to contact '" << obj->contact_name() << "'.");
 
   // Add all the service notification commands.
-  for (tab_string::const_iterator
+  for (list_string::const_iterator
 	 it(obj->service_notification_commands().begin()),
 	 end(obj->service_notification_commands().end());
        it != end;

@@ -37,6 +37,15 @@ namespace misc {
     std::istringstream iss(str);
     return ((iss >> data) && iss.eof());
   }
+  template<typename T, typename U>
+  bool                    to(std::string const& str, U& data) {
+    T tmp;
+    std::istringstream iss(str);
+    if ((iss >> tmp) && iss.eof())
+      return (false);
+    data = static_cast<U>(tmp);
+    return (true);
+  }
   std::string&            trim(std::string& str) throw ();
   std::string&            trim_left(std::string& str) throw ();
   std::string&            trim_right(std::string& str) throw ();

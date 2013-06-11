@@ -31,6 +31,7 @@
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -45,7 +46,9 @@
 
 #define MAX_CMD_ARGS 4096
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -217,14 +220,12 @@ int handle_async_service_check_result(
   int state_was_logged = FALSE;
   char* old_plugin_output = NULL;
   char* temp_ptr = NULL;
-  servicedependency* temp_dependency = NULL;
   objectlist* check_servicelist = NULL;
   objectlist* servicelist_item = NULL;
   service* master_service = NULL;
   int run_async_check = TRUE;
   int state_changes_use_cached_state = TRUE;    /* TODO - 09/23/07 move this to a global variable */
   int flapping_check_done = FALSE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "handle_async_service_check_result()";
@@ -983,9 +984,16 @@ int handle_async_service_check_result(
 
         /* check services that THIS ONE depends on for notification AND execution */
         /* we do this because we might be sending out a notification soon and we want the dependency logic to be accurate */
-        for (temp_dependency = get_first_service_dependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr);
-             temp_dependency != NULL;
-             temp_dependency = get_next_service_dependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr)) {
+        std::pair<std::string, std::string>
+          id(std::make_pair(temp_service->host_name, temp_service->description));
+        umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> > const&
+          dependencies(state::instance().servicedependencies());
+        for (umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >::const_iterator
+               it(dependencies.find(id)), end(dependencies.end());
+             it != end && it->first == id;
+             ++it) {
+          servicedependency* temp_dependency(&*it->second);
+
           if (temp_dependency->dependent_service_ptr == temp_service
               && temp_dependency->master_service_ptr != NULL) {
             master_service = (service*)temp_dependency->master_service_ptr;
@@ -1418,19 +1426,22 @@ int check_service_check_viability(
 unsigned int check_service_dependencies(
                service* svc,
                int dependency_type) {
-  servicedependency* temp_dependency = NULL;
   service* temp_service = NULL;
   int state = STATE_OK;
   time_t current_time = 0L;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "check_service_dependencies()";
 
-  /* check all dependencies... */
-  for (temp_dependency = get_first_service_dependency_by_dependent_service(svc->host_name, svc->description, &ptr);
-       temp_dependency != NULL;
-       temp_dependency = get_next_service_dependency_by_dependent_service(svc->host_name, svc->description, &ptr)) {
+  std::pair<std::string, std::string>
+    id(svc->host_name, svc->description);
+  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> > const&
+    dependencies(state::instance().servicedependencies());
+  for (umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >::const_iterator
+         it(dependencies.find(id)), end(dependencies.end());
+       it != end && it->first == id;
+       ++it) {
+    servicedependency* temp_dependency(&*it->second);
 
     /* only check dependencies of the desired type (notification or execution) */
     if (temp_dependency->dependency_type != dependency_type)
@@ -1900,19 +1911,23 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 
 /* checks host dependencies */
 unsigned int check_host_dependencies(host* hst, int dependency_type) {
-  hostdependency* temp_dependency = NULL;
   host* temp_host = NULL;
   int state = HOST_UP;
   time_t current_time = 0L;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "check_host_dependencies()";
 
+  std::string id(hst->name);
+  umultimap<std::string, shared_ptr<hostdependency> > const&
+    dependencies(state::instance().hostdependencies());
+
   /* check all dependencies... */
-  for (temp_dependency = get_first_host_dependency_by_dependent_host(hst->name, &ptr);
-       temp_dependency != NULL;
-       temp_dependency = get_next_host_dependency_by_dependent_host(hst->name, &ptr)) {
+  for (umultimap<std::string, shared_ptr<hostdependency> >::const_iterator
+         it(dependencies.find(id)), end(dependencies.end());
+       it != end && it->first == id;
+       ++it) {
+         hostdependency* temp_dependency(&*it->second);
 
     /* only check dependencies of the desired type (notification or execution) */
     if (temp_dependency->dependency_type != dependency_type)
@@ -2705,7 +2720,6 @@ int process_host_check_result_3x(
   host* parent_host = NULL;
   host* master_host = NULL;
   host* temp_host = NULL;
-  hostdependency* temp_dependency = NULL;
   objectlist* check_hostlist = NULL;
   objectlist* hostlist_item = NULL;
   int parent_state = HOST_UP;
@@ -2714,7 +2728,6 @@ int process_host_check_result_3x(
   time_t preferred_time = 0L;
   time_t next_valid_time = 0L;
   int run_async_check = TRUE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "process_host_check_result_3x()";
@@ -3110,9 +3123,14 @@ int process_host_check_result_3x(
             << "Propagating predictive dependency checks to hosts this "
             "one depends on...";
 
-          for (temp_dependency = get_first_host_dependency_by_dependent_host(hst->name, &ptr);
-               temp_dependency != NULL;
-               temp_dependency = get_next_host_dependency_by_dependent_host(hst->name, &ptr)) {
+          std::string id(hst->name);
+          umultimap<std::string, shared_ptr<hostdependency> > const&
+            dependencies(state::instance().hostdependencies());
+          for (umultimap<std::string, shared_ptr<hostdependency> >::const_iterator
+                 it(dependencies.find(id)), end(dependencies.end());
+                 it != end && it->first == id;
+                 ++it) {
+            hostdependency* temp_dependency(&*it->second);
             if (temp_dependency->dependent_host_ptr == hst
                 && temp_dependency->master_host_ptr != NULL) {
               master_host = (host*)temp_dependency->master_host_ptr;

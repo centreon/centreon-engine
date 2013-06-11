@@ -735,6 +735,7 @@ add_subdirectory("logging")
 add_subdirectory("macros")
 add_subdirectory("misc")
 add_subdirectory("modules")
+add_subdirectory("retention")
 add_subdirectory("scripts")
 
 # Link target with required libraries.

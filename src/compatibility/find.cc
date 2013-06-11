@@ -168,3 +168,143 @@ timeperiod* find_timeperiod(char const* name) {
     return (&(*it->second));
   return (NULL);
 }
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]  host_name Unused.
+ *  @param[out] ptr       Unused.
+ *
+ *  @return NULL.
+ */
+hostdependency* get_first_host_dependency_by_dependent_host(
+                  char const* host_name,
+                  void** ptr) {
+  (void)host_name;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]  host_name Unused.
+ *  @param[out] ptr       Unused.
+ *
+ *  @return NULL.
+ */
+hostescalation* get_first_host_escalation_by_host(
+                  char const* host_name,
+                  void** ptr) {
+  (void)host_name;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]  host_name       Unused.
+ *  @param[in]  svc_description Unused.
+ *  @param[out] ptr             Unused.
+ *
+ *  @return NULL.
+ */
+servicedependency* get_first_service_dependency_by_dependent_service(
+                     char const* host_name,
+                     char const* svc_description,
+                     void** ptr) {
+  (void)host_name;
+  (void)svc_description;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]  host_name       Unused.
+ *  @param[in]  svc_description Unused.
+ *  @param[out] ptr             Unused.
+ *
+ *  @return NULL.
+ */
+serviceescalation* get_first_service_escalation_by_service(
+                     char const* host_name,
+                     char const* svc_description,
+                     void** ptr) {
+  (void)host_name;
+  (void)svc_description;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]     host_name Unused.
+ *  @param[in,out] ptr       Unused.
+ *
+ *  @return NULL.
+ */
+hostdependency* get_next_host_dependency_by_dependent_host(
+                  char const* host_name,
+                  void** ptr) {
+  (void)host_name;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]     host_name Unused.
+ *  @param[in,out] ptr       Unused.
+ *
+ *  @return NULL.
+ */
+hostescalation* get_next_host_escalation_by_host(
+                  char const* host_name,
+                  void** ptr) {
+  (void)host_name;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]     host_name       Unused.
+ *  @param[in]     svc_description Unused.
+ *  @param[in,out] ptr             Unused.
+ *
+ *  @return NULL.
+ */
+servicedependency* get_next_service_dependency_by_dependent_service(
+                     char const* host_name,
+                     char const* svc_description,
+                     void** ptr) {
+  (void)host_name;
+  (void)svc_description;
+  (void)ptr;
+  return (NULL);
+}
+
+/**
+ *  Deprecated function.
+ *
+ *  @param[in]     host_name       Unused.
+ *  @param[in]     svc_description Unused.
+ *  @param[in,out] ptr             Unused.
+ *
+ *  @return NULL
+ */
+serviceescalation* get_next_service_escalation_by_service(
+                     char const* host_name,
+                     char const* svc_description,
+                     void** ptr) {
+  (void)host_name;
+  (void)svc_description;
+  (void)ptr;
+  return (NULL);
+}

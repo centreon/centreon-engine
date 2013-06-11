@@ -20,6 +20,7 @@
 */
 
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
@@ -28,6 +29,8 @@
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 static char const* tab_notification_str[] = {
@@ -1145,17 +1148,19 @@ int is_valid_escalation_for_service_notification(
 
 /* checks to see whether a service notification should be escalation */
 int should_service_notification_be_escalated(service* svc) {
-  serviceescalation* temp_se = NULL;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "should_service_notification_be_escalated()";
 
-  /* search the service escalation list */
-  for (temp_se = get_first_service_escalation_by_service(svc->host_name, svc->description, &ptr);
-       temp_se != NULL;
-       temp_se = get_next_service_escalation_by_service(svc->host_name, svc->description, &ptr)) {
-
+  std::pair<std::string, std::string>
+    id(std::make_pair(svc->host_name, svc->description));
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
+    escalations(state::instance().serviceescalations());
+  for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
+         it(escalations.find(id)), end(escalations.end());
+       it != end && it->first == id;
+       ++it) {
+    serviceescalation* temp_se(&*it->second);
     /* we found a matching entry, so escalate this notification! */
     if (is_valid_escalation_for_service_notification(
           svc,
@@ -1177,13 +1182,11 @@ int create_notification_list_from_service(
       nagios_macros* mac,
       service* svc, int options,
       int* escalated) {
-  serviceescalation* temp_se = NULL;
   contactsmember* temp_contactsmember = NULL;
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   int escalate_notification = FALSE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_service()";
@@ -1214,10 +1217,15 @@ int create_notification_list_from_service(
       << "Adding contacts from service escalation(s) to "
       "notification list.";
 
-    /* search all the escalation entries for valid matches */
-    for (temp_se = get_first_service_escalation_by_service(svc->host_name, svc->description, &ptr);
-         temp_se != NULL;
-         temp_se = get_next_service_escalation_by_service(svc->host_name, svc->description, &ptr)) {
+    std::pair<std::string, std::string>
+      id(std::make_pair(svc->host_name, svc->description));
+    umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
+      escalations(state::instance().serviceescalations());
+    for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
+           it(escalations.find(id)), end(escalations.end());
+         it != end && it->first == id;
+         ++it) {
+      serviceescalation* temp_se(&*it->second);
 
       /* skip this entry if it isn't appropriate */
       if (is_valid_escalation_for_service_notification(
@@ -2323,19 +2331,20 @@ int is_valid_escalation_for_host_notification(
 
 /* checks to see whether a host notification should be escalation */
 int should_host_notification_be_escalated(host* hst) {
-  hostescalation* temp_he = NULL;
-  void* ptr = NULL;
-
   logger(dbg_functions, basic)
     << "should_host_notification_be_escalated()";
 
   if (hst == NULL)
     return (FALSE);
 
-  /* search the host escalation list */
-  for (temp_he = get_first_host_escalation_by_host(hst->name, &ptr);
-       temp_he != NULL;
-       temp_he = get_next_host_escalation_by_host(hst->name, &ptr)) {
+  std::string id(hst->name);
+  umultimap<std::string, shared_ptr<hostescalation> > const&
+    escalations(state::instance().hostescalations());
+  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+         it(escalations.find(id)), end(escalations.end());
+       it != end && it->first == id;
+       ++it) {
+    hostescalation* temp_he(&*it->second);
 
     /* we found a matching entry, so escalate this notification! */
     if (is_valid_escalation_for_host_notification(
@@ -2357,13 +2366,11 @@ int create_notification_list_from_host(
       host* hst,
       int options,
       int* escalated) {
-  hostescalation* temp_he = NULL;
   contactsmember* temp_contactsmember = NULL;
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   int escalate_notification = FALSE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_host()";
@@ -2395,10 +2402,14 @@ int create_notification_list_from_host(
       << "Adding contacts from host escalation(s) to "
       "notification list.";
 
-    /* check all the host escalation entries */
-    for (temp_he = get_first_host_escalation_by_host(hst->name, &ptr);
-         temp_he != NULL;
-         temp_he = get_next_host_escalation_by_host(hst->name, &ptr)) {
+    std::string id(hst->name);
+    umultimap<std::string, shared_ptr<hostescalation> > const&
+      escalations(state::instance().hostescalations());
+    for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+           it(escalations.find(id)), end(escalations.end());
+         it != end && it->first == id;
+         ++it) {
+      hostescalation* temp_he(&*it->second);
 
       /* see if this escalation if valid for this notification */
       if (is_valid_escalation_for_host_notification(

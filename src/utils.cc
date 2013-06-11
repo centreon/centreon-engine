@@ -2383,9 +2383,6 @@ void cleanup() {
  *  @param[in,out] mac Macros.
  */
 void free_memory(nagios_macros* mac) {
-  // Free all allocated memory for the object definitions.
-  free_object_data();
-
   // Free memory allocated to comments.
   free_comment_data();
 
