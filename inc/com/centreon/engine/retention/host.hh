@@ -35,12 +35,16 @@ namespace        retention {
   public:
                  host(host_struct* obj = NULL);
                  ~host() throw ();
+    void         scheduling_info_is_ok(bool value);
     bool         set(
                    std::string const& key,
                    std::string const& value);
 
   private:
     void         _finished() throw ();
+    bool         _modified_attributes(
+                   std::string const& key,
+                   std::string const& value);
     bool         _retain_nonstatus_information(
                    std::string const& key,
                    std::string const& value);

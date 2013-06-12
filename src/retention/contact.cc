@@ -33,7 +33,8 @@ using namespace com::centreon::engine;
  *  @param[in] obj The contact to use for retention.
  */
 retention::contact::contact(contact_struct* obj)
-  : _obj(obj) {
+  : object(object::contact),
+    _obj(obj) {
 
 }
 

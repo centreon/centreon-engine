@@ -20,14 +20,9 @@
 #ifndef CCE_RETENTION_PARSER_HH
 #  define CCE_RETENTION_PARSER_HH
 
+#  include <fstream>
 #  include <string>
-// #  include "com/centreon/engine/retention/contact.hh"
-#  include "com/centreon/engine/retention/host.hh"
-// #  include "com/centreon/engine/retention/hostcomment.hh"
-// #  include "com/centreon/engine/retention/hostdowntime.hh"
-// #  include "com/centreon/engine/retention/service.hh"
-// #  include "com/centreon/engine/retention/servicecomment.hh"
-// #  include "com/centreon/engine/retention/servicedowntime.hh"
+#  include "com/centreon/engine/retention/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -42,6 +37,14 @@ namespace              retention {
   private:
                        parser(parser const& right);
     parser&            operator=(parser const& right);
+    bool               _get_data(
+                         std::string const& line,
+                         std::string& key,
+                         std::string& value,
+                         char const* delim);
+    bool               _get_next_line(
+                         std::ifstream& stream,
+                         std::string& line);
   };
 }
 

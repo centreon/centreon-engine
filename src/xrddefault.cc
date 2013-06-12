@@ -623,32 +623,32 @@ int xrddefault_read_state_information() {
       data_type = XRDDEFAULT_SERVICESTATUS_DATA;
     // else if (!strcmp(input, "host {"))
     //   data_type = XRDDEFAULT_HOSTSTATUS_DATA;
-    else if (!strcmp(input, "contact {"))
-      data_type = XRDDEFAULT_CONTACTSTATUS_DATA;
-    else if (!strcmp(input, "hostcomment {"))
-      data_type = XRDDEFAULT_HOSTCOMMENT_DATA;
-    else if (!strcmp(input, "servicecomment {"))
-      data_type = XRDDEFAULT_SERVICECOMMENT_DATA;
-    else if (!strcmp(input, "hostdowntime {"))
-      data_type = XRDDEFAULT_HOSTDOWNTIME_DATA;
-    else if (!strcmp(input, "servicedowntime {"))
-      data_type = XRDDEFAULT_SERVICEDOWNTIME_DATA;
-    else if (!strcmp(input, "info {"))
-      data_type = XRDDEFAULT_INFO_DATA;
-    else if (!strcmp(input, "program {"))
-      data_type = XRDDEFAULT_PROGRAMSTATUS_DATA;
+    // else if (!strcmp(input, "contact {"))
+    //   data_type = XRDDEFAULT_CONTACTSTATUS_DATA;
+    // else if (!strcmp(input, "hostcomment {"))
+    //   data_type = XRDDEFAULT_HOSTCOMMENT_DATA;
+    // else if (!strcmp(input, "servicecomment {"))
+    //   data_type = XRDDEFAULT_SERVICECOMMENT_DATA;
+    // else if (!strcmp(input, "hostdowntime {"))
+    //   data_type = XRDDEFAULT_HOSTDOWNTIME_DATA;
+    // else if (!strcmp(input, "servicedowntime {"))
+    //   data_type = XRDDEFAULT_SERVICEDOWNTIME_DATA;
+    // else if (!strcmp(input, "info {"))
+    //   data_type = XRDDEFAULT_INFO_DATA;
+    // else if (!strcmp(input, "program {"))
+    //   data_type = XRDDEFAULT_PROGRAMSTATUS_DATA;
     else if (!strcmp(input, "}")) {
       switch (data_type) {
       case XRDDEFAULT_INFO_DATA:
         break;
 
-      case XRDDEFAULT_PROGRAMSTATUS_DATA:
-        /* adjust modified attributes if necessary */
-        if (!config->use_retained_program_state()) {
-          modified_host_process_attributes = MODATTR_NONE;
-          modified_service_process_attributes = MODATTR_NONE;
-        }
-        break;
+      // case XRDDEFAULT_PROGRAMSTATUS_DATA:
+      //   /* adjust modified attributes if necessary */
+      //   if (!config->use_retained_program_state()) {
+      //     modified_host_process_attributes = MODATTR_NONE;
+      //     modified_service_process_attributes = MODATTR_NONE;
+      //   }
+      //   break;
 
       // case XRDDEFAULT_HOSTSTATUS_DATA:
       //   if (hst) {
@@ -717,229 +717,229 @@ int xrddefault_read_state_information() {
       //   hst = NULL;
       //   break;
 
-      case XRDDEFAULT_SERVICESTATUS_DATA:
-        if (svc) {
-          /* adjust modified attributes if necessary */
-          if (!svc->retain_nonstatus_information)
-            svc->modified_attributes = MODATTR_NONE;
+      // case XRDDEFAULT_SERVICESTATUS_DATA:
+      //   if (svc) {
+      //     /* adjust modified attributes if necessary */
+      //     if (!svc->retain_nonstatus_information)
+      //       svc->modified_attributes = MODATTR_NONE;
 
-          /* adjust modified attributes if no custom variables have been changed */
-          if (svc->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-            for (member = svc->custom_variables;
-                 member;
-                 member = member->next) {
-              if (member->has_been_modified)
-                break;
-            }
-            if (!member)
-              svc->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
-          }
+      //     /* adjust modified attributes if no custom variables have been changed */
+      //     if (svc->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+      //       for (member = svc->custom_variables;
+      //            member;
+      //            member = member->next) {
+      //         if (member->has_been_modified)
+      //           break;
+      //       }
+      //       if (!member)
+      //         svc->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
+      //     }
 
-          /* calculate next possible notification time */
-          if (svc->current_state != STATE_OK
-              && svc->last_notification)
-            svc->next_notification
-              = get_next_service_notification_time(
-                  svc,
-                  svc->last_notification);
+      //     /* calculate next possible notification time */
+      //     if (svc->current_state != STATE_OK
+      //         && svc->last_notification)
+      //       svc->next_notification
+      //         = get_next_service_notification_time(
+      //             svc,
+      //             svc->last_notification);
 
-          /* fix old vars */
-          if (!svc->has_been_checked
-              && svc->state_type == SOFT_STATE)
-            svc->state_type = HARD_STATE;
+      //     /* fix old vars */
+      //     if (!svc->has_been_checked
+      //         && svc->state_type == SOFT_STATE)
+      //       svc->state_type = HARD_STATE;
 
-          /* ADDED 01/23/2009 adjust current check attempt if service is in hard problem state (max attempts may have changed in config since restart) */
-          if (svc->current_state != STATE_OK
-              && svc->state_type == HARD_STATE)
-            svc->current_attempt = svc->max_attempts;
+      //     /* ADDED 01/23/2009 adjust current check attempt if service is in hard problem state (max attempts may have changed in config since restart) */
+      //     if (svc->current_state != STATE_OK
+      //         && svc->state_type == HARD_STATE)
+      //       svc->current_attempt = svc->max_attempts;
 
 
-          /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (config->use_large_installation_tweaks())
-            svc->is_flapping = was_flapping;
-          /* else use normal startup flap detection logic */
-          else {
-            /* service was flapping before program started */
-            /* 11/10/07 don't allow flapping notifications to go out */
-            allow_flapstart_notification = (was_flapping ? false : true);
+      //     /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
+      //     if (config->use_large_installation_tweaks())
+      //       svc->is_flapping = was_flapping;
+      //     /* else use normal startup flap detection logic */
+      //     else {
+      //       /* service was flapping before program started */
+      //       /* 11/10/07 don't allow flapping notifications to go out */
+      //       allow_flapstart_notification = (was_flapping ? false : true);
 
-            /* check for flapping */
-            check_for_service_flapping(
-              svc,
-              false,
-              allow_flapstart_notification);
+      //       /* check for flapping */
+      //       check_for_service_flapping(
+      //         svc,
+      //         false,
+      //         allow_flapstart_notification);
 
-            /* service was flapping before and isn't now, so clear recovery check variable if service isn't flapping now */
-            if (was_flapping && !svc->is_flapping)
-              svc->check_flapping_recovery_notification = false;
-          }
+      //       /* service was flapping before and isn't now, so clear recovery check variable if service isn't flapping now */
+      //       if (was_flapping && !svc->is_flapping)
+      //         svc->check_flapping_recovery_notification = false;
+      //     }
 
-          /* handle new vars added in 2.x */
-          if (svc->last_hard_state_change)
-            svc->last_hard_state_change = svc->last_state_change;
+      //     /* handle new vars added in 2.x */
+      //     if (svc->last_hard_state_change)
+      //       svc->last_hard_state_change = svc->last_state_change;
 
-          /* update service status */
-          update_service_status(svc, false);
-        }
+      //     /* update service status */
+      //     update_service_status(svc, false);
+      //   }
 
-        /* reset vars */
-        was_flapping = false;
-        allow_flapstart_notification = true;
+      //   /* reset vars */
+      //   was_flapping = false;
+      //   allow_flapstart_notification = true;
 
-        delete[] host_name;
-        delete[] service_description;
-        host_name = NULL;
-        service_description = NULL;
-        svc = NULL;
-        break;
+      //   delete[] host_name;
+      //   delete[] service_description;
+      //   host_name = NULL;
+      //   service_description = NULL;
+      //   svc = NULL;
+      //   break;
 
-      case XRDDEFAULT_CONTACTSTATUS_DATA:
-        if (cntct) {
-          /* adjust modified attributes if necessary */
-          if (!cntct->retain_nonstatus_information)
-            cntct->modified_attributes = MODATTR_NONE;
+      // case XRDDEFAULT_CONTACTSTATUS_DATA:
+      //   if (cntct) {
+      //     /* adjust modified attributes if necessary */
+      //     if (!cntct->retain_nonstatus_information)
+      //       cntct->modified_attributes = MODATTR_NONE;
 
-          /* adjust modified attributes if no custom variables have been changed */
-          if (cntct->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-            for (member = cntct->custom_variables;
-                 member;
-                 member = member->next) {
-              if (member->has_been_modified)
-                break;
-            }
-            if (!member)
-              cntct->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
-          }
+      //     /* adjust modified attributes if no custom variables have been changed */
+      //     if (cntct->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+      //       for (member = cntct->custom_variables;
+      //            member;
+      //            member = member->next) {
+      //         if (member->has_been_modified)
+      //           break;
+      //       }
+      //       if (!member)
+      //         cntct->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
+      //     }
 
-          /* update contact status */
-          update_contact_status(cntct, false);
-        }
+      //     /* update contact status */
+      //     update_contact_status(cntct, false);
+      //   }
 
-        delete[] contact_name;
-        contact_name = NULL;
-        cntct = NULL;
-        break;
+      //   delete[] contact_name;
+      //   contact_name = NULL;
+      //   cntct = NULL;
+      //   break;
 
-      case XRDDEFAULT_HOSTCOMMENT_DATA:
-      case XRDDEFAULT_SERVICECOMMENT_DATA:
-        /* add the comment */
-        add_comment((data_type == XRDDEFAULT_HOSTCOMMENT_DATA) ? HOST_COMMENT : SERVICE_COMMENT,
-		    entry_type,
-		    host_name,
-		    service_description,
-		    entry_time,
-		    author,
-                    comment_data,
-		    comment_id,
-		    persistent,
-		    expires,
-		    expire_time,
-		    source);
+      // case XRDDEFAULT_HOSTCOMMENT_DATA:
+      // case XRDDEFAULT_SERVICECOMMENT_DATA:
+      //   /* add the comment */
+      //   add_comment((data_type == XRDDEFAULT_HOSTCOMMENT_DATA) ? HOST_COMMENT : SERVICE_COMMENT,
+      //   	    entry_type,
+      //   	    host_name,
+      //   	    service_description,
+      //   	    entry_time,
+      //   	    author,
+      //               comment_data,
+      //   	    comment_id,
+      //   	    persistent,
+      //   	    expires,
+      //   	    expire_time,
+      //   	    source);
 
-        /* delete the comment if necessary */
-        /* it seems a bit backwards to add and then immediately delete the comment, but its necessary to track comment deletions in the event broker */
-        remove_comment = false;
-        /* host no longer exists */
-        if (!(hst = find_host(host_name)))
-          remove_comment = true;
-        /* service no longer exists */
-        else if (data_type == XRDDEFAULT_SERVICECOMMENT_DATA
-                 && !(svc = find_service(host_name, service_description)))
-          remove_comment = true;
-        /* acknowledgement comments get deleted if they're not persistent and the original problem is no longer acknowledged */
-        else if (entry_type == ACKNOWLEDGEMENT_COMMENT) {
-          ack = false;
-          if (data_type == XRDDEFAULT_HOSTCOMMENT_DATA)
-            ack = hst->problem_has_been_acknowledged;
-          else
-            ack = svc->problem_has_been_acknowledged;
-          if (!ack && !persistent)
-            remove_comment = true;
-        }
-        /* non-persistent comments don't last past restarts UNLESS they're acks (see above) */
-        else if (!persistent)
-          remove_comment = true;
+      //   /* delete the comment if necessary */
+      //   /* it seems a bit backwards to add and then immediately delete the comment, but its necessary to track comment deletions in the event broker */
+      //   remove_comment = false;
+      //   /* host no longer exists */
+      //   if (!(hst = find_host(host_name)))
+      //     remove_comment = true;
+      //   /* service no longer exists */
+      //   else if (data_type == XRDDEFAULT_SERVICECOMMENT_DATA
+      //            && !(svc = find_service(host_name, service_description)))
+      //     remove_comment = true;
+      //   /* acknowledgement comments get deleted if they're not persistent and the original problem is no longer acknowledged */
+      //   else if (entry_type == ACKNOWLEDGEMENT_COMMENT) {
+      //     ack = false;
+      //     if (data_type == XRDDEFAULT_HOSTCOMMENT_DATA)
+      //       ack = hst->problem_has_been_acknowledged;
+      //     else
+      //       ack = svc->problem_has_been_acknowledged;
+      //     if (!ack && !persistent)
+      //       remove_comment = true;
+      //   }
+      //   /* non-persistent comments don't last past restarts UNLESS they're acks (see above) */
+      //   else if (!persistent)
+      //     remove_comment = true;
 
-        if (remove_comment)
-          delete_comment((data_type == XRDDEFAULT_HOSTCOMMENT_DATA) ? HOST_COMMENT : SERVICE_COMMENT, comment_id);
+      //   if (remove_comment)
+      //     delete_comment((data_type == XRDDEFAULT_HOSTCOMMENT_DATA) ? HOST_COMMENT : SERVICE_COMMENT, comment_id);
 
-        /* free temp memory */
-        delete[] host_name;
-        delete[] service_description;
-        delete[] author;
-        delete[] comment_data;
+      //   /* free temp memory */
+      //   delete[] host_name;
+      //   delete[] service_description;
+      //   delete[] author;
+      //   delete[] comment_data;
 
-        host_name = NULL;
-        service_description = NULL;
-        author = NULL;
-        comment_data = NULL;
+      //   host_name = NULL;
+      //   service_description = NULL;
+      //   author = NULL;
+      //   comment_data = NULL;
 
-        /* reset defaults */
-        entry_type = USER_COMMENT;
-        comment_id = 0;
-        source = COMMENTSOURCE_INTERNAL;
-        persistent = false;
-        entry_time = 0L;
-        expires = false;
-        expire_time = 0L;
-        break;
+      //   /* reset defaults */
+      //   entry_type = USER_COMMENT;
+      //   comment_id = 0;
+      //   source = COMMENTSOURCE_INTERNAL;
+      //   persistent = false;
+      //   entry_time = 0L;
+      //   expires = false;
+      //   expire_time = 0L;
+      //   break;
 
-      case XRDDEFAULT_HOSTDOWNTIME_DATA:
-      case XRDDEFAULT_SERVICEDOWNTIME_DATA:
-        /* add the downtime */
-        if (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA)
-          add_host_downtime(
-            host_name,
-            entry_time,
-            author,
-            comment_data,
-            start_time,
-            end_time,
-            fixed,
-            triggered_by,
-            duration,
-            downtime_id);
-        else
-          add_service_downtime(
-            host_name,
-            service_description,
-            entry_time,
-            author,
-            comment_data,
-            start_time,
-            end_time,
-            fixed,
-            triggered_by,
-            duration,
-            downtime_id);
+      // case XRDDEFAULT_HOSTDOWNTIME_DATA:
+      // case XRDDEFAULT_SERVICEDOWNTIME_DATA:
+      //   /* add the downtime */
+      //   if (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA)
+      //     add_host_downtime(
+      //       host_name,
+      //       entry_time,
+      //       author,
+      //       comment_data,
+      //       start_time,
+      //       end_time,
+      //       fixed,
+      //       triggered_by,
+      //       duration,
+      //       downtime_id);
+      //   else
+      //     add_service_downtime(
+      //       host_name,
+      //       service_description,
+      //       entry_time,
+      //       author,
+      //       comment_data,
+      //       start_time,
+      //       end_time,
+      //       fixed,
+      //       triggered_by,
+      //       duration,
+      //       downtime_id);
 
-        /* must register the downtime with Centreon Engine so it can schedule it, add comments, etc. */
-        register_downtime(
-          (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA
-           ? HOST_DOWNTIME
-           : SERVICE_DOWNTIME),
-          downtime_id);
+      //   /* must register the downtime with Centreon Engine so it can schedule it, add comments, etc. */
+      //   register_downtime(
+      //     (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA
+      //      ? HOST_DOWNTIME
+      //      : SERVICE_DOWNTIME),
+      //     downtime_id);
 
-        /* free temp memory */
-        delete[] host_name;
-        delete[] service_description;
-        delete[] author;
-        delete[] comment_data;
+      //   /* free temp memory */
+      //   delete[] host_name;
+      //   delete[] service_description;
+      //   delete[] author;
+      //   delete[] comment_data;
 
-        host_name = NULL;
-        service_description = NULL;
-        author = NULL;
-        comment_data = NULL;
+      //   host_name = NULL;
+      //   service_description = NULL;
+      //   author = NULL;
+      //   comment_data = NULL;
 
-        /* reset defaults */
-        downtime_id = 0;
-        entry_time = 0L;
-        start_time = 0L;
-        end_time = 0L;
-        fixed = false;
-        triggered_by = 0;
-        duration = 0L;
-        break;
+      //   /* reset defaults */
+      //   downtime_id = 0;
+      //   entry_time = 0L;
+      //   start_time = 0L;
+      //   end_time = 0L;
+      //   fixed = false;
+      //   triggered_by = 0;
+      //   duration = 0L;
+      //   break;
 
       default:
         break;
@@ -976,112 +976,112 @@ int xrddefault_read_state_information() {
                  || !strcmp(var, "new_version"))
           break;
 
-      case XRDDEFAULT_PROGRAMSTATUS_DATA:
-        if (!strcmp(var, "modified_host_attributes")) {
-          modified_host_process_attributes = strtoul(val, NULL, 10);
+      // case XRDDEFAULT_PROGRAMSTATUS_DATA:
+      //   if (!strcmp(var, "modified_host_attributes")) {
+      //     modified_host_process_attributes = strtoul(val, NULL, 10);
 
-          /* mask out attributes we don't want to retain */
-          modified_host_process_attributes &= ~process_host_attribute_mask;
-        }
-        else if (!strcmp(var, "modified_service_attributes")) {
-          modified_service_process_attributes = strtoul(val, NULL, 10);
+      //     /* mask out attributes we don't want to retain */
+      //     modified_host_process_attributes &= ~process_host_attribute_mask;
+      //   }
+      //   else if (!strcmp(var, "modified_service_attributes")) {
+      //     modified_service_process_attributes = strtoul(val, NULL, 10);
 
-          /* mask out attributes we don't want to retain */
-          modified_service_process_attributes &= ~process_service_attribute_mask;
-        }
-        if (config->use_retained_program_state()) {
-          if (!strcmp(var, "enable_notifications")) {
-            if (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-              config->enable_notifications(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "active_service_checks_enabled")) {
-            if (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-              config->execute_service_checks(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "passive_service_checks_enabled")) {
-            if (modified_service_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-              config->accept_passive_service_checks(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "active_host_checks_enabled")) {
-            if (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-              config->execute_host_checks(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "passive_host_checks_enabled")) {
-            if (modified_host_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-              config->accept_passive_host_checks(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "enable_event_handlers")) {
-            if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-              config->enable_event_handlers(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "obsess_over_services")) {
-            if (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-              config->obsess_over_services(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "obsess_over_hosts")) {
-            if (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-              config->obsess_over_hosts(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "check_service_freshness")) {
-            if (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-              config->check_service_freshness(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "check_host_freshness")) {
-            if (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-              config->check_host_freshness(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "enable_flap_detection")) {
-            if (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-              config->enable_flap_detection(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "enable_failure_prediction")) {
-            if (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-              config->enable_failure_prediction(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "process_performance_data")) {
-            if (modified_host_process_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
-              config->process_performance_data(atoi(val) > 0);
-          }
-          else if (!strcmp(var, "global_host_event_handler")) {
-            if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-              /* make sure the check command still exists... */
-              tempval = my_strdup(val);
-              temp_ptr = my_strtok(tempval, "!");
-              cmd = find_command(temp_ptr);
-              temp_ptr = my_strdup(val);
-              delete[] tempval;
+      //     /* mask out attributes we don't want to retain */
+      //     modified_service_process_attributes &= ~process_service_attribute_mask;
+      //   }
+      //   if (config->use_retained_program_state()) {
+      //     if (!strcmp(var, "enable_notifications")) {
+      //       if (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
+      //         config->enable_notifications(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "active_service_checks_enabled")) {
+      //       if (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
+      //         config->execute_service_checks(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "passive_service_checks_enabled")) {
+      //       if (modified_service_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
+      //         config->accept_passive_service_checks(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "active_host_checks_enabled")) {
+      //       if (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
+      //         config->execute_host_checks(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "passive_host_checks_enabled")) {
+      //       if (modified_host_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
+      //         config->accept_passive_host_checks(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "enable_event_handlers")) {
+      //       if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
+      //         config->enable_event_handlers(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "obsess_over_services")) {
+      //       if (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+      //         config->obsess_over_services(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "obsess_over_hosts")) {
+      //       if (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+      //         config->obsess_over_hosts(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "check_service_freshness")) {
+      //       if (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
+      //         config->check_service_freshness(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "check_host_freshness")) {
+      //       if (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
+      //         config->check_host_freshness(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "enable_flap_detection")) {
+      //       if (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
+      //         config->enable_flap_detection(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "enable_failure_prediction")) {
+      //       if (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
+      //         config->enable_failure_prediction(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "process_performance_data")) {
+      //       if (modified_host_process_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
+      //         config->process_performance_data(atoi(val) > 0);
+      //     }
+      //     else if (!strcmp(var, "global_host_event_handler")) {
+      //       if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+      //         /* make sure the check command still exists... */
+      //         tempval = my_strdup(val);
+      //         temp_ptr = my_strtok(tempval, "!");
+      //         cmd = find_command(temp_ptr);
+      //         temp_ptr = my_strdup(val);
+      //         delete[] tempval;
 
-              if (cmd && temp_ptr) {
-                config->global_host_event_handler(temp_ptr);
-              }
-            }
-          }
-          else if (!strcmp(var, "global_service_event_handler")) {
-            if (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-              /* make sure the check command still exists... */
-              tempval = my_strdup(val);
-              temp_ptr = my_strtok(tempval, "!");
-              cmd = find_command(temp_ptr);
-              temp_ptr = my_strdup(val);
-              delete[] tempval;
+      //         if (cmd && temp_ptr) {
+      //           config->global_host_event_handler(temp_ptr);
+      //         }
+      //       }
+      //     }
+      //     else if (!strcmp(var, "global_service_event_handler")) {
+      //       if (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+      //         /* make sure the check command still exists... */
+      //         tempval = my_strdup(val);
+      //         temp_ptr = my_strtok(tempval, "!");
+      //         cmd = find_command(temp_ptr);
+      //         temp_ptr = my_strdup(val);
+      //         delete[] tempval;
 
-              if (cmd && temp_ptr) {
-                config->global_service_event_handler(temp_ptr);
-              }
-            }
-          }
-          else if (!strcmp(var, "next_comment_id"))
-            next_comment_id = strtoul(val, NULL, 10);
-          else if (!strcmp(var, "next_downtime_id"))
-            next_downtime_id = strtoul(val, NULL, 10);
-          else if (!strcmp(var, "next_event_id"))
-            next_event_id = strtoul(val, NULL, 10);
-          else if (!strcmp(var, "next_problem_id"))
-            next_problem_id = strtoul(val, NULL, 10);
-          else if (!strcmp(var, "next_notification_id"))
-            next_notification_id = strtoul(val, NULL, 10);
-        }
-        break;
+      //         if (cmd && temp_ptr) {
+      //           config->global_service_event_handler(temp_ptr);
+      //         }
+      //       }
+      //     }
+      //     else if (!strcmp(var, "next_comment_id"))
+      //       next_comment_id = strtoul(val, NULL, 10);
+      //     else if (!strcmp(var, "next_downtime_id"))
+      //       next_downtime_id = strtoul(val, NULL, 10);
+      //     else if (!strcmp(var, "next_event_id"))
+      //       next_event_id = strtoul(val, NULL, 10);
+      //     else if (!strcmp(var, "next_problem_id"))
+      //       next_problem_id = strtoul(val, NULL, 10);
+      //     else if (!strcmp(var, "next_notification_id"))
+      //       next_notification_id = strtoul(val, NULL, 10);
+      //   }
+      //   break;
 
       // case XRDDEFAULT_HOSTSTATUS_DATA:
       //   if (!hst) {
@@ -1340,424 +1340,424 @@ int xrddefault_read_state_information() {
       //   }
       //   break;
 
-      case XRDDEFAULT_SERVICESTATUS_DATA:
-        if (!svc) {
-          if (!strcmp(var, "host_name")) {
-            host_name = my_strdup(val);
+      // case XRDDEFAULT_SERVICESTATUS_DATA:
+      //   if (!svc) {
+        //   if (!strcmp(var, "host_name")) {
+        //     host_name = my_strdup(val);
 
-            /*svc=find_service(host_name,service_description); */
+        //     /*svc=find_service(host_name,service_description); */
 
-            /* break out */
-            break;
-          }
-          else if (!strcmp(var, "service_description")) {
-            service_description = my_strdup(val);
-            svc = find_service(host_name, service_description);
+        //     /* break out */
+        //     break;
+        //   }
+        //   else if (!strcmp(var, "service_description")) {
+        //     service_description = my_strdup(val);
+        //     svc = find_service(host_name, service_description);
 
-            /* break out */
-            break;
-          }
-        }
-        else {
-          if (!strcmp(var, "modified_attributes")) {
-            svc->modified_attributes = strtoul(val, NULL, 10);
+        //     /* break out */
+        //     break;
+        //   }
+        // }
+        // else {
+        //   if (!strcmp(var, "modified_attributes")) {
+        //     svc->modified_attributes = strtoul(val, NULL, 10);
 
-            /* mask out attributes we don't want to retain */
-            svc->modified_attributes &= ~service_attribute_mask;
-          }
-          if (svc->retain_status_information) {
-            if (!strcmp(var, "has_been_checked"))
-              svc->has_been_checked = (atoi(val) > 0);
-            else if (!strcmp(var, "check_execution_time"))
-              svc->execution_time = strtod(val, NULL);
-            else if (!strcmp(var, "check_latency"))
-              svc->latency = strtod(val, NULL);
-            else if (!strcmp(var, "check_type"))
-              svc->check_type = atoi(val);
-            else if (!strcmp(var, "current_state"))
-              svc->current_state = atoi(val);
-            else if (!strcmp(var, "last_state"))
-              svc->last_state = atoi(val);
-            else if (!strcmp(var, "last_hard_state"))
-              svc->last_hard_state = atoi(val);
-            else if (!strcmp(var, "current_attempt"))
-              svc->current_attempt = atoi(val);
-            else if (!strcmp(var, "current_event_id"))
-              svc->current_event_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_event_id"))
-              svc->last_event_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "current_problem_id"))
-              svc->current_problem_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_problem_id"))
-              svc->last_problem_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "state_type"))
-              svc->state_type = atoi(val);
-            else if (!strcmp(var, "last_state_change"))
-              svc->last_state_change = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_hard_state_change"))
-              svc->last_hard_state_change = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_ok"))
-              svc->last_time_ok = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_warning"))
-              svc->last_time_warning = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_unknown"))
-              svc->last_time_unknown = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_critical"))
-              svc->last_time_critical = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "plugin_output")) {
-              delete[] svc->plugin_output;
-              svc->plugin_output = my_strdup(val);
-            }
-            else if (!strcmp(var, "long_plugin_output")) {
-              delete[] svc->long_plugin_output;
-              svc->long_plugin_output = my_strdup(val);
-            }
-            else if (!strcmp(var, "performance_data")) {
-              delete[] svc->perf_data;
-              svc->perf_data = my_strdup(val);
-            }
-            else if (!strcmp(var, "last_check"))
-              svc->last_check = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "next_check")) {
-              if (config->use_retained_scheduling_info()
-                  && scheduling_info_is_ok)
-                svc->next_check = strtoul(val, NULL, 10);
-            }
-            else if (!strcmp(var, "check_options")) {
-              if (config->use_retained_scheduling_info()
-                  && scheduling_info_is_ok)
-                svc->check_options = atoi(val);
-            }
-            else if (!strcmp(var, "notified_on_unknown"))
-              svc->notified_on_unknown = (atoi(val) > 0);
-            else if (!strcmp(var, "notified_on_warning"))
-              svc->notified_on_warning = (atoi(val) > 0);
-            else if (!strcmp(var, "notified_on_critical"))
-              svc->notified_on_critical = (atoi(val) > 0);
-            else if (!strcmp(var, "current_notification_number"))
-              svc->current_notification_number = atoi(val);
-            else if (!strcmp(var, "current_notification_id"))
-              svc->current_notification_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_notification"))
-              svc->last_notification = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "is_flapping"))
-              was_flapping = atoi(val);
-            else if (!strcmp(var, "percent_state_change"))
-              svc->percent_state_change = strtod(val, NULL);
-            else
-              if (!strcmp(var, "check_flapping_recovery_notification"))
-                svc->check_flapping_recovery_notification = atoi(val);
-              else if (!strcmp(var, "state_history")) {
-                temp_ptr = val;
-                for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x) {
-                  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
-                    svc->state_history[x] = atoi(ch);
-                  else
-                    break;
-                }
-                svc->state_history_index = 0;
-              }
-              else
-                found_directive = false;
-          }
-          if (svc->retain_nonstatus_information) {
-            /* null-op speeds up logic */
-            if (found_directive);
+        //     /* mask out attributes we don't want to retain */
+        //     svc->modified_attributes &= ~service_attribute_mask;
+        //   }
+        //   if (svc->retain_status_information) {
+        //     if (!strcmp(var, "has_been_checked"))
+        //       svc->has_been_checked = (atoi(val) > 0);
+        //     else if (!strcmp(var, "check_execution_time"))
+        //       svc->execution_time = strtod(val, NULL);
+        //     else if (!strcmp(var, "check_latency"))
+        //       svc->latency = strtod(val, NULL);
+        //     else if (!strcmp(var, "check_type"))
+        //       svc->check_type = atoi(val);
+        //     else if (!strcmp(var, "current_state"))
+        //       svc->current_state = atoi(val);
+        //     else if (!strcmp(var, "last_state"))
+        //       svc->last_state = atoi(val);
+        //     else if (!strcmp(var, "last_hard_state"))
+        //       svc->last_hard_state = atoi(val);
+        //     else if (!strcmp(var, "current_attempt"))
+        //       svc->current_attempt = atoi(val);
+        //     else if (!strcmp(var, "current_event_id"))
+        //       svc->current_event_id = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_event_id"))
+        //       svc->last_event_id = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "current_problem_id"))
+        //       svc->current_problem_id = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_problem_id"))
+        //       svc->last_problem_id = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "state_type"))
+        //       svc->state_type = atoi(val);
+        //     else if (!strcmp(var, "last_state_change"))
+        //       svc->last_state_change = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_hard_state_change"))
+        //       svc->last_hard_state_change = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_time_ok"))
+        //       svc->last_time_ok = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_time_warning"))
+        //       svc->last_time_warning = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_time_unknown"))
+        //       svc->last_time_unknown = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_time_critical"))
+        //       svc->last_time_critical = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "plugin_output")) {
+        //       delete[] svc->plugin_output;
+        //       svc->plugin_output = my_strdup(val);
+        //     }
+        //     else if (!strcmp(var, "long_plugin_output")) {
+        //       delete[] svc->long_plugin_output;
+        //       svc->long_plugin_output = my_strdup(val);
+        //     }
+        //     else if (!strcmp(var, "performance_data")) {
+        //       delete[] svc->perf_data;
+        //       svc->perf_data = my_strdup(val);
+        //     }
+        //     else if (!strcmp(var, "last_check"))
+        //       svc->last_check = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "next_check")) {
+        //       if (config->use_retained_scheduling_info()
+        //           && scheduling_info_is_ok)
+        //         svc->next_check = strtoul(val, NULL, 10);
+        //     }
+        //     else if (!strcmp(var, "check_options")) {
+        //       if (config->use_retained_scheduling_info()
+        //           && scheduling_info_is_ok)
+        //         svc->check_options = atoi(val);
+        //     }
+        //     else if (!strcmp(var, "notified_on_unknown"))
+        //       svc->notified_on_unknown = (atoi(val) > 0);
+        //     else if (!strcmp(var, "notified_on_warning"))
+        //       svc->notified_on_warning = (atoi(val) > 0);
+        //     else if (!strcmp(var, "notified_on_critical"))
+        //       svc->notified_on_critical = (atoi(val) > 0);
+        //     else if (!strcmp(var, "current_notification_number"))
+        //       svc->current_notification_number = atoi(val);
+        //     else if (!strcmp(var, "current_notification_id"))
+        //       svc->current_notification_id = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "last_notification"))
+        //       svc->last_notification = strtoul(val, NULL, 10);
+        //     else if (!strcmp(var, "is_flapping"))
+        //       was_flapping = atoi(val);
+        //     else if (!strcmp(var, "percent_state_change"))
+        //       svc->percent_state_change = strtod(val, NULL);
+        //     else
+        //       if (!strcmp(var, "check_flapping_recovery_notification"))
+        //         svc->check_flapping_recovery_notification = atoi(val);
+        //       else if (!strcmp(var, "state_history")) {
+        //         temp_ptr = val;
+        //         for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x) {
+        //           if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
+        //             svc->state_history[x] = atoi(ch);
+        //           else
+        //             break;
+        //         }
+        //         svc->state_history_index = 0;
+        //       }
+        //       else
+        //         found_directive = false;
+        //   }
+        //   if (svc->retain_nonstatus_information) {
+        //     /* null-op speeds up logic */
+        //     if (found_directive);
 
-            else if (!strcmp(var, "problem_has_been_acknowledged"))
-              svc->problem_has_been_acknowledged = (atoi(val) > 0);
-            else if (!strcmp(var, "acknowledgement_type"))
-              svc->acknowledgement_type = atoi(val);
-            else if (!strcmp(var, "notifications_enabled")) {
-              if (svc->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                svc->notifications_enabled = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "active_checks_enabled")) {
-              if (svc->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-                svc->checks_enabled = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "passive_checks_enabled")) {
-              if (svc->modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-                svc->accept_passive_service_checks = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "event_handler_enabled")) {
-              if (svc->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-                svc->event_handler_enabled = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "flap_detection_enabled")) {
-              if (svc->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-                svc->flap_detection_enabled = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "failure_prediction_enabled")) {
-              if (svc->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-                svc->failure_prediction_enabled = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "process_performance_data")) {
-              if (svc->modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
-                svc->process_performance_data = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "obsess_over_service")) {
-              if (svc->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-                svc->obsess_over_service = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "check_command")) {
-              if (svc->modified_attributes & MODATTR_CHECK_COMMAND) {
-                /* make sure the check command still exists... */
-                tempval = my_strdup(val);
-                temp_ptr = my_strtok(tempval, "!");
-                cmd = find_command(temp_ptr);
-                temp_ptr = my_strdup(val);
-                delete[] tempval;
+        //     else if (!strcmp(var, "problem_has_been_acknowledged"))
+        //       svc->problem_has_been_acknowledged = (atoi(val) > 0);
+        //     else if (!strcmp(var, "acknowledgement_type"))
+        //       svc->acknowledgement_type = atoi(val);
+        //     else if (!strcmp(var, "notifications_enabled")) {
+        //       if (svc->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
+        //         svc->notifications_enabled = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "active_checks_enabled")) {
+        //       if (svc->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
+        //         svc->checks_enabled = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "passive_checks_enabled")) {
+        //       if (svc->modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
+        //         svc->accept_passive_service_checks = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "event_handler_enabled")) {
+        //       if (svc->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
+        //         svc->event_handler_enabled = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "flap_detection_enabled")) {
+        //       if (svc->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
+        //         svc->flap_detection_enabled = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "failure_prediction_enabled")) {
+        //       if (svc->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
+        //         svc->failure_prediction_enabled = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "process_performance_data")) {
+        //       if (svc->modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
+        //         svc->process_performance_data = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "obsess_over_service")) {
+        //       if (svc->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+        //         svc->obsess_over_service = (atoi(val) > 0);
+        //     }
+        //     else if (!strcmp(var, "check_command")) {
+        //       if (svc->modified_attributes & MODATTR_CHECK_COMMAND) {
+        //         /* make sure the check command still exists... */
+        //         tempval = my_strdup(val);
+        //         temp_ptr = my_strtok(tempval, "!");
+        //         cmd = find_command(temp_ptr);
+        //         temp_ptr = my_strdup(val);
+        //         delete[] tempval;
 
-                if (cmd && temp_ptr) {
-                  delete[] svc->service_check_command;
-                  svc->service_check_command = temp_ptr;
-                }
-                else
-                  svc->modified_attributes -= MODATTR_CHECK_COMMAND;
-              }
-            }
-            else if (!strcmp(var, "check_period")) {
-              if (svc->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                tperiod = find_timeperiod(val);
-                temp_ptr = my_strdup(val);
+        //         if (cmd && temp_ptr) {
+        //           delete[] svc->service_check_command;
+        //           svc->service_check_command = temp_ptr;
+        //         }
+        //         else
+        //           svc->modified_attributes -= MODATTR_CHECK_COMMAND;
+        //       }
+        //     }
+        //     else if (!strcmp(var, "check_period")) {
+        //       if (svc->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
+        //         /* make sure the timeperiod still exists... */
+        //         tperiod = find_timeperiod(val);
+        //         temp_ptr = my_strdup(val);
 
-                if (tperiod && temp_ptr) {
-                  delete[] svc->check_period;
-                  svc->check_period = temp_ptr;
-                }
-                else
-                  svc->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "notification_period")) {
-              if (svc->modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                tperiod = find_timeperiod(val);
-                temp_ptr = my_strdup(val);
+        //         if (tperiod && temp_ptr) {
+        //           delete[] svc->check_period;
+        //           svc->check_period = temp_ptr;
+        //         }
+        //         else
+        //           svc->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
+        //       }
+        //     }
+        //     else if (!strcmp(var, "notification_period")) {
+        //       if (svc->modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
+        //         /* make sure the timeperiod still exists... */
+        //         tperiod = find_timeperiod(val);
+        //         temp_ptr = my_strdup(val);
 
-                if (tperiod && temp_ptr) {
-                  delete[] svc->notification_period;
-                  svc->notification_period = temp_ptr;
-                }
-                else
-                  svc->modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "event_handler")) {
-              if (svc->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-                /* make sure the check command still exists... */
-                tempval = my_strdup(val);
-                temp_ptr = my_strtok(tempval, "!");
-                cmd = find_command(temp_ptr);
-                temp_ptr = my_strdup(val);
-                delete[] tempval;
+        //         if (tperiod && temp_ptr) {
+        //           delete[] svc->notification_period;
+        //           svc->notification_period = temp_ptr;
+        //         }
+        //         else
+        //           svc->modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
+        //       }
+        //     }
+        //     else if (!strcmp(var, "event_handler")) {
+        //       if (svc->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+        //         /* make sure the check command still exists... */
+        //         tempval = my_strdup(val);
+        //         temp_ptr = my_strtok(tempval, "!");
+        //         cmd = find_command(temp_ptr);
+        //         temp_ptr = my_strdup(val);
+        //         delete[] tempval;
 
-                if (cmd && temp_ptr) {
-                  delete[] svc->event_handler;
-                  svc->event_handler = temp_ptr;
-                }
-                else
-                  svc->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
-              }
-            }
-            else if (!strcmp(var, "normal_check_interval")) {
-              if (svc->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
-                  && strtod(val, NULL) >= 0)
-                svc->check_interval = strtod(val, NULL);
-            }
-            else if (!strcmp(var, "retry_check_interval")) {
-              if (svc->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL
-                  && strtod(val, NULL) >= 0)
-                svc->retry_interval = strtod(val, NULL);
-            }
-            else if (!strcmp(var, "max_attempts")) {
-              if (svc->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS
-                  && atoi(val) >= 1) {
-                svc->max_attempts = atoi(val);
+        //         if (cmd && temp_ptr) {
+        //           delete[] svc->event_handler;
+        //           svc->event_handler = temp_ptr;
+        //         }
+        //         else
+        //           svc->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
+        //       }
+        //     }
+        //     else if (!strcmp(var, "normal_check_interval")) {
+        //       if (svc->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
+        //           && strtod(val, NULL) >= 0)
+        //         svc->check_interval = strtod(val, NULL);
+        //     }
+        //     else if (!strcmp(var, "retry_check_interval")) {
+        //       if (svc->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL
+        //           && strtod(val, NULL) >= 0)
+        //         svc->retry_interval = strtod(val, NULL);
+        //     }
+        //     else if (!strcmp(var, "max_attempts")) {
+        //       if (svc->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS
+        //           && atoi(val) >= 1) {
+        //         svc->max_attempts = atoi(val);
 
-                /* adjust current attempt number if in a hard state */
-                if (svc->state_type == HARD_STATE
-                    && svc->current_state != STATE_OK
-                    && svc->current_attempt > 1)
-                  svc->current_attempt = svc->max_attempts;
-              }
-            }
-            /* custom variables */
-            else if (var[0] == '_') {
-              if (svc->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+        //         /* adjust current attempt number if in a hard state */
+        //         if (svc->state_type == HARD_STATE
+        //             && svc->current_state != STATE_OK
+        //             && svc->current_attempt > 1)
+        //           svc->current_attempt = svc->max_attempts;
+        //       }
+        //     }
+        //     /* custom variables */
+        //     else if (var[0] == '_') {
+        //       if (svc->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
 
-                /* get the variable name */
-                customvarname = var + 1;
+        //         /* get the variable name */
+        //         customvarname = var + 1;
 
-                for (member = svc->custom_variables;
-                     member;
-                     member = member->next) {
-                  if (!strcmp(customvarname, member->variable_name)) {
-                    if ((x = atoi(val)) > 0 && strlen(val) > 3) {
-                      delete[] member->variable_value;
-                      member->variable_value = my_strdup(val + 2);
-                      member->has_been_modified = (x > 0);
-                    }
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-        break;
+        //         for (member = svc->custom_variables;
+        //              member;
+        //              member = member->next) {
+        //           if (!strcmp(customvarname, member->variable_name)) {
+        //             if ((x = atoi(val)) > 0 && strlen(val) > 3) {
+        //               delete[] member->variable_value;
+        //               member->variable_value = my_strdup(val + 2);
+        //               member->has_been_modified = (x > 0);
+        //             }
+        //             break;
+        //           }
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        // break;
 
-      case XRDDEFAULT_CONTACTSTATUS_DATA:
-        if (!cntct) {
-          if (!strcmp(var, "contact_name")) {
-            contact_name = my_strdup(val);
-            cntct = find_contact(contact_name);
-          }
-        }
-        else {
-          if (!strcmp(var, "modified_attributes")) {
-            cntct->modified_attributes = strtoul(val, NULL, 10);
+      // case XRDDEFAULT_CONTACTSTATUS_DATA:
+      //   if (!cntct) {
+      //     if (!strcmp(var, "contact_name")) {
+      //       contact_name = my_strdup(val);
+      //       cntct = find_contact(contact_name);
+      //     }
+      //   }
+      //   else {
+      //     if (!strcmp(var, "modified_attributes")) {
+      //       cntct->modified_attributes = strtoul(val, NULL, 10);
 
-            /* mask out attributes we don't want to retain */
-            cntct->modified_attributes &= ~contact_attribute_mask;
-          }
-          else if (!strcmp(var, "modified_host_attributes")) {
-            cntct->modified_host_attributes = strtoul(val, NULL, 10);
+      //       /* mask out attributes we don't want to retain */
+      //       cntct->modified_attributes &= ~contact_attribute_mask;
+      //     }
+      //     else if (!strcmp(var, "modified_host_attributes")) {
+      //       cntct->modified_host_attributes = strtoul(val, NULL, 10);
 
-            /* mask out attributes we don't want to retain */
-            cntct->modified_host_attributes &= ~contact_host_attribute_mask;
-          }
-          else if (!strcmp(var, "modified_service_attributes")) {
-            cntct->modified_service_attributes = strtoul(val, NULL, 10);
+      //       /* mask out attributes we don't want to retain */
+      //       cntct->modified_host_attributes &= ~contact_host_attribute_mask;
+      //     }
+      //     else if (!strcmp(var, "modified_service_attributes")) {
+      //       cntct->modified_service_attributes = strtoul(val, NULL, 10);
 
-            /* mask out attributes we don't want to retain */
-            cntct->modified_service_attributes &= ~contact_service_attribute_mask;
-          }
-          else if (cntct->retain_status_information) {
-            if (!strcmp(var, "last_host_notification"))
-              cntct->last_host_notification = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_service_notification"))
-              cntct->last_service_notification = strtoul(val, NULL, 10);
-            else
-              found_directive = false;
-          }
-          if (cntct->retain_nonstatus_information) {
-            /* null-op speeds up logic */
-            if (found_directive);
+      //       /* mask out attributes we don't want to retain */
+      //       cntct->modified_service_attributes &= ~contact_service_attribute_mask;
+      //     }
+      //     else if (cntct->retain_status_information) {
+      //       if (!strcmp(var, "last_host_notification"))
+      //         cntct->last_host_notification = strtoul(val, NULL, 10);
+      //       else if (!strcmp(var, "last_service_notification"))
+      //         cntct->last_service_notification = strtoul(val, NULL, 10);
+      //       else
+      //         found_directive = false;
+      //     }
+      //     if (cntct->retain_nonstatus_information) {
+      //       /* null-op speeds up logic */
+      //       if (found_directive);
 
-            else if (!strcmp(var, "host_notification_period")) {
-              if (cntct->modified_host_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                tperiod = find_timeperiod(val);
-                temp_ptr = my_strdup(val);
+      //       else if (!strcmp(var, "host_notification_period")) {
+      //         if (cntct->modified_host_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
+      //           /* make sure the timeperiod still exists... */
+      //           tperiod = find_timeperiod(val);
+      //           temp_ptr = my_strdup(val);
 
-                if (tperiod && temp_ptr) {
-                  delete[] cntct->host_notification_period;
-                  cntct->host_notification_period = temp_ptr;
-                }
-                else
-                  cntct->modified_host_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "service_notification_period")) {
-              if (cntct->modified_service_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                tperiod = find_timeperiod(val);
-                temp_ptr = my_strdup(val);
+      //           if (tperiod && temp_ptr) {
+      //             delete[] cntct->host_notification_period;
+      //             cntct->host_notification_period = temp_ptr;
+      //           }
+      //           else
+      //             cntct->modified_host_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
+      //         }
+      //       }
+      //       else if (!strcmp(var, "service_notification_period")) {
+      //         if (cntct->modified_service_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
+      //           /* make sure the timeperiod still exists... */
+      //           tperiod = find_timeperiod(val);
+      //           temp_ptr = my_strdup(val);
 
-                if (tperiod && temp_ptr) {
-                  delete[] cntct->service_notification_period;
-                  cntct->service_notification_period = temp_ptr;
-                }
-                else
-                  cntct->modified_service_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "host_notifications_enabled")) {
-              if (cntct->modified_host_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                cntct->host_notifications_enabled = (atoi(val) > 0);
-            }
-            else if (!strcmp(var, "service_notifications_enabled")) {
-              if (cntct->modified_service_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                cntct->service_notifications_enabled = (atoi(val) > 0);
-            }
-            /* custom variables */
-            else if (var[0] == '_') {
-              if (cntct->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-                /* get the variable name */
-                customvarname = var + 1;
+      //           if (tperiod && temp_ptr) {
+      //             delete[] cntct->service_notification_period;
+      //             cntct->service_notification_period = temp_ptr;
+      //           }
+      //           else
+      //             cntct->modified_service_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
+      //         }
+      //       }
+      //       else if (!strcmp(var, "host_notifications_enabled")) {
+      //         if (cntct->modified_host_attributes & MODATTR_NOTIFICATIONS_ENABLED)
+      //           cntct->host_notifications_enabled = (atoi(val) > 0);
+      //       }
+      //       else if (!strcmp(var, "service_notifications_enabled")) {
+      //         if (cntct->modified_service_attributes & MODATTR_NOTIFICATIONS_ENABLED)
+      //           cntct->service_notifications_enabled = (atoi(val) > 0);
+      //       }
+      //       /* custom variables */
+      //       else if (var[0] == '_') {
+      //         if (cntct->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+      //           /* get the variable name */
+      //           customvarname = var + 1;
 
-                for (member = cntct->custom_variables;
-                     member;
-                     member = member->next) {
-                  if (!strcmp(customvarname, member->variable_name)) {
-                    if ((x = atoi(val)) > 0 && strlen(val) > 3) {
-                      delete[] member->variable_value;
-                      member->variable_value = my_strdup(val + 2);
-                      member->has_been_modified = (x > 0);
-                    }
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-        break;
+      //           for (member = cntct->custom_variables;
+      //                member;
+      //                member = member->next) {
+      //             if (!strcmp(customvarname, member->variable_name)) {
+      //               if ((x = atoi(val)) > 0 && strlen(val) > 3) {
+      //                 delete[] member->variable_value;
+      //                 member->variable_value = my_strdup(val + 2);
+      //                 member->has_been_modified = (x > 0);
+      //               }
+      //               break;
+      //             }
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      //   break;
 
-      case XRDDEFAULT_HOSTCOMMENT_DATA:
-      case XRDDEFAULT_SERVICECOMMENT_DATA:
-        if (!strcmp(var, "host_name"))
-          host_name = my_strdup(val);
-        else if (!strcmp(var, "service_description"))
-          service_description = my_strdup(val);
-        else if (!strcmp(var, "entry_type"))
-          entry_type = atoi(val);
-        else if (!strcmp(var, "comment_id"))
-          comment_id = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "source"))
-          source = atoi(val);
-        else if (!strcmp(var, "persistent"))
-          persistent = (atoi(val) > 0);
-        else if (!strcmp(var, "entry_time"))
-          entry_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "expires"))
-          expires = (atoi(val) > 0);
-        else if (!strcmp(var, "expire_time"))
-          expire_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "author"))
-          author = my_strdup(val);
-        else if (!strcmp(var, "comment_data"))
-          comment_data = my_strdup(val);
-            break;
+      // case XRDDEFAULT_HOSTCOMMENT_DATA:
+      // case XRDDEFAULT_SERVICECOMMENT_DATA:
+      //   if (!strcmp(var, "host_name"))
+      //     host_name = my_strdup(val);
+      //   else if (!strcmp(var, "service_description"))
+      //     service_description = my_strdup(val);
+      //   else if (!strcmp(var, "entry_type"))
+      //     entry_type = atoi(val);
+      //   else if (!strcmp(var, "comment_id"))
+      //     comment_id = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "source"))
+      //     source = atoi(val);
+      //   else if (!strcmp(var, "persistent"))
+      //     persistent = (atoi(val) > 0);
+      //   else if (!strcmp(var, "entry_time"))
+      //     entry_time = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "expires"))
+      //     expires = (atoi(val) > 0);
+      //   else if (!strcmp(var, "expire_time"))
+      //     expire_time = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "author"))
+      //     author = my_strdup(val);
+      //   else if (!strcmp(var, "comment_data"))
+      //     comment_data = my_strdup(val);
+      //       break;
 
-      case XRDDEFAULT_HOSTDOWNTIME_DATA:
-      case XRDDEFAULT_SERVICEDOWNTIME_DATA:
-        if (!strcmp(var, "host_name"))
-          host_name = my_strdup(val);
-        else if (!strcmp(var, "service_description"))
-          service_description = my_strdup(val);
-        else if (!strcmp(var, "downtime_id"))
-          downtime_id = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "entry_time"))
-          entry_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "start_time"))
-          start_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "end_time"))
-          end_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "fixed"))
-          fixed = (atoi(val) > 0);
-        else if (!strcmp(var, "triggered_by"))
-          triggered_by = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "duration"))
-          duration = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "author"))
-          author = my_strdup(val);
-        else if (!strcmp(var, "comment"))
-          comment_data = my_strdup(val);
-            break;
+      // case XRDDEFAULT_HOSTDOWNTIME_DATA:
+      // case XRDDEFAULT_SERVICEDOWNTIME_DATA:
+      //   if (!strcmp(var, "host_name"))
+      //     host_name = my_strdup(val);
+      //   else if (!strcmp(var, "service_description"))
+      //     service_description = my_strdup(val);
+      //   else if (!strcmp(var, "downtime_id"))
+      //     downtime_id = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "entry_time"))
+      //     entry_time = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "start_time"))
+      //     start_time = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "end_time"))
+      //     end_time = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "fixed"))
+      //     fixed = (atoi(val) > 0);
+      //   else if (!strcmp(var, "triggered_by"))
+      //     triggered_by = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "duration"))
+      //     duration = strtoul(val, NULL, 10);
+      //   else if (!strcmp(var, "author"))
+      //     author = my_strdup(val);
+      //   else if (!strcmp(var, "comment"))
+      //     comment_data = my_strdup(val);
+      //       break;
 
       default:
         break;

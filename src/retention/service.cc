@@ -22,7 +22,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects.hh"
-#include "com/centreon/engine/retention/host.hh"
+#include "com/centreon/engine/retention/service.hh"
 #include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine::configuration::applier;
@@ -31,10 +31,10 @@ using namespace com::centreon::engine;
 /**
  *  Constructor.
  *
- *  @param[in] obj The host to use for retention.
+ *  @param[in] obj The service to use for retention.
  */
-retention::host::host(host_struct* obj)
-  : object(object::host),
+retention::service::service(service_struct* obj)
+  : object(object::service),
     _obj(obj),
     _scheduling_info_is_ok(false),
     _was_flapping(false) {
@@ -44,7 +44,7 @@ retention::host::host(host_struct* obj)
 /**
  *  Destructor.
  */
-retention::host::~host() throw () {
+retention::service::~service() throw () {
   _finished();
 }
 
@@ -53,7 +53,7 @@ retention::host::~host() throw () {
  *
  *  @param[in] value The new scheduling info.
  */
-void retention::host::scheduling_info_is_ok(bool value) {
+void retention::service::scheduling_info_is_ok(bool value) {
   _scheduling_info_is_ok = value;
 }
 
@@ -65,18 +65,28 @@ void retention::host::scheduling_info_is_ok(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool retention::host::set(
+bool retention::service::set(
        std::string const& key,
        std::string const& value) {
-  if (!_obj && value == "host_name") {
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
-      it(state::instance().hosts().find(value));
-    if (it != state::instance().hosts().end())
-      _obj = &*it->second;
-    return (true);
+  if (!_obj) {
+    bool ret(false);
+    if (key == "host_name") {
+      _host_name = value;
+      ret = true;
+    }
+    else if (key == "service_description") {
+      _service_description = value;
+      ret = true;
+    }
+
+    if (ret && !_host_name.empty() && !_service_description.empty()) {
+      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+        it(state::instance().services().find(std::make_pair(_host_name, _service_description)));
+      if (it != state::instance().services().end())
+        _obj = &*it->second;
+    }
+    return (ret);
   }
-  else if (!_obj)
-    return (false);
   if (_modified_attributes(key, value))
     return (true);
   if (_retain_status_information(key, value))
@@ -85,9 +95,9 @@ bool retention::host::set(
 }
 
 /**
- *  Finish all host update.
+ *  Finish all service update.
  */
-void retention::host::_finished() throw () {
+void retention::service::_finished() throw () {
   if (!_obj)
     return;
 
@@ -110,47 +120,51 @@ void retention::host::_finished() throw () {
   }
 
   // calculate next possible notification time.
-  if (_obj->current_state != HOST_UP && _obj->last_host_notification)
-    _obj->next_host_notification
-      = get_next_host_notification_time(
+  if (_obj->current_state != STATE_OK && _obj->last_notification)
+    _obj->next_notification
+      = get_next_service_notification_time(
           _obj,
-          _obj->last_host_notification);
+          _obj->last_notification);
 
-  // ADDED 01/23/2009 adjust current check attempts if host in hard
-  // problem state (max attempts may have changed in config
+  // fix old vars.
+  if (!_obj->has_been_checked && _obj->state_type == SOFT_STATE)
+    _obj->state_type = HARD_STATE;
+
+  // ADDED 01/23/2009 adjust current check attempt if service is
+  // in hard problem state (max attempts may have changed in config
   // since restart).
-  if (_obj->current_state != HOST_UP && _obj->state_type == HARD_STATE)
+  if (_obj->current_state != STATE_OK && _obj->state_type == HARD_STATE)
     _obj->current_attempt = _obj->max_attempts;
 
-  // ADDED 02/20/08 assume same flapping state if large install
-  // tweaks enabled.
+
+  // ADDED 02/20/08 assume same flapping state if large
+  // install tweaks enabled.
   if (config->use_large_installation_tweaks())
-    _obj->is_flapping =_was_flapping;
+    _obj->is_flapping = _was_flapping;
   // else use normal startup flap detection logic.
   else {
-    // host was flapping before program started.
+    // service was flapping before program started.
     // 11/10/07 don't allow flapping notifications to go out.
     allow_flapstart_notification = (_was_flapping ? false : true);
 
     // check for flapping.
-    check_for_host_flapping(
+    check_for_service_flapping(
       _obj,
-      false,
       false,
       allow_flapstart_notification);
 
-    // host was flapping before and isn't now, so clear recovery
-    // check variable if host isn't flapping now.
+    // service was flapping before and isn't now, so clear
+    // recovery check variable if service isn't flapping now.
     if (_was_flapping && !_obj->is_flapping)
       _obj->check_flapping_recovery_notification = false;
   }
 
   // handle new vars added in 2.x.
-  if (!_obj->last_hard_state_change)
+  if (_obj->last_hard_state_change)
     _obj->last_hard_state_change = _obj->last_state_change;
 
-  // update host status.
-  update_host_status(_obj, false);
+  // update service status.
+  update_service_status(_obj, false);
 }
 
 /**
@@ -161,7 +175,7 @@ void retention::host::_finished() throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool retention::host::_modified_attributes(
+bool retention::service::_modified_attributes(
        std::string const& key,
        std::string const& value) {
   if (key == "modified_attributes") {
@@ -170,8 +184,6 @@ bool retention::host::_modified_attributes(
     _obj->modified_attributes
       &= ~config->retained_host_attribute_mask();
   }
-  else
-    return (false);
   return (true);
 }
 
@@ -183,7 +195,7 @@ bool retention::host::_modified_attributes(
  *
  *  @return True on success, otherwise false.
  */
-bool retention::host::_retain_nonstatus_information(
+bool retention::service::_retain_nonstatus_information(
        std::string const& key,
        std::string const& value) {
   if (!_obj->retain_nonstatus_information)
@@ -203,7 +215,7 @@ bool retention::host::_retain_nonstatus_information(
   }
   else if (key == "passive_checks_enabled") {
     if (_obj->modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-      misc::to<bool, int>(value, _obj->accept_passive_host_checks);
+      misc::to<bool, int>(value, _obj->accept_passive_service_checks);
   }
   else if (key == "event_handler_enabled") {
     if (_obj->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
@@ -221,9 +233,9 @@ bool retention::host::_retain_nonstatus_information(
     if (_obj->modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
       misc::to<bool, int>(value, _obj->process_performance_data);
   }
-  else if (key == "obsess_over_host") {
+  else if (key == "obsess_over_service") {
     if (_obj->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-      misc::to<bool, int>(value, _obj->obsess_over_host);
+      misc::to<bool, int>(value, _obj->obsess_over_service);
   }
   else if (key == "check_command") {
     if (_obj->modified_attributes & MODATTR_CHECK_COMMAND) {
@@ -233,8 +245,8 @@ bool retention::host::_retain_nonstatus_information(
         if (!find_command(command.c_str()))
           _obj->modified_attributes -= MODATTR_CHECK_COMMAND;
         else {
-          delete[] _obj->host_check_command;
-          _obj->host_check_command = my_strdup(value);
+          delete[] _obj->service_check_command;
+          _obj->service_check_command = my_strdup(value);
         }
       }
     }
@@ -295,7 +307,7 @@ bool retention::host::_retain_nonstatus_information(
 
         // adjust current attempt number if in a hard state.
         if (_obj->state_type == HARD_STATE
-            && _obj->current_state != HOST_UP
+            && _obj->current_state != STATE_OK
             && _obj->current_attempt > 1)
           _obj->current_attempt = _obj->max_attempts;
       }
@@ -334,7 +346,7 @@ bool retention::host::_retain_nonstatus_information(
  *
  *  @return True on success, otherwise false.
  */
-bool retention::host::_retain_status_information(
+bool retention::service::_retain_status_information(
        std::string const& key,
        std::string const& value) {
   if (!_obj->retain_status_information)
@@ -354,6 +366,30 @@ bool retention::host::_retain_status_information(
     misc::to(value, _obj->last_state);
   else if (key == "last_hard_state")
     misc::to(value, _obj->last_hard_state);
+  else if (key == "current_attempt")
+    misc::to(value, _obj->current_attempt);
+  else if (key == "current_event_id")
+    misc::to(value, _obj->current_event_id);
+  else if (key == "last_event_id")
+    misc::to(value, _obj->last_event_id);
+  else if (key == "current_problem_id")
+    misc::to(value, _obj->current_problem_id);
+  else if (key == "last_problem_id")
+    misc::to(value, _obj->last_problem_id);
+  else if (key == "state_type")
+    misc::to(value, _obj->state_type);
+  else if (key == "last_state_change")
+    misc::to(value, _obj->last_state_change);
+  else if (key == "last_hard_state_change")
+    misc::to(value, _obj->last_hard_state_change);
+  else if (key == "last_time_ok")
+    misc::to(value, _obj->last_time_ok);
+  else if (key == "last_time_warning")
+    misc::to(value, _obj->last_time_warning);
+  else if (key == "last_time_unknown")
+    misc::to(value, _obj->last_time_unknown);
+  else if (key == "last_time_critical")
+    misc::to(value, _obj->last_time_critical);
   else if (key == "plugin_output") {
     delete[] _obj->plugin_output;
     _obj->plugin_output = my_strdup(value);
@@ -376,38 +412,18 @@ bool retention::host::_retain_status_information(
     if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
       misc::to(value, _obj->check_options);
   }
-  else if (key == "current_attempt")
-    misc::to<bool, int>(value, _obj->current_attempt);
-  else if (key == "current_event_id")
-    misc::to(value, _obj->current_event_id);
-  else if (key == "last_event_id")
-    misc::to(value, _obj->last_event_id);
-  else if (key == "current_problem_id")
-    misc::to(value, _obj->current_problem_id);
-  else if (key == "last_problem_id")
-    misc::to(value, _obj->last_problem_id);
-  else if (key == "state_type")
-    misc::to(value, _obj->state_type);
-  else if (key == "last_state_change")
-    misc::to(value, _obj->last_state_change);
-  else if (key == "last_hard_state_change")
-    misc::to(value, _obj->last_hard_state_change);
-  else if (key == "last_time_up")
-    misc::to(value, _obj->last_time_up);
-  else if (key == "last_time_down")
-    misc::to(value, _obj->last_time_down);
-  else if (key == "last_time_unreachable")
-    misc::to(value, _obj->last_time_unreachable);
-  else if (key == "notified_on_down")
-    misc::to(value, _obj->notified_on_down);
-  else if (key == "notified_on_unreachable")
-    misc::to<bool, int>(value, _obj->notified_on_unreachable);
-  else if (key == "last_notification")
-    misc::to(value, _obj->last_host_notification);
+  else if (key == "notified_on_unknown")
+    misc::to<bool, int>(value, _obj->notified_on_unknown);
+  else if (key == "notified_on_warning")
+    misc::to<bool, int>(value, _obj->notified_on_warning);
+  else if (key == "notified_on_critical")
+    misc::to<bool, int>(value, _obj->notified_on_critical);
   else if (key == "current_notification_number")
     misc::to(value, _obj->current_notification_number);
   else if (key == "current_notification_id")
     misc::to(value, _obj->current_notification_id);
+  else if (key == "last_notification")
+    misc::to(value, _obj->last_notification);
   else if (key == "is_flapping")
     misc::to(value, _was_flapping);
   else if (key == "percent_state_change")
@@ -426,7 +442,5 @@ bool retention::host::_retain_status_information(
     }
     _obj->state_history_index = 0;
   }
-  else
-    return (false);
   return (true);
 }

@@ -24,14 +24,25 @@ set(INC_DIR "${INC_DIR}/com/centreon/engine/retention")
 # cce_retention target.
 add_library("cce_retention"
   STATIC
+  "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/contact.cc"
+  "${SRC_DIR}/downtime.cc"
   "${SRC_DIR}/host.cc"
+  "${SRC_DIR}/info.cc"
   "${SRC_DIR}/parser.cc"
+  "${SRC_DIR}/program.cc"
+  "${SRC_DIR}/object.cc"
+  "${SRC_DIR}/service.cc"
 
+  "${INC_DIR}/comment.hh"
   "${INC_DIR}/contact.hh"
+  "${INC_DIR}/downtime.hh"
   "${INC_DIR}/host.hh"
+  "${INC_DIR}/info.hh"
   "${INC_DIR}/parser.hh"
+  "${INC_DIR}/program.hh"
   "${INC_DIR}/object.hh"
+  "${INC_DIR}/service.hh"
 )
 
 # Link target with necessary libraries.
