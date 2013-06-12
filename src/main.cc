@@ -308,10 +308,8 @@ int main(int argc, char* argv[]) {
       }
 
       // Read initial service and host state information.
-      if (result == OK) {
-        initialize_retention_data(config_file);
-        read_initial_state_information();
-      }
+      if (result == OK)
+        result = read_initial_state_information();
 
       if (result != OK) {
         logger(logging::log_config_error, logging::basic)
@@ -468,7 +466,6 @@ int main(int argc, char* argv[]) {
       initialize_status_data(config_file);
 
       // Read initial service and host state information.
-      initialize_retention_data(config_file);
       read_initial_state_information();
 
       // Initialize comment data.
@@ -552,7 +549,6 @@ int main(int argc, char* argv[]) {
 
       // Save service and host state information.
       save_state_information(FALSE);
-      cleanup_retention_data(config_file);
 
       // Clean up performance data.
       cleanup_performance_data(config_file);

@@ -24,6 +24,56 @@ using namespace com::centreon::engine;
 static char const* whitespaces(" \t\r\n");
 
 /**
+ *  Get the next valid line.
+ *
+ *  @param[in, out] stream The current stream to read new line.
+ *  @param[out]     line   The line to fill.
+ *  @param[in, out] pos    The current position.
+ *
+ *  @return True if data is available, false if no data.
+ */
+bool misc::get_next_line(
+       std::ifstream& stream,
+       std::string& line,
+       unsigned int& pos) {
+  while (std::getline(stream, line, '\n')) {
+    ++pos;
+    misc::trim(line);
+    if (!line.empty()) {
+      char c(line[0]);
+      if (c != '#' && c != ';' && c != '\x0')
+        return (true);
+    }
+  }
+  return (false);
+}
+
+/**
+ *  Get key and value from line.
+ *
+ *  @param[in]  line  The line to extract data.
+ *  @param[out] key   The key to fill.
+ *  @param[out] value The value to fill.
+ *  @param[in]  delim The delimiter.
+ */
+bool misc::split(
+       std::string const& line,
+       std::string& key,
+       std::string& value,
+       char delim) {
+  std::size_t pos(line.find(delim));
+  if (pos == std::string::npos)
+    return (false);
+
+  key = line.substr(0, pos);
+  misc::trim(key);
+
+  value = line.substr(pos + 1);
+  misc::trim(value);
+  return (true);
+}
+
+/**
  *  Split data into element.
  *
  *  @param[int] data  The data to split.

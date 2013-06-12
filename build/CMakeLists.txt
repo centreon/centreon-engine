@@ -682,7 +682,6 @@ add_library("cce_core" STATIC
   "${SRC_DIR}/xdddefault.cc"
   "${SRC_DIR}/xodtemplate.cc"
   "${SRC_DIR}/xpddefault.cc"
-  "${SRC_DIR}/xrddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
   # Headers.
   "${INC_DIR}/com/centreon/engine/broker.hh"
@@ -717,7 +716,6 @@ add_library("cce_core" STATIC
   "${INC_DIR}/com/centreon/engine/xdddefault.hh"
   "${INC_DIR}/com/centreon/engine/xodtemplate.hh"
   "${INC_DIR}/com/centreon/engine/xpddefault.hh"
-  "${INC_DIR}/com/centreon/engine/xrddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
 
@@ -756,6 +754,7 @@ target_link_libraries("cce_core"
   "cce_compatibility"
   "cce_objects"
   "cce_deleter"
+  "cce_retention"
 )
 
 # centengine target.

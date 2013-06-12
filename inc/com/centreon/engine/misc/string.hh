@@ -20,6 +20,7 @@
 #ifndef CCE_MISC_STRING_HH
 #  define CCE_MISC_STRING_HH
 
+#  include <fstream>
 #  include <list>
 #  include <sstream>
 #  include <string>
@@ -28,6 +29,15 @@
 CCE_BEGIN()
 
 namespace misc {
+  bool                    get_next_line(
+                            std::ifstream& stream,
+                            std::string& line,
+                            unsigned int& pos);
+  bool                    split(
+                            std::string const& line,
+                            std::string& key,
+                            std::string& value,
+                            char delim);
   std::list<std::string>& split(
                             std::string const& data,
                             std::list<std::string>& out,
