@@ -144,7 +144,6 @@ check_include_file_cxx("stdlib.h" HAVE_STDLIB_H)
 check_include_file_cxx("string" HAVE_STRING)
 check_include_file_cxx("string.h" HAVE_STRING_H)
 check_include_file_cxx("syslog.h" HAVE_SYSLOG_H)
-check_include_file_cxx("sys/ioctl.h" HAVE_SYS_IOCTL_H)
 check_include_file_cxx("sys/mman.h" HAVE_SYS_MMAN_H)
 check_include_file_cxx("sys/stat.h" HAVE_SYS_STAT_H)
 check_include_file_cxx("sys/time.h" HAVE_SYS_TIME_H)
@@ -176,7 +175,6 @@ if (NOT HAVE_ALGORITHM
     OR NOT HAVE_STRING
     OR NOT HAVE_STRING_H
     OR NOT HAVE_SYSLOG_H
-    OR NOT HAVE_SYS_IOCTL_H
     OR NOT HAVE_SYS_MMAN_H
     OR NOT HAVE_SYS_STAT_H
     OR NOT HAVE_SYS_TIME_H
@@ -195,34 +193,25 @@ set(CMAKE_REQUIRED_LIBRARIES
   "${PTHREAD_LIBRARIES}")
 check_function_exists("atoi" HAVE_ATOI)
 check_function_exists("ceil" HAVE_CEIL)
-check_function_exists("chdir" HAVE_CHDIR)
 check_function_exists("close" HAVE_CLOSE)
 check_function_exists("closedir" HAVE_CLOSEDIR)
 check_function_exists("ctime" HAVE_CTIME)
 check_function_exists("dirname" HAVE_DIRNAME)
-check_function_exists("dup2" HAVE_DUP2)
-check_function_exists("execvp" HAVE_EXECVP)
-check_function_exists("exit" HAVE_EXIT)
-check_function_exists("_exit" HAVE__EXIT)
 check_function_exists("fclose" HAVE_FCLOSE)
 check_function_exists("fdopen" HAVE_FDOPEN)
 check_function_exists("fflush" HAVE_FFLUSH)
 check_function_exists("fgets" HAVE_FGETS)
 check_function_exists("floor" HAVE_FLOOR)
 check_function_exists("fopen" HAVE_FOPEN)
-check_function_exists("fork" HAVE_FORK)
 check_function_exists("fprintf" HAVE_FPRINTF)
 check_function_exists("fputc" HAVE_FPUTC)
 check_function_exists("fputs" HAVE_FPUTS)
 check_function_exists("fsync" HAVE_FSYNC)
 check_function_exists("ftruncate" HAVE_FTRUNCATE)
-check_function_exists("fwrite" HAVE_FWRITE)
 check_function_exists("getopt" HAVE_GETOPT)
 check_function_exists("getpid" HAVE_GETPID)
 check_function_exists("gettimeofday" HAVE_GETTIMEOFDAY)
 check_function_exists("gmtime_r" HAVE_GMTIME_R)
-check_function_exists("ioctl" HAVE_IOCTL)
-check_function_exists("kill" HAVE_KILL)
 check_function_exists("localtime_r" HAVE_LOCALTIME_R)
 check_function_exists("lseek" HAVE_LSEEK)
 check_function_exists("memcpy" HAVE_MEMCPY)
@@ -234,12 +223,9 @@ check_function_exists("mmap" HAVE_MMAP)
 check_function_exists("munmap" HAVE_MUNMAP)
 check_function_exists("open" HAVE_OPEN)
 check_function_exists("opendir" HAVE_OPENDIR)
-check_function_exists("openlog" HAVE_OPENLOG)
-check_function_exists("pipe" HAVE_PIPE)
 check_function_exists("printf" HAVE_PRINTF)
 check_function_exists("pthread_mutex_lock" HAVE_PTHREAD_MUTEX_LOCK)
 check_function_exists("pthread_mutex_unlock" HAVE_PTHREAD_MUTEX_UNLOCK)
-check_function_exists("putchar" HAVE_PUTCHAR)
 check_function_exists("putenv" HAVE_PUTENV)
 check_function_exists("puts" HAVE_PUTS)
 check_function_exists("qsort" HAVE_QSORT)
@@ -269,46 +255,34 @@ check_function_exists("strstr" HAVE_STRSTR)
 check_function_exists("strtod" HAVE_STRTOD)
 check_function_exists("strtok" HAVE_STRTOK)
 check_function_exists("strtoul" HAVE_STRTOUL)
-check_function_exists("syslog" HAVE_SYSLOG)
 check_function_exists("time" HAVE_TIME)
 check_function_exists("toupper" HAVE_TOUPPER)
-check_function_exists("tzset" HAVE_TZSET)
 check_function_exists("umask" HAVE_UMASK)
 check_function_exists("unlink" HAVE_UNLINK)
 check_function_exists("unsetenv" HAVE_UNSETENV)
 check_function_exists("vsnprintf" HAVE_VSNPRINTF)
-check_function_exists("waitpid" HAVE_WAITPID)
 check_function_exists("write" HAVE_WRITE)
 if (NOT HAVE_ATOI
     OR NOT HAVE_CEIL
-    OR NOT HAVE_CHDIR
     OR NOT HAVE_CLOSE
     OR NOT HAVE_CLOSEDIR
     OR NOT HAVE_CTIME
     OR NOT HAVE_DIRNAME
-    OR NOT HAVE_DUP2
-    OR NOT HAVE_EXECVP
-    OR NOT HAVE_EXIT
-    OR NOT HAVE__EXIT
     OR NOT HAVE_FCLOSE
     OR NOT HAVE_FDOPEN
     OR NOT HAVE_FFLUSH
     OR NOT HAVE_FGETS
     OR NOT HAVE_FLOOR
     OR NOT HAVE_FOPEN
-    OR NOT HAVE_FORK
 #    OR NOT HAVE_FPRINTF # Does not work with Clang.
     OR NOT HAVE_FPUTC
     OR NOT HAVE_FPUTS
     OR NOT HAVE_FSYNC
     OR NOT HAVE_FTRUNCATE
-    OR NOT HAVE_FWRITE
     OR NOT HAVE_GETOPT
     OR NOT HAVE_GETPID
     OR NOT HAVE_GETTIMEOFDAY
     OR NOT HAVE_GMTIME_R
-    OR NOT HAVE_IOCTL
-    OR NOT HAVE_KILL
     OR NOT HAVE_LOCALTIME_R
     OR NOT HAVE_LSEEK
     OR NOT HAVE_MEMCPY
@@ -320,12 +294,9 @@ if (NOT HAVE_ATOI
     OR NOT HAVE_MUNMAP
     OR NOT HAVE_OPEN
     OR NOT HAVE_OPENDIR
-    OR NOT HAVE_OPENLOG
-    OR NOT HAVE_PIPE
     OR NOT HAVE_PRINTF
     OR NOT HAVE_PTHREAD_MUTEX_LOCK
     OR NOT HAVE_PTHREAD_MUTEX_UNLOCK
-    OR NOT HAVE_PUTCHAR
     OR NOT HAVE_PUTENV
     OR NOT HAVE_PUTS
     OR NOT HAVE_QSORT
@@ -355,15 +326,12 @@ if (NOT HAVE_ATOI
     OR NOT HAVE_STRTOD
     OR NOT HAVE_STRTOK
     OR NOT HAVE_STRTOUL
-    OR NOT HAVE_SYSLOG
     OR NOT HAVE_TIME
     OR NOT HAVE_TOUPPER
-    OR NOT HAVE_TZSET
     OR NOT HAVE_UMASK
     OR NOT HAVE_UNLINK
     OR NOT HAVE_UNSETENV
     OR NOT HAVE_VSNPRINTF
-    OR NOT HAVE_WAITPID
     OR NOT HAVE_WRITE)
   message(FATAL_ERROR "Could not find all mandatory functions.")
 endif ()
