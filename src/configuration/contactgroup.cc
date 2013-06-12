@@ -39,7 +39,7 @@ static struct {
  *  Default constructor.
  */
 contactgroup::contactgroup()
-  : object(object::contactgroup, "contactgroup") {
+  : object(object::contactgroup) {
 
 }
 

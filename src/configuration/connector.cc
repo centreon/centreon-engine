@@ -38,7 +38,7 @@ static struct {
  *  Default constructor.
  */
 connector::connector()
-  : object(object::connector, "connector") {
+  : object(object::connector) {
 
 }
 

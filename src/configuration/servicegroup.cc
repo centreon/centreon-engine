@@ -43,7 +43,7 @@ static struct {
  *  Default constructor.
  */
 servicegroup::servicegroup()
-  : object(object::servicegroup, "servicegroup") {
+  : object(object::servicegroup) {
 
 }
 

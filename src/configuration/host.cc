@@ -116,7 +116,7 @@ static unsigned short const default_stalking_options(host::none);
  *  Default constructor.
  */
 host::host()
-  : object(object::host, "host") {
+  : object(object::host) {
 
 }
 

@@ -44,7 +44,7 @@ static struct {
  *  Default constructor.
  */
 serviceextinfo::serviceextinfo()
-  : object(object::serviceextinfo, "serviceextinfo") {
+  : object(object::serviceextinfo) {
 
 }
 

@@ -41,7 +41,7 @@ static struct {
  *  Default constructor.
  */
 timeperiod::timeperiod()
-  : object(object::timeperiod, "timeperiod") {
+  : object(object::timeperiod) {
   _exceptions.resize(DATERANGE_TYPES);
   _timeranges.resize(7);
 }

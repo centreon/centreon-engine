@@ -113,7 +113,7 @@ static unsigned short const default_stalking_options(service::none);
  *  Default constructor.
  */
 service::service()
-  : object(object::service, "service") {
+  : object(object::service) {
 
 }
 

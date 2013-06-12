@@ -42,7 +42,7 @@ static struct {
  *  Default constructor.
  */
 hostgroup::hostgroup()
-  : object(object::hostgroup, "hostgroup") {
+  : object(object::hostgroup) {
 
 }
 

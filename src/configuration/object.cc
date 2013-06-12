@@ -55,14 +55,12 @@ static struct {
  *  Constructor.
  *
  *  @param[in] type      The object type.
- *  @param[in] type_name The object type name.
  */
-object::object(object::object_type type, std::string const& type_name)
+object::object(object::object_type type)
   : _id(0),
     _is_resolve(false),
     _is_template(false),
-    _type(type),
-    _type_name(type_name) {
+    _type(type) {
 
 }
 
@@ -97,7 +95,6 @@ object& object::operator=(object const& right) {
     _name = right._name;
     _templates = right._templates;
     _type = right._type;
-    _type_name = right._type_name;
   }
   return (*this);
 }
@@ -113,7 +110,6 @@ bool object::operator==(object const& right) const throw () {
   return (_id == right._id
           && _name == right._name
           && _type == right._type
-          && _type_name == right._type_name
           && _is_resolve == right._is_resolve
           && _is_template == right._is_template
           && _templates == right._templates);
@@ -264,7 +260,24 @@ object::object_type object::type() const throw () {
  *  @return The object type name.
  */
 std::string const& object::type_name() const throw () {
-  return (_type_name);
+  static std::string const tab[] = {
+    "command",
+    "connector",
+    "contact",
+    "contactgroup",
+    "host",
+    "hostdependency",
+    "hostescalation",
+    "hostextinfo",
+    "hostgroup",
+    "service",
+    "servicedependency",
+    "serviceescalation",
+    "serviceextinfo",
+    "servicegroup",
+    "timeperiod"
+  };
+  return (tab[_type]);
 }
 
 /**

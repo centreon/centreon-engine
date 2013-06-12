@@ -39,7 +39,7 @@ static struct {
  *  Default constructor.
  */
 command::command()
-  : object(object::command, "command") {
+  : object(object::command) {
 
 }
 

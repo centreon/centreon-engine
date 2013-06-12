@@ -54,7 +54,7 @@ static unsigned int const   default_notification_interval(0);
  *  Default constructor.
  */
 hostescalation::hostescalation()
-  : object(object::hostescalation, "hostescalation") {
+  : object(object::hostescalation) {
 
 }
 

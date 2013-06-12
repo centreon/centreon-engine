@@ -53,7 +53,7 @@ static point_3d const default_coords_3d(0.0, 0.0, 0.0);
  *  Default constructor.
  */
 hostextinfo::hostextinfo()
-  : object(object::hostextinfo, "hostextinfo") {
+  : object(object::hostextinfo) {
 
 }
 

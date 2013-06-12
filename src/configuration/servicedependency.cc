@@ -71,7 +71,7 @@ static unsigned short const default_notification_failure_options(servicedependen
  *  Default constructor.
  */
 servicedependency::servicedependency()
-  : object(object::servicedependency, "servicedependency") {
+  : object(object::servicedependency) {
 
 }
 

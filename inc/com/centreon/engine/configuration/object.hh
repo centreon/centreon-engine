@@ -54,9 +54,7 @@ namespace                  configuration {
       timeperiod = 14
     };
 
-                           object(
-                             object_type type,
-                             std::string const& type_name);
+                           object(object_type type);
                            object(object const& right);
     virtual                ~object() throw ();
     object&                operator=(object const& right);
@@ -116,7 +114,6 @@ namespace                  configuration {
     std::string            _name;
     list_string            _templates;
     object_type            _type;
-    std::string            _type_name;
   };
 
   typedef shared_ptr<object>            object_ptr;

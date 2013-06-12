@@ -66,7 +66,7 @@ static unsigned int const   MAX_ADDRESSES(6);
  *  Default constructor.
  */
 contact::contact()
-  : object(object::contact, "contact") {
+  : object(object::contact) {
   _address.resize(MAX_ADDRESSES);
 }
 
