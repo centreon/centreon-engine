@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -72,76 +73,77 @@ void applier::host::add_object(host_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Creating new host '" << obj->host_name() << "'.";
 
-  // Create contact.
-  shared_ptr<host_struct> h;
-  h = shared_ptr<host_struct>(
-        add_host(
-          obj->host_name().c_str(),
-          NULL_IF_EMPTY(obj->display_name()),
-          NULL_IF_EMPTY(obj->alias()),
-          NULL_IF_EMPTY(obj->address()),
-          NULL_IF_EMPTY(obj->check_period()),
-          obj->initial_state(),
-          obj->check_interval(),
-          obj->retry_interval(),
-          obj->max_check_attempts(),
-          static_cast<bool>(obj->notification_options()
-                            & configuration::host::up),
-          static_cast<bool>(obj->notification_options()
-                            & configuration::host::down),
-          static_cast<bool>(obj->notification_options()
-                            & configuration::host::unreachable),
-          static_cast<bool>(obj->notification_options()
-                            & configuration::host::flapping),
-          static_cast<bool>(obj->notification_options()
-                            & configuration::host::downtime),
-          obj->notification_interval(),
-          obj->first_notification_delay(),
-          NULL_IF_EMPTY(obj->notification_period()),
-          obj->notifications_enabled(),
-          NULL_IF_EMPTY(obj->check_command()),
-          obj->checks_active(),
-          obj->checks_passive(),
-          NULL_IF_EMPTY(obj->event_handler()),
-          obj->event_handler_enabled(),
-          obj->flap_detection_enabled(),
-          obj->low_flap_threshold(),
-          obj->high_flap_threshold(),
-          static_cast<bool>(obj->flap_detection_options()
-                            & configuration::host::up),
-          static_cast<bool>(obj->flap_detection_options()
-                            & configuration::host::down),
-          static_cast<bool>(obj->flap_detection_options()
-                            & configuration::host::unreachable),
-          static_cast<bool>(obj->stalking_options()
-                            & configuration::host::up),
-          static_cast<bool>(obj->stalking_options()
-                            & configuration::host::down),
-          static_cast<bool>(obj->stalking_options()
-                            & configuration::host::unreachable),
-          obj->process_perf_data(),
-          false, // failure_prediction_enabled
-          NULL, // failure_prediction_options
-          obj->check_freshness(),
-          obj->freshness_threshold(),
-          NULL_IF_EMPTY(obj->notes()),
-          NULL_IF_EMPTY(obj->notes_url()),
-          NULL_IF_EMPTY(obj->action_url()),
-          NULL_IF_EMPTY(obj->icon_image()),
-          NULL_IF_EMPTY(obj->icon_image_alt()),
-          NULL_IF_EMPTY(obj->vrml_image()),
-          NULL_IF_EMPTY(obj->statusmap_image()),
-          obj->coords_2d().x(),
-          obj->coords_2d().y(),
-          obj->have_coords_2d(),
-          obj->coords_3d().x(),
-          obj->coords_3d().y(),
-          obj->coords_3d().z(),
-          obj->have_coords_3d(),
-          false, // should_be_drawn
-          obj->retain_status_information(),
-          obj->retain_nonstatus_information(),
-          obj->obsess_over_host()));
+  // Create host.
+  shared_ptr<host_struct>
+    h(
+      add_host(
+        obj->host_name().c_str(),
+        NULL_IF_EMPTY(obj->display_name()),
+        NULL_IF_EMPTY(obj->alias()),
+        NULL_IF_EMPTY(obj->address()),
+        NULL_IF_EMPTY(obj->check_period()),
+        obj->initial_state(),
+        obj->check_interval(),
+        obj->retry_interval(),
+        obj->max_check_attempts(),
+        static_cast<bool>(obj->notification_options()
+                          & configuration::host::up),
+        static_cast<bool>(obj->notification_options()
+                          & configuration::host::down),
+        static_cast<bool>(obj->notification_options()
+                          & configuration::host::unreachable),
+        static_cast<bool>(obj->notification_options()
+                          & configuration::host::flapping),
+        static_cast<bool>(obj->notification_options()
+                          & configuration::host::downtime),
+        obj->notification_interval(),
+        obj->first_notification_delay(),
+        NULL_IF_EMPTY(obj->notification_period()),
+        obj->notifications_enabled(),
+        NULL_IF_EMPTY(obj->check_command()),
+        obj->checks_active(),
+        obj->checks_passive(),
+        NULL_IF_EMPTY(obj->event_handler()),
+        obj->event_handler_enabled(),
+        obj->flap_detection_enabled(),
+        obj->low_flap_threshold(),
+        obj->high_flap_threshold(),
+        static_cast<bool>(obj->flap_detection_options()
+                          & configuration::host::up),
+        static_cast<bool>(obj->flap_detection_options()
+                          & configuration::host::down),
+        static_cast<bool>(obj->flap_detection_options()
+                          & configuration::host::unreachable),
+        static_cast<bool>(obj->stalking_options()
+                          & configuration::host::up),
+        static_cast<bool>(obj->stalking_options()
+                          & configuration::host::down),
+        static_cast<bool>(obj->stalking_options()
+                          & configuration::host::unreachable),
+        obj->process_perf_data(),
+        false, // failure_prediction_enabled
+        NULL, // failure_prediction_options
+        obj->check_freshness(),
+        obj->freshness_threshold(),
+        NULL_IF_EMPTY(obj->notes()),
+        NULL_IF_EMPTY(obj->notes_url()),
+        NULL_IF_EMPTY(obj->action_url()),
+        NULL_IF_EMPTY(obj->icon_image()),
+        NULL_IF_EMPTY(obj->icon_image_alt()),
+        NULL_IF_EMPTY(obj->vrml_image()),
+        NULL_IF_EMPTY(obj->statusmap_image()),
+        obj->coords_2d().x(),
+        obj->coords_2d().y(),
+        obj->have_coords_2d(),
+        obj->coords_3d().x(),
+        obj->coords_3d().y(),
+        obj->coords_3d().z(),
+        obj->have_coords_3d(),
+        false, // should_be_drawn
+        obj->retain_status_information(),
+        obj->retain_nonstatus_information(),
+        obj->obsess_over_host()),
+      &deleter::host);
   if (!h.get())
     throw (engine_error() << "Error: Could not register host '"
            << obj->host_name() << "'.");
@@ -267,8 +269,12 @@ void applier::host::modify_object(host_ptr obj) {
   modify_if_different(
     h->host_check_command,
     NULL_IF_EMPTY(obj->check_command()));
-  // XXX : active checks enabled
-  // XXX : passive checks enabled
+  modify_if_different(
+    h->checks_enabled,
+    static_cast<int>(obj->checks_active()));
+  modify_if_different(
+    h->accept_passive_host_checks,
+    static_cast<int>(obj->checks_passive()));
   modify_if_different(
     h->event_handler,
     NULL_IF_EMPTY(obj->event_handler()));
@@ -305,9 +311,9 @@ void applier::host::modify_object(host_ptr obj) {
     h->stalk_on_unreachable,
     static_cast<int>(static_cast<bool>(
       obj->stalking_options() & configuration::host::unreachable)));
-  /* XXX modify_if_different(
-    h->process_perf_data,
-    static_cast<int>(obj->process_perf_data()));*/
+  modify_if_different(
+    h->process_performance_data,
+    static_cast<int>(obj->process_perf_data()));
   modify_if_different(
     h->check_freshness,
     static_cast<int>(obj->check_freshness()));

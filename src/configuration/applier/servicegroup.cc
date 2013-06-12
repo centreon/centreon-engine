@@ -17,10 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/servicegroup.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
+#include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/servicegroup.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -68,7 +69,27 @@ void applier::servicegroup::add_object(servicegroup_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
 
+  // Create servicegroup.
+  shared_ptr<servicegroup_struct>
+    sg(
+      add_servicegroup(
+        obj->servicegroup_name().c_str(),
+        NULL_IF_EMPTY(obj->alias()),
+        NULL_IF_EMPTY(obj->notes()),
+        NULL_IF_EMPTY(obj->notes_url()),
+        NULL_IF_EMPTY(obj->action_url())),
+      &deleter::servicegroup);
+  if (!sg.get())
+    throw (engine_error() << "Error: Could not register service group '"
+           << obj->servicegroup_name() << "'.");
+
   // XXX
+
+  // Register servicegroup.
+  sg->next = servicegroup_list;
+  applier::state::instance().servicegroups()[obj->servicegroup_name()]
+    = sg;
+  servicegroup_list = sg.get();
 
   return ;
 }
@@ -98,7 +119,7 @@ void applier::servicegroup::remove_object(servicegroup_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
 
-  // Unregister host.
+  // Unregister servicegroup.
   unregister_object<servicegroup_struct, &servicegroup_struct::group_name>(
     &servicegroup_list,
     obj->servicegroup_name().c_str());

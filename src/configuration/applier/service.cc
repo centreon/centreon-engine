@@ -17,9 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/service.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -64,12 +68,136 @@ applier::service& applier::service::operator=(
  *  @param[in] obj The new service to add into the monitoring engine.
  */
 void applier::service::add_object(service_ptr obj) {
-  // Logging.
-  // logger(logging::dbg_config, logging::more)
-  //   << "Creating new service '" << obj->service_description()
-  //   << "' of host '" << obj->host_name() << "'.";
+  // Browse all hosts of this service.
+  for (list_string::const_iterator
+         it(obj->hosts().begin()),
+         end(obj->hosts().end());
+       it != end;
+       ++it) {
+    // Logging.
+    logger(logging::dbg_config, logging::more)
+      << "Creating new service '" << obj->service_description()
+      << "' of host '" << *it << "'.";
 
-  // XXX
+    // Create service.
+    shared_ptr<service_struct>
+      s(
+        add_service(
+          it->c_str(),
+          obj->service_description().c_str(),
+          NULL_IF_EMPTY(obj->display_name()),
+          NULL_IF_EMPTY(obj->check_period()),
+          obj->initial_state(),
+          obj->max_check_attempts(),
+          false, // parallelize
+          obj->checks_passive(),
+          obj->check_interval(),
+          obj->retry_interval(),
+          obj->notification_interval(),
+          obj->first_notification_delay(),
+          NULL_IF_EMPTY(obj->notification_period()),
+          static_cast<bool>(obj->notification_options()
+                            & configuration::service::ok),
+          static_cast<bool>(obj->notification_options()
+                            & configuration::service::unknown),
+          static_cast<bool>(obj->notification_options()
+                            & configuration::service::warning),
+          static_cast<bool>(obj->notification_options()
+                            & configuration::service::critical),
+          static_cast<bool>(obj->notification_options()
+                            & configuration::service::flapping),
+          static_cast<bool>(obj->notification_options()
+                            & configuration::service::downtime),
+          obj->notifications_enabled(),
+          obj->is_volatile(),
+          NULL_IF_EMPTY(obj->event_handler()),
+          obj->event_handler_enabled(),
+          NULL_IF_EMPTY(obj->check_command()),
+          obj->checks_active(),
+          obj->flap_detection_enabled(),
+          obj->low_flap_threshold(),
+          obj->high_flap_threshold(),
+          static_cast<bool>(obj->flap_detection_options()
+                            & configuration::service::ok),
+          static_cast<bool>(obj->flap_detection_options()
+                            &configuration::service::warning),
+          static_cast<bool>(obj->flap_detection_options()
+                            &configuration::service::unknown),
+          static_cast<bool>(obj->flap_detection_options()
+                            &configuration::service::critical),
+          static_cast<bool>(obj->stalking_options()
+                            &configuration::service::ok),
+          static_cast<bool>(obj->stalking_options()
+                            &configuration::service::warning),
+          static_cast<bool>(obj->stalking_options()
+                            &configuration::service::unknown),
+          static_cast<bool>(obj->stalking_options()
+                            &configuration::service::critical),
+          obj->process_perf_data(),
+          false, // failure_prediction_enabled
+          NULL, // failure_prediction_options
+          obj->check_freshness(),
+          obj->freshness_threshold(),
+          NULL_IF_EMPTY(obj->notes()),
+          NULL_IF_EMPTY(obj->notes_url()),
+          NULL_IF_EMPTY(obj->action_url()),
+          NULL_IF_EMPTY(obj->icon_image()),
+          NULL_IF_EMPTY(obj->icon_image_alt()),
+          obj->retain_status_information(),
+          obj->retain_nonstatus_information(),
+          obj->obsess_over_service()),
+        &deleter::service);
+    if (!s.get())
+      throw (engine_error() << "Error: Could not register service '"
+             << obj->service_description()
+             << "' of host '" << *it << "'.");
+
+    // Add contacts.
+    for (list_string::const_iterator
+           it2(obj->contacts().begin()),
+           end2(obj->contacts().end());
+         it2 != end2;
+         ++it2)
+      if (!add_contact_to_service(s.get(), it2->c_str()))
+        throw (engine_error() << "Error: Could not add contact '"
+               << *it2 << "' to service '" << obj->service_description()
+               << "' of host '" << *it << "'.");
+
+    // Add contactgroups.
+    for (list_string::const_iterator
+           it2(obj->contactgroups().begin()),
+           end2(obj->contactgroups().end());
+         it2 != end2;
+         ++it2)
+      if (!add_contactgroup_to_service(s.get(), it2->c_str()))
+        throw (engine_error() << "Error: Could not add contact group '"
+               << *it2 << "' to service '" << obj->service_description()
+               << "' of host '" << *it << "'.");
+
+    // Add custom variables.
+    for (properties::const_iterator
+           it2(obj->customvariables().begin()),
+           end2(obj->customvariables().end());
+         it2 != end2;
+         ++it2)
+      if (!add_custom_variable_to_service(
+             s.get(),
+             it2->first.c_str(),
+             it2->second.c_str()))
+        throw (engine_error()
+               << "Error: Could not add custom variable '"
+               << it2->first << "' to service '"
+               << obj->service_description() << "' of host '" << *it
+               << "'.");
+
+    // XXX : hostgroups
+    // XXX : servicegroups
+
+    // Register service.
+    s->next = service_list;
+    applier::state::instance().services()[std::make_pair(*it, obj->service_description())] = s;
+    service_list = s.get();
+  }
 
   return ;
 }
@@ -80,12 +208,19 @@ void applier::service::add_object(service_ptr obj) {
  *  @param[in] obj The new service to modify into the monitoring engine.
  */
 void applier::service::modify_object(service_ptr obj) {
-  // Logging.
-  // logger(logging::dbg_config, logging::more)
-  //   << "Modifying service '" << obj->service_description()
-  //   << "' of host '" << obj->host_name() << "'.";
+  // Browse all hosts of this service.
+  for (list_string::const_iterator
+         it(obj->hosts().begin()),
+         end(obj->hosts().end());
+       it != end;
+       ++it) {
+    // Logging.
+    logger(logging::dbg_config, logging::more)
+      << "Modifying service '" << obj->service_description()
+      << "' of host '" << *it << "'.";
 
-  // XXX
+    // XXX
+  }
 
   return ;
 }
@@ -96,12 +231,19 @@ void applier::service::modify_object(service_ptr obj) {
  *  @param[in] obj The new service to remove from the monitoring engine.
  */
 void applier::service::remove_object(service_ptr obj) {
-  // Logging.
-  // logger(logging::dbg_config, logging::more)
-  //   << "Removing service '" << obj->service_description()
-  //   << "' of host '" << obj->host_name() << "'.";
+  // Browse all hosts of this service.
+  for (list_string::const_iterator
+         it(obj->hosts().begin()),
+         end(obj->hosts().end());
+       it != end;
+       ++it) {
+    // Logging.
+    logger(logging::dbg_config, logging::more)
+      << "Removing service '" << obj->service_description()
+      << "' of host '" << *it << "'.";
 
-  // XXX
+    // XXX
+  }
 
   return ;
 }
@@ -112,12 +254,33 @@ void applier::service::remove_object(service_ptr obj) {
  *  @param[in] obj Service object.
  */
 void applier::service::resolve_object(service_ptr obj) {
-  // Logging.
-  // logger(logging::dbg_config, logging::more)
-  //   << "Resolving service '" << obj->service_description()
-  //   << "' of host '" << obj->host_name () << "'.";
+  // Browse all hosts of this service.
+  for (list_string::const_iterator
+         it(obj->hosts().begin()),
+         end(obj->hosts().end());
+       it != end;
+       ++it) {
+    // Logging.
+    logger(logging::dbg_config, logging::more)
+      << "Resolving service '" << obj->service_description()
+      << "' of host '" << *it << "'.";
 
-  // XXX
+    // Find service.
+    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+      it2(applier::state::instance().services().find(
+           std::make_pair(*it, obj->service_description())));
+    if (applier::state::instance().services().end() == it2)
+      throw (engine_error()
+             << "Error: Cannot resolve non-existing service '"
+             << obj->service_description() << "' of host '"
+             << *it << "'.");
+
+    // Resolve service.
+    if (!check_service(it2->second.get(), NULL, NULL))
+      throw (engine_error() << "Error: Cannot resolve service '"
+             << obj->service_description() << "' of host '"
+             << *it << "'.");
+  }
 
   return ;
 }

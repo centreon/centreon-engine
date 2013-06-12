@@ -22,6 +22,8 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contactgroup.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/shared.hh"
 
@@ -72,21 +74,35 @@ void applier::contactgroup::add_object(contactgroup_ptr obj) {
     << obj->contactgroup_name() << "'.";
 
   // Create contactgroup.
-  shared_ptr<contactgroup_struct> g(new contactgroup_struct);
-  memset(g.get(), 0, sizeof(*g));
+  shared_ptr<contactgroup_struct>
+    cg(
+      add_contactgroup(
+        obj->contactgroup_name().c_str(),
+        NULL_IF_EMPTY(obj->alias())),
+      &deleter::contactgroup);
+  if (!cg.get())
+    throw (engine_error() << "Error: Could not register contact group '"
+           << obj->contactgroup_name() << "'.");
 
-  g->group_name = my_strdup(obj->contactgroup_name().c_str());
-  g->alias = my_strdup(obj->alias().c_str());
-  applier::add_members<contact_struct, contactsmember_struct>(
-    applier::state::instance().contacts(),
-    obj->members(),
-    g->members);
-  // XXX: todo fill contactgroup.
+  // Add contact members.
+  for (list_string::const_iterator
+         it(obj->members().begin()),
+         end(obj->members().end());
+       it != end;
+       ++it)
+    if (!add_contact_to_contactgroup(
+           cg.get(),
+           it->c_str()))
+      throw (engine_error() << "Error: Could not add contact '" << *it
+             << "' to contact group '" << obj->contactgroup_name()
+             << "'.");
+  // XXX : contactgroup members
 
-  // Register contact.
-  g->next = contactgroup_list;
-  applier::state::instance().contactgroups()[obj->contactgroup_name()] = g;
-  contactgroup_list = g.get();
+  // Register contactgroup.
+  cg->next = contactgroup_list;
+  applier::state::instance().contactgroups()[obj->contactgroup_name()]
+    = cg;
+  contactgroup_list = cg.get();
 
   return ;
 }

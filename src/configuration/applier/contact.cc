@@ -21,10 +21,9 @@
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/customvariable.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
-#include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contact.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -88,43 +87,44 @@ void applier::contact::add_object(contact_ptr obj) {
   }
 
   // Create contact.
-  shared_ptr<contact_struct> c;
-  c = shared_ptr<contact_struct>(
-        add_contact(
-          obj->contact_name().c_str(),
-          NULL_IF_EMPTY(obj->alias()),
-          NULL_IF_EMPTY(obj->email()),
-          NULL_IF_EMPTY(obj->pager()),
-          addresses,
-          NULL_IF_EMPTY(obj->service_notification_period()),
-          NULL_IF_EMPTY(obj->host_notification_period()),
-          static_cast<bool>(
-            obj->service_notification_options() & service::ok),
-          static_cast<bool>(
-            obj->service_notification_options() & service::critical),
-          static_cast<bool>(
-            obj->service_notification_options() & service::warning),
-          static_cast<bool>(
-            obj->service_notification_options() & service::unknown),
-          static_cast<bool>(
-            obj->service_notification_options() & service::flapping),
-          static_cast<bool>(
-            obj->service_notification_options() & service::downtime),
-          static_cast<bool>(
-            obj->host_notification_options() & host::up),
-          static_cast<bool>(
-            obj->host_notification_options() & host::down),
-          static_cast<bool>(
-            obj->host_notification_options() & host::unreachable),
-          static_cast<bool>(
-            obj->host_notification_options() & host::flapping),
-          static_cast<bool>(
-            obj->host_notification_options() & host::downtime),
-          obj->host_notifications_enabled(),
-          obj->service_notifications_enabled(),
-          obj->can_submit_commands(),
-          obj->retain_status_information(),
-          obj->retain_nonstatus_information()));
+  shared_ptr<contact_struct>
+    c(
+      add_contact(
+        obj->contact_name().c_str(),
+        NULL_IF_EMPTY(obj->alias()),
+        NULL_IF_EMPTY(obj->email()),
+        NULL_IF_EMPTY(obj->pager()),
+        addresses,
+        NULL_IF_EMPTY(obj->service_notification_period()),
+        NULL_IF_EMPTY(obj->host_notification_period()),
+        static_cast<bool>(
+          obj->service_notification_options() & service::ok),
+        static_cast<bool>(
+          obj->service_notification_options() & service::critical),
+        static_cast<bool>(
+          obj->service_notification_options() & service::warning),
+        static_cast<bool>(
+          obj->service_notification_options() & service::unknown),
+        static_cast<bool>(
+          obj->service_notification_options() & service::flapping),
+        static_cast<bool>(
+          obj->service_notification_options() & service::downtime),
+        static_cast<bool>(
+          obj->host_notification_options() & host::up),
+        static_cast<bool>(
+          obj->host_notification_options() & host::down),
+        static_cast<bool>(
+          obj->host_notification_options() & host::unreachable),
+        static_cast<bool>(
+          obj->host_notification_options() & host::flapping),
+        static_cast<bool>(
+          obj->host_notification_options() & host::downtime),
+        obj->host_notifications_enabled(),
+        obj->service_notifications_enabled(),
+        obj->can_submit_commands(),
+        obj->retain_status_information(),
+        obj->retain_nonstatus_information()),
+      &deleter::contact);
   if (!c.get())
     throw (engine_error() << "Error: Could not register contact '"
            << obj->contact_name() << "'.");
