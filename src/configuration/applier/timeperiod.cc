@@ -21,6 +21,8 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/timeperiod.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -65,7 +67,63 @@ void applier::timeperiod::add_object(timeperiod_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Creating new timeperiod '" << obj->timeperiod_name() << "'.";
 
-  // XXX
+  // Create timeperiod.
+  shared_ptr<timeperiod_struct>
+    tp(
+      add_timeperiod(
+        obj->timeperiod_name().c_str(),
+        NULL_IF_EMPTY(obj->alias())),
+      &deleter::timeperiod);
+  if (!tp.get())
+    throw (engine_error() << "Error: Could not register timeperiod '"
+           << obj->timeperiod_name() << "'.");
+
+  // Add exceptions to timeperiod.
+  for (std::vector<std::list<daterange> >::const_iterator
+         it(obj->exceptions().begin()),
+         end(obj->exceptions().end());
+       it != end;
+       ++it)
+    for (std::list<daterange>::const_iterator
+           it2(it->begin()),
+           end2(it->end());
+         it2 != end2;
+         ++it2)
+      if (!add_exception_to_timeperiod(
+             tp.get(),
+             it2->type(),
+             it2->year_start(),
+             it2->month_start(),
+             it2->month_day_start(),
+             it2->week_day_start(),
+             it2->week_day_start_offset(),
+             it2->year_end(),
+             it2->month_end(),
+             it2->month_day_end(),
+             it2->week_day_end(),
+             it2->week_day_end_offset(),
+             it2->skip_interval()))
+        throw (engine_error()
+               << "Error: Could not add exception to timeperiod '"
+               << obj->timeperiod_name() << "'.");
+
+  // Add exclusions to timeperiod.
+  for (list_string::const_iterator
+         it(obj->exclude().begin()),
+         end(obj->exclude().end());
+       it != end;
+       ++it)
+    if (!add_exclusion_to_timeperiod(
+           tp.get(),
+           it->c_str()))
+      throw (engine_error() << "Error: Could not add exclusion '"
+             << *it << "' to timeperiod '" << obj->timeperiod_name()
+             << "'.");
+
+  // Register timeperiod.
+  tp->next = timeperiod_list;
+  applier::state::instance().timeperiods()[obj->timeperiod_name()] = tp;
+  timeperiod_list = tp.get();
 
   return ;
 }
@@ -95,7 +153,7 @@ void applier::timeperiod::remove_object(timeperiod_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Removing timeperiod '" << obj->timeperiod_name() << "'.";
 
-  // Unregister host.
+  // Unregister timeperiod.
   unregister_object<timeperiod_struct, &timeperiod_struct::name>(
     &timeperiod_list,
     obj->timeperiod_name().c_str());

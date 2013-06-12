@@ -17,6 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -66,8 +69,6 @@ void applier::connector::add_object(connector_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Creating new connector '" << obj->connector_name() << "'.";
 
-  // XXX
-
   return ;
 }
 
@@ -81,7 +82,10 @@ void applier::connector::modify_object(connector_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Modifying connector '" << obj->connector_name() << "'.";
 
-  // XXX
+  // XXX : cannot modify a connector because
+  //       1) unmodified commands might hold a pointer on the connector
+  //       2) even if we cast the command, there's no public API to
+  //          restart a connector
 
   return ;
 }
@@ -96,7 +100,8 @@ void applier::connector::remove_object(connector_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Removing connector '" << obj->connector_name() << "'.";
 
-  // XXX
+  // Remove connector.
+  commands::set::instance().remove_command(obj->connector_name());
 
   return ;
 }
@@ -111,7 +116,24 @@ void applier::connector::resolve_object(connector_ptr obj) {
   logger(logging::dbg_config, logging::more)
     << "Resolving connector '" << obj->connector_name() << "'.";
 
-  // XXX
+  // Expand command line.
+  nagios_macros* macros(get_global_macros());
+  char* command_line(NULL);
+  process_macros_r(
+    macros,
+    obj->connector_line().c_str(),
+    &command_line,
+    0);
+  std::string processed_cmd(command_line);
+  delete [] command_line;
+
+  // Create connector.
+  shared_ptr<commands::command>
+    cmd(new commands::connector(
+                        obj->connector_name(),
+                        processed_cmd,
+                        &checks::checker::instance()));
+  commands::set::instance().add_command(cmd);
 
   return ;
 }

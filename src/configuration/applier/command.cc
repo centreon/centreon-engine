@@ -18,10 +18,16 @@
 */
 
 #include <cstring>
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/commands/forward.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/command.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
@@ -71,10 +77,15 @@ void applier::command::add_object(command_ptr obj) {
     << "Creating new command '" << obj->command_name() << "'.";
 
   // Create command.
-  shared_ptr<command_struct> c(new command_struct);
-  memset(c.get(), 0, sizeof(*c));
-  c->name = my_strdup(obj->command_name().c_str());
-  c->command_line = my_strdup(obj->command_line().c_str());
+  shared_ptr<command_struct>
+    c(
+      add_command(
+        obj->command_name().c_str(),
+        obj->command_line().c_str()),
+      &deleter::command);
+  if (!c.get())
+    throw (engine_error() << "Error: Could not register command '"
+           << obj->command_name() << "'.");
 
   // Register command.
   c->next = command_list;
@@ -99,6 +110,12 @@ void applier::command::modify_object(command_ptr obj) {
     c(applier::state::instance().commands()[obj->command_name()]);
   modify_if_different(c->command_line, obj->command_line().c_str());
 
+  // Command will be temporarily removed from the command set but will
+  // be added back during resolve_object(). This does not create
+  // dangling pointers since commands::command object are not referenced
+  // anywhere, only ::command objects are.
+  commands::set::instance().remove_command(obj->command_name());
+
   return ;
 }
 
@@ -113,12 +130,11 @@ void applier::command::remove_object(command_ptr obj) {
     << "Removing command '" << obj->command_name() << "'.";
 
   // Unregister command.
-  for (command_struct** cs(&command_list); *cs; cs = &(*cs)->next)
-    if (!strcmp((*cs)->name, obj->command_name().c_str())) {
-      (*cs) = (*cs)->next;
-      break ;
-    }
+  unregister_object<command_struct, &command_struct::name>(
+    &command_list,
+    obj->command_name().c_str());
   applier::state::instance().commands().erase(obj->command_name());
+  commands::set::instance().remove_command(obj->command_name());
 
   return ;
 }
@@ -132,7 +148,32 @@ void applier::command::remove_object(command_ptr obj) {
  *  @param[in] obj Object to resolve.
  */
 void applier::command::resolve_object(command_ptr obj) {
-  (void)obj;
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving command '" << obj->command_name() << "'.";
+
+  // Command set.
+  commands::set& cmd_set(commands::set::instance());
+
+  // Raw command.
+  if (obj->connector().empty()) {
+    shared_ptr<commands::command>
+      cmd(new commands::raw(
+                          obj->command_name(),
+                          obj->command_line(),
+                          &checks::checker::instance()));
+    cmd_set.add_command(cmd);
+  }
+  // Connector command.
+  else {
+    shared_ptr<commands::command>
+      cmd(new commands::forward(
+                          obj->command_name(),
+                          obj->command_line(),
+                          *cmd_set.get_command(obj->connector())));
+    cmd_set.add_command(cmd);
+  }
+
   return ;
 }
 
