@@ -55,6 +55,7 @@
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
+#include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/sretention.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/utils.hh"
@@ -353,9 +354,21 @@ int main(int argc, char* argv[]) {
 
         // XXX: -> TESTING start !!!
         {
-          configuration::state config;
-          configuration::parser p;
-          p.parse("/tmp/engine/configuration.cfg", config);
+          try {
+            configuration::state config;
+            {
+              configuration::parser p;
+              p.parse("/tmp/bench/etc/centengine.cfg", config);
+            }
+
+            {
+              retention::parser p;
+              p.parse("/tmp/bench/var/status.sav");
+            }
+          }
+          catch (std::exception const& e) {
+            std::cerr << "error: " << e.what() << std::endl;
+          }
           return (0);
         }
 

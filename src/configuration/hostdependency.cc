@@ -20,7 +20,9 @@
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -301,8 +303,9 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
-  _id = 0;
-  _hash(_id, _dependent_hosts.get());
+  _id = hash(
+          _dependent_hosts.get().begin(),
+          _dependent_hosts.get().end());
   return (true);
 }
 

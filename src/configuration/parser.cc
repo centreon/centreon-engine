@@ -119,6 +119,7 @@ void parser::parse(std::string const& path, state& config) {
  *
  *  @param[in] obj The object to add into the list.
  */
+#include <iostream>
 void parser::_add_object(object_ptr obj) {
   if (obj->is_template())
     return;
@@ -128,6 +129,8 @@ void parser::_add_object(object_ptr obj) {
     throw (engine_error() << "configuration: parse "
            << obj->type_name() << " failed: property missing in "
            "file '" << _current_path << "' on line " << _current_line);
+
+  std::cout << "path(" << _current_path << "), line(" << _current_line << "), id(" << id << ")" << std::endl;
 
   std::size_t type(obj->type());
   uset<std::size_t>& set_ids(_ids[type]);

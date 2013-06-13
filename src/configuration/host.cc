@@ -22,7 +22,9 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -373,6 +375,10 @@ bool host::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
+  if (!key.empty() && key[0] == '_') {
+    _customvariables[key.substr(1)] = value;
+    return (true);
+  }
   return (false);
 }
 
@@ -1136,7 +1142,7 @@ bool host::_set_high_flap_threshold(unsigned int value) {
  */
 bool host::_set_host_name(std::string const& value) {
   _host_name = value;
-  _id = _hash(value);
+  _id = hash(value);
   return (true);
 }
 

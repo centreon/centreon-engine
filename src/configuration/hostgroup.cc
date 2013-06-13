@@ -19,7 +19,9 @@
 
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -279,7 +281,7 @@ bool hostgroup::_set_hostgroup_members(std::string const& value) {
  */
 bool hostgroup::_set_hostgroup_name(std::string const& value) {
   _hostgroup_name = value;
-  _id = _hash(value);
+  _id = hash(value);
   return (true);
 }
 

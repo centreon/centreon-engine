@@ -97,13 +97,6 @@ namespace                  configuration {
       }
     };
 
-    static std::size_t     _hash(std::string const& data) throw ();
-    static void            _hash(
-                             std::size_t& id,
-                             list_string const& lst) throw ();
-    static void            _hash(
-                             std::size_t& hash,
-                             std::string const& data) throw ();
     bool                   _set_is_template(bool value);
     bool                   _set_name(std::string const& value);
     bool                   _set_templates(std::string const& value);

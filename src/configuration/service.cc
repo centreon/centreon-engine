@@ -21,7 +21,9 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -259,8 +261,8 @@ bool service::operator!=(service const& right) const throw () {
  */
 std::size_t service::id() const throw () {
   if (!_id) {
-    _hash(_id, _hosts.get());
-    _hash(_id, _service_description);
+    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(_id, _service_description);
   }
   return (_id);
 }
@@ -350,7 +352,10 @@ bool service::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-
+  if (!key.empty() && key[0] == '_') {
+    _customvariables[key.substr(1)] = value;
+    return (true);
+  }
   return (false);
 }
 

@@ -20,7 +20,9 @@
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -378,8 +380,7 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  */
 bool hostescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
-  _id = 0;
-  _hash(_id, _hosts.get());
+  _id = hash(_hosts.get().begin(), _hosts.get().end());
   return (true);
 }
 

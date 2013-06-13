@@ -20,7 +20,9 @@
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -159,8 +161,14 @@ bool servicedependency::operator!=(servicedependency const& right) const throw (
  */
 std::size_t servicedependency::id() const throw () {
   if (!_id) {
-    _hash(_id, _dependent_hosts.get());
-    _hash(_id, _dependent_service_description.get());
+    hash_combine(
+      _id,
+      _dependent_hosts.get().begin(),
+      _dependent_hosts.get().end());
+    hash_combine(
+      _id,
+      _dependent_service_description.get().begin(),
+      _dependent_service_description.get().end());
   }
   return (_id);
 }
