@@ -242,7 +242,17 @@ void applier::service::remove_object(service_ptr obj) {
       << "Removing service '" << obj->service_description()
       << "' of host '" << *it << "'.";
 
-    // XXX
+    // Unregister service.
+    for (service_struct** s(&service_list); *s; s = &(*s)->next)
+      if (!strcmp((*s)->host_name, it->c_str())
+          && !strcmp(
+                (*s)->description,
+                obj->service_description().c_str())) {
+        *s = (*s)->next;
+        break ;
+      }
+    applier::state::instance().services().erase(
+      std::make_pair(*it, obj->service_description()));
   }
 
   return ;
