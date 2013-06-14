@@ -92,10 +92,12 @@ std::list<std::string>& misc::split(
   std::size_t last(0);
   std::size_t current(0);
   while ((current = data.find(delim, current)) != std::string::npos) {
-    out.push_back(data.substr(last, current - last));
+    std::string tmp(data.substr(last, current - last));
+    out.push_back(trim(tmp));
     last = ++current;
   }
-  out.push_back(last ? data.substr(last) : data);
+  std::string tmp(last ? data.substr(last) : data);
+  out.push_back(trim(tmp));
   return (out);
 }
 

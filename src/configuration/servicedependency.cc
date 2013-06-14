@@ -163,8 +163,16 @@ std::size_t servicedependency::id() const throw () {
   if (!_id) {
     hash_combine(
       _id,
+      _dependent_hostgroups.get().begin(),
+      _dependent_hostgroups.get().end());
+    hash_combine(
+      _id,
       _dependent_hosts.get().begin(),
       _dependent_hosts.get().end());
+    hash_combine(
+      _id,
+      _dependent_servicegroups.get().begin(),
+      _dependent_servicegroups.get().end());
     hash_combine(
       _id,
       _dependent_service_description.get().begin(),
@@ -372,6 +380,7 @@ bool servicedependency::_set_dependency_period(std::string const& value) {
  */
 bool servicedependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -397,6 +406,7 @@ bool servicedependency::_set_dependent_hosts(std::string const& value) {
  */
 bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
   _dependent_servicegroups.set(value);
+  _id = 0;
   return (true);
 }
 

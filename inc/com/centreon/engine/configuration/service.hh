@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_SERVICE_HH
 
 #  include <list>
+#  include <utility>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -190,6 +191,7 @@ namespace                  configuration {
 
   typedef shared_ptr<service>    service_ptr;
   typedef std::list<service_ptr> list_service;
+  typedef umap<std::pair<std::string, std::string>, service_ptr> map_service;
 }
 
 CCE_END()

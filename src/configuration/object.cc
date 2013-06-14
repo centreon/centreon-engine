@@ -217,7 +217,6 @@ bool object::parse(std::string const& line) {
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
   misc::trim(value);
-
   if (!object::parse(key, value))
     return (parse(key, value));
   return (true);

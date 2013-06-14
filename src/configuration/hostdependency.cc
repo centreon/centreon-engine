@@ -139,6 +139,16 @@ bool hostdependency::operator!=(hostdependency const& right) const throw () {
  *  @return The object id.
  */
 std::size_t hostdependency::id() const throw () {
+  if (!_id) {
+    hash_combine(
+      _id,
+      _dependent_hostgroups.get().begin(),
+      _dependent_hostgroups.get().end());
+    hash_combine(
+      _id,
+      _dependent_hosts.get().begin(),
+      _dependent_hosts.get().end());
+  }
   return (_id);
 }
 
@@ -291,6 +301,7 @@ bool hostdependency::_set_dependency_period(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -303,9 +314,7 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
-  _id = hash(
-          _dependent_hosts.get().begin(),
-          _dependent_hosts.get().end());
+  _id = 0;
   return (true);
 }
 
