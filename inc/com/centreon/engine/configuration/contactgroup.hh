@@ -21,9 +21,12 @@
 #  define CCE_CONFIGURATION_CONTACTGROUP_HH
 
 #  include <list>
+#  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+
+typedef std::set<std::string> set_string;
 
 CCE_BEGIN()
 
@@ -51,6 +54,11 @@ namespace                  configuration {
     std::string const&     contactgroup_name() const throw ();
     list_string const&     members() const throw ();
 
+    bool                   is_resolved() const throw ();
+    set_string&            resolved_members() throw ();
+    set_string const&      resolved_members() const throw ();
+    void                   set_resolved(bool resolved) throw ();
+
   private:
     bool                   _set_alias(std::string const& value);
     bool                   _set_contactgroup_members(std::string const& value);
@@ -61,6 +69,8 @@ namespace                  configuration {
     group                  _contactgroup_members;
     std::string            _contactgroup_name;
     group                  _members;
+    bool                   _resolved;
+    set_string             _resolved_members;
   };
 
   typedef shared_ptr<contactgroup>    contactgroup_ptr;

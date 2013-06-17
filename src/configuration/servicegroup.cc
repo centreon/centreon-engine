@@ -43,9 +43,7 @@ static struct {
  *  Default constructor.
  */
 servicegroup::servicegroup()
-  : object(object::servicegroup) {
-
-}
+  : object(object::servicegroup), _resolved(false) {}
 
 /**
  *  Copy constructor.
@@ -79,6 +77,8 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
     _members = right._members;
     _notes = right._notes;
     _notes_url = right._notes_url;
+    _resolved = right._resolved;
+    _resolved_members = right._resolved_members;
     _servicegroup_members = right._servicegroup_members;
     _servicegroup_name = right._servicegroup_name;
   }
@@ -233,6 +233,44 @@ list_string const& servicegroup::servicegroup_members() const throw () {
  */
 std::string const& servicegroup::servicegroup_name() const throw () {
   return (_servicegroup_name);
+}
+
+/**
+ *  Check if servicegroup was resolved.
+ *
+ *  @return True if servicegroup was resolved, false otherwise.
+ */
+bool servicegroup::is_resolved() const throw () {
+  return (_resolved);
+}
+
+/**
+ *  Get resolved members.
+ *
+ *  @return Modifiable list of members.
+ */
+set_string& servicegroup::resolved_members() throw () {
+  return (_resolved_members);
+}
+
+/**
+ *  Get resolved members.
+ *
+ *  @return read-only list of members.
+ */
+set_string const& servicegroup::resolved_members() const throw () {
+  return (_resolved_members);
+}
+
+/**
+ *  Set whether or not servicegroup has been resolved.
+ *
+ *  @param[in] resolved True if servicegroup has been resolved, false
+ *                      otherwise.
+ */
+void servicegroup::set_resolved(bool resolved) throw () {
+  _resolved = resolved;
+  return ;
 }
 
 /**

@@ -41,10 +41,7 @@ static struct {
 /**
  *  Default constructor.
  */
-hostgroup::hostgroup()
-  : object(object::hostgroup) {
-
-}
+hostgroup::hostgroup() : object(object::hostgroup), _resolved(false) {}
 
 /**
  *  Copy constructor.
@@ -59,9 +56,7 @@ hostgroup::hostgroup(hostgroup const& right)
 /**
  *  Destructor.
  */
-hostgroup::~hostgroup() throw () {
-
-}
+hostgroup::~hostgroup() throw () {}
 
 /**
  *  Copy constructor.
@@ -80,6 +75,8 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
     _members = right._members;
     _notes = right._notes;
     _notes_url = right._notes_url;
+    _resolved = right._resolved;
+    _resolved_members = right._resolved_members;
   }
   return (*this);
 }
@@ -232,6 +229,44 @@ std::string const& hostgroup::notes() const throw () {
  */
 std::string const& hostgroup::notes_url() const throw () {
   return (_notes_url);
+}
+
+/**
+ *  Check if hostgroup was resolved.
+ *
+ *  @return True if hostgroup was resolved, false otherwise.
+ */
+bool hostgroup::is_resolved() const throw () {
+  return (_resolved);
+}
+
+/**
+ *  Get resolved members.
+ *
+ *  @return Modifiable list of members.
+ */
+set_string& hostgroup::resolved_members() throw () {
+  return (_resolved_members);
+}
+
+/**
+ *  Get resolved members.
+ *
+ *  @return Read-only list of members.
+ */
+set_string const& hostgroup::resolved_members() const throw () {
+  return (_resolved_members);
+}
+
+/**
+ *  Set whether or not hostgroup has been resolved.
+ *
+ *  @param[in] resolved True if hostgroup has been resolved, false
+ *                      otherwise.
+ */
+void hostgroup::set_resolved(bool resolved) throw () {
+  _resolved = resolved;
+  return ;
 }
 
 /**

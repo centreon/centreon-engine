@@ -63,8 +63,11 @@ applier::servicegroup& applier::servicegroup::operator=(
  *  Add new servicegroup.
  *
  *  @param[in] obj The new servicegroup to add into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicegroup::add_object(servicegroup_ptr obj) {
+void applier::servicegroup::add_object(
+                              servicegroup_ptr obj,
+                              configuration::state& s) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
@@ -83,8 +86,6 @@ void applier::servicegroup::add_object(servicegroup_ptr obj) {
     throw (engine_error() << "Error: Could not register service group '"
            << obj->servicegroup_name() << "'.");
 
-  // XXX
-
   // Register servicegroup.
   sg->next = servicegroup_list;
   applier::state::instance().servicegroups()[obj->servicegroup_name()]
@@ -98,8 +99,11 @@ void applier::servicegroup::add_object(servicegroup_ptr obj) {
  *  Modify servicegroup.
  *
  *  @param[in] obj The new servicegroup to modify into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicegroup::modify_object(servicegroup_ptr obj) {
+void applier::servicegroup::modify_object(
+                              servicegroup_ptr obj,
+                              configuration::state& s) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
@@ -113,8 +117,13 @@ void applier::servicegroup::modify_object(servicegroup_ptr obj) {
  *  Remove old servicegroup.
  *
  *  @param[in] obj The new servicegroup to remove from the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicegroup::remove_object(servicegroup_ptr obj) {
+void applier::servicegroup::remove_object(
+                              servicegroup_ptr obj,
+                              configuration::state& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
@@ -131,14 +140,24 @@ void applier::servicegroup::remove_object(servicegroup_ptr obj) {
 /**
  *  Resolve a servicegroup.
  *
- *  @param[in] obj Servicegroup object.
+ *  @param[in,out] obj Servicegroup object.
+ *  @param[in]     s   Configuration being applied.
  */
-void applier::servicegroup::resolve_object(servicegroup_ptr obj) {
-  // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Resolving servicegroup '" << obj->servicegroup_name() << "'.";
+void applier::servicegroup::resolve_object(
+                              servicegroup_ptr obj,
+                              configuration::state& s) {
+  // Only process if servicegroup has not been resolved already.
+  if (!obj->is_resolved()) {
+    // Logging.
+    logger(logging::dbg_config, logging::more)
+      << "Resolving servicegroup '" << obj->servicegroup_name() << "'.";
 
-  // XXX
+    // Mark object as resolved.
+    obj->set_resolved(true);
+
+    // Add base members.
+    // XXX
+  }
 
   return ;
 }

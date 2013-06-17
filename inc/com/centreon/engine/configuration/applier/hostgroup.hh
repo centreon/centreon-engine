@@ -26,6 +26,8 @@
 CCE_BEGIN()
 
 namespace               configuration {
+  class                 state;
+
   namespace             applier {
     class               hostgroup {
     public:
@@ -33,10 +35,18 @@ namespace               configuration {
                         hostgroup(hostgroup const& right);
                         ~hostgroup() throw ();
       hostgroup&        operator=(hostgroup const& right);
-      void              add_object(hostgroup_ptr obj);
-      void              modify_object(hostgroup_ptr obj);
-      void              remove_object(hostgroup_ptr obj);
-      void              resolve_object(hostgroup_ptr obj);
+      void              add_object(
+                          hostgroup_ptr obj,
+                          configuration::state& s);
+      void              modify_object(
+                          hostgroup_ptr obj,
+                          configuration::state& s);
+      void              remove_object(
+                          hostgroup_ptr obj,
+                          configuration::state& s);
+      void              resolve_object(
+                          hostgroup_ptr obj,
+                          configuration::state& s);
     };
   }
 }

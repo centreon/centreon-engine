@@ -26,6 +26,8 @@
 CCE_BEGIN()
 
 namespace                  configuration {
+  class                    state;
+
   namespace                applier {
     class                  contactgroup {
     public:
@@ -33,10 +35,18 @@ namespace                  configuration {
                            contactgroup(contactgroup const& right);
                            ~contactgroup() throw ();
       contactgroup&        operator=(contactgroup const& right);
-      void                 add_object(contactgroup_ptr obj);
-      void                 modify_object(contactgroup_ptr obj);
-      void                 remove_object(contactgroup_ptr obj);
-      void                 resolve_object(contactgroup_ptr obj);
+      void                 add_object(
+                             contactgroup_ptr obj,
+                             configuration::state& s);
+      void                 modify_object(
+                             contactgroup_ptr obj,
+                             configuration::state& s);
+      void                 remove_object(
+                             contactgroup_ptr obj,
+                             configuration::state& s);
+      void                 resolve_object(
+                             contactgroup_ptr obj,
+                             configuration::state& s);
     };
   }
 }

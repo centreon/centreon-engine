@@ -39,9 +39,7 @@ static struct {
  *  Default constructor.
  */
 contactgroup::contactgroup()
-  : object(object::contactgroup) {
-
-}
+  : object(object::contactgroup), _resolved(false) {}
 
 /**
  *  Copy constructor.
@@ -74,6 +72,8 @@ contactgroup& contactgroup::operator=(contactgroup const& right) {
     _contactgroup_members = right._contactgroup_members;
     _contactgroup_name = right._contactgroup_name;
     _members = right._members;
+    _resolved = right._resolved;
+    _resolved_members = right._resolved_members;
   }
   return (*this);
 }
@@ -193,6 +193,44 @@ std::string const& contactgroup::contactgroup_name() const throw () {
  */
 list_string const& contactgroup::members() const throw () {
   return (_members.get());
+}
+
+/**
+ *  Check if contactgroup was resolved.
+ *
+ *  @return True if contactgroup was resolved, false otherwise.
+ */
+bool contactgroup::is_resolved() const throw () {
+  return (_resolved);
+}
+
+/**
+ *  Get resolved members.
+ *
+ *  @return Modified list of members.
+ */
+set_string& contactgroup::resolved_members() throw () {
+  return (_resolved_members);
+}
+
+/**
+ *  Get resolved members.
+ *
+ *  @return Read-only list of members.
+ */
+set_string const& contactgroup::resolved_members() const throw () {
+  return (_resolved_members);
+}
+
+/**
+ *  Set whether or not contactgroup has been resolved.
+ *
+ *  @param[in] resolved True if contactgroup has been resolved, false
+ *                      otherwise.
+ */
+void contactgroup::set_resolved(bool resolved) throw () {
+  _resolved = resolved;
+  return ;
 }
 
 /**
