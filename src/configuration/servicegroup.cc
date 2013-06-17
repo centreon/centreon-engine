@@ -251,7 +251,7 @@ bool servicegroup::is_resolved() const throw () {
  *
  *  @return Modifiable list of members.
  */
-set_string& servicegroup::resolved_members() throw () {
+set_pair_string& servicegroup::resolved_members() throw () {
   return (_resolved_members);
 }
 
@@ -260,7 +260,7 @@ set_string& servicegroup::resolved_members() throw () {
  *
  *  @return read-only list of members.
  */
-set_string const& servicegroup::resolved_members() const throw () {
+set_pair_string const& servicegroup::resolved_members() const throw () {
   return (_resolved_members);
 }
 

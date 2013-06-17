@@ -22,11 +22,12 @@
 
 #  include <list>
 #  include <set>
+#  include <utility>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
-typedef std::set<std::string> set_string;
+typedef std::set<std::pair<std::string, std::string> > set_pair_string;
 
 CCE_BEGIN()
 
@@ -58,8 +59,8 @@ namespace                  configuration {
     std::string const&     servicegroup_name() const throw ();
 
     bool                   is_resolved() const throw ();
-    set_string&            resolved_members() throw ();
-    set_string const&      resolved_members() const throw ();
+    set_pair_string&       resolved_members() throw ();
+    set_pair_string const& resolved_members() const throw ();
     void                   set_resolved(bool resolved) throw ();
 
   private:
@@ -77,7 +78,7 @@ namespace                  configuration {
     std::string            _notes;
     std::string            _notes_url;
     bool                   _resolved;
-    set_string             _resolved_members;
+    set_pair_string        _resolved_members;
     group                  _servicegroup_members;
     std::string            _servicegroup_name;
   };
