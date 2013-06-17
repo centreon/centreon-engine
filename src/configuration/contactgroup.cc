@@ -19,7 +19,9 @@
 
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -266,7 +268,7 @@ bool contactgroup::_set_contactgroup_members(std::string const& value) {
  */
 bool contactgroup::_set_contactgroup_name(std::string const& value) {
   _contactgroup_name = value;
-  _id = _hash(value);
+  _id = hash(value);
   return (true);
 }
 

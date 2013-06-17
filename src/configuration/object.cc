@@ -217,7 +217,6 @@ bool object::parse(std::string const& line) {
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
   misc::trim(value);
-
   if (!object::parse(key, value))
     return (parse(key, value));
   return (true);
@@ -281,50 +280,6 @@ std::string const& object::type_name() const throw () {
 }
 
 /**
- *  Get the string hash.
- *
- *  @param[in] data The string to hash.
- *
- *  @return The string hash.
- */
-std::size_t object::_hash(std::string const& data) throw () {
-  std::size_t hash(0);
-  _hash(hash, data);
-  return (hash);
-}
-
-/**
- *  Get the list of string hash.
- *
- *  @param[in,out] hash The hash to fill.
- *  @param[in]     data The data to hash.
- */
-void object::_hash(
-       std::size_t& hash,
-       std::list<std::string> const& data) throw () {
-  for (std::list<std::string>::const_iterator
-         it(data.begin()), end(data.end());
-       it != end;
-       ++it)
-    _hash(hash, *it);
-}
-
-/**
- *  Get the string hash.
- *
- *  @param[in,out] hash The hash to fill.
- *  @param[in]     data The string to hash.
- */
-void object::_hash(std::size_t& hash, std::string const& data) throw () {
-  for (std::string::const_iterator it(data.begin()), end(data.end());
-       it != end;
-       ++it) {
-    std::size_t val(static_cast<std::size_t>(*it));
-    hash ^= val + 0x9e3779b9 + (hash<<6) + (hash>>2);
-  }
-}
-
-/**
  *  Set is template value.
  *
  *  @param[in] value The new is template value.
@@ -332,7 +287,7 @@ void object::_hash(std::size_t& hash, std::string const& data) throw () {
  *  @return True on success, otherwise false.
  */
 bool object::_set_is_template(bool value) {
-  _is_template = value;
+  _is_template = !value;
   return (true);
 }
 

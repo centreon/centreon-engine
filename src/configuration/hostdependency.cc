@@ -20,7 +20,9 @@
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -137,6 +139,16 @@ bool hostdependency::operator!=(hostdependency const& right) const throw () {
  *  @return The object id.
  */
 std::size_t hostdependency::id() const throw () {
+  if (!_id) {
+    hash_combine(
+      _id,
+      _dependent_hostgroups.get().begin(),
+      _dependent_hostgroups.get().end());
+    hash_combine(
+      _id,
+      _dependent_hosts.get().begin(),
+      _dependent_hosts.get().end());
+  }
   return (_id);
 }
 
@@ -289,6 +301,7 @@ bool hostdependency::_set_dependency_period(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -302,7 +315,6 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts.set(value);
   _id = 0;
-  _hash(_id, _dependent_hosts.get());
   return (true);
 }
 

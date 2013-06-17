@@ -19,7 +19,9 @@
 
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -354,6 +356,6 @@ bool servicegroup::_set_servicegroup_members(std::string const& value) {
  */
 bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
-  _id = _hash(value);
+  _id = hash(value);
   return (true);
 }

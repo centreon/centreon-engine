@@ -20,7 +20,9 @@
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -159,8 +161,22 @@ bool servicedependency::operator!=(servicedependency const& right) const throw (
  */
 std::size_t servicedependency::id() const throw () {
   if (!_id) {
-    _hash(_id, _dependent_hosts.get());
-    _hash(_id, _dependent_service_description.get());
+    hash_combine(
+      _id,
+      _dependent_hostgroups.get().begin(),
+      _dependent_hostgroups.get().end());
+    hash_combine(
+      _id,
+      _dependent_hosts.get().begin(),
+      _dependent_hosts.get().end());
+    hash_combine(
+      _id,
+      _dependent_servicegroups.get().begin(),
+      _dependent_servicegroups.get().end());
+    hash_combine(
+      _id,
+      _dependent_service_description.get().begin(),
+      _dependent_service_description.get().end());
   }
   return (_id);
 }
@@ -364,6 +380,7 @@ bool servicedependency::_set_dependency_period(std::string const& value) {
  */
 bool servicedependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -389,6 +406,7 @@ bool servicedependency::_set_dependent_hosts(std::string const& value) {
  */
 bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
   _dependent_servicegroups.set(value);
+  _id = 0;
   return (true);
 }
 

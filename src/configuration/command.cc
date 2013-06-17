@@ -20,7 +20,9 @@
 #include <memory>
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -207,7 +209,7 @@ bool command::_set_command_line(std::string const& value) {
  */
 bool command::_set_command_name(std::string const& value) {
   _command_name = value;
-  _id = _hash(value);
+  _id = hash(value);
   return (true);
 }
 

@@ -29,18 +29,18 @@ using namespace com::centreon::io;
 parser::store parser::_store[] = {
   &parser::_store_into_map<command, &command::command_name>,
   &parser::_store_into_map<connector, &connector::connector_name>,
-  &parser::_store_into_map<contactgroup, &contactgroup::contactgroup_name>,
   &parser::_store_into_map<contact, &contact::contact_name>,
-  &parser::_store_into_list,
-  &parser::_store_into_list,
-  &parser::_store_into_list,
-  &parser::_store_into_map<hostgroup, &hostgroup::hostgroup_name>,
+  &parser::_store_into_map<contactgroup, &contactgroup::contactgroup_name>,
   &parser::_store_into_map<host, &host::host_name>,
   &parser::_store_into_list,
   &parser::_store_into_list,
   &parser::_store_into_list,
-  &parser::_store_into_map<servicegroup, &servicegroup::servicegroup_name>,
+  &parser::_store_into_map<hostgroup, &hostgroup::hostgroup_name>,
   &parser::_store_into_list,
+  &parser::_store_into_list,
+  &parser::_store_into_list,
+  &parser::_store_into_list,
+  &parser::_store_into_map<servicegroup, &servicegroup::servicegroup_name>,
   &parser::_store_into_map<timeperiod, &timeperiod::timeperiod_name>
 };
 
@@ -107,7 +107,6 @@ void parser::parse(std::string const& path, state& config) {
   for (unsigned int i(0);
        i < sizeof(_lst_objects) / sizeof(_lst_objects[0]);
        ++i) {
-    _ids[i].clear();
     _lst_objects[i].clear();
     _map_objects[i].clear();
     _templates[i].clear();
@@ -123,20 +122,11 @@ void parser::_add_object(object_ptr obj) {
   if (obj->is_template())
     return;
 
-  std::size_t id(obj->id());
-  if (!id)
+  if (!obj->id())
     throw (engine_error() << "configuration: parse "
            << obj->type_name() << " failed: property missing in "
            "file '" << _current_path << "' on line " << _current_line);
-
-  std::size_t type(obj->type());
-  uset<std::size_t>& set_ids(_ids[type]);
-  if (set_ids.find(id) != set_ids.end())
-    throw (engine_error() << "configuration: parse "
-           << obj->type_name() << " failed: " << obj->name()
-           << " already exist");
-  set_ids.insert(id);
-  (this->*_store[type])(obj);
+  (this->*_store[obj->type()])(obj);
 }
 
 /**
@@ -900,5 +890,11 @@ void parser::_store_into_list(object_ptr obj) {
 template<typename T, std::string const& (T::*ptr)() const throw ()>
 void parser::_store_into_map(object_ptr obj) {
   shared_ptr<T> real(obj);
+  map_object::iterator
+    it(_map_objects[obj->type()].find((real.get()->*ptr)()));
+  if (it != _map_objects[obj->type()].end())
+    throw (engine_error() << "configuration: parse "
+           << obj->type_name() << " failed: " << obj->name()
+           << " already exist");
   _map_objects[obj->type()][(real.get()->*ptr)()] = real;
 }

@@ -131,7 +131,6 @@ namespace              configuration {
     state*             _config;
     unsigned int       _current_line;
     std::string        _current_path;
-    uset<std::size_t>  _ids[15];
     list_object        _lst_objects[15];
     map_object         _map_objects[15];
     static store       _store[];

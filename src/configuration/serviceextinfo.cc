@@ -19,7 +19,9 @@
 
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -124,8 +126,8 @@ bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
  */
 std::size_t serviceextinfo::id() const throw () {
   if (!_id) {
-    _hash(_id, _hosts.get());
-    _hash(_id, _service_description);
+    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(_id, _service_description);
   }
   return (_id);
 }

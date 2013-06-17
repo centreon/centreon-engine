@@ -22,7 +22,9 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/hash.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -225,8 +227,14 @@ bool contact::parse(
        ++i)
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
-  if (key.find("address") == 0)
-    return (_set_address(key, value));
+  if (!key.empty()) {
+    if (key.find("address") == 0)
+      return (_set_address(key, value));
+    else if (key[0] == '_') {
+      _customvariables[key.substr(1)] = value;
+      return (true);
+    }
+  }
   return (false);
 }
 
@@ -455,7 +463,7 @@ bool contact::_set_contactgroups(std::string const& value) {
  */
 bool contact::_set_contact_name(std::string const& value) {
   _contact_name = value;
-  _id = _hash(value);
+  _id = hash(value);
   return (true);
 }
 
