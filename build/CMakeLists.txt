@@ -701,6 +701,7 @@ add_subdirectory("logging")
 add_subdirectory("macros")
 add_subdirectory("misc")
 add_subdirectory("modules")
+add_subdirectory("objects")
 add_subdirectory("retention")
 add_subdirectory("scripts")
 

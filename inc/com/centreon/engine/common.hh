@@ -33,6 +33,9 @@
 #    define _THREAD_SAFE
 #  endif /* !_THREAD_SAFE */
 
+/* Max number of old states to keep track of for flap detection. */
+#  define MAX_STATE_HISTORY_ENTRIES 21
+
 /* Commands. */
 #  define CMD_NONE                                             0
 #  define CMD_ADD_HOST_COMMENT                                 1
