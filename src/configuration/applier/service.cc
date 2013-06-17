@@ -109,6 +109,22 @@ void applier::service::add_object(
       target_hosts.insert(*it3);
   }
 
+  // Get service group list.
+  std::list<shared_ptr<servicegroup_struct> > target_groups;
+  for (list_string::const_iterator
+         it(obj->servicegroups().begin()),
+         end(obj->servicegroups().end());
+       it != end;
+       ++it) {
+    umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+      it2(applier::state::instance().servicegroups().find(*it));
+    if (it2 == applier::state::instance().servicegroups().end())
+      throw (engine_error() << "Error: Could not add service '"
+             << obj->service_description() << "' to service group '"
+             << *it << "'.");
+    target_groups.push_back(it2->second);
+  }
+
   // Browse all hosts of this service.
   for (std::set<std::string>::const_iterator
          it(target_hosts.begin()),
@@ -231,7 +247,20 @@ void applier::service::add_object(
                << obj->service_description() << "' of host '" << *it
                << "'.");
 
-    // XXX : servicegroups
+    // Service groups.
+    for (std::list<shared_ptr<servicegroup_struct> >::iterator
+           it2(target_groups.begin()),
+           end2(target_groups.end());
+         it2 != end2;
+         ++it2)
+      if (!add_service_to_servicegroup(
+             it2->get(),
+             it->c_str(),
+             obj->service_description().c_str()))
+        throw (engine_error() << "Error: Could not add service '"
+               << obj->service_description() << "' of host '" << *it
+               << "' to service group '" << (*it2)->group_name
+               << "'.");
 
     // Register service.
     s->next = service_list;
