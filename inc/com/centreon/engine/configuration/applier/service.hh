@@ -26,6 +26,8 @@
 CCE_BEGIN()
 
 namespace             configuration {
+  class               state;
+
   namespace           applier {
     class             service {
     public:
@@ -33,10 +35,18 @@ namespace             configuration {
                       service(service const& right);
                       ~service() throw ();
       service&        operator=(service const& right);
-      void            add_object(service_ptr obj);
-      void            modify_object(service_ptr obj);
-      void            remove_object(service_ptr obj);
-      void            resolve_object(service_ptr obj);
+      void            add_object(
+                        service_ptr obj,
+                        configuration::state& s);
+      void            modify_object(
+                        service_ptr obj,
+                        configuration::state& s);
+      void            remove_object(
+                        service_ptr obj,
+                        configuration::state& s);
+      void            resolve_object(
+                        service_ptr obj,
+                        configuration::state& s);
     };
   }
 }
