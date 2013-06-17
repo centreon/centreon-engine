@@ -37,6 +37,24 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        daterange const& obj1,
        daterange const& obj2) throw () {
+  if (obj1.type == obj2.type
+      && obj1.syear == obj2.syear
+      && obj1.smon == obj2.smon
+      && obj1.smday == obj2.smday
+      && obj1.swday == obj2.swday
+      && obj1.swday_offset == obj2.swday_offset
+      && obj1.eyear == obj2.eyear
+      && obj1.emon == obj2.emon
+      && obj1.emday == obj2.emday
+      && obj1.ewday == obj2.ewday
+      && obj1.ewday_offset == obj2.ewday_offset
+      && obj1.skip_interval == obj2.skip_interval
+      && is_equal(obj1.times, obj2.times)) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
+  }
   return (false);
 }
 

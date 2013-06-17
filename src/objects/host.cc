@@ -40,7 +40,117 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        host const& obj1,
        host const& obj2) throw () {
-  return (false);
+  return (is_equal(obj1.name, obj2.name)
+          && is_equal(obj1.display_name, obj2.display_name)
+          && is_equal(obj1.alias, obj2.alias)
+          && is_equal(obj1.address, obj2.address)
+          && is_equal(obj1.parent_hosts, obj2.parent_hosts)
+          && is_equal(obj1.child_hosts, obj2.child_hosts)
+          && is_equal(obj1.services, obj2.services)
+          && is_equal(obj1.host_check_command, obj2.host_check_command)
+          && obj1.initial_state == obj2.initial_state
+          && obj1.check_interval == obj2.check_interval
+          && obj1.retry_interval == obj2.retry_interval
+          && obj1.max_attempts == obj2.max_attempts
+          && is_equal(obj1.event_handler, obj2.event_handler)
+          && is_equal(obj1.contact_groups, obj2.contact_groups)
+          && is_equal(obj1.contacts, obj2.contacts)
+          && obj1.notification_interval == obj2.notification_interval
+          && obj1.first_notification_delay == obj2.first_notification_delay
+          && obj1.notify_on_down == obj2.notify_on_down
+          && obj1.notify_on_unreachable == obj2.notify_on_unreachable
+          && obj1.notify_on_recovery == obj2.notify_on_recovery
+          && obj1.notify_on_flapping == obj2.notify_on_flapping
+          && obj1.notify_on_downtime == obj2.notify_on_downtime
+          && is_equal(obj1.notification_period, obj2.notification_period)
+          && is_equal(obj1.check_period, obj2.check_period)
+          && obj1.flap_detection_enabled == obj2.flap_detection_enabled
+          && obj1.low_flap_threshold == obj2.low_flap_threshold
+          && obj1.high_flap_threshold == obj2.high_flap_threshold
+          && obj1.flap_detection_on_up == obj2.flap_detection_on_up
+          && obj1.flap_detection_on_down == obj2.flap_detection_on_down
+          && obj1.flap_detection_on_unreachable == obj2.flap_detection_on_unreachable
+          && obj1.stalk_on_up == obj2.stalk_on_up
+          && obj1.stalk_on_down == obj2.stalk_on_down
+          && obj1.stalk_on_unreachable == obj2.stalk_on_unreachable
+          && obj1.check_freshness == obj2.check_freshness
+          && obj1.freshness_threshold == obj2.freshness_threshold
+          && obj1.process_performance_data == obj2.process_performance_data
+          && obj1.checks_enabled == obj2.checks_enabled
+          && obj1.accept_passive_host_checks == obj2.accept_passive_host_checks
+          && obj1.event_handler_enabled == obj2.event_handler_enabled
+          && obj1.retain_status_information == obj2.retain_status_information
+          && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
+          && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
+          && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
+          && obj1.obsess_over_host == obj2.obsess_over_host
+          && is_equal(obj1.notes, obj2.notes)
+          && is_equal(obj1.notes_url, obj2.notes_url)
+          && is_equal(obj1.action_url, obj2.action_url)
+          && is_equal(obj1.icon_image, obj2.icon_image)
+          && is_equal(obj1.icon_image_alt, obj2.icon_image_alt)
+          && is_equal(obj1.vrml_image, obj2.vrml_image)
+          && is_equal(obj1.statusmap_image, obj2.statusmap_image)
+          && obj1.have_2d_coords == obj2.have_2d_coords
+          && obj1.x_2d == obj2.x_2d
+          && obj1.y_2d == obj2.y_2d
+          && obj1.have_3d_coords == obj2.have_3d_coords
+          && obj1.x_3d == obj2.x_3d
+          && obj1.y_3d == obj2.y_3d
+          && obj1.z_3d == obj2.z_3d
+          && obj1.should_be_drawn == obj2.should_be_drawn
+          && is_equal(obj1.custom_variables, obj2.custom_variables)
+          && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
+          && obj1.acknowledgement_type == obj2.acknowledgement_type
+          && obj1.check_type == obj2.check_type
+          && obj1.current_state == obj2.current_state
+          && obj1.last_state == obj2.last_state
+          && obj1.last_hard_state == obj2.last_hard_state
+          && is_equal(obj1.plugin_output, obj2.plugin_output)
+          && is_equal(obj1.long_plugin_output, obj2.long_plugin_output)
+          && is_equal(obj1.perf_data, obj2.perf_data)
+          && obj1.state_type == obj2.state_type
+          && obj1.current_attempt == obj2.current_attempt
+          && obj1.current_event_id == obj2.current_event_id
+          && obj1.last_event_id == obj2.last_event_id
+          && obj1.current_problem_id == obj2.current_problem_id
+          && obj1.last_problem_id == obj2.last_problem_id
+          && obj1.latency == obj2.latency
+          && obj1.execution_time == obj2.execution_time
+          && obj1.is_executing == obj2.is_executing
+          && obj1.check_options == obj2.check_options
+          && obj1.notifications_enabled == obj2.notifications_enabled
+          && obj1.last_host_notification == obj2.last_host_notification
+          && obj1.next_host_notification == obj2.next_host_notification
+          && obj1.next_check == obj2.next_check
+          && obj1.should_be_scheduled == obj2.should_be_scheduled
+          && obj1.last_check == obj2.last_check
+          && obj1.last_state_change == obj2.last_state_change
+          && obj1.last_hard_state_change == obj2.last_hard_state_change
+          && obj1.last_time_up == obj2.last_time_up
+          && obj1.last_time_down == obj2.last_time_down
+          && obj1.last_time_unreachable == obj2.last_time_unreachable
+          && obj1.has_been_checked == obj2.has_been_checked
+          && obj1.is_being_freshened == obj2.is_being_freshened
+          && obj1.notified_on_down == obj2.notified_on_down
+          && obj1.notified_on_unreachable == obj2.notified_on_unreachable
+          && obj1.current_notification_number == obj2.current_notification_number
+          && obj1.no_more_notifications == obj2.no_more_notifications
+          && obj1.current_notification_id == obj2.current_notification_id
+          && obj1.check_flapping_recovery_notification == obj2.check_flapping_recovery_notification
+          && obj1.scheduled_downtime_depth == obj2.scheduled_downtime_depth
+          && obj1.pending_flex_downtime == obj2.pending_flex_downtime
+          && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
+          && obj1.state_history_index == obj2.state_history_index
+          && obj1.last_state_history_update == obj2.last_state_history_update
+          && obj1.is_flapping == obj2.is_flapping
+          && obj1.flapping_comment_id == obj2.flapping_comment_id
+          && obj1.percent_state_change == obj2.percent_state_change
+          && obj1.total_services == obj2.total_services
+          && obj1.total_service_check_interval == obj2.total_service_check_interval
+          && obj1.modified_attributes == obj2.modified_attributes
+          && obj1.circular_path_checked == obj2.circular_path_checked
+          && obj1.contains_circular_path == obj2.contains_circular_path);
 }
 
 /**
@@ -186,4 +296,3 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "}\n";
   return (os);
 }
-

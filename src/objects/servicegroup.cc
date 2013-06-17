@@ -20,6 +20,7 @@
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
+#include "com/centreon/engine/objects/servicesmember.hh"
 
 using namespace com::centreon::engine::misc;
 
@@ -34,7 +35,12 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        servicegroup const& obj1,
        servicegroup const& obj2) throw () {
-  return (false);
+  return (is_equal(obj1.group_name, obj2.group_name)
+          && is_equal(obj1.alias, obj2.alias)
+          && is_equal(obj1.members, obj2.members)
+          && is_equal(obj1.notes, obj2.notes)
+          && is_equal(obj1.notes_url, obj2.notes_url)
+          && is_equal(obj1.action_url, obj2.action_url));
 }
 
 /**

@@ -25,6 +25,7 @@ set(INC_DIR "${INC_DIR}/com/centreon/engine/misc")
 add_library("cce_misc"
   STATIC
   "${SRC_DIR}/string.cc"
+  "${INC_DIR}/object.hh"
   "${INC_DIR}/string.hh")
 
 if (WITH_TESTING)

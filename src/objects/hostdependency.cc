@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
 
@@ -33,7 +34,17 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        hostdependency const& obj1,
        hostdependency const& obj2) throw () {
-  return (false);
+  return (obj1.dependency_type == obj2.dependency_type
+          && is_equal(obj1.dependent_host_name, obj2.dependent_host_name)
+          && is_equal(obj1.host_name, obj2.host_name)
+          && is_equal(obj1.dependency_period, obj2.dependency_period)
+          && obj1.inherits_parent == obj2.inherits_parent
+          && obj1.fail_on_up == obj2.fail_on_up
+          && obj1.fail_on_down == obj2.fail_on_down
+          && obj1.fail_on_unreachable == obj2.fail_on_unreachable
+          && obj1.fail_on_pending == obj2.fail_on_pending
+          && obj1.circular_path_checked == obj2.circular_path_checked
+          && obj1.contains_circular_path == obj2.contains_circular_path);
 }
 
 /**

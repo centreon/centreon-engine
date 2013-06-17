@@ -35,7 +35,9 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        contactgroup const& obj1,
        contactgroup const& obj2) throw () {
-  return (false);
+  return (is_equal(obj1.group_name, obj2.group_name)
+          && is_equal(obj1.alias, obj2.alias)
+          && is_equal(obj1.members, obj2.members));
 }
 
 /**

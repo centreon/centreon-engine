@@ -36,7 +36,37 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        contact const& obj1,
        contact const& obj2) throw () {
-  return (false);
+  return (is_equal(obj1.name, obj2.name)
+          && is_equal(obj1.alias, obj2.alias)
+          && is_equal(obj1.email, obj2.email)
+          && is_equal(obj1.pager, obj2.pager)
+          && is_equal(obj1.address, obj2.address, MAX_CONTACT_ADDRESSES)
+          && is_equal(obj1.host_notification_commands, obj2.host_notification_commands)
+          && is_equal(obj1.service_notification_commands, obj2.service_notification_commands)
+          && obj1.notify_on_service_unknown == obj2.notify_on_service_unknown
+          && obj1.notify_on_service_warning == obj2.notify_on_service_warning
+          && obj1.notify_on_service_critical == obj2.notify_on_service_critical
+          && obj1.notify_on_service_recovery == obj2.notify_on_service_recovery
+          && obj1.notify_on_service_flapping == obj2.notify_on_service_flapping
+          && obj1.notify_on_service_downtime == obj2.notify_on_service_downtime
+          && obj1.notify_on_host_down == obj2.notify_on_host_down
+          && obj1.notify_on_host_unreachable == obj2.notify_on_host_unreachable
+          && obj1.notify_on_host_recovery == obj2.notify_on_host_recovery
+          && obj1.notify_on_host_flapping == obj2.notify_on_host_flapping
+          && obj1.notify_on_host_downtime == obj2.notify_on_host_downtime
+          && is_equal(obj1.host_notification_period, obj2.host_notification_period)
+          && is_equal(obj1.service_notification_period, obj2.service_notification_period)
+          && obj1.host_notifications_enabled == obj2.host_notifications_enabled
+          && obj1.service_notifications_enabled == obj2.service_notifications_enabled
+          && obj1.can_submit_commands == obj2.can_submit_commands
+          && obj1.retain_status_information == obj2.retain_status_information
+          && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
+          && is_equal(obj1.custom_variables, obj2.custom_variables)
+          && obj1.last_host_notification == obj2.last_host_notification
+          && obj1.last_service_notification == obj2.last_service_notification
+          && obj1.modified_attributes == obj2.modified_attributes
+          && obj1.modified_host_attributes == obj2.modified_host_attributes
+          && obj1.modified_service_attributes == obj2.modified_service_attributes);
 }
 
 /**

@@ -19,6 +19,8 @@
 
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/objects/contactgroupsmember.hh"
+#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/hostescalation.hh"
 
 using namespace com::centreon::engine::misc;
@@ -34,7 +36,16 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        hostescalation const& obj1,
        hostescalation const& obj2) throw () {
-  return (false);
+  return (is_equal(obj1.host_name, obj2.host_name)
+          && obj1.first_notification == obj2.first_notification
+          && obj1.last_notification == obj2.last_notification
+          && obj1.notification_interval == obj2.notification_interval
+          && is_equal(obj1.escalation_period, obj2.escalation_period)
+          && obj1.escalate_on_recovery == obj2.escalate_on_recovery
+          && obj1.escalate_on_down == obj2.escalate_on_down
+          && obj1.escalate_on_unreachable == obj2.escalate_on_unreachable
+          && is_equal(obj1.contact_groups, obj2.contact_groups)
+          && is_equal(obj1.contacts, obj2.contacts));
 }
 
 /**

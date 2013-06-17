@@ -28,7 +28,7 @@
 
 CCE_BEGIN()
 
-namespace misc {
+namespace                 misc {
   bool                    get_next_line(
                             std::ifstream& stream,
                             std::string& line,

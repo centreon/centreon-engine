@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/daterange.hh"
@@ -38,11 +37,20 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        timeperiod const& obj1,
        timeperiod const& obj2) throw () {
-  if (strcmp(obj1.name, obj2.name)
-      || strcmp(obj1.alias, obj2.alias))
-    return (false);
-  // XXX: todo
-  return (true);
+  if (is_equal(obj1.name, obj2.name)
+      && is_equal(obj1.alias, obj2.alias)
+      && is_equal(obj1.exclusions, obj2.exclusions)) {
+    for (unsigned int i(0); i < DATERANGE_TYPES; ++i)
+      if (!is_equal(obj1.exceptions[i], obj2.exceptions[i]))
+        return (false);
+    for (unsigned int i(0);
+         i < sizeof(obj1.days) / sizeof(obj1.days[0]);
+         ++i)
+      if (!is_equal(obj1.days[i], obj2.days[i]))
+        return (false);
+    return (true);
+  }
+  return (false);
 }
 
 /**

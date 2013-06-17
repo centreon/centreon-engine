@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
+#include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/timeperiodexclusion.hh"
 
@@ -34,7 +34,13 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        timeperiodexclusion const& obj1,
        timeperiodexclusion const& obj2) throw () {
-  return (!strcmp(obj1.timeperiod_name, obj2.timeperiod_name));
+  if (is_equal(obj1.timeperiod_name, obj2.timeperiod_name)) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
+  }
+  return (false);
 }
 
 /**

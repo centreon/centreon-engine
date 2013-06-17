@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 
@@ -33,6 +34,14 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        customvariablesmember const& obj1,
        customvariablesmember const& obj2) throw () {
+  if (is_equal(obj1.variable_name, obj2.variable_name)
+      && is_equal(obj1.variable_value, obj2.variable_value)
+      && obj1.has_been_modified == obj2.has_been_modified) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
+  }
   return (false);
 }
 

@@ -34,6 +34,13 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        timerange const& obj1,
        timerange const& obj2) throw () {
+  if (obj1.range_start == obj2.range_start
+      && obj1.range_end == obj2.range_end) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
+  }
   return (false);
 }
 

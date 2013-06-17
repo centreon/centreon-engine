@@ -20,6 +20,7 @@
 #ifndef CCE_MISC_OBJECT_HH
 #  define CCE_MISC_OBJECT_HH
 
+#  include <cstring>
 #  include <fstream>
 #  include "com/centreon/engine/namespace.hh"
 
@@ -33,6 +34,38 @@ namespace misc {
     else
       os << "\"NULL\"";
     return (os);
+  }
+
+  inline bool             is_equal(
+                            char const* str1,
+                            char const* str2) throw () {
+    return (str1 == str2 || (str1 && str2 && !strcmp(str1, str2)));
+  }
+
+  inline bool             is_equal(
+                            char* const* tab1,
+                            char* const* tab2,
+                            unsigned int size) throw () {
+    for (unsigned int i(0); i < size; ++i)
+      if (!is_equal(tab1[i], tab2[i]))
+        return (false);
+    return (true);
+  }
+
+  template<typename T>
+  inline bool             is_equal(
+                            T const* tab1,
+                            T const* tab2,
+                            unsigned int size) throw () {
+    for (unsigned int i(0); i < size; ++i)
+      if (tab1[i] != tab2[i])
+        return (false);
+    return (true);
+  }
+
+  template<typename T>
+  inline bool is_equal(T const* obj1, T const* obj2) throw () {
+    return (obj1 == obj2 || (obj1 && obj2 && *obj1 == *obj2));
   }
 }
 

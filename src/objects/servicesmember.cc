@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
 
@@ -33,6 +34,13 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        servicesmember const& obj1,
        servicesmember const& obj2) throw () {
+  if (is_equal(obj1.host_name, obj2.host_name)
+      && is_equal(obj1.service_description, obj2.service_description)) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
+  }
   return (false);
 }
 

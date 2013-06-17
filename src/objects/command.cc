@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstring>
+#include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/command.hh"
 
@@ -34,8 +34,8 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        command const& obj1,
        command const& obj2) throw () {
-  return (!strcmp(obj1.name, obj2.name)
-          && !strcmp(obj1.command_line, obj2.command_line));
+  return (is_equal(obj1.name, obj2.name)
+          && is_equal(obj1.command_line, obj2.command_line));
 }
 
 /**

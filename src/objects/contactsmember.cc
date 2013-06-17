@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 
@@ -33,6 +34,12 @@ using namespace com::centreon::engine::misc;
 bool operator==(
        contactsmember const& obj1,
        contactsmember const& obj2) throw () {
+  if (is_equal(obj1.contact_name, obj2.contact_name)) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
+  }
   return (false);
 }
 
