@@ -61,27 +61,32 @@ applier::timeperiod& applier::timeperiod::operator=(
  *  Add new timeperiod.
  *
  *  @param[in] obj The new timeperiod to add into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::timeperiod::add_object(timeperiod_ptr obj) {
+void applier::timeperiod::add_object(
+                            configuration::timeperiod const& obj,
+                            configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new timeperiod '" << obj->timeperiod_name() << "'.";
+    << "Creating new timeperiod '" << obj.timeperiod_name() << "'.";
 
   // Create timeperiod.
   shared_ptr<timeperiod_struct>
     tp(
       add_timeperiod(
-        obj->timeperiod_name().c_str(),
-        NULL_IF_EMPTY(obj->alias())),
+        obj.timeperiod_name().c_str(),
+        NULL_IF_EMPTY(obj.alias())),
       &deleter::timeperiod);
   if (!tp.get())
     throw (engine_error() << "Error: Could not register timeperiod '"
-           << obj->timeperiod_name() << "'.");
+           << obj.timeperiod_name() << "'.");
 
   // Add exceptions to timeperiod.
   for (std::vector<std::list<daterange> >::const_iterator
-         it(obj->exceptions().begin()),
-         end(obj->exceptions().end());
+         it(obj.exceptions().begin()),
+         end(obj.exceptions().end());
        it != end;
        ++it)
     for (std::list<daterange>::const_iterator
@@ -105,24 +110,25 @@ void applier::timeperiod::add_object(timeperiod_ptr obj) {
              it2->skip_interval()))
         throw (engine_error()
                << "Error: Could not add exception to timeperiod '"
-               << obj->timeperiod_name() << "'.");
+               << obj.timeperiod_name() << "'.");
 
   // Add exclusions to timeperiod.
   for (list_string::const_iterator
-         it(obj->exclude().begin()),
-         end(obj->exclude().end());
+         it(obj.exclude().begin()),
+         end(obj.exclude().end());
        it != end;
        ++it)
     if (!add_exclusion_to_timeperiod(
            tp.get(),
            it->c_str()))
       throw (engine_error() << "Error: Could not add exclusion '"
-             << *it << "' to timeperiod '" << obj->timeperiod_name()
+             << *it << "' to timeperiod '" << obj.timeperiod_name()
              << "'.");
 
   // Register timeperiod.
   tp->next = timeperiod_list;
-  applier::state::instance().timeperiods()[obj->timeperiod_name()] = tp;
+  applier::state::instance().timeperiods()[obj.timeperiod_name()]
+    = std::make_pair(obj, tp);
   timeperiod_list = tp.get();
 
   return ;
@@ -132,11 +138,14 @@ void applier::timeperiod::add_object(timeperiod_ptr obj) {
  *  Modified timeperiod.
  *
  *  @param[in] obj The new timeperiod to modify into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::timeperiod::modify_object(timeperiod_ptr obj) {
+void applier::timeperiod::modify_object(
+                            configuration::timeperiod const& obj,
+                            configuration::state const& s) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying timeperiod '" << obj->timeperiod_name() << "'.";
+    << "Modifying timeperiod '" << obj.timeperiod_name() << "'.";
 
   // XXX
 
@@ -147,17 +156,22 @@ void applier::timeperiod::modify_object(timeperiod_ptr obj) {
  *  Remove old timeperiod.
  *
  *  @param[in] obj The new timeperiod to remove from the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::timeperiod::remove_object(timeperiod_ptr obj) {
+void applier::timeperiod::remove_object(
+                            configuration::timeperiod const& obj,
+                            configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing timeperiod '" << obj->timeperiod_name() << "'.";
+    << "Removing timeperiod '" << obj.timeperiod_name() << "'.";
 
   // Unregister timeperiod.
   unregister_object<timeperiod_struct, &timeperiod_struct::name>(
     &timeperiod_list,
-    obj->timeperiod_name().c_str());
-  applier::state::instance().timeperiods().erase(obj->timeperiod_name());
+    obj.timeperiod_name().c_str());
+  applier::state::instance().timeperiods().erase(obj.timeperiod_name());
 
   return ;
 }
@@ -165,11 +179,17 @@ void applier::timeperiod::remove_object(timeperiod_ptr obj) {
 /**
  *  Resolve a timeperiod.
  *
- *  @param[in] obj Timeperiod object.
+ *  @param[in,out] obj Timeperiod object.
+ *  @param[in] s       Configuration being applied.
  */
-void applier::timeperiod::resolve_object(timeperiod_ptr obj) {
+void applier::timeperiod::resolve_object(
+                            configuration::timeperiod const& obj,
+                            configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving timeperiod '" << obj->timeperiod_name() << "'.";
+    << "Resolving timeperiod '" << obj.timeperiod_name() << "'.";
+
   return ;
 }

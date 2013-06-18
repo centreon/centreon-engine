@@ -20,12 +20,13 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 
-#  include "com/centreon/engine/configuration/hostgroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace               configuration {
+  // Forward declarations.
+  class                 hostgroup;
   class                 state;
 
   namespace             applier {
@@ -36,17 +37,17 @@ namespace               configuration {
                         ~hostgroup() throw ();
       hostgroup&        operator=(hostgroup const& right);
       void              add_object(
-                          hostgroup_ptr obj,
-                          configuration::state& s);
+                          configuration::hostgroup const& obj,
+                          configuration::state const& s);
       void              modify_object(
-                          hostgroup_ptr obj,
-                          configuration::state& s);
+                          configuration::hostgroup const& obj,
+                          configuration::state const& s);
       void              remove_object(
-                          hostgroup_ptr obj,
-                          configuration::state& s);
+                          configuration::hostgroup const& obj,
+                          configuration::state const& s);
       void              resolve_object(
-                          hostgroup_ptr obj,
-                          configuration::state& s);
+                          configuration::hostgroup const& obj,
+                          configuration::state const& s);
     };
   }
 }

@@ -247,16 +247,7 @@ bool hostgroup::is_resolved() const throw () {
  *
  *  @return Modifiable list of members.
  */
-set_string& hostgroup::resolved_members() throw () {
-  return (_resolved_members);
-}
-
-/**
- *  Get resolved members.
- *
- *  @return Read-only list of members.
- */
-set_string const& hostgroup::resolved_members() const throw () {
+set_string& hostgroup::resolved_members() const throw () {
   return (_resolved_members);
 }
 
@@ -266,7 +257,7 @@ set_string const& hostgroup::resolved_members() const throw () {
  *  @param[in] resolved True if hostgroup has been resolved, false
  *                      otherwise.
  */
-void hostgroup::set_resolved(bool resolved) throw () {
+void hostgroup::set_resolved(bool resolved) const throw () {
   _resolved = resolved;
   return ;
 }

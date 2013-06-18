@@ -92,11 +92,13 @@ bool retention::comment::set(
  *  Add host comment.
  */
 void retention::comment::_add_host_comment() throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
+  umap<std::string,
+       std::pair<configuration::host,
+                 shared_ptr<host_struct> > >::const_iterator
     it(state::instance().hosts().find(_host_name));
   if (it == state::instance().hosts().end())
     return;
-  host_struct* hst(&*it->second);
+  host_struct* hst(it->second.second.get());
 
   // add the comment.
   add_comment(
@@ -129,13 +131,15 @@ void retention::comment::_add_host_comment() throw () {
  *  Add serivce comment.
  */
 void retention::comment::_add_service_comment() throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
+  umap<std::string,
+       std::pair<configuration::host,
+                 shared_ptr<host_struct> > >::const_iterator
     it_hst(state::instance().hosts().find(_host_name));
   if (it_hst == state::instance().hosts().end())
-    return;
-  host_struct* hst(&*it_hst->second);
+    return ;
+  host_struct* hst(it_hst->second.second.get());
   if (!hst)
-    return;
+    return ;
 
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
     it_svc(state::instance().services().find(std::make_pair(_host_name, _service_description)));

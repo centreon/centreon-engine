@@ -22,14 +22,15 @@
 
 #  include <list>
 #  include <string>
-#  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/namespace.hh"
-
-struct commandsmember_struct;
 
 CCE_BEGIN()
 
 namespace             configuration {
+  // Forward declarations.
+  class               command;
+  class               state;
+
   namespace           applier {
     class             command {
     public:
@@ -37,10 +38,18 @@ namespace             configuration {
                       command(command const& right);
                       ~command() throw ();
       command&        operator=(command const& right);
-      void            add_object(command_ptr obj);
-      void            modify_object(command_ptr obj);
-      void            remove_object(command_ptr obj);
-      void            resolve_object(command_ptr obj);
+      void            add_object(
+                        configuration::command const& obj,
+                        configuration::state const& s);
+      void            modify_object(
+                        configuration::command const& obj,
+                        configuration::state const& s);
+      void            remove_object(
+                        configuration::command const& obj,
+                        configuration::state const& s);
+      void            resolve_object(
+                        configuration::command const& obj,
+                        configuration::state const& s);
     };
   }
 }

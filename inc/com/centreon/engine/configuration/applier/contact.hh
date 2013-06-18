@@ -20,12 +20,15 @@
 #ifndef CCE_CONFIGURATION_APPLIER_CONTACT_HH
 #  define CCE_CONFIGURATION_APPLIER_CONTACT_HH
 
-#  include "com/centreon/engine/configuration/contact.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace             configuration {
+  // Forward declarations.
+  class               contact;
+  class               state;
+
   namespace           applier {
     class             contact {
     public:
@@ -33,10 +36,18 @@ namespace             configuration {
                       contact(contact const& right);
                       ~contact() throw ();
       contact&        operator=(contact const& right);
-      void            add_object(contact_ptr obj);
-      void            modify_object(contact_ptr obj);
-      void            remove_object(contact_ptr obj);
-      void            resolve_object(contact_ptr obj);
+      void            add_object(
+                        configuration::contact const& obj,
+			configuration::state const& s);
+      void            modify_object(
+                        configuration::contact const& obj,
+			configuration::state const& s);
+      void            remove_object(
+                        configuration::contact const& obj,
+			configuration::state const& s);
+      void            resolve_object(
+                        configuration::contact const& obj,
+			configuration::state const& s);
     };
   }
 }

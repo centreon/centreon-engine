@@ -77,32 +77,12 @@ namespace          configuration {
       return ;
     }
 
-    void modify_if_different(char*& s1, char const* s2) {
-      if (strcmp(s1, s2)) {
-	delete [] s1;
-	s1 = NULL;
-	s1 = my_strdup(s2);
-      }
-      return ;
-    }
+    void modify_if_different(char*& s1, char const* s2);
 
-    void modify_if_different(char** t1, std::vector<std::string> const& t2, unsigned int size) {
-      unsigned int i(0);
-      for (std::vector<std::string>::const_iterator it(t2.begin()), end(t2.end());
-           (it != end) && (i < size);
-           ++it, ++i)
-        if (!t1[i] || strcmp(t1[i], it->c_str())) {
-          delete [] t1[i];
-          t1[i] = NULL;
-          t1[i] = my_strdup(it->c_str());
-        }
-      while (i < size) {
-        delete [] t1[i];
-        t1[i] = NULL;
-	++i;
-      }
-      return ;
-    }
+    void modify_if_different(
+           char** t1,
+           std::vector<std::string> const& t2,
+           unsigned int size);
 
     template<typename T, char* T::*member>
     void unregister_object(T** lst, char const* name) {

@@ -116,15 +116,6 @@ command* add_command(char const* name, char const* value) {
     obj->name = my_strdup(name);
     obj->command_line = my_strdup(value);
 
-    // Add new command to the monitoring engine.
-    umap<std::string, shared_ptr<command_struct> >::const_iterator
-      it(state::instance().commands().find(name));
-    if (it != state::instance().commands().end()) {
-      logger(log_config_error, basic)
-        << "Error: Command '" << name << "' has already been defined";
-      return (NULL);
-    }
-
     // Add new items to the list.
     obj->next = command_list;
     command_list = obj.get();
@@ -265,15 +256,6 @@ contact* add_contact(
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->service_notifications_enabled = (service_notifications_enabled > 0);
-
-    // Add new contact to the monitoring engine.
-    umap<std::string, shared_ptr<contact_struct> >::const_iterator
-      it(state::instance().contacts().find(name));
-    if (it != state::instance().contacts().end()) {
-      logger(log_config_error, basic)
-        << "Error: Contact '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the list.
     obj->next = contact_list;
@@ -466,15 +448,6 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     // Duplicate vars.
     obj->group_name = my_strdup(name);
     obj->alias = my_strdup(!alias ? name : alias);
-
-    // Add new contact group to the monitoring engine.
-    umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
-      it(state::instance().contactgroups().find(name));
-    if (it != state::instance().contactgroups().end()) {
-      logger(log_config_error, basic)
-        << "Error: Contactgroup '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the list.
     obj->next = contactgroup_list;
@@ -1174,15 +1147,6 @@ host* add_host(
     for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
       obj->state_history[x] = STATE_OK;
 
-    // Add new host to the monitoring engine.
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
-      it(state::instance().hosts().find(name));
-    if (it != state::instance().hosts().end()) {
-      logger(log_config_error, basic)
-        << "Error: Host '" << name << "' has already been defined";
-      return (NULL);
-    }
-
     // Add new items to the list.
     obj->next = host_list;
     host_list = obj.get();
@@ -1486,15 +1450,6 @@ hostgroup* add_hostgroup(
       obj->notes = my_strdup(notes);
     if (notes_url)
       obj->notes_url = my_strdup(notes_url);
-
-    // Add new hostgroup to the monitoring engine.
-    umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
-      it(state::instance().hostgroups().find(name));
-    if (it != state::instance().hostgroups().end()) {
-      logger(log_config_error, basic)
-        << "Error: Hostgroup '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the list.
     obj->next = hostgroup_list;
@@ -2269,15 +2224,6 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     // Copy string vars.
     obj->name = my_strdup(name);
     obj->alias = my_strdup(alias);
-
-    // Add new timeperiod to the monitoring engine.
-    umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
-      it(state::instance().timeperiods().find(name));
-    if (it != state::instance().timeperiods().end()) {
-      logger(log_config_error, basic)
-        << "Error: Timeperiod '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the list.
     obj->next = timeperiod_list;

@@ -63,11 +63,16 @@ applier::connector& applier::connector::operator=(
  *  Add new connector.
  *
  *  @param[in] obj The new connector to add into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::connector::add_object(connector_ptr obj) {
+void applier::connector::add_object(
+                           configuration::connector const& obj,
+                           configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new connector '" << obj->connector_name() << "'.";
+    << "Creating new connector '" << obj.connector_name() << "'.";
 
   return ;
 }
@@ -76,11 +81,14 @@ void applier::connector::add_object(connector_ptr obj) {
  *  Modified connector.
  *
  *  @param[in] obj The new connector to modify into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::connector::modify_object(connector_ptr obj) {
+void applier::connector::modify_object(
+                           configuration::connector const& obj,
+                           configuration::state const& s) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying connector '" << obj->connector_name() << "'.";
+    << "Modifying connector '" << obj.connector_name() << "'.";
 
   // XXX : cannot modify a connector because
   //       1) unmodified commands might hold a pointer on the connector
@@ -94,14 +102,19 @@ void applier::connector::modify_object(connector_ptr obj) {
  *  Remove old connector.
  *
  *  @param[in] obj The new connector to remove from the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::connector::remove_object(connector_ptr obj) {
+void applier::connector::remove_object(
+                           configuration::connector const& obj,
+                           configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing connector '" << obj->connector_name() << "'.";
+    << "Removing connector '" << obj.connector_name() << "'.";
 
   // Remove connector.
-  commands::set::instance().remove_command(obj->connector_name());
+  commands::set::instance().remove_command(obj.connector_name());
 
   return ;
 }
@@ -109,19 +122,24 @@ void applier::connector::remove_object(connector_ptr obj) {
 /**
  *  Resolve a connector.
  *
- *  @param[in] obj Connector object.
+ *  @param[in,out] obj Connector object.
+ *  @param[in] s       Configuration being applied.
  */
-void applier::connector::resolve_object(connector_ptr obj) {
+void applier::connector::resolve_object(
+                           configuration::connector const& obj,
+                           configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving connector '" << obj->connector_name() << "'.";
+    << "Resolving connector '" << obj.connector_name() << "'.";
 
   // Expand command line.
   nagios_macros* macros(get_global_macros());
   char* command_line(NULL);
   process_macros_r(
     macros,
-    obj->connector_line().c_str(),
+    obj.connector_line().c_str(),
     &command_line,
     0);
   std::string processed_cmd(command_line);
@@ -130,7 +148,7 @@ void applier::connector::resolve_object(connector_ptr obj) {
   // Create connector.
   shared_ptr<commands::command>
     cmd(new commands::connector(
-                        obj->connector_name(),
+                        obj.connector_name(),
                         processed_cmd,
                         &checks::checker::instance()));
   commands::set::instance().add_command(cmd);

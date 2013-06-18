@@ -37,9 +37,7 @@ retention::host::host(host_struct* obj)
   : object(object::host),
     _obj(obj),
     _scheduling_info_is_ok(false),
-    _was_flapping(false) {
-
-}
+    _was_flapping(false) {}
 
 /**
  *  Destructor.
@@ -69,10 +67,12 @@ bool retention::host::set(
        std::string const& key,
        std::string const& value) {
   if (!_obj && value == "host_name") {
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
+    umap<std::string,
+         std::pair<configuration::host,
+                   shared_ptr<host_struct> > >::const_iterator
       it(state::instance().hosts().find(value));
     if (it != state::instance().hosts().end())
-      _obj = &*it->second;
+      _obj = it->second.second.get();
     return (true);
   }
   else if (!_obj)
