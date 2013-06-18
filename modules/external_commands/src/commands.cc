@@ -2089,8 +2089,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     if (!strcmp(varname, temp_customvariablesmember->variable_name)) {
 
       /* update the value */
-      if (temp_customvariablesmember->variable_value)
-        delete[] temp_customvariablesmember->variable_value;
+      delete[] temp_customvariablesmember->variable_value;
       temp_customvariablesmember->variable_value = my_strdup(varvalue);
 
       /* mark the variable value as having been changed */

@@ -34,12 +34,12 @@ static int check_enter_active_mode(int argc, char** argv) {
   (void)argv;
 
   // Action.
-  config->set_enable_notifications(false);
+  config->enable_notifications(false);
   char const* cmd("[1317196300] ENTER_ACTIVE_MODE");
   process_external_command(cmd);
 
   // Check.
-  if (!config->get_enable_notifications())
+  if (!config->enable_notifications())
     throw (engine_error() << "enter_active_mode failed");
 
   // Success.

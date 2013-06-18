@@ -34,12 +34,12 @@ static int check_enter_standby_mode(int argc, char** argv) {
   (void)argv;
 
   // Action.
-  enable_notifications = true;
+  config->enable_notifications(true);
   char const* cmd("[1317196300] ENTER_STANDBY_MODE");
   process_external_command(cmd);
 
   // Result.
-  if (enable_notifications)
+  if (config->enable_notifications())
     throw (engine_error() << "enter_standby_mode failed");
 
   // Success.

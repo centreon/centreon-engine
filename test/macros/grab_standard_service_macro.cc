@@ -255,38 +255,10 @@ int main_test(int argc, char** argv) {
     }
   }
 
-  delete service_list->servicegroups_ptr->next->next;
-  delete service_list->servicegroups_ptr->next;
-  delete service_list->servicegroups_ptr;
-
-  delete[] sg1->group_name;
-  delete[] sg1->alias;
-  delete[] sg1->members->host_name;
-  delete[] sg1->members->service_description;
-  delete sg1->members;
-  delete sg1;
-
-  delete[] sg2->group_name;
-  delete[] sg2->alias;
-  delete[] sg2->members->host_name;
-  delete[] sg2->members->service_description;
-  delete sg2->members;
-  delete sg2;
-
-  delete[] sg3->group_name;
-  delete[] sg3->alias;
-  delete[] sg3->members->host_name;
-  delete[] sg3->members->service_description;
-  delete sg3->members;
-  delete sg3;
-
   delete [] mac.x[MACRO_SERVICEACKAUTHOR];
   delete [] mac.x[MACRO_SERVICEACKAUTHORNAME];
   delete [] mac.x[MACRO_SERVICEACKAUTHORALIAS];
   delete [] mac.x[MACRO_SERVICEACKCOMMENT];
-
-  // Cleanup the minimal setup.
-  test::cleanup_setup();
 
   return (retval);
 }

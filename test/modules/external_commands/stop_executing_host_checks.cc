@@ -33,11 +33,11 @@ static int check_stop_executing_host_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  execute_host_checks = true;
+  config->execute_host_checks(true);
   char const* cmd("[1317196300] STOP_EXECUTING_HOST_CHECKS");
   process_external_command(cmd);
 
-  if (execute_host_checks)
+  if (config->execute_host_checks())
     throw (engine_error() << "stop_executing_host_checks failed.");
 
   return (0);

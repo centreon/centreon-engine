@@ -117,13 +117,17 @@ command* add_command(char const* name, char const* value) {
     obj->command_line = my_strdup(value);
 
     // Add new command to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<command_struct> >::const_iterator
-      it(state::instance().commands().find(name));
+      it(state::instance().commands().find(id));
     if (it != state::instance().commands().end()) {
       logger(log_config_error, basic)
         << "Error: Command '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().commands()[id] = obj;
 
     // Add new items to the list.
     obj->next = command_list;
@@ -267,13 +271,17 @@ contact* add_contact(
     obj->service_notifications_enabled = (service_notifications_enabled > 0);
 
     // Add new contact to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<contact_struct> >::const_iterator
-      it(state::instance().contacts().find(name));
+      it(state::instance().contacts().find(id));
     if (it != state::instance().contacts().end()) {
       logger(log_config_error, basic)
         << "Error: Contact '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().contacts()[id] = obj;
 
     // Add new items to the list.
     obj->next = contact_list;
@@ -468,13 +476,17 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     obj->alias = my_strdup(!alias ? name : alias);
 
     // Add new contact group to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
-      it(state::instance().contactgroups().find(name));
+      it(state::instance().contactgroups().find(id));
     if (it != state::instance().contactgroups().end()) {
       logger(log_config_error, basic)
         << "Error: Contactgroup '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().contactgroups()[id] = obj;
 
     // Add new items to the list.
     obj->next = contactgroup_list;
@@ -1175,13 +1187,17 @@ host* add_host(
       obj->state_history[x] = STATE_OK;
 
     // Add new host to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<host_struct> >::const_iterator
-      it(state::instance().hosts().find(name));
+      it(state::instance().hosts().find(id));
     if (it != state::instance().hosts().end()) {
       logger(log_config_error, basic)
         << "Error: Host '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().hosts()[id] = obj;
 
     // Add new items to the list.
     obj->next = host_list;
@@ -1259,13 +1275,18 @@ hostdependency* add_host_dependency(
     obj->inherits_parent = (inherits_parent > 0);
 
     // Add new hostdependency to the monitoring engine.
-    umap<std::string, shared_ptr<hostdependency_struct> >::const_iterator
-      it(state::instance().hostdependencies().find(dependent_host_name));
+    std::string id(dependent_host_name);
+    umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator
+      it(state::instance().hostdependencies().find(id));
     if (it != state::instance().hostdependencies().end()) {
       logger(log_config_error, basic)
         << "Error: Hostdependency '" << dependent_host_name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().hostdependencies()
+      .insert(std::make_pair(dependent_host_name, obj));
 
     // Add new items to the list.
     obj->next = hostdependency_list;
@@ -1426,13 +1447,18 @@ hostescalation* add_host_escalation(
     obj->notification_interval = (notification_interval <= 0) ? 0 : notification_interval;
 
     // Add new hostescalation to the monitoring engine.
-    umap<std::string, shared_ptr<hostescalation_struct> >::const_iterator
-      it(state::instance().hostescalations().find(host_name));
+    std::string id(host_name);
+    umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator
+      it(state::instance().hostescalations().find(id));
     if (it != state::instance().hostescalations().end()) {
       logger(log_config_error, basic)
         << "Error: Hostescalation '" << host_name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().hostescalations()
+      .insert(std::make_pair(id, obj));
 
     // Add new items to the list.
     obj->next = hostescalation_list;
@@ -1488,13 +1514,17 @@ hostgroup* add_hostgroup(
       obj->notes_url = my_strdup(notes_url);
 
     // Add new hostgroup to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
-      it(state::instance().hostgroups().find(name));
+      it(state::instance().hostgroups().find(id));
     if (it != state::instance().hostgroups().end()) {
       logger(log_config_error, basic)
         << "Error: Hostgroup '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().hostgroups()[id] = obj;
 
     // Add new items to the list.
     obj->next = hostgroup_list;
@@ -1808,14 +1838,19 @@ service* add_service(
     for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
       obj->state_history[x] = STATE_OK;
 
+    std::pair<std::string, std::string>
+      id(std::make_pair(host_name, description));
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-      it(state::instance().services().find(std::make_pair(host_name, description)));
+      it(state::instance().services().find(id));
     if (it != state::instance().services().end()) {
       logger(log_config_error, basic)
         << "Error: Service '" << description << "' on host '"
         << host_name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().services()[id] = obj;
 
     // Add new items to the list.
     obj->next = service_list;
@@ -1929,6 +1964,10 @@ servicedependency* add_service_dependency(
         << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().servicedependencies()
+      .insert(std::make_pair(id, obj));
 
     // Add new items to the list.
     obj->next = servicedependency_list;
@@ -2163,6 +2202,10 @@ serviceescalation* add_service_escalation(
       return (NULL);
     }
 
+    // Add new items to the configuration state.
+    state::instance().serviceescalations()
+      .insert(std::make_pair(id, obj));
+
     // Add new items to tail the list.
     obj->next = serviceescalation_list;
     serviceescalation_list = obj.get();
@@ -2217,13 +2260,17 @@ servicegroup* add_servicegroup(
       obj->notes_url = my_strdup(notes_url);
 
     // Add new servicegroup to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
-      it(state::instance().servicegroups().find(name));
+      it(state::instance().servicegroups().find(id));
     if (it != state::instance().servicegroups().end()) {
       logger(log_config_error, basic)
         << "Error: Servicegroup '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().servicegroups()[name] = obj;
 
     // Add  new items to the list.
     obj->next = servicegroup_list;
@@ -2271,13 +2318,17 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     obj->alias = my_strdup(alias);
 
     // Add new timeperiod to the monitoring engine.
+    std::string id(name);
     umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
-      it(state::instance().timeperiods().find(name));
+      it(state::instance().timeperiods().find(id));
     if (it != state::instance().timeperiods().end()) {
       logger(log_config_error, basic)
         << "Error: Timeperiod '" << name << "' has already been defined";
       return (NULL);
     }
+
+    // Add new items to the configuration state.
+    state::instance().timeperiods()[id] = obj;
 
     // Add new items to the list.
     obj->next = timeperiod_list;

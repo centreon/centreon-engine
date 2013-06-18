@@ -20,6 +20,7 @@
 #include "com/centreon/engine/deleter/commandsmember.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/contact.hh"
+#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/objects.hh"
@@ -39,7 +40,7 @@ void deleter::contact(void* ptr) throw () {
 
   listmember(obj->host_notification_commands, &commandsmember);
   listmember(obj->service_notification_commands, &commandsmember);
-  listmember(obj->custom_variables, &contactsmember);
+  listmember(obj->custom_variables, &customvariablesmember);
   listmember(obj->contactgroups_ptr, &objectlist);
 
   // host_notification_period_ptr not free.

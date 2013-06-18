@@ -20,16 +20,20 @@
 #ifndef CCE_DELETER_LISTMEMBER_HH
 #  define CCE_DELETER_LISTMEMBER_HH
 
+#  include <cstddef>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace deleter {
-  template <typename T>
+  template<typename T>
   void    listmember(T* ptr, void (*release)(void*)) throw () {
-    if (ptr)
-      for (T* next(ptr->next); ptr; ptr = next)
-        release(ptr);
+    T* next(NULL);
+    while (ptr) {
+      next = ptr->next;
+      release(ptr);
+      ptr = next;
+    }
   }
 }
 

@@ -33,8 +33,6 @@ static int check_change_contact_svc_notification_timeperiod(int argc, char** arg
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
@@ -50,18 +48,6 @@ static int check_change_contact_svc_notification_timeperiod(int argc, char** arg
 
   if (cntct->service_notification_period_ptr != tperiod)
     throw (engine_error() << "change_contact_svc_notification_timeperiod failed.");
-
-  delete[] cntct->name;
-  delete[] cntct->alias;
-  delete[] cntct->service_notification_period;
-  delete cntct;
-
-  delete[] tperiod->name;
-  delete[] tperiod->alias;
-  delete tperiod;
-
-  free_object_skiplists();
-
   return (0);
 }
 

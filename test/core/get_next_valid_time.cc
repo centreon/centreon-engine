@@ -23,10 +23,17 @@
 #include <iostream>
 #include <fstream>
 #include <libgen.h>
+#include "com/centreon/engine/configuration/applier/timeperiod.hh"
+#include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "test/unittest.hh"
+
+#ifndef __THROW
+#  define __THROW
+#endif // !__THROW
 
 // # file.conf format
 // preferred_time=%Y-%m-%d %H:%M:%S
@@ -49,16 +56,27 @@ struct                     options {
   time_t                   ref_time;
 };
 
-#ifndef __THROW
-#  define __THROW
-#endif // !__THROW
-
-// overload of libc time function.
-// always return "Mon Jan 28 13:00:00 CET 2013"
-extern "C" time_t time(time_t *t) __THROW {
-  if (t)
-    *t = _current_time;
-  return (_current_time);
+static void add_timeperiod(
+              std::string const& name,
+              std::string const& alias,
+              std::vector<std::string> const& range,
+              std::vector<std::string> const& exclude) {
+  configuration::timeperiod_ptr obj(new configuration::timeperiod);
+  obj->parse("timeperiod_name " + name);
+  if (!alias.empty())
+    obj->parse("alias " + alias);
+  for (std::vector<std::string>::const_iterator
+         it(range.begin()), end(range.end());
+       it != end;
+       ++it)
+    obj->parse(*it);
+  for (std::vector<std::string>::const_iterator
+         it(exclude.begin()), end(exclude.end());
+       it != end;
+       ++it)
+    obj->parse(*it);
+  configuration::applier::timeperiod app;
+  app.add_object(obj);
 }
 
 static time_t string_to_time_t(std::string const& data) {
@@ -69,25 +87,12 @@ static time_t string_to_time_t(std::string const& data) {
   return (mktime(&t));
 }
 
-/**
- *  Trim a string.
- *
- *  @param[in] str The string.
- *
- *  @return The trimming string.
- */
-static std::string& trim(std::string& str) throw() {
-  static char const* whitespaces(" \t\r\n");
-  size_t pos(str.find_last_not_of(whitespaces));
-
-  if (pos == std::string::npos)
-    str.clear();
-  else {
-    str.erase(pos + 1);
-    if ((pos = str.find_first_not_of(whitespaces)) != std::string::npos)
-      str.erase(0, pos);
-  }
-  return (str);
+// overload of libc time function.
+// always return "Mon Jan 28 13:00:00 CET 2013"
+extern "C" time_t time(time_t *t) __THROW {
+  if (t)
+    *t = _current_time;
+  return (_current_time);
 }
 
 /**
@@ -103,60 +108,53 @@ static void parse_file(char const* filename, options& opt) {
   if (!stream.is_open())
     throw (engine_error()
            << "invalid filename: can't open " << filename);
-  try {
-    std::vector<std::string> range;
-    std::vector<std::string> exclude;
-    while (stream.good()) {
-      std::string line;
-      std::getline(stream, line, '\n');
-      trim(line);
-      if (line.empty() || line[0] == '#')
-        continue;
-      size_t pos(line.find_first_of('='));
-      if (pos == std::string::npos)
+  std::vector<std::string> range;
+  std::vector<std::string> exclude;
+  while (stream.good()) {
+    std::string line;
+    std::getline(stream, line, '\n');
+    misc::trim(line);
+    if (line.empty() || line[0] == '#')
+      continue;
+    size_t pos(line.find_first_of('='));
+    if (pos == std::string::npos)
+      throw (engine_error()
+             << "parsing configuration failed: invalid format");
+    std::string key(line.substr(0, pos));
+    std::string value(line.substr(pos + 1));
+    if (key == "preferred_time")
+      opt.preferred_time = string_to_time_t(value);
+    else if (key == "current_time")
+      _current_time = string_to_time_t(value);
+    else if (key == "ref_time")
+      opt.ref_time = string_to_time_t(value);
+    else if (key == "weekday")
+      range.push_back(value);
+    else if (key == "speday")
+      range.push_back(value);
+    else if (key == "exclusion")
+      exclude.push_back(value);
+    else if (key == "timeperiod") {
+      add_timeperiod(value, value, range, exclude);
+      timeperiod* p(find_timeperiod(value.c_str()));
+      if (!p)
         throw (engine_error()
-               << "parsing configuration failed: invalid format");
-      std::string key(line.substr(0, pos));
-      std::string value(line.substr(pos + 1));
-      if (key == "preferred_time")
-        opt.preferred_time = string_to_time_t(value);
-      else if (key == "current_time")
-        _current_time = string_to_time_t(value);
-      else if (key == "ref_time")
-        opt.ref_time = string_to_time_t(value);
-      else if (key == "weekday")
-        range.push_back(value);
-      else if (key == "speday")
-        range.push_back(value);
-      else if (key == "exclusion")
-        exclude.push_back(value);
-      else if (key == "timeperiod") {
-        objects::add_timeperiod(value, value, range, exclude);
-        timeperiod* p(find_timeperiod(value.c_str()));
-        if (!p)
-          throw (engine_error()
-                 << "invalid timeperiod: can't find " << value);
-        for (timeperiodexclusion* e(p->exclusions); e; e = e->next)
-          e->timeperiod_ptr = find_timeperiod(e->timeperiod_name);
-        exclude.clear();
-        range.clear();
-        opt.period.push_back(p);
-      }
-      else
-        throw (engine_error()
-               << "parsing configuration failed: invalid format");
+               << "invalid timeperiod: can't find " << value);
+      for (timeperiodexclusion* e(p->exclusions); e; e = e->next)
+        e->timeperiod_ptr = find_timeperiod(e->timeperiod_name);
+      exclude.clear();
+      range.clear();
+      opt.period.push_back(p);
     }
-    if (!opt.preferred_time
-        || !_current_time
-        || !opt.ref_time
-        || !opt.period.size())
-      throw (engine_error() << "invalid configuration");
+    else
+      throw (engine_error()
+             << "parsing configuration failed: invalid format");
   }
-  catch (...) {
-    for (unsigned int i(0), end(opt.period.size()); i < end; ++i)
-      objects::release(opt.period[i]);
-    throw;
-  }
+  if (!opt.preferred_time
+      || !_current_time
+      || !opt.ref_time
+      || !opt.period.size())
+    throw (engine_error() << "invalid configuration");
 }
 
 /**
@@ -168,7 +166,6 @@ int main_test(int argc, char** argv) {
   if (argc != 2)
     throw (engine_error() << "usage: " << argv[0] << " file.conf");
 
-  init_object_skiplists();
   try {
     options opt;
     parse_file(argv[1], opt);
@@ -179,25 +176,19 @@ int main_test(int argc, char** argv) {
       &valid,
       opt.period.back());
 
-    for (unsigned int i(0), end(opt.period.size()); i < end; ++i)
-      objects::release(opt.period[i]);
-
     if (valid != opt.ref_time) {
       std::string ref_str(ctime(&opt.ref_time));
       std::string valid_str(ctime(&valid));
       throw (engine_error()
              << "get next valid time failed: "
-             << basename(argv[1]) << ": ref_time(" << trim(ref_str)
-             << ") valid_time(" << trim(valid_str) << ")");
+             << basename(argv[1]) << ": ref_time(" << misc::trim(ref_str)
+             << ") valid_time(" << misc::trim(valid_str) << ")");
     }
   }
   catch (...) {
     free_memory(get_global_macros());
     throw;
   }
-
-  free_object_skiplists();
-
   return (0);
 }
 

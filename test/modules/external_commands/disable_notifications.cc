@@ -33,11 +33,11 @@ static int check_disable_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  enable_notifications = true;
+  config->enable_notifications(true);
   char const* cmd("[1317196300] DISABLE_NOTIFICATIONS");
   process_external_command(cmd);
 
-  if (enable_notifications)
+  if (config->enable_notifications())
     throw (engine_error() << "disable_notifications failed.");
 
   return (0);

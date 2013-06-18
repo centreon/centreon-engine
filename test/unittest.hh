@@ -27,8 +27,10 @@
 #  include "com/centreon/engine/broker/loader.hh"
 #  include "com/centreon/engine/checks/checker.hh"
 #  include "com/centreon/engine/commands/set.hh"
+#  include "com/centreon/engine/configuration/applier/state.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/loop.hh"
+#  include "com/centreon/engine/globals.hh"
 #  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/logging/backend.hh"
@@ -111,8 +113,9 @@ private:
            &_log,
            com::centreon::engine::logging::all,
            com::centreon::engine::logging::most);
-      configuration::state::load();
       commands::set::load();
+      ::config = new configuration::state;
+      configuration::applier::state::load();
       checks::checker::load();
       events::loop::load();
       broker::loader::load();
@@ -137,8 +140,9 @@ private:
       broker::loader::unload();
       events::loop::unload();
       checks::checker::unload();
+      configuration::applier::state::unload();
       commands::set::unload();
-      configuration::state::unload();
+      delete ::config;
       com::centreon::clib::unload();
     }
     catch (std::exception const& e) {

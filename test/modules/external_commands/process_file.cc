@@ -47,7 +47,7 @@ static int check_process_file(int argc, char** argv) {
     file << "[1317196300] ENABLE_NOTIFICATIONS" << std::endl;
     file.close();
 
-    config->set_enable_notifications(false);
+    config->enable_notifications(false);
     std::string cmd("[1317196300] PROCESS_FILE;");
     cmd.append(tmp);
     cmd.append(";0\n");
@@ -56,7 +56,7 @@ static int check_process_file(int argc, char** argv) {
     remove(tmp);
     free(tmp);
     tmp = NULL;
-    if (!config->get_enable_notifications())
+    if (!config->enable_notifications())
       throw (engine_error() << "process_file failed.");
   }
   catch (...) {

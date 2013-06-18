@@ -33,11 +33,11 @@ static int check_start_executing_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config->set_execute_service_checks(false);
+  config->execute_service_checks(false);
   char const* cmd("[1317196300] START_EXECUTING_SVC_CHECKS");
   process_external_command(cmd);
 
-  if (!config->get_execute_service_checks())
+  if (!config->execute_service_checks())
     throw (engine_error() << "start_executing_svc_checks failed.");
 
   return (0);

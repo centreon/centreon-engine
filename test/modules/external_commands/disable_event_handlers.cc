@@ -33,11 +33,11 @@ static int check_disable_event_handlers(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  enable_event_handlers = true;
+  config->enable_event_handlers(true);
   char const* cmd("[1317196300] DISABLE_EVENT_HANDLERS");
   process_external_command(cmd);
 
-  if (enable_event_handlers)
+  if (config->enable_event_handlers())
     throw (engine_error() << "disable_event_handlers failed.");
 
   return (0);
