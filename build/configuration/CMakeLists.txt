@@ -49,6 +49,7 @@ add_library("cce_configuration"
   "${SRC_DIR}/serviceextinfo.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/timeperiod.cc"
+
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
   "${INC_DIR}/contactgroup.hh"

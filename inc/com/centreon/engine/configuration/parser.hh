@@ -44,7 +44,27 @@ CCE_BEGIN()
 namespace              configuration {
   class                parser {
   public:
-                       parser();
+    enum               read_options {
+      read_commands = (1 << 0),
+      read_connector = (1 << 1),
+      read_contact = (1 << 2),
+      read_contactgroup = (1 << 3),
+      read_host = (1 << 4),
+      read_hostdependency = (1 << 5),
+      read_hostescalation = (1 << 6),
+      read_hostextinfo = (1 << 7),
+      read_hostgroup = (1 << 8),
+      read_hostgroupescalation = (1 << 9),
+      read_service = (1 << 10),
+      read_servicedependency = (1 << 11),
+      read_serviceescalation = (1 << 12),
+      read_serviceextinfo = (1 << 13),
+      read_servicegroup = (1 << 14),
+      read_timeperiod = (1 << 15),
+      read_all = (~0)
+    };
+
+                       parser(unsigned int read_options = read_all);
                        ~parser() throw ();
     void               parse(std::string const& path, state& config);
 
@@ -105,6 +125,7 @@ namespace              configuration {
     std::string        _current_path;
     list_object        _lst_objects[15];
     map_object         _map_objects[15];
+    unsigned int       _read_options;
     static store       _store[];
     map_object         _templates[15];
   };

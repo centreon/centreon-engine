@@ -46,9 +46,13 @@ parser::store parser::_store[] = {
 
 /**
  *  Default constructor.
+ *
+ *  @param[in] read_options Configuration file reading options
+ *             (use to skip some object type).
  */
-parser::parser()
-  : _config(NULL) {
+parser::parser(unsigned int read_options)
+  : _config(NULL),
+    _read_options(read_options) {
 
 }
 
@@ -423,6 +427,7 @@ void parser::_parse_object_definitions(std::string const& path) {
   _current_line = 0;
   _current_path = path;
 
+  bool parse_object(false);
   object_ptr obj;
   std::string input;
   while (misc::get_next_line(stream, input, _current_line)) {
@@ -447,21 +452,26 @@ void parser::_parse_object_definitions(std::string const& path) {
                "definitions failed: unknown object type name "
                "'" << type << "' in file '" << _current_path
                << "' on line " << _current_line);
+      parse_object = (_read_options & (1 << obj->type()));
     }
     // Check if is the not the end of the current object.
     else if (input != "}") {
-      if (!obj->parse(input))
-        throw (engine_error() << "configuration: parse object "
-               "definitions failed: invalid line "
-               "'" << input << "' in file '" << _current_path
-               << "' on line " << _current_line);
+      if (parse_object) {
+        if (!obj->parse(input))
+          throw (engine_error() << "configuration: parse object "
+                 "definitions failed: invalid line "
+                 "'" << input << "' in file '" << _current_path
+                 << "' on line " << _current_line);
+      }
     }
     // End of the current object.
     else {
-      if (obj->is_template())
-        _add_template(obj);
-      else
-        _add_object(obj);
+      if (parse_object) {
+        if (obj->is_template())
+          _add_template(obj);
+        else
+          _add_object(obj);
+      }
       obj.clear();
     }
   }

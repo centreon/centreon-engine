@@ -22,11 +22,11 @@
 #include <cstring>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/deleter.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
-#include "com/centreon/engine/xodtemplate.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
@@ -3101,12 +3101,23 @@ int read_object_config_data(
       int options,
       int cache,
       int precache) {
-  // Read in data from all text host config files (template-based).
-  return (xodtemplate_read_config_data(
-            main_config_file,
-            options,
-            cache,
-            precache) != OK);
+  // XXX: cache and precache are unused.
+  (void)cache;
+  (void)precache;
+
+  int ret(ERROR);
+  try {
+    configuration::state config;
+    configuration::parser p(options);
+    p.parse(main_config_file, config);
+    configuration::applier::state::instance().apply(config);
+    ret = OK;
+  }
+  catch (std::exception const& e) {
+    logger(log_config_error, basic)
+      << e.what();
+  }
+  return (ret);
 }
 
 }

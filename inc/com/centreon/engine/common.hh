@@ -280,25 +280,6 @@
 #    define FALSE 0
 #  endif /* !FALSE */
 
-/* Host config file reading options. */
-#  define READ_HOSTS                (1 << 0)
-#  define READ_HOSTGROUPS           (1 << 1)
-#  define READ_CONTACTS             (1 << 2)
-#  define READ_CONTACTGROUPS        (1 << 3)
-#  define READ_SERVICES             (1 << 4)
-#  define READ_COMMANDS             (1 << 5)
-#  define READ_TIMEPERIODS          (1 << 6)
-#  define READ_SERVICEESCALATIONS   (1 << 7)
-#  define READ_HOSTGROUPESCALATIONS (1 << 8) /* No longer implemented. */
-#  define READ_SERVICEDEPENDENCIES  (1 << 9)
-#  define READ_HOSTDEPENDENCIES     (1 << 10)
-#  define READ_HOSTESCALATIONS      (1 << 11)
-#  define READ_HOSTEXTINFO          (1 << 12)
-#  define READ_SERVICEEXTINFO       (1 << 13)
-#  define READ_SERVICEGROUPS        (1 << 14)
-#  define READ_CONNECTOR            (1 << 15)
-#  define READ_ALL_OBJECT_DATA      (~0)
-
 /* Date range types. */
 #  define DATERANGE_CALENDAR_DATE  0  /* 2008-12-25 */
 #  define DATERANGE_MONTH_DATE     1  /* july 4 (specific month) */
