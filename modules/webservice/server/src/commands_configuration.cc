@@ -1503,7 +1503,7 @@ int centreonengine__setLogInitialState(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << value << ")";
 
-    config->log_initial_state(value);
+    config->log_initial_states(value);
 
     webservice::sync::instance().worker_finish();
   }

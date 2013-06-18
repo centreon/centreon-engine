@@ -30,42 +30,10 @@
         </sequence>
       </complexType>
 
-      <!-- Command type. -->
-      <complexType name="commandType">
-        <sequence>
-          <element name="name" type="xsd:string"/>
-          <element name="commandLine" type="xsd:string"/>
-        </sequence>
-      </complexType>
-
       <!-- Contact identifier. -->
       <complexType name="contactIDType">
         <sequence>
           <element name="name" type="xsd:string"/>
-        </sequence>
-      </complexType>
-
-      <!-- Contact type. -->
-      <complexType name="contactType">
-        <sequence>
-          <element name="id" type="tns:contactIDType"/>
-          <element name="alias" type="xsd:string" minOccurs="0"/>
-	  <element name="contactgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="hostNotificationsEnabled" type="xsd:boolean"/>
-	  <element name="serviceNotificationsEnabled" type="xsd:boolean"/>
-	  <element name="hostNotificationPeriod" type="xsd:string"/>
-	  <element name="serviceNotificationPeriod" type="xsd:string"/>
-	  <element name="hostNotificationOptions" type="xsd:string"/>
-	  <element name="serviceNotificationOptions" type="xsd:string"/>
-	  <element name="hostNotificationCommands" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
-	  <element name="serviceNotificationCommands" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
-	  <element name="email" type="xsd:string" minOccurs="0"/>
-	  <element name="pager" type="xsd:string" minOccurs="0"/>
-	  <element name="address" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="canSubmitCommands" type="xsd:boolean" minOccurs="0"/>
-	  <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
-	  <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
-	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
 
@@ -76,16 +44,6 @@
         </sequence>
       </complexType>
 
-      <!-- Contactgroup type. -->
-      <complexType name="contactgroupType">
-        <sequence>
-          <element name="name" type="xsd:string"/>
-          <element name="alias" type="xsd:string" minOccurs="0"/>
-	  <element name="contactMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="contactgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
-      </complexType>
-
       <!-- Host identifier. -->
       <complexType name="hostIDType">
         <sequence>
@@ -93,100 +51,10 @@
         </sequence>
       </complexType>
 
-      <!-- Host type. -->
-      <complexType name="hostType">
-        <sequence>
-          <element name="id" type="tns:hostIDType"/>
-          <element name="alias" type="xsd:string"/>
-          <element name="displayName" type="xsd:string" minOccurs="0"/>
-          <element name="address" type="xsd:string"/>
-          <element name="parents" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="checkCommand" type="xsd:string" minOccurs="0"/>
-          <element name="initialState" type="xsd:string" minOccurs="0"/>
-          <element name="maxCheckAttempts" type="xsd:unsignedInt"/>
-          <element name="checkInterval" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="retryInterval" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="activeChecksEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="passiveChecksEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="checkPeriod" type="xsd:string"/>
-          <element name="obsessOverHost" type="xsd:boolean" minOccurs="0"/>
-          <element name="checkFreshness" type="xsd:boolean" minOccurs="0"/>
-          <element name="freshnessThreshold" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="eventHandler" type="xsd:string" minOccurs="0"/>
-          <element name="eventHandlerEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="lowFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="highFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="flapDetectionEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="flapDetectionOptions" type="xsd:string" minOccurs="0"/>
-          <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
-          <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
-          <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
-          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="notificationInterval" type="xsd:unsignedInt"/>
-          <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="notificationPeriod" type="xsd:string"/>
-          <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
-          <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
-          <element name="notes" type="xsd:string" minOccurs="0"/>
-          <element name="notesUrl" type="xsd:string" minOccurs="0"/>
-          <element name="actionUrl" type="xsd:string" minOccurs="0"/>
-          <element name="iconImage" type="xsd:string" minOccurs="0"/>
-          <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
-          <element name="vrmlImage" type="xsd:string" minOccurs="0"/>
-          <element name="statusmapImage" type="xsd:string" minOccurs="0"/>
-	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
-      </complexType>
-
-      <!-- hostDependency type -->
-      <complexType name="hostDependencyType">
-        <sequence>
-          <element name="dependentHostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
-	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
-	  <element name="notificationFailureCriteria" type="xsd:string" minOccurs="0"/>
-	  <element name="dependencyPeriod" type="xsd:string" minOccurs="0"/>
-        </sequence>
-      </complexType>
-
-      <!-- hostEscalation type -->
-      <complexType name="hostEscalationType">
-        <sequence>
-          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="firstNotification" type="xsd:unsignedInt"/>
-	  <element name="lastNotification" type="xsd:unsignedInt"/>
-	  <element name="notificationInterval" type="xsd:unsignedInt"/>
-	  <element name="escalationPeriod" type="xsd:string" minOccurs="0"/>
-	  <element name="escalationOptions" type="xsd:string" minOccurs="0"/>
-        </sequence>
-      </complexType>
-
       <!-- Hostgroup identifier. -->
       <complexType name="hostgroupIDType">
         <sequence>
           <element name="name" type="xsd:string"/>
-        </sequence>
-      </complexType>
-
-      <!-- Hostgroup type. -->
-      <complexType name="hostgroupType">
-        <sequence>
-          <element name="id" type="tns:hostgroupIDType"/>
-          <element name="alias" type="xsd:string" minOccurs="0"/>
-          <element name="hostMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="notes" type="xsd:string" minOccurs="0"/>
-	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
-	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
         </sequence>
       </complexType>
 
@@ -198,100 +66,10 @@
         </sequence>
       </complexType>
 
-      <!-- Service type -->
-      <complexType name="serviceType">
-        <sequence>
-	  <element name="id" type="tns:serviceIDType"/>
-          <element name="hostgroupName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="displayName" type="xsd:string" minOccurs="0"/>
-          <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="isVolatile" type="xsd:boolean" minOccurs="0"/>
-          <element name="checkCommand" type="xsd:string"/>
-          <element name="initialState" type="xsd:string" minOccurs="0"/>
-          <element name="maxCheckAttempts" type="xsd:unsignedInt"/>
-          <element name="checkInterval" type="xsd:unsignedInt"/>
-          <element name="retryInterval" type="xsd:unsignedInt"/>
-          <element name="activeChecksEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="passiveChecksEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="checkPeriod" type="xsd:string"/>
-          <element name="obsessOverService" type="xsd:boolean" minOccurs="0"/>
-          <element name="checkFreshness" type="xsd:boolean" minOccurs="0"/>
-          <element name="freshnessThreshold" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="eventHandler" type="xsd:string" minOccurs="0"/>
-          <element name="eventHandlerEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="lowFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="highFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="flapDetectionEnabled" type="xsd:boolean" minOccurs="0"/>
-	  <element name="flapDetectionOptions" type="xsd:string" minOccurs="0"/>
-          <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
-          <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
-          <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
-          <element name="notificationInterval" type="xsd:unsignedInt"/>
-          <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
-          <element name="notificationPeriod" type="xsd:string"/>
-	  <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
-          <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
-          <element name="notes" type="xsd:string" minOccurs="0"/>
-          <element name="notesUrl" type="xsd:string" minOccurs="0"/>
-          <element name="actionUrl" type="xsd:string" minOccurs="0"/>
-          <element name="iconImage" type="xsd:string" minOccurs="0"/>
-          <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
-	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
-      </complexType>
-
-      <!-- serviceDependency type -->
-      <complexType name="serviceDependencyType">
-        <sequence>
-          <element name="dependentHostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="dependentServiceDescription" type="xsd:string"/>
-          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="serviceDescription" type="xsd:string"/>
-	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
-	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
-	  <element name="notificationFailureCriteria" type="xsd:string" minOccurs="0"/>
-	  <element name="dependencyPeriod" type="xsd:string" minOccurs="0"/>
-        </sequence>
-      </complexType>
-
-      <!-- serviceEscalation type -->
-      <complexType name="serviceEscalationType">
-        <sequence>
-          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="serviceDescription" type="xsd:string"/>
-          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="firstNotification" type="xsd:unsignedInt"/>
-	  <element name="lastNotification" type="xsd:unsignedInt"/>
-	  <element name="notificationInterval" type="xsd:unsignedInt"/>
-	  <element name="escalationPeriod" type="xsd:string" minOccurs="0"/>
-	  <element name="escalationOptions" type="xsd:string" minOccurs="0"/>
-        </sequence>
-      </complexType>
-
       <!-- Servicegroup identifier. -->
       <complexType name="servicegroupIDType">
         <sequence>
           <element name="name" type="xsd:string"/>
-        </sequence>
-      </complexType>
-
-      <!-- Servicegroup type. -->
-      <complexType name="servicegroupType">
-        <sequence>
-          <element name="id" type="tns:servicegroupIDType"/>
-          <element name="alias" type="xsd:string" minOccurs="0"/>
-          <element name="serviceMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="servicegroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="notes" type="xsd:string" minOccurs="0"/>
-	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
-	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
         </sequence>
       </complexType>
 
@@ -511,11 +289,6 @@
     <part name="command" type="tns:commandIDType"/>
   </message>
 
-  <!-- Command add request. -->
-  <message name="commandFullRequest">
-    <part name="command" type="tns:commandType"/>
-  </message>
-
   <!--
 	 Contact messages.
    -->
@@ -544,11 +317,6 @@
     <part name="varvalue" type="xsd:string"/>
   </message>
 
-  <!-- Add or modify contact. -->
-  <message name="contactFullRequest">
-    <part name="contact" type="tns:contactType"/>
-  </message>
-
   <!-- String request on a contact. -->
   <message name="contactStringRequest">
     <part name="contact" type="tns:contactIDType"/>
@@ -575,11 +343,6 @@
   <message name="contactgroupContactgroupRequest">
     <part name="contactgroup" type="tns:contactgroupIDType"/>
     <part name="member" type="tns:contactgroupIDType"/>
-  </message>
-
-  <!-- Add/modify contact group request. -->
-  <message name="contactgroupFullRequest">
-    <part name="contactgroup" type="tns:contactgroupType"/>
   </message>
 
   <!-- Message sent when executing an operation on a contact group. -->
@@ -645,21 +408,6 @@
     <part name="value" type="xsd:unsignedInt"/>
   </message>
 
-  <!-- Host add request. -->
-  <message name="hostFullRequest">
-    <part name="host" type="tns:hostType"/>
-  </message>
-
-  <!-- Add a host dependency. -->
-  <message name="addHostDependencyRequest">
-    <part name="hostdependency" type="tns:hostDependencyType"/>
-  </message>
-
-  <!-- Add a host escalation. -->
-  <message name="addHostEscalationRequest">
-    <part name="hostescalation" type="tns:hostEscalationType"/>
-  </message>
-
   <!--
 	 Host Group Messages.
   -->
@@ -674,11 +422,6 @@
   <message name="hostgroupHostgroupRequest">
     <part name="hostgroup" type="tns:hostgroupIDType"/>
     <part name="member" type="tns:hostgroupIDType"/>
-  </message>
-
-  <!-- Add/modify contact group request. -->
-  <message name="hostgroupFullRequest">
-    <part name="hostgroup" type="tns:hostgroupType"/>
   </message>
 
   <!-- Message sent when executing an operation on a host group. -->
@@ -755,21 +498,6 @@
     <part name="dependency" type="tns:serviceDependencyIDType"/>
   </message>
 
-  <!-- Service add request. -->
-  <message name="serviceFullRequest">
-    <part name="service" type="tns:serviceType"/>
-  </message>
-
-  <!-- Add a service dependency. -->
-  <message name="addServiceDependencyRequest">
-    <part name="servicedependency" type="tns:serviceDependencyType"/>
-  </message>
-
-  <!-- Add a service escalation. -->
-  <message name="addServiceEscalationRequest">
-    <part name="serviceescalation" type="tns:serviceEscalationType"/>
-  </message>
-
   <!--
         Service Group Messages.
   -->
@@ -784,11 +512,6 @@
   <message name="servicegroupServicegroupRequest">
     <part name="servicegroup" type="tns:servicegroupIDType"/>
     <part name="member" type="tns:servicegroupIDType"/>
-  </message>
-
-  <!-- Add/modify service group request. -->
-  <message name="servicegroupFullRequest">
-    <part name="servicegroup" type="tns:servicegroupType"/>
   </message>
 
   <!-- Message sent when executing an operation on a service group. -->
@@ -900,11 +623,6 @@
          Timeperiod.
   -->
 
-  <!-- Add or modify a timeperiod. -->
-  <message name="timeperiodFullRequest">
-    <part name="timeperiod" type="tns:timeperiodType"/>
-  </message>
-
   <!-- Timeperiod request. -->
   <message name="timeperiodRequest">
     <part name="timeperiod" type="tns:timeperiodIDType"/>
@@ -961,9 +679,9 @@
   <portType name="commandPortType">
 
     <!--
-	                      
-	 Global operations.  
-	                      
+
+	 Global operations.
+
      -->
 
     <!--
@@ -1358,56 +1076,6 @@
     <!-- </operation> -->
 
     <!--
-	 Add object operations.
-    -->
-
-    <!-- addHostDependency() -->
-    <operation name="addHostDependency">
-      <documentation>Add host dependency.</documentation>
-      <input message="tns:addHostDependencyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- addHostEscalation() -->
-    <operation name="addHostEscalation">
-      <documentation>Add host escalation.</documentation>
-      <input message="tns:addHostEscalationRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- addServiceDependency() -->
-    <operation name="addServiceDependency">
-      <documentation>Add Service dependency.</documentation>
-      <input message="tns:addServiceDependencyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- addServiceEscalation() -->
-    <operation name="addServiceEscalation">
-      <documentation>Add service escalation.</documentation>
-      <input message="tns:addServiceEscalationRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
-	 Remove object operations.
-    -->
-
-    <!-- removeServiceEscalation() -->
-    <operation name="removeServiceEscalation">
-      <documentation>Remove service escalation.</documentation>
-      <input message="tns:serviceEscalationRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- removeServiceDependency() -->
-    <operation name="removeServiceDependency">
-      <documentation>Remove service dependency.</documentation>
-      <input message="tns:serviceDependencyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
 	 Features.
      -->
 
@@ -1670,44 +1338,9 @@
 
     <!--
 
-         Commands.
-
-     -->
-
-    <!-- commandAdd(command) -->
-    <operation name="commandAdd">
-      <documentation>Add a new command.</documentation>
-      <input message="tns:commandFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- commandModify(command) -->
-    <operation name="commandModify">
-      <documentation>Modify an existing command.</documentation>
-      <input message="tns:commandFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- commandRemove(command_id) -->
-    <operation name="commandRemove">
-      <documentation>Remove a command.</documentation>
-      <input message="tns:commandRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-
-    <!--
-
          Contact.
 
      -->
-
-    <!-- contactAdd(contact) -->
-    <operation name="contactAdd">
-      <documentation>Add a contact.</documentation>
-      <input message="tns:contactFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
 
     <!-- contactAddNotificationsOnHostCommand(contact, command) -->
     <operation name="contactAddNotificationsOnHostCommand">
@@ -1915,13 +1548,6 @@
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- contactModify(contact) -->
-    <operation name="contactModify">
-      <documentation>Modify an existing contact.</documentation>
-      <input message="tns:contactFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- contactRemove(contact_id) -->
     <operation name="contactRemove">
       <documentation>Remove a contact.</documentation>
@@ -2100,83 +1726,9 @@
 
     <!--
 
-         Contact group.
-
-     -->
-
-    <!-- contactgroupAdd(contactgroup) -->
-    <operation name="contactgroupAdd">
-      <documentation>Add a contact group.</documentation>
-      <input message="tns:contactgroupFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactgroupAddContact(contactgroup_id, contact_id) -->
-    <operation name="contactgroupAddContact">
-      <documentation>Add a contact to the contact group.</documentation>
-      <input message="tns:contactgroupContactRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactgroupAddContactgroup(contactgroup_id, contactgroup_id) -->
-    <operation name="contactgroupAddContactgroup">
-      <documentation>Add a contact group to the contact group.</documentation>
-      <input message="tns:contactgroupContactgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactgroupModify(contactgroup) -->
-    <operation name="contactgroupModify">
-      <documentation>Modify an existing contact group.</documentation>
-      <input message="tns:contactgroupFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactgroupRemove(contactgroup_id) -->
-    <operation name="contactgroupRemove">
-      <documentation>Remove a contact group.</documentation>
-      <input message="tns:contactgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactgroupRemoveContact(contactgroup_id, contact_id) -->
-    <operation name="contactgroupRemoveContact">
-      <documentation>Remove a contact member.</documentation>
-      <input message="tns:contactgroupContactRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-
-    <!--
-
 	 Host.
 
      -->
-
-    <!--
-         Global.
-     -->
-
-    <!-- hostAdd(host) -->
-    <operation name="hostAdd">
-      <documentation>Create a new host.</documentation>
-      <input message="tns:hostFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostModify(host) -->
-    <operation name="hostModify">
-      <documentation>Modify an existing host.</documentation>
-      <input message="tns:hostFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostRemove(host_id) -->
-    <operation name="hostRemove">
-      <documentation>Remove a host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
 
     <!--
 	 Acknowledgement.
@@ -3112,31 +2664,6 @@
      -->
 
     <!--
-         Global.
-     -->
-
-    <!-- serviceAdd(service) -->
-    <operation name="serviceAdd">
-      <documentation>Create a new service.</documentation>
-      <input message="tns:serviceFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- serviceModify(service) -->
-    <operation name="serviceModify">
-      <documentation>Modify an existing service.</documentation>
-      <input message="tns:serviceFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- serviceRemove(service_id) -->
-    <operation name="serviceRemove">
-      <documentation>Remove a service.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
 	 Acknowledgement.
      -->
 
@@ -4010,9 +3537,9 @@
 
 
     <!--
-	                    
-	 Acknowledgements.  
-	                    
+
+	 Acknowledgements.
+
      -->
 
     <!--
@@ -4053,9 +3580,9 @@
 
 
     <!--
-	          
-	 Checks.  
-	          
+
+	 Checks.
+
      -->
 
     <!-- checkHostProcessResult(host, result) -->
@@ -4166,9 +3693,9 @@
 
 
     <!--
-	             
-	 Downtimes.  
-	             
+
+	 Downtimes.
+
      -->
 
     <!--
@@ -4270,60 +3797,10 @@
       <output message="tns:downtimeResponse"/>
     </operation>
 
-
     <!--
 
-         Host Group.
+	 Notifications.
 
-     -->
-
-    <!-- hostgroupAdd(hostgroup) -->
-    <operation name="hostgroupAdd">
-      <documentation>Add new host group.</documentation>
-      <input message="tns:hostgroupFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostgroupAddHost(hostgroup_id, host_id) -->
-    <operation name="hostgroupAddHost">
-      <documentation>Add a host to a host group.</documentation>
-      <input message="tns:hostgroupHostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostgroupAddHostgroup(hostgroup_id, hostgroup_id) -->
-    <operation name="hostgroupAddHostgroup">
-      <documentation>Add a host group to a host group.</documentation>
-      <input message="tns:hostgroupHostgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostgroupModify(hostgroup) -->
-    <operation name="hostgroupModify">
-      <documentation>Modify a host group.</documentation>
-      <input message="tns:hostgroupFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostgroupRemove(hostgroup_id) -->
-    <operation name="hostgroupRemove">
-      <documentation>Remove a host group.</documentation>
-      <input message="tns:hostgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- hostgroupRemoveHost(hostgroup_id, host_id) -->
-    <operation name="hostgroupRemoveHost">
-      <documentation>Remove a host from a host group.</documentation>
-      <input message="tns:hostgroupHostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-
-    <!--
-	                 
-	 Notifications.  
-	                 
      -->
 
     <!--
@@ -4359,83 +3836,6 @@
     <operation name="notificationServiceSend">
       <documentation>Send a notification on a service.</documentation>
       <input message="tns:notificationServiceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-
-    <!--
-
-         Service Group.
-
-     -->
-
-    <!-- servicegroupAdd(servicegroup) -->
-    <operation name="servicegroupAdd">
-      <documentation>Add new service group.</documentation>
-      <input message="tns:servicegroupFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- servicegroupAddService(servicegroup_id, service_id) -->
-    <operation name="servicegroupAddService">
-      <documentation>Add a service to a service group.</documentation>
-      <input message="tns:servicegroupServiceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- servicegroupAddServicegroup(servicegroup_id, servicegroup_id) -->
-    <operation name="servicegroupAddServicegroup">
-      <documentation>Add a service group to a service group.</documentation>
-      <input message="tns:servicegroupServicegroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- servicegroupModify(servicegroup) -->
-    <operation name="servicegroupModify">
-      <documentation>Modify a service group.</documentation>
-      <input message="tns:servicegroupFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- servicegroupRemove(servicegroup_id) -->
-    <operation name="servicegroupRemove">
-      <documentation>Remove a service group.</documentation>
-      <input message="tns:servicegroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- servicegroupRemoveService(servicegroup_id, service_id) -->
-    <operation name="servicegroupRemoveService">
-      <documentation>Remove a service from a service group.</documentation>
-      <input message="tns:servicegroupServiceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-
-    <!--
-
-         Timeperiod.
-
-     -->
-
-    <!-- timeperiodAdd(timeperiod) -->
-    <operation name="timeperiodAdd">
-      <documentation>Create a new timeperiod.</documentation>
-      <input message="tns:timeperiodFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- timeperiodModify(timeperiod) -->
-    <operation name="timeperiodModify">
-      <documentation>Modify an existing timeperiod.</documentation>
-      <input message="tns:timeperiodFullRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- timeperiodRemove(timeperiod_id) -->
-    <operation name="timeperiodRemove">
-      <documentation>Remove an existing timeperiod.</documentation>
-      <input message="tns:timeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -4580,9 +3980,9 @@
     <SOAP:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
 
     <!--
-	                     
-	 Global operations.  
-	                     
+
+	 Global operations.
+
      -->
 
     <!--
@@ -4921,50 +4321,6 @@
     <!--   <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output> -->
     <!-- </operation> -->
 
-    <!--
-         Add object operations.
-    -->
-
-    <operation name="addHostDependency">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="addHostEscalation">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="addServiceDependency">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="addServiceEscalation">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <!--
-         Remove object operations.
-    -->
-
-    <operation name="removeServiceEscalation">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="removeServiceDependency">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="getEventHandlersEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5178,52 +4534,9 @@
 
     <!--
 
-         Command.
-
-     -->
-
-    <operation name="commandAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="commandModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="commandRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-
-    <!--
-
 	 Contacts.
 
      -->
-
-    <operation name="contactAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactAddNotificationsOnHostCommand">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactAddNotificationsOnServiceCommand">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
 
     <operation name="contactGetAlias">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -5387,30 +4700,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="contactModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactRemoveNotificationsOnHostCommand">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactRemoveNotificationsOnServiceCommand">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="contactSetAlias">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5546,70 +4835,9 @@
 
     <!--
 
-         Contact group.
-
-     -->
-
-    <operation name="contactgroupAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactgroupAddContact">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactgroupAddContactgroup">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactgroupModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactgroupRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactgroupRemoveContact">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-
-    <!--
-
 	 Host.
 
      -->
-
-    <operation name="hostAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
 
     <operation name="hostGetAcknowledgementIsSet">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -6338,24 +5566,6 @@
 
      -->
 
-    <operation name="serviceAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="serviceGetAcknowledgementIsSet">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -7041,9 +6251,9 @@
     </operation>
 
     <!--
-	                    
-	 Acknowledgements.  
-	                    
+
+	 Acknowledgements.
+
      -->
 
     <operation name="acknowledgementOnHostAdd">
@@ -7071,9 +6281,9 @@
     </operation>
 
     <!--
-	          
-	 Checks.  
-	          
+
+	 Checks.
+
      -->
 
     <operation name="checkHostProcessResult">
@@ -7162,9 +6372,9 @@
 
 
     <!--
-	             
-	 Downtimes.  
-	             
+
+	 Downtimes.
+
      -->
 
     <operation name="downtimeGetAuthor">
@@ -7233,53 +6443,11 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <!--
-
-         Host Group.
-
-     -->
-
-    <operation name="hostgroupAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostgroupAddHost">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostgroupAddHostgroup">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostgroupModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostgroupRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostgroupRemoveHost">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
 
     <!--
-	                 
-	 Notifications.  
-	                 
+
+	 Notifications.
+
      -->
 
     <operation name="notificationHostDelay">
@@ -7301,73 +6469,6 @@
     </operation>
 
     <operation name="notificationServiceSend">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-
-    <!--
-
-         Service Group.
-
-     -->
-
-    <operation name="servicegroupAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="servicegroupAddService">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="servicegroupAddServicegroup">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="servicegroupModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="servicegroupRemove">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="servicegroupRemoveService">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <!--
-
-         Timeperiod.
-
-     -->
-
-    <operation name="timeperiodAdd">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="timeperiodModify">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="timeperiodRemove">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
