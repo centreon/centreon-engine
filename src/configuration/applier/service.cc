@@ -66,12 +66,69 @@ applier::service& applier::service::operator=(
  *  Add new service.
  *
  *  @param[in] obj The new service to add into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::service::add_object(service_ptr obj) {
-  // Browse all hosts of this service.
+void applier::service::add_object(
+                         service_ptr obj,
+                         configuration::state& s) {
+  // Get host list.
+  std::set<std::string> target_hosts;
+  // Hosts members.
   for (list_string::const_iterator
          it(obj->hosts().begin()),
          end(obj->hosts().end());
+       it != end;
+       ++it)
+    target_hosts.insert(*it);
+  // Host group members.
+  for (list_string::const_iterator
+         it(obj->hostgroups().begin()),
+         end(obj->hostgroups().end());
+       it != end;
+       ++it) {
+    // Find host group.
+    list_hostgroup::iterator
+      it2(s.hostgroups().begin()),
+      end2(s.hostgroups().end());
+    while (it2 != end2) {
+      if (*it == (*it2)->hostgroup_name())
+        break ;
+      ++it2;
+    }
+    if (it2 == end2)
+      throw (engine_error() << "Error: Could not find host group '"
+             << *it << "' on which to apply service '"
+             << obj->service_description() << "'.");
+
+    // Add host group members.
+    for (set_string::const_iterator
+           it3((*it2)->resolved_members().begin()),
+           end3((*it2)->resolved_members().end());
+         it3 != end3;
+         ++it3)
+      target_hosts.insert(*it3);
+  }
+
+  // Get service group list.
+  std::list<shared_ptr<servicegroup_struct> > target_groups;
+  for (list_string::const_iterator
+         it(obj->servicegroups().begin()),
+         end(obj->servicegroups().end());
+       it != end;
+       ++it) {
+    umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+      it2(applier::state::instance().servicegroups().find(*it));
+    if (it2 == applier::state::instance().servicegroups().end())
+      throw (engine_error() << "Error: Could not add service '"
+             << obj->service_description() << "' to service group '"
+             << *it << "'.");
+    target_groups.push_back(it2->second);
+  }
+
+  // Browse all hosts of this service.
+  for (std::set<std::string>::const_iterator
+         it(target_hosts.begin()),
+         end(target_hosts.end());
        it != end;
        ++it) {
     // Logging.
@@ -190,8 +247,20 @@ void applier::service::add_object(service_ptr obj) {
                << obj->service_description() << "' of host '" << *it
                << "'.");
 
-    // XXX : hostgroups
-    // XXX : servicegroups
+    // Service groups.
+    for (std::list<shared_ptr<servicegroup_struct> >::iterator
+           it2(target_groups.begin()),
+           end2(target_groups.end());
+         it2 != end2;
+         ++it2)
+      if (!add_service_to_servicegroup(
+             it2->get(),
+             it->c_str(),
+             obj->service_description().c_str()))
+        throw (engine_error() << "Error: Could not add service '"
+               << obj->service_description() << "' of host '" << *it
+               << "' to service group '" << (*it2)->group_name
+               << "'.");
 
     // Register service.
     s->next = service_list;
@@ -206,8 +275,11 @@ void applier::service::add_object(service_ptr obj) {
  *  Modified service.
  *
  *  @param[in] obj The new service to modify into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::service::modify_object(service_ptr obj) {
+void applier::service::modify_object(
+                         service_ptr obj,
+                         configuration::state& s) {
   // Browse all hosts of this service.
   for (list_string::const_iterator
          it(obj->hosts().begin()),
@@ -229,8 +301,11 @@ void applier::service::modify_object(service_ptr obj) {
  *  Remove old service.
  *
  *  @param[in] obj The new service to remove from the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::service::remove_object(service_ptr obj) {
+void applier::service::remove_object(
+                         service_ptr obj,
+                         configuration::state& s) {
   // Browse all hosts of this service.
   for (list_string::const_iterator
          it(obj->hosts().begin()),
@@ -262,8 +337,11 @@ void applier::service::remove_object(service_ptr obj) {
  *  Resolve a service.
  *
  *  @param[in] obj Service object.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::service::resolve_object(service_ptr obj) {
+void applier::service::resolve_object(
+                         service_ptr obj,
+                         configuration::state& s) {
   // Browse all hosts of this service.
   for (list_string::const_iterator
          it(obj->hosts().begin()),
