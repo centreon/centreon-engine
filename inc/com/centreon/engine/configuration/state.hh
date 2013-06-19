@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_STATE_HH
 
 #  include <list>
+#  include <set>
 #  include <sstream>
 #  include <string>
 #  include <vector>

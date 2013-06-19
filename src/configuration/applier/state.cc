@@ -22,6 +22,7 @@
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
+#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
@@ -55,16 +56,16 @@ void applier::state::apply(configuration::state const& new_cfg) {
   //   config,
   //   config.timeperiods());
 
-  // // Apply connectors.
-  // _apply<configuration::connector,
-  //        commands::connector,
-  //        applier::connector,
-  //        std::string,
-  //        &configuration::connector::connector_name>(
-  //   config->connectors(),
-  //   _connectors,
-  //   new_cfg,
-  //   new_cfg.connectors());
+  // Apply connectors.
+  _apply<configuration::connector,
+         commands::connector,
+         applier::connector,
+         std::string,
+         &configuration::connector::connector_name>(
+    config->connectors(),
+    _connectors,
+    new_cfg,
+    new_cfg.connectors());
 
   // // Apply commands.
   // _apply<configuration::command,
@@ -416,105 +417,59 @@ void applier::state::_apply(
                        configuration::state const& new_state,
                        std::list<shared_ptr<ConfigurationType> > const& new_cfg) {
   // Type alias.
-  typedef umap<KeyType, shared_ptr<ObjectType> > applied_objects;
+  typedef std::list<shared_ptr<ConfigurationType> > cfg_set;
 
   /*
   ** Configuration diff.
   */
 
-  // // Copy all current configuration names.
-  // umap<KeyType, ConfigurationType> to_delete;
-  // for (typename applied_objects::const_iterator
-  //        it(cur_cfg.begin()),
-  //        end(cur_cfg.end());
-  //      it != end;
-  //      ++it)
-  //   to_delete[it->first] = it->second.first;
+  difference<std::list<shared_ptr<ConfigurationType> > > diff;
+  diff.parse(cur_cfg, new_cfg);
 
-  // // Sort configuration in three lists : to_delete, to_create and
-  // // to_modify.
-  // umap<KeyType, ConfigurationType> to_create;
-  // umap<KeyType, ConfigurationType> to_modify;
-  // for (typename std::list<shared_ptr<ConfigurationType> >::const_iterator
-  //        it_new(new_cfg.begin()),
-  //        end_new(new_cfg.end());
-  //      it_new != end_new;
-  //      ++it_new) {
-  //   // Find already existing object.
-  //   typename umap<KeyType, ConfigurationType>::iterator
-  //     it(to_delete.find(((**it_new).*config_key)()));
+  /*
+  ** Configuration application.
+  */
 
-  //   // Exists already.
-  //   if (it != to_delete.end()) {
-  //     // Modified. In the other case we just won't act on the object.
-  //     if (it->second != **it_new)
-  //       to_modify[((**it_new).*config_key)()] = **it_new;
+  // Applier.
+  ApplierType aplyr;
 
-  //     // Object should not be deleted.
-  //     to_delete.erase(it);
-  //   }
-  //   // Does not exist.
-  //   else
-  //     to_create[((**it_new).*config_key)()] = **it_new;
-  // }
+  // Erase objects.
+  {
+    typename cfg_set::iterator
+      it_current(cur_cfg.begin()),
+      end_current(cur_cfg.end());
+    for (typename cfg_set::const_iterator
+           it_delete(diff.deleted().begin()),
+           end_delete(diff.deleted().end());
+         it_delete != end_delete;
+         ++it_delete) {
+      typename umap<KeyType, shared_ptr<ObjectType> >::iterator
+        it(cur_obj.find(((**it_delete).*config_key)()));
+      if (it != cur_obj.end()) {
+        aplyr.remove_object(**it_delete, new_state);
+        while ((it_current != end_current)
+               && (((**it_current).*config_key)()
+                   < ((**it_delete).*config_key)()))
+          ++it_current;
+        if ((it_current != end_current)
+            && (((**it_current).*config_key)()
+                == ((**it_delete).*config_key)()))
+          it_current = cur_cfg.erase(it_current);
+      }
+    }
+  }
 
-  // /*
-  // ** Configuration backup.
-  // */
+  // Add objects.
+  for (typename cfg_set::const_iterator
+         it_create(diff.added().begin()),
+         end_create(diff.added().end());
+       it_create != end_create;
+       ++it_create)
+    aplyr.add_object(**it_create, new_state);
+  // XXX : add in cur_cfg (sorted)
 
-  // // Make a configuration backup. It will be restored in case of error.
-  // std::list<shared_ptr<ConfigurationType> > backup;
-  // for (typename applied_objects::const_iterator
-  //        it(cur_cfg.begin()),
-  //        end(cur_cfg.end());
-  //      it != end;
-  //      ++it)
-  //   backup.push_back(shared_ptr<ConfigurationType>(
-  //                      new ConfigurationType(it->second.first)));
-
-  // /*
-  // ** Configuration application.
-  // */
-
-  // try {
-  //   // Applier.
-  //   ApplierType aplyr;
-
-  //   // Erase objects.
-  //   for (typename umap<KeyType, ConfigurationType>::iterator
-  //          it_delete(to_delete.begin()),
-  //          end_delete(to_delete.end());
-  //        it_delete != end_delete;
-  //        ++it_delete) {
-  //     typename applied_objects::iterator
-  //       it(cur_cfg.find(it_delete->first));
-  //     if (it != cur_cfg.end())
-  //       aplyr.remove_object(it->second.first, cur_state);
-  //   }
-  //   to_delete.clear();
-
-  //   // Add objects.
-  //   for (typename umap<KeyType, ConfigurationType>::iterator
-  //          it_create(to_create.begin()),
-  //          end_create(to_create.end());
-  //        it_create != end_create;
-  //        ++it_create)
-  //     aplyr.add_object(it_create->second, cur_state);
-
-  //   // Modify objects.
-  //   // XXX
-  // }
-  // // Exception occurred, restore backup.
-  // catch (error const& e) {
-  //   logger(engine::logging::log_config_error, engine::logging::basic)
-  //     << "Error: New configuration could not be applied "
-  //     << "(old one will be restored): " << e.what();
-  //   _apply<ConfigurationType,
-  //          ObjectType,
-  //          ApplierType,
-  //          KeyType,
-  //          config_key>(cur_cfg, cur_state, backup);
-  // }
+  // Modify objects.
+  // XXX
 
   return ;
 }
