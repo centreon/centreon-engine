@@ -20,6 +20,7 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/applier")
 set(INC_DIR "${INC_DIR}/applier")
+set(TEST_DIR "${TEST_DIR}/applier")
 
 # cce_configuration_applier target.
 add_library("cce_configuration_applier"
@@ -70,3 +71,21 @@ add_library("cce_configuration_applier"
 
 # Link target with required libraries.
 target_link_libraries("cce_configuration_applier" "cce_logging")
+
+if (WITH_TESTING)
+  # check compatibility.
+  set(TEST_BIN_NAME "check_compatibility")
+  add_executable(
+    "${TEST_BIN_NAME}"
+    "${TEST_DIR}/check_compatibility.cc"
+    "${TEST_DIR}/xodtemplate.cc")
+  target_link_libraries("${TEST_BIN_NAME}" "cce_core")
+
+  ## check compatibility configuration path.
+  set(CONF_DIR "${TEST_DIR}/configuration/")
+
+  # #
+  # set(TEST_NAME "")
+  # set(TEST_CONF_FILE ".conf")
+  # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+endif ()
