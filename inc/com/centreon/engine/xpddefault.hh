@@ -21,7 +21,9 @@
 #ifndef CCE_XPDDEFAULT_HH
 #  define CCE_XPDDEFAULT_HH
 
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/macros/defines.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 #  define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE    \
   "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"

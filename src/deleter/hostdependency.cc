@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/hostdependency.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/hostdependency.hh"
 
 using namespace com::centreon::engine;
 

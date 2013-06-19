@@ -47,7 +47,7 @@ webservice::webservice(configuration const* config)
   : _config(config),
     _is_end(false) {
 #ifndef WITH_OPENSSL
-  if (_config->ssl_enable())
+  if (_config->get_ssl_enable())
     logger(log_config_warning, basic)
       << "webservice configuration enable SSL but webservice module " \
          "was compiled without OpenSSL support";
@@ -75,7 +75,7 @@ webservice::~webservice() throw () {
 void  webservice::_run() {
   // Thread pool.
   concurrency::thread_pool pool;
-  pool.set_max_thread_count(_config->thread_count());
+  pool.set_max_thread_count(_config->get_thread_count());
 
   // Process while end is not requested.
   while (!_is_end) {
@@ -103,7 +103,7 @@ void  webservice::_run() {
 
 #ifdef WITH_OPENSSL
     // SSL handshake.
-    if (_config->ssl_enable()
+    if (_config->get_ssl_enable()
         && (soap_ssl_accept(soap_cpy) != SOAP_OK)) {
       char buf_error[1024];
       soap_sprint_fault(soap_cpy, buf_error, sizeof(buf_error));
@@ -129,7 +129,7 @@ void  webservice::_run() {
   soap_end(&_soap_ctx);
   soap_done(&_soap_ctx);
 #ifdef WITH_OPENSSL
-  if (_config->ssl_enable())
+  if (_config->get_ssl_enable())
     CRYPTO_thread_cleanup();
 #endif // !WITH_OPENSSL
 
@@ -170,7 +170,7 @@ webservice& webservice::operator=(webservice const& right) {
 void webservice::_init() {
   // SSL initialization.
 #ifdef WITH_OPENSSL
-  if (_config->ssl_enable()) {
+  if (_config->get_ssl_enable()) {
     signal(SIGPIPE, _sigpipe_handle);
     soap_ssl_init();
     if (CRYPTO_thread_setup())
@@ -180,24 +180,24 @@ void webservice::_init() {
 
   // SOAP initialization.
   soap_init(&_soap_ctx);
-  _soap_ctx.accept_timeout = _config->accept_timeout();
-  _soap_ctx.send_timeout = _config->send_timeout();
-  _soap_ctx.recv_timeout = _config->recv_timeout();
+  _soap_ctx.accept_timeout = _config->get_accept_timeout();
+  _soap_ctx.send_timeout = _config->get_send_timeout();
+  _soap_ctx.recv_timeout = _config->get_recv_timeout();
 
   // SSL parameters.
 #ifdef WITH_OPENSSL
-  if (_config->ssl_enable()) {
-    char const* keyfile(!_config->ssl_keyfile().empty()
-                        ? _config->ssl_keyfile().c_str()
+  if (_config->get_ssl_enable()) {
+    char const* keyfile(!_config->get_ssl_keyfile().empty()
+                        ? _config->get_ssl_keyfile().c_str()
                         : NULL);
-    char const* cacert(!_config->ssl_cacert().empty()
-                       ? _config->ssl_cacert().c_str()
+    char const* cacert(!_config->get_ssl_cacert().empty()
+                       ? _config->get_ssl_cacert().c_str()
                        : NULL);
-    char const* dh(!_config->ssl_dh().empty()
-                   ? _config->ssl_dh().c_str()
+    char const* dh(!_config->get_ssl_dh().empty()
+                   ? _config->get_ssl_dh().c_str()
                    : NULL);
-    char const* password(!_config->ssl_password().empty()
-                         ? _config->ssl_password().c_str()
+    char const* password(!_config->get_ssl_password().empty()
+                         ? _config->get_ssl_password().c_str()
                          : NULL);
     int flags((!keyfile && !cacert && !dh && !password)
               ? SOAP_SSL_NO_AUTHENTICATION
@@ -213,23 +213,23 @@ void webservice::_init() {
           NULL,
           NULL))
       throw (engine_error() << "create ssl context with host '"
-             << _config->host() << "' on port "
-             << _config->port() << " failed");
+             << _config->get_host() << "' on port "
+             << _config->get_port() << " failed");
   }
 #endif // !WITH_OPENSSL
 
   // SOAP parameters.
-  char const* host(!_config->host().empty()
-                   ? _config->host().c_str()
+  char const* host(!_config->get_host().empty()
+                   ? _config->get_host().c_str()
                    : NULL);
   SOAP_SOCKET m_socket(soap_bind(
                          &_soap_ctx,
                          host,
-                         _config->port(),
+                         _config->get_port(),
                          100));
   if (!soap_valid_socket(m_socket))
-    throw (engine_error() << "bind with host '" << _config->host()
-           << "' on port " << _config->port() << " failed");
+    throw (engine_error() << "bind with host '" << _config->get_host()
+           << "' on port " << _config->get_port() << " failed");
 
   return ;
 }

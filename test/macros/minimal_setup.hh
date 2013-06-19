@@ -25,7 +25,6 @@ namespace       com {
     namespace   engine {
       namespace test {
         void    minimal_setup();
-        void    cleanup_setup();
       }
     }
   }

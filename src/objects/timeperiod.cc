@@ -17,13 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/timeperiod.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/daterange.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #include "com/centreon/engine/objects/timerange.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -91,3 +101,54 @@ std::ostream& operator<<(std::ostream& os, timeperiod const& obj) {
   return (os);
 }
 
+/**
+ *  Add a new timeperiod to the list in memory.
+ *
+ *  @param[in] name  Time period name.
+ *  @param[in] alias Time period alias.
+ *
+ *  @return New timeperiod object.
+ */
+timeperiod* add_timeperiod(char const* name, char const* alias) {
+  // Make sure we have the data we need.
+  if (!name || !name[0] || !alias || !alias[0]) {
+    logger(log_config_error, basic)
+      << "Error: Name or alias for timeperiod is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for the new timeperiod.
+  shared_ptr<timeperiod> obj(new timeperiod, deleter::timeperiod);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Copy string vars.
+    obj->name = my_strdup(name);
+    obj->alias = my_strdup(alias);
+
+    // Add new timeperiod to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+      it(state::instance().timeperiods().find(id));
+    if (it != state::instance().timeperiods().end()) {
+      logger(log_config_error, basic)
+        << "Error: Timeperiod '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().timeperiods()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = timeperiod_list;
+    timeperiod_list = obj.get();
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    obj.clear();
+  }
+
+  return (obj.get());
+}

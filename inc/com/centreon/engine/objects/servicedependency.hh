@@ -48,6 +48,30 @@ typedef struct                     servicedependency_struct {
 }                                  servicedependency;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+servicedependency* add_service_dependency(
+                     char const* dependent_host_name,
+                     char const* dependent_service_description,
+                     char const* host_name,
+                     char const* service_description,
+                     int dependency_type,
+                     int inherits_parent,
+                     int fail_on_ok,
+                     int fail_on_warning,
+                     int fail_on_unknown,
+                     int fail_on_critical,
+                     int fail_on_pending,
+                     char const* dependency_period);
+int                check_for_circular_servicedependency_path(
+                     servicedependency* root_dep,
+                     servicedependency* dep,
+                     int dependency_type);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -59,7 +83,7 @@ bool          operator!=(
 std::ostream& operator<<(
                 std::ostream& os,
                 servicedependency const& obj);
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICEDEPENDENCY_HH
 

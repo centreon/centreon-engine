@@ -26,8 +26,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/file.hh"
 

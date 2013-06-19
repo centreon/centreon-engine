@@ -20,6 +20,11 @@
 #ifndef CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 #  define CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 
+/* Forward declarations. */
+struct contact_struct;
+struct host_struct;
+struct service_struct;
+
 typedef struct                         customvariablesmember_struct {
   char*                                variable_name;
   char*                                variable_value;
@@ -28,6 +33,29 @@ typedef struct                         customvariablesmember_struct {
 }                                      customvariablesmember;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+customvariablesmember* add_custom_variable_to_contact(
+                         contact_struct* cntct,
+                         char const* varname,
+                         char const* varvalue);
+customvariablesmember* add_custom_variable_to_host(
+                         host_struct* hst,
+                         char const* varname,
+                         char const* varvalue);
+customvariablesmember* add_custom_variable_to_object(
+                         customvariablesmember** object_ptr,
+                         char const* varname,
+                         char const* varvalue);
+customvariablesmember* add_custom_variable_to_service(
+                         service_struct* svc,
+                         char const* varname,
+                         char const* varvalue);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -40,7 +68,7 @@ std::ostream& operator<<(
                 std::ostream& os,
                 customvariablesmember const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 

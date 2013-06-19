@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/timerange.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/timerange.hh"
 
 using namespace com::centreon::engine;
 
@@ -28,10 +28,6 @@ using namespace com::centreon::engine;
  *  @param[in] ptr The timerange to delete.
  */
 void deleter::timerange(void* ptr) throw () {
-  if (!ptr)
-    return;
-
   timerange_struct* obj(static_cast<timerange_struct*>(ptr));
-
   delete obj;
 }

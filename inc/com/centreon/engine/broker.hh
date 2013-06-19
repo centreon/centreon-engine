@@ -23,7 +23,9 @@
 
 #  include <sys/time.h>
 #  include "com/centreon/engine/events.hh"
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 /* Event broker options. */
 #  define BROKER_NOTHING                           0

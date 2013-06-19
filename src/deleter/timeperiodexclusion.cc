@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/timeperiodexclusion.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/timeperiodexclusion.hh"
 
 using namespace com::centreon::engine;
 

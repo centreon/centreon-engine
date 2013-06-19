@@ -28,9 +28,12 @@
 #include "com/centreon/engine/events.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xpddefault.hh"
+#include "find.hh"
 
 using namespace com::centreon::engine::logging;
 

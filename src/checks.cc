@@ -380,7 +380,7 @@ int handle_async_service_check_result(
 	       ? " - plugin may be missing" : ""))
 	<< ')';
 
-    temp_service->plugin_output = my_strdup(oss.str().c_str());
+    temp_service->plugin_output = my_strdup(oss.str());
     temp_service->current_state = STATE_CRITICAL;
   }
 
@@ -2623,7 +2623,7 @@ int handle_async_host_check_result_3x(
       delete[] temp_host->long_plugin_output;
       delete[] temp_host->perf_data;
 
-      temp_host->plugin_output = my_strdup(oss.str().c_str());
+      temp_host->plugin_output = my_strdup(oss.str());
       temp_host->long_plugin_output = NULL;
       temp_host->perf_data = NULL;
 

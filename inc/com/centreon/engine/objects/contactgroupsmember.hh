@@ -22,6 +22,10 @@
 
 /* Forward declaration. */
 struct contactgroup_struct;
+struct host_struct;
+struct hostescalation_struct;
+struct service_struct;
+struct serviceescalation_struct;
 
 typedef struct                       contactgroupsmember_struct {
   char*                              group_name;
@@ -30,6 +34,25 @@ typedef struct                       contactgroupsmember_struct {
 }                                    contactgroupsmember;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+contactgroupsmember* add_contactgroup_to_host(
+                       host_struct* hst,
+                       char const* group_name);
+contactgroupsmember* add_contactgroup_to_host_escalation(
+                       hostescalation_struct* he,
+                       char const* group_name);
+contactgroupsmember* add_contactgroup_to_service(
+                       service_struct* svc,
+                       char const* group_name);
+contactgroupsmember* add_contactgroup_to_serviceescalation(
+                       serviceescalation_struct* se,
+                       char const* group_name);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -42,7 +65,7 @@ std::ostream& operator<<(
                 std::ostream& os,
                 contactgroupsmember const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
 

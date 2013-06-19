@@ -19,11 +19,14 @@
 
 #include <iomanip>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/deleter/daterange.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/daterange.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/objects/timerange.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -247,4 +250,76 @@ std::string const& get_weekday_name(unsigned int index) {
   if (index >= sizeof(days) / sizeof(*days))
     return (unknown);
   return (days[index]);
+}
+
+/**
+ *  Add a new exception to a timeperiod.
+ *
+ *  @param[in] period        Base period.
+ *  @param[in] type
+ *  @param[in] syear
+ *  @param[in] smon
+ *  @param[in] smday
+ *  @param[in] swday
+ *  @param[in] swday_offset
+ *  @param[in] eyear
+ *  @param[in] emon
+ *  @param[in] emday
+ *  @param[in] ewday
+ *  @param[in] ewday_offset
+ *  @param[in] skip_interval
+ *
+ *  @return Excluded date range.
+ */
+daterange* add_exception_to_timeperiod(
+             timeperiod* period,
+             int type,
+             int syear,
+             int smon,
+             int smday,
+             int swday,
+             int swday_offset,
+             int eyear,
+             int emon,
+             int emday,
+             int ewday,
+             int ewday_offset,
+             int skip_interval) {
+  // Make sure we have the data we need.
+  if (!period)
+    return (NULL);
+
+  // Allocate memory for the date range range.
+  daterange* obj(new daterange);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Set daterange properties.
+    obj->type = type;
+    obj->syear = syear;
+    obj->smon = smon;
+    obj->smday = smday;
+    obj->swday = swday;
+    obj->swday_offset = swday_offset;
+    obj->eyear = eyear;
+    obj->emon = emon;
+    obj->emday = emday;
+    obj->ewday = ewday;
+    obj->ewday_offset = ewday_offset;
+    obj->skip_interval = skip_interval;
+
+    // Add the new date range to the head of the range
+    // list for this exception type.
+    obj->next = period->exceptions[type];
+    period->exceptions[type] = obj;
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    deleter::daterange(obj);
+    obj = NULL;
+  }
+
+  return (obj);
 }

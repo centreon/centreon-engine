@@ -146,7 +146,76 @@ typedef struct                  service_struct {
   struct service_struct*        nexthash;
 }                               service;
 
+/* Other SERVICE structure. */
+struct                          service_other_properties {
+  time_t                        initial_notif_time;
+};
+
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+service* add_service(
+           char const* host_name,
+           char const* description,
+           char const* display_name,
+           char const* check_period,
+           int initial_state,
+           int max_attempts,
+           int parallelize,
+           int accept_passive_checks,
+           double check_interval,
+           double retry_interval,
+           double notification_interval,
+           double first_notification_delay,
+           char const* notification_period,
+           int notify_recovery,
+           int notify_unknown,
+           int notify_warning,
+           int notify_critical,
+           int notify_flapping,
+           int notify_downtime,
+           int notifications_enabled,
+           int is_volatile,
+           char const* event_handler,
+           int event_handler_enabled,
+           char const* check_command,
+           int checks_enabled,
+           int flap_detection_enabled,
+           double low_flap_threshold,
+           double high_flap_threshold,
+           int flap_detection_on_ok,
+           int flap_detection_on_warning,
+           int flap_detection_on_unknown,
+           int flap_detection_on_critical,
+           int stalk_on_ok,
+           int stalk_on_warning,
+           int stalk_on_unknown,
+           int stalk_on_critical,
+           int process_perfdata,
+           int failure_prediction_enabled,
+           char const* failure_prediction_options,
+           int check_freshness,
+           int freshness_threshold,
+           char const* notes,
+           char const* notes_url,
+           char const* action_url,
+           char const* icon_image,
+           char const* icon_image_alt,
+           int retain_status_information,
+           int retain_nonstatus_information,
+           int obsess_over_service);
+int      get_service_count();
+int      is_contact_for_service(
+           service_struct* svc,
+           contact_struct* cntct);
+int      is_escalated_contact_for_service(
+           service_struct* svc,
+           contact_struct* cntct);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -157,7 +226,7 @@ bool          operator!=(
                 service_struct const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, service const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICE_HH
 

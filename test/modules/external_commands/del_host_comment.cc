@@ -33,8 +33,6 @@ static int check_del_host_comment(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   next_comment_id = 1;
   if (add_new_comment(HOST_COMMENT,
                       USER_COMMENT,
@@ -55,9 +53,6 @@ static int check_del_host_comment(int argc, char** argv) {
 
   if (comment_list)
     throw (engine_error() << "del_host_comment failed.");
-
-  free_object_skiplists();
-
   return (0);
 }
 

@@ -24,7 +24,7 @@
 char* check_result_path = NULL;
 unsigned long max_check_result_file_age = 0;
 
-com::centreon::engine::configuration::state* config = NULL;
+com::centreon::engine::configuration::state* config(NULL);
 char*                     config_file = NULL;
 
 command*                  global_host_event_handler_ptr = NULL;

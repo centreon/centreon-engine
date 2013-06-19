@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/commandsmember.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/commandsmember.hh"
 
 using namespace com::centreon::engine;
 

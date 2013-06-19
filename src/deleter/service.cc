@@ -23,7 +23,11 @@
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/service.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/contactgroupsmember.hh"
+#include "com/centreon/engine/objects/contactsmember.hh"
+#include "com/centreon/engine/objects/customvariablesmember.hh"
+#include "com/centreon/engine/objects/objectlist.hh"
+#include "com/centreon/engine/objects/service.hh"
 
 using namespace com::centreon::engine;
 

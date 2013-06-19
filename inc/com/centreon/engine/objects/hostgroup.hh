@@ -21,6 +21,7 @@
 #  define CCE_OBJECTS_HOSTGROUP_HH
 
 /* Forward declaration. */
+struct host_struct;
 struct hostsmember_struct;
 
 typedef struct             hostgroup_struct {
@@ -35,6 +36,22 @@ typedef struct             hostgroup_struct {
 }                          hostgroup;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+hostgroup* add_hostgroup(
+             char const* name,
+             char const* alias,
+             char const* notes,
+             char const* notes_url,
+             char const* action_url);
+int        is_host_member_of_hostgroup(
+             hostgroup_struct* group,
+             host_struct* hst);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -45,7 +62,7 @@ bool          operator!=(
                 hostgroup const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, hostgroup const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTGROUP_HH
 

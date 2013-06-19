@@ -170,7 +170,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     // Initialise configuration.
     gl_config = new configuration;
     if (args != NULL) {
-      gl_config->filename(args);
+      gl_config->set_filename(args);
       gl_config->parse();
     }
 

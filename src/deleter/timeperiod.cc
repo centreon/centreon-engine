@@ -18,10 +18,12 @@
 */
 
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/timeperiodexclusion.hh"
 #include "com/centreon/engine/deleter/timeperiod.hh"
+#include "com/centreon/engine/deleter/timeperiodexclusion.hh"
 #include "com/centreon/engine/deleter/timerange.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/daterange.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/objects/timerange.hh"
 
 using namespace com::centreon::engine;
 

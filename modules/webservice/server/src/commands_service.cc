@@ -21,7 +21,6 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
-#include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "soapH.h"
@@ -30,282 +29,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules;
 using namespace com::centreon::engine::modules::webservice;
-
-/**
- *  Create a new service into the engine.
- *
- *  @param[in] svc Struct with all information to create new service.
- */
-void webservice::create_service(ns1__serviceType const& svc) {
-  // Check all arguments and set default option for optional options.
-  if (svc.contacts.empty() && svc.contactGroups.empty())
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service
-           << "') no contact or no contact groups are defined");
-
-  // Notification options.
-  std::map<char, bool>
-    notif_opt(get_options(svc.notificationOptions, "wucrfs", "n"));
-  if (notif_opt.empty())
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service
-           << "') invalid notification options");
-
-  // Flap detection options.
-  std::map<char, bool> flap_detection_opt(get_options(
-                                            svc.flapDetectionOptions,
-                                            "owuc",
-                                            "n"));
-  if (flap_detection_opt.empty())
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service
-           << "') invalid flap detection options");
-
-  // Stalking options.
-  std::map<char, bool>
-    stalk_opt(get_options(svc.stalkingOptions, "owuc", "n"));
-  if (stalk_opt.empty())
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service
-           << "') invalid stalking options");
-
-  // Initial state.
-  int initial_state(STATE_OK);
-  std::string initial_state_options(
-                svc.initialState ? *svc.initialState : "o");
-  std::transform(
-         initial_state_options.begin(),
-         initial_state_options.end(),
-         initial_state_options.begin(),
-         tolower);
-  if ((initial_state_options == "o") || (initial_state_options == "ok"))
-    initial_state = STATE_OK;
-  else if ((initial_state_options == "w")
-           || (initial_state_options == "warning"))
-    initial_state = STATE_WARNING;
-  else if ((initial_state_options == "u")
-           || (initial_state_options == "unknown"))
-    initial_state = STATE_UNKNOWN;
-  else if ((initial_state_options == "c")
-           || (initial_state_options == "critical"))
-    initial_state = STATE_CRITICAL;
-  else
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service << "') invalid initial state");
-
-  // Check period.
-  timeperiod* check_period(find_timeperiod(svc.checkPeriod.c_str()));
-  if (!check_period)
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service << "') invalid check period");
-
-  // Notification period.
-  timeperiod* notification_period(find_timeperiod(
-                                    svc.notificationPeriod.c_str()));
-  if (!notification_period)
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service
-           << "') invalid notification period");
-
-  // Event handler.
-  command* cmd_event_handler(NULL);
-  if (svc.eventHandler) {
-    std::string
-      cmd_name(*svc.eventHandler, 0, svc.eventHandler->find('!'));
-    if ((cmd_event_handler = find_command(cmd_name.c_str())) == NULL)
-      throw (engine_error() << "service ('" << svc.id->host->name
-             << "', '" << svc.id->service
-             << "') invalid event handler");
-  }
-
-  // Check command.
-  std::string cmd_name(svc.checkCommand, 0, svc.checkCommand.find('!'));
-  command* cmd_check_command(find_command(cmd_name.c_str()));
-  if (!cmd_check_command)
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service << "') invalid check command");
-
-  // Host.
-  host* hst(find_host(svc.id->host->name.c_str()));
-  if (!hst)
-    throw (engine_error() << "service ('" << svc.id->host->name
-           << "', '" << svc.id->service << "') invalid host name");
-
-  // String properties.
-  char const* display_name(svc.displayName
-                           ? svc.displayName->c_str()
-                           : NULL);
-  char const* event_handler(svc.eventHandler
-                            ? svc.eventHandler->c_str()
-                            : NULL);
-  char const* notes = (svc.notes
-                       ? svc.notes->c_str()
-                       : NULL);
-  char const* notes_url(svc.notesUrl
-                        ? svc.notesUrl->c_str()
-                        : NULL);
-  char const* action_url(svc.actionUrl
-                         ? svc.actionUrl->c_str()
-                         : NULL);
-  char const* icon_image(svc.iconImage
-                         ? svc.iconImage->c_str()
-                         : NULL);
-  char const* icon_image_alt(svc.iconImageAlt
-                             ? svc.iconImageAlt->c_str()
-                             : NULL);
-
-  // Remaining properties.
-  bool active_checks_enabled(svc.activeChecksEnabled
-                             ? *svc.activeChecksEnabled
-                             : true);
-  bool passive_checks_enabled(svc.passiveChecksEnabled
-                              ? *svc.passiveChecksEnabled
-                              : true);
-  bool obsess_over_service(svc.obsessOverService
-                           ? *svc.obsessOverService
-                           : true);
-  bool event_handler_enabled(svc.eventHandlerEnabled
-                             ? *svc.eventHandlerEnabled
-                             : true);
-  bool flap_detection_enabled(svc.flapDetectionEnabled
-                              ? *svc.flapDetectionEnabled
-                              : true);
-  bool notifications_enabled(svc.notificationsEnabled
-                             ? *svc.notificationsEnabled
-                             : true);
-  bool process_perfdata(svc.processPerfData
-                        ? *svc.processPerfData
-                        : true);
-  bool retain_status_information(svc.retainStatusInformation
-                                 ? *svc.retainStatusInformation
-                                 : true);
-  bool retain_nonstatus_information(svc.retainNonstatusInformation
-                                    ? *svc.retainNonstatusInformation
-                                    : true);
-  bool is_volatile(svc.isVolatile ? *svc.isVolatile : true);
-  int first_notification_delay(svc.firstNotificationDelay
-                               ? * svc.firstNotificationDelay
-                               : 60);
-  double low_flap_threshold(svc.lowFlapThreshold
-                            ? *svc.lowFlapThreshold / 100
-                            : 0.0);
-  double high_flap_threshold(svc.highFlapThreshold
-                             ? *svc.highFlapThreshold / 100
-                             : 0.0);
-  bool check_freshness(svc.checkFreshness
-                       ? *svc.checkFreshness
-                       : false);
-  int freshness_threshold(svc.freshnessThreshold
-                          ? *svc.freshnessThreshold
-                          : false);
-
-  // Create a new service.
-  service* new_svc(add_service(
-                     svc.id->host->name.c_str(),
-                     svc.id->service.c_str(),
-                     display_name,
-                     svc.checkPeriod.c_str(),
-                     initial_state,
-                     svc.maxCheckAttempts,
-                     true, // no documentation for parallelize in nagios 3
-                     passive_checks_enabled,
-                     svc.checkInterval,
-                     svc.retryInterval,
-                     svc.notificationInterval,
-                     first_notification_delay,
-                     svc.notificationPeriod.c_str(),
-                     notif_opt['r'],
-                     notif_opt['u'],
-                     notif_opt['w'],
-                     notif_opt['c'],
-                     notif_opt['f'],
-                     notif_opt['s'],
-                     notifications_enabled,
-                     is_volatile,
-                     event_handler,
-                     event_handler_enabled,
-                     svc.checkCommand.c_str(),
-                     active_checks_enabled,
-                     flap_detection_enabled,
-                     low_flap_threshold,
-                     high_flap_threshold,
-                     flap_detection_opt['o'],
-                     flap_detection_opt['u'],
-                     flap_detection_opt['w'],
-                     flap_detection_opt['c'],
-                     stalk_opt['o'],
-                     stalk_opt['u'],
-                     stalk_opt['w'],
-                     stalk_opt['c'],
-                     process_perfdata,
-                     true,
-                     NULL,
-                     check_freshness,
-                     freshness_threshold,
-                     notes,
-                     notes_url,
-                     action_url,
-                     icon_image,
-                     icon_image_alt,
-                     retain_status_information,
-                     retain_nonstatus_information,
-                     obsess_over_service));
-
-  try {
-    // Link with contacts.
-    std::vector<contact*> svc_contacts(
-                            _find<contact>(
-                              svc.contacts,
-                              (void* (*)(char const*))&find_contact));
-    if (svc.contacts.size() != svc_contacts.size())
-      throw (engine_error() << "service ('" << svc.id->host->name
-             << "', '" << svc.id->service << "') invalid contact");
-
-    // Link with contact groups.
-    std::vector<contactgroup*> svc_contactgroups(
-                             _find<contactgroup>(
-                               svc.contactGroups,
-                               (void* (*)(char const*))&find_contactgroup));
-    if (svc.contactGroups.size() != svc_contactgroups.size())
-      throw (engine_error() << "service ('" << svc.id->host->name
-             << "', '" << svc.id->service
-             << "') invalid contact group");
-
-    // Link with service groups.
-    std::vector<servicegroup*>
-      svc_servicegroups(_find<servicegroup>(
-                          svc.servicegroups,
-                          (void* (*)(char const*))&find_servicegroup));
-    if (svc.servicegroups.size() != svc_servicegroups.size())
-      throw (engine_error() << "service ('" << svc.id->host->name
-             << "', '" << svc.id->service
-             << "') invalid service group");
-
-    // Link objects together.
-    objects::link(
-               new_svc,
-               svc_contacts,
-               svc_contactgroups,
-               svc_servicegroups,
-               svc.customVariables,
-               initial_state,
-               check_period,
-               notification_period,
-               cmd_event_handler,
-               cmd_check_command);
-  }
-  catch (std::exception const& e) {
-    (void)e;
-
-    // Release service in case of error.
-    objects::release(new_svc);
-
-    // Rethrow exception.
-    throw ;
-  }
-
-  return ;
-}
 
 /**
  *  Find target service.
@@ -340,112 +63,6 @@ static void notify_event_broker(service* svc) {
     MODATTR_ALL,
     &tv);
   return ;
-}
-
-/**************************************
-*                                     *
-*               Global                *
-*                                     *
-**************************************/
-
-/**
- *  Add a new service.
- *
- *  @param[in]  s   SOAP object.
- *  @param[in]  svc Service properties.
- *  @param[out] res Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceAdd(
-      soap* s,
-      ns1__serviceType* svc,
-      centreonengine__serviceAddResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN("{" << svc->id->host->name
-                << ", " << svc->id->service << "}")
-
-  // Create service.
-  create_service(*svc);
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Modify an existing service.
- *
- *  @param[in]  s   SOAP object.
- *  @param[in]  svc Service properties.
- *  @param[out] res Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceModify(
-      soap* s,
-      ns1__serviceType* svc,
-      centreonengine__serviceModifyResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN("{" << svc->id->host->name
-                << ", " << svc->id->service << "}")
-
-  // XXX
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Remove a service.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  service_id Target service.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceRemove(
-      soap* s,
-      ns1__serviceIDType* service_id,
-      centreonengine__serviceRemoveResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN("{" << service_id->host->name
-                << ", " << service_id->service << "}")
-
-  // Find service.
-  service* svc(find_service(
-                 service_id->host->name.c_str(),
-                 service_id->service.c_str()));
-  if (svc) {
-    // Check link for service groups.
-    if (svc->servicegroups_ptr)
-      throw (engine_error() << "cannot remove service ('"
-             << service_id->host->name << "', '" << service_id->service
-             << "'): member of at least one service group");
-
-    // Remove service.
-    if (!remove_service_by_id(
-           service_id->host->name.c_str(),
-           service_id->service.c_str()))
-      throw (engine_error() << "error while removing service ('"
-             << service_id->host->name << "', '"
-             << service_id->service << "')");
-  }
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
 }
 
 /**************************************
@@ -512,7 +129,7 @@ int centreonengine__serviceGetAcknowledgementType(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -549,7 +166,7 @@ int centreonengine__serviceGetCheckActiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -583,7 +200,7 @@ int centreonengine__serviceGetCheckCommand(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -614,7 +231,7 @@ int centreonengine__serviceGetCheckCurrentAttempt(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -645,7 +262,7 @@ int centreonengine__serviceGetCheckIntervalNormal(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -676,7 +293,7 @@ int centreonengine__serviceGetCheckIntervalRetry(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -708,7 +325,7 @@ int centreonengine__serviceGetCheckLast(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -739,7 +356,7 @@ int centreonengine__serviceGetCheckMaxAttempts(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -771,7 +388,7 @@ int centreonengine__serviceGetCheckNext(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -802,7 +419,7 @@ int centreonengine__serviceGetCheckOptions(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -833,7 +450,7 @@ int centreonengine__serviceGetCheckPassiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -867,7 +484,7 @@ int centreonengine__serviceGetCheckPeriod(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -898,7 +515,7 @@ int centreonengine__serviceGetCheckShouldBeScheduled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -929,7 +546,7 @@ int centreonengine__serviceGetCheckType(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -967,7 +584,7 @@ int centreonengine__serviceSetCheckActiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1024,7 +641,7 @@ int centreonengine__serviceSetCheckCommand(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1062,7 +679,7 @@ int centreonengine__serviceSetCheckIntervalNormal(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1100,7 +717,7 @@ int centreonengine__serviceSetCheckIntervalRetry(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1145,7 +762,7 @@ int centreonengine__serviceSetCheckMaxAttempts(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1183,7 +800,7 @@ int centreonengine__serviceSetCheckPassiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1394,7 +1011,7 @@ int centreonengine__serviceGetDowntimeDepth(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1466,7 +1083,7 @@ int centreonengine__serviceGetEventHandler(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1497,7 +1114,7 @@ int centreonengine__serviceGetEventHandlerEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1554,7 +1171,7 @@ int centreonengine__serviceSetEventHandler(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1592,7 +1209,7 @@ int centreonengine__serviceSetEventHandlerEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1629,7 +1246,7 @@ int centreonengine__serviceGetFailurePredictionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1663,7 +1280,7 @@ int centreonengine__serviceGetFailurePredictionOptions(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1701,7 +1318,7 @@ int centreonengine__serviceSetFailurePredictionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1738,7 +1355,7 @@ int centreonengine__serviceGetFlapDetectionCommentID(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1769,7 +1386,7 @@ int centreonengine__serviceGetFlapDetectionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1800,7 +1417,7 @@ int centreonengine__serviceGetFlapDetectionIsFlapping(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1832,7 +1449,7 @@ int centreonengine__serviceGetFlapDetectionOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1864,7 +1481,7 @@ int centreonengine__serviceGetFlapDetectionOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1896,7 +1513,7 @@ int centreonengine__serviceGetFlapDetectionOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1928,7 +1545,7 @@ int centreonengine__serviceGetFlapDetectionOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1959,7 +1576,7 @@ int centreonengine__serviceGetFlapDetectionThresholdHigh(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1990,7 +1607,7 @@ int centreonengine__serviceGetFlapDetectionThresholdLow(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2028,7 +1645,7 @@ int centreonengine__serviceSetFlapDetectionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2066,7 +1683,7 @@ int centreonengine__serviceSetFlapDetectionOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2104,7 +1721,7 @@ int centreonengine__serviceSetFlapDetectionOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2142,7 +1759,7 @@ int centreonengine__serviceSetFlapDetectionOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2180,7 +1797,7 @@ int centreonengine__serviceSetFlapDetectionOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2218,7 +1835,7 @@ int centreonengine__serviceSetFlapDetectionThresholdHigh(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2256,7 +1873,7 @@ int centreonengine__serviceSetFlapDetectionThresholdLow(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2293,7 +1910,7 @@ int centreonengine__serviceGetFreshnessCheckEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2324,7 +1941,7 @@ int centreonengine__serviceGetFreshnessIsActive(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2355,7 +1972,7 @@ int centreonengine__serviceGetFreshnessThreshold(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2393,7 +2010,7 @@ int centreonengine__serviceSetFreshnessCheckEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2431,7 +2048,7 @@ int centreonengine__serviceSetFreshnessThreshold(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2468,7 +2085,7 @@ int centreonengine__serviceGetModifiedAttributes(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2508,7 +2125,7 @@ int centreonengine__serviceGetNameDisplay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2547,7 +2164,7 @@ int centreonengine__serviceSetNameDisplay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2562,7 +2179,7 @@ int centreonengine__serviceSetNameDisplay(
  *
  *  @param[in]  s          SOAP object.
  *  @param[in]  service_id Target service.
- *  @param[out] res        
+ *  @param[out] res
  *
  *  @return SOAP_OK on success.
  */
@@ -2584,7 +2201,7 @@ int centreonengine__serviceGetNotificationsCurrentID(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2615,7 +2232,7 @@ int centreonengine__serviceGetNotificationsCurrentNumber(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2646,7 +2263,7 @@ int centreonengine__serviceGetNotificationsEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2677,7 +2294,7 @@ int centreonengine__serviceGetNotificationsFirstDelay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2708,7 +2325,7 @@ int centreonengine__serviceGetNotificationsInterval(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2739,7 +2356,7 @@ int centreonengine__serviceGetNotificationsLast(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2771,7 +2388,7 @@ int centreonengine__serviceGetNotificationsNext(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2803,7 +2420,7 @@ int centreonengine__serviceGetNotificationsOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2834,7 +2451,7 @@ int centreonengine__serviceGetNotificationsOnDowntime(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2866,7 +2483,7 @@ int centreonengine__serviceGetNotificationsOnFlapping(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2898,7 +2515,7 @@ int centreonengine__serviceGetNotificationsOnRecovery(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2930,7 +2547,7 @@ int centreonengine__serviceGetNotificationsOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2962,7 +2579,7 @@ int centreonengine__serviceGetNotificationsOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2996,7 +2613,7 @@ int centreonengine__serviceGetNotificationsPeriod(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3034,7 +2651,7 @@ int centreonengine__serviceSetNotificationsEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3072,7 +2689,7 @@ int centreonengine__serviceSetNotificationsFirstDelay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3110,7 +2727,7 @@ int centreonengine__serviceSetNotificationsInterval(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3148,7 +2765,7 @@ int centreonengine__serviceSetNotificationsOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3186,7 +2803,7 @@ int centreonengine__serviceSetNotificationsOnDowntime(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3224,7 +2841,7 @@ int centreonengine__serviceSetNotificationsOnFlapping(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3262,7 +2879,7 @@ int centreonengine__serviceSetNotificationsOnRecovery(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3300,7 +2917,7 @@ int centreonengine__serviceSetNotificationsOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3338,7 +2955,7 @@ int centreonengine__serviceSetNotificationsOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3435,7 +3052,7 @@ int centreonengine__serviceGetObsessOver(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3473,7 +3090,7 @@ int centreonengine__serviceSetObsessOver(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3510,7 +3127,7 @@ int centreonengine__serviceGetPerfdataProcessingEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3548,7 +3165,7 @@ int centreonengine__serviceSetPerfdataProcessingEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3585,7 +3202,7 @@ int centreonengine__serviceGetPluginExecutionTime(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3616,7 +3233,7 @@ int centreonengine__serviceGetPluginIsExecuting(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3647,7 +3264,7 @@ int centreonengine__serviceGetPluginLatency(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3681,7 +3298,7 @@ int centreonengine__serviceGetPluginOutput(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3715,7 +3332,7 @@ int centreonengine__serviceGetPluginPerfdata(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3752,7 +3369,7 @@ int centreonengine__serviceGetRetainStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3783,7 +3400,7 @@ int centreonengine__serviceGetRetainNonStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3821,7 +3438,7 @@ int centreonengine__serviceSetRetainStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3859,7 +3476,7 @@ int centreonengine__serviceSetRetainNonStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3897,7 +3514,7 @@ int centreonengine__serviceGetStalkOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3928,7 +3545,7 @@ int centreonengine__serviceGetStalkOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3960,7 +3577,7 @@ int centreonengine__serviceGetStalkOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3992,7 +3609,7 @@ int centreonengine__serviceGetStalkOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4030,7 +3647,7 @@ int centreonengine__serviceSetStalkOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4068,7 +3685,7 @@ int centreonengine__serviceSetStalkOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4106,7 +3723,7 @@ int centreonengine__serviceSetStalkOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4144,7 +3761,7 @@ int centreonengine__serviceSetStalkOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4181,7 +3798,7 @@ int centreonengine__serviceGetStateCurrent(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4212,7 +3829,7 @@ int centreonengine__serviceGetStateInitial(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4243,7 +3860,7 @@ int centreonengine__serviceGetStateLast(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4274,7 +3891,7 @@ int centreonengine__serviceGetStateLastChange(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4305,7 +3922,7 @@ int centreonengine__serviceGetStateLastCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4336,7 +3953,7 @@ int centreonengine__serviceGetStateLastHard(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4367,7 +3984,7 @@ int centreonengine__serviceGetStateLastHardChange(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4398,7 +4015,7 @@ int centreonengine__serviceGetStateLastOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4429,7 +4046,7 @@ int centreonengine__serviceGetStateLastUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4460,7 +4077,7 @@ int centreonengine__serviceGetStateLastWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4491,7 +4108,7 @@ int centreonengine__serviceGetStatePercentChange(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4522,6 +4139,6 @@ int centreonengine__serviceGetStateType(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }

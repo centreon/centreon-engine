@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/deleter/command.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/command.hh"
 
 using namespace com::centreon::engine;
 

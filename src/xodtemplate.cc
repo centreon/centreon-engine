@@ -222,7 +222,7 @@ int xodtemplate_read_config_data(
         if (config_base_dir != NULL && val[0] != '/') {
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
-          config_file = my_strdup(oss.str().c_str());
+          config_file = my_strdup(oss.str());
           delete[] temp_buffer;
         }
         else
@@ -244,7 +244,7 @@ int xodtemplate_read_config_data(
         if (config_base_dir != NULL && val[0] != '/') {
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
-          config_file = my_strdup(oss.str().c_str());
+          config_file = my_strdup(oss.str());
           delete[] temp_buffer;
         }
         else

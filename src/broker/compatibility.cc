@@ -76,7 +76,7 @@ void compatibility::author_module(broker::handle* mod) {
       if (tmp->module_handle == mod) {
         delete[] tmp->info[NEBMODULE_MODINFO_AUTHOR];
         tmp->info[NEBMODULE_MODINFO_AUTHOR]
-          = my_strdup(mod->get_author().c_str());
+          = my_strdup(mod->get_author());
       }
   }
   return;
@@ -93,7 +93,7 @@ void compatibility::copyright_module(broker::handle* mod) {
       if (tmp->module_handle == mod) {
         delete[] tmp->info[NEBMODULE_MODINFO_COPYRIGHT];
         tmp->info[NEBMODULE_MODINFO_COPYRIGHT]
-          = my_strdup(mod->get_copyright().c_str());
+          = my_strdup(mod->get_copyright());
       }
   }
   return;
@@ -110,9 +110,8 @@ void compatibility::create_module(broker::handle* mod) {
     std::auto_ptr<nebmodule> new_module(new nebmodule);
 
     // Module parameters.
-    new_module->filename
-      = my_strdup(mod->get_filename().c_str());
-    new_module->args = my_strdup(mod->get_args().c_str());
+    new_module->filename = my_strdup(mod->get_filename());
+    new_module->args = my_strdup(mod->get_args());
     new_module->deinit_func = NULL;
     new_module->init_func = NULL;
     new_module->is_currently_loaded = mod->is_loaded();
@@ -122,17 +121,17 @@ void compatibility::create_module(broker::handle* mod) {
 
     // Module information.
     new_module->info[NEBMODULE_MODINFO_AUTHOR]
-      = my_strdup(mod->get_author().c_str());
+      = my_strdup(mod->get_author());
     new_module->info[NEBMODULE_MODINFO_COPYRIGHT]
-      = my_strdup(mod->get_copyright().c_str());
+      = my_strdup(mod->get_copyright());
     new_module->info[NEBMODULE_MODINFO_DESC]
-      = my_strdup(mod->get_description().c_str());
+      = my_strdup(mod->get_description());
     new_module->info[NEBMODULE_MODINFO_LICENSE]
-      = my_strdup(mod->get_license().c_str());
+      = my_strdup(mod->get_license());
     new_module->info[NEBMODULE_MODINFO_TITLE]
-      = my_strdup(mod->get_name().c_str());
+      = my_strdup(mod->get_name());
     new_module->info[NEBMODULE_MODINFO_VERSION]
-      = my_strdup(mod->get_version().c_str());
+      = my_strdup(mod->get_version());
 
     // Add module to head of list.
     new_module->next = neb_module_list;
@@ -152,7 +151,7 @@ void compatibility::description_module(broker::handle* mod) {
       if (tmp->module_handle == mod) {
         delete[] tmp->info[NEBMODULE_MODINFO_DESC];
         tmp->info[NEBMODULE_MODINFO_DESC]
-          = my_strdup(mod->get_description().c_str());
+          = my_strdup(mod->get_description());
       }
   }
   return;
@@ -201,7 +200,7 @@ void compatibility::license_module(broker::handle* mod) {
       if (tmp->module_handle == mod) {
         delete[] tmp->info[NEBMODULE_MODINFO_LICENSE];
         tmp->info[NEBMODULE_MODINFO_LICENSE]
-          = my_strdup(mod->get_license().c_str());
+          = my_strdup(mod->get_license());
       }
   }
   return;
@@ -232,7 +231,7 @@ void compatibility::name_module(broker::handle* mod) {
       if (tmp->module_handle == mod) {
         delete[] tmp->info[NEBMODULE_MODINFO_TITLE];
         tmp->info[NEBMODULE_MODINFO_TITLE]
-          = my_strdup(mod->get_name().c_str());
+          = my_strdup(mod->get_name());
       }
   }
   return;
@@ -263,7 +262,7 @@ void compatibility::version_module(broker::handle* mod) {
       if (tmp->module_handle == mod) {
         delete[] tmp->info[NEBMODULE_MODINFO_VERSION];
         tmp->info[NEBMODULE_MODINFO_VERSION]
-          = my_strdup(mod->get_version().c_str());
+          = my_strdup(mod->get_version());
       }
   }
   return;

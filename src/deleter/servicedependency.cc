@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/servicedependency.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/servicedependency.hh"
 
 using namespace com::centreon::engine;
 

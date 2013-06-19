@@ -34,8 +34,6 @@ static int check_process_service_check_result(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   service* svc = add_service("name", "description", NULL,
                              NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
@@ -59,21 +57,6 @@ static int check_process_service_check_result(int argc, char** argv) {
 
   if (com::centreon::engine::checks::checker::instance().reaper_is_empty())
     throw (engine_error() << "process_service_check_result failed.");
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete svc;
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  free_object_skiplists();
-
   return (0);
 }
 

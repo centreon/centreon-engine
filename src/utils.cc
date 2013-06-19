@@ -114,12 +114,8 @@ int my_system_r(
     = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
   *exectime = (res.end_time - res.start_time).to_seconds();
   *early_timeout = res.exit_status == process::timeout;
-  if (output && max_output_length > 0) {
-    *output = my_strdup(res.output.substr(
-                                     0,
-                                     max_output_length - 1)
-                        .c_str());
-  }
+  if (output && max_output_length > 0)
+    *output = my_strdup(res.output.substr(0, max_output_length - 1));
   int result(res.exit_code);
 
   logger(dbg_commands, more)
@@ -303,7 +299,7 @@ int set_environment_var(char const* name, char const* value, int set) {
     /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
     std::string val(name);
     val.append("=").append(value ? value : "");
-    char* env_string(my_strdup(val.c_str()));
+    char* env_string(my_strdup(val));
     putenv(env_string);
   }
   /* clear the variable */

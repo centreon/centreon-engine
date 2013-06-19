@@ -357,7 +357,7 @@ void checker::run(
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
+  char* processed_cmd_ptr(my_strdup(processed_cmd));
 
   // Send event broker.
   broker_host_check(
@@ -574,7 +574,7 @@ void checker::run(
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(svc->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
+  char* processed_cmd_ptr(my_strdup(processed_cmd));
 
   // Send event broker.
   res = broker_service_check(
@@ -900,7 +900,7 @@ void checker::finished(commands::result const& res) throw () {
   result.early_timeout = (res.exit_status == process::timeout);
   result.return_code = res.exit_code;
   result.exited_ok = (res.exit_status == process::normal);
-  result.output = my_strdup(res.output.c_str());
+  result.output = my_strdup(res.output);
 
   // Queue check result.
   concurrency::locker lock(&_mut_reap);
@@ -979,7 +979,7 @@ int checker::_execute_sync(host* hst) {
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* tmp_processed_cmd(my_strdup(processed_cmd.c_str()));
+  char* tmp_processed_cmd(my_strdup(processed_cmd));
 
   // Send broker event.
   broker_host_check(
@@ -1060,7 +1060,7 @@ int checker::_execute_sync(host* hst) {
   }
 
   // Get output.
-  char* output(my_strdup(res.output.c_str()));
+  char* output(my_strdup(res.output));
 
   unsigned int execution_time(0);
   if (res.end_time >= res.start_time)
@@ -1112,7 +1112,7 @@ int checker::_execute_sync(host* hst) {
   hst->check_type = HOST_CHECK_ACTIVE;
 
   // Get plugin output.
-  char* tmp_plugin_output(my_strdup(res.output.c_str()));
+  char* tmp_plugin_output(my_strdup(res.output));
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(

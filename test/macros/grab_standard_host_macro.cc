@@ -167,7 +167,7 @@ int main_test(int argc, char** argv) {
   delete [] host_list->notes;
   host_list->notes = my_strdup(STR(NOTES));
 
-  // Macro object.
+  // macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
   mac.x[MACRO_HOSTACKAUTHOR] = my_strdup(STR(ACK_AUTHOR));
@@ -263,28 +263,6 @@ int main_test(int argc, char** argv) {
     }
   }
 
-  delete host_list->hostgroups_ptr->next->next;
-  delete host_list->hostgroups_ptr->next;
-  delete host_list->hostgroups_ptr;
-
-  delete[] hg1->group_name;
-  delete[] hg1->alias;
-  delete[] hg1->members->host_name;
-  delete hg1->members;
-  delete hg1;
-
-  delete[] hg2->group_name;
-  delete[] hg2->alias;
-  delete[] hg2->members->host_name;
-  delete hg2->members;
-  delete hg2;
-
-  delete[] hg3->group_name;
-  delete[] hg3->alias;
-  delete[] hg3->members->host_name;
-  delete hg3->members;
-  delete hg3;
-
   delete [] mac.x[MACRO_TOTALHOSTSERVICES];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESOK];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESWARNING];
@@ -295,9 +273,6 @@ int main_test(int argc, char** argv) {
   delete [] mac.x[MACRO_HOSTACKAUTHORNAME];
   delete [] mac.x[MACRO_HOSTACKAUTHORALIAS];
   delete [] mac.x[MACRO_HOSTACKCOMMENT];
-
-  // Cleanup the minimal setup.
-  test::cleanup_setup();
 
   return (retval);
 }

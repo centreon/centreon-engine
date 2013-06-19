@@ -17,10 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/timeperiodexclusion.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/objects/timeperiodexclusion.hh"
+#include "com/centreon/engine/shared.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -71,3 +75,38 @@ std::ostream& operator<<(std::ostream& os, timeperiodexclusion const& obj) {
   return (os);
 }
 
+/**
+ *  Adds a new exclusion to a timeperiod.
+ *
+ *  @param[in] period Base timeperiod.
+ *  @param[in] name   Exclusion timeperiod name.
+ *
+ *  @return Timeperiod exclusion object.
+ */
+timeperiodexclusion* add_exclusion_to_timeperiod(
+                       timeperiod* period,
+                       char const* name) {
+  // Make sure we have enough data.
+  if (!period || !name)
+    return (NULL);
+
+  // Allocate memory.
+  timeperiodexclusion* obj(new timeperiodexclusion);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Set exclusion properties.
+    obj->timeperiod_name = my_strdup(name);
+    obj->next = period->exclusions;
+    period->exclusions = obj;
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    deleter::timeperiodexclusion(obj);
+    obj = NULL;
+  }
+
+  return (obj);
+}

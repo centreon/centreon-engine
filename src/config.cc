@@ -23,11 +23,14 @@
 #include <cstdlib>
 #include <sstream>
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -41,7 +44,7 @@ int read_all_object_data(char* main_config_file) {
   int cache = FALSE;
   int precache = FALSE;
 
-  options = READ_ALL_OBJECT_DATA;
+  options = configuration::parser::read_all;
 
   /* cache object definitions if we're up and running */
   if (verify_config == FALSE && test_scheduling == FALSE)
@@ -198,7 +201,7 @@ int pre_flight_check() {
   if (config->global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config->global_host_event_handler().c_str());
+    buf = my_strdup(config->global_host_event_handler());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -220,7 +223,7 @@ int pre_flight_check() {
   if (config->global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config->global_service_event_handler().c_str());
+    buf = my_strdup(config->global_service_event_handler());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -247,7 +250,7 @@ int pre_flight_check() {
 
   if (!config->ocsp_command().empty()) {
 
-    buf = my_strdup(config->ocsp_command().c_str());
+    buf = my_strdup(config->ocsp_command());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -268,7 +271,7 @@ int pre_flight_check() {
 
   if (!config->ochp_command().empty()) {
 
-    buf = my_strdup(config->ochp_command().c_str());
+    buf = my_strdup(config->ochp_command());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");

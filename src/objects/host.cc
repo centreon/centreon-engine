@@ -17,6 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/host.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
@@ -26,7 +31,13 @@
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -295,4 +306,497 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  hostgroups_ptr:                       " << obj.hostgroups_ptr << "\n"
     "}\n";
   return (os);
+}
+
+/**
+ *  Add a new host definition.
+ *
+ *  @param[in] name                          Host name.
+ *  @param[in] display_name                  Display name.
+ *  @param[in] alias                         Host alias.
+ *  @param[in] address                       Host address.
+ *  @param[in] check_period                  Check period.
+ *  @param[in] initial_state                 Initial host state.
+ *  @param[in] check_interval                Normal check interval.
+ *  @param[in] retry_interval                Retry check interval.
+ *  @param[in] max_attempts                  Max check attempts.
+ *  @param[in] notify_up                     Does this host notify when
+ *                                           up ?
+ *  @param[in] notify_down                   Does this host notify when
+ *                                           down ?
+ *  @param[in] notify_unreachable            Does this host notify when
+ *                                           unreachable ?
+ *  @param[in] notify_flapping               Does this host notify for
+ *                                           flapping ?
+ *  @param[in] notify_downtime               Does this host notify for
+ *                                           downtimes ?
+ *  @param[in] notification_interval         Notification interval.
+ *  @param[in] first_notification_delay      First notification delay.
+ *  @param[in] notification_period           Notification period.
+ *  @param[in] notifications_enabled         Whether notifications are
+ *                                           enabled for this host.
+ *  @param[in] check_command                 Active check command name.
+ *  @param[in] checks_enabled                Are active checks enabled ?
+ *  @param[in] accept_passive_checks         Can we submit passive check
+ *                                           results ?
+ *  @param[in] event_handler                 Event handler command name.
+ *  @param[in] event_handler_enabled         Whether event handler is
+ *                                           enabled or not.
+ *  @param[in] flap_detection_enabled        Whether flap detection is
+ *                                           enabled or not.
+ *  @param[in] low_flap_threshold            Low flap threshold.
+ *  @param[in] high_flap_threshold           High flap threshold.
+ *  @param[in] flap_detection_on_up          Is flap detection enabled
+ *                                           for up state ?
+ *  @param[in] flap_detection_on_down        Is flap detection enabled
+ *                                           for down state ?
+ *  @param[in] flap_detection_on_unreachable Is flap detection enabled
+ *                                           for unreachable state ?
+ *  @param[in] stalk_on_up                   Stalk on up ?
+ *  @param[in] stalk_on_down                 Stalk on down ?
+ *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
+ *  @param[in] process_perfdata              Should host perfdata be
+ *                                           processed ?
+ *  @param[in] failure_prediction_enabled    Whether or not failure
+ *                                           prediction is enabled.
+ *  @param[in] check_freshness               Whether or not freshness
+ *                                           check is enabled.
+ *  @param[in] freshness_threshold           Freshness threshold.
+ *  @param[in] notes                         Notes.
+ *  @param[in] notes_url                     URL.
+ *  @param[in] action_url                    Action URL.
+ *  @param[in] icon_image                    Icon image.
+ *  @param[in] icon_image_alt                Alternative icon image.
+ *  @param[in] vrml_image                    VRML image.
+ *  @param[in] statusmap_image               Status-map image.
+ *  @param[in] x_2d                          2D x-coord.
+ *  @param[in] y_2d                          2D y-coord.
+ *  @param[in] have_2d_coords                Whether host has 2D coords.
+ *  @param[in] x_3d                          3D x-coord.
+ *  @param[in] y_3d                          3D y-coord.
+ *  @param[in] z_3d                          3D z-coord.
+ *  @param[in] have_3d_coords                Whether host has 3D coords.
+ *  @param[in] should_be_drawn               Whether this host should be
+ *                                           drawn.
+ *  @param[in] retain_status_information     Should Engine retain status
+ *                                           information of this host ?
+ *  @param[in] retain_nonstatus_information  Should Engine retain
+ *                                           non-status information of
+ *                                           this host ?
+ *  @param[in] obsess_over_host              Should we obsess over this
+ *                                           host ?
+ *
+ *  @return New host.
+ */
+host* add_host(
+        char const* name,
+        char const* display_name,
+        char const* alias,
+        char const* address,
+        char const* check_period,
+        int initial_state,
+        double check_interval,
+        double retry_interval,
+        int max_attempts,
+        int notify_up,
+        int notify_down,
+        int notify_unreachable,
+        int notify_flapping,
+        int notify_downtime,
+        double notification_interval,
+        double first_notification_delay,
+        char const* notification_period,
+        int notifications_enabled,
+        char const* check_command,
+        int checks_enabled,
+        int accept_passive_checks,
+        char const* event_handler,
+        int event_handler_enabled,
+        int flap_detection_enabled,
+        double low_flap_threshold,
+        double high_flap_threshold,
+        int flap_detection_on_up,
+        int flap_detection_on_down,
+        int flap_detection_on_unreachable,
+        int stalk_on_up,
+        int stalk_on_down,
+        int stalk_on_unreachable,
+        int process_perfdata,
+        int failure_prediction_enabled,
+        char const* failure_prediction_options,
+        int check_freshness,
+        int freshness_threshold,
+        char const* notes,
+        char const* notes_url,
+        char const* action_url,
+        char const* icon_image,
+        char const* icon_image_alt,
+        char const* vrml_image,
+        char const* statusmap_image,
+        int x_2d,
+        int y_2d,
+        int have_2d_coords,
+        double x_3d,
+        double y_3d,
+        double z_3d,
+        int have_3d_coords,
+        int should_be_drawn,
+        int retain_status_information,
+        int retain_nonstatus_information,
+        int obsess_over_host) {
+  // Make sure we have the data we need.
+  if (!name || !name[0] || !address || !address[0]) {
+    logger(log_config_error, basic)
+      << "Error: Host name or address is NULL";
+    return (NULL);
+  }
+  if (max_attempts <= 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid max_check_attempts value for host '"
+      << name << "'";
+    return (NULL);
+  }
+  if (check_interval < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid check_interval value for host '"
+      << name << "'";
+    return (NULL);
+  }
+  if (notification_interval < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid notification_interval value for host '"
+      << name << "'";
+    return (NULL);
+  }
+  if (first_notification_delay < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid first_notification_delay value for host '"
+      << name << "'";
+    return (NULL);
+  }
+  if (freshness_threshold < 0) {
+    logger(log_config_error, basic)
+      << "Error: Invalid freshness_threshold value for host '"
+      << name << "'";
+    return (NULL);
+  }
+
+  // Allocate memory for a new host.
+  shared_ptr<host> obj(new host, deleter::host);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Duplicate string vars.
+    obj->name = my_strdup(name);
+    obj->address = my_strdup(address);
+    obj->alias = my_strdup(alias ? alias : name);
+    obj->display_name = my_strdup(display_name ? display_name : name);
+    if (action_url)
+      obj->action_url = my_strdup(action_url);
+    if (check_period)
+      obj->check_period = my_strdup(check_period);
+    if (event_handler)
+      obj->event_handler = my_strdup(event_handler);
+    if (failure_prediction_options)
+      obj->failure_prediction_options = my_strdup(failure_prediction_options);
+    if (check_command)
+      obj->host_check_command = my_strdup(check_command);
+    if (icon_image)
+      obj->icon_image = my_strdup(icon_image);
+    if (icon_image_alt)
+      obj->icon_image_alt = my_strdup(icon_image_alt);
+    if (notes)
+      obj->notes = my_strdup(notes);
+    if (notes_url)
+      obj->notes_url = my_strdup(notes_url);
+    if (notification_period)
+      obj->notification_period = my_strdup(notification_period);
+    if (statusmap_image)
+      obj->statusmap_image = my_strdup(statusmap_image);
+    if (vrml_image)
+      obj->vrml_image = my_strdup(vrml_image);
+
+    // Duplicate non-string vars.
+    obj->accept_passive_host_checks = (accept_passive_checks > 0);
+    obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+    obj->check_freshness = (check_freshness > 0);
+    obj->check_interval = check_interval;
+    obj->check_options = CHECK_OPTION_NONE;
+    obj->check_type = HOST_CHECK_ACTIVE;
+    obj->checks_enabled = (checks_enabled > 0);
+    obj->current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
+    obj->current_state = initial_state;
+    obj->event_handler_enabled = (event_handler_enabled > 0);
+    obj->failure_prediction_enabled = (failure_prediction_enabled > 0);
+    obj->first_notification_delay = first_notification_delay;
+    obj->flap_detection_enabled = (flap_detection_enabled > 0);
+    obj->flap_detection_on_down = (flap_detection_on_down > 0);
+    obj->flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
+    obj->flap_detection_on_up = (flap_detection_on_up > 0);
+    obj->freshness_threshold = freshness_threshold;
+    obj->have_2d_coords = (have_2d_coords > 0);
+    obj->have_3d_coords = (have_3d_coords > 0);
+    obj->high_flap_threshold = high_flap_threshold;
+    obj->last_hard_state = initial_state;
+    obj->last_state = initial_state;
+    obj->low_flap_threshold = low_flap_threshold;
+    obj->max_attempts = max_attempts;
+    obj->modified_attributes = MODATTR_NONE;
+    obj->notification_interval = notification_interval;
+    obj->notifications_enabled = (notifications_enabled > 0);
+    obj->notify_on_down = (notify_down > 0);
+    obj->notify_on_downtime = (notify_downtime > 0);
+    obj->notify_on_flapping = (notify_flapping > 0);
+    obj->notify_on_recovery = (notify_up > 0);
+    obj->notify_on_unreachable = (notify_unreachable > 0);
+    obj->obsess_over_host = (obsess_over_host > 0);
+    obj->process_performance_data = (process_perfdata > 0);
+    obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
+    obj->retain_status_information = (retain_status_information > 0);
+    obj->retry_interval = retry_interval;
+    obj->should_be_drawn = (should_be_drawn > 0);
+    obj->should_be_scheduled = true;
+    obj->stalk_on_down = (stalk_on_down > 0);
+    obj->stalk_on_unreachable = (stalk_on_unreachable > 0);
+    obj->stalk_on_up = (stalk_on_up > 0);
+    obj->state_type = HARD_STATE;
+    obj->x_2d = x_2d;
+    obj->x_3d = x_3d;
+    obj->y_2d = y_2d;
+    obj->y_3d = y_3d;
+    obj->z_3d = z_3d;
+
+    for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
+      obj->state_history[x] = STATE_OK;
+
+    // Add new host to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<host_struct> >::const_iterator
+      it(state::instance().hosts().find(id));
+    if (it != state::instance().hosts().end()) {
+      logger(log_config_error, basic)
+        << "Error: Host '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().hosts()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = host_list;
+    host_list = obj.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_host_data(
+      NEBTYPE_HOST_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj.get(),
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
+  }
+  catch (...) {
+    obj.clear();
+  }
+
+  return (obj.get());
+}
+
+/**
+ *  Get number of registered hosts.
+ *
+ *  @return Number of registered hosts.
+ */
+int get_host_count() {
+  return (state::instance().hosts().size());
+}
+
+/**
+ *  Tests whether a contact is a contact for a particular host.
+ *
+ *  @param[in] hst   Target host.
+ *  @param[in] cntct Target contact.
+ *
+ *  @return true or false.
+ */
+int is_contact_for_host(host* hst, contact* cntct) {
+  if (!hst || !cntct)
+    return (false);
+
+  // Search all individual contacts of this host.
+  for (contactsmember* member(hst->contacts);
+       member;
+       member = member->next)
+    if (member->contact_ptr == cntct)
+      return (true);
+
+  // Search all contactgroups of this host.
+  for (contactgroupsmember* member(hst->contact_groups);
+       member;
+       member = member->next)
+    if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
+      return (true);
+
+  return (false);
+}
+
+/**
+ *  Tests whether or not a contact is an escalated contact for a
+ *  particular host.
+ *
+ *  @param[in] hst   Target host.
+ *  @param[in] cntct Target contact.
+ *
+ *  @return true or false.
+ */
+int is_escalated_contact_for_host(host* hst, contact* cntct) {
+  if (!hst || !cntct)
+    return (false);
+
+  std::string id(hst->name);
+  umultimap<std::string, shared_ptr<hostescalation> > const&
+    escalations(state::instance().hostescalations());
+
+  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+         it(escalations.find(id)), end(escalations.end());
+         it != end && it->first == id;
+       ++it) {
+    hostescalation* hstescalation(&*it->second);
+    // Search all contacts of this host escalation.
+    for (contactsmember* member(hstescalation->contacts);
+         member;
+         member = member->next)
+      if (member->contact_ptr == cntct)
+        return (true);
+
+    // Search all contactgroups of this host escalation.
+    for (contactgroupsmember* member(hstescalation->contact_groups);
+         member;
+         member = member->next)
+      if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
+        return (true);
+  }
+
+  return (false);
+}
+
+/**
+ *  Determines whether or not a specific host is an immediate child of
+ *  another host.
+ *
+ *  @param[in] parent_host Parent host.
+ *  @param[in] child_host  Child host.
+ *
+ *  @return true or false.
+ */
+int is_host_immediate_child_of_host(
+      host* parent_host,
+      host* child_host) {
+  // Not enough data.
+  if (!child_host)
+    return (false);
+
+  // Root/top-level hosts.
+  if (!parent_host) {
+    if (!child_host->parent_hosts)
+      return (true);
+  }
+  // Mid-level/bottom hosts.
+  else {
+    for (hostsmember* member(child_host->parent_hosts);
+         member;
+         member = member->next)
+      if (member->host_ptr == parent_host)
+        return (true);
+  }
+
+  return (false);
+}
+
+/**
+ *  Determines whether or not a specific host is an immediate parent of
+ *  another host.
+ *
+ *  @param[in] child_host  Child host.
+ *  @param[in] parent_host Parent host.
+ *
+ *  @return true or false.
+ */
+int is_host_immediate_parent_of_host(
+      host* child_host,
+      host* parent_host) {
+  if (is_host_immediate_child_of_host(parent_host, child_host) == true)
+    return (true);
+  return (false);
+}
+
+/**
+ *  Returns a count of the immediate children for a given host.
+ *
+ *  @deprecated This function is only used by the CGIS.
+ *
+ *  @param[in] hst Target host.
+ *
+ *  @return Number of immediate child hosts.
+ */
+int number_of_immediate_child_hosts(host* hst) {
+  int children(0);
+  for (host* tmp(host_list); tmp; tmp = tmp->next)
+    if (is_host_immediate_child_of_host(hst, tmp))
+      ++children;
+  return (children);
+}
+
+/**
+ *  Get the number of immediate parent hosts for a given host.
+ *
+ *  @deprecated This function is only used by the CGIS.
+ *
+ *  @param[in] hst Target host.
+ *
+ *  @return Number of immediate parent hosts.
+ */
+int number_of_immediate_parent_hosts(host* hst) {
+  int parents(0);
+  for (host* tmp(host_list); tmp; tmp = tmp->next)
+    if (is_host_immediate_parent_of_host(hst, tmp))
+      ++parents;
+  return (parents);
+}
+
+/**
+ *  Returns a count of the total children for a given host.
+ *
+ *  @deprecated This function is only used by the CGIS.
+ *
+ *  @param[in] hst Target host.
+ *
+ *  @return Number of total child hosts.
+ */
+int number_of_total_child_hosts(host* hst) {
+  int children(0);
+  for (host* tmp(host_list); tmp; tmp = tmp->next)
+    if (is_host_immediate_child_of_host(hst, tmp))
+      children += number_of_total_child_hosts(tmp) + 1;
+  return (children);
+}
+
+/**
+ *  Get the total number of parent hosts for a given host.
+ *
+ *  @deprecated This function is only used by the CGIS.
+ *
+ *  @param[in] hst Target host.
+ *
+ *  @return Number of total parent hosts.
+ */
+int number_of_total_parent_hosts(host* hst) {
+  int parents(0);
+  for (host* tmp(host_list); tmp; tmp = tmp->next)
+    if (is_host_immediate_parent_of_host(hst, tmp))
+      parents += number_of_total_parent_hosts(tmp) + 1;
+  return (parents);
 }

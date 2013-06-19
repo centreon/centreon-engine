@@ -38,6 +38,14 @@ typedef struct                timeperiod_struct {
 }                             timeperiod;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+timeperiod* add_timeperiod(char const* name, char const* alias);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -48,7 +56,7 @@ bool          operator!=(
                 timeperiod const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, timeperiod const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_TIMEPERIOD_HH
 

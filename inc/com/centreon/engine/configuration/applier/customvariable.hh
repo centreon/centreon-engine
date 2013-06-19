@@ -21,7 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_CUSTOMVARIABLE_HH
 
 #  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/customvariablesmember.hh"
 
 bool operator==(
        customvariablesmember const* left,

@@ -17,12 +17,22 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/serviceescalation.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -92,3 +102,88 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
   return (os);
 }
 
+/**
+ *  Add a new service escalation to the list in memory.
+ *
+ *  @param[in] host_name             Host name.
+ *  @param[in] description           Description.
+ *  @param[in] first_notification    First notification.
+ *  @param[in] last_notification     Last notification.
+ *  @param[in] notification_interval Notification interval.
+ *  @param[in] escalation_period     Escalation timeperiod name.
+ *  @param[in] escalate_on_warning   Do we escalate on warning ?
+ *  @param[in] escalate_on_unknown   Do we escalate on unknown ?
+ *  @param[in] escalate_on_critical  Do we escalate on critical ?
+ *  @param[in] escalate_on_recovery  Do we escalate on recovery ?
+ *
+ *  @return New service escalation.
+ */
+serviceescalation* add_service_escalation(
+                     char const* host_name,
+                     char const* description,
+                     int first_notification,
+                     int last_notification,
+                     double notification_interval,
+                     char const* escalation_period,
+                     int escalate_on_warning,
+                     int escalate_on_unknown,
+                     int escalate_on_critical,
+                     int escalate_on_recovery) {
+  // Make sure we have the data we need.
+  if (!host_name
+      || !host_name[0]
+      || !description
+      || !description[0]) {
+    logger(log_config_error, basic)
+      << "Error: Service escalation host name or description is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for a new service escalation entry.
+  shared_ptr<serviceescalation> obj(new serviceescalation, deleter::serviceescalation);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->host_name = my_strdup(host_name);
+    obj->description = my_strdup(description);
+    if (escalation_period)
+      obj->escalation_period = my_strdup(escalation_period);
+
+    obj->escalate_on_critical = (escalate_on_critical > 0);
+    obj->escalate_on_recovery = (escalate_on_recovery > 0);
+    obj->escalate_on_unknown = (escalate_on_unknown > 0);
+    obj->escalate_on_warning = (escalate_on_warning > 0);
+    obj->first_notification = first_notification;
+    obj->last_notification = last_notification;
+    obj->notification_interval = (notification_interval <= 0) ? 0 : notification_interval;
+
+    // XXX: Add new serviceescalation to the monitoring engine.
+    std::pair<std::string, std::string>
+      id(std::make_pair(host_name, description));
+    umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::const_iterator
+      it(state::instance().serviceescalations().find(id));
+    if (it != state::instance().serviceescalations().end()) {
+      logger(log_config_error, basic)
+        << "Error: Serviceescalation '" << description << "' on host '"
+        << host_name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().serviceescalations()
+      .insert(std::make_pair(id, obj));
+
+    // Add new items to tail the list.
+    obj->next = serviceescalation_list;
+    serviceescalation_list = obj.get();
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    obj.clear();
+  }
+
+  return (obj.get());
+}

@@ -25,6 +25,18 @@ typedef struct              objectlist_struct {
   struct objectlist_struct* next;
 }                           objectlist;
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+int add_object_to_objectlist(objectlist** list, void* ptr);
+int free_objectlist(objectlist** list);
+int remove_object_to_objectlist(objectlist** list, void* ptr);
+
+#  ifdef __cplusplus
+}
+#  endif /* C++ */
+
 #endif // !CCE_OBJECTS_OBJECTLIST_HH
 
 

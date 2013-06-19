@@ -21,8 +21,6 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/xcddefault.hh"
 
 /******************************************************************/

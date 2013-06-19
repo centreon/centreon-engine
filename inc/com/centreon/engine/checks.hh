@@ -22,7 +22,9 @@
 #  define CCE_CHECKS_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 // Service dependency values
 #  define DEPENDENCIES_OK     0

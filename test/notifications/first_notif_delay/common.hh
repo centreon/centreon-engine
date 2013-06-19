@@ -27,7 +27,6 @@
 CCE_BEGIN()
 
 int  first_notif_delay_default_setup(std::string const& path);
-void first_notif_delay_default_cleanup();
 
 CCE_END()
 

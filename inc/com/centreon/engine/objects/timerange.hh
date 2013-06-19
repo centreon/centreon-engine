@@ -20,6 +20,10 @@
 #ifndef CCE_OBJECTS_TIMERANGE_HH
 #  define CCE_OBJECTS_TIMERANGE_HH
 
+/* Forward declarations. */
+struct daterange_struct;
+struct timeperiod_struct;
+
 typedef struct             timerange_struct {
   unsigned long            range_start;
   unsigned long            range_end;
@@ -27,6 +31,22 @@ typedef struct             timerange_struct {
 }                          timerange;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif
+
+timerange* add_timerange_to_daterange(
+             daterange_struct* drange,
+             unsigned long start_time,
+             unsigned long end_time);
+timerange* add_timerange_to_timeperiod(
+             timeperiod_struct* period,
+             int day,
+             unsigned long start_time,
+             unsigned long end_time);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -37,7 +57,7 @@ bool          operator!=(
                 timerange const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, timerange const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_TIMERANGE_HH
 

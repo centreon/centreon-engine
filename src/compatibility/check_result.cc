@@ -141,7 +141,7 @@ extern "C" {
     // Create a safe temp file.
     std::ostringstream oss;
     oss << check_result_path << "/cXXXXXX";
-    char* output_file(my_strdup(oss.str().c_str()));
+    char* output_file(my_strdup(oss.str()));
     int output_file_fd(mkstemp(output_file));
 
     // File created okay.

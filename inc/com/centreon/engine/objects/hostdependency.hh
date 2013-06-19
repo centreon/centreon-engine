@@ -45,6 +45,27 @@ typedef struct                  hostdependency_struct {
 }                               hostdependency;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+hostdependency* add_host_dependency(
+                  char const* dependent_host_name,
+                  char const* host_name,
+                  int dependency_type,
+                  int inherits_parent,
+                  int fail_on_up,
+                  int fail_on_down,
+                  int fail_on_unreachable,
+                  int fail_on_pending,
+                  char const* dependency_period);
+int             check_for_circular_hostdependency_path(
+                  hostdependency* root_dep,
+                  hostdependency* dep,
+                  int dependency_type);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -55,7 +76,7 @@ bool          operator!=(
                 hostdependency const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, hostdependency const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH
 

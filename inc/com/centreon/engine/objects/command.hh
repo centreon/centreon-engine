@@ -28,6 +28,14 @@ typedef struct           command_struct {
 }                        command;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+command* add_command(char const* name, char const* value);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -38,7 +46,7 @@ bool          operator!=(
                 command const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, command const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_COMMAND_HH
 

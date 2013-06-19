@@ -33,11 +33,11 @@ static int check_stop_accepting_passive_host_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config->set_accept_passive_host_checks(true);
+  config->accept_passive_host_checks(true);
   char const* cmd("[1317196300] STOP_ACCEPTING_PASSIVE_HOST_CHECKS");
   process_external_command(cmd);
 
-  if (config->get_accept_passive_host_checks())
+  if (config->accept_passive_host_checks())
     throw (engine_error() << "stop_accepting_passive_host_checks failed.");
 
   return (0);

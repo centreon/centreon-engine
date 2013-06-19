@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/objectlist.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/objectlist.hh"
 
 using namespace com::centreon::engine;
 
@@ -28,10 +28,6 @@ using namespace com::centreon::engine;
  *  @param[in] ptr The objectlist to delete.
  */
 void deleter::objectlist(void* ptr) throw () {
-  if (!ptr)
-    return;
-
   objectlist_struct* obj(static_cast<objectlist_struct*>(ptr));
-
   delete obj;
 }

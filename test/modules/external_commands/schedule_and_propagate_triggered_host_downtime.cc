@@ -41,9 +41,6 @@ static int check_schedule_and_propagate_triggered_host_downtime(
   (void)argc;
   (void)argv;
 
-  // Initialization.
-  init_object_skiplists();
-
   // Create target hosts.
   host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0,
                             0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,

@@ -17,10 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/command.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -68,3 +79,61 @@ std::ostream& operator<<(std::ostream& os, command const& obj) {
   return (os);
 }
 
+/**
+ *  Add a new command to the list in memory.
+ *
+ *  @param[in] name  Command name.
+ *  @param[in] value Command itself.
+ *
+ *  @return New command object.
+ */
+command* add_command(char const* name, char const* value) {
+  // Make sure we have the data we need.
+  if (!name || !name[0] || !value || !value[0]) {
+    logger(log_config_error, basic)
+      << "Error: Command name or command line is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for the new command.
+  shared_ptr<command> obj(new command, deleter::command);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->name = my_strdup(name);
+    obj->command_line = my_strdup(value);
+
+    // Add new command to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<command_struct> >::const_iterator
+      it(state::instance().commands().find(id));
+    if (it != state::instance().commands().end()) {
+      logger(log_config_error, basic)
+        << "Error: Command '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().commands()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = command_list;
+    command_list = obj.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_command_data(
+      NEBTYPE_COMMAND_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      name,
+      value,
+      &tv);
+  }
+  catch (...) {
+    obj.clear();
+  }
+
+  return (obj.get());
+}

@@ -22,7 +22,9 @@
 #  define CCE_COMMENTS_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 // Comment sources.
 #  define COMMENTSOURCE_INTERNAL  0

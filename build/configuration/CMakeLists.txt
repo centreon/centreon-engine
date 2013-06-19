@@ -49,6 +49,7 @@ add_library("cce_configuration"
   "${SRC_DIR}/serviceextinfo.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/timeperiod.cc"
+
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
   "${INC_DIR}/contactgroup.hh"
@@ -84,21 +85,21 @@ if (WITH_TESTING)
   # Set directories.
   set(TEST_DIR "${TEST_DIR}/configuration")
 
-  # Basic test.
-  set(TEST_NAME "configuration_basic")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/basic.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
+  # # Basic test.
+  # set(TEST_NAME "configuration_basic")
+  # add_executable("${TEST_NAME}" "${TEST_DIR}/basic.cc")
+  # target_link_libraries("${TEST_NAME}" "cce_core")
+  # add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
 
-  # Parsing test.
-  set(TEST_NAME "configuration_parsing")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/parsing.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # # Parsing test.
+  # set(TEST_NAME "configuration_parsing")
+  # add_executable("${TEST_NAME}" "${TEST_DIR}/parsing.cc")
+  # target_link_libraries("${TEST_NAME}" "cce_core")
+  # add_test("${TEST_NAME}" "${TEST_NAME}")
 
-  # Parsing test.
-  set(TEST_NAME "configuration_parser")
-  add_executable("${TEST_NAME}" "${TEST_DIR}/parser.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # # Parsing test.
+  # set(TEST_NAME "configuration_parser")
+  # add_executable("${TEST_NAME}" "${TEST_DIR}/parser.cc")
+  # target_link_libraries("${TEST_NAME}" "cce_core")
+  # add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()

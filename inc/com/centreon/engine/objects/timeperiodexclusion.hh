@@ -30,6 +30,16 @@ typedef struct                       timeperiodexclusion_struct {
 }                                    timeperiodexclusion;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+timeperiodexclusion* add_exclusion_to_timeperiod(
+                       timeperiod_struct* period,
+                       char const* name);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -42,7 +52,7 @@ std::ostream& operator<<(
                 std::ostream& os,
                 timeperiodexclusion const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
 

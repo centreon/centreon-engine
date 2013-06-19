@@ -17,10 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/deleter/customvariablesmember.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
+#include "com/centreon/engine/shared.hh"
 
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -73,3 +79,147 @@ std::ostream& operator<<(std::ostream& os, customvariablesmember const& obj) {
   return (os);
 }
 
+/**
+ *  Adds a custom variable to a contact.
+ *
+ *  @param[in] cntct    Contact object.
+ *  @param[in] varname  Custom variable name.
+ *  @param[in] varvalue Custom variable value.
+ *
+ *  @return Contact custom variable.
+ */
+customvariablesmember* add_custom_variable_to_contact(
+                         contact* cntct,
+                         char const* varname,
+                         char const* varvalue) {
+  // Add custom variable to contact.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &cntct->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    cntct,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
+}
+
+/**
+ *  Adds a custom variable to a host
+ *
+ *  @param[in] hst      Host.
+ *  @param[in] varname  Custom variable name.
+ *  @param[in] varvalue Custom variable value.
+ *
+ *  @return New host custom variable.
+ */
+customvariablesmember* add_custom_variable_to_host(
+                         host* hst,
+                         char const* varname,
+                         char const* varvalue) {
+  // Add custom variable to host.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &hst->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_HOSTCUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hst,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
+}
+
+/**
+ *  Adds a custom variable to an object.
+ *
+ *  @param[in] object_ptr Object's custom variables.
+ *  @param[in] varname    Custom variable name.
+ *  @param[in] varvalue   Custom variable value.
+ *
+ *  @return New custom variable.
+ */
+customvariablesmember* add_custom_variable_to_object(
+                         customvariablesmember** object_ptr,
+                         char const* varname,
+                         char const* varvalue) {
+  // Make sure we have the data we need.
+  if (!object_ptr) {
+    logger(log_config_error, basic)
+      << "Error: Custom variable object is NULL";
+    return (NULL);
+  }
+  if (!varname || !varname[0]) {
+    logger(log_config_error, basic)
+      << "Error: Custom variable name is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for a new member.
+  customvariablesmember* obj(new customvariablesmember);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    obj->variable_name = my_strdup(varname);
+    if (varvalue)
+      obj->variable_value = my_strdup(varvalue);
+
+    // Add the new member to the head of the member list.
+    obj->next = *object_ptr;
+    *object_ptr = obj;
+  }
+  catch (...) {
+    deleter::customvariablesmember(obj);
+    obj = NULL;
+  }
+
+  return (obj);
+}
+
+/**
+ *  Adds a custom variable to a service.
+ *
+ *  @param[in] svc      Service.
+ *  @param[in] varname  Custom variable name.
+ *  @param[in] varvalue Custom variable value.
+ *
+ *  @return New custom variable.
+ */
+customvariablesmember* add_custom_variable_to_service(
+                         service* svc,
+                         char const* varname,
+                         char const* varvalue) {
+  // Add custom variable to service.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &svc->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_SERVICECUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
+}

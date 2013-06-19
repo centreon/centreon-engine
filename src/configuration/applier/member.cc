@@ -20,8 +20,12 @@
 #include <memory>
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/commandsmember.hh"
+#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/shared.hh"
 
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration;
@@ -50,7 +54,7 @@ void applier::add_member(
   // Create and fill the new member.
   std::auto_ptr<contactsmember_struct> obj(new contactsmember_struct);
   memset(obj.get(), 0, sizeof(*obj));
-  obj->contact_name = my_strdup(name.c_str());
+  obj->contact_name = my_strdup(name);
   obj->contact_ptr = &(*it->second);
   obj->next = members;
   members = obj.release();
@@ -83,7 +87,7 @@ void applier::add_member(
   // Create and fill the new member.
   std::auto_ptr<commandsmember_struct> obj(new commandsmember_struct);
   memset(obj.get(), 0, sizeof(*obj));
-  obj->cmd = my_strdup(name.c_str());
+  obj->cmd = my_strdup(name);
   obj->command_ptr = &(*it->second);
   obj->next = members;
   members = obj.release();

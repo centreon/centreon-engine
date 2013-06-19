@@ -43,6 +43,7 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtime.hh"
@@ -110,9 +111,9 @@ int main(int argc, char* argv[]) {
 
   // Load singletons.
   com::centreon::clib::load();
-  // XXX: com::centreon::engine::configuration::state::load();
   com::centreon::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
+  com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::commands::set::load();
   com::centreon::engine::checks::checker::load();
   com::centreon::engine::events::loop::load();
@@ -190,7 +191,7 @@ int main(int argc, char* argv[]) {
         buffer.append(config_file);
         delete[] config_file;
         config_file = NULL;
-        config_file = my_strdup(buffer.c_str());
+        config_file = my_strdup(buffer);
       }
     }
 
@@ -613,7 +614,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::logging::unload();
-  // com::centreon::engine::configuration::state::unload();
+  com::centreon::engine::configuration::applier::state::load();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 

@@ -21,6 +21,7 @@
 #  define CCE_OBJECTS_DATERANGE_HH
 
 /* Forward declaration. */
+struct timeperiod_struct;
 struct timerange_struct;
 
 typedef struct             daterange_struct {
@@ -41,6 +42,27 @@ typedef struct             daterange_struct {
 }                          daterange;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+daterange* add_exception_to_timeperiod(
+             timeperiod_struct* period,
+             int type,
+             int syear,
+             int smon,
+             int smday,
+             int swday,
+             int swday_offset,
+             int eyear,
+             int emon,
+             int emday,
+             int ewday,
+             int ewday_offset,
+             int skip_interval);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool               operator==(
@@ -53,7 +75,7 @@ std::ostream&      operator<<(std::ostream& os, daterange const& obj);
 std::string const& get_month_name(unsigned int index);
 std::string const& get_weekday_name(unsigned int index);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_DATERANGE_HH
 
