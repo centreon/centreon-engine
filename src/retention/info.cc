@@ -64,7 +64,6 @@ bool retention::info::set(
     time_t current_time(time(NULL));
     time_t creation_time;
     misc::to(value, creation_time);
-
     if ((current_time - creation_time)
         < static_cast<time_t>(config->retention_scheduling_horizon()))
       _scheduling_info_is_ok = true;

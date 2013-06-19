@@ -28,11 +28,16 @@
 
 CCE_BEGIN()
 
-namespace misc {
+namespace                 misc {
   bool                    get_next_line(
                             std::ifstream& stream,
                             std::string& line,
                             unsigned int& pos);
+
+  inline char const*      chkstr(char const* str) throw () {
+    return (str ? str : "\"NULL\"");
+  }
+
   bool                    split(
                             std::string const& line,
                             std::string& key,
@@ -42,11 +47,13 @@ namespace misc {
                             std::string const& data,
                             std::list<std::string>& out,
                             char delim);
+
   template<typename T>
   bool                    to(std::string const& str, T& data) {
     std::istringstream iss(str);
     return ((iss >> data) && iss.eof());
   }
+
   template<typename T, typename U>
   bool                    to(std::string const& str, U& data) {
     T tmp;
@@ -55,6 +62,7 @@ namespace misc {
       return (false);
     data = static_cast<U>(tmp);
     return (true);
+
   }
   std::string&            trim(std::string& str) throw ();
   std::string&            trim_left(std::string& str) throw ();

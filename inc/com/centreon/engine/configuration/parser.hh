@@ -60,34 +60,6 @@ namespace              configuration {
                          void (parser::*pfunc)(std::string const&));
     void               _apply_hostextinfo();
     void               _apply_serviceextinfo();
-    void               _check_command_dependencies();
-    void               _check_contact_dependencies();
-    void               _check_contactgroup_dependencies();
-    void               _check_dependencies();
-    void               _check_hostdependency_dependencies();
-    void               _check_hostescalation_dependencies();
-    void               _check_hostextinfo_dependencies();
-    void               _check_hostgroup_dependencies();
-    template<typename T, list_string const& (T::*get_list)() const throw (), std::string const& (T::*get_name)() const throw ()>
-    void               _check_objects_dependencies(
-                         map_object const& objects,
-                         map_object const& dependencies);
-    template<typename T, std::string const& (T::*get_data)() const throw (), std::string const& (T::*get_name)() const throw ()>
-    void               _check_objects_dependencies(
-                         map_object const& objects,
-                         map_object const& dependencies);
-    template<typename T, list_string const& (T::*get_list)() const throw ()>
-    void               _check_objects_dependencies(
-                         list_object const& objects,
-                         map_object const& dependencies);
-    template<typename T, std::string const& (T::*get_data)() const throw ()>
-    void               _check_objects_dependencies(
-                         list_object const& objects,
-                         map_object const& dependencies);
-    void               _check_servicedependency_dependencies();
-    void               _check_serviceescalation_dependencies();
-    void               _check_serviceextinfo_dependencies();
-    void               _check_servicegroup_dependencies();
     void               _get_hosts_by_hostgroups(
                          hostgroup_ptr const& hostgroups,
                          list_host& hosts);

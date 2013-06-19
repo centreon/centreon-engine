@@ -361,10 +361,11 @@ int main(int argc, char* argv[]) {
               p.parse("/tmp/bench/etc/centengine.cfg", config);
             }
 
-            {
-              retention::parser p;
-              p.parse("/tmp/bench/var/status.sav");
-            }
+            // ::config = &config;
+            // {
+            //   retention::parser p;
+            //   p.parse("/tmp/bench/var/status.sav");
+            // }
           }
           catch (std::exception const& e) {
             std::cerr << "error: " << e.what() << std::endl;
