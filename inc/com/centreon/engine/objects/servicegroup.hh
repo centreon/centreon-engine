@@ -21,6 +21,8 @@
 #  define CCE_OBJECTS_SERVICEGROUP_HH
 
 /* Forward declaration. */
+struct host_struct;
+struct service_struct;
 struct servicesmember_struct;
 
 typedef struct                servicegroup_struct {
@@ -35,6 +37,25 @@ typedef struct                servicegroup_struct {
 }                             servicegroup;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+servicegroup* add_servicegroup(
+                char const* name,
+                char const* alias,
+                char const* notes,
+                char const* notes_url,
+                char const* action_url);
+int           is_host_member_of_servicegroup(
+                servicegroup_struct* group,
+                host_struct* hst);
+int           is_service_member_of_servicegroup(
+                servicegroup_struct* group,
+                service_struct* svc);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -45,7 +66,7 @@ bool          operator!=(
                 servicegroup const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, servicegroup const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICEGROUP_HH
 

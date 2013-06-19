@@ -21,7 +21,13 @@
 #ifndef CCE_MACROS_DEFINES_HH_
 # define CCE_MACROS_DEFINES_HH_
 
-# include "com/centreon/engine/objects.hh"
+# include "com/centreon/engine/objects/contact.hh"
+# include "com/centreon/engine/objects/contactgroup.hh"
+# include "com/centreon/engine/objects/customvariablesmember.hh"
+# include "com/centreon/engine/objects/host.hh"
+# include "com/centreon/engine/objects/hostgroup.hh"
+# include "com/centreon/engine/objects/service.hh"
+# include "com/centreon/engine/objects/servicegroup.hh"
 
 // Length Limitations
 # define MAX_COMMAND_ARGUMENTS                  32   // maximum number of $ARGx$ macros

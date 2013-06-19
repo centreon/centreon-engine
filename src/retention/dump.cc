@@ -21,7 +21,6 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
 using namespace com::centreon::engine::retention;

@@ -155,7 +155,90 @@ typedef struct                  host_struct {
   struct host_struct*           nexthash;
 }                               host;
 
+/* Other HOST structure. */
+struct                          host_other_properties {
+  time_t                        initial_notif_time;
+};
+
+/* Hash structures. */
+typedef struct                  host_cursor_struct {
+  int                           host_hashchain_iterator;
+  host*                         current_host_pointer;
+}                               host_cursor;
+
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+host* add_host(
+        char const* name,
+        char const* display_name,
+        char const* alias,
+        char const* address,
+        char const* check_period,
+        int initial_state,
+        double check_interval,
+        double retry_interval,
+        int max_attempts,
+        int notify_up,
+        int notify_down,
+        int notify_unreachable,
+        int notify_flapping,
+        int notify_downtime,
+        double notification_interval,
+        double first_notification_delay,
+        char const* notification_period,
+        int notifications_enabled,
+        char const* check_command,
+        int checks_enabled,
+        int accept_passive_checks,
+        char const* event_handler,
+        int event_handler_enabled,
+        int flap_detection_enabled,
+        double low_flap_threshold,
+        double high_flap_threshold,
+        int flap_detection_on_up,
+        int flap_detection_on_down,
+        int flap_detection_on_unreachable,
+        int stalk_on_up,
+        int stalk_on_down,
+        int stalk_on_unreachable,
+        int process_perfdata,
+        int failure_prediction_enabled,
+        char const* failure_prediction_options,
+        int check_freshness,
+        int freshness_threshold,
+        char const* notes,
+        char const* notes_url,
+        char const* action_url,
+        char const* icon_image,
+        char const* icon_image_alt,
+        char const* vrml_image,
+        char const* statusmap_image,
+        int x_2d,
+        int y_2d,
+        int have_2d_coords,
+        double x_3d,
+        double y_3d,
+        double z_3d,
+        int have_3d_coords,
+        int should_be_drawn,
+        int retain_status_information,
+        int retain_nonstatus_information,
+        int obsess_over_host);
+int   get_host_count();
+int   is_contact_for_host(host* hst, contact_struct* cntct);
+int   is_escalated_contact_for_host(host* hst, contact_struct* cntct);
+int   is_host_immediate_child_of_host(host* parent, host* child);
+int   is_host_immediate_parent_of_host(host* child, host* parent);
+int   number_of_immediate_child_hosts(host* hst);
+int   number_of_immediate_parent_hosts(host* hst);
+int   number_of_total_child_hosts(host* hst);
+int   number_of_total_parent_hosts(host* hst);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -166,7 +249,7 @@ bool          operator!=(
                 host const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, host const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOST_HH
 

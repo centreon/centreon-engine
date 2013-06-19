@@ -21,7 +21,8 @@
 #ifndef CCE_NEBSTRUCTS_HH
 #  define CCE_NEBSTRUCTS_HH
 
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 /* Acknowledgement structure. */
 typedef struct   nebstruct_acknowledgement_struct {

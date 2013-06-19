@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/contactgroupsmember.hh"
 
 using namespace com::centreon::engine;
 

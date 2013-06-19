@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
 #include "com/centreon/engine/configuration/applier/customvariable.hh"
 
 /**

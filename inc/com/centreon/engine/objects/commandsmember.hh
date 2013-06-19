@@ -22,6 +22,7 @@
 
 /* Forward declaration. */
 struct command_struct;
+struct contact_struct;
 
 typedef struct                  commandsmember_struct {
   char*                         cmd;
@@ -30,6 +31,19 @@ typedef struct                  commandsmember_struct {
 }                               commandsmember;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+commandsmember* add_host_notification_command_to_contact(
+                  contact_struct* cntct,
+                  char const* command_name);
+commandsmember* add_service_notification_command_to_contact(
+                  contact_struct* cntct,
+                  char const* command_name);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -40,7 +54,7 @@ bool          operator!=(
                 commandsmember const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, commandsmember const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_COMMANDSMEMBER_HH
 

@@ -46,6 +46,24 @@ typedef struct                     serviceescalation_struct {
 }                                  serviceescalation;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+serviceescalation* add_service_escalation(
+                     char const* host_name,
+                     char const* description,
+                     int first_notification,
+                     int last_notification,
+                     double notification_interval,
+                     char const* escalation_period,
+                     int escalate_on_warning,
+                     int escalate_on_unknown,
+                     int escalate_on_critical,
+                     int escalate_on_recovery);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -58,7 +76,7 @@ std::ostream& operator<<(
                 std::ostream& os,
                 serviceescalation const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICEESCALATION_HH
 

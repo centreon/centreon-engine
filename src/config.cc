@@ -23,11 +23,14 @@
 #include <cstdlib>
 #include <sstream>
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -41,7 +44,7 @@ int read_all_object_data(char* main_config_file) {
   int cache = FALSE;
   int precache = FALSE;
 
-  options = READ_ALL_OBJECT_DATA;
+  options = configuration::parser::read_all;
 
   /* cache object definitions if we're up and running */
   if (verify_config == FALSE && test_scheduling == FALSE)

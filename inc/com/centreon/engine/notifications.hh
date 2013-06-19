@@ -23,8 +23,12 @@
 #  define CCE_NOTIFICATIONS_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/macros.hh"
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/macros/defines.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/hostescalation.hh"
+#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/objects/serviceescalation.hh"
 
 // Notification Types
 #  define HOST_NOTIFICATION               0

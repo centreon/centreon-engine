@@ -17,10 +17,20 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/servicedependency.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -95,3 +105,179 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
   return (os);
 }
 
+
+/**
+ *  Adds a service dependency definition.
+ *
+ *  @param[in] dependent_host_name           Dependent host name.
+ *  @param[in] dependent_service_description Dependent service
+ *                                           description.
+ *  @param[in] host_name                     Host name.
+ *  @param[in] service_description           Service description.
+ *  @param[in] dependency_type               Type of dependency.
+ *  @param[in] inherits_parent               Inherits parent ?
+ *  @param[in] fail_on_ok                    Does dependency fail on
+ *                                           ok state ?
+ *  @param[in] fail_on_warning               Does dependency fail on
+ *                                           warning state ?
+ *  @param[in] fail_on_unknown               Does dependency fail on
+ *                                           unknown state ?
+ *  @param[in] fail_on_critical              Does dependency fail on
+ *                                           critical state ?
+ *  @param[in] fail_on_pending               Does dependency fail on
+ *                                           pending state ?
+ *  @param[in] dependency_period             Dependency timeperiod name.
+ *
+ *  @return Service dependency.
+ */
+servicedependency* add_service_dependency(
+                     char const* dependent_host_name,
+                     char const* dependent_service_description,
+                     char const* host_name,
+                     char const* service_description,
+                     int dependency_type,
+                     int inherits_parent,
+                     int fail_on_ok,
+                     int fail_on_warning,
+                     int fail_on_unknown,
+                     int fail_on_critical,
+                     int fail_on_pending,
+                     char const* dependency_period) {
+  // Make sure we have what we need.
+  if (!host_name
+      || !host_name[0]
+      || !service_description
+      || !service_description[0]) {
+    logger(log_config_error, basic)
+      << "Error: NULL master service description/host "
+         "name in service dependency definition";
+    return (NULL);
+  }
+  if (!dependent_host_name
+      || !dependent_host_name[0]
+      || !dependent_service_description
+      || !dependent_service_description[0]) {
+    logger(log_config_error, basic)
+      << "Error: NULL dependent service description/host "
+         "name in service dependency definition";
+    return (NULL);
+  }
+
+  // Allocate memory for a new service dependency entry.
+  shared_ptr<servicedependency> obj(new servicedependency, deleter::servicedependency);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->dependent_host_name = my_strdup(dependent_host_name);
+    obj->dependent_service_description = my_strdup(dependent_service_description);
+    obj->host_name = my_strdup(host_name);
+    obj->service_description = my_strdup(service_description);
+    if (dependency_period)
+      obj->dependency_period = my_strdup(dependency_period);
+
+    obj->dependency_type = (dependency_type == EXECUTION_DEPENDENCY) ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY;
+    obj->fail_on_critical = (fail_on_critical == 1);
+    obj->fail_on_ok = (fail_on_ok == 1);
+    obj->fail_on_pending = (fail_on_pending == 1);
+    obj->fail_on_unknown = (fail_on_unknown == 1);
+    obj->fail_on_warning = (fail_on_warning == 1);
+    obj->inherits_parent = (inherits_parent > 0);
+
+    std::pair<std::string, std::string>
+      id(std::make_pair(dependent_host_name, dependent_service_description));
+    umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::const_iterator
+      it(state::instance().servicedependencies().find(id));
+    if (it != state::instance().servicedependencies().end()) {
+      logger(log_config_error, basic)
+        << "Error: Servicedependency '" << dependent_service_description
+        << "' on host '" << dependent_host_name
+        << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().servicedependencies()
+      .insert(std::make_pair(id, obj));
+
+    // Add new items to the list.
+    obj->next = servicedependency_list;
+    servicedependency_list = obj.get();
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    obj.clear();
+  }
+
+  return (obj.get());
+}
+
+/**
+ *  Checks to see if there exists a circular dependency for a service.
+ *
+ *  @param[in] root_dep        Root dependency.
+ *  @param[in] dep             Dependency.
+ *  @param[in] dependency_type Dependency type.
+ *
+ *  @return true if circular path was found, false otherwise.
+ */
+int check_for_circular_servicedependency_path(
+      servicedependency* root_dep,
+      servicedependency* dep,
+      int dependency_type) {
+  if (!root_dep || !dep)
+    return (false);
+
+  // This is not the proper dependency type.
+  if ((root_dep->dependency_type != dependency_type)
+      || (dep->dependency_type != dependency_type))
+    return (false);
+
+  // Don't go into a loop, don't bother checking anymore if we know this
+  // dependency already has a loop.
+  if (root_dep->contains_circular_path == true)
+    return (true);
+
+  // Dependency has already been checked - there is a path somewhere,
+  // but it may not be for this particular dep... This should speed up
+  // detection for some loops.
+  if (dep->circular_path_checked == true)
+    return (false);
+
+  // Set the check flag so we don't get into an infinite loop.
+  dep->circular_path_checked = true;
+
+  // Is this service dependent on the root service?
+  if (dep != root_dep) {
+    if (root_dep->dependent_service_ptr == dep->master_service_ptr) {
+      root_dep->contains_circular_path = true;
+      dep->contains_circular_path = true;
+      return (true);
+    }
+  }
+
+  // Notification dependencies are ok at this point as long as they
+  // don't inherit.
+  if ((dependency_type == NOTIFICATION_DEPENDENCY)
+      && (dep->inherits_parent == false))
+    return (false);
+
+  // Check all parent dependencies.
+  for (servicedependency* temp_sd(servicedependency_list);
+       temp_sd;
+       temp_sd = temp_sd->next) {
+    // Only check parent dependencies.
+    if (dep->master_service_ptr != temp_sd->dependent_service_ptr)
+      continue;
+
+    if (check_for_circular_servicedependency_path(
+          root_dep,
+          temp_sd,
+          dependency_type) == true)
+      return (true);
+  }
+
+  return (false);
+}

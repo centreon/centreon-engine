@@ -21,7 +21,6 @@
 #include <cstdlib>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/objects.hh"
 #include "skiplist.h"
 
 skiplist* skiplist_new(

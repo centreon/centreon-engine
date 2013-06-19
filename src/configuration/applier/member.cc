@@ -20,8 +20,12 @@
 #include <memory>
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/commandsmember.hh"
+#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/shared.hh"
 
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration;

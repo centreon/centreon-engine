@@ -72,6 +72,37 @@ typedef struct                  contact_struct {
 }                               contact;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+contact* add_contact(
+           char const* name,
+           char const* alias,
+           char const* email,
+           char const* pager,
+           char const* const* addresses,
+           char const* svc_notification_period,
+           char const* host_notification_period,
+           int notify_service_ok,
+           int notify_service_critical,
+           int notify_service_warning,
+           int notify_service_unknown,
+           int notify_service_flapping,
+           int notify_service_downtime,
+           int notify_host_up,
+           int notify_host_down,
+           int notify_host_unreachable,
+           int notify_host_flapping,
+           int notify_host_downtime,
+           int host_notifications_enabled,
+           int service_notifications_enabled,
+           int can_submit_commands,
+           int retain_status_information,
+           int retain_nonstatus_information);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -82,7 +113,7 @@ bool          operator!=(
                 contact const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, contact const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACT_HH
 

@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/servicesmember.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/servicesmember.hh"
 
 using namespace com::centreon::engine;
 

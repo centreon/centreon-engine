@@ -21,6 +21,7 @@
 #  define CCE_OBJECTS_CONTACTGROUP_HH
 
 /* Forward declaration. */
+struct contact_struct;
 struct contactsmember_struct;
 
 typedef struct                contactgroup_struct {
@@ -32,6 +33,17 @@ typedef struct                contactgroup_struct {
 }                             contactgroup;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+contactgroup* add_contactgroup(char const* name, char const* alias);
+int           is_contact_member_of_contactgroup(
+                contactgroup_struct* group,
+                contact_struct* cntct);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -42,7 +54,7 @@ bool          operator!=(
                 contactgroup const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, contactgroup const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACTGROUP_HH
 

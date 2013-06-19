@@ -21,7 +21,9 @@
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/serviceescalation.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/contactgroupsmember.hh"
+#include "com/centreon/engine/objects/contactsmember.hh"
+#include "com/centreon/engine/objects/serviceescalation.hh"
 
 using namespace com::centreon::engine;
 

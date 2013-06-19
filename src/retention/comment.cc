@@ -20,7 +20,6 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/misc/string.hh"
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/comment.hh"
 
 using namespace com::centreon::engine::configuration::applier;

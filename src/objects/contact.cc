@@ -17,12 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contact.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -135,3 +146,162 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
   return (os);
 }
 
+/**
+ *  Add a new contact to the list in memory.
+ *
+ *  @param[in] name                          Contact name.
+ *  @param[in] alias                         Contact alias.
+ *  @param[in] email                         Email.
+ *  @param[in] pager                         Pager.
+ *  @param[in] addresses                     Contact addresses.
+ *  @param[in] svc_notification_period       Service notification
+ *                                           period.
+ *  @param[in] host_notification_period      Host nofication period.
+ *  @param[in] notify_service_ok             Contact can be notified
+ *                                           when service is ok.
+ *  @param[in] notify_service_critical       Contact can be notified
+ *                                           when service is critical.
+ *  @param[in] notify_service_warning        Contact can be notified
+ *                                           when service is warning.
+ *  @param[in] notify_service_unknown        Contact can be notified
+ *                                           when service is unknown.
+ *  @param[in] notify_service_flapping       Contact can be notified
+ *                                           when service is flapping.
+ *  @param[in] notify_sevice_downtime        Contact can be notified on
+ *                                           service downtime.
+ *  @param[in] notify_host_up                Contact can be notified
+ *                                           when host is up.
+ *  @param[in] notify_host_down              Contact can be notified
+ *                                           when host is down.
+ *  @param[in] notify_host_unreachable       Contact can be notified
+ *                                           when host is unreachable.
+ *  @param[in] notify_host_flapping          Contact can be notified
+ *                                           when host is flapping.
+ *  @param[in] notify_host_downtime          Contact can be notified on
+ *                                           host downtime.
+ *  @param[in] host_notifications_enabled    Are contact host
+ *                                           notifications enabled ?
+ *  @param[in] service_notifications_enabled Are contact service
+ *                                           notifications enabled ?
+ *  @param[in] can_submit_commands           Can user submit external
+ *                                           commands ?
+ *  @param[in] retain_status_information     Shall Engine retain contact
+ *                                           status info ?
+ *  @param[in] retain_nonstatus_information  Shell Engine retain contact
+ *                                           non-status info ?
+ *
+ *  @return New contact object.
+ */
+contact* add_contact(
+           char const* name,
+           char const* alias,
+           char const* email,
+           char const* pager,
+           char const* const* addresses,
+           char const* svc_notification_period,
+           char const* host_notification_period,
+           int notify_service_ok,
+           int notify_service_critical,
+           int notify_service_warning,
+           int notify_service_unknown,
+           int notify_service_flapping,
+           int notify_service_downtime,
+           int notify_host_up,
+           int notify_host_down,
+           int notify_host_unreachable,
+           int notify_host_flapping,
+           int notify_host_downtime,
+           int host_notifications_enabled,
+           int service_notifications_enabled,
+           int can_submit_commands,
+           int retain_status_information,
+           int retain_nonstatus_information) {
+  // Make sure we have the data we need.
+  if (!name || !name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Contact name is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for a new contact.
+  shared_ptr<contact> obj(new contact, deleter::contact);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->name = my_strdup(name);
+    obj->alias = my_strdup(!alias ? name : alias);
+    if (email)
+      obj->email = my_strdup(email);
+    if (host_notification_period)
+      obj->host_notification_period = my_strdup(host_notification_period);
+    if (pager)
+      obj->pager = my_strdup(pager);
+    if (svc_notification_period)
+      obj->service_notification_period = my_strdup(svc_notification_period);
+    if (addresses) {
+      for (unsigned int x(0); x < MAX_CONTACT_ADDRESSES; ++x)
+        if (addresses[x])
+          obj->address[x] = my_strdup(addresses[x]);
+    }
+
+    // Set remaining contact properties.
+    obj->can_submit_commands = (can_submit_commands > 0);
+    obj->host_notifications_enabled = (host_notifications_enabled > 0);
+    obj->modified_attributes = MODATTR_NONE;
+    obj->modified_host_attributes = MODATTR_NONE;
+    obj->modified_service_attributes = MODATTR_NONE;
+    obj->notify_on_host_down = (notify_host_down > 0);
+    obj->notify_on_host_downtime = (notify_host_downtime > 0);
+    obj->notify_on_host_flapping = (notify_host_flapping > 0);
+    obj->notify_on_host_recovery = (notify_host_up > 0);
+    obj->notify_on_host_unreachable = (notify_host_unreachable > 0);
+    obj->notify_on_service_critical = (notify_service_critical > 0);
+    obj->notify_on_service_downtime = (notify_service_downtime > 0);
+    obj->notify_on_service_flapping = (notify_service_flapping > 0);
+    obj->notify_on_service_recovery = (notify_service_ok > 0);
+    obj->notify_on_service_unknown = (notify_service_unknown > 0);
+    obj->notify_on_service_warning = (notify_service_warning > 0);
+    obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
+    obj->retain_status_information = (retain_status_information > 0);
+    obj->service_notifications_enabled = (service_notifications_enabled > 0);
+
+    // Add new contact to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<contact_struct> >::const_iterator
+      it(state::instance().contacts().find(id));
+    if (it != state::instance().contacts().end()) {
+      logger(log_config_error, basic)
+        << "Error: Contact '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().contacts()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = contact_list;
+    contact_list = obj.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_contact_data(
+      NEBTYPE_CONTACT_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj.get(),
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
+  }
+  catch (...) {
+    obj.clear();
+  }
+
+  return (obj.get());
+}

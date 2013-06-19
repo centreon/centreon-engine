@@ -17,9 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/contactgroup.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/hostgroup.hh"
+#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/objects/servicegroup.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "find.hh"
+
+// forward declaration.
+struct hostdependency_struct;
+struct hostescalation_struct;
+struct servicedependency_struct;
+struct serviceescalation_struct;
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration::applier;
@@ -177,9 +191,9 @@ timeperiod* find_timeperiod(char const* name) {
  *
  *  @return NULL.
  */
-hostdependency* get_first_host_dependency_by_dependent_host(
-                  char const* host_name,
-                  void** ptr) {
+hostdependency_struct* get_first_host_dependency_by_dependent_host(
+                         char const* host_name,
+                         void** ptr) {
   (void)host_name;
   (void)ptr;
   return (NULL);
@@ -193,9 +207,9 @@ hostdependency* get_first_host_dependency_by_dependent_host(
  *
  *  @return NULL.
  */
-hostescalation* get_first_host_escalation_by_host(
-                  char const* host_name,
-                  void** ptr) {
+hostescalation_struct* get_first_host_escalation_by_host(
+                         char const* host_name,
+                         void** ptr) {
   (void)host_name;
   (void)ptr;
   return (NULL);
@@ -210,10 +224,10 @@ hostescalation* get_first_host_escalation_by_host(
  *
  *  @return NULL.
  */
-servicedependency* get_first_service_dependency_by_dependent_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr) {
+servicedependency_struct* get_first_service_dependency_by_dependent_service(
+                            char const* host_name,
+                            char const* svc_description,
+                            void** ptr) {
   (void)host_name;
   (void)svc_description;
   (void)ptr;
@@ -229,10 +243,10 @@ servicedependency* get_first_service_dependency_by_dependent_service(
  *
  *  @return NULL.
  */
-serviceescalation* get_first_service_escalation_by_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr) {
+serviceescalation_struct* get_first_service_escalation_by_service(
+                            char const* host_name,
+                            char const* svc_description,
+                            void** ptr) {
   (void)host_name;
   (void)svc_description;
   (void)ptr;
@@ -247,9 +261,9 @@ serviceescalation* get_first_service_escalation_by_service(
  *
  *  @return NULL.
  */
-hostdependency* get_next_host_dependency_by_dependent_host(
-                  char const* host_name,
-                  void** ptr) {
+hostdependency_struct* get_next_host_dependency_by_dependent_host(
+                         char const* host_name,
+                         void** ptr) {
   (void)host_name;
   (void)ptr;
   return (NULL);
@@ -263,9 +277,9 @@ hostdependency* get_next_host_dependency_by_dependent_host(
  *
  *  @return NULL.
  */
-hostescalation* get_next_host_escalation_by_host(
-                  char const* host_name,
-                  void** ptr) {
+hostescalation_struct* get_next_host_escalation_by_host(
+                         char const* host_name,
+                         void** ptr) {
   (void)host_name;
   (void)ptr;
   return (NULL);
@@ -280,10 +294,10 @@ hostescalation* get_next_host_escalation_by_host(
  *
  *  @return NULL.
  */
-servicedependency* get_next_service_dependency_by_dependent_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr) {
+servicedependency_struct* get_next_service_dependency_by_dependent_service(
+                            char const* host_name,
+                            char const* svc_description,
+                            void** ptr) {
   (void)host_name;
   (void)svc_description;
   (void)ptr;
@@ -299,10 +313,10 @@ servicedependency* get_next_service_dependency_by_dependent_service(
  *
  *  @return NULL
  */
-serviceescalation* get_next_service_escalation_by_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr) {
+serviceescalation_struct* get_next_service_escalation_by_service(
+                            char const* host_name,
+                            char const* svc_description,
+                            void** ptr) {
   (void)host_name;
   (void)svc_description;
   (void)ptr;

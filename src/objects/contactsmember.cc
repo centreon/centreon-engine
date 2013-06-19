@@ -17,10 +17,20 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/contactsmember.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/hostescalation.hh"
+#include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/objects/serviceescalation.hh"
+#include "com/centreon/engine/shared.hh"
 
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
 /**
@@ -71,3 +81,144 @@ std::ostream& operator<<(std::ostream& os, contactsmember const& obj) {
   return (os);
 }
 
+/**
+ *  Add a new member to a contact group.
+ *
+ *  @param[in] grp          Contact group.
+ *  @param[in] contact_name Contact name.
+ *
+ *  @return Contact group membership object.
+ */
+contactsmember* add_contact_to_contactgroup(
+                  contactgroup* grp,
+                  char const* contact_name) {
+  // Make sure we have the data we need.
+  if (!grp || !contact_name || !contact_name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Contactgroup or contact name is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for a new member.
+  contactsmember* obj(new contactsmember);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->contact_name = my_strdup(contact_name);
+
+    // Add the new member to the head of the member list.
+    obj->next = grp->members;
+    grp->members = obj;
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    deleter::contactsmember(obj);
+    obj = NULL;
+  }
+
+  return (obj);
+}
+
+/**
+ *  Adds a contact to a host.
+ *
+ *  @param[in] hst          Host.
+ *  @param[in] contact_name Contact name.
+ *
+ *  @return Contact membership object.
+ */
+contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
+  // XXX: event broker
+  return (add_contact_to_object(&hst->contacts, contact_name));
+}
+
+/**
+ *  Adds a contact to a host escalation.
+ *
+ *  @param[in] he           Host escalation.
+ *  @param[in] contact_name Contact name.
+ *
+ *  @return Contact membership object.
+ */
+contactsmember* add_contact_to_host_escalation(
+                  hostescalation* he,
+                  char const* contact_name) {
+  // XXX: event broker
+  return (add_contact_to_object(&he->contacts, contact_name));
+}
+
+/**
+ *  Adds a contact to an object.
+ *
+ *  @param[in] object_ptr
+ *  @param[in] contact_name Contact name.
+ *
+ *  @return Contact membership object.
+ */
+contactsmember* add_contact_to_object(
+                  contactsmember** object_ptr,
+                  char const* contact_name) {
+  // Make sure we have the data we need.
+  if (!object_ptr) {
+    logger(log_config_error, basic)
+      << "Error: Contact object is NULL";
+    return (NULL);
+  }
+  if (!contact_name || !contact_name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Contact name is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for a new member.
+  contactsmember* obj(new contactsmember);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->contact_name = my_strdup(contact_name);
+
+    // Add the new contact to the head of the contact list.
+    obj->next = *object_ptr;
+    *object_ptr = obj;
+  }
+  catch (...) {
+    deleter::contactsmember(obj);
+    obj = NULL;
+  }
+
+  return (obj);
+}
+
+/**
+ *  Adds a contact to a service.
+ *
+ *  @param[in] svc          Service.
+ *  @param[in] contact_name Contact name.
+ *
+ *  @return Contact membership object.
+ */
+contactsmember* add_contact_to_service(
+                  service* svc,
+                  char const* contact_name) {
+  // XXX: event broker
+  return (add_contact_to_object(&svc->contacts, contact_name));
+}
+
+/**
+ *  Adds a contact to a service escalation.
+ *
+ *  @param[in] se           Service escalation.
+ *  @param[in] contact_name Contact name.
+ *
+ *  @return Contact membership object.
+ */
+contactsmember* add_contact_to_serviceescalation(
+                  serviceescalation* se,
+                  char const* contact_name) {
+  // XXX: event broker
+  return (add_contact_to_object(&se->contacts, contact_name));
+}

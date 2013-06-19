@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/customvariablesmember.hh"
 
 using namespace com::centreon::engine;
 

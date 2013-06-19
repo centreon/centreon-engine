@@ -44,6 +44,22 @@ typedef struct                   hostescalation_struct {
 }                                hostescalation;
 
 #  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+hostescalation* add_host_escalation(
+                  char const* host_name,
+                  int first_notification,
+                  int last_notification,
+                  double notification_interval,
+                  char const* escalation_period,
+                  int escalate_on_down,
+                  int escalate_on_unreachable,
+                  int escalate_on_recovery);
+
+#  ifdef __cplusplus
+}
+
 #    include <ostream>
 
 bool          operator==(
@@ -54,7 +70,7 @@ bool          operator!=(
                 hostescalation const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj);
 
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTESCALATION_HH
 

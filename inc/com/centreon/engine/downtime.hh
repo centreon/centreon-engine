@@ -22,7 +22,9 @@
 #  define CCE_DOWTIME_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 // SCHEDULED_DOWNTIME_ENTRY structure
 typedef struct                      scheduled_downtime_struct {
