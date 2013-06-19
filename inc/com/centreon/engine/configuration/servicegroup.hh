@@ -31,56 +31,55 @@ typedef std::set<std::pair<std::string, std::string> > set_pair_string;
 
 CCE_BEGIN()
 
-namespace                  configuration {
-  class                    servicegroup
+namespace                   configuration {
+  class                     servicegroup
     : public object {
   public:
-                           servicegroup();
-                           servicegroup(servicegroup const& right);
-                           ~servicegroup() throw ();
-    servicegroup&          operator=(servicegroup const& right);
-    bool                   operator==(
-                             servicegroup const& right) const throw ();
-    bool                   operator!=(
-                             servicegroup const& right) const throw ();
-    void                   check_validity() const;
-    std::size_t            id() const throw ();
-    void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+                            servicegroup();
+                            servicegroup(servicegroup const& right);
+                            ~servicegroup() throw ();
+    servicegroup&           operator=(servicegroup const& right);
+    bool                    operator==(
+                              servicegroup const& right) const throw ();
+    bool                    operator!=(
+                              servicegroup const& right) const throw ();
+    void                    check_validity() const;
+    std::size_t             id() const throw ();
+    void                    merge(object const& obj);
+    bool                    parse(
+                              std::string const& key,
+                              std::string const& value);
 
-    std::string const&     action_url() const throw ();
-    std::string const&     alias() const throw ();
-    list_string const&     members() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
-    list_string const&     servicegroup_members() const throw ();
-    std::string const&     servicegroup_name() const throw ();
+    std::string const&      action_url() const throw ();
+    std::string const&      alias() const throw ();
+    list_string const&      members() const throw ();
+    std::string const&      notes() const throw ();
+    std::string const&      notes_url() const throw ();
+    list_string const&      servicegroup_members() const throw ();
+    std::string const&      servicegroup_name() const throw ();
 
-    bool                   is_resolved() const throw ();
-    set_pair_string&       resolved_members() throw ();
-    set_pair_string const& resolved_members() const throw ();
-    void                   set_resolved(bool resolved) throw ();
+    bool                    is_resolved() const throw ();
+    set_pair_string&        resolved_members() const throw ();
+    void                    set_resolved(bool resolved) const throw ();
 
   private:
-    bool                   _set_action_url(std::string const& value);
-    bool                   _set_alias(std::string const& value);
-    bool                   _set_members(std::string const& value);
-    bool                   _set_notes(std::string const& value);
-    bool                   _set_notes_url(std::string const& value);
-    bool                   _set_servicegroup_members(std::string const& value);
-    bool                   _set_servicegroup_name(std::string const& value);
+    bool                    _set_action_url(std::string const& value);
+    bool                    _set_alias(std::string const& value);
+    bool                    _set_members(std::string const& value);
+    bool                    _set_notes(std::string const& value);
+    bool                    _set_notes_url(std::string const& value);
+    bool                    _set_servicegroup_members(std::string const& value);
+    bool                    _set_servicegroup_name(std::string const& value);
 
-    std::string            _action_url;
-    std::string            _alias;
-    group                  _members;
-    std::string            _notes;
-    std::string            _notes_url;
-    bool                   _resolved;
-    set_pair_string        _resolved_members;
-    group                  _servicegroup_members;
-    std::string            _servicegroup_name;
+    std::string             _action_url;
+    std::string             _alias;
+    group                   _members;
+    std::string             _notes;
+    std::string             _notes_url;
+    mutable bool            _resolved;
+    mutable set_pair_string _resolved_members;
+    group                   _servicegroup_members;
+    std::string             _servicegroup_name;
   };
 
   typedef shared_ptr<servicegroup>    servicegroup_ptr;

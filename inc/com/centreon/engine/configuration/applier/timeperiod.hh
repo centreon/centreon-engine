@@ -20,12 +20,15 @@
 #ifndef CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 #  define CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 
-#  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace                configuration {
+  // Forward declarations.
+  class                  state;
+  class                  timeperiod;
+
   namespace              applier {
     class                timeperiod {
     public:
@@ -33,10 +36,18 @@ namespace                configuration {
                          timeperiod(timeperiod const& right);
                          ~timeperiod() throw ();
       timeperiod&        operator=(timeperiod const& right);
-      void               add_object(timeperiod_ptr obj);
-      void               modify_object(timeperiod_ptr obj);
-      void               remove_object(timeperiod_ptr obj);
-      void               resolve_object(timeperiod_ptr obj);
+      void               add_object(
+                           configuration::timeperiod const& obj,
+			   configuration::state const& s);
+      void               modify_object(
+                           configuration::timeperiod const& obj,
+			   configuration::state const& s);
+      void               remove_object(
+                           configuration::timeperiod const& obj,
+			   configuration::state const& s);
+      void               resolve_object(
+                           configuration::timeperiod const& obj,
+			   configuration::state const& s);
     };
   }
 }

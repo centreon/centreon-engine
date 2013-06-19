@@ -20,12 +20,13 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICEGROUP_HH
 
-#  include "com/centreon/engine/configuration/servicegroup.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace                  configuration {
+  // Forward declarations.
+  class                    servicegroup;
   class                    state;
 
   namespace                applier {
@@ -36,17 +37,17 @@ namespace                  configuration {
                            ~servicegroup() throw ();
       servicegroup&        operator=(servicegroup const& right);
       void                 add_object(
-                             servicegroup_ptr obj,
-                             configuration::state& s);
+                             configuration::servicegroup const& obj,
+                             configuration::state const& s);
       void                 modify_object(
-                             servicegroup_ptr obj,
-                             configuration::state& s);
+                             configuration::servicegroup const& obj,
+                             configuration::state const& s);
       void                 remove_object(
-                             servicegroup_ptr obj,
-                             configuration::state& s);
+                             configuration::servicegroup const& obj,
+                             configuration::state const& s);
       void                 resolve_object(
-                             servicegroup_ptr obj,
-                             configuration::state& s);
+                             configuration::servicegroup const& obj,
+                             configuration::state const& s);
     };
   }
 }

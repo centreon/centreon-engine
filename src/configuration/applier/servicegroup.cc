@@ -66,33 +66,31 @@ applier::servicegroup& applier::servicegroup::operator=(
  *  @param[in] s   Configuration being applied.
  */
 void applier::servicegroup::add_object(
-                              servicegroup_ptr obj,
-                              configuration::state& s) {
+                              configuration::servicegroup const& obj,
+                              configuration::state const& s) {
   (void)s;
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
+    << "Creating new servicegroup '" << obj.servicegroup_name() << "'.";
 
   // Create servicegroup.
   shared_ptr<servicegroup_struct>
     sg(
       add_servicegroup(
-        obj->servicegroup_name().c_str(),
-        NULL_IF_EMPTY(obj->alias()),
-        NULL_IF_EMPTY(obj->notes()),
-        NULL_IF_EMPTY(obj->notes_url()),
-        NULL_IF_EMPTY(obj->action_url())),
+        obj.servicegroup_name().c_str(),
+        NULL_IF_EMPTY(obj.alias()),
+        NULL_IF_EMPTY(obj.notes()),
+        NULL_IF_EMPTY(obj.notes_url()),
+        NULL_IF_EMPTY(obj.action_url())),
       &deleter::servicegroup);
   if (!sg.get())
     throw (engine_error() << "Error: Could not register service group '"
-           << obj->servicegroup_name() << "'.");
+           << obj.servicegroup_name() << "'.");
 
   // Register servicegroup.
-  sg->next = servicegroup_list;
-  applier::state::instance().servicegroups()[obj->servicegroup_name()]
-    = sg;
-  servicegroup_list = sg.get();
+  applier::state::instance().servicegroups()[obj.servicegroup_name()]
+    = std::make_pair(obj, sg);
 
   return ;
 }
@@ -104,11 +102,11 @@ void applier::servicegroup::add_object(
  *  @param[in] s   Configuration being applied.
  */
 void applier::servicegroup::modify_object(
-                              servicegroup_ptr obj,
-                              configuration::state& s) {
+                              configuration::servicegroup const& obj,
+                              configuration::state const& s) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
+    << "Modifying servicegroup '" << obj.servicegroup_name() << "'.";
 
   // XXX
 
@@ -122,19 +120,19 @@ void applier::servicegroup::modify_object(
  *  @param[in] s   Configuration being applied.
  */
 void applier::servicegroup::remove_object(
-                              servicegroup_ptr obj,
-                              configuration::state& s) {
+                              configuration::servicegroup const& obj,
+                              configuration::state const& s) {
   (void)s;
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
+    << "Removing servicegroup '" << obj.servicegroup_name() << "'.";
 
   // Unregister servicegroup.
   unregister_object<servicegroup_struct, &servicegroup_struct::group_name>(
     &servicegroup_list,
-    obj->servicegroup_name().c_str());
-  applier::state::instance().servicegroups().erase(obj->servicegroup_name());
+    obj.servicegroup_name().c_str());
+  applier::state::instance().servicegroups().erase(obj.servicegroup_name());
 
   return ;
 }
@@ -146,40 +144,40 @@ void applier::servicegroup::remove_object(
  *  @param[in]     s   Configuration being applied.
  */
 void applier::servicegroup::resolve_object(
-                              servicegroup_ptr obj,
-                              configuration::state& s) {
+                              configuration::servicegroup const& obj,
+                              configuration::state const& s) {
   // Only process if servicegroup has not been resolved already.
-  if (!obj->is_resolved()) {
+  if (!obj.is_resolved()) {
     // Logging.
     logger(logging::dbg_config, logging::more)
-      << "Resolving servicegroup '" << obj->servicegroup_name() << "'.";
+      << "Resolving servicegroup '" << obj.servicegroup_name() << "'.";
 
     // Mark object as resolved.
-    obj->set_resolved(true);
+    obj.set_resolved(true);
 
     // Add base members.
     for (list_string::const_iterator
-           it(obj->members().begin()),
-           end(obj->members().end());
+           it(obj.members().begin()),
+           end(obj.members().end());
          it != end;
          ++it) {
       list_string::const_iterator it_prev(it++);
       if (it == end)
         throw (engine_error() << "Error: members of service group '"
-               << obj->servicegroup_name()
+               << obj.servicegroup_name()
                << "' were not specified as a list of host-service pairs"
                << " (host1,service1,host2,service2,...)");
-      obj->resolved_members().insert(std::make_pair(*it_prev, *it));
+      obj.resolved_members().insert(std::make_pair(*it_prev, *it));
     }
 
     // Add servicegroup members.
     for (list_string::const_iterator
-           it(obj->servicegroup_members().begin()),
-           end(obj->servicegroup_members().end());
+           it(obj.servicegroup_members().begin()),
+           end(obj.servicegroup_members().end());
          it != end;
          ++it) {
       // Find servicegroup entry.
-      list_servicegroup::iterator
+      list_servicegroup::const_iterator
         it2(s.servicegroups().begin()),
         end2(s.servicegroups().end());
       while (it2 != end2) {
@@ -191,10 +189,10 @@ void applier::servicegroup::resolve_object(
         throw (engine_error()
                << "Error: Could not add non-existing servicegroup member '"
                << *it << "' to servicegroup '"
-               << obj->servicegroup_name() << "'.");
+               << obj.servicegroup_name() << "'.");
 
       // Resolve servicegroup member.
-      resolve_object(*it2, s);
+      resolve_object(**it2, s);
 
       // Add servicegroup member members to members.
       for (set_pair_string::const_iterator
@@ -202,15 +200,15 @@ void applier::servicegroup::resolve_object(
              end3((*it2)->resolved_members().end());
            it3 != end3;
            ++it3)
-        obj->resolved_members().insert(*it3);
+        obj.resolved_members().insert(*it3);
     }
 
     // Apply resolved services on servicegroup.
     shared_ptr<servicegroup_struct>&
-      sg(applier::state::instance().servicegroups()[obj->servicegroup_name()]);
+      sg(applier::state::instance().servicegroups()[obj.servicegroup_name()].second);
     for (set_pair_string::const_iterator
-           it(obj->resolved_members().begin()),
-           end(obj->resolved_members().end());
+           it(obj.resolved_members().begin()),
+           end(obj.resolved_members().end());
          it != end;
          ++it)
       if (!add_service_to_servicegroup(
@@ -219,7 +217,7 @@ void applier::servicegroup::resolve_object(
              it->second.c_str()))
         throw (engine_error() << "Error: Could not add service member '"
                << it->second << "' of host '" << it->first
-               << "' to service group '" << obj->servicegroup_name()
+               << "' to service group '" << obj.servicegroup_name()
                << "'.");
   }
 

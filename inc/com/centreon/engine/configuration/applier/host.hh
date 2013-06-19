@@ -20,12 +20,15 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOST_HH
 #  define CCE_CONFIGURATION_APPLIER_HOST_HH
 
-#  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace          configuration {
+  // Forward declarations.
+  class            host;
+  class            state;
+
   namespace        applier {
     class          host {
     public:
@@ -33,10 +36,18 @@ namespace          configuration {
                    host(host const& right);
                    ~host() throw ();
       host&        operator=(host const& right);
-      void         add_object(host_ptr obj);
-      void         modify_object(host_ptr obj);
-      void         remove_object(host_ptr obj);
-      void         resolve_object(host_ptr obj);
+      void         add_object(
+                     configuration::host const& obj,
+		     configuration::state const& s);
+      void         modify_object(
+                     configuration::host const& obj,
+		     configuration::state const& s);
+      void         remove_object(
+                     configuration::host const& obj,
+		     configuration::state const& s);
+      void         resolve_object(
+                     configuration::host const& obj,
+		     configuration::state const& s);
     };
   }
 }

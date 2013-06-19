@@ -211,16 +211,7 @@ bool contactgroup::is_resolved() const throw () {
  *
  *  @return Modified list of members.
  */
-set_string& contactgroup::resolved_members() throw () {
-  return (_resolved_members);
-}
-
-/**
- *  Get resolved members.
- *
- *  @return Read-only list of members.
- */
-set_string const& contactgroup::resolved_members() const throw () {
+set_string& contactgroup::resolved_members() const throw () {
   return (_resolved_members);
 }
 
@@ -230,7 +221,7 @@ set_string const& contactgroup::resolved_members() const throw () {
  *  @param[in] resolved True if contactgroup has been resolved, false
  *                      otherwise.
  */
-void contactgroup::set_resolved(bool resolved) throw () {
+void contactgroup::set_resolved(bool resolved) const throw () {
   _resolved = resolved;
   return ;
 }

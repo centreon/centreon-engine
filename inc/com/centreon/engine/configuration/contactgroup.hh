@@ -55,9 +55,8 @@ namespace                  configuration {
     list_string const&     members() const throw ();
 
     bool                   is_resolved() const throw ();
-    set_string&            resolved_members() throw ();
-    set_string const&      resolved_members() const throw ();
-    void                   set_resolved(bool resolved) throw ();
+    set_string&            resolved_members() const throw ();
+    void                   set_resolved(bool resolved) const throw ();
 
   private:
     bool                   _set_alias(std::string const& value);
@@ -69,8 +68,8 @@ namespace                  configuration {
     group                  _contactgroup_members;
     std::string            _contactgroup_name;
     group                  _members;
-    bool                   _resolved;
-    set_string             _resolved_members;
+    mutable bool           _resolved;
+    mutable set_string     _resolved_members;
   };
 
   typedef shared_ptr<contactgroup>    contactgroup_ptr;

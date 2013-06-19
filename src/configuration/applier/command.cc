@@ -70,27 +70,31 @@ applier::command& applier::command::operator=(
  *  Add new command.
  *
  *  @param[in] obj The new command to add into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::command::add_object(command_ptr obj) {
+void applier::command::add_object(
+                         configuration::command const& obj,
+                         configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new command '" << obj->command_name() << "'.";
+    << "Creating new command '" << obj.command_name() << "'.";
 
   // Create command.
   shared_ptr<command_struct>
     c(
       add_command(
-        obj->command_name().c_str(),
-        obj->command_line().c_str()),
+        obj.command_name().c_str(),
+        obj.command_line().c_str()),
       &deleter::command);
   if (!c.get())
     throw (engine_error() << "Error: Could not register command '"
-           << obj->command_name() << "'.");
+           << obj.command_name() << "'.");
 
   // Register command.
-  c->next = command_list;
-  applier::state::instance().commands()[obj->command_name()] = c;
-  command_list = c.get();
+  applier::state::instance().commands()[obj.command_name()]
+    = std::make_pair(obj, c);
 
   return ;
 }
@@ -99,22 +103,27 @@ void applier::command::add_object(command_ptr obj) {
  *  Modified command.
  *
  *  @param[in] obj The new command to modify into the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::command::modify_object(command_ptr obj) {
+void applier::command::modify_object(
+                         configuration::command const& obj,
+                         configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying command '" << obj->command_name() << "'.";
+    << "Modifying command '" << obj.command_name() << "'.";
 
   // Modify command.
   shared_ptr<command_struct>&
-    c(applier::state::instance().commands()[obj->command_name()]);
-  modify_if_different(c->command_line, obj->command_line().c_str());
+    c(applier::state::instance().commands()[obj.command_name()].second);
+  modify_if_different(c->command_line, obj.command_line().c_str());
 
   // Command will be temporarily removed from the command set but will
   // be added back during resolve_object(). This does not create
   // dangling pointers since commands::command object are not referenced
   // anywhere, only ::command objects are.
-  commands::set::instance().remove_command(obj->command_name());
+  commands::set::instance().remove_command(obj.command_name());
 
   return ;
 }
@@ -123,18 +132,23 @@ void applier::command::modify_object(command_ptr obj) {
  *  Remove old command.
  *
  *  @param[in] obj The new command to remove from the monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::command::remove_object(command_ptr obj) {
+void applier::command::remove_object(
+                         configuration::command const& obj,
+                         configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing command '" << obj->command_name() << "'.";
+    << "Removing command '" << obj.command_name() << "'.";
 
   // Unregister command.
   unregister_object<command_struct, &command_struct::name>(
     &command_list,
-    obj->command_name().c_str());
-  applier::state::instance().commands().erase(obj->command_name());
-  commands::set::instance().remove_command(obj->command_name());
+    obj.command_name().c_str());
+  applier::state::instance().commands().erase(obj.command_name());
+  commands::set::instance().remove_command(obj.command_name());
 
   return ;
 }
@@ -145,22 +159,27 @@ void applier::command::remove_object(command_ptr obj) {
  *  This method does nothing, as command objects do not require
  *  resolution.
  *
- *  @param[in] obj Object to resolve.
+ *  @param[in,out] obj Object to resolve.
+ *  @param[in]     s   Configuration being applied.
  */
-void applier::command::resolve_object(command_ptr obj) {
+void applier::command::resolve_object(
+                         configuration::command const& obj,
+                         configuration::state const& s) {
+  (void)s;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving command '" << obj->command_name() << "'.";
+    << "Resolving command '" << obj.command_name() << "'.";
 
   // Command set.
   commands::set& cmd_set(commands::set::instance());
 
   // Raw command.
-  if (obj->connector().empty()) {
+  if (obj.connector().empty()) {
     shared_ptr<commands::command>
       cmd(new commands::raw(
-                          obj->command_name(),
-                          obj->command_line(),
+                          obj.command_name(),
+                          obj.command_line(),
                           &checks::checker::instance()));
     cmd_set.add_command(cmd);
   }
@@ -168,9 +187,9 @@ void applier::command::resolve_object(command_ptr obj) {
   else {
     shared_ptr<commands::command>
       cmd(new commands::forward(
-                          obj->command_name(),
-                          obj->command_line(),
-                          *cmd_set.get_command(obj->connector())));
+                          obj.command_name(),
+                          obj.command_line(),
+                          *cmd_set.get_command(obj.connector())));
     cmd_set.add_command(cmd);
   }
 
