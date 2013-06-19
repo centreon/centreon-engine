@@ -155,10 +155,12 @@ servicegroup* find_servicegroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+  umap<std::string,
+       std::pair<configuration::servicegroup,
+                 shared_ptr<servicegroup_struct> > >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
-    return (&(*it->second));
+    return (it->second.second.get());
   return (NULL);
 }
 

@@ -251,16 +251,7 @@ bool servicegroup::is_resolved() const throw () {
  *
  *  @return Modifiable list of members.
  */
-set_pair_string& servicegroup::resolved_members() throw () {
-  return (_resolved_members);
-}
-
-/**
- *  Get resolved members.
- *
- *  @return read-only list of members.
- */
-set_pair_string const& servicegroup::resolved_members() const throw () {
+set_pair_string& servicegroup::resolved_members() const throw () {
   return (_resolved_members);
 }
 
@@ -270,7 +261,7 @@ set_pair_string const& servicegroup::resolved_members() const throw () {
  *  @param[in] resolved True if servicegroup has been resolved, false
  *                      otherwise.
  */
-void servicegroup::set_resolved(bool resolved) throw () {
+void servicegroup::set_resolved(bool resolved) const throw () {
   _resolved = resolved;
   return ;
 }

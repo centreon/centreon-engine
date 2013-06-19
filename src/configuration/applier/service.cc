@@ -116,13 +116,15 @@ void applier::service::add_object(
          end(obj->servicegroups().end());
        it != end;
        ++it) {
-    umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+    umap<std::string,
+         std::pair<configuration::servicegroup,
+                   shared_ptr<servicegroup_struct> > >::iterator
       it2(applier::state::instance().servicegroups().find(*it));
     if (it2 == applier::state::instance().servicegroups().end())
       throw (engine_error() << "Error: Could not add service '"
              << obj->service_description() << "' to service group '"
              << *it << "'.");
-    target_groups.push_back(it2->second);
+    target_groups.push_back(it2->second.second);
   }
 
   // Browse all hosts of this service.

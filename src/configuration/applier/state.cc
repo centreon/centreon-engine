@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
+#include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/command.hh"
@@ -113,6 +114,16 @@ void applier::state::apply(configuration::state const& config) {
     _hosts,
     config,
     config.hosts());
+
+  // Apply servicegroups.
+  _apply<configuration::servicegroup,
+         servicegroup_struct,
+         applier::servicegroup,
+         std::string,
+         &configuration::servicegroup::servicegroup_name>(
+    _servicegroups,
+    config,
+    config.servicegroups());
 
   return ;
 }
@@ -357,7 +368,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
  *
  *  @return The current servicegroups.
  */
-umap<std::string, shared_ptr<servicegroup_struct> > const& applier::state::servicegroups() const throw () {
+umap<std::string, std::pair<configuration::servicegroup, shared_ptr<servicegroup_struct> > > const& applier::state::servicegroups() const throw () {
   return (_servicegroups);
 }
 
@@ -366,7 +377,7 @@ umap<std::string, shared_ptr<servicegroup_struct> > const& applier::state::servi
  *
  *  @return The current servicegroups.
  */
-umap<std::string, shared_ptr<servicegroup_struct> >& applier::state::servicegroups() throw () {
+umap<std::string, std::pair<configuration::servicegroup, shared_ptr<servicegroup_struct> > >& applier::state::servicegroups() throw () {
   return (_servicegroups);
 }
 

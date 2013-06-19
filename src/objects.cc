@@ -2171,15 +2171,6 @@ servicegroup* add_servicegroup(
     if (notes_url)
       obj->notes_url = my_strdup(notes_url);
 
-    // Add new servicegroup to the monitoring engine.
-    umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
-      it(state::instance().servicegroups().find(name));
-    if (it != state::instance().servicegroups().end()) {
-      logger(log_config_error, basic)
-        << "Error: Servicegroup '" << name << "' has already been defined";
-      return (NULL);
-    }
-
     // Add  new items to the list.
     obj->next = servicegroup_list;
     servicegroup_list = obj.get();

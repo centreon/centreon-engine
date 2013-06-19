@@ -132,9 +132,13 @@ namespace           configuration {
                     serviceescalations() const throw ();
       umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >&
                     serviceescalations() throw ();
-      umap<std::string, shared_ptr<servicegroup_struct> > const&
+      umap<std::string,
+           std::pair<configuration::servicegroup,
+                     shared_ptr<servicegroup_struct> > > const&
                     servicegroups() const throw ();
-      umap<std::string, shared_ptr<servicegroup_struct> >&
+      umap<std::string,
+           std::pair<configuration::servicegroup,
+                     shared_ptr<servicegroup_struct> > >&
                     servicegroups() throw ();
       umap<std::string,
            std::pair<configuration::timeperiod,
@@ -163,10 +167,12 @@ namespace           configuration {
       state*        _config;
 
       umap<std::string,
-           std::pair<configuration::command, shared_ptr<command_struct> > >
+           std::pair<configuration::command,
+                     shared_ptr<command_struct> > >
                     _commands;
       umap<std::string,
-           std::pair<configuration::connector, shared_ptr<commands::connector> > >
+           std::pair<configuration::connector,
+                     shared_ptr<commands::connector> > >
                     _connectors;
       umap<std::string,
            std::pair<configuration::contact,
@@ -194,7 +200,9 @@ namespace           configuration {
                     _servicedependencies;
       umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >
                     _serviceescalations;
-      umap<std::string, shared_ptr<servicegroup_struct> >
+      umap<std::string,
+           std::pair<configuration::servicegroup,
+                     shared_ptr<servicegroup_struct> > >
                     _servicegroups;
       umap<std::string,
            std::pair<configuration::timeperiod,
