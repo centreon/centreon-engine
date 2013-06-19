@@ -180,10 +180,6 @@ void applier::contact::add_object(
   // XXX : c->modified_host_attributes = obj.modified_host_attributes();
   // XXX : c->modified_service_attributes = obj.modified_service_attributes();
 
-  // Register contact.
-  applier::state::instance().contacts()[obj.contact_name()]
-    = std::make_pair(obj, c);
-
   return ;
 }
 
@@ -204,7 +200,7 @@ void applier::contact::modify_object(
 
   // Modify command.
   shared_ptr<contact_struct>&
-    c(applier::state::instance().contacts()[obj.contact_name()].second);
+    c(applier::state::instance().contacts()[obj.contact_name()]);
   modify_if_different(c->alias, NULL_IF_EMPTY(obj.alias()));
   modify_if_different(c->email, NULL_IF_EMPTY(obj.email()));
   modify_if_different(c->pager, NULL_IF_EMPTY(obj.pager()));
@@ -394,9 +390,7 @@ void applier::contact::resolve_object(
     << "Resolving contact '" << obj.contact_name() << "'.";
 
   // Find contact.
-  umap<std::string,
-       std::pair<configuration::contact,
-                 shared_ptr<contact_struct> > >::iterator
+  umap<std::string, shared_ptr<contact_struct> >::iterator
     it(applier::state::instance().contacts().find(obj.contact_name()));
   if (applier::state::instance().contacts().end() == it)
     throw (engine_error()
@@ -404,7 +398,7 @@ void applier::contact::resolve_object(
            << obj.contact_name() << "'.");
 
   // Resolve contact.
-  if (!check_contact(it->second.second.get(), NULL, NULL))
+  if (!check_contact(it->second.get(), NULL, NULL))
     throw (engine_error() << "Error: Cannot resolve contact '"
            << obj.contact_name());
 

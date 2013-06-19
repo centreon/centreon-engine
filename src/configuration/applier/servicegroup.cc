@@ -88,10 +88,6 @@ void applier::servicegroup::add_object(
     throw (engine_error() << "Error: Could not register service group '"
            << obj.servicegroup_name() << "'.");
 
-  // Register servicegroup.
-  applier::state::instance().servicegroups()[obj.servicegroup_name()]
-    = std::make_pair(obj, sg);
-
   return ;
 }
 
@@ -205,7 +201,7 @@ void applier::servicegroup::resolve_object(
 
     // Apply resolved services on servicegroup.
     shared_ptr<servicegroup_struct>&
-      sg(applier::state::instance().servicegroups()[obj.servicegroup_name()].second);
+      sg(applier::state::instance().servicegroups()[obj.servicegroup_name()]);
     for (set_pair_string::const_iterator
            it(obj.resolved_members().begin()),
            end(obj.resolved_members().end());

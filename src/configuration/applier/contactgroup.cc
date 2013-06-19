@@ -87,10 +87,6 @@ void applier::contactgroup::add_object(
     throw (engine_error() << "Error: Could not register contact group '"
            << obj.contactgroup_name() << "'.");
 
-  // Register contactgroup.
-  applier::state::instance().contactgroups()[obj.contactgroup_name()]
-    = std::make_pair(obj, cg);
-
   return ;
 }
 
@@ -200,7 +196,7 @@ void applier::contactgroup::resolve_object(
 
     // Apply resolved contacts on contactgroup.
     shared_ptr<contactgroup_struct>&
-      cg(applier::state::instance().contactgroups()[obj.contactgroup_name()].second);
+      cg(applier::state::instance().contactgroups()[obj.contactgroup_name()]);
     for (set_string::const_iterator
            it(obj.resolved_members().begin()),
            end(obj.resolved_members().end());

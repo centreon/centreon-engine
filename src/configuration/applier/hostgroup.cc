@@ -86,10 +86,6 @@ void applier::hostgroup::add_object(
     throw (engine_error() << "Error: Could not register hostgroup '"
            << obj.hostgroup_name() << "'.");
 
-  // Register hostgroup.
-  applier::state::instance().hostgroups()[obj.hostgroup_name()]
-    = std::make_pair(obj, hg);
-
   return ;
 }
 
@@ -196,7 +192,7 @@ void applier::hostgroup::resolve_object(
 
     // Apply resolved hosts on hostgroup.
     shared_ptr<hostgroup_struct>&
-      hg(applier::state::instance().hostgroups()[obj.hostgroup_name()].second);
+      hg(applier::state::instance().hostgroups()[obj.hostgroup_name()]);
     for (set_string::const_iterator
            it(obj.resolved_members().begin()),
            end(obj.resolved_members().end());

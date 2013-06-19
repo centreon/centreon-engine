@@ -92,10 +92,6 @@ void applier::command::add_object(
     throw (engine_error() << "Error: Could not register command '"
            << obj.command_name() << "'.");
 
-  // Register command.
-  applier::state::instance().commands()[obj.command_name()]
-    = std::make_pair(obj, c);
-
   return ;
 }
 
@@ -116,7 +112,7 @@ void applier::command::modify_object(
 
   // Modify command.
   shared_ptr<command_struct>&
-    c(applier::state::instance().commands()[obj.command_name()].second);
+    c(applier::state::instance().commands()[obj.command_name()]);
   modify_if_different(c->command_line, obj.command_line().c_str());
 
   // Command will be temporarily removed from the command set but will

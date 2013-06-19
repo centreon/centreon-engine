@@ -50,12 +50,10 @@ command* find_command(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::command,
-                 shared_ptr<command_struct> > >::const_iterator
+  umap<std::string, shared_ptr<command_struct> >::const_iterator
     it(state::instance().commands().find(name));
   if (it != state::instance().commands().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 
@@ -70,12 +68,10 @@ contact* find_contact(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::contact,
-                 shared_ptr<contact_struct> > >::const_iterator
+  umap<std::string, shared_ptr<contact_struct> >::const_iterator
     it(state::instance().contacts().find(name));
   if (it != state::instance().contacts().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 
@@ -90,12 +86,10 @@ contactgroup* find_contactgroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::contactgroup,
-                 shared_ptr<contactgroup_struct> > >::const_iterator
+  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(name));
   if (it != state::instance().contactgroups().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 
@@ -110,12 +104,10 @@ host* find_host(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::host,
-                 shared_ptr<host_struct> > >::const_iterator
+  umap<std::string, shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(name));
   if (it != state::instance().hosts().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 
@@ -130,12 +122,10 @@ hostgroup* find_hostgroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::hostgroup,
-                 shared_ptr<hostgroup_struct> > >::const_iterator
+  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
     it(state::instance().hostgroups().find(name));
   if (it != state::instance().hostgroups().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 
@@ -169,12 +159,10 @@ servicegroup* find_servicegroup(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::servicegroup,
-                 shared_ptr<servicegroup_struct> > >::const_iterator
+  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it != state::instance().servicegroups().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 
@@ -189,12 +177,10 @@ timeperiod* find_timeperiod(char const* name) {
   if (!name)
     return (NULL);
 
-  umap<std::string,
-       std::pair<configuration::timeperiod,
-                 shared_ptr<timeperiod_struct> > >::const_iterator
+  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   if (it != state::instance().timeperiods().end())
-    return (it->second.second.get());
+    return (it->second.get());
   return (NULL);
 }
 

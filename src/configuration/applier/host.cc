@@ -203,9 +203,7 @@ void applier::host::add_object(
        it != end;
        ++it) {
     // Find host group object.
-    umap<std::string,
-         std::pair<configuration::hostgroup,
-                   shared_ptr<hostgroup_struct> > >::iterator
+    umap<std::string, shared_ptr<hostgroup_struct> >::iterator
       it2(applier::state::instance().hostgroups().find(*it));
     if (it2 == applier::state::instance().hostgroups().end())
       throw (engine_error() << "Error: Could not add host '"
@@ -214,15 +212,11 @@ void applier::host::add_object(
 
     // Add host to host group.
     if (!add_host_to_hostgroup(
-           it2->second.second.get(),
+           it2->second.get(),
            obj.host_name().c_str()))
       throw (engine_error() << "Error: Could not add host '"
              << obj.host_name() << "' to host group '" << *it << "'.");
   }
-
-  // Register host.
-  applier::state::instance().hosts()[obj.host_name()]
-    = std::make_pair(obj, h);
 
   return ;
 }
@@ -244,7 +238,7 @@ void applier::host::modify_object(
 
   // Modify command.
   shared_ptr<host_struct>&
-    h(applier::state::instance().hosts()[obj.host_name()].second);
+    h(applier::state::instance().hosts()[obj.host_name()]);
   modify_if_different(
     h->display_name,
     NULL_IF_EMPTY(obj.display_name()));
@@ -432,16 +426,14 @@ void applier::host::resolve_object(
     << "Resolving host '" << obj.host_name() << "'.";
 
   // Find host.
-  umap<std::string,
-       std::pair<configuration::host,
-                 shared_ptr<host_struct> > >::iterator
+  umap<std::string, shared_ptr<host_struct> >::iterator
     it(applier::state::instance().hosts().find(obj.host_name()));
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Error: Cannot resolve non-existing host '"
            << obj.host_name() << "'.");
 
   // Resolve host.
-  if (!check_host(it->second.second.get(), NULL, NULL))
+  if (!check_host(it->second.get(), NULL, NULL))
     throw (engine_error() << "Error: Cannot resolve host '"
            << obj.host_name() << "'.");
 

@@ -91,13 +91,11 @@ bool retention::comment::set(
  *  Add host comment.
  */
 void retention::comment::_add_host_comment() throw () {
-  umap<std::string,
-       std::pair<configuration::host,
-                 shared_ptr<host_struct> > >::const_iterator
+  umap<std::string, shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(_host_name));
   if (it == state::instance().hosts().end())
     return;
-  host_struct* hst(it->second.second.get());
+  host_struct* hst(it->second.get());
 
   // add the comment.
   add_comment(
@@ -130,13 +128,11 @@ void retention::comment::_add_host_comment() throw () {
  *  Add serivce comment.
  */
 void retention::comment::_add_service_comment() throw () {
-  umap<std::string,
-       std::pair<configuration::host,
-                 shared_ptr<host_struct> > >::const_iterator
+  umap<std::string, shared_ptr<host_struct> >::const_iterator
     it_hst(state::instance().hosts().find(_host_name));
   if (it_hst == state::instance().hosts().end())
     return ;
-  host_struct* hst(it_hst->second.second.get());
+  host_struct* hst(it_hst->second.get());
   if (!hst)
     return ;
 

@@ -56,12 +56,10 @@ bool retention::contact::set(
        std::string const& key,
        std::string const& value) {
   if (!_obj && key == "contact_name") {
-    umap<std::string,
-         std::pair<configuration::contact,
-                   shared_ptr<contact_struct> > >::const_iterator
+    umap<std::string, shared_ptr<contact_struct> >::const_iterator
       it(state::instance().contacts().find(value));
     if (it != state::instance().contacts().end())
-      _obj = it->second.second.get();
+      _obj = it->second.get();
     return (true);
   }
   else if (!_obj)

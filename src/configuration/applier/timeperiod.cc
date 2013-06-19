@@ -125,12 +125,6 @@ void applier::timeperiod::add_object(
              << *it << "' to timeperiod '" << obj.timeperiod_name()
              << "'.");
 
-  // Register timeperiod.
-  tp->next = timeperiod_list;
-  applier::state::instance().timeperiods()[obj.timeperiod_name()]
-    = std::make_pair(obj, tp);
-  timeperiod_list = tp.get();
-
   return ;
 }
 

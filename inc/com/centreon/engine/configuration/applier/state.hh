@@ -59,50 +59,30 @@ namespace           configuration {
     class           state
       : public base {
     public:
-      void          apply(configuration::state const& config);
+      void          apply(configuration::state const& new_cfg);
       static state& instance();
       static void   load();
       static void   unload();
 
-      umap<std::string,
-           std::pair<configuration::command,
-                     shared_ptr<command_struct> > > const&
+      umap<std::string, shared_ptr<command_struct> > const&
                     commands() const throw ();
-      umap<std::string,
-           std::pair<configuration::command,
-                     shared_ptr<command_struct> > >&
+      umap<std::string, shared_ptr<command_struct> >&
                     commands() throw ();
-      umap<std::string,
-           std::pair<configuration::connector,
-                     shared_ptr<commands::connector> > > const&
+      umap<std::string, shared_ptr<commands::connector> > const&
                     connectors() const throw ();
-      umap<std::string,
-           std::pair<configuration::connector,
-                     shared_ptr<commands::connector> > >&
+      umap<std::string, shared_ptr<commands::connector> >&
                     connectors() throw ();
-      umap<std::string,
-           std::pair<configuration::contact,
-                     shared_ptr<contact_struct> > > const&
+      umap<std::string, shared_ptr<contact_struct> > const&
                     contacts() const throw ();
-      umap<std::string,
-           std::pair<configuration::contact,
-                     shared_ptr<contact_struct> > >&
+      umap<std::string, shared_ptr<contact_struct> >&
                     contacts() throw ();
-      umap<std::string,
-           std::pair<configuration::contactgroup,
-                     shared_ptr<contactgroup_struct> > > const&
+      umap<std::string, shared_ptr<contactgroup_struct> > const&
                     contactgroups() const throw ();
-      umap<std::string,
-           std::pair<configuration::contactgroup,
-                     shared_ptr<contactgroup_struct> > >&
+      umap<std::string, shared_ptr<contactgroup_struct> >&
                     contactgroups() throw ();
-      umap<std::string,
-           std::pair<configuration::host,
-                     shared_ptr<host_struct> > > const&
+      umap<std::string, shared_ptr<host_struct> > const&
                     hosts() const throw ();
-      umap<std::string,
-           std::pair<configuration::host,
-                     shared_ptr<host_struct> > >&
+      umap<std::string, shared_ptr<host_struct> >&
                     hosts() throw ();
       umultimap<std::string, shared_ptr<hostdependency_struct> > const&
                     hostdependencies() const throw ();
@@ -112,13 +92,9 @@ namespace           configuration {
                     hostescalations() const throw ();
       umultimap<std::string, shared_ptr<hostescalation_struct> >&
                     hostescalations() throw ();
-      umap<std::string,
-           std::pair<configuration::hostgroup,
-                     shared_ptr<hostgroup_struct> > > const&
+      umap<std::string, shared_ptr<hostgroup_struct> > const&
                     hostgroups() const throw ();
-      umap<std::string,
-           std::pair<configuration::hostgroup,
-                     shared_ptr<hostgroup_struct> > >&
+      umap<std::string, shared_ptr<hostgroup_struct> >&
                     hostgroups() throw ();
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
                     services() const throw ();
@@ -132,21 +108,13 @@ namespace           configuration {
                     serviceescalations() const throw ();
       umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >&
                     serviceescalations() throw ();
-      umap<std::string,
-           std::pair<configuration::servicegroup,
-                     shared_ptr<servicegroup_struct> > > const&
+      umap<std::string, shared_ptr<servicegroup_struct> > const&
                     servicegroups() const throw ();
-      umap<std::string,
-           std::pair<configuration::servicegroup,
-                     shared_ptr<servicegroup_struct> > >&
+      umap<std::string, shared_ptr<servicegroup_struct> >&
                     servicegroups() throw ();
-      umap<std::string,
-           std::pair<configuration::timeperiod,
-                     shared_ptr<timeperiod_struct> > > const&
+      umap<std::string, shared_ptr<timeperiod_struct> > const&
                     timeperiods() const throw ();
-      umap<std::string,
-           std::pair<configuration::timeperiod,
-                     shared_ptr<timeperiod_struct> > >&
+      umap<std::string, shared_ptr<timeperiod_struct> >&
                     timeperiods() throw ();
 
     private:
@@ -160,39 +128,28 @@ namespace           configuration {
                      typename KeyType,
                      KeyType const& (ConfigurationType::* config_key)() const throw () >
       void          _apply(
-                      umap<KeyType, std::pair<ConfigurationType, shared_ptr<ObjectType> > >& cur_cfg,
-                      configuration::state const& cur_state,
+                      std::list<shared_ptr<ConfigurationType> >& cur_cfg,
+                      umap<KeyType, shared_ptr<ObjectType> >& cur_obj,
+                      configuration::state const& new_state,
                       std::list<shared_ptr<ConfigurationType> > const& new_cfg);
 
       state*        _config;
 
-      umap<std::string,
-           std::pair<configuration::command,
-                     shared_ptr<command_struct> > >
+      umap<std::string, shared_ptr<command_struct> >
                     _commands;
-      umap<std::string,
-           std::pair<configuration::connector,
-                     shared_ptr<commands::connector> > >
+      umap<std::string, shared_ptr<commands::connector> >
                     _connectors;
-      umap<std::string,
-           std::pair<configuration::contact,
-                     shared_ptr<contact_struct> > >
+      umap<std::string, shared_ptr<contact_struct> >
                     _contacts;
-      umap<std::string,
-           std::pair<configuration::contactgroup,
-                     shared_ptr<contactgroup_struct> > >
+      umap<std::string, shared_ptr<contactgroup_struct> >
                     _contactgroups;
-      umap<std::string,
-           std::pair<configuration::host,
-                     shared_ptr<host_struct> > >
+      umap<std::string, shared_ptr<host_struct> >
                     _hosts;
       umultimap<std::string, shared_ptr<hostdependency_struct> >
                     _hostdependencies;
       umultimap<std::string, shared_ptr<hostescalation_struct> >
                     _hostescalations;
-      umap<std::string,
-           std::pair<configuration::hostgroup,
-                     shared_ptr<hostgroup_struct> > >
+      umap<std::string, shared_ptr<hostgroup_struct> >
                     _hostgroups;
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >
                     _services;
@@ -200,13 +157,9 @@ namespace           configuration {
                     _servicedependencies;
       umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >
                     _serviceescalations;
-      umap<std::string,
-           std::pair<configuration::servicegroup,
-                     shared_ptr<servicegroup_struct> > >
+      umap<std::string, shared_ptr<servicegroup_struct> >
                     _servicegroups;
-      umap<std::string,
-           std::pair<configuration::timeperiod,
-                     shared_ptr<timeperiod_struct> > >
+      umap<std::string, shared_ptr<timeperiod_struct> >
                     _timeperiods;
     };
   }
