@@ -751,7 +751,7 @@ int grab_standard_contact_macro_r(
       buf.append(temp_contactgroup->group_name);
     }
     if (!buf.empty())
-      *output = my_strdup(buf.c_str());
+      *output = my_strdup(buf);
   }
     break;
 

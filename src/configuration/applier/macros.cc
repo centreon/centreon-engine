@@ -112,7 +112,7 @@ void applier::macros::_set_macro(
     throw (engine_error() << "applier: invalid type of global macro");
   if (!_mac->x[type] || strcmp(_mac->x[type], value.c_str())) {
     delete[] _mac->x[type];
-    _mac->x[type] = my_strdup(value.c_str());
+    _mac->x[type] = my_strdup(value);
   }
 }
 
@@ -129,6 +129,6 @@ void applier::macros::_set_macros_user(
     throw (engine_error() << "applier: invalid index of user macro");
   if (!macro_user[idx] || strcmp(macro_user[idx], value.c_str())) {
     delete[] macro_user[idx];
-    macro_user[idx] = my_strdup(value.c_str());
+    macro_user[idx] = my_strdup(value);
   }
 }

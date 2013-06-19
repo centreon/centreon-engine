@@ -191,6 +191,6 @@ void applier::globals::_set_global(
        char*& property,
        std::string const& value) {
   if (property && strcmp(property, value.c_str())) {
-    property = my_strdup(value.c_str());
+    property = my_strdup(value);
   }
 }

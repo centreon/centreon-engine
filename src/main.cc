@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
         buffer.append(config_file);
         delete[] config_file;
         config_file = NULL;
-        config_file = my_strdup(buffer.c_str());
+        config_file = my_strdup(buffer);
       }
     }
 

@@ -80,7 +80,7 @@ static char* get_service_group_names(service& svc, nagios_macros* mac) {
       buf.append(temp_servicegroup->group_name);
     }
   }
-  return (my_strdup(buf.c_str()));
+  return (my_strdup(buf));
 }
 
 /**

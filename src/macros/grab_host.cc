@@ -137,7 +137,7 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
       buf.append(temp_hostgroup->group_name);
     }
   }
-  return (my_strdup(buf.c_str()));
+  return (my_strdup(buf));
 }
 
 /**
