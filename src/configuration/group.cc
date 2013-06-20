@@ -87,6 +87,19 @@ bool group::operator!=(group const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool group::operator<(group const& right) const throw () {
+  if (_is_add_inherit != right._is_add_inherit)
+    return (_is_add_inherit != right._is_add_inherit);
+  return (_group < right._group);
+}
+
+/**
  *  Clear group.
  */
 void group::clear() {

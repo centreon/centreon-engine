@@ -119,6 +119,41 @@ bool daterange::operator!=(daterange const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool daterange::operator<(daterange const& right) const throw () {
+  if (_month_end != right._month_end)
+    return (_month_end < right._month_end);
+  else if (_month_start != right._month_start)
+    return (_month_start < right._month_start);
+  else if (_month_day_end != right._month_day_end)
+    return (_month_day_end < right._month_day_end);
+  else if (_month_day_start != right._month_day_start)
+    return (_month_day_start < right._month_day_start);
+  else if (_skip_interval != right._skip_interval)
+    return (_skip_interval < right._skip_interval);
+  else if (_type != right._type)
+    return (_type < right._type);
+  else if (_week_day_end != right._week_day_end)
+    return (_week_day_end < right._week_day_end);
+  else if (_week_day_start != right._week_day_start)
+    return (_week_day_start < right._week_day_start);
+  else if (_week_day_end_offset != right._week_day_end_offset)
+    return (_week_day_end_offset < right._week_day_end_offset);
+  else if (_week_day_start_offset != right._week_day_start_offset)
+    return (_week_day_start_offset < right._week_day_start_offset);
+  else if (_year_end != right._year_end)
+    return (_year_end < right._year_end);
+  else if (_year_start != right._year_start)
+    return (_year_start < right._year_start);
+  return (_timeranges < right._timeranges);
+}
+
+/**
  *  Set month_end value.
  *
  *  @param[in] value The new month_end value.

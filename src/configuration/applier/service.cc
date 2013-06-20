@@ -87,7 +87,7 @@ void applier::service::add_object(
        it != end;
        ++it) {
     // Find host group.
-    list_hostgroup::iterator
+    set_hostgroup::iterator
       it2(s.hostgroups().begin()),
       end2(s.hostgroups().end());
     while (it2 != end2) {

@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_TIMEPERIOD_HH
 
 #  include <list>
+#  include <set>
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/configuration/daterange.hh"
@@ -40,6 +41,8 @@ namespace                  configuration {
     bool                   operator==(
                              timeperiod const& right) const throw ();
     bool                   operator!=(
+                             timeperiod const& right) const throw ();
+    bool                   operator<(
                              timeperiod const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -82,8 +85,8 @@ namespace                  configuration {
                            _timeranges;
   };
 
-  typedef shared_ptr<timeperiod>    timeperiod_ptr;
-  typedef std::list<timeperiod_ptr> list_timeperiod;
+  typedef shared_ptr<timeperiod>   timeperiod_ptr;
+  typedef std::set<timeperiod_ptr> set_timeperiod;
 }
 
 CCE_END()

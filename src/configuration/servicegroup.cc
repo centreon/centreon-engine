@@ -117,6 +117,27 @@ bool servicegroup::operator!=(servicegroup const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool servicegroup::operator<(servicegroup const& right) const throw () {
+  if (_servicegroup_name != right._servicegroup_name)
+    return (_servicegroup_name < right._servicegroup_name);
+  else if (_action_url != right._action_url)
+    return (_action_url < right._action_url);
+  else if (_notes != right._notes)
+    return (_notes < right._notes);
+  else if (_notes_url != right._notes_url)
+    return (_notes_url < right._notes_url);
+  else if (_servicegroup_members != right._servicegroup_members)
+    return (_servicegroup_members < right._servicegroup_members);
+  return (_members < right._members);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

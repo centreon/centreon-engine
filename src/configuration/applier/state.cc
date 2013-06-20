@@ -46,15 +46,16 @@ static applier::state* _instance = NULL;
  *  @param[in] new_cfg The new configuration.
  */
 void applier::state::apply(configuration::state const& new_cfg) {
-  // // Apply timeperiods.
-  // _apply<configuration::timeperiod,
-  //        timeperiod_struct,
-  //        applier::timeperiod,
-  //        std::string,
-  //        &configuration::timeperiod::timeperiod_name> (
-  //   _timeperiods,
-  //   config,
-  //   config.timeperiods());
+  // Apply timeperiods.
+  _apply<configuration::timeperiod,
+         timeperiod_struct,
+         applier::timeperiod,
+         std::string,
+         &configuration::timeperiod::timeperiod_name> (
+    config->timeperiods(),
+    _timeperiods,
+    new_cfg,
+    new_cfg.timeperiods());
 
   // Apply connectors.
   _apply<configuration::connector,
@@ -67,65 +68,71 @@ void applier::state::apply(configuration::state const& new_cfg) {
     new_cfg,
     new_cfg.connectors());
 
-  // // Apply commands.
-  // _apply<configuration::command,
-  //        command_struct,
-  //        applier::command,
-  //        std::string,
-  //        &configuration::command::command_name>(
-  //   _commands,
-  //   config,
-  //   config.commands());
+  // Apply commands.
+  _apply<configuration::command,
+         command_struct,
+         applier::command,
+         std::string,
+         &configuration::command::command_name>(
+    config->commands(),
+    _commands,
+    new_cfg,
+    new_cfg.commands());
 
-  // // Apply contactgroups.
-  // _apply<configuration::contactgroup,
-  //        contactgroup_struct,
-  //        applier::contactgroup,
-  //        std::string,
-  //        &configuration::contactgroup::contactgroup_name>(
-  //   _contactgroups,
-  //   config,
-  //   config.contactgroups());
+  // Apply contactgroups.
+  _apply<configuration::contactgroup,
+         contactgroup_struct,
+         applier::contactgroup,
+         std::string,
+         &configuration::contactgroup::contactgroup_name>(
+    config->contactgroups(),
+    _contactgroups,
+    new_cfg,
+    new_cfg.contactgroups());
 
-  // // Apply contacts.
-  // _apply<configuration::contact,
-  //        contact_struct,
-  //        applier::contact,
-  //        std::string,
-  //        &configuration::contact::contact_name>(
-  //   _contacts,
-  //   config,
-  //   config.contacts());
+  // Apply contacts.
+  _apply<configuration::contact,
+         contact_struct,
+         applier::contact,
+         std::string,
+         &configuration::contact::contact_name>(
+    config->contacts(),
+    _contacts,
+    new_cfg,
+    new_cfg.contacts());
 
-  // // Apply hostgroups.
-  // _apply<configuration::hostgroup,
-  //        hostgroup_struct,
-  //        applier::hostgroup,
-  //        std::string,
-  //        &configuration::hostgroup::hostgroup_name>(
-  //   _hostgroups,
-  //   config,
-  //   config.hostgroups());
+  // Apply hostgroups.
+  _apply<configuration::hostgroup,
+         hostgroup_struct,
+         applier::hostgroup,
+         std::string,
+         &configuration::hostgroup::hostgroup_name>(
+    config->hostgroups(),
+    _hostgroups,
+    new_cfg,
+    new_cfg.hostgroups());
 
-  // // Apply hosts.
-  // _apply<configuration::host,
-  //        host_struct,
-  //        applier::host,
-  //        std::string,
-  //        &configuration::host::host_name>(
-  //   _hosts,
-  //   config,
-  //   config.hosts());
+  // Apply hosts.
+  _apply<configuration::host,
+         host_struct,
+         applier::host,
+         std::string,
+         &configuration::host::host_name>(
+    config->hosts(),
+    _hosts,
+    new_cfg,
+    new_cfg.hosts());
 
-  // // Apply servicegroups.
-  // _apply<configuration::servicegroup,
-  //        servicegroup_struct,
-  //        applier::servicegroup,
-  //        std::string,
-  //        &configuration::servicegroup::servicegroup_name>(
-  //   _servicegroups,
-  //   config,
-  //   config.servicegroups());
+  // Apply servicegroups.
+  _apply<configuration::servicegroup,
+         servicegroup_struct,
+         applier::servicegroup,
+         std::string,
+         &configuration::servicegroup::servicegroup_name>(
+    config->servicegroups(),
+    _servicegroups,
+    new_cfg,
+    new_cfg.servicegroups());
 
   return ;
 }

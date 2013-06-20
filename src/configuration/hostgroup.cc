@@ -113,6 +113,29 @@ bool hostgroup::operator!=(hostgroup const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool hostgroup::operator<(hostgroup const& right) const throw () {
+  if (_hostgroup_name != right._hostgroup_name)
+    return (_hostgroup_name < right._hostgroup_name);
+  else if (_action_url != right._action_url)
+    return (_action_url < right._action_url);
+  else if (_alias != right._alias)
+    return (_alias < right._alias);
+  else if (_notes != right._notes)
+    return (_notes < right._notes);
+  else if (_notes_url != right._notes_url)
+    return (_notes_url < right._notes_url);
+  else if (_hostgroup_members != right._hostgroup_members)
+    return (_hostgroup_members < right._hostgroup_members);
+  return (_members < right._members);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

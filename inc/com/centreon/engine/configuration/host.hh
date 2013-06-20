@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_HOST_HH
 
 #  include <list>
+#  include <set>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -53,6 +54,7 @@ namespace                  configuration {
     host&                  operator=(host const& right);
     bool                   operator==(host const& right) const throw ();
     bool                   operator!=(host const& right) const throw ();
+    bool                   operator<(host const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
@@ -203,6 +205,7 @@ namespace                  configuration {
 
   typedef shared_ptr<host>    host_ptr;
   typedef std::list<host_ptr> list_host;
+  typedef std::set<host_ptr>  set_host;
 }
 
 CCE_END()

@@ -22,14 +22,15 @@
 
 #  include <algorithm>
 #  include <list>
+#  include <map>
 #  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
-typedef std::list<std::string>         list_string;
-typedef umap<std::string, std::string> properties;
+typedef std::list<std::string>             list_string;
+typedef std::map<std::string, std::string> properties;
 
 CCE_BEGIN()
 

@@ -44,6 +44,7 @@ namespace        configuration {
     daterange&   operator=(daterange const& right);
     bool         operator==(daterange const& right) const throw ();
     bool         operator!=(daterange const& right) const throw ();
+    bool         operator<(daterange const& right) const throw ();
     void         month_end(unsigned int value);
     unsigned int month_end() const throw ();
     void         month_start(unsigned int value);

@@ -93,17 +93,17 @@ void parser::parse(std::string const& path, state& config) {
   // XXX XXX XXX
   _insert(_map_objects[object::command], config.commands());
   _insert(_map_objects[object::connector], config.connectors());
-  // _insert(_map_objects[object::contact], config.contacts());
-  // _insert(_map_objects[object::contactgroup], config.contactgroups());
+  _insert(_map_objects[object::contact], config.contacts());
+  _insert(_map_objects[object::contactgroup], config.contactgroups());
   // _insert(_lst_objects[object::hostdependency], config.hostdependencies());
   // _insert(_lst_objects[object::hostescalation], config.hostescalations());
-  // _insert(_map_objects[object::hostgroup], config.hostgroups());
-  // _insert(_map_objects[object::host], config.hosts());
+  _insert(_map_objects[object::hostgroup], config.hostgroups());
+  _insert(_map_objects[object::host], config.hosts());
   // _insert(_lst_objects[object::servicedependency], config.servicedependencies());
   // _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
-  // _insert(_map_objects[object::servicegroup], config.servicegroups());
+  _insert(_map_objects[object::servicegroup], config.servicegroups());
   // _insert(_lst_objects[object::service], config.services());
-  // _insert(_map_objects[object::timeperiod], config.timeperiods());
+  _insert(_map_objects[object::timeperiod], config.timeperiods());
 
   // cleanup.
   for (unsigned int i(0);

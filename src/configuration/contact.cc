@@ -162,6 +162,70 @@ bool contact::operator!=(contact const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool contact::operator<(contact const& right) const throw () {
+  if (_contact_name != right._contact_name)
+    return (_contact_name < right._contact_name);
+  else if (_address != right._address)
+    return (_address < right._address);
+  else if (_alias != right._alias)
+    return (_alias < right._alias);
+  else if (_can_submit_commands != right._can_submit_commands)
+    return (_can_submit_commands < right._can_submit_commands);
+  else if (_contactgroups != right._contactgroups)
+    return (_contactgroups < right._contactgroups);
+  else if (_customvariables != right._customvariables)
+    return (_customvariables < right._customvariables);
+  else if (_email != right._email)
+    return (_email < right._email);
+  else if (_host_notifications_enabled
+           != right._host_notifications_enabled)
+    return (_host_notifications_enabled
+            < right._host_notifications_enabled);
+  else if (_host_notification_commands
+           != right._host_notification_commands)
+    return (_host_notification_commands
+            < right._host_notification_commands);
+  else if (_host_notification_options
+           != right._host_notification_options)
+    return (_host_notification_options
+            < right._host_notification_options);
+  else if (_host_notification_period
+           != right._host_notification_period)
+    return (_host_notification_period
+            < right._host_notification_period);
+  else if (_retain_nonstatus_information
+           != right._retain_nonstatus_information)
+    return (_retain_nonstatus_information
+            < right._retain_nonstatus_information);
+  else if (_retain_status_information
+           != right._retain_status_information)
+    return (_retain_status_information
+            < right._retain_status_information);
+  else if (_pager != right._pager)
+    return (_pager < right._pager);
+  else if (_service_notification_commands
+           != right._service_notification_commands)
+    return (_service_notification_commands
+            < right._service_notification_commands);
+  else if (_service_notification_options
+           != right._service_notification_options)
+    return (_service_notification_options
+            < right._service_notification_options);
+  else if (_service_notification_period
+           != right._service_notification_period)
+    return (_service_notification_period
+            < right._service_notification_period);
+  return (_service_notifications_enabled
+          < right._service_notifications_enabled);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.
