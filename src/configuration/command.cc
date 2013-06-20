@@ -105,6 +105,19 @@ bool command::operator!=(command const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is strictly less than right.
+ */
+bool command::operator<(command const& right) const throw () {
+  if (_command_name != right._command_name)
+    return (_command_name < right._command_name);
+  return (_command_line < right._command_line);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

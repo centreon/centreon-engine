@@ -138,17 +138,16 @@ namespace              configuration {
     void               check_result_path(std::string const& value);
     bool               check_service_freshness() const throw ();
     void               check_service_freshness(bool value);
-    list_command const&
-                       commands() const throw ();
-    list_command&      commands() throw ();
+    set_command const& commands() const throw ();
+    set_command&       commands() throw ();
     int                command_check_interval() const throw ();
     void               command_check_interval(int value);
     void               command_check_interval(int value, bool is_second);
     std::string const& command_file() const throw ();
     void               command_file(std::string const& value);
-    list_connector const&
+    set_connector const&
                        connectors() const throw ();
-    list_connector&    connectors() throw ();
+    set_connector&     connectors() throw ();
     list_contact const&
                        contacts() const throw ();
     list_contact&      contacts() throw ();
@@ -454,11 +453,11 @@ namespace              configuration {
     unsigned int       _check_reaper_interval;
     std::string        _check_result_path;
     bool               _check_service_freshness;
-    list_command       _commands;
+    set_command        _commands;
     int                _command_check_interval;
     bool               _command_check_interval_is_seconds;
     std::string        _command_file;
-    list_connector     _connectors;
+    set_connector      _connectors;
     list_contactgroup  _contactgroups;
     list_contact       _contacts;
     date_type          _date_format;

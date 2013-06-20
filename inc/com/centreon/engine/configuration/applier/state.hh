@@ -128,10 +128,10 @@ namespace           configuration {
                      typename KeyType,
                      KeyType const& (ConfigurationType::* config_key)() const throw () >
       void          _apply(
-                      std::list<shared_ptr<ConfigurationType> >& cur_cfg,
+                      std::set<shared_ptr<ConfigurationType> >& cur_cfg,
                       umap<KeyType, shared_ptr<ObjectType> >& cur_obj,
                       configuration::state const& new_state,
-                      std::list<shared_ptr<ConfigurationType> > const& new_cfg);
+                      std::set<shared_ptr<ConfigurationType> > const& new_cfg);
 
       state*        _config;
 

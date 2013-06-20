@@ -412,18 +412,18 @@ template <typename ConfigurationType,
           typename KeyType,
           KeyType const& (ConfigurationType::* config_key)() const throw () >
 void applier::state::_apply(
-                       std::list<shared_ptr<ConfigurationType> >& cur_cfg,
+                       std::set<shared_ptr<ConfigurationType> >& cur_cfg,
                        umap<KeyType, shared_ptr<ObjectType> >& cur_obj,
                        configuration::state const& new_state,
-                       std::list<shared_ptr<ConfigurationType> > const& new_cfg) {
+                       std::set<shared_ptr<ConfigurationType> > const& new_cfg) {
   // Type alias.
-  typedef std::list<shared_ptr<ConfigurationType> > cfg_set;
+  typedef std::set<shared_ptr<ConfigurationType> > cfg_set;
 
   /*
   ** Configuration diff.
   */
 
-  difference<std::list<shared_ptr<ConfigurationType> > > diff;
+  difference<std::set<shared_ptr<ConfigurationType> > > diff;
   diff.parse(cur_cfg, new_cfg);
 
   /*
@@ -453,8 +453,11 @@ void applier::state::_apply(
           ++it_current;
         if ((it_current != end_current)
             && (((**it_current).*config_key)()
-                == ((**it_delete).*config_key)()))
-          it_current = cur_cfg.erase(it_current);
+                == ((**it_delete).*config_key)())) {
+          typename cfg_set::iterator will_be_erased(it_current);
+          ++it_current;
+          cur_cfg.erase(will_be_erased);
+        }
       }
     }
   }

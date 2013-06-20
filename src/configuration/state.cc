@@ -302,6 +302,30 @@ static bool cmp_list_ptr(
 }
 
 /**
+ *  Compare sets with the pointer content.
+ *
+ *  @param[in] s1 The first set.
+ *  @param[in] s2 The second set.
+ *
+ *  @return True on success, otherwise false.
+ */
+template <typename T>
+static bool cmp_set_ptr(
+              std::set<shared_ptr<T> > const& s1,
+              std::set<shared_ptr<T> > const& s2) {
+  if (s1.size() != s2.size())
+    return (false);
+  typename std::set<shared_ptr<T> >::const_iterator
+    it1(s1.begin()),
+    end1(s1.end()),
+    it2(s2.begin());
+  while (it1 != end1)
+    if (**it1++ != **it2++)
+      return (false);
+  return (true);
+}
+
+/**
  *  Default constructor.
  */
 state::state()
@@ -587,11 +611,11 @@ bool state::operator==(state const& right) const throw () {
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
-          && cmp_list_ptr(_commands, right._commands)
+          && cmp_set_ptr(_commands, right._commands)
           && _command_check_interval == right._command_check_interval
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
-          && cmp_list_ptr(_connectors, right._connectors)
+          && cmp_set_ptr(_connectors, right._connectors)
           && cmp_list_ptr(_contactgroups, right._contactgroups)
           && cmp_list_ptr(_contacts, right._contacts)
           && _date_format == right._date_format
@@ -1111,7 +1135,7 @@ void state::check_service_freshness(bool value) {
  *
  *  @return All engine commands.
  */
-list_command const& state::commands() const throw () {
+set_command const& state::commands() const throw () {
   return (_commands);
 }
 
@@ -1120,7 +1144,7 @@ list_command const& state::commands() const throw () {
  *
  *  @return All engine commands.
  */
-list_command& state::commands() throw () {
+set_command& state::commands() throw () {
   return (_commands);
 }
 
@@ -1184,7 +1208,7 @@ void state::command_file(std::string const& value) {
  *
  *  @return All engine connectors.
  */
-list_connector const& state::connectors() const throw () {
+set_connector const& state::connectors() const throw () {
   return (_connectors);
 }
 
@@ -1193,7 +1217,7 @@ list_connector const& state::connectors() const throw () {
  *
  *  @return All engine connectors.
  */
-list_connector& state::connectors() throw () {
+set_connector& state::connectors() throw () {
   return (_connectors);
 }
 
