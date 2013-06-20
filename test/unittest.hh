@@ -35,6 +35,7 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/logging/backend.hh"
 #  include "com/centreon/logging/engine.hh"
+#  include "com/centreon/logging/file.hh"
 
 CCE_BEGIN()
 
@@ -56,7 +57,7 @@ public:
    *  @return Return value of func.
    */
           unittest(int argc, char** argv, int (* func)(int, char**))
-    : _argc(argc), _argv(argv), _func(func) {}
+            : _argc(argc), _argv(argv), _func(func), _log(stdout) {}
 
   /**
    *  Destructor.
@@ -161,7 +162,8 @@ private:
   int     _argc;
   char**  _argv;
   int     (*_func)(int, char**);
-  nothing _log;
+  // nothing _log;
+  com::centreon::logging::file _log;
 };
 
 CCE_END()

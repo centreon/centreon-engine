@@ -648,7 +648,7 @@ add_library("cce_core" STATIC
   "${SRC_DIR}/error.cc"
   "${SRC_DIR}/xcddefault.cc"
   "${SRC_DIR}/xdddefault.cc"
-  "${SRC_DIR}/xodtemplate.cc"
+  # XXX: remove "${SRC_DIR}/xodtemplate.cc"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
   # Headers.
@@ -682,7 +682,7 @@ add_library("cce_core" STATIC
   "${INC_DIR}/com/centreon/engine/version.hh"
   "${INC_DIR}/com/centreon/engine/xcddefault.hh"
   "${INC_DIR}/com/centreon/engine/xdddefault.hh"
-  "${INC_DIR}/com/centreon/engine/xodtemplate.hh"
+  ## XXX: remove "${INC_DIR}/com/centreon/engine/xodtemplate.hh"
   "${INC_DIR}/com/centreon/engine/xpddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
