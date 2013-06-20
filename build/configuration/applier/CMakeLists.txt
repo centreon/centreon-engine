@@ -85,33 +85,53 @@ if (WITH_TESTING)
   ## check compatibility configuration path.
   set(CONF_DIR "${TEST_DIR}/configuration/")
 
-  # main_command
-  set(TEST_NAME "main_command")
+  # parse_configuration_command
+  set(TEST_NAME "parse_configuration_command")
   set(TEST_CONF_FILE "main_command.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # main_comment
-  set(TEST_NAME "main_comment")
+  # parse_configuration_comment
+  set(TEST_NAME "parse_configuration_comment")
   set(TEST_CONF_FILE "main_comment.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # main_globals
-  set(TEST_NAME "main_globals")
+  # parse_configuration_connector
+  set(TEST_NAME "parse_configuration_connector")
+  set(TEST_CONF_FILE "main_connector.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_contact
+  set(TEST_NAME "parse_configuration_contact")
+  set(TEST_CONF_FILE "main_contact.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_contact_template
+  set(TEST_NAME "parse_configuration_contact_template")
+  set(TEST_CONF_FILE "main_contact_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_globals
+  set(TEST_NAME "parse_configuration_globals")
   set(TEST_CONF_FILE "main_globals.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # main_timeperiod
-  set(TEST_NAME "main_timeperiod")
+  # # parse_configuration_host
+  # set(TEST_NAME "parse_configuration_host")
+  # set(TEST_CONF_FILE "main_host.cfg")
+  # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # # parse_configuration_host_template
+  # set(TEST_NAME "parse_configuration_host_template")
+  # set(TEST_CONF_FILE "main_host_template.cfg")
+  # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_timeperiod
+  set(TEST_NAME "parse_configuration_timeperiod")
   set(TEST_CONF_FILE "main_timeperiod.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # main_timeperiod_template
-  set(TEST_NAME "main_timeperiod_template")
+  # parse_configuration_timeperiod_template
+  set(TEST_NAME "parse_configuration_timeperiod_template")
   set(TEST_CONF_FILE "main_timeperiod_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # #
-  # set(TEST_NAME "")
-  # set(TEST_CONF_FILE ".cfg")
-  # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 endif ()
