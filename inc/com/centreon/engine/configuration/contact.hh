@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_CONTACT_HH
 #  define CCE_CONFIGURATION_CONTACT_HH
 
-#  include <list>
+#  include <set>
 #  include <vector>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -42,6 +42,8 @@ namespace                  configuration {
     bool                   operator==(
                              contact const& right) const throw ();
     bool                   operator!=(
+                             contact const& right) const throw ();
+    bool                   operator<(
                              contact const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -110,8 +112,8 @@ namespace                  configuration {
     opt<bool>              _service_notifications_enabled;
   };
 
-  typedef shared_ptr<contact>    contact_ptr;
-  typedef std::list<contact_ptr> list_contact;
+  typedef shared_ptr<contact>   contact_ptr;
+  typedef std::set<contact_ptr> set_contact;
 }
 
 CCE_END()

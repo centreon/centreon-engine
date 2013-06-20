@@ -164,7 +164,7 @@ void applier::hostgroup::resolve_object(
          it != end;
          ++it) {
       // Find hostgroup entry.
-      list_hostgroup::const_iterator
+      set_hostgroup::const_iterator
         it2(s.hostgroups().begin()),
         end2(s.hostgroups().end());
       while (it2 != end2) {

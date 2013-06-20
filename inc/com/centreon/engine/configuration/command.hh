@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_COMMAND_HH
 #  define CCE_CONFIGURATION_COMMAND_HH
 
-#  include <list>
+#  include <set>
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -37,6 +37,8 @@ namespace                  configuration {
     bool                   operator==(
                              command const& right) const throw ();
     bool                   operator!=(
+                             command const& right) const throw ();
+    bool                   operator<(
                              command const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -59,8 +61,8 @@ namespace                  configuration {
     std::string            _connector;
   };
 
-  typedef shared_ptr<command>    command_ptr;
-  typedef std::list<command_ptr> list_command;
+  typedef shared_ptr<command>   command_ptr;
+  typedef std::set<command_ptr> set_command;
 }
 
 CCE_END()

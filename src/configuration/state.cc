@@ -303,6 +303,30 @@ static bool cmp_list_ptr(
 }
 
 /**
+ *  Compare sets with the pointer content.
+ *
+ *  @param[in] s1 The first set.
+ *  @param[in] s2 The second set.
+ *
+ *  @return True on success, otherwise false.
+ */
+template <typename T>
+static bool cmp_set_ptr(
+              std::set<shared_ptr<T> > const& s1,
+              std::set<shared_ptr<T> > const& s2) {
+  if (s1.size() != s2.size())
+    return (false);
+  typename std::set<shared_ptr<T> >::const_iterator
+    it1(s1.begin()),
+    end1(s1.end()),
+    it2(s2.begin());
+  while (it1 != end1)
+    if (**it1++ != **it2++)
+      return (false);
+  return (true);
+}
+
+/**
  *  Default constructor.
  */
 state::state()
@@ -588,13 +612,13 @@ bool state::operator==(state const& right) const throw () {
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
-          && cmp_list_ptr(_commands, right._commands)
+          && cmp_set_ptr(_commands, right._commands)
           && _command_check_interval == right._command_check_interval
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
-          && cmp_list_ptr(_connectors, right._connectors)
-          && cmp_list_ptr(_contactgroups, right._contactgroups)
-          && cmp_list_ptr(_contacts, right._contacts)
+          && cmp_set_ptr(_connectors, right._connectors)
+          && cmp_set_ptr(_contactgroups, right._contactgroups)
+          && cmp_set_ptr(_contacts, right._contacts)
           && _date_format == right._date_format
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
@@ -617,8 +641,8 @@ bool state::operator==(state const& right) const throw () {
           && _high_service_flap_threshold == right._high_service_flap_threshold
           && cmp_list_ptr(_hostdependencies, right._hostdependencies)
           && cmp_list_ptr(_hostescalations, right._hostescalations)
-          && cmp_list_ptr(_hostgroups, right._hostgroups)
-          && cmp_list_ptr(_hosts, right._hosts)
+          && cmp_set_ptr(_hostgroups, right._hostgroups)
+          && cmp_set_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
           && _host_inter_check_delay_method == right._host_inter_check_delay_method
@@ -663,7 +687,7 @@ bool state::operator==(state const& right) const throw () {
           && _retention_update_interval == right._retention_update_interval
           && cmp_list_ptr(_servicedependencies, right._servicedependencies)
           && cmp_list_ptr(_serviceescalations, right._serviceescalations)
-          && cmp_list_ptr(_servicegroups, right._servicegroups)
+          && cmp_set_ptr(_servicegroups, right._servicegroups)
           && cmp_list_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
@@ -674,7 +698,7 @@ bool state::operator==(state const& right) const throw () {
           && _state_retention_file == right._state_retention_file
           && _status_file == right._status_file
           && _status_update_interval == right._status_update_interval
-          && cmp_list_ptr(_timeperiods, right._timeperiods)
+          && cmp_set_ptr(_timeperiods, right._timeperiods)
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
@@ -1119,7 +1143,7 @@ void state::check_service_freshness(bool value) {
  *
  *  @return All engine commands.
  */
-list_command const& state::commands() const throw () {
+set_command const& state::commands() const throw () {
   return (_commands);
 }
 
@@ -1128,7 +1152,7 @@ list_command const& state::commands() const throw () {
  *
  *  @return All engine commands.
  */
-list_command& state::commands() throw () {
+set_command& state::commands() throw () {
   return (_commands);
 }
 
@@ -1192,7 +1216,7 @@ void state::command_file(std::string const& value) {
  *
  *  @return All engine connectors.
  */
-list_connector const& state::connectors() const throw () {
+set_connector const& state::connectors() const throw () {
   return (_connectors);
 }
 
@@ -1201,7 +1225,7 @@ list_connector const& state::connectors() const throw () {
  *
  *  @return All engine connectors.
  */
-list_connector& state::connectors() throw () {
+set_connector& state::connectors() throw () {
   return (_connectors);
 }
 
@@ -1210,7 +1234,7 @@ list_connector& state::connectors() throw () {
  *
  *  @return All engine contacts.
  */
-list_contact const& state::contacts() const throw () {
+set_contact const& state::contacts() const throw () {
   return (_contacts);
 }
 
@@ -1219,7 +1243,7 @@ list_contact const& state::contacts() const throw () {
  *
  *  @return All engine contacts.
  */
-list_contact& state::contacts() throw () {
+set_contact& state::contacts() throw () {
   return (_contacts);
 }
 
@@ -1228,7 +1252,7 @@ list_contact& state::contacts() throw () {
  *
  *  @return All engine contactgroups.
  */
-list_contactgroup const& state::contactgroups() const throw () {
+set_contactgroup const& state::contactgroups() const throw () {
   return (_contactgroups);
 }
 
@@ -1237,7 +1261,7 @@ list_contactgroup const& state::contactgroups() const throw () {
  *
  *  @return All engine contactgroups.
  */
-list_contactgroup& state::contactgroups() throw () {
+set_contactgroup& state::contactgroups() throw () {
   return (_contactgroups);
 }
 
@@ -1660,7 +1684,7 @@ list_hostescalation& state::hostescalations() throw () {
  *
  *  @return All engine hostgroups.
  */
-list_hostgroup const& state::hostgroups() const throw () {
+set_hostgroup const& state::hostgroups() const throw () {
   return (_hostgroups);
 }
 
@@ -1669,7 +1693,7 @@ list_hostgroup const& state::hostgroups() const throw () {
  *
  *  @return All engine hostgroups.
  */
-list_hostgroup& state::hostgroups() throw () {
+set_hostgroup& state::hostgroups() throw () {
   return (_hostgroups);
 }
 
@@ -1678,7 +1702,7 @@ list_hostgroup& state::hostgroups() throw () {
  *
  *  @return All engine hosts.
  */
-list_host const& state::hosts() const throw () {
+set_host const& state::hosts() const throw () {
   return (_hosts);
 }
 
@@ -1687,7 +1711,7 @@ list_host const& state::hosts() const throw () {
  *
  *  @return All engine hosts.
  */
-list_host& state::hosts() throw () {
+set_host& state::hosts() throw () {
   return (_hosts);
 }
 
@@ -2550,7 +2574,7 @@ list_serviceescalation& state::serviceescalations() throw () {
  *
  *  @return All engine servicegroups.
  */
-list_servicegroup const& state::servicegroups() const throw () {
+set_servicegroup const& state::servicegroups() const throw () {
   return (_servicegroups);
 }
 
@@ -2559,7 +2583,7 @@ list_servicegroup const& state::servicegroups() const throw () {
  *
  *  @return All engine servicegroups.
  */
-list_servicegroup& state::servicegroups() throw () {
+set_servicegroup& state::servicegroups() throw () {
   return (_servicegroups);
 }
 
@@ -2783,7 +2807,7 @@ bool state::set(std::string const& key, std::string const& value) {
  *
  *  @return All engine timeperiods.
  */
-list_timeperiod const& state::timeperiods() const throw () {
+set_timeperiod const& state::timeperiods() const throw () {
   return (_timeperiods);
 }
 
@@ -2792,7 +2816,7 @@ list_timeperiod const& state::timeperiods() const throw () {
  *
  *  @return All engine timeperiods.
  */
-list_timeperiod& state::timeperiods() throw () {
+set_timeperiod& state::timeperiods() throw () {
   return (_timeperiods);
 }
 

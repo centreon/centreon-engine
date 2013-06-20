@@ -108,6 +108,25 @@ bool timeperiod::operator!=(timeperiod const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool timeperiod::operator<(timeperiod const& right) const throw () {
+  if (_timeperiod_name != right._timeperiod_name)
+    return (_timeperiod_name < right._timeperiod_name);
+  else if (_alias != right._alias)
+    return (_alias < right._alias);
+  else if (_exclude != right._exclude)
+    return (_exclude < right._exclude);
+  else if (_timeranges != right._timeranges)
+    return (_timeranges < right._timeranges);
+  return (_exceptions < right._exceptions);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

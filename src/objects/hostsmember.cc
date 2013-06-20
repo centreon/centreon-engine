@@ -22,6 +22,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/object.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/objects/hostgroup.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/shared.hh"
 

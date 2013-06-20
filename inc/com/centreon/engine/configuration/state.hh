@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_STATE_HH
 
 #  include <list>
+#  include <set>
 #  include <sstream>
 #  include <string>
 #  include <vector>
@@ -137,23 +138,21 @@ namespace              configuration {
     void               check_result_path(std::string const& value);
     bool               check_service_freshness() const throw ();
     void               check_service_freshness(bool value);
-    list_command const&
-                       commands() const throw ();
-    list_command&      commands() throw ();
+    set_command const& commands() const throw ();
+    set_command&       commands() throw ();
     int                command_check_interval() const throw ();
     void               command_check_interval(int value);
     void               command_check_interval(int value, bool is_second);
     std::string const& command_file() const throw ();
     void               command_file(std::string const& value);
-    list_connector const&
+    set_connector const&
                        connectors() const throw ();
-    list_connector&    connectors() throw ();
-    list_contact const&
-                       contacts() const throw ();
-    list_contact&      contacts() throw ();
-    list_contactgroup const&
+    set_connector&     connectors() throw ();
+    set_contact const& contacts() const throw ();
+    set_contact&       contacts() throw ();
+    set_contactgroup const&
                        contactgroups() const throw ();
-    list_contactgroup& contactgroups() throw ();
+    set_contactgroup&  contactgroups() throw ();
     date_type          date_format() const throw ();
     void               date_format(date_type value);
     std::string const& debug_file() const throw ();
@@ -202,11 +201,11 @@ namespace              configuration {
                        hostescalations() const throw ();
     list_hostescalation&
                        hostescalations() throw ();
-    list_hostgroup const&
+    set_hostgroup const&
                        hostgroups() const throw ();
-    list_hostgroup&    hostgroups() throw ();
-    list_host const&   hosts() const throw ();
-    list_host&         hosts() throw ();
+    set_hostgroup&     hostgroups() throw ();
+    set_host const&    hosts() const throw ();
+    set_host&          hosts() throw ();
     unsigned int       host_check_timeout() const throw ();
     void               host_check_timeout(unsigned int value);
     unsigned int       host_freshness_check_interval() const throw ();
@@ -302,9 +301,9 @@ namespace              configuration {
                        serviceescalations() const throw ();
     list_serviceescalation&
                        serviceescalations() throw ();
-    list_servicegroup const&
+    set_servicegroup const&
                        servicegroups() const throw ();
-    list_servicegroup& servicegroups() throw ();
+    set_servicegroup&  servicegroups() throw ();
     list_service const&
                        services() const throw ();
     list_service&      services() throw ();
@@ -327,9 +326,9 @@ namespace              configuration {
     unsigned int       status_update_interval() const throw ();
     void               status_update_interval(unsigned int value);
     bool               set(std::string const& key, std::string const& value);
-    list_timeperiod const&
+    set_timeperiod const&
                        timeperiods() const throw ();
-    list_timeperiod&   timeperiods() throw ();
+    set_timeperiod&    timeperiods() throw ();
     unsigned int       time_change_threshold() const throw ();
     void               time_change_threshold(unsigned int value);
     bool               translate_passive_host_checks() const throw ();
@@ -453,13 +452,13 @@ namespace              configuration {
     unsigned int       _check_reaper_interval;
     std::string        _check_result_path;
     bool               _check_service_freshness;
-    list_command       _commands;
+    set_command        _commands;
     int                _command_check_interval;
     bool               _command_check_interval_is_seconds;
     std::string        _command_file;
-    list_connector     _connectors;
-    list_contactgroup  _contactgroups;
-    list_contact       _contacts;
+    set_connector      _connectors;
+    set_contactgroup   _contactgroups;
+    set_contact        _contacts;
     date_type          _date_format;
     std::string        _debug_file;
     unsigned long      _debug_level;
@@ -484,8 +483,8 @@ namespace              configuration {
                        _hostdependencies;
     list_hostescalation
                        _hostescalations;
-    list_hostgroup     _hostgroups;
-    list_host          _hosts;
+    set_hostgroup      _hostgroups;
+    set_host           _hosts;
     unsigned int       _host_check_timeout;
     unsigned int       _host_freshness_check_interval;
     inter_check_delay  _host_inter_check_delay_method;
@@ -534,7 +533,7 @@ namespace              configuration {
                        _servicedependencies;
     list_serviceescalation
                        _serviceescalations;
-    list_servicegroup  _servicegroups;
+    set_servicegroup   _servicegroups;
     list_service       _services;
     unsigned int       _service_check_timeout;
     unsigned int       _service_freshness_check_interval;
@@ -545,7 +544,7 @@ namespace              configuration {
     std::string        _state_retention_file;
     std::string        _status_file;
     unsigned int       _status_update_interval;
-    list_timeperiod    _timeperiods;
+    set_timeperiod     _timeperiods;
     unsigned int       _time_change_threshold;
     bool               _translate_passive_host_checks;
     std::vector<std::string>

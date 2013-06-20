@@ -264,6 +264,109 @@ bool host::operator!=(host const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool host::operator<(host const& right) const throw () {
+  if (_host_name != right._host_name)
+    return (_host_name < right._host_name);
+  else if (_action_url != right._action_url)
+    return (_action_url < right._action_url);
+  else if (_address != right._address)
+    return (_address < right._address);
+  else if (_alias != right._alias)
+    return (_alias < right._alias);
+  else if (_checks_active != right._checks_active)
+    return (_checks_active < right._checks_active);
+  else if (_checks_passive != right._checks_passive)
+    return (_checks_passive < right._checks_passive);
+  else if (_check_command != right._check_command)
+    return (_check_command < right._check_command);
+  else if (_check_freshness != right._check_freshness)
+    return (_check_freshness < right._check_freshness);
+  else if (_check_interval != right._check_interval)
+    return (_check_interval < right._check_interval);
+  else if (_check_period != right._check_period)
+    return (_check_period < right._check_period);
+  else if (_contactgroups != right._contactgroups)
+    return (_contactgroups < right._contactgroups);
+  else if (_contacts != right._contacts)
+    return (_contacts < right._contacts);
+  else if (_coords_2d != right._coords_2d)
+    return (_coords_2d < right._coords_2d);
+  else if (_coords_3d != right._coords_3d)
+    return (_coords_3d < right._coords_3d);
+  else if (_customvariables != right._customvariables)
+    return (_customvariables < right._customvariables);
+  else if (_display_name != right._display_name)
+    return (_display_name < right._display_name);
+  else if (_event_handler != right._event_handler)
+    return (_event_handler < right._event_handler);
+  else if (_event_handler_enabled != right._event_handler_enabled)
+    return (_event_handler_enabled < right._event_handler_enabled);
+  else if (_first_notification_delay
+           != right._first_notification_delay)
+    return (_first_notification_delay
+            < right._first_notification_delay);
+  else if (_flap_detection_enabled != right._flap_detection_enabled)
+    return (_flap_detection_enabled < right._flap_detection_enabled);
+  else if (_flap_detection_options != right._flap_detection_options)
+    return (_flap_detection_options < right._flap_detection_options);
+  else if (_freshness_threshold != right._freshness_threshold)
+    return (_freshness_threshold < right._freshness_threshold);
+  else if (_high_flap_threshold != right._high_flap_threshold)
+    return (_high_flap_threshold < right._high_flap_threshold);
+  else if (_hostgroups != right._hostgroups)
+    return (_hostgroups < right._hostgroups);
+  else if (_icon_image != right._icon_image)
+    return (_icon_image < right._icon_image);
+  else if (_icon_image_alt != right._icon_image_alt)
+    return (_icon_image_alt < right._icon_image_alt);
+  else if (_initial_state != right._initial_state)
+    return (_initial_state < right._initial_state);
+  else if (_low_flap_threshold != right._low_flap_threshold)
+    return (_low_flap_threshold < right._low_flap_threshold);
+  else if (_max_check_attempts != right._max_check_attempts)
+    return (_max_check_attempts < right._max_check_attempts);
+  else if (_notes != right._notes)
+    return (_notes < right._notes);
+  else if (_notes_url != right._notes_url)
+    return (_notes_url < right._notes_url);
+  else if (_notifications_enabled != right._notifications_enabled)
+    return (_notifications_enabled < right._notifications_enabled);
+  else if (_notification_interval != right._notification_interval)
+    return (_notification_interval < right._notification_interval);
+  else if (_notification_options != right._notification_options)
+    return (_notification_options < right._notification_options);
+  else if (_notification_period != right._notification_period)
+    return (_notification_period < right._notification_period);
+  else if (_obsess_over_host != right._obsess_over_host)
+    return (_obsess_over_host < right._obsess_over_host);
+  else if (_parents != right._parents)
+    return (_parents < right._parents);
+  else if (_process_perf_data != right._process_perf_data)
+    return (_process_perf_data < right._process_perf_data);
+  else if (_retain_nonstatus_information
+           != right._retain_nonstatus_information)
+    return (_retain_nonstatus_information
+            < right._retain_nonstatus_information);
+  else if (_retain_status_information
+           != right._retain_status_information)
+    return (_retain_status_information
+            < right._retain_status_information);
+  else if (_retry_interval != right._retry_interval)
+    return (_retry_interval < right._retry_interval);
+  else if (_stalking_options != right._stalking_options)
+    return (_stalking_options < right._stalking_options);
+  else if (_statusmap_image != right._statusmap_image)
+    return (_statusmap_image < right._statusmap_image);
+  return (_vrml_image < right._vrml_image);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

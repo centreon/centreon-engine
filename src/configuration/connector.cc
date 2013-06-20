@@ -102,6 +102,19 @@ bool connector::operator!=(connector const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is strictly less than right.
+ */
+bool connector::operator<(connector const& right) const throw () {
+  if (_connector_name != right._connector_name)
+    return (_connector_name < right._connector_name);
+  return (_connector_line < right._connector_line);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

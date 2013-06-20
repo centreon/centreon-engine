@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_CONTACTGROUP_HH
 #  define CCE_CONFIGURATION_CONTACTGROUP_HH
 
-#  include <list>
 #  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -41,6 +40,8 @@ namespace                  configuration {
     bool                   operator==(
                              contactgroup const& right) const throw ();
     bool                   operator!=(
+                             contactgroup const& right) const throw ();
+    bool                   operator<(
                              contactgroup const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -72,8 +73,8 @@ namespace                  configuration {
     mutable set_string     _resolved_members;
   };
 
-  typedef shared_ptr<contactgroup>    contactgroup_ptr;
-  typedef std::list<contactgroup_ptr> list_contactgroup;
+  typedef shared_ptr<contactgroup>   contactgroup_ptr;
+  typedef std::set<contactgroup_ptr> set_contactgroup;
 }
 
 CCE_END()

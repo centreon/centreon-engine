@@ -35,6 +35,7 @@ namespace  configuration {
     group& operator=(group const& right);
     bool   operator==(group const& right) const throw ();
     bool   operator!=(group const& right) const throw ();
+    bool   operator<(group const& right) const throw ();
     void   clear();
     bool   empty() const throw ();
     std::list<std::string> const&

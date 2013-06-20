@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_HOSTGROUP_HH
 #  define CCE_CONFIGURATION_HOSTGROUP_HH
 
-#  include <list>
 #  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -41,6 +40,8 @@ namespace                  configuration {
     bool                   operator==(
                              hostgroup const& right) const throw ();
     bool                   operator!=(
+                             hostgroup const& right) const throw ();
+    bool                   operator<(
                              hostgroup const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -81,8 +82,8 @@ namespace                  configuration {
     mutable set_string     _resolved_members;
   };
 
-  typedef shared_ptr<hostgroup>    hostgroup_ptr;
-  typedef std::list<hostgroup_ptr> list_hostgroup;
+  typedef shared_ptr<hostgroup>   hostgroup_ptr;
+  typedef std::set<hostgroup_ptr> set_hostgroup;
 }
 
 CCE_END()

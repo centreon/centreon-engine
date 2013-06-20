@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_CONNECTOR_HH
 #  define CCE_CONFIGURATION_CONNECTOR_HH
 
-#  include <list>
+#  include <set>
 #  include "com/centreon/engine/commands/connector.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -38,6 +38,8 @@ namespace                  configuration {
     bool                   operator==(
                              connector const& right) const throw ();
     bool                   operator!=(
+                             connector const& right) const throw ();
+    bool                   operator<(
                              connector const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -57,8 +59,8 @@ namespace                  configuration {
     std::string            _connector_name;
   };
 
-  typedef shared_ptr<connector>    connector_ptr;
-  typedef std::list<connector_ptr> list_connector;
+  typedef shared_ptr<connector>   connector_ptr;
+  typedef std::set<connector_ptr> set_connector;
 }
 
 CCE_END()

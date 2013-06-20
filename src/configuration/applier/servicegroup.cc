@@ -173,7 +173,7 @@ void applier::servicegroup::resolve_object(
          it != end;
          ++it) {
       // Find servicegroup entry.
-      list_servicegroup::const_iterator
+      set_servicegroup::const_iterator
         it2(s.servicegroups().begin()),
         end2(s.servicegroups().end());
       while (it2 != end2) {

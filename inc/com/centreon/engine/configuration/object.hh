@@ -22,14 +22,15 @@
 
 #  include <algorithm>
 #  include <list>
+#  include <map>
 #  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 #  include "com/centreon/unordered_hash.hh"
 
-typedef std::list<std::string>         list_string;
-typedef umap<std::string, std::string> properties;
+typedef std::list<std::string>             list_string;
+typedef std::map<std::string, std::string> properties;
 
 CCE_BEGIN()
 
@@ -115,6 +116,32 @@ namespace                  configuration {
 }
 
 CCE_END()
+
+namespace std {
+  template <typename T>
+  struct  less<com::centreon::shared_ptr<T> >
+            : std::binary_function<
+                     com::centreon::shared_ptr<T>,
+                     com::centreon::shared_ptr<T>,
+                     bool> {
+    bool  operator()(
+            com::centreon::shared_ptr<T> const& left,
+            com::centreon::shared_ptr<T> const& right) {
+      bool retval;
+      if (left.get()) {
+        if (right.get())
+          retval = *left < *right;
+        else
+          retval = false;
+      }
+      else if (right.get())
+        retval = true;
+      else
+        retval = false;
+      return (retval);
+    }
+  };
+}
 
 #  define MRG_ADDRESS(prop) \
   do { \

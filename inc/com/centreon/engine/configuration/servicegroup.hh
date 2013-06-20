@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_SERVICEGROUP_HH
 #  define CCE_CONFIGURATION_SERVICEGROUP_HH
 
-#  include <list>
 #  include <set>
 #  include <utility>
 #  include "com/centreon/engine/configuration/group.hh"
@@ -43,6 +42,8 @@ namespace                   configuration {
                               servicegroup const& right) const throw ();
     bool                    operator!=(
                               servicegroup const& right) const throw ();
+    bool                    operator<(
+                              servicegroup const& right) const throw();
     void                    check_validity() const;
     std::size_t             id() const throw ();
     void                    merge(object const& obj);
@@ -82,8 +83,8 @@ namespace                   configuration {
     std::string             _servicegroup_name;
   };
 
-  typedef shared_ptr<servicegroup>    servicegroup_ptr;
-  typedef std::list<servicegroup_ptr> list_servicegroup;
+  typedef shared_ptr<servicegroup>   servicegroup_ptr;
+  typedef std::set<servicegroup_ptr> set_servicegroup;
 }
 
 CCE_END()

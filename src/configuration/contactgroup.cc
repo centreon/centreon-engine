@@ -107,6 +107,23 @@ bool contactgroup::operator!=(contactgroup const& right) const throw () {
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool contactgroup::operator<(contactgroup const& right) const throw () {
+  if (_contactgroup_name != right._contactgroup_name)
+    return (_contactgroup_name < right._contactgroup_name);
+  else if (_alias != right._alias)
+    return (_alias < right._alias);
+  else if (_contactgroup_members != right._contactgroup_members)
+    return (_contactgroup_members < right._contactgroup_members);
+  return (_members < right._members);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.

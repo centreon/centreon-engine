@@ -168,7 +168,7 @@ void applier::contactgroup::resolve_object(
          it != end;
          ++it) {
       // Find contactgroup entry.
-      list_contactgroup::const_iterator
+      set_contactgroup::const_iterator
         it2(s.contactgroups().begin()),
         end2(s.contactgroups().end());
       while (it2 != end2) {
