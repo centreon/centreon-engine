@@ -25,9 +25,11 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 struct               global {
@@ -43,6 +45,33 @@ struct               global {
   serviceescalation* serviceescalations;
   servicegroup*      servicegroups;
   timeperiod*        timeperiods;
+
+  umap<std::string, shared_ptr<command> >
+                     save_commands;
+  umap<std::string, shared_ptr<commands::connector> >
+                     save_connectors;
+  umap<std::string, shared_ptr<contact> >
+                     save_contacts;
+  umap<std::string, shared_ptr<contactgroup> >
+                     save_contactgroups;
+  umap<std::string, shared_ptr<host> >
+                     save_hosts;
+  umultimap<std::string, shared_ptr<hostdependency> >
+                     save_hostdependencies;
+  umultimap<std::string, shared_ptr<hostescalation> >
+                     save_hostescalations;
+  umap<std::string, shared_ptr<hostgroup> >
+                     save_hostgroups;
+  umap<std::pair<std::string, std::string>, shared_ptr<service> >
+                     save_services;
+  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
+                     save_servicedependencies;
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >
+                     save_serviceescalations;
+  umap<std::string, shared_ptr<servicegroup> >
+                     save_servicegroups;
+  umap<std::string, shared_ptr<timeperiod> >
+                     save_timeperiods;
 
   bool               accept_passive_host_checks;
   bool               accept_passive_service_checks;
@@ -172,14 +201,14 @@ static bool chkdiff(T const* l1, T const* l2) {
     obj1 = obj1->next;
     obj2 = obj2->next;
   }
-  if (!obj1) {
-    std::cerr << "missing object" << std::endl;
-    std::cerr << "new " << *obj2 << std::endl;
-    return (false);
-  }
-  if (!obj2) {
+  if (obj1) {
     std::cerr << "missing object" << std::endl;
     std::cerr << "old " << *obj1 << std::endl;
+    return (false);
+  }
+  if (obj2) {
+    std::cerr << "missing object" << std::endl;
+    std::cerr << "new " << *obj2 << std::endl;
     return (false);
   }
   return (true);
@@ -351,6 +380,35 @@ static global get_globals() {
   g.timeperiods = timeperiod_list;
   timeperiod_list = NULL;
 
+  configuration::applier::state&
+    app_state(configuration::applier::state::instance());
+  g.save_commands = app_state.commands();
+  app_state.commands().clear();
+  g.save_connectors = app_state.connectors();
+  app_state.connectors().clear();
+  g.save_contacts = app_state.contacts();
+  app_state.contacts().clear();
+  g.save_contactgroups = app_state.contactgroups();
+  app_state.contactgroups().clear();
+  g.save_hosts = app_state.hosts();
+  app_state.hosts().clear();
+  g.save_hostdependencies = app_state.hostdependencies();
+  app_state.hostdependencies().clear();
+  g.save_hostescalations = app_state.hostescalations();
+  app_state.hostescalations().clear();
+  g.save_hostgroups = app_state.hostgroups();
+  app_state.hostgroups().clear();
+  g.save_services = app_state.services();
+  app_state.services().clear();
+  g.save_servicedependencies = app_state.servicedependencies();
+  app_state.servicedependencies().clear();
+  g.save_serviceescalations = app_state.serviceescalations();
+  app_state.serviceescalations().clear();
+  g.save_servicegroups = app_state.servicegroups();
+  app_state.servicegroups().clear();
+  g.save_timeperiods = app_state.timeperiods();
+  app_state.timeperiods().clear();
+
   g.accept_passive_host_checks = accept_passive_host_checks;
   g.accept_passive_service_checks = accept_passive_service_checks;
   g.additional_freshness_latency = additional_freshness_latency;
@@ -512,38 +570,6 @@ static bool oldparser_read_config(
 }
 
 /**
- *  Release a specific object list.
- *
- *  @param[in] lst     The list to release.
- *  @param[in] deleter The deleter to use.
- */
-template<typename T>
-static void release(T* lst, void (*deleter)(void*)) {
-  for (T* obj(lst); lst; lst = lst->next)
-    deleter(obj);
-}
-
-/**
- *  Release all object list.
- *
- *  @param[in] g The object list.
- */
-static void release_globals(global& g) {
-  release(g.commands, &deleter::command);
-  release(g.contacts, &deleter::contact);
-  release(g.contactgroups, &deleter::contactgroup);
-  release(g.hosts, &deleter::host);
-  release(g.hostdependencies, &deleter::hostdependency);
-  release(g.hostescalations, &deleter::hostescalation);
-  release(g.hostgroups, &deleter::hostgroup);
-  release(g.services, &deleter::service);
-  release(g.servicedependencies, &deleter::servicedependency);
-  release(g.serviceescalations, &deleter::serviceescalation);
-  release(g.servicegroups, &deleter::servicegroup);
-  release(g.timeperiods, &deleter::timeperiod);
-}
-
-/**
  *  Check if the configuration parser works properly.
  *
  *  @return 0 on success.
@@ -563,7 +589,6 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "new parser can't parse " << argv[1]);
 
   bool ret(chkdiff(oldcfg, newcfg));
-  release_globals(oldcfg);
 
   return (!ret);
 }

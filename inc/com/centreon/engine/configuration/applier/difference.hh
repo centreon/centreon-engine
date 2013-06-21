@@ -53,6 +53,12 @@ namespace      configuration {
         std::insert_iterator<T> add(std::inserter(
                                       _added,
                                       _added.begin()));
+
+        if (first1 == last1) {
+          std::copy(first2, last2, add);
+          return ;
+        }
+
         std::insert_iterator<T> del(std::inserter(
                                       _deleted,
                                       _deleted.begin()));
