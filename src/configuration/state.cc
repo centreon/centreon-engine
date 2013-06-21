@@ -24,6 +24,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/io/file_entry.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -925,7 +926,13 @@ std::string const& state::broker_module_directory() const throw () {
  *  @param[in] value The new broker_module_directory value.
  */
 void state::broker_module_directory(std::string const& value) {
-  _broker_module_directory = value;
+  if (value.empty() || value[0] == '/')
+    _broker_module_directory = value;
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _broker_module_directory = base_name + "/" + value;
+  }
 }
 
 /**
@@ -979,6 +986,7 @@ std::list<std::string> const& state::cfg_dir() const throw () {
  *  @return The cfg_file value.
  */
 std::list<std::string> const& state::cfg_file() const throw () {
+
   return (_cfg_file);
 }
 
@@ -3155,7 +3163,13 @@ void state::_set_broker_module(std::string const& value) {
  *  @param[in] value The new configuration directory.
  */
 void state::_set_cfg_dir(std::string const& value) {
-  _cfg_dir.push_back(value);
+  if (value.empty() || value[0] == '/')
+    _cfg_dir.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _cfg_dir.push_back(base_name + "/" + value);
+  }
 }
 
 /**
@@ -3164,7 +3178,13 @@ void state::_set_cfg_dir(std::string const& value) {
  *  @param[in] value The new configuration file.
  */
 void state::_set_cfg_file(std::string const& value) {
-  _cfg_file.push_back(value);
+  if (value.empty() || value[0] == '/')
+    _cfg_file.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _cfg_file.push_back(base_name + "/" + value);
+  }
 }
 
 /**
@@ -3383,7 +3403,13 @@ void state::_set_p1_file(std::string const& value) {
  *  @param[in] value The new resource_file.
  */
 void state::_set_resource_file(std::string const& value) {
-  _resource_file.push_back(value);
+  if (value.empty() || value[0] == '/')
+    _resource_file.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _resource_file.push_back(base_name + "/" + value);
+  }
 }
 
 /**

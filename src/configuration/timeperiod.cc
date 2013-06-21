@@ -669,7 +669,7 @@ bool timeperiod::_set_alias(std::string const& value) {
 bool timeperiod::_set_exclude(std::string const& value) {
   _exclude.clear();
   misc::split(value, _exclude, ',');
-  return (false);
+  return (true);
 }
 
 /**

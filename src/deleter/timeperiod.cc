@@ -17,12 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/daterange.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/timeperiod.hh"
 #include "com/centreon/engine/deleter/timeperiodexclusion.hh"
 #include "com/centreon/engine/deleter/timerange.hh"
 #include "com/centreon/engine/objects/daterange.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #include "com/centreon/engine/objects/timerange.hh"
 
 using namespace com::centreon::engine;
@@ -45,7 +47,8 @@ void deleter::timeperiod(void* ptr) throw () {
   for (unsigned int i(0);
        i < sizeof(obj->exceptions) / sizeof(obj->exceptions[0]);
        ++i)
-    listmember(obj->exceptions[i], &timeperiodexclusion);
+    listmember(obj->exceptions[i], &daterange);
+  listmember(obj->exclusions, &timeperiodexclusion);
 
   delete[] obj->name;
   obj->name = NULL;

@@ -94,8 +94,8 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     "  escalate_on_warning:   " << obj.escalate_on_warning << "\n"
     "  escalate_on_unknown:   " << obj.escalate_on_unknown << "\n"
     "  escalate_on_critical:  " << obj.escalate_on_critical << "\n"
-    "  contact_groups:        " << chkobj(os, obj.contact_groups) << "\n"
-    "  contacts:              " << chkobj(os, obj.contacts) << "\n"
+    "  contact_groups:        " << chkobj(obj.contact_groups) << "\n"
+    "  contacts:              " << chkobj(obj.contacts) << "\n"
     "  service_ptr:           " << obj.service_ptr << "\n"
     "  escalation_period_ptr: " << obj.escalation_period_ptr << "\n"
     "}\n";

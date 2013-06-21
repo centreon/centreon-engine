@@ -258,6 +258,7 @@ char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
 
   while (1) {
     delete[] tempbuf;
+    tempbuf = NULL;
 
     if ((tempbuf = mmap_fgets(temp_mmapfile)) == NULL)
       break;
@@ -309,7 +310,7 @@ char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
       break;
   }
 
-  delete[] tempbuf;
+  // delete[] tempbuf;
   return (buf);
 }
 

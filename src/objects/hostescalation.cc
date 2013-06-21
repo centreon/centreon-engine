@@ -90,8 +90,8 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     "  escalate_on_recovery:    " << obj.escalate_on_recovery << "\n"
     "  escalate_on_down:        " << obj.escalate_on_down << "\n"
     "  escalate_on_unreachable: " << obj.escalate_on_unreachable << "\n"
-    "  contact_groups:          " << chkobj(os, obj.contact_groups) << "\n"
-    "  contacts:                " << chkobj(os, obj.contacts) << "\n"
+    "  contact_groups:          " << chkobj(obj.contact_groups) << "\n"
+    "  contacts:                " << chkobj(obj.contacts) << "\n"
     "  host_ptr:                " << obj.host_ptr << "\n"
     "  escalation_period_ptr:   " << obj.escalation_period_ptr << "\n"
     "}\n";

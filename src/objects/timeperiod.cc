@@ -89,14 +89,16 @@ std::ostream& operator<<(std::ostream& os, timeperiod const& obj) {
   os << "timeperiod {\n"
      << "  name:  " << chkstr(obj.name) << "\n"
      << "  alias: " << chkstr(obj.alias) << "\n"
-     << "  exclusions: " << chkobj(os, obj.exclusions) << "\n";
+     << "  exclusions: " << chkobj(obj.exclusions) << "\n";
 
   for (unsigned int i(0); i < sizeof(obj.days) / sizeof(obj.days[0]); ++i)
-    os << get_weekday_name(i) << ": " << *obj.days[i] << "\n";
+    if (obj.days[i])
+      os << "  " << get_weekday_name(i) << ": " << *obj.days[i] << "\n";
 
   for (unsigned int i(0); i < DATERANGE_TYPES; ++i)
     for (daterange const* it(obj.exceptions[i]); it; it = it->next)
-      os << *it << "\n";
+      if (it)
+        os << "  " << *it << "\n";
   os << "}\n";
   return (os);
 }

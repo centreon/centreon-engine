@@ -28,9 +28,8 @@ CCE_BEGIN()
 namespace deleter {
   template<typename T>
   void    listmember(T* ptr, void (*release)(void*)) throw () {
-    T* next(NULL);
     while (ptr) {
-      next = ptr->next;
+      T* next(ptr->next);
       release(ptr);
       ptr = next;
     }
