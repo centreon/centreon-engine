@@ -120,6 +120,11 @@ if (WITH_TESTING)
   set(TEST_CONF_FILE "main_host.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # parse_configuration_hostdependency
+  set(TEST_NAME "parse_configuration_hostdependency")
+  set(TEST_CONF_FILE "main_hostdependency.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
   # parse_configuration_hostextinfo
   set(TEST_NAME "parse_configurationextinfo_host")
   set(TEST_CONF_FILE "main_hostextinfo.cfg")
@@ -128,6 +133,11 @@ if (WITH_TESTING)
   # parse_configuration_host_template
   set(TEST_NAME "parse_configuration_host_template")
   set(TEST_CONF_FILE "main_host_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_hostdependency_template
+  set(TEST_NAME "parse_configuration_hostdependency_template")
+  set(TEST_CONF_FILE "main_hostdependency_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
   # parse_configuration_service

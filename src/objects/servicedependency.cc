@@ -184,19 +184,9 @@ servicedependency* add_service_dependency(
     obj->fail_on_warning = (fail_on_warning == 1);
     obj->inherits_parent = (inherits_parent > 0);
 
+    // Add new items to the configuration state.
     std::pair<std::string, std::string>
       id(std::make_pair(dependent_host_name, dependent_service_description));
-    umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::const_iterator
-      it(state::instance().servicedependencies().find(id));
-    if (it != state::instance().servicedependencies().end()) {
-      logger(log_config_error, basic)
-        << "Error: Servicedependency '" << dependent_service_description
-        << "' on host '" << dependent_host_name
-        << "' has already been defined";
-      return (NULL);
-    }
-
-    // Add new items to the configuration state.
     state::instance().servicedependencies()
       .insert(std::make_pair(id, obj));
 

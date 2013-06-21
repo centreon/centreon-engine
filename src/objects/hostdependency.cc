@@ -151,16 +151,6 @@ hostdependency* add_host_dependency(
     obj->fail_on_up = (fail_on_up == 1);
     obj->inherits_parent = (inherits_parent > 0);
 
-    // Add new hostdependency to the monitoring engine.
-    std::string id(dependent_host_name);
-    umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator
-      it(state::instance().hostdependencies().find(id));
-    if (it != state::instance().hostdependencies().end()) {
-      logger(log_config_error, basic)
-        << "Error: Hostdependency '" << dependent_host_name << "' has already been defined";
-      return (NULL);
-    }
-
     // Add new items to the configuration state.
     state::instance().hostdependencies()
       .insert(std::make_pair(dependent_host_name, obj));
