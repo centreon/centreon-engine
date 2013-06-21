@@ -1067,7 +1067,7 @@ bool host::_set_coords_2d(std::string const& value) {
 bool host::_set_coords_3d(std::string const& value) {
   std::list<std::string> coords;
   misc::split(value, coords, ',');
-  if (coords.size() != 2)
+  if (coords.size() != 3)
     return (false);
 
   double x;

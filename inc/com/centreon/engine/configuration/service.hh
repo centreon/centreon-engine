@@ -32,6 +32,8 @@
 CCE_BEGIN()
 
 namespace                  configuration {
+  class                    serviceextinfo;
+
   class                    service
     : public object {
   public:
@@ -58,6 +60,7 @@ namespace                  configuration {
                              service const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
+    void                   merge(configuration::serviceextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

@@ -992,6 +992,7 @@ int xodtemplate_begin_object_definition(
     new_hostescalation->last_notification = -2;
   }
   else if (!strcmp(input, "serviceextinfo")) {
+    xodtemplate_current_object_type = XODTEMPLATE_SERVICEEXTINFO;
     xod_begin_def(serviceextinfo);
   }
   else if (!strcmp(input, "hostextinfo")) {

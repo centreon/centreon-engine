@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/configuration/service.hh"
+#include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/misc/string.hh"
@@ -378,6 +379,19 @@ void service::check_validity() const {
   if (_check_command.empty())
     throw (engine_error() << "configuration: invalid service property "
            "check_command is missing");
+}
+
+/**
+ *  Merge object.
+ *
+ *  @param[in] obj The object to merge.
+ */
+void service::merge(configuration::serviceextinfo const& obj) {
+  _action_url = obj.action_url();
+  _icon_image = obj.icon_image();
+  _icon_image_alt = obj.icon_image_alt();
+  _notes = obj.notes();
+  _notes_url = obj.notes_url();
 }
 
 /**
