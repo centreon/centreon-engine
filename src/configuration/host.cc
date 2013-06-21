@@ -80,8 +80,8 @@ static struct {
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
-  { "coords_2d",                    SETTER(std::string const&, _set_coords_2d) },
-  { "coords_3d",                    SETTER(std::string const&, _set_coords_3d) },
+  { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
+  { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
