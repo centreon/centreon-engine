@@ -224,6 +224,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
     new_cfg.servicegroups());
 
   // Apply services.
+  // XXX : expand services
   _apply<configuration::service,
          service_struct,
          applier::service,

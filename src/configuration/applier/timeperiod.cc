@@ -21,7 +21,6 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -73,13 +72,10 @@ void applier::timeperiod::add_object(
     << "Creating new timeperiod '" << obj.timeperiod_name() << "'.";
 
   // Create timeperiod.
-  shared_ptr<timeperiod_struct>
-    tp(
-      add_timeperiod(
-        obj.timeperiod_name().c_str(),
-        NULL_IF_EMPTY(obj.alias())),
-      &deleter::timeperiod);
-  if (!tp.get())
+  timeperiod_struct* tp(add_timeperiod(
+                          obj.timeperiod_name().c_str(),
+                          NULL_IF_EMPTY(obj.alias())));
+  if (!tp)
     throw (engine_error() << "Error: Could not register timeperiod '"
            << obj.timeperiod_name() << "'.");
 
@@ -95,7 +91,7 @@ void applier::timeperiod::add_object(
          it2 != end2;
          ++it2)
       if (!add_exception_to_timeperiod(
-             tp.get(),
+             tp,
              it2->type(),
              it2->year_start(),
              it2->month_start(),
@@ -119,7 +115,7 @@ void applier::timeperiod::add_object(
        it != end;
        ++it)
     if (!add_exclusion_to_timeperiod(
-           tp.get(),
+           tp,
            it->c_str()))
       throw (engine_error() << "Error: Could not add exclusion '"
              << *it << "' to timeperiod '" << obj.timeperiod_name()
