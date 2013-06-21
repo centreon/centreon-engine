@@ -645,8 +645,26 @@ unsigned int service::high_flap_threshold() const throw () {
  *
  *  @return The hostgroups.
  */
+list_string& service::hostgroups() throw () {
+  return (_hostgroups.get());
+}
+
+/**
+ *  Get hostgroups.
+ *
+ *  @return The hostgroups.
+ */
 list_string const& service::hostgroups() const throw () {
   return (_hostgroups.get());
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string& service::hosts() throw () {
+  return (_hosts.get());
 }
 
 /**

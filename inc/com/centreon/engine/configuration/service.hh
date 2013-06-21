@@ -85,7 +85,9 @@ namespace                  configuration {
     unsigned short         flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
     unsigned int           high_flap_threshold() const throw ();
+    list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
+    list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();
