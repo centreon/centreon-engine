@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_SERVICE_HH
 
 #  include <list>
+#  include <set>
 #  include <utility>
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
@@ -52,6 +53,8 @@ namespace                  configuration {
     bool                   operator==(
                              service const& right) const throw ();
     bool                   operator!=(
+                             service const& right) const throw ();
+    bool                   operator<(
                              service const& right) const throw ();
     void                   check_validity() const;
     std::size_t            id() const throw ();
@@ -191,6 +194,7 @@ namespace                  configuration {
 
   typedef shared_ptr<service>    service_ptr;
   typedef std::list<service_ptr> list_service;
+  typedef std::set<service_ptr>  set_service;
   typedef umap<std::pair<std::string, std::string>, service_ptr> map_service;
 }
 

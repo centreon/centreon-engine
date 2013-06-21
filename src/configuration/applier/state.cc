@@ -25,6 +25,7 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
+#include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
@@ -41,6 +42,94 @@ using namespace com::centreon::engine::configuration;
 static applier::state* _instance = NULL;
 
 /**
+ *  Get the key of a command.
+ *
+ *  @return Command name.
+ */
+std::string command_key(configuration::command const& c) {
+  return (c.command_name());
+}
+
+/**
+ *  Get the key of a connector.
+ *
+ *  @return Connector name.
+ */
+std::string connector_key(configuration::connector const& c) {
+  return (c.connector_name());
+}
+
+/**
+ *  Get the key of a contact.
+ *
+ *  @return Contact name.
+ */
+std::string contact_key(configuration::contact const& c) {
+  return (c.contact_name());
+}
+
+/**
+ *  Get the key of a contactgroup.
+ *
+ *  @return Contactgroup name.
+ */
+std::string contactgroup_key(configuration::contactgroup const& cg) {
+  return (cg.contactgroup_name());
+}
+
+/**
+ *  Get the key of a host.
+ *
+ *  @return Host name.
+ */
+std::string host_key(configuration::host const& h) {
+  return (h.host_name());
+}
+
+/**
+ *  Get the key of a hostgroup.
+ *
+ *  @return Hostgroup name.
+ */
+std::string hostgroup_key(configuration::hostgroup const& hg) {
+  return (hg.hostgroup_name());
+}
+
+/**
+ *  Get the key of a service.
+ *
+ *  @return Pair of host name / service description.
+ */
+std::pair<std::string, std::string> service_key(
+                                      configuration::service const& s) {
+  if ((s.hosts().size() > 1)
+      || !s.hostgroups().empty())
+    throw (engine_error() << "Error: Cannot apply unexpanded service '"
+           << s.service_description() << "'.");
+  return (std::make_pair(
+                 s.hosts().front(),
+                 s.service_description()));
+}
+
+/**
+ *  Get the key of a servicegroup.
+ *
+ *  @return Servicegroup name.
+ */
+std::string servicegroup_key(configuration::servicegroup const& sg) {
+  return (sg.servicegroup_name());
+}
+
+/**
+ *  Get the key of a timeperiod.
+ *
+ *  @return Timeperiod name.
+ */
+std::string timeperiod_key(configuration::timeperiod const& t) {
+  return (t.timeperiod_name());
+}
+
+/**
  *  Apply new configuration.
  *
  *  @param[in] new_cfg The new configuration.
@@ -51,7 +140,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          timeperiod_struct,
          applier::timeperiod,
          std::string,
-         &configuration::timeperiod::timeperiod_name> (
+         &timeperiod_key>(
     config->timeperiods(),
     _timeperiods,
     new_cfg,
@@ -62,7 +151,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          commands::connector,
          applier::connector,
          std::string,
-         &configuration::connector::connector_name>(
+         &connector_key>(
     config->connectors(),
     _connectors,
     new_cfg,
@@ -73,7 +162,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          command_struct,
          applier::command,
          std::string,
-         &configuration::command::command_name>(
+         &command_key>(
     config->commands(),
     _commands,
     new_cfg,
@@ -84,7 +173,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          contactgroup_struct,
          applier::contactgroup,
          std::string,
-         &configuration::contactgroup::contactgroup_name>(
+         &contactgroup_key>(
     config->contactgroups(),
     _contactgroups,
     new_cfg,
@@ -95,7 +184,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          contact_struct,
          applier::contact,
          std::string,
-         &configuration::contact::contact_name>(
+         &contact_key>(
     config->contacts(),
     _contacts,
     new_cfg,
@@ -106,7 +195,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          hostgroup_struct,
          applier::hostgroup,
          std::string,
-         &configuration::hostgroup::hostgroup_name>(
+         &hostgroup_key>(
     config->hostgroups(),
     _hostgroups,
     new_cfg,
@@ -117,7 +206,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
          host_struct,
          applier::host,
          std::string,
-         &configuration::host::host_name>(
+         &host_key>(
     config->hosts(),
     _hosts,
     new_cfg,
@@ -128,11 +217,22 @@ void applier::state::apply(configuration::state const& new_cfg) {
          servicegroup_struct,
          applier::servicegroup,
          std::string,
-         &configuration::servicegroup::servicegroup_name>(
+         &servicegroup_key>(
     config->servicegroups(),
     _servicegroups,
     new_cfg,
     new_cfg.servicegroups());
+
+  // Apply services.
+  _apply<configuration::service,
+         service_struct,
+         applier::service,
+         std::pair<std::string, std::string>,
+         &service_key>(
+    config->services(),
+    _services,
+    new_cfg,
+    new_cfg.services());
 
   return ;
 }
@@ -417,7 +517,7 @@ template <typename ConfigurationType,
           typename ObjectType,
           typename ApplierType,
           typename KeyType,
-          KeyType const& (ConfigurationType::* config_key)() const throw () >
+          KeyType (* config_key)(ConfigurationType const&)>
 void applier::state::_apply(
                        std::set<shared_ptr<ConfigurationType> >& cur_cfg,
                        umap<KeyType, shared_ptr<ObjectType> >& cur_obj,
@@ -451,16 +551,16 @@ void applier::state::_apply(
          it_delete != end_delete;
          ++it_delete) {
       typename umap<KeyType, shared_ptr<ObjectType> >::iterator
-        it(cur_obj.find(((**it_delete).*config_key)()));
+        it(cur_obj.find((*config_key)(**it_delete)));
       if (it != cur_obj.end()) {
         aplyr.remove_object(**it_delete, new_state);
         while ((it_current != end_current)
-               && (((**it_current).*config_key)()
-                   < ((**it_delete).*config_key)()))
+               && ((*config_key)(**it_current)
+                   < (*config_key)(**it_delete)))
           ++it_current;
         if ((it_current != end_current)
-            && (((**it_current).*config_key)()
-                == ((**it_delete).*config_key)())) {
+            && ((*config_key)(**it_current)
+                == (*config_key)(**it_delete))) {
           typename cfg_set::iterator will_be_erased(it_current);
           ++it_current;
           cur_cfg.erase(will_be_erased);

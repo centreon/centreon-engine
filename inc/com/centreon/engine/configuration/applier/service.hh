@@ -20,12 +20,12 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICE_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICE_HH
 
-#  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace             configuration {
+  class               service;
   class               state;
 
   namespace           applier {
@@ -36,17 +36,17 @@ namespace             configuration {
                       ~service() throw ();
       service&        operator=(service const& right);
       void            add_object(
-                        service_ptr obj,
-                        configuration::state& s);
+                        configuration::service const& obj,
+                        configuration::state const& s);
       void            modify_object(
-                        service_ptr obj,
-                        configuration::state& s);
+                        configuration::service const& obj,
+                        configuration::state const& s);
       void            remove_object(
-                        service_ptr obj,
-                        configuration::state& s);
+                        configuration::service const& obj,
+                        configuration::state const& s);
       void            resolve_object(
-                        service_ptr obj,
-                        configuration::state& s);
+                        configuration::service const& obj,
+                        configuration::state const& s);
     };
   }
 }

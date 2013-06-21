@@ -687,7 +687,7 @@ bool state::operator==(state const& right) const throw () {
           && cmp_list_ptr(_servicedependencies, right._servicedependencies)
           && cmp_list_ptr(_serviceescalations, right._serviceescalations)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
-          && cmp_list_ptr(_services, right._services)
+          && cmp_set_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
           && _service_inter_check_delay_method == right._service_inter_check_delay_method
@@ -2584,7 +2584,7 @@ set_servicegroup& state::servicegroups() throw () {
  *
  *  @return All engine services.
  */
-list_service const& state::services() const throw () {
+set_service const& state::services() const throw () {
   return (_services);
 }
 
@@ -2593,7 +2593,7 @@ list_service const& state::services() const throw () {
  *
  *  @return All engine services.
  */
-list_service& state::services() throw () {
+set_service& state::services() throw () {
   return (_services);
 }
 

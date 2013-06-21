@@ -96,7 +96,7 @@ namespace              configuration {
     template<typename T>
     static void        _insert(
                          list_object const& from,
-                         std::list<shared_ptr<T> >& to);
+                         std::set<shared_ptr<T> >& to);
     template<typename T>
     static void        _insert(
                          map_object const& from,

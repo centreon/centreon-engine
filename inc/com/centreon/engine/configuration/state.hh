@@ -304,9 +304,8 @@ namespace              configuration {
     set_servicegroup const&
                        servicegroups() const throw ();
     set_servicegroup&  servicegroups() throw ();
-    list_service const&
-                       services() const throw ();
-    list_service&      services() throw ();
+    set_service const& services() const throw ();
+    set_service&       services() throw ();
     unsigned int       service_check_timeout() const throw ();
     void               service_check_timeout(unsigned int value);
     unsigned int       service_freshness_check_interval() const throw ();
@@ -534,7 +533,7 @@ namespace              configuration {
     list_serviceescalation
                        _serviceescalations;
     set_servicegroup   _servicegroups;
-    list_service       _services;
+    set_service        _services;
     unsigned int       _service_check_timeout;
     unsigned int       _service_freshness_check_interval;
     inter_check_delay  _service_inter_check_delay_method;
