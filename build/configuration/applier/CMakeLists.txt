@@ -115,14 +115,24 @@ if (WITH_TESTING)
   set(TEST_CONF_FILE "main_globals.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # # parse_configuration_host
-  # set(TEST_NAME "parse_configuration_host")
-  # set(TEST_CONF_FILE "main_host.cfg")
+  # parse_configuration_host
+  set(TEST_NAME "parse_configuration_host")
+  set(TEST_CONF_FILE "main_host.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_host_template
+  set(TEST_NAME "parse_configuration_host_template")
+  set(TEST_CONF_FILE "main_host_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # # parse_configuration_service
+  # set(TEST_NAME "parse_configuration_service")
+  # set(TEST_CONF_FILE "main_service.cfg")
   # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # # parse_configuration_host_template
-  # set(TEST_NAME "parse_configuration_host_template")
-  # set(TEST_CONF_FILE "main_host_template.cfg")
+  # # parse_configuration_service_template
+  # set(TEST_NAME "parse_configuration_service_template")
+  # set(TEST_CONF_FILE "main_service_template.cfg")
   # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
   # parse_configuration_timeperiod

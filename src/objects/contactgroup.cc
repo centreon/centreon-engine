@@ -77,7 +77,7 @@ std::ostream& operator<<(std::ostream& os, contactgroup const& obj) {
   os << "contactgroup {\n"
     "  group_name: " << chkstr(obj.group_name) << "\n"
     "  alias:      " << chkstr(obj.alias) << "\n"
-    "  members:    " << chkobj(os, obj.members) << "\n"
+    "  members:    " << chkobj(obj.members) << "\n"
     "}\n";
   return (os);
 }

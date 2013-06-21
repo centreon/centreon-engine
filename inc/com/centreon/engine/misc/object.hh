@@ -21,19 +21,19 @@
 #  define CCE_MISC_OBJECT_HH
 
 #  include <cstring>
-#  include <fstream>
+#  include <sstream>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace misc {
   template<typename T>
-  inline std::ostream& chkobj(std::ostream& os, T const* obj) throw () {
-    if (obj)
-      os << *obj;
-    else
-      os << "\"NULL\"";
-    return (os);
+  inline std::string chkobj(T const* obj) throw () {
+    if (!obj)
+      return ("\"NULL\"");
+    std::ostringstream oss;
+    oss << *obj;
+    return (oss.str());
   }
 
   inline bool             is_equal(

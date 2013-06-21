@@ -113,8 +113,8 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     os << chkstr(obj.address[i])
        << (i + 1 < MAX_CONTACT_ADDRESSES && obj.address[i + 1] ? ", " : "");
   os << (obj.address[0] ? " \n" : "\"NULL\"\n");
-  os << "  host_notification_commands:      " << chkobj(os, obj.host_notification_commands) << "\n"
-    "  service_notification_commands:   " << chkobj(os, obj.service_notification_commands) << "\n"
+  os << "  host_notification_commands:      " << chkobj(obj.host_notification_commands) << "\n"
+    "  service_notification_commands:   " << chkobj(obj.service_notification_commands) << "\n"
     "  notify_on_service_unknown:       " << obj.notify_on_service_unknown << "\n"
     "  notify_on_service_warning:       " << obj.notify_on_service_warning << "\n"
     "  notify_on_service_critical:      " << obj.notify_on_service_critical << "\n"
@@ -133,7 +133,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  can_submit_commands:             " << obj.can_submit_commands << "\n"
     "  retain_status_information:       " << obj.retain_status_information << "\n"
     "  retain_nonstatus_information:    " << obj.retain_nonstatus_information << "\n"
-    "  custom_variables:                " << chkobj(os, obj.custom_variables) << "\n"
+    "  custom_variables:                " << chkobj(obj.custom_variables) << "\n"
     "  last_host_notification:          " << obj.last_host_notification << "\n"
     "  last_service_notification:       " << obj.last_service_notification << "\n"
     "  modified_attributes:             " << obj.modified_attributes << "\n"

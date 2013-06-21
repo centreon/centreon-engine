@@ -80,7 +80,7 @@ std::ostream& operator<<(std::ostream& os, hostgroup const& obj) {
   os << "hostgroup {\n"
     "  group_name: " << chkstr(obj.group_name) << "\n"
     "  alias:      " << chkstr(obj.alias) << "\n"
-    "  members:    " << chkobj(os, obj.members) << "\n"
+    "  members:    " << chkobj(obj.members) << "\n"
     "  notes:      " << chkstr(obj.notes) << "\n"
     "  notes_url:  " << chkstr(obj.notes_url) << "\n"
     "  action_url: " << chkstr(obj.action_url) << "\n"
