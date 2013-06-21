@@ -126,7 +126,7 @@ namespace           configuration {
                      typename ObjectType,
                      typename ApplierType,
                      typename KeyType,
-                     KeyType const& (ConfigurationType::* config_key)() const throw () >
+                     KeyType (* config_key)(ConfigurationType const&)>
       void          _apply(
                       std::set<shared_ptr<ConfigurationType> >& cur_cfg,
                       umap<KeyType, shared_ptr<ObjectType> >& cur_obj,

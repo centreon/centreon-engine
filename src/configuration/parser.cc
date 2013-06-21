@@ -102,7 +102,7 @@ void parser::parse(std::string const& path, state& config) {
   // _insert(_lst_objects[object::servicedependency], config.servicedependencies());
   // _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
   _insert(_map_objects[object::servicegroup], config.servicegroups());
-  // _insert(_lst_objects[object::service], config.services());
+  _insert(_lst_objects[object::service], config.services());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
 
   // cleanup.
@@ -329,12 +329,12 @@ static bool smaller_id(shared_ptr<T> const& c1, shared_ptr<T> const& c2) {
 template<typename T>
 void parser::_insert(
        list_object const& from,
-       std::list<shared_ptr<T> >& to) {
+       std::set<shared_ptr<T> >& to) {
   for (list_object::const_iterator it(from.begin()), end(from.end());
        it != end;
        ++it)
-    to.push_back(*it);
-  to.sort(&smaller_id<T>);
+    to.insert(*it);
+  return ;
 }
 
 /**

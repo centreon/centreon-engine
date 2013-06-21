@@ -26,7 +26,6 @@
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/command.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -82,13 +81,10 @@ void applier::command::add_object(
     << "Creating new command '" << obj.command_name() << "'.";
 
   // Create command.
-  shared_ptr<command_struct>
-    c(
-      add_command(
-        obj.command_name().c_str(),
-        obj.command_line().c_str()),
-      &deleter::command);
-  if (!c.get())
+  command_struct* c(add_command(
+                      obj.command_name().c_str(),
+                      obj.command_line().c_str()));
+  if (!c)
     throw (engine_error() << "Error: Could not register command '"
            << obj.command_name() << "'.");
 
