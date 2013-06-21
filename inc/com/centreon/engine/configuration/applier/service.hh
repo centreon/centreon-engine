@@ -20,7 +20,9 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICE_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICE_HH
 
+#  include <set>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -38,6 +40,10 @@ namespace             configuration {
       void            add_object(
                         configuration::service const& obj,
                         configuration::state const& s);
+      void            expand_object(
+                        configuration::service const& obj,
+                        configuration::state const& s,
+                        std::set<shared_ptr<configuration::service> >& expanded);
       void            modify_object(
                         configuration::service const& obj,
                         configuration::state const& s);

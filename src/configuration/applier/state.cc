@@ -224,16 +224,27 @@ void applier::state::apply(configuration::state const& new_cfg) {
     new_cfg.servicegroups());
 
   // Apply services.
-  // XXX : expand services
-  _apply<configuration::service,
-         service_struct,
-         applier::service,
-         std::pair<std::string, std::string>,
-         &service_key>(
-    config->services(),
-    _services,
-    new_cfg,
-    new_cfg.services());
+  {
+    std::set<shared_ptr<configuration::service> > expanded_services;
+    {
+      applier::service aplyr;
+      for (std::set<shared_ptr<configuration::service> >::const_iterator
+             it(new_cfg.services().begin()),
+             end(new_cfg.services().end());
+           it != end;
+           ++it)
+        aplyr.expand_object(**it, new_cfg, expanded_services);
+      _apply<configuration::service,
+             service_struct,
+             applier::service,
+             std::pair<std::string, std::string>,
+             &service_key>(
+        config->services(),
+        _services,
+        new_cfg,
+        expanded_services);
+    }
+  }
 
   return ;
 }
