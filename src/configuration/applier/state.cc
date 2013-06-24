@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
@@ -255,6 +256,16 @@ void applier::state::apply(configuration::state const& new_cfg) {
     config->servicegroups());
   _resolve<configuration::service, applier::service>(
     config->services());
+
+  // Pre-flight check.
+  {
+    bool old_verify_config(verify_config);
+    verify_config = true;
+    int w(0);
+    int e(0);
+    pre_flight_object_check(&w, &e);
+    verify_config = old_verify_config;
+  }
 
   return ;
 }
