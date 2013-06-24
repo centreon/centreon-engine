@@ -551,6 +551,22 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
+             "%[a-z] %u %[a-z] %n",
+             buffer[0],
+             &week_day_start_offset,
+             buffer[1],
+             &pos) == 3) {
+    // thursday 3 february
+    if (_get_day_id(buffer[0], week_day_start)
+        && _get_month_id(buffer[1], month_start)) {
+      month_end = month_start;
+      week_day_end = week_day_start;
+      week_day_end_offset = week_day_start_offset;
+      type = daterange::month_week_day;
+    }
+  }
+  else if (sscanf(
+             line.c_str(),
              "%[a-z] %u %n",
              buffer[0],
              &month_day_start,
@@ -572,22 +588,6 @@ bool timeperiod::_add_other_date(std::string const& line) {
     else if (!strcmp(buffer[0], "day")) {
       month_day_end = month_day_start;
       type = daterange::month_day;
-    }
-  }
-  else if (sscanf(
-             line.c_str(),
-             "%[a-z] %u %[a-z] %n",
-             buffer[0],
-             &week_day_start_offset,
-             buffer[1],
-             &pos) == 3) {
-    // thursday 3 february
-    if (_get_day_id(buffer[0], week_day_start)
-        && _get_month_id(buffer[1], month_start)) {
-      month_end = month_start;
-      week_day_end = week_day_start;
-      week_day_end_offset = week_day_start_offset;
-      type = daterange::month_week_day;
     }
   }
 
