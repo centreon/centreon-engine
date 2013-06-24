@@ -39,7 +39,7 @@ static struct {
   { "contact_groups",                SETTER(std::string const&, _set_contactgroups) },
   { "contactgroups",                 SETTER(std::string const&, _set_contactgroups) },
   { "email",                         SETTER(std::string const&, _set_email) },
-  { "pager",                         SETTER(std::string const&, _set_email) },
+  { "pager",                         SETTER(std::string const&, _set_pager) },
   { "host_notification_period",      SETTER(std::string const&, _set_host_notification_period) },
   { "host_notification_commands",    SETTER(std::string const&, _set_host_notification_commands) },
   { "service_notification_period",   SETTER(std::string const&, _set_service_notification_period) },
