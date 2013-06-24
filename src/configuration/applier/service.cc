@@ -166,7 +166,7 @@ void applier::service::add_object(
     obj.retain_status_information(),
     obj.retain_nonstatus_information(),
     obj.obsess_over_service()));
-  if (svc)
+  if (!svc)
       throw (engine_error() << "Error: Could not register service '"
              << obj.service_description()
              << "' of host '" << obj.hosts().front() << "'.");

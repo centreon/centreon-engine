@@ -48,7 +48,7 @@ namespace    configuration {
     bool     operator!=(opt const& right) const throw () {
       return (!operator==(right));
     }
-    operator bool() const throw () { return (_is_set); }
+             operator T const& () const throw () { return (_data); }
     T const& get() const throw () { return (_data); }
     bool     is_set() const throw () { return (_is_set); }
     void     reset() throw () { _is_set = false; }

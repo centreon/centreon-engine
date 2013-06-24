@@ -33,6 +33,7 @@ namespace     configuration {
     point_2d& operator=(point_2d const& right);
     bool      operator==(point_2d const& right) const throw ();
     bool      operator!=(point_2d const& right) const throw ();
+    bool      operator<(point_2d const& right) const throw ();
     int       x() const throw ();
     int       y() const throw ();
 

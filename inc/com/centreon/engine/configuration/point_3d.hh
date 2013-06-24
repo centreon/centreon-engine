@@ -33,6 +33,7 @@ namespace     configuration {
     point_3d& operator=(point_3d const& right);
     bool      operator==(point_3d const& right) const throw ();
     bool      operator!=(point_3d const& right) const throw ();
+    bool      operator<(point_3d const& right) const throw ();
     double    x() const throw ();
     double    y() const throw ();
     double    z() const throw ();
