@@ -22,7 +22,6 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contactgroup.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/shared.hh"
@@ -77,13 +76,10 @@ void applier::contactgroup::add_object(
     << obj.contactgroup_name() << "'.";
 
   // Create contactgroup.
-  shared_ptr<contactgroup_struct>
-    cg(
-      add_contactgroup(
-        obj.contactgroup_name().c_str(),
-        NULL_IF_EMPTY(obj.alias())),
-      &deleter::contactgroup);
-  if (!cg.get())
+  contactgroup_struct* cg(add_contactgroup(
+                            obj.contactgroup_name().c_str(),
+                            NULL_IF_EMPTY(obj.alias())));
+  if (!cg)
     throw (engine_error() << "Error: Could not register contact group '"
            << obj.contactgroup_name() << "'.");
 

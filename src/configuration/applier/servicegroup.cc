@@ -20,7 +20,6 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/servicegroup.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -75,16 +74,13 @@ void applier::servicegroup::add_object(
     << "Creating new servicegroup '" << obj.servicegroup_name() << "'.";
 
   // Create servicegroup.
-  shared_ptr<servicegroup_struct>
-    sg(
-      add_servicegroup(
-        obj.servicegroup_name().c_str(),
-        NULL_IF_EMPTY(obj.alias()),
-        NULL_IF_EMPTY(obj.notes()),
-        NULL_IF_EMPTY(obj.notes_url()),
-        NULL_IF_EMPTY(obj.action_url())),
-      &deleter::servicegroup);
-  if (!sg.get())
+  servicegroup_struct* sg(add_servicegroup(
+                            obj.servicegroup_name().c_str(),
+                            NULL_IF_EMPTY(obj.alias()),
+                            NULL_IF_EMPTY(obj.notes()),
+                            NULL_IF_EMPTY(obj.notes_url()),
+                            NULL_IF_EMPTY(obj.action_url())));
+  if (!sg)
     throw (engine_error() << "Error: Could not register service group '"
            << obj.servicegroup_name() << "'.");
 

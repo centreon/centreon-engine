@@ -21,7 +21,6 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -73,16 +72,13 @@ void applier::hostgroup::add_object(
     << "Creating new hostgroup '" << obj.hostgroup_name() << "'.";
 
   // Create hostgroup.
-  shared_ptr<hostgroup_struct>
-    hg(
-      add_hostgroup(
-        obj.hostgroup_name().c_str(),
-        NULL_IF_EMPTY(obj.alias()),
-        NULL_IF_EMPTY(obj.notes()),
-        NULL_IF_EMPTY(obj.notes_url()),
-        NULL_IF_EMPTY(obj.action_url())),
-      &deleter::hostgroup);
-  if (!hg.get())
+  hostgroup_struct* hg(add_hostgroup(
+                         obj.hostgroup_name().c_str(),
+                         NULL_IF_EMPTY(obj.alias()),
+                         NULL_IF_EMPTY(obj.notes()),
+                         NULL_IF_EMPTY(obj.notes_url()),
+                         NULL_IF_EMPTY(obj.action_url())));
+  if (!hg)
     throw (engine_error() << "Error: Could not register hostgroup '"
            << obj.hostgroup_name() << "'.");
 

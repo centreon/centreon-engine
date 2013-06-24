@@ -24,7 +24,6 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -79,9 +78,8 @@ void applier::host::add_object(
     << "Creating new host '" << obj.host_name() << "'.";
 
   // Create host.
-  shared_ptr<host_struct>
-    h(
-      add_host(
+  host_struct*
+    h(add_host(
         obj.host_name().c_str(),
         NULL_IF_EMPTY(obj.display_name()),
         NULL_IF_EMPTY(obj.alias()),
@@ -147,9 +145,8 @@ void applier::host::add_object(
         false, // should_be_drawn
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
-        obj.obsess_over_host()),
-      &deleter::host);
-  if (!h.get())
+        obj.obsess_over_host()));
+  if (!h)
     throw (engine_error() << "Error: Could not register host '"
            << obj.host_name() << "'.");
 
@@ -159,7 +156,7 @@ void applier::host::add_object(
          end(obj.contacts().end());
        it != end;
        ++it)
-    if (!add_contact_to_host(h.get(), it->c_str()))
+    if (!add_contact_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add contact '"
              << *it << "' to host '" << obj.host_name() << "'.");
 
@@ -169,7 +166,7 @@ void applier::host::add_object(
          end(obj.contactgroups().end());
        it != end;
        ++it)
-    if (!add_contactgroup_to_host(h.get(), it->c_str()))
+    if (!add_contactgroup_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add contact group '"
              << *it << "' to host '" << obj.host_name() << "'.");
 
@@ -180,7 +177,7 @@ void applier::host::add_object(
        it != end;
        ++it)
     if (!add_custom_variable_to_host(
-           h.get(),
+           h,
            it->first.c_str(),
            it->second.c_str()))
       throw (engine_error() << "Error: Could not add custom variable '"
@@ -192,7 +189,7 @@ void applier::host::add_object(
          end(obj.parents().end());
        it != end;
        ++it)
-    if (!add_parent_host_to_host(h.get(), it->c_str()))
+    if (!add_parent_host_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add parent '"
              << *it << "' to host '" << obj.host_name() << "'.");
 
