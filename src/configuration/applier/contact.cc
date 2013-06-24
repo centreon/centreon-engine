@@ -220,7 +220,7 @@ void applier::contact::modify_object(
   modify_if_different(
     c->notify_on_service_recovery,
     static_cast<int>(static_cast<bool>(
-      obj.service_notification_options() & service::recovery)));
+      obj.service_notification_options() & service::ok)));
   modify_if_different(
     c->notify_on_service_flapping,
     static_cast<int>(static_cast<bool>(
@@ -240,7 +240,7 @@ void applier::contact::modify_object(
   modify_if_different(
     c->notify_on_host_recovery,
     static_cast<int>(static_cast<bool>(
-      obj.host_notification_options() & host::recovery)));
+      obj.host_notification_options() & host::up)));
   modify_if_different(
     c->notify_on_host_flapping,
     static_cast<int>(static_cast<bool>(
