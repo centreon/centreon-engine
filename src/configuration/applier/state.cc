@@ -262,8 +262,11 @@ applier::state& applier::state::instance() {
  *  Load state applier singleton.
  */
 void applier::state::load() {
-  if (!_instance)
+  if (!_instance) {
     _instance = new applier::state;
+    config = new configuration::state;
+  }
+  return ;
 }
 
 /**
@@ -272,6 +275,9 @@ void applier::state::load() {
 void applier::state::unload() {
   delete _instance;
   _instance = NULL;
+  delete config;
+  config = NULL;
+  return ;
 }
 
 /**

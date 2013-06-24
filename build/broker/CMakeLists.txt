@@ -63,7 +63,7 @@ if (WITH_TESTING)
 
   # Test compatibility.
   add_executable("broker_compatibility" "${TEST_DIR}/compatibility.cc")
-  target_link_libraries("broker_compatibility" "cce_configuration" "cce_core" "cce_configuration")
+  target_link_libraries("broker_compatibility" "cce_core" "cce_configuration")
   add_test("broker_compatibility" "broker_compatibility")
 
 endif ()

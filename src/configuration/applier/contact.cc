@@ -23,7 +23,6 @@
 #include "com/centreon/engine/configuration/applier/customvariable.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contact.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -92,9 +91,8 @@ void applier::contact::add_object(
   }
 
   // Create contact.
-  shared_ptr<contact_struct>
-    c(
-      add_contact(
+  contact_struct*
+    c(add_contact(
         obj.contact_name().c_str(),
         NULL_IF_EMPTY(obj.alias()),
         NULL_IF_EMPTY(obj.email()),
@@ -128,9 +126,8 @@ void applier::contact::add_object(
         obj.service_notifications_enabled(),
         obj.can_submit_commands(),
         obj.retain_status_information(),
-        obj.retain_nonstatus_information()),
-      &deleter::contact);
-  if (!c.get())
+        obj.retain_nonstatus_information()));
+  if (!c)
     throw (engine_error() << "Error: Could not register contact '"
            << obj.contact_name() << "'.");
 
@@ -141,7 +138,7 @@ void applier::contact::add_object(
        it != end;
        ++it)
     if (!add_host_notification_command_to_contact(
-           c.get(),
+           c,
            it->c_str()))
       throw (engine_error()
              << "Error: Could not add host notification command '"
@@ -154,7 +151,7 @@ void applier::contact::add_object(
        it != end;
        ++it)
     if (!add_service_notification_command_to_contact(
-           c.get(),
+           c,
 	   it->c_str()))
       throw (engine_error()
 	     << "Error: Could not add service notification command '"
@@ -167,7 +164,7 @@ void applier::contact::add_object(
        it != end;
        ++it)
     if (!add_custom_variable_to_contact(
-           c.get(),
+           c,
 	   it->first.c_str(),
 	   it->second.c_str()))
       throw (engine_error()

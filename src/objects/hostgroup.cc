@@ -114,7 +114,7 @@ hostgroup* add_hostgroup(
 
   // Allocate memory.
   shared_ptr<hostgroup> obj(new hostgroup, deleter::hostgroup);
-  memset(obj.get(), 0, sizeof(*obj));
+  memset(obj.get(), 0, sizeof(hostgroup));
 
   try {
     // Duplicate vars.
