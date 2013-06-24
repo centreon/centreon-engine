@@ -296,13 +296,13 @@ bool timeperiod::_build_timeranges(
     std::size_t pos(it->find('-'));
     if (pos == std::string::npos)
       return (false);
-    unsigned long start;
-    if (!_build_time_t(it->substr(0, pos), start))
+    unsigned long start_time;
+    if (!_build_time_t(it->substr(0, pos), start_time))
       return (false);
-    unsigned long end;
-    if (!_build_time_t(it->substr(pos + 1), end))
+    unsigned long end_time;
+    if (!_build_time_t(it->substr(pos + 1), end_time))
       return (false);
-    timeranges.push_back(timerange(start, end));
+    timeranges.push_back(timerange(start_time, end_time));
   }
   return (true);
 }
