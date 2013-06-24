@@ -68,7 +68,14 @@ static unsigned int const   MAX_ADDRESSES(6);
  *  Default constructor.
  */
 contact::contact()
-  : object(object::contact) {
+  : object(object::contact),
+    _can_submit_commands(default_can_submit_commands),
+    _host_notifications_enabled(default_host_notifications_enabled),
+    _host_notification_options(default_host_notification_options),
+    _retain_nonstatus_information(default_retain_nonstatus_information),
+    _retain_status_information(default_retain_status_information),
+    _service_notification_options(default_service_notification_options),
+    _service_notifications_enabled(default_service_notifications_enabled) {
   _address.resize(MAX_ADDRESSES);
 }
 

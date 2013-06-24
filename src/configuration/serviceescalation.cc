@@ -61,7 +61,11 @@ static unsigned int const   default_notification_interval(0);
  *  Default constructor.
  */
 serviceescalation::serviceescalation()
-  : object(object::serviceescalation) {
+  : object(object::serviceescalation),
+    _escalation_options(default_escalation_options),
+    _first_notification(default_first_notification),
+    _last_notification(default_last_notification),
+    _notification_interval(default_notification_interval) {
 
 }
 

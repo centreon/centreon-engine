@@ -89,12 +89,12 @@ static struct {
 
 // XXX: check all default value from xodtemplate_inherit_object_properties !
 // Default values.
-static point_2d const       default_coords_2d(-1, -1);
-static point_3d const       default_coords_3d(0.0, 0.0, 0.0);
 static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
 static unsigned int const   default_check_interval(5);
+static point_2d const       default_coords_2d(-1, -1);
+static point_3d const       default_coords_3d(0.0, 0.0, 0.0);
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
@@ -118,7 +118,31 @@ static unsigned short const default_stalking_options(host::none);
  *  Default constructor.
  */
 host::host()
-  : object(object::host) {
+  : object(object::host),
+    _checks_active(default_checks_active),
+    _checks_passive(default_checks_passive),
+    _check_freshness(default_check_freshness),
+    _check_interval(default_check_interval),
+    _coords_2d(default_coords_2d),
+    _coords_3d(default_coords_3d),
+    _event_handler_enabled(default_event_handler_enabled),
+    _first_notification_delay(default_first_notification_delay),
+    _flap_detection_enabled(default_flap_detection_enabled),
+    _flap_detection_options(default_flap_detection_options),
+    _freshness_threshold(default_freshness_threshold),
+    _high_flap_threshold(default_high_flap_threshold),
+    _initial_state(default_initial_state),
+    _low_flap_threshold(default_low_flap_threshold),
+    _max_check_attempts(default_max_check_attempts),
+    _notifications_enabled(default_notifications_enabled),
+    _notification_interval(default_notification_interval),
+    _notification_options(default_notification_options),
+    _obsess_over_host(default_obsess_over_host),
+    _process_perf_data(default_process_perf_data),
+    _retain_nonstatus_information(default_retain_nonstatus_information),
+    _retain_status_information(default_retain_status_information),
+    _retry_interval(default_retry_interval),
+    _stalking_options(default_stalking_options) {
 
 }
 

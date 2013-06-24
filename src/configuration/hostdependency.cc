@@ -60,7 +60,10 @@ static unsigned short const default_notification_failure_options(hostdependency:
  *  Default constructor.
  */
 hostdependency::hostdependency()
-  : object(object::hostdependency) {
+  : object(object::hostdependency),
+    _execution_failure_options(default_execution_failure_options),
+    _inherits_parent(default_inherits_parent),
+    _notification_failure_options(default_notification_failure_options) {
 
 }
 

@@ -115,7 +115,33 @@ static unsigned short const default_stalking_options(service::none);
 /**
  *  Default constructor.
  */
-service::service() : object(object::service) {}
+service::service()
+  : object(object::service),
+    _checks_active(default_checks_active),
+    _checks_passive(default_checks_passive),
+    _check_freshness(default_check_freshness),
+    _check_interval(default_check_interval),
+    _event_handler_enabled(default_event_handler_enabled),
+    _first_notification_delay(default_first_notification_delay),
+    _flap_detection_enabled(default_flap_detection_enabled),
+    _flap_detection_options(default_flap_detection_options),
+    _freshness_threshold(default_freshness_threshold),
+    _high_flap_threshold(default_high_flap_threshold),
+    _initial_state(default_initial_state),
+    _is_volatile(default_is_volatile),
+    _low_flap_threshold(default_low_flap_threshold),
+    _max_check_attempts(default_max_check_attempts),
+    _notifications_enabled(default_notifications_enabled),
+    _notification_interval(default_notification_interval),
+    _notification_options(default_notification_options),
+    _obsess_over_service(default_obsess_over_service),
+    _process_perf_data(default_process_perf_data),
+    _retain_nonstatus_information(default_retain_nonstatus_information),
+    _retain_status_information(default_retain_status_information),
+    _retry_interval(default_retry_interval),
+    _stalking_options(default_stalking_options) {
+
+}
 
 /**
  *  Copy constructor.
