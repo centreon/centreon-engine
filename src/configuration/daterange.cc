@@ -248,7 +248,7 @@ unsigned int daterange::skip_interval() const throw () {
  *
  *  @return The timeranges value.
  */
-void daterange::timeranges(std::list<std::string> const& value) {
+void daterange::timeranges(std::list<timerange> const& value) {
   _timeranges = value;
 }
 
@@ -257,7 +257,7 @@ void daterange::timeranges(std::list<std::string> const& value) {
  *
  *  @param[in] value The new timeranges value.
  */
-std::list<std::string> const& daterange::timeranges() const throw () {
+std::list<timerange> const& daterange::timeranges() const throw () {
   return (_timeranges);
 }
 

@@ -20,6 +20,7 @@
 #include <cstdio>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
+#include "com/centreon/engine/configuration/timerange.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/hash.hh"
@@ -246,10 +247,65 @@ std::string const& timeperiod::timeperiod_name() const throw () {
  *
  *  @return The timeranges list.
  */
-std::vector<list_string> const& timeperiod::timeranges() const throw () {
+std::vector<std::list<timerange> > const& timeperiod::timeranges() const throw () {
   return (_timeranges);
 }
 
+/**
+ *  Build time_t from timerange configuration.
+ *
+ *  @param[in]  time_str The time to parse (format 00:00-12:00).
+ *  @param[out] ret      The value to fill.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool timeperiod::_build_time_t(
+       std::string const& time_str,
+       unsigned long& ret) {
+  std::size_t pos(time_str.find(':'));
+  if (pos == std::string::npos)
+    return (false);
+  unsigned long hours;
+  if (!misc::to(time_str.substr(0, pos), hours))
+    return (false);
+  unsigned long minutes;
+  if (!misc::to(time_str.substr(pos + 1), minutes))
+    return (false);
+  ret = hours * 3600 + minutes * 60;
+  return (true);
+}
+
+/**
+ *  Build timerange from new line.
+ *
+ *  @param[in]  line       The line to parse.
+ *  @param[out] timeranges The list to fill.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool timeperiod::_build_timeranges(
+       std::string const& line,
+       std::list<timerange>& timeranges) {
+  list_string timeranges_str;
+  misc::split(line, timeranges_str, ',');
+  for (list_string::const_iterator
+         it(timeranges_str.begin()),
+         end(timeranges_str.end());
+       it != end;
+       ++it) {
+    std::size_t pos(it->find('-'));
+    if (pos == std::string::npos)
+      return (false);
+    unsigned long start;
+    if (!_build_time_t(it->substr(0, pos), start))
+      return (false);
+    unsigned long end;
+    if (!_build_time_t(it->substr(pos + 1), end))
+      return (false);
+    timeranges.push_back(timerange(start, end));
+  }
+  return (true);
+}
 
 /**
  *  Add a calendar date.
@@ -318,8 +374,9 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
       month_day_end = month_day_start;
     }
 
-    std::list<std::string> timeranges;
-    misc::split(line.substr(pos), timeranges, ',');
+    std::list<timerange> timeranges;
+    if (!_build_timeranges(line.substr(pos), timeranges))
+      return (false);
 
     daterange range(daterange::calendar_date);
     range.year_start(year_start);
@@ -562,8 +619,10 @@ bool timeperiod::_add_other_date(std::string const& line) {
     }
     range.skip_interval(skip_interval);
 
-    std::list<std::string> timeranges;
-    misc::split(line.substr(pos), timeranges, ',');
+    std::list<timerange> timeranges;
+    if (!_build_timeranges(line.substr(pos), timeranges))
+      return (false);
+
     range.timeranges(timeranges);
     _exceptions[daterange::calendar_date].push_back(range);
     return (true);
@@ -586,7 +645,10 @@ bool timeperiod::_add_week_day(
   unsigned int day_id;
   if (!_get_day_id(key, day_id))
     return (false);
-  misc::split(value, _timeranges[day_id], ',');
+
+  if (!_build_timeranges(value, _timeranges[day_id]))
+    return (false);
+
   return (true);
 }
 

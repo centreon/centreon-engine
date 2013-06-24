@@ -57,7 +57,7 @@ namespace                  configuration {
                            exceptions() const throw ();
     list_string const&     exclude() const throw ();
     std::string const&     timeperiod_name() const throw ();
-    std::vector<list_string> const&
+    std::vector<std::list<timerange> > const&
                            timeranges() const throw ();
 
   private:
@@ -66,6 +66,12 @@ namespace                  configuration {
     bool                   _add_week_day(
                              std::string const& key,
                              std::string const& value);
+    static bool            _build_timeranges(
+                             std::string const& line,
+                             std::list<timerange>& timeranges);
+    static bool            _build_time_t(
+                             std::string const& time_str,
+                             unsigned long& ret);
     static bool            _get_month_id(
                              std::string const& name,
                              unsigned int& id);
@@ -81,7 +87,7 @@ namespace                  configuration {
                            _exceptions;
     list_string            _exclude;
     std::string            _timeperiod_name;
-    std::vector<list_string>
+    std::vector<std::list<timerange> >
                            _timeranges;
   };
 

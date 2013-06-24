@@ -22,6 +22,7 @@
 
 #  include <list>
 #  include <string>
+#  include "com/centreon/engine/configuration/timerange.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -55,8 +56,8 @@ namespace        configuration {
     unsigned int month_day_start() const throw ();
     void         skip_interval(unsigned int value);
     unsigned int skip_interval() const throw ();
-    void         timeranges(std::list<std::string> const& value);
-    std::list<std::string> const&
+    void         timeranges(std::list<timerange> const& value);
+    std::list<timerange> const&
                  timeranges() const throw ();
     void         type(type_range value);
     type_range   type() const throw ();
@@ -79,7 +80,7 @@ namespace        configuration {
     unsigned int _month_day_end;
     unsigned int _month_day_start;
     unsigned int _skip_interval;
-    std::list<std::string>
+    std::list<timerange>
                  _timeranges;
     type_range   _type;
     unsigned int _week_day_end;
