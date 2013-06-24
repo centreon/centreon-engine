@@ -87,7 +87,7 @@ void applier::contact::add_object(
            end(obj.address().end());
          it != end;
          ++it, ++i)
-      addresses[i] = it->c_str();
+      addresses[i] = NULL_IF_EMPTY(*it);
   }
 
   // Create contact.
@@ -397,7 +397,7 @@ void applier::contact::resolve_object(
   // Resolve contact.
   if (!check_contact(it->second.get(), NULL, NULL))
     throw (engine_error() << "Error: Cannot resolve contact '"
-           << obj.contact_name());
+           << obj.contact_name() << "'.");
 
   return ;
 }

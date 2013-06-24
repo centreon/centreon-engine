@@ -145,8 +145,10 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _timeperiods,
     new_cfg,
     new_cfg.timeperiods());
+  _resolve<configuration::timeperiod, applier::timeperiod>(
+    config->timeperiods());
 
-  // Apply connectors.
+  // Apply connectors and commands.
   _apply<configuration::connector,
          commands::connector,
          applier::connector,
@@ -156,8 +158,6 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _connectors,
     new_cfg,
     new_cfg.connectors());
-
-  // Apply commands.
   _apply<configuration::command,
          command_struct,
          applier::command,
@@ -167,8 +167,12 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _commands,
     new_cfg,
     new_cfg.commands());
+  _resolve<configuration::connector, applier::connector>(
+    config->connectors());
+  _resolve<configuration::command, applier::command>(
+    config->commands());
 
-  // Apply contactgroups.
+  // Apply contactgroups and contacts.
   _apply<configuration::contactgroup,
          contactgroup_struct,
          applier::contactgroup,
@@ -178,8 +182,6 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _contactgroups,
     new_cfg,
     new_cfg.contactgroups());
-
-  // Apply contacts.
   _apply<configuration::contact,
          contact_struct,
          applier::contact,
@@ -189,8 +191,12 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _contacts,
     new_cfg,
     new_cfg.contacts());
+  _resolve<configuration::contactgroup, applier::contactgroup>(
+    config->contactgroups());
+  _resolve<configuration::contact, applier::contact>(
+    config->contacts());
 
-  // Apply hostgroups.
+  // Apply hostgroups and hosts.
   _apply<configuration::hostgroup,
          hostgroup_struct,
          applier::hostgroup,
@@ -200,8 +206,6 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _hostgroups,
     new_cfg,
     new_cfg.hostgroups());
-
-  // Apply hosts.
   _apply<configuration::host,
          host_struct,
          applier::host,
@@ -211,8 +215,12 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _hosts,
     new_cfg,
     new_cfg.hosts());
+  _resolve<configuration::hostgroup, applier::hostgroup>(
+    config->hostgroups());
+  _resolve<configuration::host, applier::host>(
+    config->hosts());
 
-  // Apply servicegroups.
+  // Apply servicegroups and services.
   _apply<configuration::servicegroup,
          servicegroup_struct,
          applier::servicegroup,
@@ -222,8 +230,6 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _servicegroups,
     new_cfg,
     new_cfg.servicegroups());
-
-  // Apply services.
   {
     std::set<shared_ptr<configuration::service> > expanded_services;
     {
@@ -245,6 +251,10 @@ void applier::state::apply(configuration::state const& new_cfg) {
         expanded_services);
     }
   }
+  _resolve<configuration::servicegroup, applier::servicegroup>(
+    config->servicegroups());
+  _resolve<configuration::service, applier::service>(
+    config->services());
 
   return ;
 }
@@ -592,12 +602,31 @@ void applier::state::_apply(
          it_create(diff.added().begin()),
          end_create(diff.added().end());
        it_create != end_create;
-       ++it_create)
+       ++it_create) {
     aplyr.add_object(**it_create, new_state);
-  // XXX : add in cur_cfg (sorted)
+    cur_cfg.insert(*it_create);
+  }
 
   // Modify objects.
   // XXX
 
+  return ;
+}
+
+/**
+ *  Resolve objects.
+ *
+ *  @param[in] cfg Configuration objects.
+ */
+template <typename ConfigurationType, typename ApplierType>
+void applier::state::_resolve(
+       std::set<shared_ptr<ConfigurationType> > const& cfg) {
+  ApplierType aplyr;
+  for (typename std::set<shared_ptr<ConfigurationType> >::const_iterator
+         it(cfg.begin()),
+         end(cfg.end());
+       it != end;
+       ++it)
+    aplyr.resolve_object(**it, *config);
   return ;
 }
