@@ -85,113 +85,113 @@ if (WITH_TESTING)
   ## check compatibility configuration path.
   set(CONF_DIR "${TEST_DIR}/etc")
 
-  # parse_configuration_command
-  set(TEST_NAME "parse_configuration_command")
+  # parse_and_apply_configuration_command
+  set(TEST_NAME "parse_and_apply_configuration_command")
   set(TEST_CONF_FILE "main_command.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_comment
-  set(TEST_NAME "parse_configuration_comment")
+  # parse_and_apply_configuration_comment
+  set(TEST_NAME "parse_and_apply_configuration_comment")
   set(TEST_CONF_FILE "main_comment.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_connector
-  set(TEST_NAME "parse_configuration_connector")
+  # parse_and_apply_configuration_connector
+  set(TEST_NAME "parse_and_apply_configuration_connector")
   set(TEST_CONF_FILE "main_connector.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_contact
-  set(TEST_NAME "parse_configuration_contact")
+  # parse_and_apply_configuration_contact
+  set(TEST_NAME "parse_and_apply_configuration_contact")
   set(TEST_CONF_FILE "main_contact.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_contact_template
-  set(TEST_NAME "parse_configuration_contact_template")
+  # parse_and_apply_configuration_contact_template
+  set(TEST_NAME "parse_and_apply_configuration_contact_template")
   set(TEST_CONF_FILE "main_contact_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_globals
-  set(TEST_NAME "parse_configuration_globals")
+  # parse_and_apply_configuration_globals
+  set(TEST_NAME "parse_and_apply_configuration_globals")
   set(TEST_CONF_FILE "main_globals.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_host
-  set(TEST_NAME "parse_configuration_host")
+  # parse_and_apply_configuration_host
+  set(TEST_NAME "parse_and_apply_configuration_host")
   set(TEST_CONF_FILE "main_host.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_host_template
-  set(TEST_NAME "parse_configuration_host_template")
+  # parse_and_apply_configuration_host_template
+  set(TEST_NAME "parse_and_apply_configuration_host_template")
   set(TEST_CONF_FILE "main_host_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_hostdependency
-  set(TEST_NAME "parse_configuration_hostdependency")
+  # parse_and_apply_configuration_hostdependency
+  set(TEST_NAME "parse_and_apply_configuration_hostdependency")
   set(TEST_CONF_FILE "main_hostdependency.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_hostdependency_template
-  set(TEST_NAME "parse_configuration_hostdependency_template")
+  # parse_and_apply_configuration_hostdependency_template
+  set(TEST_NAME "parse_and_apply_configuration_hostdependency_template")
   set(TEST_CONF_FILE "main_hostdependency_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_hostescalation
-  set(TEST_NAME "parse_configuration_hostescalation")
+  # parse_and_apply_configuration_hostescalation
+  set(TEST_NAME "parse_and_apply_configuration_hostescalation")
   set(TEST_CONF_FILE "main_hostescalation.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_hostescalation_template
-  set(TEST_NAME "parse_configuration_hostescalation_template")
+  # parse_and_apply_configuration_hostescalation_template
+  set(TEST_NAME "parse_and_apply_configuration_hostescalation_template")
   set(TEST_CONF_FILE "main_hostescalation_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_hostextinfo
-  set(TEST_NAME "parse_configuration_hostextinfo")
+  # parse_and_apply_configuration_hostextinfo
+  set(TEST_NAME "parse_and_apply_configuration_hostextinfo")
   set(TEST_CONF_FILE "main_hostextinfo.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_service
-  set(TEST_NAME "parse_configuration_service")
+  # parse_and_apply_configuration_service
+  set(TEST_NAME "parse_and_apply_configuration_service")
   set(TEST_CONF_FILE "main_service.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_service_template
-  set(TEST_NAME "parse_configuration_service_template")
+  # parse_and_apply_configuration_service_template
+  set(TEST_NAME "parse_and_apply_configuration_service_template")
   set(TEST_CONF_FILE "main_service_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_servicedependency
-  set(TEST_NAME "parse_configuration_servicedependency")
+  # parse_and_apply_configuration_servicedependency
+  set(TEST_NAME "parse_and_apply_configuration_servicedependency")
   set(TEST_CONF_FILE "main_servicedependency.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_servicedependency_template
-  set(TEST_NAME "parse_configuration_servicedependency_template")
+  # parse_and_apply_configuration_servicedependency_template
+  set(TEST_NAME "parse_and_apply_configuration_servicedependency_template")
   set(TEST_CONF_FILE "main_servicedependency_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_serviceescalation
-  set(TEST_NAME "parse_configuration_serviceescalation")
+  # parse_and_apply_configuration_serviceescalation
+  set(TEST_NAME "parse_and_apply_configuration_serviceescalation")
   set(TEST_CONF_FILE "main_serviceescalation.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_serviceescalation_template
-  set(TEST_NAME "parse_configuration_serviceescalation_template")
+  # parse_and_apply_configuration_serviceescalation_template
+  set(TEST_NAME "parse_and_apply_configuration_serviceescalation_template")
   set(TEST_CONF_FILE "main_serviceescalation_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_serviceextinfo
-  set(TEST_NAME "parse_configuration_serviceextinfo")
+  # parse_and_apply_configuration_serviceextinfo
+  set(TEST_NAME "parse_and_apply_configuration_serviceextinfo")
   set(TEST_CONF_FILE "main_serviceextinfo.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_timeperiod
-  set(TEST_NAME "parse_configuration_timeperiod")
+  # parse_and_apply_configuration_timeperiod
+  set(TEST_NAME "parse_and_apply_configuration_timeperiod")
   set(TEST_CONF_FILE "main_timeperiod.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_configuration_timeperiod_template
-  set(TEST_NAME "parse_configuration_timeperiod_template")
+  # parse_and_apply_configuration_timeperiod_template
+  set(TEST_NAME "parse_and_apply_configuration_timeperiod_template")
   set(TEST_CONF_FILE "main_timeperiod_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 endif ()
