@@ -31,9 +31,7 @@ using namespace com::centreon::engine::configuration;
 point_3d::point_3d(double x, double y, double z)
   : _x(x),
     _y(y),
-    _z(z){
-
-}
+    _z(z){}
 
 /**
  *  Copy constructor.
@@ -47,9 +45,7 @@ point_3d::point_3d(point_3d const& right) {
 /**
  *  Destructor.
  */
-point_3d::~point_3d() throw () {
-
-}
+point_3d::~point_3d() throw () {}
 
 /**
  *  Copy operator.
@@ -87,6 +83,21 @@ bool point_3d::operator==(point_3d const& right) const throw () {
  */
 bool point_3d::operator!=(point_3d const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool point_3d::operator<(point_3d const& right) const throw () {
+  if (_x != right._x)
+    return (_x < right._x);
+  else if (_y != right._y)
+    return (_y < right._y);
+  return (_z < right._z);
 }
 
 /**
