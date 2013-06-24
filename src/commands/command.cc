@@ -19,6 +19,7 @@
 
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/command.hh"
+#include "com/centreon/engine/macros/grab.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;

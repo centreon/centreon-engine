@@ -24,6 +24,8 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/engine/macros/process.hh"
 
 using namespace com::centreon::engine::configuration;
 

@@ -48,7 +48,7 @@ static struct {
 } gl_setters[] = {
   { "use",      SETTER(std::string const&, _set_templates) },
   { "name",     SETTER(std::string const&, _set_name) },
-  { "register", SETTER(bool, _set_is_template) }
+  { "register", SETTER(bool, _set_is_not_template) }
 };
 
 /**
@@ -286,7 +286,7 @@ std::string const& object::type_name() const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool object::_set_is_template(bool value) {
+bool object::_set_is_not_template(bool value) {
   _is_template = !value;
   return (true);
 }

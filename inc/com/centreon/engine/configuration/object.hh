@@ -98,7 +98,7 @@ namespace                  configuration {
       }
     };
 
-    bool                   _set_is_template(bool value);
+    bool                   _set_is_not_template(bool value);
     bool                   _set_name(std::string const& value);
     bool                   _set_templates(std::string const& value);
 
