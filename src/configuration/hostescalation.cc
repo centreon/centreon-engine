@@ -137,6 +137,13 @@ bool hostescalation::operator!=(hostescalation const& right) const throw () {
  *  @return The object id.
  */
 std::size_t hostescalation::id() const throw () {
+  if (!_id) {
+    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(
+      _id,
+      _hostgroups.get().begin(),
+      _hostgroups.get().end());
+  }
   return (_id);
 }
 
@@ -368,6 +375,7 @@ bool hostescalation::_set_first_notification(unsigned int value) {
  */
 bool hostescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -380,7 +388,7 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  */
 bool hostescalation::_set_hosts(std::string const& value) {
   _hosts.set(value);
-  _id = hash(_hosts.get().begin(), _hosts.get().end());
+  _id = 0;
   return (true);
 }
 

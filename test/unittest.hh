@@ -112,7 +112,7 @@ private:
       com::centreon::logging::engine::instance()
         .add(
            &_log,
-           com::centreon::engine::logging::all,
+           com::centreon::engine::logging::log_all,
            com::centreon::engine::logging::most);
       commands::set::load();
       ::config = new configuration::state;
@@ -162,8 +162,12 @@ private:
   int     _argc;
   char**  _argv;
   int     (*_func)(int, char**);
-  // nothing _log;
-  com::centreon::logging::file _log;
+#  ifdef NDEBUG
+  nothing _log;
+#  else
+  com::centreon::logging::file
+          _log;
+#  endif // !NDEBUG
 };
 
 CCE_END()

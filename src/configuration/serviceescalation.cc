@@ -150,8 +150,16 @@ std::size_t serviceescalation::id() const throw () {
     hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
     hash_combine(
       _id,
+      _hostgroups.get().begin(),
+      _hostgroups.get().end());
+    hash_combine(
+      _id,
       _service_description.get().begin(),
       _service_description.get().end());
+    hash_combine(
+      _id,
+      _servicegroups.get().begin(),
+      _servicegroups.get().end());
   }
   return (_id);
 }
@@ -410,6 +418,7 @@ bool serviceescalation::_set_first_notification(unsigned int value) {
  */
 bool serviceescalation::_set_hostgroups(std::string const& value) {
   _hostgroups.set(value);
+  _id = 0;
   return (true);
 }
 
@@ -459,6 +468,7 @@ bool serviceescalation::_set_notification_interval(unsigned int value) {
  */
 bool serviceescalation::_set_servicegroups(std::string const& value) {
   _servicegroups.set(value);
+  _id = 0;
   return (true);
 }
 

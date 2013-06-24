@@ -83,7 +83,7 @@ if (WITH_TESTING)
   target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
   ## check compatibility configuration path.
-  set(CONF_DIR "${TEST_DIR}/configuration/")
+  set(CONF_DIR "${TEST_DIR}/etc")
 
   # parse_configuration_command
   set(TEST_NAME "parse_configuration_command")
@@ -135,6 +135,16 @@ if (WITH_TESTING)
   set(TEST_CONF_FILE "main_hostdependency_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+  # parse_configuration_hostescalation
+  set(TEST_NAME "parse_configuration_hostescalation")
+  set(TEST_CONF_FILE "main_hostescalation.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_hostescalation_template
+  set(TEST_NAME "parse_configuration_hostescalation_template")
+  set(TEST_CONF_FILE "main_hostescalation_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
   # parse_configuration_hostextinfo
   set(TEST_NAME "parse_configuration_hostextinfo")
   set(TEST_CONF_FILE "main_hostextinfo.cfg")
@@ -158,6 +168,16 @@ if (WITH_TESTING)
   # parse_configuration_servicedependency_template
   set(TEST_NAME "parse_configuration_servicedependency_template")
   set(TEST_CONF_FILE "main_servicedependency_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_serviceescalation
+  set(TEST_NAME "parse_configuration_serviceescalation")
+  set(TEST_CONF_FILE "main_serviceescalation.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_configuration_serviceescalation_template
+  set(TEST_NAME "parse_configuration_serviceescalation_template")
+  set(TEST_CONF_FILE "main_serviceescalation_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
   # parse_configuration_serviceextinfo

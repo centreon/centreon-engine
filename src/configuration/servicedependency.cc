@@ -441,11 +441,11 @@ bool servicedependency::_set_execution_failure_options(std::string const& value)
     misc::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
-    else if (*it == "d" || *it == "unknown")
+    else if (*it == "u" || *it == "unknown")
       options |= unknown;
     else if (*it == "w" || *it == "warning")
       options |= warning;
-    else if (*it == "w" || *it == "critical")
+    else if (*it == "c" || *it == "critical")
       options |= critical;
     else if (*it == "p" || *it == "pending")
       options |= pending;
@@ -514,11 +514,11 @@ bool servicedependency::_set_notification_failure_options(std::string const& val
     misc::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
-    else if (*it == "d" || *it == "unknown")
+    else if (*it == "u" || *it == "unknown")
       options |= unknown;
     else if (*it == "w" || *it == "warning")
       options |= warning;
-    else if (*it == "w" || *it == "critical")
+    else if (*it == "c" || *it == "critical")
       options |= critical;
     else if (*it == "p" || *it == "pending")
       options |= pending;
