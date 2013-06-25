@@ -193,28 +193,6 @@ void applier::host::add_object(
       throw (engine_error() << "Error: Could not add parent '"
              << *it << "' to host '" << obj.host_name() << "'.");
 
-  // Host groups.
-  for (list_string::const_iterator
-         it(obj.hostgroups().begin()),
-         end(obj.hostgroups().end());
-       it != end;
-       ++it) {
-    // Find host group object.
-    umap<std::string, shared_ptr<hostgroup_struct> >::iterator
-      it2(applier::state::instance().hostgroups().find(*it));
-    if (it2 == applier::state::instance().hostgroups().end())
-      throw (engine_error() << "Error: Could not add host '"
-             << obj.host_name() << "' to non-existent host group '"
-             << *it << "'.");
-
-    // Add host to host group.
-    if (!add_host_to_hostgroup(
-           it2->second.get(),
-           obj.host_name().c_str()))
-      throw (engine_error() << "Error: Could not add host '"
-             << obj.host_name() << "' to host group '" << *it << "'.");
-  }
-
   return ;
 }
 

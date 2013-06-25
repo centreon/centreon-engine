@@ -234,6 +234,15 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *
  *  @return The members.
  */
+list_string& hostgroup::members() throw () {
+  return (_members.get());
+}
+
+/**
+ *  Get members.
+ *
+ *  @return The members.
+ */
 list_string const& hostgroup::members() const throw () {
   return (_members.get());
 }

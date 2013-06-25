@@ -20,7 +20,9 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 
+#  include <set>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -39,6 +41,10 @@ namespace               configuration {
       void              add_object(
                           configuration::hostgroup const& obj,
                           configuration::state const& s);
+      void              expand_object(
+                          configuration::hostgroup const& obj,
+                          configuration::state const& s,
+                          std::set<shared_ptr<configuration::hostgroup> >& expanded);
       void              modify_object(
                           configuration::hostgroup const& obj,
                           configuration::state const& s);
