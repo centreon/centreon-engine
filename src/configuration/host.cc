@@ -1428,7 +1428,7 @@ bool host::_set_notification_options(
     else if (*it == "u" || *it == "unreachable")
       options |= unreachable;
     else if (*it == "r" || *it == "recovery")
-      options |= recovery;
+      options |= up;
     else if (*it == "f" || *it == "flapping")
       options |= flapping;
     else if (*it == "s" || *it == "downtime")
@@ -1436,7 +1436,7 @@ bool host::_set_notification_options(
     else if (*it == "n" || *it == "none")
       options = none;
     else if (*it == "a" || *it == "all")
-      options = down | unreachable | recovery | flapping | downtime;
+      options = down | unreachable | up | flapping | downtime;
     else
       return (false);
   }

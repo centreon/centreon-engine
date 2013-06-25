@@ -1311,7 +1311,7 @@ bool service::_set_notification_options(std::string const& value) {
     else if (*it == "c" || *it == "critical")
       options |= critical;
     else if (*it == "r" || *it == "recovery")
-      options |= recovery;
+      options |= ok;
     else if (*it == "f" || *it == "flapping")
       options |= flapping;
     else if (*it == "s" || *it == "downtime")
@@ -1319,7 +1319,7 @@ bool service::_set_notification_options(std::string const& value) {
     else if (*it == "n" || *it == "none")
       options = none;
     else if (*it == "a" || *it == "all")
-      options = unknown | warning | critical | recovery | flapping | downtime;
+      options = unknown | warning | critical | ok | flapping | downtime;
     else
       return (false);
   }

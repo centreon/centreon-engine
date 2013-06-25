@@ -41,10 +41,10 @@ bool operator==(
        commandsmember const& obj1,
        commandsmember const& obj2) throw () {
   if (is_equal(obj1.cmd, obj2.cmd)) {
-    if (!obj1.next && !obj2.next)
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    else
       return (*obj1.next == *obj2.next);
-    if (obj1.next == obj2.next)
-      return (true);
   }
   return (false);
 }

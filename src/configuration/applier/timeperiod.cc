@@ -79,6 +79,29 @@ void applier::timeperiod::add_object(
     throw (engine_error() << "Error: Could not register timeperiod '"
            << obj.timeperiod_name() << "'.");
 
+  // Add timeranges to timeperiod.
+  {
+    unsigned short day(0);
+    for (std::vector<std::list<timerange> >::const_iterator
+           it(obj.timeranges().begin()),
+           end(obj.timeranges().end());
+         it != end;
+         ++it, ++day)
+      for (std::list<timerange>::const_iterator
+             it2(it->begin()),
+             end2(it->end());
+           it2 != end2;
+           ++it2)
+        if (!add_timerange_to_timeperiod(
+               tp,
+               day,
+               it2->start(),
+               it2->end()))
+          throw (engine_error()
+                 << "Error: Could not add timerange to timeperiod '"
+                 << obj.timeperiod_name() << "'.");
+  }
+
   // Add exceptions to timeperiod.
   for (std::vector<std::list<daterange> >::const_iterator
          it(obj.exceptions().begin()),

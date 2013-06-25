@@ -595,7 +595,7 @@ bool contact::_set_host_notification_options(std::string const& value) {
     else if (*it == "u" || *it == "unreachable")
       options |= host::unreachable;
     else if (*it == "r" || *it == "recovery")
-      options |= host::recovery;
+      options |= host::up;
     else if (*it == "f" || *it == "flapping")
       options |= host::flapping;
     else if (*it == "s" || *it == "downtime")
@@ -605,7 +605,7 @@ bool contact::_set_host_notification_options(std::string const& value) {
     else if (*it == "a" || *it == "all")
       options = host::down
         | host::unreachable
-        | host::recovery
+        | host::up
         | host::flapping
         | host::downtime;
     else
@@ -698,7 +698,7 @@ bool contact::_set_service_notification_options(std::string const& value) {
     else if (*it == "c" || *it == "critical")
       options |= service::critical;
     else if (*it == "r" || *it == "recovery")
-      options |= service::recovery;
+      options |= service::ok;
     else if (*it == "f" || *it == "flapping")
       options |= service::flapping;
     else if (*it == "s" || *it == "downtime")
@@ -709,7 +709,7 @@ bool contact::_set_service_notification_options(std::string const& value) {
       options = service::unknown
         | service::warning
         | service::critical
-        | service::recovery
+        | service::ok
         | service::flapping
         | service::downtime;
     else

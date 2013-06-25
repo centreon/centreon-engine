@@ -43,9 +43,8 @@ namespace                  configuration {
       up = (1 << 0),
       down = (1 << 1),
       unreachable = (1 << 2),
-      recovery = (1 << 3),
-      flapping = (1 << 4),
-      downtime = (1 << 5)
+      flapping = (1 << 3),
+      downtime = (1 << 4)
     };
 
                            host();
