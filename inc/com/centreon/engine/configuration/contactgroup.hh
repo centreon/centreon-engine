@@ -53,6 +53,7 @@ namespace                  configuration {
     std::string const&     alias() const throw ();
     list_string const&     contactgroup_members() const throw ();
     std::string const&     contactgroup_name() const throw ();
+    list_string&           members() throw ();
     list_string const&     members() const throw ();
 
     bool                   is_resolved() const throw ();

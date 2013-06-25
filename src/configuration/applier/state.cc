@@ -173,16 +173,7 @@ void applier::state::apply(configuration::state const& new_cfg) {
   _resolve<configuration::command, applier::command>(
     config->commands());
 
-  // Apply contactgroups and contacts.
-  _apply<configuration::contactgroup,
-         contactgroup_struct,
-         applier::contactgroup,
-         std::string,
-         &contactgroup_key>(
-    config->contactgroups(),
-    _contactgroups,
-    new_cfg,
-    new_cfg.contactgroups());
+  // Apply contacts and contactgroups.
   _apply<configuration::contact,
          contact_struct,
          applier::contact,
@@ -192,6 +183,27 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _contacts,
     new_cfg,
     new_cfg.contacts());
+  {
+    std::set<shared_ptr<configuration::contactgroup> > expanded_groups;
+    {
+      applier::contactgroup aplyr;
+      for (std::set<shared_ptr<configuration::contactgroup> >::const_iterator
+             it(new_cfg.contactgroups().begin()),
+             end(new_cfg.contactgroups().end());
+           it != end;
+           ++it)
+        aplyr.expand_object(**it, new_cfg, expanded_groups);
+    }
+    _apply<configuration::contactgroup,
+           contactgroup_struct,
+           applier::contactgroup,
+           std::string,
+           &contactgroup_key>(
+      config->contactgroups(),
+      _contactgroups,
+      new_cfg,
+      expanded_groups);
+  }
   _resolve<configuration::contactgroup, applier::contactgroup>(
     config->contactgroups());
   _resolve<configuration::contact, applier::contact>(
@@ -241,16 +253,16 @@ void applier::state::apply(configuration::state const& new_cfg) {
            it != end;
            ++it)
         aplyr.expand_object(**it, new_cfg, expanded_services);
-      _apply<configuration::service,
-             service_struct,
-             applier::service,
-             std::pair<std::string, std::string>,
-             &service_key>(
-        config->services(),
-        _services,
-        new_cfg,
-        expanded_services);
     }
+    _apply<configuration::service,
+           service_struct,
+           applier::service,
+           std::pair<std::string, std::string>,
+           &service_key>(
+      config->services(),
+      _services,
+      new_cfg,
+      expanded_services);
   }
   _resolve<configuration::servicegroup, applier::servicegroup>(
     config->servicegroups());
