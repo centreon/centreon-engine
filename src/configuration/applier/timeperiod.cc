@@ -132,7 +132,7 @@ void applier::timeperiod::add_object(
                << obj.timeperiod_name() << "'.");
       for (std::list<timerange>::const_iterator
              it3(it2->timeranges().begin()),
-             end3(it2->timeranges().begin());
+             end3(it2->timeranges().end());
            it3 != end3;
            ++it3)
         if (!add_timerange_to_daterange(

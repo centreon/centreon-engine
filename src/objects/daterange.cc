@@ -53,10 +53,10 @@ bool operator==(
       && obj1.ewday_offset == obj2.ewday_offset
       && obj1.skip_interval == obj2.skip_interval
       && is_equal(obj1.times, obj2.times)) {
-    if (!obj1.next && !obj2.next)
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    else
       return (*obj1.next == *obj2.next);
-    if (obj1.next == obj2.next)
-      return (true);
   }
   return (false);
 }
