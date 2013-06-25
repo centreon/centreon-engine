@@ -112,7 +112,7 @@ void applier::timeperiod::add_object(
            it2(it->begin()),
            end2(it->end());
          it2 != end2;
-         ++it2)
+         ++it2) {
       if (!add_exception_to_timeperiod(
              tp,
              it2->type(),
@@ -130,6 +130,20 @@ void applier::timeperiod::add_object(
         throw (engine_error()
                << "Error: Could not add exception to timeperiod '"
                << obj.timeperiod_name() << "'.");
+      for (std::list<timerange>::const_iterator
+             it3(it2->timeranges().begin()),
+             end3(it2->timeranges().begin());
+           it3 != end3;
+           ++it3)
+        if (!add_timerange_to_daterange(
+               tp->exceptions[it2->type()],
+               it3->start(),
+               it3->end()))
+          throw (engine_error()
+                 << "Error: Could not add timerange to daterange of type "
+                 << it2->type() << " of timeperiod '"
+                 << obj.timeperiod_name() << "'.");
+    }
 
   // Add exclusions to timeperiod.
   for (list_string::const_iterator

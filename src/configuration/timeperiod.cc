@@ -388,7 +388,7 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
     range.skip_interval(skip_interval);
     range.timeranges(timeranges);
 
-    _exceptions[daterange::calendar_date].push_back(range);
+    _exceptions[daterange::calendar_date].push_front(range);
     return (true);
   }
   return (false);
