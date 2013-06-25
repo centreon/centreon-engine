@@ -87,6 +87,62 @@ private:
   std::string        _type_name;
 };
 
+class chk_service : public check {
+public:
+                     ~chk_service() throw () {}
+  std::string const& id() const throw () {
+    return (_service_description);
+  }
+
+  void               id(configuration::object const& obj) {
+    _type_name = obj.type_name();
+    configuration::service const&
+      real(*static_cast<configuration::service const*>(&obj));
+    _hosts = real.hosts();
+    for (list_string::const_iterator
+           it(real.hostgroups().begin()), end(real.hostgroups().end());
+         it != end;
+         ++it) {
+      hostgroup_struct* hg(find_hostgroup(it->c_str()));
+      if (!hg)
+        throw (engine_error() << "invalid service: hostgroup not found!");
+      for (hostsmember_struct* m(hg->members); m; m = m->next)
+        _hosts.push_back(m->host_name);
+    }
+    _service_description = real.service_description();
+  }
+
+  bool               find_into_config() {
+    configuration::set_service const& objects(config->services());
+    for (configuration::set_service::const_iterator
+           it(objects.begin()), end(objects.end());
+         it != end;
+         ++it)
+      if ((*it)->service_description() == _service_description)
+        return (true);
+    return (false);
+  }
+
+  bool               find_into_applier() {
+    for (list_string::const_iterator
+           it(_hosts.begin()), end(_hosts.end());
+         it != end;
+         ++it)
+      if (find_service(it->c_str(), _service_description.c_str()))
+        return (true);
+    return (false);
+  }
+
+  std::string const& type_name() const throw () {
+    return (_type_name);
+  }
+
+private:
+  list_string        _hosts;
+  std::string        _service_description;
+  std::string        _type_name;
+};
+
 template<typename T, T& (configuration::state::*get)() throw ()>
 static void check_remove_objects(std::string const& path, check& chk) {
   configuration::state config;
@@ -187,15 +243,12 @@ int main_test(int argc, char* argv[]) {
       configuration::set_hostgroup,
       &configuration::state::hostgroups>(argv[2], chk_hostgroup);
   }
-  // else if (type == "service") {
-  //   chk_generic<
-  //     configuration::service, &configuration::service::,
-  //     configuration::set_service, &configuration::state::services,
-  //     service_struct, &find_service> chk_service;
-  //   check_remove_objects<
-  //     configuration::set_service,
-  //     &configuration::state::services>(argv[2], chk_service);
-  // }
+  else if (type == "service") {
+    chk_service chk_service;
+    check_remove_objects<
+      configuration::set_service,
+      &configuration::state::services>(argv[2], chk_service);
+  }
   else if (type == "servicegroup") {
     chk_generic<
       configuration::servicegroup,

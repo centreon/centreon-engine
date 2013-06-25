@@ -211,8 +211,58 @@ if (WITH_TESTING)
   set(TEST_CONF_FILE "main_command.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "command" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # # parse_and_remove_configuration_XXX
-  # set(TEST_NAME "parse_and_remove_configuration_XXX")
-  # set(TEST_CONF_FILE "main_XXX.cfg")
-  # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "XXX" "${CONF_DIR}/${TEST_CONF_FILE}")
+  # parse_and_remove_configuration_contact
+  set(TEST_NAME "parse_and_remove_configuration_contact")
+  set(TEST_CONF_FILE "main_contact.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_contact_template
+  set(TEST_NAME "parse_and_remove_configuration_contact_template")
+  set(TEST_CONF_FILE "main_contact_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_contactgroup
+  set(TEST_NAME "parse_and_remove_configuration_contactgroup")
+  set(TEST_CONF_FILE "main_contact.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactgroup" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_host
+  set(TEST_NAME "parse_and_remove_configuration_host")
+  set(TEST_CONF_FILE "main_host.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_host_template
+  set(TEST_NAME "parse_and_remove_configuration_host_tempalte")
+  set(TEST_CONF_FILE "main_host_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_hostgroup
+  set(TEST_NAME "parse_and_remove_configuration_hostgroup")
+  set(TEST_CONF_FILE "main_host.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostgroup" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_service
+  set(TEST_NAME "parse_and_remove_configuration_service")
+  set(TEST_CONF_FILE "main_service.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "service" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_service_template
+  set(TEST_NAME "parse_and_remove_configuration_service_template")
+  set(TEST_CONF_FILE "main_service_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "service" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_servicegroup
+  set(TEST_NAME "parse_and_remove_configuration_servicegroup")
+  set(TEST_CONF_FILE "main_service.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "servicegroup" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_timeperiod
+  set(TEST_NAME "parse_and_remove_configuration_timeperiod")
+  set(TEST_CONF_FILE "main_timeperiod.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timeperiod" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_timeperiod_template
+  set(TEST_NAME "parse_and_remove_configuration_timeperiod_template")
+  set(TEST_CONF_FILE "main_timeperiod_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timeperiod" "${CONF_DIR}/${TEST_CONF_FILE}")
 endif ()
