@@ -262,7 +262,7 @@ void contact::merge(object const& obj) {
     throw (engine_error() << "merge failed: invalid object type");
   contact const& tmpl(static_cast<contact const&>(obj));
 
-  MRG_ADDRESS(_address);
+  MRG_TAB(_address);
   MRG_DEFAULT(_alias);
   MRG_OPTION(_can_submit_commands);
   MRG_INHERIT(_contactgroups);

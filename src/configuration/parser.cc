@@ -525,6 +525,17 @@ void parser::_resolve_template() {
          ++it)
       (*it)->resolve_template(templates);
   }
+
+  for (unsigned int i(0);
+       i < sizeof(_map_objects) / sizeof(_map_objects[0]);
+       ++i) {
+    map_object& templates(_templates[i]);
+    for (map_object::iterator
+           it(_map_objects[i].begin()), end(_map_objects[i].end());
+         it != end;
+         ++it)
+      it->second->resolve_template(templates);
+  }
 }
 
 /**

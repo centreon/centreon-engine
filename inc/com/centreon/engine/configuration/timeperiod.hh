@@ -25,6 +25,7 @@
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/configuration/daterange.hh"
+#  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -72,6 +73,9 @@ namespace                  configuration {
     static bool            _build_time_t(
                              std::string const& time_str,
                              unsigned long& ret);
+    static bool            _has_similar_daterange(
+                             std::list<daterange> const& lst,
+                             daterange const& range) throw ();
     static bool            _get_month_id(
                              std::string const& name,
                              unsigned int& id);
@@ -85,7 +89,7 @@ namespace                  configuration {
     std::string            _alias;
     std::vector<std::list<daterange> >
                            _exceptions;
-    list_string            _exclude;
+    group                  _exclude;
     std::string            _timeperiod_name;
     std::vector<std::list<timerange> >
                            _timeranges;
