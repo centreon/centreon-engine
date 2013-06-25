@@ -1041,7 +1041,7 @@ bool service::_set_event_handler_enabled(bool value) {
 bool service::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: service failure_prediction_enabled was ignored";
+    << "Warning: service failure_prediction_enabled was ignored";
   return (true);
 }
 
@@ -1055,7 +1055,7 @@ bool service::_set_failure_prediction_enabled(bool value) {
 bool service::_set_failure_prediction_options(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: service failure_prediction_options was ignored";
+    << "Warning: service failure_prediction_options was ignored";
   return (true);
 }
 
@@ -1373,7 +1373,7 @@ bool service::_set_obsess_over_service(bool value) {
 bool service::_set_parallelize_check(bool value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: service parallelize_check was ignored";
+    << "Warning: service parallelize_check was ignored";
   return (true);
 }
 

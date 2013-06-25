@@ -1158,7 +1158,7 @@ bool host::_set_event_handler_enabled(bool value) {
 bool host::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: host failure_prediction_enabled was ignored";
+    << "Warning: host failure_prediction_enabled was ignored";
   return (true);
 }
 
@@ -1173,7 +1173,7 @@ bool host::_set_failure_prediction_options(
        std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: service failure_prediction_options was ignored";
+    << "Warning: service failure_prediction_options was ignored";
   return (true);
 }
 
