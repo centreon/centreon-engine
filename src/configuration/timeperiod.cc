@@ -306,7 +306,7 @@ bool timeperiod::_build_timeranges(
     unsigned long end_time;
     if (!_build_time_t(it->substr(pos + 1), end_time))
       return (false);
-    timeranges.push_back(timerange(start_time, end_time));
+    timeranges.push_front(timerange(start_time, end_time));
   }
   return (true);
 }
@@ -628,7 +628,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
       return (false);
 
     range.timeranges(timeranges);
-    _exceptions[type].push_back(range);
+    _exceptions[type].push_front(range);
     return (true);
   }
 
