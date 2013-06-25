@@ -194,7 +194,7 @@ unsigned int daterange::month_start() const throw () {
  *
  *  @param[in] value The new month_day_end value.
  */
-void daterange::month_day_end(unsigned int value) {
+void daterange::month_day_end(int value) {
   _month_day_end = value;
 }
 
@@ -203,7 +203,7 @@ void daterange::month_day_end(unsigned int value) {
  *
  *  @return The month_day_end value.
  */
-unsigned int daterange::month_day_end() const throw () {
+int daterange::month_day_end() const throw () {
   return (_month_day_end);
 }
 
@@ -212,7 +212,7 @@ unsigned int daterange::month_day_end() const throw () {
  *
  *  @param[in] value The new month_day_start value.
  */
-void daterange::month_day_start(unsigned int value) {
+void daterange::month_day_start(int value) {
   _month_day_start = value;
 }
 
@@ -221,7 +221,7 @@ void daterange::month_day_start(unsigned int value) {
  *
  *  @return The month_day_start value.
  */
-unsigned int daterange::month_day_start() const throw () {
+int daterange::month_day_start() const throw () {
   return (_month_day_start);
 }
 
@@ -320,7 +320,7 @@ unsigned int daterange::week_day_start() const throw () {
  *
  *  @param[in] value The new week_day_end_offset value.
  */
-void daterange::week_day_end_offset(unsigned int value) {
+void daterange::week_day_end_offset(int value) {
   _week_day_end_offset = value;
 }
 
@@ -329,7 +329,7 @@ void daterange::week_day_end_offset(unsigned int value) {
  *
  *  @return The week_day_end_offset value.
  */
-unsigned int daterange::week_day_end_offset() const throw () {
+int daterange::week_day_end_offset() const throw () {
   return (_week_day_end_offset);
 }
 
@@ -338,7 +338,7 @@ unsigned int daterange::week_day_end_offset() const throw () {
  *
  *  @param[in] value The new week_day_start_offset value.
  */
-void daterange::week_day_start_offset(unsigned int value) {
+void daterange::week_day_start_offset(int value) {
   _week_day_start_offset = value;
 }
 
@@ -347,7 +347,7 @@ void daterange::week_day_start_offset(unsigned int value) {
  *
  *  @return The week_day_start_offset value.
  */
-unsigned int daterange::week_day_start_offset() const throw () {
+int daterange::week_day_start_offset() const throw () {
   return (_week_day_start_offset);
 }
 

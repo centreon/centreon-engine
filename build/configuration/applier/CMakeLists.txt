@@ -211,8 +211,8 @@ if (WITH_TESTING)
   set(TEST_CONF_FILE "main_command.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "command" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # parse_and_remove_configuration_XXX
-  set(TEST_NAME "parse_and_remove_configuration_XXX")
-  set(TEST_CONF_FILE "main_XXX.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "XXX" "${CONF_DIR}/${TEST_CONF_FILE}")
+  # # parse_and_remove_configuration_XXX
+  # set(TEST_NAME "parse_and_remove_configuration_XXX")
+  # set(TEST_CONF_FILE "main_XXX.cfg")
+  # add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "XXX" "${CONF_DIR}/${TEST_CONF_FILE}")
 endif ()

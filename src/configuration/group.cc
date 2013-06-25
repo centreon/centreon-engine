@@ -158,7 +158,7 @@ void group::is_add_inherit(bool enable) throw () {
  */
 void group::set(group const& grp) {
   if (_is_add_inherit)
-    std::copy(grp._group.begin(), grp._group.end(), _group.begin());
+    _group.insert(_group.end(), grp._group.begin(), grp._group.end());
   else
     _group = grp._group;
 }

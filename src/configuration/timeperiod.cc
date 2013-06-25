@@ -162,10 +162,22 @@ void timeperiod::merge(object const& obj) {
   timeperiod const& tmpl(static_cast<timeperiod const&>(obj));
 
   MRG_DEFAULT(_alias);
-  MRG_DEFAULT(_exceptions);
-  MRG_DEFAULT(_exclude);
+  MRG_INHERIT(_exclude);
   MRG_DEFAULT(_timeperiod_name);
-  MRG_DEFAULT(_timeranges);
+  MRG_TAB(_timeranges);
+
+  // Merge exceptions.
+  for (unsigned int i(0); i < DATERANGE_TYPES; ++i) {
+    for (std::list<daterange>::const_iterator
+           it(tmpl._exceptions[i].begin()),
+           end(tmpl._exceptions[i].end());
+         it != end;
+         ++it) {
+      if (_has_similar_daterange(_exceptions[i], *it))
+        continue;
+      _exceptions[i].push_front(*it);
+    }
+  }
 }
 
 /**
@@ -234,7 +246,7 @@ std::vector<std::list<daterange> > const& timeperiod::exceptions() const throw (
  *  @return The exclude value.
  */
 list_string const& timeperiod::exclude() const throw () {
-  return (_exclude);
+  return (_exclude.get());
 }
 
 /**
@@ -253,30 +265,6 @@ std::string const& timeperiod::timeperiod_name() const throw () {
  */
 std::vector<std::list<timerange> > const& timeperiod::timeranges() const throw () {
   return (_timeranges);
-}
-
-/**
- *  Build time_t from timerange configuration.
- *
- *  @param[in]  time_str The time to parse (format 00:00-12:00).
- *  @param[out] ret      The value to fill.
- *
- *  @return True on success, otherwise false.
- */
-bool timeperiod::_build_time_t(
-       std::string const& time_str,
-       unsigned long& ret) {
-  std::size_t pos(time_str.find(':'));
-  if (pos == std::string::npos)
-    return (false);
-  unsigned long hours;
-  if (!misc::to(time_str.substr(0, pos), hours))
-    return (false);
-  unsigned long minutes;
-  if (!misc::to(time_str.substr(pos + 1), minutes))
-    return (false);
-  ret = hours * 3600 + minutes * 60;
-  return (true);
 }
 
 /**
@@ -309,6 +297,62 @@ bool timeperiod::_build_timeranges(
     timeranges.push_front(timerange(start_time, end_time));
   }
   return (true);
+}
+
+/**
+ *  Build time_t from timerange configuration.
+ *
+ *  @param[in]  time_str The time to parse (format 00:00-12:00).
+ *  @param[out] ret      The value to fill.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool timeperiod::_build_time_t(
+       std::string const& time_str,
+       unsigned long& ret) {
+  std::size_t pos(time_str.find(':'));
+  if (pos == std::string::npos)
+    return (false);
+  unsigned long hours;
+  if (!misc::to(time_str.substr(0, pos), hours))
+    return (false);
+  unsigned long minutes;
+  if (!misc::to(time_str.substr(pos + 1), minutes))
+    return (false);
+  ret = hours * 3600 + minutes * 60;
+  return (true);
+}
+
+/**
+ *  Check if into the list we havea daterange similar
+ *   to the argument.
+ *
+ *  @param[in] lst   The list to check.
+ *  @param[in] range The date range to find.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool timeperiod::_has_similar_daterange(
+       std::list<daterange> const& lst,
+       daterange const& range) throw () {
+  for (std::list<daterange>::const_iterator
+         it(lst.begin()), end(lst.end());
+       it != end;
+       ++it)
+    if (it->type() == range.type()
+        && it->year_start() == range.year_start()
+        && it->month_start() == range.month_start()
+        && it->month_day_start() == range.month_day_start()
+        && it->week_day_start() == range.week_day_start()
+        && it->week_day_start_offset() == range.week_day_start_offset()
+        && it->year_end() == range.year_end()
+        && it->month_end() == range.month_end()
+        && it->month_day_end() == range.month_day_end()
+        && it->week_day_end() == range.week_day_end()
+        && it->week_day_end_offset() == range.week_day_end_offset()
+        && it->skip_interval() == range.skip_interval())
+      return (true);
+  return (false);
 }
 
 /**
@@ -410,13 +454,13 @@ bool timeperiod::_add_other_date(std::string const& line) {
   daterange::type_range type(daterange::none);
   unsigned int month_start(0);
   unsigned int month_end(0);
-  unsigned int month_day_start(0);
-  unsigned int month_day_end(0);
+  int month_day_start(0);
+  int month_day_end(0);
   unsigned int skip_interval(0);
   unsigned int week_day_start(0);
   unsigned int week_day_end(0);
-  unsigned int week_day_start_offset(0);
-  unsigned int week_day_end_offset(0);
+  int week_day_start_offset(0);
+  int week_day_end_offset(0);
   char buffer[4][4096];
 
   if (line.size() > 1024)
@@ -424,7 +468,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
 
   if (sscanf(
         line.c_str(),
-        "%[a-z] %u %[a-z] - %[a-z] %u %[a-z] / %u %n",
+        "%[a-z] %d %[a-z] - %[a-z] %d %[a-z] / %u %n",
         buffer[0],
         &week_day_start_offset,
         buffer[1],
@@ -442,7 +486,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u - %[a-z] %u / %u %n",
+             "%[a-z] %d - %[a-z] %d / %u %n",
              buffer[0],
              &month_day_start,
              buffer[1],
@@ -467,7 +511,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u - %u / %u %n",
+             "%[a-z] %d - %d / %u %n",
              buffer[0],
              &month_day_start,
              &month_day_end,
@@ -491,7 +535,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u %[a-z] - %[a-z] %u %[a-z] %n",
+             "%[a-z] %d %[a-z] - %[a-z] %d %[a-z] %n",
              buffer[0],
              &week_day_start_offset,
              buffer[1],
@@ -508,7 +552,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u - %u %n",
+             "%[a-z] %d - %d %n",
              buffer[0],
              &month_day_start,
              &month_day_end,
@@ -531,7 +575,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u - %[a-z] %u %n",
+             "%[a-z] %d - %[a-z] %d %n",
              buffer[0],
              &month_day_start,
              buffer[1],
@@ -555,7 +599,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u %[a-z] %n",
+             "%[a-z] %d %[a-z] %n",
              buffer[0],
              &week_day_start_offset,
              buffer[1],
@@ -571,7 +615,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
   }
   else if (sscanf(
              line.c_str(),
-             "%[a-z] %u %n",
+             "%[a-z] %d %n",
              buffer[0],
              &month_day_start,
              &pos) == 2) {
@@ -733,8 +777,7 @@ bool timeperiod::_set_alias(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool timeperiod::_set_exclude(std::string const& value) {
-  _exclude.clear();
-  misc::split(value, _exclude, ',');
+  _exclude.set(value);
   return (true);
 }
 
