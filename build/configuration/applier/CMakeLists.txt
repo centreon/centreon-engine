@@ -74,6 +74,11 @@ add_library("cce_configuration_applier"
 target_link_libraries("cce_configuration_applier" "cce_logging")
 
 if (WITH_TESTING)
+  ## check compatibility configuration path.
+  set(CONF_DIR "${TEST_DIR}/etc")
+
+  ## apply configuration and check compatibility.
+
   # check compatibility.
   set(TEST_BIN_NAME "check_compatibility")
   add_executable(
@@ -81,9 +86,6 @@ if (WITH_TESTING)
     "${TEST_DIR}/check_compatibility.cc"
     "${TEST_DIR}/xodtemplate.cc")
   target_link_libraries("${TEST_BIN_NAME}" "cce_core")
-
-  ## check compatibility configuration path.
-  set(CONF_DIR "${TEST_DIR}/etc")
 
   # parse_and_apply_configuration_command
   set(TEST_NAME "parse_and_apply_configuration_command")
@@ -194,4 +196,23 @@ if (WITH_TESTING)
   set(TEST_NAME "parse_and_apply_configuration_timeperiod_template")
   set(TEST_CONF_FILE "main_timeperiod_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  ## parse configuration and remove objects.
+
+  # check remove objects.
+  set(TEST_BIN_NAME "remove_objects")
+  add_executable(
+    "${TEST_BIN_NAME}"
+    "${TEST_DIR}/remove_objects.cc")
+  target_link_libraries("${TEST_BIN_NAME}" "cce_core")
+
+  # parse_and_remove_configuration_command
+  set(TEST_NAME "parse_and_remove_configuration_command")
+  set(TEST_CONF_FILE "main_command.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "command" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_XXX
+  set(TEST_NAME "parse_and_remove_configuration_XXX")
+  set(TEST_CONF_FILE "main_XXX.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "XXX" "${CONF_DIR}/${TEST_CONF_FILE}")
 endif ()

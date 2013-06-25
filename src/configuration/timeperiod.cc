@@ -624,7 +624,7 @@ bool timeperiod::_add_other_date(std::string const& line) {
       return (false);
 
     range.timeranges(timeranges);
-    _exceptions[daterange::calendar_date].push_back(range);
+    _exceptions[type].push_back(range);
     return (true);
   }
 
