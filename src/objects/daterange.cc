@@ -196,8 +196,10 @@ std::ostream& operator<<(std::ostream& os, daterange const& obj) {
 
   if (obj.type < 0 || obj.type >= DATERANGE_TYPES)
     os << "unknown type " << obj.type;
-  else
-    os << (*(tab[obj.type]))(os, obj) << " " << chkobj(obj.times);
+  else {
+    (*(tab[obj.type]))(os, obj);
+    os << " " << chkobj(obj.times);
+  }
   return (os);
 }
 
