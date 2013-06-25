@@ -77,8 +77,10 @@ timeperiod& timeperiod::operator=(timeperiod const& right) {
   if (this != &right) {
     object::operator=(right);
     _alias = right._alias;
+    _exceptions = right._exceptions;
     _exclude = right._exclude;
     _timeperiod_name = right._timeperiod_name;
+    _timeranges = right._timeranges;
   }
   return (*this);
 }
@@ -93,8 +95,10 @@ timeperiod& timeperiod::operator=(timeperiod const& right) {
 bool timeperiod::operator==(timeperiod const& right) const throw () {
   return (object::operator==(right)
           && _alias == right._alias
+          && _exceptions == right._exceptions
           && _exclude == right._exclude
-          && _timeperiod_name == right._timeperiod_name);
+          && _timeperiod_name == right._timeperiod_name
+          && _timeranges == right._timeranges);
 }
 
 /**
