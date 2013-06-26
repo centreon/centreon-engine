@@ -114,7 +114,7 @@ void applier::service::add_object(
     NULL_IF_EMPTY(obj.check_period()),
     obj.initial_state(),
     obj.max_check_attempts(),
-    false, // parallelize
+    true, // parallelize, enabled by default in Nagios
     obj.checks_passive(),
     obj.check_interval(),
     obj.retry_interval(),
@@ -159,7 +159,7 @@ void applier::service::add_object(
     static_cast<bool>(obj.stalking_options()
                       &configuration::service::critical),
     obj.process_perf_data(),
-    false, // failure_prediction_enabled
+    true, // failure_prediction_enabled, enabled by default in Nagios
     NULL, // failure_prediction_options
     obj.check_freshness(),
     obj.freshness_threshold(),

@@ -104,7 +104,7 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(service::none);
+static unsigned short const default_notification_options(service::ok | service::warning | service::critical | service::unknown | service::flapping | service::downtime);
 static bool const           default_obsess_over_service(true);
 static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
