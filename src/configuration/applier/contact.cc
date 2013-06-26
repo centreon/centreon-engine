@@ -171,27 +171,6 @@ void applier::contact::add_object(
 	     << "Error: Could not add custom variable '" << it->first
 	     << "' to contact '" << obj.contact_name() << "'.");
 
-  // Add contact to contactgroups.
-  for (list_string::const_iterator
-         it_group(obj.contactgroups().begin()),
-         end_group(obj.contactgroups().end());
-       it_group != end_group;
-       ++it_group) {
-    umap<std::string, shared_ptr<contactgroup_struct> >::iterator
-      it(applier::state::instance().contactgroups().find(*it_group));
-    if (it == applier::state::instance().contactgroups().end())
-      throw (engine_error()
-             << "Error: Could not add contact '" << obj.contact_name()
-             << "' to non-existing contact group '" << *it_group
-             << "'.");
-    if (!add_contact_to_contactgroup(
-           it->second.get(),
-           obj.contact_name().c_str()))
-      throw (engine_error()
-             << "Error: Could not add contact '" << obj.contact_name()
-             << "' to contact group '" << *it_group << "'.");
-  }
-
   // XXX : c->last_host_notification = obj.last_host_notification();
   // XXX : c->last_service_notification = obj.last_service_notification();
   // XXX : c->modified_attributes = obj.modified_attributes();

@@ -87,6 +87,44 @@ void applier::contactgroup::add_object(
 }
 
 /**
+ *  Expand a contactgroup.
+ *
+ *  @param[in]  obj      Object to expand.
+ *  @param[in]  s        State being applied.
+ *  @param[out] expanded Expanded contactgroup.
+ */
+void applier::contactgroup::expand_object(
+                              configuration::contactgroup const& obj,
+                              configuration::state const& s,
+                              std::set<shared_ptr<configuration::contactgroup> >& expanded) {
+  shared_ptr<configuration::contactgroup>
+    cg(new configuration::contactgroup(obj));
+  for (std::set<shared_ptr<configuration::contact> >::const_iterator
+         it(s.contacts().begin()),
+         end(s.contacts().end());
+       it != end;
+       ++it) {
+    list_string::const_iterator
+      it2(std::find(
+                 (*it)->contactgroups().begin(),
+                 (*it)->contactgroups().end(),
+                 obj.contactgroup_name()));
+    if ((it2 != (*it)->contactgroups().end())
+        && (std::find(
+                   cg->members().begin(),
+                   cg->members().end(),
+                   (*it)->contact_name())
+            == cg->members().end()))
+      cg->members().push_back((*it)->contact_name());
+  }
+  if (!expanded.insert(cg).second) // Element already existed.
+    throw (engine_error() << "Error: Cannot expand contact group '"
+           << obj.contactgroup_name()
+           << "': such group already existed.");
+  return ;
+}
+
+/**
  *  Modified contactgroup.
  *
  *  @param[in] obj The new contactgroup to modify into the monitoring engine.

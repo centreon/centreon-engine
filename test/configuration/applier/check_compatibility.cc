@@ -180,6 +180,28 @@ struct               global {
 static std::string to_str(char const* str) { return (str ? str : ""); }
 
 /**
+ *  Sort a list.
+ */
+static void sort_it(contactsmember*& l) {
+  contactsmember* remaining(l);
+  contactsmember** new_root(&l);
+  *new_root = NULL;
+  while (remaining) {
+    contactsmember** min(&remaining);
+    for (contactsmember** cur(&((*min)->next));
+         *cur;
+         cur = &((*cur)->next))
+      if (strcmp((*cur)->contact_name, (*min)->contact_name) < 0)
+        min = cur;
+    *new_root = *min;
+    *min = (*min)->next;
+    new_root = &((*new_root)->next);
+    *new_root = NULL;
+  }
+  return ;
+}
+
+/**
  *  Check difference between to list of object.
  *
  *  @param[in] l1 The first list.
@@ -325,6 +347,14 @@ bool chkdiff(global const& g1, global const& g2) {
     ret = false;
   if (!chkdiff(g1.contacts, g2.contacts))
     ret = false;
+  for (contactgroup_struct* cg1(g1.contactgroups);
+       cg1;
+       cg1 = cg1->next)
+    sort_it(cg1->members);
+  for (contactgroup_struct* cg2(g2.contactgroups);
+       cg2;
+       cg2 = cg2->next)
+    sort_it(cg2->members);
   if (!chkdiff(g1.contactgroups, g2.contactgroups))
     ret = false;
   if (!chkdiff(g1.hosts, g2.hosts))

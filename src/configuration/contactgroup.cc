@@ -210,6 +210,15 @@ std::string const& contactgroup::contactgroup_name() const throw () {
  *
  *  @return The members.
  */
+list_string& contactgroup::members() throw () {
+  return (_members.get());
+}
+
+/**
+ *  Get members.
+ *
+ *  @return The members.
+ */
 list_string const& contactgroup::members() const throw () {
   return (_members.get());
 }

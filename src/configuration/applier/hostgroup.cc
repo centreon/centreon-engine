@@ -86,6 +86,43 @@ void applier::hostgroup::add_object(
 }
 
 /**
+ *  Expand a hostgroup.
+ *
+ *  @param[in]  obj      Object to expand.
+ *  @param[in]  s        State being applied.
+ *  @param[out] expanded Expanded contactgroup.
+ */
+void applier::hostgroup::expand_object(
+                           configuration::hostgroup const& obj,
+                           configuration::state const& s,
+                           std::set<shared_ptr<configuration::hostgroup> >& expanded) {
+  shared_ptr<configuration::hostgroup>
+    hg(new configuration::hostgroup(obj));
+  for (std::set<shared_ptr<configuration::host> >::const_iterator
+         it(s.hosts().begin()),
+         end(s.hosts().end());
+       it != end;
+       ++it) {
+    list_string::const_iterator
+      it2(std::find(
+                 (*it)->hostgroups().begin(),
+                 (*it)->hostgroups().end(),
+                 obj.hostgroup_name()));
+    if ((it2 != (*it)->hostgroups().end())
+        && (std::find(
+                   hg->members().begin(),
+                   hg->members().end(),
+                   (*it)->host_name())
+            == hg->members().end()))
+      hg->members().push_back((*it)->host_name());
+  }
+  if (!expanded.insert(hg).second) // Element already existed.
+    throw (engine_error() << "Error: Cannot expand host group '"
+           << obj.hostgroup_name() << "': such group already existed.");
+  return ;
+}
+
+/**
  *  Modified hostgroup.
  *
  *  @param[in] obj The new hostgroup to modify into the monitoring engine.
