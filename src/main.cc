@@ -43,6 +43,8 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/configuration/applier/globals.hh"
+#include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -115,6 +117,8 @@ int main(int argc, char* argv[]) {
   com::centreon::clib::load();
   com::centreon::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
+  com::centreon::engine::configuration::applier::globals::load();
+  com::centreon::engine::configuration::applier::macros::load();
   com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::commands::set::load();
   com::centreon::engine::checks::checker::load();
@@ -594,7 +598,9 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::logging::unload();
-  com::centreon::engine::configuration::applier::state::load();
+  com::centreon::engine::configuration::applier::state::unload();
+  com::centreon::engine::configuration::applier::macro::unload();
+  com::centreon::engine::configuration::applier::globals::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 

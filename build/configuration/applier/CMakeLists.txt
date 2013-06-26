@@ -77,6 +77,12 @@ if (WITH_TESTING)
   ## check compatibility configuration path.
   set(CONF_DIR "${TEST_DIR}/etc")
 
+  # parse_and_apply_configuration_resource
+  set(TEST_NAME "parse_and_apply_configuration_resource")
+  add_executable("${TEST_NAME}" "${TEST_DIR}/resource.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+
   ## apply configuration and check compatibility.
 
   # check compatibility.

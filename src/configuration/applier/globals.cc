@@ -126,6 +126,10 @@ void applier::globals::apply(state& config) {
   ::use_retained_scheduling_info = config.use_retained_scheduling_info();
   ::use_syslog = config.use_syslog();
   ::use_true_regexp_matching = config.use_true_regexp_matching();
+
+  std::vector<std::string> const& users(config.user());
+  for (unsigned int i(0), end(users.size()); i != end; ++i)
+    misc::setstr(macro_user[i], users[i]);
 }
 
 /**
