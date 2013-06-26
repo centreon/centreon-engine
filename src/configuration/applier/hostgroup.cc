@@ -99,9 +99,8 @@ void applier::hostgroup::add_object(
 /**
  *  Expand a hostgroup.
  *
- *  @param[in]  obj      Object to expand.
- *  @param[in]  s        State being applied.
- *  @param[out] expanded Expanded contactgroup.
+ *  @param[in]     obj      Object to expand.
+ *  @param[in,out] s        State being applied.
  */
 void applier::hostgroup::expand_object(
                            shared_ptr<configuration::hostgroup> obj,

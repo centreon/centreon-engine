@@ -39,6 +39,9 @@ namespace                  configuration {
       void                 add_object(
                              configuration::servicegroup const& obj,
                              configuration::state const& s);
+      void                 expand_object(
+                             shared_ptr<configuration::servicegroup> obj,
+                             configuration::state& s);
       void                 modify_object(
                              configuration::servicegroup const& obj,
                              configuration::state const& s);
@@ -48,6 +51,11 @@ namespace                  configuration {
       void                 resolve_object(
                              configuration::servicegroup const& obj,
                              configuration::state const& s);
+
+    private:
+      void                 _resolve_members(
+                             shared_ptr<configuration::servicegroup> obj,
+                             configuration::state& s);
     };
   }
 }

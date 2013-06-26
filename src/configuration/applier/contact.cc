@@ -229,13 +229,15 @@ void applier::contact::expand_object(
              << obj->contact_name()
              << "' to non-existing contact group '" << *it << "'.");
 
+    // Remove contact group from state.
+    shared_ptr<configuration::contactgroup> backup(*it_group);
+    s.contactgroups().erase(it_group);
+
     // Add contact to group members.
-    (*it_group)->members().push_back(obj->contact_name());
+    backup->members().push_back(obj->contact_name());
 
     // Reinsert contact group.
-    shared_ptr<configuration::contactgroup> to_insert(*it_group);
-    s.contactgroups().erase(it_group);
-    s.contactgroups().insert(to_insert);
+    s.contactgroups().insert(backup);
   }
 
   // We do not need to reinsert the contact in the set, as no

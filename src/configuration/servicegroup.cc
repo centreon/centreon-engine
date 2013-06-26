@@ -218,6 +218,15 @@ std::string const& servicegroup::alias() const throw () {
  *
  *  @return The members.
  */
+list_string& servicegroup::members() throw () {
+  return (_members.get());
+}
+
+/**
+ *  Get members.
+ *
+ *  @return The members.
+ */
 list_string const& servicegroup::members() const throw () {
   return (_members.get());
 }

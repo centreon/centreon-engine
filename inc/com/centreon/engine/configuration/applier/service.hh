@@ -20,13 +20,13 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICE_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICE_HH
 
-#  include <set>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
 namespace             configuration {
+  // Forward declarations.
   class               service;
   class               state;
 
@@ -41,9 +41,8 @@ namespace             configuration {
                         configuration::service const& obj,
                         configuration::state const& s);
       void            expand_object(
-                        configuration::service const& obj,
-                        configuration::state const& s,
-                        std::set<shared_ptr<configuration::service> >& expanded);
+                        shared_ptr<configuration::service> obj,
+                        configuration::state& s);
       void            modify_object(
                         configuration::service const& obj,
                         configuration::state const& s);
@@ -53,6 +52,11 @@ namespace             configuration {
       void            resolve_object(
                         configuration::service const& obj,
                         configuration::state const& s);
+
+    private:
+      void            _expand_service_memberships(
+                        shared_ptr<configuration::service> obj,
+                        configuration::state& s);
     };
   }
 }

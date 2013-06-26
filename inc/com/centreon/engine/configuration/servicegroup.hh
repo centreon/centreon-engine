@@ -53,6 +53,7 @@ namespace                   configuration {
 
     std::string const&      action_url() const throw ();
     std::string const&      alias() const throw ();
+    list_string&            members() throw ();
     list_string const&      members() const throw ();
     std::string const&      notes() const throw ();
     std::string const&      notes_url() const throw ();

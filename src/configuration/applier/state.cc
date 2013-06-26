@@ -233,7 +233,22 @@ void applier::state::apply(configuration::state& new_cfg) {
   _resolve<configuration::host, applier::host>(
     config->hosts());
 
-  // Apply servicegroups and services.
+  // Apply services and servicegroups.
+  _expand<configuration::service, applier::service>(
+    new_cfg,
+    new_cfg.services());
+  _apply<configuration::service,
+         service_struct,
+         applier::service,
+         std::pair<std::string, std::string>,
+         &service_key>(
+    config->services(),
+    _services,
+    new_cfg,
+    new_cfg.services());
+  _expand<configuration::servicegroup, applier::servicegroup>(
+    new_cfg,
+    new_cfg.servicegroups());
   _apply<configuration::servicegroup,
          servicegroup_struct,
          applier::servicegroup,
@@ -243,27 +258,6 @@ void applier::state::apply(configuration::state& new_cfg) {
     _servicegroups,
     new_cfg,
     new_cfg.servicegroups());
-  {
-    std::set<shared_ptr<configuration::service> > expanded_services;
-    {
-      applier::service aplyr;
-      for (std::set<shared_ptr<configuration::service> >::const_iterator
-             it(new_cfg.services().begin()),
-             end(new_cfg.services().end());
-           it != end;
-           ++it)
-        aplyr.expand_object(**it, new_cfg, expanded_services);
-    }
-    _apply<configuration::service,
-           service_struct,
-           applier::service,
-           std::pair<std::string, std::string>,
-           &service_key>(
-      config->services(),
-      _services,
-      new_cfg,
-      expanded_services);
-  }
   _resolve<configuration::servicegroup, applier::servicegroup>(
     config->servicegroups());
   _resolve<configuration::service, applier::service>(
