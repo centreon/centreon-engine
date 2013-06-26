@@ -93,8 +93,8 @@ static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
 static unsigned int const   default_check_interval(5);
-static point_2d const       default_coords_2d(-1, -1);
-static point_3d const       default_coords_3d(0.0, 0.0, 0.0);
+static point_2d const       default_coords_2d;
+static point_3d const       default_coords_3d;
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
@@ -106,7 +106,7 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(host::none);
+static unsigned short const default_notification_options(host::up | host::down | host::unreachable | host::flapping | host::downtime);
 static bool const           default_obsess_over_host(true);
 static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
@@ -123,8 +123,6 @@ host::host()
     _checks_passive(default_checks_passive),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
-    _coords_2d(default_coords_2d),
-    _coords_3d(default_coords_3d),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),

@@ -35,7 +35,7 @@ static applier::macros* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::macros::apply(state const& config) {
+void applier::macros::apply(state& config) {
   _set_macro(MACRO_ADMINEMAIL, config.admin_email());
   _set_macro(MACRO_ADMINPAGER, config.admin_pager());
   _set_macro(MACRO_COMMANDFILE, config.command_file());

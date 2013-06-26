@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -27,9 +28,29 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 // XXX : update the event_list_low and event_list_high
+
+/**
+ *  Check if the host group name matches the configuration object.
+ */
+class         hostgroup_name_comparator {
+public:
+              hostgroup_name_comparator(
+                std::string const& hostgroup_name) {
+    _hostgroup_name = hostgroup_name;
+  }
+
+  bool        operator()(shared_ptr<configuration::hostgroup> hg) {
+    return (_hostgroup_name == hg->hostgroup_name());
+  }
+
+private:
+  std::string _hostgroup_name;
+};
 
 /**
  *  Default constructor.
@@ -124,7 +145,7 @@ void applier::host::add_object(
         static_cast<bool>(obj.stalking_options()
                           & configuration::host::unreachable),
         obj.process_perf_data(),
-        false, // failure_prediction_enabled
+        true, // failure_prediction_enabled, enabled by Nagios
         NULL, // failure_prediction_options
         obj.check_freshness(),
         obj.freshness_threshold(),
@@ -142,7 +163,7 @@ void applier::host::add_object(
         obj.coords_3d().y(),
         obj.coords_3d().z(),
         obj.have_coords_3d(),
-        false, // should_be_drawn
+        true, // should_be_drawn, enabled by Nagios
         obj.retain_status_information(),
         obj.retain_nonstatus_information(),
         obj.obsess_over_host()));
@@ -192,6 +213,50 @@ void applier::host::add_object(
     if (!add_parent_host_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add parent '"
              << *it << "' to host '" << obj.host_name() << "'.");
+
+  return ;
+}
+
+/**
+ *  @brief Expand a host.
+ *
+ *  During expansion, the host will be added to its host groups. These
+ *  will be modified in the state.
+ *
+ *  @param[in]      obj Host to expand.
+ *  @param[int,out] s   Configuration state.
+ */
+void applier::host::expand_object(
+                      shared_ptr<configuration::host> obj,
+                      configuration::state& s) {
+  // Browse host groups.
+  for (list_string::const_iterator
+         it(obj->hostgroups().begin()),
+         end(obj->hostgroups().end());
+       it != end;
+       ++it) {
+    // Find host group.
+    std::set<shared_ptr<configuration::hostgroup> >::iterator
+      it_group(std::find_if(
+                      s.hostgroups().begin(),
+                      s.hostgroups().end(),
+                      hostgroup_name_comparator(*it)));
+    if (it_group == s.hostgroups().end())
+      throw (engine_error() << "Error: Could not add host '"
+             << obj->host_name() << "' to non-existing host group '"
+             << *it << "'.");
+
+    // Add host to group members.
+    (*it_group)->members().push_back(obj->host_name());
+
+    // Reinsert host group.
+    shared_ptr<configuration::hostgroup> to_insert(*it_group);
+    s.hostgroups().erase(it_group);
+    s.hostgroups().insert(to_insert);
+  }
+
+  // We do not need to reinsert the host in the set, as no modification
+  // was applied on the host.
 
   return ;
 }
@@ -400,17 +465,18 @@ void applier::host::resolve_object(
   logger(logging::dbg_config, logging::more)
     << "Resolving host '" << obj.host_name() << "'.";
 
-  // Find host.
-  umap<std::string, shared_ptr<host_struct> >::iterator
-    it(applier::state::instance().hosts().find(obj.host_name()));
-  if (applier::state::instance().hosts().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing host '"
-           << obj.host_name() << "'.");
+  // XXX : check_host is called in preflight_check()
+  // // Find host.
+  // umap<std::string, shared_ptr<host_struct> >::iterator
+  //   it(applier::state::instance().hosts().find(obj.host_name()));
+  // if (applier::state::instance().hosts().end() == it)
+  //   throw (engine_error() << "Error: Cannot resolve non-existing host '"
+  //          << obj.host_name() << "'.");
 
-  // Resolve host.
-  if (!check_host(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve host '"
-           << obj.host_name() << "'.");
+  // // Resolve host.
+  // if (!check_host(it->second.get(), NULL, NULL))
+  //   throw (engine_error() << "Error: Cannot resolve host '"
+  //          << obj.host_name() << "'.");
 
   return ;
 }

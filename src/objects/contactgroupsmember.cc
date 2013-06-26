@@ -45,10 +45,10 @@ bool operator==(
        contactgroupsmember const& obj1,
        contactgroupsmember const& obj2) throw () {
   if (is_equal(obj1.group_name, obj2.group_name)) {
-    if (!obj1.next && !obj2.next)
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    else
       return (*obj1.next == *obj2.next);
-    if (obj1.next == obj2.next)
-      return (true);
   }
   return (false);
 }

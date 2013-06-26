@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_HOST_HH
 
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -39,6 +40,9 @@ namespace          configuration {
       void         add_object(
                      configuration::host const& obj,
 		     configuration::state const& s);
+      void         expand_object(
+                     shared_ptr<configuration::host> obj,
+                     configuration::state& s);
       void         modify_object(
                      configuration::host const& obj,
 		     configuration::state const& s);

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
@@ -27,8 +28,27 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
+
+/**
+ *  Check if the contact group name matches the configuration object.
+ */
+class         contactgroup_name_comparator {
+public:
+              contactgroup_name_comparator(
+                std::string const& contactgroup_name) {
+    _contactgroup_name = contactgroup_name;
+  }
+
+  bool        operator()(shared_ptr<configuration::contactgroup> cg) {
+    return (_contactgroup_name == cg->contactgroup_name());
+  }
+
+private:
+  std::string _contactgroup_name;
+};
 
 /**
  *  Default constructor.
@@ -176,6 +196,50 @@ void applier::contact::add_object(
   // XXX : c->modified_attributes = obj.modified_attributes();
   // XXX : c->modified_host_attributes = obj.modified_host_attributes();
   // XXX : c->modified_service_attributes = obj.modified_service_attributes();
+
+  return ;
+}
+
+/**
+ *  @brief Expand a contact.
+ *
+ *  During expansion, the contact will be added to its contact groups.
+ *  These will be modified in the state.
+ *
+ *  @param[in]      obj Contact to expand.
+ *  @param[int,out] s   Configuration state.
+ */
+void applier::contact::expand_object(
+                         shared_ptr<configuration::contact> obj,
+                         configuration::state& s) {
+  // Browse contact groups.
+  for (list_string::const_iterator
+         it(obj->contactgroups().begin()),
+         end(obj->contactgroups().end());
+       it != end;
+       ++it) {
+    // Find contact group.
+    std::set<shared_ptr<configuration::contactgroup> >::iterator
+      it_group(std::find_if(
+                      s.contactgroups().begin(),
+                      s.contactgroups().end(),
+                      contactgroup_name_comparator(*it)));
+    if (it_group == s.contactgroups().end())
+      throw (engine_error() << "Error: Could not add contact '"
+             << obj->contact_name()
+             << "' to non-existing contact group '" << *it << "'.");
+
+    // Add contact to group members.
+    (*it_group)->members().push_back(obj->contact_name());
+
+    // Reinsert contact group.
+    shared_ptr<configuration::contactgroup> to_insert(*it_group);
+    s.contactgroups().erase(it_group);
+    s.contactgroups().insert(to_insert);
+  }
+
+  // We do not need to reinsert the contact in the set, as no
+  // modification was applied on the contact.
 
   return ;
 }

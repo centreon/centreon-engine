@@ -56,7 +56,6 @@ bool operator==(
           && is_equal(obj1.alias, obj2.alias)
           && is_equal(obj1.address, obj2.address)
           && is_equal(obj1.parent_hosts, obj2.parent_hosts)
-          && is_equal(obj1.child_hosts, obj2.child_hosts)
           && is_equal(obj1.services, obj2.services)
           && is_equal(obj1.host_check_command, obj2.host_check_command)
           && obj1.initial_state == obj2.initial_state

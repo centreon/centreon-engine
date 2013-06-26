@@ -27,7 +27,7 @@ CCE_BEGIN()
 namespace     configuration {
   class       point_2d {
   public:
-              point_2d(int x = 0, int y = 0);
+              point_2d(int x = -1, int y = -1);
               point_2d(point_2d const& right);
               ~point_2d() throw ();
     point_2d& operator=(point_2d const& right);

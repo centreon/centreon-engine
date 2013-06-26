@@ -39,14 +39,14 @@ namespace                configuration {
      */
     class                logging : public base {
     public:
-      void               apply(state const& config);
+      void               apply(state& config);
       static logging&    instance();
       static void        load();
       static void        unload();
 
     private:
                          logging();
-                         logging(state const& config);
+                         logging(state& config);
                          logging(logging const&);
                          ~logging() throw ();
       logging&           operator=(logging const&);

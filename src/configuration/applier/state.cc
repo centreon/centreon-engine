@@ -135,7 +135,7 @@ std::string timeperiod_key(configuration::timeperiod const& t) {
  *
  *  @param[in] new_cfg The new configuration.
  */
-void applier::state::apply(configuration::state const& new_cfg) {
+void applier::state::apply(configuration::state& new_cfg) {
   // Apply timeperiods.
   _apply<configuration::timeperiod,
          timeperiod_struct,
@@ -174,6 +174,9 @@ void applier::state::apply(configuration::state const& new_cfg) {
     config->commands());
 
   // Apply contacts and contactgroups.
+  _expand<configuration::contact, applier::contact>(
+    new_cfg,
+    new_cfg.contacts());
   _apply<configuration::contact,
          contact_struct,
          applier::contact,
@@ -183,33 +186,27 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _contacts,
     new_cfg,
     new_cfg.contacts());
-  {
-    std::set<shared_ptr<configuration::contactgroup> > expanded_groups;
-    {
-      applier::contactgroup aplyr;
-      for (std::set<shared_ptr<configuration::contactgroup> >::const_iterator
-             it(new_cfg.contactgroups().begin()),
-             end(new_cfg.contactgroups().end());
-           it != end;
-           ++it)
-        aplyr.expand_object(**it, new_cfg, expanded_groups);
-    }
-    _apply<configuration::contactgroup,
-           contactgroup_struct,
-           applier::contactgroup,
-           std::string,
-           &contactgroup_key>(
-      config->contactgroups(),
-      _contactgroups,
-      new_cfg,
-      expanded_groups);
-  }
+  _expand<configuration::contactgroup, applier::contactgroup>(
+    new_cfg,
+    new_cfg.contactgroups());
+  _apply<configuration::contactgroup,
+         contactgroup_struct,
+         applier::contactgroup,
+         std::string,
+         &contactgroup_key>(
+    config->contactgroups(),
+    _contactgroups,
+    new_cfg,
+    new_cfg.contactgroups());
   _resolve<configuration::contactgroup, applier::contactgroup>(
     config->contactgroups());
   _resolve<configuration::contact, applier::contact>(
     config->contacts());
 
   // Apply hosts and hostgroups.
+  _expand<configuration::host, applier::host>(
+    new_cfg,
+    new_cfg.hosts());
   _apply<configuration::host,
          host_struct,
          applier::host,
@@ -219,27 +216,18 @@ void applier::state::apply(configuration::state const& new_cfg) {
     _hosts,
     new_cfg,
     new_cfg.hosts());
-  {
-    std::set<shared_ptr<configuration::hostgroup> > expanded_groups;
-    {
-      applier::hostgroup aplyr;
-      for (std::set<shared_ptr<configuration::hostgroup> >::const_iterator
-             it(new_cfg.hostgroups().begin()),
-             end(new_cfg.hostgroups().end());
-           it != end;
-           ++it)
-        aplyr.expand_object(**it, new_cfg, expanded_groups);
-    }
-    _apply<configuration::hostgroup,
-           hostgroup_struct,
-           applier::hostgroup,
-           std::string,
-           &hostgroup_key>(
-      config->hostgroups(),
-      _hostgroups,
-      new_cfg,
-      expanded_groups);
-  }
+  _expand<configuration::hostgroup, applier::hostgroup>(
+    new_cfg,
+    new_cfg.hostgroups());
+  _apply<configuration::hostgroup,
+         hostgroup_struct,
+         applier::hostgroup,
+         std::string,
+         &hostgroup_key>(
+    config->hostgroups(),
+    _hostgroups,
+    new_cfg,
+    new_cfg.hostgroups());
   _resolve<configuration::hostgroup, applier::hostgroup>(
     config->hostgroups());
   _resolve<configuration::host, applier::host>(
@@ -645,6 +633,28 @@ void applier::state::_apply(
   // Modify objects.
   // XXX
 
+  return ;
+}
+
+/**
+ *  Expand objects.
+ *
+ *  @param[in,out] new_state New configuration state.
+ *  @param[in,out] cfg       Configuration objects.
+ */
+template <typename ConfigurationType, typename ApplierType>
+void applier::state::_expand(
+                       configuration::state& new_state,
+                       std::set<shared_ptr<ConfigurationType> >& cfg) {
+  ApplierType aplyr;
+  for (typename std::set<shared_ptr<ConfigurationType> >::iterator
+         it(cfg.begin()),
+         end(cfg.end());
+       it != end;) {
+    typename std::set<shared_ptr<ConfigurationType> >::iterator
+      to_expand(it++);
+    aplyr.expand_object(*to_expand, new_state);
+  }
   return ;
 }
 

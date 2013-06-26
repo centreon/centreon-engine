@@ -37,7 +37,7 @@ namespace             configuration {
     class             globals
       : public base {
     public:
-      void            apply(state const& globals);
+      void            apply(state& globals);
       static globals& instance();
       static void     load();
       static void     unload();
