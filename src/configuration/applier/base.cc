@@ -35,10 +35,10 @@ base::base() {}
 /**
  *  Copy constructor.
  *
- *  @param[in] b Object to copy.
+ *  @param[in] right Object to copy.
  */
-base::base(base const& b) {
-  (void)b;
+base::base(base const& right) {
+  (void)right;
 }
 
 /**
@@ -49,11 +49,11 @@ base::~base() throw () {}
 /**
  *  Assignment operator.
  *
- *  @param[in] b Object to copy.
+ *  @param[in] right Object to copy.
  *
  *  @return This object.
  */
-base& base::operator=(base const& b) {
-  (void)b;
+base& base::operator=(base const& right) {
+  (void)right;
   return (*this);
 }

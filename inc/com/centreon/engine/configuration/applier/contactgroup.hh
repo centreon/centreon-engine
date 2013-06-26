@@ -20,40 +20,43 @@
 #ifndef CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_CONTACTGROUP_HH
 
-#  include <set>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
-namespace                  configuration {
+namespace           configuration {
   // Forward declarations.
-  class                    contactgroup;
-  class                    state;
+  class             contactgroup;
+  class             state;
 
-  namespace                applier {
-    class                  contactgroup {
+  namespace         applier {
+    class           contactgroup {
     public:
-                           contactgroup();
-                           contactgroup(contactgroup const& right);
-                           ~contactgroup() throw ();
-      contactgroup&        operator=(contactgroup const& right);
-      void                 add_object(
-                             configuration::contactgroup const& obj,
-                             configuration::state const& s);
-      void                 expand_object(
-                             configuration::contactgroup const& obj,
-                             configuration::state const& s,
-                             std::set<shared_ptr<configuration::contactgroup> >& expanded);
-      void                 modify_object(
-                             configuration::contactgroup const& obj,
-                             configuration::state const& s);
-      void                 remove_object(
-                             configuration::contactgroup const& obj,
-                             configuration::state const& s);
-      void                 resolve_object(
-                             configuration::contactgroup const& obj,
-                             configuration::state const& s);
+                    contactgroup();
+                    contactgroup(contactgroup const& right);
+                    ~contactgroup() throw ();
+      contactgroup& operator=(contactgroup const& right);
+      void          add_object(
+                      configuration::contactgroup const& obj,
+                      configuration::state const& s);
+      void          expand_object(
+                      shared_ptr<configuration::contactgroup> obj,
+                      configuration::state& s);
+      void          modify_object(
+                      configuration::contactgroup const& obj,
+                      configuration::state const& s);
+      void          remove_object(
+                      configuration::contactgroup const& obj,
+                      configuration::state const& s);
+      void          resolve_object(
+                      configuration::contactgroup const& obj,
+                      configuration::state const& s);
+
+    private:
+      void          _resolve_members(
+                       shared_ptr<configuration::contactgroup> obj,
+                       configuration::state& s);
     };
   }
 }

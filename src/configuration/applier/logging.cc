@@ -33,7 +33,7 @@ static applier::logging* _instance = NULL;
  *
  *  @param[in] config The new configuration.
  */
-void applier::logging::apply(state const& config) {
+void applier::logging::apply(state& config) {
   // Syslog.
   if (config.use_syslog() == true && !_syslog)
     _add_syslog();
@@ -112,7 +112,7 @@ applier::logging::logging()
  *
  *  @param[in] config The initial confiuration.
  */
-applier::logging::logging(state const& config)
+applier::logging::logging(state& config)
   : _debug(NULL),
     _debug_level(0),
     _debug_verbosity(0),

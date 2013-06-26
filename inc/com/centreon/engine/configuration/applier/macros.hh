@@ -40,7 +40,7 @@ namespace            configuration {
     class            macros
       : public base {
     public:
-      void           apply(state const& config);
+      void           apply(state& config);
       static macros& instance();
       static void    load();
       static void    unload();

@@ -59,7 +59,7 @@ namespace           configuration {
     class           state
       : public base {
     public:
-      void          apply(configuration::state const& new_cfg);
+      void          apply(configuration::state& new_cfg);
       static state& instance();
       static void   load();
       static void   unload();
@@ -132,6 +132,11 @@ namespace           configuration {
                       umap<KeyType, shared_ptr<ObjectType> >& cur_obj,
                       configuration::state const& new_state,
                       std::set<shared_ptr<ConfigurationType> > const& new_cfg);
+      template      <typename ConfigurationType,
+                     typename ApplierType>
+      void          _expand(
+                      configuration::state& new_state,
+                      std::set<shared_ptr<ConfigurationType> >& cfg);
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _resolve(

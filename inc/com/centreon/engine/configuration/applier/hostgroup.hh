@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTGROUP_HH
 
-#  include <set>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
@@ -42,9 +41,8 @@ namespace               configuration {
                           configuration::hostgroup const& obj,
                           configuration::state const& s);
       void              expand_object(
-                          configuration::hostgroup const& obj,
-                          configuration::state const& s,
-                          std::set<shared_ptr<configuration::hostgroup> >& expanded);
+                          shared_ptr<configuration::hostgroup> obj,
+                          configuration::state& s);
       void              modify_object(
                           configuration::hostgroup const& obj,
                           configuration::state const& s);
@@ -54,6 +52,11 @@ namespace               configuration {
       void              resolve_object(
                           configuration::hostgroup const& obj,
                           configuration::state const& s);
+
+    private:
+      void              _resolve_members(
+                          shared_ptr<configuration::hostgroup> obj,
+                          configuration::state& s);
     };
   }
 }

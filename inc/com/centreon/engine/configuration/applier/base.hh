@@ -38,10 +38,10 @@ namespace          configuration {
     class          base {
     public:
                    base();
-                   base(base const& b);
+                   base(base const& right);
       virtual      ~base() throw ();
-      base&        operator=(base const& b);
-      virtual void apply(state const& config) = 0;
+      base&        operator=(base const& right);
+      virtual void apply(state& new_cfg) = 0;
     };
   }
 }

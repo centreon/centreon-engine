@@ -98,6 +98,7 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
   try {
     // Initialize values.
     obj->host_ptr = child;
+    obj->host_name = my_strdup(child->name);
 
     // Add the child entry to the host definition.
     obj->next = parent->child_hosts;
