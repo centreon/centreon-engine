@@ -40,12 +40,14 @@
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "nagios.h"
 #include "skiplist.h"
 #include "xodtemplate.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list = NULL;
@@ -224,7 +226,7 @@ int xodtemplate_read_config_data(
         if (config_base_dir != NULL && val[0] != '/') {
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
-          config_file = my_strdup(oss.str());
+          config_file = misc::strdup(oss.str());
           delete[] temp_buffer;
         }
         else
@@ -246,7 +248,7 @@ int xodtemplate_read_config_data(
         if (config_base_dir != NULL && val[0] != '/') {
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
-          config_file = my_strdup(oss.str());
+          config_file = misc::strdup(oss.str());
           delete[] temp_buffer;
         }
         else

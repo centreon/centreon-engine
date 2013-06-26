@@ -32,7 +32,7 @@ extern "C" {
 // Configuration Functions
 
 // reads all object config data
-int read_all_object_data(char* main_config_file);
+int read_all_object_data(char const* main_config_file);
 
 // Setup Functions
 

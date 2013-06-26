@@ -52,9 +52,7 @@ extern "C" {
 #  endif // C++
 
 // initializes scheduled downtime data
-int initialize_downtime_data(char const* config_file);
-// cleans up scheduled downtime data
-int cleanup_downtime_data(char const* config_file);
+int initialize_downtime_data();
 int schedule_downtime(
       int type,
       char const* host_name,

@@ -29,9 +29,9 @@ extern "C" {
 #  endif // C++
 
 // initializes performance data
-int initialize_performance_data(char* config_file);
+int initialize_performance_data();
 // cleans up performance data
-int cleanup_performance_data(char* config_file);
+int cleanup_performance_data();
 // updates service performance data
 int update_service_performance_data(service* svc);
 // updates host performance data

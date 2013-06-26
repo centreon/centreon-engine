@@ -20,6 +20,7 @@
 #ifndef CCE_MISC_STRING_HH
 #  define CCE_MISC_STRING_HH
 
+#  include <cstring>
 #  include <fstream>
 #  include <list>
 #  include <sstream>
@@ -36,6 +37,41 @@ namespace                 misc {
 
   inline char const*      chkstr(char const* str) throw () {
     return (str ? str : "\"NULL\"");
+  }
+
+  inline char*            strdup(char const* value) {
+    if (!value)
+      return (NULL);
+    char* buf(new char[strlen(value) + 1]);
+    strcpy(buf, value);
+    return (buf);
+  }
+
+  inline char*            strdup(std::string const& value) {
+    char* buf(new char[value.size() + 1]);
+    strcpy(buf, value.c_str());
+    return (buf);
+  }
+
+  template<typename T>
+  inline char*            strdup(T value) {
+    std::ostringstream oss;
+    oss << value;
+    std::string const& str(oss.str());
+    char* buf(new char[str.size() + 1]);
+    strcpy(buf, str.c_str());
+    return (buf);
+  }
+
+  inline char const*      setstr(char*& buf, char const* value = NULL) {
+    delete[] buf;
+    return ((buf = misc::strdup(value)));
+  }
+
+  template<typename T>
+  inline char const*      setstr(char*& buf, T const& value) {
+    delete[] buf;
+    return ((buf = misc::strdup(value)));
   }
 
   bool                    split(

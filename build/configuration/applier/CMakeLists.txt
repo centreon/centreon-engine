@@ -229,11 +229,16 @@ if (WITH_TESTING)
   # parse_and_remove_configuration_host
   set(TEST_NAME "parse_and_remove_configuration_host")
   set(TEST_CONF_FILE "main_host.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostescalation" "${CONF_DIR}/${TEST_CONF_FILE}")
 
   # parse_and_remove_configuration_host_template
   set(TEST_NAME "parse_and_remove_configuration_host_tempalte")
   set(TEST_CONF_FILE "main_host_template.cfg")
+  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+  # parse_and_remove_configuration_hostescalation
+  set(TEST_NAME "parse_and_remove_configuration_hostescalation")
+  set(TEST_CONF_FILE "main_host.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
 
   # parse_and_remove_configuration_hostgroup

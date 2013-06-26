@@ -37,6 +37,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
@@ -380,7 +381,7 @@ int handle_async_service_check_result(
 	       ? " - plugin may be missing" : ""))
 	<< ')';
 
-    temp_service->plugin_output = my_strdup(oss.str());
+    engine::misc::setstr(temp_service->plugin_output, oss.str());
     temp_service->current_state = STATE_CRITICAL;
   }
 
@@ -2619,12 +2620,10 @@ int handle_async_host_check_result_3x(
 	       || queued_check_result->return_code == 127)
 	      ? " - plugin may be missing" : "") << ")";
 
-      delete[] temp_host->plugin_output;
+      engine::misc::setstr(temp_host->plugin_output, oss.str());
       delete[] temp_host->long_plugin_output;
-      delete[] temp_host->perf_data;
-
-      temp_host->plugin_output = my_strdup(oss.str());
       temp_host->long_plugin_output = NULL;
+      delete[] temp_host->perf_data;
       temp_host->perf_data = NULL;
 
       result = STATE_CRITICAL;

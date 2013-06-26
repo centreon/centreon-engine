@@ -243,10 +243,8 @@ bool retention::service::_retain_nonstatus_information(
         std::string command(value.substr(pos + 1));
         if (!find_command(command.c_str()))
           _obj->modified_attributes -= MODATTR_CHECK_COMMAND;
-        else {
-          delete[] _obj->service_check_command;
-          _obj->service_check_command = my_strdup(value);
-        }
+        else
+          misc::setstr(_obj->service_check_command, value);
       }
     }
   }
@@ -254,20 +252,16 @@ bool retention::service::_retain_nonstatus_information(
     if (_obj->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
       if (!find_timeperiod(value.c_str()))
         _obj->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-      else {
-        delete[] _obj->check_period;
-        _obj->check_period = my_strdup(value);
-      }
+      else
+        misc::setstr(_obj->check_period, value);
     }
   }
   else if (key == "notification_period") {
     if (_obj->modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
       if (!find_timeperiod(value.c_str()))
         _obj->modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      else {
-        delete[] _obj->notification_period;
-        _obj->notification_period = my_strdup(value);
-      }
+      else
+        misc::setstr(_obj->notification_period, value);
     }
   }
   else if (key == "event_handler") {
@@ -277,10 +271,8 @@ bool retention::service::_retain_nonstatus_information(
         std::string command(value.substr(pos + 1));
         if (!find_command(command.c_str()))
           _obj->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
-        else {
-          delete[] _obj->event_handler;
-          _obj->event_handler = my_strdup(value);
-        }
+        else
+          misc::setstr(_obj->event_handler, value);
       }
     }
   }
@@ -323,8 +315,7 @@ bool retention::service::_retain_nonstatus_information(
            member = member->next) {
         if (!strcmp(cvname, member->variable_name)) {
           if (strcmp(cvvalue, member->variable_value)) {
-            delete[] member->variable_value;
-            member->variable_value = my_strdup(cvvalue);
+            misc::setstr(member->variable_value, cvvalue);
             member->has_been_modified = true;
           }
           break;
@@ -389,18 +380,12 @@ bool retention::service::_retain_status_information(
     misc::to(value, _obj->last_time_unknown);
   else if (key == "last_time_critical")
     misc::to(value, _obj->last_time_critical);
-  else if (key == "plugin_output") {
-    delete[] _obj->plugin_output;
-    _obj->plugin_output = my_strdup(value);
-  }
-  else if (key == "long_plugin_output") {
-    delete[] _obj->long_plugin_output;
-    _obj->long_plugin_output = my_strdup(value);
-  }
-  else if (key == "performance_data") {
-    delete[] _obj->perf_data;
-    _obj->perf_data = my_strdup(value);
-  }
+  else if (key == "plugin_output")
+    misc::setstr(_obj->plugin_output, value);
+  else if (key == "long_plugin_output")
+    misc::setstr(_obj->long_plugin_output, value);
+  else if (key == "performance_data")
+    misc::setstr(_obj->perf_data, value);
   else if (key == "last_check")
     misc::to(value, _obj->last_check);
   else if (key == "next_check") {

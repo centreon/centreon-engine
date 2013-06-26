@@ -36,17 +36,15 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* initializes scheduled downtime data */
-int initialize_downtime_data(char const* config_file) {
-  return (xdddefault_initialize_downtime_data(config_file));
+int initialize_downtime_data() {
+  return (xdddefault_initialize_downtime_data());
 }
 
 /* cleans up scheduled downtime data */
-int cleanup_downtime_data(char const* config_file) {
-  int result = xdddefault_cleanup_downtime_data(config_file);
-
+int cleanup_downtime_data() {
   /* free memory allocated to downtime data */
   free_downtime_data();
-  return (result);
+  return (OK);
 }
 
 /******************************************************************/

@@ -149,20 +149,16 @@ bool retention::contact::_retain_nonstatus_information(
     if (_obj->modified_host_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
       if (!find_timeperiod(value.c_str()))
         _obj->modified_host_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      else {
-        delete[] _obj->host_notification_period;
-        _obj->host_notification_period = my_strdup(value);
-      }
+      else
+        misc::setstr(_obj->host_notification_period, value);
     }
   }
   else if (key == "service_notification_period") {
     if (_obj->modified_service_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
       if (!find_timeperiod(value.c_str()))
         _obj->modified_service_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      else {
-        delete[] _obj->service_notification_period;
-        _obj->service_notification_period = my_strdup(value);
-      }
+      else
+        misc::setstr(_obj->service_notification_period, value);
     }
   }
   else if (key == "host_notifications_enabled") {
@@ -184,8 +180,7 @@ bool retention::contact::_retain_nonstatus_information(
            member = member->next) {
         if (!strcmp(cvname, member->variable_name)) {
           if (strcmp(cvvalue, member->variable_value)) {
-            delete[] member->variable_value;
-            member->variable_value = my_strdup(cvvalue);
+            misc::setstr(member->variable_value, cvvalue);
             member->has_been_modified = true;
           }
           break;

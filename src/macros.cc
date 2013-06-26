@@ -25,9 +25,11 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -413,13 +415,13 @@ int grab_datetime_macro_r(
     break;
 
   case MACRO_TIMET:
-    *output = obj2pchar<unsigned long>(current_time);
+    misc::setstr(*output, current_time);
     break;
 
   case MACRO_ISVALIDTIME:
-    *output = obj2pchar((check_time_against_period(
-                           test_time,
-                           temp_timeperiod) == OK) ? 1 : 0);
+    misc::setstr(
+      *output,
+      !check_time_against_period(test_time, temp_timeperiod));
     break;
 
   case MACRO_NEXTVALIDTIME:
@@ -429,7 +431,7 @@ int grab_datetime_macro_r(
              test_time,
              temp_timeperiod) == ERROR)
       next_valid_time = (time_t)0L;
-    *output = obj2pchar<unsigned long>(next_valid_time);
+    misc::setstr(*output, next_valid_time);
     break;
 
   default:
@@ -751,7 +753,7 @@ int grab_standard_contact_macro_r(
       buf.append(temp_contactgroup->group_name);
     }
     if (!buf.empty())
-      *output = my_strdup(buf);
+      *output = misc::strdup(buf);
   }
     break;
 

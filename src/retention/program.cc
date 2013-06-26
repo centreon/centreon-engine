@@ -147,8 +147,7 @@ bool retention::program::set(
         if (pos != std::string::npos) {
           std::string command(value.substr(pos + 1));
           if (find_command(command.c_str())) {
-            delete[] global_host_event_handler;
-            global_host_event_handler = my_strdup(value);
+            misc::setstr(global_host_event_handler, value);
             config->global_host_event_handler(value);
           }
         }
@@ -160,8 +159,7 @@ bool retention::program::set(
         if (pos != std::string::npos) {
           std::string command(value.substr(pos + 1));
           if (find_command(command.c_str())) {
-            delete[] global_service_event_handler;
-            global_service_event_handler = my_strdup(value);
+            misc::setstr(global_service_event_handler, value);
             config->global_service_event_handler(value);
           }
         }

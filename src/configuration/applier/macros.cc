@@ -23,7 +23,9 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/engine/misc/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 static applier::macros* _instance = NULL;
@@ -41,6 +43,9 @@ void applier::macros::apply(state const& config) {
   _set_macro(MACRO_MAINCONFIGFILE, config.cfg_main());
   if (config.resource_file().size() > 0)
     _set_macro(MACRO_RESOURCEFILE, config.resource_file().front());
+  _set_macro(MACRO_STATUSDATAFILE, config.status_file());
+  _set_macro(MACRO_HOSTPERFDATAFILE, config.host_perfdata_file());
+  _set_macro(MACRO_SERVICEPERFDATAFILE, config.service_perfdata_file());
 }
 
 /**
@@ -93,6 +98,12 @@ applier::macros::~macros() throw() {
   delete[] _mac->x[MACRO_TEMPFILE];
   delete[] _mac->x[MACRO_TEMPPATH];
 
+  delete[] _mac->x[MACRO_OBJECTCACHEFILE];
+  delete[] _mac->x[MACRO_PROCESSSTARTTIME];
+  delete[] _mac->x[MACRO_EVENTSTARTTIME];
+  delete[] _mac->x[MACRO_RETENTIONDATAFILE];
+  delete[] _mac->x[MACRO_STATUSDATAFILE];
+
   for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
     delete[] macro_user[i];
     macro_user[i] = NULL;
@@ -110,10 +121,8 @@ void applier::macros::_set_macro(
        std::string const& value) {
   if (type >= MACRO_X_COUNT)
     throw (engine_error() << "applier: invalid type of global macro");
-  if (!_mac->x[type] || strcmp(_mac->x[type], value.c_str())) {
-    delete[] _mac->x[type];
-    _mac->x[type] = my_strdup(value);
-  }
+  if (!_mac->x[type] || strcmp(_mac->x[type], value.c_str()))
+    misc::setstr(_mac->x[type], value);
 }
 
 /**
@@ -127,8 +136,6 @@ void applier::macros::_set_macros_user(
        std::string const& value) {
   if (idx >= MAX_USER_MACROS)
     throw (engine_error() << "applier: invalid index of user macro");
-  if (!macro_user[idx] || strcmp(macro_user[idx], value.c_str())) {
-    delete[] macro_user[idx];
-    macro_user[idx] = my_strdup(value);
-  }
+  if (!macro_user[idx] || strcmp(macro_user[idx], value.c_str()))
+    misc::setstr(macro_user[idx], value);
 }

@@ -21,6 +21,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #ifdef HAVE_GETOPT_H
 #  include <getopt.h>
 #endif // HAVE_GETOPT_H
