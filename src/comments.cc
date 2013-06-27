@@ -33,13 +33,8 @@ static comment* comment_hashlist[COMMENT_HASHSLOTS];
 /******************************************************************/
 
 /* initializes comment data */
-int initialize_comment_data(char const* config_file) {
-  return (xcddefault_initialize_comment_data(config_file));
-}
-
-/* removes old/invalid comments */
-int cleanup_comment_data(char const* config_file) {
-  return (xcddefault_cleanup_comment_data(config_file));
+int initialize_comment_data() {
+  return (xcddefault_initialize_comment_data());
 }
 
 /******************************************************************/

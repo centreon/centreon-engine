@@ -27,6 +27,8 @@
 #  include "com/centreon/engine/broker/loader.hh"
 #  include "com/centreon/engine/checks/checker.hh"
 #  include "com/centreon/engine/commands/set.hh"
+#  include "com/centreon/engine/configuration/applier/globals.hh"
+#  include "com/centreon/engine/configuration/applier/macros.hh"
 #  include "com/centreon/engine/configuration/applier/state.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/loop.hh"
@@ -116,6 +118,8 @@ private:
            com::centreon::engine::logging::most);
       commands::set::load();
       ::config = new configuration::state;
+      configuration::applier::globals::load();
+      configuration::applier::macros::load();
       configuration::applier::state::load();
       checks::checker::load();
       events::loop::load();
@@ -142,6 +146,8 @@ private:
       events::loop::unload();
       checks::checker::unload();
       configuration::applier::state::unload();
+      configuration::applier::macros::load();
+      configuration::applier::globals::load();
       commands::set::unload();
       delete ::config;
       com::centreon::clib::unload();

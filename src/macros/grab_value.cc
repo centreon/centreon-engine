@@ -23,8 +23,10 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /**************************************
@@ -703,28 +705,22 @@ static int handle_summary_macro(
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
-    for (unsigned int x = MACRO_TOTALHOSTSUP;
-         x <= MACRO_TOTALSERVICEPROBLEMSUNHANDLED;
-         x++) {
-      delete[] mac->x[x];
-      mac->x[x] = NULL;
-    }
-    mac->x[MACRO_TOTALHOSTSUP] = obj2pchar(hosts_up);
-    mac->x[MACRO_TOTALHOSTSDOWN] = obj2pchar(hosts_down);
-    mac->x[MACRO_TOTALHOSTSUNREACHABLE] = obj2pchar(hosts_unreachable);
-    mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED] = obj2pchar(hosts_down_unhandled);
-    mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED] = obj2pchar(hosts_unreachable_unhandled);
-    mac->x[MACRO_TOTALHOSTPROBLEMS] = obj2pchar(host_problems);
-    mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED] = obj2pchar(host_problems_unhandled);
-    mac->x[MACRO_TOTALSERVICESOK] = obj2pchar(services_ok);
-    mac->x[MACRO_TOTALSERVICESWARNING] = obj2pchar(services_warning);
-    mac->x[MACRO_TOTALSERVICESCRITICAL] = obj2pchar(services_critical);
-    mac->x[MACRO_TOTALSERVICESUNKNOWN] = obj2pchar(services_unknown);
-    mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED] = obj2pchar(services_warning_unhandled);
-    mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED] = obj2pchar(services_critical_unhandled);
-    mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED] = obj2pchar(services_unknown_unhandled);
-    mac->x[MACRO_TOTALSERVICEPROBLEMS] = obj2pchar(service_problems);
-    mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED] = obj2pchar(service_problems_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALHOSTSUP], hosts_up);
+    misc::setstr(mac->x[MACRO_TOTALHOSTSDOWN], hosts_down);
+    misc::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLE], hosts_unreachable);
+    misc::setstr(mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED], hosts_down_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED], hosts_unreachable_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALHOSTPROBLEMS], host_problems);
+    misc::setstr(mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED], host_problems_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESOK], services_ok);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESWARNING], services_warning);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESCRITICAL], services_critical);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWN], services_unknown);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED], services_warning_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED], services_critical_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED], services_unknown_unhandled);
+    misc::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMS], service_problems);
+    misc::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED], service_problems_unhandled);
   }
 
   // Return only the macro the user requested.

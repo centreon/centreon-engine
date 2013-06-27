@@ -22,10 +22,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
-#include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comments.hh"
@@ -39,6 +36,7 @@
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/sretention.hh"
+#include "mmap.h"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

@@ -42,9 +42,6 @@ namespace              retention {
                          std::string& key,
                          std::string& value,
                          char const* delim);
-    bool               _get_next_line(
-                         std::ifstream& stream,
-                         std::string& line);
   };
 }
 

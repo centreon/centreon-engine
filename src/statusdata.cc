@@ -28,8 +28,8 @@
 /******************************************************************/
 
 /* initializes status data at program start */
-int initialize_status_data(char* config_file) {
-  return (xsddefault_initialize_status_data(config_file));
+int initialize_status_data() {
+  return (xsddefault_initialize_status_data());
 }
 
 /* update all status data (aggregated dump) */
@@ -58,10 +58,8 @@ int update_all_status_data() {
 }
 
 /* cleans up status data before program termination */
-int cleanup_status_data(char* config_file, int delete_status_data) {
-  return (xsddefault_cleanup_status_data(
-            config_file,
-            delete_status_data));
+int cleanup_status_data(int delete_status_data) {
+  return (xsddefault_cleanup_status_data(delete_status_data));
 }
 
 /* updates program status info */

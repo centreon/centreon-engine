@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
@@ -36,6 +37,9 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
+//
+// Check interface.
+//
 class check {
 public:
   virtual                    ~check() throw () {}
@@ -46,6 +50,9 @@ public:
   virtual std::string const& type_name() const throw () = 0;
 };
 
+//
+// Check generic.
+//
 template<
   typename T, std::string const& (T::*get_id)() const throw (),
   typename U, U const& (configuration::state::*get_config)() const throw (),
@@ -54,13 +61,11 @@ class chk_generic : public check {
 public:
                      ~chk_generic() throw () {}
   std::string const& id() const throw () {
-    return (_id);
+    return ((_obj.*get_id)());
   }
 
   void               id(configuration::object const& obj) {
-    _type_name = obj.type_name();
-    T const& real(*static_cast<T const*>(&obj));
-    _id = (real.*get_id)();
+    _obj = *static_cast<T const*>(&obj);
   }
 
   bool               find_into_config() {
@@ -69,24 +74,156 @@ public:
            it(objects.begin()), end(objects.end());
          it != end;
          ++it)
-      if (((**it).*get_id)() == _id)
+      if (((**it).*get_id)() == id())
         return (true);
     return (false);
   }
 
   bool               find_into_applier() {
-    return (find_object(_id.c_str()));
+    return (find_object(id().c_str()));
   }
 
   std::string const& type_name() const throw () {
-    return (_type_name);
+    return (_obj.type_name());
   }
 
 private:
-  std::string        _id;
-  std::string        _type_name;
+  T                  _obj;
 };
 
+//
+// Check service
+//
+class chk_service : public check {
+public:
+                     ~chk_service() throw () {}
+  std::string const& id() const throw () {
+    return (_obj.service_description());
+  }
+
+  void               id(configuration::object const& obj) {
+    _obj = *static_cast<configuration::service const*>(&obj);
+    _all_hosts = _obj.hosts();
+    for (list_string::const_iterator
+           it(_obj.hostgroups().begin()), end(_obj.hostgroups().end());
+         it != end;
+         ++it) {
+      hostgroup_struct* hg(find_hostgroup(it->c_str()));
+      if (!hg)
+        throw (engine_error() << "invalid service: hostgroup not found!");
+      for (hostsmember_struct* m(hg->members); m; m = m->next)
+        _all_hosts.push_back(m->host_name);
+    }
+  }
+
+  bool               find_into_config() {
+    configuration::set_service const& objects(config->services());
+    for (configuration::set_service::const_iterator
+           it(objects.begin()), end(objects.end());
+         it != end;
+         ++it)
+      if (**it == _obj)
+        return (true);
+    return (false);
+  }
+
+  bool               find_into_applier() {
+    for (list_string::const_iterator
+           it(_all_hosts.begin()), end(_all_hosts.end());
+         it != end;
+         ++it)
+      if (find_service(it->c_str(), _obj.service_description().c_str()))
+        return (true);
+    return (false);
+  }
+
+  std::string const& type_name() const throw () {
+    return (_obj.type_name());
+  }
+
+private:
+  list_string        _all_hosts;
+  configuration::service
+                     _obj;
+};
+
+//
+// Check hostescalation
+//
+class chk_hostescalation : public check {
+public:
+                     ~chk_hostescalation() throw () {}
+  std::string const& id() const throw () {
+    return (_obj.type_name());
+  }
+
+  void               id(configuration::object const& obj) {
+    _obj = *static_cast<configuration::hostescalation const*>(&obj);
+    _all_hosts = _obj.hosts();
+    for (list_string::const_iterator
+           it(_obj.hostgroups().begin()), end(_obj.hostgroups().end());
+         it != end;
+         ++it) {
+      hostgroup_struct* hg(find_hostgroup(it->c_str()));
+      if (!hg)
+        throw (engine_error() << "invalid escalation: hostgroup not found!");
+      for (hostsmember_struct* m(hg->members); m; m = m->next)
+        _all_hosts.push_back(m->host_name);
+    }
+  }
+
+  bool               find_into_config() {
+    configuration::list_hostescalation const& objects(config->hostescalations());
+    for (configuration::list_hostescalation::const_iterator
+           it(objects.begin()), end(objects.end());
+         it != end;
+         ++it)
+      if (**it == _obj)
+        return (true);
+    return (false);
+  }
+
+  bool               find_into_applier() {
+    umultimap<std::string, shared_ptr<hostescalation_struct> > const&
+      escalations(configuration::applier::state::instance().hostescalations());
+    for (list_string::const_iterator
+           it(_all_hosts.begin()), end(_all_hosts.end());
+         it != end;
+         ++it) {
+      for (umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator
+             it_escalation(escalations.find(*it)), end(escalations.end());
+           it_escalation != end;
+           ++it_escalation) {
+        hostescalation_struct const& escalation(*it_escalation->second);
+        if (escalation.first_notification == static_cast<int>(_obj.first_notification())
+            && escalation.last_notification == static_cast<int>(_obj.last_notification())
+            && escalation.notification_interval == _obj.notification_interval()
+            && escalation.escalation_period == _obj.escalation_period()
+            && escalation.escalate_on_recovery == static_cast<bool>(_obj.escalation_options() & configuration::hostescalation::recovery)
+            && escalation.escalate_on_down == static_cast<bool>(_obj.escalation_options() & configuration::hostescalation::down)
+            && escalation.escalate_on_unreachable == static_cast<bool>(_obj.escalation_options() & configuration::hostescalation::unreachable))
+          return (true);
+      }
+    }
+    return (false);
+  }
+
+  std::string const& type_name() const throw () {
+    return (_obj.type_name());
+  }
+
+private:
+  list_string        _all_hosts;
+  configuration::hostescalation
+                     _obj;
+};
+
+/**
+ *  Check if objects was remove correctly.
+ *
+ *  @param[in] path The file configuration path to load.
+ *  @param[in] chk  The check to use to valid remove object.
+ */
 template<typename T, T& (configuration::state::*get)() throw ()>
 static void check_remove_objects(std::string const& path, check& chk) {
   configuration::state config;
@@ -175,6 +312,12 @@ int main_test(int argc, char* argv[]) {
       configuration::set_host,
       &configuration::state::hosts>(argv[2], chk_host);
   }
+  else if (type == "hostescalation") {
+    chk_hostescalation chk_hostescalation;
+    check_remove_objects<
+      configuration::list_hostescalation,
+      &configuration::state::hostescalations>(argv[2], chk_hostescalation);
+  }
   else if (type == "hostgroup") {
     chk_generic<
       configuration::hostgroup,
@@ -187,15 +330,12 @@ int main_test(int argc, char* argv[]) {
       configuration::set_hostgroup,
       &configuration::state::hostgroups>(argv[2], chk_hostgroup);
   }
-  // else if (type == "service") {
-  //   chk_generic<
-  //     configuration::service, &configuration::service::,
-  //     configuration::set_service, &configuration::state::services,
-  //     service_struct, &find_service> chk_service;
-  //   check_remove_objects<
-  //     configuration::set_service,
-  //     &configuration::state::services>(argv[2], chk_service);
-  // }
+  else if (type == "service") {
+    chk_service chk_service;
+    check_remove_objects<
+      configuration::set_service,
+      &configuration::state::services>(argv[2], chk_service);
+  }
   else if (type == "servicegroup") {
     chk_generic<
       configuration::servicegroup,

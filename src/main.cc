@@ -43,6 +43,8 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/configuration/applier/globals.hh"
+#include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -54,6 +56,7 @@
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
@@ -114,6 +117,8 @@ int main(int argc, char* argv[]) {
   com::centreon::clib::load();
   com::centreon::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
+  com::centreon::engine::configuration::applier::globals::load();
+  com::centreon::engine::configuration::applier::macros::load();
   com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::commands::set::load();
   com::centreon::engine::checks::checker::load();
@@ -190,9 +195,7 @@ int main(int argc, char* argv[]) {
           buffer(com::centreon::io::directory_entry::current_path());
         buffer.append("/");
         buffer.append(config_file);
-        delete[] config_file;
-        config_file = NULL;
-        config_file = my_strdup(buffer);
+        misc::setstr(config_file, buffer);
       }
     }
 
@@ -393,9 +396,7 @@ int main(int argc, char* argv[]) {
       // after we read config files, as user may have overridden
       // timezone offset.
       program_start = time(NULL);
-      delete[] mac->x[MACRO_PROCESSSTARTTIME];
-      mac->x[MACRO_PROCESSSTARTTIME]
-        = obj2pchar<unsigned long>(program_start);
+      misc::setstr(mac->x[MACRO_PROCESSSTARTTIME], program_start);
 
       // Initialize modules.
       neb_init_modules();
@@ -479,19 +480,19 @@ int main(int argc, char* argv[]) {
         NULL);
 
       // Initialize status data.
-      initialize_status_data(config_file);
+      initialize_status_data();
 
       // Read initial service and host state information.
       read_initial_state_information();
 
       // Initialize comment data.
-      initialize_comment_data(config_file);
+      initialize_comment_data();
 
       // Initialize scheduled downtime data.
-      initialize_downtime_data(config_file);
+      initialize_downtime_data();
 
       // Initialize performance data.
-      initialize_performance_data(config_file);
+      initialize_performance_data();
 
       // Initialize the event timing loop.
       init_timing_loop();
@@ -515,10 +516,8 @@ int main(int argc, char* argv[]) {
 
       // Get event start time and save as macro.
       event_start = time(NULL);
-      delete[] mac->x[MACRO_EVENTSTARTTIME];
       try {
-        mac->x[MACRO_EVENTSTARTTIME]
-          = obj2pchar<unsigned long>(event_start);
+        misc::setstr(mac->x[MACRO_EVENTSTARTTIME], event_start);
       }
       catch (...) {
         // Send program data to broker.
@@ -567,16 +566,10 @@ int main(int argc, char* argv[]) {
       save_state_information(FALSE);
 
       // Clean up performance data.
-      cleanup_performance_data(config_file);
-
-      // Clean up the scheduled downtime data.
-      cleanup_downtime_data(config_file);
-
-      // Clean up the comment data.
-      cleanup_comment_data(config_file);
+      cleanup_performance_data();
 
       // Clean up the status data.
-      cleanup_status_data(config_file, TRUE);
+      cleanup_status_data(TRUE);
 
       // Shutdown stuff.
       if (sigshutdown) {
@@ -593,16 +586,6 @@ int main(int argc, char* argv[]) {
     cleanup();
     delete[] config_file;
     config_file = NULL;
-    delete[] mac->x[MACRO_OBJECTCACHEFILE];
-    mac->x[MACRO_OBJECTCACHEFILE] = NULL;
-    delete[] mac->x[MACRO_PROCESSSTARTTIME];
-    mac->x[MACRO_PROCESSSTARTTIME] = NULL;
-    delete[] mac->x[MACRO_EVENTSTARTTIME];
-    mac->x[MACRO_EVENTSTARTTIME] = NULL;
-    delete[] mac->x[MACRO_RETENTIONDATAFILE];
-    mac->x[MACRO_RETENTIONDATAFILE] = NULL;
-    delete[] mac->x[MACRO_STATUSDATAFILE];
-    mac->x[MACRO_STATUSDATAFILE] = NULL;
   }
   catch (std::exception const& e) {
     logger(logging::log_runtime_error, logging::basic)
@@ -615,7 +598,9 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::logging::unload();
-  com::centreon::engine::configuration::applier::state::load();
+  com::centreon::engine::configuration::applier::state::unload();
+  com::centreon::engine::configuration::applier::macro::unload();
+  com::centreon::engine::configuration::applier::globals::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 

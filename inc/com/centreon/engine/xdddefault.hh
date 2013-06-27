@@ -32,9 +32,8 @@
 extern "C" {
 #  endif // C++
 
-int xdddefault_initialize_downtime_data(char const* main_config_file);
+int xdddefault_initialize_downtime_data();
 int xdddefault_validate_downtime_data();
-int xdddefault_cleanup_downtime_data(char const* main_config_file);
 
 int xdddefault_save_downtime_data();
 int xdddefault_add_new_host_downtime(

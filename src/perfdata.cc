@@ -27,14 +27,14 @@
 /******************************************************************/
 
 /* initializes performance data */
-int initialize_performance_data(char* config_file) {
-  xpddefault_initialize_performance_data(config_file);
+int initialize_performance_data() {
+  xpddefault_initialize_performance_data();
   return (OK);
 }
 
 /* cleans up performance data */
-int cleanup_performance_data(char* config_file) {
-  xpddefault_cleanup_performance_data(config_file);
+int cleanup_performance_data() {
+  xpddefault_cleanup_performance_data();
   return (OK);
 }
 

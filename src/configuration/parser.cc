@@ -498,7 +498,10 @@ void parser::_parse_resource_file(std::string const& path) {
       std::string key;
       std::string value;
       if (!misc::split(input, key, value, '='))
-        throw (engine_error());
+        throw (engine_error() << "configuration: parse resources "
+               "configuration failed: invalid line "
+               "'" << input << "' in file '" << _current_path << "' "
+               "on line " << _current_line);
       _config->user(key, value);
     }
     catch (std::exception const& e) {

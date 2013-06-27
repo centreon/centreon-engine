@@ -106,9 +106,6 @@ namespace              configuration {
                          std::string& key,
                          std::string& value,
                          char const* delim);
-    bool               _get_next_line(
-                         std::ifstream& stream,
-                         std::string& line);
     std::string const& _map_object_type(
                          map_object const& objects) const throw ();
     void               _parse_directory_configuration(std::string const& path);

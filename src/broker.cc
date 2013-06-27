@@ -23,10 +23,13 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sehandlers.hh"
+
+using namespace com::centreon::engine;
 
 extern "C" {
 
@@ -1338,9 +1341,9 @@ void broker_program_status(
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
   ds.global_host_event_handler
-    = my_strdup(config->global_host_event_handler());
+    = misc::strdup(config->global_host_event_handler());
   ds.global_service_event_handler
-    = my_strdup(config->global_service_event_handler());
+    = misc::strdup(config->global_service_event_handler());
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, &ds);

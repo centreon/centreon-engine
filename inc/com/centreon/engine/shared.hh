@@ -24,34 +24,16 @@
 #  include <sys/time.h>
 #  include <sys/types.h>
 
-// mmapfile structure - used for reading files via mmap()
-typedef struct  mmapfile_struct {
-  char*         path;
-  int           mode;
-  int           fd;
-  unsigned long file_size;
-  unsigned long current_position;
-  unsigned long current_line;
-  void*         mmap_buf;
-}               mmapfile;
-
 // only usable on compile-time initialized arrays, for obvious reasons
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
 #  ifdef __cplusplus
-#    include <string>
-char* my_strdup(std::string const& str);
-
 extern "C" {
 #  endif // C++
 
 char* my_strdup(char const* str);
 char* my_strtok(char const* buffer, char const* tokens);
 char* my_strsep(char** stringp, char const* delim);
-mmapfile* mmap_fopen(char const* filename);
-int mmap_fclose(mmapfile* temp_mmapfile);
-char* mmap_fgets(mmapfile* temp_mmapfile);
-char* mmap_fgets_multiline(mmapfile* temp_mmapfile);
 void strip(char* buffer);
 int hashfunc(char const* name1, char const* name2, int hashslots);
 int compare_hashdata(
@@ -74,24 +56,6 @@ char* resize_string(char* str, size_t size);
 
 #  ifdef __cplusplus
 }
-
-#    include <sstream>
-#    include <string>
-#    include <string.h>
-
-template <class T>
-char* obj2pchar(T obj) {
-  std::ostringstream oss;
-  oss << obj;
-  std::string const& str = oss.str();
-  char* buf = new char[str.size() + 1];
-  strcpy(buf, str.c_str());
-  return (buf);
-}
-
-template <>
-char* obj2pchar<char const*>(char const* str);
-
 #  endif // C++
 
 #endif // !CCE_SHARED_HH

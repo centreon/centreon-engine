@@ -29,8 +29,10 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/utils.hh"
 #include "globals.h"
+#include "mmap.h"
 
 using namespace com::centreon::engine;
 
@@ -141,7 +143,7 @@ extern "C" {
     // Create a safe temp file.
     std::ostringstream oss;
     oss << check_result_path << "/cXXXXXX";
-    char* output_file(my_strdup(oss.str()));
+    char* output_file(misc::strdup(oss.str()));
     int output_file_fd(mkstemp(output_file));
 
     // File created okay.

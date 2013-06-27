@@ -19,7 +19,9 @@
 
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/misc/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 static applier::globals* _instance = NULL;
@@ -124,6 +126,10 @@ void applier::globals::apply(state& config) {
   ::use_retained_scheduling_info = config.use_retained_scheduling_info();
   ::use_syslog = config.use_syslog();
   ::use_true_regexp_matching = config.use_true_regexp_matching();
+
+  std::vector<std::string> const& users(config.user());
+  for (unsigned int i(0), end(users.size()); i != end; ++i)
+    misc::setstr(macro_user[i], users[i]);
 }
 
 /**
@@ -191,6 +197,6 @@ void applier::globals::_set_global(
        char*& property,
        std::string const& value) {
   if (property && strcmp(property, value.c_str())) {
-    property = my_strdup(value);
+    property = misc::strdup(value);
   }
 }
