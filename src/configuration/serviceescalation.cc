@@ -151,19 +151,19 @@ bool serviceescalation::operator!=(serviceescalation const& right) const throw (
  */
 std::size_t serviceescalation::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
     hash_combine(
       _id,
-      _hostgroups.get().begin(),
-      _hostgroups.get().end());
+      _hostgroups->get().begin(),
+      _hostgroups->get().end());
     hash_combine(
       _id,
-      _service_description.get().begin(),
-      _service_description.get().end());
+      _service_description->get().begin(),
+      _service_description->get().end());
     hash_combine(
       _id,
-      _servicegroups.get().begin(),
-      _servicegroups.get().end());
+      _servicegroups->get().begin(),
+      _servicegroups->get().end());
   }
   return (_id);
 }
@@ -174,13 +174,13 @@ std::size_t serviceescalation::id() const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void serviceescalation::check_validity() const {
-  if (_service_description.empty() && _servicegroups.empty())
+  if (_service_description->empty() && _servicegroups->empty())
     throw (engine_error() << "configuration: invalid serviceescalation "
            "property service_description or servicegroup is missing");
-  if (_hosts.empty() && _hostgroups.empty())
+  if (_hosts->empty() && _hostgroups->empty())
     throw (engine_error() << "configuration: invalid serviceescalation "
            "property host or hostgroup is missing");
-  if (_contacts.empty() && _contactgroups.empty())
+  if (_contacts->empty() && _contactgroups->empty())
     throw (engine_error() << "configuration: invalid serviceescalation "
            "property contact or contactgroup is missing");
   if (_escalation_period.empty())
@@ -236,7 +236,7 @@ bool serviceescalation::parse(
  *  @return The contactgroups.
  */
 list_string const& serviceescalation::contactgroups() const throw () {
-  return (_contactgroups.get());
+  return (_contactgroups->get());
 }
 
 /**
@@ -245,7 +245,7 @@ list_string const& serviceescalation::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& serviceescalation::contacts() const throw () {
-  return (_contacts.get());
+  return (_contacts->get());
 }
 
 /**
@@ -281,7 +281,7 @@ unsigned int serviceescalation::first_notification() const throw () {
  *  @return The hostgroups.
  */
 list_string const& serviceescalation::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -290,7 +290,7 @@ list_string const& serviceescalation::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& serviceescalation::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**
@@ -317,7 +317,7 @@ unsigned int serviceescalation::notification_interval() const throw () {
  *  @return The servicegroups.
  */
 list_string const& serviceescalation::servicegroups() const throw () {
-  return (_servicegroups.get());
+  return (_servicegroups->get());
 }
 
 /**
@@ -326,7 +326,7 @@ list_string const& serviceescalation::servicegroups() const throw () {
  *  @return The service_description.
  */
 list_string const& serviceescalation::service_description() const throw () {
-  return (_service_description.get());
+  return (_service_description->get());
 }
 
 

@@ -145,12 +145,12 @@ std::size_t hostdependency::id() const throw () {
   if (!_id) {
     hash_combine(
       _id,
-      _dependent_hostgroups.get().begin(),
-      _dependent_hostgroups.get().end());
+      _dependent_hostgroups->get().begin(),
+      _dependent_hostgroups->get().end());
     hash_combine(
       _id,
-      _dependent_hosts.get().begin(),
-      _dependent_hosts.get().end());
+      _dependent_hosts->get().begin(),
+      _dependent_hosts->get().end());
   }
   return (_id);
 }
@@ -161,10 +161,10 @@ std::size_t hostdependency::id() const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void hostdependency::check_validity() const {
-  if (_hosts.empty() && _hostgroups.empty())
+  if (_hosts->empty() && _hostgroups->empty())
     throw (engine_error() << "configuration: invalid hostdependency "
            "property host or hostgroup is missing");
-  if (_dependent_hosts.empty() && _dependent_hostgroups.empty())
+  if (_dependent_hosts->empty() && _dependent_hostgroups->empty())
     throw (engine_error() << "configuration: invalid hostdependency "
            "property dependent_host or dependent_hostgroup is missing");
   if (_dependency_period.empty())
@@ -226,7 +226,7 @@ std::string const& hostdependency::dependency_period() const throw () {
  *  @return The dependent_hostgroups.
  */
 list_string const& hostdependency::dependent_hostgroups() const throw () {
-  return (_dependent_hostgroups.get());
+  return (_dependent_hostgroups->get());
 }
 
 /**
@@ -235,7 +235,7 @@ list_string const& hostdependency::dependent_hostgroups() const throw () {
  *  @return The dependent_hosts.
  */
 list_string const& hostdependency::dependent_hosts() const throw () {
-  return (_dependent_hosts.get());
+  return (_dependent_hosts->get());
 }
 
 /**
@@ -253,7 +253,7 @@ unsigned int hostdependency::execution_failure_options() const throw () {
  *  @return The hostgroups.
  */
 list_string const& hostdependency::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -262,7 +262,7 @@ list_string const& hostdependency::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& hostdependency::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**

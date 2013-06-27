@@ -126,7 +126,7 @@ bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
  */
 std::size_t serviceextinfo::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
     hash_combine(_id, _service_description);
   }
   return (_id);
@@ -141,7 +141,7 @@ void serviceextinfo::check_validity() const {
   if (_service_description.empty())
     throw (engine_error() << "configuration: invalid serviceextinfo "
            "property service_description is missing");
-  if (_hosts.empty() && _hostgroups.empty())
+  if (_hosts->empty() && _hostgroups->empty())
     throw (engine_error() << "configuration: invalid serviceextinfo "
            "property host or hostgroup is missing");
 }
@@ -218,7 +218,7 @@ std::string const& serviceextinfo::icon_image_alt() const throw () {
  *  @return The hostgroups.
  */
 list_string const& serviceextinfo::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -227,7 +227,7 @@ list_string const& serviceextinfo::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& serviceextinfo::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**

@@ -22,6 +22,7 @@
 
 #  include <list>
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -68,8 +69,8 @@ namespace                  configuration {
     std::string            _action_url;
     std::string            _icon_image;
     std::string            _icon_image_alt;
-    group                  _hostgroups;
-    group                  _hosts;
+    opt<group>             _hostgroups;
+    opt<group>             _hosts;
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;

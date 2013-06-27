@@ -56,7 +56,10 @@ bool operator==(
           && is_equal(obj1.alias, obj2.alias)
           && is_equal(obj1.address, obj2.address)
           && is_equal(obj1.parent_hosts, obj2.parent_hosts)
-          && is_equal(obj1.services, obj2.services)
+          // Children do not need to be tested, they are
+          // created as parent back links.
+          // Services do not need to be tested, they are
+          // created as services back links.
           && is_equal(obj1.host_check_command, obj2.host_check_command)
           && obj1.initial_state == obj2.initial_state
           && obj1.check_interval == obj2.check_interval

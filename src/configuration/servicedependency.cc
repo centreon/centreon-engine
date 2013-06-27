@@ -166,20 +166,20 @@ std::size_t servicedependency::id() const throw () {
   if (!_id) {
     hash_combine(
       _id,
-      _dependent_hostgroups.get().begin(),
-      _dependent_hostgroups.get().end());
+      _dependent_hostgroups->get().begin(),
+      _dependent_hostgroups->get().end());
     hash_combine(
       _id,
-      _dependent_hosts.get().begin(),
-      _dependent_hosts.get().end());
+      _dependent_hosts->get().begin(),
+      _dependent_hosts->get().end());
     hash_combine(
       _id,
-      _dependent_servicegroups.get().begin(),
-      _dependent_servicegroups.get().end());
+      _dependent_servicegroups->get().begin(),
+      _dependent_servicegroups->get().end());
     hash_combine(
       _id,
-      _dependent_service_description.get().begin(),
-      _dependent_service_description.get().end());
+      _dependent_service_description->get().begin(),
+      _dependent_service_description->get().end());
   }
   return (_id);
 }
@@ -190,18 +190,18 @@ std::size_t servicedependency::id() const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void servicedependency::check_validity() const {
-  if (_service_description.empty() && _servicegroups.empty())
+  if (_service_description->empty() && _servicegroups->empty())
     throw (engine_error() << "configuration: invalid servicedependency "
            "property service_description or servicegroup is missing");
-  if (_hosts.empty() && _hostgroups.empty())
+  if (_hosts->empty() && _hostgroups->empty())
     throw (engine_error() << "configuration: invalid servicedependency "
            "property host or hostgroup is missing");
-  if (_dependent_hosts.empty()
-      && _dependent_hostgroups.empty())
+  if (_dependent_hosts->empty()
+      && _dependent_hostgroups->empty())
     throw (engine_error() << "configuration: invalid servicedependency "
            "property dependent_host or dependent_hostgroup is missing");
-  if (_dependent_service_description.empty()
-      && _dependent_servicegroups.empty())
+  if (_dependent_service_description->empty()
+      && _dependent_servicegroups->empty())
     throw (engine_error() << "configuration: invalid servicedependency "
            "property dependent_service_description or "
            "dependent_servicegroup is missing");
@@ -268,7 +268,7 @@ std::string const& servicedependency::dependency_period() const throw () {
  *  @return The dependent_hostgroup.
  */
 list_string const& servicedependency::dependent_hostgroups() const throw () {
-  return (_dependent_hostgroups.get());
+  return (_dependent_hostgroups->get());
 }
 
 /**
@@ -277,7 +277,7 @@ list_string const& servicedependency::dependent_hostgroups() const throw () {
  *  @return The dependent_hosts.
  */
 list_string const& servicedependency::dependent_hosts() const throw () {
-  return (_dependent_hosts.get());
+  return (_dependent_hosts->get());
 }
 
 /**
@@ -286,7 +286,7 @@ list_string const& servicedependency::dependent_hosts() const throw () {
  *  @return The dependent_servicegroup.
  */
 list_string const& servicedependency::dependent_servicegroups() const throw () {
-  return (_dependent_servicegroups.get());
+  return (_dependent_servicegroups->get());
 }
 
 /**
@@ -295,7 +295,7 @@ list_string const& servicedependency::dependent_servicegroups() const throw () {
  *  @return The dependent_service_description.
  */
 list_string const& servicedependency::dependent_service_description() const throw () {
-  return (_dependent_service_description.get());
+  return (_dependent_service_description->get());
 }
 
 /**
@@ -322,7 +322,7 @@ bool servicedependency::inherits_parent() const throw () {
  *  @return The hostgroup.
  */
 list_string const& servicedependency::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -331,7 +331,7 @@ list_string const& servicedependency::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& servicedependency::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**
@@ -349,7 +349,7 @@ unsigned int servicedependency::notification_failure_options() const throw () {
  *  @return The servicegroup.
  */
 list_string const& servicedependency::servicegroups() const throw () {
-  return (_servicegroups.get());
+  return (_servicegroups->get());
 }
 
 /**
@@ -358,7 +358,7 @@ list_string const& servicedependency::servicegroups() const throw () {
  *  @return The service_description.
  */
 list_string const& servicedependency::service_description() const throw () {
-  return (_service_description.get());
+  return (_service_description->get());
 }
 
 

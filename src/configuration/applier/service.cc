@@ -228,8 +228,13 @@ void applier::service::expand_object(
                          shared_ptr<configuration::service> obj,
                          configuration::state& s) {
   // Either expand service instance.
-  if ((obj->hosts().size() == 1) && obj->hostgroups().empty())
+  if ((obj->hosts().size() == 1) && obj->hostgroups().empty()) {
+    // Expand memberships.
     _expand_service_memberships(obj, s);
+
+    // Inherits special vars.
+    _inherits_special_vars(obj, s);
+  }
   // Or expand service to instances.
   else {
     // All hosts members.
@@ -436,6 +441,57 @@ void applier::service::_expand_service_memberships(
 
     // Reinsert service group.
     s.servicegroups().insert(backup);
+  }
+
+  return ;
+}
+
+/**
+ *  @brief Inherits special variables from host.
+ *
+ *  These special variables, if not defined are inherited from host.
+ *  They are contact_groups, notification_interval and
+ *  notification_period.
+ *
+ *  @param[in,out] obj Target service.
+ *  @param[in,out] s   Configuration state.
+ */
+void applier::service::_inherits_special_vars(
+                         shared_ptr<configuration::service> obj,
+                         configuration::state& s) {
+  // Detect if any special variable has not been defined.
+  if (!obj->contactgroups_defined()
+      || !obj->notification_interval_defined()
+      || !obj->notification_period_defined()) {
+    // Remove service from state (it will be modified
+    // and reinserted later).
+    s.services().erase(obj);
+
+    // Find host.
+    std::set<shared_ptr<configuration::host> >::const_iterator
+      it(s.hosts().begin()),
+      end(s.hosts().end());
+    while (it != end) {
+      if ((*it)->host_name() == obj->hosts().front())
+        break ;
+      ++it;
+    }
+    if (it == end)
+      throw (engine_error()
+             << "Error: Could not inherit special variables for service '"
+             << obj->service_description() << "': host '"
+             << obj->hosts().front() << "' does not exist.");
+
+    // Inherits variables.
+    if (!obj->contactgroups_defined())
+      obj->contactgroups() = (*it)->contactgroups();
+    if (!obj->notification_interval_defined())
+      obj->notification_interval((*it)->notification_interval());
+    if (!obj->notification_period_defined())
+      obj->notification_period((*it)->notification_period());
+
+    // Reinsert service.
+    s.services().insert(obj);
   }
 
   return ;

@@ -23,6 +23,7 @@
 #  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 typedef std::set<std::string> set_string;
@@ -74,9 +75,9 @@ namespace                  configuration {
 
     std::string            _action_url;
     std::string            _alias;
-    group                  _hostgroup_members;
+    opt<group>             _hostgroup_members;
     std::string            _hostgroup_name;
-    group                  _members;
+    opt<group>             _members;
     std::string            _notes;
     std::string            _notes_url;
     mutable bool           _resolved;

@@ -75,13 +75,13 @@ namespace                  configuration {
     bool                   _set_last_notification(unsigned int value);
     bool                   _set_notification_interval(unsigned int value);
 
-    group                  _contactgroups;
-    group                  _contacts;
+    opt<group>             _contactgroups;
+    opt<group>             _contacts;
     opt<unsigned short>    _escalation_options;
     std::string            _escalation_period;
     opt<unsigned int>      _first_notification;
-    group                  _hostgroups;
-    group                  _hosts;
+    opt<group>             _hostgroups;
+    opt<group>             _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
   };

@@ -155,7 +155,7 @@ namespace std {
 #  define MRG_IMPORTANT(prop) \
   if (prop.empty() || tmpl.prop##_is_important) prop = tmpl.prop
 #  define MRG_INHERIT(prop) \
-  if (prop.empty() || prop.is_add_inherit()) prop.set(tmpl.prop)
+  if (!prop.is_set() || prop.get().is_add_inherit()) prop.set(tmpl.prop)
 #  define MRG_MAP(prop) \
   prop.insert(tmpl.prop.begin(), tmpl.prop.end())
 #  define MRG_OPTION(prop) \

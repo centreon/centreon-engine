@@ -219,7 +219,7 @@ std::string const& servicegroup::alias() const throw () {
  *  @return The members.
  */
 list_string& servicegroup::members() throw () {
-  return (_members.get());
+  return (_members->get());
 }
 
 /**
@@ -228,7 +228,7 @@ list_string& servicegroup::members() throw () {
  *  @return The members.
  */
 list_string const& servicegroup::members() const throw () {
-  return (_members.get());
+  return (_members->get());
 }
 
 /**
@@ -255,7 +255,7 @@ std::string const& servicegroup::notes_url() const throw () {
  *  @return The servicegroup_members.
  */
 list_string const& servicegroup::servicegroup_members() const throw () {
-  return (_servicegroup_members.get());
+  return (_servicegroup_members->get());
 }
 
 /**

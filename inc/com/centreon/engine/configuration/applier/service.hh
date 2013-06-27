@@ -57,6 +57,9 @@ namespace             configuration {
       void            _expand_service_memberships(
                         shared_ptr<configuration::service> obj,
                         configuration::state& s);
+      void            _inherits_special_vars(
+                        shared_ptr<configuration::service> obj,
+                        configuration::state& s);
     };
   }
 }

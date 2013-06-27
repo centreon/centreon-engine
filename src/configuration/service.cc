@@ -105,6 +105,7 @@ static unsigned int const   default_max_check_attempts(0);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
 static unsigned short const default_notification_options(service::ok | service::warning | service::critical | service::unknown | service::flapping | service::downtime);
+static std::string const    default_notification_period;
 static bool const           default_obsess_over_service(true);
 static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
@@ -384,7 +385,7 @@ bool service::operator<(service const& right) const throw () {
  */
 std::size_t service::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
     hash_combine(_id, _service_description);
   }
   return (_id);
@@ -399,7 +400,7 @@ void service::check_validity() const {
   if (_service_description.empty())
     throw (engine_error() << "configuration: invalid service property "
            "service_description is missing");
-  if (_hosts.empty() && _hostgroups.empty())
+  if (_hosts->empty() && _hostgroups->empty())
     throw (engine_error() << "configuration: invalid service property "
            "host or hostgroup is missing");
   if (_check_command.empty())
@@ -461,7 +462,7 @@ void service::merge(object const& obj) {
   MRG_OPTION(_notifications_enabled);
   MRG_OPTION(_notification_interval);
   MRG_OPTION(_notification_options);
-  MRG_DEFAULT(_notification_period);
+  MRG_OPTION(_notification_period);
   MRG_OPTION(_obsess_over_service);
   MRG_OPTION(_process_perf_data);
   MRG_OPTION(_retain_nonstatus_information);
@@ -572,8 +573,26 @@ std::string const& service::check_period() const throw () {
  *
  *  @return The contactgroups.
  */
+list_string& service::contactgroups() throw () {
+  return (_contactgroups->get());
+}
+
+/**
+ *  Get contactgroups.
+ *
+ *  @return The contactgroups.
+ */
 list_string const& service::contactgroups() const throw () {
-  return (_contactgroups.get());
+  return (_contactgroups->get());
+}
+
+/**
+ *  Check if contactgroups were defined.
+ *
+ *  @return True if contactgroups were defined.
+ */
+bool service::contactgroups_defined() const throw () {
+  return (_contactgroups.is_set());
 }
 
 /**
@@ -582,7 +601,7 @@ list_string const& service::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& service::contacts() const throw () {
-  return (_contacts.get());
+  return (_contacts->get());
 }
 
 /**
@@ -672,7 +691,7 @@ unsigned int service::high_flap_threshold() const throw () {
  *  @return The hostgroups.
  */
 list_string& service::hostgroups() throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -681,7 +700,7 @@ list_string& service::hostgroups() throw () {
  *  @return The hostgroups.
  */
 list_string const& service::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -690,7 +709,7 @@ list_string const& service::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string& service::hosts() throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**
@@ -699,7 +718,7 @@ list_string& service::hosts() throw () {
  *  @return The hosts.
  */
 list_string const& service::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**
@@ -784,6 +803,25 @@ bool service::notifications_enabled() const throw () {
 }
 
 /**
+ *  Set notification_interval.
+ *
+ *  @param[in] interval Notification interval.
+ */
+void service::notification_interval(unsigned int interval) throw () {
+  _notification_interval = interval;
+  return ;
+}
+
+/**
+ *  Check if notification interval has been set.
+ *
+ *  @return True if notification interval was set in configuration.
+ */
+bool service::notification_interval_defined() const throw () {
+  return (_notification_interval.is_set());
+}
+
+/**
  *  Get notification_interval.
  *
  *  @return The notification_interval.
@@ -802,12 +840,31 @@ unsigned short service::notification_options() const throw () {
 }
 
 /**
+ *  Set notification_period.
+ *
+ *  @param[in] period Period.
+ */
+void service::notification_period(std::string const& period) {
+  _notification_period = period;
+  return ;
+}
+
+/**
  *  Get notification_period.
  *
  *  @return The notification_period.
  */
 std::string const& service::notification_period() const throw () {
   return (_notification_period);
+}
+
+/**
+ *  Check if notification period has been set.
+ *
+ *  @return True if notification period was set in configuration.
+ */
+bool service::notification_period_defined() const throw () {
+  return (_notification_period.is_set());
 }
 
 /**
@@ -861,7 +918,7 @@ unsigned int service::retry_interval() const throw () {
  *  @return The servicegroups.
  */
 list_string const& service::servicegroups() const throw () {
-  return (_servicegroups.get());
+  return (_servicegroups->get());
 }
 
 /**

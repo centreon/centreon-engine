@@ -317,10 +317,10 @@ bool host::operator<(host const& right) const throw () {
     return (_contactgroups < right._contactgroups);
   else if (_contacts != right._contacts)
     return (_contacts < right._contacts);
-  else if (_coords_2d.get() != right._coords_2d.get())
-    return (_coords_2d.get() < right._coords_2d.get());
-  else if (_coords_3d.get() != right._coords_3d.get())
-    return (_coords_3d.get() < right._coords_3d.get());
+  else if (_coords_2d != right._coords_2d)
+    return (_coords_2d < right._coords_2d);
+  else if (_coords_3d != right._coords_3d)
+    return (_coords_3d < right._coords_3d);
   else if (_customvariables != right._customvariables)
     return (_customvariables < right._customvariables);
   else if (_display_name != right._display_name)
@@ -594,7 +594,7 @@ std::string const& host::check_period() const throw () {
  *  @return The contactgroups.
  */
 list_string const& host::contactgroups() const throw () {
-  return (_contactgroups.get());
+  return (_contactgroups->get());
 }
 
 /**
@@ -603,7 +603,7 @@ list_string const& host::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& host::contacts() const throw () {
-  return (_contacts.get());
+  return (_contacts->get());
 }
 
 /**
@@ -729,7 +729,7 @@ unsigned int host::high_flap_threshold() const throw () {
  *  @return The hostgroups.
  */
 list_string const& host::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -855,7 +855,7 @@ bool host::obsess_over_host() const throw () {
  *  @return The parents.
  */
 list_string const& host::parents() const throw () {
-  return (_parents.get());
+  return (_parents->get());
 }
 
 /**

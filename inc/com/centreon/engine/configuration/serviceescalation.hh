@@ -82,17 +82,17 @@ namespace                  configuration {
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
 
-    group                  _contactgroups;
-    group                  _contacts;
+    opt<group>             _contactgroups;
+    opt<group>             _contacts;
     opt<unsigned short>    _escalation_options;
     std::string            _escalation_period;
     opt<unsigned int>      _first_notification;
-    group                  _hostgroups;
-    group                  _hosts;
+    opt<group>             _hostgroups;
+    opt<group>             _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
-    group                  _servicegroups;
-    group                  _service_description;
+    opt<group>             _servicegroups;
+    opt<group>             _service_description;
   };
 
   typedef shared_ptr<serviceescalation>    serviceescalation_ptr;
