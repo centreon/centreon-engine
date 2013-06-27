@@ -18,6 +18,7 @@
 */
 
 #include <string>
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -702,24 +703,25 @@ static bool oldparser_read_config(
   init_object_skiplists();
   init_macros();
   int ret(read_main_config_file(filename.c_str()));
-  if (ret == OK) {
+  if (ret == OK)
     ret = xodtemplate_read_config_data(
             filename.c_str(),
             options,
             false,
             false);
-    if (ret == OK) {
-      remove_duplicate_members_for_object(
-        contactgroup_list,
-        &deleter::contactsmember);
-      remove_duplicate_members_for_object(
-        hostgroup_list,
-        &deleter::hostsmember);
-      remove_duplicate_members_for_object(
-        servicegroup_list,
-        &deleter::servicesmember);
-      g = get_globals();
-    }
+  if (ret == OK)
+    ret = pre_flight_check();
+  if (ret == OK) {
+    remove_duplicate_members_for_object(
+      contactgroup_list,
+      &deleter::contactsmember);
+    remove_duplicate_members_for_object(
+      hostgroup_list,
+      &deleter::hostsmember);
+    remove_duplicate_members_for_object(
+      servicegroup_list,
+      &deleter::servicesmember);
+    g = get_globals();
   }
   clear_volatile_macros_r(get_global_macros());
   free_macrox_names();
