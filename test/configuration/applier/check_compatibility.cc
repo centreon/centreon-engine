@@ -573,43 +573,58 @@ static global get_globals() {
   return (g);
 }
 
+/**
+ *  Check for contact member.
+ *
+ *  @param[in] lst The object list to check.
+ *  @param[in] obj The object to check.
+ */
 static bool member_is_already_in_list(
               contactsmember const* lst,
               contactsmember const* obj) {
-  contact const* ref(obj->contact_ptr);
-  for (contactsmember const* m(lst); m && m != obj; m = m->next) {
-    contact const* tmp(m->contact_ptr);
-    if (!strcmp(tmp->name, ref->name))
+  for (contactsmember const* m(lst); m && m != obj; m = m->next)
+    if (!strcmp(m->contact_name, obj->contact_name))
       return (true);
-  }
   return (false);
 }
 
+/**
+ *  Check for host member.
+ *
+ *  @param[in] lst The object list to check.
+ *  @param[in] obj The object to check.
+ */
 static bool member_is_already_in_list(
               hostsmember const* lst,
               hostsmember const* obj) {
-  host const* ref(obj->host_ptr);
-  for (hostsmember const* m(lst); m && m != obj; m = m->next) {
-    host const* tmp(m->host_ptr);
-    if (!strcmp(tmp->name, ref->name))
+  for (hostsmember const* m(lst); m && m != obj; m = m->next)
+    if (!strcmp(m->host_name, obj->host_name))
       return (true);
-  }
   return (false);
 }
 
+/**
+ *  Check for service member.
+ *
+ *  @param[in] lst The object list to check.
+ *  @param[in] obj The object to check.
+ */
 static bool member_is_already_in_list(
               servicesmember const* lst,
               servicesmember const* obj) {
-  service const* ref(obj->service_ptr);
-  for (servicesmember const* m(lst); m && m != obj; m = m->next) {
-    service const* tmp(m->service_ptr);
-    if (!strcmp(tmp->host_name, ref->host_name)
-        && !strcmp(tmp->description, ref->description))
+  for (servicesmember const* m(lst); m && m != obj; m = m->next)
+    if (!strcmp(m->host_name, obj->host_name)
+        && !strcmp(m->service_description, obj->service_description))
       return (true);
-  }
   return (false);
 }
 
+/**
+ *  Remove duplicate members.
+ *
+ *  @param[in] lst     The object list to check.
+ *  @param[in] deleter The deleter to delete duplicate members.
+ */
 template<typename T>
 static void remove_duplicate_members(
               T* lst,
@@ -626,11 +641,17 @@ static void remove_duplicate_members(
   }
 }
 
+/**
+ *  Remove duplicate members for all objects.
+ *
+ *  @param[in] lst     The object list to check.
+ *  @param[in] deleter The deleter to delete duplicate members.
+ */
 template<typename T>
 static void remove_duplicate_members_for_object(
               T const* lst,
               void (*deleter)(void*)) {
-  for (T const* obj(lst); lst; obj = obj->next)
+  for (T const* obj(lst); obj; obj = obj->next)
     remove_duplicate_members(obj->members, deleter);
 }
 
