@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_HOSTDEPENDENCY_HH
 
+#  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -47,6 +48,7 @@ namespace                  configuration {
                              hostdependency const& right) const throw ();
     bool                   operator!=(
                              hostdependency const& right) const throw ();
+    bool                   operator<(hostdependency const& right) const;
     void                   check_validity() const;
     std::size_t            id() const throw ();
     void                   merge(object const& obj);
@@ -55,12 +57,20 @@ namespace                  configuration {
                              std::string const& value);
 
     std::string const&     dependency_period() const throw ();
+    list_string&           dependent_hostgroups() throw ();
     list_string const&     dependent_hostgroups() const throw ();
+    list_string&           dependent_hosts() throw ();
     list_string const&     dependent_hosts() const throw ();
+    void                   execution_failure_options(
+                             unsigned int options) throw ();
     unsigned int           execution_failure_options() const throw ();
+    list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
+    list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     bool                   inherits_parent() const throw ();
+    void                   notification_failure_options(
+                             unsigned int options) throw ();
     unsigned int           notification_failure_options() const throw ();
 
   private:
@@ -84,7 +94,7 @@ namespace                  configuration {
   };
 
   typedef shared_ptr<hostdependency>    hostdependency_ptr;
-  typedef std::list<hostdependency_ptr> list_hostdependency;
+  typedef std::set<hostdependency_ptr>  set_hostdependency;
 }
 
 CCE_END()

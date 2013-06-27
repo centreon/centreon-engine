@@ -205,6 +205,41 @@ static void sort_it(contactsmember*& l) {
 /**
  *  Sort a list.
  */
+static void sort_it(hostdependency_struct*& l) {
+  hostdependency_struct* remaining(l);
+  hostdependency_struct** new_root(&l);
+  *new_root = NULL;
+  while (remaining) {
+    hostdependency_struct** min(&remaining);
+    for (hostdependency_struct** cur(&((*min)->next));
+         *cur;
+         cur = &((*cur)->next)) {
+      int dependent_host_less_than(strcmp(
+                                     (*cur)->dependent_host_name,
+                                     (*min)->dependent_host_name));
+      int host_less_than(strcmp(
+                           (*cur)->host_name,
+                           (*min)->host_name));
+      int type_less_than(
+            (*cur)->dependency_type < (*min)->dependency_type);
+      if ((dependent_host_less_than < 0)
+          || ((dependent_host_less_than == 0)
+              && ((host_less_than < 0)
+                  || ((host_less_than == 0)
+                      && (type_less_than < 0)))))
+        min = cur;
+    }
+    *new_root = *min;
+    *min = (*min)->next;
+    new_root = &((*new_root)->next);
+    *new_root = NULL;
+  }
+  return ;
+}
+
+/**
+ *  Sort a list.
+ */
 static void sort_it(servicesmember*& l) {
   servicesmember* remaining(l);
   servicesmember** new_root(&l);
@@ -273,7 +308,7 @@ static bool chkdiff(T const* l1, T const* l2) {
  *
  *  @return True if globals are equal, otherwise false.
  */
-bool chkdiff(global const& g1, global const& g2) {
+bool chkdiff(global& g1, global& g2) {
   bool ret(true);
 
   check_value(accept_passive_host_checks);
@@ -388,6 +423,8 @@ bool chkdiff(global const& g1, global const& g2) {
     ret = false;
   if (!chkdiff(g1.hosts, g2.hosts))
     ret = false;
+  sort_it(g1.hostdependencies);
+  sort_it(g2.hostdependencies);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
   if (!chkdiff(g1.hostescalations, g2.hostescalations))

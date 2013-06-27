@@ -1038,6 +1038,12 @@ int pre_flight_circular_check(int* w, int* e) {
     }
   }
 
+  /* clear checked flag for all dependencies */
+  for (temp_sd = servicedependency_list;
+       temp_sd != NULL;
+       temp_sd = temp_sd->next)
+    temp_sd->circular_path_checked = FALSE;
+
   /* check execution dependencies between all hosts */
   for (temp_hd = hostdependency_list;
        temp_hd != NULL;
@@ -1085,6 +1091,12 @@ int pre_flight_circular_check(int* w, int* e) {
       errors++;
     }
   }
+
+  /* clear checked flag for all dependencies */
+  for (temp_hd = hostdependency_list;
+       temp_hd != NULL;
+       temp_hd = temp_hd->next)
+    temp_hd->circular_path_checked = FALSE;
 
   /* update warning and error count */
   if (w != NULL)

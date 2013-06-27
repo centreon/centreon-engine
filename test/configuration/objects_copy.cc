@@ -102,7 +102,7 @@ int main_test(int argc, char* argv[]) {
   else if (type == "hostdependency") {
     check_objects<
       configuration::hostdependency,
-      configuration::list_hostdependency,
+      configuration::set_hostdependency,
       &configuration::state::hostdependencies>(fe.path());
   }
   else if (type == "hostescalation") {

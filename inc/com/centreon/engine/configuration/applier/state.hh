@@ -123,13 +123,14 @@ namespace           configuration {
                     ~state() throw ();
       state&        operator=(state const&);
       template      <typename ConfigurationType,
-                     typename ObjectType,
+                     typename ObjectCollectionType,
                      typename ApplierType,
                      typename KeyType,
-                     KeyType (* config_key)(ConfigurationType const&)>
+                     KeyType (* config_key)(ConfigurationType const&),
+                     typename ObjectCollectionType::iterator (* find_obj_from_key)(ObjectCollectionType&, KeyType const&)>
       void          _apply(
                       std::set<shared_ptr<ConfigurationType> >& cur_cfg,
-                      umap<KeyType, shared_ptr<ObjectType> >& cur_obj,
+                      ObjectCollectionType& cur_obj,
                       configuration::state const& new_state,
                       std::set<shared_ptr<ConfigurationType> > const& new_cfg);
       template      <typename ConfigurationType,

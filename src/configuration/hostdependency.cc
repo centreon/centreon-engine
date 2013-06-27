@@ -63,9 +63,7 @@ hostdependency::hostdependency()
   : object(object::hostdependency),
     _execution_failure_options(default_execution_failure_options),
     _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {
-
-}
+    _notification_failure_options(default_notification_failure_options) {}
 
 /**
  *  Copy constructor.
@@ -80,9 +78,7 @@ hostdependency::hostdependency(hostdependency const& right)
 /**
  *  Destructor.
  */
-hostdependency::~hostdependency() throw () {
-
-}
+hostdependency::~hostdependency() throw () {}
 
 /**
  *  Copy constructor.
@@ -134,6 +130,34 @@ bool hostdependency::operator==(hostdependency const& right) const throw () {
  */
 bool hostdependency::operator!=(hostdependency const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool hostdependency::operator<(hostdependency const& right) const {
+  if (_dependent_hosts != right._dependent_hosts)
+    return (_dependent_hosts < right._dependent_hosts);
+  else if (_hosts != right._hosts)
+    return (_hosts < right._hosts);
+  else if (_hostgroups != right._hostgroups)
+    return (_hostgroups < right._hostgroups);
+  else if (_dependent_hostgroups != right._dependent_hostgroups)
+    return (_dependent_hostgroups < right._dependent_hostgroups);
+  else if (_dependency_period != right._dependency_period)
+    return (_dependency_period < right._dependency_period);
+  else if (_execution_failure_options
+           != right._execution_failure_options)
+    return (_execution_failure_options
+            < right._execution_failure_options);
+  else if (_inherits_parent != right._inherits_parent)
+    return (_inherits_parent < right._inherits_parent);
+  return (_notification_failure_options
+          < right._notification_failure_options);
 }
 
 /**
@@ -221,12 +245,30 @@ std::string const& hostdependency::dependency_period() const throw () {
 }
 
 /**
+ *  Get dependent host groups.
+ *
+ *  @return Dependent host groups.
+ */
+list_string& hostdependency::dependent_hostgroups() throw () {
+  return (_dependent_hostgroups->get());
+}
+
+/**
  *  Get dependent_hostgroups.
  *
  *  @return The dependent_hostgroups.
  */
 list_string const& hostdependency::dependent_hostgroups() const throw () {
   return (_dependent_hostgroups->get());
+}
+
+/**
+ *  Get dependent hosts.
+ *
+ *  @return The dependent hosts.
+ */
+list_string& hostdependency::dependent_hosts() throw () {
+  return (_dependent_hosts->get());
 }
 
 /**
@@ -239,6 +281,17 @@ list_string const& hostdependency::dependent_hosts() const throw () {
 }
 
 /**
+ *  Set the execution failure options.
+ *
+ *  @param[in] options New options.
+ */
+void hostdependency::execution_failure_options(
+                       unsigned int options) throw () {
+  _execution_failure_options.set(options);
+  return ;
+}
+
+/**
  *  Get execution_failure_options.
  *
  *  @return The execution_failure_options.
@@ -248,12 +301,30 @@ unsigned int hostdependency::execution_failure_options() const throw () {
 }
 
 /**
+ *  Get host groups.
+ *
+ *  @return The host groups.
+ */
+list_string& hostdependency::hostgroups() throw () {
+  return (_hostgroups->get());
+}
+
+/**
  *  Get hostgroups.
  *
  *  @return The hostgroups.
  */
 list_string const& hostdependency::hostgroups() const throw () {
   return (_hostgroups->get());
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string& hostdependency::hosts() throw () {
+  return (_hosts->get());
 }
 
 /**
@@ -272,6 +343,17 @@ list_string const& hostdependency::hosts() const throw () {
  */
 bool hostdependency::inherits_parent() const throw () {
   return (_inherits_parent);
+}
+
+/**
+ *  Set notification failure options.
+ *
+ *  @param[in] options New options.
+ */
+void hostdependency::notification_failure_options(
+                       unsigned int options) throw () {
+  _notification_failure_options.set(options);
+  return ;
 }
 
 /**

@@ -203,9 +203,9 @@ namespace              configuration {
     void               high_host_flap_threshold(float value);
     float              high_service_flap_threshold() const throw ();
     void               high_service_flap_threshold(float value);
-    list_hostdependency const&
+    set_hostdependency const&
                        hostdependencies() const throw ();
-    list_hostdependency&
+    set_hostdependency&
                        hostdependencies() throw ();
     list_hostescalation const&
                        hostescalations() const throw ();
@@ -514,8 +514,7 @@ namespace              configuration {
     std::string        _global_service_event_handler;
     float              _high_host_flap_threshold;
     float              _high_service_flap_threshold;
-    list_hostdependency
-                       _hostdependencies;
+    set_hostdependency _hostdependencies;
     list_hostescalation
                        _hostescalations;
     set_hostgroup      _hostgroups;
