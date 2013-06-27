@@ -275,9 +275,7 @@ void applier::state::apply(configuration::state& new_cfg) {
   {
     bool old_verify_config(verify_config);
     verify_config = true;
-    int w(0);
-    int e(0);
-    pre_flight_object_check(&w, &e);
+    pre_flight_check();
     verify_config = old_verify_config;
   }
 
