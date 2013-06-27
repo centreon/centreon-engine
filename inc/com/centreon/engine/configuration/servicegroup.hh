@@ -24,6 +24,7 @@
 #  include <utility>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 typedef std::set<std::pair<std::string, std::string> > set_pair_string;
@@ -53,6 +54,7 @@ namespace                   configuration {
 
     std::string const&      action_url() const throw ();
     std::string const&      alias() const throw ();
+    list_string&            members() throw ();
     list_string const&      members() const throw ();
     std::string const&      notes() const throw ();
     std::string const&      notes_url() const throw ();
@@ -74,12 +76,12 @@ namespace                   configuration {
 
     std::string             _action_url;
     std::string             _alias;
-    group                   _members;
+    opt<group>              _members;
     std::string             _notes;
     std::string             _notes_url;
     mutable bool            _resolved;
     mutable set_pair_string _resolved_members;
-    group                   _servicegroup_members;
+    opt<group>              _servicegroup_members;
     std::string             _servicegroup_name;
   };
 

@@ -77,8 +77,8 @@ namespace                  configuration {
     std::string            _action_url;
     opt<point_2d>          _coords_2d;
     opt<point_3d>          _coords_3d;
-    group                  _hostgroups;
-    group                  _hosts;
+    opt<group>             _hostgroups;
+    opt<group>             _hosts;
     std::string            _icon_image;
     std::string            _icon_image_alt;
     std::string            _notes;

@@ -143,8 +143,11 @@ bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
  */
 std::size_t hostextinfo::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
-    hash_combine(_id, _hostgroups.get().begin(), _hostgroups.get().end());
+    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
+    hash_combine(
+      _id,
+      _hostgroups->get().begin(),
+      _hostgroups->get().end());
   }
   return (_id);
 }
@@ -155,7 +158,7 @@ std::size_t hostextinfo::id() const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void hostextinfo::check_validity() const {
-  if (_hostgroups.empty() && _hosts.empty())
+  if (_hostgroups->empty() && _hosts->empty())
     throw (engine_error() << "configuration: invalid hostextinfo "
            "property hostgroup or host is missing");
 }
@@ -235,7 +238,7 @@ point_3d const& hostextinfo::coords_3d() const throw () {
  *  @return The hostgroups.
  */
 list_string const& hostextinfo::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -244,7 +247,7 @@ list_string const& hostextinfo::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& hostextinfo::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**

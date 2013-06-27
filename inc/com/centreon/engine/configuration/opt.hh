@@ -48,12 +48,29 @@ namespace    configuration {
     bool     operator!=(opt const& right) const throw () {
       return (!operator==(right));
     }
+    bool     operator<(opt const& right) const throw () {
+      return (_data < right._data);
+    }
              operator T const& () const throw () { return (_data); }
+    T&       operator*() throw () { return (_data); }
+    T const& operator*() const throw () { return (_data); }
+    T*       operator->() throw () { return (&_data); }
+    T const* operator->() const throw () { return (&_data); }
+    T&       get() throw () { return (_data); }
     T const& get() const throw () { return (_data); }
     bool     is_set() const throw () { return (_is_set); }
     void     reset() throw () { _is_set = false; }
     void     set(T const& right) {
       _data = right;
+      _is_set = true;
+    }
+    void     set(opt<T> const& right) {
+      _data = right._data;
+      _is_set = right._is_set;
+    }
+    template <typename U>
+    void     set(U right) {
+      _data.set(right);
       _is_set = true;
     }
 

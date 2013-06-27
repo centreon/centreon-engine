@@ -202,6 +202,34 @@ static void sort_it(contactsmember*& l) {
 }
 
 /**
+ *  Sort a list.
+ */
+static void sort_it(servicesmember*& l) {
+  servicesmember* remaining(l);
+  servicesmember** new_root(&l);
+  *new_root = NULL;
+  while (remaining) {
+    servicesmember** min(&remaining);
+    for (servicesmember** cur(&((*min)->next));
+         *cur;
+         cur = &((*cur)->next)) {
+      int host_less_than(strcmp((*cur)->host_name, (*min)->host_name));
+      if ((host_less_than < 0)
+          || (!host_less_than
+              && (strcmp(
+                    (*cur)->service_description,
+                    (*min)->service_description) < 0)))
+        min = cur;
+    }
+    *new_root = *min;
+    *min = (*min)->next;
+    new_root = &((*new_root)->next);
+    *new_root = NULL;
+  }
+  return ;
+}
+
+/**
  *  Check difference between to list of object.
  *
  *  @param[in] l1 The first list.
@@ -371,6 +399,14 @@ bool chkdiff(global const& g1, global const& g2) {
     ret = false;
   if (!chkdiff(g1.serviceescalations, g2.serviceescalations))
     ret = false;
+  for (servicegroup_struct* sg1(g1.servicegroups);
+       sg1;
+       sg1 = sg1->next)
+    sort_it(sg1->members);
+  for (servicegroup_struct* sg2(g2.servicegroups);
+       sg2;
+       sg2 = sg2->next)
+    sort_it(sg2->members);
   if (!chkdiff(g1.servicegroups, g2.servicegroups))
     ret = false;
   if (!chkdiff(g1.timeperiods, g2.timeperiods))

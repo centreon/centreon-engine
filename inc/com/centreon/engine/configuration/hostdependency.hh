@@ -74,11 +74,11 @@ namespace                  configuration {
     bool                   _set_notification_failure_options(std::string const& value);
 
     std::string            _dependency_period;
-    group                  _dependent_hostgroups;
-    group                  _dependent_hosts;
+    opt<group>             _dependent_hostgroups;
+    opt<group>             _dependent_hosts;
     opt<unsigned int>      _execution_failure_options;
-    group                  _hostgroups;
-    group                  _hosts;
+    opt<group>             _hostgroups;
+    opt<group>             _hosts;
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
   };

@@ -599,7 +599,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::logging::unload();
   com::centreon::engine::configuration::applier::state::unload();
-  com::centreon::engine::configuration::applier::macro::unload();
+  com::centreon::engine::configuration::applier::macros::unload();
   com::centreon::engine::configuration::applier::globals::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();

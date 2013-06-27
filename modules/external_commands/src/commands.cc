@@ -149,7 +149,7 @@ int process_external_commands_from_file(
 
   /* delete the file */
   if (delete_file)
-    unlink(file);
+    ::remove(file);
 
   return (OK);
 }

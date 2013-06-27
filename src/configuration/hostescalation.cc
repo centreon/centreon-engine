@@ -142,11 +142,11 @@ bool hostescalation::operator!=(hostescalation const& right) const throw () {
  */
 std::size_t hostescalation::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts.get().begin(), _hosts.get().end());
+    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
     hash_combine(
       _id,
-      _hostgroups.get().begin(),
-      _hostgroups.get().end());
+      _hostgroups->get().begin(),
+      _hostgroups->get().end());
   }
   return (_id);
 }
@@ -157,10 +157,10 @@ std::size_t hostescalation::id() const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void hostescalation::check_validity() const {
-  if (_hosts.empty() && _hostgroups.empty())
+  if (_hosts->empty() && _hostgroups->empty())
     throw (engine_error() << "configuration: invalid hostescalation "
            "property host or hostgroup is missing");
-  if (_contacts.empty() && _contactgroups.empty())
+  if (_contacts->empty() && _contactgroups->empty())
     throw (engine_error() << "configuration: invalid hostescalation "
            "property contact or contactgroup is missing");
   if (_escalation_period.empty())
@@ -214,7 +214,7 @@ bool hostescalation::parse(
  *  @return The contactgroups.
  */
 list_string const& hostescalation::contactgroups() const throw () {
-  return (_contactgroups.get());
+  return (_contactgroups->get());
 }
 
 /**
@@ -223,7 +223,7 @@ list_string const& hostescalation::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& hostescalation::contacts() const throw () {
-  return (_contacts.get());
+  return (_contacts->get());
 }
 
 /**
@@ -259,7 +259,7 @@ unsigned int hostescalation::first_notification() const throw () {
  *  @return The hostgroups.
  */
 list_string const& hostescalation::hostgroups() const throw () {
-  return (_hostgroups.get());
+  return (_hostgroups->get());
 }
 
 /**
@@ -268,7 +268,7 @@ list_string const& hostescalation::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& hostescalation::hosts() const throw () {
-  return (_hosts.get());
+  return (_hosts->get());
 }
 
 /**

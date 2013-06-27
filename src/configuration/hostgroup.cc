@@ -217,7 +217,7 @@ std::string const& hostgroup::alias() const throw () {
  *  @return The hostgroup_members.
  */
 list_string const& hostgroup::hostgroup_members() const throw () {
-  return (_hostgroup_members.get());
+  return (_hostgroup_members->get());
 }
 
 /**
@@ -235,7 +235,7 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *  @return The members.
  */
 list_string& hostgroup::members() throw () {
-  return (_members.get());
+  return (_members->get());
 }
 
 /**
@@ -244,7 +244,7 @@ list_string& hostgroup::members() throw () {
  *  @return The members.
  */
 list_string const& hostgroup::members() const throw () {
-  return (_members.get());
+  return (_members->get());
 }
 
 /**

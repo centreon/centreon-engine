@@ -77,8 +77,8 @@ bool operator!=(
  */
 std::ostream& operator<<(std::ostream& os, servicesmember const& obj) {
   for (servicesmember const* m(&obj); m; m = m->next)
-    os << chkstr(m->host_name) << ", "
-       << chkstr(m->service_description) << (m->next ? ", " : "");
+    os << "(" << chkstr(m->host_name) << ", "
+       << chkstr(m->service_description) << (m->next ? "), " : ")");
   return (os);
 }
 

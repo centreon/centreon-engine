@@ -246,13 +246,15 @@ void applier::host::expand_object(
              << obj->host_name() << "' to non-existing host group '"
              << *it << "'.");
 
+    // Remove host group from state.
+    shared_ptr<configuration::hostgroup> backup(*it_group);
+    s.hostgroups().erase(it_group);
+
     // Add host to group members.
-    (*it_group)->members().push_back(obj->host_name());
+    backup->members().push_back(obj->host_name());
 
     // Reinsert host group.
-    shared_ptr<configuration::hostgroup> to_insert(*it_group);
-    s.hostgroups().erase(it_group);
-    s.hostgroups().insert(to_insert);
+    s.hostgroups().insert(backup);
   }
 
   // We do not need to reinsert the host in the set, as no modification

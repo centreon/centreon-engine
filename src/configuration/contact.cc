@@ -342,7 +342,7 @@ bool contact::can_submit_commands() const throw () {
  *  @return The contactgroups.
  */
 list_string const& contact::contactgroups() const throw () {
-  return (_contactgroups.get());
+  return (_contactgroups->get());
 }
 
 /**
@@ -387,7 +387,7 @@ bool contact::host_notifications_enabled() const throw () {
  *  @return The host_notification_commands.
  */
 list_string const& contact::host_notification_commands() const throw () {
-  return (_host_notification_commands.get());
+  return (_host_notification_commands->get());
 }
 
 /**
@@ -441,7 +441,7 @@ std::string const& contact::pager() const throw () {
  *  @return The service_notification_commands.
  */
 list_string const& contact::service_notification_commands() const throw () {
-  return (_service_notification_commands.get());
+  return (_service_notification_commands->get());
 }
 
 /**
