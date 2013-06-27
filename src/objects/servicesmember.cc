@@ -45,10 +45,10 @@ bool operator==(
        servicesmember const& obj2) throw () {
   if (is_equal(obj1.host_name, obj2.host_name)
       && is_equal(obj1.service_description, obj2.service_description)) {
-    if (!obj1.next && !obj2.next)
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    else
       return (*obj1.next == *obj2.next);
-    if (obj1.next == obj2.next)
-      return (true);
   }
   return (false);
 }

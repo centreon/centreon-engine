@@ -20,12 +20,19 @@
 #ifndef CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 #  define CCE_CONFIGURATION_APPLIER_HOSTDEPENDENCY_HH
 
-#  include "com/centreon/engine/configuration/hostdependency.hh"
+#  include <list>
+#  include <set>
+#  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
 namespace             configuration {
+  // Forward declarations.
+  class               hostdependency;
+  class               state;
+
   namespace           applier {
     class             hostdependency {
     public:
@@ -33,10 +40,28 @@ namespace             configuration {
                       hostdependency(hostdependency const& right);
                       ~hostdependency() throw ();
       hostdependency& operator=(hostdependency const& right);
-      void            add_object(hostdependency_ptr obj);
-      void            modify_object(hostdependency_ptr obj);
-      void            remove_object(hostdependency_ptr obj);
-      void            resolve_object(hostdependency_ptr obj);
+      void            add_object(
+                        configuration::hostdependency const& obj,
+                        configuration::state const& s);
+      void            expand_object(
+                        shared_ptr<configuration::hostdependency> obj,
+                        configuration::state& s);
+      void            modify_object(
+                        configuration::hostdependency const& obj,
+                        configuration::state const& s);
+      void            remove_object(
+                        configuration::hostdependency const& obj,
+                        configuration::state const& s);
+      void            resolve_object(
+                        configuration::hostdependency const& obj,
+                        configuration::state const& s);
+
+    private:
+      void            _expand_hosts(
+                        std::list<std::string> const& hosts,
+                        std::list<std::string> const& hostgroups,
+                        configuration::state& s,
+                        std::set<std::string>& expanded);
     };
   }
 }
