@@ -537,6 +537,67 @@ static global get_globals() {
   return (g);
 }
 
+static bool member_is_already_in_list(
+              contactsmember const* lst,
+              contactsmember const* obj) {
+  contact const* ref(obj->contact_ptr);
+  for (contactsmember const* m(lst); m && m != obj; m = m->next) {
+    contact const* tmp(m->contact_ptr);
+    if (!strcmp(tmp->name, ref->name))
+      return (true);
+  }
+  return (false);
+}
+
+static bool member_is_already_in_list(
+              hostsmember const* lst,
+              hostsmember const* obj) {
+  host const* ref(obj->host_ptr);
+  for (hostsmember const* m(lst); m && m != obj; m = m->next) {
+    host const* tmp(m->host_ptr);
+    if (!strcmp(tmp->name, ref->name))
+      return (true);
+  }
+  return (false);
+}
+
+static bool member_is_already_in_list(
+              servicesmember const* lst,
+              servicesmember const* obj) {
+  service const* ref(obj->service_ptr);
+  for (servicesmember const* m(lst); m && m != obj; m = m->next) {
+    service const* tmp(m->service_ptr);
+    if (!strcmp(tmp->host_name, ref->host_name)
+        && !strcmp(tmp->description, ref->description))
+      return (true);
+  }
+  return (false);
+}
+
+template<typename T>
+static void remove_duplicate_members(
+              T* lst,
+              void (*deleter)(void*)) {
+  T* last(lst);
+  for (T* m(lst); m; m = m->next) {
+    if (member_is_already_in_list(lst, m)) {
+      last->next = m->next;
+      m->next = 0;
+      deleter(m);
+      m = last;
+    }
+    last = m;
+  }
+}
+
+template<typename T>
+static void remove_duplicate_members_for_object(
+              T const* lst,
+              void (*deleter)(void*)) {
+  for (T const* obj(lst); lst; obj = obj->next)
+    remove_duplicate_members(obj->members, deleter);
+}
+
 /**
  *  Read configuration with new parser.
  *
@@ -590,8 +651,18 @@ static bool oldparser_read_config(
             options,
             false,
             false);
-    if (ret == OK)
+    if (ret == OK) {
+      remove_duplicate_members_for_object(
+        contactgroup_list,
+        &deleter::contactsmember);
+      remove_duplicate_members_for_object(
+        hostgroup_list,
+        &deleter::hostsmember);
+      remove_duplicate_members_for_object(
+        servicegroup_list,
+        &deleter::servicesmember);
       g = get_globals();
+    }
   }
   clear_volatile_macros_r(get_global_macros());
   free_macrox_names();
