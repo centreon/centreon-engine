@@ -19,15 +19,14 @@
 
 #include "com/centreon/engine/deleter/commandsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
 #include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
 
 /**
  *  Equal operator.
@@ -73,7 +72,7 @@ bool operator!=(
  */
 std::ostream& operator<<(std::ostream& os, commandsmember const& obj) {
   for (commandsmember const* m(&obj); m; m = m->next)
-    os << chkstr(m->cmd) << (m->next ? ", " : "");
+    os << string::chkstr(m->cmd) << (m->next ? ", " : "");
   return (os);
 }
 
@@ -101,7 +100,7 @@ commandsmember* add_host_notification_command_to_contact(
 
   try {
     // Duplicate vars.
-    obj->cmd = my_strdup(command_name);
+    obj->cmd = string::dup(command_name);
 
     // Add the notification command.
     obj->next = cntct->host_notification_commands;
@@ -142,7 +141,7 @@ commandsmember* add_service_notification_command_to_contact(
 
   try {
     // Duplicate vars.
-    obj->cmd = my_strdup(command_name);
+    obj->cmd = string::dup(command_name);
 
     // Add the notification command.
     obj->next = cntct->service_notification_commands;

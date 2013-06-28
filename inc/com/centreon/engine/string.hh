@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MISC_STRING_HH
-#  define CCE_MISC_STRING_HH
+#ifndef CCE_STRING_HH
+#  define CCE_STRING_HH
 
 #  include <cstring>
 #  include <fstream>
@@ -29,7 +29,7 @@
 
 CCE_BEGIN()
 
-namespace                 misc {
+namespace                 string {
   bool                    get_next_line(
                             std::ifstream& stream,
                             std::string& line,
@@ -39,22 +39,20 @@ namespace                 misc {
     return (str ? str : "\"NULL\"");
   }
 
-  inline char*            strdup(char const* value) {
+  inline char*            dup(char const* value) {
     if (!value)
       return (NULL);
     char* buf(new char[strlen(value) + 1]);
-    strcpy(buf, value);
-    return (buf);
+    return (strcpy(buf, value));
   }
 
-  inline char*            strdup(std::string const& value) {
+  inline char*            dup(std::string const& value) {
     char* buf(new char[value.size() + 1]);
-    strcpy(buf, value.c_str());
-    return (buf);
+    return (strcpy(buf, value.c_str()));
   }
 
   template<typename T>
-  inline char*            strdup(T value) {
+  inline char*            dup(T value) {
     std::ostringstream oss;
     oss << value;
     std::string const& str(oss.str());
@@ -65,13 +63,13 @@ namespace                 misc {
 
   inline char const*      setstr(char*& buf, char const* value = NULL) {
     delete[] buf;
-    return ((buf = misc::strdup(value)));
+    return ((buf = string::dup(value)));
   }
 
   template<typename T>
   inline char const*      setstr(char*& buf, T const& value) {
     delete[] buf;
-    return ((buf = misc::strdup(value)));
+    return ((buf = string::dup(value)));
   }
 
   bool                    split(

@@ -21,7 +21,7 @@
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -1153,12 +1153,12 @@ bool service::_set_flap_detection_enabled(bool value) {
 bool service::_set_flap_detection_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
     else if (*it == "w" || *it == "warning")
@@ -1260,7 +1260,7 @@ bool service::_set_icon_image_alt(std::string const& value) {
  */
 bool service::_set_initial_state(std::string const& value) {
   std::string data(value);
-  misc::trim(data);
+  string::trim(data);
   if (data == "o" || data == "ok")
     _initial_state = STATE_OK;
   else if (data == "w" || data == "warning")
@@ -1358,12 +1358,12 @@ bool service::_set_notifications_enabled(bool value) {
 bool service::_set_notification_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "u" || *it == "unknown")
       options |= unknown;
     else if (*it == "w" || *it == "warning")
@@ -1522,12 +1522,12 @@ bool service::_set_service_description(std::string const& value) {
 bool service::_set_stalking_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
     else if (*it == "w" || *it == "warning")

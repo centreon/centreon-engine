@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -436,12 +436,12 @@ bool servicedependency::_set_dependent_service_description(std::string const& va
 bool servicedependency::_set_execution_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
     else if (*it == "u" || *it == "unknown")
@@ -509,12 +509,12 @@ bool servicedependency::_set_hosts(std::string const& value) {
 bool servicedependency::_set_notification_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "ok")
       options |= ok;
     else if (*it == "u" || *it == "unknown")

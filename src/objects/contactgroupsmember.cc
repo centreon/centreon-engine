@@ -19,19 +19,19 @@
 
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostescalation.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -105,7 +105,7 @@ contactgroupsmember* add_contactgroup_to_host(
 
   try {
     // Duplicate string vars.
-    obj->group_name = my_strdup(group_name);
+    obj->group_name = string::dup(group_name);
 
     // Add the new member to the head of the member list.
     obj->next = hst->contact_groups;
@@ -146,7 +146,7 @@ contactgroupsmember* add_contactgroup_to_host_escalation(
 
   try {
     // Duplicate vars.
-    obj->group_name = my_strdup(group_name);
+    obj->group_name = string::dup(group_name);
 
     // Add this contactgroup to the host escalation.
     obj->next = he->contact_groups;
@@ -187,7 +187,7 @@ contactgroupsmember* add_contactgroup_to_service(
 
   try {
     // Duplicate vars.
-    obj->group_name = my_strdup(group_name);
+    obj->group_name = string::dup(group_name);
 
     // Add this contactgroup to the service.
     obj->next = svc->contact_groups;
@@ -228,7 +228,7 @@ contactgroupsmember* add_contactgroup_to_serviceescalation(
 
   try {
     // Duplicate vars.
-    obj->group_name = my_strdup(group_name);
+    obj->group_name = string::dup(group_name);
 
     // Add this contactgroup to the service escalation.
     obj->next = se->contact_groups;

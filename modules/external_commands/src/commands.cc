@@ -30,12 +30,13 @@
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
-#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 #include "mmap.h"
 
 using namespace com::centreon::engine;
@@ -562,8 +563,8 @@ int process_passive_service_check(
 
   check_result result;
   result.object_check_type = SERVICE_CHECK;
-  result.host_name = my_strdup(real_host_name);
-  result.service_description = my_strdup(svc_description);
+  result.host_name = string::dup(real_host_name);
+  result.service_description = string::dup(svc_description);
   result.check_type = SERVICE_CHECK_PASSIVE;
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
@@ -580,7 +581,7 @@ int process_passive_service_check(
   result.early_timeout = false;
   result.exited_ok = true;
   result.return_code = return_code;
-  result.output = my_strdup(output);
+  result.output = string::dup(output);
   result.next = NULL;
   // result.check_time = check_time;
 
@@ -681,7 +682,7 @@ int process_passive_host_check(
 
   check_result result;
   result.object_check_type = HOST_CHECK;
-  result.host_name = my_strdup(real_host_name);
+  result.host_name = string::dup(real_host_name);
   result.service_description = NULL;
   result.check_type = HOST_CHECK_PASSIVE;
   result.check_options = CHECK_OPTION_NONE;
@@ -699,7 +700,7 @@ int process_passive_host_check(
   result.early_timeout = false;
   result.exited_ok = true;
   result.return_code = return_code;
-  result.output = my_strdup(output);
+  result.output = string::dup(output);
   result.next = NULL;
   // result.check_time = check_time;
 
@@ -768,14 +769,14 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   /* get the acknowledgement author */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
     return (ERROR);
-  ack_author = my_strdup(temp_ptr);
+  ack_author = string::dup(temp_ptr);
 
   /* get the acknowledgement data */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
     delete[] ack_author;
     return (ERROR);
   }
-  ack_data = my_strdup(temp_ptr);
+  ack_data = string::dup(temp_ptr);
 
   /* acknowledge the host problem */
   if (cmd == CMD_ACKNOWLEDGE_HOST_PROBLEM)
@@ -1759,7 +1760,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
   }
 
-  temp_ptr = my_strdup(charval);
+  temp_ptr = string::dup(charval);
 
   /* do some validation */
   switch (cmd) {
@@ -1791,7 +1792,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     }
 
     delete[] temp_ptr;
-    temp_ptr = my_strdup(charval);
+    temp_ptr = string::dup(charval);
     break;
 
   default:
@@ -2022,7 +2023,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   /* get the host or contact name */
   if ((temp_ptr = my_strtok(args, ";")) == NULL)
     return (ERROR);
-  name1 = my_strdup(temp_ptr);
+  name1 = string::dup(temp_ptr);
 
   /* get the service description if necessary */
   if (cmd == CMD_CHANGE_CUSTOM_SVC_VAR) {
@@ -2030,7 +2031,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       delete[] name1;
       return (ERROR);
     }
-    name2 = my_strdup(temp_ptr);
+    name2 = string::dup(temp_ptr);
   }
 
   /* get the custom variable name */
@@ -2039,7 +2040,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     delete[] name2;
     return (ERROR);
   }
-  varname = my_strdup(temp_ptr);
+  varname = string::dup(temp_ptr);
 
   /* get the custom variable value */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
@@ -2048,7 +2049,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     delete[] varname;
     return (ERROR);
   }
-  varvalue = my_strdup(temp_ptr);
+  varvalue = string::dup(temp_ptr);
 
   /* find the object */
   switch (cmd) {
@@ -2088,7 +2089,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
 
       /* update the value */
       delete[] temp_customvariablesmember->variable_value;
-      temp_customvariablesmember->variable_value = my_strdup(varvalue);
+      temp_customvariablesmember->variable_value = string::dup(varvalue);
 
       /* mark the variable value as having been changed */
       temp_customvariablesmember->has_been_modified = true;
@@ -2139,7 +2140,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
   /* get the file name */
   if ((temp_ptr = my_strtok(args, ";")) == NULL)
     return (ERROR);
-  fname = my_strdup(temp_ptr);
+  fname = string::dup(temp_ptr);
 
   /* find the deletion option */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {

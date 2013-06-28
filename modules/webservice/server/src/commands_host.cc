@@ -188,7 +188,7 @@ int centreonengine__hostSetAddress(
 
   // Set new host address.
   delete [] hst->address;
-  hst->address = my_strdup(address.c_str());
+  hst->address = string::dup(address.c_str());
 
   // Notify event broker.
   notify_event_broker(hst);
@@ -643,7 +643,7 @@ int centreonengine__hostSetCheckCommand(
 
     // Set new command.
     delete [] hst->host_check_command;
-    hst->host_check_command = my_strdup(cmd.c_str());
+    hst->host_check_command = string::dup(cmd.c_str());
     hst->check_command_ptr = cmd_ptr;
   }
   // Remove check command.
@@ -843,7 +843,7 @@ int centreonengine__hostSetCheckPeriod(
 
     // Set timeperiod.
     delete [] hst->check_period;
-    hst->check_period = my_strdup(timeperiod_id->name.c_str());
+    hst->check_period = string::dup(timeperiod_id->name.c_str());
     hst->check_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -1005,7 +1005,7 @@ int centreonengine__hostSetCustomVariable(
     if (!*cvar) {
       *cvar = new customvariablesmember;
       (*cvar)->next = NULL;
-      (*cvar)->variable_name = my_strdup(varname.c_str());
+      (*cvar)->variable_name = string::dup(varname.c_str());
     }
     else {
       delete [] (*cvar)->variable_value;
@@ -1013,7 +1013,7 @@ int centreonengine__hostSetCustomVariable(
     }
 
     // Set new value.
-    (*cvar)->variable_value = my_strdup(varvalue.c_str());
+    (*cvar)->variable_value = string::dup(varvalue.c_str());
   }
   // Delete variable.
   if (*cvar) {
@@ -1191,7 +1191,7 @@ int centreonengine__hostSetEventHandler(
 
     // Set new event handler.
     delete [] hst->event_handler;
-    hst->event_handler = my_strdup(event_handler.c_str());
+    hst->event_handler = string::dup(event_handler.c_str());
     hst->event_handler_ptr = cmd;
   }
   // Remove event handler.
@@ -2102,7 +2102,7 @@ int centreonengine__hostSetNameAlias(
 
   // Set alias.
   delete [] hst->alias;
-  hst->alias = my_strdup(alias.c_str());
+  hst->alias = string::dup(alias.c_str());
 
   // Notify event broker.
   notify_event_broker(hst);
@@ -2138,7 +2138,7 @@ int centreonengine__hostSetNameDisplay(
 
   // Set new display name.
   delete [] hst->display_name;
-  hst->display_name = my_strdup(displayname.c_str());
+  hst->display_name = string::dup(displayname.c_str());
 
   // Notify event broker.
   notify_event_broker(hst);
@@ -2914,7 +2914,7 @@ int centreonengine__hostSetNotificationsPeriod(
     // Set timeperiod.
     delete [] hst->notification_period;
     hst->notification_period
-      = my_strdup(timeperiod_id->name.c_str());
+      = string::dup(timeperiod_id->name.c_str());
     hst->notification_period_ptr = tmprd;
   }
   // Remove timeperiod.

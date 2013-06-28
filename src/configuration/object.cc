@@ -34,7 +34,7 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -216,7 +216,7 @@ bool object::parse(std::string const& line) {
     return (false);
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
-  misc::trim(value);
+  string::trim(value);
   if (!object::parse(key, value))
     return (parse(key, value));
   return (true);
@@ -312,6 +312,6 @@ bool object::_set_name(std::string const& value) {
  */
 bool object::_set_templates(std::string const& value) {
   _templates.clear();
-  misc::split(value, _templates, ',');
+  string::split(value, _templates, ',');
   return (true);
 }

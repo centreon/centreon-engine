@@ -27,8 +27,8 @@
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
 #include "com/centreon/engine/macros/misc.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
 using namespace com::centreon::engine;
@@ -52,7 +52,7 @@ using namespace com::centreon::engine::logging;
  */
 static char* get_service_check_type(service& svc, nagios_macros* mac) {
   (void)mac;
-  return (my_strdup(
+  return (string::dup(
             (SERVICE_CHECK_PASSIVE == svc.check_type
              ? "PASSIVE"
              : "ACTIVE")));
@@ -82,7 +82,7 @@ static char* get_service_group_names(service& svc, nagios_macros* mac) {
       buf.append(temp_servicegroup->group_name);
     }
   }
-  return (misc::strdup(buf));
+  return (string::dup(buf));
 }
 
 /**
@@ -105,7 +105,7 @@ static char* get_service_state(service& svc, nagios_macros* mac) {
     state = "CRITICAL";
   else
     state = "UNKNOWN";
-  return (my_strdup(state));
+  return (string::dup(state));
 }
 
 /**************************************

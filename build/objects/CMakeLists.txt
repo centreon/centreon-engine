@@ -69,6 +69,7 @@ add_library("cce_objects"
   "${INC_DIR}/timeperiod.hh"
   "${INC_DIR}/timeperiodexclusion.hh"
   "${INC_DIR}/timerange.hh"
+  "${INC_DIR}/tool.hh"
 )
 
 # Link target with necessary libraries.

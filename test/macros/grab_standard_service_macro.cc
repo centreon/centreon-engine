@@ -23,6 +23,7 @@
 #include <string.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
+#include "com/centreon/engine/string.hh"
 #include "test/macros/minimal_setup.hh"
 #include "test/unittest.hh"
 
@@ -92,17 +93,17 @@ int main_test(int argc, char** argv) {
 
   // Set service values.
   delete [] service_list->description;
-  service_list->description = my_strdup(STR(DESCRIPTION));
+  service_list->description = string::dup(STR(DESCRIPTION));
   delete [] service_list->display_name;
-  service_list->display_name = my_strdup(STR(DISPLAY_NAME));
+  service_list->display_name = string::dup(STR(DISPLAY_NAME));
   delete [] service_list->plugin_output;
-  service_list->plugin_output = my_strdup(STR(OUTPUT));
+  service_list->plugin_output = string::dup(STR(OUTPUT));
   delete [] service_list->long_plugin_output;
-  service_list->long_plugin_output = my_strdup(STR(LONG_OUTPUT));
+  service_list->long_plugin_output = string::dup(STR(LONG_OUTPUT));
   delete [] service_list->perf_data;
-  service_list->perf_data = my_strdup(STR(PERF_DATA));
+  service_list->perf_data = string::dup(STR(PERF_DATA));
   delete [] service_list->service_check_command;
-  service_list->service_check_command = my_strdup(STR(CHECK_COMMAND));
+  service_list->service_check_command = string::dup(STR(CHECK_COMMAND));
   service_list->check_type = SERVICE_CHECK_PASSIVE;
   service_list->state_type = SOFT_STATE;
   service_list->current_state = STATE_ID;
@@ -127,11 +128,11 @@ int main_test(int argc, char** argv) {
   service_list->current_problem_id = PROBLEM_ID;
   service_list->last_problem_id = LAST_PROBLEM_ID;
   delete [] service_list->action_url;
-  service_list->action_url = my_strdup(STR(ACTION_URL));
+  service_list->action_url = string::dup(STR(ACTION_URL));
   delete [] service_list->notes_url;
-  service_list->notes_url = my_strdup(STR(NOTES_URL));
+  service_list->notes_url = string::dup(STR(NOTES_URL));
   delete [] service_list->notes;
-  service_list->notes = my_strdup(STR(NOTES));
+  service_list->notes = string::dup(STR(NOTES));
 
   // Add service groups and link them to service.
   servicegroup* sg1(add_servicegroup(const_cast<char*>(STR(GROUP1)),
@@ -165,10 +166,10 @@ int main_test(int argc, char** argv) {
   // Macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  mac.x[MACRO_SERVICEACKAUTHOR] = my_strdup(STR(ACK_AUTHOR));
-  mac.x[MACRO_SERVICEACKAUTHORNAME] = my_strdup(STR(ACK_AUTHOR_NAME));
-  mac.x[MACRO_SERVICEACKAUTHORALIAS] = my_strdup(STR(ACK_AUTHOR_ALIAS));
-  mac.x[MACRO_SERVICEACKCOMMENT] = my_strdup(STR(ACK_COMMENT));
+  mac.x[MACRO_SERVICEACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
+  mac.x[MACRO_SERVICEACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
+  mac.x[MACRO_SERVICEACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
+  mac.x[MACRO_SERVICEACKCOMMENT] = string::dup(STR(ACK_COMMENT));
 
   // Macro values table.
   struct {

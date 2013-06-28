@@ -22,17 +22,17 @@
 #include "com/centreon/engine/deleter/command.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -101,8 +101,8 @@ command* add_command(char const* name, char const* value) {
 
   try {
     // Duplicate vars.
-    obj->name = my_strdup(name);
-    obj->command_line = my_strdup(value);
+    obj->name = string::dup(name);
+    obj->command_line = string::dup(value);
 
     // Add new command to the monitoring engine.
     std::string id(name);

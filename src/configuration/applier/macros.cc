@@ -23,7 +23,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/misc.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
@@ -122,7 +122,7 @@ void applier::macros::_set_macro(
   if (type >= MACRO_X_COUNT)
     throw (engine_error() << "applier: invalid type of global macro");
   if (!_mac->x[type] || strcmp(_mac->x[type], value.c_str()))
-    misc::setstr(_mac->x[type], value);
+    string::setstr(_mac->x[type], value);
 }
 
 /**
@@ -137,5 +137,5 @@ void applier::macros::_set_macros_user(
   if (idx >= MAX_USER_MACROS)
     throw (engine_error() << "applier: invalid index of user macro");
   if (!macro_user[idx] || strcmp(macro_user[idx], value.c_str()))
-    misc::setstr(macro_user[idx], value);
+    string::setstr(macro_user[idx], value);
 }

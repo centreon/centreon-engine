@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -323,12 +323,12 @@ bool hostescalation::_set_contacts(std::string const& value) {
 bool hostescalation::_set_escalation_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "d" || *it == "down")
       options |= down;
     else if (*it == "u" || *it == "unreachable")

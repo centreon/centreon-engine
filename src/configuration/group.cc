@@ -18,7 +18,7 @@
 */
 
 #include "com/centreon/engine/configuration/group.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace  com::centreon::engine::configuration;
 
@@ -77,11 +77,11 @@ group& group::operator=(std::string const& right) {
   if (!right.empty()) {
     if (right[0] == '+') {
       _is_inherit = true;
-      misc::split(right.substr(1), _data, ',');
+      string::split(right.substr(1), _data, ',');
     }
     else {
       _is_inherit = false;
-      misc::split(right, _data, ',');
+      string::split(right, _data, ',');
     }
   }
   _is_set = true;

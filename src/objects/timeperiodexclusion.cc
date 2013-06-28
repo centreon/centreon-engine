@@ -18,14 +18,14 @@
 */
 
 #include "com/centreon/engine/deleter/timeperiodexclusion.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/objects/timeperiodexclusion.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -96,7 +96,7 @@ timeperiodexclusion* add_exclusion_to_timeperiod(
 
   try {
     // Set exclusion properties.
-    obj->timeperiod_name = my_strdup(name);
+    obj->timeperiod_name = string::dup(name);
     obj->next = period->exclusions;
     period->exclusions = obj;
 

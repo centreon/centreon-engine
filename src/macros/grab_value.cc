@@ -23,7 +23,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
 using namespace com::centreon::engine;
@@ -95,7 +95,7 @@ static int handle_host_macro(
           if (buffer) {
             // Add macro value to already running macro.
             if (*output == NULL)
-              *output = my_strdup(buffer);
+              *output = string::dup(buffer);
             else {
               *output
                 = resize_string(
@@ -255,7 +255,7 @@ static int handle_service_macro(
               if (buffer) {
                 // Add macro value to already running macro.
                 if (*output == NULL)
-                  *output = my_strdup(buffer);
+                  *output = string::dup(buffer);
                 else {
                   *output = resize_string(
                               *output,
@@ -392,7 +392,7 @@ static int handle_contact_macro(
           if (buffer) {
             // Add macro value to already running macro.
             if (*output == NULL)
-              *output = my_strdup(buffer);
+              *output = string::dup(buffer);
             else {
               *output = resize_string(
                           *output,
@@ -705,22 +705,22 @@ static int handle_summary_macro(
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
-    misc::setstr(mac->x[MACRO_TOTALHOSTSUP], hosts_up);
-    misc::setstr(mac->x[MACRO_TOTALHOSTSDOWN], hosts_down);
-    misc::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLE], hosts_unreachable);
-    misc::setstr(mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED], hosts_down_unhandled);
-    misc::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED], hosts_unreachable_unhandled);
-    misc::setstr(mac->x[MACRO_TOTALHOSTPROBLEMS], host_problems);
-    misc::setstr(mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED], host_problems_unhandled);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESOK], services_ok);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESWARNING], services_warning);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESCRITICAL], services_critical);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWN], services_unknown);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED], services_warning_unhandled);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED], services_critical_unhandled);
-    misc::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED], services_unknown_unhandled);
-    misc::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMS], service_problems);
-    misc::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED], service_problems_unhandled);
+    string::setstr(mac->x[MACRO_TOTALHOSTSUP], hosts_up);
+    string::setstr(mac->x[MACRO_TOTALHOSTSDOWN], hosts_down);
+    string::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLE], hosts_unreachable);
+    string::setstr(mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED], hosts_down_unhandled);
+    string::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED], hosts_unreachable_unhandled);
+    string::setstr(mac->x[MACRO_TOTALHOSTPROBLEMS], host_problems);
+    string::setstr(mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED], host_problems_unhandled);
+    string::setstr(mac->x[MACRO_TOTALSERVICESOK], services_ok);
+    string::setstr(mac->x[MACRO_TOTALSERVICESWARNING], services_warning);
+    string::setstr(mac->x[MACRO_TOTALSERVICESCRITICAL], services_critical);
+    string::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWN], services_unknown);
+    string::setstr(mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED], services_warning_unhandled);
+    string::setstr(mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED], services_critical_unhandled);
+    string::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED], services_unknown_unhandled);
+    string::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMS], service_problems);
+    string::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED], service_problems_unhandled);
   }
 
   // Return only the macro the user requested.
@@ -1017,7 +1017,7 @@ int grab_macro_value_r(
     return (ERROR);
 
   /* work with a copy of the original buffer */
-  buf = my_strdup(macro_buffer);
+  buf = string::dup(macro_buffer);
 
   /* BY DEFAULT, TELL CALLER TO FREE MACRO BUFFER WHEN DONE */
   *free_macro = TRUE;
@@ -1158,7 +1158,7 @@ int grab_macro_value_r(
 
           /* add macro value to already running macro */
           if (*output == NULL)
-            *output = my_strdup(temp_buffer);
+            *output = string::dup(temp_buffer);
           else {
             *output = resize_string(
                         *output,

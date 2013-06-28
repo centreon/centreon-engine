@@ -23,7 +23,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/io/file_entry.hh"
 
 using namespace com::centreon;
@@ -3161,7 +3161,7 @@ void state::user(std::string const& key, std::string const& value) {
   tmp.erase(pos - 1);
 
   unsigned int idx;
-  if (!misc::to(tmp, idx) || !idx || idx >= MAX_USER_MACROS)
+  if (!string::to(tmp, idx) || !idx || idx >= MAX_USER_MACROS)
     throw (engine_error()
            << "configuration: invalid user key '" << key << "'");
 
@@ -3588,7 +3588,7 @@ void state::_set_host_inter_check_delay_method(std::string const& value) {
     _host_inter_check_delay_method = icd_smart;
   else {
     _host_inter_check_delay_method = icd_user;
-    if (!misc::to(value, scheduling_info.host_inter_check_delay)
+    if (!string::to(value, scheduling_info.host_inter_check_delay)
         || scheduling_info.host_inter_check_delay <= 0.0)
       throw (engine_error()
                << "host_inter_check_delay_method: invalid value.");
@@ -3726,7 +3726,7 @@ void state::_set_service_inter_check_delay_method(std::string const& value) {
     _service_inter_check_delay_method = icd_smart;
   else {
     _service_inter_check_delay_method = icd_user;
-    if (!misc::to(value, scheduling_info.service_inter_check_delay)
+    if (!string::to(value, scheduling_info.service_inter_check_delay)
         || scheduling_info.service_inter_check_delay <= 0.0)
       throw (engine_error() << "service_inter_check_delay_method: invalid value.");
   }
@@ -3742,7 +3742,7 @@ void state::_set_service_interleave_factor_method(std::string const& value) {
     _service_interleave_factor_method = ilf_smart;
   else {
     _service_interleave_factor_method = ilf_user;
-    if (!misc::to(value, scheduling_info.service_interleave_factor)
+    if (!string::to(value, scheduling_info.service_interleave_factor)
         || scheduling_info.service_interleave_factor < 1)
       scheduling_info.service_interleave_factor = 1;
   }

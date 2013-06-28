@@ -18,8 +18,8 @@
 */
 
 #include "com/centreon/engine/downtime.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/retention/downtime.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 
@@ -64,19 +64,19 @@ bool retention::downtime::set(
   else if (key == "service_description")
     _service_description = value;
   else if (key == "downtime_id")
-    misc::to(value, _downtime_id);
+    string::to(value, _downtime_id);
   else if (key == "entry_time")
-    misc::to(value, _entry_time);
+    string::to(value, _entry_time);
   else if (key == "start_time")
-    misc::to(value, _start_time);
+    string::to(value, _start_time);
   else if (key == "end_time")
-    misc::to(value, _end_time);
+    string::to(value, _end_time);
   else if (key == "fixed")
-    misc::to(value, _fixed);
+    string::to(value, _fixed);
   else if (key == "triggered_by")
-    misc::to(value, _triggered_by);
+    string::to(value, _triggered_by);
   else if (key == "duration")
-    misc::to(value, _duration);
+    string::to(value, _duration);
   else if (key == "author")
     _author = value;
   else if (key == "comment")

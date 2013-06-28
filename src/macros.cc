@@ -25,8 +25,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;
@@ -167,7 +167,7 @@ int grab_custom_macro_value_r(
 
         /* add macro value to already running macro */
         if (*output == NULL)
-          *output = my_strdup(temp_buffer);
+          *output = string::dup(temp_buffer);
         else {
           *output = resize_string(
                       *output,
@@ -239,7 +239,7 @@ int grab_custom_macro_value_r(
 
           /* add macro value to already running macro */
           if (*output == NULL)
-            *output = my_strdup(temp_buffer);
+            *output = string::dup(temp_buffer);
           else {
             *output = resize_string(
                         *output,
@@ -303,7 +303,7 @@ int grab_custom_macro_value_r(
 
         /* add macro value to already running macro */
         if (*output == NULL)
-          *output = my_strdup(temp_buffer);
+          *output = string::dup(temp_buffer);
         else {
           *output = resize_string(
                       *output,
@@ -415,11 +415,11 @@ int grab_datetime_macro_r(
     break;
 
   case MACRO_TIMET:
-    misc::setstr(*output, current_time);
+    string::setstr(*output, current_time);
     break;
 
   case MACRO_ISVALIDTIME:
-    misc::setstr(
+    string::setstr(
       *output,
       !check_time_against_period(test_time, temp_timeperiod));
     break;
@@ -431,7 +431,7 @@ int grab_datetime_macro_r(
              test_time,
              temp_timeperiod) == ERROR)
       next_valid_time = (time_t)0L;
-    misc::setstr(*output, next_valid_time);
+    string::setstr(*output, next_valid_time);
     break;
 
   default:
@@ -470,12 +470,12 @@ int grab_standard_hostgroup_macro_r(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_HOSTGROUPNAME:
-    *output = my_strdup(temp_hostgroup->group_name);
+    *output = string::dup(temp_hostgroup->group_name);
     break;
 
   case MACRO_HOSTGROUPALIAS:
     if (temp_hostgroup->alias)
-      *output = my_strdup(temp_hostgroup->alias);
+      *output = string::dup(temp_hostgroup->alias);
     break;
 
   case MACRO_HOSTGROUPMEMBERS:
@@ -514,17 +514,17 @@ int grab_standard_hostgroup_macro_r(
 
   case MACRO_HOSTGROUPACTIONURL:
     if (temp_hostgroup->action_url)
-      *output = my_strdup(temp_hostgroup->action_url);
+      *output = string::dup(temp_hostgroup->action_url);
     break;
 
   case MACRO_HOSTGROUPNOTESURL:
     if (temp_hostgroup->notes_url)
-      *output = my_strdup(temp_hostgroup->notes_url);
+      *output = string::dup(temp_hostgroup->notes_url);
     break;
 
   case MACRO_HOSTGROUPNOTES:
     if (temp_hostgroup->notes)
-      *output = my_strdup(temp_hostgroup->notes);
+      *output = string::dup(temp_hostgroup->notes);
     break;
 
   default:
@@ -588,12 +588,12 @@ int grab_standard_servicegroup_macro_r(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_SERVICEGROUPNAME:
-    *output = my_strdup(temp_servicegroup->group_name);
+    *output = string::dup(temp_servicegroup->group_name);
     break;
 
   case MACRO_SERVICEGROUPALIAS:
     if (temp_servicegroup->alias)
-      *output = my_strdup(temp_servicegroup->alias);
+      *output = string::dup(temp_servicegroup->alias);
     break;
 
   case MACRO_SERVICEGROUPMEMBERS:
@@ -647,17 +647,17 @@ int grab_standard_servicegroup_macro_r(
     break;
   case MACRO_SERVICEGROUPACTIONURL:
     if (temp_servicegroup->action_url)
-      *output = my_strdup(temp_servicegroup->action_url);
+      *output = string::dup(temp_servicegroup->action_url);
     break;
 
   case MACRO_SERVICEGROUPNOTESURL:
     if (temp_servicegroup->notes_url)
-      *output = my_strdup(temp_servicegroup->notes_url);
+      *output = string::dup(temp_servicegroup->notes_url);
     break;
 
   case MACRO_SERVICEGROUPNOTES:
     if (temp_servicegroup->notes)
-      *output = my_strdup(temp_servicegroup->notes);
+      *output = string::dup(temp_servicegroup->notes);
     break;
 
   default:
@@ -721,21 +721,21 @@ int grab_standard_contact_macro_r(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_CONTACTNAME:
-    *output = my_strdup(temp_contact->name);
+    *output = string::dup(temp_contact->name);
     break;
 
   case MACRO_CONTACTALIAS:
-    *output = my_strdup(temp_contact->alias);
+    *output = string::dup(temp_contact->alias);
     break;
 
   case MACRO_CONTACTEMAIL:
     if (temp_contact->email)
-      *output = my_strdup(temp_contact->email);
+      *output = string::dup(temp_contact->email);
     break;
 
   case MACRO_CONTACTPAGER:
     if (temp_contact->pager)
-      *output = my_strdup(temp_contact->pager);
+      *output = string::dup(temp_contact->pager);
     break;
 
   case MACRO_CONTACTGROUPNAMES: {
@@ -753,7 +753,7 @@ int grab_standard_contact_macro_r(
       buf.append(temp_contactgroup->group_name);
     }
     if (!buf.empty())
-      *output = misc::strdup(buf);
+      *output = string::dup(buf);
   }
     break;
 
@@ -790,7 +790,7 @@ int grab_contact_address_macro(
 
   /* get the macro */
   if (temp_contact->address[macro_num])
-    *output = my_strdup(temp_contact->address[macro_num]);
+    *output = string::dup(temp_contact->address[macro_num]);
   return (OK);
 }
 
@@ -807,12 +807,12 @@ int grab_standard_contactgroup_macro(
   /* get the macro value */
   switch (macro_type) {
   case MACRO_CONTACTGROUPNAME:
-    *output = my_strdup(temp_contactgroup->group_name);
+    *output = string::dup(temp_contactgroup->group_name);
     break;
 
   case MACRO_CONTACTGROUPALIAS:
     if (temp_contactgroup->alias)
-      *output = my_strdup(temp_contactgroup->alias);
+      *output = string::dup(temp_contactgroup->alias);
     break;
 
   case MACRO_CONTACTGROUPMEMBERS:
@@ -823,7 +823,7 @@ int grab_standard_contactgroup_macro(
       if (temp_contactsmember->contact_name == NULL)
         continue;
       if (*output == NULL)
-        *output = my_strdup(temp_contactsmember->contact_name);
+        *output = string::dup(temp_contactsmember->contact_name);
       else {
         *output = resize_string(
                     *output,
@@ -867,7 +867,7 @@ int grab_custom_object_macro_r(
 
     if (!strcmp(macro_name, temp_customvariablesmember->variable_name)) {
       if (temp_customvariablesmember->variable_value)
-        *output = my_strdup(temp_customvariablesmember->variable_value);
+        *output = string::dup(temp_customvariablesmember->variable_value);
       result = OK;
       break;
     }
@@ -987,7 +987,7 @@ int init_macros() {
  * initializes the names of macros, using this nifty little macro
  * which ensures we never add any typos to the list
  */
-#define add_macrox_name(name) macro_x_names[MACRO_##name] = my_strdup(#name)
+#define add_macrox_name(name) macro_x_names[MACRO_##name] = string::dup(#name)
 int init_macrox_names() {
   unsigned int x = 0;
 

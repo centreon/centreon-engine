@@ -626,7 +626,7 @@ int centreonengine__serviceSetCheckCommand(
 
     // Set new check command.
     delete [] svc->service_check_command;
-    svc->service_check_command = my_strdup(cmd.c_str());
+    svc->service_check_command = string::dup(cmd.c_str());
     svc->check_command_ptr = cmd_ptr;
   }
   // Remove check command.
@@ -844,7 +844,7 @@ int centreonengine__serviceSetCheckPeriod(
 
     // Set new timeperiod.
     delete [] svc->check_period;
-    svc->check_period = my_strdup(timeperiod_id->name.c_str());
+    svc->check_period = string::dup(timeperiod_id->name.c_str());
     svc->check_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -953,7 +953,7 @@ int centreonengine__serviceSetCustomVariable(
     if (!*cvar) {
       *cvar = new customvariablesmember;
       (*cvar)->next = NULL;
-      (*cvar)->variable_name = my_strdup(varname.c_str());
+      (*cvar)->variable_name = string::dup(varname.c_str());
     }
     else {
       delete [] (*cvar)->variable_value;
@@ -961,7 +961,7 @@ int centreonengine__serviceSetCustomVariable(
     }
 
     // Set new value.
-    (*cvar)->variable_value = my_strdup(varvalue.c_str());
+    (*cvar)->variable_value = string::dup(varvalue.c_str());
   }
   // Delete variable.
   if (*cvar) {
@@ -1156,7 +1156,7 @@ int centreonengine__serviceSetEventHandler(
 
     // Set new event handler.
     delete [] svc->event_handler;
-    svc->event_handler = my_strdup(event_handler.c_str());
+    svc->event_handler = string::dup(event_handler.c_str());
     svc->event_handler_ptr = cmd;
   }
   // Remove event handler.
@@ -2157,7 +2157,7 @@ int centreonengine__serviceSetNameDisplay(
 
   // Get requested value.
   delete [] svc->display_name;
-  svc->display_name = my_strdup(name.c_str());
+  svc->display_name = string::dup(name.c_str());
 
   // Notify event broker.
   notify_event_broker(svc);
@@ -3000,7 +3000,7 @@ int centreonengine__serviceSetNotificationsPeriod(
     // Set new timeperiod.
     delete [] svc->notification_period;
     svc->notification_period
-      = my_strdup(timeperiod_id->name.c_str());
+      = string::dup(timeperiod_id->name.c_str());
     svc->notification_period_ptr = tmprd;
   }
   // Remove notification period.

@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/io/directory_entry.hh"
 
 using namespace com::centreon;
@@ -402,10 +402,10 @@ void parser::_parse_global_configuration(std::string const& path) {
   _current_path = path;
 
   std::string input;
-  while (misc::get_next_line(stream, input, _current_line)) {
+  while (string::get_next_line(stream, input, _current_line)) {
     std::string key;
     std::string value;
-    if (!misc::split(input, key, value, '=')
+    if (!string::split(input, key, value, '=')
         || !_config->set(key, value))
       throw (engine_error() << "configuration: parse global "
              "configuration failed: invalid line "
@@ -431,7 +431,7 @@ void parser::_parse_object_definitions(std::string const& path) {
   bool parse_object(false);
   object_ptr obj;
   std::string input;
-  while (misc::get_next_line(stream, input, _current_line)) {
+  while (string::get_next_line(stream, input, _current_line)) {
     // Check if is a valid object.
     if (obj.is_null()) {
       if (input.find("define") || !std::isspace(input[6]))
@@ -439,14 +439,14 @@ void parser::_parse_object_definitions(std::string const& path) {
                "definitions failed: unexpected start definition in "
                "file '" << _current_path << "' on line "
                << _current_line);
-      misc::trim_left(input.erase(0, 6));
+      string::trim_left(input.erase(0, 6));
       std::size_t last(input.size() - 1);
       if (input.empty() || input[last] != '{')
         throw (engine_error() << "configuration: parse object "
                "definitions failed: unexpected start definition in "
                "file '" << _current_path << "' on line "
                << _current_line);
-      std::string const& type(misc::trim_right(input.erase(last)));
+      std::string const& type(string::trim_right(input.erase(last)));
       obj = object::create(type);
       if (obj.is_null())
         throw (engine_error() << "configuration: parse object "
@@ -493,11 +493,11 @@ void parser::_parse_resource_file(std::string const& path) {
   _current_path = path;
 
   std::string input;
-  while (misc::get_next_line(stream, input, _current_line)) {
+  while (string::get_next_line(stream, input, _current_line)) {
     try {
       std::string key;
       std::string value;
-      if (!misc::split(input, key, value, '='))
+      if (!string::split(input, key, value, '='))
         throw (engine_error() << "configuration: parse resources "
                "configuration failed: invalid line "
                "'" << input << "' in file '" << _current_path << "' "

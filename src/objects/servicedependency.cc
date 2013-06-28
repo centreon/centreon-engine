@@ -21,17 +21,17 @@
 #include "com/centreon/engine/deleter/servicedependency.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -185,12 +185,12 @@ servicedependency* add_service_dependency(
 
   try {
     // Duplicate vars.
-    obj->dependent_host_name = my_strdup(dependent_host_name);
-    obj->dependent_service_description = my_strdup(dependent_service_description);
-    obj->host_name = my_strdup(host_name);
-    obj->service_description = my_strdup(service_description);
+    obj->dependent_host_name = string::dup(dependent_host_name);
+    obj->dependent_service_description = string::dup(dependent_service_description);
+    obj->host_name = string::dup(host_name);
+    obj->service_description = string::dup(service_description);
     if (dependency_period)
-      obj->dependency_period = my_strdup(dependency_period);
+      obj->dependency_period = string::dup(dependency_period);
 
     obj->dependency_type = (dependency_type == EXECUTION_DEPENDENCY) ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY;
     obj->fail_on_critical = (fail_on_critical == 1);

@@ -23,11 +23,11 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sehandlers.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 
@@ -523,7 +523,7 @@ int broker_contact_notification_method_data(
   char* command_name(NULL);
   char* command_args(NULL);
   if (cmd) {
-    command_buf = my_strdup(cmd);
+    command_buf = string::dup(cmd);
     command_name = strtok(command_buf, "!");
     command_args = strtok(NULL, "\x0");
   }
@@ -636,8 +636,8 @@ void broker_custom_variable(
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.object_ptr = data;
-  ds.var_name = my_strdup(varname);
-  ds.var_value = my_strdup(varvalue);
+  ds.var_name = string::dup(varname);
+  ds.var_value = string::dup(varvalue);
 
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_CUSTOM_VARIABLE_DATA, &ds);
@@ -766,7 +766,7 @@ int broker_event_handler(
   char* command_name(NULL);
   char* command_args(NULL);
   if (cmd) {
-    command_buf = my_strdup(cmd);
+    command_buf = string::dup(cmd);
     command_name = strtok(command_buf, "!");
     command_args = strtok(NULL, "\x0");
   }
@@ -1043,7 +1043,7 @@ int broker_host_check(
   char* command_name(NULL);
   char* command_args(NULL);
   if (cmd) {
-    command_buf = my_strdup(cmd);
+    command_buf = string::dup(cmd);
     command_name = strtok(command_buf, "!");
     command_args = strtok(NULL, "\x0");
   }
@@ -1181,8 +1181,8 @@ void broker_module_data(
   ds.flags = flags;
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
-  ds.module = my_strdup(module);
-  ds.args = my_strdup(args);
+  ds.module = string::dup(module);
+  ds.args = string::dup(args);
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_MODULE_DATA, &ds);
@@ -1341,9 +1341,9 @@ void broker_program_status(
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
   ds.global_host_event_handler
-    = misc::strdup(config->global_host_event_handler());
+    = string::dup(config->global_host_event_handler());
   ds.global_service_event_handler
-    = misc::strdup(config->global_service_event_handler());
+    = string::dup(config->global_service_event_handler());
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, &ds);
@@ -1488,7 +1488,7 @@ int broker_service_check(
   char* command_name(NULL);
   char* command_args(NULL);
   if (cmd) {
-    command_buf = my_strdup(cmd);
+    command_buf = string::dup(cmd);
     command_name = strtok(command_buf, "!");
     command_args = strtok(NULL, "\x0");
   }

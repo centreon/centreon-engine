@@ -19,18 +19,18 @@
 
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -148,8 +148,8 @@ servicesmember* add_service_to_servicegroup(
 
   try {
     // Duplicate vars.
-    obj->host_name = my_strdup(host_name);
-    obj->service_description = my_strdup(svc_description);
+    obj->host_name = string::dup(host_name);
+    obj->service_description = string::dup(svc_description);
 
     // Add new member to member list, sorted by host name then
     // service description.

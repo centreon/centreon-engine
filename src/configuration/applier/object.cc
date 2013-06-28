@@ -21,15 +21,16 @@
 #include <string>
 #include <vector>
 #include "com/centreon/engine/configuration/applier/object.hh"
-#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 void applier::modify_if_different(char*& s1, char const* s2) {
   if (strcmp(s1, s2)) {
     delete [] s1;
     s1 = NULL;
-    s1 = my_strdup(s2);
+    s1 = string::dup(s2);
   }
   return ;
 }
@@ -47,7 +48,7 @@ void applier::modify_if_different(
     if (!t1[i] || strcmp(t1[i], it->c_str())) {
       delete [] t1[i];
       t1[i] = NULL;
-      t1[i] = my_strdup(it->c_str());
+      t1[i] = string::dup(it->c_str());
     }
   while (i < size) {
     delete [] t1[i];

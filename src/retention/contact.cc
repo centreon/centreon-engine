@@ -19,9 +19,9 @@
 
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/retention/contact.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine;
@@ -110,18 +110,18 @@ bool retention::contact::_modified_attributes(
        std::string const& value) {
 
   if (key == "modified_attributes") {
-    misc::to(value, _obj->modified_attributes);
+    string::to(value, _obj->modified_attributes);
     // mask out attributes we don't want to retain.
     _obj->modified_attributes &= ~0L;
   }
   else if (key == "modified_host_attributes") {
-    misc::to(value, _obj->modified_host_attributes);
+    string::to(value, _obj->modified_host_attributes);
     // mask out attributes we don't want to retain.
     _obj->modified_host_attributes
       &= ~config->retained_contact_host_attribute_mask();
   }
   else if (key == "modified_service_attributes") {
-    misc::to(value, _obj->modified_service_attributes);
+    string::to(value, _obj->modified_service_attributes);
     // mask out attributes we don't want to retain.
     _obj->modified_service_attributes
       &= ~config->retained_contact_service_attribute_mask();
@@ -150,7 +150,7 @@ bool retention::contact::_retain_nonstatus_information(
       if (!find_timeperiod(value.c_str()))
         _obj->modified_host_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
       else
-        misc::setstr(_obj->host_notification_period, value);
+        string::setstr(_obj->host_notification_period, value);
     }
   }
   else if (key == "service_notification_period") {
@@ -158,16 +158,16 @@ bool retention::contact::_retain_nonstatus_information(
       if (!find_timeperiod(value.c_str()))
         _obj->modified_service_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
       else
-        misc::setstr(_obj->service_notification_period, value);
+        string::setstr(_obj->service_notification_period, value);
     }
   }
   else if (key == "host_notifications_enabled") {
     if (_obj->modified_host_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-      misc::to<bool, int>(value, _obj->host_notifications_enabled);
+      string::to<bool, int>(value, _obj->host_notifications_enabled);
   }
   else if (key == "service_notifications_enabled") {
     if (_obj->modified_service_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-      misc::to<bool, int>(value, _obj->service_notifications_enabled);
+      string::to<bool, int>(value, _obj->service_notifications_enabled);
   }
   else if (!key.empty() && key[0] == '_') {
     if (_obj->modified_attributes & MODATTR_CUSTOM_VARIABLE
@@ -180,7 +180,7 @@ bool retention::contact::_retain_nonstatus_information(
            member = member->next) {
         if (!strcmp(cvname, member->variable_name)) {
           if (strcmp(cvvalue, member->variable_value)) {
-            misc::setstr(member->variable_value, cvvalue);
+            string::setstr(member->variable_value, cvvalue);
             member->has_been_modified = true;
           }
           break;
@@ -208,9 +208,9 @@ bool retention::contact::_retain_status_information(
     return (false);
 
   if (key == "last_host_notification")
-    misc::to(value, _obj->last_host_notification);
+    string::to(value, _obj->last_host_notification);
   else if (key == "last_service_notification")
-    misc::to(value, _obj->last_service_notification);
+    string::to(value, _obj->last_service_notification);
   else
     return (false);
   return (true);

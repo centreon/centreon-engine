@@ -19,8 +19,8 @@
 
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/retention/info.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 
@@ -63,7 +63,7 @@ bool retention::info::set(
   if (key == "created") {
     time_t current_time(time(NULL));
     time_t creation_time;
-    misc::to(value, creation_time);
+    string::to(value, creation_time);
     if ((current_time - creation_time)
         < static_cast<time_t>(config->retention_scheduling_horizon()))
       _scheduling_info_is_ok = true;

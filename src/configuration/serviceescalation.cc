@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -364,12 +364,12 @@ bool serviceescalation::_set_contacts(std::string const& value) {
 bool serviceescalation::_set_escalation_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "w" || *it == "warning")
       options |= warning;
     else if (*it == "u" || *it == "unknown")

@@ -22,21 +22,21 @@
 #include "com/centreon/engine/deleter/service.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
 #include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -486,28 +486,28 @@ service* add_service(
 
   try {
     // Duplicate vars.
-    obj->host_name = my_strdup(host_name);
-    obj->description = my_strdup(description);
-    obj->display_name = my_strdup(display_name ? display_name : description);
-    obj->service_check_command = my_strdup(check_command);
+    obj->host_name = string::dup(host_name);
+    obj->description = string::dup(description);
+    obj->display_name = string::dup(display_name ? display_name : description);
+    obj->service_check_command = string::dup(check_command);
     if (event_handler)
-      obj->event_handler = my_strdup(event_handler);
+      obj->event_handler = string::dup(event_handler);
     if (notification_period)
-      obj->notification_period = my_strdup(notification_period);
+      obj->notification_period = string::dup(notification_period);
     if (check_period)
-      obj->check_period = my_strdup(check_period);
+      obj->check_period = string::dup(check_period);
     if (failure_prediction_options)
-      obj->failure_prediction_options = my_strdup(failure_prediction_options);
+      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (notes)
-      obj->notes = my_strdup(notes);
+      obj->notes = string::dup(notes);
     if (notes_url)
-      obj->notes_url = my_strdup(notes_url);
+      obj->notes_url = string::dup(notes_url);
     if (action_url)
-      obj->action_url = my_strdup(action_url);
+      obj->action_url = string::dup(action_url);
     if (icon_image)
-      obj->icon_image = my_strdup(icon_image);
+      obj->icon_image = string::dup(icon_image);
     if (icon_image_alt)
-      obj->icon_image_alt = my_strdup(icon_image_alt);
+      obj->icon_image_alt = string::dup(icon_image_alt);
 
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;

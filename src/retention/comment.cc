@@ -19,8 +19,8 @@
 
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/retention/comment.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine;
@@ -65,19 +65,19 @@ bool retention::comment::set(
   else if (key == "service_description")
     _service_description = value;
   else if (key == "entry_type")
-    misc::to(value, _entry_type);
+    string::to(value, _entry_type);
   else if (key == "comment_id")
-    misc::to(value, _comment_id);
+    string::to(value, _comment_id);
   else if (key == "source")
-    misc::to(value, _source);
+    string::to(value, _source);
   else if (key == "persistent")
-    misc::to(value, _persistent);
+    string::to(value, _persistent);
   else if (key == "entry_time")
-    misc::to(value, _entry_time);
+    string::to(value, _entry_time);
   else if (key == "expires")
-    misc::to(value, _expires);
+    string::to(value, _expires);
   else if (key == "expire_time")
-    misc::to(value, _expire_time);
+    string::to(value, _expire_time);
   else if (key == "author")
     _author = value;
   else if (key == "comment_data")

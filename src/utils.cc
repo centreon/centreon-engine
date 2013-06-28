@@ -44,10 +44,10 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon;
@@ -117,7 +117,7 @@ int my_system_r(
   *exectime = (res.end_time - res.start_time).to_seconds();
   *early_timeout = res.exit_status == process::timeout;
   if (output && max_output_length > 0)
-    *output = engine::misc::strdup(res.output.substr(0, max_output_length - 1));
+    *output = engine::string::dup(res.output.substr(0, max_output_length - 1));
   int result(res.exit_code);
 
   logger(dbg_commands, more)
@@ -206,7 +206,7 @@ int get_raw_command_line_r(
   /* get the full command line */
   if (full_command != NULL) {
     *full_command
-      = my_strdup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
+      = string::dup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
   }
 
   /* XXX: Crazy indent */
@@ -301,7 +301,7 @@ int set_environment_var(char const* name, char const* value, int set) {
     /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
     std::string val(name);
     val.append("=").append(value ? value : "");
-    char* env_string(engine::misc::strdup(val));
+    char* env_string(engine::string::dup(val));
     putenv(env_string);
   }
   /* clear the variable */
@@ -1888,7 +1888,7 @@ int parse_check_output(
 
       /* handle this line of input */
       buf[x] = '\x0';
-      tempbuf = my_strdup(buf);
+      tempbuf = string::dup(buf);
 
       /* first line contains short plugin output and optional perf data */
       if (current_line == 1) {
@@ -1896,7 +1896,7 @@ int parse_check_output(
         /* get the short plugin output */
         if ((ptr = strtok(tempbuf, "|"))) {
           if (short_output)
-            *short_output = my_strdup(ptr);
+            *short_output = string::dup(ptr);
 
           /* get the optional perf data */
           if ((ptr = strtok(NULL, "\n")))
@@ -1964,7 +1964,7 @@ int parse_check_output(
   /* save long output */
   if (long_output && (db1.buf && strcmp(db1.buf, ""))) {
     if (escape_newlines_please == false)
-      *long_output = my_strdup(db1.buf);
+      *long_output = string::dup(db1.buf);
     else {
       /* escape newlines (and backslashes) in long output */
       tempbuf = new char[strlen(db1.buf) * 2 + 1];
@@ -1984,14 +1984,14 @@ int parse_check_output(
       }
 
       tempbuf[y] = '\x0';
-      *long_output = my_strdup(tempbuf);
+      *long_output = string::dup(tempbuf);
       delete[] tempbuf;
     }
   }
 
   /* save perf data */
   if (perf_data && (db2.buf && strcmp(db2.buf, "")))
-    *perf_data = my_strdup(db2.buf);
+    *perf_data = string::dup(db2.buf);
 
   /* strip short output and perf data */
   if (short_output)

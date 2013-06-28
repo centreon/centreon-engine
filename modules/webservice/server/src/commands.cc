@@ -202,8 +202,8 @@ int centreonengine__acknowledgementOnHostAdd(soap* s,
 
     int type = (acknowledgement_type->sticky == true ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL);
 
-    char* author = my_strdup(acknowledgement_type->author.c_str());
-    char* comment = my_strdup(acknowledgement_type->comment.c_str());
+    char* author = string::dup(acknowledgement_type->author.c_str());
+    char* comment = string::dup(acknowledgement_type->comment.c_str());
 
     acknowledge_host_problem(host,
                              author,
@@ -312,8 +312,8 @@ int centreonengine__acknowledgementOnServiceAdd(soap* s,
 
     int type = (acknowledgement_type->sticky == true ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL);
 
-    char* author = my_strdup(acknowledgement_type->author.c_str());
-    char* comment = my_strdup(acknowledgement_type->comment.c_str());
+    char* author = string::dup(acknowledgement_type->author.c_str());
+    char* comment = string::dup(acknowledgement_type->comment.c_str());
 
     acknowledge_service_problem(service,
                                 author,
@@ -1112,8 +1112,8 @@ int centreonengine__downtimeAddToHost(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
@@ -1196,8 +1196,8 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
 
     time_t entry_time = time(NULL);
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
@@ -1291,8 +1291,8 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
 
     time_t entry_time = time(NULL);
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
@@ -1389,8 +1389,8 @@ int centreonengine__downtimeAddToHostServices(soap* s,
 
     time_t entry_time = time(NULL);
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
     bool is_error = false;
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
@@ -1477,8 +1477,8 @@ int centreonengine__downtimeAddToService(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(SERVICE_DOWNTIME,
@@ -1610,8 +1610,8 @@ int centreonengine__notificationHostSend(soap* s,
       | (notification_type->forced == true ? NOTIFICATION_OPTION_FORCED : 0)
       | (notification_type->increment == true ? NOTIFICATION_OPTION_INCREMENT : 0);
 
-    char* author = my_strdup(notification_type->author.c_str());
-    char* comment = my_strdup(notification_type->comment.c_str());
+    char* author = string::dup(notification_type->author.c_str());
+    char* comment = string::dup(notification_type->comment.c_str());
 
     if (host_notification(host,
                           NOTIFICATION_CUSTOM,
@@ -1737,8 +1737,8 @@ int centreonengine__notificationServiceSend(soap* s,
       | (notification_type->increment == true ? NOTIFICATION_OPTION_INCREMENT : 0);
 
 
-    char* author = my_strdup(notification_type->author.c_str());
-    char* comment = my_strdup(notification_type->comment.c_str());
+    char* author = string::dup(notification_type->author.c_str());
+    char* comment = string::dup(notification_type->comment.c_str());
 
     if (service_notification(service,
                              NOTIFICATION_CUSTOM,
@@ -2401,7 +2401,7 @@ int centreonengine__setHostsEventHandler(soap* s,
     }
 
     delete[] global_host_event_handler;
-    global_host_event_handler = my_strdup(command_id->command.c_str());
+    global_host_event_handler = string::dup(command_id->command.c_str());
     global_host_event_handler_ptr = command;
 
     modified_host_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;
@@ -2646,7 +2646,7 @@ int centreonengine__setServicesEventHandler(soap* s,
     }
 
     delete[] global_service_event_handler;
-    global_service_event_handler = my_strdup(command_id->command.c_str());
+    global_service_event_handler = string::dup(command_id->command.c_str());
     global_service_event_handler_ptr = command;
 
     modified_service_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;

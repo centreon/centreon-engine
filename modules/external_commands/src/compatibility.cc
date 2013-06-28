@@ -26,7 +26,9 @@
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/modules/external_commands/compatibility.hh"
 #include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 int process_external_command1(char* cmd) {
@@ -58,13 +60,13 @@ int process_external_command1(char* cmd) {
   /* get the command identifier */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
     return (ERROR);
-  command_id = my_strdup(temp_ptr + 1);
+  command_id = string::dup(temp_ptr + 1);
 
   /* get the command arguments */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
-    args = my_strdup("");
+    args = string::dup("");
   else
-    args = my_strdup(temp_ptr);
+    args = string::dup(temp_ptr);
 
   /* decide what type of command this is... */
 
@@ -1198,10 +1200,10 @@ int process_host_command(int cmd,
       intval = atoi(str);
     str = my_strtok(NULL, ";");
     if (str)
-      buf[0] = my_strdup(str);
+      buf[0] = string::dup(str);
     str = my_strtok(NULL, ";");
     if (str)
-      buf[1] = my_strdup(str);
+      buf[1] = string::dup(str);
     if (buf[0] && buf[1])
       host_notification(temp_host, NOTIFICATION_CUSTOM, buf[0], buf[1], intval);
     break;
@@ -1298,10 +1300,10 @@ int process_service_command(int cmd,
       intval = atoi(str);
     str = my_strtok(NULL, ";");
     if (str)
-      buf[0] = my_strdup(str);
+      buf[0] = string::dup(str);
     str = my_strtok(NULL, ";");
     if (str)
-      buf[1] = my_strdup(str);
+      buf[1] = string::dup(str);
     if (buf[0] && buf[1])
       service_notification(temp_service,
                            NOTIFICATION_CUSTOM,

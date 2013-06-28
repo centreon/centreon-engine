@@ -28,8 +28,11 @@
 #include <iostream>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/exceptions/basic.hh"
+
+using namespace com::centreon::engine;
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1
@@ -202,8 +205,6 @@ int read_stats_file();
 int read_status_file();
 void strip(char*);
 
-extern "C" char* my_strdup(char const* str);
-
 /**
  *  centenginestats entry point.
  *
@@ -228,8 +229,8 @@ int main(int argc, char* argv[]) {
   int retval(EXIT_FAILURE);
   try {
     // Defaults.
-    main_config_file = my_strdup(DEFAULT_CONFIG_FILE);
-    status_file = my_strdup(DEFAULT_STATUS_FILE);
+    main_config_file = string::dup(DEFAULT_CONFIG_FILE);
+    status_file = string::dup(DEFAULT_STATUS_FILE);
 
     // Options.
     bool display_help(false);
@@ -265,12 +266,12 @@ int main(int argc, char* argv[]) {
       case 'c':
         delete[] main_config_file;
         main_config_file = NULL;
-        main_config_file = my_strdup(optarg);
+        main_config_file = string::dup(optarg);
         break;
       case 's':
         delete[] stats_file;
         stats_file = NULL;
-        stats_file = my_strdup(optarg);
+        stats_file = string::dup(optarg);
         break;
       default:
         error = true;
@@ -571,7 +572,7 @@ int read_config_file() {
         || !strcmp(var, "xsddefault_status_log")) {
       if (status_file)
         delete[]status_file;
-      status_file = my_strdup(val);
+      status_file = string::dup(val);
     }
   }
 
@@ -923,7 +924,7 @@ int read_status_file() {
         if (!strcmp(var, "created"))
           status_creation_date = strtoul(val, NULL, 10);
         else if (!strcmp(var, "version"))
-          status_version = my_strdup(val);
+          status_version = string::dup(val);
         break;
 
       case STATUS_PROGRAM_DATA:
@@ -1115,7 +1116,7 @@ int read_stats_file() {
     if (!strcmp(var, "created"))
       status_creation_date = strtoul(val, NULL, 10);
     else if (!strcmp(var, "nagios_version"))
-      status_version = my_strdup(val);
+      status_version = string::dup(val);
 
     /****  PROGRAM INFO ****/
     else if (!strcmp(var, "program_start"))
@@ -1479,9 +1480,4 @@ void get_time_breakdown(
   *minutes = temp_minutes;
   *seconds = temp_seconds;
   return;
-}
-
-char* my_strdup(char const* str) {
-  char* new_str = new char[strlen(str) + 1];
-  return (strcpy(new_str, str));
 }

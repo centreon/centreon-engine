@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
@@ -129,7 +129,7 @@ void applier::globals::apply(state& config) {
 
   std::vector<std::string> const& users(config.user());
   for (unsigned int i(0), end(users.size()); i != end; ++i)
-    misc::setstr(macro_user[i], users[i]);
+    string::setstr(macro_user[i], users[i]);
 }
 
 /**
@@ -197,6 +197,6 @@ void applier::globals::_set_global(
        char*& property,
        std::string const& value) {
   if (property && strcmp(property, value.c_str())) {
-    property = misc::strdup(value);
+    property = string::dup(value);
   }
 }

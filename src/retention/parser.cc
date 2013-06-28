@@ -19,10 +19,10 @@
 
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/retention/info.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/object.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::retention;
 
@@ -60,7 +60,7 @@ void parser::parse(std::string const& path) {
 
   shared_ptr<object> obj;
   std::string input;
-  while (misc::get_next_line(stream, input, current_line)) {
+  while (string::get_next_line(stream, input, current_line)) {
     if (obj.is_null()) {
       std::size_t pos(input.find_first_of(" \t"));
       if (pos == std::string::npos)
@@ -72,7 +72,7 @@ void parser::parse(std::string const& path) {
     else if (input != "}") {
       std::string key;
       std::string value;
-      if (misc::split(input, key, value, '='))
+      if (string::split(input, key, value, '='))
         obj->set(key, value);
     }
     else {

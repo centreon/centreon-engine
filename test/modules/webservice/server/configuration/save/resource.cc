@@ -56,7 +56,7 @@ static bool check_with_data_resources() {
   for (unsigned int i(0); i < MAX_USER_MACROS; i += 2) {
     oss << "$USER" << (i + 1) << "$=" << __func__ << std::endl;
     delete[] macro_user[i];
-    macro_user[i] = my_strdup(__func__);
+    macro_user[i] = string::dup(__func__);
   }
   configuration::save::resource save;
   save.add_resource(macro_user);
@@ -73,7 +73,7 @@ static bool check_full_resources() {
   for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
     oss << "$USER" << (i + 1) << "$=" << __func__ << std::endl;
     delete[] macro_user[i];
-    macro_user[i] = my_strdup(__func__);
+    macro_user[i] = string::dup(__func__);
   }
   configuration::save::resource save;
   save.add_resource(macro_user);

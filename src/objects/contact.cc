@@ -22,19 +22,19 @@
 #include "com/centreon/engine/deleter/contact.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -239,20 +239,20 @@ contact* add_contact(
 
   try {
     // Duplicate vars.
-    obj->name = my_strdup(name);
-    obj->alias = my_strdup(!alias ? name : alias);
+    obj->name = string::dup(name);
+    obj->alias = string::dup(!alias ? name : alias);
     if (email)
-      obj->email = my_strdup(email);
+      obj->email = string::dup(email);
     if (host_notification_period)
-      obj->host_notification_period = my_strdup(host_notification_period);
+      obj->host_notification_period = string::dup(host_notification_period);
     if (pager)
-      obj->pager = my_strdup(pager);
+      obj->pager = string::dup(pager);
     if (svc_notification_period)
-      obj->service_notification_period = my_strdup(svc_notification_period);
+      obj->service_notification_period = string::dup(svc_notification_period);
     if (addresses) {
       for (unsigned int x(0); x < MAX_CONTACT_ADDRESSES; ++x)
         if (addresses[x])
-          obj->address[x] = my_strdup(addresses[x]);
+          obj->address[x] = string::dup(addresses[x]);
     }
 
     // Set remaining contact properties.

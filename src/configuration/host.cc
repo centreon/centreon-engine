@@ -21,7 +21,7 @@
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -1062,17 +1062,17 @@ bool host::_set_contacts(std::string const& value) {
  */
 bool host::_set_coords_2d(std::string const& value) {
   std::list<std::string> coords;
-  misc::split(value, coords, ',');
+  string::split(value, coords, ',');
   if (coords.size() != 2)
     return (false);
 
   int x;
-  if (!misc::to(misc::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()), x))
     return (false);
   coords.pop_front();
 
   int y;
-  if (!misc::to(misc::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()), y))
     return (false);
 
   _coords_2d = point_2d(x, y);
@@ -1088,22 +1088,22 @@ bool host::_set_coords_2d(std::string const& value) {
  */
 bool host::_set_coords_3d(std::string const& value) {
   std::list<std::string> coords;
-  misc::split(value, coords, ',');
+  string::split(value, coords, ',');
   if (coords.size() != 3)
     return (false);
 
   double x;
-  if (!misc::to(misc::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()), x))
     return (false);
   coords.pop_front();
 
   double y;
-  if (!misc::to(misc::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()), y))
     return (false);
   coords.pop_front();
 
   double z;
-  if (!misc::to(misc::trim(coords.front()), z))
+  if (!string::to(string::trim(coords.front()), z))
     return (false);
 
   _coords_3d = point_3d(x, y, z);
@@ -1211,12 +1211,12 @@ bool host::_set_flap_detection_options(
        std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "up")
       options |= up;
     else if (*it == "d" || *it == "down")
@@ -1316,7 +1316,7 @@ bool host::_set_icon_image_alt(std::string const& value) {
  */
 bool host::_set_initial_state(std::string const& value) {
   std::string data(value);
-  misc::trim(data);
+  string::trim(data);
   if (data == "o" || data == "up")
     _initial_state = HOST_UP;
   else if (data == "d" || data == "down")
@@ -1414,12 +1414,12 @@ bool host::_set_notification_options(
        std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "d" || *it == "down")
       options |= down;
     else if (*it == "u" || *it == "unreachable")
@@ -1538,12 +1538,12 @@ bool host::_set_stalking_options(
        std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "up")
       options |= up;
     else if (*it == "d" || *it == "down")

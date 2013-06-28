@@ -20,14 +20,14 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -175,9 +175,9 @@ customvariablesmember* add_custom_variable_to_object(
   memset(obj, 0, sizeof(*obj));
 
   try {
-    obj->variable_name = my_strdup(varname);
+    obj->variable_name = string::dup(varname);
     if (varvalue)
-      obj->variable_value = my_strdup(varvalue);
+      obj->variable_value = string::dup(varvalue);
 
     // Add the new member to the head of the member list.
     obj->next = *object_ptr;

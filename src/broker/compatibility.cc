@@ -21,8 +21,8 @@
 #include <cstring>
 #include <memory>
 #include "com/centreon/engine/broker/compatibility.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/nebmodules.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
@@ -75,7 +75,7 @@ void compatibility::author_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        misc::setstr(tmp->info[NEBMODULE_MODINFO_AUTHOR], mod->get_author());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_AUTHOR], mod->get_author());
   }
   return;
 }
@@ -89,7 +89,7 @@ void compatibility::copyright_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        misc::setstr(tmp->info[NEBMODULE_MODINFO_COPYRIGHT], mod->get_copyright());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_COPYRIGHT], mod->get_copyright());
   }
   return;
 }
@@ -105,8 +105,8 @@ void compatibility::create_module(broker::handle* mod) {
     std::auto_ptr<nebmodule> new_module(new nebmodule);
 
     // Module parameters.
-    new_module->filename = misc::strdup(mod->get_filename());
-    new_module->args = misc::strdup(mod->get_args());
+    new_module->filename = string::dup(mod->get_filename());
+    new_module->args = string::dup(mod->get_args());
     new_module->deinit_func = NULL;
     new_module->init_func = NULL;
     new_module->is_currently_loaded = mod->is_loaded();
@@ -116,17 +116,17 @@ void compatibility::create_module(broker::handle* mod) {
 
     // Module information.
     new_module->info[NEBMODULE_MODINFO_AUTHOR]
-      = misc::strdup(mod->get_author());
+      = string::dup(mod->get_author());
     new_module->info[NEBMODULE_MODINFO_COPYRIGHT]
-      = misc::strdup(mod->get_copyright());
+      = string::dup(mod->get_copyright());
     new_module->info[NEBMODULE_MODINFO_DESC]
-      = misc::strdup(mod->get_description());
+      = string::dup(mod->get_description());
     new_module->info[NEBMODULE_MODINFO_LICENSE]
-      = misc::strdup(mod->get_license());
+      = string::dup(mod->get_license());
     new_module->info[NEBMODULE_MODINFO_TITLE]
-      = misc::strdup(mod->get_name());
+      = string::dup(mod->get_name());
     new_module->info[NEBMODULE_MODINFO_VERSION]
-      = misc::strdup(mod->get_version());
+      = string::dup(mod->get_version());
 
     // Add module to head of list.
     new_module->next = neb_module_list;
@@ -144,7 +144,7 @@ void compatibility::description_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        misc::setstr(tmp->info[NEBMODULE_MODINFO_DESC], mod->get_description());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_DESC], mod->get_description());
   }
   return;
 }
@@ -190,7 +190,7 @@ void compatibility::license_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        misc::setstr(tmp->info[NEBMODULE_MODINFO_LICENSE], mod->get_license());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_LICENSE], mod->get_license());
   }
   return;
 }
@@ -218,7 +218,7 @@ void compatibility::name_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        misc::setstr(tmp->info[NEBMODULE_MODINFO_TITLE], mod->get_name());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_TITLE], mod->get_name());
   }
   return;
 }
@@ -246,7 +246,7 @@ void compatibility::version_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod)
-        misc::setstr(tmp->info[NEBMODULE_MODINFO_VERSION], mod->get_version());
+        string::setstr(tmp->info[NEBMODULE_MODINFO_VERSION], mod->get_version());
   }
   return;
 }

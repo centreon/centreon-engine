@@ -25,13 +25,12 @@
 #  include <sys/types.h>
 
 // only usable on compile-time initialized arrays, for obvious reasons
-# define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
+#  define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++
 
-char* my_strdup(char const* str);
 char* my_strtok(char const* buffer, char const* tokens);
 char* my_strsep(char** stringp, char const* delim);
 void strip(char* buffer);

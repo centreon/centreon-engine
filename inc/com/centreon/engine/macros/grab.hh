@@ -25,9 +25,8 @@
 #  include <sstream>
 #  include <time.h>
 #  include "com/centreon/engine/macros/process.hh"
-#  include "com/centreon/engine/misc/string.hh"
 #  include "com/centreon/engine/namespace.hh"
-// #  include "com/centreon/engine/shared.hh"
+#  include "com/centreon/engine/string.hh"
 
 CCE_BEGIN()
 
@@ -46,7 +45,7 @@ namespace  macros {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision)
         << t.*member;
-    return (misc::strdup(oss.str()));
+    return (string::dup(oss.str()));
   }
 
   /**
@@ -79,7 +78,7 @@ namespace  macros {
         << hours << "h "
         << minutes << "m "
         << duration << "s";
-    return (misc::strdup(oss.str()));
+    return (string::dup(oss.str()));
   }
 
   /**
@@ -97,7 +96,7 @@ namespace  macros {
     // Get duration.
     time_t now(time(NULL));
     unsigned long duration(now - t.last_state_change);
-    return (misc::strdup(duration));
+    return (string::dup(duration));
   }
 
   /**
@@ -111,7 +110,7 @@ namespace  macros {
   template <typename T, unsigned int macro_id>
   char*    get_macro_copy(T& t, nagios_macros* mac) {
     (void)t;
-    return (misc::strdup(mac->x[macro_id] ? mac->x[macro_id] : ""));
+    return (string::dup(mac->x[macro_id] ? mac->x[macro_id] : ""));
   }
 
   /**
@@ -125,7 +124,7 @@ namespace  macros {
   template <typename T, typename U, U (T::* member)>
   char*    get_member_as_string(T& t, nagios_macros* mac) {
     (void)mac;
-    return (misc::strdup(t.*member));
+    return (string::dup(t.*member));
   }
 
   /**
@@ -157,7 +156,7 @@ namespace  macros {
   template <typename T>
   char* get_state_type(T& t, nagios_macros* mac) {
     (void)mac;
-    return (misc::strdup((t.state_type == HARD_STATE)
+    return (string::dup((t.state_type == HARD_STATE)
                       ? "HARD"
                       : "SOFT"));
   }

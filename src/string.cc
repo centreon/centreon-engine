@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 
@@ -32,13 +32,13 @@ static char const* whitespaces(" \t\r\n");
  *
  *  @return True if data is available, false if no data.
  */
-bool misc::get_next_line(
+bool string::get_next_line(
        std::ifstream& stream,
        std::string& line,
        unsigned int& pos) {
   while (std::getline(stream, line, '\n')) {
     ++pos;
-    misc::trim(line);
+    string::trim(line);
     if (!line.empty()) {
       char c(line[0]);
       if (c != '#' && c != ';' && c != '\x0')
@@ -56,7 +56,7 @@ bool misc::get_next_line(
  *  @param[out] value The value to fill.
  *  @param[in]  delim The delimiter.
  */
-bool misc::split(
+bool string::split(
        std::string const& line,
        std::string& key,
        std::string& value,
@@ -66,10 +66,10 @@ bool misc::split(
     return (false);
 
   key = line.substr(0, pos);
-  misc::trim(key);
+  string::trim(key);
 
   value = line.substr(pos + 1);
-  misc::trim(value);
+  string::trim(value);
   return (true);
 }
 
@@ -82,7 +82,7 @@ bool misc::split(
  *
  *  @return The list of string split by delimiter.
  */
-std::list<std::string>& misc::split(
+std::list<std::string>& string::split(
                           std::string const& data,
                           std::list<std::string>& out,
                           char delim) {
@@ -108,7 +108,7 @@ std::list<std::string>& misc::split(
  *
  *  @return The trimming stream.
  */
-std::string& misc::trim(std::string& str) throw () {
+std::string& string::trim(std::string& str) throw () {
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)
     str.clear();
@@ -127,7 +127,7 @@ std::string& misc::trim(std::string& str) throw () {
  *
  *  @return The trimming stream.
  */
-std::string& misc::trim_left(std::string& str) throw () {
+std::string& string::trim_left(std::string& str) throw () {
   size_t pos(str.find_first_not_of(whitespaces));
   if (pos != std::string::npos)
     str.erase(0, pos);
@@ -141,7 +141,7 @@ std::string& misc::trim_left(std::string& str) throw () {
  *
  *  @return The trimming stream.
  */
-std::string& misc::trim_right(std::string& str) throw () {
+std::string& string::trim_right(std::string& str) throw () {
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)
     str.clear();

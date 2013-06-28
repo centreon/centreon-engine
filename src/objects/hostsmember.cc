@@ -20,15 +20,15 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/hostgroup.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -98,7 +98,7 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
   try {
     // Initialize values.
     obj->host_ptr = child;
-    obj->host_name = my_strdup(child->name);
+    obj->host_name = string::dup(child->name);
 
     // Add the child entry to the host definition.
     obj->next = parent->child_hosts;
@@ -152,7 +152,7 @@ hostsmember* add_host_to_hostgroup(
 
   try {
     // Duplicate vars.
-    obj->host_name = my_strdup(host_name);
+    obj->host_name = string::dup(host_name);
 
     // Add the new member to the member list, sorted by host name.
     hostsmember* last(temp_hostgroup->members);
@@ -217,7 +217,7 @@ hostsmember* add_parent_host_to_host(
 
   try {
     // Duplicate string vars.
-    obj->host_name = my_strdup(host_name);
+    obj->host_name = string::dup(host_name);
 
     // Add the parent host entry to the host definition */
     obj->next = hst->parent_hosts;

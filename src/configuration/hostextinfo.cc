@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -325,17 +325,17 @@ bool hostextinfo::_set_action_url(std::string const& value) {
  */
 bool hostextinfo::_set_coords_2d(std::string const& value) {
   std::list<std::string> coords;
-  misc::split(value, coords, ',');
+  string::split(value, coords, ',');
   if (coords.size() != 2)
     return (false);
 
   int x;
-  if (!misc::to(misc::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()), x))
     return (false);
   coords.pop_front();
 
   int y;
-  if (!misc::to(misc::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()), y))
     return (false);
 
   _coords_2d = point_2d(x, y);
@@ -351,22 +351,22 @@ bool hostextinfo::_set_coords_2d(std::string const& value) {
  */
 bool hostextinfo::_set_coords_3d(std::string const& value) {
   std::list<std::string> coords;
-  misc::split(value, coords, ',');
+  string::split(value, coords, ',');
   if (coords.size() != 3)
     return (false);
 
   double x;
-  if (!misc::to(misc::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()), x))
     return (false);
   coords.pop_front();
 
   double y;
-  if (!misc::to(misc::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()), y))
     return (false);
   coords.pop_front();
 
   double z;
-  if (!misc::to(misc::trim(coords.front()), z))
+  if (!string::to(string::trim(coords.front()), z))
     return (false);
 
   _coords_3d = point_3d(x, y, z);

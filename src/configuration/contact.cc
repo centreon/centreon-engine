@@ -21,7 +21,7 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -483,7 +483,7 @@ bool contact::_set_address(
        std::string const& key,
        std::string const& value) {
   unsigned int id;
-  if (!misc::to(key, id) || id < 1 || id > MAX_ADDRESSES)
+  if (!string::to(key, id) || id < 1 || id > MAX_ADDRESSES)
     return (false);
   _address[id] = value;
   return (true);
@@ -584,12 +584,12 @@ bool contact::_set_host_notification_commands(std::string const& value) {
 bool contact::_set_host_notification_options(std::string const& value) {
   unsigned short options(host::none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "d" || *it == "down")
       options |= host::down;
     else if (*it == "u" || *it == "unreachable")
@@ -685,12 +685,12 @@ bool contact::_set_service_notification_commands(std::string const& value) {
 bool contact::_set_service_notification_options(std::string const& value) {
   unsigned short options(service::none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "u" || *it == "unknown")
       options |= service::unknown;
     else if (*it == "w" || *it == "warning")

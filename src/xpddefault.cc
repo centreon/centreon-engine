@@ -29,10 +29,10 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/service.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "find.hh"
 
@@ -81,15 +81,15 @@ int xpddefault_initialize_performance_data() {
   xpddefault_service_perfdata_file_processing_command_ptr = NULL;
 
   /* grab config info from main config file */
-  xpddefault_host_perfdata_command = misc::strdup(config->host_perfdata_command());
-  xpddefault_service_perfdata_command = misc::strdup(config->service_perfdata_command());
-  xpddefault_host_perfdata_file_template = misc::strdup(config->host_perfdata_file_template());
-  xpddefault_service_perfdata_file_template = misc::strdup(config->service_perfdata_file_template());
-  xpddefault_host_perfdata_file = misc::strdup(config->host_perfdata_file());
-  xpddefault_service_perfdata_file = misc::strdup(config->service_perfdata_file());
+  xpddefault_host_perfdata_command = string::dup(config->host_perfdata_command());
+  xpddefault_service_perfdata_command = string::dup(config->service_perfdata_command());
+  xpddefault_host_perfdata_file_template = string::dup(config->host_perfdata_file_template());
+  xpddefault_service_perfdata_file_template = string::dup(config->service_perfdata_file_template());
+  xpddefault_host_perfdata_file = string::dup(config->host_perfdata_file());
+  xpddefault_service_perfdata_file = string::dup(config->service_perfdata_file());
 
-  xpddefault_host_perfdata_file_processing_command = misc::strdup(config->host_perfdata_file_processing_command());
-  xpddefault_service_perfdata_file_processing_command = misc::strdup(config->service_perfdata_file_processing_command());
+  xpddefault_host_perfdata_file_processing_command = string::dup(config->host_perfdata_file_processing_command());
+  xpddefault_service_perfdata_file_processing_command = string::dup(config->service_perfdata_file_processing_command());
 
   /* process special chars in templates */
   xpddefault_preprocess_file_templates(xpddefault_host_perfdata_file_template);
@@ -101,7 +101,7 @@ int xpddefault_initialize_performance_data() {
 
   /* verify that performance data commands are valid */
   if (xpddefault_host_perfdata_command) {
-    temp_buffer = my_strdup(xpddefault_host_perfdata_command);
+    temp_buffer = string::dup(xpddefault_host_perfdata_command);
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(temp_buffer, "!");
@@ -123,7 +123,7 @@ int xpddefault_initialize_performance_data() {
   }
 
   if (xpddefault_service_perfdata_command != NULL) {
-    temp_buffer = my_strdup(xpddefault_service_perfdata_command);
+    temp_buffer = string::dup(xpddefault_service_perfdata_command);
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(temp_buffer, "!");
@@ -147,7 +147,7 @@ int xpddefault_initialize_performance_data() {
 
   if (xpddefault_host_perfdata_file_processing_command != NULL) {
     temp_buffer
-      = my_strdup(xpddefault_host_perfdata_file_processing_command);
+      = string::dup(xpddefault_host_perfdata_file_processing_command);
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(temp_buffer, "!");
@@ -170,7 +170,7 @@ int xpddefault_initialize_performance_data() {
 
   if (xpddefault_service_perfdata_file_processing_command != NULL) {
     temp_buffer
-      = my_strdup(xpddefault_service_perfdata_file_processing_command);
+      = string::dup(xpddefault_service_perfdata_file_processing_command);
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(temp_buffer, "!");
@@ -632,7 +632,7 @@ int xpddefault_update_service_performance_data_file(
     return (OK);
 
   /* get the raw line to write */
-  raw_output = my_strdup(xpddefault_service_perfdata_file_template);
+  raw_output = string::dup(xpddefault_service_perfdata_file_template);
 
   logger(dbg_perfdata, most)
     << "Raw service performance data file output: " << raw_output;
@@ -680,7 +680,7 @@ int xpddefault_update_host_performance_data_file(
     return (OK);
 
   /* get the raw output */
-  raw_output = my_strdup(xpddefault_host_perfdata_file_template);
+  raw_output = string::dup(xpddefault_host_perfdata_file_template);
 
   logger(dbg_perfdata, most)
     << "Raw host performance file output: " << raw_output;

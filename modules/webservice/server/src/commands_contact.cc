@@ -854,7 +854,7 @@ int centreonengine__contactSetAlias(
 
   // Set new alias.
   delete [] cntct->alias;
-  cntct->alias = my_strdup(alias.c_str());
+  cntct->alias = string::dup(alias.c_str());
 
   // Exception handling.
   COMMAND_END()
@@ -932,7 +932,7 @@ int centreonengine__contactSetCustomVariable(
     if (!*cvar) {
       *cvar = new customvariablesmember;
       (*cvar)->next = NULL;
-      (*cvar)->variable_name = my_strdup(varname.c_str());
+      (*cvar)->variable_name = string::dup(varname.c_str());
     }
     else {
       delete [] (*cvar)->variable_value;
@@ -940,7 +940,7 @@ int centreonengine__contactSetCustomVariable(
     }
 
     // Set new value.
-    (*cvar)->variable_value = my_strdup(varvalue.c_str());
+    (*cvar)->variable_value = string::dup(varvalue.c_str());
   }
   // Delete variable.
   if (*cvar) {
@@ -982,7 +982,7 @@ int centreonengine__contactSetEmail(
 
   // Set new email.
   delete [] cntct->email;
-  cntct->email = my_strdup(email.c_str());
+  cntct->email = string::dup(email.c_str());
 
   // Exception handling.
   COMMAND_END()
@@ -1187,7 +1187,7 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(
     // Set new timeperiod.
     delete [] cntct->host_notification_period;
     cntct->host_notification_period
-      = my_strdup(timeperiod_id->name.c_str());
+      = string::dup(timeperiod_id->name.c_str());
     cntct->host_notification_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -1432,7 +1432,7 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(
     // Set new timeperiod.
     delete [] cntct->service_notification_period;
     cntct->service_notification_period
-      = my_strdup(timeperiod_id->name.c_str());
+      = string::dup(timeperiod_id->name.c_str());
     cntct->service_notification_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -1537,7 +1537,7 @@ int centreonengine__contactSetPager(
 
   // Set new pager.
   delete [] cntct->pager;
-  cntct->pager = my_strdup(pager.c_str());
+  cntct->pager = string::dup(pager.c_str());
 
   // Exception handling.
   COMMAND_END()

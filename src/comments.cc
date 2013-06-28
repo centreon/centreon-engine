@@ -23,8 +23,11 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xcddefault.hh"
+
+using namespace com::centreon::engine;
 
 static comment* comment_hashlist[COMMENT_HASHSLOTS];
 
@@ -563,11 +566,11 @@ int add_comment(
   memset(new_comment, 0, sizeof(*new_comment));
 
   /* duplicate vars */
-  new_comment->host_name = my_strdup(host_name);
+  new_comment->host_name = string::dup(host_name);
   if (comment_type == SERVICE_COMMENT)
-    new_comment->service_description = my_strdup(svc_description);
-  new_comment->author = my_strdup(author);
-  new_comment->comment_data = my_strdup(comment_data);
+    new_comment->service_description = string::dup(svc_description);
+  new_comment->author = string::dup(author);
+  new_comment->comment_data = string::dup(comment_data);
 
   new_comment->comment_type = comment_type;
   new_comment->entry_type = entry_type;

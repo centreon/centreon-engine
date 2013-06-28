@@ -19,19 +19,19 @@
 
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostescalation.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/serviceescalation.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -105,7 +105,7 @@ contactsmember* add_contact_to_contactgroup(
 
   try {
     // Duplicate vars.
-    obj->contact_name = my_strdup(contact_name);
+    obj->contact_name = string::dup(contact_name);
 
     // Add the new member to the head of the member list.
     obj->next = grp->members;
@@ -179,7 +179,7 @@ contactsmember* add_contact_to_object(
 
   try {
     // Duplicate vars.
-    obj->contact_name = my_strdup(contact_name);
+    obj->contact_name = string::dup(contact_name);
 
     // Add the new contact to the head of the contact list.
     obj->next = *object_ptr;

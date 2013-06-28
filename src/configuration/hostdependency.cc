@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -438,12 +438,12 @@ bool hostdependency::_set_dependent_hosts(std::string const& value) {
 bool hostdependency::_set_execution_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "up")
       options |= up;
     else if (*it == "d" || *it == "down")
@@ -509,12 +509,12 @@ bool hostdependency::_set_inherits_parent(bool value) {
 bool hostdependency::_set_notification_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
-  misc::split(value, values, ',');
+  string::split(value, values, ',');
   for (std::list<std::string>::iterator
          it(values.begin()), end(values.end());
        it != end;
        ++it) {
-    misc::trim(*it);
+    string::trim(*it);
     if (*it == "o" || *it == "up")
       options |= up;
     else if (*it == "d" || *it == "down")

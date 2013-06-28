@@ -20,14 +20,13 @@
 #include <iomanip>
 #include "com/centreon/engine/deleter/timerange.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/daterange.hh"
 #include "com/centreon/engine/objects/timerange.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
 
 /**
  *  Equal operator.

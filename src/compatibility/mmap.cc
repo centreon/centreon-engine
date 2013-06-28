@@ -26,7 +26,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/string.hh"
 #include "mmap.h"
+
+using namespace com::centreon::engine;
 
 /* open a file read-only via mmap() */
 mmapfile* mmap_fopen(char const* filename) {
@@ -68,7 +71,7 @@ mmapfile* mmap_fopen(char const* filename) {
   mmapfile* new_mmapfile = new mmapfile();
 
   /* populate struct info for later use */
-  new_mmapfile->path = my_strdup(filename);
+  new_mmapfile->path = string::dup(filename);
   new_mmapfile->fd = fd;
   new_mmapfile->file_size = (unsigned long)file_size;
   new_mmapfile->current_position = 0L;

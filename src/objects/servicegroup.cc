@@ -22,18 +22,18 @@
 #include "com/centreon/engine/deleter/servicegroup.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -118,14 +118,14 @@ servicegroup* add_servicegroup(
 
   try {
     // Duplicate vars.
-    obj->group_name = my_strdup(name);
-    obj->alias = my_strdup(alias ? alias : name);
+    obj->group_name = string::dup(name);
+    obj->alias = string::dup(alias ? alias : name);
     if (action_url)
-      obj->action_url = my_strdup(action_url);
+      obj->action_url = string::dup(action_url);
     if (notes)
-      obj->notes = my_strdup(notes);
+      obj->notes = string::dup(notes);
     if (notes_url)
-      obj->notes_url = my_strdup(notes_url);
+      obj->notes_url = string::dup(notes_url);
 
     // Add new servicegroup to the monitoring engine.
     std::string id(name);

@@ -645,10 +645,10 @@ add_library("cce_core" STATIC
   "${SRC_DIR}/objects.cc"
   "${SRC_DIR}/shared.cc"
   "${SRC_DIR}/statusdata.cc"
+  "${SRC_DIR}/string.cc"
   "${SRC_DIR}/error.cc"
   "${SRC_DIR}/xcddefault.cc"
   "${SRC_DIR}/xdddefault.cc"
-  # XXX: remove "${SRC_DIR}/xodtemplate.cc"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
   # Headers.
@@ -678,11 +678,11 @@ add_library("cce_core" STATIC
   "${INC_DIR}/com/centreon/engine/shared.hh"
   "${INC_DIR}/com/centreon/engine/sretention.hh"
   "${INC_DIR}/com/centreon/engine/statusdata.hh"
+  "${INC_DIR}/com/centreon/engine/string.hh"
   "${INC_DIR}/com/centreon/engine/utils.hh"
   "${INC_DIR}/com/centreon/engine/version.hh"
   "${INC_DIR}/com/centreon/engine/xcddefault.hh"
   "${INC_DIR}/com/centreon/engine/xdddefault.hh"
-  ## XXX: remove "${INC_DIR}/com/centreon/engine/xodtemplate.hh"
   "${INC_DIR}/com/centreon/engine/xpddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
@@ -699,7 +699,6 @@ add_subdirectory("deleter")
 add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")
-add_subdirectory("misc")
 add_subdirectory("modules")
 add_subdirectory("objects")
 add_subdirectory("retention")
@@ -718,7 +717,6 @@ target_link_libraries("cce_core"
   "cce_configuration"
   "cce_checks"
   "cce_macros"
-  "cce_misc"
   "cce_commands"
   "cce_compatibility"
   "cce_objects"

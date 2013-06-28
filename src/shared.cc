@@ -22,7 +22,10 @@
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
+
+using namespace com::centreon::engine;
 
 #ifdef HAVE_TZNAME
 #  ifdef CYGWIN
@@ -37,11 +40,6 @@ extern char* tzname[2];
  * core.
  */
 
-char* my_strdup(char const* str) {
-  char* new_str = new char[strlen(str) + 1];
-  return (strcpy(new_str, str));
-}
-
 /* fix the problem with strtok() skipping empty options between tokens */
 char* my_strtok(char const* buffer, char const* tokens) {
   char* token_position = NULL;
@@ -51,7 +49,7 @@ char* my_strtok(char const* buffer, char const* tokens) {
     original_my_strtok_buffer;
 
   if (buffer != NULL) {
-    original_my_strtok_buffer.reset(my_strdup(buffer));
+    original_my_strtok_buffer.reset(string::dup(buffer));
     my_strtok_buffer = original_my_strtok_buffer.get();
   }
 

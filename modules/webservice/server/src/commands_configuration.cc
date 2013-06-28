@@ -67,7 +67,7 @@ int centreonengine__updateResourceUser(soap* s,
 
     unsigned int pos(resource_id->id - 1);
     delete[] macro_user[pos];
-    macro_user[pos] = my_strdup(value.c_str());
+    macro_user[pos] = string::dup(value.c_str());
     webservice::sync::instance().worker_finish();
   }
   catch (...) {

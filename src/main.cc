@@ -56,13 +56,13 @@
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/misc.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/sretention.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
       error = true;
     else {
       // Config file is last argument specified.
-      config_file = my_strdup(argv[optind]);
+      config_file = string::dup(argv[optind]);
 
       // Make sure the config file uses an absolute path.
       if (config_file[0] != '/') {
@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
           buffer(com::centreon::io::directory_entry::current_path());
         buffer.append("/");
         buffer.append(config_file);
-        misc::setstr(config_file, buffer);
+        string::setstr(config_file, buffer);
       }
     }
 
@@ -396,7 +396,7 @@ int main(int argc, char* argv[]) {
       // after we read config files, as user may have overridden
       // timezone offset.
       program_start = time(NULL);
-      misc::setstr(mac->x[MACRO_PROCESSSTARTTIME], program_start);
+      string::setstr(mac->x[MACRO_PROCESSSTARTTIME], program_start);
 
       // Initialize modules.
       neb_init_modules();
@@ -517,7 +517,7 @@ int main(int argc, char* argv[]) {
       // Get event start time and save as macro.
       event_start = time(NULL);
       try {
-        misc::setstr(mac->x[MACRO_EVENTSTARTTIME], event_start);
+        string::setstr(mac->x[MACRO_EVENTSTARTTIME], event_start);
       }
       catch (...) {
         // Send program data to broker.

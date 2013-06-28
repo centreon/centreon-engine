@@ -26,9 +26,9 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -108,7 +108,7 @@ int pre_flight_check() {
   if (config->global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = misc::strdup(config->global_host_event_handler());
+    buf = string::dup(config->global_host_event_handler());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -130,7 +130,7 @@ int pre_flight_check() {
   if (config->global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = misc::strdup(config->global_service_event_handler());
+    buf = string::dup(config->global_service_event_handler());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -157,7 +157,7 @@ int pre_flight_check() {
 
   if (!config->ocsp_command().empty()) {
 
-    buf = misc::strdup(config->ocsp_command());
+    buf = string::dup(config->ocsp_command());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -178,7 +178,7 @@ int pre_flight_check() {
 
   if (!config->ochp_command().empty()) {
 
-    buf = misc::strdup(config->ochp_command());
+    buf = string::dup(config->ochp_command());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -1133,7 +1133,7 @@ int check_service(service* svc, int* w, int* e) {
   if (svc->event_handler != NULL) {
 
     /* check the event handler command */
-    char* buf = misc::strdup(svc->event_handler);
+    char* buf = string::dup(svc->event_handler);
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1154,7 +1154,7 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check the service check_command */
-  char* buf = misc::strdup(svc->service_check_command);
+  char* buf = string::dup(svc->service_check_command);
 
   /* get the command name, leave any arguments behind */
   char* temp_command_name = my_strtok(buf, "!");
@@ -1341,7 +1341,7 @@ int check_host(host* hst, int* w, int* e) {
   if (hst->event_handler != NULL) {
 
     /* check the event handler command */
-    char* buf = my_strdup(hst->event_handler);
+    char* buf = string::dup(hst->event_handler);
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1365,7 +1365,7 @@ int check_host(host* hst, int* w, int* e) {
   if (hst->host_check_command != NULL) {
 
     /* check the host check_command */
-    char* buf = my_strdup(hst->host_check_command);
+    char* buf = string::dup(hst->host_check_command);
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1529,7 +1529,7 @@ int check_contact(contact* cntct, int* w, int* e) {
 	 temp_commandsmember = temp_commandsmember->next) {
 
       /* check the host notification command */
-      char* buf = my_strdup(temp_commandsmember->cmd);
+      char* buf = string::dup(temp_commandsmember->cmd);
 
       /* get the command name, leave any arguments behind */
       char* temp_command_name = my_strtok(buf, "!");
@@ -1562,7 +1562,7 @@ int check_contact(contact* cntct, int* w, int* e) {
 	 temp_commandsmember = temp_commandsmember->next) {
 
       /* check the host notification command */
-      char* buf = my_strdup(temp_commandsmember->cmd);
+      char* buf = string::dup(temp_commandsmember->cmd);
 
       /* get the command name, leave any arguments behind */
       char* temp_command_name = my_strtok(buf, "!");

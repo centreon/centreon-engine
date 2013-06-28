@@ -35,7 +35,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "compatibility/check_result.h"
 
@@ -349,7 +349,7 @@ void checker::run(
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = NULL;
   check_result_info.output_file = NULL;
-  check_result_info.host_name = my_strdup(hst->name);
+  check_result_info.host_name = string::dup(hst->name);
   check_result_info.service_description = NULL;
   check_result_info.latency = latency;
   check_result_info.next = NULL;
@@ -359,7 +359,7 @@ void checker::run(
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* processed_cmd_ptr(misc::strdup(processed_cmd));
+  char* processed_cmd_ptr(string::dup(processed_cmd));
 
   // Send event broker.
   broker_host_check(
@@ -417,7 +417,7 @@ void checker::run(
     check_result_info.early_timeout = false;
     check_result_info.return_code = STATE_UNKNOWN;
     check_result_info.exited_ok = true;
-    check_result_info.output = my_strdup("(Execute command failed)");
+    check_result_info.output = string::dup("(Execute command failed)");
 
     // Queue check result.
     concurrency::locker lock(&_mut_reap);
@@ -566,8 +566,8 @@ void checker::run(
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = NULL;
   check_result_info.output_file = NULL;
-  check_result_info.host_name = my_strdup(svc->host_name);
-  check_result_info.service_description = my_strdup(svc->description);
+  check_result_info.host_name = string::dup(svc->host_name);
+  check_result_info.service_description = string::dup(svc->description);
   check_result_info.latency = latency;
   check_result_info.next = NULL;
 
@@ -576,7 +576,7 @@ void checker::run(
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(svc->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* processed_cmd_ptr(misc::strdup(processed_cmd));
+  char* processed_cmd_ptr(string::dup(processed_cmd));
 
   // Send event broker.
   res = broker_service_check(
@@ -633,7 +633,7 @@ void checker::run(
     check_result_info.early_timeout = false;
     check_result_info.return_code = STATE_UNKNOWN;
     check_result_info.exited_ok = true;
-    check_result_info.output = my_strdup("(Execute command failed)");
+    check_result_info.output = string::dup("(Execute command failed)");
 
     // Queue check result.
     concurrency::locker lock(&_mut_reap);
@@ -737,7 +737,7 @@ void checker::run_sync(
   // Save old plugin output for state stalking.
   char* old_plugin_output(NULL);
   if (hst->plugin_output)
-    old_plugin_output = my_strdup(hst->plugin_output);
+    old_plugin_output = string::dup(hst->plugin_output);
 
   // Set the checked flag.
   hst->has_been_checked = true;
@@ -902,7 +902,7 @@ void checker::finished(commands::result const& res) throw () {
   result.early_timeout = (res.exit_status == process::timeout);
   result.return_code = res.exit_code;
   result.exited_ok = (res.exit_status == process::normal);
-  result.output = misc::strdup(res.output);
+  result.output = string::dup(res.output);
 
   // Queue check result.
   concurrency::locker lock(&_mut_reap);
@@ -981,7 +981,7 @@ int checker::_execute_sync(host* hst) {
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* tmp_processed_cmd(misc::strdup(processed_cmd));
+  char* tmp_processed_cmd(string::dup(processed_cmd));
 
   // Send broker event.
   broker_host_check(
@@ -1062,7 +1062,7 @@ int checker::_execute_sync(host* hst) {
   }
 
   // Get output.
-  char* output(misc::strdup(res.output));
+  char* output(string::dup(res.output));
 
   unsigned int execution_time(0);
   if (res.end_time >= res.start_time)
@@ -1114,7 +1114,7 @@ int checker::_execute_sync(host* hst) {
   hst->check_type = HOST_CHECK_ACTIVE;
 
   // Get plugin output.
-  char* tmp_plugin_output(misc::strdup(res.output));
+  char* tmp_plugin_output(string::dup(res.output));
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(
@@ -1129,7 +1129,7 @@ int checker::_execute_sync(host* hst) {
   // A NULL host check command means we should assume the host is UP.
   if (!hst->host_check_command) {
     delete[] hst->plugin_output;
-    hst->plugin_output = my_strdup("(Host assumed to be UP)");
+    hst->plugin_output = string::dup("(Host assumed to be UP)");
     res.exit_code = STATE_OK;
   }
 
@@ -1137,7 +1137,7 @@ int checker::_execute_sync(host* hst) {
   if (!hst->plugin_output || !strcmp(hst->plugin_output, "")) {
     delete[] hst->plugin_output;
     hst->plugin_output
-      = my_strdup("(No output returned from host check)");
+      = string::dup("(No output returned from host check)");
   }
 
   // Replace semicolons with colons in plugin output

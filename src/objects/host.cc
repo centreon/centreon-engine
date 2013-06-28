@@ -22,8 +22,6 @@
 #include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/object.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
 #include "com/centreon/engine/objects/contactgroupsmember.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
@@ -31,14 +29,16 @@
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::misc;
+using namespace com::centreon::engine::string;
 
 /**
  *  Equal operator.
@@ -512,34 +512,34 @@ host* add_host(
 
   try {
     // Duplicate string vars.
-    obj->name = my_strdup(name);
-    obj->address = my_strdup(address);
-    obj->alias = my_strdup(alias ? alias : name);
-    obj->display_name = my_strdup(display_name ? display_name : name);
+    obj->name = string::dup(name);
+    obj->address = string::dup(address);
+    obj->alias = string::dup(alias ? alias : name);
+    obj->display_name = string::dup(display_name ? display_name : name);
     if (action_url)
-      obj->action_url = my_strdup(action_url);
+      obj->action_url = string::dup(action_url);
     if (check_period)
-      obj->check_period = my_strdup(check_period);
+      obj->check_period = string::dup(check_period);
     if (event_handler)
-      obj->event_handler = my_strdup(event_handler);
+      obj->event_handler = string::dup(event_handler);
     if (failure_prediction_options)
-      obj->failure_prediction_options = my_strdup(failure_prediction_options);
+      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (check_command)
-      obj->host_check_command = my_strdup(check_command);
+      obj->host_check_command = string::dup(check_command);
     if (icon_image)
-      obj->icon_image = my_strdup(icon_image);
+      obj->icon_image = string::dup(icon_image);
     if (icon_image_alt)
-      obj->icon_image_alt = my_strdup(icon_image_alt);
+      obj->icon_image_alt = string::dup(icon_image_alt);
     if (notes)
-      obj->notes = my_strdup(notes);
+      obj->notes = string::dup(notes);
     if (notes_url)
-      obj->notes_url = my_strdup(notes_url);
+      obj->notes_url = string::dup(notes_url);
     if (notification_period)
-      obj->notification_period = my_strdup(notification_period);
+      obj->notification_period = string::dup(notification_period);
     if (statusmap_image)
-      obj->statusmap_image = my_strdup(statusmap_image);
+      obj->statusmap_image = string::dup(statusmap_image);
     if (vrml_image)
-      obj->vrml_image = my_strdup(vrml_image);
+      obj->vrml_image = string::dup(vrml_image);
 
     // Duplicate non-string vars.
     obj->accept_passive_host_checks = (accept_passive_checks > 0);

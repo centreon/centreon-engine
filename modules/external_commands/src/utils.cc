@@ -32,8 +32,10 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
+#include "com/centreon/engine/string.hh"
 #include "nagios.h"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 static int   command_file_fd = -1;
@@ -373,7 +375,7 @@ int submit_external_command(char const* cmd, int* buffer_items) {
   if (external_command_buffer.items < config->external_command_buffer_slots()) {
 
     /* save the line in the buffer */
-    ((char**)external_command_buffer.buffer)[external_command_buffer.head] = my_strdup(cmd);
+    ((char**)external_command_buffer.buffer)[external_command_buffer.head] = string::dup(cmd);
 
     /* increment the head counter and items */
     external_command_buffer.head = (external_command_buffer.head + 1)

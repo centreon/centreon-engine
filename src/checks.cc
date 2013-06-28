@@ -37,12 +37,12 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/misc/string.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 
 #define MAX_CMD_ARGS 4096
@@ -353,7 +353,7 @@ int handle_async_service_check_result(
       << "' did not exit properly!";
 
     temp_service->plugin_output
-      = my_strdup("(Service check did not exit properly)");
+      = string::dup("(Service check did not exit properly)");
     temp_service->current_state = STATE_CRITICAL;
   }
 
@@ -381,7 +381,7 @@ int handle_async_service_check_result(
 	       ? " - plugin may be missing" : ""))
 	<< ')';
 
-    engine::misc::setstr(temp_service->plugin_output, oss.str());
+    string::setstr(temp_service->plugin_output, oss.str());
     temp_service->current_state = STATE_CRITICAL;
   }
 
@@ -400,7 +400,7 @@ int handle_async_service_check_result(
     /* make sure the plugin output isn't null */
     if (temp_service->plugin_output == NULL)
       temp_service->plugin_output
-        = my_strdup("(No output returned from plugin)");
+        = string::dup("(No output returned from plugin)");
 
     /* replace semicolons in plugin output (but not performance data) with colons */
     else if ((temp_ptr = temp_service->plugin_output)) {
@@ -2557,7 +2557,7 @@ int handle_async_host_check_result_3x(
       || !strcmp(temp_host->plugin_output, "")) {
     delete[] temp_host->plugin_output;
     temp_host->plugin_output
-      = my_strdup("(No output returned from host check)");
+      = string::dup("(No output returned from host check)");
   }
 
   /* replace semicolons in plugin output (but not performance data) with colons */
@@ -2594,7 +2594,7 @@ int handle_async_host_check_result_3x(
       delete[] temp_host->perf_data;
 
       temp_host->plugin_output
-        = my_strdup("(Host check did not exit properly)");
+        = string::dup("(Host check did not exit properly)");
       temp_host->long_plugin_output = NULL;
       temp_host->perf_data = NULL;
 
@@ -2620,7 +2620,7 @@ int handle_async_host_check_result_3x(
 	       || queued_check_result->return_code == 127)
 	      ? " - plugin may be missing" : "") << ")";
 
-      engine::misc::setstr(temp_host->plugin_output, oss.str());
+      string::setstr(temp_host->plugin_output, oss.str());
       delete[] temp_host->long_plugin_output;
       temp_host->long_plugin_output = NULL;
       delete[] temp_host->perf_data;
@@ -2632,7 +2632,7 @@ int handle_async_host_check_result_3x(
     /* a NULL host check command means we should assume the host is UP */
     if (temp_host->host_check_command == NULL) {
       delete[] temp_host->plugin_output;
-      temp_host->plugin_output = my_strdup("(Host assumed to be UP)");
+      temp_host->plugin_output = string::dup("(Host assumed to be UP)");
       result = STATE_OK;
     }
   }

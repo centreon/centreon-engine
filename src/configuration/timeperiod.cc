@@ -22,7 +22,7 @@
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/configuration/timerange.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/hash.hh"
 
 using namespace com::centreon;
@@ -212,10 +212,10 @@ bool timeperiod::parse(std::string const& line) {
     return (false);
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
-  misc::trim(value);
+  string::trim(value);
 
   if (object::parse(key, value)
-      || parse(key, misc::trim(value))
+      || parse(key, string::trim(value))
       || _add_calendar_date(line)
       || _add_other_date(line))
     return (true);
@@ -279,7 +279,7 @@ bool timeperiod::_build_timeranges(
        std::string const& line,
        std::list<timerange>& timeranges) {
   list_string timeranges_str;
-  misc::split(line, timeranges_str, ',');
+  string::split(line, timeranges_str, ',');
   for (list_string::const_iterator
          it(timeranges_str.begin()),
          end(timeranges_str.end());
@@ -314,10 +314,10 @@ bool timeperiod::_build_time_t(
   if (pos == std::string::npos)
     return (false);
   unsigned long hours;
-  if (!misc::to(time_str.substr(0, pos), hours))
+  if (!string::to(time_str.substr(0, pos), hours))
     return (false);
   unsigned long minutes;
-  if (!misc::to(time_str.substr(pos + 1), minutes))
+  if (!string::to(time_str.substr(pos + 1), minutes))
     return (false);
   ret = hours * 3600 + minutes * 60;
   return (true);
