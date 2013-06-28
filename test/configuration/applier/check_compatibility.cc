@@ -221,7 +221,7 @@ static void sort_it(hostdependency_struct*& l) {
                            (*cur)->host_name,
                            (*min)->host_name));
       int type_less_than(
-            (*cur)->dependency_type < (*min)->dependency_type);
+            (*cur)->dependency_type - (*min)->dependency_type);
       if ((dependent_host_less_than < 0)
           || ((dependent_host_less_than == 0)
               && ((host_less_than < 0)
