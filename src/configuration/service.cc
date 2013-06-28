@@ -120,6 +120,7 @@ service::service()
   : object(object::service),
     _checks_active(default_checks_active),
     _checks_passive(default_checks_passive),
+    _check_command_is_important(false),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
     _event_handler_enabled(default_event_handler_enabled),
@@ -963,8 +964,10 @@ bool service::_set_check_command(std::string const& value) {
     _check_command_is_important = true;
     _check_command = value.substr(1);
   }
-  else
+  else {
+    _check_command_is_important = false;
     _check_command = value;
+  }
   return (true);
 }
 

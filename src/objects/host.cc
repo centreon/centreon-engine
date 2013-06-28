@@ -305,8 +305,15 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  current_notification_id:              " << obj.current_notification_id << "\n"
     "  check_flapping_recovery_notification: " << obj.check_flapping_recovery_notification << "\n"
     "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
-    "  state_history:                        " << obj.state_history << "\n"
+    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n";
+
+  os << "  state_history:                        ";
+  for (unsigned int i(0), end(sizeof(obj.state_history) / sizeof(obj.state_history[0]));
+       i < end;
+       ++i)
+    os << obj.state_history[i] << (i + 1 < end ? ", " : "\n");
+
+  os <<
     "  state_history_index:                  " << obj.state_history_index << "\n"
     "  last_state_history_update:            " << obj.last_state_history_update << "\n"
     "  is_flapping:                          " << obj.is_flapping << "\n"
