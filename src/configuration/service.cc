@@ -414,12 +414,12 @@ void service::check_validity() const {
  *
  *  @param[in] obj The object to merge.
  */
-void service::merge(configuration::serviceextinfo const& obj) {
-  _action_url = obj.action_url();
-  _icon_image = obj.icon_image();
-  _icon_image_alt = obj.icon_image_alt();
-  _notes = obj.notes();
-  _notes_url = obj.notes_url();
+void service::merge(configuration::serviceextinfo const& tmpl) {
+  MRG_DEFAULT(_action_url);
+  MRG_DEFAULT(_icon_image);
+  MRG_DEFAULT(_icon_image_alt);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
 }
 
 /**

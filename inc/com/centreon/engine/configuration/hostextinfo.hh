@@ -31,8 +31,10 @@
 CCE_BEGIN()
 
 namespace                  configuration {
+  class                    host;
   class                    hostextinfo
     : public object {
+    friend class host;
   public:
                            hostextinfo();
                            hostextinfo(hostextinfo const& right);

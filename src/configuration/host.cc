@@ -416,16 +416,16 @@ void host::check_validity() const {
  *
  *  @param[in] obj The object to merge.
  */
-void host::merge(configuration::hostextinfo const& obj) {
-  _action_url = obj.action_url();
-  _coords_2d = obj.coords_2d();
-  _coords_3d = obj.coords_3d();
-  _icon_image = obj.icon_image();
-  _icon_image_alt = obj.icon_image_alt();
-  _notes = obj.notes();
-  _notes_url = obj.notes_url();
-  _statusmap_image = obj.statusmap_image();
-  _vrml_image = obj.vrml_image();
+void host::merge(configuration::hostextinfo const& tmpl) {
+  MRG_DEFAULT(_action_url);
+  MRG_OPTION(_coords_2d);
+  MRG_OPTION(_coords_3d);
+  MRG_DEFAULT(_icon_image);
+  MRG_DEFAULT(_icon_image_alt);
+  MRG_DEFAULT(_notes);
+  MRG_DEFAULT(_notes_url);
+  MRG_DEFAULT(_statusmap_image);
+  MRG_DEFAULT(_vrml_image);
 }
 
 /**

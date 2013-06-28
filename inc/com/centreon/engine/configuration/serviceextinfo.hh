@@ -31,6 +31,7 @@ CCE_BEGIN()
 namespace                  configuration {
   class                    serviceextinfo
     : public object {
+    friend class service;
   public:
                            serviceextinfo();
                            serviceextinfo(serviceextinfo const& right);
