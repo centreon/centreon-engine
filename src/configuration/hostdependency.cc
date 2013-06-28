@@ -250,7 +250,7 @@ std::string const& hostdependency::dependency_period() const throw () {
  *  @return Dependent host groups.
  */
 list_string& hostdependency::dependent_hostgroups() throw () {
-  return (_dependent_hostgroups->get());
+  return (*_dependent_hostgroups);
 }
 
 /**
@@ -268,7 +268,7 @@ list_string const& hostdependency::dependent_hostgroups() const throw () {
  *  @return The dependent hosts.
  */
 list_string& hostdependency::dependent_hosts() throw () {
-  return (_dependent_hosts->get());
+  return (*_dependent_hosts);
 }
 
 /**
@@ -306,7 +306,7 @@ unsigned int hostdependency::execution_failure_options() const throw () {
  *  @return The host groups.
  */
 list_string& hostdependency::hostgroups() throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -324,7 +324,7 @@ list_string const& hostdependency::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string& hostdependency::hosts() throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
