@@ -33,6 +33,11 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::misc;
 
+#define CMP_CSTR(str1, str2) \
+  if ((!!(str1) ^ !!(str2)) \
+      || ((str1) && (str2) && strcmp((str1), (str2)))) \
+    return (strcmp((str1), (str2)) < 0);
+
 /**
  *  Equal operator.
  *
@@ -69,6 +74,39 @@ bool operator!=(
        hostdependency const& obj1,
        hostdependency const& obj2) throw () {
   return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Less-than operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if the first object is strictly less than the second.
+ */
+bool operator<(
+       hostdependency const& obj1,
+       hostdependency const& obj2) throw () {
+  CMP_CSTR(obj1.dependent_host_name, obj2.dependent_host_name)
+  else
+    CMP_CSTR(obj1.host_name, obj2.host_name)
+  else if (obj1.dependency_type != obj2.dependency_type)
+    return (obj1.dependency_type < obj2.dependency_type);
+  else
+    CMP_CSTR(obj1.dependency_period, obj2.dependency_period)
+  else if (obj1.inherits_parent != obj2.inherits_parent)
+    return (obj1.inherits_parent < obj2.inherits_parent);
+  else if (obj1.fail_on_up != obj2.fail_on_up)
+    return (obj1.fail_on_up < obj2.fail_on_up);
+  else if (obj1.fail_on_down != obj2.fail_on_down)
+    return (obj1.fail_on_down < obj2.fail_on_down);
+  else if (obj1.fail_on_unreachable != obj2.fail_on_unreachable)
+    return (obj1.fail_on_unreachable < obj2.fail_on_unreachable);
+  else if (obj1.fail_on_pending != obj2.fail_on_pending)
+    return (obj1.fail_on_pending < obj2.fail_on_pending);
+  else if (obj1.circular_path_checked != obj2.circular_path_checked)
+    return (obj1.circular_path_checked < obj2.circular_path_checked);
+  return (obj1.contains_circular_path < obj2.contains_circular_path);
 }
 
 /**

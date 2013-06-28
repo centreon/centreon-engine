@@ -39,6 +39,11 @@ namespace                  configuration {
       unreachable = (1 << 2),
       pending = (1 << 3)
     };
+    enum                   dependency_kind {
+      unknown = 0,
+      execution_dependency,
+      notification_dependency
+    };
 
                            hostdependency();
                            hostdependency(hostdependency const& right);
@@ -57,6 +62,9 @@ namespace                  configuration {
                              std::string const& value);
 
     std::string const&     dependency_period() const throw ();
+    void                   dependency_type(
+                             dependency_kind type) throw ();
+    dependency_kind        dependency_type() const throw ();
     list_string&           dependent_hostgroups() throw ();
     list_string const&     dependent_hostgroups() const throw ();
     list_string&           dependent_hosts() throw ();
@@ -84,6 +92,7 @@ namespace                  configuration {
     bool                   _set_notification_failure_options(std::string const& value);
 
     std::string            _dependency_period;
+    dependency_kind        _dependency_type;
     opt<group>             _dependent_hostgroups;
     opt<group>             _dependent_hosts;
     opt<unsigned int>      _execution_failure_options;

@@ -75,6 +75,13 @@ void applier::hostdependency::add_object(
       || !obj.dependent_hostgroups().empty())
     throw (engine_error() << "Error: Could not create host dependency "
            "with multiple (dependent) host / host groups.");
+  if ((obj.dependency_type()
+       != configuration::hostdependency::execution_dependency)
+      && (obj.dependency_type()
+          != configuration::hostdependency::notification_dependency))
+    throw (engine_error() << "Error: Could not create unexpanded "
+           << "dependency of '" << obj.dependent_hosts().front()
+           << "' on '" << obj.hosts().front() << "'.");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -83,51 +90,54 @@ void applier::hostdependency::add_object(
     << obj.hosts().front() << "'.";
 
   // Create execution dependency.
-  if (!add_host_dependency(
-         obj.dependent_hosts().front().c_str(),
-         obj.hosts().front().c_str(),
-         EXECUTION_DEPENDENCY,
-         obj.inherits_parent(),
-         static_cast<bool>(
-           obj.execution_failure_options()
-           & configuration::hostdependency::up),
-         static_cast<bool>(
-           obj.execution_failure_options()
-           & configuration::hostdependency::down),
-         static_cast<bool>(
-           obj.execution_failure_options()
-           & configuration::hostdependency::unreachable),
-         static_cast<bool>(
-           obj.execution_failure_options()
-           & configuration::hostdependency::pending),
-         NULL_IF_EMPTY(obj.dependency_period())))
-    throw (engine_error() << "Error: Could not create host execution "
-           << "dependency of '" << obj.dependent_hosts().front()
-           << "' on '" << obj.hosts().front() << "'.");
-
-  // Create notification dependency.
-  if (!add_host_dependency(
-         obj.dependent_hosts().front().c_str(),
-         obj.hosts().front().c_str(),
-         NOTIFICATION_DEPENDENCY,
-         obj.inherits_parent(),
-         static_cast<bool>(
-           obj.notification_failure_options()
-           & configuration::hostdependency::up),
-         static_cast<bool>(
-           obj.notification_failure_options()
-           & configuration::hostdependency::down),
-         static_cast<bool>(
-           obj.notification_failure_options()
-           & configuration::hostdependency::unreachable),
-         static_cast<bool>(
-           obj.notification_failure_options()
-           & configuration::hostdependency::pending),
-         NULL_IF_EMPTY(obj.dependency_period())))
-    throw (engine_error() << "Error: Could not create host "
-           << "notification dependency of '"
-           << obj.dependent_hosts().front() << "' on '"
-           << obj.hosts().front() << "'.");
+  if (obj.dependency_type()
+      == configuration::hostdependency::execution_dependency) {
+    if (!add_host_dependency(
+           obj.dependent_hosts().front().c_str(),
+           obj.hosts().front().c_str(),
+           EXECUTION_DEPENDENCY,
+           obj.inherits_parent(),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::hostdependency::up),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::hostdependency::down),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::hostdependency::unreachable),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::hostdependency::pending),
+           NULL_IF_EMPTY(obj.dependency_period())))
+      throw (engine_error() << "Error: Could not create host execution "
+             << "dependency of '" << obj.dependent_hosts().front()
+             << "' on '" << obj.hosts().front() << "'.");
+  }
+  else
+    // Create notification dependency.
+    if (!add_host_dependency(
+           obj.dependent_hosts().front().c_str(),
+           obj.hosts().front().c_str(),
+           NOTIFICATION_DEPENDENCY,
+           obj.inherits_parent(),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::hostdependency::up),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::hostdependency::down),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::hostdependency::unreachable),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::hostdependency::pending),
+           NULL_IF_EMPTY(obj.dependency_period())))
+      throw (engine_error() << "Error: Could not create host "
+             << "notification dependency of '"
+             << obj.dependent_hosts().front() << "' on '"
+             << obj.hosts().front() << "'.");
 
   return ;
 }
@@ -145,7 +155,9 @@ void applier::hostdependency::expand_object(
   if ((obj->hosts().size() != 1)
       || !obj->hostgroups().empty()
       || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()) {
+      || !obj->dependent_hostgroups().empty()
+      || (obj->dependency_type()
+          == configuration::hostdependency::unknown)) {
     // Expanded depended hosts.
     std::set<std::string> depended_hosts;
     _expand_hosts(
@@ -176,19 +188,25 @@ void applier::hostdependency::expand_object(
              end2(dependent_hosts.end());
            it2 != end2;
            ++it2) {
-        // Create host execution dependency instance.
-        shared_ptr<configuration::hostdependency>
-          hdep(new configuration::hostdependency(*obj));
-        hdep->hostgroups().clear();
-        hdep->hosts().clear();
-        hdep->hosts().push_back(*it1);
-        hdep->dependent_hostgroups().clear();
-        hdep->dependent_hosts().clear();
-        hdep->dependent_hosts().push_back(*it2);
+        for (unsigned int i(0); i < 2; ++i) {
+          // Create host execution dependency instance.
+          shared_ptr<configuration::hostdependency>
+            hdep(new configuration::hostdependency(*obj));
+          hdep->hostgroups().clear();
+          hdep->hosts().clear();
+          hdep->hosts().push_back(*it1);
+          hdep->dependent_hostgroups().clear();
+          hdep->dependent_hosts().clear();
+          hdep->dependent_hosts().push_back(*it2);
+          hdep->dependency_type(
+           !i
+           ? configuration::hostdependency::execution_dependency
+           : configuration::hostdependency::notification_dependency);
 
-        // Insert new host dependency. We do not need to expand it
-        // because no expansion is made on 1->1 dependency.
-        s.hostdependencies().insert(hdep);
+          // Insert new host dependency. We do not need to expand it
+          // because no expansion is made on 1->1 dependency.
+          s.hostdependencies().insert(hdep);
+        }
       }
   }
 

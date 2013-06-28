@@ -61,6 +61,7 @@ static unsigned short const default_notification_failure_options(hostdependency:
  */
 hostdependency::hostdependency()
   : object(object::hostdependency),
+    _dependency_type(unknown),
     _execution_failure_options(default_execution_failure_options),
     _inherits_parent(default_inherits_parent),
     _notification_failure_options(default_notification_failure_options) {}
@@ -91,6 +92,7 @@ hostdependency& hostdependency::operator=(hostdependency const& right) {
   if (this != &right) {
     object::operator=(right);
     _dependency_period = right._dependency_period;
+    _dependency_type = right._dependency_type;
     _dependent_hostgroups = right._dependent_hostgroups;
     _dependent_hosts = right._dependent_hosts;
     _execution_failure_options = right._execution_failure_options;
@@ -112,6 +114,7 @@ hostdependency& hostdependency::operator=(hostdependency const& right) {
 bool hostdependency::operator==(hostdependency const& right) const throw () {
   return (object::operator==(right)
           && _dependency_period == right._dependency_period
+          && _dependency_type == right._dependency_type
           && _dependent_hostgroups == right._dependent_hostgroups
           && _dependent_hosts == right._dependent_hosts
           && _execution_failure_options == right._execution_failure_options
@@ -148,6 +151,8 @@ bool hostdependency::operator<(hostdependency const& right) const {
     return (_hostgroups < right._hostgroups);
   else if (_dependent_hostgroups != right._dependent_hostgroups)
     return (_dependent_hostgroups < right._dependent_hostgroups);
+  else if (_dependency_type != right._dependency_type)
+    return (_dependency_type < right._dependency_type);
   else if (_dependency_period != right._dependency_period)
     return (_dependency_period < right._dependency_period);
   else if (_execution_failure_options
@@ -242,6 +247,26 @@ bool hostdependency::parse(
  */
 std::string const& hostdependency::dependency_period() const throw () {
   return (_dependency_period);
+}
+
+/**
+ *  Set the dependency type.
+ *
+ *  @param[in] type Dependency type.
+ */
+void hostdependency::dependency_type(
+                       hostdependency::dependency_kind type) throw () {
+  _dependency_type = type;
+  return ;
+}
+
+/**
+ *  Get the dependency type.
+ *
+ *  @return Dependency type.
+ */
+hostdependency::dependency_kind hostdependency::dependency_type() const throw () {
+  return (_dependency_type);
 }
 
 /**

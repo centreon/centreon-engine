@@ -26,6 +26,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
@@ -222,11 +223,12 @@ static void sort_it(hostdependency_struct*& l) {
                            (*min)->host_name));
       int type_less_than(
             (*cur)->dependency_type - (*min)->dependency_type);
-      if ((dependent_host_less_than < 0)
+      /*if ((dependent_host_less_than < 0)
           || ((dependent_host_less_than == 0)
               && ((host_less_than < 0)
                   || ((host_less_than == 0)
-                      && (type_less_than < 0)))))
+                  && (type_less_than < 0)))))*/
+      if (**cur < **min)
         min = cur;
     }
     *new_root = *min;
