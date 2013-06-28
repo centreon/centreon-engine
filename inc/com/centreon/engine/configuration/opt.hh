@@ -43,7 +43,7 @@ namespace    configuration {
       return (*this);
     }
     bool     operator==(opt const& right) const throw () {
-      return (_data == right._data && _is_set == right._is_set);
+      return (_data == right._data);
     }
     bool     operator!=(opt const& right) const throw () {
       return (!operator==(right));
