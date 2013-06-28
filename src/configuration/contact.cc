@@ -257,7 +257,6 @@ void contact::check_validity() const {
  *
  *  @param[in] obj The object to merge.
  */
-#include <iostream>
 void contact::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
@@ -281,11 +280,6 @@ void contact::merge(object const& obj) {
   MRG_OPTION(_service_notification_options);
   MRG_DEFAULT(_service_notification_period);
   MRG_OPTION(_service_notifications_enabled);
-
-  std::cout << "contact (" << _contact_name << ") tmpl (" << tmpl._name << ") contactgroups=";
-  for (list_string::const_iterator it(_contactgroups->get().begin()), end(_contactgroups->get().end()); it != end; ++it)
-    std::cout << *it << ", ";
-  std::cout << std::endl;
 }
 
 /**
@@ -348,7 +342,7 @@ bool contact::can_submit_commands() const throw () {
  *  @return The contactgroups.
  */
 list_string const& contact::contactgroups() const throw () {
-  return (_contactgroups->get());
+  return (*_contactgroups);
 }
 
 /**
@@ -393,7 +387,7 @@ bool contact::host_notifications_enabled() const throw () {
  *  @return The host_notification_commands.
  */
 list_string const& contact::host_notification_commands() const throw () {
-  return (_host_notification_commands->get());
+  return (*_host_notification_commands);
 }
 
 /**
@@ -447,7 +441,7 @@ std::string const& contact::pager() const throw () {
  *  @return The service_notification_commands.
  */
 list_string const& contact::service_notification_commands() const throw () {
-  return (_service_notification_commands->get());
+  return (*_service_notification_commands);
 }
 
 /**
@@ -527,7 +521,7 @@ bool contact::_set_can_submit_commands(bool value) {
  *  @return True on success, otherwise false.
  */
 bool contact::_set_contactgroups(std::string const& value) {
-  _contactgroups.set(value);
+  _contactgroups = value;
   return (true);
 }
 
@@ -576,7 +570,7 @@ bool contact::_set_host_notifications_enabled(bool value) {
  *  @return True on success, otherwise false.
  */
 bool contact::_set_host_notification_commands(std::string const& value) {
-  _host_notification_commands.set(value);
+  _host_notification_commands = value;
   return (true);
 }
 
@@ -677,7 +671,7 @@ bool contact::_set_pager(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool contact::_set_service_notification_commands(std::string const& value) {
-  _service_notification_commands.set(value);
+  _service_notification_commands = value;
   return (true);
 }
 

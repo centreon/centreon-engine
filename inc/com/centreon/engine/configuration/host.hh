@@ -165,8 +165,8 @@ namespace                  configuration {
     opt<bool>              _check_freshness;
     opt<unsigned int>      _check_interval;
     std::string            _check_period;
-    opt<group>             _contactgroups;
-    opt<group>             _contacts;
+    group                  _contactgroups;
+    group                  _contacts;
     opt<point_2d>          _coords_2d;
     opt<point_3d>          _coords_3d;
     properties             _customvariables;
@@ -178,7 +178,7 @@ namespace                  configuration {
     opt<unsigned int>      _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
     opt<unsigned int>      _high_flap_threshold;
-    opt<group>             _hostgroups;
+    group                  _hostgroups;
     std::string            _host_name;
     std::string            _icon_image;
     std::string            _icon_image_alt;
@@ -192,7 +192,7 @@ namespace                  configuration {
     opt<unsigned int>      _notification_options;
     std::string            _notification_period;
     opt<bool>              _obsess_over_host;
-    opt<group>             _parents;
+    group                  _parents;
     opt<bool>              _process_perf_data;
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;

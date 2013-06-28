@@ -142,11 +142,11 @@ bool hostescalation::operator!=(hostescalation const& right) const throw () {
  */
 std::size_t hostescalation::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
+    hash_combine(_id, _hosts->begin(), _hosts->end());
     hash_combine(
       _id,
-      _hostgroups->get().begin(),
-      _hostgroups->get().end());
+      _hostgroups->begin(),
+      _hostgroups->end());
   }
   return (_id);
 }
@@ -214,7 +214,7 @@ bool hostescalation::parse(
  *  @return The contactgroups.
  */
 list_string const& hostescalation::contactgroups() const throw () {
-  return (_contactgroups->get());
+  return (*_contactgroups);
 }
 
 /**
@@ -223,7 +223,7 @@ list_string const& hostescalation::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& hostescalation::contacts() const throw () {
-  return (_contacts->get());
+  return (*_contacts);
 }
 
 /**
@@ -259,7 +259,7 @@ unsigned int hostescalation::first_notification() const throw () {
  *  @return The hostgroups.
  */
 list_string const& hostescalation::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -268,7 +268,7 @@ list_string const& hostescalation::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& hostescalation::hosts() const throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -297,7 +297,7 @@ unsigned int hostescalation::notification_interval() const throw () {
  *  @return True on success, otherwise false.
  */
 bool hostescalation::_set_contactgroups(std::string const& value) {
-  _contactgroups.set(value);
+  _contactgroups = value;
   return (true);
 }
 
@@ -309,7 +309,7 @@ bool hostescalation::_set_contactgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostescalation::_set_contacts(std::string const& value) {
-  _contacts.set(value);
+  _contacts = value;
   return (true);
 }
 
@@ -378,7 +378,7 @@ bool hostescalation::_set_first_notification(unsigned int value) {
  *  @return True on success, otherwise false.
  */
 bool hostescalation::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   _id = 0;
   return (true);
 }
@@ -391,7 +391,7 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostescalation::_set_hosts(std::string const& value) {
-  _hosts.set(value);
+  _hosts = value;
   _id = 0;
   return (true);
 }

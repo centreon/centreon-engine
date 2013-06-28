@@ -69,12 +69,6 @@ namespace    configuration {
       _is_set = right._is_set;
     }
 
-    template<typename U>
-    void set(U const& right) {
-      _data = right;
-      _is_set = true;
-    }
-
   private:
     T        _data;
     bool     _is_set;

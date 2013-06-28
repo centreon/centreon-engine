@@ -246,7 +246,7 @@ std::vector<std::list<daterange> > const& timeperiod::exceptions() const throw (
  *  @return The exclude value.
  */
 list_string const& timeperiod::exclude() const throw () {
-  return (_exclude->get());
+  return (*_exclude);
 }
 
 /**
@@ -777,7 +777,7 @@ bool timeperiod::_set_alias(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool timeperiod::_set_exclude(std::string const& value) {
-  _exclude.set(value);
+  _exclude = value;
   return (true);
 }
 

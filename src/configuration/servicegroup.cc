@@ -219,7 +219,7 @@ std::string const& servicegroup::alias() const throw () {
  *  @return The members.
  */
 list_string& servicegroup::members() throw () {
-  return (_members->get());
+  return (*_members);
 }
 
 /**
@@ -228,7 +228,7 @@ list_string& servicegroup::members() throw () {
  *  @return The members.
  */
 list_string const& servicegroup::members() const throw () {
-  return (_members->get());
+  return (*_members);
 }
 
 /**
@@ -255,7 +255,7 @@ std::string const& servicegroup::notes_url() const throw () {
  *  @return The servicegroup_members.
  */
 list_string const& servicegroup::servicegroup_members() const throw () {
-  return (_servicegroup_members->get());
+  return (*_servicegroup_members);
 }
 
 /**
@@ -328,7 +328,7 @@ bool servicegroup::_set_alias(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool servicegroup::_set_members(std::string const& value) {
-  _members.set(value);
+  _members = value;
   return (true);
 }
 
@@ -364,7 +364,7 @@ bool servicegroup::_set_notes_url(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool servicegroup::_set_servicegroup_members(std::string const& value) {
-  _servicegroup_members.set(value);
+  _servicegroup_members = value;
   return (true);
 }
 

@@ -169,8 +169,8 @@ namespace                  configuration {
     opt<bool>              _check_freshness;
     opt<unsigned int>      _check_interval;
     std::string            _check_period;
-    opt<group>             _contactgroups;
-    opt<group>             _contacts;
+    group                  _contactgroups;
+    group                  _contacts;
     properties             _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
@@ -180,8 +180,8 @@ namespace                  configuration {
     opt<unsigned short>    _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
     opt<unsigned int>      _high_flap_threshold;
-    opt<group>             _hostgroups;
-    opt<group>             _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     std::string            _icon_image;
     std::string            _icon_image_alt;
     opt<unsigned int>      _initial_state;
@@ -199,7 +199,7 @@ namespace                  configuration {
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
-    opt<group>             _servicegroups;
+    group                  _servicegroups;
     std::string            _service_description;
     opt<unsigned short>    _stalking_options;
  };

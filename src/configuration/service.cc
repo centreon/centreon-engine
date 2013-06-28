@@ -385,7 +385,7 @@ bool service::operator<(service const& right) const throw () {
  */
 std::size_t service::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
+    hash_combine(_id, _hosts->begin(), _hosts->end());
     hash_combine(_id, _service_description);
   }
   return (_id);
@@ -574,7 +574,7 @@ std::string const& service::check_period() const throw () {
  *  @return The contactgroups.
  */
 list_string& service::contactgroups() throw () {
-  return (_contactgroups->get());
+  return (*_contactgroups);
 }
 
 /**
@@ -583,7 +583,7 @@ list_string& service::contactgroups() throw () {
  *  @return The contactgroups.
  */
 list_string const& service::contactgroups() const throw () {
-  return (_contactgroups->get());
+  return (*_contactgroups);
 }
 
 /**
@@ -601,7 +601,7 @@ bool service::contactgroups_defined() const throw () {
  *  @return The contacts.
  */
 list_string const& service::contacts() const throw () {
-  return (_contacts->get());
+  return (*_contacts);
 }
 
 /**
@@ -691,7 +691,7 @@ unsigned int service::high_flap_threshold() const throw () {
  *  @return The hostgroups.
  */
 list_string& service::hostgroups() throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -700,7 +700,7 @@ list_string& service::hostgroups() throw () {
  *  @return The hostgroups.
  */
 list_string const& service::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -709,7 +709,7 @@ list_string const& service::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string& service::hosts() throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -718,7 +718,7 @@ list_string& service::hosts() throw () {
  *  @return The hosts.
  */
 list_string const& service::hosts() const throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -918,7 +918,7 @@ unsigned int service::retry_interval() const throw () {
  *  @return The servicegroups.
  */
 list_string const& service::servicegroups() const throw () {
-  return (_servicegroups->get());
+  return (*_servicegroups);
 }
 
 /**
@@ -1036,7 +1036,7 @@ bool service::_set_check_period(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool service::_set_contactgroups(std::string const& value) {
-  _contactgroups.set(value);
+  _contactgroups = value;
   return (true);
 }
 
@@ -1048,7 +1048,7 @@ bool service::_set_contactgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool service::_set_contacts(std::string const& value) {
-  _contacts.set(value);
+  _contacts = value;
   return (true);
 }
 
@@ -1207,7 +1207,7 @@ bool service::_set_high_flap_threshold(unsigned int value) {
  *  @return True on success, otherwise false.
  */
 bool service::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   return (true);
 }
 
@@ -1219,7 +1219,7 @@ bool service::_set_hostgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool service::_set_hosts(std::string const& value) {
-  _hosts.set(value);
+  _hosts = value;
   _id = 0;
   return (true);
 }
@@ -1492,7 +1492,7 @@ bool service::_set_retry_interval(unsigned int value) {
  *  @return True on success, otherwise false.
  */
 bool service::_set_servicegroups(std::string const& value) {
-  _servicegroups.set(value);
+  _servicegroups = value;
   return (true);
 }
 

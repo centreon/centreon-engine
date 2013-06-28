@@ -76,12 +76,12 @@ namespace                   configuration {
 
     std::string             _action_url;
     std::string             _alias;
-    opt<group>              _members;
+    group                   _members;
     std::string             _notes;
     std::string             _notes_url;
     mutable bool            _resolved;
     mutable set_pair_string _resolved_members;
-    opt<group>              _servicegroup_members;
+    group                   _servicegroup_members;
     std::string             _servicegroup_name;
   };
 

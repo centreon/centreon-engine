@@ -594,7 +594,7 @@ std::string const& host::check_period() const throw () {
  *  @return The contactgroups.
  */
 list_string const& host::contactgroups() const throw () {
-  return (_contactgroups->get());
+  return (*_contactgroups);
 }
 
 /**
@@ -603,7 +603,7 @@ list_string const& host::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& host::contacts() const throw () {
-  return (_contacts->get());
+  return (*_contacts);
 }
 
 /**
@@ -729,7 +729,7 @@ unsigned int host::high_flap_threshold() const throw () {
  *  @return The hostgroups.
  */
 list_string const& host::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -855,7 +855,7 @@ bool host::obsess_over_host() const throw () {
  *  @return The parents.
  */
 list_string const& host::parents() const throw () {
-  return (_parents->get());
+  return (*_parents);
 }
 
 /**
@@ -1037,7 +1037,7 @@ bool host::_set_check_period(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool host::_set_contactgroups(std::string const& value) {
-  _contactgroups.set(value);
+  _contactgroups = value;
   return (true);
 }
 
@@ -1049,7 +1049,7 @@ bool host::_set_contactgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool host::_set_contacts(std::string const& value) {
-  _contacts.set(value);
+  _contacts = value;
   return (true);
 }
 
@@ -1279,7 +1279,7 @@ bool host::_set_host_name(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool host::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   return (true);
 }
 
@@ -1302,8 +1302,7 @@ bool host::_set_icon_image(std::string const& value) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::_set_icon_image_alt(
-       std::string const& value) {
+bool host::_set_icon_image_alt(std::string const& value) {
   _icon_image_alt = value;
   return (true);
 }
@@ -1475,7 +1474,7 @@ bool host::_set_obsess_over_host(bool value) {
  *  @return True on success, otherwise false.
  */
 bool host::_set_parents(std::string const& value) {
-  _parents.set(value);
+  _parents = value;
   return (true);
 }
 

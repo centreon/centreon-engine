@@ -151,19 +151,19 @@ bool serviceescalation::operator!=(serviceescalation const& right) const throw (
  */
 std::size_t serviceescalation::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
+    hash_combine(_id, _hosts->begin(), _hosts->end());
     hash_combine(
       _id,
-      _hostgroups->get().begin(),
-      _hostgroups->get().end());
+      _hostgroups->begin(),
+      _hostgroups->end());
     hash_combine(
       _id,
-      _service_description->get().begin(),
-      _service_description->get().end());
+      _service_description->begin(),
+      _service_description->end());
     hash_combine(
       _id,
-      _servicegroups->get().begin(),
-      _servicegroups->get().end());
+      _servicegroups->begin(),
+      _servicegroups->end());
   }
   return (_id);
 }
@@ -236,7 +236,7 @@ bool serviceescalation::parse(
  *  @return The contactgroups.
  */
 list_string const& serviceescalation::contactgroups() const throw () {
-  return (_contactgroups->get());
+  return (*_contactgroups);
 }
 
 /**
@@ -245,7 +245,7 @@ list_string const& serviceescalation::contactgroups() const throw () {
  *  @return The contacts.
  */
 list_string const& serviceescalation::contacts() const throw () {
-  return (_contacts->get());
+  return (*_contacts);
 }
 
 /**
@@ -281,7 +281,7 @@ unsigned int serviceescalation::first_notification() const throw () {
  *  @return The hostgroups.
  */
 list_string const& serviceescalation::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -290,7 +290,7 @@ list_string const& serviceescalation::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& serviceescalation::hosts() const throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -317,7 +317,7 @@ unsigned int serviceescalation::notification_interval() const throw () {
  *  @return The servicegroups.
  */
 list_string const& serviceescalation::servicegroups() const throw () {
-  return (_servicegroups->get());
+  return (*_servicegroups);
 }
 
 /**
@@ -326,7 +326,7 @@ list_string const& serviceescalation::servicegroups() const throw () {
  *  @return The service_description.
  */
 list_string const& serviceescalation::service_description() const throw () {
-  return (_service_description->get());
+  return (*_service_description);
 }
 
 
@@ -338,7 +338,7 @@ list_string const& serviceescalation::service_description() const throw () {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::_set_contactgroups(std::string const& value) {
-  _contactgroups.set(value);
+  _contactgroups = value;
   return (true);
 }
 
@@ -350,7 +350,7 @@ bool serviceescalation::_set_contactgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::_set_contacts(std::string const& value) {
-  _contacts.set(value);
+  _contacts = value;
   return (true);
 }
 
@@ -421,7 +421,7 @@ bool serviceescalation::_set_first_notification(unsigned int value) {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   _id = 0;
   return (true);
 }
@@ -434,7 +434,7 @@ bool serviceescalation::_set_hostgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::_set_hosts(std::string const& value) {
-  _hosts.set(value);
+  _hosts = value;
   _id = 0;
   return (true);
 }
@@ -471,7 +471,7 @@ bool serviceescalation::_set_notification_interval(unsigned int value) {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::_set_servicegroups(std::string const& value) {
-  _servicegroups.set(value);
+  _servicegroups = value;
   _id = 0;
   return (true);
 }
@@ -484,7 +484,7 @@ bool serviceescalation::_set_servicegroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool serviceescalation::_set_service_description(std::string const& value) {
-  _service_description.set(value);
+  _service_description = value;
   _id = 0;
   return (true);
 }

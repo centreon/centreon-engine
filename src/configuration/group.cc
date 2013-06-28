@@ -27,8 +27,9 @@ using namespace  com::centreon::engine::configuration;
  *
  *  @param[in] is_add_inherit True if add on merge list.
  */
-group::group(bool is_add_inherit)
-  : _is_add_inherit(is_add_inherit) {
+group::group(bool is_inherit)
+  : _is_inherit(is_inherit),
+    _is_set(false) {
 
 }
 
@@ -57,9 +58,9 @@ group::~group() throw () {
  */
 group& group::operator=(group const& right) {
   if (this != &right) {
-    // _group = right._group;
-    // _is_add_inherit = right._is_add_inherit;
-    set(right);
+    _data = right._data;
+    _is_inherit = right._is_inherit;
+    _is_set = right._is_set;
   }
   return (*this);
 }
@@ -72,7 +73,26 @@ group& group::operator=(group const& right) {
  *  @return This object.
  */
 group& group::operator=(std::string const& right) {
-  set(right);
+  _data.clear();
+  if (!right.empty()) {
+    if (right[0] == '+') {
+      _is_inherit = true;
+      misc::split(right.substr(1), _data, ',');
+    }
+    else {
+      _is_inherit = false;
+      misc::split(right, _data, ',');
+    }
+  }
+  _is_set = true;
+  return (*this);
+}
+
+group& group::operator+=(group const& right) {
+  if (this != &right) {
+    _data.insert(_data.end(), right._data.begin(), right._data.end());
+    _is_set = true;
+  }
   return (*this);
 }
 
@@ -84,8 +104,9 @@ group& group::operator=(std::string const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool group::operator==(group const& right) const throw () {
-  return (_group == right._group
-          && _is_add_inherit == right._is_add_inherit);
+  return (_is_inherit == right._is_inherit
+          && _is_set == right._is_set
+          && _data == right._data);
 }
 
 /**
@@ -107,90 +128,18 @@ bool group::operator!=(group const& right) const throw () {
  *  @return True if this object is less than right.
  */
 bool group::operator<(group const& right) const throw () {
-  if (_is_add_inherit != right._is_add_inherit)
-    return (_is_add_inherit != right._is_add_inherit);
-  return (_group < right._group);
+  if (_is_inherit != right._is_inherit)
+    return (_is_inherit != right._is_inherit);
+  if (_is_set != right._is_set)
+    return (_is_set != right._is_set);
+  return (_data < right._data);
 }
 
 /**
  *  Clear group.
  */
-void group::clear() {
-  _group.clear();
-}
-
-/**
- *  Get if the group is empty.
- *
- *  @return True is the group is empty, otherwise false.
- */
-bool group::empty() const throw () {
-  return (_group.empty());
-}
-
-/**
- *  Get the group list.
- *
- *  @return The group list.
- */
-std::list<std::string> const& group::get() const throw () {
-  return (_group);
-}
-
-/**
- *  Get the group list.
- *
- *  @return The group list.
- */
-std::list<std::string>& group::get() throw () {
-  return (_group);
-}
-
-/**
- *  Get if the group add on inherit.
- *
- *  @return True if add inherit is true.
- */
-bool group::is_add_inherit() const throw () {
-  return (_is_add_inherit);
-}
-
-/**
- *  Set the add inherit property.
- *
- *  @param[in] enable True to enable add inherit.
- */
-void group::is_add_inherit(bool enable) throw () {
-  _is_add_inherit = enable;
-}
-
-/**
- *  Add or set group contents with inherit rules.
- *
- *  @param[in] grp The group to get data.
- */
-void group::set(group const& grp) {
-  if (_is_add_inherit)
-    _group.insert(_group.end(), grp._group.begin(), grp._group.end());
-  else
-    _group = grp._group;
-}
-
-/**
- *  Set group contents with string argument.
- *
- *  @param[in] value The string arguments.
- */
-void group::set(std::string const& value) {
-  _group.clear();
-  if (!value.empty()) {
-    if (value[0] == '+') {
-      _is_add_inherit = true;
-      misc::split(value.substr(1), _group, ',');
-    }
-    else {
-      _is_add_inherit = false;
-      misc::split(value, _group, ',');
-    }
-  }
+void group::reset() {
+  _data.clear();
+  _is_inherit = false;
+  _is_set = false;
 }

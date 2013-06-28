@@ -69,8 +69,8 @@ namespace                  configuration {
     std::string            _action_url;
     std::string            _icon_image;
     std::string            _icon_image_alt;
-    opt<group>             _hostgroups;
-    opt<group>             _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;

@@ -145,12 +145,12 @@ std::size_t hostdependency::id() const throw () {
   if (!_id) {
     hash_combine(
       _id,
-      _dependent_hostgroups->get().begin(),
-      _dependent_hostgroups->get().end());
+      _dependent_hostgroups->begin(),
+      _dependent_hostgroups->end());
     hash_combine(
       _id,
-      _dependent_hosts->get().begin(),
-      _dependent_hosts->get().end());
+      _dependent_hosts->begin(),
+      _dependent_hosts->end());
   }
   return (_id);
 }
@@ -226,7 +226,7 @@ std::string const& hostdependency::dependency_period() const throw () {
  *  @return The dependent_hostgroups.
  */
 list_string const& hostdependency::dependent_hostgroups() const throw () {
-  return (_dependent_hostgroups->get());
+  return (*_dependent_hostgroups);
 }
 
 /**
@@ -235,7 +235,7 @@ list_string const& hostdependency::dependent_hostgroups() const throw () {
  *  @return The dependent_hosts.
  */
 list_string const& hostdependency::dependent_hosts() const throw () {
-  return (_dependent_hosts->get());
+  return (*_dependent_hosts);
 }
 
 /**
@@ -253,7 +253,7 @@ unsigned int hostdependency::execution_failure_options() const throw () {
  *  @return The hostgroups.
  */
 list_string const& hostdependency::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -262,7 +262,7 @@ list_string const& hostdependency::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& hostdependency::hosts() const throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -303,7 +303,7 @@ bool hostdependency::_set_dependency_period(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
-  _dependent_hostgroups.set(value);
+  _dependent_hostgroups = value;
   _id = 0;
   return (true);
 }
@@ -316,7 +316,7 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
-  _dependent_hosts.set(value);
+  _dependent_hosts = value;
   _id = 0;
   return (true);
 }
@@ -364,7 +364,7 @@ bool hostdependency::_set_execution_failure_options(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostdependency::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   return (true);
 }
 
@@ -376,7 +376,7 @@ bool hostdependency::_set_hostgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostdependency::_set_hosts(std::string const& value) {
-  _hosts.set(value);
+  _hosts = value;
   return (true);
 }
 
