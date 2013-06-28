@@ -74,6 +74,9 @@ bool          operator==(
 bool          operator!=(
                 hostdependency const& obj1,
                 hostdependency const& obj2) throw ();
+bool          operator<(
+                hostdependency const& obj1,
+                hostdependency const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, hostdependency const& obj);
 
 #  endif /* C++ */
