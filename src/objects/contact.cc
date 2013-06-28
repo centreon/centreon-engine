@@ -103,6 +103,16 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, contact const& obj) {
+  char const* cntctgrp_str(NULL);
+  if (obj.contactgroups_ptr)
+    cntctgrp_str = chkstr(static_cast<contactgroup const*>(obj.contactgroups_ptr->object_ptr)->group_name);
+  char const* hst_notif_str(NULL);
+  if (obj.host_notification_period_ptr)
+    hst_notif_str = chkstr(obj.host_notification_period_ptr->name);
+  char const* svc_notif_str(NULL);
+  if (obj.service_notification_period_ptr)
+    svc_notif_str = chkstr(obj.service_notification_period_ptr->name);
+
   os << "contact {\n"
     "  name:                            " << chkstr(obj.name) << "\n"
     "  alias:                           " << chkstr(obj.alias) << "\n"
@@ -139,9 +149,9 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  modified_attributes:             " << obj.modified_attributes << "\n"
     "  modified_host_attributes:        " << obj.modified_host_attributes << "\n"
     "  modified_service_attributes:     " << obj.modified_service_attributes << "\n"
-    "  host_notification_period_ptr:    " << obj.host_notification_period_ptr << "\n"
-    "  service_notification_period_ptr: " << obj.service_notification_period_ptr << "\n"
-    "  contactgroups_ptr:               " << obj.contactgroups_ptr << "\n"
+    "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
+    "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
+    "  contactgroups_ptr:               " << chkstr(cntctgrp_str) << "\n"
     "}\n";
   return (os);
 }

@@ -57,9 +57,22 @@ group::~group() throw () {
  */
 group& group::operator=(group const& right) {
   if (this != &right) {
-    _group = right._group;
-    _is_add_inherit = right._is_add_inherit;
+    // _group = right._group;
+    // _is_add_inherit = right._is_add_inherit;
+    set(right);
   }
+  return (*this);
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right The object to copy.
+ *
+ *  @return This object.
+ */
+group& group::operator=(std::string const& right) {
+  set(right);
   return (*this);
 }
 

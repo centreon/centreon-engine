@@ -148,6 +148,7 @@ void contactgroup::check_validity() const {
  *
  *  @param[in] obj The object to merge.
  */
+#include <iostream>
 void contactgroup::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
@@ -156,7 +157,18 @@ void contactgroup::merge(object const& obj) {
   MRG_DEFAULT(_alias);
   MRG_INHERIT(_contactgroup_members);
   MRG_DEFAULT(_contactgroup_name);
+
+  std::cout << "before contactgroup (" << _contactgroup_name << ") tmpl (" << tmpl._name << ") contactgroups=";
+  for (list_string::const_iterator it(_members->get().begin()), end(_members->get().end()); it != end; ++it)
+    std::cout << *it << ", ";
+  std::cout << std::endl;
+
   MRG_INHERIT(_members);
+
+  std::cout << "after contactgroup (" << _contactgroup_name << ") tmpl (" << tmpl._name << ") contactgroups=";
+  for (list_string::const_iterator it(_members->get().begin()), end(_members->get().end()); it != end; ++it)
+    std::cout << *it << ", ";
+  std::cout << std::endl;
 }
 
 /**

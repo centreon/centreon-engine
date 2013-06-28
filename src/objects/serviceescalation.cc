@@ -83,6 +83,16 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
+  char const* escalation_period_str(NULL);
+  if (obj.escalation_period_ptr)
+    escalation_period_str = chkstr(obj.escalation_period_ptr->name);
+  std::string svc_str("\"NULL\"");
+  if (obj.service_ptr) {
+    svc_str = chkstr(obj.service_ptr->host_name);
+    svc_str += ", ";
+    svc_str += chkstr(obj.service_ptr->description);
+  }
+
   os << "serviceescalation {\n"
     "  host_name:             " << chkstr(obj.host_name) << "\n"
     "  description:           " << chkstr(obj.description) << "\n"
@@ -96,8 +106,8 @@ std::ostream& operator<<(std::ostream& os, serviceescalation const& obj) {
     "  escalate_on_critical:  " << obj.escalate_on_critical << "\n"
     "  contact_groups:        " << chkobj(obj.contact_groups) << "\n"
     "  contacts:              " << chkobj(obj.contacts) << "\n"
-    "  service_ptr:           " << obj.service_ptr << "\n"
-    "  escalation_period_ptr: " << obj.escalation_period_ptr << "\n"
+    "  service_ptr:           " << svc_str << "\n"
+    "  escalation_period_ptr: " << chkstr(escalation_period_str) << "\n"
     "}\n";
   return (os);
 }

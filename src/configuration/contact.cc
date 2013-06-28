@@ -257,6 +257,7 @@ void contact::check_validity() const {
  *
  *  @param[in] obj The object to merge.
  */
+#include <iostream>
 void contact::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
@@ -280,6 +281,11 @@ void contact::merge(object const& obj) {
   MRG_OPTION(_service_notification_options);
   MRG_DEFAULT(_service_notification_period);
   MRG_OPTION(_service_notifications_enabled);
+
+  std::cout << "contact (" << _contact_name << ") tmpl (" << tmpl._name << ") contactgroups=";
+  for (list_string::const_iterator it(_contactgroups->get().begin()), end(_contactgroups->get().end()); it != end; ++it)
+    std::cout << *it << ", ";
+  std::cout << std::endl;
 }
 
 /**

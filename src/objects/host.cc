@@ -189,6 +189,22 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, host const& obj) {
+  char const* evt_str(NULL);
+  if (obj.event_handler_ptr)
+    evt_str = chkstr(obj.event_handler_ptr->name);
+  char const* cmd_str(NULL);
+  if (obj.check_command_ptr)
+    cmd_str = chkstr(obj.check_command_ptr->name);
+  char const* chk_period_str(NULL);
+  if (obj.check_period_ptr)
+    chk_period_str = chkstr(obj.check_period_ptr->name);
+  char const* notif_period_str(NULL);
+  if (obj.notification_period_ptr)
+    notif_period_str = chkstr(obj.notification_period_ptr->name);
+  char const* hstgrp_str(NULL);
+  if (obj.hostgroups_ptr)
+    hstgrp_str = chkstr(static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr)->group_name);
+
   os << "host {\n"
     "  name:                                 " << chkstr(obj.name) << "\n"
     "  display_name:                         " << chkstr(obj.display_name) << "\n"
@@ -301,11 +317,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  modified_attributes:                  " << obj.modified_attributes << "\n"
     "  circular_path_checked:                " << obj.circular_path_checked << "\n"
     "  contains_circular_path:               " << obj.contains_circular_path << "\n"
-    "  event_handler_ptr:                    " << obj.event_handler_ptr << "\n"
-    "  check_command_ptr:                    " << obj.check_command_ptr << "\n"
-    "  check_period_ptr:                     " << obj.check_period_ptr << "\n"
-    "  notification_period_ptr:              " << obj.notification_period_ptr << "\n"
-    "  hostgroups_ptr:                       " << obj.hostgroups_ptr << "\n"
+    "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
+    "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
+    "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
+    "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
+    "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n"
     "}\n";
   return (os);
 }

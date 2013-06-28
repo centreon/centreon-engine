@@ -519,6 +519,17 @@ void parser::_parse_resource_file(std::string const& path) {
  */
 void parser::_resolve_template() {
   for (unsigned int i(0);
+       i < sizeof(_templates) / sizeof(_templates[0]);
+       ++i) {
+    map_object& templates(_templates[i]);
+    for (map_object::iterator
+           it(_templates[i].begin()), end(_templates[i].end());
+         it != end;
+         ++it)
+      it->second->resolve_template(templates);
+  }
+
+  for (unsigned int i(0);
        i < sizeof(_lst_objects) / sizeof(_lst_objects[0]);
        ++i) {
     map_object& templates(_templates[i]);

@@ -33,6 +33,7 @@ namespace  configuration {
            group(group const& right);
            ~group() throw ();
     group& operator=(group const& right);
+    group& operator=(std::string const& right);
     bool   operator==(group const& right) const throw ();
     bool   operator!=(group const& right) const throw ();
     bool   operator<(group const& right) const throw ();
