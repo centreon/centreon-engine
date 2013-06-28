@@ -126,7 +126,7 @@ bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
  */
 std::size_t serviceextinfo::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
+    hash_combine(_id, _hosts->begin(), _hosts->end());
     hash_combine(_id, _service_description);
   }
   return (_id);
@@ -218,7 +218,7 @@ std::string const& serviceextinfo::icon_image_alt() const throw () {
  *  @return The hostgroups.
  */
 list_string const& serviceextinfo::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -227,7 +227,7 @@ list_string const& serviceextinfo::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& serviceextinfo::hosts() const throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -301,7 +301,7 @@ bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool serviceextinfo::_set_hosts(std::string const& value) {
-  _hosts.set(value);
+  _hosts = value;
   _id = 0;
   return (true);
 }
@@ -314,7 +314,7 @@ bool serviceextinfo::_set_hosts(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool serviceextinfo::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   return (true);
 }
 

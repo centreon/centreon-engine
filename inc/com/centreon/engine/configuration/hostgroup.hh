@@ -75,9 +75,9 @@ namespace                  configuration {
 
     std::string            _action_url;
     std::string            _alias;
-    opt<group>             _hostgroup_members;
+    group                  _hostgroup_members;
     std::string            _hostgroup_name;
-    opt<group>             _members;
+    group                  _members;
     std::string            _notes;
     std::string            _notes_url;
     mutable bool           _resolved;

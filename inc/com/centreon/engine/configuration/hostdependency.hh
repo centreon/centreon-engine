@@ -93,11 +93,11 @@ namespace                  configuration {
 
     std::string            _dependency_period;
     dependency_kind        _dependency_type;
-    opt<group>             _dependent_hostgroups;
-    opt<group>             _dependent_hosts;
+    group                  _dependent_hostgroups;
+    group                  _dependent_hosts;
     opt<unsigned int>      _execution_failure_options;
-    opt<group>             _hostgroups;
-    opt<group>             _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
   };

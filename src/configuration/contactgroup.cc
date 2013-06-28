@@ -193,7 +193,7 @@ std::string const& contactgroup::alias() const throw () {
  *  @return The contactgroup_members.
  */
 list_string const& contactgroup::contactgroup_members() const throw () {
-  return (_contactgroup_members->get());
+  return (*_contactgroup_members);
 }
 
 /**
@@ -211,7 +211,7 @@ std::string const& contactgroup::contactgroup_name() const throw () {
  *  @return The members.
  */
 list_string& contactgroup::members() throw () {
-  return (_members->get());
+  return (*_members);
 }
 
 /**
@@ -220,7 +220,7 @@ list_string& contactgroup::members() throw () {
  *  @return The members.
  */
 list_string const& contactgroup::members() const throw () {
-  return (_members->get());
+  return (*_members);
 }
 
 /**
@@ -272,7 +272,7 @@ bool contactgroup::_set_alias(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool contactgroup::_set_contactgroup_members(std::string const& value) {
-  _contactgroup_members.set(value);
+  _contactgroup_members = value;
   return (true);
 }
 
@@ -297,6 +297,6 @@ bool contactgroup::_set_contactgroup_name(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool contactgroup::_set_members(std::string const& value) {
-  _members.set(value);
+  _members = value;
   return (true);
 }

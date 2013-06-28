@@ -68,9 +68,9 @@ namespace                  configuration {
     bool                   _set_members(std::string const& value);
 
     std::string            _alias;
-    opt<group>             _contactgroup_members;
+    group                  _contactgroup_members;
     std::string            _contactgroup_name;
-    opt<group>             _members;
+    group                  _members;
     mutable bool           _resolved;
     mutable set_string     _resolved_members;
   };

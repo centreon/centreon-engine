@@ -143,11 +143,11 @@ bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
  */
 std::size_t hostextinfo::id() const throw () {
   if (!_id) {
-    hash_combine(_id, _hosts->get().begin(), _hosts->get().end());
+    hash_combine(_id, _hosts->begin(), _hosts->end());
     hash_combine(
       _id,
-      _hostgroups->get().begin(),
-      _hostgroups->get().end());
+      _hostgroups->begin(),
+      _hostgroups->end());
   }
   return (_id);
 }
@@ -238,7 +238,7 @@ point_3d const& hostextinfo::coords_3d() const throw () {
  *  @return The hostgroups.
  */
 list_string const& hostextinfo::hostgroups() const throw () {
-  return (_hostgroups->get());
+  return (*_hostgroups);
 }
 
 /**
@@ -247,7 +247,7 @@ list_string const& hostextinfo::hostgroups() const throw () {
  *  @return The hosts.
  */
 list_string const& hostextinfo::hosts() const throw () {
-  return (_hosts->get());
+  return (*_hosts);
 }
 
 /**
@@ -381,7 +381,7 @@ bool hostextinfo::_set_coords_3d(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostextinfo::_set_hostgroups(std::string const& value) {
-  _hostgroups.set(value);
+  _hostgroups = value;
   _id = 0;
   return (true);
 }
@@ -394,7 +394,7 @@ bool hostextinfo::_set_hostgroups(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostextinfo::_set_hosts(std::string const& value) {
-  _hosts.set(value);
+  _hosts = value;
   _id = 0;
   return (true);
 }

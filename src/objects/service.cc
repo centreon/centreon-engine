@@ -176,6 +176,25 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, service const& obj) {
+  char const* hst_str(NULL);
+  if (obj.host_ptr)
+    hst_str = chkstr(obj.host_ptr->name);
+  char const* evt_str(NULL);
+  if (obj.event_handler_ptr)
+    evt_str = chkstr(obj.event_handler_ptr->name);
+  char const* cmd_str(NULL);
+  if (obj.check_command_ptr)
+    cmd_str = chkstr(obj.check_command_ptr->name);
+  char const* chk_period_str(NULL);
+  if (obj.check_period_ptr)
+    chk_period_str = chkstr(obj.check_period_ptr->name);
+  char const* notif_period_str(NULL);
+  if (obj.notification_period_ptr)
+    notif_period_str = chkstr(obj.notification_period_ptr->name);
+  char const* svcgrp_str(NULL);
+  if (obj.servicegroups_ptr)
+    svcgrp_str = chkstr(static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)->group_name);
+
   os << "service {\n"
     "  host_name:                            " << chkstr(obj.host_name) << "\n"
     "  description:                          " << chkstr(obj.description) << "\n"
@@ -277,14 +296,14 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  modified_attributes:                  " << obj.modified_attributes << "\n"
-    "  host_ptr:                             " << obj.host_ptr << "\n"
-    "  event_handler_ptr:                    " << obj.event_handler_ptr << "\n"
+    "  host_ptr:                             " << chkstr(hst_str) << "\n"
+    "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
     "  event_handler_args:                   " << chkstr(obj.event_handler_args) << "\n"
-    "  check_command_ptr:                    " << obj.check_command_ptr << "\n"
+    "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_command_args:                   " << chkstr(obj.check_command_args) << "\n"
-    "  check_period_ptr:                     " << obj.check_period_ptr << "\n"
-    "  notification_period_ptr:              " << obj.notification_period_ptr << "\n"
-    "  servicegroups_ptr:                    " << obj.servicegroups_ptr << "\n"
+    "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
+    "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
+    "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n"
     "}\n";
   return (os);
 }

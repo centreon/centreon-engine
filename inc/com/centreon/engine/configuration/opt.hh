@@ -29,7 +29,7 @@ namespace    configuration {
   class      opt {
   public:
              opt() : _is_set(false) {}
-             opt(T const& right) : _data(right), _is_set(true) {}
+             opt(T const& right) : _data(right), _is_set(false) {}
              opt(opt const& right)
       : _data(right._data), _is_set(right._is_set) {}
              ~opt() throw () {}
@@ -67,11 +67,6 @@ namespace    configuration {
     void     set(opt<T> const& right) {
       _data = right._data;
       _is_set = right._is_set;
-    }
-    template <typename U>
-    void     set(U right) {
-      _data.set(right);
-      _is_set = true;
     }
 
   private:

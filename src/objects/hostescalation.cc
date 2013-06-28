@@ -81,6 +81,13 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
+  char const* hst_str(NULL);
+  if (obj.host_ptr)
+    hst_str = chkstr(obj.host_ptr->name);
+  char const* escalation_period_str(NULL);
+  if (obj.escalation_period_ptr)
+    escalation_period_str = chkstr(obj.escalation_period_ptr->name);
+
   os << "hostescalation {\n"
     "  host_name:               " << chkstr(obj.host_name) << "\n"
     "  first_notification:      " << obj.first_notification << "\n"
@@ -92,8 +99,8 @@ std::ostream& operator<<(std::ostream& os, hostescalation const& obj) {
     "  escalate_on_unreachable: " << obj.escalate_on_unreachable << "\n"
     "  contact_groups:          " << chkobj(obj.contact_groups) << "\n"
     "  contacts:                " << chkobj(obj.contacts) << "\n"
-    "  host_ptr:                " << obj.host_ptr << "\n"
-    "  escalation_period_ptr:   " << obj.escalation_period_ptr << "\n"
+    "  host_ptr:                " << chkstr(hst_str) << "\n"
+    "  escalation_period_ptr:   " << chkstr(escalation_period_str) << "\n"
     "}\n";
   return (os);
 }

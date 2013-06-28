@@ -118,6 +118,16 @@ bool operator<(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
+  char const* dependency_period_str(NULL);
+  if (obj.dependency_period_ptr)
+    dependency_period_str = chkstr(obj.dependency_period_ptr->name);
+  char const* dependent_hst_str(NULL);
+  if (obj.dependent_host_ptr)
+    dependent_hst_str = obj.dependent_host_ptr->name;
+  char const* master_hst_str(NULL);
+  if (obj.master_host_ptr)
+    master_hst_str = obj.master_host_ptr->name;
+
   os << "hostdependency {\n"
     "  dependency_type:        " << obj.dependency_type << "\n"
     "  dependent_host_name:    " << chkstr(obj.dependent_host_name) << "\n"
@@ -130,9 +140,9 @@ std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
     "  fail_on_pending:        " << obj.fail_on_pending << "\n"
     "  circular_path_checked:  " << obj.circular_path_checked << "\n"
     "  contains_circular_path: " << obj.contains_circular_path << "\n"
-    "  master_host_ptr:        " << obj.master_host_ptr << "\n"
-    "  dependent_host_ptr:     " << obj.dependent_host_ptr << "\n"
-    "  dependency_period_ptr:  " << obj.dependency_period_ptr << "\n"
+    "  master_host_ptr:        " << chkstr(master_hst_str) << "\n"
+    "  dependent_host_ptr:     " << chkstr(dependent_hst_str) << "\n"
+    "  dependency_period_ptr:  " << chkstr(dependency_period_str) << "\n"
     "}\n";
   return (os);
 }

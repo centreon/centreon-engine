@@ -155,7 +155,12 @@ namespace std {
 #  define MRG_IMPORTANT(prop) \
   if (prop.empty() || tmpl.prop##_is_important) prop = tmpl.prop
 #  define MRG_INHERIT(prop) \
-  if (!prop.is_set() || prop.get().is_add_inherit()) prop.set(tmpl.prop)
+  do { \
+    if (!prop.is_set()) \
+      prop = tmpl.prop; \
+    else if (prop.is_inherit()) \
+      prop += tmpl.prop; \
+  } while (false)
 #  define MRG_MAP(prop) \
   prop.insert(tmpl.prop.begin(), tmpl.prop.end())
 #  define MRG_OPTION(prop) \
@@ -163,8 +168,6 @@ namespace std {
     if (!prop.is_set()) { \
       if (tmpl.prop.is_set()) \
         prop = tmpl.prop; \
-      else \
-        prop = default##prop; \
     } \
   } while (false)
 

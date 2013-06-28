@@ -85,17 +85,17 @@ namespace                  configuration {
     bool                   _set_service_description(std::string const& value);
 
     std::string            _dependency_period;
-    opt<group>             _dependent_hostgroups;
-    opt<group>             _dependent_hosts;
-    opt<group>             _dependent_servicegroups;
-    opt<group>             _dependent_service_description;
+    group                  _dependent_hostgroups;
+    group                  _dependent_hosts;
+    group                  _dependent_servicegroups;
+    group                  _dependent_service_description;
     opt<unsigned int>      _execution_failure_options;
     opt<bool>              _inherits_parent;
-    opt<group>             _hostgroups;
-    opt<group>             _hosts;
+    group                  _hostgroups;
+    group                  _hosts;
     opt<unsigned int>      _notification_failure_options;
-    opt<group>             _servicegroups;
-    opt<group>             _service_description;
+    group                  _servicegroups;
+    group                  _service_description;
   };
 
   typedef shared_ptr<servicedependency>    servicedependency_ptr;

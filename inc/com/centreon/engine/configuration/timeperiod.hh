@@ -90,7 +90,7 @@ namespace                  configuration {
     std::string            _alias;
     std::vector<std::list<daterange> >
                            _exceptions;
-    opt<group>             _exclude;
+    group                  _exclude;
     std::string            _timeperiod_name;
     std::vector<std::list<timerange> >
                            _timeranges;

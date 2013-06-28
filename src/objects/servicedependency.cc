@@ -83,6 +83,22 @@ bool operator!=(
  *  @return The output stream.
  */
 std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
+  char const* dependency_period_str(NULL);
+  if (obj.dependency_period_ptr)
+    dependency_period_str = chkstr(obj.dependency_period_ptr->name);
+  std::string dependent_svc_str("\"NULL\"");
+  if (obj.dependent_service_ptr) {
+    dependent_svc_str = obj.dependent_service_ptr->host_name;
+    dependent_svc_str += ", ";
+    dependent_svc_str += obj.dependent_service_ptr->description;
+  }
+  std::string master_svc_str("\"NULL\"");
+  if (obj.master_service_ptr) {
+    master_svc_str = obj.master_service_ptr->host_name;
+    master_svc_str += ", ";
+    master_svc_str += obj.master_service_ptr->description;
+  }
+
   os << "servicedependency {\n"
     "  dependency_type:               " << obj.dependency_type << "\n"
     "  dependent_host_name:           " << chkstr(obj.dependent_host_name) << "\n"
@@ -98,9 +114,9 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
     "  fail_on_pending:               " << obj.fail_on_pending << "\n"
     "  circular_path_checked:         " << obj.circular_path_checked << "\n"
     "  contains_circular_path:        " << obj.contains_circular_path << "\n"
-    "  master_service_ptr:            " << obj.master_service_ptr << "\n"
-    "  dependent_service_ptr:         " << obj.dependent_service_ptr << "\n"
-    "  dependency_period_ptr:         " << obj.dependency_period_ptr << "\n"
+    "  master_service_ptr:            " << master_svc_str << "\n"
+    "  dependent_service_ptr:         " << dependent_svc_str << "\n"
+    "  dependency_period_ptr:         " << chkstr(dependency_period_str) << "\n"
     "}\n";
   return (os);
 }

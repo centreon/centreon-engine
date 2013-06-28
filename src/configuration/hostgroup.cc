@@ -217,7 +217,7 @@ std::string const& hostgroup::alias() const throw () {
  *  @return The hostgroup_members.
  */
 list_string const& hostgroup::hostgroup_members() const throw () {
-  return (_hostgroup_members->get());
+  return (*_hostgroup_members);
 }
 
 /**
@@ -235,7 +235,7 @@ std::string const& hostgroup::hostgroup_name() const throw () {
  *  @return The members.
  */
 list_string& hostgroup::members() throw () {
-  return (_members->get());
+  return (*_members);
 }
 
 /**
@@ -244,7 +244,7 @@ list_string& hostgroup::members() throw () {
  *  @return The members.
  */
 list_string const& hostgroup::members() const throw () {
-  return (_members->get());
+  return (*_members);
 }
 
 /**
@@ -326,7 +326,7 @@ bool hostgroup::_set_alias(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostgroup::_set_hostgroup_members(std::string const& value) {
-  _hostgroup_members.set(value);
+  _hostgroup_members = value;
   return (true);
 }
 
@@ -351,7 +351,7 @@ bool hostgroup::_set_hostgroup_name(std::string const& value) {
  *  @return True on success, otherwise false.
  */
 bool hostgroup::_set_members(std::string const& value) {
-  _members.set(value);
+  _members = value;
   return (true);
 }
 

@@ -24,33 +24,37 @@
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 
+typedef std::list<std::string> list_string;
+
 CCE_BEGIN()
 
-namespace  configuration {
-  class    group {
+namespace              configuration {
+  class                group {
   public:
-           group(bool inherit = false);
-           group(group const& right);
-           ~group() throw ();
-    group& operator=(group const& right);
-    bool   operator==(group const& right) const throw ();
-    bool   operator!=(group const& right) const throw ();
-    bool   operator<(group const& right) const throw ();
-    void   clear();
-    bool   empty() const throw ();
-    std::list<std::string> const&
-           get() const throw ();
-    std::list<std::string>&
-           get() throw ();
-    bool   is_add_inherit() const throw ();
-    void   is_add_inherit(bool enable) throw ();
-    void   set(group const& grp);
-    void   set(std::string const& value);
+                       group(bool inherit = false);
+                       group(group const& right);
+                       ~group() throw ();
+    group&             operator=(group const& right);
+    group&             operator=(std::string const& right);
+    group&             operator+=(group const& right);
+    bool               operator==(group const& right) const throw ();
+    bool               operator!=(group const& right) const throw ();
+    bool               operator<(group const& right) const throw ();
+    list_string&       operator*() throw () { return (_data); }
+    list_string const& operator*() const throw () { return (_data); }
+    list_string*       operator->() throw () { return (&_data); }
+    list_string const* operator->() const throw () { return (&_data); }
+    list_string&       get() throw () { return (_data); }
+    list_string const& get() const throw () { return (_data); }
+    bool               is_inherit() const throw () { return (_is_inherit); }
+    void               is_inherit(bool enable) throw () { _is_inherit = enable; }
+    bool               is_set() const throw () { return (_is_set); }
+    void               reset();
 
   private:
-    std::list<std::string>
-           _group;
-    bool   _is_add_inherit;
+    list_string        _data;
+    bool               _is_inherit;
+    bool               _is_set;
   };
 }
 
