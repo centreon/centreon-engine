@@ -104,9 +104,7 @@ group& group::operator+=(group const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool group::operator==(group const& right) const throw () {
-  return (_is_inherit == right._is_inherit
-          && _is_set == right._is_set
-          && _data == right._data);
+  return (_data == right._data);
 }
 
 /**
@@ -128,10 +126,6 @@ bool group::operator!=(group const& right) const throw () {
  *  @return True if this object is less than right.
  */
 bool group::operator<(group const& right) const throw () {
-  if (_is_inherit != right._is_inherit)
-    return (_is_inherit != right._is_inherit);
-  if (_is_set != right._is_set)
-    return (_is_set != right._is_set);
   return (_data < right._data);
 }
 

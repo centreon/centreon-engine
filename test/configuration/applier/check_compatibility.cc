@@ -214,23 +214,9 @@ static void sort_it(hostdependency_struct*& l) {
     hostdependency_struct** min(&remaining);
     for (hostdependency_struct** cur(&((*min)->next));
          *cur;
-         cur = &((*cur)->next)) {
-      int dependent_host_less_than(strcmp(
-                                     (*cur)->dependent_host_name,
-                                     (*min)->dependent_host_name));
-      int host_less_than(strcmp(
-                           (*cur)->host_name,
-                           (*min)->host_name));
-      int type_less_than(
-            (*cur)->dependency_type - (*min)->dependency_type);
-      /*if ((dependent_host_less_than < 0)
-          || ((dependent_host_less_than == 0)
-              && ((host_less_than < 0)
-                  || ((host_less_than == 0)
-                  && (type_less_than < 0)))))*/
+         cur = &((*cur)->next))
       if (**cur < **min)
         min = cur;
-    }
     *new_root = *min;
     *min = (*min)->next;
     new_root = &((*new_root)->next);
@@ -263,6 +249,28 @@ static void sort_it(servicesmember*& l) {
     *min = (*min)->next;
     new_root = &((*new_root)->next);
     *new_root = NULL;
+  }
+  return ;
+}
+
+/**
+ *  Remove duplicate members of a list.
+ */
+template <typename T>
+static void remove_duplicates(
+              T* l,
+              void (*deleter)(void*)) {
+  while (l) {
+    for (T* m(l->next); m;)
+      if (*l == *m) {
+        l->next = m->next;
+        T* to_delete(m);
+        m = m->next;
+        deleter(to_delete);
+      }
+      else
+        m = m->next;
+    l = l->next;
   }
   return ;
 }
@@ -426,7 +434,9 @@ bool chkdiff(global& g1, global& g2) {
   if (!chkdiff(g1.hosts, g2.hosts))
     ret = false;
   sort_it(g1.hostdependencies);
+  remove_duplicates(g1.hostdependencies, &deleter::hostdependency);
   sort_it(g2.hostdependencies);
+  remove_duplicates(g2.hostdependencies, &deleter::hostdependency);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
   if (!chkdiff(g1.hostescalations, g2.hostescalations))
