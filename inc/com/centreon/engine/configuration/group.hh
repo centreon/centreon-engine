@@ -54,6 +54,7 @@ namespace              configuration {
   private:
     list_string        _data;
     bool               _is_inherit;
+    bool               _is_null;
     bool               _is_set;
   };
 }

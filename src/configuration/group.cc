@@ -29,6 +29,7 @@ using namespace  com::centreon::engine::configuration;
  */
 group::group(bool is_inherit)
   : _is_inherit(is_inherit),
+    _is_null(false),
     _is_set(false) {
 
 }
@@ -60,6 +61,7 @@ group& group::operator=(group const& right) {
   if (this != &right) {
     _data = right._data;
     _is_inherit = right._is_inherit;
+    _is_null = right._is_null;
     _is_set = right._is_set;
   }
   return (*this);
@@ -79,6 +81,8 @@ group& group::operator=(std::string const& right) {
       _is_inherit = true;
       string::split(right.substr(1), _data, ',');
     }
+    else if (right == "null")
+      _is_null = true;
     else {
       _is_inherit = false;
       string::split(right, _data, ',');
@@ -88,6 +92,13 @@ group& group::operator=(std::string const& right) {
   return (*this);
 }
 
+/**
+ *  Add data.
+ *
+ *  @param[in] right The object to add.
+ *
+ *  @return This object.
+ */
 group& group::operator+=(group const& right) {
   if (this != &right) {
     _data.insert(_data.end(), right._data.begin(), right._data.end());
@@ -106,6 +117,7 @@ group& group::operator+=(group const& right) {
 bool group::operator==(group const& right) const throw () {
   return (_is_inherit == right._is_inherit
           && _is_set == right._is_set
+          && _is_null == right._is_null
           && _data == right._data);
 }
 
@@ -130,6 +142,8 @@ bool group::operator!=(group const& right) const throw () {
 bool group::operator<(group const& right) const throw () {
   if (_is_inherit != right._is_inherit)
     return (_is_inherit != right._is_inherit);
+  if (_is_null != right._is_null)
+    return (_is_null != right._is_null);
   if (_is_set != right._is_set)
     return (_is_set != right._is_set);
   return (_data < right._data);
@@ -141,5 +155,6 @@ bool group::operator<(group const& right) const throw () {
 void group::reset() {
   _data.clear();
   _is_inherit = false;
+  _is_null = false;
   _is_set = false;
 }
