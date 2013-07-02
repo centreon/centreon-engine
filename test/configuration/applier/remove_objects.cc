@@ -309,12 +309,9 @@ static void remove_dependency_for_servicegroup(
  */
 template<typename T, typename U, T& (configuration::state::*get)() throw ()>
 static void check_remove_objects(
-              std::string const& path,
+              configuration::state& config,
               check& chk,
               void (*remove)(configuration::state&, U const&) = NULL) {
-  configuration::state config;
-  configuration::parser p;
-  p.parse(path, config);
   configuration::applier::state::instance().apply(config);
 
   T& objects((config.*get)());
@@ -351,6 +348,11 @@ int main_test(int argc, char* argv[]) {
     throw (engine_error() << "usage: " << argv[0] << " object_type file.cfg");
 
   std::string type(argv[1]);
+  std::string path(argv[2]);
+
+  configuration::state config;
+  configuration::parser p;
+  p.parse(path, config);
 
   if (type == "command") {
     chk_generic<
@@ -363,7 +365,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_command,
       configuration::command,
-      &configuration::state::commands>(argv[2], chk_command);
+      &configuration::state::commands>(config, chk_command);
   }
   else if (type == "contact") {
     chk_generic<
@@ -376,7 +378,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_contact,
       configuration::contact,
-      &configuration::state::contacts>(argv[2], chk_contact);
+      &configuration::state::contacts>(config, chk_contact);
   }
   else if (type == "contactgroup") {
     chk_generic<
@@ -389,7 +391,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_contactgroup,
       configuration::contactgroup,
-      &configuration::state::contactgroups>(argv[2], chk_contactgroup, remove_dependency_for_contactgroup);
+      &configuration::state::contactgroups>(config, chk_contactgroup, remove_dependency_for_contactgroup);
   }
   else if (type == "host") {
     chk_generic<
@@ -402,14 +404,14 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_host,
       configuration::host,
-      &configuration::state::hosts>(argv[2], chk_host);
+      &configuration::state::hosts>(config, chk_host);
   }
   else if (type == "hostescalation") {
     chk_hostescalation chk_hostescalation;
     check_remove_objects<
       configuration::list_hostescalation,
       configuration::hostescalation,
-      &configuration::state::hostescalations>(argv[2], chk_hostescalation);
+      &configuration::state::hostescalations>(config, chk_hostescalation);
   }
   else if (type == "hostgroup") {
     chk_generic<
@@ -422,14 +424,20 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_hostgroup,
       configuration::hostgroup,
-      &configuration::state::hostgroups>(argv[2], chk_hostgroup, remove_dependency_for_hostgroup);
+      &configuration::state::hostgroups>(config, chk_hostgroup, remove_dependency_for_hostgroup);
   }
   else if (type == "service") {
+    config.servicegroups().clear();
+    for (configuration::set_service::iterator
+           it(config.services().begin()), end(config.services().end());
+         it != end;
+         ++it)
+      (*it)->parse("servicegroups", "null");
     chk_service chk_service;
     check_remove_objects<
       configuration::set_service,
       configuration::service,
-      &configuration::state::services>(argv[2], chk_service);
+      &configuration::state::services>(config, chk_service);
   }
   else if (type == "servicegroup") {
     chk_generic<
@@ -442,7 +450,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_servicegroup,
       configuration::servicegroup,
-      &configuration::state::servicegroups>(argv[2], chk_servicegroup, remove_dependency_for_servicegroup);
+      &configuration::state::servicegroups>(config, chk_servicegroup, remove_dependency_for_servicegroup);
   }
   else if (type == "timeperiod") {
     chk_generic<
@@ -455,7 +463,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_timeperiod,
       configuration::timeperiod,
-      &configuration::state::timeperiods>(argv[2], chk_timeperiod);
+      &configuration::state::timeperiods>(config, chk_timeperiod);
   }
 
   return (0);
