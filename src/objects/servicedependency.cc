@@ -99,6 +99,8 @@ bool operator<(
     CMP_CSTR(obj1.host_name, obj2.host_name)
   else
     CMP_CSTR(obj1.service_description, obj2.service_description)
+  else if (obj1.dependency_type != obj2.dependency_type)
+    return (obj1.dependency_type < obj2.dependency_type);
   else
     CMP_CSTR(obj1.dependency_period, obj2.dependency_period)
   else if (obj1.inherits_parent != obj2.inherits_parent)

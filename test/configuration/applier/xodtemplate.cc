@@ -2864,12 +2864,14 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_servicedependency->fail_execute_on_unknown = FALSE;
           temp_servicedependency->fail_execute_on_warning = FALSE;
           temp_servicedependency->fail_execute_on_critical = FALSE;
+          temp_servicedependency->fail_execute_on_pending = FALSE;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
           temp_servicedependency->fail_execute_on_ok = TRUE;
           temp_servicedependency->fail_execute_on_unknown = TRUE;
           temp_servicedependency->fail_execute_on_warning = TRUE;
           temp_servicedependency->fail_execute_on_critical = TRUE;
+          temp_servicedependency->fail_execute_on_pending = TRUE;
         }
         else {
           logger(log_config_error, basic)
