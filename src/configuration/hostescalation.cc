@@ -261,8 +261,26 @@ bool hostescalation::contactgroups_defined() const throw () {
  *
  *  @return The contacts.
  */
+list_string& hostescalation::contacts() throw () {
+  return (*_contacts);
+}
+
+/**
+ *  Get contacts.
+ *
+ *  @return The contacts.
+ */
 list_string const& hostescalation::contacts() const throw () {
   return (*_contacts);
+}
+
+/**
+ *  Check if contacts were defined.
+ *
+ *  @return True if contacts were defined.
+ */
+bool hostescalation::contacts_defined() const throw () {
+  return (_contacts.is_set());
 }
 
 /**

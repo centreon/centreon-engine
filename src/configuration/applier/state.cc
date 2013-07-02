@@ -202,6 +202,30 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
 }
 
 /**
+ *  Find a service escalation in the umultimap.
+ *
+ *  @param[in] obj Collection in which to search for.
+ *  @param[in] key Key to search for.
+ *
+ *  @return Iterator to the element matchin key, obj.end() if it was
+ *          not found.
+ */
+umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator find_serviceescalation_key(
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >& obj,
+  configuration::serviceescalation const& key) {
+  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > CollectionType;
+  std::pair<CollectionType::iterator, CollectionType::iterator>
+    p(obj.equal_range(std::make_pair(
+                             key.hosts().front(),
+                             key.service_description().front())));
+  while (p.first != p.second) {
+    // XXX
+    ++p.first;
+  }
+  return ((p.first != p.second) ? p.first : obj.end());
+}
+
+/**
  *  Get the key of a command.
  *
  *  @return Command name.
@@ -301,6 +325,18 @@ std::pair<std::string, std::string> service_key(
 configuration::servicedependency servicedependency_key(
                  configuration::servicedependency const& sd) {
   return (sd);
+}
+
+/**
+ *  Get the key of a service escalation.
+ *
+ *  @param[in] se Service escalation.
+ *
+ *  @return A copy of the service escalation configuration object.
+ */
+configuration::serviceescalation serviceescalation_key(
+                                   configuration::serviceescalation const& se) {
+  return (se);
 }
 
 /**
@@ -541,6 +577,24 @@ void applier::state::apply(configuration::state& new_cfg) {
     new_cfg.hostescalations());
   _resolve<configuration::hostescalation, applier::hostescalation>(
     config->hostescalations());
+
+  // Apply service escalations.
+  _expand<configuration::serviceescalation, applier::serviceescalation>(
+    new_cfg,
+    new_cfg.serviceescalations());
+  _apply<configuration::serviceescalation,
+         umultimap<std::pair<std::string, std::string>,
+                   shared_ptr<serviceescalation_struct> >,
+         applier::serviceescalation,
+         configuration::serviceescalation,
+         &serviceescalation_key,
+         &find_serviceescalation_key>(
+    config->serviceescalations(),
+    _serviceescalations,
+    new_cfg,
+    new_cfg.serviceescalations());
+  _resolve<configuration::serviceescalation, applier::serviceescalation>(
+    config->serviceescalations());
 
   // Pre-flight check.
   {

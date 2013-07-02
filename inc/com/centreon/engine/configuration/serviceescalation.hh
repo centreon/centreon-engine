@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEESCALATION_HH
 #  define CCE_CONFIGURATION_SERVICEESCALATION_HH
 
-#  include <list>
+#  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -50,6 +50,8 @@ namespace                  configuration {
                              serviceescalation const& right) const throw ();
     bool                   operator!=(
                              serviceescalation const& right) const throw ();
+    bool                   operator<(
+                             serviceescalation const& right) const;
     void                   check_validity() const;
     std::size_t            id() const throw ();
     void                   merge(object const& obj);
@@ -57,16 +59,29 @@ namespace                  configuration {
                              std::string const& key,
                              std::string const& value);
 
+    list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
+    bool                   contactgroups_defined() const throw ();
+    list_string&           contacts() throw ();
     list_string const&     contacts() const throw ();
+    bool                   contacts_defined() const throw ();
     unsigned short         escalation_options() const throw ();
+    void                   escalation_period(std::string const& period);
     std::string const&     escalation_period() const throw ();
+    bool                   escalation_period_defined() const throw ();
     unsigned int           first_notification() const throw ();
+    list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
+    list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     unsigned int           last_notification() const throw ();
+    void                   notification_interval(
+                             unsigned int interval) throw ();
     unsigned int           notification_interval() const throw ();
+    bool                   notification_interval_defined() const throw ();
+    list_string&           servicegroups() throw ();
     list_string const&     servicegroups() const throw ();
+    list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
 
   private:
@@ -85,7 +100,7 @@ namespace                  configuration {
     group                  _contactgroups;
     group                  _contacts;
     opt<unsigned short>    _escalation_options;
-    std::string            _escalation_period;
+    opt<std::string>       _escalation_period;
     opt<unsigned int>      _first_notification;
     group                  _hostgroups;
     group                  _hosts;
@@ -95,8 +110,8 @@ namespace                  configuration {
     group                  _service_description;
   };
 
-  typedef shared_ptr<serviceescalation>    serviceescalation_ptr;
-  typedef std::list<serviceescalation_ptr> list_serviceescalation;
+  typedef shared_ptr<serviceescalation>   serviceescalation_ptr;
+  typedef std::set<serviceescalation_ptr> set_serviceescalation;
 }
 
 CCE_END()

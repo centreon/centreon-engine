@@ -298,29 +298,6 @@ static std::string const               default_use_timezone("");
 static bool const                      default_use_true_regexp_matching(false);
 
 /**
- *  Compare list with the pointer content.
- *
- *  @param[in] l1 The first list.
- *  @param[in] l2 The second list.
- *
- *  @return True on success, otherwise false.
- */
-template<typename T>
-static bool cmp_list_ptr(
-       std::list<shared_ptr<T> > const& l1,
-       std::list<shared_ptr<T> > const& l2) {
-  if (l1.size() != l2.size())
-    return (false);
-  typename std::list<shared_ptr<T> >::const_iterator it1(l1.begin()), end(l1.end());
-  typename std::list<shared_ptr<T> >::const_iterator it2(l2.begin());
-  while (it1 != end) {
-    if (**it1++ != **it2++)
-      return (false);
-  }
-  return (true);
-}
-
-/**
  *  Compare sets with the pointer content.
  *
  *  @param[in] s1 The first set.
@@ -728,7 +705,7 @@ bool state::operator==(state const& right) const throw () {
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
           && cmp_set_ptr(_servicedependencies, right._servicedependencies)
-          && cmp_list_ptr(_serviceescalations, right._serviceescalations)
+          && cmp_set_ptr(_serviceescalations, right._serviceescalations)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
           && cmp_set_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
@@ -2712,7 +2689,7 @@ set_servicedependency& state::servicedependencies() throw () {
  *
  *  @return All engine serviceescalations.
  */
-list_serviceescalation const& state::serviceescalations() const throw () {
+set_serviceescalation const& state::serviceescalations() const throw () {
   return (_serviceescalations);
 }
 
@@ -2721,7 +2698,7 @@ list_serviceescalation const& state::serviceescalations() const throw () {
  *
  *  @return All engine serviceescalations.
  */
-list_serviceescalation& state::serviceescalations() throw () {
+set_serviceescalation& state::serviceescalations() throw () {
   return (_serviceescalations);
 }
 

@@ -319,9 +319,9 @@ namespace              configuration {
                        servicedependencies() const throw ();
     set_servicedependency&
                        servicedependencies() throw ();
-    list_serviceescalation const&
+    set_serviceescalation const&
                        serviceescalations() const throw ();
-    list_serviceescalation&
+    set_serviceescalation&
                        serviceescalations() throw ();
     set_servicegroup const&
                        servicegroups() const throw ();
@@ -570,7 +570,7 @@ namespace              configuration {
     unsigned int       _retention_update_interval;
     set_servicedependency
                        _servicedependencies;
-    list_serviceescalation
+    set_serviceescalation
                        _serviceescalations;
     set_servicegroup   _servicegroups;
     set_service        _services;

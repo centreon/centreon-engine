@@ -65,9 +65,7 @@ serviceescalation::serviceescalation()
     _escalation_options(default_escalation_options),
     _first_notification(default_first_notification),
     _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {
-
-}
+    _notification_interval(default_notification_interval) {}
 
 /**
  *  Copy constructor.
@@ -82,9 +80,7 @@ serviceescalation::serviceescalation(serviceescalation const& right)
 /**
  *  Destructor.
  */
-serviceescalation::~serviceescalation() throw () {
-
-}
+serviceescalation::~serviceescalation() throw () {}
 
 /**
  *  Copy constructor.
@@ -145,6 +141,37 @@ bool serviceescalation::operator!=(serviceescalation const& right) const throw (
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool serviceescalation::operator<(serviceescalation const& right) const {
+  if (_hosts != right._hosts)
+    return (_hosts < right._hosts);
+  else if (_hostgroups != right. _hostgroups)
+    return (_hostgroups < right._hostgroups);
+  else if (_service_description != right._service_description)
+    return (_service_description < right._service_description);
+  else if (_servicegroups != right._servicegroups)
+    return (_servicegroups < right._servicegroups);
+  else if (_contacts != right._contacts)
+    return (_contacts < right._contacts);
+  else if (_contactgroups != right._contactgroups)
+    return (_contactgroups < right._contactgroups);
+  else if (_escalation_options != right._escalation_options)
+    return (_escalation_options < right._escalation_options);
+  else if (_escalation_period != right._escalation_period)
+    return (_escalation_period < right._escalation_period);
+  else if (_first_notification != right._first_notification)
+    return (_first_notification < right._first_notification);
+  else if (_last_notification != right._last_notification)
+    return (_last_notification < right._last_notification);
+  return (_notification_interval < right._notification_interval);
+}
+
+/**
  *  Get the unique object id.
  *
  *  @return The object id.
@@ -183,7 +210,7 @@ void serviceescalation::check_validity() const {
   if (_contacts->empty() && _contactgroups->empty())
     throw (engine_error() << "configuration: invalid serviceescalation "
            "property contact or contactgroup is missing");
-  if (_escalation_period.empty())
+  if (_escalation_period.is_set() && _escalation_period->empty())
     throw (engine_error() << "configuration: invalid serviceescalation "
            "property escalation_period is missing");
 }
@@ -201,7 +228,7 @@ void serviceescalation::merge(object const& obj) {
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
   MRG_OPTION(_escalation_options);
-  MRG_DEFAULT(_escalation_period);
+  MRG_OPTION(_escalation_period);
   MRG_OPTION(_first_notification);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
@@ -231,12 +258,39 @@ bool serviceescalation::parse(
 }
 
 /**
+ *  Get contact groups.
+ *
+ *  @return The contact groups.
+ */
+list_string& serviceescalation::contactgroups() throw () {
+  return (*_contactgroups);
+}
+
+/**
  *  Get contactgroups.
  *
  *  @return The contactgroups.
  */
 list_string const& serviceescalation::contactgroups() const throw () {
   return (*_contactgroups);
+}
+
+/**
+ *  Check if contact groups were defined.
+ *
+ *  @return True if contact groups were defined.
+ */
+bool serviceescalation::contactgroups_defined() const throw () {
+  return (_contactgroups.is_set());
+}
+
+/**
+ *  Get contacts.
+ *
+ *  @return The contacts;
+ */
+list_string& serviceescalation::contacts() throw () {
+  return (*_contacts);
 }
 
 /**
@@ -249,12 +303,31 @@ list_string const& serviceescalation::contacts() const throw () {
 }
 
 /**
+ *  Check if contacts were defined.
+ *
+ *  @return True if contacts were defined.
+ */
+bool serviceescalation::contacts_defined() const throw () {
+  return (_contacts.is_set());
+}
+
+/**
  *  Get escalation_options.
  *
  *  @return The escalation_options.
  */
 unsigned short serviceescalation::escalation_options() const throw () {
   return (_escalation_options);
+}
+
+/**
+ *  Set the escalation period.
+ *
+ *  @param[in] period New escalation period.
+ */
+void serviceescalation::escalation_period(std::string const& period) {
+  _escalation_period = period;
+  return ;
 }
 
 /**
@@ -267,6 +340,15 @@ std::string const& serviceescalation::escalation_period() const throw () {
 }
 
 /**
+ *  Check if escalation period was defined.
+ *
+ *  @return True if the escalation period was defined.
+ */
+bool serviceescalation::escalation_period_defined() const throw () {
+  return (_escalation_period.is_set());
+}
+
+/**
  *  Get first_notification.
  *
  *  @return The first_notification.
@@ -276,12 +358,30 @@ unsigned int serviceescalation::first_notification() const throw () {
 }
 
 /**
+ *  Get host groups.
+ *
+ *  @return Host groups.
+ */
+list_string& serviceescalation::hostgroups() throw () {
+  return (*_hostgroups);
+}
+
+/**
  *  Get hostgroups.
  *
  *  @return The hostgroups.
  */
 list_string const& serviceescalation::hostgroups() const throw () {
   return (*_hostgroups);
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string& serviceescalation::hosts() throw () {
+  return (*_hosts);
 }
 
 /**
@@ -303,6 +403,17 @@ unsigned int serviceescalation::last_notification() const throw () {
 }
 
 /**
+ *  Set the notification interval.
+ *
+ *  @param[in] interval New notification interval.
+ */
+void serviceescalation::notification_interval(
+                          unsigned int interval) throw () {
+  _notification_interval = interval;
+  return ;
+}
+
+/**
  *  Get notification_interval.
  *
  *  @return The notification_interval.
@@ -312,12 +423,39 @@ unsigned int serviceescalation::notification_interval() const throw () {
 }
 
 /**
+ *  Check if notification interval was set.
+ *
+ *  @return True if the notification interval was set.
+ */
+bool serviceescalation::notification_interval_defined() const throw () {
+  return (_notification_interval.is_set());
+}
+
+/**
+ *  Get service groups.
+ *
+ *  @return The service groups.
+ */
+list_string& serviceescalation::servicegroups() throw () {
+  return (*_servicegroups);
+}
+
+/**
  *  Get servicegroups.
  *
  *  @return The servicegroups.
  */
 list_string const& serviceescalation::servicegroups() const throw () {
   return (*_servicegroups);
+}
+
+/**
+ *  Get service description.
+ *
+ *  @return Service description.
+ */
+list_string& serviceescalation::service_description() throw () {
+  return (*_service_description);
 }
 
 /**

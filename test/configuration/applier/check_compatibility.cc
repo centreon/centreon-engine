@@ -445,6 +445,18 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.servicedependencies, &deleter::servicedependency);
   if (!chkdiff(g1.servicedependencies, g2.servicedependencies))
     ret = false;
+  for (serviceescalation_struct* se1(g1.serviceescalations);
+       se1;
+       se1 = se1->next) {
+    sort_it(se1->contacts);
+    sort_it(se1->contact_groups);
+  }
+  for (serviceescalation_struct* se2(g2.serviceescalations);
+       se2;
+       se2 = se2->next) {
+    sort_it(se2->contacts);
+    sort_it(se2->contact_groups);
+  }
   if (!chkdiff(g1.serviceescalations, g2.serviceescalations))
     ret = false;
   for (servicegroup_struct* sg1(g1.servicegroups);

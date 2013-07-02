@@ -20,12 +20,19 @@
 #ifndef CCE_CONFIGURATION_APPLIER_SERVICEESCALATION_HH
 #  define CCE_CONFIGURATION_APPLIER_SERVICEESCALATION_HH
 
-#  include "com/centreon/engine/configuration/serviceescalation.hh"
+#  include <list>
+#  include <set>
+#  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
 namespace                configuration {
+  // Forward declarations.
+  class                  serviceescalation;
+  class                  state;
+
   namespace              applier {
     class                serviceescalation {
     public:
@@ -34,10 +41,33 @@ namespace                configuration {
                            serviceescalation const& right);
                          ~serviceescalation() throw ();
       serviceescalation& operator=(serviceescalation const& right);
-      void               add_object(serviceescalation_ptr obj);
-      void               modify_object(serviceescalation_ptr obj);
-      void               remove_object(serviceescalation_ptr obj);
-      void               resolve_object(serviceescalation_ptr obj);
+      void               add_object(
+                           configuration::serviceescalation const& obj,
+			   configuration::state const& s);
+      void               expand_object(
+                           shared_ptr<configuration::serviceescalation> obj,
+                           configuration::state& s);
+      void               modify_object(
+                           configuration::serviceescalation const& obj,
+			   configuration::state const& s);
+      void               remove_object(
+                           configuration::serviceescalation const& obj,
+			   configuration::state const& s);
+      void               resolve_object(
+                           configuration::serviceescalation const& obj,
+			   configuration::state const& s);
+
+    private:
+      void               _expand_services(
+                           std::list<std::string> const& hst,
+                           std::list<std::string> const& hg,
+                           std::list<std::string> const& svc,
+                           std::list<std::string> const& sg,
+                           configuration::state& s,
+                           std::set<std::pair<std::string, std::string> >& expanded);
+      void               _inherits_special_vars(
+                           shared_ptr<configuration::serviceescalation> obj,
+                           configuration::state& s);
     };
   }
 }

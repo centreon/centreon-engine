@@ -138,7 +138,7 @@ int main_test(int argc, char* argv[]) {
   else if (type == "serviceescalation") {
     check_objects<
       configuration::serviceescalation,
-      configuration::list_serviceescalation,
+      configuration::set_serviceescalation,
       &configuration::state::serviceescalations>(fe.path());
   }
   // else if (type == "serviceextinfo") {

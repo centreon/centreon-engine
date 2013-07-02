@@ -59,7 +59,9 @@ namespace                  configuration {
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
+    list_string&           contacts() throw ();
     list_string const&     contacts() const throw ();
+    bool                   contacts_defined() const throw ();
     unsigned short         escalation_options() const throw ();
     void                   escalation_period(std::string const& period);
     std::string const&     escalation_period() const throw ();

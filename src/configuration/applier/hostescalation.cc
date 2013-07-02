@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
@@ -97,7 +96,7 @@ void applier::hostescalation::add_object(
            obj.escalation_options()
            & configuration::hostescalation::recovery)));
   if (!he)
-    throw (engine_error() << "Error: Could not create host escalation "
+    throw (engine_error() << "Error: Could not create escalation "
            << "on host '" << obj.hosts().front() << "'.");
 
   // Unique contacts.
@@ -180,9 +179,9 @@ void applier::hostescalation::expand_object(
       hesc->hosts().clear();
       hesc->hosts().push_back(*it);
 
-      // Insert new host escalation. We do not need to expand it
-      // because no expansion is made on 1->1 dependency.
+      // Insert new host escalation and expand it.
       s.hostescalations().insert(hesc);
+      expand_object(hesc, s);
     }
   }
 
@@ -287,11 +286,12 @@ void applier::hostescalation::_inherits_special_vars(
                                 shared_ptr<configuration::hostescalation> obj,
                                 configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj->contactgroups_defined()
+  if (!obj->contacts_defined()
+      || !obj->contactgroups_defined()
       || !obj->notification_interval_defined()
       || !obj->escalation_period_defined()) {
-    // Remove host escalation from state (it will be modified and
-    // reinserted at the end of the method).
+    // Remove host escalation from state. It will be modified and
+    // reinserted at the end of the method.
     s.hostescalations().erase(obj);
 
     // Find host.
@@ -309,6 +309,8 @@ void applier::hostescalation::_inherits_special_vars(
              << obj->hosts().front() << "': host does not exist.");
 
     // Inherits variables.
+    if (!obj->contacts_defined())
+      obj->contacts() = (*it)->contacts();
     if (!obj->contactgroups_defined())
       obj->contactgroups() = (*it)->contactgroups();
     if (!obj->notification_interval_defined())
