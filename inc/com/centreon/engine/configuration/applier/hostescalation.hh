@@ -63,6 +63,9 @@ namespace             configuration {
                         std::list<std::string> const& hg,
                         configuration::state const& s,
                         std::set<std::string>& expanded);
+      void            _inherits_special_vars(
+                        shared_ptr<configuration::hostescalation> obj,
+                        configuration::state& s);
     };
   }
 }

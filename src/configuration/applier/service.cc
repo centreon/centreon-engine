@@ -464,7 +464,7 @@ void applier::service::_inherits_special_vars(
       || !obj->notification_interval_defined()
       || !obj->notification_period_defined()) {
     // Remove service from state (it will be modified
-    // and reinserted later).
+    // and reinserted at the end of the method).
     s.services().erase(obj);
 
     // Find host.

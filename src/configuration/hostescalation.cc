@@ -186,9 +186,7 @@ void hostescalation::check_validity() const {
   if (_contacts->empty() && _contactgroups->empty())
     throw (engine_error() << "configuration: invalid hostescalation "
            "property contact or contactgroup is missing");
-  if (_escalation_period.empty())
-    throw (engine_error() << "configuration: invalid hostescalation "
-           "property escalation_period is missing");
+  return ;
 }
 
 /**
@@ -204,7 +202,7 @@ void hostescalation::merge(object const& obj) {
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
   MRG_OPTION(_escalation_options);
-  MRG_DEFAULT(_escalation_period);
+  MRG_OPTION(_escalation_period);
   MRG_OPTION(_first_notification);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
@@ -232,12 +230,30 @@ bool hostescalation::parse(
 }
 
 /**
+ *  Get contact groups.
+ *
+ *  @return The contact groups.
+ */
+list_string& hostescalation::contactgroups() throw () {
+  return (*_contactgroups);
+}
+
+/**
  *  Get contactgroups.
  *
  *  @return The contactgroups.
  */
 list_string const& hostescalation::contactgroups() const throw () {
   return (*_contactgroups);
+}
+
+/**
+ *  Check if contact groups were defined.
+ *
+ *  @return True if contact groups were defined.
+ */
+bool hostescalation::contactgroups_defined() const throw () {
+  return (_contactgroups.is_set());
 }
 
 /**
@@ -259,12 +275,31 @@ unsigned short hostescalation::escalation_options() const throw () {
 }
 
 /**
+ *  Set the escalation period.
+ *
+ *  @param[in] period New escalation period.
+ */
+void hostescalation::escalation_period(std::string const& period) {
+  _escalation_period = period;
+  return ;
+}
+
+/**
  *  Get escalation_period.
  *
  *  @return The escalation_period.
  */
 std::string const& hostescalation::escalation_period() const throw () {
   return (_escalation_period);
+}
+
+/**
+ *  Check if escalation period was defined.
+ *
+ *  @return True if escalation period was defined.
+ */
+bool hostescalation::escalation_period_defined() const throw () {
+  return (_escalation_period.is_set());
 }
 
 /**
@@ -322,12 +357,31 @@ unsigned int hostescalation::last_notification() const throw () {
 }
 
 /**
+ *  Set the notification interval.
+ *
+ *  @param[in] interval New notification interval.
+ */
+void hostescalation::notification_interval(unsigned int interval) {
+  _notification_interval = interval;
+  return ;
+}
+
+/**
  *  Get notification_interval.
  *
  *  @return The notification_interval.
  */
 unsigned int hostescalation::notification_interval() const throw () {
   return (_notification_interval);
+}
+
+/**
+ *  Check if the notification interval was defined.
+ *
+ *  @return True if the notification interval was defined.
+ */
+bool hostescalation::notification_interval_defined() const throw () {
+  return (_notification_interval.is_set());
 }
 
 /**

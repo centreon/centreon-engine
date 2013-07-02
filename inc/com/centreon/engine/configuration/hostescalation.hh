@@ -56,17 +56,23 @@ namespace                  configuration {
                              std::string const& key,
                              std::string const& value);
 
+    list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
+    bool                   contactgroups_defined() const throw ();
     list_string const&     contacts() const throw ();
     unsigned short         escalation_options() const throw ();
+    void                   escalation_period(std::string const& period);
     std::string const&     escalation_period() const throw ();
+    bool                   escalation_period_defined() const throw ();
     unsigned int           first_notification() const throw ();
     list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     unsigned int           last_notification() const throw ();
+    void                   notification_interval(unsigned int interval);
     unsigned int           notification_interval() const throw ();
+    bool                   notification_interval_defined() const throw ();
 
   private:
     bool                   _set_contactgroups(std::string const& value);
@@ -82,7 +88,7 @@ namespace                  configuration {
     group                  _contactgroups;
     group                  _contacts;
     opt<unsigned short>    _escalation_options;
-    std::string            _escalation_period;
+    opt<std::string>       _escalation_period;
     opt<unsigned int>      _first_notification;
     group                  _hostgroups;
     group                  _hosts;

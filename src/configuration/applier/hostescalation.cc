@@ -152,8 +152,11 @@ void applier::hostescalation::add_object(
 void applier::hostescalation::expand_object(
                                 shared_ptr<configuration::hostescalation> obj,
                                 configuration::state& s) {
+  // Inherits special vars.
+  if ((obj->hosts().size() == 1) && obj->hostgroups().empty())
+    _inherits_special_vars(obj, s);
   // Expand host escalation.
-  if ((obj->hosts().size() != 1) || !obj->hostgroups().empty()) {
+  else {
     // Expanded hosts.
     std::set<std::string> expanded_hosts;
     _expand_hosts(
@@ -269,6 +272,52 @@ void applier::hostescalation::_expand_hosts(
          it_member != end_member;
          ++it_member)
       expanded.insert(*it_member);
+  }
+
+  return ;
+}
+
+/**
+ *  Inherits special variables from the host.
+ *
+ *  @param[in,out] obj Host escalation object.
+ *  @param[in,out] s   Configuration state.
+ */
+void applier::hostescalation::_inherits_special_vars(
+                                shared_ptr<configuration::hostescalation> obj,
+                                configuration::state& s) {
+  // Detect if any special variable has not been defined.
+  if (!obj->contactgroups_defined()
+      || !obj->notification_interval_defined()
+      || !obj->escalation_period_defined()) {
+    // Remove host escalation from state (it will be modified and
+    // reinserted at the end of the method).
+    s.hostescalations().erase(obj);
+
+    // Find host.
+    std::set<shared_ptr<configuration::host> >::const_iterator
+      it(s.hosts().begin()),
+      end(s.hosts().end());
+    while (it != end) {
+      if ((*it)->host_name() == obj->hosts().front())
+        break ;
+      ++it;
+    }
+    if (it == end)
+      throw (engine_error()
+             << "Error: Could not inherit special variables from host '"
+             << obj->hosts().front() << "': host does not exist.");
+
+    // Inherits variables.
+    if (!obj->contactgroups_defined())
+      obj->contactgroups() = (*it)->contactgroups();
+    if (!obj->notification_interval_defined())
+      obj->notification_interval((*it)->notification_interval());
+    if (!obj->escalation_period_defined())
+      obj->escalation_period((*it)->notification_period());
+
+    // Reinsert host escalation.
+    s.hostescalations().insert(obj);
   }
 
   return ;
