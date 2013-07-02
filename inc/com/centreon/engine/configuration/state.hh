@@ -207,9 +207,9 @@ namespace              configuration {
                        hostdependencies() const throw ();
     set_hostdependency&
                        hostdependencies() throw ();
-    list_hostescalation const&
+    set_hostescalation const&
                        hostescalations() const throw ();
-    list_hostescalation&
+    set_hostescalation&
                        hostescalations() throw ();
     set_hostgroup const&
                        hostgroups() const throw ();
@@ -515,8 +515,7 @@ namespace              configuration {
     float              _high_host_flap_threshold;
     float              _high_service_flap_threshold;
     set_hostdependency _hostdependencies;
-    list_hostescalation
-                       _hostescalations;
+    set_hostescalation _hostescalations;
     set_hostgroup      _hostgroups;
     set_host           _hosts;
     unsigned int       _host_check_timeout;

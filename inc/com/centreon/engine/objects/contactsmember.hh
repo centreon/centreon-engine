@@ -68,6 +68,9 @@ bool          operator==(
 bool          operator!=(
                 contactsmember const& obj1,
                 contactsmember const& obj2) throw ();
+bool          operator<(
+                contactsmember const& obj1,
+                contactsmember const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, contactsmember const& obj);
 
 #  endif /* C++ */

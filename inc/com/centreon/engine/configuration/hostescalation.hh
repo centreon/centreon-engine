@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_HOSTESCALATION_HH
 #  define CCE_CONFIGURATION_HOSTESCALATION_HH
 
-#  include <list>
+#  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -47,6 +47,8 @@ namespace                  configuration {
                              hostescalation const& right) const throw ();
     bool                   operator!=(
                              hostescalation const& right) const throw ();
+    bool                   operator<(
+                             hostescalation const& right) const;
     void                   check_validity() const;
     std::size_t            id() const throw ();
     void                   merge(object const& obj);
@@ -59,7 +61,9 @@ namespace                  configuration {
     unsigned short         escalation_options() const throw ();
     std::string const&     escalation_period() const throw ();
     unsigned int           first_notification() const throw ();
+    list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
+    list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     unsigned int           last_notification() const throw ();
     unsigned int           notification_interval() const throw ();
@@ -86,8 +90,8 @@ namespace                  configuration {
     opt<unsigned int>      _notification_interval;
   };
 
-  typedef shared_ptr<hostescalation>    hostescalation_ptr;
-  typedef std::list<hostescalation_ptr> list_hostescalation;
+  typedef shared_ptr<hostescalation>   hostescalation_ptr;
+  typedef std::set<hostescalation_ptr> set_hostescalation;
 }
 
 CCE_END()

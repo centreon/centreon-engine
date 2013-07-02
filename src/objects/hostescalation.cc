@@ -35,6 +35,11 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
 
+#define CMP_CSTR(str1, str2) \
+  if ((!!(str1) ^ !!(str2)) \
+      || ((str1) && (str2) && strcmp((str1), (str2)))) \
+    return (strcmp((str1), (str2)) < 0);
+
 /**
  *  Equal operator.
  *
@@ -70,6 +75,55 @@ bool operator!=(
        hostescalation const& obj1,
        hostescalation const& obj2) throw () {
   return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Less-than operator.
+ *
+ *  @param[in] obj1 First object to compare.
+ *  @param[in] obj2 Second object to compare.
+ *
+ *  @return True if the first object is less than the second.
+ */
+bool operator<(
+       hostescalation const& obj1,
+       hostescalation const& obj2) {
+  CMP_CSTR(obj1.host_name, obj2.host_name)
+  else
+    CMP_CSTR(obj1.escalation_period, obj2.escalation_period)
+  else if (obj1.first_notification != obj2.first_notification)
+    return (obj1.first_notification < obj2.first_notification);
+  else if (obj1.last_notification != obj2.last_notification)
+    return (obj1.last_notification < obj2.last_notification);
+  else if (obj1.notification_interval != obj2.notification_interval)
+    return (obj1.notification_interval < obj2.notification_interval);
+  else if (obj1.escalate_on_recovery != obj2.escalate_on_recovery)
+    return (obj1.escalate_on_recovery < obj2.escalate_on_recovery);
+  else if (obj1.escalate_on_down != obj2.escalate_on_down)
+    return (obj2.escalate_on_down < obj2.escalate_on_down);
+  else if (obj1.escalate_on_unreachable
+           != obj2.escalate_on_unreachable)
+    return (obj1.escalate_on_unreachable
+            < obj2.escalate_on_unreachable);
+  for (contactgroupsmember
+         * m1(obj1.contact_groups),
+         * m2(obj2.contact_groups);
+       m1 || m2;
+       m1 = m1->next, m2 = m2->next) {
+    if (!m1 || !m2)
+      return (!!m1 < !!m2);
+    else if (*m1 != *m2)
+      return (*m1 < *m2);
+  }
+  for (contactsmember* m1(obj1.contacts), * m2(obj2.contacts);
+       m1 || m2;
+       m1 = m1->next, m2 = m2->next) {
+    if (!m1 || !m2)
+      return (!!m1 < !!m2);
+    else if (*m1 != *m2)
+      return (*m1 < *m2);
+  }
+  return (false);
 }
 
 /**

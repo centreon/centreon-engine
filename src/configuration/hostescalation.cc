@@ -60,9 +60,7 @@ hostescalation::hostescalation()
     _escalation_options(default_escalation_options),
     _first_notification(default_first_notification),
     _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {
-
-}
+    _notification_interval(default_notification_interval) {}
 
 /**
  *  Copy constructor.
@@ -77,9 +75,7 @@ hostescalation::hostescalation(hostescalation const& right)
 /**
  *  Destructor.
  */
-hostescalation::~hostescalation() throw () {
-
-}
+hostescalation::~hostescalation() throw () {}
 
 /**
  *  Copy constructor.
@@ -133,6 +129,33 @@ bool hostescalation::operator==(hostescalation const& right) const throw () {
  */
 bool hostescalation::operator!=(hostescalation const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool hostescalation::operator<(hostescalation const& right) const {
+  if (_hosts != right._hosts)
+    return (_hosts < right._hosts);
+  else if (_hostgroups != right._hostgroups)
+    return (_hostgroups < right._hostgroups);
+  else if (_contacts != right._contacts)
+    return (_contacts < right._contacts);
+  else if (_contactgroups != right._contactgroups)
+    return (_contactgroups < right._contactgroups);
+  else if (_escalation_options != right._escalation_options)
+    return (_escalation_options < right._escalation_options);
+  else if (_escalation_period != right._escalation_period)
+    return (_escalation_period < right._escalation_period);
+  else if (_first_notification != right._first_notification)
+    return (_first_notification < right._first_notification);
+  else if (_last_notification != right._last_notification)
+    return (_last_notification < right._last_notification);
+  return (_notification_interval < right._notification_interval);
 }
 
 /**
@@ -254,12 +277,30 @@ unsigned int hostescalation::first_notification() const throw () {
 }
 
 /**
+ *  Get host groups.
+ *
+ *  @return The host groups.
+ */
+list_string& hostescalation::hostgroups() throw () {
+  return (*_hostgroups);
+}
+
+/**
  *  Get hostgroups.
  *
  *  @return The hostgroups.
  */
 list_string const& hostescalation::hostgroups() const throw () {
   return (*_hostgroups);
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The hosts.
+ */
+list_string& hostescalation::hosts() throw () {
+  return (*_hosts);
 }
 
 /**

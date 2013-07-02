@@ -61,6 +61,9 @@ bool          operator==(
 bool          operator!=(
                 contactgroupsmember const& obj1,
                 contactgroupsmember const& obj2) throw ();
+bool          operator<(
+                contactgroupsmember const& obj1,
+                contactgroupsmember const& obj2) throw ();
 std::ostream& operator<<(
                 std::ostream& os,
                 contactgroupsmember const& obj);

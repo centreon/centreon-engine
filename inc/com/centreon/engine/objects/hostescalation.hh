@@ -68,6 +68,9 @@ bool          operator==(
 bool          operator!=(
                 hostescalation const& obj1,
                 hostescalation const& obj2) throw ();
+bool          operator<(
+                hostescalation const& obj1,
+                hostescalation const& obj2);
 std::ostream& operator<<(std::ostream& os, hostescalation const& obj);
 
 #  endif /* C++ */

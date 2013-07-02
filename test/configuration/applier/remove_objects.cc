@@ -173,8 +173,8 @@ public:
   }
 
   bool               find_into_config() {
-    configuration::list_hostescalation const& objects(config->hostescalations());
-    for (configuration::list_hostescalation::const_iterator
+    configuration::set_hostescalation const& objects(config->hostescalations());
+    for (configuration::set_hostescalation::const_iterator
            it(objects.begin()), end(objects.end());
          it != end;
          ++it)
@@ -409,7 +409,7 @@ int main_test(int argc, char* argv[]) {
   else if (type == "hostescalation") {
     chk_hostescalation chk_hostescalation;
     check_remove_objects<
-      configuration::list_hostescalation,
+      configuration::set_hostescalation,
       configuration::hostescalation,
       &configuration::state::hostescalations>(config, chk_hostescalation);
   }

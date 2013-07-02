@@ -206,28 +206,6 @@ static void sort_it(T*& l) {
 /**
  *  Sort a list.
  */
-static void sort_it(contactsmember*& l) {
-  contactsmember* remaining(l);
-  contactsmember** new_root(&l);
-  *new_root = NULL;
-  while (remaining) {
-    contactsmember** min(&remaining);
-    for (contactsmember** cur(&((*min)->next));
-         *cur;
-         cur = &((*cur)->next))
-      if (strcmp((*cur)->contact_name, (*min)->contact_name) < 0)
-        min = cur;
-    *new_root = *min;
-    *min = (*min)->next;
-    new_root = &((*new_root)->next);
-    *new_root = NULL;
-  }
-  return ;
-}
-
-/**
- *  Sort a list.
- */
 static void sort_it(servicesmember*& l) {
   servicesmember* remaining(l);
   servicesmember** new_root(&l);
@@ -439,6 +417,22 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.hostdependencies, &deleter::hostdependency);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
+  for (hostescalation_struct* he1(g1.hostescalations);
+       he1;
+       he1 = he1->next) {
+    sort_it(he1->contacts);
+    sort_it(he1->contact_groups);
+  }
+  sort_it(g1.hostescalations);
+  remove_duplicates(g1.hostescalations, &deleter::hostescalation);
+  for (hostescalation_struct* he2(g2.hostescalations);
+       he2;
+       he2 = he2->next) {
+    sort_it(he2->contacts);
+    sort_it(he2->contact_groups);
+  }
+  sort_it(g2.hostescalations);
+  remove_duplicates(g2.hostescalations, &deleter::hostescalation);
   if (!chkdiff(g1.hostescalations, g2.hostescalations))
     ret = false;
   if (!chkdiff(g1.hostgroups, g2.hostgroups))

@@ -676,7 +676,7 @@ bool state::operator==(state const& right) const throw () {
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
           && cmp_set_ptr(_hostdependencies, right._hostdependencies)
-          && cmp_list_ptr(_hostescalations, right._hostescalations)
+          && cmp_set_ptr(_hostescalations, right._hostescalations)
           && cmp_set_ptr(_hostgroups, right._hostgroups)
           && cmp_set_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
@@ -1714,7 +1714,7 @@ set_hostdependency& state::hostdependencies() throw () {
  *
  *  @return All engine hostescalations.
  */
-list_hostescalation const& state::hostescalations() const throw () {
+set_hostescalation const& state::hostescalations() const throw () {
   return (_hostescalations);
 }
 
@@ -1723,7 +1723,7 @@ list_hostescalation const& state::hostescalations() const throw () {
  *
  *  @return All engine hostescalations.
  */
-list_hostescalation& state::hostescalations() throw () {
+set_hostescalation& state::hostescalations() throw () {
   return (_hostescalations);
 }
 

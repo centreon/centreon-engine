@@ -108,7 +108,7 @@ int main_test(int argc, char* argv[]) {
   else if (type == "hostescalation") {
     check_objects<
       configuration::hostescalation,
-      configuration::list_hostescalation,
+      configuration::set_hostescalation,
       &configuration::state::hostescalations>(fe.path());
   }
   // else if (type == "hostextinfo") {

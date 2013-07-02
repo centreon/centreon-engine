@@ -27,10 +27,12 @@
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
+#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
+#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
@@ -105,6 +107,28 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator find_hostde
         && ((p.first->second->dependency_type
              == NOTIFICATION_DEPENDENCY) == key.is_notification))
       break ;
+    ++p.first;
+  }
+  return ((p.first != p.second) ? p.first : obj.end());
+}
+
+/**
+ *  Find a host escalation in the umultimap.
+ *
+ *  @param[in] obj Collection in which to search for.
+ *  @param[in] key Key to search for.
+ *
+ *  @return Iterator to the element matching key, obj.end() if it was
+ *          not found.
+ */
+umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator find_hostescalation_key(
+  umultimap<std::string, shared_ptr<hostescalation_struct> >& obj,
+  configuration::hostescalation const& key) {
+  typedef umultimap<std::string, shared_ptr<hostescalation_struct> > CollectionType;
+  std::pair<CollectionType::iterator, CollectionType::iterator>
+    p(obj.equal_range(key.hosts().front()));
+  while (p.first != p.second) {
+    // XXX
     ++p.first;
   }
   return ((p.first != p.second) ? p.first : obj.end());
@@ -236,6 +260,16 @@ hostdependency_id hostdependency_key(
   id.host = hd.hosts().front();
   id.is_notification = hd.notification_failure_options();
   return (id);
+}
+
+/**
+ *  Get the key of a host escalation.
+ *
+ *  @return A copy of the host escalation configuration object.
+ */
+configuration::hostescalation hostescalation_key(
+                                configuration::hostescalation const& he) {
+  return (he);
 }
 
 /**
@@ -489,6 +523,24 @@ void applier::state::apply(configuration::state& new_cfg) {
     new_cfg.servicedependencies());
   _resolve<configuration::servicedependency, applier::servicedependency>(
     config->servicedependencies());
+
+  // Apply host escalations.
+  _expand<configuration::hostescalation, applier::hostescalation>(
+    new_cfg,
+    new_cfg.hostescalations());
+  _apply<configuration::hostescalation,
+         umultimap<std::string,
+                   shared_ptr<hostescalation_struct> >,
+         applier::hostescalation,
+         configuration::hostescalation,
+         &hostescalation_key,
+         &find_hostescalation_key>(
+    config->hostescalations(),
+    _hostescalations,
+    new_cfg,
+    new_cfg.hostescalations());
+  _resolve<configuration::hostescalation, applier::hostescalation>(
+    config->hostescalations());
 
   // Pre-flight check.
   {

@@ -68,6 +68,26 @@ bool operator!=(
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] obj1 First object to compare.
+ *  @param[in] obj2 Second object to compare.
+ *
+ *  @return True if the first object is less than the second.
+ */
+bool operator<(
+       contactgroupsmember const& obj1,
+       contactgroupsmember const& obj2) throw () {
+  if (!!obj1.group_name ^ !!obj2.group_name)
+    return (!!obj1.group_name < !!obj2.group_name);
+  else if (obj1.group_name
+           && obj2.group_name
+           && strcmp(obj1.group_name, obj2.group_name))
+    return (strcmp(obj1.group_name, obj2.group_name) < 0);
+  return (false);
+}
+
+/**
  *  Dump contactgroupsmember content into the stream.
  *
  *  @param[out] os  The output stream.
