@@ -727,7 +727,7 @@ bool state::operator==(state const& right) const throw () {
           && _retain_state_information == right._retain_state_information
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
-          && cmp_list_ptr(_servicedependencies, right._servicedependencies)
+          && cmp_set_ptr(_servicedependencies, right._servicedependencies)
           && cmp_list_ptr(_serviceescalations, right._serviceescalations)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
           && cmp_set_ptr(_services, right._services)
@@ -2694,7 +2694,7 @@ void state::retention_update_interval(unsigned int value) {
  *
  *  @return All engine servicedependencies.
  */
-list_servicedependency const& state::servicedependencies() const throw () {
+set_servicedependency const& state::servicedependencies() const throw () {
   return (_servicedependencies);
 }
 
@@ -2703,7 +2703,7 @@ list_servicedependency const& state::servicedependencies() const throw () {
  *
  *  @return All engine servicedependencies.
  */
-list_servicedependency& state::servicedependencies() throw () {
+set_servicedependency& state::servicedependencies() throw () {
   return (_servicedependencies);
 }
 

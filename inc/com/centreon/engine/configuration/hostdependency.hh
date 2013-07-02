@@ -41,8 +41,8 @@ namespace                  configuration {
     };
     enum                   dependency_kind {
       unknown = 0,
-      execution_dependency,
-      notification_dependency
+      notification_dependency,
+      execution_dependency
     };
 
                            hostdependency();

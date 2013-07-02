@@ -132,7 +132,7 @@ int main_test(int argc, char* argv[]) {
   else if (type == "servicedependency") {
     check_objects<
       configuration::servicedependency,
-      configuration::list_servicedependency,
+      configuration::set_servicedependency,
       &configuration::state::servicedependencies>(fe.path());
   }
   else if (type == "serviceescalation") {

@@ -315,9 +315,9 @@ namespace              configuration {
     void               retention_scheduling_horizon(unsigned int value);
     unsigned int       retention_update_interval() const throw ();
     void               retention_update_interval(unsigned int value);
-    list_servicedependency const&
+    set_servicedependency const&
                        servicedependencies() const throw ();
-    list_servicedependency&
+    set_servicedependency&
                        servicedependencies() throw ();
     list_serviceescalation const&
                        serviceescalations() const throw ();
@@ -569,7 +569,7 @@ namespace              configuration {
     bool               _retain_state_information;
     unsigned int       _retention_scheduling_horizon;
     unsigned int       _retention_update_interval;
-    list_servicedependency
+    set_servicedependency
                        _servicedependencies;
     list_serviceescalation
                        _serviceescalations;

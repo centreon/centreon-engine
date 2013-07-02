@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
 #  define CCE_CONFIGURATION_SERVICEDEPENDENCY_HH
 
-#  include <list>
+#  include <set>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/opt.hh"
@@ -40,6 +40,11 @@ namespace                  configuration {
       critical = (1 << 3),
       pending = (1 << 4)
     };
+    enum                   dependency_kind {
+      unknown_type = 0,
+      notification_dependency,
+      execution_dependency
+    };
 
                            servicedependency();
                            servicedependency(
@@ -50,6 +55,8 @@ namespace                  configuration {
                              servicedependency const& right) const throw ();
     bool                   operator!=(
                              servicedependency const& right) const throw ();
+    bool                   operator<(
+                             servicedependency const& right) const;
     void                   check_validity() const;
     std::size_t            id() const throw ();
     void                   merge(object const& obj);
@@ -58,16 +65,27 @@ namespace                  configuration {
                              std::string const& value);
 
     std::string const&     dependency_period() const throw ();
+    void                   dependency_type(
+                             dependency_kind type) throw ();
+    dependency_kind        dependency_type() const throw ();
+    list_string&           dependent_hostgroups() throw ();
     list_string const&     dependent_hostgroups() const throw ();
+    list_string&           dependent_hosts() throw ();
     list_string const&     dependent_hosts() const throw ();
+    list_string&           dependent_servicegroups() throw ();
     list_string const&     dependent_servicegroups() const throw ();
+    list_string&           dependent_service_description() throw ();
     list_string const&     dependent_service_description() const throw ();
     unsigned int           execution_failure_options() const throw ();
     bool                   inherits_parent() const throw ();
+    list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
+    list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     unsigned int           notification_failure_options() const throw ();
+    list_string&           servicegroups() throw ();
     list_string const&     servicegroups() const throw ();
+    list_string&           service_description() throw ();
     list_string const&     service_description() const throw ();
 
   private:
@@ -85,21 +103,22 @@ namespace                  configuration {
     bool                   _set_service_description(std::string const& value);
 
     std::string            _dependency_period;
+    dependency_kind        _dependency_type;
     group                  _dependent_hostgroups;
     group                  _dependent_hosts;
     group                  _dependent_servicegroups;
     group                  _dependent_service_description;
     opt<unsigned int>      _execution_failure_options;
-    opt<bool>              _inherits_parent;
     group                  _hostgroups;
     group                  _hosts;
+    opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
     group                  _servicegroups;
     group                  _service_description;
   };
 
   typedef shared_ptr<servicedependency>    servicedependency_ptr;
-  typedef std::list<servicedependency_ptr> list_servicedependency;
+  typedef std::set<servicedependency_ptr>  set_servicedependency;
 }
 
 CCE_END()

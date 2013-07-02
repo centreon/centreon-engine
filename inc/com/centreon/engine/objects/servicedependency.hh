@@ -80,6 +80,9 @@ bool          operator==(
 bool          operator!=(
                 servicedependency const& obj1,
                 servicedependency const& obj2) throw ();
+bool          operator<(
+                servicedependency const& obj1,
+                servicedependency const& obj2);
 std::ostream& operator<<(
                 std::ostream& os,
                 servicedependency const& obj);

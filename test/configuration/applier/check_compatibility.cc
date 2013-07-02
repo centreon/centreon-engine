@@ -27,6 +27,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
+#include "com/centreon/engine/objects/servicedependency.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
@@ -184,16 +185,15 @@ static std::string to_str(char const* str) { return (str ? str : ""); }
 /**
  *  Sort a list.
  */
-static void sort_it(contactsmember*& l) {
-  contactsmember* remaining(l);
-  contactsmember** new_root(&l);
+template <typename T>
+static void sort_it(T*& l) {
+  T* remaining(l);
+  T** new_root(&l);
   *new_root = NULL;
   while (remaining) {
-    contactsmember** min(&remaining);
-    for (contactsmember** cur(&((*min)->next));
-         *cur;
-         cur = &((*cur)->next))
-      if (strcmp((*cur)->contact_name, (*min)->contact_name) < 0)
+    T** min(&remaining);
+    for (T** cur(&((*min)->next)); *cur; cur = &((*cur)->next))
+      if (**cur < **min)
         min = cur;
     *new_root = *min;
     *min = (*min)->next;
@@ -206,16 +206,16 @@ static void sort_it(contactsmember*& l) {
 /**
  *  Sort a list.
  */
-static void sort_it(hostdependency_struct*& l) {
-  hostdependency_struct* remaining(l);
-  hostdependency_struct** new_root(&l);
+static void sort_it(contactsmember*& l) {
+  contactsmember* remaining(l);
+  contactsmember** new_root(&l);
   *new_root = NULL;
   while (remaining) {
-    hostdependency_struct** min(&remaining);
-    for (hostdependency_struct** cur(&((*min)->next));
+    contactsmember** min(&remaining);
+    for (contactsmember** cur(&((*min)->next));
          *cur;
          cur = &((*cur)->next))
-      if (**cur < **min)
+      if (strcmp((*cur)->contact_name, (*min)->contact_name) < 0)
         min = cur;
     *new_root = *min;
     *min = (*min)->next;
@@ -445,6 +445,10 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   if (!chkdiff(g1.services, g2.services))
     ret = false;
+  sort_it(g1.servicedependencies);
+  remove_duplicates(g1.servicedependencies, &deleter::servicedependency);
+  sort_it(g2.servicedependencies);
+  remove_duplicates(g2.servicedependencies, &deleter::servicedependency);
   if (!chkdiff(g1.servicedependencies, g2.servicedependencies))
     ret = false;
   if (!chkdiff(g1.serviceescalations, g2.serviceescalations))

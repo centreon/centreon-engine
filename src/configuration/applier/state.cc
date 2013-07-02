@@ -30,6 +30,7 @@
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
+#include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
@@ -103,6 +104,73 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator find_hostde
     if ((p.first->second->host_name == key.host)
         && ((p.first->second->dependency_type
              == NOTIFICATION_DEPENDENCY) == key.is_notification))
+      break ;
+    ++p.first;
+  }
+  return ((p.first != p.second) ? p.first : obj.end());
+}
+
+/**
+ *  Find a service dependency in the umultimap.
+ *
+ *  @param[in] obj Collection in which to search for.
+ *  @param[in] key Key to search for.
+ *
+ *  @return Iterator to the element matching key, obj.end() if it was
+ *          not found.
+ */
+umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator find_servicedependency_key(
+  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >& obj,
+  configuration::servicedependency const& key) {
+  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> > CollectionType;
+  std::pair<CollectionType::iterator, CollectionType::iterator>
+    p(obj.equal_range(std::make_pair(
+                        key.dependent_hosts().front(),
+                        key.dependent_service_description().front())));
+  while (p.first != p.second) {
+    servicedependency_struct& sd(*p.first->second);
+    unsigned int options(
+                   (sd.fail_on_ok
+                    ? configuration::servicedependency::ok
+                    : 0)
+                   | (sd.fail_on_warning
+                      ? configuration::servicedependency::warning
+                      : 0)
+                   | (sd.fail_on_unknown
+                      ? configuration::servicedependency::unknown
+                      : 0)
+                   | (sd.fail_on_critical
+                      ? configuration::servicedependency::critical
+                      : 0)
+                   | (sd.fail_on_pending
+                      ? configuration::servicedependency::pending
+                      : 0));
+    std::string dhn(sd.dependent_host_name
+                    ? sd.dependent_host_name
+                    : "");
+    std::string dsd(sd.dependent_service_description
+                    ? sd.dependent_service_description
+                    : "");
+    std::string hn(sd.host_name
+                   ? sd.host_name
+                   : "");
+    std::string sde(sd.service_description
+                    ? sd.service_description
+                    : "");
+    std::string dp(sd.dependency_period
+                   ? sd.dependency_period
+                   : NULL);
+    if ((sd.dependency_type == key.dependency_type())
+        && (dhn == key.dependent_hosts().front())
+        && (dsd == key.dependent_service_description().front())
+        && (hn == key.hosts().front())
+        && (sde == key.service_description().front())
+        && (dp == key.dependency_period())
+        && (sd.inherits_parent == key.inherits_parent())
+        && (options
+            == ((sd.dependency_type == EXECUTION_DEPENDENCY)
+                ? key.execution_failure_options()
+                : key.notification_failure_options())))
       break ;
     ++p.first;
   }
@@ -189,6 +257,16 @@ std::pair<std::string, std::string> service_key(
   return (std::make_pair(
                  s.hosts().front(),
                  s.service_description()));
+}
+
+/**
+ *  Get the key of a service dependency.
+ *
+ *  @param[in] sd Service dependency.
+ */
+configuration::servicedependency servicedependency_key(
+                 configuration::servicedependency const& sd) {
+  return (sd);
 }
 
 /**
@@ -393,6 +471,24 @@ void applier::state::apply(configuration::state& new_cfg) {
     new_cfg.hostdependencies());
   _resolve<configuration::hostdependency, applier::hostdependency>(
     config->hostdependencies());
+
+  // Apply service dependencies.
+  _expand<configuration::servicedependency, applier::servicedependency>(
+    new_cfg,
+    new_cfg.servicedependencies());
+  _apply<configuration::servicedependency,
+         umultimap<std::pair<std::string, std::string>,
+                   shared_ptr<servicedependency_struct> >,
+         applier::servicedependency,
+         configuration::servicedependency,
+         &servicedependency_key,
+         &find_servicedependency_key>(
+    config->servicedependencies(),
+    _servicedependencies,
+    new_cfg,
+    new_cfg.servicedependencies());
+  _resolve<configuration::servicedependency, applier::servicedependency>(
+    config->servicedependencies());
 
   // Pre-flight check.
   {

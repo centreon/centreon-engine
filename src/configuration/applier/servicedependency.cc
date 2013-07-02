@@ -17,9 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/object.hh"
+#include "com/centreon/engine/configuration/servicedependency.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -60,27 +63,221 @@ applier::servicedependency& applier::servicedependency::operator=(
 /**
  *  Add new servicedependency.
  *
- *  @param[in] obj The new servicedependency to add into the monitoring engine.
+ *  @param[in] obj The new servicedependency to add into the monitoring
+ *                 engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicedependency::add_object(servicedependency_ptr obj) {
-  // XXX
+void applier::servicedependency::add_object(
+                                   configuration::servicedependency const& obj,
+                                   configuration::state const& s) {
+  // Check service dependency.
+  if ((obj.hosts().size() != 1)
+      || !obj.hostgroups().empty()
+      || (obj.service_description().size() != 1)
+      || !obj.servicegroups().empty()
+      || (obj.dependent_hosts().size() != 1)
+      || !obj.dependent_hostgroups().empty()
+      || (obj.dependent_service_description().size() != 1)
+      || !obj.dependent_servicegroups().empty())
+    throw (engine_error() << "Error: Could not create service "
+           << "dependency with multiple (dependent) hosts / host groups "
+           << "/ services / service groups.");
+  if ((obj.dependency_type()
+       != configuration::servicedependency::execution_dependency)
+      && (obj.dependency_type()
+          != configuration::servicedependency::notification_dependency))
+    throw (engine_error() << "Error: Could not create unexpanded "
+           << "dependency of service '"
+           << obj.dependent_service_description().front()
+           << "' of host '" << obj.dependent_hosts().front()
+           << "' on service '" << obj.service_description().front()
+           << "' of host '" << obj.hosts().front() << "'.");
+
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Creating new service dependency of service '"
+    << obj.dependent_service_description().front() << "' of host '"
+    << obj.dependent_hosts().front() << "' on service '"
+    << obj.service_description().front() << "' of host '"
+    << obj.hosts().front() << "'.";
+
+  // Create execution dependency.
+  if (obj.dependency_type()
+      == configuration::servicedependency::execution_dependency) {
+    if (!add_service_dependency(
+           obj.dependent_hosts().front().c_str(),
+           obj.dependent_service_description().front().c_str(),
+           obj.hosts().front().c_str(),
+           obj.service_description().front().c_str(),
+           EXECUTION_DEPENDENCY,
+           obj.inherits_parent(),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::servicedependency::ok),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::servicedependency::warning),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::servicedependency::unknown),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::servicedependency::critical),
+           static_cast<bool>(
+             obj.execution_failure_options()
+             & configuration::servicedependency::pending),
+           NULL_IF_EMPTY(obj.dependency_period())))
+      throw (engine_error() << "Error: Could not create service "
+             << "execution dependency of service '"
+             << obj.dependent_service_description().front()
+             << "' of host '" << obj.dependent_hosts().front()
+             << "' on service '" << obj.service_description().front()
+             << "' of host '" << obj.hosts().front() << "'.");
+  }
+  // Create notification dependency.
+  else
+    if (!add_service_dependency(
+           obj.dependent_hosts().front().c_str(),
+           obj.dependent_service_description().front().c_str(),
+           obj.hosts().front().c_str(),
+           obj.service_description().front().c_str(),
+           NOTIFICATION_DEPENDENCY,
+           obj.inherits_parent(),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::servicedependency::ok),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::servicedependency::warning),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::servicedependency::unknown),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::servicedependency::critical),
+           static_cast<bool>(
+             obj.notification_failure_options()
+             & configuration::servicedependency::pending),
+           NULL_IF_EMPTY(obj.dependency_period())))
+      throw (engine_error() << "Error: Could not create service "
+             << "notification dependency of service '"
+             << obj.dependent_service_description().front()
+             << "' of host '" << obj.dependent_hosts().front()
+             << "' on service '" << obj.service_description().front()
+             << "' of host '" << obj.hosts().front() << "'.");
+
+  return ;
+}
+
+/**
+ *  Expand service dependency.
+ *
+ *  @param[in,out] obj Service dependency object to expand.
+ *  @param[in,out] s   Configuration being applied.
+ */
+void applier::servicedependency::expand_object(
+                                   shared_ptr<configuration::servicedependency> obj,
+                                   configuration::state& s) {
+  // Check service dependency.
+  if ((obj->hosts().size() != 1)
+      || !obj->hostgroups().empty()
+      || (obj->service_description().size() != 1)
+      || !obj->servicegroups().empty()
+      || (obj->dependent_hosts().size() != 1)
+      || !obj->dependent_hostgroups().empty()
+      || (obj->dependent_service_description().size() != 1)
+      || !obj->dependent_servicegroups().empty()
+      || (obj->dependency_type()
+          == configuration::servicedependency::unknown_type)) {
+    // Expand depended services.
+    std::set<std::pair<std::string, std::string> >
+      depended_services;
+    _expand_services(
+      obj->hosts(),
+      obj->hostgroups(),
+      obj->service_description(),
+      obj->servicegroups(),
+      s,
+      depended_services);
+
+    // Expand dependent services.
+    std::set<std::pair<std::string, std::string> >
+      dependent_services;
+    _expand_services(
+      obj->dependent_hosts(),
+      obj->dependent_hostgroups(),
+      obj->dependent_service_description(),
+      obj->dependent_servicegroups(),
+      s,
+      dependent_services);
+
+    // Remove current service dependency.
+    s.servicedependencies().erase(obj);
+
+    // Browse all depended and dependent services.
+    for (std::set<std::pair<std::string, std::string> >::const_iterator
+           it1(depended_services.begin()),
+           end1(depended_services.end());
+         it1 != end1;
+         ++it1)
+      for (std::set<std::pair<std::string, std::string> >::const_iterator
+             it2(dependent_services.begin()),
+             end2(dependent_services.end());
+           it2 != end2;
+           ++it2)
+        for (unsigned int i(0); i < 2; ++i) {
+          // Create service dependency instance.
+          shared_ptr<configuration::servicedependency>
+            sdep(new configuration::servicedependency(*obj));
+          sdep->hostgroups().clear();
+          sdep->hosts().clear();
+          sdep->hosts().push_back(it1->first);
+          sdep->servicegroups().clear();
+          sdep->service_description().clear();
+          sdep->service_description().push_back(it1->second);
+          sdep->dependent_hostgroups().clear();
+          sdep->dependent_hosts().clear();
+          sdep->dependent_hosts().push_back(it2->first);
+          sdep->dependent_servicegroups().clear();
+          sdep->dependent_service_description().clear();
+          sdep->dependent_service_description().push_back(it2->second);
+          sdep->dependency_type(
+            !i
+            ? configuration::servicedependency::execution_dependency
+            : configuration::servicedependency::notification_dependency);
+
+          // Insert new service dependency. We do not need to expand it
+          // because no expansion is made on 1->1 dependency.
+          s.servicedependencies().insert(sdep);
+        }
+  }
+
+  return ;
 }
 
 /**
  *  Modified servicedependency.
  *
- *  @param[in] obj The new servicedependency to modify into the monitoring engine.
+ *  @param[in] obj The new servicedependency to modify into the
+ *                 monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicedependency::modify_object(servicedependency_ptr obj) {
+void applier::servicedependency::modify_object(
+                                   configuration::servicedependency const& obj,
+                                   configuration::state const& s) {
   // XXX
 }
 
 /**
  *  Remove old servicedependency.
  *
- *  @param[in] obj The new servicedependency to remove from the monitoring engine.
+ *  @param[in] obj The new servicedependency to remove from the
+ *                 monitoring engine.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicedependency::remove_object(servicedependency_ptr obj) {
+void applier::servicedependency::remove_object(
+                                   configuration::servicedependency const& obj,
+                                   configuration::state const& s) {
   // XXX
 }
 
@@ -88,7 +285,111 @@ void applier::servicedependency::remove_object(servicedependency_ptr obj) {
  *  Resolve a servicedependency.
  *
  *  @param[in] obj Servicedependency object.
+ *  @param[in] s   Configuration being applied.
  */
-void applier::servicedependency::resolve_object(servicedependency_ptr obj) {
+void applier::servicedependency::resolve_object(
+                                   configuration::servicedependency const& obj,
+                                   configuration::state const& s) {
   // XXX
+}
+
+/**
+ *  Expand services.
+ *
+ *  @param[in]     hst      Hosts.
+ *  @param[in]     hg       Host groups.
+ *  @param[in]     svc      Service descriptions.
+ *  @param[in]     sg       Service groups.
+ *  @param[in,out] s        Configuration state.
+ *  @param[out]    expanded Expanded services.
+ */
+void applier::servicedependency::_expand_services(
+       std::list<std::string> const& hst,
+       std::list<std::string> const& hg,
+       std::list<std::string> const& svc,
+       std::list<std::string> const& sg,
+       configuration::state& s,
+       std::set<std::pair<std::string, std::string> >& expanded) {
+  // Expanded hosts.
+  std::set<std::string> all_hosts;
+
+  // Base hosts.
+  for (std::list<std::string>::const_iterator
+         it(hst.begin()),
+         end(hst.end());
+       it != end;
+       ++it)
+    all_hosts.insert(*it);
+
+  // Host groups.
+  for (std::list<std::string>::const_iterator
+         it(hg.begin()),
+         end(hg.end());
+       it != end;
+       ++it) {
+    // Find host group.
+    std::set<shared_ptr<configuration::hostgroup> >::iterator
+      it_group(s.hostgroups().begin()),
+      end_group(s.hostgroups().end());
+    while (it_group != end_group) {
+      if ((*it_group)->hostgroup_name() == *it)
+        break ;
+      ++it_group;
+    }
+    if (it_group == end_group)
+      throw (engine_error() << "Error: Could not resolve host group '"
+             << *it << "'.");
+
+    // Add host group members.
+    for (std::set<std::string>::const_iterator
+           it_member((*it_group)->resolved_members().begin()),
+           end_member((*it_group)->resolved_members().end());
+         it_member != end_member;
+         ++it_member)
+      all_hosts.insert(*it_member);
+  }
+
+  // Hosts * services.
+  for (std::set<std::string>::const_iterator
+         it_host(all_hosts.begin()),
+         end_host(all_hosts.end());
+       it_host != end_host;
+       ++it_host)
+    for (std::list<std::string>::const_iterator
+           it_service(svc.begin()),
+           end_service(svc.end());
+         it_service != end_service;
+         ++it_service)
+      expanded.insert(std::make_pair(*it_host, *it_service));
+
+  // Service groups.
+  for (std::list<std::string>::const_iterator
+         it(sg.begin()),
+         end(sg.end());
+       it != end;
+       ++it) {
+    // Find service group.
+    std::set<shared_ptr<configuration::servicegroup> >::iterator
+      it_group(s.servicegroups().begin()),
+      end_group(s.servicegroups().end());
+    while (it_group != end_group) {
+      if ((*it_group)->servicegroup_name() == *it)
+        break ;
+      ++it_group;
+    }
+    if (it_group == end_group)
+      throw (engine_error()
+             << "Error: Could not resolve service group '"
+             << *it << "'.");
+
+    // Add service group members.
+    for (std::set<std::pair<std::string, std::string> >::const_iterator
+           it_member((*it_group)->resolved_members().begin()),
+           end_member((*it_group)->resolved_members().end());
+         it_member != end_member;
+         ++it_member)
+      expanded.insert(*it_member);
+  }
+
+  return ;
 }

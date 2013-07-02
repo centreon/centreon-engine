@@ -80,7 +80,7 @@ void applier::hostdependency::add_object(
       && (obj.dependency_type()
           != configuration::hostdependency::notification_dependency))
     throw (engine_error() << "Error: Could not create unexpanded "
-           << "dependency of '" << obj.dependent_hosts().front()
+           << "host dependency of '" << obj.dependent_hosts().front()
            << "' on '" << obj.hosts().front() << "'.");
 
   // Logging.
@@ -114,8 +114,8 @@ void applier::hostdependency::add_object(
              << "dependency of '" << obj.dependent_hosts().front()
              << "' on '" << obj.hosts().front() << "'.");
   }
+  // Create notification dependency.
   else
-    // Create notification dependency.
     if (!add_host_dependency(
            obj.dependent_hosts().front().c_str(),
            obj.hosts().front().c_str(),
@@ -187,9 +187,9 @@ void applier::hostdependency::expand_object(
              it2(dependent_hosts.begin()),
              end2(dependent_hosts.end());
            it2 != end2;
-           ++it2) {
+           ++it2)
         for (unsigned int i(0); i < 2; ++i) {
-          // Create host execution dependency instance.
+          // Create host dependency instance.
           shared_ptr<configuration::hostdependency>
             hdep(new configuration::hostdependency(*obj));
           hdep->hostgroups().clear();
@@ -207,7 +207,6 @@ void applier::hostdependency::expand_object(
           // because no expansion is made on 1->1 dependency.
           s.hostdependencies().insert(hdep);
         }
-      }
   }
 
   return ;

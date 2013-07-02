@@ -74,11 +74,11 @@ static unsigned short const default_notification_failure_options(servicedependen
  */
 servicedependency::servicedependency()
   : object(object::servicedependency),
+    _dependency_type(unknown_type),
     _execution_failure_options(default_execution_failure_options),
     _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {
-
-}
+    _notification_failure_options(default_notification_failure_options)
+{}
 
 /**
  *  Copy constructor.
@@ -93,9 +93,7 @@ servicedependency::servicedependency(servicedependency const& right)
 /**
  *  Destructor.
  */
-servicedependency::~servicedependency() throw () {
-
-}
+servicedependency::~servicedependency() throw () {}
 
 /**
  *  Copy constructor.
@@ -108,6 +106,7 @@ servicedependency& servicedependency::operator=(servicedependency const& right) 
   if (this != &right) {
     object::operator=(right);
     _dependency_period = right._dependency_period;
+    _dependency_type = right._dependency_type;
     _dependent_hostgroups = right._dependent_hostgroups;
     _dependent_hosts = right._dependent_hosts;
     _dependent_servicegroups = right._dependent_servicegroups;
@@ -133,6 +132,7 @@ servicedependency& servicedependency::operator=(servicedependency const& right) 
 bool servicedependency::operator==(servicedependency const& right) const throw () {
   return (object::operator==(right)
           && _dependency_period == right._dependency_period
+          && _dependency_type == right._dependency_type
           && _dependent_hostgroups == right._dependent_hostgroups
           && _dependent_hosts == right._dependent_hosts
           && _dependent_servicegroups == right._dependent_servicegroups
@@ -155,6 +155,46 @@ bool servicedependency::operator==(servicedependency const& right) const throw (
  */
 bool servicedependency::operator!=(servicedependency const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Less-than operator.
+ *
+ *  @param[in] right Object to compare to.
+ *
+ *  @return True if this object is less than right.
+ */
+bool servicedependency::operator<(servicedependency const& right) const {
+  if (_dependent_hosts != right._dependent_hosts)
+    return (_dependent_hosts < right._dependent_hosts);
+  else if (_dependent_service_description
+           != right._dependent_service_description)
+    return (_dependent_service_description
+            < right._dependent_service_description);
+  else if (_hosts != right._hosts)
+    return (_hosts < right._hosts);
+  else if (_service_description != right._service_description)
+    return (_service_description < right._service_description);
+  else if (_dependent_hostgroups != right._dependent_hostgroups)
+    return (_dependent_hostgroups < right._dependent_hostgroups);
+  else if (_hostgroups != right._hostgroups)
+    return (_hostgroups < right._hostgroups);
+  else if (_dependent_servicegroups != right._dependent_servicegroups)
+    return (_dependent_servicegroups < right._dependent_servicegroups);
+  else if (_servicegroups != right._servicegroups)
+    return (_servicegroups < right._servicegroups);
+  else if (_dependency_type != right._dependency_type)
+    return (_dependency_type < right._dependency_type);
+  else if (_dependency_period != right._dependency_period)
+    return (_dependency_period < right._dependency_period);
+  else if (_execution_failure_options
+           != right._execution_failure_options)
+    return (_execution_failure_options
+            < right._execution_failure_options);
+  else if (_inherits_parent != right._inherits_parent)
+    return (_inherits_parent < right._inherits_parent);
+  return (_notification_failure_options
+          < right._notification_failure_options);
 }
 
 /**
@@ -263,12 +303,50 @@ std::string const& servicedependency::dependency_period() const throw () {
 }
 
 /**
+ *  Set the dependency type.
+ *
+ *  @param[in] type Dependency type.
+ */
+void servicedependency::dependency_type(
+                          servicedependency::dependency_kind type) throw () {
+  _dependency_type = type;
+  return ;
+}
+
+/**
+ *  Get the dependency type.
+ *
+ *  @return Dependency type.
+ */
+servicedependency::dependency_kind servicedependency::dependency_type() const throw () {
+  return (_dependency_type);
+}
+
+/**
+ *  Get dependent host groups.
+ *
+ *  @return Dependent host groups.
+ */
+list_string& servicedependency::dependent_hostgroups() throw () {
+  return (*_dependent_hostgroups);
+}
+
+/**
  *  Get dependent_hostgroup.
  *
  *  @return The dependent_hostgroup.
  */
 list_string const& servicedependency::dependent_hostgroups() const throw () {
   return (*_dependent_hostgroups);
+}
+
+/**
+ *  Get dependent hosts.
+ *
+ *  @return Dependent hosts.
+ */
+list_string& servicedependency::dependent_hosts() throw () {
+  return (*_dependent_hosts);
 }
 
 /**
@@ -281,12 +359,30 @@ list_string const& servicedependency::dependent_hosts() const throw () {
 }
 
 /**
+ *  Get dependent service groups.
+ *
+ *  @return Dependent service groups.
+ */
+list_string& servicedependency::dependent_servicegroups() throw () {
+  return (*_dependent_servicegroups);
+}
+
+/**
  *  Get dependent_servicegroup.
  *
  *  @return The dependent_servicegroup.
  */
 list_string const& servicedependency::dependent_servicegroups() const throw () {
   return (*_dependent_servicegroups);
+}
+
+/**
+ *  Get dependent service description.
+ *
+ *  @return Dependent service description.
+ */
+list_string& servicedependency::dependent_service_description() throw () {
+  return (*_dependent_service_description);
 }
 
 /**
@@ -317,12 +413,30 @@ bool servicedependency::inherits_parent() const throw () {
 }
 
 /**
+ *  Get host groups.
+ *
+ *  @return Host groups.
+ */
+list_string& servicedependency::hostgroups() throw () {
+  return (*_hostgroups);
+}
+
+/**
  *  Get hostgroup.
  *
  *  @return The hostgroup.
  */
 list_string const& servicedependency::hostgroups() const throw () {
   return (*_hostgroups);
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return Hosts.
+ */
+list_string& servicedependency::hosts() throw () {
+  return (*_hosts);
 }
 
 /**
@@ -344,12 +458,30 @@ unsigned int servicedependency::notification_failure_options() const throw () {
 }
 
 /**
+ *  Get service groups.
+ *
+ *  @return Service groups.
+ */
+list_string& servicedependency::servicegroups() throw () {
+  return (*_servicegroups);
+}
+
+/**
  *  Get servicegroup.
  *
  *  @return The servicegroup.
  */
 list_string const& servicedependency::servicegroups() const throw () {
   return (*_servicegroups);
+}
+
+/**
+ *  Get service description.
+ *
+ *  @return Service description.
+ */
+list_string& servicedependency::service_description() throw () {
+  return (*_service_description);
 }
 
 /**
