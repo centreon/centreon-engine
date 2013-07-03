@@ -48,6 +48,9 @@ static int xsddefault_status_log_fd(-1);
 
 /* initialize status data */
 int xsddefault_initialize_status_data() {
+  if (config->status_file().empty())
+    return (OK);
+
   // delete the old status log (it might not exist).
   unlink(config->status_file().c_str());
 
@@ -87,6 +90,9 @@ int xsddefault_cleanup_status_data(int delete_status_data) {
 
 /* write all status data to file */
 int xsddefault_save_status_data() {
+  if (xsddefault_status_log_fd == -1)
+    return (OK);
+
   int used_external_command_buffer_slots(0);
   int high_external_command_buffer_slots(0);
 

@@ -18,13 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/applier/engine.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 extern "C" {
@@ -53,7 +52,7 @@ int read_object_config_data(
     configuration::state config;
     configuration::parser p(options);
     p.parse(main_config_file, config);
-    configuration::applier::state::instance().apply(config);
+    configuration::applier::engine::instance().apply(config);
     ret = OK;
   }
   catch (std::exception const& e) {
