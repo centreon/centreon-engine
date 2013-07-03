@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -136,23 +135,15 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t hostgroup::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void hostgroup::check_validity() const {
   if (_hostgroup_name.empty())
-    throw (engine_error() << "configuration: invalid hostgroup "
-           "property hostgroup_name is missing");
+    throw (engine_error()
+           << "host group has no name (property 'hostgroup_name')");
+  return ;
 }
 
 /**
@@ -339,7 +330,6 @@ bool hostgroup::_set_hostgroup_members(std::string const& value) {
  */
 bool hostgroup::_set_hostgroup_name(std::string const& value) {
   _hostgroup_name = value;
-  _id = hash(value);
   return (true);
 }
 

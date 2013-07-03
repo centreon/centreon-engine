@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -120,30 +119,20 @@ bool serviceextinfo::operator!=(serviceextinfo const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t serviceextinfo::id() const throw () {
-  if (!_id) {
-    hash_combine(_id, _hosts->begin(), _hosts->end());
-    hash_combine(_id, _service_description);
-  }
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void serviceextinfo::check_validity() const {
   if (_service_description.empty())
-    throw (engine_error() << "configuration: invalid serviceextinfo "
-           "property service_description is missing");
+    throw (engine_error() << "service extended information is not "
+           << "attached to a service (property 'service_description')");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "configuration: invalid serviceextinfo "
-           "property host or hostgroup is missing");
+    throw (engine_error() << "service extended information of service '"
+           << _service_description << "' is not attached to any host or"
+           << " host group (properties 'host_name' or 'hostgroup_name'"
+           << ", respectively)");
+  return ;
 }
 
 /**
@@ -302,7 +291,6 @@ bool serviceextinfo::_set_icon_image_alt(std::string const& value) {
  */
 bool serviceextinfo::_set_hosts(std::string const& value) {
   _hosts = value;
-  _id = 0;
   return (true);
 }
 
@@ -351,6 +339,5 @@ bool serviceextinfo::_set_notes_url(std::string const& value) {
  */
 bool serviceextinfo::_set_service_description(std::string const& value) {
   _service_description = value;
-  _id = 0;
   return (true);
 }

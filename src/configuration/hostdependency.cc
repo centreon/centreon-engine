@@ -20,7 +20,6 @@
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -167,39 +166,21 @@ bool hostdependency::operator<(hostdependency const& right) const {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t hostdependency::id() const throw () {
-  if (!_id) {
-    hash_combine(
-      _id,
-      _dependent_hostgroups->begin(),
-      _dependent_hostgroups->end());
-    hash_combine(
-      _id,
-      _dependent_hosts->begin(),
-      _dependent_hosts->end());
-  }
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void hostdependency::check_validity() const {
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "configuration: invalid hostdependency "
-           "property host or hostgroup is missing");
+    throw (engine_error() << "host dependency is not attached to any "
+           << "host or host group (properties 'host_name' or "
+           << "'hostgroup_name', respectively)");
   if (_dependent_hosts->empty() && _dependent_hostgroups->empty())
-    throw (engine_error() << "configuration: invalid hostdependency "
-           "property dependent_host or dependent_hostgroup is missing");
-  if (_dependency_period.empty())
-    throw (engine_error() << "configuration: invalid hostdependency "
-           "property dependency_period is missing");
+    throw (engine_error() << "host dependency is not attached to any "
+           << "dependent host or dependent host group (properties "
+           << "'dependent_host_name' or 'dependent_hostgroup_name', "
+           << "respectively)");
+  return ;
 }
 
 /**
@@ -412,7 +393,6 @@ bool hostdependency::_set_dependency_period(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -425,7 +405,6 @@ bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool hostdependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts = value;
-  _id = 0;
   return (true);
 }
 

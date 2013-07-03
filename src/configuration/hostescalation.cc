@@ -20,7 +20,6 @@
 #include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -159,33 +158,19 @@ bool hostescalation::operator<(hostescalation const& right) const {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t hostescalation::id() const throw () {
-  if (!_id) {
-    hash_combine(_id, _hosts->begin(), _hosts->end());
-    hash_combine(
-      _id,
-      _hostgroups->begin(),
-      _hostgroups->end());
-  }
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void hostescalation::check_validity() const {
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "configuration: invalid hostescalation "
-           "property host or hostgroup is missing");
+    throw (engine_error() << "host escalation is not attached to any "
+           << "host or host group (properties 'host_name' or "
+           << "'hostgroup_name', respectively)");
   if (_contacts->empty() && _contactgroups->empty())
-    throw (engine_error() << "configuration: invalid hostescalation "
-           "property contact or contactgroup is missing");
+    throw (engine_error() << "host escalation is not attached to any "
+           << "contact or contact group (properties 'contacts' or "
+           << "'contact_groups', respectively)");
   return ;
 }
 
@@ -492,7 +477,6 @@ bool hostescalation::_set_first_notification(unsigned int value) {
  */
 bool hostescalation::_set_hostgroups(std::string const& value) {
   _hostgroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -505,7 +489,6 @@ bool hostescalation::_set_hostgroups(std::string const& value) {
  */
 bool hostescalation::_set_hosts(std::string const& value) {
   _hosts = value;
-  _id = 0;
   return (true);
 }
 

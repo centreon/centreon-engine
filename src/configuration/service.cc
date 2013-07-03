@@ -22,7 +22,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -380,33 +379,22 @@ bool service::operator<(service const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
- *
- *  @return The object id.
- */
-std::size_t service::id() const throw () {
-  if (!_id) {
-    hash_combine(_id, _hosts->begin(), _hosts->end());
-    hash_combine(_id, _service_description);
-  }
-  return (_id);
-}
-
-/**
  *  Check if the object is valid.
  *
  *  @return True if is a valid object, otherwise false.
  */
 void service::check_validity() const {
   if (_service_description.empty())
-    throw (engine_error() << "configuration: invalid service property "
-           "service_description is missing");
+    throw (engine_error() << "service has no description (property "
+           << "'service_description')");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "configuration: invalid service property "
-           "host or hostgroup is missing");
+    throw (engine_error() << "service '" << _service_description
+           << "' is not attached to any host or host group (properties "
+           << "'host_name' or 'hostgroup_name', respectively)");
   if (_check_command.empty())
-    throw (engine_error() << "configuration: invalid service property "
-           "check_command is missing");
+    throw (engine_error() << "service '" << _service_description
+           << "' has no check command (property 'check_command')");
+  return ;
 }
 
 /**
@@ -1223,7 +1211,6 @@ bool service::_set_hostgroups(std::string const& value) {
  */
 bool service::_set_hosts(std::string const& value) {
   _hosts = value;
-  _id = 0;
   return (true);
 }
 
@@ -1508,7 +1495,6 @@ bool service::_set_servicegroups(std::string const& value) {
  */
 bool service::_set_service_description(std::string const& value) {
   _service_description = value;
-  _id = 0;
   return (true);
 }
 

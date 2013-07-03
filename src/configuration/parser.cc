@@ -123,10 +123,14 @@ void parser::_add_object(object_ptr obj) {
   if (obj->is_template())
     return;
 
-  if (!obj->id())
-    throw (engine_error() << "configuration: parse "
-           << obj->type_name() << " failed: property missing in "
-           "file '" << _current_path << "' on line " << _current_line);
+  // XXX : object validity should be checked with check_validity()
+  //       however it cannot be called right now (template resolution
+  //       has not occurred) nor later (no _current_path, no
+  //       _current_line)
+  // if (!obj->id())
+  //   throw (engine_error() << "configuration: parse "
+  //          << obj->type_name() << " failed: property missing in "
+  //          "file '" << _current_path << "' on line " << _current_line);
   (this->*_store[obj->type()])(obj);
 }
 
@@ -306,17 +310,6 @@ void parser::_get_objects_by_list_name(
       out.push_back(obj);
     }
   }
-}
-
-/**
- *  Compare two shared pointer object id.
- *
- *  @return True if the first object id is smaller than
- *          the second object id.
- */
-template<typename T>
-static bool smaller_id(shared_ptr<T> const& c1, shared_ptr<T> const& c2) {
-  return (c1->id() < c2->id());
 }
 
 /**

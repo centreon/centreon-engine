@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -124,23 +123,15 @@ bool contactgroup::operator<(contactgroup const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t contactgroup::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void contactgroup::check_validity() const {
   if (_contactgroup_name.empty())
-    throw (engine_error() << "configuration: invalid contactgroup "
-           "property contactgroup_name is missing");
+    throw (engine_error() << "contact group has no name "
+           << "(property 'contactgroup_name')");
+  return ;
 }
 
 /**
@@ -285,7 +276,6 @@ bool contactgroup::_set_contactgroup_members(std::string const& value) {
  */
 bool contactgroup::_set_contactgroup_name(std::string const& value) {
   _contactgroup_name = value;
-  _id = hash(value);
   return (true);
 }
 
