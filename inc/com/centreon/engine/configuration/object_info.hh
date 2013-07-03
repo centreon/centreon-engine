@@ -21,8 +21,8 @@
 #  define CCE_CONFIGURATION_OBJECT_INFO_HH
 
 #  include <string>
+#  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -31,7 +31,7 @@ namespace              configuration {
   public:
                        object_info();
                        object_info(
-                         shared_ptr<object> obj,
+                         object_ptr obj,
                          std::string const& path,
                          unsigned int line);
                        object_info(object_info const& right);
@@ -43,14 +43,14 @@ namespace              configuration {
                          object_info const& right) const throw ();
     unsigned int       line() const throw ();
     void               line(unsigned int line) throw ();
-    shared_ptr<object> object() const throw ();
-    void               object(shared_ptr<object> obj);
+    object_ptr object() const throw ();
+    void               object(object_ptr obj);
     std::string const& path() const throw ();
     void               path(std::string const& path);
 
   private:
     unsigned int       _line;
-    shared_ptr<object> _obj;
+    object_ptr         _obj;
     std::string        _path;
   };
 }

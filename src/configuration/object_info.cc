@@ -36,7 +36,7 @@ object_info::object_info() {
  *  @param[in]
  */
 object_info::object_info(
-  shared_ptr<object> obj,
+  object_ptr obj,
   std::string const& path,
   unsigned int line)
   : _line(line),
@@ -87,7 +87,7 @@ object_info& object_info::operator=(object_info const& right) {
 bool object_info::operator==(object_info const& right) const throw () {
   return (_line == right._line
           && _path == right._path
-          && _obj == right._obj);
+          /*XXX: && _obj == right._obj*/);
 }
 
 /**
@@ -124,7 +124,7 @@ void object_info::line(unsigned int line) throw () {
  *
  *  @return The object.
  */
-shared_ptr<object> object_info::object() const throw () {
+object_ptr object_info::object() const throw () {
   return (_obj);
 }
 
@@ -133,7 +133,7 @@ shared_ptr<object> object_info::object() const throw () {
  *
  *  @param[in] obj The new object.
  */
-void object_info::object(shared_ptr<object> obj) {
+void object_info::object(object_ptr obj) {
   _obj = obj;
 }
 
