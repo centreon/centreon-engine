@@ -33,6 +33,7 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
@@ -49,6 +50,7 @@
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 

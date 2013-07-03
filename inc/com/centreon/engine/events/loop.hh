@@ -23,7 +23,7 @@
 #  define CCE_EVENTS_LOOP_HH
 
 #  include <ctime>
-#  include "com/centreon/engine/events.hh"
+#  include "com/centreon/engine/events/timed_event.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()

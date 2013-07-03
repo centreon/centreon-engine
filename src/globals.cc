@@ -23,7 +23,7 @@
 #include "nagios.h"
 
 com::centreon::engine::configuration::state* config(NULL);
-com::centreon::engine::hash_timed_event      quick_timed_event;
+com::centreon::engine::events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
 std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
 

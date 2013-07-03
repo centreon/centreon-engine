@@ -23,6 +23,13 @@
 #ifndef CCE_EVENTS_SCHED_INFO_HH
 #  define CCE_EVENTS_SCHED_INFO_HH
 
+#  include <time.h>
+
+// Forward declaration.
+struct host_struct;
+struct service_struct;
+struct timed_event_struct;
+
 typedef struct  sched_info_struct {
   int           total_services;
   int           total_scheduled_services;
@@ -47,5 +54,16 @@ typedef struct  sched_info_struct {
   time_t        first_host_check;
   time_t        last_host_check;
 }               sched_info;
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
+void adjust_check_scheduling();
+void display_scheduling_info();
+
+#  ifdef __cplusplus
+}
+#  endif /* C++ */
 
 #endif // !CCE_EVENTS_SCHED_INFO_HH

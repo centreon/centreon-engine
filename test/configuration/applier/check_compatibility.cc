@@ -19,6 +19,7 @@
 
 #include <string>
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/applier/engine.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -124,7 +125,7 @@ struct               global {
   unsigned int       interval_length;
   bool               log_event_handlers;
   bool               log_external_commands;
-  std::string        log_file;
+  //  std::string        log_file;
   bool               log_host_retries;
   bool               log_initial_states;
   bool               log_notifications;
@@ -347,7 +348,7 @@ bool chkdiff(global& g1, global& g2) {
   check_value(interval_length);
   check_value(log_event_handlers);
   check_value(log_external_commands);
-  check_value(log_file);
+  // check_value(log_file);
   check_value(log_host_retries);
   check_value(log_initial_states);
   check_value(log_notifications);
@@ -583,7 +584,7 @@ static global get_globals() {
   g.interval_length = interval_length;
   g.log_event_handlers = log_event_handlers;
   g.log_external_commands = log_external_commands;
-  g.log_file = to_str(log_file);
+  // g.log_file = to_str(log_file);
   g.log_host_retries = log_host_retries;
   g.log_initial_states = log_initial_states;
   g.log_notifications = log_notifications;
@@ -734,7 +735,12 @@ static bool newparser_read_config(
     configuration::state config;
     configuration::parser p(options);
     p.parse(filename, config);
-    configuration::applier::state::instance().apply(config);
+
+    // tricks to bypass create log file.
+    config.log_file("");
+
+    configuration::applier::engine::instance().apply(config);
+
     g = get_globals();
     clear_volatile_macros_r(get_global_macros());
     free_macrox_names();

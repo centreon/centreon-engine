@@ -24,12 +24,10 @@
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/difference.hh"
-#include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
-#include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
@@ -332,12 +330,6 @@ std::string timeperiod_key(configuration::timeperiod const& t) {
  *  @param[in] new_cfg The new configuration.
  */
 void applier::state::apply(configuration::state& new_cfg) {
-  // Apply globals
-  applier::globals::instance().apply(new_cfg);
-
-  // Apply macros
-  applier::macros::instance().apply(new_cfg);
-
   // Apply timeperiods.
   _expand<configuration::timeperiod, applier::timeperiod>(
     new_cfg,

@@ -18,9 +18,12 @@
 */
 
 #include <cstddef>
-#include "com/centreon/engine/hash_timed_event.hh"
+#include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/hash_timed_event.hh"
+#include "com/centreon/engine/events/sched_info.hh"
+#include "com/centreon/engine/events/timed_event.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::events;
 
 /**
  *  Default constructor.
