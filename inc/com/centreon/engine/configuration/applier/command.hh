@@ -23,6 +23,7 @@
 #  include <list>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -41,6 +42,9 @@ namespace             configuration {
       void            add_object(
                         configuration::command const& obj,
                         configuration::state const& s);
+      void            expand_object(
+                        shared_ptr<configuration::command> obj,
+                        configuration::state& s);
       void            modify_object(
                         configuration::command const& obj,
                         configuration::state const& s);
@@ -50,6 +54,10 @@ namespace             configuration {
       void            resolve_object(
                         configuration::command const& obj,
                         configuration::state const& s);
+
+    private:
+      void            _create_command(
+                        configuration::command const& obj);
     };
   }
 }

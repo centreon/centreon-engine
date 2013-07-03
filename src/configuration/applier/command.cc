@@ -80,7 +80,7 @@ void applier::command::add_object(
   logger(logging::dbg_config, logging::more)
     << "Creating new command '" << obj.command_name() << "'.";
 
-  // Create command.
+  // Create compatibility command.
   command_struct* c(add_command(
                       obj.command_name().c_str(),
                       obj.command_line().c_str()));
@@ -88,6 +88,26 @@ void applier::command::add_object(
     throw (engine_error() << "Error: Could not register command '"
            << obj.command_name() << "'.");
 
+  // Create real command object.
+  _create_command(obj);
+
+  return ;
+}
+
+/**
+ *  @brief Expand command.
+ *
+ *  Command configuration objects do not need expansion. Therefore this
+ *  method does nothing.
+ *
+ *  @param[in] obj Unused.
+ *  @param[in] s   Unused.
+ */
+void applier::command::expand_object(
+                         shared_ptr<configuration::command> obj,
+                         configuration::state& s) {
+  (void)obj;
+  (void)s;
   return ;
 }
 
@@ -112,10 +132,11 @@ void applier::command::modify_object(
   modify_if_different(c->command_line, obj.command_line().c_str());
 
   // Command will be temporarily removed from the command set but will
-  // be added back during resolve_object(). This does not create
-  // dangling pointers since commands::command object are not referenced
-  // anywhere, only ::command objects are.
+  // be added back right after with _create_command. This does not
+  // create dangling pointers since commands::command object are not
+  // referenced anywhere, only ::command objects are.
   commands::set::instance().remove_command(obj.command_name());
+  _create_command(obj);
 
   return ;
 }
@@ -146,23 +167,32 @@ void applier::command::remove_object(
 }
 
 /**
- *  @brief Resolve a command object.
+ *  Resolve command.
  *
- *  This method does nothing, as command objects do not require
- *  resolution.
- *
- *  @param[in,out] obj Object to resolve.
- *  @param[in]     s   Configuration being applied.
+ *  @param[in] obj Unused.
+ *  @param[in] s   Unused.
  */
 void applier::command::resolve_object(
                          configuration::command const& obj,
                          configuration::state const& s) {
-  (void)s;
+  // XXX : resolution should occur, command objects should check for
+  //       the validity of their connector (if any). However there is
+  //       currently no support code to do that in the commands::set
+  //       and other classes of the commands namespace.
 
-  // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Resolving command '" << obj.command_name() << "'.";
+  return ;
+}
 
+/**
+ *  @brief Find real command object.
+ *
+ *  Create the commands::command object. This can be either a
+ *  commands::raw object or a commands::forward object.
+ *
+ *  @param[in] obj Command configuration object.
+ */
+void applier::command::_create_command(
+                         configuration::command const& obj) {
   // Command set.
   commands::set& cmd_set(commands::set::instance());
 

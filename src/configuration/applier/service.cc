@@ -178,39 +178,39 @@ void applier::service::add_object(
 
   // Add contacts.
   for (list_string::const_iterator
-         it2(obj.contacts().begin()),
-         end2(obj.contacts().end());
-       it2 != end2;
-       ++it2)
-    if (!add_contact_to_service(svc, it2->c_str()))
+         it(obj.contacts().begin()),
+         end(obj.contacts().end());
+       it != end;
+       ++it)
+    if (!add_contact_to_service(svc, it->c_str()))
       throw (engine_error() << "Error: Could not add contact '"
-             << *it2 << "' to service '" << obj.service_description()
+             << *it << "' to service '" << obj.service_description()
              << "' of host '" << obj.hosts().front() << "'.");
 
   // Add contactgroups.
   for (list_string::const_iterator
-         it2(obj.contactgroups().begin()),
-         end2(obj.contactgroups().end());
-       it2 != end2;
-       ++it2)
-    if (!add_contactgroup_to_service(svc, it2->c_str()))
+         it(obj.contactgroups().begin()),
+         end(obj.contactgroups().end());
+       it != end;
+       ++it)
+    if (!add_contactgroup_to_service(svc, it->c_str()))
       throw (engine_error() << "Error: Could not add contact group '"
-             << *it2 << "' to service '" << obj.service_description()
+             << *it << "' to service '" << obj.service_description()
              << "' of host '" << obj.hosts().front() << "'.");
 
   // Add custom variables.
   for (properties::const_iterator
-         it2(obj.customvariables().begin()),
-         end2(obj.customvariables().end());
-       it2 != end2;
-       ++it2)
+         it(obj.customvariables().begin()),
+         end(obj.customvariables().end());
+       it != end;
+       ++it)
     if (!add_custom_variable_to_service(
            svc,
-           it2->first.c_str(),
-           it2->second.c_str()))
+           it->first.c_str(),
+           it->second.c_str()))
       throw (engine_error()
              << "Error: Could not add custom variable '"
-             << it2->first << "' to service '"
+             << it->first << "' to service '"
              << obj.service_description() << "' of host '"
              << obj.hosts().front() << "'.");
 
@@ -337,29 +337,22 @@ void applier::service::modify_object(
 void applier::service::remove_object(
                          configuration::service const& obj,
                          configuration::state const& s) {
-  // Browse all hosts of this service.
-  for (list_string::const_iterator
-         it(obj.hosts().begin()),
-         end(obj.hosts().end());
-       it != end;
-       ++it) {
-    // Logging.
-    logger(logging::dbg_config, logging::more)
-      << "Removing service '" << obj.service_description()
-      << "' of host '" << *it << "'.";
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing service '" << obj.service_description()
+    << "' of host '" << obj.hosts().front() << "'.";
 
-    // Unregister service.
-    for (service_struct** s(&service_list); *s; s = &(*s)->next)
-      if (!strcmp((*s)->host_name, it->c_str())
-          && !strcmp(
-                (*s)->description,
-                obj.service_description().c_str())) {
-        *s = (*s)->next;
-        break ;
-      }
-    applier::state::instance().services().erase(
-      std::make_pair(*it, obj.service_description()));
-  }
+  // Unregister service.
+  for (service_struct** s(&service_list); *s; s = &(*s)->next)
+    if (!strcmp((*s)->host_name, obj.hosts().front().c_str())
+        && !strcmp(
+              (*s)->description,
+              obj.service_description().c_str())) {
+      *s = (*s)->next;
+      break ;
+    }
+  applier::state::instance().services().erase(
+    std::make_pair(obj.hosts().front(), obj.service_description()));
 
   return ;
 }
@@ -373,33 +366,26 @@ void applier::service::remove_object(
 void applier::service::resolve_object(
                          configuration::service const& obj,
                          configuration::state const& s) {
-  // Browse all hosts of this service.
-  for (list_string::const_iterator
-         it(obj.hosts().begin()),
-         end(obj.hosts().end());
-       it != end;
-       ++it) {
-    // Logging.
-    logger(logging::dbg_config, logging::more)
-      << "Resolving service '" << obj.service_description()
-      << "' of host '" << *it << "'.";
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving service '" << obj.service_description()
+    << "' of host '" << obj.hosts().front() << "'.";
 
-    // Find service.
-    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
-      it2(applier::state::instance().services().find(
-           std::make_pair(*it, obj.service_description())));
-    if (applier::state::instance().services().end() == it2)
-      throw (engine_error()
-             << "Error: Cannot resolve non-existing service '"
-             << obj.service_description() << "' of host '"
-             << *it << "'.");
+  // Find service.
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+    it(applier::state::instance().services().find(
+         std::make_pair(obj.hosts().front(), obj.service_description())));
+  if (applier::state::instance().services().end() == it)
+    throw (engine_error()
+           << "Error: Cannot resolve non-existing service '"
+           << obj.service_description() << "' of host '"
+           << obj.hosts().front() << "'.");
 
-    // Resolve service.
-    if (!check_service(it2->second.get(), NULL, NULL))
+  // Resolve service.
+  if (!check_service(it->second.get(), NULL, NULL))
       throw (engine_error() << "Error: Cannot resolve service '"
              << obj.service_description() << "' of host '"
-             << *it << "'.");
-  }
+             << obj.hosts().front() << "'.");
 
   return ;
 }
