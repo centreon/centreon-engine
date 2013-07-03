@@ -23,6 +23,7 @@
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/concurrency/thread.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"

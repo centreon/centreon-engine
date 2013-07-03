@@ -30,9 +30,9 @@
 #  include "com/centreon/engine/comments.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/downtime.hh"
-#  include "com/centreon/engine/events.hh"
+#  include "com/centreon/engine/events/hash_timed_event.hh"
 #  include "com/centreon/engine/events/sched_info.hh"
-#  include "com/centreon/engine/hash_timed_event.hh"
+#  include "com/centreon/engine/events/timed_event.hh"
 #  include "com/centreon/engine/nebmods.hh"
 #  include "com/centreon/engine/notifications.hh"
 #  include "com/centreon/engine/objects.hh"
@@ -58,7 +58,7 @@ extern command*                  ochp_command_ptr;
 extern unsigned long             logging_options;
 extern unsigned long             syslog_options;
 
-extern com::centreon::engine::hash_timed_event quick_timed_event;
+extern com::centreon::engine::events::hash_timed_event quick_timed_event;
 
 extern time_t                    last_command_check;
 extern time_t                    last_command_status_update;

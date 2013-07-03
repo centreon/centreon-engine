@@ -27,6 +27,7 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"

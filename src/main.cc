@@ -46,6 +46,7 @@
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtime.hh"
@@ -119,6 +120,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::configuration::applier::logging::load();
   com::centreon::engine::configuration::applier::globals::load();
   com::centreon::engine::configuration::applier::macros::load();
+  com::centreon::engine::configuration::applier::scheduler::load();
   com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::commands::set::load();
   com::centreon::engine::checks::checker::load();
@@ -330,7 +332,7 @@ int main(int argc, char* argv[]) {
 
       if (OK == result) {
         // Initialize the event timing loop.
-        init_timing_loop();
+        // XXX: init_timing_loop();
 
         // Display scheduling information.
         display_scheduling_info();
@@ -495,7 +497,7 @@ int main(int argc, char* argv[]) {
       initialize_performance_data();
 
       // Initialize the event timing loop.
-      init_timing_loop();
+      // XXX: init_timing_loop();
 
       // Initialize check statistics.
       init_check_stats();
@@ -600,6 +602,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::configuration::applier::logging::unload();
   com::centreon::engine::configuration::applier::state::unload();
   com::centreon::engine::configuration::applier::macros::unload();
+  com::centreon::engine::configuration::applier::scheduler::unload();
   com::centreon::engine::configuration::applier::globals::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();

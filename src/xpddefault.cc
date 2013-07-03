@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/events.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"

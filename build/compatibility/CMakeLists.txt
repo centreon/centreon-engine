@@ -47,6 +47,7 @@ add_library("cce_compatibility" STATIC
   "${INC_DIR}/downtime.h"
   "${INC_DIR}/embedded_perl.h"
   "${INC_DIR}/epn_nagios.h"
+  "${INC_DIR}/events.h"
   "${INC_DIR}/find.hh"
   "${INC_DIR}/locations.h"
   "${INC_DIR}/logging.h"
