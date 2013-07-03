@@ -19,7 +19,6 @@
 
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -138,23 +137,15 @@ bool servicegroup::operator<(servicegroup const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t servicegroup::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void servicegroup::check_validity() const {
   if (_servicegroup_name.empty())
-    throw (engine_error() << "configuration: invalid servicegroup "
-           "property servicegroup_name is missing");
+    throw (engine_error() << "service group has no name "
+           << "(property 'servicegroup_name')");
+  return ;
 }
 
 /**
@@ -377,6 +368,5 @@ bool servicegroup::_set_servicegroup_members(std::string const& value) {
  */
 bool servicegroup::_set_servicegroup_name(std::string const& value) {
   _servicegroup_name = value;
-  _id = hash(value);
   return (true);
 }

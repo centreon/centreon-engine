@@ -20,7 +20,6 @@
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -198,56 +197,33 @@ bool servicedependency::operator<(servicedependency const& right) const {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t servicedependency::id() const throw () {
-  if (!_id) {
-    hash_combine(
-      _id,
-      _dependent_hostgroups->begin(),
-      _dependent_hostgroups->end());
-    hash_combine(
-      _id,
-      _dependent_hosts->begin(),
-      _dependent_hosts->end());
-    hash_combine(
-      _id,
-      _dependent_servicegroups->begin(),
-      _dependent_servicegroups->end());
-    hash_combine(
-      _id,
-      _dependent_service_description->begin(),
-      _dependent_service_description->end());
-  }
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void servicedependency::check_validity() const {
   if (_service_description->empty() && _servicegroups->empty())
-    throw (engine_error() << "configuration: invalid servicedependency "
-           "property service_description or servicegroup is missing");
+    throw (engine_error() << "service dependency is not attached to "
+           << "any service or service group (properties "
+           << "'service_description' or 'servicegroup_name', "
+           << "respectively)");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "configuration: invalid servicedependency "
-           "property host or hostgroup is missing");
-  if (_dependent_hosts->empty()
-      && _dependent_hostgroups->empty())
-    throw (engine_error() << "configuration: invalid servicedependency "
-           "property dependent_host or dependent_hostgroup is missing");
+    throw (engine_error() << "service dependency is not attached to "
+           << "any host or host group (properties 'host_name' or "
+           << "'hostgroup_name', respectively)");
   if (_dependent_service_description->empty()
       && _dependent_servicegroups->empty())
-    throw (engine_error() << "configuration: invalid servicedependency "
-           "property dependent_service_description or "
-           "dependent_servicegroup is missing");
-  if (_dependency_period.empty())
-    throw (engine_error() << "configuration: invalid servicedependency "
-           "property dependency_period is missing");
+    throw (engine_error() << "service dependency is not attached to "
+           << "any dependent service or dependent service group "
+           << "(properties 'dependent_service_description' or "
+           << "'dependent_servicegroup_name', respectively)");
+  if (_dependent_hosts->empty()
+      && _dependent_hostgroups->empty())
+    throw (engine_error() << "service dependency is not attached to "
+           << "any dependent host or dependent host group (properties "
+           << "'dependent_host_name' or 'dependent_hostgroup_name', "
+           << "respectively)");
+  return ;
 }
 
 /**
@@ -515,7 +491,6 @@ bool servicedependency::_set_dependency_period(std::string const& value) {
  */
 bool servicedependency::_set_dependent_hostgroups(std::string const& value) {
   _dependent_hostgroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -528,7 +503,6 @@ bool servicedependency::_set_dependent_hostgroups(std::string const& value) {
  */
 bool servicedependency::_set_dependent_hosts(std::string const& value) {
   _dependent_hosts = value;
-  _id = 0;
   return (true);
 }
 
@@ -541,7 +515,6 @@ bool servicedependency::_set_dependent_hosts(std::string const& value) {
  */
 bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
   _dependent_servicegroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -554,7 +527,6 @@ bool servicedependency::_set_dependent_servicegroups(std::string const& value) {
  */
 bool servicedependency::_set_dependent_service_description(std::string const& value) {
   _dependent_service_description = value;
-  _id = 0;
   return (true);
 }
 

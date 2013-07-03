@@ -47,29 +47,6 @@ using namespace com::centreon::engine::configuration;
 static applier::state* _instance = NULL;
 
 /**
- *  Local structure identifying an host dependency.
- */
-struct hostdependency_id {
-  std::string dependent_host;
-  std::string host;
-  bool        is_notification;
-
-  bool        operator==(hostdependency_id const& right) const {
-    return ((dependent_host == right.dependent_host)
-            && (host == right.host)
-            && (is_notification == right.is_notification));
-  }
-
-  bool        operator<(hostdependency_id const& right) const {
-    if (dependent_host != right.dependent_host)
-      return (dependent_host < right.dependent_host);
-    else if (host != right.host)
-      return (host < right.host);
-    return (is_notification < right.is_notification);
-  }
-};
-
-/**
  *  Find key in collection with direct access to find().
  *
  *  @param[in] obj Collection in which to search for.
@@ -96,14 +73,12 @@ typename ObjectCollectionType::iterator find_key_with_collection_find(
  */
 umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator find_hostdependency_key(
   umultimap<std::string, shared_ptr<hostdependency_struct> >& obj,
-  hostdependency_id const& key) {
+  configuration::hostdependency const& key) {
   typedef umultimap<std::string, shared_ptr<hostdependency_struct> > CollectionType;
   std::pair<CollectionType::iterator, CollectionType::iterator>
-    p(obj.equal_range(key.dependent_host));
+    p(obj.equal_range(key.dependent_hosts().front()));
   while (p.first != p.second) {
-    if ((p.first->second->host_name == key.host)
-        && ((p.first->second->dependency_type
-             == NOTIFICATION_DEPENDENCY) == key.is_notification))
+    // XXX
       break ;
     ++p.first;
   }
@@ -271,17 +246,11 @@ std::string host_key(configuration::host const& h) {
 /**
  *  Get the key of a hostdependency.
  *
- *  @return hostdependency_id with dependent_host, host and false for
- *          an execution dependency and true for a notification
- *          dependency.
+ *  @return A copy of the host dependency configuration object.
  */
-hostdependency_id hostdependency_key(
-                    configuration::hostdependency const& hd) {
-  hostdependency_id id;
-  id.dependent_host = hd.dependent_hosts().front();
-  id.host = hd.hosts().front();
-  id.is_notification = hd.notification_failure_options();
-  return (id);
+configuration::hostdependency hostdependency_key(
+                                configuration::hostdependency const& hd) {
+  return (hd);
 }
 
 /**
@@ -362,6 +331,9 @@ std::string timeperiod_key(configuration::timeperiod const& t) {
  */
 void applier::state::apply(configuration::state& new_cfg) {
   // Apply timeperiods.
+  _expand<configuration::timeperiod, applier::timeperiod>(
+    new_cfg,
+    new_cfg.timeperiods());
   _apply<configuration::timeperiod,
          umap<std::string, shared_ptr<timeperiod_struct> >,
          applier::timeperiod,
@@ -377,7 +349,10 @@ void applier::state::apply(configuration::state& new_cfg) {
   _resolve<configuration::timeperiod, applier::timeperiod>(
     config->timeperiods());
 
-  // Apply connectors and commands.
+  // Apply connectors.
+  _expand<configuration::connector, applier::connector>(
+    new_cfg,
+    new_cfg.connectors());
   _apply<configuration::connector,
          umap<std::string, shared_ptr<commands::connector> >,
          applier::connector,
@@ -390,6 +365,13 @@ void applier::state::apply(configuration::state& new_cfg) {
     _connectors,
     new_cfg,
     new_cfg.connectors());
+  _resolve<configuration::connector, applier::connector>(
+    config->connectors());
+
+  // Apply commands.
+  _expand<configuration::command, applier::command>(
+    new_cfg,
+    new_cfg.commands());
   _apply<configuration::command,
          umap<std::string, shared_ptr<command_struct> >,
          applier::command,
@@ -402,8 +384,6 @@ void applier::state::apply(configuration::state& new_cfg) {
     _commands,
     new_cfg,
     new_cfg.commands());
-  _resolve<configuration::connector, applier::connector>(
-    config->connectors());
   _resolve<configuration::command, applier::command>(
     config->commands());
 
@@ -524,7 +504,7 @@ void applier::state::apply(configuration::state& new_cfg) {
   _apply<configuration::hostdependency,
          umultimap<std::string, shared_ptr<hostdependency_struct> >,
          applier::hostdependency,
-         hostdependency_id,
+         configuration::hostdependency,
          &hostdependency_key,
          &find_hostdependency_key>(
     config->hostdependencies(),

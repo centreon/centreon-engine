@@ -57,9 +57,9 @@ applier::timeperiod& applier::timeperiod::operator=(
 }
 
 /**
- *  Add new timeperiod.
+ *  Add new time period.
  *
- *  @param[in] obj The new timeperiod to add into the monitoring engine.
+ *  @param[in] obj The new time period to add in the monitoring engine.
  *  @param[in] s   Configuration being applied.
  */
 void applier::timeperiod::add_object(
@@ -69,17 +69,17 @@ void applier::timeperiod::add_object(
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new timeperiod '" << obj.timeperiod_name() << "'.";
+    << "Creating new time period '" << obj.timeperiod_name() << "'.";
 
   // Create timeperiod.
   timeperiod_struct* tp(add_timeperiod(
                           obj.timeperiod_name().c_str(),
                           NULL_IF_EMPTY(obj.alias())));
   if (!tp)
-    throw (engine_error() << "Error: Could not register timeperiod '"
+    throw (engine_error() << "Error: Could not register time period '"
            << obj.timeperiod_name() << "'.");
 
-  // Add timeranges to timeperiod.
+  // Add time ranges to time period.
   {
     unsigned short day(0);
     for (std::vector<std::list<timerange> >::const_iterator
@@ -98,11 +98,11 @@ void applier::timeperiod::add_object(
                it2->start(),
                it2->end()))
           throw (engine_error()
-                 << "Error: Could not add timerange to timeperiod '"
+                 << "Error: Could not add time range to time period '"
                  << obj.timeperiod_name() << "'.");
   }
 
-  // Add exceptions to timeperiod.
+  // Add exceptions to time period.
   for (std::vector<std::list<daterange> >::const_iterator
          it(obj.exceptions().begin()),
          end(obj.exceptions().end());
@@ -128,7 +128,7 @@ void applier::timeperiod::add_object(
              it2->week_day_end_offset(),
              it2->skip_interval()))
         throw (engine_error()
-               << "Error: Could not add exception to timeperiod '"
+               << "Error: Could not add exception to time period '"
                << obj.timeperiod_name() << "'.");
       for (std::list<timerange>::const_iterator
              it3(it2->timeranges().begin()),
@@ -140,12 +140,12 @@ void applier::timeperiod::add_object(
                it3->start(),
                it3->end()))
           throw (engine_error()
-                 << "Error: Could not add timerange to daterange of type "
-                 << it2->type() << " of timeperiod '"
+                 << "Error: Could not add time range to date range of "
+                 << "type " << it2->type() << " of time period '"
                  << obj.timeperiod_name() << "'.");
     }
 
-  // Add exclusions to timeperiod.
+  // Add exclusions to time period.
   for (list_string::const_iterator
          it(obj.exclude().begin()),
          end(obj.exclude().end());
@@ -155,16 +155,33 @@ void applier::timeperiod::add_object(
            tp,
            it->c_str()))
       throw (engine_error() << "Error: Could not add exclusion '"
-             << *it << "' to timeperiod '" << obj.timeperiod_name()
+             << *it << "' to time period '" << obj.timeperiod_name()
              << "'.");
 
   return ;
 }
 
 /**
- *  Modified timeperiod.
+ *  @brief Expand time period.
  *
- *  @param[in] obj The new timeperiod to modify into the monitoring engine.
+ *  Time period objects do not need expansion. Therefore this method
+ *  does nothing.
+ *
+ *  @param[in] obj Unused.
+ *  @param[in] s   Unused.
+ */
+void applier::timeperiod::expand_object(
+                            shared_ptr<configuration::timeperiod> obj,
+                            configuration::state& s) {
+  (void)obj;
+  (void)s;
+  return ;
+}
+
+/**
+ *  Modify time period.
+ *
+ *  @param[in] obj The time period to modify in the monitoring engine.
  *  @param[in] s   Configuration being applied.
  */
 void applier::timeperiod::modify_object(
@@ -172,7 +189,7 @@ void applier::timeperiod::modify_object(
                             configuration::state const& s) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying timeperiod '" << obj.timeperiod_name() << "'.";
+    << "Modifying time period '" << obj.timeperiod_name() << "'.";
 
   // XXX
 
@@ -180,9 +197,9 @@ void applier::timeperiod::modify_object(
 }
 
 /**
- *  Remove old timeperiod.
+ *  Remove old time period.
  *
- *  @param[in] obj The new timeperiod to remove from the monitoring engine.
+ *  @param[in] obj The time period to remove from the monitoring engine.
  *  @param[in] s   Configuration being applied.
  */
 void applier::timeperiod::remove_object(
@@ -192,7 +209,7 @@ void applier::timeperiod::remove_object(
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing timeperiod '" << obj.timeperiod_name() << "'.";
+    << "Removing time period '" << obj.timeperiod_name() << "'.";
 
   // Unregister timeperiod.
   unregister_object<timeperiod_struct, &timeperiod_struct::name>(
@@ -204,19 +221,18 @@ void applier::timeperiod::remove_object(
 }
 
 /**
- *  Resolve a timeperiod.
+ *  @brief Resolve a time period object.
  *
- *  @param[in,out] obj Timeperiod object.
- *  @param[in] s       Configuration being applied.
+ *  This method does nothing because a time period object does not rely
+ *  on any external object.
+ *
+ *  @param[in] obj Unused.
+ *  @param[in] s   Unused.
  */
 void applier::timeperiod::resolve_object(
                             configuration::timeperiod const& obj,
                             configuration::state const& s) {
+  (void)obj;
   (void)s;
-
-  // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Resolving timeperiod '" << obj.timeperiod_name() << "'.";
-
   return ;
 }

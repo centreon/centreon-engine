@@ -66,7 +66,6 @@ namespace                  configuration {
     virtual void           check_validity() const = 0;
     static shared_ptr<object>
                            create(std::string const& type_name);
-    virtual std::size_t    id() const throw () = 0;
     bool                   is_template() const throw ();
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
@@ -102,7 +101,6 @@ namespace                  configuration {
     bool                   _set_name(std::string const& value);
     bool                   _set_templates(std::string const& value);
 
-    mutable std::size_t    _id;
     bool                   _is_resolve;
     bool                   _is_template;
     std::string            _name;

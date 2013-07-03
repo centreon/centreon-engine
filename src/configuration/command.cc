@@ -20,7 +20,6 @@
 #include <memory>
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -118,26 +117,18 @@ bool command::operator<(command const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t command::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void command::check_validity() const {
   if (_command_name.empty())
-    throw (engine_error() << "configuration: invalid command property "
-           "command_name is missing");
+    throw (engine_error()
+           << "command has no name (property 'command_name')");
   if (_command_line.empty())
-    throw (engine_error() << "configuration: invalid command property "
-           "command_line is missing");
+    throw (engine_error() << "command '" << _command_name
+           << "' has no command line (property 'command_line')");
+  return ;
 }
 
 /**
@@ -222,7 +213,6 @@ bool command::_set_command_line(std::string const& value) {
  */
 bool command::_set_command_name(std::string const& value) {
   _command_name = value;
-  _id = hash(value);
   return (true);
 }
 

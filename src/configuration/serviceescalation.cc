@@ -20,7 +20,6 @@
 #include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -172,47 +171,25 @@ bool serviceescalation::operator<(serviceescalation const& right) const {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t serviceescalation::id() const throw () {
-  if (!_id) {
-    hash_combine(_id, _hosts->begin(), _hosts->end());
-    hash_combine(
-      _id,
-      _hostgroups->begin(),
-      _hostgroups->end());
-    hash_combine(
-      _id,
-      _service_description->begin(),
-      _service_description->end());
-    hash_combine(
-      _id,
-      _servicegroups->begin(),
-      _servicegroups->end());
-  }
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void serviceescalation::check_validity() const {
   if (_service_description->empty() && _servicegroups->empty())
-    throw (engine_error() << "configuration: invalid serviceescalation "
-           "property service_description or servicegroup is missing");
+    throw (engine_error() << "service escalation is not attached to "
+           << "any service or service group (properties "
+           << "'service_description' and 'servicegroup_name', "
+           << "respectively)");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "configuration: invalid serviceescalation "
-           "property host or hostgroup is missing");
+    throw (engine_error() << "service escalation is not attached to "
+           << "any host or host group (properties 'host_name' or "
+           << "'hostgroup_name', respectively)");
   if (_contacts->empty() && _contactgroups->empty())
-    throw (engine_error() << "configuration: invalid serviceescalation "
-           "property contact or contactgroup is missing");
-  if (_escalation_period.is_set() && _escalation_period->empty())
-    throw (engine_error() << "configuration: invalid serviceescalation "
-           "property escalation_period is missing");
+    throw (engine_error() << "service escalation is not attached to "
+           << "any contact or contact group (properties 'contacts' or "
+           << "'contact_groups', respectively)");
+  return ;
 }
 
 /**
@@ -560,7 +537,6 @@ bool serviceescalation::_set_first_notification(unsigned int value) {
  */
 bool serviceescalation::_set_hostgroups(std::string const& value) {
   _hostgroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -573,7 +549,6 @@ bool serviceescalation::_set_hostgroups(std::string const& value) {
  */
 bool serviceescalation::_set_hosts(std::string const& value) {
   _hosts = value;
-  _id = 0;
   return (true);
 }
 
@@ -610,7 +585,6 @@ bool serviceescalation::_set_notification_interval(unsigned int value) {
  */
 bool serviceescalation::_set_servicegroups(std::string const& value) {
   _servicegroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -623,6 +597,5 @@ bool serviceescalation::_set_servicegroups(std::string const& value) {
  */
 bool serviceescalation::_set_service_description(std::string const& value) {
   _service_description = value;
-  _id = 0;
   return (true);
 }

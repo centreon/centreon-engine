@@ -41,7 +41,6 @@ namespace                  configuration {
     bool                   operator<(
                              command const& right) const throw ();
     void                   check_validity() const;
-    std::size_t            id() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

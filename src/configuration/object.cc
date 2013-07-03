@@ -57,12 +57,7 @@ static struct {
  *  @param[in] type      The object type.
  */
 object::object(object::object_type type)
-  : _id(0),
-    _is_resolve(false),
-    _is_template(false),
-    _type(type) {
-
-}
+  : _is_resolve(false), _is_template(false), _type(type) {}
 
 /**
  *  Copy constructor.
@@ -89,7 +84,6 @@ object::~object() throw () {
  */
 object& object::operator=(object const& right) {
   if (this != &right) {
-    _id = right._id;
     _is_resolve = right._is_resolve;
     _is_template = right._is_template;
     _name = right._name;
@@ -107,8 +101,7 @@ object& object::operator=(object const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool object::operator==(object const& right) const throw () {
-  return (_id == right._id
-          && _name == right._name
+  return (_name == right._name
           && _type == right._type
           && _is_resolve == right._is_resolve
           && _is_template == right._is_template

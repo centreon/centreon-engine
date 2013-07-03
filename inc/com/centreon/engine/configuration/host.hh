@@ -55,7 +55,6 @@ namespace                  configuration {
     bool                   operator!=(host const& right) const throw ();
     bool                   operator<(host const& right) const throw ();
     void                   check_validity() const;
-    std::size_t            id() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(

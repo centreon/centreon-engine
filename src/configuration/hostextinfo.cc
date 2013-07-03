@@ -20,7 +20,6 @@
 #include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -137,30 +136,16 @@ bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t hostextinfo::id() const throw () {
-  if (!_id) {
-    hash_combine(_id, _hosts->begin(), _hosts->end());
-    hash_combine(
-      _id,
-      _hostgroups->begin(),
-      _hostgroups->end());
-  }
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void hostextinfo::check_validity() const {
   if (_hostgroups->empty() && _hosts->empty())
-    throw (engine_error() << "configuration: invalid hostextinfo "
-           "property hostgroup or host is missing");
+    throw (engine_error() << "host extended information is not attached"
+           << " to any host or host group (properties 'host_name' or "
+           << "'hostgroup_name', respectively)");
+  return ;
 }
 
 /**
@@ -382,7 +367,6 @@ bool hostextinfo::_set_coords_3d(std::string const& value) {
  */
 bool hostextinfo::_set_hostgroups(std::string const& value) {
   _hostgroups = value;
-  _id = 0;
   return (true);
 }
 
@@ -395,7 +379,6 @@ bool hostextinfo::_set_hostgroups(std::string const& value) {
  */
 bool hostextinfo::_set_hosts(std::string const& value) {
   _hosts = value;
-  _id = 0;
   return (true);
 }
 

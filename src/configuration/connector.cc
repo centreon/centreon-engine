@@ -20,7 +20,6 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -115,26 +114,18 @@ bool connector::operator<(connector const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t connector::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void connector::check_validity() const {
   if (_connector_name.empty())
-    throw (engine_error() << "configuration: invalid connector "
-           "property connector_name is missing");
+    throw (engine_error()
+           << "connector has no name (property 'connector_name')");
   if (_connector_line.empty())
-    throw (engine_error() << "configuration: invalid connector "
-           " property connector_line is missing");
+    throw (engine_error() << "connector '" << _connector_name
+           << "' has no command line (property 'connector_line')");
+  return ;
 }
 
 /**
@@ -208,6 +199,5 @@ bool connector::_set_connector_line(std::string const& value) {
  */
 bool connector::_set_connector_name(std::string const& value) {
   _connector_name = value;
-  _id = hash(value);
   return (true);
 }

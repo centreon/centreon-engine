@@ -22,7 +22,6 @@
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -233,23 +232,15 @@ bool contact::operator<(contact const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t contact::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void contact::check_validity() const {
   if (_contact_name.empty())
-    throw (engine_error() << "configuration: invalid contact property "
-           "contact_name is missing");
+    throw (engine_error()
+           << "contact has no name (property 'contact_name')");
+  return ;
 }
 
 /**
@@ -534,7 +525,6 @@ bool contact::_set_contactgroups(std::string const& value) {
  */
 bool contact::_set_contact_name(std::string const& value) {
   _contact_name = value;
-  _id = hash(value);
   return (true);
 }
 

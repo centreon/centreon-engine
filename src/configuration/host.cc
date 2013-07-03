@@ -22,7 +22,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
-#include "com/centreon/hash.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -389,26 +388,17 @@ bool host::operator<(host const& right) const throw () {
 }
 
 /**
- *  Get the unique object id.
+ *  @brief Check if the object is valid.
  *
- *  @return The object id.
- */
-std::size_t host::id() const throw () {
-  return (_id);
-}
-
-/**
- *  Check if the object is valid.
- *
- *  @return True if is a valid object, otherwise false.
+ *  If the object is not valid, an exception is thrown.
  */
 void host::check_validity() const {
   if (_host_name.empty())
-    throw (engine_error() << "configuration: invalid host "
-           "property host_name is missing");
+    throw (engine_error() << "host has no name (property 'host_name')");
   if (_address.empty())
-    throw (engine_error() << "configuration: invalid host "
-           "property address is missing");
+    throw (engine_error() << "host '" << _host_name
+           << "' has no address (property 'address')");
+  return ;
 }
 
 /**
@@ -1267,7 +1257,6 @@ bool host::_set_high_flap_threshold(unsigned int value) {
  */
 bool host::_set_host_name(std::string const& value) {
   _host_name = value;
-  _id = hash(value);
   return (true);
 }
 

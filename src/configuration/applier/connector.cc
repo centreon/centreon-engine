@@ -76,13 +76,49 @@ void applier::connector::add_object(
   logger(logging::dbg_config, logging::more)
     << "Creating new connector '" << obj.connector_name() << "'.";
 
+  // Expand command line.
+  nagios_macros* macros(get_global_macros());
+  char* command_line(NULL);
+  process_macros_r(
+    macros,
+    obj.connector_line().c_str(),
+    &command_line,
+    0);
+  std::string processed_cmd(command_line);
+  delete [] command_line;
+
+  // Create connector.
+  shared_ptr<commands::command>
+    cmd(new commands::connector(
+                        obj.connector_name(),
+                        processed_cmd,
+                        &checks::checker::instance()));
+  commands::set::instance().add_command(cmd);
+
   return ;
 }
 
 /**
- *  Modified connector.
+ *  @brief Expand connector.
  *
- *  @param[in] obj The new connector to modify into the monitoring engine.
+ *  Connector configuration objects do not need expansion. Therefore
+ *  this method does nothing.
+ *
+ *  @param[in] obj Unused.
+ *  @param[in] s   Unused.
+ */
+void applier::connector::expand_object(
+                           shared_ptr<configuration::connector> obj,
+                           configuration::state& s) {
+  (void)obj;
+  (void)s;
+  return ;
+}
+
+/**
+ *  Modify connector.
+ *
+ *  @param[in] obj The connector to modify in the monitoring engine.
  *  @param[in] s   Configuration being applied.
  */
 void applier::connector::modify_object(
@@ -122,38 +158,18 @@ void applier::connector::remove_object(
 }
 
 /**
- *  Resolve a connector.
+ *  @brief Resolve a connector.
  *
- *  @param[in,out] obj Connector object.
- *  @param[in] s       Configuration being applied.
+ *  Connector objects do not need resolution. Therefore this method does
+ *  nothing.
+ *
+ *  @param[in] obj Unused.
+ *  @param[in] s   Unused.
  */
 void applier::connector::resolve_object(
                            configuration::connector const& obj,
                            configuration::state const& s) {
+  (void)obj;
   (void)s;
-
-  // Logging.
-  logger(logging::dbg_config, logging::more)
-    << "Resolving connector '" << obj.connector_name() << "'.";
-
-  // Expand command line.
-  nagios_macros* macros(get_global_macros());
-  char* command_line(NULL);
-  process_macros_r(
-    macros,
-    obj.connector_line().c_str(),
-    &command_line,
-    0);
-  std::string processed_cmd(command_line);
-  delete [] command_line;
-
-  // Create connector.
-  shared_ptr<commands::command>
-    cmd(new commands::connector(
-                        obj.connector_name(),
-                        processed_cmd,
-                        &checks::checker::instance()));
-  commands::set::instance().add_command(cmd);
-
   return ;
 }
