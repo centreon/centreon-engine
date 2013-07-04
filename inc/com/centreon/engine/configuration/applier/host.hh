@@ -38,20 +38,16 @@ namespace          configuration {
                    ~host() throw ();
       host&        operator=(host const& right);
       void         add_object(
-                     configuration::host const& obj,
-		     configuration::state const& s);
+                     shared_ptr<configuration::host> obj);
       void         expand_object(
                      shared_ptr<configuration::host> obj,
                      configuration::state& s);
       void         modify_object(
-                     configuration::host const& obj,
-		     configuration::state const& s);
+                     shared_ptr<configuration::host> obj);
       void         remove_object(
-                     configuration::host const& obj,
-		     configuration::state const& s);
+                     shared_ptr<configuration::host> obj);
       void         resolve_object(
-                     configuration::host const& obj,
-		     configuration::state const& s);
+                     shared_ptr<configuration::host> obj);
     };
   }
 }

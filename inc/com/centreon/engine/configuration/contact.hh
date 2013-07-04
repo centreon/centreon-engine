@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_CONTACT_HH
 
 #  include <set>
+#  include <string>
 #  include <vector>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
@@ -32,9 +33,10 @@ typedef std::vector<std::string> tab_string;
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    contact
-    : public object {
+  class                    contact : public object {
   public:
+    typedef std::string    key_type;
+
                            contact();
                            contact(contact const& right);
                            ~contact() throw ();
@@ -46,6 +48,7 @@ namespace                  configuration {
     bool                   operator<(
                              contact const& right) const throw ();
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

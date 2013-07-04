@@ -140,9 +140,7 @@ service::service()
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {
-
-}
+    _stalking_options(default_stalking_options) {}
 
 /**
  *  Copy constructor.
@@ -157,9 +155,7 @@ service::service(service const& right)
 /**
  *  Destructor.
  */
-service::~service() throw () {
-
-}
+service::~service() throw () {}
 
 /**
  *  Copy constructor.
@@ -395,6 +391,19 @@ void service::check_validity() const {
     throw (engine_error() << "service '" << _service_description
            << "' has no check command (property 'check_command')");
   return ;
+}
+
+/**
+ *  Get the service key.
+ *
+ *  @return A pair with host name and service description.
+ */
+service::key_type service::key() const {
+  key_type k;
+  if (!_hosts->empty())
+    k.first = _hosts->front();
+  k.second = _service_description;
+  return (k);
 }
 
 /**

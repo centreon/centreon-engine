@@ -55,9 +55,7 @@ contactgroup::contactgroup(contactgroup const& right)
 /**
  *  Destructor.
  */
-contactgroup::~contactgroup() throw () {
-
-}
+contactgroup::~contactgroup() throw () {}
 
 /**
  *  Copy constructor.
@@ -132,6 +130,15 @@ void contactgroup::check_validity() const {
     throw (engine_error() << "contact group has no name "
            << "(property 'contactgroup_name')");
   return ;
+}
+
+/**
+ *  Get the contact group key.
+ *
+ *  @return The contact group name.
+ */
+contactgroup::key_type const& contactgroup::key() const throw () {
+  return (_contactgroup_name);
 }
 
 /**

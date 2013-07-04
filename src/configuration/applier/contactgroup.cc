@@ -65,33 +65,34 @@ applier::contactgroup& applier::contactgroup::operator=(
  *  Add new contactgroup.
  *
  *  @param[in] obj The new contactgroup to add into the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::contactgroup::add_object(
-                              configuration::contactgroup const& obj,
-                              configuration::state const& s) {
+                              shared_ptr<configuration::contactgroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new contactgroup '"
-    << obj.contactgroup_name() << "'.";
+    << obj->contactgroup_name() << "'.";
 
-  // Create contactgroup.
+  // Add contact group to the global configuration set.
+  config->contactgroups().insert(obj);
+
+  // Create contact group.
   contactgroup_struct* cg(add_contactgroup(
-                            obj.contactgroup_name().c_str(),
-                            NULL_IF_EMPTY(obj.alias())));
+                            obj->contactgroup_name().c_str(),
+                            NULL_IF_EMPTY(obj->alias())));
   if (!cg)
     throw (engine_error() << "Error: Could not register contact group '"
-           << obj.contactgroup_name() << "'.");
+           << obj->contactgroup_name() << "'.");
 
   // Apply resolved contacts on contactgroup.
   for (set_string::const_iterator
-         it(obj.resolved_members().begin()),
-         end(obj.resolved_members().end());
+         it(obj->resolved_members().begin()),
+         end(obj->resolved_members().end());
        it != end;
        ++it)
     if (!add_contact_to_contactgroup(cg, it->c_str()))
       throw (engine_error() << "Error: Could not add contact '" << *it
-             << "' to contact group '" << obj.contactgroup_name()
+             << "' to contact group '" << obj->contactgroup_name()
              << "'.");
 
   return ;
@@ -100,9 +101,8 @@ void applier::contactgroup::add_object(
 /**
  *  Expand a contactgroup.
  *
- *  @param[in]  obj      Object to expand.
- *  @param[in]  s        State being applied.
- *  @param[out] expanded Expanded contactgroup.
+ *  @param[in,out] obj Object to expand.
+ *  @param[in]     s   State being applied.
  */
 void applier::contactgroup::expand_object(
                               shared_ptr<configuration::contactgroup> obj,
@@ -122,16 +122,14 @@ void applier::contactgroup::expand_object(
  *  Modified contactgroup.
  *
  *  @param[in] obj The new contactgroup to modify into the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::contactgroup::modify_object(
-                              configuration::contactgroup const& obj,
-                              configuration::state const& s) {
+                              shared_ptr<configuration::contactgroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying contactgroup '" << obj.contactgroup_name() << "'.";
+    << "Modifying contactgroup '" << obj->contactgroup_name() << "'.";
 
-  // // Modify command.
+  // // Modify contact group.
   // shared_ptr<contactgroup_struct>&
   //   g(applier::state::instance().contactgroups()[obj->contactgroup_name()]);
   // modify_if_different(g->alias, obj->alias().c_str());
@@ -143,22 +141,24 @@ void applier::contactgroup::modify_object(
  *  Remove old contactgroup.
  *
  *  @param[in] obj The new contactgroup to remove from the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::contactgroup::remove_object(
-                              configuration::contactgroup const& obj,
-                              configuration::state const& s) {
-  (void)s;
-
+                              shared_ptr<configuration::contactgroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing contactgroup '" << obj.contactgroup_name() << "'.";
+    << "Removing contactgroup '" << obj->contactgroup_name() << "'.";
 
-  // Unregister contactgroup.
+  // Unregister contact group.
   unregister_object<contactgroup_struct, &contactgroup_struct::group_name>(
     &contactgroup_list,
-    obj.contactgroup_name().c_str());
-  applier::state::instance().contactgroups().erase(obj.contactgroup_name());
+    obj->contactgroup_name().c_str());
+
+  // Remove contact group object
+  // (this will effectively delete the object).
+  applier::state::instance().contactgroups().erase(obj->contactgroup_name());
+
+  // Remove contact group from the global configuration set.
+  config->contactgroups().erase(obj);
 
   return ;
 }
@@ -166,12 +166,11 @@ void applier::contactgroup::remove_object(
 /**
  *  Resolve a contact group.
  *
- *  @param[in] obj
- *  @param[in] s
+ *  @param[in] obj Contact group object.
  */
 void applier::contactgroup::resolve_object(
-                              configuration::contactgroup const& obj,
-                              configuration::state const& s) {
+                              shared_ptr<configuration::contactgroup> obj) {
+  // XXX
 }
 
 /**

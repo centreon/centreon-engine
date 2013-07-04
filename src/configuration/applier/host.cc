@@ -32,8 +32,6 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
-// XXX : update the event_list_low and event_list_high
-
 /**
  *  Check if the host group name matches the configuration object.
  */
@@ -87,114 +85,113 @@ applier::host& applier::host::operator=(applier::host const& right) {
  *  Add new host.
  *
  *  @param[in] obj The new host to add into the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::host::add_object(
-                      configuration::host const& obj,
-                      configuration::state const& s) {
-  (void)s;
-
+                      shared_ptr<configuration::host> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new host '" << obj.host_name() << "'.";
+    << "Creating new host '" << obj->host_name() << "'.";
+
+  // Add host to the global configuration set.
+  config->hosts().insert(obj);
 
   // Create host.
   host_struct*
     h(add_host(
-        obj.host_name().c_str(),
-        NULL_IF_EMPTY(obj.display_name()),
-        NULL_IF_EMPTY(obj.alias()),
-        NULL_IF_EMPTY(obj.address()),
-        NULL_IF_EMPTY(obj.check_period()),
-        obj.initial_state(),
-        obj.check_interval(),
-        obj.retry_interval(),
-        obj.max_check_attempts(),
-        static_cast<bool>(obj.notification_options()
+        obj->host_name().c_str(),
+        NULL_IF_EMPTY(obj->display_name()),
+        NULL_IF_EMPTY(obj->alias()),
+        NULL_IF_EMPTY(obj->address()),
+        NULL_IF_EMPTY(obj->check_period()),
+        obj->initial_state(),
+        obj->check_interval(),
+        obj->retry_interval(),
+        obj->max_check_attempts(),
+        static_cast<bool>(obj->notification_options()
                           & configuration::host::up),
-        static_cast<bool>(obj.notification_options()
+        static_cast<bool>(obj->notification_options()
                           & configuration::host::down),
-        static_cast<bool>(obj.notification_options()
+        static_cast<bool>(obj->notification_options()
                           & configuration::host::unreachable),
-        static_cast<bool>(obj.notification_options()
+        static_cast<bool>(obj->notification_options()
                           & configuration::host::flapping),
-        static_cast<bool>(obj.notification_options()
+        static_cast<bool>(obj->notification_options()
                           & configuration::host::downtime),
-        obj.notification_interval(),
-        obj.first_notification_delay(),
-        NULL_IF_EMPTY(obj.notification_period()),
-        obj.notifications_enabled(),
-        NULL_IF_EMPTY(obj.check_command()),
-        obj.checks_active(),
-        obj.checks_passive(),
-        NULL_IF_EMPTY(obj.event_handler()),
-        obj.event_handler_enabled(),
-        obj.flap_detection_enabled(),
-        obj.low_flap_threshold(),
-        obj.high_flap_threshold(),
-        static_cast<bool>(obj.flap_detection_options()
+        obj->notification_interval(),
+        obj->first_notification_delay(),
+        NULL_IF_EMPTY(obj->notification_period()),
+        obj->notifications_enabled(),
+        NULL_IF_EMPTY(obj->check_command()),
+        obj->checks_active(),
+        obj->checks_passive(),
+        NULL_IF_EMPTY(obj->event_handler()),
+        obj->event_handler_enabled(),
+        obj->flap_detection_enabled(),
+        obj->low_flap_threshold(),
+        obj->high_flap_threshold(),
+        static_cast<bool>(obj->flap_detection_options()
                           & configuration::host::up),
-        static_cast<bool>(obj.flap_detection_options()
+        static_cast<bool>(obj->flap_detection_options()
                           & configuration::host::down),
-        static_cast<bool>(obj.flap_detection_options()
+        static_cast<bool>(obj->flap_detection_options()
                           & configuration::host::unreachable),
-        static_cast<bool>(obj.stalking_options()
+        static_cast<bool>(obj->stalking_options()
                           & configuration::host::up),
-        static_cast<bool>(obj.stalking_options()
+        static_cast<bool>(obj->stalking_options()
                           & configuration::host::down),
-        static_cast<bool>(obj.stalking_options()
+        static_cast<bool>(obj->stalking_options()
                           & configuration::host::unreachable),
-        obj.process_perf_data(),
+        obj->process_perf_data(),
         true, // failure_prediction_enabled, enabled by Nagios
         NULL, // failure_prediction_options
-        obj.check_freshness(),
-        obj.freshness_threshold(),
-        NULL_IF_EMPTY(obj.notes()),
-        NULL_IF_EMPTY(obj.notes_url()),
-        NULL_IF_EMPTY(obj.action_url()),
-        NULL_IF_EMPTY(obj.icon_image()),
-        NULL_IF_EMPTY(obj.icon_image_alt()),
-        NULL_IF_EMPTY(obj.vrml_image()),
-        NULL_IF_EMPTY(obj.statusmap_image()),
-        obj.coords_2d().x(),
-        obj.coords_2d().y(),
-        obj.have_coords_2d(),
-        obj.coords_3d().x(),
-        obj.coords_3d().y(),
-        obj.coords_3d().z(),
-        obj.have_coords_3d(),
+        obj->check_freshness(),
+        obj->freshness_threshold(),
+        NULL_IF_EMPTY(obj->notes()),
+        NULL_IF_EMPTY(obj->notes_url()),
+        NULL_IF_EMPTY(obj->action_url()),
+        NULL_IF_EMPTY(obj->icon_image()),
+        NULL_IF_EMPTY(obj->icon_image_alt()),
+        NULL_IF_EMPTY(obj->vrml_image()),
+        NULL_IF_EMPTY(obj->statusmap_image()),
+        obj->coords_2d().x(),
+        obj->coords_2d().y(),
+        obj->have_coords_2d(),
+        obj->coords_3d().x(),
+        obj->coords_3d().y(),
+        obj->coords_3d().z(),
+        obj->have_coords_3d(),
         true, // should_be_drawn, enabled by Nagios
-        obj.retain_status_information(),
-        obj.retain_nonstatus_information(),
-        obj.obsess_over_host()));
+        obj->retain_status_information(),
+        obj->retain_nonstatus_information(),
+        obj->obsess_over_host()));
   if (!h)
     throw (engine_error() << "Error: Could not register host '"
-           << obj.host_name() << "'.");
+           << obj->host_name() << "'.");
 
   // Contacts.
   for (list_string::const_iterator
-         it(obj.contacts().begin()),
-         end(obj.contacts().end());
+         it(obj->contacts().begin()),
+         end(obj->contacts().end());
        it != end;
        ++it)
     if (!add_contact_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add contact '"
-             << *it << "' to host '" << obj.host_name() << "'.");
+             << *it << "' to host '" << obj->host_name() << "'.");
 
   // Contact groups.
   for (list_string::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
+         it(obj->contactgroups().begin()),
+         end(obj->contactgroups().end());
        it != end;
        ++it)
     if (!add_contactgroup_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add contact group '"
-             << *it << "' to host '" << obj.host_name() << "'.");
+             << *it << "' to host '" << obj->host_name() << "'.");
 
   // Custom variables.
   for (properties::const_iterator
-         it(obj.customvariables().begin()),
-         end(obj.customvariables().end());
+         it(obj->customvariables().begin()),
+         end(obj->customvariables().end());
        it != end;
        ++it)
     if (!add_custom_variable_to_host(
@@ -202,17 +199,17 @@ void applier::host::add_object(
            it->first.c_str(),
            it->second.c_str()))
       throw (engine_error() << "Error: Could not add custom variable '"
-             << it->first << "' to host '" << obj.host_name() << "'.");
+             << it->first << "' to host '" << obj->host_name() << "'.");
 
   // Parents.
   for (list_string::const_iterator
-         it(obj.parents().begin()),
-         end(obj.parents().end());
+         it(obj->parents().begin()),
+         end(obj->parents().end());
        it != end;
        ++it)
     if (!add_parent_host_to_host(h, it->c_str()))
       throw (engine_error() << "Error: Could not add parent '"
-             << *it << "' to host '" << obj.host_name() << "'.");
+             << *it << "' to host '" << obj->host_name() << "'.");
 
   return ;
 }
@@ -267,157 +264,155 @@ void applier::host::expand_object(
  *  Modified host.
  *
  *  @param[in] obj The new host to modify into the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::host::modify_object(
-                      configuration::host const& obj,
-                      configuration::state const& s) {
-  (void)s;
-
+                      shared_ptr<configuration::host> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying host '" << obj.host_name() << "'.";
+    << "Modifying host '" << obj->host_name() << "'.";
+
+  // XXX : need to reinsert the host in the configuration set
 
   // Modify command.
   shared_ptr<host_struct>&
-    h(applier::state::instance().hosts()[obj.host_name()]);
+    h(applier::state::instance().hosts()[obj->host_name()]);
   modify_if_different(
     h->display_name,
-    NULL_IF_EMPTY(obj.display_name()));
-  modify_if_different(h->alias, NULL_IF_EMPTY(obj.alias()));
-  modify_if_different(h->address, NULL_IF_EMPTY(obj.address()));
+    NULL_IF_EMPTY(obj->display_name()));
+  modify_if_different(h->alias, NULL_IF_EMPTY(obj->alias()));
+  modify_if_different(h->address, NULL_IF_EMPTY(obj->address()));
   modify_if_different(
     h->check_period,
-    NULL_IF_EMPTY(obj.check_period()));
+    NULL_IF_EMPTY(obj->check_period()));
   modify_if_different(
     h->initial_state,
-    static_cast<int>(obj.initial_state()));
+    static_cast<int>(obj->initial_state()));
   modify_if_different(
     h->check_interval,
-    static_cast<double>(obj.check_interval()));
+    static_cast<double>(obj->check_interval()));
   modify_if_different(
     h->retry_interval,
-    static_cast<double>(obj.retry_interval()));
+    static_cast<double>(obj->retry_interval()));
   modify_if_different(
     h->max_attempts,
-    static_cast<int>(obj.max_check_attempts()));
+    static_cast<int>(obj->max_check_attempts()));
   modify_if_different(
     h->notify_on_recovery,
     static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::up)));
+      obj->notification_options() & configuration::host::up)));
   modify_if_different(
     h->notify_on_down,
     static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::down)));
+      obj->notification_options() & configuration::host::down)));
   modify_if_different(
     h->notify_on_unreachable,
     static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::unreachable)));
+      obj->notification_options() & configuration::host::unreachable)));
   modify_if_different(
     h->notify_on_flapping,
     static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::flapping)));
+      obj->notification_options() & configuration::host::flapping)));
   modify_if_different(
     h->notify_on_downtime,
     static_cast<int>(static_cast<bool>(
-      obj.notification_options() & configuration::host::downtime)));
+      obj->notification_options() & configuration::host::downtime)));
   modify_if_different(
     h->notification_interval,
-    static_cast<double>(obj.notification_interval()));
+    static_cast<double>(obj->notification_interval()));
   modify_if_different(
     h->first_notification_delay,
-    static_cast<double>(obj.first_notification_delay()));
+    static_cast<double>(obj->first_notification_delay()));
   modify_if_different(
     h->notification_period,
-    NULL_IF_EMPTY(obj.notification_period()));
+    NULL_IF_EMPTY(obj->notification_period()));
   modify_if_different(
     h->notifications_enabled,
-    static_cast<int>(obj.notifications_enabled()));
+    static_cast<int>(obj->notifications_enabled()));
   modify_if_different(
     h->host_check_command,
-    NULL_IF_EMPTY(obj.check_command()));
+    NULL_IF_EMPTY(obj->check_command()));
   modify_if_different(
     h->checks_enabled,
-    static_cast<int>(obj.checks_active()));
+    static_cast<int>(obj->checks_active()));
   modify_if_different(
     h->accept_passive_host_checks,
-    static_cast<int>(obj.checks_passive()));
+    static_cast<int>(obj->checks_passive()));
   modify_if_different(
     h->event_handler,
-    NULL_IF_EMPTY(obj.event_handler()));
+    NULL_IF_EMPTY(obj->event_handler()));
   modify_if_different(
     h->flap_detection_enabled,
-    static_cast<int>(obj.flap_detection_enabled()));
+    static_cast<int>(obj->flap_detection_enabled()));
   modify_if_different(
     h->low_flap_threshold,
-    static_cast<double>(obj.low_flap_threshold()));
+    static_cast<double>(obj->low_flap_threshold()));
   modify_if_different(
     h->high_flap_threshold,
-    static_cast<double>(obj.high_flap_threshold()));
+    static_cast<double>(obj->high_flap_threshold()));
   modify_if_different(
     h->flap_detection_on_up,
     static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::host::up)));
+      obj->flap_detection_options() & configuration::host::up)));
   modify_if_different(
     h->flap_detection_on_down,
     static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::host::down)));
+      obj->flap_detection_options() & configuration::host::down)));
   modify_if_different(
     h->flap_detection_on_unreachable,
     static_cast<int>(static_cast<bool>(
-      obj.flap_detection_options() & configuration::host::unreachable)));
+      obj->flap_detection_options() & configuration::host::unreachable)));
   modify_if_different(
     h->stalk_on_up,
     static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::host::up)));
+      obj->stalking_options() & configuration::host::up)));
   modify_if_different(
     h->stalk_on_down,
     static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::host::down)));
+      obj->stalking_options() & configuration::host::down)));
   modify_if_different(
     h->stalk_on_unreachable,
     static_cast<int>(static_cast<bool>(
-      obj.stalking_options() & configuration::host::unreachable)));
+      obj->stalking_options() & configuration::host::unreachable)));
   modify_if_different(
     h->process_performance_data,
-    static_cast<int>(obj.process_perf_data()));
+    static_cast<int>(obj->process_perf_data()));
   modify_if_different(
     h->check_freshness,
-    static_cast<int>(obj.check_freshness()));
+    static_cast<int>(obj->check_freshness()));
   modify_if_different(
     h->freshness_threshold,
-    static_cast<int>(obj.freshness_threshold()));
-  modify_if_different(h->notes, NULL_IF_EMPTY(obj.notes()));
-  modify_if_different(h->notes_url, NULL_IF_EMPTY(obj.notes_url()));
-  modify_if_different(h->action_url, NULL_IF_EMPTY(obj.action_url()));
-  modify_if_different(h->icon_image, NULL_IF_EMPTY(obj.icon_image()));
+    static_cast<int>(obj->freshness_threshold()));
+  modify_if_different(h->notes, NULL_IF_EMPTY(obj->notes()));
+  modify_if_different(h->notes_url, NULL_IF_EMPTY(obj->notes_url()));
+  modify_if_different(h->action_url, NULL_IF_EMPTY(obj->action_url()));
+  modify_if_different(h->icon_image, NULL_IF_EMPTY(obj->icon_image()));
   modify_if_different(
     h->icon_image_alt,
-    NULL_IF_EMPTY(obj.icon_image_alt()));
-  modify_if_different(h->vrml_image, NULL_IF_EMPTY(obj.vrml_image()));
+    NULL_IF_EMPTY(obj->icon_image_alt()));
+  modify_if_different(h->vrml_image, NULL_IF_EMPTY(obj->vrml_image()));
   modify_if_different(
     h->statusmap_image,
-    NULL_IF_EMPTY(obj.statusmap_image()));
-  modify_if_different(h->x_2d, obj.coords_2d().x());
-  modify_if_different(h->y_2d, obj.coords_2d().y());
+    NULL_IF_EMPTY(obj->statusmap_image()));
+  modify_if_different(h->x_2d, obj->coords_2d().x());
+  modify_if_different(h->y_2d, obj->coords_2d().y());
   modify_if_different(
     h->have_2d_coords,
-    static_cast<int>(obj.have_coords_2d()));
-  modify_if_different(h->x_3d, obj.coords_3d().x());
-  modify_if_different(h->y_3d, obj.coords_3d().y());
-  modify_if_different(h->z_3d, obj.coords_3d().z());
+    static_cast<int>(obj->have_coords_2d()));
+  modify_if_different(h->x_3d, obj->coords_3d().x());
+  modify_if_different(h->y_3d, obj->coords_3d().y());
+  modify_if_different(h->z_3d, obj->coords_3d().z());
   modify_if_different(
     h->have_3d_coords,
-    static_cast<int>(obj.have_coords_3d()));
+    static_cast<int>(obj->have_coords_3d()));
   modify_if_different(
     h->retain_status_information,
-    static_cast<int>(obj.retain_status_information()));
+    static_cast<int>(obj->retain_status_information()));
   modify_if_different(
     h->retain_nonstatus_information,
-    static_cast<int>(obj.retain_nonstatus_information()));
+    static_cast<int>(obj->retain_nonstatus_information()));
   modify_if_different(
     h->obsess_over_host,
-    static_cast<int>(obj.obsess_over_host()));
+    static_cast<int>(obj->obsess_over_host()));
 
   // XXX : contacts
   // XXX : contactgroups
@@ -432,22 +427,23 @@ void applier::host::modify_object(
  *  Remove old host.
  *
  *  @param[in] obj The new host to remove from the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::host::remove_object(
-                      configuration::host const& obj,
-                      configuration::state const& s) {
-  (void)s;
-
+                      shared_ptr<configuration::host> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing host '" << obj.host_name() << "'.";
+    << "Removing host '" << obj->host_name() << "'.";
 
   // Unregister host.
   unregister_object<host_struct, &host_struct::name>(
     &host_list,
-    obj.host_name().c_str());
-  applier::state::instance().hosts().erase(obj.host_name());
+    obj->host_name().c_str());
+
+  // Remove host object (will effectively delete the object).
+  applier::state::instance().hosts().erase(obj->host_name());
+
+  // Remove host from the global configuration set.
+  config->hosts().erase(obj);
 
   return ;
 }
@@ -456,29 +452,24 @@ void applier::host::remove_object(
  *  Resolve a host.
  *
  *  @param[in] obj Host object.
- *  @param[in] s   Configuration being applied.
  */
 void applier::host::resolve_object(
-                      configuration::host const& obj,
-                      configuration::state const& s) {
-  (void)s;
-
+                      shared_ptr<configuration::host> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Resolving host '" << obj.host_name() << "'.";
+    << "Resolving host '" << obj->host_name() << "'.";
 
-  // XXX : check_host is called in preflight_check()
-  // // Find host.
-  // umap<std::string, shared_ptr<host_struct> >::iterator
-  //   it(applier::state::instance().hosts().find(obj.host_name()));
-  // if (applier::state::instance().hosts().end() == it)
-  //   throw (engine_error() << "Error: Cannot resolve non-existing host '"
-  //          << obj.host_name() << "'.");
+  // Find host.
+  umap<std::string, shared_ptr<host_struct> >::iterator
+    it(applier::state::instance().hosts().find(obj->key()));
+  if (applier::state::instance().hosts().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing host '"
+           << obj->host_name() << "'.");
 
-  // // Resolve host.
-  // if (!check_host(it->second.get(), NULL, NULL))
-  //   throw (engine_error() << "Error: Cannot resolve host '"
-  //          << obj.host_name() << "'.");
+  // Resolve host.
+  if (!check_host(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve host '"
+           << obj->host_name() << "'.");
 
   return ;
 }

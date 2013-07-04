@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_CONNECTOR_HH
 
 #  include <set>
+#  include <string>
 #  include "com/centreon/engine/commands/connector.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -28,9 +29,10 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    connector
-    : public object {
+  class                    connector : public object {
   public:
+    typedef std::string    key_type;
+
                            connector();
                            connector(connector const& right);
                            ~connector() throw ();
@@ -42,6 +44,7 @@ namespace                  configuration {
     bool                   operator<(
                              connector const& right) const throw ();
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

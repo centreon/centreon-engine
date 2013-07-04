@@ -32,9 +32,10 @@ typedef std::set<std::pair<std::string, std::string> > set_pair_string;
 CCE_BEGIN()
 
 namespace                   configuration {
-  class                     servicegroup
-    : public object {
+  class                     servicegroup : public object {
   public:
+    typedef std::string     key_type;
+
                             servicegroup();
                             servicegroup(servicegroup const& right);
                             ~servicegroup() throw ();
@@ -46,6 +47,7 @@ namespace                   configuration {
     bool                    operator<(
                               servicegroup const& right) const throw();
     void                    check_validity() const;
+    key_type const&         key() const throw ();
     void                    merge(object const& obj);
     bool                    parse(
                               std::string const& key,

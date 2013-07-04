@@ -46,6 +46,7 @@ namespace                  configuration {
       flapping = (1 << 3),
       downtime = (1 << 4)
     };
+    typedef std::string    key_type;
 
                            host();
                            host(host const& right);
@@ -55,6 +56,7 @@ namespace                  configuration {
     bool                   operator!=(host const& right) const throw ();
     bool                   operator<(host const& right) const throw ();
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(

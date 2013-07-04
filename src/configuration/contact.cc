@@ -91,9 +91,7 @@ contact::contact(contact const& right)
 /**
  *  Destructor.
  */
-contact::~contact() throw () {
-
-}
+contact::~contact() throw () {}
 
 /**
  *  Copy constructor.
@@ -241,6 +239,15 @@ void contact::check_validity() const {
     throw (engine_error()
            << "contact has no name (property 'contact_name')");
   return ;
+}
+
+/**
+ *  Get contact key.
+ *
+ *  @return Contact name.
+ */
+contact::key_type const& contact::key() const throw () {
+  return (_contact_name);
 }
 
 /**

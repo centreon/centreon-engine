@@ -147,6 +147,15 @@ void hostgroup::check_validity() const {
 }
 
 /**
+ *  Get the host group key.
+ *
+ *  @return The host group name.
+ */
+hostgroup::key_type const& hostgroup::key() const throw () {
+  return (_hostgroup_name);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.

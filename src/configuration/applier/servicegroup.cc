@@ -62,32 +62,31 @@ applier::servicegroup& applier::servicegroup::operator=(
  *  Add new servicegroup.
  *
  *  @param[in] obj The new servicegroup to add into the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::servicegroup::add_object(
-                              configuration::servicegroup const& obj,
-                              configuration::state const& s) {
-  (void)s;
-
+                              shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new servicegroup '" << obj.servicegroup_name() << "'.";
+    << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
+
+  // Add service group to the global configuration set.
+  config->servicegroups().insert(obj);
 
   // Create servicegroup.
   servicegroup_struct* sg(add_servicegroup(
-                            obj.servicegroup_name().c_str(),
-                            NULL_IF_EMPTY(obj.alias()),
-                            NULL_IF_EMPTY(obj.notes()),
-                            NULL_IF_EMPTY(obj.notes_url()),
-                            NULL_IF_EMPTY(obj.action_url())));
+                            obj->servicegroup_name().c_str(),
+                            NULL_IF_EMPTY(obj->alias()),
+                            NULL_IF_EMPTY(obj->notes()),
+                            NULL_IF_EMPTY(obj->notes_url()),
+                            NULL_IF_EMPTY(obj->action_url())));
   if (!sg)
     throw (engine_error() << "Error: Could not register service group '"
-           << obj.servicegroup_name() << "'.");
+           << obj->servicegroup_name() << "'.");
 
   // Apply resolved services on servicegroup.
   for (set_pair_string::const_iterator
-         it(obj.resolved_members().begin()),
-         end(obj.resolved_members().end());
+         it(obj->resolved_members().begin()),
+         end(obj->resolved_members().end());
        it != end;
        ++it)
     if (!add_service_to_servicegroup(
@@ -96,7 +95,7 @@ void applier::servicegroup::add_object(
            it->second.c_str()))
       throw (engine_error() << "Error: Could not add service member '"
              << it->second << "' of host '" << it->first
-             << "' to service group '" << obj.servicegroup_name()
+             << "' to service group '" << obj->servicegroup_name()
              << "'.");
 
   return ;
@@ -105,8 +104,8 @@ void applier::servicegroup::add_object(
 /**
  *  Expand a servicegroup.
  *
- *  @param[in]     obj Object to expand.
- *  @param[in,out] s   State being applied.
+ *  @param[in,out] obj Object to expand.
+ *  @param[in]     s   State being applied.
  */
 void applier::servicegroup::expand_object(
                               shared_ptr<configuration::servicegroup> obj,
@@ -126,14 +125,12 @@ void applier::servicegroup::expand_object(
  *  Modify servicegroup.
  *
  *  @param[in] obj The new servicegroup to modify into the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::servicegroup::modify_object(
-                              configuration::servicegroup const& obj,
-                              configuration::state const& s) {
+                              shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying servicegroup '" << obj.servicegroup_name() << "'.";
+    << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
 
   // XXX
 
@@ -144,22 +141,23 @@ void applier::servicegroup::modify_object(
  *  Remove old servicegroup.
  *
  *  @param[in] obj The new servicegroup to remove from the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::servicegroup::remove_object(
-                              configuration::servicegroup const& obj,
-                              configuration::state const& s) {
-  (void)s;
-
+                              shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing servicegroup '" << obj.servicegroup_name() << "'.";
+    << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
 
-  // Unregister servicegroup.
+  // Unregister service group.
   unregister_object<servicegroup_struct, &servicegroup_struct::group_name>(
     &servicegroup_list,
-    obj.servicegroup_name().c_str());
-  applier::state::instance().servicegroups().erase(obj.servicegroup_name());
+    obj->servicegroup_name().c_str());
+
+  // Remove service group object (will effectively delete the object).
+  applier::state::instance().servicegroups().erase(obj->servicegroup_name());
+
+  // Remove service group from the global configuration state.
+  config->servicegroups().erase(obj);
 
   return ;
 }
@@ -168,11 +166,10 @@ void applier::servicegroup::remove_object(
  *  Resolve a servicegroup.
  *
  *  @param[in,out] obj Servicegroup object.
- *  @param[in]     s   Configuration being applied.
  */
 void applier::servicegroup::resolve_object(
-                              configuration::servicegroup const& obj,
-                              configuration::state const& s) {
+                              shared_ptr<configuration::servicegroup> obj) {
+  // XXX
 }
 
 /**

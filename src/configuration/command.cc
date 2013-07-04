@@ -39,10 +39,7 @@ static struct {
 /**
  *  Default constructor.
  */
-command::command()
-  : object(object::command) {
-
-}
+command::command() : object(object::command) {}
 
 /**
  *  Copy constructor.
@@ -57,9 +54,7 @@ command::command(command const& right)
 /**
  *  Destructor.
  */
-command::~command() throw () {
-
-}
+command::~command() throw () {}
 
 /**
  *  Copy constructor.
@@ -129,6 +124,15 @@ void command::check_validity() const {
     throw (engine_error() << "command '" << _command_name
            << "' has no command line (property 'command_line')");
   return ;
+}
+
+/**
+ *  Get the command key.
+ *
+ *  @return The command name.
+ */
+command::key_type const& command::key() const throw () {
+  return (_command_name);
 }
 
 /**

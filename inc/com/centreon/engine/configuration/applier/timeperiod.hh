@@ -38,20 +38,16 @@ namespace                configuration {
                          ~timeperiod() throw ();
       timeperiod&        operator=(timeperiod const& right);
       void               add_object(
-                           configuration::timeperiod const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::timeperiod> obj);
       void               expand_object(
                            shared_ptr<configuration::timeperiod> obj,
                            configuration::state& s);
       void               modify_object(
-                           configuration::timeperiod const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::timeperiod> obj);
       void               remove_object(
-                           configuration::timeperiod const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::timeperiod> obj);
       void               resolve_object(
-                           configuration::timeperiod const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::timeperiod> obj);
     };
   }
 }

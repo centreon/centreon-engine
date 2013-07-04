@@ -37,20 +37,16 @@ namespace                  configuration {
                            ~servicegroup() throw ();
       servicegroup&        operator=(servicegroup const& right);
       void                 add_object(
-                             configuration::servicegroup const& obj,
-                             configuration::state const& s);
+                             shared_ptr<configuration::servicegroup> obj);
       void                 expand_object(
                              shared_ptr<configuration::servicegroup> obj,
                              configuration::state& s);
       void                 modify_object(
-                             configuration::servicegroup const& obj,
-                             configuration::state const& s);
+                             shared_ptr<configuration::servicegroup> obj);
       void                 remove_object(
-                             configuration::servicegroup const& obj,
-                             configuration::state const& s);
+                             shared_ptr<configuration::servicegroup> obj);
       void                 resolve_object(
-                             configuration::servicegroup const& obj,
-                             configuration::state const& s);
+                             shared_ptr<configuration::servicegroup> obj);
 
     private:
       void                 _resolve_members(

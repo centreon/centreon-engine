@@ -38,20 +38,16 @@ namespace             configuration {
                       ~contact() throw ();
       contact&        operator=(contact const& right);
       void            add_object(
-                        configuration::contact const& obj,
-			configuration::state const& s);
+                        shared_ptr<configuration::contact> obj);
       void            expand_object(
                         shared_ptr<configuration::contact> obj,
                         configuration::state& s);
       void            modify_object(
-                        configuration::contact const& obj,
-			configuration::state const& s);
+                        shared_ptr<configuration::contact> obj);
       void            remove_object(
-                        configuration::contact const& obj,
-			configuration::state const& s);
+                        shared_ptr<configuration::contact> obj);
       void            resolve_object(
-                        configuration::contact const& obj,
-			configuration::state const& s);
+                        shared_ptr<configuration::contact> obj);
     };
   }
 }

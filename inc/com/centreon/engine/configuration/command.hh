@@ -21,15 +21,17 @@
 #  define CCE_CONFIGURATION_COMMAND_HH
 
 #  include <set>
+#  include <string>
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    command
-    : public object {
+  class                    command : public object {
   public:
+    typedef std::string    key_type;
+
                            command();
                            command(command const& right);
                            ~command() throw ();
@@ -41,6 +43,7 @@ namespace                  configuration {
     bool                   operator<(
                              command const& right) const throw ();
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

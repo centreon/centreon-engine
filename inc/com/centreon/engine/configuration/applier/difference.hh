@@ -71,19 +71,19 @@ namespace      configuration {
             std::copy(first1, last1, del);
             break;
           }
-          // XXX : calls to id() should be replaced with calls to key()
-          // if ((*first1)->id() < (*first2)->id())
-          //   *del++ = *first1++;
-          // else if ((*first1)->id() != (*first2)->id())
-          //   *add++ = *first2++;
-          // else if (**first1 != **first2) {
-          //   *modif++ = *first2++;
-          //   ++first1;
-          // }
-          // else {
-          //   ++first2;
-          //   ++first1;
-          // }
+
+          if ((*first1)->key() < (*first2)->key())
+            *del++ = *first1++;
+          else if ((*first1)->key() != (*first2)->key())
+            *add++ = *first2++;
+          else if (**first1 != **first2) {
+            *modif++ = *first2++;
+            ++first1;
+          }
+          else {
+            ++first2;
+            ++first1;
+          }
         }
       }
 

@@ -40,24 +40,20 @@ namespace             configuration {
                       ~command() throw ();
       command&        operator=(command const& right);
       void            add_object(
-                        configuration::command const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::command> obj);
       void            expand_object(
                         shared_ptr<configuration::command> obj,
                         configuration::state& s);
       void            modify_object(
-                        configuration::command const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::command> obj);
       void            remove_object(
-                        configuration::command const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::command> obj);
       void            resolve_object(
-                        configuration::command const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::command> obj);
 
     private:
       void            _create_command(
-                        configuration::command const& obj);
+                        shared_ptr<configuration::command> obj);
     };
   }
 }

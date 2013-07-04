@@ -38,20 +38,16 @@ namespace               configuration {
                         ~connector() throw ();
       connector&        operator=(connector const& right);
       void              add_object(
-                          configuration::connector const& obj,
-                          configuration::state const& s);
+                          shared_ptr<configuration::connector> obj);
       void              expand_object(
                           shared_ptr<configuration::connector> obj,
                           configuration::state& s);
       void              modify_object(
-                          configuration::connector const& obj,
-			  configuration::state const& s);
+                          shared_ptr<configuration::connector> obj);
       void              remove_object(
-                          configuration::connector const& obj,
-			  configuration::state const& s);
+                          shared_ptr<configuration::connector> obj);
       void              resolve_object(
-                          configuration::connector const& obj,
-			  configuration::state const& s);
+                          shared_ptr<configuration::connector> obj);
     };
   }
 }

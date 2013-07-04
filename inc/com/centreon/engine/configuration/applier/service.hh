@@ -38,20 +38,16 @@ namespace             configuration {
                       ~service() throw ();
       service&        operator=(service const& right);
       void            add_object(
-                        configuration::service const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::service> obj);
       void            expand_object(
                         shared_ptr<configuration::service> obj,
                         configuration::state& s);
       void            modify_object(
-                        configuration::service const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::service> obj);
       void            remove_object(
-                        configuration::service const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::service> obj);
       void            resolve_object(
-                        configuration::service const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::service> obj);
 
     private:
       void            _expand_service_memberships(

@@ -38,10 +38,7 @@ static struct {
 /**
  *  Default constructor.
  */
-connector::connector()
-  : object(object::connector) {
-
-}
+connector::connector() : object(object::connector) {}
 
 /**
  *  Copy constructor.
@@ -56,9 +53,7 @@ connector::connector(connector const& right)
 /**
  *  Destructor.
  */
-connector::~connector() throw () {
-
-}
+connector::~connector() throw () {}
 
 /**
  *  Copy constructor.
@@ -126,6 +121,15 @@ void connector::check_validity() const {
     throw (engine_error() << "connector '" << _connector_name
            << "' has no command line (property 'connector_line')");
   return ;
+}
+
+/**
+ *  Get the connector key.
+ *
+ *  @return The connector name.
+ */
+connector::key_type const& connector::key() const throw () {
+  return (_connector_name);
 }
 
 /**

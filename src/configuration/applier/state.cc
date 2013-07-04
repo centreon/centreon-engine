@@ -47,284 +47,6 @@ using namespace com::centreon::engine::configuration;
 static applier::state* _instance = NULL;
 
 /**
- *  Find key in collection with direct access to find().
- *
- *  @param[in] obj Collection in which to search for.
- *  @param[in] key Key to search for.
- *
- *  @return Iterator to the element matching key, obj.end() if it was
- *          not found.
- */
-template <typename ObjectCollectionType, typename KeyType>
-typename ObjectCollectionType::iterator find_key_with_collection_find(
-                                         ObjectCollectionType& obj,
-                                         KeyType const& key) {
-  return (obj.find(key));
-}
-
-/**
- *  Find a host dependency in the umultimap.
- *
- *  @param[in] obj Collection in which to search for.
- *  @param[in] key Key to search for.
- *
- *  @return Iterator to the element matching key, obj.end() if it was
- *          not found.
- */
-umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator find_hostdependency_key(
-  umultimap<std::string, shared_ptr<hostdependency_struct> >& obj,
-  configuration::hostdependency const& key) {
-  typedef umultimap<std::string, shared_ptr<hostdependency_struct> > CollectionType;
-  std::pair<CollectionType::iterator, CollectionType::iterator>
-    p(obj.equal_range(key.dependent_hosts().front()));
-  while (p.first != p.second) {
-    // XXX
-      break ;
-    ++p.first;
-  }
-  return ((p.first != p.second) ? p.first : obj.end());
-}
-
-/**
- *  Find a host escalation in the umultimap.
- *
- *  @param[in] obj Collection in which to search for.
- *  @param[in] key Key to search for.
- *
- *  @return Iterator to the element matching key, obj.end() if it was
- *          not found.
- */
-umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator find_hostescalation_key(
-  umultimap<std::string, shared_ptr<hostescalation_struct> >& obj,
-  configuration::hostescalation const& key) {
-  typedef umultimap<std::string, shared_ptr<hostescalation_struct> > CollectionType;
-  std::pair<CollectionType::iterator, CollectionType::iterator>
-    p(obj.equal_range(key.hosts().front()));
-  while (p.first != p.second) {
-    // XXX
-    ++p.first;
-  }
-  return ((p.first != p.second) ? p.first : obj.end());
-}
-
-/**
- *  Find a service dependency in the umultimap.
- *
- *  @param[in] obj Collection in which to search for.
- *  @param[in] key Key to search for.
- *
- *  @return Iterator to the element matching key, obj.end() if it was
- *          not found.
- */
-umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator find_servicedependency_key(
-  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >& obj,
-  configuration::servicedependency const& key) {
-  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> > CollectionType;
-  std::pair<CollectionType::iterator, CollectionType::iterator>
-    p(obj.equal_range(std::make_pair(
-                        key.dependent_hosts().front(),
-                        key.dependent_service_description().front())));
-  while (p.first != p.second) {
-    servicedependency_struct& sd(*p.first->second);
-    unsigned int options(
-                   (sd.fail_on_ok
-                    ? configuration::servicedependency::ok
-                    : 0)
-                   | (sd.fail_on_warning
-                      ? configuration::servicedependency::warning
-                      : 0)
-                   | (sd.fail_on_unknown
-                      ? configuration::servicedependency::unknown
-                      : 0)
-                   | (sd.fail_on_critical
-                      ? configuration::servicedependency::critical
-                      : 0)
-                   | (sd.fail_on_pending
-                      ? configuration::servicedependency::pending
-                      : 0));
-    std::string dhn(sd.dependent_host_name
-                    ? sd.dependent_host_name
-                    : "");
-    std::string dsd(sd.dependent_service_description
-                    ? sd.dependent_service_description
-                    : "");
-    std::string hn(sd.host_name
-                   ? sd.host_name
-                   : "");
-    std::string sde(sd.service_description
-                    ? sd.service_description
-                    : "");
-    std::string dp(sd.dependency_period
-                   ? sd.dependency_period
-                   : NULL);
-    if ((sd.dependency_type == key.dependency_type())
-        && (dhn == key.dependent_hosts().front())
-        && (dsd == key.dependent_service_description().front())
-        && (hn == key.hosts().front())
-        && (sde == key.service_description().front())
-        && (dp == key.dependency_period())
-        && (sd.inherits_parent == key.inherits_parent())
-        && (options
-            == ((sd.dependency_type == EXECUTION_DEPENDENCY)
-                ? key.execution_failure_options()
-                : key.notification_failure_options())))
-      break ;
-    ++p.first;
-  }
-  return ((p.first != p.second) ? p.first : obj.end());
-}
-
-/**
- *  Find a service escalation in the umultimap.
- *
- *  @param[in] obj Collection in which to search for.
- *  @param[in] key Key to search for.
- *
- *  @return Iterator to the element matchin key, obj.end() if it was
- *          not found.
- */
-umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator find_serviceescalation_key(
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >& obj,
-  configuration::serviceescalation const& key) {
-  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > CollectionType;
-  std::pair<CollectionType::iterator, CollectionType::iterator>
-    p(obj.equal_range(std::make_pair(
-                             key.hosts().front(),
-                             key.service_description().front())));
-  while (p.first != p.second) {
-    // XXX
-    ++p.first;
-  }
-  return ((p.first != p.second) ? p.first : obj.end());
-}
-
-/**
- *  Get the key of a command.
- *
- *  @return Command name.
- */
-std::string command_key(configuration::command const& c) {
-  return (c.command_name());
-}
-
-/**
- *  Get the key of a connector.
- *
- *  @return Connector name.
- */
-std::string connector_key(configuration::connector const& c) {
-  return (c.connector_name());
-}
-
-/**
- *  Get the key of a contact.
- *
- *  @return Contact name.
- */
-std::string contact_key(configuration::contact const& c) {
-  return (c.contact_name());
-}
-
-/**
- *  Get the key of a contactgroup.
- *
- *  @return Contactgroup name.
- */
-std::string contactgroup_key(configuration::contactgroup const& cg) {
-  return (cg.contactgroup_name());
-}
-
-/**
- *  Get the key of a host.
- *
- *  @return Host name.
- */
-std::string host_key(configuration::host const& h) {
-  return (h.host_name());
-}
-
-/**
- *  Get the key of a hostdependency.
- *
- *  @return A copy of the host dependency configuration object.
- */
-configuration::hostdependency hostdependency_key(
-                                configuration::hostdependency const& hd) {
-  return (hd);
-}
-
-/**
- *  Get the key of a host escalation.
- *
- *  @return A copy of the host escalation configuration object.
- */
-configuration::hostescalation hostescalation_key(
-                                configuration::hostescalation const& he) {
-  return (he);
-}
-
-/**
- *  Get the key of a hostgroup.
- *
- *  @return Hostgroup name.
- */
-std::string hostgroup_key(configuration::hostgroup const& hg) {
-  return (hg.hostgroup_name());
-}
-
-/**
- *  Get the key of a service.
- *
- *  @return Pair of host name / service description.
- */
-std::pair<std::string, std::string> service_key(
-                                      configuration::service const& s) {
-  return (std::make_pair(
-                 s.hosts().front(),
-                 s.service_description()));
-}
-
-/**
- *  Get the key of a service dependency.
- *
- *  @param[in] sd Service dependency.
- */
-configuration::servicedependency servicedependency_key(
-                 configuration::servicedependency const& sd) {
-  return (sd);
-}
-
-/**
- *  Get the key of a service escalation.
- *
- *  @param[in] se Service escalation.
- *
- *  @return A copy of the service escalation configuration object.
- */
-configuration::serviceescalation serviceescalation_key(
-                                   configuration::serviceescalation const& se) {
-  return (se);
-}
-
-/**
- *  Get the key of a servicegroup.
- *
- *  @return Servicegroup name.
- */
-std::string servicegroup_key(configuration::servicegroup const& sg) {
-  return (sg.servicegroup_name());
-}
-
-/**
- *  Get the key of a timeperiod.
- *
- *  @return Timeperiod name.
- */
-std::string timeperiod_key(configuration::timeperiod const& t) {
-  return (t.timeperiod_name());
-}
-
-/**
  *  Apply new configuration.
  *
  *  @param[in] new_cfg The new configuration.
@@ -334,17 +56,8 @@ void applier::state::apply(configuration::state& new_cfg) {
   _expand<configuration::timeperiod, applier::timeperiod>(
     new_cfg,
     new_cfg.timeperiods());
-  _apply<configuration::timeperiod,
-         umap<std::string, shared_ptr<timeperiod_struct> >,
-         applier::timeperiod,
-         std::string,
-         &timeperiod_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<timeperiod_struct> >,
-            std::string> >(
+  _apply<configuration::timeperiod, applier::timeperiod>(
     config->timeperiods(),
-    _timeperiods,
-    new_cfg,
     new_cfg.timeperiods());
   _resolve<configuration::timeperiod, applier::timeperiod>(
     config->timeperiods());
@@ -353,17 +66,8 @@ void applier::state::apply(configuration::state& new_cfg) {
   _expand<configuration::connector, applier::connector>(
     new_cfg,
     new_cfg.connectors());
-  _apply<configuration::connector,
-         umap<std::string, shared_ptr<commands::connector> >,
-         applier::connector,
-         std::string,
-         &connector_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<commands::connector> >,
-            std::string> >(
+  _apply<configuration::connector, applier::connector>(
     config->connectors(),
-    _connectors,
-    new_cfg,
     new_cfg.connectors());
   _resolve<configuration::connector, applier::connector>(
     config->connectors());
@@ -372,17 +76,8 @@ void applier::state::apply(configuration::state& new_cfg) {
   _expand<configuration::command, applier::command>(
     new_cfg,
     new_cfg.commands());
-  _apply<configuration::command,
-         umap<std::string, shared_ptr<command_struct> >,
-         applier::command,
-         std::string,
-         &command_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<command_struct> >,
-            std::string> >(
+  _apply<configuration::command, applier::command>(
     config->commands(),
-    _commands,
-    new_cfg,
     new_cfg.commands());
   _resolve<configuration::command, applier::command>(
     config->commands());
@@ -391,32 +86,14 @@ void applier::state::apply(configuration::state& new_cfg) {
   _expand<configuration::contact, applier::contact>(
     new_cfg,
     new_cfg.contacts());
-  _apply<configuration::contact,
-         umap<std::string, shared_ptr<contact_struct> >,
-         applier::contact,
-         std::string,
-         &contact_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<contact_struct> >,
-            std::string> >(
+  _apply<configuration::contact, applier::contact>(
     config->contacts(),
-    _contacts,
-    new_cfg,
     new_cfg.contacts());
   _expand<configuration::contactgroup, applier::contactgroup>(
     new_cfg,
     new_cfg.contactgroups());
-  _apply<configuration::contactgroup,
-         umap<std::string, shared_ptr<contactgroup_struct> >,
-         applier::contactgroup,
-         std::string,
-         &contactgroup_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<contactgroup_struct> >,
-            std::string> >(
+  _apply<configuration::contactgroup, applier::contactgroup>(
     config->contactgroups(),
-    _contactgroups,
-    new_cfg,
     new_cfg.contactgroups());
   _resolve<configuration::contactgroup, applier::contactgroup>(
     config->contactgroups());
@@ -427,32 +104,14 @@ void applier::state::apply(configuration::state& new_cfg) {
   _expand<configuration::host, applier::host>(
     new_cfg,
     new_cfg.hosts());
-  _apply<configuration::host,
-         umap<std::string, shared_ptr<host_struct> >,
-         applier::host,
-         std::string,
-         &host_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<host_struct> >,
-            std::string> >(
+  _apply<configuration::host, applier::host>(
     config->hosts(),
-    _hosts,
-    new_cfg,
     new_cfg.hosts());
   _expand<configuration::hostgroup, applier::hostgroup>(
     new_cfg,
     new_cfg.hostgroups());
-  _apply<configuration::hostgroup,
-         umap<std::string, shared_ptr<hostgroup_struct> >,
-         applier::hostgroup,
-         std::string,
-         &hostgroup_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<hostgroup_struct> >,
-            std::string> >(
+  _apply<configuration::hostgroup, applier::hostgroup>(
     config->hostgroups(),
-    _hostgroups,
-    new_cfg,
     new_cfg.hostgroups());
   _resolve<configuration::hostgroup, applier::hostgroup>(
     config->hostgroups());
@@ -463,110 +122,59 @@ void applier::state::apply(configuration::state& new_cfg) {
   _expand<configuration::service, applier::service>(
     new_cfg,
     new_cfg.services());
-  _apply<configuration::service,
-         umap<std::pair<std::string, std::string>,
-              shared_ptr<service_struct> >,
-         applier::service,
-         std::pair<std::string, std::string>,
-         &service_key,
-         &find_key_with_collection_find<
-            umap<std::pair<std::string, std::string>,
-                 shared_ptr<service_struct> >,
-            std::pair<std::string, std::string> > >(
+  _apply<configuration::service, applier::service>(
     config->services(),
-    _services,
-    new_cfg,
     new_cfg.services());
   _expand<configuration::servicegroup, applier::servicegroup>(
     new_cfg,
     new_cfg.servicegroups());
-  _apply<configuration::servicegroup,
-         umap<std::string, shared_ptr<servicegroup_struct> >,
-         applier::servicegroup,
-         std::string,
-         &servicegroup_key,
-         &find_key_with_collection_find<
-            umap<std::string, shared_ptr<servicegroup_struct> >,
-            std::string> >(
+  _apply<configuration::servicegroup, applier::servicegroup>(
     config->servicegroups(),
-    _servicegroups,
-    new_cfg,
     new_cfg.servicegroups());
   _resolve<configuration::servicegroup, applier::servicegroup>(
     config->servicegroups());
   _resolve<configuration::service, applier::service>(
     config->services());
 
-  // Apply host dependencies.
-  _expand<configuration::hostdependency, applier::hostdependency>(
-    new_cfg,
-    new_cfg.hostdependencies());
-  _apply<configuration::hostdependency,
-         umultimap<std::string, shared_ptr<hostdependency_struct> >,
-         applier::hostdependency,
-         configuration::hostdependency,
-         &hostdependency_key,
-         &find_hostdependency_key>(
-    config->hostdependencies(),
-    _hostdependencies,
-    new_cfg,
-    new_cfg.hostdependencies());
-  _resolve<configuration::hostdependency, applier::hostdependency>(
-    config->hostdependencies());
+  // // Apply host dependencies.
+  // _expand<configuration::hostdependency, applier::hostdependency>(
+  //   new_cfg,
+  //   new_cfg.hostdependencies());
+  // _apply<configuration::hostdependency, applier::hostdependency>(
+  //   config->hostdependencies(),
+  //   new_cfg.hostdependencies());
+  // _resolve<configuration::hostdependency, applier::hostdependency>(
+  //   config->hostdependencies());
 
-  // Apply service dependencies.
-  _expand<configuration::servicedependency, applier::servicedependency>(
-    new_cfg,
-    new_cfg.servicedependencies());
-  _apply<configuration::servicedependency,
-         umultimap<std::pair<std::string, std::string>,
-                   shared_ptr<servicedependency_struct> >,
-         applier::servicedependency,
-         configuration::servicedependency,
-         &servicedependency_key,
-         &find_servicedependency_key>(
-    config->servicedependencies(),
-    _servicedependencies,
-    new_cfg,
-    new_cfg.servicedependencies());
-  _resolve<configuration::servicedependency, applier::servicedependency>(
-    config->servicedependencies());
+  // // Apply service dependencies.
+  // _expand<configuration::servicedependency, applier::servicedependency>(
+  //   new_cfg,
+  //   new_cfg.servicedependencies());
+  // _apply<configuration::servicedependency, applier::servicedependency>(
+  //   config->servicedependencies(),
+  //   new_cfg.servicedependencies());
+  // _resolve<configuration::servicedependency, applier::servicedependency>(
+  //   config->servicedependencies());
 
-  // Apply host escalations.
-  _expand<configuration::hostescalation, applier::hostescalation>(
-    new_cfg,
-    new_cfg.hostescalations());
-  _apply<configuration::hostescalation,
-         umultimap<std::string,
-                   shared_ptr<hostescalation_struct> >,
-         applier::hostescalation,
-         configuration::hostescalation,
-         &hostescalation_key,
-         &find_hostescalation_key>(
-    config->hostescalations(),
-    _hostescalations,
-    new_cfg,
-    new_cfg.hostescalations());
-  _resolve<configuration::hostescalation, applier::hostescalation>(
-    config->hostescalations());
+  // // Apply host escalations.
+  // _expand<configuration::hostescalation, applier::hostescalation>(
+  //   new_cfg,
+  //   new_cfg.hostescalations());
+  // _apply<configuration::hostescalation, applier::hostescalation>(
+  //   config->hostescalations(),
+  //   new_cfg.hostescalations());
+  // _resolve<configuration::hostescalation, applier::hostescalation>(
+  //   config->hostescalations());
 
-  // Apply service escalations.
-  _expand<configuration::serviceescalation, applier::serviceescalation>(
-    new_cfg,
-    new_cfg.serviceescalations());
-  _apply<configuration::serviceescalation,
-         umultimap<std::pair<std::string, std::string>,
-                   shared_ptr<serviceescalation_struct> >,
-         applier::serviceescalation,
-         configuration::serviceescalation,
-         &serviceescalation_key,
-         &find_serviceescalation_key>(
-    config->serviceescalations(),
-    _serviceescalations,
-    new_cfg,
-    new_cfg.serviceescalations());
-  _resolve<configuration::serviceescalation, applier::serviceescalation>(
-    config->serviceescalations());
+  // // Apply service escalations.
+  // _expand<configuration::serviceescalation, applier::serviceescalation>(
+  //   new_cfg,
+  //   new_cfg.serviceescalations());
+  // _apply<configuration::serviceescalation, applier::serviceescalation>(
+  //   config->serviceescalations(),
+  //   new_cfg.serviceescalations());
+  // _resolve<configuration::serviceescalation, applier::serviceescalation>(
+  //   config->serviceescalations());
 
   // Pre-flight check.
   {
@@ -857,20 +465,19 @@ umap<std::string, shared_ptr<timeperiod_struct> >& applier::state::timeperiods()
 }
 
 /**
- *  Apply configuration of a specific object type.
+ *  @brief Apply configuration of a specific object type.
  *
- *  XXX
+ *  This method will perform a diff on cur_cfg and new_cfg to create the
+ *  three element sets : added, modified and removed. The type applier
+ *  will then be called to 1) remove old objects 2) create new objects
+ *  3) modify existing objects, in this order.
+ *
+ *  @param[in] cur_cfg Current configuration set.
+ *  @param[in] new_cfg New configuration set.
  */
-template <typename ConfigurationType,
-          typename ObjectCollectionType,
-          typename ApplierType,
-          typename KeyType,
-          KeyType (* config_key)(ConfigurationType const&),
-          typename ObjectCollectionType::iterator (* find_obj_from_key)(ObjectCollectionType&, KeyType const&)>
+template <typename ConfigurationType, typename ApplierType>
 void applier::state::_apply(
-                       std::set<shared_ptr<ConfigurationType> >& cur_cfg,
-                       ObjectCollectionType& cur_obj,
-                       configuration::state const& new_state,
+                       std::set<shared_ptr<ConfigurationType> > const& cur_cfg,
                        std::set<shared_ptr<ConfigurationType> > const& new_cfg) {
   // Type alias.
   typedef std::set<shared_ptr<ConfigurationType> > cfg_set;
@@ -890,46 +497,28 @@ void applier::state::_apply(
   ApplierType aplyr;
 
   // Erase objects.
-  {
-    typename cfg_set::iterator
-      it_current(cur_cfg.begin()),
-      end_current(cur_cfg.end());
-    for (typename cfg_set::const_iterator
-           it_delete(diff.deleted().begin()),
-           end_delete(diff.deleted().end());
-         it_delete != end_delete;
-         ++it_delete) {
-      typename ObjectCollectionType::iterator
-        it(find_obj_from_key(cur_obj, (*config_key)(**it_delete)));
-      if (it != cur_obj.end()) {
-        aplyr.remove_object(**it_delete, new_state);
-        while ((it_current != end_current)
-               && ((*config_key)(**it_current)
-                   < (*config_key)(**it_delete)))
-          ++it_current;
-        if ((it_current != end_current)
-            && ((*config_key)(**it_current)
-                == (*config_key)(**it_delete))) {
-          typename cfg_set::iterator will_be_erased(it_current);
-          ++it_current;
-          cur_cfg.erase(will_be_erased);
-        }
-      }
-    }
-  }
+  for (typename cfg_set::const_iterator
+         it_delete(diff.deleted().begin()),
+         end_delete(diff.deleted().end());
+       it_delete != end_delete;
+       ++it_delete)
+    aplyr.remove_object(*it_delete);
 
   // Add objects.
   for (typename cfg_set::const_iterator
          it_create(diff.added().begin()),
          end_create(diff.added().end());
        it_create != end_create;
-       ++it_create) {
-    aplyr.add_object(**it_create, new_state);
-    cur_cfg.insert(*it_create);
-  }
+       ++it_create)
+    aplyr.add_object(*it_create);
 
   // Modify objects.
-  // XXX
+  for (typename cfg_set::const_iterator
+         it_modify(diff.modified().begin()),
+         end_modify(diff.modified().end());
+       it_modify != end_modify;
+       ++it_modify)
+    aplyr.modify_object(*it_modify);
 
   return ;
 }
@@ -963,13 +552,13 @@ void applier::state::_expand(
  */
 template <typename ConfigurationType, typename ApplierType>
 void applier::state::_resolve(
-       std::set<shared_ptr<ConfigurationType> > const& cfg) {
+       std::set<shared_ptr<ConfigurationType> >& cfg) {
   ApplierType aplyr;
   for (typename std::set<shared_ptr<ConfigurationType> >::const_iterator
          it(cfg.begin()),
          end(cfg.end());
        it != end;
        ++it)
-    aplyr.resolve_object(**it, *config);
+    aplyr.resolve_object(*it);
   return ;
 }

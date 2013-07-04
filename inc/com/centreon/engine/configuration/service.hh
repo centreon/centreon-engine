@@ -34,8 +34,7 @@ CCE_BEGIN()
 namespace                  configuration {
   class                    serviceextinfo;
 
-  class                    service
-    : public object {
+  class                    service : public object {
   public:
     enum                   action_on {
       none = 0,
@@ -46,6 +45,8 @@ namespace                  configuration {
       flapping = (1 << 4),
       downtime = (1 << 5)
     };
+    typedef                std::pair<std::string, std::string>
+                           key_type;
 
                            service();
                            service(service const& right);
@@ -58,6 +59,7 @@ namespace                  configuration {
     bool                   operator<(
                              service const& right) const throw ();
     void                   check_validity() const;
+    key_type               key() const;
     void                   merge(configuration::serviceextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(

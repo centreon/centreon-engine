@@ -139,9 +139,7 @@ host::host()
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {
-
-}
+    _stalking_options(default_stalking_options) {}
 
 /**
  *  Copy constructor.
@@ -156,9 +154,7 @@ host::host(host const& right)
 /**
  *  Destructor.
  */
-host::~host() throw () {
-
-}
+host::~host() throw () {}
 
 /**
  *  Copy constructor.
@@ -399,6 +395,15 @@ void host::check_validity() const {
     throw (engine_error() << "host '" << _host_name
            << "' has no address (property 'address')");
   return ;
+}
+
+/**
+ *  Get host key.
+ *
+ *  @return Host name.
+ */
+host::key_type const& host::key() const throw () {
+  return (_host_name);
 }
 
 /**

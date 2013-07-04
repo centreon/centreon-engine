@@ -143,6 +143,15 @@ void timeperiod::check_validity() const {
 }
 
 /**
+ *  Get the time period key.
+ *
+ *  @return The time period name.
+ */
+timeperiod::key_type const& timeperiod::key() const throw () {
+  return (_timeperiod_name);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.

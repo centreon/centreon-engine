@@ -122,16 +122,9 @@ namespace           configuration {
                     state(state const&);
                     ~state() throw ();
       state&        operator=(state const&);
-      template      <typename ConfigurationType,
-                     typename ObjectCollectionType,
-                     typename ApplierType,
-                     typename KeyType,
-                     KeyType (* config_key)(ConfigurationType const&),
-                     typename ObjectCollectionType::iterator (* find_obj_from_key)(ObjectCollectionType&, KeyType const&)>
+      template      <typename ConfigurationType, typename ApplierType>
       void          _apply(
-                      std::set<shared_ptr<ConfigurationType> >& cur_cfg,
-                      ObjectCollectionType& cur_obj,
-                      configuration::state const& new_state,
+                      std::set<shared_ptr<ConfigurationType> > const& cur_cfg,
                       std::set<shared_ptr<ConfigurationType> > const& new_cfg);
       template      <typename ConfigurationType,
                      typename ApplierType>
@@ -141,7 +134,7 @@ namespace           configuration {
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _resolve(
-                      std::set<shared_ptr<ConfigurationType> > const& cfg);
+                      std::set<shared_ptr<ConfigurationType> >& cfg);
 
       state*        _config;
 

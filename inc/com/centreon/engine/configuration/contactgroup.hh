@@ -26,14 +26,13 @@
 #  include "com/centreon/engine/configuration/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
-typedef std::set<std::string> set_string;
-
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    contactgroup
-    : public object {
+  class                    contactgroup : public object {
   public:
+    typedef std::string    key_type;
+
                            contactgroup();
                            contactgroup(contactgroup const& right);
                            ~contactgroup() throw ();
@@ -45,6 +44,7 @@ namespace                  configuration {
     bool                   operator<(
                              contactgroup const& right) const throw ();
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

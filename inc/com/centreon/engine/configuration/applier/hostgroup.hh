@@ -38,20 +38,16 @@ namespace               configuration {
                         ~hostgroup() throw ();
       hostgroup&        operator=(hostgroup const& right);
       void              add_object(
-                          configuration::hostgroup const& obj,
-                          configuration::state const& s);
+                          shared_ptr<configuration::hostgroup> obj);
       void              expand_object(
                           shared_ptr<configuration::hostgroup> obj,
                           configuration::state& s);
       void              modify_object(
-                          configuration::hostgroup const& obj,
-                          configuration::state const& s);
+                          shared_ptr<configuration::hostgroup> obj);
       void              remove_object(
-                          configuration::hostgroup const& obj,
-                          configuration::state const& s);
+                          shared_ptr<configuration::hostgroup> obj);
       void              resolve_object(
-                          configuration::hostgroup const& obj,
-                          configuration::state const& s);
+                          shared_ptr<configuration::hostgroup> obj);
 
     private:
       void              _resolve_members(

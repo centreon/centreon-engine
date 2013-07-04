@@ -60,31 +60,30 @@ applier::timeperiod& applier::timeperiod::operator=(
  *  Add new time period.
  *
  *  @param[in] obj The new time period to add in the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::timeperiod::add_object(
-                            configuration::timeperiod const& obj,
-                            configuration::state const& s) {
-  (void)s;
-
+                            shared_ptr<configuration::timeperiod> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new time period '" << obj.timeperiod_name() << "'.";
+    << "Creating new time period '" << obj->timeperiod_name() << "'.";
 
-  // Create timeperiod.
+  // Add time period to the global configuration set.
+  config->timeperiods().insert(obj);
+
+  // Create time period.
   timeperiod_struct* tp(add_timeperiod(
-                          obj.timeperiod_name().c_str(),
-                          NULL_IF_EMPTY(obj.alias())));
+                          obj->timeperiod_name().c_str(),
+                          NULL_IF_EMPTY(obj->alias())));
   if (!tp)
     throw (engine_error() << "Error: Could not register time period '"
-           << obj.timeperiod_name() << "'.");
+           << obj->timeperiod_name() << "'.");
 
   // Add time ranges to time period.
   {
     unsigned short day(0);
     for (std::vector<std::list<timerange> >::const_iterator
-           it(obj.timeranges().begin()),
-           end(obj.timeranges().end());
+           it(obj->timeranges().begin()),
+           end(obj->timeranges().end());
          it != end;
          ++it, ++day)
       for (std::list<timerange>::const_iterator
@@ -99,13 +98,13 @@ void applier::timeperiod::add_object(
                it2->end()))
           throw (engine_error()
                  << "Error: Could not add time range to time period '"
-                 << obj.timeperiod_name() << "'.");
+                 << obj->timeperiod_name() << "'.");
   }
 
   // Add exceptions to time period.
   for (std::vector<std::list<daterange> >::const_iterator
-         it(obj.exceptions().begin()),
-         end(obj.exceptions().end());
+         it(obj->exceptions().begin()),
+         end(obj->exceptions().end());
        it != end;
        ++it)
     for (std::list<daterange>::const_iterator
@@ -129,7 +128,7 @@ void applier::timeperiod::add_object(
              it2->skip_interval()))
         throw (engine_error()
                << "Error: Could not add exception to time period '"
-               << obj.timeperiod_name() << "'.");
+               << obj->timeperiod_name() << "'.");
       for (std::list<timerange>::const_iterator
              it3(it2->timeranges().begin()),
              end3(it2->timeranges().end());
@@ -142,20 +141,20 @@ void applier::timeperiod::add_object(
           throw (engine_error()
                  << "Error: Could not add time range to date range of "
                  << "type " << it2->type() << " of time period '"
-                 << obj.timeperiod_name() << "'.");
+                 << obj->timeperiod_name() << "'.");
     }
 
   // Add exclusions to time period.
   for (list_string::const_iterator
-         it(obj.exclude().begin()),
-         end(obj.exclude().end());
+         it(obj->exclude().begin()),
+         end(obj->exclude().end());
        it != end;
        ++it)
     if (!add_exclusion_to_timeperiod(
            tp,
            it->c_str()))
       throw (engine_error() << "Error: Could not add exclusion '"
-             << *it << "' to time period '" << obj.timeperiod_name()
+             << *it << "' to time period '" << obj->timeperiod_name()
              << "'.");
 
   return ;
@@ -182,14 +181,12 @@ void applier::timeperiod::expand_object(
  *  Modify time period.
  *
  *  @param[in] obj The time period to modify in the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::timeperiod::modify_object(
-                            configuration::timeperiod const& obj,
-                            configuration::state const& s) {
+                            shared_ptr<configuration::timeperiod> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying time period '" << obj.timeperiod_name() << "'.";
+    << "Modifying time period '" << obj->timeperiod_name() << "'.";
 
   // XXX
 
@@ -200,22 +197,24 @@ void applier::timeperiod::modify_object(
  *  Remove old time period.
  *
  *  @param[in] obj The time period to remove from the monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::timeperiod::remove_object(
-                            configuration::timeperiod const& obj,
-                            configuration::state const& s) {
-  (void)s;
-
+                            shared_ptr<configuration::timeperiod> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing time period '" << obj.timeperiod_name() << "'.";
+    << "Removing time period '" << obj->timeperiod_name() << "'.";
 
-  // Unregister timeperiod.
+  // Unregister time period from the compatibility list.
   unregister_object<timeperiod_struct, &timeperiod_struct::name>(
     &timeperiod_list,
-    obj.timeperiod_name().c_str());
-  applier::state::instance().timeperiods().erase(obj.timeperiod_name());
+    obj->timeperiod_name().c_str());
+
+  // Remove time period from the object list (will effectively deleted
+  // the time periiod object).
+  applier::state::instance().timeperiods().erase(obj->timeperiod_name());
+
+  // Remove time period from the global configuration set.
+  config->timeperiods().erase(obj);
 
   return ;
 }
@@ -227,12 +226,9 @@ void applier::timeperiod::remove_object(
  *  on any external object.
  *
  *  @param[in] obj Unused.
- *  @param[in] s   Unused.
  */
 void applier::timeperiod::resolve_object(
-                            configuration::timeperiod const& obj,
-                            configuration::state const& s) {
+                            shared_ptr<configuration::timeperiod> obj) {
   (void)obj;
-  (void)s;
   return ;
 }

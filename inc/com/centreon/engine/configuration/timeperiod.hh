@@ -33,9 +33,10 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    timeperiod
-    : public object {
+  class                    timeperiod : public object {
   public:
+    typedef std::string    key_type;
+
                            timeperiod();
                            timeperiod(timeperiod const& right);
                            ~timeperiod() throw ();
@@ -47,6 +48,7 @@ namespace                  configuration {
     bool                   operator<(
                              timeperiod const& right) const throw ();
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

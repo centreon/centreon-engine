@@ -59,9 +59,7 @@ servicegroup::servicegroup(servicegroup const& right)
 /**
  *  Destructor.
  */
-servicegroup::~servicegroup() throw () {
-
-}
+servicegroup::~servicegroup() throw () {}
 
 /**
  *  Copy constructor.
@@ -146,6 +144,15 @@ void servicegroup::check_validity() const {
     throw (engine_error() << "service group has no name "
            << "(property 'servicegroup_name')");
   return ;
+}
+
+/**
+ *  Get the service group key.
+ *
+ *  @return The service group name.
+ */
+servicegroup::key_type const& servicegroup::key() const throw () {
+  return (_servicegroup_name);
 }
 
 /**
