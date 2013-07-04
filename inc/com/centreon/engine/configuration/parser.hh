@@ -25,6 +25,7 @@
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/configuration/connector.hh"
 #  include "com/centreon/engine/configuration/contact.hh"
+#  include "com/centreon/engine/configuration/file_info.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
 #  include "com/centreon/engine/configuration/hostescalation.hh"
 #  include "com/centreon/engine/configuration/hostextinfo.hh"
@@ -80,6 +81,7 @@ namespace              configuration {
                          void (parser::*pfunc)(std::string const&));
     void               _apply_hostextinfo();
     void               _apply_serviceextinfo();
+    file_info const&   _get_file_info(object* obj) const;
     void               _get_hosts_by_hostgroups(
                          hostgroup_ptr const& hostgroups,
                          list_host& hosts);
@@ -101,11 +103,6 @@ namespace              configuration {
     static void        _insert(
                          map_object const& from,
                          std::set<shared_ptr<T> >& to);
-    bool               _get_data(
-                         std::string const& line,
-                         std::string& key,
-                         std::string& value,
-                         char const* delim);
     std::string const& _map_object_type(
                          map_object const& objects) const throw ();
     void               _parse_directory_configuration(std::string const& path);
@@ -122,6 +119,8 @@ namespace              configuration {
     std::string        _current_path;
     list_object        _lst_objects[15];
     map_object         _map_objects[15];
+    umap<object*, file_info>
+                       _objects_info;
     unsigned int       _read_options;
     static store       _store[];
     map_object         _templates[15];

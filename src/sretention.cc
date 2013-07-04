@@ -36,9 +36,7 @@ using namespace com::centreon::engine::retention;
 
 /* save all host and service state information */
 int save_state_information(int autosave) {
-  int result(OK);
-
-  if (config->retain_state_information() == false)
+  if (!config->retain_state_information())
     return (OK);
 
   /* send data to event broker */
@@ -48,6 +46,7 @@ int save_state_information(int autosave) {
     NEBATTR_NONE,
     NULL);
 
+  int result(ERROR);
   try {
     std::ofstream stream(
                     config->state_retention_file().c_str(),
@@ -63,11 +62,12 @@ int save_state_information(int autosave) {
     dump::contacts(stream);
     dump::comments(stream);
     dump::downtimes(stream);
+
+    result = OK;
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
       << e.what();
-    result = ERROR;
   }
 
   /* send data to event broker */
@@ -86,9 +86,7 @@ int save_state_information(int autosave) {
 
 /* reads in initial host and state information */
 int read_initial_state_information() {
-  int result(OK);
-
-  if (config->retain_state_information() == false)
+  if (!config->retain_state_information())
     return (OK);
 
   // send data to event broker.
@@ -98,6 +96,7 @@ int read_initial_state_information() {
     NEBATTR_NONE,
     NULL);
 
+  int result(OK);
   try {
     parser p;
     p.parse(config->state_retention_file());

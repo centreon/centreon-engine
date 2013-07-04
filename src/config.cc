@@ -39,31 +39,24 @@ using namespace com::centreon::engine::logging;
 
 /* read all configuration data */
 int read_all_object_data(char const* main_config_file) {
-  int result(OK);
   int options(configuration::parser::read_all);
-  int cache(FALSE);
-  int precache(FALSE);
+  int cache(false);
+  int precache(false);
 
-  /* cache object definitions if we're up and running */
-  if (verify_config == FALSE && test_scheduling == FALSE)
-    cache = TRUE;
+  // cache object definitions if we're up and running.
+  if (!verify_config && !test_scheduling)
+    cache = true;
 
-  /* precache object definitions */
-  if (precache_objects == TRUE
-      && (verify_config == TRUE
-          || test_scheduling == TRUE))
-    precache = TRUE;
+  // precache object definitions.
+  if (precache_objects && (verify_config || test_scheduling))
+    precache = true;
 
-  /* read in all host configuration data from external sources */
-  result = read_object_config_data(
-             main_config_file,
-             options,
-             cache,
-             precache);
-  if (result != OK)
-    return (ERROR);
-
-  return (OK);
+  // read in all host configuration data from external sources.
+  return (read_object_config_data(
+            main_config_file,
+            options,
+            cache,
+            precache));
 }
 
 /****************************************************************/

@@ -67,7 +67,7 @@ namespace                 string {
   }
 
   template<typename T>
-  inline char const*      setstr(char*& buf, T const& value) {
+  inline char const*      setstr(char*& buf, T value) {
     delete[] buf;
     return ((buf = string::dup(value)));
   }
