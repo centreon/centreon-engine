@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"

@@ -21,7 +21,6 @@
 #  define CCE_CONFIGURATION_APPLIER_SCHEDULER_HH
 
 #  include <vector>
-#  include "com/centreon/engine/configuration/applier/base.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/unordered_hash.hh"
@@ -41,8 +40,7 @@ namespace                 configuration {
      *
      *  Simple configuration applier for scheduler class.
      */
-    class                 scheduler
-      : public base {
+    class                 scheduler {
     public:
       void                apply(state& config);
       static scheduler&   instance();

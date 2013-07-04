@@ -43,7 +43,7 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/engine.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/downtime.hh"
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
   com::centreon::clib::load();
   com::centreon::logging::engine::load();
   com::centreon::engine::commands::set::load();
-  com::centreon::engine::configuration::applier::engine::load();
+  com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::checks::checker::load();
   com::centreon::engine::events::loop::load();
   com::centreon::engine::broker::loader::load();
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
         configuration::state config;
         configuration::parser p;
         p.parse(config_file, config);
-        configuration::applier::engine::instance().apply(config);
+        configuration::applier::state::instance().apply(config);
         retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {
@@ -272,7 +272,7 @@ int main(int argc, char* argv[]) {
         p.parse(config_file, config);
 
         // Apply configuration.
-        configuration::applier::engine::instance().apply(config);
+        configuration::applier::state::instance().apply(config);
 
         // Load retention files.
         if (read_initial_state_information()) {
@@ -342,7 +342,7 @@ int main(int argc, char* argv[]) {
           NULL);
 
         // Apply configuration.
-        configuration::applier::engine::instance().apply(*config);
+        configuration::applier::state::instance().apply(*config);
         delete ::config;
         ::config = config.release();
 
@@ -460,7 +460,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::checks::checker::unload();
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
-  com::centreon::engine::configuration::applier::engine::unload();
+  com::centreon::engine::configuration::applier::state::unload();
   com::centreon::engine::commands::set::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();

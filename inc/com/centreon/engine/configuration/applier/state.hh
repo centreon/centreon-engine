@@ -22,7 +22,7 @@
 
 #  include <string>
 #  include <utility>
-#  include "com/centreon/engine/configuration/applier/base.hh"
+#  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -56,8 +56,7 @@ namespace           configuration {
      *
      *  Simple configuration applier for state class.
      */
-    class           state
-      : public base {
+    class           state {
     public:
       void          apply(configuration::state& new_cfg);
       static state& instance();
@@ -124,8 +123,8 @@ namespace           configuration {
       state&        operator=(state const&);
       template      <typename ConfigurationType, typename ApplierType>
       void          _apply(
-                      std::set<shared_ptr<ConfigurationType> > const& cur_cfg,
-                      std::set<shared_ptr<ConfigurationType> > const& new_cfg);
+                      difference<std::set<shared_ptr<ConfigurationType> > > const& diff);
+      void          _expand(configuration::state& new_state);
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _expand(

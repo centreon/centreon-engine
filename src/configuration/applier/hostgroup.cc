@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"

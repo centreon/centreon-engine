@@ -27,37 +27,10 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-/******************************************************************/
-/************** CONFIGURATION INPUT FUNCTIONS *********************/
-/******************************************************************/
-
-/* read all configuration data */
-int read_all_object_data(char const* main_config_file) {
-  int options(configuration::parser::read_all);
-  int cache(false);
-  int precache(false);
-
-  // cache object definitions if we're up and running.
-  if (!verify_config && !test_scheduling)
-    cache = true;
-
-  // precache object definitions.
-  if (precache_objects && (verify_config || test_scheduling))
-    precache = true;
-
-  // read in all host configuration data from external sources.
-  return (read_object_config_data(
-            main_config_file,
-            options,
-            cache,
-            precache));
-}
 
 /****************************************************************/
 /**************** CONFIG VERIFICATION FUNCTIONS *****************/

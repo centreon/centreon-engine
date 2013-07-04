@@ -68,18 +68,4 @@
 #  define SERVICEESCALATION_SKIPLIST       11
 #  define NUM_OBJECT_SKIPLISTS             12
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* C++ */
-
-int read_object_config_data(
-      char const* main_config_file,
-      int options,
-      int cache,
-      int precache);
-
-#  ifdef __cplusplus
-}
-#  endif /* C++ */
-
 #endif /* !CCE_OBJECTS_HH */

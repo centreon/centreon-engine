@@ -21,7 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_GLOBALS_HH
 
 #  include <string>
-#  include "com/centreon/engine/configuration/applier/base.hh"
+#  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -34,8 +34,7 @@ namespace             configuration {
      *
      *  Simple configuration applier for globals class.
      */
-    class             globals
-      : public base {
+    class             globals {
     public:
       void            apply(state& globals);
       static globals& instance();

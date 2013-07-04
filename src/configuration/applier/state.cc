@@ -20,14 +20,17 @@
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
+#include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
-#include "com/centreon/engine/configuration/applier/connector.hh"
-#include "com/centreon/engine/configuration/applier/difference.hh"
+#include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
+#include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/configuration/applier/macros.hh"
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
@@ -52,129 +55,242 @@ static applier::state* _instance = NULL;
  *  @param[in] new_cfg The new configuration.
  */
 void applier::state::apply(configuration::state& new_cfg) {
-  // Apply timeperiods.
+  // Apply logging configurations.
+  applier::logging::instance().apply(new_cfg);
+
+  // Apply globals configurations.
+  applier::globals::instance().apply(new_cfg);
+
+  // Apply macros configurations.
+  applier::macros::instance().apply(new_cfg);
+
+  //
+  // Expand all objects.
+  //
+
+  // Expand timeperiods.
   _expand<configuration::timeperiod, applier::timeperiod>(
     new_cfg,
     new_cfg.timeperiods());
-  _apply<configuration::timeperiod, applier::timeperiod>(
+
+  // Expand connectors.
+  _expand<configuration::connector, applier::connector>(
+    new_cfg,
+    new_cfg.connectors());
+
+  // Expand commands.
+  _expand<configuration::command, applier::command>(
+    new_cfg,
+    new_cfg.commands());
+
+  // Expand contacts.
+  _expand<configuration::contact, applier::contact>(
+    new_cfg,
+    new_cfg.contacts());
+
+  // Expand contactgroups.
+  _expand<configuration::contactgroup, applier::contactgroup>(
+    new_cfg,
+    new_cfg.contactgroups());
+
+  // Expand hosts.
+  _expand<configuration::host, applier::host>(
+    new_cfg,
+    new_cfg.hosts());
+
+  // Expand hostgroups.
+  _expand<configuration::hostgroup, applier::hostgroup>(
+    new_cfg,
+    new_cfg.hostgroups());
+
+  // Expand services.
+  _expand<configuration::service, applier::service>(
+    new_cfg,
+    new_cfg.services());
+
+  // Expand servicegroups.
+  _expand<configuration::servicegroup, applier::servicegroup>(
+    new_cfg,
+    new_cfg.servicegroups());
+
+  // Expand hostdependencies.
+  _expand<configuration::hostdependency, applier::hostdependency>(
+    new_cfg,
+    new_cfg.hostdependencies());
+
+  // Expand servicedependencies.
+  _expand<configuration::servicedependency, applier::servicedependency>(
+    new_cfg,
+    new_cfg.servicedependencies());
+
+  // Expand hostescalations.
+  _expand<configuration::hostescalation, applier::hostescalation>(
+    new_cfg,
+    new_cfg.hostescalations());
+
+  // Expand serviceescalations.
+  _expand<configuration::serviceescalation, applier::serviceescalation>(
+    new_cfg,
+    new_cfg.serviceescalations());
+
+  //
+  //  Build difference for all objects.
+  //
+
+  // Build difference for timeperiods.
+  difference<set_timeperiod> diff_timeperiods;
+  diff_timeperiods.parse(
     config->timeperiods(),
     new_cfg.timeperiods());
+
+  // Build difference for connectors.
+  difference<set_connector> diff_connectors;
+  diff_connectors.parse(
+    config->connectors(),
+    new_cfg.connectors());
+
+  // Build difference for commands.
+  difference<set_command> diff_commands;
+  diff_commands.parse(
+    config->commands(),
+    new_cfg.commands());
+
+  // Build difference for contacts.
+  difference<set_contact> diff_contacts;
+  diff_contacts.parse(
+    config->contacts(),
+    new_cfg.contacts());
+
+  // Build difference for contactgroups.
+  difference<set_contactgroup> diff_contactgroups;
+  diff_contactgroups.parse(
+    config->contactgroups(),
+    new_cfg.contactgroups());
+
+  // Build difference for hosts.
+  difference<set_host> diff_hosts;
+  diff_hosts.parse(
+    config->hosts(),
+    new_cfg.hosts());
+
+  // Build difference for hostgroups.
+  difference<set_hostgroup> diff_hostgroups;
+  diff_hostgroups.parse(
+    config->hostgroups(),
+    new_cfg.hostgroups());
+
+  // Build difference for services.
+  difference<set_service> diff_services;
+  diff_services.parse(
+    config->services(),
+    new_cfg.services());
+
+  // Build difference for servicegroups.
+  difference<set_servicegroup> diff_servicegroups;
+  diff_servicegroups.parse(
+    config->servicegroups(),
+    new_cfg.servicegroups());
+
+  // Build difference for hostdependencies.
+  difference<set_hostdependency> diff_hostdependencies;
+  diff_hostdependencies.parse(
+    config->hostdependencies(),
+    new_cfg.hostdependencies());
+
+  // Build difference for servicedependencies.
+  difference<set_servicedependency> diff_servicedependencies;
+  diff_servicedependencies.parse(
+    config->servicedependencies(),
+    new_cfg.servicedependencies());
+
+  // Build difference for hostescalations.
+  difference<set_hostescalation> diff_hostescalations;
+  diff_hostescalations.parse(
+    config->hostescalations(),
+    new_cfg.hostescalations());
+
+  // Build difference for serviceescalations.
+  difference<set_serviceescalation> diff_serviceescalations;
+  diff_serviceescalations.parse(
+    config->serviceescalations(),
+    new_cfg.serviceescalations());
+
+  //
+  //  Apply and resolve all objects.
+  //
+
+  // Apply timeperiods.
+  _apply<configuration::timeperiod, applier::timeperiod>(
+    diff_timeperiods);
   _resolve<configuration::timeperiod, applier::timeperiod>(
     config->timeperiods());
 
   // Apply connectors.
-  _expand<configuration::connector, applier::connector>(
-    new_cfg,
-    new_cfg.connectors());
   _apply<configuration::connector, applier::connector>(
-    config->connectors(),
-    new_cfg.connectors());
+    diff_connectors);
   _resolve<configuration::connector, applier::connector>(
     config->connectors());
 
   // Apply commands.
-  _expand<configuration::command, applier::command>(
-    new_cfg,
-    new_cfg.commands());
   _apply<configuration::command, applier::command>(
-    config->commands(),
-    new_cfg.commands());
+    diff_commands);
   _resolve<configuration::command, applier::command>(
     config->commands());
 
   // Apply contacts and contactgroups.
-  _expand<configuration::contact, applier::contact>(
-    new_cfg,
-    new_cfg.contacts());
   _apply<configuration::contact, applier::contact>(
-    config->contacts(),
-    new_cfg.contacts());
-  _expand<configuration::contactgroup, applier::contactgroup>(
-    new_cfg,
-    new_cfg.contactgroups());
+    diff_contacts);
   _apply<configuration::contactgroup, applier::contactgroup>(
-    config->contactgroups(),
-    new_cfg.contactgroups());
+    diff_contactgroups);
   _resolve<configuration::contactgroup, applier::contactgroup>(
     config->contactgroups());
   _resolve<configuration::contact, applier::contact>(
     config->contacts());
 
   // Apply hosts and hostgroups.
-  _expand<configuration::host, applier::host>(
-    new_cfg,
-    new_cfg.hosts());
   _apply<configuration::host, applier::host>(
-    config->hosts(),
-    new_cfg.hosts());
-  _expand<configuration::hostgroup, applier::hostgroup>(
-    new_cfg,
-    new_cfg.hostgroups());
+    diff_hosts);
   _apply<configuration::hostgroup, applier::hostgroup>(
-    config->hostgroups(),
-    new_cfg.hostgroups());
+    diff_hostgroups);
   _resolve<configuration::hostgroup, applier::hostgroup>(
     config->hostgroups());
   _resolve<configuration::host, applier::host>(
     config->hosts());
 
   // Apply services and servicegroups.
-  _expand<configuration::service, applier::service>(
-    new_cfg,
-    new_cfg.services());
   _apply<configuration::service, applier::service>(
-    config->services(),
-    new_cfg.services());
-  _expand<configuration::servicegroup, applier::servicegroup>(
-    new_cfg,
-    new_cfg.servicegroups());
+    diff_services);
   _apply<configuration::servicegroup, applier::servicegroup>(
-    config->servicegroups(),
-    new_cfg.servicegroups());
+    diff_servicegroups);
   _resolve<configuration::servicegroup, applier::servicegroup>(
     config->servicegroups());
   _resolve<configuration::service, applier::service>(
     config->services());
 
   // Apply host dependencies.
-  _expand<configuration::hostdependency, applier::hostdependency>(
-    new_cfg,
-    new_cfg.hostdependencies());
   _apply<configuration::hostdependency, applier::hostdependency>(
-    config->hostdependencies(),
-    new_cfg.hostdependencies());
+    diff_hostdependencies);
   _resolve<configuration::hostdependency, applier::hostdependency>(
     config->hostdependencies());
 
   // Apply service dependencies.
-  _expand<configuration::servicedependency, applier::servicedependency>(
-    new_cfg,
-    new_cfg.servicedependencies());
   _apply<configuration::servicedependency, applier::servicedependency>(
-    config->servicedependencies(),
-    new_cfg.servicedependencies());
+    diff_servicedependencies);
   _resolve<configuration::servicedependency, applier::servicedependency>(
     config->servicedependencies());
 
   // Apply host escalations.
-  _expand<configuration::hostescalation, applier::hostescalation>(
-    new_cfg,
-    new_cfg.hostescalations());
   _apply<configuration::hostescalation, applier::hostescalation>(
-    config->hostescalations(),
-    new_cfg.hostescalations());
+    diff_hostescalations);
   _resolve<configuration::hostescalation, applier::hostescalation>(
     config->hostescalations());
 
   // Apply service escalations.
-  _expand<configuration::serviceescalation, applier::serviceescalation>(
-    new_cfg,
-    new_cfg.serviceescalations());
   _apply<configuration::serviceescalation, applier::serviceescalation>(
-    config->serviceescalations(),
-    new_cfg.serviceescalations());
+    diff_serviceescalations);
   _resolve<configuration::serviceescalation, applier::serviceescalation>(
     config->serviceescalations());
+
 
   // Pre-flight check.
   {
@@ -183,6 +299,9 @@ void applier::state::apply(configuration::state& new_cfg) {
     pre_flight_check();
     verify_config = old_verify_config;
   }
+
+  // Schedule host and service checks.
+  applier::scheduler::instance().apply(new_cfg);
 
   return ;
 }
@@ -221,13 +340,22 @@ void applier::state::unload() {
 /**
  *  Default constructor.
  */
-applier::state::state() : _config(NULL) {}
+applier::state::state()
+  : _config(NULL) {
+  applier::logging::load();
+  applier::globals::load();
+  applier::macros::load();
+  applier::scheduler::load();
+}
 
 /**
  *  Destructor.
  */
 applier::state::~state() throw() {
-
+  applier::scheduler::unload();
+  applier::macros::unload();
+  applier::globals::unload();
+  applier::logging::unload();
 }
 
 /**
@@ -477,17 +605,9 @@ umap<std::string, shared_ptr<timeperiod_struct> >& applier::state::timeperiods()
  */
 template <typename ConfigurationType, typename ApplierType>
 void applier::state::_apply(
-                       std::set<shared_ptr<ConfigurationType> > const& cur_cfg,
-                       std::set<shared_ptr<ConfigurationType> > const& new_cfg) {
+       difference<std::set<shared_ptr<ConfigurationType> > > const& diff) {
   // Type alias.
   typedef std::set<shared_ptr<ConfigurationType> > cfg_set;
-
-  /*
-  ** Configuration diff.
-  */
-
-  difference<std::set<shared_ptr<ConfigurationType> > > diff;
-  diff.parse(cur_cfg, new_cfg);
 
   /*
   ** Configuration application.

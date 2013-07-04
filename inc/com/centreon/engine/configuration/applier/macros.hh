@@ -21,7 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_MACROS_HH
 
 #  include <string>
-#  include "com/centreon/engine/configuration/applier/base.hh"
+#  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
@@ -37,8 +37,7 @@ namespace            configuration {
      *
      *  Simple configuration applier for macros class.
      */
-    class            macros
-      : public base {
+    class            macros {
     public:
       void           apply(state& config);
       static macros& instance();
