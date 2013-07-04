@@ -44,6 +44,7 @@ namespace                  configuration {
       notification_dependency,
       execution_dependency
     };
+    typedef hostdependency key_type;
 
                            hostdependency();
                            hostdependency(hostdependency const& right);
@@ -55,6 +56,7 @@ namespace                  configuration {
                              hostdependency const& right) const throw ();
     bool                   operator<(hostdependency const& right) const;
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

@@ -63,16 +63,14 @@ applier::serviceescalation& applier::serviceescalation::operator=(
  *
  *  @param[in] obj The new serviceescalation to add into the monitoring
  *                 engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::serviceescalation::add_object(
-                                   configuration::serviceescalation const& obj,
-                                   configuration::state const& s) {
+                                   shared_ptr<configuration::serviceescalation> obj) {
   // Check service escalation.
-  if ((obj.hosts().size() != 1)
-      || !obj.hostgroups().empty()
-      || (obj.service_description().size() != 1)
-      || !obj.servicegroups().empty())
+  if ((obj->hosts().size() != 1)
+      || !obj->hostgroups().empty()
+      || (obj->service_description().size() != 1)
+      || !obj->servicegroups().empty())
     throw (engine_error() << "Error: Could not create service "
            << "escalation with multiple hosts / host groups / services "
            << "/ service groups.");
@@ -80,40 +78,43 @@ void applier::serviceescalation::add_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new escalation for service '"
-    << obj.service_description().front() << "' of host '"
-    << obj.hosts().front() << "'.";
+    << obj->service_description().front() << "' of host '"
+    << obj->hosts().front() << "'.";
+
+  // Add escalation to the global configuration set.
+  config->serviceescalations().insert(obj);
 
   // Create service escalation.
   serviceescalation_struct*
     se(add_service_escalation(
-         obj.hosts().front().c_str(),
-         obj.service_description().front().c_str(),
-         obj.first_notification(),
-         obj.last_notification(),
-         obj.notification_interval(),
-         NULL_IF_EMPTY(obj.escalation_period()),
+         obj->hosts().front().c_str(),
+         obj->service_description().front().c_str(),
+         obj->first_notification(),
+         obj->last_notification(),
+         obj->notification_interval(),
+         NULL_IF_EMPTY(obj->escalation_period()),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::serviceescalation::recovery),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::serviceescalation::warning),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::serviceescalation::unknown),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::serviceescalation::critical)));
   if (!se)
     throw (engine_error() << "Error: Could not create escalation on "
-           << "service '" << obj.service_description().front()
-           << "' of host '" << obj.hosts().front() << "'.");
+           << "service '" << obj->service_description().front()
+           << "' of host '" << obj->hosts().front() << "'.");
 
   // Unique contacts.
   std::set<std::string> contacts;
   for (std::list<std::string>::const_iterator
-         it(obj.contacts().begin()),
-         end(obj.contacts().end());
+         it(obj->contacts().begin()),
+         end(obj->contacts().end());
        it != end;
        ++it)
     contacts.insert(*it);
@@ -127,14 +128,14 @@ void applier::serviceescalation::add_object(
     if (!add_contact_to_serviceescalation(se, it->c_str()))
       throw (engine_error() << "Error: Could not add contact '"
              << *it << "' to escalation of service '"
-             << obj.service_description().front() << "' of host '"
-             << obj.hosts().front() << "'.");
+             << obj->service_description().front() << "' of host '"
+             << obj->hosts().front() << "'.");
 
   // Unique contact groups.
   std::set<std::string> contact_groups;
   for (std::list<std::string>::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
+         it(obj->contactgroups().begin()),
+         end(obj->contactgroups().end());
        it != end;
        ++it)
     contact_groups.insert(*it);
@@ -148,8 +149,8 @@ void applier::serviceescalation::add_object(
     if (!add_contactgroup_to_serviceescalation(se, it->c_str()))
       throw (engine_error() << "Error: Could not add contact group '"
              << *it << "' to escalation of service '"
-             << obj.service_description().front() << "' of host '"
-             << obj.hosts().front() << "'.");
+             << obj->service_description().front() << "' of host '"
+             << obj->hosts().front() << "'.");
 
   return ;
 }
@@ -209,16 +210,21 @@ void applier::serviceescalation::expand_object(
 }
 
 /**
- *  Modified serviceescalation.
+ *  @brief Modify service escalation.
  *
- *  @param[in] obj The new serviceescalation to modify into the
- *                 monitoring engine.
- *  @param[in] s   Configuration being applied.
+ *  Service escalations cannot be defined with anything else than their
+ *  full content. Therefore no modification can occur.
+ *
+ *  @param[in] obj Unused.
  */
 void applier::serviceescalation::modify_object(
-                                   configuration::serviceescalation const& obj,
-                                   configuration::state const& s) {
-  // XXX
+                                   shared_ptr<configuration::serviceescalation> obj) {
+  (void)obj;
+  throw (engine_error() << "Error: Could not modify a service "
+         << "escalation: service escalation objects can only be added "
+         << "or removed, this is likely a software bug that you should "
+         << "report to Centreon Engine developers");
+  return ;
 }
 
 /**
@@ -226,11 +232,9 @@ void applier::serviceescalation::modify_object(
  *
  *  @param[in] obj The new serviceescalation to remove from the
  *                 monitoring engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::serviceescalation::remove_object(
-                                   configuration::serviceescalation const& obj,
-                                   configuration::state const& s) {
+                                   shared_ptr<configuration::serviceescalation> obj) {
   // XXX
 }
 
@@ -238,11 +242,9 @@ void applier::serviceescalation::remove_object(
  *  Resolve a serviceescalation.
  *
  *  @param[in] obj Serviceescalation object.
- *  @param[in] s   Configuration being applied.
  */
 void applier::serviceescalation::resolve_object(
-                                   configuration::serviceescalation const& obj,
-                                   configuration::state const& s) {
+                                   shared_ptr<configuration::serviceescalation> obj) {
   // XXX
 }
 

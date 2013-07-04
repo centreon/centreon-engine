@@ -63,47 +63,48 @@ applier::hostescalation& applier::hostescalation::operator=(
  *
  *  @param[in] obj The new hostescalation to add into the monitoring
  *                 engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::hostescalation::add_object(
-                                configuration::hostescalation const& obj,
-                                configuration::state const& s) {
+                                shared_ptr<configuration::hostescalation> obj) {
   // Check host escalation.
-  if ((obj.hosts().size() != 1) || !obj.hostgroups().empty())
+  if ((obj->hosts().size() != 1) || !obj->hostgroups().empty())
     throw (engine_error() << "Error: Could not create host escalation "
            << "with multiple hosts / host groups.");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new escalation for host '"
-    << obj.hosts().front() << "'.";
+    << obj->hosts().front() << "'.";
+
+  // Add escalation to the global configuration set.
+  config->hostescalations().insert(obj);
 
   // Create host escalation.
   hostescalation_struct*
     he(add_host_escalation(
-         obj.hosts().front().c_str(),
-         obj.first_notification(),
-         obj.last_notification(),
-         obj.notification_interval(),
-         NULL_IF_EMPTY(obj.escalation_period()),
+         obj->hosts().front().c_str(),
+         obj->first_notification(),
+         obj->last_notification(),
+         obj->notification_interval(),
+         NULL_IF_EMPTY(obj->escalation_period()),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::hostescalation::down),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::hostescalation::unreachable),
          static_cast<bool>(
-           obj.escalation_options()
+           obj->escalation_options()
            & configuration::hostescalation::recovery)));
   if (!he)
     throw (engine_error() << "Error: Could not create escalation "
-           << "on host '" << obj.hosts().front() << "'.");
+           << "on host '" << obj->hosts().front() << "'.");
 
   // Unique contacts.
   std::set<std::string> contacts;
   for (std::list<std::string>::const_iterator
-         it(obj.contacts().begin()),
-         end(obj.contacts().end());
+         it(obj->contacts().begin()),
+         end(obj->contacts().end());
        it != end;
        ++it)
     contacts.insert(*it);
@@ -117,13 +118,13 @@ void applier::hostescalation::add_object(
     if (!add_contact_to_host_escalation(he, it->c_str()))
       throw (engine_error() << "Error: Could not add contact '"
              << *it << "' on escalation of host '"
-             << obj.hosts().front() << "'.");
+             << obj->hosts().front() << "'.");
 
   // Unique contact groups.
   std::set<std::string> contact_groups;
   for (std::list<std::string>::const_iterator
-         it(obj.contactgroups().begin()),
-         end(obj.contactgroups().end());
+         it(obj->contactgroups().begin()),
+         end(obj->contactgroups().end());
        it != end;
        ++it)
     contact_groups.insert(*it);
@@ -137,7 +138,7 @@ void applier::hostescalation::add_object(
     if (!add_contactgroup_to_host_escalation(he, it->c_str()))
       throw (engine_error() << "Error: Could not add contact group '"
              << *it << "' on escalation of host '"
-             << obj.hosts().front() << "'.");
+             << obj->hosts().front() << "'.");
 
   return ;
 }
@@ -193,12 +194,15 @@ void applier::hostescalation::expand_object(
  *
  *  @param[in] obj The new hostescalation to modify into the monitoring
  *                 engine.
- *  @param[in] s   Configuration being applied.
  */
 void applier::hostescalation::modify_object(
-                                configuration::hostescalation const& obj,
-                                configuration::state const& s) {
-  // XXX
+                                shared_ptr<configuration::hostescalation> obj) {
+  (void)obj;
+  throw (engine_error() << "Error: Could not modify a host escalation: "
+         << "host escalation objects can only be added or removed, "
+         << "this is likely a software bug that you should report to "
+         << "Centreon Engine developers");
+  return ;
 }
 
 /**
@@ -207,8 +211,7 @@ void applier::hostescalation::modify_object(
  *  @param[in] obj The new hostescalation to remove from the monitoring engine.
  */
 void applier::hostescalation::remove_object(
-                                configuration::hostescalation const& obj,
-                                configuration::state const& s) {
+                                shared_ptr<configuration::hostescalation> obj) {
   // XXX
 }
 
@@ -218,8 +221,7 @@ void applier::hostescalation::remove_object(
  *  @param[in] obj Hostescalation object.
  */
 void applier::hostescalation::resolve_object(
-                                configuration::hostescalation const& obj,
-                                configuration::state const& s) {
+                                shared_ptr<configuration::hostescalation> obj) {
   // XXX
 }
 

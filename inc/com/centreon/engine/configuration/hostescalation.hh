@@ -38,6 +38,7 @@ namespace                  configuration {
       unreachable = (1 << 1),
       recovery = (1 << 2)
     };
+    typedef hostescalation key_type;
 
                            hostescalation();
                            hostescalation(hostescalation const& right);
@@ -50,6 +51,7 @@ namespace                  configuration {
     bool                   operator<(
                              hostescalation const& right) const;
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

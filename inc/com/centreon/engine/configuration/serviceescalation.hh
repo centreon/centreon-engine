@@ -40,6 +40,8 @@ namespace                  configuration {
       pending = (1 << 4),
       recovery = (1 << 5)
     };
+    typedef                serviceescalation
+                           key_type;
 
                            serviceescalation();
                            serviceescalation(
@@ -53,6 +55,7 @@ namespace                  configuration {
     bool                   operator<(
                              serviceescalation const& right) const;
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

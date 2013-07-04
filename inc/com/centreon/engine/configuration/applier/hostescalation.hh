@@ -41,20 +41,16 @@ namespace             configuration {
                       ~hostescalation() throw ();
       hostescalation& operator=(hostescalation const& right);
       void            add_object(
-                        configuration::hostescalation const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostescalation> obj);
       void            expand_object(
                         shared_ptr<configuration::hostescalation> obj,
                         configuration::state& s);
       void            modify_object(
-                        configuration::hostescalation const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostescalation> obj);
       void            remove_object(
-                        configuration::hostescalation const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostescalation> obj);
       void            resolve_object(
-                        configuration::hostescalation const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostescalation> obj);
 
     private:
       void            _expand_hosts(

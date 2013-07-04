@@ -227,6 +227,15 @@ void servicedependency::check_validity() const {
 }
 
 /**
+ *  Get service dependency key.
+ *
+ *  @return This object.
+ */
+servicedependency::key_type const& servicedependency::key() const throw () {
+  return (*this);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.

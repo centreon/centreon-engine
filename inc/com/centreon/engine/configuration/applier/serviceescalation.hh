@@ -42,20 +42,16 @@ namespace                configuration {
                          ~serviceescalation() throw ();
       serviceescalation& operator=(serviceescalation const& right);
       void               add_object(
-                           configuration::serviceescalation const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::serviceescalation> obj);
       void               expand_object(
                            shared_ptr<configuration::serviceescalation> obj,
                            configuration::state& s);
       void               modify_object(
-                           configuration::serviceescalation const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::serviceescalation> obj);
       void               remove_object(
-                           configuration::serviceescalation const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::serviceescalation> obj);
       void               resolve_object(
-                           configuration::serviceescalation const& obj,
-			   configuration::state const& s);
+                           shared_ptr<configuration::serviceescalation> obj);
 
     private:
       void               _expand_services(

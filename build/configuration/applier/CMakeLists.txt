@@ -242,7 +242,7 @@ if (WITH_TESTING)
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostescalation" "${CONF_DIR}/${TEST_CONF_FILE}")
 
   # parse_and_remove_configuration_host_template
-  set(TEST_NAME "parse_and_remove_configuration_host_tempalte")
+  set(TEST_NAME "parse_and_remove_configuration_host_template")
   set(TEST_CONF_FILE "main_host_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
 

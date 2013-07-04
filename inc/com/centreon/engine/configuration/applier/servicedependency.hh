@@ -42,20 +42,16 @@ namespace                configuration {
                          ~servicedependency() throw ();
       servicedependency& operator=(servicedependency const& right);
       void               add_object(
-                           configuration::servicedependency const& obj,
-                           configuration::state const& s);
+                           shared_ptr<configuration::servicedependency> obj);
       void               expand_object(
                            shared_ptr<configuration::servicedependency> obj,
                            configuration::state& s);
       void               modify_object(
-                           configuration::servicedependency const& obj,
-                           configuration::state const& s);
+                           shared_ptr<configuration::servicedependency> obj);
       void               remove_object(
-                           configuration::servicedependency const& obj,
-                           configuration::state const& s);
+                           shared_ptr<configuration::servicedependency> obj);
       void               resolve_object(
-                           configuration::servicedependency const& obj,
-                           configuration::state const& s);
+                           shared_ptr<configuration::servicedependency> obj);
 
     private:
       void               _expand_services(

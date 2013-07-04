@@ -45,6 +45,8 @@ namespace                  configuration {
       notification_dependency,
       execution_dependency
     };
+    typedef                servicedependency
+                           key_type;
 
                            servicedependency();
                            servicedependency(
@@ -58,6 +60,7 @@ namespace                  configuration {
     bool                   operator<(
                              servicedependency const& right) const;
     void                   check_validity() const;
+    key_type const&        key() const throw ();
     void                   merge(object const& obj);
     bool                   parse(
                              std::string const& key,

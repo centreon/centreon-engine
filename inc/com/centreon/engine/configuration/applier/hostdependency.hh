@@ -41,20 +41,16 @@ namespace             configuration {
                       ~hostdependency() throw ();
       hostdependency& operator=(hostdependency const& right);
       void            add_object(
-                        configuration::hostdependency const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostdependency> obj);
       void            expand_object(
                         shared_ptr<configuration::hostdependency> obj,
                         configuration::state& s);
       void            modify_object(
-                        configuration::hostdependency const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostdependency> obj);
       void            remove_object(
-                        configuration::hostdependency const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostdependency> obj);
       void            resolve_object(
-                        configuration::hostdependency const& obj,
-                        configuration::state const& s);
+                        shared_ptr<configuration::hostdependency> obj);
 
     private:
       void            _expand_hosts(

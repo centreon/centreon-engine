@@ -193,6 +193,15 @@ void serviceescalation::check_validity() const {
 }
 
 /**
+ *  Get the service escalation key.
+ *
+ *  @return This object.
+ */
+serviceescalation::key_type const& serviceescalation::key() const throw () {
+  return (*this);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.

@@ -184,6 +184,15 @@ void hostdependency::check_validity() const {
 }
 
 /**
+ *  Get host dependency key.
+ *
+ *  @return This object.
+ */
+hostdependency::key_type const& hostdependency::key() const throw () {
+  return (*this);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.

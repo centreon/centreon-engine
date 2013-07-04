@@ -175,6 +175,15 @@ void hostescalation::check_validity() const {
 }
 
 /**
+ *  Get host escalation key.
+ *
+ *  @return This object.
+ */
+hostescalation::key_type const& hostescalation::key() const throw () {
+  return (*this);
+}
+
+/**
  *  Merge object.
  *
  *  @param[in] obj The object to merge.

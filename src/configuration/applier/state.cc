@@ -136,45 +136,45 @@ void applier::state::apply(configuration::state& new_cfg) {
   _resolve<configuration::service, applier::service>(
     config->services());
 
-  // // Apply host dependencies.
-  // _expand<configuration::hostdependency, applier::hostdependency>(
-  //   new_cfg,
-  //   new_cfg.hostdependencies());
-  // _apply<configuration::hostdependency, applier::hostdependency>(
-  //   config->hostdependencies(),
-  //   new_cfg.hostdependencies());
-  // _resolve<configuration::hostdependency, applier::hostdependency>(
-  //   config->hostdependencies());
+  // Apply host dependencies.
+  _expand<configuration::hostdependency, applier::hostdependency>(
+    new_cfg,
+    new_cfg.hostdependencies());
+  _apply<configuration::hostdependency, applier::hostdependency>(
+    config->hostdependencies(),
+    new_cfg.hostdependencies());
+  _resolve<configuration::hostdependency, applier::hostdependency>(
+    config->hostdependencies());
 
-  // // Apply service dependencies.
-  // _expand<configuration::servicedependency, applier::servicedependency>(
-  //   new_cfg,
-  //   new_cfg.servicedependencies());
-  // _apply<configuration::servicedependency, applier::servicedependency>(
-  //   config->servicedependencies(),
-  //   new_cfg.servicedependencies());
-  // _resolve<configuration::servicedependency, applier::servicedependency>(
-  //   config->servicedependencies());
+  // Apply service dependencies.
+  _expand<configuration::servicedependency, applier::servicedependency>(
+    new_cfg,
+    new_cfg.servicedependencies());
+  _apply<configuration::servicedependency, applier::servicedependency>(
+    config->servicedependencies(),
+    new_cfg.servicedependencies());
+  _resolve<configuration::servicedependency, applier::servicedependency>(
+    config->servicedependencies());
 
-  // // Apply host escalations.
-  // _expand<configuration::hostescalation, applier::hostescalation>(
-  //   new_cfg,
-  //   new_cfg.hostescalations());
-  // _apply<configuration::hostescalation, applier::hostescalation>(
-  //   config->hostescalations(),
-  //   new_cfg.hostescalations());
-  // _resolve<configuration::hostescalation, applier::hostescalation>(
-  //   config->hostescalations());
+  // Apply host escalations.
+  _expand<configuration::hostescalation, applier::hostescalation>(
+    new_cfg,
+    new_cfg.hostescalations());
+  _apply<configuration::hostescalation, applier::hostescalation>(
+    config->hostescalations(),
+    new_cfg.hostescalations());
+  _resolve<configuration::hostescalation, applier::hostescalation>(
+    config->hostescalations());
 
-  // // Apply service escalations.
-  // _expand<configuration::serviceescalation, applier::serviceescalation>(
-  //   new_cfg,
-  //   new_cfg.serviceescalations());
-  // _apply<configuration::serviceescalation, applier::serviceescalation>(
-  //   config->serviceescalations(),
-  //   new_cfg.serviceescalations());
-  // _resolve<configuration::serviceescalation, applier::serviceescalation>(
-  //   config->serviceescalations());
+  // Apply service escalations.
+  _expand<configuration::serviceescalation, applier::serviceescalation>(
+    new_cfg,
+    new_cfg.serviceescalations());
+  _apply<configuration::serviceescalation, applier::serviceescalation>(
+    config->serviceescalations(),
+    new_cfg.serviceescalations());
+  _resolve<configuration::serviceescalation, applier::serviceescalation>(
+    config->serviceescalations());
 
   // Pre-flight check.
   {
