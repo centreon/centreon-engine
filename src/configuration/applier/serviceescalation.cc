@@ -59,9 +59,9 @@ applier::serviceescalation& applier::serviceescalation::operator=(
 }
 
 /**
- *  Add new serviceescalation.
+ *  Add new service escalation.
  *
- *  @param[in] obj The new serviceescalation to add into the monitoring
+ *  @param[in] obj The new service escalation to add into the monitoring
  *                 engine.
  */
 void applier::serviceescalation::add_object(

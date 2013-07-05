@@ -216,6 +216,9 @@ namespace              configuration {
     set_hostgroup&     hostgroups() throw ();
     set_host const&    hosts() const throw ();
     set_host&          hosts() throw ();
+    set_host::const_iterator
+                       hosts_find(host::key_type const& k) const;
+    set_host::iterator hosts_find(host::key_type const& k);
     unsigned int       host_check_timeout() const throw ();
     void               host_check_timeout(unsigned int value);
     unsigned int       host_freshness_check_interval() const throw ();

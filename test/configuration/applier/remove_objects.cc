@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/contact.hh"
@@ -219,6 +220,77 @@ private:
 };
 
 /**
+ *  Template to deeply copy a collection.
+ *
+ *  @param[in]  from Source collection.
+ *  @param[out] to   Destination collection.
+ */
+template <typename T, typename U>
+static void deep_copy(T const& from, T& to) {
+  to.clear();
+  for (typename T::const_iterator it(from.begin()), end(from.end());
+       it != end;
+       ++it)
+    to.insert(new U(**it));
+  return ;
+}
+
+/**
+ *  Deep copy of a configuration state.
+ *
+ *  @param[in] s State to copy.
+ *
+ *  @return A deep copy of s.
+ */
+static configuration::state deep_copy(configuration::state const& s) {
+  // First copy construct the copy.
+  configuration::state c(s);
+
+  // Copy members.
+  deep_copy<configuration::set_command, configuration::command>(
+    s.commands(),
+    c.commands());
+  deep_copy<configuration::set_connector, configuration::connector>(
+    s.connectors(),
+    c.connectors());
+  deep_copy<configuration::set_contactgroup, configuration::contactgroup>(
+    s.contactgroups(),
+    c.contactgroups());
+  deep_copy<configuration::set_contact, configuration::contact>(
+    s.contacts(),
+    c.contacts());
+  deep_copy<configuration::set_hostdependency, configuration::hostdependency>(
+    s.hostdependencies(),
+    c.hostdependencies());
+  deep_copy<configuration::set_hostescalation, configuration::hostescalation>(
+    s.hostescalations(),
+    c.hostescalations());
+  deep_copy<configuration::set_hostgroup, configuration::hostgroup>(
+    s.hostgroups(),
+    c.hostgroups());
+  deep_copy<configuration::set_host, configuration::host>(
+    s.hosts(),
+    c.hosts());
+  deep_copy<configuration::set_servicedependency, configuration::servicedependency>(
+    s.servicedependencies(),
+    c.servicedependencies());
+  deep_copy<configuration::set_serviceescalation, configuration::serviceescalation>(
+    s.serviceescalations(),
+    c.serviceescalations());
+  deep_copy<configuration::set_servicegroup, configuration::servicegroup>(
+    s.servicegroups(),
+    c.servicegroups());
+  deep_copy<configuration::set_service, configuration::service>(
+    s.services(),
+    c.services());
+  deep_copy<configuration::set_timeperiod, configuration::timeperiod>(
+    s.timeperiods(),
+    c.timeperiods());
+
+  return (c);
+}
+
+/**
  *  Remove contact dependency for remove contactgroup.
  *
  *  @param[in,out] config The configuration to update.
@@ -230,17 +302,32 @@ static void remove_dependency_for_contactgroup(
   for (list_string::const_iterator
          m(grp.members().begin()), end(grp.members().end());
        m != end;
-       ++m) {
+       ++m)
     for (configuration::set_contact::iterator
            it(config.contacts().begin()), end(config.contacts().end());
          it != end;
-         ++it) {
-      if ((*it)->contact_name() == *m) {
-        config.contacts().erase(it);
-        break;
-      }
-    }
-  }
+         ++it)
+      if ((*it)->contact_name() == *m)
+        (*it)->contactgroups().remove(grp.contactgroup_name());
+  return ;
+}
+
+/**
+ *  Remove host dependency for host removal.
+ *
+ *  @param[in,out] cfg The configuration to update.
+ *  @param[in]     hst Host that will be removed.
+ */
+static void remove_dependency_for_host(
+              configuration::state& cfg,
+              configuration::host const& hst) {
+  for (configuration::set_host::iterator
+         it(cfg.hosts().begin()),
+         end(cfg.hosts().end());
+       it != end;
+       ++it)
+    (*it)->parents().remove(hst.host_name());
+  return ;
 }
 
 /**
@@ -255,17 +342,14 @@ static void remove_dependency_for_hostgroup(
   for (list_string::const_iterator
          m(grp.members().begin()), end(grp.members().end());
        m != end;
-       ++m) {
+       ++m)
     for (configuration::set_host::iterator
            it(config.hosts().begin()), end(config.hosts().end());
          it != end;
-         ++it) {
-      if ((*it)->host_name() == *m) {
-        config.hosts().erase(it);
-        break;
-      }
-    }
-  }
+         ++it)
+      if ((*it)->host_name() == *m)
+        (*it)->hostgroups().remove(grp.hostgroup_name());
+  return ;
 }
 
 /**
@@ -304,26 +388,36 @@ static void remove_dependency_for_servicegroup(
 /**
  *  Check if objects was remove correctly.
  *
- *  @param[in] path The file configuration path to load.
- *  @param[in] chk  The check to use to valid remove object.
+ *  @param[in] cfg    Configuration to apply.
+ *  @param[in] chk    The check to use to valid remove object.
+ *  @param[in] remove A removal function executed every time an object
+ *                    is deleted.
  */
 template<typename T, typename U, T& (configuration::state::*get)() throw ()>
 static void check_remove_objects(
-              configuration::state& config,
+              configuration::state& cfg,
               check& chk,
               void (*remove)(configuration::state&, U const&) = NULL) {
-  configuration::applier::state::instance().apply(config);
+  // Initial configuration application.
+  configuration::applier::state::instance().apply(cfg);
 
-  T& objects((config.*get)());
+  // Copy applied configuration state to handle expansion.
+  cfg = deep_copy(*config);
+
+  // Delete objects one by one.
+  T& objects((cfg.*get)());
   while (objects.size()) {
+    // Remove first object in the list.
     typename T::iterator it(objects.begin());
     if (remove)
-      remove(config, **it);
+      remove(cfg, **it);
     chk.id(**it);
     objects.erase(it);
 
-    configuration::applier::state::instance().apply(config);
+    // Apply modified configuration.
+    configuration::applier::state::instance().apply(cfg);
 
+    // Checks.
     if (chk.find_into_config())
       throw (engine_error() << "remove " << chk.type_name()
              << " failed: " << chk.id() << " not remove from state "
@@ -332,7 +426,12 @@ static void check_remove_objects(
       throw (engine_error() << "remove " << chk.type_name()
              << " failed: " << chk.id() << " not remove from "
              "applier configuration");
+
+    // Copy applied configuration.
+    cfg = deep_copy(*config);
   }
+
+  return ;
 }
 
 /**
@@ -356,6 +455,7 @@ int main_test(int argc, char* argv[]) {
 
   // tricks to bypass create log file.
   config.log_file("");
+  ::config->log_file("");
 
   if (type == "command") {
     chk_generic<
@@ -407,7 +507,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_host,
       configuration::host,
-      &configuration::state::hosts>(config, chk_host);
+      &configuration::state::hosts>(config, chk_host, remove_dependency_for_host);
   }
   else if (type == "hostescalation") {
     chk_hostescalation chk_hostescalation;

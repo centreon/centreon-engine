@@ -719,12 +719,31 @@ unsigned int host::high_flap_threshold() const throw () {
 }
 
 /**
+ *  Get host groups.
+ *
+ *  @return The host groups.
+ */
+list_string& host::hostgroups() throw () {
+  return (*_hostgroups);
+}
+
+/**
  *  Get hostgroups.
  *
  *  @return The hostgroups.
  */
 list_string const& host::hostgroups() const throw () {
   return (*_hostgroups);
+}
+
+/**
+ *  Set host name.
+ *
+ *  @param[in] name New host name.
+ */
+void host::host_name(std::string const& name) {
+  _host_name = name;
+  return ;
 }
 
 /**
@@ -842,6 +861,15 @@ std::string const& host::notification_period() const throw () {
  */
 bool host::obsess_over_host() const throw () {
   return (_obsess_over_host);
+}
+
+/**
+ *  Get parents.
+ *
+ *  @return The parents.
+ */
+list_string& host::parents() throw () {
+  return (*_parents);
 }
 
 /**

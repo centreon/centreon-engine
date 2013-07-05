@@ -77,84 +77,8 @@ void applier::timeperiod::add_object(
     throw (engine_error() << "Error: Could not register time period '"
            << obj->timeperiod_name() << "'.");
 
-  // Add time ranges to time period.
-  {
-    unsigned short day(0);
-    for (std::vector<std::list<timerange> >::const_iterator
-           it(obj->timeranges().begin()),
-           end(obj->timeranges().end());
-         it != end;
-         ++it, ++day)
-      for (std::list<timerange>::const_iterator
-             it2(it->begin()),
-             end2(it->end());
-           it2 != end2;
-           ++it2)
-        if (!add_timerange_to_timeperiod(
-               tp,
-               day,
-               it2->start(),
-               it2->end()))
-          throw (engine_error()
-                 << "Error: Could not add time range to time period '"
-                 << obj->timeperiod_name() << "'.");
-  }
-
-  // Add exceptions to time period.
-  for (std::vector<std::list<daterange> >::const_iterator
-         it(obj->exceptions().begin()),
-         end(obj->exceptions().end());
-       it != end;
-       ++it)
-    for (std::list<daterange>::const_iterator
-           it2(it->begin()),
-           end2(it->end());
-         it2 != end2;
-         ++it2) {
-      if (!add_exception_to_timeperiod(
-             tp,
-             it2->type(),
-             it2->year_start(),
-             it2->month_start(),
-             it2->month_day_start(),
-             it2->week_day_start(),
-             it2->week_day_start_offset(),
-             it2->year_end(),
-             it2->month_end(),
-             it2->month_day_end(),
-             it2->week_day_end(),
-             it2->week_day_end_offset(),
-             it2->skip_interval()))
-        throw (engine_error()
-               << "Error: Could not add exception to time period '"
-               << obj->timeperiod_name() << "'.");
-      for (std::list<timerange>::const_iterator
-             it3(it2->timeranges().begin()),
-             end3(it2->timeranges().end());
-           it3 != end3;
-           ++it3)
-        if (!add_timerange_to_daterange(
-               tp->exceptions[it2->type()],
-               it3->start(),
-               it3->end()))
-          throw (engine_error()
-                 << "Error: Could not add time range to date range of "
-                 << "type " << it2->type() << " of time period '"
-                 << obj->timeperiod_name() << "'.");
-    }
-
-  // Add exclusions to time period.
-  for (list_string::const_iterator
-         it(obj->exclude().begin()),
-         end(obj->exclude().end());
-       it != end;
-       ++it)
-    if (!add_exclusion_to_timeperiod(
-           tp,
-           it->c_str()))
-      throw (engine_error() << "Error: Could not add exclusion '"
-             << *it << "' to time period '" << obj->timeperiod_name()
-             << "'.");
+  // Fill time period structure.
+  _fill_timeperiod_struct(*obj, tp);
 
   return ;
 }
@@ -187,7 +111,10 @@ void applier::timeperiod::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying time period '" << obj->timeperiod_name() << "'.";
 
+  // Modify time period in global configuration set.
   // XXX
+
+
 
   return ;
 }
@@ -229,5 +156,96 @@ void applier::timeperiod::remove_object(
 void applier::timeperiod::resolve_object(
                             shared_ptr<configuration::timeperiod> obj) {
   (void)obj;
+  return ;
+}
+
+/**
+ *  Fill an already created time period struct from its configuration.
+ *
+ *  @param[in]  cfg Time period configuration.
+ *  @param[out] obj Real time period object.
+ */
+void applier::timeperiod::_fill_timeperiod_struct(
+                            configuration::timeperiod const& cfg,
+                            timeperiod_struct* obj) {
+  // Add time ranges to time period.
+  {
+    unsigned short day(0);
+    for (std::vector<std::list<timerange> >::const_iterator
+           it(cfg.timeranges().begin()),
+           end(cfg.timeranges().end());
+         it != end;
+         ++it, ++day)
+      for (std::list<timerange>::const_iterator
+             it2(it->begin()),
+             end2(it->end());
+           it2 != end2;
+           ++it2)
+        if (!add_timerange_to_timeperiod(
+               obj,
+               day,
+               it2->start(),
+               it2->end()))
+          throw (engine_error()
+                 << "Error: Could not add time range to time period '"
+                 << cfg.timeperiod_name() << "'.");
+  }
+
+  // Add exceptions to time period.
+  for (std::vector<std::list<daterange> >::const_iterator
+         it(cfg.exceptions().begin()),
+         end(cfg.exceptions().end());
+       it != end;
+       ++it)
+    for (std::list<daterange>::const_iterator
+           it2(it->begin()),
+           end2(it->end());
+         it2 != end2;
+         ++it2) {
+      if (!add_exception_to_timeperiod(
+             obj,
+             it2->type(),
+             it2->year_start(),
+             it2->month_start(),
+             it2->month_day_start(),
+             it2->week_day_start(),
+             it2->week_day_start_offset(),
+             it2->year_end(),
+             it2->month_end(),
+             it2->month_day_end(),
+             it2->week_day_end(),
+             it2->week_day_end_offset(),
+             it2->skip_interval()))
+        throw (engine_error()
+               << "Error: Could not add exception to time period '"
+               << cfg.timeperiod_name() << "'.");
+      for (std::list<timerange>::const_iterator
+             it3(it2->timeranges().begin()),
+             end3(it2->timeranges().end());
+           it3 != end3;
+           ++it3)
+        if (!add_timerange_to_daterange(
+               obj->exceptions[it2->type()],
+               it3->start(),
+               it3->end()))
+          throw (engine_error()
+                 << "Error: Could not add time range to date range of "
+                 << "type " << it2->type() << " of time period '"
+                 << cfg.timeperiod_name() << "'.");
+    }
+
+  // Add exclusions to time period.
+  for (list_string::const_iterator
+         it(cfg.exclude().begin()),
+         end(cfg.exclude().end());
+       it != end;
+       ++it)
+    if (!add_exclusion_to_timeperiod(
+           obj,
+           it->c_str()))
+      throw (engine_error() << "Error: Could not add exclusion '"
+             << *it << "' to time period '" << cfg.timeperiod_name()
+             << "'.");
+
   return ;
 }

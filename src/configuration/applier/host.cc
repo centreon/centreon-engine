@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -270,9 +271,18 @@ void applier::host::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying host '" << obj->host_name() << "'.";
 
-  // XXX : need to reinsert the host in the configuration set
+  // Find the configuration object.
+  set_host::iterator it_cfg(config->hosts_find(obj->key()));
+  if (it_cfg == config->hosts().end())
+    throw (engine_error() << "Error: Cannot modify non-existing host '"
+           << obj->host_name() << "'.");
 
-  // Modify command.
+  // Update the global configuration set.
+  shared_ptr<configuration::host> obj_old(*it_cfg);
+  config->hosts().erase(it_cfg);
+  config->hosts().insert(obj);
+
+  // Modify host.
   shared_ptr<host_struct>&
     h(applier::state::instance().hosts()[obj->host_name()]);
   modify_if_different(
@@ -416,7 +426,28 @@ void applier::host::modify_object(
   // XXX : contacts
   // XXX : contactgroups
   // XXX : customvariables
-  // XXX : parents
+
+  // Parents.
+  if (obj->parents() != obj_old->parents()) {
+    // Delete old parents.
+    for (hostsmember* m(h->parent_hosts); m;) {
+      hostsmember* to_delete(m);
+      m = m->next;
+      deleter::hostsmember(to_delete);
+    }
+    h->parent_hosts = NULL;
+
+    // Create parents.
+    for (list_string::const_iterator
+           it(obj->parents().begin()),
+           end(obj->parents().end());
+         it != end;
+         ++it)
+      if (!add_parent_host_to_host(h.get(), it->c_str()))
+        throw (engine_error() << "Error: Could not add parent '"
+               << *it << "' to host '" << obj->host_name() << "'.");
+  }
+
   // XXX : hostgroups
 
   return ;

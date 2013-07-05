@@ -335,6 +335,15 @@ bool contact::can_submit_commands() const throw () {
 }
 
 /**
+ *  Get contact groups.
+ *
+ *  @return The contact groups.
+ */
+list_string& contact::contactgroups() throw () {
+  return (*_contactgroups);
+}
+
+/**
  *  Get contactgroups.
  *
  *  @return The contactgroups.

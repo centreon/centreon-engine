@@ -83,6 +83,10 @@ namespace           configuration {
                     hosts() const throw ();
       umap<std::string, shared_ptr<host_struct> >&
                     hosts() throw ();
+      umap<std::string, shared_ptr<host_struct> >::iterator
+                    hosts_find(configuration::host::key_type const& k);
+      umap<std::string, shared_ptr<host_struct> >::const_iterator
+                    hosts_find(configuration::host::key_type const& k) const;
       umultimap<std::string, shared_ptr<hostdependency_struct> > const&
                     hostdependencies() const throw ();
       umultimap<std::string, shared_ptr<hostdependency_struct> >&

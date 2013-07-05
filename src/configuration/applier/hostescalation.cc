@@ -59,9 +59,9 @@ applier::hostescalation& applier::hostescalation::operator=(
 }
 
 /**
- *  Add new hostescalation.
+ *  Add new host escalation.
  *
- *  @param[in] obj The new hostescalation to add into the monitoring
+ *  @param[in] obj The new host escalation to add into the monitoring
  *                 engine.
  */
 void applier::hostescalation::add_object(
@@ -190,10 +190,12 @@ void applier::hostescalation::expand_object(
 }
 
 /**
- *  Modified hostescalation.
+ *  @brief Modify host escalation.
  *
- *  @param[in] obj The new hostescalation to modify into the monitoring
- *                 engine.
+ *  Host escalations cannot be defined with anything else than their
+ *  full content. Therefore no modification can occur.
+ *
+ *  @param[in] obj Unused.
  */
 void applier::hostescalation::modify_object(
                                 shared_ptr<configuration::hostescalation> obj) {

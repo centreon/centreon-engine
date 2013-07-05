@@ -452,6 +452,30 @@ umap<std::string, shared_ptr<host_struct> >& applier::state::hosts() throw () {
 }
 
 /**
+ *  Find a host from its key.
+ *
+ *  @param[in] k Host key (host name).
+ *
+ *  @return Iterator to the host object if found, hosts().end() if it
+ *          was not.
+ */
+umap<std::string, shared_ptr<host_struct> >::const_iterator applier::state::hosts_find(configuration::host::key_type const& k) const {
+  return (_hosts.find(k));
+}
+
+/**
+ *  Find a host from its key.
+ *
+ *  @param[in] k Host key (host name).
+ *
+ *  @return Iterator to the host object if found, hosts().end() if it
+ *          was not.
+ */
+umap<std::string, shared_ptr<host_struct> >::iterator applier::state::hosts_find(configuration::host::key_type const& k) {
+  return (_hosts.find(k));
+}
+
+/**
  *  Get the current hostdependencies.
  *
  *  @return The current hostdependencies.
