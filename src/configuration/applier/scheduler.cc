@@ -74,8 +74,8 @@ void applier::scheduler::apply(
     memset(&scheduling_info, 0, sizeof(scheduling_info));
 
     // calculate scheduling params.
-    _calculate_service_scheduling_params(config);
     _calculate_host_scheduling_params(config);
+    _calculate_service_scheduling_params(config);
 
     // get and schedule new hosts.
     {
@@ -150,7 +150,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   time_t const now(time(NULL));
 
   // remove and add check result reaper event.
-  if (!_evt_check_reaper
+  if ((!_evt_check_reaper && config.check_reaper_interval())
       || config.check_reaper_interval() != ::config->check_reaper_interval()) {
     _remove_misc_event(_evt_check_reaper);
     _evt_check_reaper = _create_misc_event(
@@ -160,7 +160,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove and add an external command check event.
-  if (!_evt_command_check
+  if ((!_evt_command_check && config.check_external_commands())
       || config.check_external_commands() != ::config->check_external_commands()) {
     unsigned long interval(5);
     if (config.command_check_interval() != -1)
@@ -174,7 +174,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove and add a host result "freshness" check event.
-  if (!_evt_hfreshness_check
+  if ((!_evt_hfreshness_check && config.check_host_freshness())
       || config.check_host_freshness() != ::config->check_host_freshness()) {
     _remove_misc_event(_evt_hfreshness_check);
     _evt_hfreshness_check = _create_misc_event(
@@ -184,7 +184,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove and add an orphaned check event.
-  if (!_evt_orphan_check
+  if ((!_evt_orphan_check && config.check_orphaned_services())
       || config.check_orphaned_services() != ::config->check_orphaned_services()
       || config.check_orphaned_hosts() != ::config->check_orphaned_hosts()) {
     _remove_misc_event(_evt_orphan_check);
@@ -195,7 +195,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove and add a host and service check rescheduling event.
-  if (!_evt_reschedule_checks
+  if ((!_evt_reschedule_checks && config.auto_reschedule_checks())
       || config.auto_reschedule_checks() != ::config->auto_reschedule_checks()) {
     _remove_misc_event(_evt_reschedule_checks);
     _evt_reschedule_checks = _create_misc_event(
@@ -205,7 +205,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove and add a retention data save event if needed.
-  if (!_evt_retention_save
+  if ((!_evt_retention_save && config.retain_state_information())
       || config.retain_state_information() != ::config->retain_state_information()
       || config.retention_update_interval() != ::config->retention_update_interval()) {
     if (config.retain_state_information()
@@ -221,7 +221,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove add a service result "freshness" check event.
-  if (!_evt_sfreshness_check
+  if ((!_evt_sfreshness_check && config.check_service_freshness())
       || config.check_service_freshness() != ::config->check_service_freshness()) {
     _remove_misc_event(_evt_sfreshness_check);
     _evt_sfreshness_check = _create_misc_event(
@@ -231,7 +231,7 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
   }
 
   // remove and add a status save event.
-  if (!_evt_status_save
+  if ((!_evt_status_save && config.status_update_interval())
       || config.status_update_interval() != ::config->status_update_interval()) {
     _remove_misc_event(_evt_status_save);
     _evt_status_save = _create_misc_event(
@@ -332,12 +332,18 @@ void applier::scheduler::_calculate_host_scheduling_params(
     bool schedule_check(true);
     if (!hst.check_interval || !hst.checks_enabled)
       schedule_check = false;
-
-    time_t next_valid_time(now);
-    if (check_time_against_period(now, hst.check_period_ptr) == ERROR) {
-      get_next_valid_time(now, &next_valid_time, hst.check_period_ptr);
-      if (now == next_valid_time)
-        schedule_check = false;
+    else {
+      if (check_time_against_period(
+            now,
+            hst.check_period_ptr) == ERROR) {
+        time_t next_valid_time(0);
+        get_next_valid_time(
+          now,
+          &next_valid_time,
+          hst.check_period_ptr);
+        if (now == next_valid_time)
+          schedule_check = false;
+      }
     }
 
     if (schedule_check) {
@@ -346,6 +352,7 @@ void applier::scheduler::_calculate_host_scheduling_params(
         += static_cast<unsigned long>(hst.check_interval);
     }
     else {
+      hst.should_be_scheduled = false;
       logger(dbg_events, more)
         << "Host " << hst.name << " should not be scheduled.";
     }
@@ -361,16 +368,6 @@ void applier::scheduler::_calculate_host_scheduling_params(
   // the interval length.
   scheduling_info.host_check_interval_total
     = scheduling_info.host_check_interval_total * config.interval_length();
-
-  if (scheduling_info.total_hosts) {
-    scheduling_info.average_services_per_host
-      = scheduling_info.total_services
-      / (double)scheduling_info.total_hosts;
-    scheduling_info.average_scheduled_services_per_host
-      = scheduling_info.total_scheduled_services
-      / (double)scheduling_info.total_hosts;
-  }
-
 
   _calculate_host_inter_check_delay(
     config.host_inter_check_delay_method());
@@ -490,8 +487,8 @@ void applier::scheduler::_calculate_service_scheduling_params(
     if (!svc.check_interval || !svc.checks_enabled)
       schedule_check = false;
 
-    time_t next_valid_time(now);
     if (check_time_against_period(now, svc.check_period_ptr) == ERROR) {
+      time_t next_valid_time(0);
       get_next_valid_time(now, &next_valid_time, svc.check_period_ptr);
       if (now == next_valid_time)
         schedule_check = false;
@@ -503,6 +500,7 @@ void applier::scheduler::_calculate_service_scheduling_params(
         += static_cast<unsigned long>(svc.check_interval);
     }
     else {
+      svc.should_be_scheduled = false;
       logger(dbg_events, more)
         << "Service " << svc.description << " on host " << svc.host_name
         << " should not be scheduled.";
@@ -517,6 +515,15 @@ void applier::scheduler::_calculate_service_scheduling_params(
   // used later in inter-check delay calculations.
   scheduling_info.service_check_interval_total
     = scheduling_info.service_check_interval_total * config.interval_length();
+
+  if (scheduling_info.total_hosts) {
+    scheduling_info.average_services_per_host
+      = scheduling_info.total_services
+      / (double)scheduling_info.total_hosts;
+    scheduling_info.average_scheduled_services_per_host
+      = scheduling_info.total_scheduled_services
+      / (double)scheduling_info.total_hosts;
+  }
 
   // calculate rolling average execution time (available
   // from retained state information).
@@ -568,8 +575,8 @@ void applier::scheduler::_get_new_hosts(
        std::vector<host_struct*>& new_hosts) {
   umap<std::string, shared_ptr<host_struct> > const&
     hosts(applier::state::instance().hosts());
-  for (set_host::const_iterator
-         it(hst_added.begin()), end(hst_added.end());
+  for (set_host::const_reverse_iterator
+         it(hst_added.rbegin()), end(hst_added.rend());
        it != end;
        ++it) {
     std::string const& host_name((*it)->host_name());

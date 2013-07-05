@@ -29,6 +29,7 @@
 #include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "chkdiff.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
 
@@ -184,8 +185,10 @@ static std::string to_str(char const* str) { return (str ? str : ""); }
 
 template<typename T>
 static void reset_next_check(T* lst) {
-  for (T* obj(lst); obj; obj = obj->next)
+  for (T* obj(lst); obj; obj = obj->next) {
     obj->next_check = 0;
+    obj->should_be_scheduled = 1;
+  }
 }
 
 /**
@@ -257,41 +260,6 @@ static void remove_duplicates(
     l = l->next;
   }
   return ;
-}
-
-/**
- *  Check difference between to list of object.
- *
- *  @param[in] l1 The first list.
- *  @param[in] l2 The second list.
- *
- *  @return True if all list is equal, otherwise false.
- */
-template<typename T>
-static bool chkdiff(T const* l1, T const* l2) {
-  T const* obj1(l1);
-  T const* obj2(l2);
-  while (obj1 && obj2) {
-    if (*obj1 != *obj2) {
-      std::cerr << "difference detected" << std::endl;
-      std::cerr << "old " << *obj1 << std::endl;
-      std::cerr << "new " << *obj2 << std::endl;
-      return (false);
-    }
-    obj1 = obj1->next;
-    obj2 = obj2->next;
-  }
-  if (obj1) {
-    std::cerr << "missing object" << std::endl;
-    std::cerr << "old " << *obj1 << std::endl;
-    return (false);
-  }
-  if (obj2) {
-    std::cerr << "missing object" << std::endl;
-    std::cerr << "new " << *obj2 << std::endl;
-    return (false);
-  }
-  return (true);
 }
 
 /**
@@ -445,8 +413,8 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   if (!chkdiff(g1.hostgroups, g2.hostgroups))
     ret = false;
-  reset_next_check(g1.hosts);
-  reset_next_check(g2.hosts);
+  reset_next_check(g1.services);
+  reset_next_check(g2.services);
   if (!chkdiff(g1.services, g2.services))
     ret = false;
   sort_it(g1.servicedependencies);

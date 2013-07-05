@@ -1543,6 +1543,8 @@ void _get_next_valid_time(
     return;
   }
 
+  *valid_time = 0;
+
   // first check for possible timeperiod excuslions
   // before getting a valid_time
   get_earliest_time(

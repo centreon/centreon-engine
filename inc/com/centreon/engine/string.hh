@@ -39,6 +39,14 @@ namespace                 string {
     return (str ? str : "\"NULL\"");
   }
 
+  inline std::string      ctime(time_t const& time) {
+    char buf[64];
+    buf[0] = 0;
+    if (ctime_r(&time, buf))
+      buf[strlen(buf) - 1] = 0;
+    return (buf);
+  }
+
   inline char*            dup(char const* value) {
     if (!value)
       return (NULL);

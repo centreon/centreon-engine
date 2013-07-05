@@ -85,25 +85,35 @@ void schedule_new_event(
 
 #  ifdef __cplusplus
 
+#    include <ostream>
 #    include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace      events {
-  timed_event* schedule(
-                 int event_type,
-                 int high_priority,
-                 time_t run_time,
-                 int recurring,
-                 unsigned long event_interval,
-                 void* timing_func,
-                 int compensate_for_time_change,
-                 void* event_data,
-                 void* event_args,
-                 int event_options);
+namespace            events {
+  timed_event*       schedule(
+                       int event_type,
+                       int high_priority,
+                       time_t run_time,
+                       int recurring,
+                       unsigned long event_interval,
+                       void* timing_func,
+                       int compensate_for_time_change,
+                       void* event_data,
+                       void* event_args,
+                       int event_options);
+  std::string const& name(timed_event const& evt);
 }
 
 CCE_END()
+
+bool          operator==(
+                timed_event const& obj1,
+                timed_event const& obj2) throw ();
+bool          operator!=(
+                timed_event const& obj1,
+                timed_event const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, timed_event const& obj);
 
 #  endif /* C++ */
 

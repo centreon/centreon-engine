@@ -28,6 +28,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/sretention.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::events;
@@ -918,4 +919,149 @@ timed_event* events::schedule(
   else
     add_event(evt, &event_list_low, &event_list_low_tail);
   return (evt);
+}
+
+/**
+ *  Get the event name.
+ *
+ *  @param[in] evt The event to get name.
+ *
+ *  @return The event name.
+ */
+std::string const& events::name(timed_event const& evt) {
+  static std::string const event_unknown("\"unknown\"");
+  static std::string const event_sleep("EVENT_SLEEP");
+  static std::string const event_user_function("EVENT_USER_FUNCTION");
+  static std::string const event_names[] = {
+    "EVENT_SERVICE_CHECK",
+    "EVENT_COMMAND_CHECK",
+    "EVENT_LOG_ROTATION",
+    "EVENT_PROGRAM_SHUTDOWN",
+    "EVENT_PROGRAM_RESTART",
+    "EVENT_CHECK_REAPER",
+    "EVENT_ORPHAN_CHECK",
+    "EVENT_RETENTION_SAVE",
+    "EVENT_STATUS_SAVE",
+    "EVENT_SCHEDULED_DOWNTIME",
+    "EVENT_SFRESHNESS_CHECK",
+    "EVENT_EXPIRE_DOWNTIME",
+    "EVENT_HOST_CHECK",
+    "EVENT_HFRESHNESS_CHECK",
+    "EVENT_RESCHEDULE_CHECKS",
+    "EVENT_EXPIRE_COMMENT"
+  };
+
+  if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
+    return (event_names[evt.event_type]);
+  if (evt.event_type == EVENT_SLEEP)
+    return (event_sleep);
+  if (evt.event_type == EVENT_USER_FUNCTION)
+    return (event_user_function);
+  return (event_unknown);
+}
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool operator==(
+       timed_event const& obj1,
+       timed_event const& obj2) throw () {
+  if (obj1.event_type != obj2.event_type)
+    return (false);
+
+  bool is_not_null(obj1.event_data && obj2.event_data);
+  if (is_not_null && obj1.event_type == EVENT_HOST_CHECK) {
+    host& hst1(*(host*)obj1.event_data);
+    host& hst2(*(host*)obj2.event_data);
+    if (strcmp(hst1.name, hst2.name))
+      return (false);
+  }
+  else if (is_not_null && obj1.event_type == EVENT_SERVICE_CHECK) {
+    service& svc1(*(service*)obj1.event_data);
+    service& svc2(*(service*)obj2.event_data);
+    if (strcmp(svc1.host_name, svc2.host_name)
+        || strcmp(svc1.description, svc2.description))
+      return (false);
+  }
+  else if (is_not_null
+           && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME
+               || obj1.event_type == EVENT_EXPIRE_COMMENT)) {
+    unsigned long id1(*(unsigned long*)obj1.event_data);
+    unsigned long id2(*(unsigned long*)obj2.event_data);
+    if (id1 != id2)
+      return (false);
+  }
+  else if (obj1.event_data != obj2.event_data)
+    return (false);
+
+  return (obj1.run_time == obj2.run_time
+          && obj1.recurring == obj2.recurring
+          && obj1.event_interval == obj2.event_interval
+          && obj1.compensate_for_time_change == obj2.compensate_for_time_change
+          && obj1.timing_func == obj2.timing_func
+          && obj1.event_args == obj2.event_args
+          && obj1.event_options == obj2.event_options);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool operator!=(
+       timed_event const& obj1,
+       timed_event const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Dump command content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The command to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
+  os << "timed_event {\n"
+    "  event_type:                 " << events::name(obj) << "\n"
+    "  run_time:                   " << string::ctime(obj.run_time) << "\n"
+    "  recurring:                  " << obj.recurring << "\n"
+    "  event_interval:             " << obj.event_interval << "\n"
+    "  compensate_for_time_change: " << obj.compensate_for_time_change << "\n"
+    "  timing_func:                " << obj.timing_func << "\n";
+
+  if (!obj.event_data)
+    os << "  event_data:                 \"NULL\"\n";
+  else if (obj.event_type == EVENT_HOST_CHECK) {
+    host& hst(*(host*)obj.event_data);
+    os << "  event_data:                 "
+       << hst.name << "\n";
+  }
+  else if (obj.event_type == EVENT_SERVICE_CHECK) {
+    service& svc(*(service*)obj.event_data);
+    os << "  event_data:                 "
+       << svc.host_name << ", " << svc.description << "\n";
+  }
+  else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME
+           || obj.event_type == EVENT_EXPIRE_COMMENT) {
+    unsigned long id(*(unsigned long*)obj.event_data);
+    os << "  event_data:                 " << id << "\n";
+  }
+  else
+    os << "  event_data:                 " << obj.event_data << "\n";
+
+  os <<
+    "  event_args:                 " << obj.event_args << "\n"
+    "  event_options:              " << obj.event_options << "\n"
+    "}\n";
+  return (os);
 }

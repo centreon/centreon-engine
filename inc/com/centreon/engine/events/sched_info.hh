@@ -64,6 +64,17 @@ void display_scheduling_info();
 
 #  ifdef __cplusplus
 }
+
+#    include <ostream>
+
+bool          operator==(
+                sched_info const& obj1,
+                sched_info const& obj2) throw ();
+bool          operator!=(
+                sched_info const& obj1,
+                sched_info const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, sched_info const& obj);
+
 #  endif /* C++ */
 
 #endif // !CCE_EVENTS_SCHED_INFO_HH
