@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/engine.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
@@ -76,7 +76,7 @@ int main_test(int argc, char** argv) {
     // tricks to bypass create log file.
     config.log_file("");
 
-    configuration::applier::engine::instance().apply(config);
+    configuration::applier::state::instance().apply(config);
 
     std::vector<std::string> const& users(config.user());
     for (unsigned int i(0); i < MAX_USER_MACROS - 1; ++i) {

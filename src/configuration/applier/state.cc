@@ -301,7 +301,10 @@ void applier::state::apply(configuration::state& new_cfg) {
   }
 
   // Schedule host and service checks.
-  applier::scheduler::instance().apply(new_cfg);
+  applier::scheduler::instance().apply(
+    new_cfg,
+    diff_hosts,
+    diff_services);
 
   return ;
 }

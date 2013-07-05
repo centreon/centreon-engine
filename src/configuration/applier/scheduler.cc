@@ -39,33 +39,33 @@ static applier::scheduler* _instance(NULL);
 /**
  *  Apply new configuration.
  *
- *  @param[in] config The new configuration.
+ *  @param[in] config        The new configuration.
+ *  @param[in] diff_hosts    The difference between old and the
+ *                           new host configuration.
+ *  @param[in] diff_services The difference between old and the
+ *                           new service configuration.
  */
-void applier::scheduler::apply(configuration::state& config) {
+void applier::scheduler::apply(
+       configuration::state& config,
+       difference<set_host> const& diff_hosts,
+       difference<set_service> const& diff_services) {
   // remove and create misc event.
   _apply_misc_event(config);
 
-  // parse old and new configuration services to build the diff.
-  difference<set_service> svc_diff;
-  svc_diff.parse(::config->services(), config.services());
-
   // remove deleted service check from the scheduler.
-  if (!svc_diff.deleted().empty())
-    _unscheduling_service_checks(svc_diff.deleted());
-
-  // parse old and new configuration hosts to build the diff.
-  difference<set_host> hst_diff;
-  hst_diff.parse(::config->hosts(), config.hosts());
+  if (!diff_services.deleted().empty())
+    _unscheduling_service_checks(diff_services.deleted());
 
   // remove deleted host check from the scheduler.
-  if (!hst_diff.deleted().empty())
-    _unscheduling_host_checks(hst_diff.deleted());
+  if (!diff_hosts.deleted().empty())
+    _unscheduling_host_checks(diff_hosts.deleted());
 
   // check if we need to add new object into the engine scheduler.
   bool rebuild_scheduling_info(false);
-  if (!svc_diff.added().empty() || !svc_diff.deleted().empty())
+  if (!diff_services.added().empty()
+      || !diff_services.deleted().empty())
     rebuild_scheduling_info = true;
-  if (!hst_diff.added().empty() || !hst_diff.deleted().empty())
+  if (!diff_hosts.added().empty() || !diff_hosts.deleted().empty())
     rebuild_scheduling_info = true;
 
   // check if we need to rebuild scheduled info.
@@ -80,14 +80,14 @@ void applier::scheduler::apply(configuration::state& config) {
     // get and schedule new hosts.
     {
       std::vector<host_struct*> new_hosts;
-      _get_new_hosts(hst_diff.added(), new_hosts);
+      _get_new_hosts(diff_hosts.added(), new_hosts);
       _scheduling_host_checks(new_hosts);
     }
 
     // get and schedule new services.
     {
       std::vector<service_struct*> new_services;
-      _get_new_services(svc_diff.added(), new_services);
+      _get_new_services(diff_services.added(), new_services);
       _scheduling_service_checks(new_services);
     }
   }

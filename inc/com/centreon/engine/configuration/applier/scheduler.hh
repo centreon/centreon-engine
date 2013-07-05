@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_APPLIER_SCHEDULER_HH
 
 #  include <vector>
+#  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/unordered_hash.hh"
@@ -42,7 +43,10 @@ namespace                 configuration {
      */
     class                 scheduler {
     public:
-      void                apply(state& config);
+      void                apply(
+                            state& config,
+                            difference<set_host> const& diff_hosts,
+                            difference<set_service> const& diff_services);
       static scheduler&   instance();
       static void         load();
       static void         unload();

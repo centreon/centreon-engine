@@ -19,7 +19,6 @@
 
 #include <string>
 #include "com/centreon/engine/config.hh"
-#include "com/centreon/engine/configuration/applier/engine.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -739,7 +738,7 @@ static bool newparser_read_config(
     // tricks to bypass create log file.
     config.log_file("");
 
-    configuration::applier::engine::instance().apply(config);
+    configuration::applier::state::instance().apply(config);
 
     g = get_globals();
     clear_volatile_macros_r(get_global_macros());
