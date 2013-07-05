@@ -182,6 +182,12 @@ struct               global {
 
 static std::string to_str(char const* str) { return (str ? str : ""); }
 
+template<typename T>
+static void reset_next_check(T* lst) {
+  for (T* obj(lst); obj; obj = obj->next)
+    obj->next_check = 0;
+}
+
 /**
  *  Sort a list.
  */
@@ -409,6 +415,8 @@ bool chkdiff(global& g1, global& g2) {
     sort_it(cg2->members);
   if (!chkdiff(g1.contactgroups, g2.contactgroups))
     ret = false;
+  reset_next_check(g1.hosts);
+  reset_next_check(g2.hosts);
   if (!chkdiff(g1.hosts, g2.hosts))
     ret = false;
   sort_it(g1.hostdependencies);
@@ -437,6 +445,8 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   if (!chkdiff(g1.hostgroups, g2.hostgroups))
     ret = false;
+  reset_next_check(g1.hosts);
+  reset_next_check(g2.hosts);
   if (!chkdiff(g1.services, g2.services))
     ret = false;
   sort_it(g1.servicedependencies);
