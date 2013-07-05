@@ -57,6 +57,7 @@ namespace                  configuration {
     tab_string const&      address() const throw ();
     std::string const&     alias() const throw ();
     bool                   can_submit_commands() const throw ();
+    list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
     std::string const&     contact_name() const throw ();
     properties const&      customvariables() const throw ();

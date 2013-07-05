@@ -87,6 +87,7 @@ namespace                  configuration {
     bool                   have_coords_2d() const throw ();
     bool                   have_coords_3d() const throw ();
     unsigned int           high_flap_threshold() const throw ();
+    list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
     void                   host_name(std::string const& name);
     std::string const&     host_name() const throw ();

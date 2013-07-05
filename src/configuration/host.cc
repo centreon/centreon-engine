@@ -719,6 +719,15 @@ unsigned int host::high_flap_threshold() const throw () {
 }
 
 /**
+ *  Get host groups.
+ *
+ *  @return The host groups.
+ */
+list_string& host::hostgroups() throw () {
+  return (*_hostgroups);
+}
+
+/**
  *  Get hostgroups.
  *
  *  @return The hostgroups.

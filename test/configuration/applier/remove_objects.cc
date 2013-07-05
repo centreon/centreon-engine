@@ -302,17 +302,14 @@ static void remove_dependency_for_contactgroup(
   for (list_string::const_iterator
          m(grp.members().begin()), end(grp.members().end());
        m != end;
-       ++m) {
+       ++m)
     for (configuration::set_contact::iterator
            it(config.contacts().begin()), end(config.contacts().end());
          it != end;
-         ++it) {
-      if ((*it)->contact_name() == *m) {
-        config.contacts().erase(it);
-        break;
-      }
-    }
-  }
+         ++it)
+      if ((*it)->contact_name() == *m)
+        (*it)->contactgroups().remove(grp.contactgroup_name());
+  return ;
 }
 
 /**
@@ -345,17 +342,14 @@ static void remove_dependency_for_hostgroup(
   for (list_string::const_iterator
          m(grp.members().begin()), end(grp.members().end());
        m != end;
-       ++m) {
+       ++m)
     for (configuration::set_host::iterator
            it(config.hosts().begin()), end(config.hosts().end());
          it != end;
-         ++it) {
-      if ((*it)->host_name() == *m) {
-        config.hosts().erase(it);
-        break;
-      }
-    }
-  }
+         ++it)
+      if ((*it)->host_name() == *m)
+        (*it)->hostgroups().remove(grp.hostgroup_name());
+  return ;
 }
 
 /**
