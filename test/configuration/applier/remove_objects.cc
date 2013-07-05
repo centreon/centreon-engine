@@ -354,6 +354,9 @@ int main_test(int argc, char* argv[]) {
   configuration::parser p;
   p.parse(path, config);
 
+  // tricks to bypass create log file.
+  config.log_file("");
+
   if (type == "command") {
     chk_generic<
       configuration::command,
