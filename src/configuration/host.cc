@@ -728,6 +728,16 @@ list_string const& host::hostgroups() const throw () {
 }
 
 /**
+ *  Set host name.
+ *
+ *  @param[in] name New host name.
+ */
+void host::host_name(std::string const& name) {
+  _host_name = name;
+  return ;
+}
+
+/**
  *  Get host_name.
  *
  *  @return The host_name.
@@ -842,6 +852,15 @@ std::string const& host::notification_period() const throw () {
  */
 bool host::obsess_over_host() const throw () {
   return (_obsess_over_host);
+}
+
+/**
+ *  Get parents.
+ *
+ *  @return The parents.
+ */
+list_string& host::parents() throw () {
+  return (*_parents);
 }
 
 /**

@@ -61,7 +61,7 @@ applier::hostdependency& applier::hostdependency::operator=(
 /**
  *  Add new hostdependency.
  *
- *  @param[in] obj The new hostdependency to add into the monitoring
+ *  @param[in] obj The new host dependency to add into the monitoring
  *                 engine.
  */
 void applier::hostdependency::add_object(

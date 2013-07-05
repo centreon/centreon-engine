@@ -61,7 +61,7 @@ applier::servicedependency& applier::servicedependency::operator=(
 }
 
 /**
- *  Add new servicedependency.
+ *  Add new service dependency.
  *
  *  @param[in] obj The new servicedependency to add into the monitoring
  *                 engine.

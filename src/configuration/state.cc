@@ -1741,6 +1741,46 @@ set_host& state::hosts() throw () {
 }
 
 /**
+ *  Find a host from its key.
+ *
+ *  @param[in] k Host key (host name).
+ *
+ *  @return Iterator to the host if found, hosts().end() if it was not.
+ */
+set_host::const_iterator state::hosts_find(
+                                  host::key_type const& k) const {
+  shared_ptr<configuration::host>
+    below_searched(new configuration::host);
+  below_searched->host_name(k);
+  set_host::const_iterator it(_hosts.upper_bound(below_searched));
+  if ((it != _hosts.end()) && ((*it)->host_name() == k))
+    return (it);
+  else if ((it != _hosts.begin()) && ((*--it)->host_name() == k))
+    return (it);
+  return (_hosts.end());
+}
+
+/**
+ *  Find a host from its key.
+ *
+ *  @param[in] k Host key (host name).
+ *
+ *  @return Iterator to the host if found, hosts().end() if it was not.
+ */
+set_host::iterator state::hosts_find(
+                            host::key_type const& k) {
+  shared_ptr<configuration::host>
+    below_searched(new configuration::host);
+  below_searched->host_name(k);
+  set_host::iterator it(_hosts.upper_bound(below_searched));
+  if ((it != _hosts.end()) && ((*it)->host_name() == k))
+    return (it);
+  else if ((it != _hosts.begin()) && ((*--it)->host_name() == k))
+    return (it);
+  return (_hosts.end());
+}
+
+/**
  *  Get host_check_timeout value.
  *
  *  @return The host_check_timeout value.

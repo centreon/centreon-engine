@@ -88,6 +88,7 @@ namespace                  configuration {
     bool                   have_coords_3d() const throw ();
     unsigned int           high_flap_threshold() const throw ();
     list_string const&     hostgroups() const throw ();
+    void                   host_name(std::string const& name);
     std::string const&     host_name() const throw ();
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();
@@ -101,6 +102,7 @@ namespace                  configuration {
     unsigned int           notification_options() const throw ();
     std::string const&     notification_period() const throw ();
     bool                   obsess_over_host() const throw ();
+    list_string&           parents() throw ();
     list_string const&     parents() const throw ();
     bool                   process_perf_data() const throw ();
     bool                   retain_nonstatus_information() const throw ();

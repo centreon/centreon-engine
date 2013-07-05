@@ -23,6 +23,9 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
+// Forward declaration.
+struct                   timeperiod_struct;
+
 CCE_BEGIN()
 
 namespace                configuration {
@@ -48,6 +51,11 @@ namespace                configuration {
                            shared_ptr<configuration::timeperiod> obj);
       void               resolve_object(
                            shared_ptr<configuration::timeperiod> obj);
+
+    private:
+      void               _fill_timeperiod_struct(
+                           configuration::timeperiod const& cfg,
+                           timeperiod_struct* obj);
     };
   }
 }

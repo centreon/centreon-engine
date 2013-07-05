@@ -126,7 +126,7 @@ namespace std {
                      bool> {
     bool  operator()(
             com::centreon::shared_ptr<T> const& left,
-            com::centreon::shared_ptr<T> const& right) {
+            com::centreon::shared_ptr<T> const& right) const {
       bool retval;
       if (left.get()) {
         if (right.get())
