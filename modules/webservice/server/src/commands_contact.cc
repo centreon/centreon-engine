@@ -24,7 +24,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
-#include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/unique_array_ptr.hh"
@@ -46,271 +45,6 @@ static contact* find_target_contact(char const* name) {
   if (!cntct)
     throw (engine_error() << "contact '" << name << "' not found");
   return (cntct);
-}
-
-/**
- *  Create a new contact into the engine.
- *
- *  @param[in] cntct The struct with all information to create new contact.
- */
-void webservice::create_contact(ns1__contactType const& cntct) {
-  /*
-  ** Check all arguments and set default option for optional options.
-  */
-
-  // Host notification options.
-  std::map<char, bool> host_opt(get_options(
-                                  &cntct.hostNotificationOptions,
-                                  "rdufs",
-                                  "n"));
-  if (host_opt.empty())
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid host notification options");
-
-  // Service notification options.
-  std::map<char, bool> service_opt(get_options(
-                                     &cntct.serviceNotificationOptions,
-                                     "rcwufs",
-                                     "n"));
-  if (service_opt.empty())
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid service notification options");
-
-  // Host notification period.
-  timeperiod* host_notification_period(
-                find_timeperiod(cntct.hostNotificationPeriod.c_str()));
-  if (!host_notification_period)
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid host notification period '"
-           << cntct.hostNotificationPeriod << "'");
-
-  // Service notification period.
-  timeperiod* service_notification_period(
-                find_timeperiod(cntct.serviceNotificationPeriod.c_str()));
-  if (!service_notification_period)
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid service notification period '"
-           << cntct.serviceNotificationPeriod << "'");
-
-  // Other options.
-  char const* email(cntct.email ? cntct.email->c_str() : NULL);
-  char const* pager(cntct.pager ? cntct.pager->c_str() : NULL);
-  char const* alias(cntct.alias ? cntct.alias->c_str() : NULL);
-  bool can_submit_commands(
-         cntct.canSubmitCommands ? *cntct.canSubmitCommands : true);
-  bool retain_status_information(
-         cntct.retainStatusInformation
-         ? *cntct.retainStatusInformation
-         : true);
-  bool retain_nonstatus_information(
-         cntct.retainNonstatusInformation
-         ? *cntct.retainNonstatusInformation
-         : true);
-
-  // Create address array.
-  com::centreon::unique_array_ptr<char const*>
-    address(new char const*[MAX_CONTACT_ADDRESSES]);
-  memset(address.get(), 0, sizeof(*address) * MAX_CONTACT_ADDRESSES);
-  for (unsigned int i(0), end(cntct.address.size()); i < end; ++i)
-    address[i] = cntct.address[i].c_str();
-
-  // Create a new contact.
-  contact* new_cntct(add_contact(
-                       cntct.id->name.c_str(),
-                       alias,
-                       email,
-                       pager,
-                       (cntct.address.empty() ? NULL : &(*address)),
-                       cntct.serviceNotificationPeriod.c_str(),
-                       cntct.hostNotificationPeriod.c_str(),
-                       service_opt['r'],
-                       service_opt['c'],
-                       service_opt['w'],
-                       service_opt['u'],
-                       service_opt['f'],
-                       service_opt['s'],
-                       host_opt['r'],
-                       host_opt['d'],
-                       host_opt['u'],
-                       host_opt['f'],
-                       host_opt['s'],
-                       cntct.hostNotificationsEnabled,
-                       cntct.serviceNotificationsEnabled,
-                       can_submit_commands,
-                       retain_status_information,
-                       retain_nonstatus_information));
-
-  // Find contact groups.
-  std::vector<contactgroup*>
-    cntct_contactgroups(_find<contactgroup>(
-                          cntct.contactgroups,
-                          (void* (*)(char const*))&find_contactgroup));
-  if (cntct.contactgroups.size()
-      != static_cast<size_t>(cntct_contactgroups.size())) {
-    objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid contactgroup");
-  }
-
-  // Find host notification commands.
-  std::vector<command*> cntct_host_notification_commands(
-                          _find<command>(
-                            cntct.hostNotificationCommands,
-                            (void* (*)(char const*))&find_command));
-  if (cntct.hostNotificationCommands.size()
-      != static_cast<size_t>(cntct_host_notification_commands.size())) {
-    objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid host notification commands");
-  }
-
-  // Find service notification commands.
-  std::vector<command*> cntct_service_notification_commands(
-                          _find<command>(
-                            cntct.serviceNotificationCommands,
-                            (void* (*)(char const*))&find_command));
-  if (cntct.serviceNotificationCommands.size()
-      != static_cast<size_t>(cntct_service_notification_commands.size())) {
-    objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.id->name
-           << "' has invalid service notification commands");
-  }
-
-  try {
-    // Link object.
-    objects::link(
-               new_cntct,
-               host_notification_period,
-               service_notification_period,
-               cntct_contactgroups,
-               cntct_host_notification_commands,
-               cntct_service_notification_commands,
-               cntct.customVariables);
-  }
-  catch (std::exception const& e) {
-    (void)e;
-    objects::release(new_cntct);
-    throw ;
-  }
-
-  return ;
-}
-
-/**
- *  Add a new contact.
- *
- *  @param[in]  s       SOAP object.
- *  @param[in]  contact Contact to add.
- *  @param[out] res     Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactAdd(
-      soap* s,
-      ns1__contactType* contact,
-      centreonengine__contactAddResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact->id->name)
-
-  // Create new contact.
-  create_contact(*contact);
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Add a contact notification command for host events.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  command_id New host notification command.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactAddNotificationsOnHostCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      ns1__commandIDType* command_id,
-      centreonengine__contactAddNotificationsOnHostCommandResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Find command.
-  command* cmd(find_command(command_id->command.c_str()));
-  if (!cmd)
-    throw (engine_error()
-           << "cannot add new host notification command '"
-           << command_id->command << "' to contact '"
-           << contact_id->name << "': command does not exist");
-
-  // Add new notification command.
-  std::auto_ptr<commandsmember> mbr(new commandsmember);
-  memset(mbr.get(), 0, sizeof(*mbr));
-  mbr->cmd = my_strdup(command_id->command.c_str());
-  mbr->command_ptr = cmd;
-  mbr->next = cntct->host_notification_commands;
-  cntct->host_notification_commands = mbr.release();
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Add a service notification command.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  command_id New service notification command.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactAddNotificationsOnServiceCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      ns1__commandIDType* command_id,
-      centreonengine__contactAddNotificationsOnServiceCommandResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Find command.
-  command* cmd(find_command(command_id->command.c_str()));
-  if (!cmd)
-    throw (engine_error()
-           << "cannot add new service notification command '"
-           << command_id->command << "' to contact '"
-           << contact_id->name << "': command does not exist");
-
-  // Add new notification command.
-  std::auto_ptr<commandsmember> mbr(new commandsmember);
-  memset(mbr.get(), 0, sizeof(*mbr));
-  mbr->cmd = my_strdup(command_id->command.c_str());
-  mbr->command_ptr = cmd;
-  mbr->next = cntct->service_notification_commands;
-  cntct->service_notification_commands = mbr.release();
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
 }
 
 /**
@@ -1096,172 +830,6 @@ int centreonengine__contactGetRetainStatusNonInformation(
 }
 
 /**
- *  Modify a contact.
- *
- *  @param[in]  s     SOAP object.
- *  @param[in]  cntct Contact information.
- *  @param[out] res   Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactModify(
-      soap* s,
-      ns1__contactType* cntct,
-      centreonengine__contactModifyResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(cntct->id->name)
-
-  // XXX
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Remove a contact.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Contact to remove.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactRemove(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      centreonengine__contactRemoveResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name)
-
-  // Find target contact.
-  contact* cntct(find_contact(contact_id->name.c_str()));
-  if (cntct) {
-    // Check group membership.
-    if (cntct->contactgroups_ptr)
-      throw (engine_error() << "cannot remove contact '"
-             << contact_id->name
-             << "': still member of contact group(s)");
-
-    // Check link with hosts.
-    for (host* hst(host_list); hst; hst = hst->next)
-      for (contactsmember* mbr(hst->contacts); mbr; mbr = mbr->next)
-        if (mbr->contact_ptr == cntct)
-          throw (engine_error() << "cannot remove contact '"
-                 << contact_id->name << "': used by at least one host");
-
-    // Check link with services.
-    for (service* svc(service_list); svc; svc = svc->next)
-      for (contactsmember* mbr(svc->contacts); mbr; mbr = mbr->next)
-        if (mbr->contact_ptr == cntct)
-          throw (engine_error() << "cannot remove contact '"
-                 << contact_id->name
-                 << "': used by at least one service");
-
-    // Remove contact.
-    if (!remove_contact_by_id(contact_id->name.c_str()))
-      throw (engine_error() << "contact '" << contact_id->name
-             << "' not found");
-  }
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Remove a host notification command from a contact.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  command_id Target command.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactRemoveNotificationsOnHostCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      ns1__commandIDType* command_id,
-      centreonengine__contactRemoveNotificationsOnHostCommandResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Browse host notification commands.
-  for (commandsmember
-         *current(cntct->host_notification_commands),
-         **prev(&cntct->host_notification_commands);
-       current;
-       prev = &current->next, current = current->next)
-    if (current->cmd
-        && !strcmp(current->cmd, command_id->command.c_str())) {
-      *prev = current->next;
-      delete [] current->cmd;
-      delete current;
-      break ;
-    }
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Remove a service notification command from a contact.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  command_id Target command.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactRemoveNotificationsOnServiceCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      ns1__commandIDType* command_id,
-      centreonengine__contactRemoveNotificationsOnServiceCommandResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Browse service notification commands.
-  for (commandsmember
-         *current(cntct->service_notification_commands),
-         **prev(&cntct->service_notification_commands);
-       current;
-       prev = &current->next, current = current->next)
-    if (current->cmd
-        && !strcmp(current->cmd, command_id->command.c_str())) {
-      *prev = current->next;
-      delete [] current->cmd;
-      delete current;
-      break ;
-    }
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
  *  Set the contact alias.
  *
  *  @param[in]  s          SOAP object.
@@ -1286,7 +854,7 @@ int centreonengine__contactSetAlias(
 
   // Set new alias.
   delete [] cntct->alias;
-  cntct->alias = my_strdup(alias.c_str());
+  cntct->alias = string::dup(alias.c_str());
 
   // Exception handling.
   COMMAND_END()
@@ -1364,7 +932,7 @@ int centreonengine__contactSetCustomVariable(
     if (!*cvar) {
       *cvar = new customvariablesmember;
       (*cvar)->next = NULL;
-      (*cvar)->variable_name = my_strdup(varname.c_str());
+      (*cvar)->variable_name = string::dup(varname.c_str());
     }
     else {
       delete [] (*cvar)->variable_value;
@@ -1372,7 +940,7 @@ int centreonengine__contactSetCustomVariable(
     }
 
     // Set new value.
-    (*cvar)->variable_value = my_strdup(varvalue.c_str());
+    (*cvar)->variable_value = string::dup(varvalue.c_str());
   }
   // Delete variable.
   if (*cvar) {
@@ -1414,7 +982,7 @@ int centreonengine__contactSetEmail(
 
   // Set new email.
   delete [] cntct->email;
-  cntct->email = my_strdup(email.c_str());
+  cntct->email = string::dup(email.c_str());
 
   // Exception handling.
   COMMAND_END()
@@ -1619,7 +1187,7 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(
     // Set new timeperiod.
     delete [] cntct->host_notification_period;
     cntct->host_notification_period
-      = my_strdup(timeperiod_id->name.c_str());
+      = string::dup(timeperiod_id->name.c_str());
     cntct->host_notification_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -1864,7 +1432,7 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(
     // Set new timeperiod.
     delete [] cntct->service_notification_period;
     cntct->service_notification_period
-      = my_strdup(timeperiod_id->name.c_str());
+      = string::dup(timeperiod_id->name.c_str());
     cntct->service_notification_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -1969,7 +1537,7 @@ int centreonengine__contactSetPager(
 
   // Set new pager.
   delete [] cntct->pager;
-  cntct->pager = my_strdup(pager.c_str());
+  cntct->pager = string::dup(pager.c_str());
 
   // Exception handling.
   COMMAND_END()

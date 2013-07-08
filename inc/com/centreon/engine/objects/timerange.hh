@@ -20,26 +20,45 @@
 #ifndef CCE_OBJECTS_TIMERANGE_HH
 #  define CCE_OBJECTS_TIMERANGE_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declarations. */
+struct daterange_struct;
+struct timeperiod_struct;
+
+typedef struct             timerange_struct {
+  unsigned long            range_start;
+  unsigned long            range_end;
+  struct timerange_struct* next;
+}                          timerange;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif
 
-void release_timerange(timerange const* obj);
+timerange* add_timerange_to_daterange(
+             daterange_struct* drange,
+             unsigned long start_time,
+             unsigned long end_time);
+timerange* add_timerange_to_timeperiod(
+             timeperiod_struct* period,
+             int day,
+             unsigned long start_time,
+             unsigned long end_time);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    release(timerange const* obj);
-}
+bool          operator==(
+                timerange const& obj1,
+                timerange const& obj2) throw ();
+bool          operator!=(
+                timerange const& obj1,
+                timerange const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, timerange const& obj);
 
-CCE_END()
-
-# endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_TIMERANGE_HH
+
+

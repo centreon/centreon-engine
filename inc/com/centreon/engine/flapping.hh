@@ -21,7 +21,8 @@
 #ifndef CCE_FLAPPING_HH
 #  define CCE_FLAPPING_HH
 
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 // Flapping Types
 #  define HOST_FLAPPING    0

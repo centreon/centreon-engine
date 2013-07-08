@@ -22,7 +22,9 @@
 #  define CCE_COMMENTS_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 // Comment sources.
 #  define COMMENTSOURCE_INTERNAL  0
@@ -64,9 +66,7 @@ extern "C" {
 #  endif // C++
 
 // initializes comment data
-int initialize_comment_data(char const* config_file);
-// cleans up comment data
-int cleanup_comment_data(char const* config_file);
+int initialize_comment_data();
 // adds a new host or service comment
 int add_new_comment(
       unsigned int type,

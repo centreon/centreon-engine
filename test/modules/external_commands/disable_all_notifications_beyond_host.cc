@@ -27,34 +27,11 @@
 using namespace com::centreon::engine;
 
 /**
- *  Cleanup host memory.
- */
-static void _release_host(host* hst) {
-  if (hst->parent_hosts) {
-    delete[] hst->parent_hosts->host_name;
-    delete hst->parent_hosts;
-  }
-
-  if (hst->child_hosts) {
-    delete[] hst->child_hosts->host_name;
-    delete hst->child_hosts;
-  }
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-}
-
-/**
  *  Run disable_all_notifications_beyond_host test.
  */
 static int check_disable_all_notifications_beyond_host(int argc, char** argv) {
   (void)argc;
   (void)argv;
-
-  init_object_skiplists();
 
   host* hst_parent = add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                               0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
@@ -77,12 +54,6 @@ static int check_disable_all_notifications_beyond_host(int argc, char** argv) {
 
   if (hst_child->notifications_enabled)
     throw (engine_error() << "disable_all_notifications_beyond_host failed.");
-
-  _release_host(hst_parent);
-  _release_host(hst_child);
-
-  free_object_skiplists();
-
   return (0);
 }
 

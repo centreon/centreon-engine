@@ -20,28 +20,56 @@
 #ifndef CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
 #  define CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct contactgroup_struct;
+struct host_struct;
+struct hostescalation_struct;
+struct service_struct;
+struct serviceescalation_struct;
+
+typedef struct                       contactgroupsmember_struct {
+  char*                              group_name;
+  contactgroup_struct*               group_ptr;
+  struct contactgroupsmember_struct* next;
+}                                    contactgroupsmember;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-contactgroupsmember const* release_contactgroupsmember(
-                             contactgroupsmember const* obj);
+contactgroupsmember* add_contactgroup_to_host(
+                       host_struct* hst,
+                       char const* group_name);
+contactgroupsmember* add_contactgroup_to_host_escalation(
+                       hostescalation_struct* he,
+                       char const* group_name);
+contactgroupsmember* add_contactgroup_to_service(
+                       service_struct* svc,
+                       char const* group_name);
+contactgroupsmember* add_contactgroup_to_serviceescalation(
+                       serviceescalation_struct* se,
+                       char const* group_name);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace                    objects {
-  contactgroupsmember const* release(
-                               contactgroupsmember const* obj);
-}
+bool          operator==(
+                contactgroupsmember const& obj1,
+                contactgroupsmember const& obj2) throw ();
+bool          operator!=(
+                contactgroupsmember const& obj1,
+                contactgroupsmember const& obj2) throw ();
+bool          operator<(
+                contactgroupsmember const& obj1,
+                contactgroupsmember const& obj2) throw ();
+std::ostream& operator<<(
+                std::ostream& os,
+                contactgroupsmember const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
+
+

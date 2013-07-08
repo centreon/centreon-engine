@@ -20,26 +20,23 @@
 #ifndef CCE_OBJECTS_OBJECTLIST_HH
 #  define CCE_OBJECTS_OBJECTLIST_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+typedef struct              objectlist_struct {
+  void*                     object_ptr;
+  struct objectlist_struct* next;
+}                           objectlist;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-void release_objectlist(objectlist const* obj);
+int add_object_to_objectlist(objectlist** list, void* ptr);
+int free_objectlist(objectlist** list);
+int remove_object_to_objectlist(objectlist** list, void* ptr);
 
 #  ifdef __cplusplus
 }
-
-CCE_BEGIN()
-
-namespace objects {
-  void    release(objectlist const* obj);
-}
-
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_OBJECTLIST_HH
+
+

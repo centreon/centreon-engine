@@ -17,44 +17,143 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/deleter/commandsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
+#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /**
- *  Wrapper C
+ *  Equal operator.
  *
- *  @see com::centreon::engine::objects::release
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
  */
-commandsmember const* release_commandsmember(commandsmember const* obj) {
-  try {
-    return (objects::release(obj));
+bool operator==(
+       commandsmember const& obj1,
+       commandsmember const& obj2) throw () {
+  if (is_equal(obj1.cmd, obj2.cmd)) {
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    else
+      return (*obj1.next == *obj2.next);
   }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_commandsmember: unknow exception";
-  }
-  return (NULL);
+  return (false);
 }
 
 /**
- *  Cleanup memory of commandsmember.
+ *  Not equal operator.
  *
- *  @param[in] obj The command member to cleanup memory.
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
  *
- *  @return The next commandsmember.
+ *  @return True if is not the same object, otherwise false.
  */
-commandsmember const* objects::release(commandsmember const* obj) {
-  if (obj == NULL)
-    return (NULL);
+bool operator!=(
+       commandsmember const& obj1,
+       commandsmember const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
 
-  commandsmember const* next = obj->next;
-  delete[] obj->cmd;
-  delete obj;
-  return (next);
+/**
+ *  Dump commandsmember content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The commandsmember to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, commandsmember const& obj) {
+  for (commandsmember const* m(&obj); m; m = m->next)
+    os << string::chkstr(m->cmd) << (m->next ? ", " : "");
+  return (os);
+}
+
+/**
+ *  Adds a host notification command to a contact definition.
+ *
+ *  @param[in] cntct        Contact.
+ *  @param[in] command_name Notification command name.
+ *
+ *  @return Contact notification command.
+ */
+commandsmember* add_host_notification_command_to_contact(
+                  contact* cntct,
+                  char const* command_name) {
+  // Make sure we have the data we need.
+  if (!cntct || !command_name || !command_name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Contact or host notification command is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory.
+  commandsmember* obj(new commandsmember);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->cmd = string::dup(command_name);
+
+    // Add the notification command.
+    obj->next = cntct->host_notification_commands;
+    cntct->host_notification_commands = obj;
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    deleter::commandsmember(obj);
+    obj = NULL;
+  }
+
+  return (obj);
+}
+
+/**
+ *  Adds a service notification command to a contact definition.
+ *
+ *  @param[in,out] cntct        Target contact.
+ *  @param[in]     command_name Service notification command name.
+ *
+ *  @return Service notification command of contact.
+ */
+commandsmember* add_service_notification_command_to_contact(
+                  contact*  cntct,
+                  char const* command_name) {
+  // Make sure we have the data we need.
+  if (!cntct || !command_name || !command_name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Contact or service notification command is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory.
+  commandsmember* obj(new commandsmember);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->cmd = string::dup(command_name);
+
+    // Add the notification command.
+    obj->next = cntct->service_notification_commands;
+    cntct->service_notification_commands = obj;
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    deleter::commandsmember(obj);
+    obj = NULL;
+  }
+
+  return (obj);
 }

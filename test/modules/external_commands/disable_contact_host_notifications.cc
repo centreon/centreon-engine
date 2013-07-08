@@ -33,8 +33,6 @@ static int check_disable_contact_host_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
@@ -46,13 +44,6 @@ static int check_disable_contact_host_notifications(int argc, char** argv) {
 
   if (cntct->host_notifications_enabled)
     throw (engine_error() << "disable_contact_host_notifications failed.");
-
-  delete[] cntct->name;
-  delete[] cntct->alias;
-  delete cntct;
-
-  free_object_skiplists();
-
   return (0);
 }
 

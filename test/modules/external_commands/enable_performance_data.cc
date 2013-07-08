@@ -33,11 +33,11 @@ static int check_enable_performance_data(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  process_performance_data = false;
+  config->process_performance_data(false);
   char const* cmd("[1317196300] ENABLE_PERFORMANCE_DATA");
   process_external_command(cmd);
 
-  if (!process_performance_data)
+  if (!config->process_performance_data())
     throw (engine_error() << "enable_performance_data failed.");
 
   return (0);

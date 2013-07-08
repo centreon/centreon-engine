@@ -33,8 +33,6 @@ static int check_change_custom_contact_var(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
@@ -49,17 +47,6 @@ static int check_change_custom_contact_var(int argc, char** argv) {
 
   if (strcmp(member->variable_value, "VALUE"))
     throw (engine_error() << "change_custom_contact_var failed.");
-
-  delete[] cntct->name;
-  delete[] cntct->alias;
-  delete cntct;
-
-  delete[] member->variable_name;
-  delete[] member->variable_value;
-  delete member;
-
-  free_object_skiplists();
-
   return (0);
 }
 

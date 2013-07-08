@@ -17,101 +17,209 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cctype>
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
+#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine::string;
 
 /**
- *  Wrapper C
+ *  Equal operator.
  *
- *  @see com::centreon::engine::objects::release
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
  */
-customvariablesmember const* release_customvariablesmember(
-                               customvariablesmember const* obj) {
-  try {
-    return (objects::release(obj));
+bool operator==(
+       customvariablesmember const& obj1,
+       customvariablesmember const& obj2) throw () {
+  if (is_equal(obj1.variable_name, obj2.variable_name)
+      && is_equal(obj1.variable_value, obj2.variable_value)
+      && obj1.has_been_modified == obj2.has_been_modified) {
+    if (!obj1.next && !obj2.next)
+      return (*obj1.next == *obj2.next);
+    if (obj1.next == obj2.next)
+      return (true);
   }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
+  return (false);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool operator!=(
+       customvariablesmember const& obj1,
+       customvariablesmember const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Dump customvariablesmember content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The customvariablesmember to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, customvariablesmember const& obj) {
+  for (customvariablesmember const* m(&obj); m; m = m->next)
+    os << "  " << chkstr(m->variable_name) << ": " << chkstr(m->variable_value) << "\n";
+  return (os);
+}
+
+/**
+ *  Adds a custom variable to a contact.
+ *
+ *  @param[in] cntct    Contact object.
+ *  @param[in] varname  Custom variable name.
+ *  @param[in] varvalue Custom variable value.
+ *
+ *  @return Contact custom variable.
+ */
+customvariablesmember* add_custom_variable_to_contact(
+                         contact* cntct,
+                         char const* varname,
+                         char const* varvalue) {
+  // Add custom variable to contact.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &cntct->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    cntct,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
+}
+
+/**
+ *  Adds a custom variable to a host
+ *
+ *  @param[in] hst      Host.
+ *  @param[in] varname  Custom variable name.
+ *  @param[in] varvalue Custom variable value.
+ *
+ *  @return New host custom variable.
+ */
+customvariablesmember* add_custom_variable_to_host(
+                         host* hst,
+                         char const* varname,
+                         char const* varvalue) {
+  // Add custom variable to host.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &hst->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_HOSTCUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hst,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
+}
+
+/**
+ *  Adds a custom variable to an object.
+ *
+ *  @param[in] object_ptr Object's custom variables.
+ *  @param[in] varname    Custom variable name.
+ *  @param[in] varvalue   Custom variable value.
+ *
+ *  @return New custom variable.
+ */
+customvariablesmember* add_custom_variable_to_object(
+                         customvariablesmember** object_ptr,
+                         char const* varname,
+                         char const* varvalue) {
+  // Make sure we have the data we need.
+  if (!object_ptr) {
+    logger(log_config_error, basic)
+      << "Error: Custom variable object is NULL";
+    return (NULL);
+  }
+  if (!varname || !varname[0]) {
+    logger(log_config_error, basic)
+      << "Error: Custom variable name is NULL";
+    return (NULL);
+  }
+
+  // Allocate memory for a new member.
+  customvariablesmember* obj(new customvariablesmember);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    obj->variable_name = string::dup(varname);
+    if (varvalue)
+      obj->variable_value = string::dup(varvalue);
+
+    // Add the new member to the head of the member list.
+    obj->next = *object_ptr;
+    *object_ptr = obj;
   }
   catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_customvariablesmember: unknow exception";
+    deleter::customvariablesmember(obj);
+    obj = NULL;
   }
-  return (NULL);
+
+  return (obj);
 }
 
 /**
- *  Cleanup memory of customvariablesmember.
+ *  Adds a custom variable to a service.
  *
- *  @param[in] obj The customvariable member to cleanup memory.
+ *  @param[in] svc      Service.
+ *  @param[in] varname  Custom variable name.
+ *  @param[in] varvalue Custom variable value.
  *
- *  @return The next customvariablesmember.
+ *  @return New custom variable.
  */
-customvariablesmember const* objects::release(
-                                        customvariablesmember const* obj) {
-  if (obj == NULL)
-    return (NULL);
+customvariablesmember* add_custom_variable_to_service(
+                         service* svc,
+                         char const* varname,
+                         char const* varvalue) {
+  // Add custom variable to service.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &svc->custom_variables,
+                                  varname,
+                                  varvalue));
 
-  customvariablesmember const* next = obj->next;
-  delete[] obj->variable_name;
-  delete[] obj->variable_value;
-  delete obj;
-  return (next);
-}
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_SERVICECUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc,
+    varname,
+    varvalue,
+    &tv);
 
-/**
- *  Add somme custom variable to a generic object with custom variables member list.
- *
- *  @param[in]  custom_vars    The custom variables to insert.
- *  @param[out] list_customvar The object custom variables.
- *
- *  @return True if insert sucessfuly, false otherwise.
- */
-bool objects::add_custom_variables_to_object(
-                std::vector<std::string> const& custom_vars,
-                customvariablesmember** list_customvar) {
-  if (!list_customvar)
-    return (false);
-
-  // Process all custom variables.
-  for (std::vector<std::string>::const_iterator
-         it(custom_vars.begin()), end(custom_vars.end());
-       it != end;
-       ++it) {
-    // Split string into custom var name (key)
-    // and the custom var value (value).
-    size_t pos(it->find('='));
-    if (pos == std::string::npos)
-      return (false);
-
-    // Retrieve key and value.
-    std::string key(it->substr(0, pos));
-    std::string value(it->substr(pos + 1));
-
-    // Trim it.
-    while (!key.empty() && isspace(key[0]))
-      key.erase(key.begin());
-    while (!key.empty() && isspace(key[key.size() - 1]))
-      key.resize(key.size() - 1);
-    while (!value.empty() && isspace(value[0]))
-      value.erase(value.begin());
-    while (!value.empty() && isspace(value[value.size() - 1]))
-      value.resize(value.size() - 1);
-
-    // Add a new custom var into object.
-    if (key.empty()
-        || value.empty()
-        || key[0] != '_'
-	|| add_custom_variable_to_object(
-             list_customvar,
-             key.c_str(),
-             value.c_str()) == NULL)
-      return (false);
-  }
-
-  return (true);
+  return (retval);
 }

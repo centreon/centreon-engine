@@ -20,32 +20,34 @@
 #ifndef CCE_OBJECTS_COMMAND_HH
 #  define CCE_OBJECTS_COMMAND_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+typedef struct           command_struct {
+  char*                  name;
+  char*                  command_line;
+  struct command_struct* next;
+  struct command_struct* nexthash;
+}                        command;
 
 #  ifdef __cplusplus
-#    include <vector>
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-bool link_command(command const* obj);
-void release_command(command const* obj);
+command* add_command(char const* name, char const* value);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  bool    add_commands_to_object(
-            std::vector<command*> const& commands,
-            commandsmember** list_command);
-  void    link(command const* obj);
-  void    release(command const* obj);
-}
+bool          operator==(
+                command const& obj1,
+                command const& obj2) throw ();
+bool          operator!=(
+                command const& obj1,
+                command const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, command const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_COMMAND_HH
+
+

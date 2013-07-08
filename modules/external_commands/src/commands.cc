@@ -22,23 +22,23 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
-#include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
-#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
+#include "mmap.h"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -52,7 +52,7 @@ int check_for_external_commands() {
   logger(dbg_functions, basic) << "check_for_external_commands()";
 
   /* bail out if we shouldn't be checking for external commands */
-  if (!config->get_check_external_commands())
+  if (!config->check_external_commands())
     return (ERROR);
 
   /* update last command check time */
@@ -83,7 +83,7 @@ int check_for_external_commands() {
 
     /* adjust tail counter and number of items */
     external_command_buffer.tail = (external_command_buffer.tail + 1)
-      % config->get_external_command_buffer_slots();
+      % config->external_command_buffer_slots();
     external_command_buffer.items--;
 
     /* release the lock on the buffer */
@@ -151,7 +151,7 @@ int process_external_commands_from_file(
 
   /* delete the file */
   if (delete_file)
-    unlink(file);
+    ::remove(file);
 
   return (OK);
 }
@@ -518,7 +518,7 @@ int process_passive_service_check(
   char const* real_host_name(NULL);
 
   /* skip this service check result if we aren't accepting passive service checks */
-  if (config->get_accept_passive_service_checks() == false)
+  if (config->accept_passive_service_checks() == false)
     return (ERROR);
 
   /* make sure we have all required data */
@@ -564,8 +564,8 @@ int process_passive_service_check(
 
   check_result result;
   result.object_check_type = SERVICE_CHECK;
-  result.host_name = my_strdup(real_host_name);
-  result.service_description = my_strdup(svc_description);
+  result.host_name = string::dup(real_host_name);
+  result.service_description = string::dup(svc_description);
   result.check_type = SERVICE_CHECK_PASSIVE;
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
@@ -582,7 +582,7 @@ int process_passive_service_check(
   result.early_timeout = false;
   result.exited_ok = true;
   result.return_code = return_code;
-  result.output = my_strdup(output);
+  result.output = string::dup(output);
   result.next = NULL;
   // result.check_time = check_time;
 
@@ -643,7 +643,7 @@ int process_passive_host_check(
   char const* real_host_name(NULL);
 
   /* skip this host check result if we aren't accepting passive host checks */
-  if (config->get_accept_passive_service_checks() == false)
+  if (config->accept_passive_service_checks() == false)
     return (ERROR);
 
   /* make sure we have all required data */
@@ -683,7 +683,7 @@ int process_passive_host_check(
 
   check_result result;
   result.object_check_type = HOST_CHECK;
-  result.host_name = my_strdup(real_host_name);
+  result.host_name = string::dup(real_host_name);
   result.service_description = NULL;
   result.check_type = HOST_CHECK_PASSIVE;
   result.check_options = CHECK_OPTION_NONE;
@@ -701,7 +701,7 @@ int process_passive_host_check(
   result.early_timeout = false;
   result.exited_ok = true;
   result.return_code = return_code;
-  result.output = my_strdup(output);
+  result.output = string::dup(output);
   result.next = NULL;
   // result.check_time = check_time;
 
@@ -770,14 +770,14 @@ int cmd_acknowledge_problem(int cmd, char* args) {
   /* get the acknowledgement author */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
     return (ERROR);
-  ack_author = my_strdup(temp_ptr);
+  ack_author = string::dup(temp_ptr);
 
   /* get the acknowledgement data */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
     delete[] ack_author;
     return (ERROR);
   }
-  ack_data = my_strdup(temp_ptr);
+  ack_data = string::dup(temp_ptr);
 
   /* acknowledge the host problem */
   if (cmd == CMD_ACKNOWLEDGE_HOST_PROBLEM)
@@ -1761,7 +1761,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     break;
   }
 
-  temp_ptr = my_strdup(charval);
+  temp_ptr = string::dup(charval);
 
   /* do some validation */
   switch (cmd) {
@@ -1793,7 +1793,7 @@ int cmd_change_object_char_var(int cmd, char* args) {
     }
 
     delete[] temp_ptr;
-    temp_ptr = my_strdup(charval);
+    temp_ptr = string::dup(charval);
     break;
 
   default:
@@ -1804,13 +1804,13 @@ int cmd_change_object_char_var(int cmd, char* args) {
   switch (cmd) {
 
   case CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER:
-    config->set_global_host_event_handler(temp_ptr);
+    config->global_host_event_handler(temp_ptr);
     global_host_event_handler_ptr = temp_command;
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
 
   case CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER:
-    config->set_global_service_event_handler(temp_ptr);
+    config->global_service_event_handler(temp_ptr);
     global_service_event_handler_ptr = temp_command;
     attr = MODATTR_EVENT_HANDLER_COMMAND;
     break;
@@ -2024,7 +2024,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   /* get the host or contact name */
   if ((temp_ptr = my_strtok(args, ";")) == NULL)
     return (ERROR);
-  name1 = my_strdup(temp_ptr);
+  name1 = string::dup(temp_ptr);
 
   /* get the service description if necessary */
   if (cmd == CMD_CHANGE_CUSTOM_SVC_VAR) {
@@ -2032,7 +2032,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
       delete[] name1;
       return (ERROR);
     }
-    name2 = my_strdup(temp_ptr);
+    name2 = string::dup(temp_ptr);
   }
 
   /* get the custom variable name */
@@ -2041,7 +2041,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     delete[] name2;
     return (ERROR);
   }
-  varname = my_strdup(temp_ptr);
+  varname = string::dup(temp_ptr);
 
   /* get the custom variable value */
   if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
@@ -2050,7 +2050,7 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     delete[] varname;
     return (ERROR);
   }
-  varvalue = my_strdup(temp_ptr);
+  varvalue = string::dup(temp_ptr);
 
   /* find the object */
   switch (cmd) {
@@ -2089,9 +2089,8 @@ int cmd_change_object_custom_var(int cmd, char* args) {
     if (!strcmp(varname, temp_customvariablesmember->variable_name)) {
 
       /* update the value */
-      if (temp_customvariablesmember->variable_value)
-        delete[] temp_customvariablesmember->variable_value;
-      temp_customvariablesmember->variable_value = my_strdup(varvalue);
+      delete[] temp_customvariablesmember->variable_value;
+      temp_customvariablesmember->variable_value = string::dup(varvalue);
 
       /* mark the variable value as having been changed */
       temp_customvariablesmember->has_been_modified = true;
@@ -2142,7 +2141,7 @@ int cmd_process_external_commands_from_file(int cmd, char* args) {
   /* get the file name */
   if ((temp_ptr = my_strtok(args, ";")) == NULL)
     return (ERROR);
-  fname = my_strdup(temp_ptr);
+  fname = string::dup(temp_ptr);
 
   /* find the deletion option */
   if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
@@ -2256,7 +2255,7 @@ void enable_all_notifications(void) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* bail out if we're already set... */
-  if (config->get_enable_notifications())
+  if (config->enable_notifications())
     return;
 
   /* set the attribute modified flag */
@@ -2264,7 +2263,7 @@ void enable_all_notifications(void) {
   modified_service_process_attributes |= attr;
 
   /* update notification status */
-  config->set_enable_notifications(true);
+  config->enable_notifications(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -2287,7 +2286,7 @@ void disable_all_notifications(void) {
   unsigned long attr(MODATTR_NOTIFICATIONS_ENABLED);
 
   /* bail out if we're already set... */
-  if (config->get_enable_notifications() == false)
+  if (config->enable_notifications() == false)
     return;
 
   /* set the attribute modified flag */
@@ -2295,7 +2294,7 @@ void disable_all_notifications(void) {
   modified_service_process_attributes |= attr;
 
   /* update notification status */
-  config->set_enable_notifications(false);
+  config->enable_notifications(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -2867,14 +2866,14 @@ void start_executing_service_checks(void) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* bail out if we're already executing services */
-  if (config->get_execute_service_checks())
+  if (config->execute_service_checks())
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the service check execution flag */
-  config->set_execute_service_checks(true);
+  config->execute_service_checks(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -2897,14 +2896,14 @@ void stop_executing_service_checks(void) {
   unsigned long attr = MODATTR_ACTIVE_CHECKS_ENABLED;
 
   /* bail out if we're already not executing services */
-  if (config->get_execute_service_checks() == false)
+  if (config->execute_service_checks() == false)
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the service check execution flag */
-  config->set_execute_service_checks(false);
+  config->execute_service_checks(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -2927,14 +2926,14 @@ void start_accepting_passive_service_checks(void) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* bail out if we're already accepting passive services */
-  if (config->get_accept_passive_service_checks())
+  if (config->accept_passive_service_checks())
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the service check flag */
-  config->set_accept_passive_service_checks(true);
+  config->accept_passive_service_checks(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -2957,14 +2956,14 @@ void stop_accepting_passive_service_checks(void) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* bail out if we're already not accepting passive services */
-  if (config->get_accept_passive_service_checks() == false)
+  if (config->accept_passive_service_checks() == false)
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the service check flag */
-  config->set_accept_passive_service_checks(false);
+  config->accept_passive_service_checks(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3045,14 +3044,14 @@ void start_executing_host_checks(void) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* bail out if we're already executing hosts */
-  if (config->get_execute_host_checks())
+  if (config->execute_host_checks())
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the host check execution flag */
-  config->set_execute_host_checks(true);
+  config->execute_host_checks(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3075,14 +3074,14 @@ void stop_executing_host_checks(void) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
 
   /* bail out if we're already not executing hosts */
-  if (config->get_execute_host_checks() == false)
+  if (config->execute_host_checks() == false)
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the host check execution flag */
-  config->set_execute_host_checks(false);
+  config->execute_host_checks(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3105,14 +3104,14 @@ void start_accepting_passive_host_checks(void) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* bail out if we're already accepting passive hosts */
-  if (config->get_accept_passive_host_checks())
+  if (config->accept_passive_host_checks())
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the host check flag */
-  config->set_accept_passive_host_checks(true);
+  config->accept_passive_host_checks(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3135,14 +3134,14 @@ void stop_accepting_passive_host_checks(void) {
   unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
 
   /* bail out if we're already not accepting passive hosts */
-  if (config->get_accept_passive_host_checks() == false)
+  if (config->accept_passive_host_checks() == false)
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the host check flag */
-  config->set_accept_passive_host_checks(false);
+  config->accept_passive_host_checks(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3222,7 +3221,7 @@ void start_using_event_handlers(void) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
-  if (config->get_enable_event_handlers())
+  if (config->enable_event_handlers())
     return;
 
   /* set the attribute modified flag */
@@ -3230,7 +3229,7 @@ void start_using_event_handlers(void) {
   modified_service_process_attributes |= attr;
 
   /* set the event handler flag */
-  config->set_enable_event_handlers(true);
+  config->enable_event_handlers(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3253,7 +3252,7 @@ void stop_using_event_handlers(void) {
   unsigned long attr(MODATTR_EVENT_HANDLER_ENABLED);
 
   /* no change */
-  if (config->get_enable_event_handlers() == false)
+  if (config->enable_event_handlers() == false)
     return;
 
   /* set the attribute modified flag */
@@ -3261,7 +3260,7 @@ void stop_using_event_handlers(void) {
   modified_service_process_attributes |= attr;
 
   /* set the event handler flag */
-  config->set_enable_event_handlers(false);
+  config->enable_event_handlers(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3479,14 +3478,14 @@ void start_obsessing_over_service_checks(void) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (config->get_obsess_over_services())
+  if (config->obsess_over_services())
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the service obsession flag */
-  config->set_obsess_over_services(true);
+  config->obsess_over_services(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3509,14 +3508,14 @@ void stop_obsessing_over_service_checks(void) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (config->get_obsess_over_services() == false)
+  if (config->obsess_over_services() == false)
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the service obsession flag */
-  config->set_obsess_over_services(false);
+  config->obsess_over_services(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3539,14 +3538,14 @@ void start_obsessing_over_host_checks(void) {
   unsigned long attr = MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
   /* no change */
-  if (config->get_obsess_over_hosts())
+  if (config->obsess_over_hosts())
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the host obsession flag */
-  config->set_obsess_over_hosts(true);
+  config->obsess_over_hosts(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3569,14 +3568,14 @@ void stop_obsessing_over_host_checks(void) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);
 
   /* no change */
-  if (config->get_obsess_over_hosts() == false)
+  if (config->obsess_over_hosts() == false)
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the host obsession flag */
-  config->set_obsess_over_hosts(false);
+  config->obsess_over_hosts(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3599,14 +3598,14 @@ void enable_service_freshness_checks(void) {
   unsigned long attr(MODATTR_FRESHNESS_CHECKS_ENABLED);
 
   /* no change */
-  if (config->get_check_service_freshness())
+  if (config->check_service_freshness())
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the freshness check flag */
-  config->set_check_service_freshness(true);
+  config->check_service_freshness(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3629,14 +3628,14 @@ void disable_service_freshness_checks(void) {
   unsigned long attr(MODATTR_FRESHNESS_CHECKS_ENABLED);
 
   /* no change */
-  if (config->get_check_service_freshness() == false)
+  if (config->check_service_freshness() == false)
     return;
 
   /* set the attribute modified flag */
   modified_service_process_attributes |= attr;
 
   /* set the freshness check flag */
-  config->set_check_service_freshness(false);
+  config->check_service_freshness(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3659,14 +3658,14 @@ void enable_host_freshness_checks(void) {
   unsigned long attr(MODATTR_FRESHNESS_CHECKS_ENABLED);
 
   /* no change */
-  if (config->get_check_host_freshness())
+  if (config->check_host_freshness())
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the freshness check flag */
-  config->set_check_host_freshness(true);
+  config->check_host_freshness(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3688,14 +3687,14 @@ void disable_host_freshness_checks(void) {
   unsigned long attr(MODATTR_FRESHNESS_CHECKS_ENABLED);
 
   /* no change */
-  if (config->get_check_host_freshness() == false)
+  if (config->check_host_freshness() == false)
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
 
   /* set the freshness check flag */
-  config->set_check_host_freshness(false);
+  config->check_host_freshness(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3718,14 +3717,14 @@ void enable_all_failure_prediction(void) {
   unsigned long attr(MODATTR_FAILURE_PREDICTION_ENABLED);
 
   /* bail out if we're already set... */
-  if (config->get_enable_failure_prediction())
+  if (config->enable_failure_prediction())
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
   modified_service_process_attributes |= attr;
 
-  config->set_enable_failure_prediction(true);
+  config->enable_failure_prediction(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3748,14 +3747,14 @@ void disable_all_failure_prediction(void) {
   unsigned long attr(MODATTR_FAILURE_PREDICTION_ENABLED);
 
   /* bail out if we're already set... */
-  if (config->get_enable_failure_prediction() == false)
+  if (config->enable_failure_prediction() == false)
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
   modified_service_process_attributes |= attr;
 
-  config->set_enable_failure_prediction(false);
+  config->enable_failure_prediction(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3778,14 +3777,14 @@ void enable_performance_data(void) {
   unsigned long attr(MODATTR_PERFORMANCE_DATA_ENABLED);
 
   /* bail out if we're already set... */
-  if (config->get_process_performance_data())
+  if (config->process_performance_data())
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
   modified_service_process_attributes |= attr;
 
-  config->set_process_performance_data(true);
+  config->process_performance_data(true);
 
   /* send data to event broker */
   broker_adaptive_program_data(
@@ -3808,14 +3807,14 @@ void disable_performance_data(void) {
   unsigned long attr(MODATTR_PERFORMANCE_DATA_ENABLED);
 
   /* bail out if we're already set... */
-  if (config->get_process_performance_data() == false)
+  if (config->process_performance_data() == false)
     return;
 
   /* set the attribute modified flag */
   modified_host_process_attributes |= attr;
   modified_service_process_attributes |= attr;
 
-  config->set_process_performance_data(false);
+  config->process_performance_data(false);
 
   /* send data to event broker */
   broker_adaptive_program_data(

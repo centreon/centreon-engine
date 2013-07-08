@@ -33,8 +33,6 @@ static int check_change_max_host_check_attempts(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
@@ -49,15 +47,6 @@ static int check_change_max_host_check_attempts(int argc, char** argv) {
 
   if (hst->max_attempts != 42)
     throw (engine_error() << "change_max_host_check_attempts failed.");
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  free_object_skiplists();
-
   return (0);
 }
 

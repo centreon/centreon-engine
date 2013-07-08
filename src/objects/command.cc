@@ -17,137 +17,123 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/commands/set.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/command.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/command.hh"
-#include "com/centreon/engine/objects/utils.hh"
+#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::objects::utils;
+using namespace com::centreon::engine::string;
 
 /**
- *  Wrapper C
+ *  Equal operator.
  *
- *  @see com::centreon::engine::objects::link
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
  */
-bool link_command(command const* obj) {
-  try {
-    objects::link(obj);
+bool operator==(
+       command const& obj1,
+       command const& obj2) throw () {
+  return (is_equal(obj1.name, obj2.name)
+          && is_equal(obj1.command_line, obj2.command_line));
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool operator!=(
+       command const& obj1,
+       command const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Dump command content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The command to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, command const& obj) {
+  os << "command {\n"
+    "  name:         " << chkstr(obj.name) << "\n"
+    "  command_line: " << chkstr(obj.command_line) << "\n"
+    "}\n";
+  return (os);
+}
+
+/**
+ *  Add a new command to the list in memory.
+ *
+ *  @param[in] name  Command name.
+ *  @param[in] value Command itself.
+ *
+ *  @return New command object.
+ */
+command* add_command(char const* name, char const* value) {
+  // Make sure we have the data we need.
+  if (!name || !name[0] || !value || !value[0]) {
+    logger(log_config_error, basic)
+      << "Error: Command name or command line is NULL";
+    return (NULL);
   }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-    return (false);
+
+  // Allocate memory for the new command.
+  shared_ptr<command> obj(new command, deleter::command);
+  memset(obj.get(), 0, sizeof(*obj));
+
+  try {
+    // Duplicate vars.
+    obj->name = string::dup(name);
+    obj->command_line = string::dup(value);
+
+    // Add new command to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<command_struct> >::const_iterator
+      it(state::instance().commands().find(id));
+    if (it != state::instance().commands().end()) {
+      logger(log_config_error, basic)
+        << "Error: Command '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().commands()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = command_list;
+    command_list = obj.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_command_data(
+      NEBTYPE_COMMAND_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      name,
+      value,
+      &tv);
   }
   catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: link_command: unknow exception";
-    return (false);
+    obj.clear();
   }
-  return (true);
-}
 
-/**
- *  Wrapper C
- *
- *  @see com::centreon::engine::objects::release
- */
-void release_command(command const* obj) {
-  try {
-    objects::release(obj);
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_command: unknow exception";
-  }
-  return;
-}
-
-/**
- *  Link a command into the command set.
- *
- *  @param[in,out] obj Object to link with a correct name.
- */
-void objects::link(command const* obj) {
-  // check object contents.
-  if (obj == NULL)
-    throw (engine_error() << "command is a NULL pointer.");
-  if (obj->name == NULL)
-    throw (engine_error() << "command invalid name.");
-  if (obj->command_line == NULL)
-    throw (engine_error() << "command invalid command line.");
-
-  // update command executon system.
-  commands::set& cmd_set = commands::set::instance();
-  com::centreon::shared_ptr<commands::command>
-    new_command(new commands::raw(
-                                obj->name,
-                                obj->command_line,
-                                &checks::checker::instance()));
-  cmd_set.add_command(new_command);
-  return;
-}
-
-/**
- *  Cleanup memory of command.
- *
- *  @param[in] obj The command to cleanup memory.
- */
-void objects::release(command const* obj) {
-  if (obj == NULL)
-    return;
-
-  skiplist_delete(object_skiplists[COMMAND_SKIPLIST], obj);
-  remove_object_list(obj, &command_list, &command_list_tail);
-
-  // update command executon system.
-  commands::set::instance().remove_command(obj->name);
-
-  delete[] obj->name;
-  delete[] obj->command_line;
-  delete obj;
-  return;
-}
-
-/**
- *  Add somme commands to a generic object with commands member list.
- *
- *  @param[in]  commands     The commands to insert.
- *  @param[out] list_command The object command.
- *
- *  @return True if insert sucessfuly, false otherwise.
- */
-bool objects::add_commands_to_object(
-                std::vector<command*> const& commands,
-                commandsmember** list_command) {
-  if (list_command == NULL)
-    return (false);
-
-  for (std::vector<command*>::const_iterator
-         it = commands.begin(), end = commands.end();
-       it != end;
-       ++it) {
-    if (*it == NULL)
-      return (false);
-
-    // create a new commandsmember and add it into the command list.
-    commandsmember* member = new commandsmember;
-    memset(member, 0, sizeof(*member));
-
-    member->cmd = my_strdup((*it)->name);
-    member->next = *list_command;
-    *list_command = member;
-
-    // add command to the commandsmember.
-    member->command_ptr = *it;
-  }
-  return (true);
+  return (obj.get());
 }

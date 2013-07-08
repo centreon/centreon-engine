@@ -23,6 +23,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -532,7 +533,7 @@ void raw::_build_custom_service_macro_environment(
 void raw::_build_environment_macros(
             nagios_macros& macros,
             environment& env) {
-  if (config->get_enable_environment_macros()) {
+  if (config->enable_environment_macros()) {
     _build_macrosx_environment(macros, env);
     _build_argv_macro_environment(macros, env);
     _build_custom_host_macro_environment(macros, env);
@@ -560,7 +561,7 @@ void raw::_build_macrosx_environment(
       // Skip summary macro in lage instalation tweaks.
       if ((i < MACRO_TOTALHOSTSUP
            || i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
-          && !config->get_use_large_installation_tweaks()) {
+          && !config->use_large_installation_tweaks()) {
         grab_macrox_value_r(
           &macros,
           i,
@@ -600,7 +601,7 @@ process* raw::_get_free_process() {
   if (_processes_free.empty()) {
     process* p(new process(this));
     p->enable_stream(process::err, false);
-    p->setpgid_on_exec(config->get_use_setpgid());
+    p->setpgid_on_exec(config->use_setpgid());
     return (p);
   }
   // Get a free process.

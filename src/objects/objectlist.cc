@@ -17,44 +17,97 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/logging/logger.hh"
+#include <cstring>
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::logging;
 
 /**
- *  Wrapper C
+ *  Adds a object to a list of objects.
  *
- *  @see com::centreon::engine::objects::release
+ *  @param[in,out] list       Object list.
+ *  @param[in]     ptr Object.
+ *
+ *  @return OK on success.
  */
-void release_objectlist(objectlist const* obj) {
+int add_object_to_objectlist(objectlist** list, void* ptr) {
+  if (!list || !ptr)
+    return (ERROR);
+
+  // Skip this object if its already in the list.
+  for (objectlist* obj(*list); obj; obj = obj->next)
+    if (obj->object_ptr == ptr)
+      return (OK);
+
+  // Allocate memory for a new list item.
+  objectlist* obj(new objectlist);
+  memset(obj, 0, sizeof(*obj));
+
   try {
-    objects::release(obj);
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
+    // Initialize vars.
+    obj->object_ptr = ptr;
+
+    // Add new item to head of list.
+    obj->next = *list;
+    *list = obj;
   }
   catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_objectlist: unknow exception";
+    deleter::objectlist(obj);
+    obj = NULL;
   }
-  return;
+
+  return (OK);
 }
 
 /**
- *  Cleanup memory of objectlist.
+ *  Frees memory allocated to a temporary object list.
  *
- *  @param[in] obj The object to cleanup memory.
+ *  @param[in,out] list List to free.
+ *
+ *  @return OK on success.
  */
-void objects::release(objectlist const* obj) {
-  if (obj == NULL)
-    return;
+int free_objectlist(objectlist** list) {
+  if (!list)
+    return (ERROR);
 
-  while (obj) {
-    objectlist const* tmp = obj->next;
+  // Free memory allocated to object list.
+  for (objectlist *obj(*list), *next_objectlist;
+       obj;
+       obj = next_objectlist) {
+    next_objectlist = obj->next;
     delete obj;
-    obj = tmp;
   }
-  return;
+  *list = NULL;
+
+  return (OK);
 }
+
+/**
+ *  Remove a object to a list of objects.
+ *
+ *  @param[in,out] list Object list.
+ *  @param[in]     ptr  Object.
+ *
+ *  @return OK on success.
+ */
+int remove_object_to_objectlist(objectlist** list, void* ptr) {
+  if (!list)
+    return (ERROR);
+
+  for (objectlist *obj(*list), *prev(NULL);
+       obj;
+       prev = obj, obj = obj->next) {
+    if (obj == ptr) {
+      if (!prev)
+	*list = obj->next;
+      else
+	prev->next = obj->next;
+      delete obj;
+      return (OK);
+    }
+  }
+  return (ERROR);
+}
+

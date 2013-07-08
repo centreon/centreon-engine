@@ -30,7 +30,6 @@
 #include "com/centreon/engine/globals.hh"
 // #include "com/centreon/engine/logging/dumpers.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/modules/webservice/sync.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects.hh"
@@ -203,8 +202,8 @@ int centreonengine__acknowledgementOnHostAdd(soap* s,
 
     int type = (acknowledgement_type->sticky == true ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL);
 
-    char* author = my_strdup(acknowledgement_type->author.c_str());
-    char* comment = my_strdup(acknowledgement_type->comment.c_str());
+    char* author = string::dup(acknowledgement_type->author.c_str());
+    char* comment = string::dup(acknowledgement_type->comment.c_str());
 
     acknowledge_host_problem(host,
                              author,
@@ -313,8 +312,8 @@ int centreonengine__acknowledgementOnServiceAdd(soap* s,
 
     int type = (acknowledgement_type->sticky == true ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL);
 
-    char* author = my_strdup(acknowledgement_type->author.c_str());
-    char* comment = my_strdup(acknowledgement_type->comment.c_str());
+    char* author = string::dup(acknowledgement_type->author.c_str());
+    char* comment = string::dup(acknowledgement_type->comment.c_str());
 
     acknowledge_service_problem(service,
                                 author,
@@ -1113,8 +1112,8 @@ int centreonengine__downtimeAddToHost(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
@@ -1197,8 +1196,8 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
 
     time_t entry_time = time(NULL);
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
@@ -1292,8 +1291,8 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
 
     time_t entry_time = time(NULL);
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
@@ -1390,8 +1389,8 @@ int centreonengine__downtimeAddToHostServices(soap* s,
 
     time_t entry_time = time(NULL);
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
     bool is_error = false;
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
@@ -1478,8 +1477,8 @@ int centreonengine__downtimeAddToService(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    char* author = my_strdup(downtime_type->author.c_str());
-    char* comment = my_strdup(downtime_type->comment.c_str());
+    char* author = string::dup(downtime_type->author.c_str());
+    char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
     if (schedule_downtime(SERVICE_DOWNTIME,
@@ -1611,8 +1610,8 @@ int centreonengine__notificationHostSend(soap* s,
       | (notification_type->forced == true ? NOTIFICATION_OPTION_FORCED : 0)
       | (notification_type->increment == true ? NOTIFICATION_OPTION_INCREMENT : 0);
 
-    char* author = my_strdup(notification_type->author.c_str());
-    char* comment = my_strdup(notification_type->comment.c_str());
+    char* author = string::dup(notification_type->author.c_str());
+    char* comment = string::dup(notification_type->comment.c_str());
 
     if (host_notification(host,
                           NOTIFICATION_CUSTOM,
@@ -1738,8 +1737,8 @@ int centreonengine__notificationServiceSend(soap* s,
       | (notification_type->increment == true ? NOTIFICATION_OPTION_INCREMENT : 0);
 
 
-    char* author = my_strdup(notification_type->author.c_str());
-    char* comment = my_strdup(notification_type->comment.c_str());
+    char* author = string::dup(notification_type->author.c_str());
+    char* comment = string::dup(notification_type->comment.c_str());
 
     if (service_notification(service,
                              NOTIFICATION_CUSTOM,
@@ -1804,262 +1803,6 @@ int centreonengine__notificationServiceSend(soap* s,
 //   }
 //   return (SOAP_OK);
 // }
-
-/**
- *  Add host dependency.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  hostdependency    Host dependency to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addHostDependency(soap* s,
-                                      ns1__hostDependencyType* hostdependency,
-                                      centreonengine__addHostDependencyResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "()";
-
-    create_host_dependency(*hostdependency);
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Add host escalation.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  hostescalation    Host escalation to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addHostEscalation(soap* s,
-                                      ns1__hostEscalationType* hostescalation,
-                                      centreonengine__addHostEscalationResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "()";
-
-    create_host_escalation(*hostescalation);
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Add service dependency.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  servicedependency Service dependency to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addServiceDependency(soap* s,
-                                         ns1__serviceDependencyType* servicedependency,
-                                         centreonengine__addServiceDependencyResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({"
-      << servicedependency->dependentServiceDescription << ", "
-      << servicedependency->serviceDescription << "})";
-
-    create_service_dependency(*servicedependency);
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Add service escalation.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  serviceescalation Service escalation to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addServiceEscalation(soap* s,
-                                         ns1__serviceEscalationType* serviceescalation,
-                                         centreonengine__addServiceEscalationResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({"
-      << serviceescalation->serviceDescription << "})";
-
-    create_service_escalation(*serviceescalation);
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Remove service escalation.
- *
- *  @param[in]  s                    Unused.
- *  @param[in]  serviceescalation_id Service escalation to remove.
- *  @param[out] res                  Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__removeServiceEscalation(soap* s,
-					    ns1__serviceEscalationIDType* escalation_id,
-					    centreonengine__removeServiceEscalationResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({" << escalation_id->name
-      << ", " << escalation_id->description << "})";
-
-    if (!remove_service_escalation_by_id(escalation_id->name.c_str(),
-                                         escalation_id->description.c_str())) {
-      std::string* error = soap_new_std__string(s, 1);
-      *error = "Service escalation `" + escalation_id->name + " "
-	+ escalation_id->description + "' not found.";
-
-      logger(dbg_commands, most)
-                     << "Webservice: " << __func__ << " failed. " << *error;
-
-      webservice::sync::instance().worker_finish();
-      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
-    }
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Remove service dependency.
- *
- *  @param[in]  s                    Unused.
- *  @param[in]  servicedependency_id Service dependency to remove.
- *  @param[out] res                  Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__removeServiceDependency(soap* s,
-					    ns1__serviceDependencyIDType* dependency_id,
-					    centreonengine__removeServiceDependencyResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({" << dependency_id->hostName
-      << ", " << dependency_id->serviceDescription << ", "
-      << dependency_id->dependentHostName << ", "
-      << dependency_id->dependentServiceDescription << "})";
-
-    if (!remove_service_dependency_by_id(dependency_id->hostName.c_str(),
-					dependency_id->serviceDescription.c_str(),
-					dependency_id->dependentHostName.c_str(),
-					dependency_id->dependentServiceDescription.c_str())) {
-      std::string* error = soap_new_std__string(s, 1);
-      *error = "Service dependency `" + dependency_id->hostName + " "
-	+ dependency_id->serviceDescription + " " + dependency_id->dependentHostName
-	+ dependency_id->dependentServiceDescription + "' not found.";
-
-      logger(dbg_commands, most)
-                     << "Webservice: " << __func__ << " failed. " << *error;
-
-      webservice::sync::instance().worker_finish();
-      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
-    }
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
 
 /**
  *  Check if event handlers are enabled globally.
@@ -2658,7 +2401,7 @@ int centreonengine__setHostsEventHandler(soap* s,
     }
 
     delete[] global_host_event_handler;
-    global_host_event_handler = my_strdup(command_id->command.c_str());
+    global_host_event_handler = string::dup(command_id->command.c_str());
     global_host_event_handler_ptr = command;
 
     modified_host_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;
@@ -2903,7 +2646,7 @@ int centreonengine__setServicesEventHandler(soap* s,
     }
 
     delete[] global_service_event_handler;
-    global_service_event_handler = my_strdup(command_id->command.c_str());
+    global_service_event_handler = string::dup(command_id->command.c_str());
     global_service_event_handler_ptr = command;
 
     modified_service_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;

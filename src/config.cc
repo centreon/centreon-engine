@@ -23,138 +23,14 @@
 #include <cstdlib>
 #include <sstream>
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/utils.hh"
+#include "com/centreon/engine/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-/******************************************************************/
-/************** CONFIGURATION INPUT FUNCTIONS *********************/
-/******************************************************************/
-
-/* read all configuration data */
-int read_all_object_data(char* main_config_file) {
-  int result = OK;
-  int options = 0;
-  int cache = FALSE;
-  int precache = FALSE;
-
-  options = READ_ALL_OBJECT_DATA;
-
-  /* cache object definitions if we're up and running */
-  if (verify_config == FALSE && test_scheduling == FALSE)
-    cache = TRUE;
-
-  /* precache object definitions */
-  if (precache_objects == TRUE
-      && (verify_config == TRUE
-          || test_scheduling == TRUE))
-    precache = TRUE;
-
-  /* read in all host configuration data from external sources */
-  result = read_object_config_data(
-             main_config_file,
-             options,
-             cache,
-             precache);
-  if (result != OK)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* processes macros in resource file */
-int read_resource_file(char* resource_file) {
-  char* input = NULL;
-  char* variable = NULL;
-  char* value = NULL;
-  char* temp_ptr = NULL;
-  mmapfile* thefile = NULL;
-  int current_line = 1;
-  int error = FALSE;
-  unsigned int user_index = 0;
-
-  if ((thefile = mmap_fopen(resource_file)) == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Cannot open resource file '"
-      << resource_file << "' for reading!";
-    return (ERROR);
-  }
-
-  /* process all lines in the resource file */
-  while (1) {
-
-    /* free memory */
-    delete[] input;
-    delete[] variable;
-    delete[] value;
-
-    /* read the next line */
-    if ((input = mmap_fgets_multiline(thefile)) == NULL)
-      break;
-
-    current_line = thefile->current_line;
-
-    /* skip blank lines and comments */
-    if (input[0] == '#'
-        || input[0] == '\x0'
-        || input[0] == '\n'
-        || input[0] == '\r')
-      continue;
-
-    strip(input);
-
-    /* get the variable name */
-    if ((temp_ptr = my_strtok(input, "=")) == NULL) {
-      logger(log_config_error, basic)
-        << "Error: NULL variable - Line " << current_line
-        << " of resource file '" << resource_file << "'";
-      error = TRUE;
-      break;
-    }
-    variable = my_strdup(temp_ptr);
-
-    /* get the value */
-    if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
-      logger(log_config_error, basic)
-        << "Error: NULL variable value - Line " << current_line
-        << " of resource file '" << resource_file << "'",
-      error = TRUE;
-      break;
-    }
-    value = my_strdup(temp_ptr);
-
-    /* what should we do with the variable/value pair? */
-
-    /* check for macro declarations */
-    if (variable[0] == '$' && variable[strlen(variable) - 1] == '$') {
-      /* $USERx$ macro declarations */
-      if (strstr(variable, "$USER") == variable
-          && strlen(variable) > 5) {
-        user_index = atoi(variable + 5) - 1;
-        if (user_index < MAX_USER_MACROS) {
-          delete[] macro_user[user_index];
-          macro_user[user_index] = my_strdup(value);
-        }
-      }
-    }
-  }
-
-  /* free leftover memory and close the file */
-  delete[] input;
-  mmap_fclose(thefile);
-
-  /* free memory */
-  delete[] variable;
-  delete[] value;
-
-  if (error == TRUE)
-    return (ERROR);
-
-  return (OK);
-}
 
 /****************************************************************/
 /**************** CONFIG VERIFICATION FUNCTIONS *****************/
@@ -162,13 +38,13 @@ int read_resource_file(char* resource_file) {
 
 /* do a pre-flight check to make sure object relationships, etc. make sense */
 int pre_flight_check() {
-  host* temp_host = NULL;
-  char* buf = NULL;
-  service* temp_service = NULL;
-  command* temp_command = NULL;
-  char* temp_command_name = NULL;
-  int warnings = 0;
-  int errors = 0;
+  host* temp_host(NULL);
+  char* buf(NULL);
+  service* temp_service(NULL);
+  command* temp_command(NULL);
+  char* temp_command_name(NULL);
+  int warnings(0);
+  int errors(0);
   struct timeval tv[4];
   double runtime[4];
 
@@ -195,10 +71,10 @@ int pre_flight_check() {
   if (verify_config == TRUE)
     printf("Checking global event handlers...\n");
 
-  if (config->get_global_host_event_handler() != "") {
+  if (config->global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config->get_global_host_event_handler().c_str());
+    buf = string::dup(config->global_host_event_handler());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -217,10 +93,10 @@ int pre_flight_check() {
     delete[] buf;
   }
 
-  if (config->get_global_service_event_handler() != "") {
+  if (config->global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config->get_global_service_event_handler().c_str());
+    buf = string::dup(config->global_service_event_handler());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -245,9 +121,9 @@ int pre_flight_check() {
   if (verify_config == TRUE)
     printf("Checking obsessive compulsive processor commands...\n");
 
-  if (!config->get_ocsp_command().empty()) {
+  if (!config->ocsp_command().empty()) {
 
-    buf = my_strdup(config->get_ocsp_command().c_str());
+    buf = string::dup(config->ocsp_command());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -266,9 +142,9 @@ int pre_flight_check() {
     delete[] buf;
   }
 
-  if (!config->get_ochp_command().empty()) {
+  if (!config->ochp_command().empty()) {
 
-    buf = my_strdup(config->get_ochp_command().c_str());
+    buf = string::dup(config->ochp_command());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -344,29 +220,29 @@ int pre_flight_check() {
 
 /* do a pre-flight check to make sure object relationships make sense */
 int pre_flight_object_check(int* w, int* e) {
-  contact* temp_contact = NULL;
-  contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_contactsmember = NULL;
-  contactgroupsmember* temp_contactgroupsmember = NULL;
-  host* temp_host = NULL;
-  host* temp_host2 = NULL;
-  hostsmember* temp_hostsmember = NULL;
-  hostgroup* temp_hostgroup = NULL;
-  servicegroup* temp_servicegroup = NULL;
-  servicesmember* temp_servicesmember = NULL;
-  service* temp_service = NULL;
-  service* temp_service2 = NULL;
-  command* temp_command = NULL;
-  timeperiod* temp_timeperiod = NULL;
-  timeperiod* temp_timeperiod2 = NULL;
-  timeperiodexclusion* temp_timeperiodexclusion = NULL;
-  serviceescalation* temp_se = NULL;
-  hostescalation* temp_he = NULL;
-  servicedependency* temp_sd = NULL;
-  hostdependency* temp_hd = NULL;
-  int total_objects = 0;
-  int warnings = 0;
-  int errors = 0;
+  contact* temp_contact(NULL);
+  contactgroup* temp_contactgroup(NULL);
+  contactsmember* temp_contactsmember(NULL);
+  contactgroupsmember* temp_contactgroupsmember(NULL);
+  host* temp_host(NULL);
+  host* temp_host2(NULL);
+  hostsmember* temp_hostsmember(NULL);
+  hostgroup* temp_hostgroup(NULL);
+  servicegroup* temp_servicegroup(NULL);
+  servicesmember* temp_servicesmember(NULL);
+  service* temp_service(NULL);
+  service* temp_service2(NULL);
+  command* temp_command(NULL);
+  timeperiod* temp_timeperiod(NULL);
+  timeperiod* temp_timeperiod2(NULL);
+  timeperiodexclusion* temp_timeperiodexclusion(NULL);
+  serviceescalation* temp_se(NULL);
+  hostescalation* temp_he(NULL);
+  servicedependency* temp_sd(NULL);
+  hostdependency* temp_hd(NULL);
+  int total_objects(0);
+  int warnings(0);
+  int errors(0);
 
   /*****************************************/
   /* check each service...                 */
@@ -976,7 +852,7 @@ int pre_flight_object_check(int* w, int* e) {
  * http://en.wikipedia.org/wiki/Depth-first_search
  */
 static int dfs_host_path(host* root) {
-  hostsmember* child = NULL;
+  hostsmember* child(NULL);
 
   if (!root)
     return (DFS_NEAR_LOOP);
@@ -1025,14 +901,14 @@ static int dfs_host_path(host* root) {
 
 /* check for circular paths and dependencies */
 int pre_flight_circular_check(int* w, int* e) {
-  host* temp_host = NULL;
-  servicedependency* temp_sd = NULL;
-  servicedependency* temp_sd2 = NULL;
-  hostdependency* temp_hd = NULL;
-  hostdependency* temp_hd2 = NULL;
-  int found = FALSE;
-  int warnings = 0;
-  int errors = 0;
+  host* temp_host(NULL);
+  servicedependency* temp_sd(NULL);
+  servicedependency* temp_sd2(NULL);
+  hostdependency* temp_hd(NULL);
+  hostdependency* temp_hd2(NULL);
+  int found(FALSE);
+  int warnings(0);
+  int errors(0);
 
   /* bail out if we aren't supposed to verify circular paths */
   if (verify_circular_paths == FALSE)
@@ -1128,6 +1004,12 @@ int pre_flight_circular_check(int* w, int* e) {
     }
   }
 
+  /* clear checked flag for all dependencies */
+  for (temp_sd = servicedependency_list;
+       temp_sd != NULL;
+       temp_sd = temp_sd->next)
+    temp_sd->circular_path_checked = FALSE;
+
   /* check execution dependencies between all hosts */
   for (temp_hd = hostdependency_list;
        temp_hd != NULL;
@@ -1176,6 +1058,12 @@ int pre_flight_circular_check(int* w, int* e) {
     }
   }
 
+  /* clear checked flag for all dependencies */
+  for (temp_hd = hostdependency_list;
+       temp_hd != NULL;
+       temp_hd = temp_hd->next)
+    temp_hd->circular_path_checked = FALSE;
+
   /* update warning and error count */
   if (w != NULL)
     *w += warnings;
@@ -1186,8 +1074,8 @@ int pre_flight_circular_check(int* w, int* e) {
 }
 
 int check_service(service* svc, int* w, int* e) {
-  int errors = 0;
-  int warnings = 0;
+  int errors(0);
+  int warnings(0);
 
   /* check for a valid host */
   host* temp_host = find_host(svc->host_name);
@@ -1211,7 +1099,7 @@ int check_service(service* svc, int* w, int* e) {
   if (svc->event_handler != NULL) {
 
     /* check the event handler command */
-    char* buf = my_strdup(svc->event_handler);
+    char* buf = string::dup(svc->event_handler);
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1232,7 +1120,7 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check the service check_command */
-  char* buf = my_strdup(svc->service_check_command);
+  char* buf = string::dup(svc->service_check_command);
 
   /* get the command name, leave any arguments behind */
   char* temp_command_name = my_strtok(buf, "!");
@@ -1388,13 +1276,13 @@ int check_service(service* svc, int* w, int* e) {
 }
 
 int check_host(host* hst, int* w, int* e) {
-  int warnings = 0;
-  int errors = 0;
+  int warnings(0);
+  int errors(0);
 
   /* make sure each host has at least one service associated with it */
   /* 02/21/08 NOTE: this is extremely inefficient */
   if (use_precached_objects == FALSE
-      && config->get_use_large_installation_tweaks() == false) {
+      && config->use_large_installation_tweaks() == false) {
 
     bool found = false;
     for (service* temp_service = service_list;
@@ -1419,7 +1307,7 @@ int check_host(host* hst, int* w, int* e) {
   if (hst->event_handler != NULL) {
 
     /* check the event handler command */
-    char* buf = my_strdup(hst->event_handler);
+    char* buf = string::dup(hst->event_handler);
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1443,7 +1331,7 @@ int check_host(host* hst, int* w, int* e) {
   if (hst->host_check_command != NULL) {
 
     /* check the host check_command */
-    char* buf = my_strdup(hst->host_check_command);
+    char* buf = string::dup(hst->host_check_command);
 
     /* get the command name, leave any arguments behind */
     char* temp_command_name = my_strtok(buf, "!");
@@ -1591,8 +1479,8 @@ int check_host(host* hst, int* w, int* e) {
 }
 
 int check_contact(contact* cntct, int* w, int* e) {
-  int warnings = 0;
-  int errors = 0;
+  int warnings(0);
+  int errors(0);
 
   /* check service notification commands */
   if (cntct->service_notification_commands == NULL) {
@@ -1607,7 +1495,7 @@ int check_contact(contact* cntct, int* w, int* e) {
 	 temp_commandsmember = temp_commandsmember->next) {
 
       /* check the host notification command */
-      char* buf = my_strdup(temp_commandsmember->cmd);
+      char* buf = string::dup(temp_commandsmember->cmd);
 
       /* get the command name, leave any arguments behind */
       char* temp_command_name = my_strtok(buf, "!");
@@ -1640,7 +1528,7 @@ int check_contact(contact* cntct, int* w, int* e) {
 	 temp_commandsmember = temp_commandsmember->next) {
 
       /* check the host notification command */
-      char* buf = my_strdup(temp_commandsmember->cmd);
+      char* buf = string::dup(temp_commandsmember->cmd);
 
       /* get the command name, leave any arguments behind */
       char* temp_command_name = my_strtok(buf, "!");

@@ -20,26 +20,42 @@
 #ifndef CCE_OBJECTS_COMMANDSMEMBER_HH
 #  define CCE_OBJECTS_COMMANDSMEMBER_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct command_struct;
+struct contact_struct;
+
+typedef struct                  commandsmember_struct {
+  char*                         cmd;
+  command_struct*               command_ptr;
+  struct commandsmember_struct* next;
+}                               commandsmember;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-commandsmember const* release_commandsmember(commandsmember const* obj);
+commandsmember* add_host_notification_command_to_contact(
+                  contact_struct* cntct,
+                  char const* command_name);
+commandsmember* add_service_notification_command_to_contact(
+                  contact_struct* cntct,
+                  char const* command_name);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace               objects {
-  commandsmember const* release(commandsmember const* obj);
-}
+bool          operator==(
+                commandsmember const& obj1,
+                commandsmember const& obj2) throw ();
+bool          operator!=(
+                commandsmember const& obj1,
+                commandsmember const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, commandsmember const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_COMMANDSMEMBER_HH
+
+

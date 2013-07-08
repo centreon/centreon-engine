@@ -31,7 +31,9 @@
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
@@ -41,11 +43,15 @@
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 
 #define MAX_CMD_ARGS 4096
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::events;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -114,7 +120,7 @@ int run_scheduled_service_check(
       /* determine next time we should check the service if needed */
       /* if service has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
-        preferred_time = current_time + static_cast<time_t>(svc->check_interval <= 0 ? 300 : svc->check_interval * config->get_interval_length());
+        preferred_time = current_time + static_cast<time_t>(svc->check_interval <= 0 ? 300 : svc->check_interval * config->interval_length());
 
       /* make sure we rescheduled the next service check at a valid time */
       get_next_valid_time(
@@ -217,14 +223,12 @@ int handle_async_service_check_result(
   int state_was_logged = FALSE;
   char* old_plugin_output = NULL;
   char* temp_ptr = NULL;
-  servicedependency* temp_dependency = NULL;
   objectlist* check_servicelist = NULL;
   objectlist* servicelist_item = NULL;
   service* master_service = NULL;
   int run_async_check = TRUE;
   int state_changes_use_cached_state = TRUE;    /* TODO - 09/23/07 move this to a global variable */
   int flapping_check_done = FALSE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "handle_async_service_check_result()";
@@ -257,7 +261,7 @@ int handle_async_service_check_result(
 
   /* skip this service check results if its passive and we aren't accepting passive check results */
   if (queued_check_result->check_type == SERVICE_CHECK_PASSIVE) {
-    if (config->get_accept_passive_service_checks() == false) {
+    if (config->accept_passive_service_checks() == false) {
       logger(dbg_checks, basic)
         << "Discarding passive service check result because passive "
         "service checks are disabled globally.";
@@ -351,7 +355,7 @@ int handle_async_service_check_result(
       << "' did not exit properly!";
 
     temp_service->plugin_output
-      = my_strdup("(Service check did not exit properly)");
+      = string::dup("(Service check did not exit properly)");
     temp_service->current_state = STATE_CRITICAL;
   }
 
@@ -379,7 +383,7 @@ int handle_async_service_check_result(
 	       ? " - plugin may be missing" : ""))
 	<< ')';
 
-    temp_service->plugin_output = my_strdup(oss.str().c_str());
+    string::setstr(temp_service->plugin_output, oss.str());
     temp_service->current_state = STATE_CRITICAL;
   }
 
@@ -398,7 +402,7 @@ int handle_async_service_check_result(
     /* make sure the plugin output isn't null */
     if (temp_service->plugin_output == NULL)
       temp_service->plugin_output
-        = my_strdup("(No output returned from plugin)");
+        = string::dup("(No output returned from plugin)");
 
     /* replace semicolons in plugin output (but not performance data) with colons */
     else if ((temp_ptr = temp_service->plugin_output)) {
@@ -443,7 +447,7 @@ int handle_async_service_check_result(
 
   /* log passive checks - we need to do this here, as some my bypass external commands by getting dropped in checkresults dir */
   if (temp_service->check_type == SERVICE_CHECK_PASSIVE) {
-    if (config->get_log_passive_checks() == true)
+    if (config->log_passive_checks() == true)
       logger(log_passive_check, basic)
         << "PASSIVE SERVICE CHECK: " << temp_service->host_name << ";"
         << temp_service->description << ";" << temp_service->current_state
@@ -469,7 +473,7 @@ int handle_async_service_check_result(
       /* 08/04/07 EG launch an async (parallel) host check unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
       /* do NOT allow cached check results to happen here - we need the host to be checked for real... */
-      if (config->get_use_aggressive_host_checking() == true)
+      if (config->use_aggressive_host_checking() == true)
         perform_on_demand_host_check(
           temp_host,
           NULL,
@@ -624,13 +628,13 @@ int handle_async_service_check_result(
 
       /* 08/04/07 EG launch an async (parallel) host check (possibly cached) unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
-      if (config->get_use_aggressive_host_checking() == true)
+      if (config->use_aggressive_host_checking() == true)
         perform_on_demand_host_check(
           temp_host,
           NULL,
           CHECK_OPTION_NONE,
           TRUE,
-          config->get_cached_host_check_horizon());
+          config->cached_host_check_horizon());
       /* 09/23/07 EG don't launch a new host check if we already did so earlier */
       else if (first_host_check_initiated == TRUE)
         logger(dbg_checks, more)
@@ -642,7 +646,7 @@ int handle_async_service_check_result(
         if ((state_change == FALSE
              || state_changes_use_cached_state == TRUE)
             && temp_host->has_been_checked == TRUE
-            && (static_cast<unsigned long>(current_time - temp_host->last_check) <= config->get_cached_host_check_horizon())) {
+            && (static_cast<unsigned long>(current_time - temp_host->last_check) <= config->cached_host_check_horizon())) {
           logger(dbg_checks, more)
             << "* Using cached host state: " << temp_host->current_state;
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
@@ -714,7 +718,7 @@ int handle_async_service_check_result(
         << "Service did not change state.";
 
     /* should we obsessive over service checks? */
-    if (config->get_obsess_over_services() == true)
+    if (config->obsess_over_services() == true)
       obsessive_compulsive_service_check_processor(temp_service);
 
     /* reset all service variables because its okay now... */
@@ -741,7 +745,7 @@ int handle_async_service_check_result(
       next_service_check
         = (time_t)(temp_service->last_check
                    + (temp_service->check_interval
-                      * config->get_interval_length()));
+                      * config->interval_length()));
   }
 
   /*******************************************/
@@ -762,20 +766,20 @@ int handle_async_service_check_result(
 
       /* 08/04/07 EG launch an async (parallel) host check (possibly cached) unless aggressive host checking is enabled */
       /* previous logic was to simply run a sync (serial) host check */
-      if (config->get_use_aggressive_host_checking() == true)
+      if (config->use_aggressive_host_checking() == true)
         perform_on_demand_host_check(
           temp_host,
           &route_result,
           CHECK_OPTION_NONE,
           TRUE,
-          config->get_cached_host_check_horizon());
+          config->cached_host_check_horizon());
       else {
         /* can we use the last cached host state? */
         /* only use cached host state if no service state change has occurred */
         if ((state_change == FALSE
              || state_changes_use_cached_state == TRUE)
             && temp_host->has_been_checked == TRUE
-            && (static_cast<unsigned long>(current_time - temp_host->last_check) <= config->get_cached_host_check_horizon())) {
+            && (static_cast<unsigned long>(current_time - temp_host->last_check) <= config->cached_host_check_horizon())) {
           /* use current host state as route result */
           route_result = temp_host->current_state;
           logger(dbg_checks, more)
@@ -822,7 +826,7 @@ int handle_async_service_check_result(
         << "Host is currently DOWN/UNREACHABLE.";
 
       /* we're using aggressive host checking, so really do recheck the host... */
-      if (config->get_use_aggressive_host_checking() == true) {
+      if (config->use_aggressive_host_checking() == true) {
         logger(dbg_checks, more)
           << "Agressive host checking is enabled, so we'll recheck the "
           "host state...";
@@ -831,7 +835,7 @@ int handle_async_service_check_result(
           &route_result,
           CHECK_OPTION_NONE,
           TRUE,
-          config->get_cached_host_check_horizon());
+          config->cached_host_check_horizon());
       }
 
       /* the service wobbled between non-OK states, so check the host... */
@@ -854,7 +858,7 @@ int handle_async_service_check_result(
             FALSE,
             NULL,
             NULL);
-	  /*perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config->get_cached_host_check_horizon()); */
+	  /*perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config->cached_host_check_horizon()); */
 	}
 
       /* else fake the host check, but (possibly) resend host notifications to contacts... */
@@ -938,7 +942,7 @@ int handle_async_service_check_result(
           next_service_check
             = (time_t)(temp_service->last_check
                        + (temp_service->check_interval
-                          * config->get_interval_length()));
+                          * config->interval_length()));
 
         /* log the problem as a hard state if the host just went down */
         if (hard_state_change == TRUE) {
@@ -970,11 +974,11 @@ int handle_async_service_check_result(
           next_service_check
             = (time_t)(temp_service->last_check
                        + (temp_service->retry_interval
-                          * config->get_interval_length()));
+                          * config->interval_length()));
       }
 
       /* perform dependency checks on the second to last check of the service */
-      if (config->get_enable_predictive_service_dependency_checks() == true
+      if (config->enable_predictive_service_dependency_checks() == true
           && temp_service->current_attempt == (temp_service->max_attempts - 1)) {
 
         logger(dbg_checks, more)
@@ -983,9 +987,16 @@ int handle_async_service_check_result(
 
         /* check services that THIS ONE depends on for notification AND execution */
         /* we do this because we might be sending out a notification soon and we want the dependency logic to be accurate */
-        for (temp_dependency = get_first_service_dependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr);
-             temp_dependency != NULL;
-             temp_dependency = get_next_service_dependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr)) {
+        std::pair<std::string, std::string>
+          id(std::make_pair(temp_service->host_name, temp_service->description));
+        umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> > const&
+          dependencies(state::instance().servicedependencies());
+        for (umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >::const_iterator
+               it(dependencies.find(id)), end(dependencies.end());
+             it != end && it->first == id;
+             ++it) {
+          servicedependency* temp_dependency(&*it->second);
+
           if (temp_dependency->dependent_service_ptr == temp_service
               && temp_dependency->master_service_ptr != NULL) {
             master_service = (service*)temp_dependency->master_service_ptr;
@@ -1058,12 +1069,12 @@ int handle_async_service_check_result(
         next_service_check
           = (time_t)(temp_service->last_check
                      + (temp_service->check_interval
-                        * config->get_interval_length()));
+                        * config->interval_length()));
     }
 
 
     /* should we obsessive over service checks? */
-    if (config->get_obsess_over_services() == true)
+    if (config->obsess_over_services() == true)
       obsessive_compulsive_service_check_processor(temp_service);
   }
 
@@ -1146,7 +1157,7 @@ int handle_async_service_check_result(
     NULL,
     temp_service->latency,
     temp_service->execution_time,
-    config->get_service_check_timeout(),
+    config->service_check_timeout(),
     queued_check_result->early_timeout,
     queued_check_result->return_code,
     NULL,
@@ -1184,7 +1195,7 @@ int handle_async_service_check_result(
     temp_service = (service*)servicelist_item->object_ptr;
 
     /* we can get by with a cached state, so don't check the service */
-    if (static_cast<unsigned long>(current_time - temp_service->last_check) <= config->get_cached_service_check_horizon()) {
+    if (static_cast<unsigned long>(current_time - temp_service->last_check) <= config->cached_service_check_horizon()) {
       run_async_check = FALSE;
 
       /* update check statistics */
@@ -1359,9 +1370,9 @@ int check_service_check_viability(
 
   /* get the check interval to use if we need to reschedule the check */
   if (svc->state_type == SOFT_STATE && svc->current_state != STATE_OK)
-    check_interval = static_cast<int>(svc->retry_interval * config->get_interval_length());
+    check_interval = static_cast<int>(svc->retry_interval * config->interval_length());
   else
-    check_interval = static_cast<int>(svc->check_interval * config->get_interval_length());
+    check_interval = static_cast<int>(svc->check_interval * config->interval_length());
 
   /* get the current time */
   time(&current_time);
@@ -1418,19 +1429,22 @@ int check_service_check_viability(
 unsigned int check_service_dependencies(
                service* svc,
                int dependency_type) {
-  servicedependency* temp_dependency = NULL;
   service* temp_service = NULL;
   int state = STATE_OK;
   time_t current_time = 0L;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "check_service_dependencies()";
 
-  /* check all dependencies... */
-  for (temp_dependency = get_first_service_dependency_by_dependent_service(svc->host_name, svc->description, &ptr);
-       temp_dependency != NULL;
-       temp_dependency = get_next_service_dependency_by_dependent_service(svc->host_name, svc->description, &ptr)) {
+  std::pair<std::string, std::string>
+    id(svc->host_name, svc->description);
+  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> > const&
+    dependencies(state::instance().servicedependencies());
+  for (umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >::const_iterator
+         it(dependencies.find(id)), end(dependencies.end());
+       it != end && it->first == id;
+       ++it) {
+    servicedependency* temp_dependency(&*it->second);
 
     /* only check dependencies of the desired type (notification or execution) */
     if (temp_dependency->dependency_type != dependency_type)
@@ -1450,7 +1464,7 @@ unsigned int check_service_dependencies(
 
     /* get the status to use (use last hard state if its currently in a soft state) */
     if (temp_service->state_type == SOFT_STATE
-        && config->get_soft_state_dependencies() == false)
+        && config->soft_state_dependencies() == false)
       state = temp_service->last_hard_state;
     else
       state = temp_service->current_state;
@@ -1506,8 +1520,8 @@ void check_for_orphaned_services() {
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
       = (time_t)(temp_service->next_check + temp_service->latency
-                 + config->get_service_check_timeout()
-                 + config->get_check_reaper_interval() + 600);
+                 + config->service_check_timeout()
+                 + config->check_reaper_interval() + 600);
 
     /* this service was supposed to have executed a while ago, but for some reason the results haven't come back in... */
     if (expected_time < current_time) {
@@ -1553,7 +1567,7 @@ void check_service_result_freshness() {
     << "Checking the freshness of service check results...";
 
   /* bail out if we're not supposed to be checking freshness */
-  if (config->get_check_service_freshness() == false) {
+  if (config->check_service_freshness() == false) {
     logger(dbg_checks, more)
       << "Service freshness checking is disabled.";
     return;
@@ -1637,11 +1651,11 @@ int is_service_result_fresh(
   if (temp_service->freshness_threshold == 0) {
     if (temp_service->state_type == HARD_STATE
         || temp_service->current_state == STATE_OK)
-      freshness_threshold = static_cast<int>((temp_service->check_interval * config->get_interval_length())
-					     + temp_service->latency + config->get_additional_freshness_latency());
+      freshness_threshold = static_cast<int>((temp_service->check_interval * config->interval_length())
+					     + temp_service->latency + config->additional_freshness_latency());
     else
-      freshness_threshold = static_cast<int>((temp_service->retry_interval * config->get_interval_length())
-					     + temp_service->latency + config->get_additional_freshness_latency());
+      freshness_threshold = static_cast<int>((temp_service->retry_interval * config->interval_length())
+					     + temp_service->latency + config->additional_freshness_latency());
   }
   else
     freshness_threshold = temp_service->freshness_threshold;
@@ -1664,8 +1678,8 @@ int is_service_result_fresh(
            && temp_service->freshness_threshold == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
-                 + (config->get_max_service_check_spread()
-                    * config->get_interval_length()));
+                 + (config->max_service_check_spread()
+                    * config->interval_length()));
   else
     expiration_time
       = (time_t)(temp_service->last_check + freshness_threshold);
@@ -1900,19 +1914,23 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 
 /* checks host dependencies */
 unsigned int check_host_dependencies(host* hst, int dependency_type) {
-  hostdependency* temp_dependency = NULL;
   host* temp_host = NULL;
   int state = HOST_UP;
   time_t current_time = 0L;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "check_host_dependencies()";
 
+  std::string id(hst->name);
+  umultimap<std::string, shared_ptr<hostdependency> > const&
+    dependencies(state::instance().hostdependencies());
+
   /* check all dependencies... */
-  for (temp_dependency = get_first_host_dependency_by_dependent_host(hst->name, &ptr);
-       temp_dependency != NULL;
-       temp_dependency = get_next_host_dependency_by_dependent_host(hst->name, &ptr)) {
+  for (umultimap<std::string, shared_ptr<hostdependency> >::const_iterator
+         it(dependencies.find(id)), end(dependencies.end());
+       it != end && it->first == id;
+       ++it) {
+         hostdependency* temp_dependency(&*it->second);
 
     /* only check dependencies of the desired type (notification or execution) */
     if (temp_dependency->dependency_type != dependency_type)
@@ -1932,7 +1950,7 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
 
     /* get the status to use (use last hard state if its currently in a soft state) */
     if (temp_host->state_type == SOFT_STATE
-        && config->get_soft_state_dependencies() == false)
+        && config->soft_state_dependencies() == false)
       state = temp_host->last_hard_state;
     else
       state = temp_host->current_state;
@@ -1988,8 +2006,8 @@ void check_for_orphaned_hosts() {
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
       = (time_t)(temp_host->next_check + temp_host->latency
-                 + config->get_host_check_timeout()
-                 + config->get_check_reaper_interval() + 600);
+                 + config->host_check_timeout()
+                 + config->check_reaper_interval() + 600);
 
     /* this host was supposed to have executed a while ago, but for some reason the results haven't come back in... */
     if (expected_time < current_time) {
@@ -2032,7 +2050,7 @@ void check_host_result_freshness() {
     << "Attempting to check the freshness of host check results...";
 
   /* bail out if we're not supposed to be checking freshness */
-  if (config->get_check_host_freshness() == false) {
+  if (config->check_host_freshness() == false) {
     logger(dbg_checks, most)
       << "Host freshness checking is disabled.";
     return;
@@ -2113,9 +2131,9 @@ int is_host_result_fresh(
     else
       interval = temp_host->retry_interval;
     freshness_threshold
-      = static_cast<int>((interval * config->get_interval_length())
+      = static_cast<int>((interval * config->interval_length())
                          + temp_host->latency
-                         + config->get_additional_freshness_latency());
+                         + config->additional_freshness_latency());
   }
   else
     freshness_threshold = temp_host->freshness_threshold;
@@ -2135,8 +2153,8 @@ int is_host_result_fresh(
            && temp_host->freshness_threshold == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
-                 + (config->get_max_host_check_spread()
-                    * config->get_interval_length()));
+                 + (config->max_host_check_spread()
+                    * config->interval_length()));
   else
     expiration_time
       = (time_t)(temp_host->last_check + freshness_threshold);
@@ -2307,7 +2325,7 @@ int run_scheduled_host_check_3x(
         preferred_time
           = current_time + static_cast<time_t>((hst->check_interval <= 0)
                                                ? 300
-                                               : (hst->check_interval * config->get_interval_length()));
+                                               : (hst->check_interval * config->interval_length()));
 
       /* make sure we rescheduled the next host check at a valid time */
       get_next_valid_time(
@@ -2443,7 +2461,7 @@ int handle_async_host_check_result_3x(
 
   /* skip this host check results if its passive and we aren't accepting passive check results */
   if (queued_check_result->check_type == HOST_CHECK_PASSIVE) {
-    if (config->get_accept_passive_host_checks() == false) {
+    if (config->accept_passive_host_checks() == false) {
       logger(dbg_checks, basic)
         << "Discarding passive host check result because passive host "
         "checks are disabled globally.";
@@ -2541,7 +2559,7 @@ int handle_async_host_check_result_3x(
       || !strcmp(temp_host->plugin_output, "")) {
     delete[] temp_host->plugin_output;
     temp_host->plugin_output
-      = my_strdup("(No output returned from host check)");
+      = string::dup("(No output returned from host check)");
   }
 
   /* replace semicolons in plugin output (but not performance data) with colons */
@@ -2578,7 +2596,7 @@ int handle_async_host_check_result_3x(
       delete[] temp_host->perf_data;
 
       temp_host->plugin_output
-        = my_strdup("(Host check did not exit properly)");
+        = string::dup("(Host check did not exit properly)");
       temp_host->long_plugin_output = NULL;
       temp_host->perf_data = NULL;
 
@@ -2604,12 +2622,10 @@ int handle_async_host_check_result_3x(
 	       || queued_check_result->return_code == 127)
 	      ? " - plugin may be missing" : "") << ")";
 
-      delete[] temp_host->plugin_output;
+      string::setstr(temp_host->plugin_output, oss.str());
       delete[] temp_host->long_plugin_output;
-      delete[] temp_host->perf_data;
-
-      temp_host->plugin_output = my_strdup(oss.str().c_str());
       temp_host->long_plugin_output = NULL;
+      delete[] temp_host->perf_data;
       temp_host->perf_data = NULL;
 
       result = STATE_CRITICAL;
@@ -2618,7 +2634,7 @@ int handle_async_host_check_result_3x(
     /* a NULL host check command means we should assume the host is UP */
     if (temp_host->host_check_command == NULL) {
       delete[] temp_host->plugin_output;
-      temp_host->plugin_output = my_strdup("(Host assumed to be UP)");
+      temp_host->plugin_output = string::dup("(Host assumed to be UP)");
       result = STATE_OK;
     }
   }
@@ -2628,7 +2644,7 @@ int handle_async_host_check_result_3x(
   if (queued_check_result->check_type == HOST_CHECK_ACTIVE) {
 
     /* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
-    if (config->get_use_aggressive_host_checking() == false
+    if (config->use_aggressive_host_checking() == false
         && result == STATE_WARNING)
       result = STATE_OK;
 
@@ -2651,7 +2667,7 @@ int handle_async_host_check_result_3x(
     CHECK_OPTION_NONE,
     reschedule_check,
     TRUE,
-    config->get_cached_host_check_horizon());
+    config->cached_host_check_horizon());
 
   /* free memory */
   delete[] old_plugin_output;
@@ -2680,7 +2696,7 @@ int handle_async_host_check_result_3x(
     temp_host->host_check_command,
     temp_host->latency,
     temp_host->execution_time,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     queued_check_result->early_timeout,
     queued_check_result->return_code,
     NULL,
@@ -2705,7 +2721,6 @@ int process_host_check_result_3x(
   host* parent_host = NULL;
   host* master_host = NULL;
   host* temp_host = NULL;
-  hostdependency* temp_dependency = NULL;
   objectlist* check_hostlist = NULL;
   objectlist* hostlist_item = NULL;
   int parent_state = HOST_UP;
@@ -2714,7 +2729,6 @@ int process_host_check_result_3x(
   time_t preferred_time = 0L;
   time_t next_valid_time = 0L;
   int run_async_check = TRUE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "process_host_check_result_3x()";
@@ -2734,16 +2748,16 @@ int process_host_check_result_3x(
   next_check
     = (unsigned long)(current_time +
                       (hst->check_interval
-                       * config->get_interval_length()));
+                       * config->interval_length()));
 
   /* we have to adjust current attempt # for passive checks, as it isn't done elsewhere */
   if (hst->check_type == HOST_CHECK_PASSIVE
-      && config->get_passive_host_checks_are_soft() == true)
+      && config->passive_host_checks_are_soft() == true)
     adjust_host_check_attempt_3x(hst, FALSE);
 
   /* log passive checks - we need to do this here, as some my bypass external commands by getting dropped in checkresults dir */
   if (hst->check_type == HOST_CHECK_PASSIVE) {
-    if (config->get_log_passive_checks() == true)
+    if (config->log_passive_checks() == true)
       logger(log_passive_check, basic)
         << "PASSIVE HOST CHECK: " << hst->name << ";"
         << new_state << ";" << hst->plugin_output;
@@ -2764,7 +2778,7 @@ int process_host_check_result_3x(
       /* set state type to HARD for passive checks and active checks that were previously in a HARD STATE */
       if (hst->state_type == HARD_STATE
           || (hst->check_type == HOST_CHECK_PASSIVE
-              && config->get_passive_host_checks_are_soft() == false))
+              && config->passive_host_checks_are_soft() == false))
         hst->state_type = HARD_STATE;
       else
         hst->state_type = SOFT_STATE;
@@ -2779,7 +2793,7 @@ int process_host_check_result_3x(
       next_check
         = (unsigned long)(current_time
                           + (hst->check_interval
-                             * config->get_interval_length()));
+                             * config->interval_length()));
 
       /* propagate checks to immediate parents if they are not already UP */
       /* we do this because a parent host (or grandparent) may have recovered somewhere and we should catch the recovery as soon as possible */
@@ -2825,7 +2839,7 @@ int process_host_check_result_3x(
 
       /* passive checks are treated as HARD states by default... */
       if (hst->check_type == HOST_CHECK_PASSIVE
-          && config->get_passive_host_checks_are_soft() == false) {
+          && config->passive_host_checks_are_soft() == false) {
 
         /* set the state type */
         hst->state_type = HARD_STATE;
@@ -2853,7 +2867,7 @@ int process_host_check_result_3x(
       /* translate host state between DOWN/UNREACHABLE (only for passive checks if enabled) */
       hst->current_state = new_state;
       if (hst->check_type == HOST_CHECK_ACTIVE
-          || config->get_translate_passive_host_checks() == true)
+          || config->translate_passive_host_checks() == true)
         hst->current_state = determine_host_reachability(hst);
 
       /* reschedule the next check if the host state changed */
@@ -2867,14 +2881,14 @@ int process_host_check_result_3x(
           next_check
             = (unsigned long)(current_time
                               + (hst->retry_interval
-                                 * config->get_interval_length()));
+                                 * config->interval_length()));
 
         /* host has maxed out on retries (or was previously in a hard problem state), so reschedule the next check at the normal interval */
         else
           next_check
             = (unsigned long)(current_time
                               + (hst->check_interval
-                               * config->get_interval_length()));
+                               * config->interval_length()));
       }
     }
   }
@@ -2902,7 +2916,7 @@ int process_host_check_result_3x(
         next_check
           = (unsigned long)(current_time
                             + (hst->check_interval
-                               * config->get_interval_length()));
+                               * config->interval_length()));
     }
     /***** HOST IS NOW DOWN/UNREACHABLE *****/
     else {
@@ -2923,7 +2937,7 @@ int process_host_check_result_3x(
         next_check
           = (unsigned long)(current_time
                             + (hst->check_interval
-                               * config->get_interval_length()));
+                               * config->interval_length()));
 
         /* we need to run SYNCHRONOUS checks of all parent hosts to accurately determine the state of this host */
         /* this is extremely inefficient (reminiscent of Nagios 2.x logic), but there's no other good way around it */
@@ -2986,7 +3000,7 @@ int process_host_check_result_3x(
 
           /* translate host state between DOWN/UNREACHABLE for passive checks (if enabled) */
           /* make a determination of the host's state */
-          if (config->get_translate_passive_host_checks() == true)
+          if (config->translate_passive_host_checks() == true)
             hst->current_state = determine_host_reachability(hst);
 
         }
@@ -3017,7 +3031,7 @@ int process_host_check_result_3x(
 
         /* active and (in some cases) passive check results are treated as SOFT states */
         if (hst->check_type == HOST_CHECK_ACTIVE
-            || config->get_passive_host_checks_are_soft() == true) {
+            || config->passive_host_checks_are_soft() == true) {
 
           /* set the state type */
           hst->state_type = SOFT_STATE;
@@ -3037,7 +3051,7 @@ int process_host_check_result_3x(
         /* translate host state between DOWN/UNREACHABLE (for passive checks only if enabled) */
         hst->current_state = new_state;
         if (hst->check_type == HOST_CHECK_ACTIVE
-            || config->get_translate_passive_host_checks() == true)
+            || config->translate_passive_host_checks() == true)
           hst->current_state = determine_host_reachability(hst);
 
         /* reschedule a check of the host */
@@ -3045,18 +3059,18 @@ int process_host_check_result_3x(
 
         /* schedule a re-check of the host at the retry interval because we can't determine its final state yet... */
         if (hst->check_type == HOST_CHECK_ACTIVE
-            || config->get_passive_host_checks_are_soft() == true)
+            || config->passive_host_checks_are_soft() == true)
           next_check
             = (unsigned long)(current_time
                               + (hst->retry_interval
-                                 * config->get_interval_length()));
+                                 * config->interval_length()));
 
         /* schedule a re-check of the host at the normal interval */
         else
           next_check
             = (unsigned long)(current_time
                               + (hst->check_interval
-                                 * config->get_interval_length()));
+                                 * config->interval_length()));
 
         /* propagate checks to immediate parents if they are UP */
         /* we do this because a parent host (or grandparent) may have gone down and blocked our route */
@@ -3101,7 +3115,7 @@ int process_host_check_result_3x(
         }
 
         /* check dependencies on second to last host check */
-        if (config->get_enable_predictive_host_dependency_checks() == true
+        if (config->enable_predictive_host_dependency_checks() == true
 	    && hst->current_attempt == (hst->max_attempts - 1)) {
 
           /* propagate checks to hosts that THIS ONE depends on for notifications AND execution */
@@ -3110,9 +3124,14 @@ int process_host_check_result_3x(
             << "Propagating predictive dependency checks to hosts this "
             "one depends on...";
 
-          for (temp_dependency = get_first_host_dependency_by_dependent_host(hst->name, &ptr);
-               temp_dependency != NULL;
-               temp_dependency = get_next_host_dependency_by_dependent_host(hst->name, &ptr)) {
+          std::string id(hst->name);
+          umultimap<std::string, shared_ptr<hostdependency> > const&
+            dependencies(state::instance().hostdependencies());
+          for (umultimap<std::string, shared_ptr<hostdependency> >::const_iterator
+                 it(dependencies.find(id)), end(dependencies.end());
+                 it != end && it->first == id;
+                 ++it) {
+            hostdependency* temp_dependency(&*it->second);
             if (temp_dependency->dependent_host_ptr == hst
                 && temp_dependency->master_host_ptr != NULL) {
               master_host = (host*)temp_dependency->master_host_ptr;
@@ -3266,10 +3285,10 @@ int check_host_check_viability_3x(
   /* get the check interval to use if we need to reschedule the check */
   if (hst->state_type == SOFT_STATE && hst->current_state != HOST_UP)
     check_interval
-      = static_cast<int>(hst->retry_interval * config->get_interval_length());
+      = static_cast<int>(hst->retry_interval * config->interval_length());
   else
     check_interval
-      = static_cast<int>(hst->check_interval * config->get_interval_length());
+      = static_cast<int>(hst->check_interval * config->interval_length());
 
   /* make sure check interval is positive - otherwise use 5 minutes out for next check */
   if (check_interval <= 0)

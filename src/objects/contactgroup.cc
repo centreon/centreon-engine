@@ -18,180 +18,151 @@
 */
 
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contactgroup.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
-#include "com/centreon/engine/objects/utils.hh"
-#include "com/centreon/engine/skiplist.hh"
+#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::objects::utils;
+using namespace com::centreon::engine::string;
 
 /**
- *  Wrapper C
+ *  Equal operator.
  *
- *  @see com::centreon::engine::objects::link
- */
-bool link_contactgroup(
-       contactgroup* obj,
-       contact** members,
-       contactgroup** groups) {
-  try {
-    objects::link(obj, tab2vec(members), tab2vec(groups));
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-    return (false);
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: link_contactgroup: unknow exception";
-    return (false);
-  }
-  return (true);
-}
-
-
-/**
- *  Wrapper C
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
  *
- *  @see com::centreon::engine::objects::release
+ *  @return True if is the same object, otherwise false.
  */
-void release_contactgroup(contactgroup const* obj) {
-  try {
-    objects::release(obj);
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_contactgroup: unknow exception";
-  }
-  return;
+bool operator==(
+       contactgroup const& obj1,
+       contactgroup const& obj2) throw () {
+  return (is_equal(obj1.group_name, obj2.group_name)
+          && is_equal(obj1.alias, obj2.alias)
+          && is_equal(obj1.members, obj2.members));
 }
 
 /**
- *  Link a contactgroup with contacts and groups into the engine.
+ *  Not equal operator.
  *
- *  @param[in,out] obj     Object to link with correct group_name.
- *  @param[in]     members The table with contacts member name.
- *  @param[in]     groups  The table with contact groups member name.
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
  */
-void objects::link(
-                contactgroup* obj,
-                std::vector<contact*> const& members,
-                std::vector<contactgroup*> const& groups) {
-  // Check object contents.
-  if (!obj)
-    throw (engine_error() << "contact group is a NULL pointer");
-  if (!obj->group_name)
-    throw (engine_error() << "contact group invalid group name");
+bool operator!=(
+       contactgroup const& obj1,
+       contactgroup const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
 
-  // Add all contacts into the contactgroup.
-  if (!add_contacts_to_object(members, &obj->members))
-    throw (engine_error() << "contactgroup '" << obj->group_name
-           << "' invalid member");
+/**
+ *  Dump contactgroup content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The contactgroup to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, contactgroup const& obj) {
+  os << "contactgroup {\n"
+    "  group_name: " << chkstr(obj.group_name) << "\n"
+    "  alias:      " << chkstr(obj.alias) << "\n"
+    "  members:    " << chkobj(obj.members) << "\n"
+    "}\n";
+  return (os);
+}
 
-  // Broker timestamp.
-  timeval tv(get_broker_timestamp(NULL));
+/**
+ *  Add a new contact group to the list in memory.
+ *
+ *  @param[in] name  Contact group name.
+ *  @param[in] alias Contact group alias.
+ */
+contactgroup* add_contactgroup(char const* name, char const* alias) {
+  // Make sure we have the data we need.
+  if (!name || !name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Contactgroup name is NULL";
+    return (NULL);
+  }
 
-  // Browse contacts.
-  for (std::vector<contact*>::const_iterator
-         it(members.begin()), end(members.end());
-       it != end;
-       ++it) {
-    // Link contact group to contact.
-    add_object_to_objectlist(&(*it)->contactgroups_ptr, obj);
+  // Allocate memory for a new contactgroup entry.
+  shared_ptr<contactgroup> obj(new contactgroup, deleter::contactgroup);
+  memset(obj.get(), 0, sizeof(*obj));
 
-    // Notify event broker of new member.
-    broker_group_member(
-      NEBTYPE_CONTACTGROUPMEMBER_ADD,
+  try {
+    // Duplicate vars.
+    obj->group_name = string::dup(name);
+    obj->alias = string::dup(!alias ? name : alias);
+
+    // Add new contact group to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+      it(state::instance().contactgroups().find(id));
+    if (it != state::instance().contactgroups().end()) {
+      logger(log_config_error, basic)
+        << "Error: Contactgroup '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().contactgroups()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = contactgroup_list;
+    contactgroup_list = obj.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_CONTACTGROUP_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      obj,
-      *it,
+      obj.get(),
       &tv);
   }
-
-  // Add the content of other contactgroups into this contactgroup.
-  std::vector<contact*> other_members;
-  for (std::vector<contactgroup*>::const_iterator
-         it(groups.begin()), end(groups.end());
-       it != end;
-       ++it) {
-    if (!*it)
-      throw (engine_error() << "contactgroup '" << obj->group_name
-             << "' invalid group member");
-    // Browse members.
-    for (contactsmember* mbr((*it)->members);
-         mbr;
-         mbr = mbr->next)
-      other_members.push_back(mbr->contact_ptr);
+  catch (...) {
+    obj.clear();
   }
 
-  // Recursive call.
-  if (!other_members.empty())
-    objects::link(obj, other_members, std::vector<contactgroup*>());
-  return;
+  return (obj.get());
 }
 
 /**
- *  Cleanup memory of contactgroup.
+ *  Tests whether a contact is a member of a particular contactgroup.
+ *  The mk-livestatus eventbroker module uses this, so it must hang
+ *  around until 4.0 to prevent API breakage.
  *
- *  @param[in] obj The contactgroup to cleanup memory.
+ *  The cgi's stopped using it quite long ago though, so we need only
+ *  compile it if we're building the core
+ *
+ *  @param[in] group Target contact group.
+ *  @param[in] cntct Target contact.
+ *
+ *  @return true or false.
  */
-void objects::release(contactgroup const* obj) {
-  if (obj == NULL)
-    return;
-
-  contactsmember const* member = obj->members;
-  while ((member = release(member))) {}
-
-  skiplist_delete(object_skiplists[CONTACTGROUP_SKIPLIST], obj);
-  remove_object_list(obj, &contactgroup_list, &contactgroup_list_tail);
-
-  delete[] obj->group_name;
-  delete[] obj->alias;
-  delete obj;
-  return;
-}
-
-/**
- *  Add somme contactgroups to a generic object with contactgroups member list.
- *
- *  @param[in]  contactgroups     The contactgroups to insert.
- *  @param[out] list_contactgroup The object contactgroup.
- *
- *  @return True if insert sucessfuly, false otherwise.
- */
-bool objects::add_contactgroups_to_object(
-                std::vector<contactgroup*> const& contactgroups,
-                contactgroupsmember** list_contactgroup) {
-  if (list_contactgroup == NULL)
+int is_contact_member_of_contactgroup(
+      contactgroup* group,
+      contact* cntct) {
+  if (!group || !cntct)
     return (false);
 
-  for (std::vector<contactgroup*>::const_iterator
-         it = contactgroups.begin(), end = contactgroups.end();
-       it != end;
-       ++it) {
-    if (*it == NULL)
-      return (false);
+  // Search all contacts in this contact group.
+  for (contactsmember* member(group->members);
+       member;
+       member = member->next)
+    if (member->contact_ptr == cntct)
+      return (true);
 
-    // create a new contactgroupsmember and add it into the contactgroup list.
-    contactgroupsmember* member = new contactgroupsmember;
-    memset(member, 0, sizeof(*member));
-
-    member->group_name = my_strdup((*it)->group_name);
-    member->next = *list_contactgroup;
-    *list_contactgroup = member;
-
-    // add contactgroup to the contactgroupsmember.
-    member->group_ptr = *it;
-  }
-  return (true);
+  return (false);
 }

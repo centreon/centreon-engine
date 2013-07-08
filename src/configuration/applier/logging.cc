@@ -29,6 +29,43 @@ using namespace com::centreon::engine::configuration;
 static applier::logging* _instance = NULL;
 
 /**
+ *  Apply new configuration.
+ *
+ *  @param[in] config The new configuration.
+ */
+void applier::logging::apply(state& config) {
+  // Syslog.
+  if (config.use_syslog() == true && !_syslog)
+    _add_syslog();
+  else if (config.use_syslog() == false && _syslog)
+    _del_syslog();
+
+  // Standard log file.
+  if (config.log_file() == "")
+    _del_log_file();
+  else if (!_log || config.log_file() != _log->filename()) {
+    _add_log_file(config);
+    _del_stdout();
+    _del_stderr();
+  }
+
+  // Debug file.
+  if ((config.debug_file() == "")
+      || !config.debug_level()
+      || !config.debug_verbosity()) {
+    _del_debug();
+    _debug_level = config.debug_level();
+    _debug_verbosity = config.debug_verbosity();
+  }
+  else if (!_debug
+           || config.debug_file() != _debug->filename()
+           || config.debug_level() != _debug_level
+           || config.debug_verbosity() != _debug_verbosity)
+    _add_debug(config);
+  return;
+}
+
+/**
  *  Get the singleton instance of logging applier.
  *
  *  @return Singleton instance.
@@ -56,43 +93,6 @@ void applier::logging::unload() {
 }
 
 /**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void applier::logging::apply(state const& config) {
-  // Syslog.
-  if (config.get_use_syslog() == true && !_syslog)
-    _add_syslog();
-  else if (config.get_use_syslog() == false && _syslog)
-    _del_syslog();
-
-  // Standard log file.
-  if (config.get_log_file() == "")
-    _del_log_file();
-  else if (!_log || config.get_log_file() != _log->filename()) {
-    _add_log_file(config);
-    _del_stdout();
-    _del_stderr();
-  }
-
-  // Debug file.
-  if ((config.get_debug_file() == "")
-      || !config.get_debug_level()
-      || !config.get_debug_verbosity()) {
-    _del_debug();
-    _debug_level = config.get_debug_level();
-    _debug_verbosity = config.get_debug_verbosity();
-  }
-  else if (!_debug
-           || config.get_debug_file() != _debug->filename()
-           || config.get_debug_level() != _debug_level
-           || config.get_debug_verbosity() != _debug_verbosity)
-    _add_debug(config);
-  return;
-}
-
-/**
  *  Default constructor.
  */
 applier::logging::logging()
@@ -112,7 +112,7 @@ applier::logging::logging()
  *
  *  @param[in] config The initial confiuration.
  */
-applier::logging::logging(state const& config)
+applier::logging::logging(state& config)
   : _debug(NULL),
     _debug_level(0),
     _debug_verbosity(0),
@@ -126,23 +126,6 @@ applier::logging::logging(state const& config)
 }
 
 /**
- *  Default copy constructor.
- *
- *  @param[in,out] right The class to copy.
- */
-applier::logging::logging(applier::logging& right)
-  : base(right),
-    _debug(NULL),
-    _debug_level(0),
-    _debug_verbosity(0),
-    _log(NULL),
-    _stderr(NULL),
-    _stdout(NULL),
-    _syslog(NULL) {
-  operator=(right);
-}
-
-/**
  *  Default destructor.
  */
 applier::logging::~logging() throw() {
@@ -151,30 +134,6 @@ applier::logging::~logging() throw() {
   _del_syslog();
   _del_log_file();
   _del_debug();
-}
-
-/**
- *  Default copy operator.
- *
- *  @param[in,out] right The class to copy.
- */
-applier::logging& applier::logging::operator=(applier::logging& right) {
-  if (this != &right) {
-    _debug = right._debug;
-    _debug_level = right._debug_level;
-    _debug_verbosity = right._debug_verbosity;
-    _log = right._log;
-    _stderr = right._stderr;
-    _stdout = right._stdout;
-    _syslog = right._syslog;
-
-    right._debug = NULL;
-    right._log = NULL;
-    right._stderr = NULL;
-    right._stdout = NULL;
-    right._syslog = NULL;
-  }
-  return (*this);
 }
 
 /**
@@ -247,7 +206,7 @@ void applier::logging::_add_syslog() {
  */
 void applier::logging::_add_log_file(state const& config) {
   _del_log_file();
-  _log = new com::centreon::logging::file(config.get_log_file());
+  _log = new com::centreon::logging::file(config.log_file());
   com::centreon::logging::engine::instance().add(
                                                _log,
                                                engine::logging::log_all,
@@ -260,11 +219,11 @@ void applier::logging::_add_log_file(state const& config) {
  */
 void applier::logging::_add_debug(state const& config) {
   _del_debug();
-  _debug = new com::centreon::logging::file(config.get_debug_file());
+  _debug = new com::centreon::logging::file(config.debug_file());
   com::centreon::logging::engine::instance().add(
                                                _debug,
-                                               config.get_debug_level(),
-                                               config.get_debug_verbosity());
+                                               config.debug_level(),
+                                               config.debug_verbosity());
   return;
 }
 

@@ -17,2531 +17,431 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <climits>
-#include <fstream>
-#include <string>
+#include <limits>
+#include "compatibility/locations.h"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/io/file_entry.hh"
-#include "compatibility/locations.h"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
-float const state::DEFAULT_SLEEP_TIME                  = 0.5;
-float const state::DEFAULT_LOW_SERVICE_FLAP_THRESHOLD  = 20.0;
-float const state::DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD = 30.0;
-float const state::DEFAULT_LOW_HOST_FLAP_THRESHOLD     = 20.0;
-float const state::DEFAULT_HIGH_HOST_FLAP_THRESHOLD    = 30.0;
-char const* const state::DEFAULT_ILLEGAL_OUTPUT_CHARS  = "`~$&|'\"<>";
+#define SETTER(type, method) \
+  &state::setter<type, &state::method>::generic
 
-static state* _instance = NULL;
+static struct {
+  std::string const name;
+  bool (*func)(state&, std::string const&);
+} gl_setters[] = {
+  { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
+  { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
+  { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
+  { "admin_email",                                 SETTER(std::string const&, admin_email) },
+  { "admin_pager",                                 SETTER(std::string const&, admin_pager) },
+  { "aggregate_status_updates",                    SETTER(std::string const&, _set_aggregate_status_updates) },
+  { "allow_empty_hostgroup_assignment",            SETTER(bool, allow_empty_hostgroup_assignment) },
+  { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
+  { "auto_reschedule_checks",                      SETTER(bool, auto_reschedule_checks) },
+  { "auto_rescheduling_interval",                  SETTER(unsigned int, auto_rescheduling_interval) },
+  { "auto_rescheduling_window",                    SETTER(unsigned int, auto_rescheduling_window) },
+  { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
+  { "broker_module_directory",                     SETTER(std::string const&, broker_module_directory) },
+  { "broker_module",                               SETTER(std::string const&, _set_broker_module) },
+  { "cached_host_check_horizon",                   SETTER(unsigned long, cached_host_check_horizon) },
+  { "cached_service_check_horizon",                SETTER(unsigned long, cached_service_check_horizon) },
+  { "cfg_dir",                                     SETTER(std::string const&, _set_cfg_dir) },
+  { "cfg_file",                                    SETTER(std::string const&, _set_cfg_file) },
+  { "check_external_commands",                     SETTER(bool, check_external_commands) },
+  { "check_for_orphaned_hosts",                    SETTER(bool, check_orphaned_hosts) },
+  { "check_for_orphaned_services",                 SETTER(bool, check_orphaned_services) },
+  { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
+  { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
+  { "check_result_path",                           SETTER(std::string const&, check_result_path) },
+  { "check_result_reaper_frequency",               SETTER(unsigned int, check_reaper_interval) },
+  { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
+  { "child_processes_fork_twice",                  SETTER(std::string const&, _set_child_processes_fork_twice) },
+  { "command_check_interval",                      SETTER(std::string const&, _set_command_check_interval) },
+  { "command_file",                                SETTER(std::string const&, command_file) },
+  { "comment_file",                                SETTER(std::string const&, _set_comment_file) },
+  { "daemon_dumps_core",                           SETTER(std::string const&, _set_daemon_dumps_core) },
+  { "date_format",                                 SETTER(std::string const&, _set_date_format) },
+  { "debug_file",                                  SETTER(std::string const&, debug_file) },
+  { "debug_level",                                 SETTER(unsigned long, debug_level) },
+  { "debug_verbosity",                             SETTER(unsigned int, debug_verbosity) },
+  { "downtime_file",                               SETTER(std::string const&, _set_downtime_file) },
+  { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
+  { "enable_environment_macros",                   SETTER(bool, enable_environment_macros) },
+  { "enable_event_handlers",                       SETTER(bool, enable_event_handlers) },
+  { "enable_failure_prediction",                   SETTER(bool, enable_failure_prediction) },
+  { "enable_flap_detection",                       SETTER(bool, enable_flap_detection) },
+  { "enable_notifications",                        SETTER(bool, enable_notifications) },
+  { "enable_predictive_host_dependency_checks",    SETTER(bool, enable_predictive_host_dependency_checks) },
+  { "enable_predictive_service_dependency_checks", SETTER(bool, enable_predictive_service_dependency_checks) },
+  { "event_broker_options",                        SETTER(std::string const&, _set_event_broker_options) },
+  { "event_handler_timeout",                       SETTER(unsigned int, event_handler_timeout) },
+  { "execute_host_checks",                         SETTER(bool, execute_host_checks) },
+  { "execute_service_checks",                      SETTER(bool, execute_service_checks) },
+  { "external_command_buffer_slots",               SETTER(int, external_command_buffer_slots) },
+  { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
+  { "global_host_event_handler",                   SETTER(std::string const&, global_host_event_handler) },
+  { "global_service_event_handler",                SETTER(std::string const&, global_service_event_handler) },
+  { "high_host_flap_threshold",                    SETTER(float, high_host_flap_threshold) },
+  { "high_service_flap_threshold",                 SETTER(float, high_service_flap_threshold) },
+  { "host_check_timeout",                          SETTER(unsigned int, host_check_timeout) },
+  { "host_freshness_check_interval",               SETTER(unsigned int, host_freshness_check_interval) },
+  { "host_inter_check_delay_method",               SETTER(std::string const&, _set_host_inter_check_delay_method) },
+  { "host_perfdata_command",                       SETTER(std::string const&, host_perfdata_command) },
+  { "host_perfdata_file",                          SETTER(std::string const&, host_perfdata_file) },
+  { "host_perfdata_file_mode",                     SETTER(std::string const&, _set_host_perfdata_file_mode) },
+  { "host_perfdata_file_processing_command",       SETTER(std::string const&, host_perfdata_file_processing_command) },
+  { "host_perfdata_file_processing_interval",      SETTER(unsigned int, host_perfdata_file_processing_interval) },
+  { "host_perfdata_file_template",                 SETTER(std::string const&, host_perfdata_file_template) },
+  { "illegal_macro_output_chars",                  SETTER(std::string const&, illegal_output_chars) },
+  { "illegal_object_name_chars",                   SETTER(std::string const&, illegal_object_chars) },
+  { "interval_length",                             SETTER(unsigned int, interval_length) },
+  { "lock_file",                                   SETTER(std::string const&, _set_lock_file) },
+  { "log_archive_path",                            SETTER(std::string const&, _set_log_archive_path) },
+  { "log_event_handlers",                          SETTER(bool, log_event_handlers) },
+  { "log_external_commands",                       SETTER(bool, log_external_commands) },
+  { "log_file",                                    SETTER(std::string const&, log_file) },
+  { "log_host_retries",                            SETTER(bool, log_host_retries) },
+  { "log_initial_states",                          SETTER(bool, log_initial_states) },
+  { "log_notifications",                           SETTER(bool, log_notifications) },
+  { "log_passive_checks",                          SETTER(bool, log_passive_checks) },
+  { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
+  { "log_service_retries",                         SETTER(bool, log_service_retries) },
+  { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
+  { "low_service_flap_threshold",                  SETTER(float, low_service_flap_threshold) },
+  { "max_check_result_file_age",                   SETTER(unsigned long, max_check_result_file_age) },
+  { "max_check_result_reaper_time",                SETTER(unsigned int, max_check_reaper_time) },
+  { "max_concurrent_checks",                       SETTER(unsigned int, max_parallel_service_checks) },
+  { "max_debug_file_size",                         SETTER(unsigned long, max_debug_file_size) },
+  { "max_host_check_spread",                       SETTER(unsigned int, max_host_check_spread) },
+  { "max_log_file_size",                           SETTER(unsigned long, max_log_file_size) },
+  { "max_service_check_spread",                    SETTER(unsigned int, max_service_check_spread) },
+  { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
+  { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
+  { "notification_timeout",                        SETTER(unsigned int, notification_timeout) },
+  { "object_cache_file",                           SETTER(std::string const&, object_cache_file) },
+  { "obsess_over_hosts",                           SETTER(bool, obsess_over_hosts) },
+  { "obsess_over_services",                        SETTER(bool, obsess_over_services) },
+  { "ochp_command",                                SETTER(std::string const&, ochp_command) },
+  { "ochp_timeout",                                SETTER(unsigned int, ochp_timeout) },
+  { "ocsp_command",                                SETTER(std::string const&, ocsp_command) },
+  { "ocsp_timeout",                                SETTER(unsigned int, ocsp_timeout) },
+  { "p1_file",                                     SETTER(std::string const&, _set_p1_file) },
+  { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
+  { "perfdata_timeout",                            SETTER(int, perfdata_timeout) },
+  { "precached_object_file",                       SETTER(std::string const&, precached_object_file) },
+  { "process_performance_data",                    SETTER(bool, process_performance_data) },
+  { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
+  { "retained_contact_host_attribute_mask",        SETTER(unsigned long, retained_contact_host_attribute_mask) },
+  { "retained_contact_service_attribute_mask",     SETTER(unsigned long, retained_contact_service_attribute_mask) },
+  { "retained_host_attribute_mask",                SETTER(unsigned long, retained_host_attribute_mask) },
+  { "retained_process_host_attribute_mask",        SETTER(unsigned long, retained_process_host_attribute_mask) },
+  { "retained_process_service_attribute_mask",     SETTER(std::string const&, _set_retained_process_service_attribute_mask) },
+  { "retained_service_attribute_mask",             SETTER(std::string const&, _set_retained_service_attribute_mask) },
+  { "retain_state_information",                    SETTER(bool, retain_state_information) },
+  { "retention_scheduling_horizon",                SETTER(unsigned int, retention_scheduling_horizon) },
+  { "retention_update_interval",                   SETTER(unsigned int, retention_update_interval) },
+  { "service_check_timeout",                       SETTER(unsigned int, service_check_timeout) },
+  { "service_freshness_check_interval",            SETTER(unsigned int, service_freshness_check_interval) },
+  { "service_inter_check_delay_method",            SETTER(std::string const&, _set_service_inter_check_delay_method) },
+  { "service_interleave_factor",                   SETTER(std::string const&, _set_service_interleave_factor_method) },
+  { "service_perfdata_command",                    SETTER(std::string const&, service_perfdata_command) },
+  { "service_perfdata_file",                       SETTER(std::string const&, service_perfdata_file) },
+  { "service_perfdata_file_mode",                  SETTER(std::string const&, _set_service_perfdata_file_mode) },
+  { "service_perfdata_file_processing_command",    SETTER(std::string const&, service_perfdata_file_processing_command) },
+  { "service_perfdata_file_processing_interval",   SETTER(unsigned int, service_perfdata_file_processing_interval) },
+  { "service_perfdata_file_template",              SETTER(std::string const&, service_perfdata_file_template) },
+  { "service_reaper_frequency",                    SETTER(unsigned int, check_reaper_interval) },
+  { "sleep_time",                                  SETTER(float, sleep_time) },
+  { "soft_state_dependencies",                     SETTER(bool, soft_state_dependencies) },
+  { "state_retention_file",                        SETTER(std::string const&, state_retention_file) },
+  { "status_file",                                 SETTER(std::string const&, status_file) },
+  { "status_update_interval",                      SETTER(unsigned int, status_update_interval) },
+  { "temp_file",                                   SETTER(std::string const&, _set_temp_file) },
+  { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
+  { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
+  { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
+  { "use_aggressive_host_checking",                SETTER(bool, use_aggressive_host_checking) },
+  { "use_agressive_host_checking",                 SETTER(bool, use_aggressive_host_checking) },
+  { "use_check_result_path",                       SETTER(bool, use_check_result_path) },
+  { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
+  { "use_large_installation_tweaks",               SETTER(bool, use_large_installation_tweaks) },
+  { "use_regexp_matching",                         SETTER(bool, use_regexp_matches) },
+  { "use_retained_program_state",                  SETTER(bool, use_retained_program_state) },
+  { "use_retained_scheduling_info",                SETTER(bool, use_retained_scheduling_info) },
+  { "use_setpgid",                                 SETTER(bool, use_setpgid) },
+  { "use_syslog",                                  SETTER(bool, use_syslog) },
+  { "use_timezone",                                SETTER(std::string const&, use_timezone) },
+  { "use_true_regexp_matching",                    SETTER(bool, use_true_regexp_matching) },
+  { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
+  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) }
+};
 
-/**************************************
-*                                     *
-*           Public Methods            *
-*                                     *
-**************************************/
+// Default values.
+static bool const                      default_accept_passive_host_checks(true);
+static bool const                      default_accept_passive_service_checks(true);
+static int const                       default_additional_freshness_latency(15);
+static std::string const               default_admin_email("");
+static std::string const               default_admin_pager("");
+static bool const                      default_allow_empty_hostgroup_assignment(false);
+static bool const                      default_auto_reschedule_checks(false);
+static unsigned int const              default_auto_rescheduling_interval(30);
+static unsigned int const              default_auto_rescheduling_window(180);
+static std::string const               default_broker_module_directory("");
+static unsigned long const             default_cached_host_check_horizon(15);
+static unsigned long const             default_cached_service_check_horizon(15);
+static bool const                      default_check_external_commands(true);
+static bool const                      default_check_host_freshness(false);
+static bool const                      default_check_orphaned_hosts(true);
+static bool const                      default_check_orphaned_services(true);
+static unsigned int const              default_check_reaper_interval(10);
+static std::string const               default_check_result_path(DEFAULT_CHECK_RESULT_PATH);
+static bool const                      default_check_service_freshness(true);
+static int const                       default_command_check_interval(-1);
+static std::string const               default_command_file(DEFAULT_COMMAND_FILE);
+static state::date_type const          default_date_format(state::us);
+static std::string const               default_debug_file(DEFAULT_DEBUG_FILE);
+static unsigned long const             default_debug_level(0);
+static unsigned int const              default_debug_verbosity(1);
+static bool const                      default_enable_environment_macros(false);
+static bool const                      default_enable_event_handlers(true);
+static bool const                      default_enable_failure_prediction(true);
+static bool const                      default_enable_flap_detection(false);
+static bool const                      default_enable_notifications(true);
+static bool const                      default_enable_predictive_host_dependency_checks(true);
+static bool const                      default_enable_predictive_service_dependency_checks(true);
+static unsigned long const             default_event_broker_options(std::numeric_limits<unsigned long>::max());
+static unsigned int const              default_event_handler_timeout(30);
+static bool const                      default_execute_host_checks(true);
+static bool const                      default_execute_service_checks(true);
+static int const                       default_external_command_buffer_slots(4096);
+static std::string const               default_global_host_event_handler("");
+static std::string const               default_global_service_event_handler("");
+static float const                     default_high_host_flap_threshold(30.0);
+static float const                     default_high_service_flap_threshold(30.0);
+static unsigned int const              default_host_check_timeout(30);
+static unsigned int const              default_host_freshness_check_interval(60);
+static state::inter_check_delay const  default_host_inter_check_delay_method(state::icd_smart);
+static state::perfdata_file_mode const default_host_perfdata_file_mode(state::mode_pipe);
+static unsigned int const              default_host_perfdata_file_processing_interval(0);
+static std::string const               default_host_perfdata_file_template("[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$");
+static std::string const               default_illegal_object_chars("");
+static std::string const               default_illegal_output_chars("`~$&|'\"<>");
+static unsigned int const              default_interval_length(60);
+static bool const                      default_log_event_handlers(true);
+static bool const                      default_log_external_commands(true);
+static std::string const               default_log_file(DEFAULT_LOG_FILE);
+static bool const                      default_log_host_retries(false);
+static bool const                      default_log_initial_states(false);
+static bool const                      default_log_notifications(true);
+static bool const                      default_log_passive_checks(true);
+static bool const                      default_log_service_retries(false);
+static float const                     default_low_host_flap_threshold(20.0);
+static float const                     default_low_service_flap_threshold(20.0);
+static unsigned int const              default_max_check_reaper_time(30);
+static unsigned long const             default_max_check_result_file_age(3600);
+static unsigned long const             default_max_debug_file_size(1000000);
+static unsigned int const              default_max_host_check_spread(30);
+static unsigned long const             default_max_log_file_size(0);
+static unsigned int const              default_max_parallel_service_checks(0);
+static unsigned int const              default_max_service_check_spread(30);
+static unsigned int const              default_notification_timeout(30);
+static std::string const               default_object_cache_file("");
+static bool const                      default_obsess_over_hosts(false);
+static bool const                      default_obsess_over_services(false);
+static std::string const               default_ochp_command("");
+static unsigned int const              default_ochp_timeout(15);
+static std::string const               default_ocsp_command("");
+static unsigned int const              default_ocsp_timeout(15);
+static bool const                      default_passive_host_checks_are_soft(false);
+static int const                       default_perfdata_timeout(5);
+static std::string const               default_precached_object_file(DEFAULT_PRECACHED_OBJECT_FILE);
+static bool const                      default_process_performance_data(false);
+static unsigned long const             default_retained_contact_host_attribute_mask(0L);
+static unsigned long const             default_retained_contact_service_attribute_mask(0L);
+static unsigned long const             default_retained_host_attribute_mask(0L);
+static unsigned long const             default_retained_process_host_attribute_mask(0L);
+static bool const                      default_retain_state_information(false);
+static unsigned int const              default_retention_scheduling_horizon(900);
+static unsigned int const              default_retention_update_interval(60);
+static unsigned int const              default_service_check_timeout(60);
+static unsigned int const              default_service_freshness_check_interval(60);
+static state::inter_check_delay const  default_service_inter_check_delay_method(state::icd_smart);
+static state::interleave_factor const  default_service_interleave_factor_method(state::ilf_smart);
+static state::perfdata_file_mode const default_service_perfdata_file_mode(state::mode_pipe);
+static unsigned int const              default_service_perfdata_file_processing_interval(0);
+static std::string const               default_service_perfdata_file_template("[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$");
+static float const                     default_sleep_time(0.5);
+static bool const                      default_soft_state_dependencies(false);
+static std::string const               default_state_retention_file(DEFAULT_RETENTION_FILE);
+static std::string const               default_status_file(DEFAULT_STATUS_FILE);
+static unsigned int const              default_status_update_interval(60);
+static unsigned int const              default_time_change_threshold(900);
+static bool const                      default_translate_passive_host_checks(false);
+static bool const                      default_use_aggressive_host_checking(false);
+static bool const                      default_use_check_result_path(false);
+static bool const                      default_use_large_installation_tweaks(false);
+static bool const                      default_use_regexp_matches(false);
+static bool const                      default_use_retained_program_state(true);
+static bool const                      default_use_retained_scheduling_info(false);
+static bool const                      default_use_setpgid(true);
+static bool const                      default_use_syslog(true);
+static std::string const               default_use_timezone("");
+static bool const                      default_use_true_regexp_matching(false);
 
 /**
- *  Get singleton.
- */
-state& state::instance() {
-  return (*_instance);
-}
-
-/**
- *  Load singleton.
- */
-void state::load() {
-  if (!_instance) {
-    _instance = new state;
-    config = _instance;
-  }
-  return;
-}
-
-/**
- *  Parse configuration file
+ *  Compare sets with the pointer content.
  *
- *  @param[in] filename configuration file
- */
-void state::parse(std::string const& filename) {
-  std::ifstream ifs;
-  ifs.open(filename.c_str(), std::ifstream::in);
-  if (ifs.is_open() == false) {
-    throw (engine_error() << "cannot open configuration file: '"
-           << filename << "'");
-  }
-
-  _filename = filename;
-  _command_check_interval_is_seconds = false;
-  for (_cur_line = 1; ifs.good(); ++_cur_line) {
-      std::string line = _getline(ifs);
-      if (line == "" || line[0] == '#') {
-              continue;
-      }
-
-      size_t pos = line.find_first_of('=');
-      if (pos == std::string::npos) {
-              throw (engine_error() << "[" << _filename << ":" << _cur_line
-               << "] bad variable name: '" << line << "'");
-      }
-      std::string key = line.substr(0, pos);
-      methods::const_iterator it = _lst_method.find(_trim(key).c_str());
-      if (it != _lst_method.end()) {
-              if (it->second != NULL) {
-                std::string value = line.substr(pos + 1);
-          try {
-            it->second(_trim(value).c_str(), *this);
-          }
-          catch (error const& e) {
-            throw (engine_error() << "[" << _filename << ":" << _cur_line
-                   << "] " << e.what());
-          }
-              }
-      }
-      else if (!key.compare(0, 13, "host_perfdata")
-                     || !key.compare(0, 16, "service_perfdata")) {
-              continue;
-      }
-      else {
-              throw (engine_error() << "[" << _filename << ":" << _cur_line
-                     << "] unknown variable name: '" << key << "'");
-      }
-  }
-  ifs.close();
-
-  if (!ifs.good() && !ifs.eof()) {
-    throw (engine_error() << filename << " parsing failed.");
-  }
-
-  if (_tab_string[log_file] == "") {
-    throw (engine_error() << "log_file is not specified anywhere in '" << _filename << "'");
-  }
-
-  if (!get_use_timezone().empty()) {
-    set_environment_var("TZ", get_use_timezone().c_str(), 1);
-  }
-  tzset();
-
-  delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
-  return;
-}
-
-/**
- *  Reset variable
- */
-void state::reset() {
-  _reset();
-  return;
-}
-
-/**
- *  Unload Singleton.
- */
-void state::unload() {
-  delete _instance;
-  _instance = NULL;
-  config = NULL;
-  return;
-}
-
-/**
- *  Get the admin email.
- *  @return The admin email.
- */
-std::string const& state::get_admin_email() const throw() {
-  return (_tab_string[admin_email]);
-}
-
-/**
- *  Get the admin pager.
- *  @return The admin pager.
- */
-std::string const& state::get_admin_pager() const throw() {
-  return (_tab_string[admin_pager]);
-}
-
-/**
- *  Get the logging filename.
- *  @return The logging filename.
- */
-std::string const& state::get_log_file() const throw() {
-  return (_tab_string[log_file]);
-}
-
-/**
- *  Get the broker_module directory.
- *  @return The broker_module directory.
- */
-std::string const& state::get_broker_module_directory() const throw() {
-  return (_tab_string[broker_module_directory]);
-}
-
-/**
- *  Get the debug filename.
- *  @return The debug filename.
- */
-std::string const& state::get_debug_file() const throw() {
-  return (_tab_string[debug_file]);
-}
-
-/**
- *  Get the command filename.
- *  @return The command filename.
- */
-std::string const& state::get_command_file() const throw() {
-  return (_tab_string[command_file]);
-}
-
-/**
- *  Get the check result path.
- *  @return The path.
- */
-std::string const& state::get_check_result_path() const throw() {
-  return (_tab_string[check_result_path]);
-}
-
-/**
- *  Get the global host event handler.
- *  @return The global host event handler.
- */
-std::string const& state::get_global_host_event_handler() const throw() {
-  return (_tab_string[global_host_event_handler]);
-}
-
-/**
- *  Get the global service event handler.
- *  @return The global service event handler.
- */
-std::string const& state::get_global_service_event_handler() const throw() {
-  return (_tab_string[global_service_event_handler]);
-}
-
-/**
- *  Get the ocsp command.
- *  @return The ocsp command.
- */
-std::string const& state::get_ocsp_command() const throw() {
-  return (_tab_string[ocsp_command]);
-}
-
-/**
- *  Get the ochp command.
- *  @return The ochp command.
- */
-std::string const& state::get_ochp_command() const throw() {
-  return (_tab_string[ochp_command]);
-}
-
-/**
- *  Get the illegal object characters.
- *  @return The illegal object characters.
- */
-std::string const& state::get_illegal_object_chars() const throw() {
-  return (_tab_string[illegal_object_chars]);
-}
-
-/**
- *  Get the illegal output characters.
- *  @return The illegal output characters.
- */
-std::string const& state::get_illegal_output_chars() const throw() {
-  return (_tab_string[illegal_output_chars]);
-}
-
-/**
- *  Get the use timezone.
- *  @return The use timezone.
- */
-std::string const& state::get_use_timezone() const throw() {
-  return (_tab_string[use_timezone]);
-}
-
-/**
- *  Get status file.
- *  @return The status file path.
- */
-std::string const& state::get_status_file() const throw() {
- return (_tab_string[status_file]);
-}
-
-/**
- *  Get state retention file.
- *  @return The state retention file path.
- */
-std::string const& state::get_state_retention_file() const throw() {
- return (_tab_string[state_retention_file]);
-}
-
-/**
- *  Get object cache file.
- *  @return The object cache file path.
- */
-std::string const& state::get_object_cache_file() const throw() {
- return (_tab_string[object_cache_file]);
-}
-
-/**
- *  Get precached object file.
- *  @return The precached object file path.
- */
-std::string const& state::get_precached_object_file() const throw() {
- return (_tab_string[precached_object_file]);
-}
-
-/**
- *  Get broker module.
- *  @return The list of broker module.
- */
-std::list<std::string> const& state::get_broker_module() const throw() {
- return (_lst_broker_module);
-}
-
-/**
- *  Get condifugration dir path.
- *  @return The list of configuration dir path.
- */
-std::list<std::string> const& state::get_cfg_dir() const throw() {
- return (_lst_cfg_dir);
-}
-
-/**
- *  Get configuration file path.
- *  @return The list of configuration file path.
- */
-std::list<std::string> const& state::get_cfg_file() const throw() {
- return (_lst_cfg_file);
-}
-
-/**
- *  Get resource file path.
- *  @return The list of resource file path.
- */
-std::list<std::string> const& state::get_resource_file() const throw() {
- return (_lst_resource_file);
-}
-
-/**
- *  Get perfdata timeout.
- *  @return The perfdata timeout.
- */
-int state::get_perfdata_timeout() const throw() {
- return (_tab_int[perfdata_timeout]);
-}
-
-/**
- *  Get the additional freshness latency.
- *  @return The additional freshness latency.
- */
-int state::get_additional_freshness_latency() const throw() {
-  return (_tab_int[additional_freshness_latency]);
-}
-
-/**
- *  Get the debug level.
- *  @return The debug level.
- */
-unsigned long state::get_debug_level() const throw() {
-  return (_tab_ulong[debug_level]);
-}
-
-/**
- *  Get the debug verbosity.
- *  @return The debug verbosity.
- */
-unsigned int state::get_debug_verbosity() const throw() {
-  return (_tab_uint[debug_verbosity]);
-}
-
-/**
- *  Get the command check interval.
- *  @return The command check interval.
- */
-int state::get_command_check_interval() const throw() {
-  return (_tab_int[command_check_interval]);
-}
-
-/**
- *  Get the external command buffer slots.
- *  @return The external command buffer slots.
- */
-int state::get_external_command_buffer_slots() const throw() {
-  return (_tab_int[external_command_buffer_slots]);
-}
-
-/**
- *  Get the get max service check spread.
- *  @return The get max service check spread.
- */
-unsigned int state::get_max_service_check_spread() const throw() {
-  return (_tab_uint[max_service_check_spread]);
-}
-
-/**
- *  Get the max host check spread.
- *  @return The max host check spread.
- */
-unsigned int state::get_max_host_check_spread() const throw() {
-  return (_tab_uint[max_host_check_spread]);
-}
-
-/**
- *  Get the max parallel service checks.
- *  @return The max parallel service checks.
- */
-unsigned int state::get_max_parallel_service_checks() const throw() {
-  return (_tab_uint[max_parallel_service_checks]);
-}
-
-/**
- *  Get the check reaper interval.
- *  @return The check readper interval.
- */
-unsigned int state::get_check_reaper_interval() const throw() {
-  return (_tab_uint[check_reaper_interval]);
-}
-
-/**
- *  Get the max check reaper time.
- *  @return The max check reaper time.
- */
-unsigned int state::get_max_check_reaper_time() const throw() {
-  return (_tab_uint[max_check_reaper_time]);
-}
-
-/**
- *  Get the interval length.
- *  @return The interval length.
- */
-unsigned int state::get_interval_length() const throw() {
-  return (_tab_uint[interval_length]);
-}
-
-/**
- *  Get the service freshness check interval.
- *  @return The service freshness check interval.
- */
-unsigned int state::get_service_freshness_check_interval() const throw() {
-  return (_tab_uint[service_freshness_check_interval]);
-}
-
-/**
- *  Get the host freshness check interval.
- *  @return The host freshness check interval.
- */
-unsigned int state::get_host_freshness_check_interval() const throw() {
-  return (_tab_uint[host_freshness_check_interval]);
-}
-
-/**
- *  Get the auto rescheduling interval.
- *  @return The auto rescheduling interval.
- */
-unsigned int state::get_auto_rescheduling_interval() const throw() {
-  return (_tab_uint[auto_rescheduling_interval]);
-}
-
-/**
- *  Get the auto rescheduling window.
- *  @return The auto rescheduling window.
- */
-unsigned int state::get_auto_rescheduling_window() const throw() {
-  return (_tab_uint[auto_rescheduling_window]);
-}
-
-/**
- *  Get the status update interval.
- *  @return The status update interval.
- */
-unsigned int state::get_status_update_interval() const throw() {
-  return (_tab_uint[status_update_interval]);
-}
-
-/**
- *  Get the time change threshold.
- *  @return The time change threshold.
- */
-unsigned int state::get_time_change_threshold() const throw() {
-  return (_tab_uint[time_change_threshold]);
-}
-
-/**
- *  Get the retention update interval.
- *  @return The retention update interval.
- */
-unsigned int state::get_retention_update_interval() const throw() {
-  return (_tab_uint[retention_update_interval]);
-}
-
-/**
- *  Get the retention scheduling horizon.
- *  @return The retention scheduling horizon.
- */
-unsigned int state::get_retention_scheduling_horizon() const throw() {
-  return (_tab_uint[retention_scheduling_horizon]);
-}
-
-/**
- *  Get the service check timeout.
- *  @return The service check timeout.
- */
-unsigned int state::get_service_check_timeout() const throw() {
-  return (_tab_uint[service_check_timeout]);
-}
-
-/**
- *  Get the host check timeout.
- *  @return The host check timeout.
- */
-unsigned int state::get_host_check_timeout() const throw() {
-  return (_tab_uint[host_check_timeout]);
-}
-
-/**
- *  Get the event handler timeout.
- *  @return the event handler timeout.
- */
-unsigned int state::get_event_handler_timeout() const throw() {
-  return (_tab_uint[event_handler_timeout]);
-}
-
-/**
- *  Get the notification timeout.
- *  @return The notification timeout.
- */
-unsigned int state::get_notification_timeout() const throw() {
-  return (_tab_uint[notification_timeout]);
-}
-
-/**
- *  Get the oscp timeout.
- *  @return The oscp timeout.
- */
-unsigned int state::get_ocsp_timeout() const throw() {
-  return (_tab_uint[ocsp_timeout]);
-}
-
-/**
- *  Get the ochp timeout.
- *  @return The ochp timeout.
- */
-unsigned int state::get_ochp_timeout() const throw() {
-  return (_tab_uint[ochp_timeout]);
-}
-
-/**
- *  Get the max debug file size.
- *  @return The max debug file size.
- */
-unsigned long state::get_max_debug_file_size() const throw() {
-  return (_tab_ulong[max_debug_file_size]);
-}
-
-/**
- *  Get the max log file size.
- *  @return The max log file size.
- */
-unsigned long state::get_max_log_file_size() const throw() {
-  return (_tab_ulong[max_log_file_size]);
-}
-
-/**
- *  Get the max check result file age.
- *  @return The max file aage.
- */
-unsigned long state::get_max_check_result_file_age() const throw() {
-  return (_tab_ulong[max_check_result_file_age]);
-}
-
-/**
- *  Get the retained host attribute mask.
- *  @return The retained host attribute mask.
- */
-unsigned long state::get_retained_host_attribute_mask() const throw() {
-  return (_tab_ulong[retained_host_attribute_mask]);
-}
-
-/**
- *  Get the retained process host attribute mask.
- *  @return The retained process host attribute mask.
- */
-unsigned long state::get_retained_process_host_attribute_mask() const throw() {
-  return (_tab_ulong[retained_process_host_attribute_mask]);
-}
-
-/**
- *  Get the retained contact host attribute mask.
- *  @return The retained contact host attribute mask.
- */
-unsigned long state::get_retained_contact_host_attribute_mask() const throw() {
-  return (_tab_ulong[retained_contact_host_attribute_mask]);
-}
-
-/**
- *  Get the retained contact service attribute mask.
- *  @return The retained contact service attribute mask.
- */
-unsigned long state::get_retained_contact_service_attribute_mask() const throw() {
-  return (_tab_ulong[retained_contact_service_attribute_mask]);
-}
-
-/**
- *  Get the cached host check horizon.
- *  @return The cached host check horizon.
- */
-unsigned long state::get_cached_host_check_horizon() const throw() {
-  return (_tab_ulong[cached_host_check_horizon]);
-}
-
-/**
- *  Get the cached service check horizon.
- *  @return The cached service check horizon.
- */
-unsigned long state::get_cached_service_check_horizon() const throw() {
-  return (_tab_ulong[cached_service_check_horizon]);
-}
-
-/**
- *  Get the event broker options.
- *  @return The event broker options.
- */
-unsigned long state::get_event_broker_options() const throw() {
-  return (_tab_ulong[event_broker_options]);
-}
-
-/**
- *  Get the use syslog.
- *  @return The use syslog.
- */
-bool state::get_use_syslog() const throw() {
-  return (_tab_bool[use_syslog]);
-}
-
-/**
- *  Get the logging notifications.
- *  @return Th logging notifications.
- */
-bool state::get_log_notifications() const throw() {
-  return (_tab_bool[log_notifications]);
-}
-
-/**
- *  Get the logging service retries.
- *  @return The logging service retries.
- */
-bool state::get_log_service_retries() const throw() {
-  return (_tab_bool[log_service_retries]);
-}
-
-/**
- *  Get the logging host retries.
- *  @return The logging host retries.
- */
-bool state::get_log_host_retries() const throw() {
-  return (_tab_bool[log_host_retries]);
-}
-
-/**
- *  Get the logging event handlers.
- *  @return T
- */
-bool state::get_log_event_handlers() const throw() {
-  return (_tab_bool[log_event_handlers]);
-}
-
-/**
- *  Get the logging event handlers.
- *  @return The logging event handlers.
- */
-bool state::get_log_external_commands() const throw() {
-  return (_tab_bool[log_external_commands]);
-}
-
-/**
- *  Get the logging passive checks.
- *  @return The logging passive checks.
- */
-bool state::get_log_passive_checks() const throw() {
-  return (_tab_bool[log_passive_checks]);
-}
-
-/**
- *  Get the logging initial state.
- *  @return The logging initial state.
- */
-bool state::get_log_initial_state() const throw() {
-  return (_tab_bool[log_initial_state]);
-}
-
-/**
- *  Get the retain state information.
- *  @return The retain state information.
- */
-bool state::get_retain_state_information() const throw() {
-  return (_tab_bool[retain_state_information]);
-}
-
-/**
- *  Get the use retained program state.
- *  @return The use retained program state.
- */
-bool state::get_use_retained_program_state() const throw() {
-  return (_tab_bool[use_retained_program_state]);
-}
-
-/**
- *  Get the use retained schedyling info.
- *  @return The use retained schedyling info.
- */
-bool state::get_use_retained_scheduling_info() const throw() {
-  return (_tab_bool[use_retained_scheduling_info]);
-}
-
-/**
- *  Get the obsess over services.
- *  @return The obsess over services.
- */
-bool state::get_obsess_over_services() const throw() {
-  return (_tab_bool[obsess_over_services]);
-}
-
-/**
- *  Get the obsess over hosts.
- *  @return The obsess over hosts.
- */
-bool state::get_obsess_over_hosts() const throw() {
-  return (_tab_bool[obsess_over_hosts]);
-}
-
-/**
- *  Get the translate passive host checks.
- *  @return The translate passive host checks.
- */
-bool state::get_translate_passive_host_checks() const throw() {
-  return (_tab_bool[translate_passive_host_checks]);
-}
-
-/**
- *  Get the passive host checks are soft
- *  @return The passive host checks are soft
- */
-bool state::get_passive_host_checks_are_soft() const throw() {
-  return (_tab_bool[passive_host_checks_are_soft]);
-}
-
-/**
- *  Get the use aggressive host checking.
- *  @return The use aggressive host checking.
- */
-bool state::get_use_aggressive_host_checking() const throw() {
-  return (_tab_bool[use_aggressive_host_checking]);
-}
-
-/**
- *  Get the enable predictive host dependency checks.
- *  @return The enable predictive host dependency checks.
- */
-bool state::get_enable_predictive_host_dependency_checks() const throw() {
-  return (_tab_bool[enable_predictive_host_dependency_checks]);
-}
-
-/**
- *  Get the enable predictive service dependency checks.
- *  @return The enable predictive service dependency checks.
- */
-bool state::get_enable_predictive_service_dependency_checks() const throw() {
-  return (_tab_bool[enable_predictive_service_dependency_checks]);
-}
-
-/**
- *  Get the soft state dependencies.
- *  @return The soft state dependencies.
- */
-bool state::get_soft_state_dependencies() const throw() {
-  return (_tab_bool[soft_state_dependencies]);
-}
-
-/**
- *  Get the enable event handlers.
- *  @return The enable event handlers.
- */
-bool state::get_enable_event_handlers() const throw() {
-  return (_tab_bool[enable_event_handlers]);
-}
-
-/**
- *  Get the enable notifications.
- *  @return The enable notifications.
- */
-bool state::get_enable_notifications() const throw() {
-  return (_tab_bool[enable_notifications]);
-}
-
-/**
- *  Get the execute service checks.
- *  @return The execute service checks.
- */
-bool state::get_execute_service_checks() const throw() {
-  return (_tab_bool[execute_service_checks]);
-}
-
-/**
- *  Get the accept passive service checks.
- *  @return The accept passive service checks.
- */
-bool state::get_accept_passive_service_checks() const throw() {
-  return (_tab_bool[accept_passive_service_checks]);
-}
-
-/**
- *  Get the execute host checks.
- *  @return The execute host checks.
- */
-bool state::get_execute_host_checks() const throw() {
-  return (_tab_bool[execute_host_checks]);
-}
-
-/**
- *  Get the accept passive host checks.
- *  @return The accept passive host checks.
- */
-bool state::get_accept_passive_host_checks() const throw() {
-  return (_tab_bool[accept_passive_host_checks]);
-}
-
-/**
- *  Get the check external commands.
- *  @return The check external commands.
- */
-bool state::get_check_external_commands() const throw() {
-  return (_tab_bool[check_external_commands]);
-}
-
-/**
- *  Get the check orphaned services.
- *  @return The check orphaned services.
- */
-bool state::get_check_orphaned_services() const throw() {
-  return (_tab_bool[check_orphaned_services]);
-}
-
-/**
- *  Get the check orphaned hosts.
- *  @return The check orphaned hosts.
- */
-bool state::get_check_orphaned_hosts() const throw() {
-  return (_tab_bool[check_orphaned_hosts]);
-}
-
-/**
- *  Get the check service freshness.
- *  @return The check service freshness.
- */
-bool state::get_check_service_freshness() const throw() {
-  return (_tab_bool[check_service_freshness]);
-}
-
-/**
- *  Get the check host freshness.
- *  @return The check host freshness.
- */
-bool state::get_check_host_freshness() const throw() {
-  return (_tab_bool[check_host_freshness]);
-}
-
-/**
- *  Get the auto reschedule checks.
- *  @return The auto reschedule checks.
- */
-bool state::get_auto_reschedule_checks() const throw() {
-  return (_tab_bool[auto_reschedule_checks]);
-}
-
-/**
- *  Get the process performance data.
- *  @return The process performance data.
- */
-bool state::get_process_performance_data() const throw() {
-  return (_tab_bool[process_performance_data]);
-}
-
-/**
- *  Get the enable flap detection.
- *  @return The enable flap detection.
- */
-bool state::get_enable_flap_detection() const throw() {
-  return (_tab_bool[enable_flap_detection]);
-}
-
-/**
- *  Get the enable failure prediction.
- *  @return The enable failure prediction.
- */
-bool state::get_enable_failure_prediction() const throw() {
-  return (_tab_bool[enable_failure_prediction]);
-}
-
-/**
- *  Get the use regexp matching.
- *  @return The use regexp matching.
- */
-bool state::get_use_regexp_matches() const throw() {
-  return (_tab_bool[use_regexp_matches]);
-}
-
-/**
- *  Get the use true regexp matching.
- *  @return The use true regexp matching.
- */
-bool state::get_use_true_regexp_matching() const throw() {
-  return (_tab_bool[use_true_regexp_matching]);
-}
-
-/**
- *  Get the use large installation tweaks.
- *  @return The use large installation tweaks.
- */
-bool state::get_use_large_installation_tweaks() const throw() {
-  return (_tab_bool[use_large_installation_tweaks]);
-}
-
-/**
- *  Get the enable environnement macros.
- *  @return The enable environnement macros.
- */
-bool state::get_enable_environment_macros() const throw() {
-  return (_tab_bool[enable_environment_macros]);
-}
-
-/**
- *  Get the allow empty hostgroup assignment.
- *  @return The allow empty hostgroup assignment.
- */
-bool state::get_allow_empty_hostgroup_assignment() const throw() {
-  return (_tab_bool[allow_empty_hostgroup_assignment]);
-}
-
-/**
- *  Get if use the check result path.
- *  @return True if using compatibility check result path.
- */
-bool state::get_use_check_result_path() const throw() {
-  return (_tab_bool[use_check_result_path]);
-}
-
-/**
- *  Get the sleep time.
- *  @return The sleep time.
- */
-float state::get_sleep_time() const throw() {
-  return (_tab_float[sleep_time]);
-}
-
-/**
- *  Get the low service flap threshold.
- *  @return The low service flap threshold.
- */
-float state::get_low_service_flap_threshold() const throw() {
-  return (_tab_float[low_service_flap_threshold]);
-}
-
-/**
- *  Get the hight service flap threshold.
- *  @return The hight service flap threshold.
- */
-float state::get_high_service_flap_threshold() const throw() {
-  return (_tab_float[high_service_flap_threshold]);
-}
-
-/**
- *  Get the low host flap threshold.
- *  @return The low host flap threshold.
- */
-float state::get_low_host_flap_threshold() const throw() {
-  return (_tab_float[low_host_flap_threshold]);
-}
-
-/**
- *  Get the high host flap threshold.
- *  @return The high host flap threshold.
- */
-float state::get_high_host_flap_threshold() const throw() {
-  return (_tab_float[high_host_flap_threshold]);
-}
-
-/**
- *  Get the date format.
- *  @return The date format.
- */
-state::e_date_format state::get_date_format() const throw() {
-  return (static_cast<e_date_format>(_tab_uint[date_format]));
-}
-
-/**
- *  Get the service inter check delay method.
- *  @return The service inter check delay method.
- */
-state::e_inter_check_delay state::get_service_inter_check_delay_method() const throw() {
-  return (static_cast<e_inter_check_delay>(_tab_uint[service_inter_check_delay_method]));
-}
-
-/**
- *  Get the host inter check delay method.
- *  @return The host inter check delay method.
- */
-state::e_inter_check_delay state::get_host_inter_check_delay_method() const throw() {
-  return (static_cast<e_inter_check_delay>(_tab_uint[host_inter_check_delay_method]));
-}
-
-/**
- *  Get the service interleave factor method.
- *  @return The service interleave factor method.
- */
-state::e_interleave_factor state::get_service_interleave_factor_method() const throw() {
-  return (static_cast<e_interleave_factor>(_tab_uint[service_interleave_factor_method]));
-}
-
-/**
- *  Get if use setpgid.
- *  @return True if use setpgid, otherwise false.
- */
-bool state::get_use_setpgid() const throw () {
-  return (_tab_bool[use_setpgid]);
-}
-
-/**
- *  Set the logging filename.
- *  @param[in] value The filename.
- */
-void state::set_log_file(std::string const& value) {
-  _tab_string[log_file] = value;
-
-  delete[] _mac->x[MACRO_LOGFILE];
-  _mac->x[MACRO_LOGFILE] = my_strdup(value.c_str());
-
-  delete[] ::log_file;
-  ::log_file = my_strdup(_mac->x[MACRO_LOGFILE]);
-  return;
-}
-
-/**
- *  Set the broker module directory.
- *  @param[in] value The broker module directory.
- */
-void state::set_broker_module_directory(std::string const& value) {
-  _tab_string[broker_module_directory] = value;
-  return;
-}
-
-/**
- *  Set the debug filename.
- *  @param[in] value The filename
- */
-void state::set_debug_file(std::string const& value) {
-  _tab_string[debug_file] = value;
-
-  delete[] ::debug_file;
-  ::debug_file = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the command filename.
- *  @param[in] value The filename.
- */
-void state::set_command_file(std::string const& value) {
-  _tab_string[command_file] = value;
-
-  delete[] _mac->x[MACRO_COMMANDFILE];
-  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.c_str());
-
-  delete[] ::command_file;
-  ::command_file = my_strdup(_mac->x[MACRO_COMMANDFILE]);
-  return;
-}
-
-/**
- *  Set the temporary filename.
- *  @param[in] value The filename.
- */
-void state::set_temp_file(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: temp_file variable ignored";
-  return;
-}
-
-/**
- *  Set the temporary path.
- *  @param[in] value Unused.
- */
-void state::set_temp_path(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: temp_path variable ignored";
-  return;
-}
-
-/**
- *  Set the check result path.
- *  @param[in] value Unused.
- */
-void state::set_check_result_path(std::string const& value) {
-  logger(log_config_warning, basic)
-    << "warning: check_result_path is deprecated";
-
-  _tab_string[check_result_path] = value;
-
-  delete[] ::check_result_path;
-  ::check_result_path = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the global host event handler.
- *  @param[in] value The event handler.
- */
-void state::set_global_host_event_handler(std::string const& value) {
-  _tab_string[global_host_event_handler] = value;
-
-  delete[] ::global_host_event_handler;
-  ::global_host_event_handler = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the service event handler.
- *  @param[in] value The event handler.
- */
-void state::set_global_service_event_handler(std::string const& value) {
-  _tab_string[global_service_event_handler] = value;
-
-  delete[] ::global_service_event_handler;
-  ::global_service_event_handler = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the ocsp command.
- *  @param[in] value The command.
- */
-void state::set_ocsp_command(std::string const& value) {
-  _tab_string[ocsp_command] = value;
-
-  delete[] ::ocsp_command;
-  ::ocsp_command = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the ochp command.
- *  @param[in] value The command.
- */
-void state::set_ochp_command(std::string const& value) {
-  _tab_string[ochp_command] = value;
-
-  delete[] ::ochp_command;
-  ::ochp_command = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the logging archive path.
- *  @param[in] value The path.
- */
-void state::set_log_archive_path(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: log_archive_path variable ignored";
-  return;
-}
-
-/**
- *  p1 filename ignore.
- *  @param[in] value Unused.
- */
-void state::set_p1_file(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: p1_file variable ignored";
-  return;
-}
-
-/**
- *  Set the illegal object characters.
- *  @param[in] value The illegal object characters.
- */
-void state::set_illegal_object_chars(std::string const& value) {
-  _tab_string[illegal_object_chars] = value;
-
-  delete[] ::illegal_object_chars;
-  ::illegal_object_chars = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the illegal output characters.
- *  @param[in] value The illegal output characters.
- */
-void state::set_illegal_output_chars(std::string const& value) {
-  _tab_string[illegal_output_chars] = value;
-
-  delete[] ::illegal_output_chars;
-  ::illegal_output_chars = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the use timezone.
- *  @param[in] value The timezone.
- */
-void state::set_use_timezone(std::string const& value) {
-  _tab_string[use_timezone] = value;
-
-  delete[] ::use_timezone;
-  ::use_timezone = my_strdup(value.c_str());
-  return;
-}
-
-/**
- *  Set the additional freshness latency.
- *  @param[in] value The additional freshness latency.
- */
-void state::set_additional_freshness_latency(int value) {
-  _tab_int[additional_freshness_latency] = value;
-  ::additional_freshness_latency = value;
-  return;
-}
-
-/**
- *  Set the debug level.
- *  @param[in] value The level.
- */
-void state::set_debug_level(unsigned long value) {
-  if (value == UINT_MAX) {
-    _tab_ulong[debug_level] = static_cast<unsigned long>(all);
-  }
-  else {
-    _tab_ulong[debug_level] = value;
-  }
-  ::debug_level = _tab_ulong[debug_level];
-  return;
-}
-
-/**
- *  Set the debug verbosity.
- *  @param[in] value The verbosity.
- */
-void state::set_debug_verbosity(unsigned int value) {
-  if (value > most) {
-    _tab_uint[debug_verbosity] = static_cast<unsigned int>(most);
-  }
-  else {
-    _tab_uint[debug_verbosity] = value;
-  }
-  ::debug_verbosity = _tab_uint[debug_verbosity];
-  return;
-}
-
-/**
- *  Set the command check interval.
- *  @param[in] value The check interval.
- */
-void state::set_command_check_interval(int value) {
-  _tab_int[command_check_interval] = value;
-  ::command_check_interval = value;
-
-  if (_tab_int[command_check_interval] < -1
-      || _tab_int[command_check_interval] == 0) {
-    throw (engine_error() << "command_check_interval: invalid value");
-  }
-
-  // adjust command check interval
-  if (_command_check_interval_is_seconds == false &&
-      _tab_int[command_check_interval] != -1) {
-    _tab_int[command_check_interval] *= _tab_uint[interval_length];
-  }
-  return;
-}
-
-/**
- *  Set the command check interval.
+ *  @param[in] s1 The first set.
+ *  @param[in] s2 The second set.
  *
- *  @param[in] value     Time interval.
- *  @param[in] is_second Is value is in second.
- */
-void state::set_command_check_interval(int value, bool is_second) {
-  _command_check_interval_is_seconds = is_second;
-  set_command_check_interval(value);
-  return;
-}
-
-/**
- *  Set the command check interval.
- *  @param[in] value The check interval.
- */
-void state::set_command_check_interval(std::string const& value) {
-  std::string val = value;
-  size_t pos = val.find('s');
-
-  if (pos == std::string::npos) {
-    _command_check_interval_is_seconds = false;
-  }
-  else if (pos == val.size() - 1) {
-    _command_check_interval_is_seconds = true;
-    val.erase(val.begin() + pos);
-  }
-
-  cpp_suck<int, &state::set_command_check_interval>::set_generic(val.c_str(), *this);
-  return;
-}
-
-/**
- *  Set the external command buffer slots.
- *  @param[in] value The external command buffer slots.
- */
-void state::set_external_command_buffer_slots(int value) {
-  _tab_int[external_command_buffer_slots] = value;
-  ::external_command_buffer_slots = value;
-  return;
-}
-
-/**
- *  Set the max service check spread.
- *  @param[in] value The max service check spread.
- */
-void state::set_max_service_check_spread(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error() << "max_service_check_spread: invalid value");
-  }
-  _tab_uint[max_service_check_spread] = value;
-  ::max_service_check_spread = value;
-  return;
-}
-
-/**
- *  Set the max host check spread.
- *  @param[in] value The max host check spread.
- */
-void state::set_max_host_check_spread(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error() << "max_host_check_spread: invalid value");
-  }
-  _tab_uint[max_host_check_spread] = value;
-  ::max_host_check_spread = value;
-  return;
-}
-
-/**
- *  Set the max parallel service checks.
- *  @param[in] value The max parallel service checks.
- */
-void state::set_max_parallel_service_checks(unsigned int value) {
-  _tab_uint[max_parallel_service_checks] = value;
-  ::max_parallel_service_checks = value;
-  return;
-}
-
-/**
- *  Set the check reaper interval.
- *  @param[in] value The reaper interval.
- */
-void state::set_check_reaper_interval(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error() << "check_reaper_interval: invalid value");
-  }
-  _tab_uint[check_reaper_interval] = value;
-  ::check_reaper_interval = value;
-  return;
-}
-
-/**
- *  Set the max check reaper time.
- *  @param[in] value The reaper time.
- */
-void state::set_max_check_reaper_time(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error() << "max_check_reaper_time: invalid value");
-  }
-  _tab_uint[max_check_reaper_time] = value;
-  ::max_check_reaper_time = value;
-  return;
-}
-
-/**
- *  Set the interval length.
- *  @param[in] value The interval length.
- */
-void state::set_interval_length(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error() << "interval_length: invalid value");
-  }
-
-  if (_command_check_interval_is_seconds == false &&
-      _tab_int[command_check_interval] != -1) {
-    _tab_int[command_check_interval] /= _tab_uint[interval_length];
-    _tab_uint[interval_length] = value;
-    _tab_int[command_check_interval] *= _tab_uint[interval_length];
-  }
-  else {
-    _tab_uint[interval_length] = value;
-  }
-  ::interval_length = value;
-  return;
-}
-
-/**
- *  Set the service freshness check interval.
- *  @param[in] value The check interval.
- */
-void state::set_service_freshness_check_interval(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "service_freshness_check_interval: invalid value");
-  }
-  _tab_uint[service_freshness_check_interval] = value;
-  ::service_freshness_check_interval = value;
-  return;
-}
-
-/**
- *  Set the host freshness check interval.
- *  @param[in] value The check interval.
- */
-void state::set_host_freshness_check_interval(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "host_freshness_check_interval: invalid value");
-  }
-  _tab_uint[host_freshness_check_interval] = value;
-  ::host_freshness_check_interval = value;
-  return;
-}
-
-/**
- *  Set the auto rescheduling interval.
- *  @param[in] value The rescheduling interval.
- */
-void state::set_auto_rescheduling_interval(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "auto_rescheduling_interval: invalid value");
-  }
-  _tab_uint[auto_rescheduling_interval] = value;
-  ::auto_rescheduling_interval = value;
-  return;
-}
-
-/**
- *  Set the auto rescheduling window.
- *  @param[in] value The rescheduling window.
- */
-void state::set_auto_rescheduling_window(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "auto_rescheduling_window: invalid value");
-  }
-  _tab_uint[auto_rescheduling_window] = value;
-  ::auto_rescheduling_window = value;
-  return;
-}
-
-/**
- *  Set the status update interval.
- *  @param[in] value The status update interval.
- */
-void state::set_status_update_interval(unsigned int value) {
-  if (value < 2) {
-    throw (engine_error()
-           << "status_update_interval: invalid value");
-  }
-  _tab_uint[status_update_interval] = value;
-  ::status_update_interval = value;
-  return;
-}
-
-/**
- *  Set the time change threshold.
- *  @param[in] value The time change threshold.
- */
-void state::set_time_change_threshold(unsigned int value) {
-  if (value < 6) {
-    throw (engine_error()
-           << "time_change_threshold: invalid value");
-  }
-  _tab_uint[time_change_threshold] = value;
-  ::time_change_threshold = value;
-  return;
-}
-
-/**
- *  Set the retention update interval.
- *  @param[in] value The update interval.
- */
-void state::set_retention_update_interval(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "retention_update_interval: invalid value");
-  }
-  _tab_uint[retention_update_interval] = value;
-  ::retention_update_interval = value;
-  return;
-}
-
-/**
- *  Set the retention scheduling horizon.
- *  @param[in] value The retention scheduling horizon.
- */
-void state::set_retention_scheduling_horizon(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "retention_scheduling_horizon: invalid value");
-  }
-  _tab_uint[retention_scheduling_horizon] = value;
-  ::retention_scheduling_horizon = value;
-  return;
-}
-
-/**
- *  Set the service check timeout.
- *  @param[in] value The timeout.
- */
-void state::set_service_check_timeout(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "service_check_timeout: invalid value");
-  }
-  _tab_uint[service_check_timeout] = value;
-  ::service_check_timeout = value;
-  return;
-}
-
-/**
- *  Set the host check timeout.
- *  @param[in] value The timeout.
- */
-void state::set_host_check_timeout(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "host_check_timeout: invalid value");
-  }
-  _tab_uint[host_check_timeout] = value;
-  ::host_check_timeout = value;
-  return;
-}
-
-/**
- *  Set the event handler timeout.
- *  @param[in] value The timeout.
- */
-void state::set_event_handler_timeout(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "event_handler_timeout: invalid value");
-  }
-  _tab_uint[event_handler_timeout] = value;
-  ::event_handler_timeout = value;
-  return;
-}
-
-/**
- *  Set the notification timeout.
- *  @param[in] value The timeout.
- */
-void state::set_notification_timeout(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "notification_timeout: invalid value");
-  }
-  _tab_uint[notification_timeout] = value;
-  ::notification_timeout = value;
-  return;
-}
-
-/**
- *  Set the ocsp timeout.
- *  @param[in] value The timeout.
- */
-void state::set_ocsp_timeout(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "ocsp_timeout: invalid value");
-  }
-  _tab_uint[ocsp_timeout] = value;
-  ::ocsp_timeout = value;
-  return;
-}
-
-/**
- *  Set the ochp timeout.
- *  @param[in] value The timeout.
- */
-void state::set_ochp_timeout(unsigned int value) {
-  if (value == 0) {
-    throw (engine_error()
-           << "ochp_timeout: invalid value");
-  }
-  _tab_uint[ochp_timeout] = value;
-  ::ochp_timeout = value;
-  return;
-}
-
-/**
- *  Set the max debug file size.
- *  @param[in] value The size.
- */
-void state::set_max_debug_file_size(unsigned long value) {
-  _tab_ulong[max_debug_file_size] = value;
-  ::max_debug_file_size = value;
-  return;
-}
-
-/**
- *  Set the max log file size.
- *  @param[in] value The size.
- */
-void state::set_max_log_file_size(unsigned long value) {
-  _tab_ulong[max_log_file_size] = value;
-  return;
-}
-
-/**
- *  Set the max check result file age.
- *  @param[in] value Unused.
- */
-void state::set_max_check_result_file_age(unsigned long value) {
-  logger(log_config_warning, basic)
-    << "warning: max_check_result_file_age is deprecated";
-  _tab_ulong[max_check_result_file_age] = value;
-  ::max_check_result_file_age = value;
-  return;
-}
-
-/**
- *  Set the retained host attribute mask.
- *  @param[in] value The attribute mask.
- */
-void state::set_retained_host_attribute_mask(unsigned long value) {
-  _tab_ulong[retained_host_attribute_mask] = value;
-  ::retained_host_attribute_mask = value;
-  return;
-}
-
-/**
- *  Set the retained process host attribute mask.
- *  @param[in] value The attribute mask.
- */
-void state::set_retained_process_host_attribute_mask(unsigned long value) {
-  _tab_ulong[retained_process_host_attribute_mask] = value;
-  ::retained_process_host_attribute_mask = value;
-  return;
-}
-
-/**
- *  Set the retained contact host attribute mask.
- *  @param[in] value The attribute mask.
- */
-void state::set_retained_contact_host_attribute_mask(unsigned long value) {
-  _tab_ulong[retained_contact_host_attribute_mask] = value;
-  ::retained_contact_host_attribute_mask = value;
-  return;
-}
-
-/**
- *  Set the retained contact service attribute mask.
- *  @param[in] value The attribute mask.
- */
-void state::set_retained_contact_service_attribute_mask(unsigned long value) {
-  _tab_ulong[retained_contact_service_attribute_mask] = value;
-  ::retained_contact_service_attribute_mask = value;
-  return;
-}
-
-/**
- *  Set the cached host check horizon.
- *  @param[in] value The cached host check horizon.
- */
-void state::set_cached_host_check_horizon(unsigned long value) {
-  _tab_ulong[cached_host_check_horizon] = value;
-  ::cached_host_check_horizon = value;
-  return;
-}
-
-/**
- *  Set the cached service check horizon.
- *  @param[in] value The cached service check horizon.
- */
-void state::set_cached_service_check_horizon(unsigned long value) {
-  _tab_ulong[cached_service_check_horizon] = value;
-  ::cached_service_check_horizon = value;
-  return;
-}
-
-/**
- *  Set the event broker options.
- *  @param[in] value The options.
- */
-void state::set_event_broker_options(unsigned long value) {
-  _tab_ulong[event_broker_options] = value;
-  ::event_broker_options = value;
-  return;
-}
-
-/**
- *  Set the event broker options.
- *  @param[in] value The options.
- */
-void state::set_event_broker_options(std::string const& value) {
-  if (value == "-1") {
-    _tab_ulong[event_broker_options] = BROKER_EVERYTHING;
-    ::event_broker_options = BROKER_EVERYTHING;
-  }
-  else
-    cpp_suck<unsigned long, &state::set_event_broker_options>::set_generic(value, *this);
-  return;
-}
-
-/**
- *  Set the use syslog.
- *  @param[in] value The use syslog.
- */
-void state::set_use_syslog(bool value) {
-  _tab_bool[use_syslog] = value;
-  ::use_syslog = value;
-  return;
-}
-
-/**
- *  Set the logging notifications.
- *  @param[in] value The logging notifications.
- */
-void state::set_log_notifications(bool value) {
-  _tab_bool[log_notifications] = value;
-  ::log_notifications = value;
-  return;
-}
-
-/**
- *  Set the logging service retries.
- *  @param[in] value The logging service retries.
- */
-void state::set_log_service_retries(bool value) {
-  _tab_bool[log_service_retries] = value;
-  ::log_service_retries = value;
-  return;
-}
-
-/**
- *  Set the logging host retries.
- *  @param[in] value The logging host retries.
- */
-void state::set_log_host_retries(bool value) {
-  _tab_bool[log_host_retries] = value;
-  ::log_host_retries = value;
-  return;
-}
-
-/**
- *  Set the logging event handlers.
- *  @param[in] value The logging event handlers.
- */
-void state::set_log_event_handlers(bool value) {
-  _tab_bool[log_event_handlers] = value;
-  ::log_event_handlers = value;
-  return;
-}
-
-/**
- *  Set the logging external commands.
- *  @param[in] value The logging external commands.
- */
-void state::set_log_external_commands(bool value) {
-  _tab_bool[log_external_commands] = value;
-  ::log_external_commands = value;
-  return;
-}
-
-/**
- *  Set the logging passive checks.
- *  @param[in] value The logging passive checks.
- */
-void state::set_log_passive_checks(bool value) {
-  _tab_bool[log_passive_checks] = value;
-  ::log_passive_checks = value;
-  return;
-}
-
-/**
- *  Set the logging initial state.
- *  @param[in] value The logging initial state.
- */
-void state::set_log_initial_state(bool value) {
-  _tab_bool[log_initial_state] = value;
-  ::log_initial_states = value;
-  return;
-}
-
-/**
- *  Set the retain state information.
- *  @param[in] value The retain state information.
- */
-void state::set_retain_state_information(bool value) {
-  _tab_bool[retain_state_information] = value;
-  ::retain_state_information = value;
-  return;
-}
-
-/**
- *  Set the use retained program state.
- *  @param[in] value The retained program state.
- */
-void state::set_use_retained_program_state(bool value) {
-  _tab_bool[use_retained_program_state] = value;
-  ::use_retained_program_state = value;
-  return;
-}
-
-/**
- *  Set the use retained scheduling info.
- *  @param[in] value The use retained scheduling info.
- */
-void state::set_use_retained_scheduling_info(bool value) {
-  _tab_bool[use_retained_scheduling_info] = value;
-  ::use_retained_scheduling_info = value;
-  return;
-}
-
-/**
- *  Set the obsess over services.
- *  @param[in] value The obsess over services.
- */
-void state::set_obsess_over_services(bool value) {
-  _tab_bool[obsess_over_services] = value;
-  ::obsess_over_services = value;
-  return;
-}
-
-/**
- *  Set the obsess over hosts.
- *  @param[in] value The obsess over hosts.
- */
-void state::set_obsess_over_hosts(bool value) {
-  _tab_bool[obsess_over_hosts] = value;
-  ::obsess_over_hosts = value;
-  return;
-}
-
-/**
- *  Set the translate passive host checks.
- *  @param[in] value The translate passive host checks.
- */
-void state::set_translate_passive_host_checks(bool value) {
-  _tab_bool[translate_passive_host_checks] = value;
-  ::translate_passive_host_checks = value;
-  return;
-}
-
-/**
- *  Set the passive host checks are soft.
- *  @param[in] value The passive host checks are soft.
- */
-void state::set_passive_host_checks_are_soft(bool value) {
-  _tab_bool[passive_host_checks_are_soft] = value;
-  ::passive_host_checks_are_soft = value;
-  return;
-}
-
-/**
- *  Set the use aggressive host checking.
- *  @param[in] value The use aggressive host checking.
- */
-void state::set_use_aggressive_host_checking(bool value) {
-  _tab_bool[use_aggressive_host_checking] = value;
-  ::use_aggressive_host_checking = value;
-  return;
-}
-
-/**
- *  Set the enable predictive host dependency checks.
- *  @param[in] value The enable predictive host dependency chehcks.
- */
-void state::set_enable_predictive_host_dependency_checks(bool value) {
-  _tab_bool[enable_predictive_host_dependency_checks] = value;
-  ::enable_predictive_host_dependency_checks = value;
-  return;
-}
-
-/**
- *  Set the enable predictive service dependency checks.
- *  @param[in] value The enable predictive service dependency checks.
- */
-void state::set_enable_predictive_service_dependency_checks(bool value) {
-  _tab_bool[enable_predictive_service_dependency_checks] = value;
-  ::enable_predictive_service_dependency_checks = value;
-  return;
-}
-
-/**
- *  Set the soft state dependencies.
- *  @param[in] value The soft state dependencies.
- */
-void state::set_soft_state_dependencies(bool value) {
-  _tab_bool[soft_state_dependencies] = value;
-  ::soft_state_dependencies = value;
-  return;
-}
-
-/**
- *  Set the enable event handlers.
- *  @param[in] value The enable event handlers.
- */
-void state::set_enable_event_handlers(bool value) {
-  _tab_bool[enable_event_handlers] = value;
-  ::enable_event_handlers = value;
-  return;
-}
-
-/**
- *  Set the enable notifications.
- *  @param[in] value The enable notifications.
- */
-void state::set_enable_notifications(bool value) {
-  _tab_bool[enable_notifications] = value;
-  ::enable_notifications = value;
-  return;
-}
-
-/**
- *  Set the execute service checks.
- *  @param[in] value The execute service checks.
- */
-void state::set_execute_service_checks(bool value) {
-  _tab_bool[execute_service_checks] = value;
-  ::execute_service_checks = value;
-  return;
-}
-
-/**
- *  Set the accept passive service checks.
- *  @param[in] value The accept passive service checks.
- */
-void state::set_accept_passive_service_checks(bool value) {
-  _tab_bool[accept_passive_service_checks] = value;
-  ::accept_passive_service_checks = value;
-  return;
-}
-
-/**
- *  Set the execute host checks.
- *  @param[in] value The execute host checks.
- */
-void state::set_execute_host_checks(bool value) {
-  _tab_bool[execute_host_checks] = value;
-  ::execute_host_checks = value;
-  return;
-}
-
-/**
- *  Set the accept passive host checks.
- *  @param[in] value The accept passive host checks.
- */
-void state::set_accept_passive_host_checks(bool value) {
-  _tab_bool[accept_passive_host_checks] = value;
-  ::accept_passive_host_checks = value;
-  return;
-}
-
-/**
- *  Set the check external commands.
- *  @param[in] value The check external commands.
- */
-void state::set_check_external_commands(bool value) {
-  _tab_bool[check_external_commands] = value;
-  ::check_external_commands = value;
-  return;
-}
-
-/**
- *  Set the check orphaned services.
- *  @param[in] value The check orphaned services.
- */
-void state::set_check_orphaned_services(bool value) {
-  _tab_bool[check_orphaned_services] = value;
-  ::check_orphaned_services = value;
-  return;
-}
-
-/**
- *  Set the check orphaned hosts.
- *  @param[in] value The check orphaned hosts.
- */
-void state::set_check_orphaned_hosts(bool value) {
-  _tab_bool[check_orphaned_hosts] = value;
-  ::check_orphaned_hosts = value;
-  return;
-}
-
-/**
- *  Set the check service freshness.
- *  @param[in] value The check service freshness.
- */
-void state::set_check_service_freshness(bool value) {
-  _tab_bool[check_service_freshness] = value;
-  ::check_service_freshness = value;
-  return;
-}
-
-/**
- *  Set the check host freshness.
- *  @param[in] value The check host freshness.
- */
-void state::set_check_host_freshness(bool value) {
-  _tab_bool[check_host_freshness] = value;
-  ::check_host_freshness = value;
-  return;
-}
-
-/**
- *  Set the auto reschedule checks.
- *  @param[in] value The auto reschedule checks.
- */
-void state::set_auto_reschedule_checks(bool value) {
-  _tab_bool[auto_reschedule_checks] = value;
-  ::auto_reschedule_checks = value;
-  return;
-}
-
-/**
- *  Set the process performance data.
- *  @param[in] value The process performance data.
- */
-void state::set_process_performance_data(bool value) {
-  _tab_bool[process_performance_data] = value;
-  ::process_performance_data = value;
-  return;
-}
-
-/**
- *  Set the enable flap detection.
- *  @param[in] value The enable flap detection.
- */
-void state::set_enable_flap_detection(bool value) {
-  _tab_bool[enable_flap_detection] = value;
-  ::enable_flap_detection = value;
-  return;
-}
-
-/**
- *  Set the enable failure prediction.
- *  @param[in] value The enable failure prediction.
- */
-void state::set_enable_failure_prediction(bool value) {
-  _tab_bool[enable_failure_prediction] = value;
-  ::enable_failure_prediction = value;
-  return;
-}
-
-/**
- *  Set the use regexp matches.
- *  @param[in] value The use regexp matches.
- */
-void state::set_use_regexp_matches(bool value) {
-  _tab_bool[use_regexp_matches] = value;
-  ::use_regexp_matches = value;
-  return;
-}
-
-/**
- *  Set the use true regexp matching.
- *  @param[in] value The use true regexp matching.
- */
-void state::set_use_true_regexp_matching(bool value) {
-  _tab_bool[use_true_regexp_matching] = value;
-  ::use_true_regexp_matching = value;
-  return;
-}
-
-/**
- *  Set the use large installation tweaks.
- *  @param[in] value The use large installation tweaks.
- */
-void state::set_use_large_installation_tweaks(bool value) {
-  _tab_bool[use_large_installation_tweaks] = value;
-  ::use_large_installation_tweaks = value;
-  return;
-}
-
-/**
- *  Set the enable environment macros.
- *  @param[in] value The enable environment macros.
- */
-void state::set_enable_environment_macros(bool value) {
-  _tab_bool[enable_environment_macros] = value;
-  ::enable_environment_macros = value;
-  return;
-}
-
-/**
- *  Set the free child process memory.
- *  @param[in] value The free child process memory.
- */
-void state::set_free_child_process_memory(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: free_child_process_memory variable ignored";
-  return;
-}
-
-/**
- *  Set the child processes fork twice.
- *  @param[in] value Unused.
- */
-void state::set_child_processes_fork_twice(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: child_processes_fork_twice variable ignored";
-  return;
-}
-
-/**
- *  Enable embedded perl ignore.
- *  @param[in] value Unused.
- */
-void state::set_enable_embedded_perl(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: enable_embedded_perl variable ignored";
-  return;
-}
-
-/**
- *  Use embedded perl implicitly ingore.
- *  @param[in] value Unused.
- */
-void state::set_use_embedded_perl_implicitly(bool value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: use_embedded_perl_implicitly variable ignored";
-  return;
-}
-
-/**
- *  Set the allow empty hostgroup assignment.
- *  @param[in] value The allow empty hostgroup assignment.
- */
-void state::set_allow_empty_hostgroup_assignment(bool value) {
-  _tab_bool[allow_empty_hostgroup_assignment] = value;
-  ::allow_empty_hostgroup_assignment = value;
-  return;
-}
-
-/**
- *  Set the compatibility mode to use check result path.
- *  @param[in] value True to enable compatibility mode.
- */
-void state::set_use_check_result_path(bool value) {
-  _tab_bool[use_check_result_path] = value;
-  return;
-}
-
-/**
- *  Set the sleep time.
- *  @param[in] value The sleep time.
- */
-void state::set_sleep_time(float value) {
-  if (value <= 0.0) {
-    throw (engine_error() << "sleep_time: invalid value.");
-  }
-  _tab_float[sleep_time] = value;
-  ::sleep_time = value;
-  return;
-}
-
-/**
- *  Set the low service flap threshold.
- *  @param[in] value The low service flap threshold.
- */
-void state::set_low_service_flap_threshold(float value) {
-  if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error()
-           << "low_service_flap_threshold: invalid value.");
-  }
-  _tab_float[low_service_flap_threshold] = value;
-  ::low_service_flap_threshold = value;
-  return;
-}
-
-/**
- *  Set the high service flap threshold.
- *  @param[in] value The high service flap threshold.
- */
-void state::set_high_service_flap_threshold(float value) {
-  if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error()
-           << "high_service_flap_threshold: invalid value.");
-  }
-  _tab_float[high_service_flap_threshold] = value;
-  ::high_service_flap_threshold = value;
-  return;
-}
-
-/**
- *  Set the low host flap threshold.
- *  @param[in] value The low host flap threshold.
- */
-void state::set_low_host_flap_threshold(float value) {
-  if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error()
-           << "low_host_flap_threshold: invalid value.");
-  }
-  _tab_float[low_host_flap_threshold] = value;
-  ::low_host_flap_threshold = value;
-  return;
-}
-
-/**
- *  Set the high host flap threshold.
- *  @param[in] value The high host flap threshold.
- */
-void state::set_high_host_flap_threshold(float value) {
-  if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error()
-           << "high_host_flap_threshold: invalid value.");
-  }
-  _tab_float[high_host_flap_threshold] = value;
-  ::high_host_flap_threshold = value;
-  return;
-}
-
-/**
- *  Set the date format.
- *  @param[in] value The date format.
- */
-void state::set_date_format(e_date_format value) {
-  _tab_uint[date_format] = value;
-  ::date_format = value;
-  return;
-}
-
-/**
- *  Set the data format.
- *  @param[in] value The date format.
- */
-void state::set_date_format(std::string const& value) {
-  if (value == "euro") {
-    _tab_uint[date_format] = euro;
-  }
-  else if (value == "iso8601") {
-    _tab_uint[date_format] = iso8601;
-  }
-  else if (value == "strict-iso8601") {
-    _tab_uint[date_format] = strict_iso8601;
-  }
-  else {
-    _tab_uint[date_format] = us;
-  }
-  ::date_format = _tab_uint[date_format];
-  return;
-}
-
-/**
- *  Set the logging rotation method.
- *  @param[in] value The logging rotation method.
- */
-void state::set_log_rotation_method(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: log_rotation_method "
-    "variable ignored: Centreon Engine does not check for updates";
-  return;
-}
-
-/**
- *  Set the service inter check delay method.
- *  @param[in] value The service inter check delay method.
- */
-void state::set_service_inter_check_delay_method(e_inter_check_delay value) {
-  _tab_uint[service_inter_check_delay_method] = value;
-  ::service_inter_check_delay_method = value;
-  return;
-}
-
-/**
- *  Set the service inter check delay method.
- *  @param[in] value The service inter check delay method.
- */
-void state::set_service_inter_check_delay_method(std::string const& value) {
-  if (value == "n") {
-    _tab_uint[service_inter_check_delay_method] = icd_none;
-  }
-  else if (value == "d") {
-    _tab_uint[service_inter_check_delay_method] = icd_dumb;
-  }
-  else if (value == "s") {
-    _tab_uint[service_inter_check_delay_method] = icd_smart;
-  }
-  else {
-    _tab_uint[service_inter_check_delay_method] = icd_user;
-    if (_str2obj<double>(value, &scheduling_info.service_inter_check_delay) == false
-        || scheduling_info.service_inter_check_delay <= 0.0) {
-      throw (engine_error() << "service_inter_check_delay_method: invalid value.");
-    }
-  }
-  ::service_inter_check_delay_method = _tab_uint[service_inter_check_delay_method];
-  return;
-}
-
-/**
- *  Set the host inter check delay method.
- *  @param[in] value The host inter check delay method.
- */
-void state::set_host_inter_check_delay_method(e_inter_check_delay value) {
-  _tab_uint[host_inter_check_delay_method] = value;
-  ::host_inter_check_delay_method = value;
-  return;
-}
-
-/**
- *  Set the host inter check delay method.
- *  @param[in] value The host inter check delay method.
- */
-void state::set_host_inter_check_delay_method(std::string const& value) {
-  if (value == "n") {
-    _tab_uint[host_inter_check_delay_method] = icd_none;
-  }
-  else if (value == "d") {
-    _tab_uint[host_inter_check_delay_method] = icd_dumb;
-  }
-  else if (value == "s") {
-    _tab_uint[host_inter_check_delay_method] = icd_smart;
-  }
-  else {
-    _tab_uint[host_inter_check_delay_method] = icd_user;
-    if (_str2obj<double>(value, &scheduling_info.host_inter_check_delay) == false
-	|| scheduling_info.host_inter_check_delay <= 0.0) {
-      throw (engine_error()
-             << "host_inter_check_delay_method: invalid value.");
-    }
-  }
-  ::host_inter_check_delay_method = _tab_uint[host_inter_check_delay_method];
-  return;
-}
-
-/**
- *  Set the service interleave factor method.
- *  @param[in] value The service interleave factor method.
- */
-void state::set_service_interleave_factor_method(e_interleave_factor value) {
-  _tab_uint[service_interleave_factor_method] = value;
-  ::service_interleave_factor_method = value;
-  return;
-}
-
-/**
- *  Set the service interleave factor method.
- *  @param[in] value The service interleave factor method.
- */
-void state::set_service_interleave_factor_method(std::string const& value) {
-  if (value == "s") {
-    _tab_uint[service_interleave_factor_method] = ilf_smart;
-  }
-  else {
-    _tab_uint[service_interleave_factor_method] = ilf_user;
-    if (_str2obj<int>(value, &scheduling_info.service_interleave_factor) == false
-	|| scheduling_info.service_interleave_factor < 1) {
-      scheduling_info.service_interleave_factor = 1;
-    }
-  }
-
-  ::service_interleave_factor_method = _tab_uint[service_interleave_factor_method];
-  return;
-}
-
-/**
- *  Set use setpgid.
- *  @param[in] value True to enable use setpgid.
- */
-void state::set_use_setpgid(bool value) {
-  _tab_bool[use_setpgid] = value;
+ *  @return True on success, otherwise false.
+ */
+template <typename T>
+static bool cmp_set_ptr(
+              std::set<shared_ptr<T> > const& s1,
+              std::set<shared_ptr<T> > const& s2) {
+  if (s1.size() != s2.size())
+    return (false);
+  typename std::set<shared_ptr<T> >::const_iterator
+    it1(s1.begin()),
+    end1(s1.end()),
+    it2(s2.begin());
+  while (it1 != end1)
+    if (**it1++ != **it2++)
+      return (false);
+  return (true);
 }
-
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
 
 /**
  *  Default constructor.
  */
 state::state()
-  : _cur_line(0),
+  : _accept_passive_host_checks(default_accept_passive_host_checks),
+    _accept_passive_service_checks(default_accept_passive_service_checks),
+    _additional_freshness_latency(default_additional_freshness_latency),
+    _admin_email(default_admin_email),
+    _admin_pager(default_admin_pager),
+    _allow_empty_hostgroup_assignment(default_allow_empty_hostgroup_assignment),
+    _auto_reschedule_checks(default_auto_reschedule_checks),
+    _auto_rescheduling_interval(default_auto_rescheduling_interval),
+    _auto_rescheduling_window(default_auto_rescheduling_window),
+    _cached_host_check_horizon(default_cached_host_check_horizon),
+    _cached_service_check_horizon(default_cached_service_check_horizon),
+    _check_external_commands(default_check_external_commands),
+    _check_host_freshness(default_check_host_freshness),
+    _check_orphaned_hosts(default_check_orphaned_hosts),
+    _check_orphaned_services(default_check_orphaned_services),
+    _check_reaper_interval(default_check_reaper_interval),
+    _check_result_path(default_check_result_path),
+    _check_service_freshness(default_check_service_freshness),
+    _command_check_interval(default_command_check_interval),
     _command_check_interval_is_seconds(false),
-    _mac(NULL) {
-
-  _mac = get_global_macros();
-  memset(_mac, 0, sizeof(*_mac));
-  memset(macro_user, 0, sizeof(*macro_user) * MAX_USER_MACROS);
-
-  _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &state::_parse_resource_file>::set_generic;;
-  _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &state::set_log_file>::set_generic;
-  _lst_method["max_log_file_size"]                           = &cpp_suck<unsigned long, &state::set_max_log_file_size>::set_generic;
-  _lst_method["broker_module_directory"]                     = &cpp_suck<std::string const&, &state::set_broker_module_directory>::set_generic;
-  _lst_method["debug_level"]                                 = &cpp_suck_cast<unsigned long, int, &state::set_debug_level>::set_generic_cast;
-  _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
-  _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &state::set_debug_file>::set_generic;
-  _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
-  _lst_method["command_file"]                                = &cpp_suck<std::string const&, &state::set_command_file>::set_generic;
-  _lst_method["temp_file"]                                   = &cpp_suck<std::string const&, &state::set_temp_file>::set_generic;
-  _lst_method["temp_path"]                                   = &cpp_suck<std::string const&, &state::set_temp_path>::set_generic;
-  _lst_method["use_check_result_path"]                       = &cpp_suck<bool, &state::set_use_check_result_path>::set_generic;
-  _lst_method["check_result_path"]                           = &cpp_suck<std::string const&, &state::set_check_result_path>::set_generic;
-  _lst_method["max_check_result_file_age"]                   = &cpp_suck<unsigned long, &state::set_max_check_result_file_age>::set_generic;
-  _lst_method["global_host_event_handler"]                   = &cpp_suck<std::string const&, &state::set_global_host_event_handler>::set_generic;
-  _lst_method["global_service_event_handler"]                = &cpp_suck<std::string const&, &state::set_global_service_event_handler>::set_generic;
-  _lst_method["ocsp_command"]                                = &cpp_suck<std::string const&, &state::set_ocsp_command>::set_generic;
-  _lst_method["ochp_command"]                                = &cpp_suck<std::string const&, &state::set_ochp_command>::set_generic;
-  _lst_method["admin_email"]                                 = &cpp_suck<std::string const&, &state::_set_admin_email>::set_generic;
-  _lst_method["admin_pager"]                                 = &cpp_suck<std::string const&, &state::_set_admin_pager>::set_generic;
-  _lst_method["use_setpgid"]                                 = &cpp_suck<bool, &state::set_use_setpgid>::set_generic;
-  _lst_method["use_syslog"]                                  = &cpp_suck<bool, &state::set_use_syslog>::set_generic;
-  _lst_method["log_notifications"]                           = &cpp_suck<bool, &state::set_log_notifications>::set_generic;
-  _lst_method["log_service_retries"]                         = &cpp_suck<bool, &state::set_log_service_retries>::set_generic;
-  _lst_method["log_host_retries"]                            = &cpp_suck<bool, &state::set_log_host_retries>::set_generic;
-  _lst_method["log_event_handlers"]                          = &cpp_suck<bool, &state::set_log_event_handlers>::set_generic;
-  _lst_method["log_external_commands"]                       = &cpp_suck<bool, &state::set_log_external_commands>::set_generic;
-  _lst_method["log_passive_checks"]                          = &cpp_suck<bool, &state::set_log_passive_checks>::set_generic;
-  _lst_method["log_initial_states"]                          = &cpp_suck<bool, &state::set_log_initial_state>::set_generic;
-  _lst_method["retain_state_information"]                    = &cpp_suck<bool, &state::set_retain_state_information>::set_generic;
-  _lst_method["retention_update_interval"]                   = &cpp_suck<unsigned int, &state::set_retention_update_interval>::set_generic;
-  _lst_method["use_retained_program_state"]                  = &cpp_suck<bool, &state::set_use_retained_program_state>::set_generic;
-  _lst_method["use_retained_scheduling_info"]                = &cpp_suck<bool, &state::set_use_retained_scheduling_info>::set_generic;
-  _lst_method["retention_scheduling_horizon"]                = &cpp_suck<unsigned int, &state::set_retention_scheduling_horizon>::set_generic;
-  _lst_method["additional_freshness_latency"]                = &cpp_suck<int, &state::set_additional_freshness_latency>::set_generic;
-  _lst_method["retained_host_attribute_mask"]                = &cpp_suck<unsigned long, &state::set_retained_host_attribute_mask>::set_generic;
-  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<std::string const&, &state::_set_retained_service_attribute_mask>::set_generic;
-  _lst_method["retained_process_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_process_host_attribute_mask>::set_generic;
-  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<std::string const&, &state::_set_retained_process_service_attribute_mask>::set_generic;
-  _lst_method["retained_contact_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_contact_host_attribute_mask>::set_generic;
-  _lst_method["retained_contact_service_attribute_mask"]     = &cpp_suck<unsigned long, &state::set_retained_contact_service_attribute_mask>::set_generic;
-  _lst_method["obsess_over_services"]                        = &cpp_suck<bool, &state::set_obsess_over_services>::set_generic;
-  _lst_method["obsess_over_hosts"]                           = &cpp_suck<bool, &state::set_obsess_over_hosts>::set_generic;
-  _lst_method["translate_passive_host_checks"]               = &cpp_suck<bool, &state::set_translate_passive_host_checks>::set_generic;
-  _lst_method["passive_host_checks_are_soft"]                = &cpp_suck<bool, &state::set_passive_host_checks_are_soft>::set_generic;
-  _lst_method["service_check_timeout"]                       = &cpp_suck<unsigned int, &state::set_service_check_timeout>::set_generic;
-  _lst_method["host_check_timeout"]                          = &cpp_suck<unsigned int, &state::set_host_check_timeout>::set_generic;
-  _lst_method["event_handler_timeout"]                       = &cpp_suck<unsigned int, &state::set_event_handler_timeout>::set_generic;
-  _lst_method["notification_timeout"]                        = &cpp_suck<unsigned int, &state::set_notification_timeout>::set_generic;
-  _lst_method["ocsp_timeout"]                                = &cpp_suck<unsigned int, &state::set_ocsp_timeout>::set_generic;
-  _lst_method["ochp_timeout"]                                = &cpp_suck<unsigned int, &state::set_ochp_timeout>::set_generic;
-  _lst_method["use_agressive_host_checking"]                 = &cpp_suck<bool, &state::set_use_aggressive_host_checking>::set_generic;
-  _lst_method["use_aggressive_host_checking"]                = &cpp_suck<bool, &state::set_use_aggressive_host_checking>::set_generic;
-  _lst_method["cached_host_check_horizon"]                   = &cpp_suck<unsigned long, &state::set_cached_host_check_horizon>::set_generic;
-  _lst_method["enable_predictive_host_dependency_checks"]    = &cpp_suck<bool, &state::set_enable_predictive_host_dependency_checks>::set_generic;
-  _lst_method["cached_service_check_horizon"]                = &cpp_suck<unsigned long, &state::set_cached_service_check_horizon>::set_generic;
-  _lst_method["enable_predictive_service_dependency_checks"] = &cpp_suck<bool, &state::set_enable_predictive_service_dependency_checks>::set_generic;
-  _lst_method["soft_state_dependencies"]                     = &cpp_suck<bool, &state::set_soft_state_dependencies>::set_generic;
-  _lst_method["log_rotation_method"]                         = &cpp_suck<std::string const&, &state::set_log_rotation_method>::set_generic;
-  _lst_method["log_archive_path"]                            = &cpp_suck<std::string const&, &state::set_log_archive_path>::set_generic;
-  _lst_method["enable_event_handlers"]                       = &cpp_suck<bool, &state::set_enable_event_handlers>::set_generic;
-  _lst_method["enable_notifications"]                        = &cpp_suck<bool, &state::set_enable_notifications>::set_generic;
-  _lst_method["execute_service_checks"]                      = &cpp_suck<bool, &state::set_execute_service_checks>::set_generic;
-  _lst_method["accept_passive_service_checks"]               = &cpp_suck<bool, &state::set_accept_passive_service_checks>::set_generic;
-  _lst_method["execute_host_checks"]                         = &cpp_suck<bool, &state::set_execute_host_checks>::set_generic;
-  _lst_method["accept_passive_host_checks"]                  = &cpp_suck<bool, &state::set_accept_passive_host_checks>::set_generic;
-  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<std::string const&, &state::set_service_inter_check_delay_method>::set_generic;
-  _lst_method["max_service_check_spread"]                    = &cpp_suck<unsigned int, &state::set_max_service_check_spread>::set_generic;
-  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<std::string const&, &state::set_host_inter_check_delay_method>::set_generic;
-  _lst_method["max_host_check_spread"]                       = &cpp_suck<unsigned int, &state::set_max_host_check_spread>::set_generic;
-  _lst_method["service_interleave_factor"]                   = &cpp_suck<std::string const&, &state::set_service_interleave_factor_method>::set_generic;
-  _lst_method["max_concurrent_checks"]                       = &cpp_suck<unsigned int, &state::set_max_parallel_service_checks>::set_generic;
-  _lst_method["check_result_reaper_frequency"]               = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
-  _lst_method["service_reaper_frequency"]                    = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
-  _lst_method["max_check_result_reaper_time"]                = &cpp_suck<unsigned int, &state::set_max_check_reaper_time>::set_generic;
-  _lst_method["sleep_time"]                                  = &cpp_suck<float, &state::set_sleep_time>::set_generic;
-  _lst_method["interval_length"]                             = &cpp_suck<unsigned int, &state::set_interval_length>::set_generic;
-  _lst_method["check_external_commands"]                     = &cpp_suck<bool, &state::set_check_external_commands>::set_generic;
-  _lst_method["command_check_interval"]                      = &cpp_suck<std::string const&, &state::set_command_check_interval>::set_generic;
-  _lst_method["check_for_orphaned_services"]                 = &cpp_suck<bool, &state::set_check_orphaned_services>::set_generic;
-  _lst_method["check_for_orphaned_hosts"]                    = &cpp_suck<bool, &state::set_check_orphaned_hosts>::set_generic;
-  _lst_method["check_service_freshness"]                     = &cpp_suck<bool, &state::set_check_service_freshness>::set_generic;
-  _lst_method["check_host_freshness"]                        = &cpp_suck<bool, &state::set_check_host_freshness>::set_generic;
-  _lst_method["service_freshness_check_interval"]            = &cpp_suck<unsigned int, &state::set_service_freshness_check_interval>::set_generic;
-  _lst_method["host_freshness_check_interval"]               = &cpp_suck<unsigned int, &state::set_host_freshness_check_interval>::set_generic;
-  _lst_method["auto_reschedule_checks"]                      = &cpp_suck<bool, &state::set_auto_reschedule_checks>::set_generic;
-  _lst_method["auto_rescheduling_interval"]                  = &cpp_suck<unsigned int, &state::set_auto_rescheduling_interval>::set_generic;
-  _lst_method["auto_rescheduling_window"]                    = &cpp_suck<unsigned int, &state::set_auto_rescheduling_window>::set_generic;
-  _lst_method["aggregate_status_updates"]                    = &cpp_suck<std::string const&, &state::_set_aggregate_status_updates>::set_generic;
-  _lst_method["status_update_interval"]                      = &cpp_suck<unsigned int, &state::set_status_update_interval>::set_generic;
-  _lst_method["time_change_threshold"]                       = &cpp_suck<unsigned int, &state::set_time_change_threshold>::set_generic;
-  _lst_method["process_performance_data"]                    = &cpp_suck<bool, &state::set_process_performance_data>::set_generic;
-  _lst_method["enable_flap_detection"]                       = &cpp_suck<bool, &state::set_enable_flap_detection>::set_generic;
-  _lst_method["enable_failure_prediction"]                   = &cpp_suck<bool, &state::set_enable_failure_prediction>::set_generic;
-  _lst_method["low_service_flap_threshold"]                  = &cpp_suck<float, &state::set_low_service_flap_threshold>::set_generic;
-  _lst_method["high_service_flap_threshold"]                 = &cpp_suck<float, &state::set_high_service_flap_threshold>::set_generic;
-  _lst_method["low_host_flap_threshold"]                     = &cpp_suck<float, &state::set_low_host_flap_threshold>::set_generic;
-  _lst_method["high_host_flap_threshold"]                    = &cpp_suck<float, &state::set_high_host_flap_threshold>::set_generic;
-  _lst_method["date_format"]                                 = &cpp_suck<std::string const&, &state::set_date_format>::set_generic;
-  _lst_method["use_timezone"]                                = &cpp_suck<std::string const&, &state::set_use_timezone>::set_generic;
-  _lst_method["p1_file"]                                     = &cpp_suck<std::string const&, &state::set_p1_file>::set_generic;
-  _lst_method["event_broker_options"]                        = &cpp_suck<std::string const&, &state::set_event_broker_options>::set_generic;
-  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<std::string const&, &state::set_illegal_object_chars>::set_generic;
-  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<std::string const&, &state::set_illegal_output_chars>::set_generic;
-  _lst_method["broker_module"]                               = &cpp_suck<std::string const&, &state::_set_broker_module>::set_generic;
-  _lst_method["use_regexp_matching"]                         = &cpp_suck<bool, &state::set_use_regexp_matches>::set_generic;
-  _lst_method["use_true_regexp_matching"]                    = &cpp_suck<bool, &state::set_use_true_regexp_matching>::set_generic;
-  _lst_method["use_large_installation_tweaks"]               = &cpp_suck<bool, &state::set_use_large_installation_tweaks>::set_generic;
-  _lst_method["enable_environment_macros"]                   = &cpp_suck<bool, &state::set_enable_environment_macros>::set_generic;
-  _lst_method["free_child_process_memory"]                   = &cpp_suck<bool, &state::set_free_child_process_memory>::set_generic;
-  _lst_method["child_processes_fork_twice"]                  = &cpp_suck<bool, &state::set_child_processes_fork_twice>::set_generic;
-  _lst_method["enable_embedded_perl"]                        = &cpp_suck<bool, &state::set_enable_embedded_perl>::set_generic;
-  _lst_method["use_embedded_perl_implicitly"]                = &cpp_suck<bool, &state::set_use_embedded_perl_implicitly>::set_generic;
-  _lst_method["external_command_buffer_slots"]               = &cpp_suck<int, &state::set_external_command_buffer_slots>::set_generic;
-  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &state::_set_auth_file>::set_generic;
-  _lst_method["bare_update_check"]                           = &cpp_suck<std::string const&, &state::_set_bare_update_check>::set_generic;
-  _lst_method["check_for_updates"]                           = &cpp_suck<std::string const&, &state::_set_check_for_updates>::set_generic;
-  _lst_method["comment_file"]                                = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
-  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
-  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
-  _lst_method["downtime_file"]                               = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
-  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
-  _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &state::set_allow_empty_hostgroup_assignment>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<std::string const&, &state::_set_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<std::string const&, &state::_set_group>::set_generic;
-  _lst_method["lock_file"]                                   = &cpp_suck<std::string const&, &state::_set_lock_file>::set_generic;
-
-  _lst_method["status_file"]                                 = &cpp_suck<std::string const&, &state::_set_status_file>::set_generic;
-  _lst_method["perfdata_timeout"]                            = &cpp_suck<int, &state::_set_perfdata_timeout>::set_generic;
-  _lst_method["cfg_file"]                                    = &cpp_suck<std::string const&, &state::_add_cfg_file>::set_generic;
-  _lst_method["cfg_dir"]                                     = &cpp_suck<std::string const&, &state::_add_cfg_dir>::set_generic;
-  _lst_method["state_retention_file"]                        = &cpp_suck<std::string const&, &state::_set_state_retention_file>::set_generic;
-  _lst_method["object_cache_file"]                           = &cpp_suck<std::string const&, &state::_set_object_cache_file>::set_generic;
-  _lst_method["precached_object_file"]                       = &cpp_suck<std::string const&, &state::_set_precached_object_file>::set_generic;
-
-  _reset();
-
-  set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
-  set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
-
-  // Set macros.
-  delete[] _mac->x[MACRO_TEMPFILE];
-  _mac->x[MACRO_TEMPFILE] = my_strdup("/tmp/centengine.tmp");
-  delete[] _mac->x[MACRO_TEMPPATH];
-  _mac->x[MACRO_TEMPPATH] = my_strdup("/tmp");
+    _command_file(default_command_file),
+    _date_format(default_date_format),
+    _debug_file(default_debug_file),
+    _debug_level(default_debug_level),
+    _debug_verbosity(default_debug_verbosity),
+    _enable_environment_macros(default_enable_environment_macros),
+    _enable_event_handlers(default_enable_event_handlers),
+    _enable_failure_prediction(default_enable_failure_prediction),
+    _enable_flap_detection(default_enable_flap_detection),
+    _enable_notifications(default_enable_notifications),
+    _enable_predictive_host_dependency_checks(default_enable_predictive_host_dependency_checks),
+    _enable_predictive_service_dependency_checks(default_enable_predictive_service_dependency_checks),
+    _event_broker_options(default_event_broker_options),
+    _event_handler_timeout(default_event_handler_timeout),
+    _execute_host_checks(default_execute_host_checks),
+    _execute_service_checks(default_execute_service_checks),
+    _external_command_buffer_slots(default_external_command_buffer_slots),
+    _global_host_event_handler(default_global_host_event_handler),
+    _global_service_event_handler(default_global_service_event_handler),
+    _high_host_flap_threshold(default_high_host_flap_threshold),
+    _high_service_flap_threshold(default_high_service_flap_threshold),
+    _host_check_timeout(default_host_check_timeout),
+    _host_freshness_check_interval(default_host_freshness_check_interval),
+    _host_inter_check_delay_method(default_host_inter_check_delay_method),
+    _host_perfdata_file_mode(default_host_perfdata_file_mode),
+    _host_perfdata_file_processing_interval(default_host_perfdata_file_processing_interval),
+    _host_perfdata_file_template(default_host_perfdata_file_template),
+    _illegal_object_chars(default_illegal_object_chars),
+    _illegal_output_chars(default_illegal_output_chars),
+    _interval_length(default_interval_length),
+    _log_event_handlers(default_log_event_handlers),
+    _log_external_commands(default_log_external_commands),
+    _log_file(default_log_file),
+    _log_host_retries(default_log_host_retries),
+    _log_initial_states(default_log_initial_states),
+    _log_notifications(default_log_notifications),
+    _log_passive_checks(default_log_passive_checks),
+    _log_service_retries(default_log_service_retries),
+    _low_host_flap_threshold(default_low_host_flap_threshold),
+    _low_service_flap_threshold(default_low_service_flap_threshold),
+    _max_check_reaper_time(default_max_check_reaper_time),
+    _max_check_result_file_age(default_max_check_result_file_age),
+    _max_debug_file_size(default_max_debug_file_size),
+    _max_host_check_spread(default_max_host_check_spread),
+    _max_log_file_size(default_max_log_file_size),
+    _max_parallel_service_checks(default_max_parallel_service_checks),
+    _max_service_check_spread(default_max_service_check_spread),
+    _notification_timeout(default_notification_timeout),
+    _object_cache_file(default_object_cache_file),
+    _obsess_over_hosts(default_obsess_over_hosts),
+    _obsess_over_services(default_obsess_over_services),
+    _ochp_command(default_ochp_command),
+    _ochp_timeout(default_ochp_timeout),
+    _ocsp_command(default_ocsp_command),
+    _ocsp_timeout(default_ocsp_timeout),
+    _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
+    _perfdata_timeout(default_perfdata_timeout),
+    _precached_object_file(default_precached_object_file),
+    _process_performance_data(default_process_performance_data),
+    _retained_contact_host_attribute_mask(default_retained_contact_host_attribute_mask),
+    _retained_contact_service_attribute_mask(default_retained_contact_service_attribute_mask),
+    _retained_host_attribute_mask(default_retained_host_attribute_mask),
+    _retained_process_host_attribute_mask(default_retained_process_host_attribute_mask),
+    _retain_state_information(default_retain_state_information),
+    _retention_scheduling_horizon(default_retention_scheduling_horizon),
+    _retention_update_interval(default_retention_update_interval),
+    _service_check_timeout(default_service_check_timeout),
+    _service_freshness_check_interval(default_service_freshness_check_interval),
+    _service_inter_check_delay_method(default_service_inter_check_delay_method),
+    _service_interleave_factor_method(default_service_interleave_factor_method),
+    _service_perfdata_file_mode(default_service_perfdata_file_mode),
+    _service_perfdata_file_processing_interval(default_service_perfdata_file_processing_interval),
+    _service_perfdata_file_template(default_service_perfdata_file_template),
+    _sleep_time(default_sleep_time),
+    _soft_state_dependencies(default_soft_state_dependencies),
+    _state_retention_file(default_state_retention_file),
+    _status_file(default_status_file),
+    _status_update_interval(default_status_update_interval),
+    _time_change_threshold(default_time_change_threshold),
+    _translate_passive_host_checks(default_translate_passive_host_checks),
+    _use_aggressive_host_checking(default_use_aggressive_host_checking),
+    _use_check_result_path(default_use_check_result_path),
+    _use_large_installation_tweaks(default_use_large_installation_tweaks),
+    _use_regexp_matches(default_use_regexp_matches),
+    _use_retained_program_state(default_use_retained_program_state),
+    _use_retained_scheduling_info(default_use_retained_scheduling_info),
+    _use_setpgid(default_use_setpgid),
+    _use_syslog(default_use_syslog),
+    _use_timezone(default_use_timezone),
+    _use_true_regexp_matching(default_use_true_regexp_matching) {
+  _users.resize(10);
 }
 
 /**
  *  Copy constructor.
  *
- *  @param[in] right Object to copy.
+ *  @param[in] right The object to copy.
  */
 state::state(state const& right) {
   operator=(right);
@@ -2550,573 +450,3364 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw() {
-  delete[] _mac->x[MACRO_LOGFILE];
-  delete[] _mac->x[MACRO_TEMPPATH];
-  delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  delete[] _mac->x[MACRO_COMMANDFILE];
-  delete[] _mac->x[MACRO_TEMPFILE];
-  delete[] _mac->x[MACRO_RESOURCEFILE];
-  delete[] _mac->x[MACRO_ADMINEMAIL];
-  delete[] _mac->x[MACRO_ADMINPAGER];
+state::~state() throw () {
 
-  delete[] ::log_file;
-  delete[] ::debug_file;
-  delete[] ::command_file;
-  delete[] ::global_host_event_handler;
-  delete[] ::global_service_event_handler;
-  delete[] ::ocsp_command;
-  delete[] ::ochp_command;
-  delete[] ::illegal_object_chars;
-  delete[] ::illegal_output_chars;
-  delete[] ::use_timezone;
-  delete[] ::check_result_path;
-
-  for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
-    delete[] macro_user[i];
-    macro_user[i] = NULL;
-  }
 }
 
 /**
- *  Assignment operator.
+ *  Copy operator.
  *
- *  @param[in] right Object to copy.
+ *  @param[in] right The object to copy.
  *
  *  @return This object.
  */
 state& state::operator=(state const& right) {
   if (this != &right) {
-    _filename = right._filename;
-    _cur_line = right._cur_line;
+    _accept_passive_host_checks = right._accept_passive_host_checks;
+    _accept_passive_service_checks = right._accept_passive_service_checks;
+    _additional_freshness_latency = right._additional_freshness_latency;
+    _admin_email = right._admin_email;
+    _admin_pager = right._admin_pager;
+    _allow_empty_hostgroup_assignment = right._allow_empty_hostgroup_assignment;
+    _auto_reschedule_checks = right._auto_reschedule_checks;
+    _auto_rescheduling_interval = right._auto_rescheduling_interval;
+    _auto_rescheduling_window = right._auto_rescheduling_window;
+    _broker_module_directory = right._broker_module_directory;
+    _cached_host_check_horizon = right._cached_host_check_horizon;
+    _cached_service_check_horizon = right._cached_service_check_horizon;
+    _check_external_commands = right._check_external_commands;
+    _check_host_freshness = right._check_host_freshness;
+    _check_orphaned_hosts = right._check_orphaned_hosts;
+    _check_orphaned_services = right._check_orphaned_services;
+    _check_reaper_interval = right._check_reaper_interval;
+    _check_result_path = right._check_result_path;
+    _check_service_freshness = right._check_service_freshness;
+    _commands = right._commands;
+    _command_check_interval = right._command_check_interval;
     _command_check_interval_is_seconds = right._command_check_interval_is_seconds;
-
-    for (unsigned int i = 0; i < max_string; ++i){
-      _tab_string[i] = right._tab_string[i];
-    }
-    for (unsigned int i = 0; i < max_ulong; ++i){
-      _tab_ulong[i] = right._tab_ulong[i];
-    }
-    for (unsigned int i = 0; i < max_float; ++i){
-      _tab_float[i] = right._tab_float[i];
-    }
-    for (unsigned int i = 0; i < max_int; ++i){
-      _tab_int[i] = right._tab_int[i];
-    }
-    for (unsigned int i = 0; i < max_uint; ++i){
-      _tab_uint[i] = right._tab_uint[i];
-    }
-    for (unsigned int i = 0; i < max_bool; ++i){
-      _tab_bool[i] = right._tab_bool[i];
-    }
+    _command_file = right._command_file;
+    _connectors = right._connectors;
+    _contactgroups = right._contactgroups;
+    _contacts = right._contacts;
+    _date_format = right._date_format;
+    _debug_file = right._debug_file;
+    _debug_level = right._debug_level;
+    _debug_verbosity = right._debug_verbosity;
+    _enable_environment_macros = right._enable_environment_macros;
+    _enable_event_handlers = right._enable_event_handlers;
+    _enable_failure_prediction = right._enable_failure_prediction;
+    _enable_flap_detection = right._enable_flap_detection;
+    _enable_notifications = right._enable_notifications;
+    _enable_predictive_host_dependency_checks = right._enable_predictive_host_dependency_checks;
+    _enable_predictive_service_dependency_checks = right._enable_predictive_service_dependency_checks;
+    _event_broker_options = right._event_broker_options;
+    _event_handler_timeout = right._event_handler_timeout;
+    _execute_host_checks = right._execute_host_checks;
+    _execute_service_checks = right._execute_service_checks;
+    _external_command_buffer_slots = right._external_command_buffer_slots;
+    _global_host_event_handler = right._global_host_event_handler;
+    _global_service_event_handler = right._global_service_event_handler;
+    _high_host_flap_threshold = right._high_host_flap_threshold;
+    _high_service_flap_threshold = right._high_service_flap_threshold;
+    _hostdependencies = right._hostdependencies;
+    _hostescalations = right._hostescalations;
+    _hostgroups = right._hostgroups;
+    _hosts = right._hosts;
+    _host_check_timeout = right._host_check_timeout;
+    _host_freshness_check_interval = right._host_freshness_check_interval;
+    _host_inter_check_delay_method = right._host_inter_check_delay_method;
+    _host_perfdata_command = right._host_perfdata_command;
+    _host_perfdata_file = right._host_perfdata_file;
+    _host_perfdata_file_mode = right._host_perfdata_file_mode;
+    _host_perfdata_file_processing_command = right._host_perfdata_file_processing_command;
+    _host_perfdata_file_processing_interval = right._host_perfdata_file_processing_interval;
+    _host_perfdata_file_template = right._host_perfdata_file_template;
+    _illegal_object_chars = right._illegal_object_chars;
+    _illegal_output_chars = right._illegal_output_chars;
+    _interval_length = right._interval_length;
+    _log_event_handlers = right._log_event_handlers;
+    _log_external_commands = right._log_external_commands;
+    _log_file = right._log_file;
+    _log_host_retries = right._log_host_retries;
+    _log_initial_states = right._log_initial_states;
+    _log_notifications = right._log_notifications;
+    _log_passive_checks = right._log_passive_checks;
+    _log_service_retries = right._log_service_retries;
+    _low_host_flap_threshold = right._low_host_flap_threshold;
+    _low_service_flap_threshold = right._low_service_flap_threshold;
+    _max_check_reaper_time = right._max_check_reaper_time;
+    _max_check_result_file_age = right._max_check_result_file_age;
+    _max_debug_file_size = right._max_debug_file_size;
+    _max_host_check_spread = right._max_host_check_spread;
+    _max_log_file_size = right._max_log_file_size;
+    _max_parallel_service_checks = right._max_parallel_service_checks;
+    _max_service_check_spread = right._max_service_check_spread;
+    _notification_timeout = right._notification_timeout;
+    _object_cache_file = right._object_cache_file;
+    _obsess_over_hosts = right._obsess_over_hosts;
+    _obsess_over_services = right._obsess_over_services;
+    _ochp_command = right._ochp_command;
+    _ochp_timeout = right._ochp_timeout;
+    _ocsp_command = right._ocsp_command;
+    _ocsp_timeout = right._ocsp_timeout;
+    _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
+    _perfdata_timeout = right._perfdata_timeout;
+    _precached_object_file = right._precached_object_file;
+    _process_performance_data = right._process_performance_data;
+    _retained_contact_host_attribute_mask = right._retained_contact_host_attribute_mask;
+    _retained_contact_service_attribute_mask = right._retained_contact_service_attribute_mask;
+    _retained_host_attribute_mask = right._retained_host_attribute_mask;
+    _retained_process_host_attribute_mask = right._retained_process_host_attribute_mask;
+    _retain_state_information = right._retain_state_information;
+    _retention_scheduling_horizon = right._retention_scheduling_horizon;
+    _retention_update_interval = right._retention_update_interval;
+    _servicedependencies = right._servicedependencies;
+    _serviceescalations = right._serviceescalations;
+    _servicegroups = right._servicegroups;
+    _services = right._services;
+    _service_check_timeout = right._service_check_timeout;
+    _service_freshness_check_interval = right._service_freshness_check_interval;
+    _service_inter_check_delay_method = right._service_inter_check_delay_method;
+    _service_interleave_factor_method = right._service_interleave_factor_method;
+    _service_perfdata_command = right._service_perfdata_command;
+    _service_perfdata_file = right._service_perfdata_file;
+    _service_perfdata_file_mode = right._service_perfdata_file_mode;
+    _service_perfdata_file_processing_command = right._service_perfdata_file_processing_command;
+    _service_perfdata_file_processing_interval = right._service_perfdata_file_processing_interval;
+    _service_perfdata_file_template = right._service_perfdata_file_template;
+    _sleep_time = right._sleep_time;
+    _soft_state_dependencies = right._soft_state_dependencies;
+    _state_retention_file = right._state_retention_file;
+    _status_file = right._status_file;
+    _status_update_interval = right._status_update_interval;
+    _timeperiods = right._timeperiods;
+    _time_change_threshold = right._time_change_threshold;
+    _translate_passive_host_checks = right._translate_passive_host_checks;
+    _users = right._users;
+    _use_aggressive_host_checking = right._use_aggressive_host_checking;
+    _use_check_result_path = right._use_check_result_path;
+    _use_large_installation_tweaks = right._use_large_installation_tweaks;
+    _use_regexp_matches = right._use_regexp_matches;
+    _use_retained_program_state = right._use_retained_program_state;
+    _use_retained_scheduling_info = right._use_retained_scheduling_info;
+    _use_setpgid = right._use_setpgid;
+    _use_syslog = right._use_syslog;
+    _use_timezone = right._use_timezone;
+    _use_true_regexp_matching = right._use_true_regexp_matching;
   }
   return (*this);
 }
 
 /**
- *  Get the next entire line from a stream.
+ *  Equal operator.
  *
- *  @param[in] ifs The file stream.
+ *  @param[in] right The object to compare.
  *
- *  @return The line.
+ *  @return True if object is the same object, otherwise false.
  */
-std::string state::_getline(std::ifstream& ifs) throw() {
-  std::string line;
-  while (!ifs.eof()) {
-    std::string buf;
-    std::getline(ifs, buf);
-    if (buf.empty()) {
-      return ("");
-    }
-    if (buf.size() > 1 && buf[buf.size() - 2] != '\\' && buf[buf.size() - 1] == '\\') {
-      line.append(buf.begin(), buf.end() - 2);
-      continue;
-    }
-    else if (buf[buf.size() - 1] == '\\') {
-      buf.erase(buf.size() - 1);
-    }
-    return (_trim(line).append(buf));
-  }
-  return ("");
+bool state::operator==(state const& right) const throw () {
+  return (_accept_passive_host_checks == right._accept_passive_host_checks
+          && _accept_passive_service_checks == right._accept_passive_service_checks
+          && _additional_freshness_latency == right._additional_freshness_latency
+          && _admin_email == right._admin_email
+          && _admin_pager == right._admin_pager
+          && _allow_empty_hostgroup_assignment == right._allow_empty_hostgroup_assignment
+          && _auto_reschedule_checks == right._auto_reschedule_checks
+          && _auto_rescheduling_interval == right._auto_rescheduling_interval
+          && _auto_rescheduling_window == right._auto_rescheduling_window
+          && _broker_module_directory == right._broker_module_directory
+          && _cached_host_check_horizon == right._cached_host_check_horizon
+          && _cached_service_check_horizon == right._cached_service_check_horizon
+          && _check_external_commands == right._check_external_commands
+          && _check_host_freshness == right._check_host_freshness
+          && _check_orphaned_hosts == right._check_orphaned_hosts
+          && _check_orphaned_services == right._check_orphaned_services
+          && _check_reaper_interval == right._check_reaper_interval
+          && _check_result_path == right._check_result_path
+          && _check_service_freshness == right._check_service_freshness
+          && cmp_set_ptr(_commands, right._commands)
+          && _command_check_interval == right._command_check_interval
+          && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
+          && _command_file == right._command_file
+          && cmp_set_ptr(_connectors, right._connectors)
+          && cmp_set_ptr(_contactgroups, right._contactgroups)
+          && cmp_set_ptr(_contacts, right._contacts)
+          && _date_format == right._date_format
+          && _debug_file == right._debug_file
+          && _debug_level == right._debug_level
+          && _debug_verbosity == right._debug_verbosity
+          && _enable_environment_macros == right._enable_environment_macros
+          && _enable_event_handlers == right._enable_event_handlers
+          && _enable_failure_prediction == right._enable_failure_prediction
+          && _enable_flap_detection == right._enable_flap_detection
+          && _enable_notifications == right._enable_notifications
+          && _enable_predictive_host_dependency_checks == right._enable_predictive_host_dependency_checks
+          && _enable_predictive_service_dependency_checks == right._enable_predictive_service_dependency_checks
+          && _event_broker_options == right._event_broker_options
+          && _event_handler_timeout == right._event_handler_timeout
+          && _execute_host_checks == right._execute_host_checks
+          && _execute_service_checks == right._execute_service_checks
+          && _external_command_buffer_slots == right._external_command_buffer_slots
+          && _global_host_event_handler == right._global_host_event_handler
+          && _global_service_event_handler == right._global_service_event_handler
+          && _high_host_flap_threshold == right._high_host_flap_threshold
+          && _high_service_flap_threshold == right._high_service_flap_threshold
+          && cmp_set_ptr(_hostdependencies, right._hostdependencies)
+          && cmp_set_ptr(_hostescalations, right._hostescalations)
+          && cmp_set_ptr(_hostgroups, right._hostgroups)
+          && cmp_set_ptr(_hosts, right._hosts)
+          && _host_check_timeout == right._host_check_timeout
+          && _host_freshness_check_interval == right._host_freshness_check_interval
+          && _host_inter_check_delay_method == right._host_inter_check_delay_method
+          && _host_perfdata_command == right._host_perfdata_command
+          && _host_perfdata_file == right._host_perfdata_file
+          && _host_perfdata_file_mode == right._host_perfdata_file_mode
+          && _host_perfdata_file_processing_command == right._host_perfdata_file_processing_command
+          && _host_perfdata_file_processing_interval == right._host_perfdata_file_processing_interval
+          && _host_perfdata_file_template == right._host_perfdata_file_template
+          && _illegal_object_chars == right._illegal_object_chars
+          && _illegal_output_chars == right._illegal_output_chars
+          && _interval_length == right._interval_length
+          && _log_event_handlers == right._log_event_handlers
+          && _log_external_commands == right._log_external_commands
+          && _log_file == right._log_file
+          && _log_host_retries == right._log_host_retries
+          && _log_initial_states == right._log_initial_states
+          && _log_notifications == right._log_notifications
+          && _log_passive_checks == right._log_passive_checks
+          && _log_service_retries == right._log_service_retries
+          && _low_host_flap_threshold == right._low_host_flap_threshold
+          && _low_service_flap_threshold == right._low_service_flap_threshold
+          && _max_check_reaper_time == right._max_check_reaper_time
+          && _max_check_result_file_age == right._max_check_result_file_age
+          && _max_debug_file_size == right._max_debug_file_size
+          && _max_host_check_spread == right._max_host_check_spread
+          && _max_log_file_size == right._max_log_file_size
+          && _max_parallel_service_checks == right._max_parallel_service_checks
+          && _max_service_check_spread == right._max_service_check_spread
+          && _notification_timeout == right._notification_timeout
+          && _object_cache_file == right._object_cache_file
+          && _obsess_over_hosts == right._obsess_over_hosts
+          && _obsess_over_services == right._obsess_over_services
+          && _ochp_command == right._ochp_command
+          && _ochp_timeout == right._ochp_timeout
+          && _ocsp_command == right._ocsp_command
+          && _ocsp_timeout == right._ocsp_timeout
+          && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
+          && _perfdata_timeout == right._perfdata_timeout
+          && _precached_object_file == right._precached_object_file
+          && _process_performance_data == right._process_performance_data
+          && _retained_contact_host_attribute_mask == right._retained_contact_host_attribute_mask
+          && _retained_contact_service_attribute_mask == right._retained_contact_service_attribute_mask
+          && _retained_host_attribute_mask == right._retained_host_attribute_mask
+          && _retained_process_host_attribute_mask == right._retained_process_host_attribute_mask
+          && _retain_state_information == right._retain_state_information
+          && _retention_scheduling_horizon == right._retention_scheduling_horizon
+          && _retention_update_interval == right._retention_update_interval
+          && cmp_set_ptr(_servicedependencies, right._servicedependencies)
+          && cmp_set_ptr(_serviceescalations, right._serviceescalations)
+          && cmp_set_ptr(_servicegroups, right._servicegroups)
+          && cmp_set_ptr(_services, right._services)
+          && _service_check_timeout == right._service_check_timeout
+          && _service_freshness_check_interval == right._service_freshness_check_interval
+          && _service_inter_check_delay_method == right._service_inter_check_delay_method
+          && _service_interleave_factor_method == right._service_interleave_factor_method
+          && _service_perfdata_command == right._service_perfdata_command
+          && _service_perfdata_file == right._service_perfdata_file
+          && _service_perfdata_file_mode == right._service_perfdata_file_mode
+          && _service_perfdata_file_processing_command == right._service_perfdata_file_processing_command
+          && _service_perfdata_file_processing_interval == right._service_perfdata_file_processing_interval
+          && _service_perfdata_file_template == right._service_perfdata_file_template
+          && _sleep_time == right._sleep_time
+          && _soft_state_dependencies == right._soft_state_dependencies
+          && _state_retention_file == right._state_retention_file
+          && _status_file == right._status_file
+          && _status_update_interval == right._status_update_interval
+          && cmp_set_ptr(_timeperiods, right._timeperiods)
+          && _time_change_threshold == right._time_change_threshold
+          && _translate_passive_host_checks == right._translate_passive_host_checks
+          && _users == right._users
+          && _use_aggressive_host_checking == right._use_aggressive_host_checking
+          && _use_check_result_path == right._use_check_result_path
+          && _use_large_installation_tweaks == right._use_large_installation_tweaks
+          && _use_regexp_matches == right._use_regexp_matches
+          && _use_retained_program_state == right._use_retained_program_state
+          && _use_retained_scheduling_info == right._use_retained_scheduling_info
+          && _use_setpgid == right._use_setpgid
+          && _use_syslog == right._use_syslog
+          && _use_timezone == right._use_timezone
+          && _use_true_regexp_matching == right._use_true_regexp_matching);
 }
 
 /**
- *  Trim a string.
+ *  Not equal operator.
  *
- *  @param[in] str The string.
+ *  @param[in] right The object to compare.
  *
- *  @return The trimming stream.
+ *  @return True if object is not the same object, otherwise false.
  */
-std::string& state::_trim(std::string& str) throw() {
-  const char* whitespaces = " \t\r\n";
-  size_t pos = str.find_last_not_of(whitespaces);
-
-  if (pos == std::string::npos)
-    str.clear();
-  else
-    {
-      str.erase(pos + 1);
-      if ((pos = str.find_first_not_of(whitespaces)) != std::string::npos)
-        str.erase(0, pos);
-    }
-  return (str);
+bool state::operator!=(state const& right) const throw () {
+  return (!operator==(right));
 }
 
 /**
- *  Reset variable
+ *  Get accept_passive_host_checks value.
+ *
+ *  @return The accept_passive_host_checks value.
  */
-void state::_reset() {
-  set_use_check_result_path(DEFAULT_USE_CHECK_RESULT_PATH);
-  set_check_result_path(DEFAULT_CHECK_RESULT_PATH);
-  set_max_check_result_file_age(DEFAULT_MAX_CHECK_RESULT_FILE_AGE);
-
-  set_log_file(DEFAULT_LOG_FILE);
-  set_command_file(DEFAULT_COMMAND_FILE);
-  set_debug_file(DEFAULT_DEBUG_FILE);
-
-  set_use_regexp_matches(DEFAULT_USE_REGEXP_MATCHES);
-  set_use_true_regexp_matching(DEFAULT_USE_TRUE_REGEXP_MATCHING);
-
-  set_use_setpgid(DEFAULT_USE_SETPGID);
-
-  set_use_syslog(DEFAULT_USE_SYSLOG);
-  set_log_service_retries(DEFAULT_LOG_SERVICE_RETRIES);
-  set_log_host_retries(DEFAULT_LOG_HOST_RETRIES);
-  set_log_initial_state(DEFAULT_LOG_INITIAL_STATE);
-
-  set_log_notifications(DEFAULT_NOTIFICATION_LOGGING);
-  set_log_event_handlers(DEFAULT_LOG_EVENT_HANDLERS);
-  set_log_external_commands(DEFAULT_LOG_EXTERNAL_COMMANDS);
-  set_log_passive_checks(DEFAULT_LOG_PASSIVE_CHECKS);
-
-  set_service_check_timeout(DEFAULT_SERVICE_CHECK_TIMEOUT);
-  set_host_check_timeout(DEFAULT_HOST_CHECK_TIMEOUT);
-  set_event_handler_timeout(DEFAULT_EVENT_HANDLER_TIMEOUT);
-  set_notification_timeout(DEFAULT_NOTIFICATION_TIMEOUT);
-  set_ocsp_timeout(DEFAULT_OCSP_TIMEOUT);
-  set_ochp_timeout(DEFAULT_OCHP_TIMEOUT);
-
-  set_sleep_time(DEFAULT_SLEEP_TIME);
-  _tab_uint[interval_length] = DEFAULT_INTERVAL_LENGTH;
-  set_service_inter_check_delay_method(DEFAULT_SERVICE_INTER_CHECK_DELAY_METHOD);
-  set_host_inter_check_delay_method(DEFAULT_HOST_INTER_CHECK_DELAY_METHOD);
-  set_service_interleave_factor_method(DEFAULT_SERVICE_INTERLEAVE_FACTOR_METHOD);
-  set_max_service_check_spread(DEFAULT_SERVICE_CHECK_SPREAD);
-  set_max_host_check_spread(DEFAULT_HOST_CHECK_SPREAD);
-
-  set_use_aggressive_host_checking(DEFAULT_AGGRESSIVE_HOST_CHECKING);
-  set_cached_host_check_horizon(DEFAULT_CACHED_HOST_CHECK_HORIZON);
-  set_cached_service_check_horizon(DEFAULT_CACHED_SERVICE_CHECK_HORIZON);
-  set_enable_predictive_host_dependency_checks(DEFAULT_ENABLE_PREDICTIVE_HOST_DEPENDENCY_CHECKS);
-  set_enable_predictive_service_dependency_checks(DEFAULT_ENABLE_PREDICTIVE_SERVICE_DEPENDENCY_CHECKS);
-
-  set_command_check_interval(DEFAULT_COMMAND_CHECK_INTERVAL);
-  set_check_reaper_interval(DEFAULT_CHECK_REAPER_INTERVAL);
-  set_max_check_reaper_time(DEFAULT_MAX_REAPER_TIME);
-  set_service_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
-  set_host_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
-  set_auto_rescheduling_interval(DEFAULT_AUTO_RESCHEDULING_INTERVAL);
-  set_auto_rescheduling_window(DEFAULT_AUTO_RESCHEDULING_WINDOW);
-
-  set_check_external_commands(DEFAULT_CHECK_EXTERNAL_COMMANDS);
-  set_check_orphaned_services(DEFAULT_CHECK_ORPHANED_SERVICES);
-  set_check_orphaned_hosts(DEFAULT_CHECK_ORPHANED_HOSTS);
-  set_check_service_freshness(DEFAULT_CHECK_SERVICE_FRESHNESS);
-  set_check_host_freshness(DEFAULT_CHECK_HOST_FRESHNESS);
-  set_auto_reschedule_checks(DEFAULT_AUTO_RESCHEDULE_CHECKS);
-
-  set_soft_state_dependencies(DEFAULT_SOFT_STATE_DEPENDENCIES);
-
-  set_retain_state_information(DEFAULT_RETAIN_STATE_INFORMATION);
-  set_retention_update_interval(DEFAULT_RETENTION_UPDATE_INTERVAL);
-  set_use_retained_program_state(DEFAULT_USE_RETAINED_PROGRAM_STATE);
-  set_use_retained_scheduling_info(DEFAULT_USE_RETAINED_SCHEDULING_INFO);
-  set_retention_scheduling_horizon(DEFAULT_RETENTION_SCHEDULING_HORIZON);
-  set_retained_host_attribute_mask(DEFAULT_RETAINED_HOST_ATTRIBUTE_MASK);
-  set_retained_process_host_attribute_mask(DEFAULT_RETAINED_PROCESS_HOST_ATTRIBUTE_MASK);
-  set_retained_contact_host_attribute_mask(DEFAULT_RETAINED_CONTACT_HOST_ATTRIBUTE_MASK);
-  set_retained_contact_service_attribute_mask(DEFAULT_RETAINED_CONTACT_SERVICE_ATTRIBUTE_MASK);
-
-  set_max_parallel_service_checks(DEFAULT_MAX_PARALLEL_SERVICE_CHECKS);
-
-  set_enable_notifications(DEFAULT_ENABLE_NOTIFICATIONS);
-  set_execute_service_checks(DEFAULT_EXECUTE_SERVICE_CHECKS);
-  set_accept_passive_service_checks(DEFAULT_ACCEPT_PASSIVE_SERVICE_CHECKS);
-  set_execute_host_checks(DEFAULT_EXECUTE_HOST_CHECKS);
-  set_accept_passive_service_checks(DEFAULT_ACCEPT_PASSIVE_SERVICE_CHECKS);
-  set_enable_event_handlers(DEFAULT_ENABLE_EVENT_HANDLERS);
-  set_obsess_over_services(DEFAULT_OBSESS_OVER_SERVICES);
-  set_obsess_over_hosts(DEFAULT_OBSESS_OVER_HOSTS);
-  set_enable_failure_prediction(DEFAULT_ENABLE_FAILURE_PREDICTION);
-
-  set_status_update_interval(DEFAULT_STATUS_UPDATE_INTERVAL);
-
-  set_event_broker_options(DEFAULT_EVENT_BROKER_OPTIONS);
-
-  set_time_change_threshold(DEFAULT_TIME_CHANGE_THRESHOLD);
-
-  set_enable_flap_detection(DEFAULT_ENABLE_FLAP_DETECTION);
-  set_low_service_flap_threshold(DEFAULT_LOW_SERVICE_FLAP_THRESHOLD);
-  set_high_service_flap_threshold(DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD);
-  set_low_host_flap_threshold(DEFAULT_LOW_HOST_FLAP_THRESHOLD);
-  set_high_host_flap_threshold(DEFAULT_HIGH_HOST_FLAP_THRESHOLD);
-
-  set_process_performance_data(DEFAULT_PROCESS_PERFORMANCE_DATA);
-
-  set_translate_passive_host_checks(DEFAULT_TRANSLATE_PASSIVE_HOST_CHECKS);
-  set_passive_host_checks_are_soft(DEFAULT_PASSIVE_HOST_CHECKS_SOFT);
-
-  set_use_large_installation_tweaks(DEFAULT_USE_LARGE_INSTALLATION_TWEAKS);
-  set_enable_environment_macros(DEFAULT_ENABLE_ENVIRONMENT_MACROS);
-
-  set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
-
-  set_external_command_buffer_slots(DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS);
-
-  set_debug_level(DEFAULT_DEBUG_LEVEL);
-  set_debug_verbosity(DEFAULT_DEBUG_VERBOSITY);
-  set_max_debug_file_size(DEFAULT_MAX_DEBUG_FILE_SIZE);
-  set_max_log_file_size(DEFAULT_MAX_LOG_FILE_SIZE);
-
-  set_illegal_output_chars(DEFAULT_ILLEGAL_OUTPUT_CHARS);
-
-  set_date_format(DEFAULT_DATE_FORMAT);
-
-  set_global_host_event_handler("");
-  set_global_service_event_handler("");
-
-  set_ocsp_command("");
-  set_ochp_command("");
-
-  _set_status_file("");
-  _set_perfdata_timeout(0);
-  _set_state_retention_file("");
-  _set_object_cache_file("");
-  _set_precached_object_file("");
-
-  _lst_broker_module.clear();
-  _lst_cfg_dir.clear();
-  _lst_cfg_file.clear();
-  _lst_resource_file.clear();
-  return;
+bool state::accept_passive_host_checks() const throw () {
+  return (_accept_passive_host_checks);
 }
 
 /**
- *  Parse the resource file.
- *  @param[in] value The filename.
+ *  Set accept_passive_host_checks value.
+ *
+ *  @param[in] value The new accept_passive_host_checks value.
  */
-void state::_parse_resource_file(std::string const& value) {
-  // Prepend main config file path.
-  std::string resfile;
-  if (!value.empty() && value[0] == '/')
-    resfile = value;
-  else {
-    io::file_entry f(_filename);
-    resfile = f.directory_name() + "/" + value;
-  }
+void state::accept_passive_host_checks(bool value) {
+  _accept_passive_host_checks = value;
+}
 
-  // Open resource file.
-  std::ifstream ifs;
-  ifs.open(resfile.c_str());
-  if (ifs.fail()) {
+/**
+ *  Get accept_passive_service_checks value.
+ *
+ *  @return The accept_passive_service_checks value.
+ */
+bool state::accept_passive_service_checks() const throw () {
+  return (_accept_passive_service_checks);
+}
+
+/**
+ *  Set accept_passive_service_checks value.
+ *
+ *  @param[in] value The new accept_passive_service_checks value.
+ */
+void state::accept_passive_service_checks(bool value) {
+  _accept_passive_service_checks = value;
+}
+
+/**
+ *  Get additional_freshness_latency value.
+ *
+ *  @return The additional_freshness_latency value.
+ */
+int state::additional_freshness_latency() const throw () {
+  return (_additional_freshness_latency);
+}
+
+/**
+ *  Set additional_freshness_latency value.
+ *
+ *  @param[in] value The new additional_freshness_latency value.
+ */
+void state::additional_freshness_latency(int value) {
+  _additional_freshness_latency = value;
+}
+
+/**
+ *  Get admin_email value.
+ *
+ *  @return The admin_email value.
+ */
+std::string const& state::admin_email() const throw () {
+  return (_admin_email);
+}
+
+/**
+ *  Set admin_email value.
+ *
+ *  @param[in] value The new admin_email value.
+ */
+void state::admin_email(std::string const& value) {
+  _admin_email = value;
+}
+
+/**
+ *  Get admin_pager value.
+ *
+ *  @return The admin_pager value.
+ */
+std::string const& state::admin_pager() const throw () {
+  return (_admin_pager);
+}
+
+/**
+ *  Set admin_pager value.
+ *
+ *  @param[in] value The new admin_pager value.
+ */
+void state::admin_pager(std::string const& value) {
+  _admin_pager = value;
+}
+
+/**
+ *  Get allow_empty_hostgroup_assignment value.
+ *
+ *  @return The allow_empty_hostgroup_assignment value.
+ */
+bool state::allow_empty_hostgroup_assignment() const throw () {
+  return (_allow_empty_hostgroup_assignment);
+}
+
+/**
+ *  Set allow_empty_hostgroup_assignment value.
+ *
+ *  @param[in] value The new allow_empty_hostgroup_assignment value.
+ */
+void state::allow_empty_hostgroup_assignment(bool value) {
+  _allow_empty_hostgroup_assignment = value;
+}
+
+/**
+ *  Get auto_reschedule_checks value.
+ *
+ *  @return The auto_reschedule_checks value.
+ */
+bool state::auto_reschedule_checks() const throw () {
+  return (_auto_reschedule_checks);
+}
+
+/**
+ *  Set auto_reschedule_checks value.
+ *
+ *  @param[in] value The new auto_reschedule_checks value.
+ */
+void state::auto_reschedule_checks(bool value) {
+  _auto_reschedule_checks = value;
+}
+
+/**
+ *  Get auto_rescheduling_interval value.
+ *
+ *  @return The auto_rescheduling_interval value.
+ */
+unsigned int state::auto_rescheduling_interval() const throw () {
+  return (_auto_rescheduling_interval);
+}
+
+/**
+ *  Set auto_rescheduling_interval value.
+ *
+ *  @param[in] value The new auto_rescheduling_interval value.
+ */
+void state::auto_rescheduling_interval(unsigned int value) {
+  if (!value)
     throw (engine_error()
-           << "cannot open resource file: '" << resfile << "'");
+             << "auto_rescheduling_interval: invalid value");
+  _auto_rescheduling_interval = value;
+}
+
+/**
+ *  Get auto_rescheduling_window value.
+ *
+ *  @return The auto_rescheduling_window value.
+ */
+unsigned int state::auto_rescheduling_window() const throw () {
+  return (_auto_rescheduling_window);
+}
+
+/**
+ *  Set auto_rescheduling_window value.
+ *
+ *  @param[in] value The new auto_rescheduling_window value.
+ */
+void state::auto_rescheduling_window(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "auto_rescheduling_window: invalid value");
+  _auto_rescheduling_window = value;
+}
+
+/**
+ *  Get broker_module value.
+ *
+ *  @return The auto_rescheduling_window value.
+ */
+std::list<std::string> const& state::broker_module() const throw () {
+  return (_broker_module);
+}
+
+/**
+ *  Set broker_module value.
+ *
+ *  @param[in] value The new broker_module_directory value.
+ */
+void state::broker_module(std::list<std::string> const& value) {
+  _broker_module = value;
+}
+
+/**
+ *  Get broker_module_directory value.
+ *
+ *  @return The broker_module_directory value.
+ */
+std::string const& state::broker_module_directory() const throw () {
+  return (_broker_module_directory);
+}
+
+/**
+ *  Set broker_module_directory value.
+ *
+ *  @param[in] value The new broker_module_directory value.
+ */
+void state::broker_module_directory(std::string const& value) {
+  if (value.empty() || value[0] == '/')
+    _broker_module_directory = value;
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _broker_module_directory = base_name + "/" + value;
   }
+}
 
-  unsigned int save_cur_line = _cur_line;
-  std::string save_filename = _filename;
-  _filename = resfile;
+/**
+ *  Get cached_host_check_horizon value.
+ *
+ *  @return The cached_host_check_horizon value.
+ */
+unsigned long state::cached_host_check_horizon() const throw () {
+  return (_cached_host_check_horizon);
+}
 
-  for (_cur_line = 1; !ifs.eof(); ++_cur_line) {
-    std::string line = _getline(ifs);
-    if (line == "" || line[0] == '#') {
-      continue;
-    }
+/**
+ *  Set cached_host_check_horizon value.
+ *
+ *  @param[in] value The new cached_host_check_horizon value.
+ */
+void state::cached_host_check_horizon(unsigned long value) {
+  _cached_host_check_horizon = value;
+}
 
-    size_t pos = line.find_first_of('=');
-    if (pos == std::string::npos) {
-      throw (engine_error() << "[" << _filename << ":" << _cur_line
-	     << "] bad variable name: '" << line << "'");
-    }
-    std::string key = line.substr(0, pos);
-    unsigned int user_index;
-    if (!_trim(key).compare(0, 5, "$USER") && key[key.size() - 1] == '$') {
-      key = key.substr(5, key.size() - 6);
-      if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
-	  || user_index > MAX_USER_MACROS || user_index == 0) {
-	logger(log_config_warning, basic)
-          << "warning: [" << _filename << ":" << _cur_line
-          << "] bad variable name '" << key << "'";
-	continue;
-      }
+/**
+ *  Get cached_service_check_horizon value.
+ *
+ *  @return The cached_service_check_horizon value.
+ */
+unsigned long state::cached_service_check_horizon() const throw () {
+  return (_cached_service_check_horizon);
+}
 
-      std::string value = line.substr(pos + 1);
-      delete[] macro_user[user_index - 1];
-      macro_user[user_index - 1] = my_strdup(_trim(value).c_str());
-    }
-    else
-      logger(log_config_warning, basic)
-        << "warning: [" << _filename << ":" << _cur_line
-        << "] bad variable name '" << key << "'";
+/**
+ *  Set cached_service_check_horizon value.
+ *
+ *  @param[in] value The new cached_service_check_horizon value.
+ */
+void state::cached_service_check_horizon(unsigned long value) {
+  _cached_service_check_horizon = value;
+}
+
+/**
+ *  Get cfg_dir value.
+ *
+ *  @return The cfg_dir value.
+ */
+std::list<std::string> const& state::cfg_dir() const throw () {
+  return (_cfg_dir);
+}
+
+/**
+ *  Get cfg_file value.
+ *
+ *  @return The cfg_file value.
+ */
+std::list<std::string> const& state::cfg_file() const throw () {
+
+  return (_cfg_file);
+}
+
+/**
+ *  Get check_external_commands value.
+ *
+ *  @return The check_external_commands value.
+ */
+bool state::check_external_commands() const throw () {
+  return (_check_external_commands);
+}
+
+/**
+ *  Set cfg_main value.
+ *
+ *  @param[in] value The new cfg_main value.
+ */
+void state::cfg_main(std::string const& value) {
+  _cfg_main = value;
+}
+
+/**
+ *  Get cfg_main value.
+ *
+ *  @return The cfg_main value.
+ */
+std::string const& state::cfg_main() const throw () {
+  return (_cfg_main);
+}
+
+/**
+ *  Set check_external_commands value.
+ *
+ *  @param[in] value The new check_external_commands value.
+ */
+void state::check_external_commands(bool value) {
+  _check_external_commands = value;
+}
+
+/**
+ *  Get check_host_freshness value.
+ *
+ *  @return The check_host_freshness value.
+ */
+bool state::check_host_freshness() const throw () {
+  return (_check_host_freshness);
+}
+
+/**
+ *  Set check_host_freshness value.
+ *
+ *  @param[in] value The new check_host_freshness value.
+ */
+void state::check_host_freshness(bool value) {
+  _check_host_freshness = value;
+}
+
+/**
+ *  Get check_orphaned_hosts value.
+ *
+ *  @return The check_orphaned_hosts value.
+ */
+bool state::check_orphaned_hosts() const throw () {
+  return (_check_orphaned_hosts);
+}
+
+/**
+ *  Set check_orphaned_hosts value.
+ *
+ *  @param[in] value The new check_orphaned_hosts value.
+ */
+void state::check_orphaned_hosts(bool value) {
+  _check_orphaned_hosts = value;
+}
+
+/**
+ *  Set check_orphaned_services value.
+ *
+ *  @param[in] value The new check_orphaned_services value.
+ */
+void state::check_orphaned_services(bool value) {
+  _check_orphaned_services = value;
+}
+
+/**
+ *  Get check_orphaned_services value.
+ *
+ *  @return The check_orphaned_services value.
+ */
+bool state::check_orphaned_services() const throw () {
+  return (_check_orphaned_services);
+}
+
+/**
+ *  Get check_reaper_interval value.
+ *
+ *  @return The check_reaper_interval value.
+ */
+unsigned int state::check_reaper_interval() const throw () {
+  return (_check_reaper_interval);
+}
+
+/**
+ *  Set check_reaper_interval value.
+ *
+ *  @param[in] value The new check_reaper_interval value.
+ */
+void state::check_reaper_interval(unsigned int value) {
+  if (!value)
+    throw (engine_error() << "check_reaper_interval: invalid value");
+  _check_reaper_interval = value;
+}
+
+/**
+ *  Get check_result_path value.
+ *
+ *  @return The check_result_path value.
+ */
+std::string const& state::check_result_path() const throw () {
+  return (_check_result_path);
+}
+
+/**
+ *  Set check_result_path value.
+ *
+ *  @param[in] value The new check_result_path value.
+ */
+void state::check_result_path(std::string const& value) {
+  logger(log_config_warning, basic)
+    << "Warning: check_result_path is deprecated";
+  _check_result_path = value;
+}
+
+/**
+ *  Get check_service_freshness value.
+ *
+ *  @return The check_service_freshness value.
+ */
+bool state::check_service_freshness() const throw () {
+  return (_check_service_freshness);
+}
+
+/**
+ *  Set check_service_freshness value.
+ *
+ *  @param[in] value The new check_service_freshness value.
+ */
+void state::check_service_freshness(bool value) {
+  _check_service_freshness = value;
+}
+
+/**
+ *  Get all engine commands.
+ *
+ *  @return All engine commands.
+ */
+set_command const& state::commands() const throw () {
+  return (_commands);
+}
+
+/**
+ *  Get all engine commands.
+ *
+ *  @return All engine commands.
+ */
+set_command& state::commands() throw () {
+  return (_commands);
+}
+
+/**
+ *  Get command_check_interval value.
+ *
+ *  @return The command_check_interval value.
+ */
+int state::command_check_interval() const throw () {
+  return (_command_check_interval);
+}
+
+/**
+ *  Set command_check_interval value.
+ *
+ *  @param[in] value The new command_check_interval value.
+ */
+void state::command_check_interval(int value) {
+  if (value < -1 || !value)
+    throw (engine_error() << "command_check_interval: invalid value");
+
+  _command_check_interval = value;
+
+  // adjust command check interval
+  if (!_command_check_interval_is_seconds
+      && _command_check_interval != -1)
+    _command_check_interval *= _interval_length;
+}
+
+/**
+ *  Set command_check_interval value.
+ *
+ *  @param[in] value     The new command_check_interval value.
+ *  @param[in] is_second True if the value is in second.
+ */
+void state::command_check_interval(int value, bool is_second) {
+  _command_check_interval_is_seconds = is_second;
+  command_check_interval(value);
+}
+
+/**
+ *  Get command_file value.
+ *
+ *  @return The command_file value.
+ */
+std::string const& state::command_file() const throw () {
+  return (_command_file);
+}
+
+/**
+ *  Set command_file value.
+ *
+ *  @param[in] value The new command_file value.
+ */
+void state::command_file(std::string const& value) {
+  _command_file = value;
+}
+
+/**
+ *  Get all engine connectors.
+ *
+ *  @return All engine connectors.
+ */
+set_connector const& state::connectors() const throw () {
+  return (_connectors);
+}
+
+/**
+ *  Get all engine connectors.
+ *
+ *  @return All engine connectors.
+ */
+set_connector& state::connectors() throw () {
+  return (_connectors);
+}
+
+/**
+ *  Get all engine contacts.
+ *
+ *  @return All engine contacts.
+ */
+set_contact const& state::contacts() const throw () {
+  return (_contacts);
+}
+
+/**
+ *  Get all engine contacts.
+ *
+ *  @return All engine contacts.
+ */
+set_contact& state::contacts() throw () {
+  return (_contacts);
+}
+
+/**
+ *  Get all engine contactgroups.
+ *
+ *  @return All engine contactgroups.
+ */
+set_contactgroup const& state::contactgroups() const throw () {
+  return (_contactgroups);
+}
+
+/**
+ *  Get all engine contactgroups.
+ *
+ *  @return All engine contactgroups.
+ */
+set_contactgroup& state::contactgroups() throw () {
+  return (_contactgroups);
+}
+
+/**
+ *  Get date_format value.
+ *
+ *  @return The date_format value.
+ */
+state::date_type state::date_format() const throw () {
+  return (_date_format);
+}
+
+/**
+ *  Set date_format value.
+ *
+ *  @param[in] value The new date_format value.
+ */
+void state::date_format(date_type value) {
+  _date_format = value;
+}
+
+/**
+ *  Get debug_file value.
+ *
+ *  @return The debug_file value.
+ */
+std::string const& state::debug_file() const throw () {
+  return (_debug_file);
+}
+
+/**
+ *  Set debug_file value.
+ *
+ *  @param[in] value The new debug_file value.
+ */
+void state::debug_file(std::string const& value) {
+  _debug_file = value;
+
+}
+
+/**
+ *  Get debug_level value.
+ *
+ *  @return The debug_level value.
+ */
+unsigned long state::debug_level() const throw () {
+  return (_debug_level);
+}
+
+/**
+ *  Set debug_level value.
+ *
+ *  @param[in] value The new debug_level value.
+ */
+void state::debug_level(unsigned long value) {
+  if (value == std::numeric_limits<unsigned long>::max())
+    _debug_level = static_cast<unsigned long>(all);
+  else
+    _debug_level = value;
+}
+
+/**
+ *  Get debug_verbosity value.
+ *
+ *  @return The debug_verbosity value.
+ */
+unsigned int state::debug_verbosity() const throw () {
+  return (_debug_verbosity);
+}
+
+/**
+ *  Set debug_verbosity value.
+ *
+ *  @param[in] value The new debug_verbosity value.
+ */
+void state::debug_verbosity(unsigned int value) {
+  if (value > most)
+    _debug_verbosity = static_cast<unsigned int>(most);
+  else
+    _debug_verbosity = value;
+}
+
+/**
+ *  Get enable_environment_macros value.
+ *
+ *  @return The enable_environment_macros value.
+ */
+bool state::enable_environment_macros() const throw () {
+  return (_enable_environment_macros);
+}
+
+/**
+ *  Set enable_environment_macros value.
+ *
+ *  @param[in] value The new enable_environment_macros value.
+ */
+void state::enable_environment_macros(bool value) {
+  _enable_environment_macros = value;
+}
+
+/**
+ *  Get enable_event_handlers value.
+ *
+ *  @return The enable_event_handlers value.
+ */
+bool state::enable_event_handlers() const throw () {
+  return (_enable_event_handlers);
+}
+
+/**
+ *  Set enable_event_handlers value.
+ *
+ *  @param[in] value The new enable_event_handlers value.
+ */
+void state::enable_event_handlers(bool value) {
+  _enable_event_handlers = value;
+}
+
+/**
+ *  Get enable_failure_prediction value.
+ *
+ *  @return The enable_failure_prediction value.
+ */
+bool state::enable_failure_prediction() const throw () {
+  return (_enable_failure_prediction);
+}
+
+/**
+ *  Set enable_failure_prediction value.
+ *
+ *  @param[in] value The new enable_failure_prediction value.
+ */
+void state::enable_failure_prediction(bool value) {
+  _enable_failure_prediction = value;
+}
+
+/**
+ *  Get enable_flap_detection value.
+ *
+ *  @return The enable_flap_detection value.
+ */
+bool state::enable_flap_detection() const throw () {
+  return (_enable_flap_detection);
+}
+
+/**
+ *  Set enable_flap_detection value.
+ *
+ *  @param[in] value The new enable_flap_detection value.
+ */
+void state::enable_flap_detection(bool value) {
+  _enable_flap_detection = value;
+}
+
+/**
+ *  Get enable_notifications value.
+ *
+ *  @return The enable_notifications value.
+ */
+bool state::enable_notifications() const throw () {
+  return (_enable_notifications);
+}
+
+/**
+ *  Set enable_notifications value.
+ *
+ *  @param[in] value The new enable_notifications value.
+ */
+void state::enable_notifications(bool value) {
+  _enable_notifications = value;
+}
+
+/**
+ *  Get enable_predictive_host_dependency_checks value.
+ *
+ *  @return The enable_predictive_host_dependency_checks value.
+ */
+bool state::enable_predictive_host_dependency_checks() const throw () {
+  return (_enable_predictive_host_dependency_checks);
+}
+
+/**
+ *  Set enable_predictive_host_dependency_checks value.
+ *
+ *  @param[in] value The new enable_predictive_host_dependency_checks value.
+ */
+void state::enable_predictive_host_dependency_checks(bool value) {
+  _enable_predictive_host_dependency_checks = value;
+}
+
+/**
+ *  Get enable_predictive_service_dependency_checks value.
+ *
+ *  @return The enable_predictive_service_dependency_checks value.
+ */
+bool state::enable_predictive_service_dependency_checks() const throw () {
+  return (_enable_predictive_service_dependency_checks);
+}
+
+/**
+ *  Set enable_predictive_service_dependency_checks value.
+ *
+ *  @param[in] value The new enable_predictive_service_dependency_checks value.
+ */
+void state::enable_predictive_service_dependency_checks(bool value) {
+  _enable_predictive_service_dependency_checks = value;
+}
+
+/**
+ *  Get event_broker_options value.
+ *
+ *  @return The event_broker_options value.
+ */
+unsigned long state::event_broker_options() const throw () {
+  return (_event_broker_options);
+}
+
+/**
+ *  Set event_broker_options value.
+ *
+ *  @param[in] value The new event_broker_options value.
+ */
+void state::event_broker_options(unsigned long value) {
+  _event_broker_options = value;
+}
+
+/**
+ *  Get event_handler_timeout value.
+ *
+ *  @return The event_handler_timeout value.
+ */
+unsigned int state::event_handler_timeout() const throw () {
+  return (_event_handler_timeout);
+}
+
+/**
+ *  Set event_handler_timeout value.
+ *
+ *  @param[in] value The new event_handler_timeout value.
+ */
+void state::event_handler_timeout(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+           << "event_handler_timeout: invalid value");
+  _event_handler_timeout = value;
+}
+
+/**
+ *  Get execute_host_checks value.
+ *
+ *  @return The execute_host_checks value.
+ */
+bool state::execute_host_checks() const throw () {
+  return (_execute_host_checks);
+}
+
+/**
+ *  Set execute_host_checks value.
+ *
+ *  @param[in] value The new execute_host_checks value.
+ */
+void state::execute_host_checks(bool value) {
+  _execute_host_checks = value;
+}
+
+/**
+ *  Get execute_service_checks value.
+ *
+ *  @return The execute_service_checks value.
+ */
+bool state::execute_service_checks() const throw () {
+  return (_execute_service_checks);
+}
+
+/**
+ *  Set execute_service_checks value.
+ *
+ *  @param[in] value The new execute_service_checks value.
+ */
+void state::execute_service_checks(bool value) {
+  _execute_service_checks = value;
+}
+
+/**
+ *  Get external_command_buffer_slots value.
+ *
+ *  @return The external_command_buffer_slots value.
+ */
+int state::external_command_buffer_slots() const throw () {
+  return (_external_command_buffer_slots);
+}
+
+/**
+ *  Set external_command_buffer_slots value.
+ *
+ *  @param[in] value The new external_command_buffer_slots value.
+ */
+void state::external_command_buffer_slots(int value) {
+  _external_command_buffer_slots = value;
+}
+
+/**
+ *  Get global_host_event_handler value.
+ *
+ *  @return The global_host_event_handler value.
+ */
+std::string const& state::global_host_event_handler() const throw () {
+  return (_global_host_event_handler);
+}
+
+/**
+ *  Set global_host_event_handler value.
+ *
+ *  @param[in] value The new global_host_event_handler value.
+ */
+void state::global_host_event_handler(std::string const& value) {
+  _global_host_event_handler = value;
+
+}
+
+/**
+ *  Get global_service_event_handler value.
+ *
+ *  @return The global_service_event_handler value.
+ */
+std::string const& state::global_service_event_handler() const throw () {
+  return (_global_service_event_handler);
+}
+
+/**
+ *  Set global_service_event_handler value.
+ *
+ *  @param[in] value The new global_service_event_handler value.
+ */
+void state::global_service_event_handler(std::string const& value) {
+  _global_service_event_handler = value;
+
+}
+
+/**
+ *  Get high_host_flap_threshold value.
+ *
+ *  @return The high_host_flap_threshold value.
+ */
+float state::high_host_flap_threshold() const throw () {
+  return (_high_host_flap_threshold);
+}
+
+/**
+ *  Set high_host_flap_threshold value.
+ *
+ *  @param[in] value The new high_host_flap_threshold value.
+ */
+void state::high_host_flap_threshold(float value) {
+  if (value <= 0.0 || value >= 100.0)
+    throw (engine_error()
+             << "high_host_flap_threshold: invalid value.");
+  _high_host_flap_threshold = value;
+}
+
+/**
+ *  Get high_service_flap_threshold value.
+ *
+ *  @return The high_service_flap_threshold value.
+ */
+float state::high_service_flap_threshold() const throw () {
+  return (_high_service_flap_threshold);
+}
+
+/**
+ *  Set high_service_flap_threshold value.
+ *
+ *  @param[in] value The new high_service_flap_threshold value.
+ */
+void state::high_service_flap_threshold(float value) {
+  if (value <= 0.0 || value >= 100.0)
+    throw (engine_error()
+             << "high_service_flap_threshold: invalid value.");
+  _high_service_flap_threshold = value;
+}
+
+/**
+ *  Get all engine hostdependencies.
+ *
+ *  @return All engine hostdependencies.
+ */
+set_hostdependency const& state::hostdependencies() const throw () {
+  return (_hostdependencies);
+}
+
+/**
+ *  Get all engine hostdependencies.
+ *
+ *  @return All engine hostdependencies.
+ */
+set_hostdependency& state::hostdependencies() throw () {
+  return (_hostdependencies);
+}
+
+/**
+ *  Get all engine hostescalations.
+ *
+ *  @return All engine hostescalations.
+ */
+set_hostescalation const& state::hostescalations() const throw () {
+  return (_hostescalations);
+}
+
+/**
+ *  Get all engine hostescalations.
+ *
+ *  @return All engine hostescalations.
+ */
+set_hostescalation& state::hostescalations() throw () {
+  return (_hostescalations);
+}
+
+/**
+ *  Get all engine hostgroups.
+ *
+ *  @return All engine hostgroups.
+ */
+set_hostgroup const& state::hostgroups() const throw () {
+  return (_hostgroups);
+}
+
+/**
+ *  Get all engine hostgroups.
+ *
+ *  @return All engine hostgroups.
+ */
+set_hostgroup& state::hostgroups() throw () {
+  return (_hostgroups);
+}
+
+/**
+ *  Get all engine hosts.
+ *
+ *  @return All engine hosts.
+ */
+set_host const& state::hosts() const throw () {
+  return (_hosts);
+}
+
+/**
+ *  Get all engine hosts.
+ *
+ *  @return All engine hosts.
+ */
+set_host& state::hosts() throw () {
+  return (_hosts);
+}
+
+/**
+ *  Find a host from its key.
+ *
+ *  @param[in] k Host key (host name).
+ *
+ *  @return Iterator to the host if found, hosts().end() if it was not.
+ */
+set_host::const_iterator state::hosts_find(
+                                  host::key_type const& k) const {
+  shared_ptr<configuration::host>
+    below_searched(new configuration::host);
+  below_searched->host_name(k);
+  set_host::const_iterator it(_hosts.upper_bound(below_searched));
+  if ((it != _hosts.end()) && ((*it)->host_name() == k))
+    return (it);
+  else if ((it != _hosts.begin()) && ((*--it)->host_name() == k))
+    return (it);
+  return (_hosts.end());
+}
+
+/**
+ *  Find a host from its key.
+ *
+ *  @param[in] k Host key (host name).
+ *
+ *  @return Iterator to the host if found, hosts().end() if it was not.
+ */
+set_host::iterator state::hosts_find(
+                            host::key_type const& k) {
+  shared_ptr<configuration::host>
+    below_searched(new configuration::host);
+  below_searched->host_name(k);
+  set_host::iterator it(_hosts.upper_bound(below_searched));
+  if ((it != _hosts.end()) && ((*it)->host_name() == k))
+    return (it);
+  else if ((it != _hosts.begin()) && ((*--it)->host_name() == k))
+    return (it);
+  return (_hosts.end());
+}
+
+/**
+ *  Get host_check_timeout value.
+ *
+ *  @return The host_check_timeout value.
+ */
+unsigned int state::host_check_timeout() const throw () {
+  return (_host_check_timeout);
+}
+
+/**
+ *  Set host_check_timeout value.
+ *
+ *  @param[in] value The new host_check_timeout value.
+ */
+void state::host_check_timeout(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "host_check_timeout: invalid value");
+  _host_check_timeout = value;
+}
+
+/**
+ *  Get host_freshness_check_interval value.
+ *
+ *  @return The host_freshness_check_interval value.
+ */
+unsigned int state::host_freshness_check_interval() const throw () {
+  return (_host_freshness_check_interval);
+}
+
+/**
+ *  Set host_freshness_check_interval value.
+ *
+ *  @param[in] value The new host_freshness_check_interval value.
+ */
+void state::host_freshness_check_interval(unsigned int value) {
+  _host_freshness_check_interval = value;
+}
+
+/**
+ *  Get host_inter_check_delay_method value.
+ *
+ *  @return The host_inter_check_delay_method value.
+ */
+state::inter_check_delay state::host_inter_check_delay_method() const throw () {
+  return (_host_inter_check_delay_method);
+}
+
+/**
+ *  Set host_inter_check_delay_method value.
+ *
+ *  @param[in] value The new host_inter_check_delay_method value.
+ */
+void state::host_inter_check_delay_method(inter_check_delay value) {
+  _host_inter_check_delay_method = value;
+}
+
+/**
+ *  Get host_perfdata_command value.
+ *
+ *  @return The host_perfdata_command value.
+ */
+std::string const& state::host_perfdata_command() const throw () {
+  return (_host_perfdata_command);
+}
+
+/**
+ *  Set host_perfdata_command value.
+ *
+ *  @param[in] value The new host_perfdata_command value.
+ */
+void state::host_perfdata_command(std::string const& value) {
+  _host_perfdata_command = value;
+}
+
+/**
+ *  Get host_perfdata_file value.
+ *
+ *  @return The host_perfdata_file value.
+ */
+std::string const& state::host_perfdata_file() const throw () {
+  return (_host_perfdata_file);
+}
+
+/**
+ *  Set host_perfdata_file value.
+ *
+ *  @param[in] value The new host_perfdata_file value.
+ */
+void state::host_perfdata_file(std::string const& value) {
+  _host_perfdata_file = value;
+}
+
+/**
+ *  Get host_perfdata_file_mode value.
+ *
+ *  @return The host_perfdata_file_mode value.
+ */
+state::perfdata_file_mode state::host_perfdata_file_mode() const throw () {
+  return (_host_perfdata_file_mode);
+}
+
+/**
+ *  Set host_perfdata_file_mode value.
+ *
+ *  @param[in] value The new host_perfdata_file_mode value.
+ */
+void state::host_perfdata_file_mode(perfdata_file_mode value) {
+  _host_perfdata_file_mode = value;
+}
+
+/**
+ *  Get host_perfdata_file_processing_command value.
+ *
+ *  @return The host_perfdata_file_processing_command value.
+ */
+std::string const& state::host_perfdata_file_processing_command() const throw () {
+  return (_host_perfdata_file_processing_command);
+}
+
+/**
+ *  Set host_perfdata_file_processing_command value.
+ *
+ *  @param[in] value The new host_perfdata_file_processing_command value.
+ */
+void state::host_perfdata_file_processing_command(std::string const& value) {
+  _host_perfdata_file_processing_command = value;
+}
+
+/**
+ *  Get host_perfdata_file_processing_interval value.
+ *
+ *  @return The host_perfdata_file_processing_interval value.
+ */
+unsigned int state::host_perfdata_file_processing_interval() const throw () {
+  return (_host_perfdata_file_processing_interval);
+}
+
+/**
+ *  Set host_perfdata_file_processing_interval value.
+ *
+ *  @param[in] value The new host_perfdata_file_processing_interval value.
+ */
+void state::host_perfdata_file_processing_interval(unsigned int value) {
+  _host_perfdata_file_processing_interval = value;
+}
+
+/**
+ *  Get host_perfdata_file_template value.
+ *
+ *  @return The host_perfdata_file_template value.
+ */
+std::string const& state::host_perfdata_file_template() const throw () {
+  return (_host_perfdata_file_template);
+}
+
+/**
+ *  Set host_perfdata_file_template value.
+ *
+ *  @param[in] value The new host_perfdata_file_template value.
+ */
+void state::host_perfdata_file_template(std::string const& value) {
+  _host_perfdata_file_template = value;
+}
+
+/**
+ *  Get illegal_object_chars value.
+ *
+ *  @return The illegal_object_chars value.
+ */
+std::string const& state::illegal_object_chars() const throw () {
+  return (_illegal_object_chars);
+}
+
+/**
+ *  Set illegal_object_chars value.
+ *
+ *  @param[in] value The new illegal_object_chars value.
+ */
+void state::illegal_object_chars(std::string const& value) {
+  _illegal_object_chars = value;
+}
+
+/**
+ *  Get illegal_output_chars value.
+ *
+ *  @return The illegal_output_chars value.
+ */
+std::string const& state::illegal_output_chars() const throw () {
+  return (_illegal_output_chars);
+}
+
+/**
+ *  Set illegal_output_chars value.
+ *
+ *  @param[in] value The new illegal_output_chars value.
+ */
+void state::illegal_output_chars(std::string const& value) {
+  _illegal_output_chars = value;
+
+}
+
+/**
+ *  Get interval_length value.
+ *
+ *  @return The interval_length value.
+ */
+unsigned int state::interval_length() const throw () {
+  return (_interval_length);
+}
+
+/**
+ *  Set interval_length value.
+ *
+ *  @param[in] value The new interval_length value.
+ */
+void state::interval_length(unsigned int value) {
+  if (!value)
+    throw (engine_error() << "interval_length: invalid value");
+
+  if (!_command_check_interval_is_seconds
+      && _command_check_interval != -1) {
+    _command_check_interval /= _interval_length;
+    _interval_length = value;
+    _command_check_interval *= _interval_length;
   }
-
-  _cur_line = save_cur_line;
-  _filename = save_filename;
-
-  ifs.close();
-
-  delete[] _mac->x[MACRO_RESOURCEFILE];
-  _mac->x[MACRO_RESOURCEFILE] = my_strdup(resfile.c_str());
-  _add_resource_file(resfile);
-  return;
+  else
+    _interval_length = value;
 }
 
 /**
- *  Set the auth filename.
- *  @param[in] value The filename.
+ *  Get log_event_handlers value.
+ *
+ *  @return The log_event_handlers value.
  */
-void state::_set_auth_file(std::string const& value) {
-  (void)value;
+bool state::log_event_handlers() const throw () {
+  return (_log_event_handlers);
+}
+
+/**
+ *  Set log_event_handlers value.
+ *
+ *  @param[in] value The new log_event_handlers value.
+ */
+void state::log_event_handlers(bool value) {
+  _log_event_handlers = value;
+}
+
+/**
+ *  Get log_external_commands value.
+ *
+ *  @return The log_external_commands value.
+ */
+bool state::log_external_commands() const throw () {
+  return (_log_external_commands);
+}
+
+/**
+ *  Set log_external_commands value.
+ *
+ *  @param[in] value The new log_external_commands value.
+ */
+void state::log_external_commands(bool value) {
+  _log_external_commands = value;
+}
+
+/**
+ *  Get log_file value.
+ *
+ *  @return The log_file value.
+ */
+std::string const& state::log_file() const throw () {
+  return (_log_file);
+}
+
+/**
+ *  Set log_file value.
+ *
+ *  @param[in] value The new log_file value.
+ */
+void state::log_file(std::string const& value) {
+  _log_file = value;
+}
+
+/**
+ *  Get log_host_retries value.
+ *
+ *  @return The log_host_retries value.
+ */
+bool state::log_host_retries() const throw () {
+  return (_log_host_retries);
+}
+
+/**
+ *  Set log_host_retries value.
+ *
+ *  @param[in] value The new log_host_retries value.
+ */
+void state::log_host_retries(bool value) {
+  _log_host_retries = value;
+}
+
+/**
+ *  Get log_initial_states value.
+ *
+ *  @return The log_initial_states value.
+ */
+bool state::log_initial_states() const throw () {
+  return (_log_initial_states);
+}
+
+/**
+ *  Set log_initial_states value.
+ *
+ *  @param[in] value The new log_initial_states value.
+ */
+void state::log_initial_states(bool value) {
+  _log_initial_states = value;
+}
+
+/**
+ *  Get log_notifications value.
+ *
+ *  @return The log_notifications value.
+ */
+bool state::log_notifications() const throw () {
+  return (_log_notifications);
+}
+
+/**
+ *  Set log_notifications value.
+ *
+ *  @param[in] value The new log_notifications value.
+ */
+void state::log_notifications(bool value) {
+  _log_notifications = value;
+}
+
+/**
+ *  Get log_passive_checks value.
+ *
+ *  @return The log_passive_checks value.
+ */
+bool state::log_passive_checks() const throw () {
+  return (_log_passive_checks);
+}
+
+/**
+ *  Set log_passive_checks value.
+ *
+ *  @param[in] value The new log_passive_checks value.
+ */
+void state::log_passive_checks(bool value) {
+  _log_passive_checks = value;
+}
+
+/**
+ *  Get log_service_retries value.
+ *
+ *  @return The log_service_retries value.
+ */
+bool state::log_service_retries() const throw () {
+  return (_log_service_retries);
+}
+
+/**
+ *  Set log_service_retries value.
+ *
+ *  @param[in] value The new log_service_retries value.
+ */
+void state::log_service_retries(bool value) {
+  _log_service_retries = value;
+}
+
+/**
+ *  Get low_host_flap_threshold value.
+ *
+ *  @return The low_host_flap_threshold value.
+ */
+float state::low_host_flap_threshold() const throw () {
+  return (_low_host_flap_threshold);
+}
+
+/**
+ *  Set low_host_flap_threshold value.
+ *
+ *  @param[in] value The new low_host_flap_threshold value.
+ */
+void state::low_host_flap_threshold(float value) {
+  if (value <= 0.0 || value >= 100.0)
+    throw (engine_error()
+             << "low_host_flap_threshold: invalid value.");
+  _low_host_flap_threshold = value;
+}
+
+/**
+ *  Get low_service_flap_threshold value.
+ *
+ *  @return The low_service_flap_threshold value.
+ */
+float state::low_service_flap_threshold() const throw () {
+  return (_low_service_flap_threshold);
+}
+
+/**
+ *  Set low_service_flap_threshold value.
+ *
+ *  @param[in] value The new low_service_flap_threshold value.
+ */
+void state::low_service_flap_threshold(float value) {
+  if (value <= 0.0 || value >= 100.0)
+    throw (engine_error()
+             << "low_service_flap_threshold: invalid value.");
+  _low_service_flap_threshold = value;
+}
+
+/**
+ *  Get max_check_reaper_time value.
+ *
+ *  @return The max_check_reaper_time value.
+ */
+unsigned int state::max_check_reaper_time() const throw () {
+  return (_max_check_reaper_time);
+}
+
+/**
+ *  Set max_check_reaper_time value.
+ *
+ *  @param[in] value The new max_check_reaper_time value.
+ */
+void state::max_check_reaper_time(unsigned int value) {
+  if (!value)
+    throw (engine_error() << "max_check_reaper_time: invalid value");
+  _max_check_reaper_time = value;
+}
+
+/**
+ *  Get max_check_result_file_age value.
+ *
+ *  @return The max_check_result_file_age value.
+ */
+unsigned long state::max_check_result_file_age() const throw () {
+  return (_max_check_result_file_age);
+}
+
+/**
+ *  Set max_check_result_file_age value.
+ *
+ *  @param[in] value The new max_check_result_file_age value.
+ */
+void state::max_check_result_file_age(unsigned long value) {
   logger(log_config_warning, basic)
-    << "warning: auth_file variable ignored";
-  return;
+    << "Warning: max_check_result_file_age is deprecated";
+  _max_check_result_file_age = value;
 }
 
 /**
- *  Set the admin email macro.
- *  @param[in] value The admin email.
+ *  Get max_debug_file_size value.
+ *
+ *  @return The max_debug_file_size value.
  */
-void state::_set_admin_email(std::string const& value) {
-  _tab_string[admin_email] = value;
-  delete[] _mac->x[MACRO_ADMINEMAIL];
-  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.c_str());
-  return;
+unsigned long state::max_debug_file_size() const throw () {
+  return (_max_debug_file_size);
 }
 
 /**
- *  Set the admin pager macro.
- *  @param[in] value The admin pager.
+ *  Set max_debug_file_size value.
+ *
+ *  @param[in] value The new max_debug_file_size value.
  */
-void state::_set_admin_pager(std::string const& value) {
-  _tab_string[admin_pager] = value;
-  delete[] _mac->x[MACRO_ADMINPAGER];
-  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.c_str());
-  return;
+void state::max_debug_file_size(unsigned long value) {
+  _max_debug_file_size = value;
 }
 
 /**
- *  Retained sercice attribute mask ignored.
+ *  Get max_host_check_spread value.
+ *
+ *  @return The max_host_check_spread value.
  */
-void state::_set_retained_service_attribute_mask(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: retained_service_attribute_mask variable ignored";
-  return;
+unsigned int state::max_host_check_spread() const throw () {
+  return (_max_host_check_spread);
 }
 
 /**
- * Retained process service attribute mask ignored.
+ *  Set max_host_check_spread value.
+ *
+ *  @param[in] value The new max_host_check_spread value.
  */
-void state::_set_retained_process_service_attribute_mask(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: retained_process_service_attribute_mask variable ignored";
-  return;
+void state::max_host_check_spread(unsigned int value) {
+  if (!value)
+    throw (engine_error() << "max_host_check_spread: invalid value");
+  _max_host_check_spread = value;
 }
 
 /**
- *  Aggrefate status updates ignored.
+ *  Get max_log_file_size value.
+ *
+ *  @return The max_log_file_size value.
+ */
+unsigned long state::max_log_file_size() const throw () {
+  return (_max_log_file_size);
+}
+
+/**
+ *  Set max_log_file_size value.
+ *
+ *  @param[in] value The new max_log_file_size value.
+ */
+void state::max_log_file_size(unsigned long value) {
+  _max_log_file_size = value;
+}
+
+/**
+ *  Get max_parallel_service_checks value.
+ *
+ *  @return The max_parallel_service_checks value.
+ */
+unsigned int state::max_parallel_service_checks() const throw () {
+  return (_max_parallel_service_checks);
+}
+
+/**
+ *  Set max_parallel_service_checks value.
+ *
+ *  @param[in] value The new max_parallel_service_checks value.
+ */
+void state::max_parallel_service_checks(unsigned int value) {
+  _max_parallel_service_checks = value;
+}
+
+/**
+ *  Get max_service_check_spread value.
+ *
+ *  @return The max_service_check_spread value.
+ */
+unsigned int state::max_service_check_spread() const throw () {
+  return (_max_service_check_spread);
+}
+
+/**
+ *  Set max_service_check_spread value.
+ *
+ *  @param[in] value The new max_service_check_spread value.
+ */
+void state::max_service_check_spread(unsigned int value) {
+  if (!value)
+    throw (engine_error() << "max_service_check_spread: invalid value");
+  _max_service_check_spread = value;
+}
+
+/**
+ *  Get notification_timeout value.
+ *
+ *  @return The notification_timeout value.
+ */
+unsigned int state::notification_timeout() const throw () {
+  return (_notification_timeout);
+}
+
+/**
+ *  Set notification_timeout value.
+ *
+ *  @param[in] value The new notification_timeout value.
+ */
+void state::notification_timeout(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "notification_timeout: invalid value");
+  _notification_timeout = value;
+}
+
+/**
+ *  Get object_cache_file value.
+ *
+ *  @return The object_cache_file value.
+ */
+std::string const& state::object_cache_file() const throw () {
+  return (_object_cache_file);
+}
+
+/**
+ *  Set object_cache_file value.
+ *
+ *  @param[in] value The new object_cache_file value.
+ */
+void state::object_cache_file(std::string const& value) {
+  _object_cache_file = value;
+}
+
+/**
+ *  Get obsess_over_hosts value.
+ *
+ *  @return The obsess_over_hosts value.
+ */
+bool state::obsess_over_hosts() const throw () {
+  return (_obsess_over_hosts);
+}
+
+/**
+ *  Set obsess_over_hosts value.
+ *
+ *  @param[in] value The new obsess_over_hosts value.
+ */
+void state::obsess_over_hosts(bool value) {
+  _obsess_over_hosts = value;
+}
+
+/**
+ *  Get obsess_over_services value.
+ *
+ *  @return The obsess_over_services value.
+ */
+bool state::obsess_over_services() const throw () {
+  return (_obsess_over_services);
+}
+
+/**
+ *  Set obsess_over_services value.
+ *
+ *  @param[in] value The new obsess_over_services value.
+ */
+void state::obsess_over_services(bool value) {
+  _obsess_over_services = value;
+}
+
+/**
+ *  Get ochp_command value.
+ *
+ *  @return The ochp_command value.
+ */
+std::string const& state::ochp_command() const throw () {
+  return (_ochp_command);
+}
+
+/**
+ *  Set ochp_command value.
+ *
+ *  @param[in] value The new ochp_command value.
+ */
+void state::ochp_command(std::string const& value) {
+  _ochp_command = value;
+
+}
+
+/**
+ *  Get ochp_timeout value.
+ *
+ *  @return The ochp_timeout value.
+ */
+unsigned int state::ochp_timeout() const throw () {
+  return (_ochp_timeout);
+}
+
+/**
+ *  Set ochp_timeout value.
+ *
+ *  @param[in] value The new ochp_timeout value.
+ */
+void state::ochp_timeout(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "ochp_timeout: invalid value");
+  _ochp_timeout = value;
+}
+
+/**
+ *  Get ocsp_command value.
+ *
+ *  @return The ocsp_command value.
+ */
+std::string const& state::ocsp_command() const throw () {
+  return (_ocsp_command);
+}
+
+/**
+ *  Set ocsp_command value.
+ *
+ *  @param[in] value The new ocsp_command value.
+ */
+void state::ocsp_command(std::string const& value) {
+  _ocsp_command = value;
+}
+
+/**
+ *  Get ocsp_timeout value.
+ *
+ *  @return The ocsp_timeout value.
+ */
+unsigned int state::ocsp_timeout() const throw () {
+  return (_ocsp_timeout);
+}
+
+/**
+ *  Set ocsp_timeout value.
+ *
+ *  @param[in] value The new ocsp_timeout value.
+ */
+void state::ocsp_timeout(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "ocsp_timeout: invalid value");
+  _ocsp_timeout = value;
+}
+
+/**
+ *  Get passive_host_checks_are_soft value.
+ *
+ *  @return The passive_host_checks_are_soft value.
+ */
+bool state::passive_host_checks_are_soft() const throw () {
+  return (_passive_host_checks_are_soft);
+}
+
+/**
+ *  Set passive_host_checks_are_soft value.
+ *
+ *  @param[in] value The new passive_host_checks_are_soft value.
+ */
+void state::passive_host_checks_are_soft(bool value) {
+  _passive_host_checks_are_soft = value;
+}
+
+/**
+ *  Get perfdata_timeout value.
+ *
+ *  @return The perfdata_timeout value.
+ */
+int state::perfdata_timeout() const throw () {
+  return (_perfdata_timeout);
+}
+
+/**
+ *  Set perfdata_timeout value.
+ *
+ *  @param[in] value The new perfdata_timeout value.
+ */
+void state::perfdata_timeout(int value) {
+  _perfdata_timeout = value;
+}
+
+/**
+ *  Get precached_object_file value.
+ *
+ *  @return The precached_object_file value.
+ */
+std::string const& state::precached_object_file() const throw () {
+  return (_precached_object_file);
+}
+
+/**
+ *  Set precached_object_file value.
+ *
+ *  @param[in] value The new precached_object_file value.
+ */
+void state::precached_object_file(std::string const& value) {
+  _precached_object_file = value;
+}
+
+/**
+ *  Get process_performance_data value.
+ *
+ *  @return The process_performance_data value.
+ */
+bool state::process_performance_data() const throw () {
+  return (_process_performance_data);
+}
+
+/**
+ *  Set process_performance_data value.
+ *
+ *  @param[in] value The new process_performance_data value.
+ */
+void state::process_performance_data(bool value) {
+  _process_performance_data = value;
+}
+
+/**
+ *  Get resource_file value.
+ *
+ *  @return The resource_file value.
+ */
+std::list<std::string> const& state::resource_file() const throw () {
+  return (_resource_file);
+}
+
+/**
+ *  Set resource_file value.
+ *
+ *  @param[in] value The new resource_file value.
+ */
+void state::resource_file(std::list<std::string> const& value) {
+  _resource_file = value;
+}
+
+/**
+ *  Get retained_contact_host_attribute_mask value.
+ *
+ *  @return The retained_contact_host_attribute_mask value.
+ */
+unsigned long state::retained_contact_host_attribute_mask() const throw () {
+  return (_retained_contact_host_attribute_mask);
+}
+
+/**
+ *  Set retained_contact_host_attribute_mask value.
+ *
+ *  @param[in] value The new retained_contact_host_attribute_mask value.
+ */
+void state::retained_contact_host_attribute_mask(unsigned long value) {
+  _retained_contact_host_attribute_mask = value;
+}
+
+/**
+ *  Get retained_contact_service_attribute_mask value.
+ *
+ *  @return The retained_contact_service_attribute_mask value.
+ */
+unsigned long state::retained_contact_service_attribute_mask() const throw () {
+  return (_retained_contact_service_attribute_mask);
+}
+
+/**
+ *  Set retained_contact_service_attribute_mask value.
+ *
+ *  @param[in] value The new retained_contact_service_attribute_mask value.
+ */
+void state::retained_contact_service_attribute_mask(unsigned long value) {
+  _retained_contact_service_attribute_mask = value;
+}
+
+/**
+ *  Get retained_host_attribute_mask value.
+ *
+ *  @return The retained_host_attribute_mask value.
+ */
+unsigned long state::retained_host_attribute_mask() const throw () {
+  return (_retained_host_attribute_mask);
+}
+
+/**
+ *  Set retained_host_attribute_mask value.
+ *
+ *  @param[in] value The new retained_host_attribute_mask value.
+ */
+void state::retained_host_attribute_mask(unsigned long value) {
+  _retained_host_attribute_mask = value;
+}
+
+/**
+ *  Get retained_process_host_attribute_mask value.
+ *
+ *  @return The retained_process_host_attribute_mask value.
+ */
+unsigned long state::retained_process_host_attribute_mask() const throw () {
+  return (_retained_process_host_attribute_mask);
+}
+
+/**
+ *  Set retained_process_host_attribute_mask value.
+ *
+ *  @param[in] value The new retained_process_host_attribute_mask value.
+ */
+void state::retained_process_host_attribute_mask(unsigned long value) {
+  _retained_process_host_attribute_mask = value;
+}
+
+/**
+ *  Get retain_state_information value.
+ *
+ *  @return The retain_state_information value.
+ */
+bool state::retain_state_information() const throw () {
+  return (_retain_state_information);
+}
+
+/**
+ *  Set retain_state_information value.
+ *
+ *  @param[in] value The new retain_state_information value.
+ */
+void state::retain_state_information(bool value) {
+  _retain_state_information = value;
+}
+
+/**
+ *  Get retention_scheduling_horizon value.
+ *
+ *  @return The retention_scheduling_horizon value.
+ */
+unsigned int state::retention_scheduling_horizon() const throw () {
+  return (_retention_scheduling_horizon);
+}
+
+/**
+ *  Set retention_scheduling_horizon value.
+ *
+ *  @param[in] value The new retention_scheduling_horizon value.
+ */
+void state::retention_scheduling_horizon(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "retention_scheduling_horizon: invalid value");
+  _retention_scheduling_horizon = value;
+}
+
+/**
+ *  Get retention_update_interval value.
+ *
+ *  @return The retention_update_interval value.
+ */
+unsigned int state::retention_update_interval() const throw () {
+  return (_retention_update_interval);
+}
+
+/**
+ *  Set retention_update_interval value.
+ *
+ *  @param[in] value The new retention_update_interval value.
+ */
+void state::retention_update_interval(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "retention_update_interval: invalid value");
+  _retention_update_interval = value;
+}
+
+/**
+ *  Get all engine servicedependencies.
+ *
+ *  @return All engine servicedependencies.
+ */
+set_servicedependency const& state::servicedependencies() const throw () {
+  return (_servicedependencies);
+}
+
+/**
+ *  Get all engine servicedependencies.
+ *
+ *  @return All engine servicedependencies.
+ */
+set_servicedependency& state::servicedependencies() throw () {
+  return (_servicedependencies);
+}
+
+/**
+ *  Get all engine serviceescalations.
+ *
+ *  @return All engine serviceescalations.
+ */
+set_serviceescalation const& state::serviceescalations() const throw () {
+  return (_serviceescalations);
+}
+
+/**
+ *  Get all engine serviceescalations.
+ *
+ *  @return All engine serviceescalations.
+ */
+set_serviceescalation& state::serviceescalations() throw () {
+  return (_serviceescalations);
+}
+
+/**
+ *  Get all engine servicegroups.
+ *
+ *  @return All engine servicegroups.
+ */
+set_servicegroup const& state::servicegroups() const throw () {
+  return (_servicegroups);
+}
+
+/**
+ *  Get all engine servicegroups.
+ *
+ *  @return All engine servicegroups.
+ */
+set_servicegroup& state::servicegroups() throw () {
+  return (_servicegroups);
+}
+
+/**
+ *  Get all engine services.
+ *
+ *  @return All engine services.
+ */
+set_service const& state::services() const throw () {
+  return (_services);
+}
+
+/**
+ *  Get all engine services.
+ *
+ *  @return All engine services.
+ */
+set_service& state::services() throw () {
+  return (_services);
+}
+
+/**
+ *  Get service_check_timeout value.
+ *
+ *  @return The service_check_timeout value.
+ */
+unsigned int state::service_check_timeout() const throw () {
+  return (_service_check_timeout);
+}
+
+/**
+ *  Set service_check_timeout value.
+ *
+ *  @param[in] value The new service_check_timeout value.
+ */
+void state::service_check_timeout(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "service_check_timeout: invalid value");
+  _service_check_timeout = value;
+}
+
+/**
+ *  Get service_freshness_check_interval value.
+ *
+ *  @return The service_freshness_check_interval value.
+ */
+unsigned int state::service_freshness_check_interval() const throw () {
+  return (_service_freshness_check_interval);
+}
+
+/**
+ *  Set service_freshness_check_interval value.
+ *
+ *  @param[in] value The new service_freshness_check_interval value.
+ */
+void state::service_freshness_check_interval(unsigned int value) {
+  if (!value)
+    throw (engine_error()
+             << "service_freshness_check_interval: invalid value");
+  _service_freshness_check_interval = value;
+}
+
+/**
+ *  Get service_inter_check_delay_method value.
+ *
+ *  @return The service_inter_check_delay_method value.
+ */
+state::inter_check_delay state::service_inter_check_delay_method() const throw () {
+  return (_service_inter_check_delay_method);
+}
+
+/**
+ *  Set service_inter_check_delay_method value.
+ *
+ *  @param[in] value The new service_inter_check_delay_method value.
+ */
+void state::service_inter_check_delay_method(inter_check_delay value) {
+  _service_inter_check_delay_method = value;
+}
+
+/**
+ *  Get service_interleave_factor_method value.
+ *
+ *  @return The service_interleave_factor_method value.
+ */
+state::interleave_factor state::service_interleave_factor_method() const throw () {
+  return (_service_interleave_factor_method);
+}
+
+/**
+ *  Set service_interleave_factor_method value.
+ *
+ *  @param[in] value The new service_interleave_factor_method value.
+ */
+void state::service_interleave_factor_method(interleave_factor value) {
+  _service_interleave_factor_method = value;
+}
+
+/**
+ *  Get service_perfdata_command value.
+ *
+ *  @return The service_perfdata_command value.
+ */
+std::string const& state::service_perfdata_command() const throw () {
+  return (_service_perfdata_command);
+}
+
+/**
+ *  Set service_perfdata_command value.
+ *
+ *  @param[in] value The new service_perfdata_command value.
+ */
+void state::service_perfdata_command(std::string const& value) {
+  _service_perfdata_command = value;
+}
+
+/**
+ *  Get service_perfdata_file value.
+ *
+ *  @return The service_perfdata_file value.
+ */
+std::string const& state::service_perfdata_file() const throw () {
+  return (_service_perfdata_file);
+}
+
+/**
+ *  Set service_perfdata_file value.
+ *
+ *  @param[in] value The new service_perfdata_file value.
+ */
+void state::service_perfdata_file(std::string const& value) {
+  _service_perfdata_file = value;
+}
+
+/**
+ *  Get service_perfdata_file_mode value.
+ *
+ *  @return The service_perfdata_file_mode value.
+ */
+state::perfdata_file_mode state::service_perfdata_file_mode() const throw () {
+  return (_service_perfdata_file_mode);
+}
+
+/**
+ *  Set service_perfdata_file_mode value.
+ *
+ *  @param[in] value The new service_perfdata_file_mode value.
+ */
+void state::service_perfdata_file_mode(perfdata_file_mode value) {
+  _service_perfdata_file_mode = value;
+}
+
+/**
+ *  Get service_perfdata_file_processing_command value.
+ *
+ *  @return The service_perfdata_file_processing_command value.
+ */
+std::string const& state::service_perfdata_file_processing_command() const throw () {
+  return (_service_perfdata_file_processing_command);
+}
+
+/**
+ *  Set service_perfdata_file_processing_command value.
+ *
+ *  @param[in] value The new service_perfdata_file_processing_command value.
+ */
+void state::service_perfdata_file_processing_command(std::string const& value) {
+  _service_perfdata_file_processing_command = value;
+}
+
+/**
+ *  Get service_perfdata_file_processing_interval value.
+ *
+ *  @return The service_perfdata_file_processing_interval value.
+ */
+unsigned int state::service_perfdata_file_processing_interval() const throw () {
+  return (_service_perfdata_file_processing_interval);
+}
+
+/**
+ *  Set service_perfdata_file_processing_interval value.
+ *
+ *  @param[in] value The new service_perfdata_file_processing_interval value.
+ */
+void state::service_perfdata_file_processing_interval(unsigned int value) {
+  _service_perfdata_file_processing_interval = value;
+}
+
+/**
+ *  Get service_perfdata_file_template value.
+ *
+ *  @return The service_perfdata_file_template value.
+ */
+std::string const& state::service_perfdata_file_template() const throw () {
+  return (_service_perfdata_file_template);
+}
+
+/**
+ *  Set service_perfdata_file_template value.
+ *
+ *  @param[in] value The new service_perfdata_file_template value.
+ */
+void state::service_perfdata_file_template(std::string const& value) {
+  _service_perfdata_file_template = value;
+}
+
+/**
+ *  Get sleep_time value.
+ *
+ *  @return The sleep_time value.
+ */
+float state::sleep_time() const throw () {
+  return (_sleep_time);
+}
+
+/**
+ *  Set sleep_time value.
+ *
+ *  @param[in] value The new sleep_time value.
+ */
+void state::sleep_time(float value) {
+  if (value <= 0.0)
+    throw (engine_error() << "sleep_time: invalid value.");
+  _sleep_time = value;
+}
+
+/**
+ *  Get soft_state_dependencies value.
+ *
+ *  @return The soft_state_dependencies value.
+ */
+bool state::soft_state_dependencies() const throw () {
+  return (_soft_state_dependencies);
+}
+
+/**
+ *  Set soft_state_dependencies value.
+ *
+ *  @param[in] value The new soft_state_dependencies value.
+ */
+void state::soft_state_dependencies(bool value) {
+  _soft_state_dependencies = value;
+}
+
+/**
+ *  Get state_retention_file value.
+ *
+ *  @return The state_retention_file value.
+ */
+std::string const& state::state_retention_file() const throw () {
+  return (_state_retention_file);
+}
+
+/**
+ *  Set state_retention_file value.
+ *
+ *  @param[in] value The new state_retention_file value.
+ */
+void state::state_retention_file(std::string const& value) {
+  _state_retention_file = value;
+}
+
+/**
+ *  Get status_file value.
+ *
+ *  @return The status_file value.
+ */
+std::string const& state::status_file() const throw () {
+  return (_status_file);
+}
+
+/**
+ *  Set status_file value.
+ *
+ *  @param[in] value The new status_file value.
+ */
+void state::status_file(std::string const& value) {
+  _status_file = value;
+}
+
+/**
+ *  Get status_update_interval value.
+ *
+ *  @return The status_update_interval value.
+ */
+unsigned int state::status_update_interval() const throw () {
+  return (_status_update_interval);
+}
+
+/**
+ *  Set status_update_interval value.
+ *
+ *  @param[in] value The new status_update_interval value.
+ */
+void state::status_update_interval(unsigned int value) {
+  if (value < 2)
+    throw (engine_error()
+           << "status_update_interval: invalid value");
+  _status_update_interval = value;
+}
+
+/**
+ *  Set a property with new value.
+ *
+ *  @param[in] key   The property name.
+ *  @param[in] value The new value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool state::set(std::string const& key, std::string const& value) {
+  try {
+    for (unsigned int i(0);
+         i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+         ++i)
+      if (gl_setters[i].name == key)
+        return ((gl_setters[i].func)(*this, value));
+  }
+  catch (std::exception const& e) {
+    logger(log_config_error, basic)
+      << e.what();
+    return (false);
+  }
+  return (true);
+}
+
+/**
+ *  Get all engine timeperiods.
+ *
+ *  @return All engine timeperiods.
+ */
+set_timeperiod const& state::timeperiods() const throw () {
+  return (_timeperiods);
+}
+
+/**
+ *  Get all engine timeperiods.
+ *
+ *  @return All engine timeperiods.
+ */
+set_timeperiod& state::timeperiods() throw () {
+  return (_timeperiods);
+}
+
+/**
+ *  Get time_change_threshold value.
+ *
+ *  @return The time_change_threshold value.
+ */
+unsigned int state::time_change_threshold() const throw () {
+  return (_time_change_threshold);
+}
+
+/**
+ *  Set time_change_threshold value.
+ *
+ *  @param[in] value The new time_change_threshold value.
+ */
+void state::time_change_threshold(unsigned int value) {
+  if (value < 6)
+    throw (engine_error()
+             << "time_change_threshold: invalid value");
+  _time_change_threshold = value;
+}
+
+/**
+ *  Get translate_passive_host_checks value.
+ *
+ *  @return The translate_passive_host_checks value.
+ */
+bool state::translate_passive_host_checks() const throw () {
+  return (_translate_passive_host_checks);
+}
+
+/**
+ *  Set translate_passive_host_checks value.
+ *
+ *  @param[in] value The new translate_passive_host_checks value.
+ */
+void state::translate_passive_host_checks(bool value) {
+  _translate_passive_host_checks = value;
+}
+
+/**
+ *  Get user resources.
+ *
+ *  @return The users resources list.
+ */
+std::vector<std::string> const& state::user() const throw () {
+  return (_users);
+}
+
+/**
+ *  Set the user resources.
+ *
+ *  @param[in] value The new users list.
+ */
+void state::user(std::vector<std::string> const& value) {
+  _users = value;
+}
+
+/**
+ *  Set the user resources.
+ *
+ *  @param[in] key   The user key.
+ *  @param[in] value The user value.
+ */
+void state::user(std::string const& key, std::string const& value) {
+  std::size_t pos(key.find("$USER"));
+  if (pos != 0)
+    throw (engine_error()
+           << "configuration: invalid user key '" << key << "'");
+  std::string tmp(key.substr(5));
+
+  pos = tmp.size();
+  if (!pos || tmp[pos - 1] != '$')
+    throw (engine_error()
+           << "configuration: invalid user key '" << key << "'");
+  tmp.erase(pos - 1);
+
+  unsigned int idx;
+  if (!string::to(tmp, idx) || !idx || idx >= MAX_USER_MACROS)
+    throw (engine_error()
+           << "configuration: invalid user key '" << key << "'");
+
+  user(idx - 1, value);
+}
+
+/**
+ *  Set the user resources.
+ *
+ *  @param[in] key   The user key.
+ *  @param[in] value The user value.
+ */
+void state::user(unsigned int key, std::string const& value) {
+  if (key >= _users.size())
+    _users.resize(key + 10);
+  _users[key] = value;
+}
+
+/**
+ *  Get use_aggressive_host_checking value.
+ *
+ *  @return The use_aggressive_host_checking value.
+ */
+bool state::use_aggressive_host_checking() const throw () {
+  return (_use_aggressive_host_checking);
+}
+
+/**
+ *  Set use_aggressive_host_checking value.
+ *
+ *  @param[in] value The new use_aggressive_host_checking value.
+ */
+void state::use_aggressive_host_checking(bool value) {
+  _use_aggressive_host_checking = value;
+}
+
+/**
+ *  Get use_check_result_path value.
+ *
+ *  @return The use_check_result_path value.
+ */
+bool state::use_check_result_path() const throw () {
+  return (_use_check_result_path);
+}
+
+/**
+ *  Set use_check_result_path value.
+ *
+ *  @param[in] value The new use_check_result_path value.
+ */
+void state::use_check_result_path(bool value) {
+  _use_check_result_path = value;
+}
+
+/**
+ *  Get use_large_installation_tweaks value.
+ *
+ *  @return The use_large_installation_tweaks value.
+ */
+bool state::use_large_installation_tweaks() const throw () {
+  return (_use_large_installation_tweaks);
+}
+
+/**
+ *  Set use_large_installation_tweaks value.
+ *
+ *  @param[in] value The new use_large_installation_tweaks value.
+ */
+void state::use_large_installation_tweaks(bool value) {
+  _use_large_installation_tweaks = value;
+}
+
+/**
+ *  Get use_regexp_matches value.
+ *
+ *  @return The use_regexp_matches value.
+ */
+bool state::use_regexp_matches() const throw () {
+  return (_use_regexp_matches);
+}
+
+/**
+ *  Set use_regexp_matches value.
+ *
+ *  @param[in] value The new use_regexp_matches value.
+ */
+void state::use_regexp_matches(bool value) {
+  _use_regexp_matches = value;
+}
+
+/**
+ *  Get use_retained_program_state value.
+ *
+ *  @return The use_retained_program_state value.
+ */
+bool state::use_retained_program_state() const throw () {
+  return (_use_retained_program_state);
+}
+
+/**
+ *  Set use_retained_program_state value.
+ *
+ *  @param[in] value The new use_retained_program_state value.
+ */
+void state::use_retained_program_state(bool value) {
+  _use_retained_program_state = value;
+}
+
+/**
+ *  Get use_retained_scheduling_info value.
+ *
+ *  @return The use_retained_scheduling_info value.
+ */
+bool state::use_retained_scheduling_info() const throw () {
+  return (_use_retained_scheduling_info);
+}
+
+/**
+ *  Set use_retained_scheduling_info value.
+ *
+ *  @param[in] value The new use_retained_scheduling_info value.
+ */
+void state::use_retained_scheduling_info(bool value) {
+  _use_retained_scheduling_info = value;
+}
+
+/**
+ *  Get use_setpgid value.
+ *
+ *  @return The use_setpgid value.
+ */
+bool state::use_setpgid() const throw () {
+  return (_use_setpgid);
+}
+
+/**
+ *  Set use_setpgid value.
+ *
+ *  @param[in] value The new use_setpgid value.
+ */
+void state::use_setpgid(bool value) {
+  _use_setpgid = value;
+}
+
+/**
+ *  Get use_syslog value.
+ *
+ *  @return The use_syslog value.
+ */
+bool state::use_syslog() const throw () {
+  return (_use_syslog);
+}
+
+/**
+ *  Set use_syslog value.
+ *
+ *  @param[in] value The new use_syslog value.
+ */
+void state::use_syslog(bool value) {
+  _use_syslog = value;
+}
+
+/**
+ *  Get use_timezone value.
+ *
+ *  @return The use_timezone value.
+ */
+std::string const& state::use_timezone() const throw () {
+  return (_use_timezone);
+}
+
+/**
+ *  Set use_timezone value.
+ *
+ *  @param[in] value The new use_timezone value.
+ */
+void state::use_timezone(std::string const& value) {
+  _use_timezone = value;
+
+}
+
+/**
+ *  Get use_true_regexp_matching value.
+ *
+ *  @return The use_true_regexp_matching value.
+ */
+bool state::use_true_regexp_matching() const throw () {
+  return (_use_true_regexp_matching);
+}
+
+/**
+ *  Set use_true_regexp_matching value.
+ *
+ *  @param[in] value The new use_true_regexp_matching value.
+ */
+void state::use_true_regexp_matching(bool value) {
+  _use_true_regexp_matching = value;
+}
+
+/**
+ *  Unused variable aggregate_status_updates.
+ *
+ *  @param[in] value Unused.
  */
 void state::_set_aggregate_status_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: aggregate_status_updates directive ignored: all"
-       " status file updates are now aggregated";
-  return;
+    << "Warning: aggregate_status_updates variable ignored";
 }
 
 /**
- *  Set the broker module.
- *  @param[in] value The broker module.
+ *  Unused variable auth_file.
+ *
+ *  @param[in] value Unused.
  */
-void state::_set_broker_module(std::string const& value) {
-  // Copy string.
-  std::string val(value);
-
-  // Find delimiter between module and its arguments.
-  size_t pos(val.find_first_of(" \n"));
-
-  // Extract module arguments (end of string).
-  std::string args;
-  if (pos != std::string::npos) {
-    args = val.substr(pos + 1);
-
-    // Module path is now in val.
-    val.erase(pos);
-  }
-
-  // Add module.
-  neb_add_module(val.c_str(), args.c_str(), TRUE);
-  _lst_broker_module.push_back(val.c_str());
-  return;
+void state::_set_auth_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: auth_file variable ignored";
 }
 
 /**
- *  Bare update check ignored.
+ *  Unused variable bare_update_check.
+ *
+ *  @param[in] value Unused.
  */
 void state::_set_bare_update_check(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: bare_update_check variable ignored: "
-    "Centreon Engine does not check for updates";
-  return;
+    << "Warning: bare_update_check variable ignored";
 }
 
 /**
- *  Check for updates ignored.
+ *  Add broker module.
+ *
+ *  @param[in] value The new broker module.
  */
-void state::_set_check_for_updates(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: check_for_updates variable ignored: "
-    "Centreon Engine does not check for updates";
-  return;
-}
+void state::_set_broker_module(std::string const& value) {
+  // XXX: broker register.
+  // // Copy string.
+  // std::string val(value);
 
-/**
- *  Comment file ignored.
- */
-void state::_set_comment_file(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: comment_file variable ignored: "
-    "comments are now stored in the status and retention files";
-  return;
-}
+  // // Find delimiter between module and its arguments.
+  // size_t pos(val.find_first_of(" \n"));
 
-/**
- *  Daemon dumps core ignored.
- */
-void state::_set_daemon_dumps_core(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: daemon_dumps_core variable ignored: "
-    "core dumping has to be handled by Centreon Engine user";
-  return;
-}
+  // // Extract module arguments (end of string).
+  // std::string args;
+  // if (pos != std::string::npos) {
+  //   args = val.substr(pos + 1);
 
-/**
- *  Downtime file ignored.
- */
-void state::_set_downtime_file(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: downtime_file variable ignored: "
-    "downtime entries are now stored in the status and retention files";
-  return;
-}
+  //   // Module path is now in val.
+  //   val.erase(pos);
+  // }
 
-/**
- *  Lock file ignored.
- */
-void state::_set_lock_file(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: lock_file variable ignored: "
-    "daemonization should be handled by startup script";
-  return;
-}
-
-/**
- *  User ignored.
- */
-void state::_set_user(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: nagios_user variable ignored: "
-    "priviledge drop should be handled by startup script";
-  return;
-}
-
-/**
- *  Group ignored.
- */
-void state::_set_group(std::string const& value) {
-  (void)value;
-  logger(log_config_warning, basic)
-    << "warning: nagios_group variable ignored: "
-    "priviledge drop should be handled by startup script";
-  return;
-}
-
-/**
- *  Set status file.
- *  @param[in] value  The status file path.
- */
-void state::_set_status_file(std::string const& value) {
-  _tab_string[status_file] = value;
-  return;
-}
-
-/**
- *  Set prefdata timeout.
- *  @param[in] value  The perfdata timeout.
- */
-void state::_set_perfdata_timeout(int value) {
-  _tab_int[perfdata_timeout] = value;
-  return;
+  // // Add module.
+  // neb_add_module(val.c_str(), args.c_str(), TRUE);
+  _broker_module.push_back(value);
 }
 
 /**
  *  Add configuration directory.
- *  @param[in] value  The configuration directory path.
+ *
+ *  @param[in] value The new configuration directory.
  */
-void state::_add_cfg_dir(std::string const& value) {
-  _lst_cfg_dir.push_back(value);
-  return;
+void state::_set_cfg_dir(std::string const& value) {
+  if (value.empty() || value[0] == '/')
+    _cfg_dir.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _cfg_dir.push_back(base_name + "/" + value);
+  }
 }
 
 /**
  *  Add configuration file.
- *  @param[in] value  The configuration file path.
+ *
+ *  @param[in] value The new configuration file.
  */
-void state::_add_cfg_file(std::string const& value) {
-  _lst_cfg_file.push_back(value);
-  return;
+void state::_set_cfg_file(std::string const& value) {
+  if (value.empty() || value[0] == '/')
+    _cfg_file.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _cfg_file.push_back(base_name + "/" + value);
+  }
 }
 
 /**
- *  Add resource file.
- *  @param[in] value  The resource file path.
+ *  Unused variable check_for_updates.
+ *
+ *  @param[in] value Unused.
  */
-void state::_add_resource_file(std::string const& value) {
-  _lst_resource_file.push_back(value);
-  return;
+void state::_set_check_for_updates(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_for_updates variable ignored";
 }
 
 /**
- *  Set state retention file.
- *  @param[in] value  The state retention file path.
+ *  Unused variable child_processes_fork_twice.
+ *
+ *  @param[in] value Unused.
  */
-void state::_set_state_retention_file(std::string const& value) {
-  _tab_string[state_retention_file] = value;
-  return;
+void state::_set_child_processes_fork_twice(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: child_processes_fork_twice variable ignored";
 }
 
 /**
- *  Set object cache file.
- *  @param[in] value  The object cache file path.
+ *  Set command check interval.
+ *
+ *  @param[in] value The new command check interval.
  */
-void state::_set_object_cache_file(std::string const& value) {
-  _tab_string[object_cache_file] = value;
-  return;
+void state::_set_command_check_interval(std::string const& value) {
+  std::string val(value);
+  size_t pos(val.find('s'));
+  if (pos == std::string::npos)
+    _command_check_interval_is_seconds = false;
+  else if (pos == val.size() - 1) {
+    _command_check_interval_is_seconds = true;
+    val.erase(val.begin() + pos);
+  }
+  setter<int, &state::command_check_interval>::generic(*this, val);
 }
 
 /**
- *  Set precached object file.
- *  @param[in] value  The precached object file path.
+ *  Unused variable comment_file.
+ *
+ *  @param[in] value Unused.
  */
-void state::_set_precached_object_file(std::string const& value) {
-  _tab_string[precached_object_file] = value;
-  return;
+void state::_set_comment_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: comment_file variable ignored";
+}
+
+/**
+ *  Unused variable daemon_dumps_core.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_daemon_dumps_core(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: daemon_dumps_core variable ignored";
+}
+
+/**
+ *  Set date format.
+ *
+ *  @param[in] value The new date format.
+ */
+void state::_set_date_format(std::string const& value) {
+  if (value == "euro")
+    _date_format = euro;
+  else if (value == "iso8601")
+    _date_format = iso8601;
+  else if (value == "strict-iso8601")
+    _date_format = strict_iso8601;
+  else
+    _date_format = us;
+}
+
+/**
+ *  Unused variable downtime_file.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_downtime_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: downtime_file variable ignored";
+}
+
+/**
+ *  Unused variable enable_embedded_perl.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_enable_embedded_perl(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: enable_embedded_perl variable ignored";
+}
+
+/**
+ *  Set event_broker_options.
+ *
+ *  @param[in] value The new event_broker_options value.
+ */
+void state::_set_event_broker_options(std::string const& value) {
+  if (value != "-1")
+    setter<unsigned long, &state::event_broker_options>::generic(*this, value);
+  else {
+    _event_broker_options = BROKER_EVERYTHING;
+    }
+}
+
+/**
+ *  Unused variable free_child_process_memory.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_free_child_process_memory(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: free_child_process_memory variable ignored";
+}
+
+/**
+ *  Set host_inter_check_delay_method.
+ *
+ *  @param[in] value The new host_inter_check_delay_method value.
+ */
+void state::_set_host_inter_check_delay_method(std::string const& value) {
+  if (value == "n")
+    _host_inter_check_delay_method = icd_none;
+  else if (value == "d")
+    _host_inter_check_delay_method = icd_dumb;
+  else if (value == "s")
+    _host_inter_check_delay_method = icd_smart;
+  else {
+    _host_inter_check_delay_method = icd_user;
+    if (!string::to(value, scheduling_info.host_inter_check_delay)
+        || scheduling_info.host_inter_check_delay <= 0.0)
+      throw (engine_error()
+               << "host_inter_check_delay_method: invalid value.");
+  }
+}
+
+/**
+ *  Set host_perfdata_file_mode.
+ *
+ *  @param[in] value The new host_inter_check_delay_method value.
+ */
+void state::_set_host_perfdata_file_mode(std::string const& value) {
+  if (value == "p")
+    _host_perfdata_file_mode = mode_pipe;
+  else if (value == "w")
+    _host_perfdata_file_mode = mode_file;
+  else
+    _host_perfdata_file_mode = mode_file_append;
+}
+
+/**
+ *  Unused variable lock_file.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_lock_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: lock_file variable ignored";
+}
+
+/**
+ *  Unused variable log_archive_path.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_log_archive_path(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: log_archive_path variable ignored";
+}
+
+/**
+ *  Unused variable log_rotation_method.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_log_rotation_method(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: log_rotation_method variable ignored";
+}
+
+/**
+ *  Unused variable nagios_group.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_nagios_group(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: nagios_group variable ignored";
+}
+
+/**
+ *  Unused variable nagios_user.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_nagios_user(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: nagios_user variable ignored";
+}
+
+/**
+ *  Unused variable p1_file.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_p1_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: p1_file variable ignored";
+}
+
+/**
+ *  Set resource_file.
+ *
+ *  @param[in] value The new resource_file.
+ */
+void state::_set_resource_file(std::string const& value) {
+  if (value.empty() || value[0] == '/')
+    _resource_file.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _resource_file.push_back(base_name + "/" + value);
+  }
+}
+
+/**
+ *  Unused variable retained_process_service_attribute_mask.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_retained_process_service_attribute_mask(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retained_process_service_attribute_mask variable ignored";
+}
+
+/**
+ *  Unused variable retained_service_attribute_mask.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_retained_service_attribute_mask(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retained_service_attribute_mask variable ignored";
+}
+
+/**
+ *  Set service_inter_check_delay_method
+ *
+ *  @param[in] value The new service_inter_check_delay_method.
+ */
+void state::_set_service_inter_check_delay_method(std::string const& value) {
+  if (value == "n")
+    _service_inter_check_delay_method = icd_none;
+  else if (value == "d")
+    _service_inter_check_delay_method = icd_dumb;
+  else if (value == "s")
+    _service_inter_check_delay_method = icd_smart;
+  else {
+    _service_inter_check_delay_method = icd_user;
+    if (!string::to(value, scheduling_info.service_inter_check_delay)
+        || scheduling_info.service_inter_check_delay <= 0.0)
+      throw (engine_error() << "service_inter_check_delay_method: invalid value.");
+  }
+}
+
+/**
+ *  Set service_interleave_factor_method
+ *
+ *  @param[in] value The new service_interleave_factor_method.
+ */
+void state::_set_service_interleave_factor_method(std::string const& value) {
+  if (value == "s")
+    _service_interleave_factor_method = ilf_smart;
+  else {
+    _service_interleave_factor_method = ilf_user;
+    if (!string::to(value, scheduling_info.service_interleave_factor)
+        || scheduling_info.service_interleave_factor < 1)
+      scheduling_info.service_interleave_factor = 1;
+  }
+}
+
+/**
+ *  Set service_perfdata_file_mode.
+ *
+ *  @param[in] value The new service_inter_check_delay_method value.
+ */
+void state::_set_service_perfdata_file_mode(std::string const& value) {
+  if (value == "p")
+    _service_perfdata_file_mode = mode_pipe;
+  else if (value == "w")
+    _service_perfdata_file_mode = mode_file;
+  else
+    _service_perfdata_file_mode = mode_file_append;
+}
+
+/**
+ *  Unused variable temp_file.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_temp_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: temp_file variable ignored";
+}
+
+/**
+ *  Unused variable temp_path.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_temp_path(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: temp_path variable ignored";
+}
+
+/**
+ *  Unused variable use_embedded_perl_implicitly.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_use_embedded_perl_implicitly(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_embedded_perl_implicitly variable ignored";
 }

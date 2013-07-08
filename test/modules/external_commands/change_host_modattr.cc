@@ -33,8 +33,6 @@ static int check_change_host_modattr(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
@@ -49,15 +47,6 @@ static int check_change_host_modattr(int argc, char** argv) {
 
   if (hst->modified_attributes != 42)
     throw (engine_error() << "change_host_modattr failed.");
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  free_object_skiplists();
-
   return (0);
 }
 

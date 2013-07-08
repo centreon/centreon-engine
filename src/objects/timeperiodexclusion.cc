@@ -17,41 +17,96 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/deleter/timeperiodexclusion.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/objects/timeperiodexclusion.hh"
+#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine::string;
 
 /**
- *  Wrapper C
+ *  Equal operator.
  *
- *  @see com::centreon::engine::objects::release
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
  */
-void release_timeperiodexclusion(timeperiodexclusion const* obj) {
-  try {
-    objects::release(obj);
+bool operator==(
+       timeperiodexclusion const& obj1,
+       timeperiodexclusion const& obj2) throw () {
+  if (is_equal(obj1.timeperiod_name, obj2.timeperiod_name)) {
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    else
+      return (*obj1.next == *obj2.next);
   }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_timeperiodexclusion: unknow exception";
-  }
-  return;
+  return (false);
 }
 
 /**
- *  Cleanup memory of timeperiodexclusion.
+ *  Not equal operator.
  *
- *  @param[in] obj The timeperiodexclusion to cleanup memory.
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
  */
-void objects::release(timeperiodexclusion const* obj) {
-  if (obj == NULL)
-    return;
+bool operator!=(
+       timeperiodexclusion const& obj1,
+       timeperiodexclusion const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
 
-  delete[] obj->timeperiod_name;
-  delete obj;
-  return;
+/**
+ *  Dump timeperiodexclusion content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The timeperiodexclusion to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, timeperiodexclusion const& obj) {
+  for (timeperiodexclusion const* m(&obj); m; m = m->next)
+    os << chkstr(m->timeperiod_name) << (m->next ? ", " : "");
+  return (os);
+}
+
+/**
+ *  Adds a new exclusion to a timeperiod.
+ *
+ *  @param[in] period Base timeperiod.
+ *  @param[in] name   Exclusion timeperiod name.
+ *
+ *  @return Timeperiod exclusion object.
+ */
+timeperiodexclusion* add_exclusion_to_timeperiod(
+                       timeperiod* period,
+                       char const* name) {
+  // Make sure we have enough data.
+  if (!period || !name)
+    return (NULL);
+
+  // Allocate memory.
+  timeperiodexclusion* obj(new timeperiodexclusion);
+  memset(obj, 0, sizeof(*obj));
+
+  try {
+    // Set exclusion properties.
+    obj->timeperiod_name = string::dup(name);
+    obj->next = period->exclusions;
+    period->exclusions = obj;
+
+    // Notify event broker.
+    // XXX
+  }
+  catch (...) {
+    deleter::timeperiodexclusion(obj);
+    obj = NULL;
+  }
+
+  return (obj);
 }

@@ -33,8 +33,6 @@ static int check_enable_hostgroup_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
@@ -72,32 +70,6 @@ static int check_enable_hostgroup_svc_checks(int argc, char** argv) {
 
   if (!svc->checks_enabled)
     throw (engine_error() << "enable_hostgroup_svc_checks failed.");
-
-  delete[] smember->host_name;
-  delete[] smember->service_description;
-  delete smember;
-
-  delete[] hmember->host_name;
-  delete hmember;
-
-  delete[] group->group_name;
-  delete[] group->alias;
-  delete group;
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete svc;
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  free_object_skiplists();
-
   return (0);
 }
 

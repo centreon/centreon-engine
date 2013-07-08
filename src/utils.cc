@@ -40,16 +40,20 @@
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::events;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -114,12 +118,8 @@ int my_system_r(
     = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
   *exectime = (res.end_time - res.start_time).to_seconds();
   *early_timeout = res.exit_status == process::timeout;
-  if (output && max_output_length > 0) {
-    *output = my_strdup(res.output.substr(
-                                     0,
-                                     max_output_length - 1)
-                        .c_str());
-  }
+  if (output && max_output_length > 0)
+    *output = engine::string::dup(res.output.substr(0, max_output_length - 1));
   int result(res.exit_code);
 
   logger(dbg_commands, more)
@@ -208,7 +208,7 @@ int get_raw_command_line_r(
   /* get the full command line */
   if (full_command != NULL) {
     *full_command
-      = my_strdup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
+      = string::dup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
   }
 
   /* XXX: Crazy indent */
@@ -303,7 +303,7 @@ int set_environment_var(char const* name, char const* value, int set) {
     /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
     std::string val(name);
     val.append("=").append(value ? value : "");
-    char* env_string(my_strdup(val.c_str()));
+    char* env_string(engine::string::dup(val));
     putenv(env_string);
   }
   /* clear the variable */
@@ -1543,6 +1543,8 @@ void _get_next_valid_time(
     return;
   }
 
+  *valid_time = 0;
+
   // first check for possible timeperiod excuslions
   // before getting a valid_time
   get_earliest_time(
@@ -1890,7 +1892,7 @@ int parse_check_output(
 
       /* handle this line of input */
       buf[x] = '\x0';
-      tempbuf = my_strdup(buf);
+      tempbuf = string::dup(buf);
 
       /* first line contains short plugin output and optional perf data */
       if (current_line == 1) {
@@ -1898,7 +1900,7 @@ int parse_check_output(
         /* get the short plugin output */
         if ((ptr = strtok(tempbuf, "|"))) {
           if (short_output)
-            *short_output = my_strdup(ptr);
+            *short_output = string::dup(ptr);
 
           /* get the optional perf data */
           if ((ptr = strtok(NULL, "\n")))
@@ -1966,7 +1968,7 @@ int parse_check_output(
   /* save long output */
   if (long_output && (db1.buf && strcmp(db1.buf, ""))) {
     if (escape_newlines_please == false)
-      *long_output = my_strdup(db1.buf);
+      *long_output = string::dup(db1.buf);
     else {
       /* escape newlines (and backslashes) in long output */
       tempbuf = new char[strlen(db1.buf) * 2 + 1];
@@ -1986,14 +1988,14 @@ int parse_check_output(
       }
 
       tempbuf[y] = '\x0';
-      *long_output = my_strdup(tempbuf);
+      *long_output = string::dup(tempbuf);
       delete[] tempbuf;
     }
   }
 
   /* save perf data */
   if (perf_data && (db2.buf && strcmp(db2.buf, "")))
-    *perf_data = my_strdup(db2.buf);
+    *perf_data = string::dup(db2.buf);
 
   /* strip short output and perf data */
   if (short_output)
@@ -2049,7 +2051,7 @@ int contains_illegal_object_chars(char* name) {
 
   std::string tmp(name);
   std::string const& illegal_object_chars
-    = config->get_illegal_object_chars();
+    = config->illegal_object_chars();
 
   if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
     return (false);
@@ -2383,9 +2385,6 @@ void cleanup() {
  *  @param[in,out] mac Macros.
  */
 void free_memory(nagios_macros* mac) {
-  // Free all allocated memory for the object definitions.
-  free_object_data();
-
   // Free memory allocated to comments.
   free_comment_data();
 
@@ -2452,7 +2451,7 @@ void free_notification_list() {
 
 /* reset all system-wide variables, so when we've receive a SIGHUP we can restart cleanly */
 int reset_variables() {
-  config->reset();
+  // XXX: config->reset();
 
   logging_options =
     log_runtime_error | log_runtime_warning |

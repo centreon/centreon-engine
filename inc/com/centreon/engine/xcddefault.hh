@@ -27,8 +27,7 @@
 extern "C" {
 #  endif // C++
 
-int xcddefault_initialize_comment_data(char const* main_config_file);
-int xcddefault_cleanup_comment_data(char const* main_config_file);
+int xcddefault_initialize_comment_data();
 int xcddefault_save_comment_data();
 int xcddefault_add_new_host_comment(
       int entry_type,

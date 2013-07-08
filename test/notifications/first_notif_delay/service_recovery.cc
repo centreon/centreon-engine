@@ -79,8 +79,6 @@ int main_test(int argc, char** argv) {
 
     // Check that FND was not respected.
     retval |= !io::file_stream::exists(tmpfile);
-
-    first_notif_delay_default_cleanup();
   }
 
   // Remove flag file.

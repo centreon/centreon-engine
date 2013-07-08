@@ -34,156 +34,53 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/skiplist.hh"
 #include "com/centreon/engine/statusdata.hh"
-#include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xsddefault.hh"
+#include "skiplist.h"
 
 using namespace com::centreon::engine;
 
-static char* xsddefault_status_log = NULL;
-static int   xsddefault_status_log_fd = -1;
-
-/******************************************************************/
-/***************** COMMON CONFIG INITIALIZATION  ******************/
-/******************************************************************/
-
-/* grab configuration information */
-int xsddefault_grab_config_info(char* config_file) {
-  char* input = NULL;
-  mmapfile* thefile;
-  nagios_macros* mac;
-
-  /*** CORE PASSES IN MAIN CONFIG FILE, CGIS PASS IN CGI CONFIG FILE! ***/
-
-  /* open the config file for reading */
-  if ((thefile = mmap_fopen(config_file)) == NULL)
-    return (ERROR);
-
-  /* read in all lines from the main config file */
-  while (1) {
-    /* free memory */
-    delete[] input;
-
-    /* read the next line */
-    if ((input = mmap_fgets_multiline(thefile)) == NULL)
-      break;
-
-    strip(input);
-
-    /* skip blank lines and comments */
-    if (input[0] == '#' || input[0] == '\x0')
-      continue;
-
-    /* core reads variables directly from the main config file */
-    xsddefault_grab_config_directives(input);
-  }
-
-  /* free memory and close the file */
-  delete[] input;
-  mmap_fclose(thefile);
-
-  /* initialize locations if necessary */
-  if (xsddefault_status_log == NULL)
-    xsddefault_status_log = my_strdup(DEFAULT_STATUS_FILE);
-
-  /* make sure we have what we need */
-  if (xsddefault_status_log == NULL)
-    return (ERROR);
-
-  mac = get_global_macros();
-  /* save the status file macro */
-  delete[] mac->x[MACRO_STATUSDATAFILE];
-  mac->x[MACRO_STATUSDATAFILE] = my_strdup(xsddefault_status_log);
-  strip(mac->x[MACRO_STATUSDATAFILE]);
-
-  return (OK);
-}
-
-/* processes a single directive */
-int xsddefault_grab_config_directives(char* input) {
-  char const* temp_ptr = NULL;
-  char* varname = NULL;
-  char* varvalue = NULL;
-
-  /* get the variable name */
-  if ((temp_ptr = my_strtok(input, "=")) == NULL)
-    return (ERROR);
-  varname = my_strdup(temp_ptr);
-
-  /* get the variable value */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL) {
-    delete[] varname;
-    return (ERROR);
-  }
-  varvalue = my_strdup(temp_ptr);
-
-  /* status log definition */
-  if (!strcmp(varname, "status_file")
-      || !strcmp(varname, "xsddefault_status_log"))
-    xsddefault_status_log = my_strdup(temp_ptr);
-
-  /* free memory */
-  delete[] varname;
-  delete[] varvalue;
-
-  return (OK);
-}
+static int xsddefault_status_log_fd(-1);
 
 /******************************************************************/
 /********************* INIT/CLEANUP FUNCTIONS *********************/
 /******************************************************************/
 
 /* initialize status data */
-int xsddefault_initialize_status_data(char* config_file) {
-  int result;
+int xsddefault_initialize_status_data() {
+  if (config->status_file().empty())
+    return (OK);
 
-  /* grab configuration data */
-  result = xsddefault_grab_config_info(config_file);
-  if (result == ERROR)
-    return (ERROR);
-
-  /* delete the old status log (it might not exist) */
-  if (xsddefault_status_log)
-    unlink(xsddefault_status_log);
+  // delete the old status log (it might not exist).
+  unlink(config->status_file().c_str());
 
   if (xsddefault_status_log_fd == -1) {
     if ((xsddefault_status_log_fd = open(
-                                      xsddefault_status_log,
+                                      config->status_file().c_str(),
                                       O_WRONLY | O_CREAT,
                                       S_IRUSR | S_IWUSR | S_IRGRP)) == -1) {
       logger(logging::log_runtime_error, logging::basic)
         << "Error: Unable to open status data file '"
-        << xsddefault_status_log << "': " << strerror(errno);
+        << config->status_file() << "': " << strerror(errno);
       return (ERROR);
     }
     set_cloexec(xsddefault_status_log_fd);
   }
-
   return (OK);
 }
 
-/* cleanup status data before terminating */
-int xsddefault_cleanup_status_data(
-      char* config_file,
-      int delete_status_data) {
-  (void)config_file;
-
-  /* delete the status log */
-  if (delete_status_data == TRUE && xsddefault_status_log) {
-    if (unlink(xsddefault_status_log))
+// cleanup status data before terminating.
+int xsddefault_cleanup_status_data(int delete_status_data) {
+  // delete the status log.
+  if (delete_status_data && !config->status_file().empty()) {
+    if (unlink(config->status_file().c_str()))
       return (ERROR);
   }
-
-  /* free memory */
-  delete[] xsddefault_status_log;
-  xsddefault_status_log = NULL;
 
   if (xsddefault_status_log_fd != -1) {
     close(xsddefault_status_log_fd);
     xsddefault_status_log_fd = -1;
   }
-
   return (OK);
 }
 
@@ -193,14 +90,17 @@ int xsddefault_cleanup_status_data(
 
 /* write all status data to file */
 int xsddefault_save_status_data() {
-  int used_external_command_buffer_slots = 0;
-  int high_external_command_buffer_slots = 0;
+  if (xsddefault_status_log_fd == -1)
+    return (OK);
+
+  int used_external_command_buffer_slots(0);
+  int high_external_command_buffer_slots(0);
 
   logger(logging::dbg_functions, logging::basic)
     << "save_status_data()";
 
   // get number of items in the command buffer
-  if (config->get_check_external_commands() == true) {
+  if (config->check_external_commands()) {
     pthread_mutex_lock(&external_command_buffer.buffer_lock);
     used_external_command_buffer_slots = external_command_buffer.items;
     high_external_command_buffer_slots = external_command_buffer.high;
@@ -237,27 +137,27 @@ int xsddefault_save_status_data() {
        "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
        "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
        "\tlast_log_rotation=" << static_cast<unsigned long>(last_log_rotation) << "\n"
-       "\tenable_notifications=" << config->get_enable_notifications() << "\n"
-       "\tactive_service_checks_enabled=" << config->get_execute_service_checks() << "\n"
-       "\tpassive_service_checks_enabled=" << config->get_accept_passive_service_checks() << "\n"
-       "\tactive_host_checks_enabled=" << config->get_execute_host_checks() << "\n"
-       "\tpassive_host_checks_enabled=" << config->get_accept_passive_host_checks() << "\n"
-       "\tenable_event_handlers=" << config->get_enable_event_handlers() << "\n"
-       "\tobsess_over_services=" << config->get_obsess_over_services() << "\n"
-       "\tobsess_over_hosts=" << config->get_obsess_over_hosts() << "\n"
-       "\tcheck_service_freshness=" << config->get_check_service_freshness() << "\n"
-       "\tcheck_host_freshness=" << config->get_check_host_freshness() << "\n"
-       "\tenable_flap_detection=" << config->get_enable_flap_detection() << "\n"
-       "\tenable_failure_prediction=" << config->get_enable_failure_prediction() << "\n"
-       "\tprocess_performance_data=" << config->get_process_performance_data() << "\n"
-       "\tglobal_host_event_handler=" << config->get_global_host_event_handler().c_str() << "\n"
-       "\tglobal_service_event_handler=" << config->get_global_service_event_handler().c_str() << "\n"
+       "\tenable_notifications=" << config->enable_notifications() << "\n"
+       "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
+       "\tpassive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
+       "\tactive_host_checks_enabled=" << config->execute_host_checks() << "\n"
+       "\tpassive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
+       "\tenable_event_handlers=" << config->enable_event_handlers() << "\n"
+       "\tobsess_over_services=" << config->obsess_over_services() << "\n"
+       "\tobsess_over_hosts=" << config->obsess_over_hosts() << "\n"
+       "\tcheck_service_freshness=" << config->check_service_freshness() << "\n"
+       "\tcheck_host_freshness=" << config->check_host_freshness() << "\n"
+       "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
+       "\tenable_failure_prediction=" << config->enable_failure_prediction() << "\n"
+       "\tprocess_performance_data=" << config->process_performance_data() << "\n"
+       "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
+       "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_comment_id=" << next_comment_id << "\n"
        "\tnext_downtime_id=" << next_downtime_id << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
        "\tnext_notification_id=" << next_notification_id << "\n"
-       "\ttotal_external_command_buffer_slots=" << config->get_external_command_buffer_slots() << "\n"
+       "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
        "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
        "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
        "\tactive_scheduled_host_check_stats="
@@ -517,7 +417,7 @@ int xsddefault_save_status_data() {
     char const* msg(strerror(errno));
     logger(logging::log_runtime_error, logging::basic)
       << "Error: Unable to update status data file '"
-      << xsddefault_status_log << "': " << msg;
+      << config->status_file() << "': " << msg;
     return (ERROR);
   }
 
@@ -531,7 +431,7 @@ int xsddefault_save_status_data() {
       char const* msg(strerror(errno));
       logger(logging::log_runtime_error, logging::basic)
         << "Error: Unable to update status data file '"
-        << xsddefault_status_log << "': " << msg;
+        << config->status_file() << "': " << msg;
       return (ERROR);
     }
     data_ptr += wb;

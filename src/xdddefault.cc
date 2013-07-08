@@ -21,8 +21,6 @@
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/xdddefault.hh"
 
 /******************************************************************/
@@ -30,10 +28,8 @@
 /******************************************************************/
 
 /* initialize downtime data */
-int xdddefault_initialize_downtime_data(char const* main_config_file) {
+int xdddefault_initialize_downtime_data() {
   scheduled_downtime* temp_downtime = NULL;
-
-  (void)main_config_file;
 
   /* clean up the old downtime data */
   xdddefault_validate_downtime_data();
@@ -116,14 +112,6 @@ int xdddefault_validate_downtime_data() {
   /* update downtime file */
   if (update_file == TRUE)
     xdddefault_save_downtime_data();
-  return (OK);
-}
-
-/* removes invalid and old downtime entries from the downtime file */
-int xdddefault_cleanup_downtime_data(char const* main_config_file) {
-  (void)main_config_file;
-
-  /* we don't need to do any cleanup... */
   return (OK);
 }
 

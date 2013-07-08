@@ -33,8 +33,6 @@ static int check_del_all_svc_comments(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
@@ -86,21 +84,6 @@ static int check_del_all_svc_comments(int argc, char** argv) {
 
   if (comment_list)
     throw (engine_error() << "del_all_svc_comments failed.");
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete svc;
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  free_object_skiplists();
-
   return (0);
 }
 

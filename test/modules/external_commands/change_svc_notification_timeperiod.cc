@@ -33,8 +33,6 @@ static int check_change_svc_notification_timeperiod(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   service* svc = add_service("name", "description", NULL,
                              NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
@@ -54,20 +52,6 @@ static int check_change_svc_notification_timeperiod(int argc, char** argv) {
 
   if (svc->notification_period_ptr != tperiod)
     throw (engine_error() << "change_svc_notification_timeperiod failed.");
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete[] svc->notification_period;
-  delete svc;
-
-  delete[] tperiod->name;
-  delete[] tperiod->alias;
-  delete tperiod;
-
-  free_object_skiplists();
-
   return (0);
 }
 

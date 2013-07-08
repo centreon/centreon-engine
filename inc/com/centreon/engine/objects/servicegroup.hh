@@ -20,36 +20,54 @@
 #ifndef CCE_OBJECTS_SERVICEGROUP_HH
 #  define CCE_OBJECTS_SERVICEGROUP_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct host_struct;
+struct service_struct;
+struct servicesmember_struct;
+
+typedef struct                servicegroup_struct {
+  char*                       group_name;
+  char*                       alias;
+  servicesmember_struct*      members;
+  char*                       notes;
+  char*                       notes_url;
+  char*                       action_url;
+  struct servicegroup_struct* next;
+  struct servicegroup_struct* nexthash;
+}                             servicegroup;
 
 #  ifdef __cplusplus
-#    include <string>
-#    include <vector>
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-bool link_servicegroup(
-       servicegroup* obj,
-       service** members,
-       servicegroup** groups);
-void release_servicegroup(servicegroup const* obj);
+servicegroup* add_servicegroup(
+                char const* name,
+                char const* alias,
+                char const* notes,
+                char const* notes_url,
+                char const* action_url);
+int           is_host_member_of_servicegroup(
+                servicegroup_struct* group,
+                host_struct* hst);
+int           is_service_member_of_servicegroup(
+                servicegroup_struct* group,
+                service_struct* svc);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    link(
-            servicegroup* obj,
-            std::vector<service*> const& members,
-            std::vector<servicegroup*> const& groups);
-  void    release(servicegroup const* obj);
-}
+bool          operator==(
+                servicegroup const& obj1,
+                servicegroup const& obj2) throw ();
+bool          operator!=(
+                servicegroup const& obj1,
+                servicegroup const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, servicegroup const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICEGROUP_HH
+
+

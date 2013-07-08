@@ -23,6 +23,7 @@
 #include <string.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/string.hh"
 #include "test/macros/minimal_setup.hh"
 #include "test/unittest.hh"
 
@@ -124,25 +125,25 @@ int main_test(int argc, char** argv) {
 
   // Set host values.
   delete [] host_list->name;
-  host_list->name = my_strdup(STR(NAME));
+  host_list->name = string::dup(STR(NAME));
   delete [] host_list->display_name;
-  host_list->display_name = my_strdup(STR(DISPLAY_NAME));
+  host_list->display_name = string::dup(STR(DISPLAY_NAME));
   delete [] host_list->alias;
-  host_list->alias = my_strdup(STR(ALIAS));
+  host_list->alias = string::dup(STR(ALIAS));
   delete [] host_list->address;
-  host_list->address = my_strdup(STR(ADDRESS));
+  host_list->address = string::dup(STR(ADDRESS));
   host_list->current_state = STATE_ID;
   host_list->last_state = LAST_STATE_ID;
   host_list->check_type = HOST_CHECK_ACTIVE;
   host_list->state_type = SOFT_STATE;
   delete [] host_list->plugin_output;
-  host_list->plugin_output = my_strdup(STR(OUTPUT));
+  host_list->plugin_output = string::dup(STR(OUTPUT));
   delete [] host_list->long_plugin_output;
-  host_list->long_plugin_output = my_strdup(STR(LONG_OUTPUT));
+  host_list->long_plugin_output = string::dup(STR(LONG_OUTPUT));
   delete [] host_list->perf_data;
-  host_list->perf_data = my_strdup(STR(PERF_DATA));
+  host_list->perf_data = string::dup(STR(PERF_DATA));
   delete [] host_list->host_check_command;
-  host_list->host_check_command = my_strdup(STR(CHECK_COMMAND));
+  host_list->host_check_command = string::dup(STR(CHECK_COMMAND));
   host_list->current_attempt = ATTEMPT;
   host_list->max_attempts = MAX_ATTEMPTS;
   host_list->scheduled_downtime_depth = DOWNTIME;
@@ -161,19 +162,19 @@ int main_test(int argc, char** argv) {
   host_list->current_problem_id = PROBLEM_ID;
   host_list->last_problem_id = LAST_PROBLEM_ID;
   delete [] host_list->action_url;
-  host_list->action_url = my_strdup(STR(ACTION_URL));
+  host_list->action_url = string::dup(STR(ACTION_URL));
   delete [] host_list->notes_url;
-  host_list->notes_url = my_strdup(STR(NOTES_URL));
+  host_list->notes_url = string::dup(STR(NOTES_URL));
   delete [] host_list->notes;
-  host_list->notes = my_strdup(STR(NOTES));
+  host_list->notes = string::dup(STR(NOTES));
 
-  // Macro object.
+  // macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  mac.x[MACRO_HOSTACKAUTHOR] = my_strdup(STR(ACK_AUTHOR));
-  mac.x[MACRO_HOSTACKAUTHORNAME] = my_strdup(STR(ACK_AUTHOR_NAME));
-  mac.x[MACRO_HOSTACKAUTHORALIAS] = my_strdup(STR(ACK_AUTHOR_ALIAS));
-  mac.x[MACRO_HOSTACKCOMMENT] = my_strdup(STR(ACK_COMMENT));
+  mac.x[MACRO_HOSTACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
+  mac.x[MACRO_HOSTACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
+  mac.x[MACRO_HOSTACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
+  mac.x[MACRO_HOSTACKCOMMENT] = string::dup(STR(ACK_COMMENT));
 
   // Macro values table.
   struct {
@@ -263,28 +264,6 @@ int main_test(int argc, char** argv) {
     }
   }
 
-  delete host_list->hostgroups_ptr->next->next;
-  delete host_list->hostgroups_ptr->next;
-  delete host_list->hostgroups_ptr;
-
-  delete[] hg1->group_name;
-  delete[] hg1->alias;
-  delete[] hg1->members->host_name;
-  delete hg1->members;
-  delete hg1;
-
-  delete[] hg2->group_name;
-  delete[] hg2->alias;
-  delete[] hg2->members->host_name;
-  delete hg2->members;
-  delete hg2;
-
-  delete[] hg3->group_name;
-  delete[] hg3->alias;
-  delete[] hg3->members->host_name;
-  delete hg3->members;
-  delete hg3;
-
   delete [] mac.x[MACRO_TOTALHOSTSERVICES];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESOK];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESWARNING];
@@ -295,9 +274,6 @@ int main_test(int argc, char** argv) {
   delete [] mac.x[MACRO_HOSTACKAUTHORNAME];
   delete [] mac.x[MACRO_HOSTACKAUTHORALIAS];
   delete [] mac.x[MACRO_HOSTACKCOMMENT];
-
-  // Cleanup the minimal setup.
-  test::cleanup_setup();
 
   return (retval);
 }
