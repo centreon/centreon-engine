@@ -165,6 +165,7 @@ namespace           configuration {
                     state(state const&);
                     ~state() throw ();
       state&        operator=(state const&);
+      void          _apply(configuration::state const& new_cfg);
       template      <typename ConfigurationType, typename ApplierType>
       void          _apply(
                       difference<std::set<shared_ptr<ConfigurationType> > > const& diff);

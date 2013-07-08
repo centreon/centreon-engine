@@ -70,7 +70,8 @@ namespace                 configuration {
       timed_event_struct* _create_misc_event(
                             int type,
                             time_t start,
-                            unsigned long interval);
+                            unsigned long interval,
+                            void* data = NULL);
       void                _get_new_hosts(
                             set_host const& hst_added,
                             std::vector<host_struct*>& new_hosts);
@@ -92,12 +93,14 @@ namespace                 configuration {
       timed_event_struct* _evt_hfreshness_check;
       umap<std::string, timed_event_struct*>
                           _evt_host_check;
+      timed_event_struct* _evt_host_perfdata;
       timed_event_struct* _evt_orphan_check;
       timed_event_struct* _evt_reschedule_checks;
       timed_event_struct* _evt_retention_save;
       timed_event_struct* _evt_sfreshness_check;
       umap<std::pair<std::string, std::string>, timed_event_struct*>
                           _evt_service_check;
+      timed_event_struct* _evt_service_perfdata;
       timed_event_struct* _evt_status_save;
     };
   }

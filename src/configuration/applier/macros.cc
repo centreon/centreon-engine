@@ -46,6 +46,10 @@ void applier::macros::apply(state& config) {
   _set_macro(MACRO_STATUSDATAFILE, config.status_file());
   _set_macro(MACRO_HOSTPERFDATAFILE, config.host_perfdata_file());
   _set_macro(MACRO_SERVICEPERFDATAFILE, config.service_perfdata_file());
+
+  std::vector<std::string> const& users(config.user());
+  for (unsigned int i(0), end(users.size()); i < end; ++i)
+    _set_macros_user(i, users[i]);
 }
 
 /**
