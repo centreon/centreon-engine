@@ -46,6 +46,7 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 static applier::state* _instance = NULL;
 
@@ -55,13 +56,18 @@ static applier::state* _instance = NULL;
  *  @param[in] new_cfg The new configuration.
  */
 void applier::state::apply(configuration::state& new_cfg) {
+  configuration::state save(*config);
   try {
     _processing(new_cfg);
   }
   catch (std::exception const& e) {
-    // XXX:
+    logger(log_config_error, basic)
+      << "configuration: apply new configuration failed: "
+      << e.what();
+    logger(dbg_config, more)
+      << "configuration: try to restore old configuration";
+    _processing(*config);
   }
-
   return ;
 }
 
