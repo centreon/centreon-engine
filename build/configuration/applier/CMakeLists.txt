@@ -289,23 +289,18 @@ if (WITH_TESTING)
     "${TEST_DIR}/xodtemplate.cc")
   target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
-  # apply_and_schedule_configuration_host
-  set(TEST_NAME "apply_and_schedule_configuration_host")
+  # check_scheduler_host_configuration
+  set(TEST_NAME "check_scheduler_host_configuration")
   set(TEST_CONF_FILE "main_host.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # apply_and_schedule_configuration_host_template
-  set(TEST_NAME "apply_and_schedule_configuration_host_template")
+  # check_scheduler_host_template_configuration
+  set(TEST_NAME "check_scheduler_host_template_configuration")
   set(TEST_CONF_FILE "main_host_template.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-  # apply_and_schedule_configuration_service
-  set(TEST_NAME "apply_and_schedule_configuration_service")
-  set(TEST_CONF_FILE "main_service.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # apply_and_schedule_configuration_service_template
-  set(TEST_NAME "apply_and_schedule_configuration_service_template")
-  set(TEST_CONF_FILE "main_service_template.cfg")
+  # check_scheduler_service_configuration
+  set(TEST_NAME "check_scheduler_configuration")
+  set(TEST_CONF_FILE "main_scheduler.cfg")
   add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 endif ()

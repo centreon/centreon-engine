@@ -400,7 +400,8 @@ int main(int argc, char* argv[]) {
 
         // Start monitoring all services (doesn't return until a
         // restart or shutdown signal is encountered).
-        com::centreon::engine::events::loop::instance().run();
+        // XXX: com::centreon::engine::events::loop::instance().run();
+        sigshutdown = true;
 
         if (sigshutdown)
           logger(logging::log_process_info, logging::basic)

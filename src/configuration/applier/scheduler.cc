@@ -600,8 +600,8 @@ void applier::scheduler::_get_new_services(
        std::vector<service_struct*>& new_services) {
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
     services(applier::state::instance().services());
-  for (set_service::const_iterator
-         it(svc_added.begin()), end(svc_added.end());
+  for (set_service::const_reverse_iterator
+         it(svc_added.rbegin()), end(svc_added.rend());
        it != end;
        ++it) {
     std::string const& host_name((*it)->hosts().front());

@@ -134,6 +134,7 @@ namespace           configuration {
       void          _expand(
                       configuration::state& new_state,
                       std::set<shared_ptr<ConfigurationType> >& cfg);
+      void          _processing(configuration::state& new_cfg);
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _resolve(
