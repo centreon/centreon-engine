@@ -299,9 +299,9 @@ int main(int argc, char* argv[]) {
         reset_variables();
 
         // Parse configuration.
-        std::auto_ptr<configuration::state> config(new configuration::state);
+        configuration::state config;
         configuration::parser p;
-        p.parse(config_file, *config);
+        p.parse(config_file, config);
 
         // Get program (re)start time and save as macro. Needs to be
         // done after we read config files, as user may have overridden
@@ -342,9 +342,7 @@ int main(int argc, char* argv[]) {
           NULL);
 
         // Apply configuration.
-        configuration::applier::state::instance().apply(*config);
-        delete ::config;
-        ::config = config.release();
+        configuration::applier::state::instance().apply(config);
 
         // Add broker backend.
         com::centreon::logging::engine::instance().add(

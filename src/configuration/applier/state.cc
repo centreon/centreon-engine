@@ -42,13 +42,16 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/xpddefault.hh"
+#include "com/centreon/engine/xsddefault.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
-static applier::state* _instance = NULL;
+static bool            has_already_been_loaded(false);
+static applier::state* _instance(NULL);
 
 /**
  *  Apply new configuration.
@@ -61,6 +64,12 @@ void applier::state::apply(configuration::state& new_cfg) {
     _processing(new_cfg);
   }
   catch (std::exception const& e) {
+    // If is the first time to load configuration, we don't
+    // have a valid configuration to restore.
+    if (!has_already_been_loaded)
+      throw;
+
+    // If is not the first time, we can restore the old one.
     logger(log_config_error, basic)
       << "configuration: apply new configuration failed: "
       << e.what();
@@ -379,6 +388,189 @@ umap<std::string, shared_ptr<timeperiod_struct> > const& applier::state::timeper
  */
 umap<std::string, shared_ptr<timeperiod_struct> >& applier::state::timeperiods() throw () {
   return (_timeperiods);
+}
+
+/**
+ *  Update all new globals.
+ *
+ *  @param[in] new_cfg The new configuration state.
+ */
+void applier::state::_apply(configuration::state const& new_cfg) {
+  // Check variables should not be change after the first execution.
+  if (has_already_been_loaded) {
+    if (config->broker_module() != new_cfg.broker_module())
+      logger(log_config_warning, basic)
+        << "configuration: warning: broker module can not be change";
+
+    if (config->broker_module_directory() != new_cfg.broker_module_directory())
+      logger(log_config_warning, basic)
+        << "configuration: warning: broker module directory "
+        "can not be change";
+
+    if (config->command_file() != new_cfg.command_file())
+      logger(log_config_warning, basic)
+        << "configuration: warning: command file can not be change";
+
+    if (config->external_command_buffer_slots() != new_cfg.external_command_buffer_slots())
+      logger(log_config_warning, basic)
+        << "configuration: warning: external command buffer slots "
+        "can not be change";
+
+    if (config->use_timezone() != new_cfg.use_timezone())
+      logger(log_config_warning, basic)
+        << "configuration: warning: timezone can not be change";
+  }
+
+  // Initialize perfdata if necessary.
+  if (!has_already_been_loaded
+      || config->host_perfdata_command() != new_cfg.host_perfdata_command()
+      || config->host_perfdata_file() != new_cfg.host_perfdata_file()
+      || config->host_perfdata_file_mode() != new_cfg.host_perfdata_file_mode()
+      || config->host_perfdata_file_processing_command() != new_cfg.host_perfdata_file_processing_command()
+      || config->host_perfdata_file_processing_interval() != new_cfg.host_perfdata_file_processing_interval()
+      || config->host_perfdata_file_template() != new_cfg.host_perfdata_file_template()
+      || config->service_perfdata_command() != new_cfg.service_perfdata_command()
+      || config->service_perfdata_file() != new_cfg.service_perfdata_file()
+      || config->service_perfdata_file_mode() != new_cfg.service_perfdata_file_mode()
+      || config->service_perfdata_file_processing_command() != new_cfg.service_perfdata_file_processing_command()
+      || config->service_perfdata_file_processing_interval() != new_cfg.service_perfdata_file_processing_interval()
+      || config->service_perfdata_file_template() != new_cfg.service_perfdata_file_template()) {
+    xpddefault_cleanup_performance_data();
+    xpddefault_initialize_performance_data();
+  }
+
+  // Initialize status file.
+  if (!has_already_been_loaded
+      || config->status_file() != new_cfg.status_file()) {
+    xsddefault_cleanup_status_data(true);
+    xsddefault_initialize_status_data();
+  }
+
+  // Set new values.
+  config->accept_passive_host_checks(new_cfg.accept_passive_host_checks());
+  config->accept_passive_service_checks(new_cfg.accept_passive_service_checks());
+  config->additional_freshness_latency(new_cfg.additional_freshness_latency());
+  config->admin_email(new_cfg.admin_email());
+  config->admin_pager(new_cfg.admin_pager());
+  config->allow_empty_hostgroup_assignment(new_cfg.allow_empty_hostgroup_assignment());
+  config->auto_reschedule_checks(new_cfg.auto_reschedule_checks());
+  config->auto_rescheduling_interval(new_cfg.auto_rescheduling_interval());
+  config->auto_rescheduling_window(new_cfg.auto_rescheduling_window());
+  config->cached_host_check_horizon(new_cfg.cached_host_check_horizon());
+  config->cached_service_check_horizon(new_cfg.cached_service_check_horizon());
+  config->cfg_main(new_cfg.cfg_main());
+  config->check_external_commands(new_cfg.check_external_commands());
+  config->check_host_freshness(new_cfg.check_host_freshness());
+  config->check_orphaned_hosts(new_cfg.check_orphaned_hosts());
+  config->check_orphaned_services(new_cfg.check_orphaned_services());
+  config->check_reaper_interval(new_cfg.check_reaper_interval());
+  config->check_result_path(new_cfg.check_result_path());
+  config->check_service_freshness(new_cfg.check_service_freshness());
+  config->command_check_interval(new_cfg.command_check_interval());
+  config->date_format(new_cfg.date_format());
+  config->debug_file(new_cfg.debug_file());
+  config->debug_level(new_cfg.debug_level());
+  config->debug_verbosity(new_cfg.debug_verbosity());
+  config->enable_environment_macros(new_cfg.enable_environment_macros());
+  config->enable_event_handlers(new_cfg.enable_event_handlers());
+  config->enable_failure_prediction(new_cfg.enable_failure_prediction());
+  config->enable_flap_detection(new_cfg.enable_flap_detection());
+  config->enable_notifications(new_cfg.enable_notifications());
+  config->enable_predictive_host_dependency_checks(new_cfg.enable_predictive_host_dependency_checks());
+  config->enable_predictive_service_dependency_checks(new_cfg.enable_predictive_service_dependency_checks());
+  config->event_broker_options(new_cfg.event_broker_options());
+  config->event_handler_timeout(new_cfg.event_handler_timeout());
+  config->execute_host_checks(new_cfg.execute_host_checks());
+  config->execute_service_checks(new_cfg.execute_service_checks());
+  config->global_host_event_handler(new_cfg.global_host_event_handler());
+  config->global_service_event_handler(new_cfg.global_service_event_handler());
+  config->high_host_flap_threshold(new_cfg.high_host_flap_threshold());
+  config->high_service_flap_threshold(new_cfg.high_service_flap_threshold());
+  config->host_check_timeout(new_cfg.host_check_timeout());
+  config->host_freshness_check_interval(new_cfg.host_freshness_check_interval());
+  config->host_inter_check_delay_method(new_cfg.host_inter_check_delay_method());
+  config->host_perfdata_command(new_cfg.host_perfdata_command());
+  config->host_perfdata_file(new_cfg.host_perfdata_file());
+  config->host_perfdata_file_mode(new_cfg.host_perfdata_file_mode());
+  config->host_perfdata_file_processing_command(new_cfg.host_perfdata_file_processing_command());
+  config->host_perfdata_file_processing_interval(new_cfg.host_perfdata_file_processing_interval());
+  config->host_perfdata_file_template(new_cfg.host_perfdata_file_template());
+  config->illegal_object_chars(new_cfg.illegal_object_chars());
+  config->illegal_output_chars(new_cfg.illegal_output_chars());
+  config->interval_length(new_cfg.interval_length());
+  config->log_event_handlers(new_cfg.log_event_handlers());
+  config->log_external_commands(new_cfg.log_external_commands());
+  config->log_file(new_cfg.log_file());
+  config->log_host_retries(new_cfg.log_host_retries());
+  config->log_initial_states(new_cfg.log_initial_states());
+  config->log_notifications(new_cfg.log_notifications());
+  config->log_passive_checks(new_cfg.log_passive_checks());
+  config->log_service_retries(new_cfg.log_service_retries());
+  config->low_host_flap_threshold(new_cfg.low_host_flap_threshold());
+  config->low_service_flap_threshold(new_cfg.low_service_flap_threshold());
+  config->max_check_reaper_time(new_cfg.max_check_reaper_time());
+  config->max_check_result_file_age(new_cfg.max_check_result_file_age());
+  config->max_debug_file_size(new_cfg.max_debug_file_size());
+  config->max_host_check_spread(new_cfg.max_host_check_spread());
+  config->max_log_file_size(new_cfg.max_log_file_size());
+  config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
+  config->max_service_check_spread(new_cfg.max_service_check_spread());
+  config->notification_timeout(new_cfg.notification_timeout());
+  config->object_cache_file(new_cfg.object_cache_file());
+  config->obsess_over_hosts(new_cfg.obsess_over_hosts());
+  config->obsess_over_services(new_cfg.obsess_over_services());
+  config->ochp_command(new_cfg.ochp_command());
+  config->ochp_timeout(new_cfg.ochp_timeout());
+  config->ocsp_command(new_cfg.ocsp_command());
+  config->ocsp_timeout(new_cfg.ocsp_timeout());
+  config->passive_host_checks_are_soft(new_cfg.passive_host_checks_are_soft());
+  config->perfdata_timeout(new_cfg.perfdata_timeout());
+  config->precached_object_file(new_cfg.precached_object_file());
+  config->process_performance_data(new_cfg.process_performance_data());
+  config->resource_file(new_cfg.resource_file());
+  config->retain_state_information(new_cfg.retain_state_information());
+  config->retained_contact_host_attribute_mask(new_cfg.retained_contact_host_attribute_mask());
+  config->retained_contact_service_attribute_mask(new_cfg.retained_contact_service_attribute_mask());
+  config->retained_host_attribute_mask(new_cfg.retained_host_attribute_mask());
+  config->retained_process_host_attribute_mask(new_cfg.retained_process_host_attribute_mask());
+  config->retention_scheduling_horizon(new_cfg.retention_scheduling_horizon());
+  config->retention_update_interval(new_cfg.retention_update_interval());
+  config->service_check_timeout(new_cfg.service_check_timeout());
+  config->service_freshness_check_interval(new_cfg.service_freshness_check_interval());
+  config->service_inter_check_delay_method(new_cfg.service_inter_check_delay_method());
+  config->service_interleave_factor_method(new_cfg.service_interleave_factor_method());
+  config->service_perfdata_command(new_cfg.service_perfdata_command());
+  config->service_perfdata_file(new_cfg.service_perfdata_file());
+  config->service_perfdata_file_mode(new_cfg.service_perfdata_file_mode());
+  config->service_perfdata_file_processing_command(new_cfg.service_perfdata_file_processing_command());
+  config->service_perfdata_file_processing_interval(new_cfg.service_perfdata_file_processing_interval());
+  config->service_perfdata_file_template(new_cfg.service_perfdata_file_template());
+  config->sleep_time(new_cfg.sleep_time());
+  config->soft_state_dependencies(new_cfg.soft_state_dependencies());
+  config->state_retention_file(new_cfg.state_retention_file());
+  config->status_file(new_cfg.status_file());
+  config->status_update_interval(new_cfg.status_update_interval());
+  config->time_change_threshold(new_cfg.time_change_threshold());
+  config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
+  config->use_aggressive_host_checking(new_cfg.use_aggressive_host_checking());
+  config->use_check_result_path(new_cfg.use_check_result_path());
+  config->use_large_installation_tweaks(new_cfg.use_large_installation_tweaks());
+  config->use_regexp_matches(new_cfg.use_regexp_matches());
+  config->use_retained_program_state(new_cfg.use_retained_program_state());
+  config->use_retained_scheduling_info(new_cfg.use_retained_scheduling_info());
+  config->use_setpgid(new_cfg.use_setpgid());
+  config->use_syslog(new_cfg.use_syslog());
+  config->use_true_regexp_matching(new_cfg.use_true_regexp_matching());
+  config->user(new_cfg.user());
+
+  // Set this variable just the first time.
+  if (!has_already_been_loaded) {
+    config->broker_module(new_cfg.broker_module());
+    config->broker_module_directory(new_cfg.broker_module_directory());
+    config->command_file(new_cfg.command_file());
+    config->external_command_buffer_slots(new_cfg.external_command_buffer_slots());
+    config->use_timezone(new_cfg.use_timezone());
+  }
 }
 
 /**
@@ -707,6 +899,9 @@ void applier::state::_processing(configuration::state& new_cfg) {
     new_cfg,
     diff_hosts,
     diff_services);
+
+  // Apply new global on the current state.
+  _apply(new_cfg);
 }
 
 /**

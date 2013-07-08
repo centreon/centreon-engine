@@ -164,45 +164,6 @@ int xpddefault_initialize_performance_data() {
       = temp_command;
   }
 
-  union {
-    int (*func)();
-    void* data;
-  } type;
-
-  // periodically process the host perfdata file.
-  if (config->host_perfdata_file_processing_interval() > 0
-      && !config->host_perfdata_file_processing_command().empty()) {
-    type.func = xpddefault_process_host_perfdata_file;
-    schedule_new_event(
-      EVENT_USER_FUNCTION,
-      TRUE,
-      current_time + config->host_perfdata_file_processing_interval(),
-      TRUE,
-      config->host_perfdata_file_processing_interval(),
-      NULL,
-      TRUE,
-      type.data,
-      NULL,
-      0);
-  }
-
-  // periodically process the service perfdata file.
-  if (config->service_perfdata_file_processing_interval() > 0
-      && !config->service_perfdata_file_processing_command().empty()) {
-    type.func = xpddefault_process_service_perfdata_file;
-    schedule_new_event(
-      EVENT_USER_FUNCTION,
-      TRUE,
-      current_time + config->service_perfdata_file_processing_interval(),
-      TRUE,
-      config->service_perfdata_file_processing_interval(),
-      NULL,
-      TRUE,
-      type.data,
-      NULL,
-      0);
-  }
-
   return (OK);
 }
 
