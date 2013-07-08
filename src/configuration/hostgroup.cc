@@ -221,6 +221,16 @@ list_string const& hostgroup::hostgroup_members() const throw () {
 }
 
 /**
+ *  Set the host group name.
+ *
+ *  @param[in] name Host group name.
+ */
+void hostgroup::hostgroup_name(std::string const& name) {
+  _hostgroup_name = name;
+  return ;
+}
+
+/**
  *  Get hostgroup_name.
  *
  *  @return The hostgroup_name.

@@ -1723,6 +1723,51 @@ set_hostgroup& state::hostgroups() throw () {
 }
 
 /**
+ *  Find a host group by its key.
+ *
+ *  @param[in] k Host group key.
+ *
+ *  @return Iterator to the element if found, hostgroups().end()
+ *          otherwise.
+ */
+set_hostgroup::const_iterator state::hostgroups_find(
+                                hostgroup::key_type const& k) const {
+  shared_ptr<configuration::hostgroup>
+    below_searched(new configuration::hostgroup);
+  below_searched->hostgroup_name(k);
+  set_hostgroup::const_iterator
+    it(_hostgroups.upper_bound(below_searched));
+  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
+    return (it);
+  else if ((it != _hostgroups.begin())
+           && ((*--it)->hostgroup_name() == k))
+    return (it);
+  return (_hostgroups.end());
+}
+
+/**
+ *  Find a host group by its key.
+ *
+ *  @param[in] k Host group key.
+ *
+ *  @return Iterator to the element if found, hostgroups().end()
+ *          otherwise.
+ */
+set_hostgroup::iterator state::hostgroups_find(
+                                 hostgroup::key_type const& k) {
+  shared_ptr<configuration::hostgroup>
+    below_searched(new configuration::hostgroup);
+  below_searched->hostgroup_name(k);
+  set_hostgroup::iterator it(_hostgroups.upper_bound(below_searched));
+  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
+    return (it);
+  else if ((it != _hostgroups.begin())
+           && ((*--it)->hostgroup_name() == k))
+    return (it);
+  return (_hostgroups.end());
+}
+
+/**
  *  Get all engine hosts.
  *
  *  @return All engine hosts.
@@ -2758,6 +2803,52 @@ set_servicegroup const& state::servicegroups() const throw () {
  */
 set_servicegroup& state::servicegroups() throw () {
   return (_servicegroups);
+}
+
+/**
+ *  Get service group by its key.
+ *
+ *  @param[in] k Service group name.
+ *
+ *  @return Iterator to the element if found, servicegroups().end()
+ *          otherwise.
+ */
+set_servicegroup::const_iterator state::servicegroups_find(
+                                   servicegroup::key_type const& k) const {
+  shared_ptr<configuration::servicegroup>
+    below_searched(new configuration::servicegroup);
+  below_searched->servicegroup_name(k);
+  set_servicegroup::const_iterator
+    it(_servicegroups.upper_bound(below_searched));
+  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
+    return (it);
+  else if ((it != _servicegroups.begin())
+           && ((*--it)->servicegroup_name() == k))
+    return (it);
+  return (_servicegroups.end());
+}
+
+/**
+ *  Get service group by its key.
+ *
+ *  @param[in] k Service group name.
+ *
+ *  @return Iterator to the element if found, servicegroups().end()
+ *          otherwise.
+ */
+set_servicegroup::iterator state::servicegroups_find(
+                             servicegroup::key_type const& k) {
+  shared_ptr<configuration::servicegroup>
+    below_searched(new configuration::servicegroup);
+  below_searched->servicegroup_name(k);
+  set_servicegroup::iterator
+    it(_servicegroups.upper_bound(below_searched));
+  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
+    return (it);
+  else if ((it != _servicegroups.begin())
+           && ((*--it)->servicegroup_name() == k))
+    return (it);
+  return (_servicegroups.end());
 }
 
 /**

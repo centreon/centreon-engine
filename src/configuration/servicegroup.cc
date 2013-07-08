@@ -257,6 +257,16 @@ list_string const& servicegroup::servicegroup_members() const throw () {
 }
 
 /**
+ *  Set service group name.
+ *
+ *  @param[in] name New service group name.
+ */
+void servicegroup::servicegroup_name(std::string const& name) {
+  _servicegroup_name = name;
+  return ;
+}
+
+/**
  *  Get servicegroup_name.
  *
  *  @return The servicegroup_name.

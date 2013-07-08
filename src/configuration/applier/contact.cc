@@ -421,13 +421,18 @@ void applier::contact::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing contact '" << obj->contact_name() << "'.";
 
-  // Unregister contact.
-  unregister_object<contact_struct, &contact_struct::name>(
-    &contact_list,
-    obj->contact_name().c_str());
+  // Find contact.
+  umap<std::string, shared_ptr<contact_struct> >::iterator
+    it(applier::state::instance().contacts_find(obj->key()));
+  if (it != applier::state::instance().contacts().end()) {
+    // Remove contact from its list.
+    unregister_object<contact_struct>(
+      &contact_list,
+      it->second.get());
 
-  // Remove contact object (this will effectively delete the object).
-  applier::state::instance().contacts().erase(obj->contact_name());
+    // Erase contact object (this will effectively delete the object).
+    applier::state::instance().contacts().erase(it);
+  }
 
   // Remove contact from the global configuration set.
   config->contacts().erase(obj);

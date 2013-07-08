@@ -228,14 +228,34 @@ void applier::serviceescalation::modify_object(
 }
 
 /**
- *  Remove old serviceescalation.
+ *  Remove old service escalation.
  *
- *  @param[in] obj The new serviceescalation to remove from the
- *                 monitoring engine.
+ *  @param[in] obj The service escalation to remove from the monitoring
+ *                 engine.
  */
 void applier::serviceescalation::remove_object(
                                    shared_ptr<configuration::serviceescalation> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing a service escalation.";
+
+  // Find service escalation.
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
+    it(applier::state::instance().serviceescalations_find(obj->key()));
+  if (it != applier::state::instance().serviceescalations().end()) {
+    // Remove service escalation from its list.
+    unregister_object<serviceescalation_struct>(
+      &serviceescalation_list,
+      it->second.get());
+
+    // Erase service escalation (will effectively delete the object).
+    applier::state::instance().serviceescalations().erase(it);
+  }
+
+  // Remove escalation from the global configuration set.
+  config->serviceescalations().erase(obj);
+
+  return ;
 }
 
 /**

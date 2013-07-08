@@ -60,6 +60,7 @@ namespace                   configuration {
     std::string const&      notes() const throw ();
     std::string const&      notes_url() const throw ();
     list_string const&      servicegroup_members() const throw ();
+    void                    servicegroup_name(std::string const& name);
     std::string const&      servicegroup_name() const throw ();
 
     bool                    is_resolved() const throw ();

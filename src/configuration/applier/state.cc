@@ -136,6 +136,30 @@ umap<std::string, shared_ptr<command_struct> >& applier::state::commands() throw
 }
 
 /**
+ *  Find a command from its key.
+ *
+ *  @param[in] k Command name.
+ *
+ *  @return Iterator to the element if found, commands().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<command_struct> >::const_iterator applier::state::commands_find(configuration::command::key_type const& k) const {
+  return (_commands.find(k));
+}
+
+/**
+ *  Find a command from its key.
+ *
+ *  @param[in] k Command name.
+ *
+ *  @return Iterator to the element if found, commands().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<command_struct> >::iterator applier::state::commands_find(configuration::command::key_type const& k) {
+  return (_commands.find(k));
+}
+
+/**
  *  Get the current connectors.
  *
  *  @return The current connectors.
@@ -172,6 +196,30 @@ umap<std::string, shared_ptr<contact_struct> >& applier::state::contacts() throw
 }
 
 /**
+ *  Find a contact from its key.
+ *
+ *  @param[in] k Contact name.
+ *
+ *  @return Iterator to the element if found, contacts().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<contact_struct> >::const_iterator applier::state::contacts_find(configuration::contact::key_type const& k) const {
+  return (_contacts.find(k));
+}
+
+/**
+ *  Find a contact from its key.
+ *
+ *  @param[in] k Contact name.
+ *
+ *  @return Iterator to the element if found, contacts().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<contact_struct> >::iterator applier::state::contacts_find(configuration::contact::key_type const& k) {
+  return (_contacts.find(k));
+}
+
+/**
  *  Get the current contactgroups.
  *
  *  @return The current contactgroups.
@@ -187,6 +235,30 @@ umap<std::string, shared_ptr<contactgroup_struct> > const& applier::state::conta
  */
 umap<std::string, shared_ptr<contactgroup_struct> >& applier::state::contactgroups() throw () {
   return (_contactgroups);
+}
+
+/**
+ *  Find a contact group from its key.
+ *
+ *  @param[in] k Contact group key.
+ *
+ *  @return Iterator to the element if found, contactgroups().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
+  return (_contactgroups.find(k));
+}
+
+/**
+ *  Find a contact group from its key.
+ *
+ *  @param[in] k Contact group key.
+ *
+ *  @return Iterator to the element if found, contactgroups().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<contactgroup_struct> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
+  return (_contactgroups.find(k));
 }
 
 /**
@@ -250,6 +322,30 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >& applier::state::host
 }
 
 /**
+ *  Get a host dependency from its key.
+ *
+ *  @param[in] k Host dependency key.
+ *
+ *  @return Iterator to the element if found, hostdependencies().end()
+ *          otherwise.
+ */
+umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) const {
+  // XXX
+}
+
+/**
+ *  Get a host dependency from its key.
+ *
+ *  @param[in] k Host dependency key.
+ *
+ *  @return Iterator to the element if found, hostdependencies().end()
+ *          otherwise.
+ */
+umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
+  // XXX
+}
+
+/**
  *  Get the current hostescalations.
  *
  *  @return The current hostescalations.
@@ -268,6 +364,30 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >& applier::state::host
 }
 
 /**
+ *  Find a host escalation by its key.
+ *
+ *  @param[in] k Host escalation configuration.
+ *
+ *  @return Iterator to the element if found, hostescalations().end()
+ *          otherwise.
+ */
+umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
+  // XXX
+}
+
+/**
+ *  Find a host escalation by its key.
+ *
+ *  @param[in] k Host escalation configuration.
+ *
+ *  @return Iterator to the element if found, hostescalations().end()
+ *          otherwise.
+ */
+umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
+  // XXX
+}
+
+/**
  *  Get the current hostgroups.
  *
  *  @return The current hostgroups.
@@ -283,6 +403,30 @@ umap<std::string, shared_ptr<hostgroup_struct> > const& applier::state::hostgrou
  */
 umap<std::string, shared_ptr<hostgroup_struct> >& applier::state::hostgroups() throw () {
   return (_hostgroups);
+}
+
+/**
+ *  Find a host group from its key.
+ *
+ *  @param[in] k Host group name.
+ *
+ *  @return Iterator to the element if found, hostgroups().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) const {
+  return (_hostgroups.find(k));
+}
+
+/**
+ *  Find a host group from its key.
+ *
+ *  @param[in] k Host group name.
+ *
+ *  @return Iterator to the element if found, hostgroups().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<hostgroup_struct> >::iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) {
+  return (_hostgroups.find(k));
 }
 
 /**
@@ -322,6 +466,30 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
 }
 
 /**
+ *  Find a service dependency from its key.
+ *
+ *  @param[in] k The service dependency configuration.
+ *
+ *  @return Iterator to the element if found,
+ *          servicedependencies().end() otherwise.
+ */
+umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::const_iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) const {
+  // XXX
+}
+
+/**
+ *  Find a service dependency from its key.
+ *
+ *  @param[in] k The service dependency configuration.
+ *
+ *  @return Iterator to the element if found,
+ *          servicedependencies().end() otherwise.
+ */
+umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) {
+  // XXX
+}
+
+/**
  *  Get the current serviceescalations.
  *
  *  @return The current serviceescalations.
@@ -337,6 +505,30 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
  */
 umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
   return (_serviceescalations);
+}
+
+/**
+ *  Find a service escalation by its key.
+ *
+ *  @param[in] k Service escalation configuration object.
+ *
+ *  @return Iterator to the element if found, serviceescalations().end()
+ *          otherwise.
+ */
+umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
+  // XXX
+}
+
+/**
+ *  Find a service escalation by its key.
+ *
+ *  @param[in] k Service escalation configuration object.
+ *
+ *  @return Iterator to the element if found, serviceescalations().end()
+ *          otherwise.
+ */
+umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
+  // XXX
 }
 
 /**
@@ -358,6 +550,30 @@ umap<std::string, shared_ptr<servicegroup_struct> >& applier::state::servicegrou
 }
 
 /**
+ *  Find a service group from its key.
+ *
+ *  @param[in] k Service group name.
+ *
+ *  @return Iterator to the element if found, servicegroups().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
+  return (_servicegroups.find(k));
+}
+
+/**
+ *  Find a service group from its key.
+ *
+ *  @param[in] k Service group name.
+ *
+ *  @return Iterator to the element if found, servicegroups().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<servicegroup_struct> >::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
+  return (_servicegroups.find(k));
+}
+
+/**
  *  Get the current timeperiods.
  *
  *  @return The current timeperiods.
@@ -373,6 +589,30 @@ umap<std::string, shared_ptr<timeperiod_struct> > const& applier::state::timeper
  */
 umap<std::string, shared_ptr<timeperiod_struct> >& applier::state::timeperiods() throw () {
   return (_timeperiods);
+}
+
+/**
+ *  Find a time period from its key.
+ *
+ *  @param[in] k Time period name.
+ *
+ *  @return Iterator to the element if found, timeperiods().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) const {
+  return (_timeperiods.find(k));
+}
+
+/**
+ *  Find a time period from its key.
+ *
+ *  @param[in] k Time period name.
+ *
+ *  @return Iterator to the element if found, timeperiods().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<timeperiod_struct> >::iterator applier::state::timeperiods_find(configuration::timeperiod::key_type const& k) {
+  return (_timeperiods.find(k));
 }
 
 /**

@@ -214,6 +214,10 @@ namespace              configuration {
     set_hostgroup const&
                        hostgroups() const throw ();
     set_hostgroup&     hostgroups() throw ();
+    set_hostgroup::const_iterator
+                       hostgroups_find(hostgroup::key_type const& k) const;
+    set_hostgroup::iterator
+                       hostgroups_find(hostgroup::key_type const& k);
     set_host const&    hosts() const throw ();
     set_host&          hosts() throw ();
     set_host::const_iterator
@@ -329,6 +333,10 @@ namespace              configuration {
     set_servicegroup const&
                        servicegroups() const throw ();
     set_servicegroup&  servicegroups() throw ();
+    set_servicegroup::const_iterator
+                       servicegroups_find(servicegroup::key_type const& k) const;
+    set_servicegroup::iterator
+                       servicegroups_find(servicegroup::key_type const& k);
     set_service const& services() const throw ();
     set_service&       services() throw ();
     unsigned int       service_check_timeout() const throw ();

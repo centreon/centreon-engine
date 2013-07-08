@@ -130,14 +130,18 @@ void applier::timeperiod::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing time period '" << obj->timeperiod_name() << "'.";
 
-  // Unregister time period from the compatibility list.
-  unregister_object<timeperiod_struct, &timeperiod_struct::name>(
-    &timeperiod_list,
-    obj->timeperiod_name().c_str());
+  // Find time period.
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+    it(applier::state::instance().timeperiods_find(obj->key()));
+  if (it != applier::state::instance().timeperiods().end()) {
+    // Remove timeperiod from its list.
+    unregister_object<timeperiod_struct>(
+      &timeperiod_list,
+      it->second.get());
 
-  // Remove time period from the object list (will effectively deleted
-  // the time periiod object).
-  applier::state::instance().timeperiods().erase(obj->timeperiod_name());
+    // Erase time period (will effectively delete the object).
+    applier::state::instance().timeperiods().erase(it);
+  }
 
   // Remove time period from the global configuration set.
   config->timeperiods().erase(obj);

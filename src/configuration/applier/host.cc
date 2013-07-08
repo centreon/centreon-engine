@@ -33,24 +33,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 /**
- *  Check if the host group name matches the configuration object.
- */
-class         hostgroup_name_comparator {
-public:
-              hostgroup_name_comparator(
-                std::string const& hostgroup_name) {
-    _hostgroup_name = hostgroup_name;
-  }
-
-  bool        operator()(shared_ptr<configuration::hostgroup> hg) {
-    return (_hostgroup_name == hg->hostgroup_name());
-  }
-
-private:
-  std::string _hostgroup_name;
-};
-
-/**
  *  Default constructor.
  */
 applier::host::host() {}
@@ -234,10 +216,7 @@ void applier::host::expand_object(
        ++it) {
     // Find host group.
     std::set<shared_ptr<configuration::hostgroup> >::iterator
-      it_group(std::find_if(
-                      s.hostgroups().begin(),
-                      s.hostgroups().end(),
-                      hostgroup_name_comparator(*it)));
+      it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
       throw (engine_error() << "Error: Could not add host '"
              << obj->host_name() << "' to non-existing host group '"
@@ -279,8 +258,8 @@ void applier::host::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::host> obj_old(*it_cfg);
-  config->hosts().erase(it_cfg);
   config->hosts().insert(obj);
+  config->hosts().erase(it_cfg);
 
   // Modify host.
   shared_ptr<host_struct>&
@@ -464,13 +443,18 @@ void applier::host::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing host '" << obj->host_name() << "'.";
 
-  // Unregister host.
-  unregister_object<host_struct, &host_struct::name>(
-    &host_list,
-    obj->host_name().c_str());
+  // Find host.
+  umap<std::string, shared_ptr<host_struct> >::iterator
+    it(applier::state::instance().hosts_find(obj->key()));
+  if (it != applier::state::instance().hosts().end()) {
+    // Remove host from its list.
+    unregister_object<host_struct>(
+      &host_list,
+      it->second.get());
 
-  // Remove host object (will effectively delete the object).
-  applier::state::instance().hosts().erase(obj->host_name());
+    // Erase host object (will effectively delete the object).
+    applier::state::instance().hosts().erase(it);
+  }
 
   // Remove host from the global configuration set.
   config->hosts().erase(obj);

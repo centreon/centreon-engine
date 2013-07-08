@@ -234,12 +234,32 @@ void applier::hostdependency::modify_object(
 /**
  *  Remove old host dependency.
  *
- *  @param[in] obj The new hostdependency to remove from the monitoring
+ *  @param[in] obj The host dependency to remove from the monitoring
  *                 engine.
  */
 void applier::hostdependency::remove_object(
                                 shared_ptr<configuration::hostdependency> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing a host dependency.";
+
+  // Find host dependency.
+  umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
+    it(applier::state::instance().hostdependencies_find(obj->key()));
+  if (it != applier::state::instance().hostdependencies().end()) {
+    // Remove host dependency from its list.
+    unregister_object<hostdependency_struct>(
+      &hostdependency_list,
+      it->second.get());
+
+    // Erase host dependency (will effectively delete the object).
+    applier::state::instance().hostdependencies().erase(it);
+  }
+
+  // Remove dependency from the global configuration set.
+  config->hostdependencies().erase(obj);
+
+  return ;
 }
 
 /**

@@ -20,6 +20,7 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -132,7 +133,65 @@ void applier::servicegroup::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
 
-  // XXX
+  // Find old configuration.
+  set_servicegroup::iterator
+    it_cfg(config->servicegroups_find(obj->key()));
+  if (it_cfg == config->servicegroups().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "service group '" << obj->servicegroup_name() << "'.");
+
+  // Find service group object.
+  umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+    it_obj(applier::state::instance().servicegroups_find(obj->key()));
+  if (it_obj == applier::state::instance().servicegroups().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "service group object '" << obj->servicegroup_name()
+           << "'.");
+  servicegroup_struct* sg(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::servicegroup> old_cfg(*it_cfg);
+  config->servicegroups().insert(obj);
+  config->servicegroups().erase(it_cfg);
+
+  // Modify properties.
+  modify_if_different(
+    sg->action_url,
+    NULL_IF_EMPTY(obj->action_url()));
+  modify_if_different(
+    sg->alias,
+    NULL_IF_EMPTY(obj->alias()));
+  modify_if_different(
+    sg->notes,
+    NULL_IF_EMPTY(obj->notes()));
+  modify_if_different(
+    sg->notes_url,
+    NULL_IF_EMPTY(obj->notes_url()));
+
+  // Were members modified ?
+  if (obj->members() != old_cfg->members()) {
+    // Delete all old service group members.
+    for (servicesmember* m((*it_obj).second->members); m;) {
+      servicesmember* to_delete(m);
+      m = m->next;
+      deleter::servicesmember(to_delete);
+    }
+
+    // Create new service group members.
+    for (set_pair_string::const_iterator
+           it(obj->resolved_members().begin()),
+           end(obj->resolved_members().end());
+         it != end;
+         ++it)
+      if (!add_service_to_servicegroup(
+             sg,
+             it->first.c_str(),
+             it->second.c_str()))
+        throw (engine_error() << "Error: Could not add service member '"
+               << it->second << "' of host '" << it->first
+               << "' to service group '" << obj->servicegroup_name()
+               << "'.");
+  }
 
   return ;
 }
@@ -148,13 +207,18 @@ void applier::servicegroup::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
 
-  // Unregister service group.
-  unregister_object<servicegroup_struct, &servicegroup_struct::group_name>(
-    &servicegroup_list,
-    obj->servicegroup_name().c_str());
+  // Find service group.
+  umap<std::string, shared_ptr<servicegroup_struct> >::iterator
+    it(applier::state::instance().servicegroups_find(obj->key()));
+  if (it != applier::state::instance().servicegroups().end()) {
+    // Remove service dependency from its list.
+    unregister_object<servicegroup_struct>(
+      &servicegroup_list,
+      it->second.get());
 
-  // Remove service group object (will effectively delete the object).
-  applier::state::instance().servicegroups().erase(obj->servicegroup_name());
+    // Erase service group object (will effectively delete the object).
+    applier::state::instance().servicegroups().erase(it);
+  }
 
   // Remove service group from the global configuration state.
   config->servicegroups().erase(obj);

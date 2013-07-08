@@ -20,6 +20,7 @@
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -128,7 +129,62 @@ void applier::hostgroup::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying hostgroup '" << obj->hostgroup_name() << "'.";
 
-  // XXX
+  // Find old configuration.
+  set_hostgroup::iterator
+    it_cfg(config->hostgroups_find(obj->key()));
+  if (it_cfg == config->hostgroups().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "host group '" << obj->hostgroup_name() << "'.");
+
+  // Find host group object.
+  umap<std::string, shared_ptr<hostgroup_struct> >::iterator
+    it_obj(applier::state::instance().hostgroups_find(obj->key()));
+  if (it_obj == applier::state::instance().hostgroups().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "host group object '" << obj->hostgroup_name() << "'.");
+  hostgroup_struct* hg(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::hostgroup> old_cfg(*it_cfg);
+  config->hostgroups().insert(obj);
+  config->hostgroups().erase(it_cfg);
+
+  // Modify properties.
+  modify_if_different(
+    hg->action_url,
+    NULL_IF_EMPTY(obj->action_url()));
+  modify_if_different(
+    hg->alias,
+    NULL_IF_EMPTY(obj->alias()));
+  modify_if_different(
+    hg->notes,
+    NULL_IF_EMPTY(obj->notes()));
+  modify_if_different(
+    hg->notes_url,
+    NULL_IF_EMPTY(obj->notes_url()));
+
+  // Were members modified ?
+  if (obj->members() != old_cfg->members()) {
+    // Delete all old host group members.
+    for (hostsmember* m((*it_obj).second->members); m;) {
+      hostsmember* to_delete(m);
+      m = m->next;
+      deleter::hostsmember(to_delete);
+    }
+
+    // Create new host group members.
+    for (set_string::const_iterator
+           it(obj->resolved_members().begin()),
+           end(obj->resolved_members().end());
+         it != end;
+         ++it)
+      if (!add_host_to_hostgroup(
+             hg,
+             it->c_str()))
+        throw (engine_error() << "Error: Could not add host member '"
+               << *it << "' to host group '" << obj->hostgroup_name()
+               << "'.");
+  }
 
   return ;
 }
@@ -144,13 +200,18 @@ void applier::hostgroup::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing hostgroup '" << obj->hostgroup_name() << "'.";
 
-  // Unregister host.
-  unregister_object<hostgroup_struct, &hostgroup_struct::group_name>(
-    &hostgroup_list,
-    obj->hostgroup_name().c_str());
+  // Find host group.
+  umap<std::string, shared_ptr<hostgroup_struct> >::iterator
+    it(applier::state::instance().hostgroups_find(obj->key()));
+  if (it != applier::state::instance().hostgroups().end()) {
+    // Remove host group from its list.
+    unregister_object<hostgroup_struct>(
+      &hostgroup_list,
+      it->second.get());
 
-  // Remove host group object (will effectively delete the object).
-  applier::state::instance().hostgroups().erase(obj->hostgroup_name());
+    // Erase host group object (will effectively delete the object).
+    applier::state::instance().hostgroups().erase(it);
+  }
 
   // Remove host group from the global configuration set.
   config->hostgroups().erase(obj);

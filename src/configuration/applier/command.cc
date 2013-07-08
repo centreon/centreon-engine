@@ -149,13 +149,20 @@ void applier::command::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing command '" << obj->command_name() << "'.";
 
-  // Unregister command.
-  unregister_object<command_struct, &command_struct::name>(
-    &command_list,
-    obj->command_name().c_str());
+  // Find command.
+  umap<std::string, shared_ptr<command_struct> >::iterator
+    it(applier::state::instance().commands_find(obj->key()));
+  if (it != applier::state::instance().commands().end()) {
+    // Remove command from its list.
+    unregister_object<command_struct>(
+      &command_list,
+      it->second.get());
+
+    // Erase command (will effectively delete the object).
+    applier::state::instance().commands().erase(it);
+  }
 
   // Remove command objects.
-  applier::state::instance().commands().erase(obj->command_name());
   commands::set::instance().remove_command(obj->command_name());
 
   // Remove command from the global configuration set.
