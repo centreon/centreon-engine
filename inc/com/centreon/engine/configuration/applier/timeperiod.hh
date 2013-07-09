@@ -20,42 +20,53 @@
 #ifndef CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 #  define CCE_CONFIGURATION_APPLIER_TIMEPERIOD_HH
 
+#  include <list>
+#  include <string>
+#  include <vector>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 // Forward declaration.
-struct                   timeperiod_struct;
+struct            timeperiod_struct;
 
 CCE_BEGIN()
 
-namespace                configuration {
+namespace         configuration {
   // Forward declarations.
-  class                  state;
-  class                  timeperiod;
+  class           daterange;
+  class           state;
+  class           timeperiod;
+  class           timerange;
 
-  namespace              applier {
-    class                timeperiod {
+  namespace       applier {
+    class         timeperiod {
     public:
-                         timeperiod();
-                         timeperiod(timeperiod const& right);
-                         ~timeperiod() throw ();
-      timeperiod&        operator=(timeperiod const& right);
-      void               add_object(
-                           shared_ptr<configuration::timeperiod> obj);
-      void               expand_object(
-                           shared_ptr<configuration::timeperiod> obj,
-                           configuration::state& s);
-      void               modify_object(
-                           shared_ptr<configuration::timeperiod> obj);
-      void               remove_object(
-                           shared_ptr<configuration::timeperiod> obj);
-      void               resolve_object(
-                           shared_ptr<configuration::timeperiod> obj);
+                  timeperiod();
+                  timeperiod(timeperiod const& right);
+                  ~timeperiod() throw ();
+      timeperiod& operator=(timeperiod const& right);
+      void        add_object(
+                    shared_ptr<configuration::timeperiod> obj);
+      void        expand_object(
+                    shared_ptr<configuration::timeperiod> obj,
+                    configuration::state& s);
+      void        modify_object(
+                    shared_ptr<configuration::timeperiod> obj);
+      void        remove_object(
+                    shared_ptr<configuration::timeperiod> obj);
+      void        resolve_object(
+                    shared_ptr<configuration::timeperiod> obj);
 
     private:
-      void               _fill_timeperiod_struct(
-                           configuration::timeperiod const& cfg,
-                           timeperiod_struct* obj);
+      void        _add_exclusions(
+                    std::list<std::string> const& exclusions,
+                    timeperiod_struct* tp);
+      void        _add_exceptions(
+                    std::vector<std::list<daterange> > const& exceptions,
+                    timeperiod_struct* tp);
+      void        _add_time_ranges(
+                    std::vector<std::list<timerange> > const& ranges,
+                    timeperiod_struct* tp);
     };
   }
 }

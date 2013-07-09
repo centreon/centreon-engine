@@ -59,6 +59,7 @@ namespace                  configuration {
     std::vector<std::list<daterange> > const&
                            exceptions() const throw ();
     list_string const&     exclude() const throw ();
+    void                   timeperiod_name(std::string const& name);
     std::string const&     timeperiod_name() const throw ();
     std::vector<std::list<timerange> > const&
                            timeranges() const throw ();

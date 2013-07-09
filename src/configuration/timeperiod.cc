@@ -250,6 +250,16 @@ list_string const& timeperiod::exclude() const throw () {
 }
 
 /**
+ *  Set the time period name.
+ *
+ *  @param[in] name New time period name.
+ */
+void timeperiod::timeperiod_name(std::string const& name) {
+  _timeperiod_name = name;
+  return ;
+}
+
+/**
  *  Get timeperiod_name value.
  *
  *  @return The timeperiod_name value.

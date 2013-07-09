@@ -3193,6 +3193,50 @@ set_timeperiod& state::timeperiods() throw () {
 }
 
 /**
+ *  Find a time period by its key.
+ *
+ *  @param[in] k Time period name.
+ *
+ *  @return Iterator to the element if found, timeperiods().end()
+ *          otherwise.
+ */
+set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type const& k) const {
+  shared_ptr<configuration::timeperiod>
+    below_searched(new configuration::timeperiod);
+  below_searched->timeperiod_name(k);
+  set_timeperiod::const_iterator
+    it(_timeperiods.upper_bound(below_searched));
+  if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
+    return (it);
+  else if ((it != _timeperiods.begin())
+           && ((*--it)->timeperiod_name() == k))
+    return (it);
+  return (_timeperiods.end());
+}
+
+/**
+ *  Find a time period by its key.
+ *
+ *  @param[in] k Time period name.
+ *
+ *  @return Iterator to the element if found, timeperiods().end()
+ *          otherwise.
+ */
+set_timeperiod::iterator state::timeperiods_find(timeperiod::key_type const& k) {
+  shared_ptr<configuration::timeperiod>
+    below_searched(new configuration::timeperiod);
+  below_searched->timeperiod_name(k);
+  set_timeperiod::iterator
+    it(_timeperiods.upper_bound(below_searched));
+  if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
+    return (it);
+  else if ((it != _timeperiods.begin())
+           && ((*--it)->timeperiod_name() == k))
+    return (it);
+  return (_timeperiods.end());
+}
+
+/**
  *  Get time_change_threshold value.
  *
  *  @return The time_change_threshold value.

@@ -373,6 +373,10 @@ namespace              configuration {
     set_timeperiod const&
                        timeperiods() const throw ();
     set_timeperiod&    timeperiods() throw ();
+    set_timeperiod::const_iterator
+                       timeperiods_find(timeperiod::key_type const& k) const;
+    set_timeperiod::iterator
+                       timeperiods_find(timeperiod::key_type const& k);
     unsigned int       time_change_threshold() const throw ();
     void               time_change_threshold(unsigned int value);
     bool               translate_passive_host_checks() const throw ();
