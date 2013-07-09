@@ -176,6 +176,7 @@ void applier::servicegroup::modify_object(
       m = m->next;
       deleter::servicesmember(to_delete);
     }
+    (*it_obj).second->members = NULL;
 
     // Create new service group members.
     for (set_pair_string::const_iterator

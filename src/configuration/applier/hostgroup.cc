@@ -171,6 +171,7 @@ void applier::hostgroup::modify_object(
       m = m->next;
       deleter::hostsmember(to_delete);
     }
+    (*it_obj).second->members = NULL;
 
     // Create new host group members.
     for (set_string::const_iterator
