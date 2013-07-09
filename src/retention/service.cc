@@ -35,7 +35,6 @@ using namespace com::centreon::engine;
 retention::service::service(service_struct* obj)
   : object(object::service),
     _obj(obj),
-    _scheduling_info_is_ok(false),
     _was_flapping(false) {
 
 }
@@ -45,15 +44,6 @@ retention::service::service(service_struct* obj)
  */
 retention::service::~service() throw () {
   _finished();
-}
-
-/**
- *  Set scheduling info is ok.
- *
- *  @param[in] value The new scheduling info.
- */
-void retention::service::scheduling_info_is_ok(bool value) {
-  _scheduling_info_is_ok = value;
 }
 
 /**
@@ -389,11 +379,11 @@ bool retention::service::_retain_status_information(
   else if (key == "last_check")
     string::to(value, _obj->last_check);
   else if (key == "next_check") {
-    if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
+    // if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
       string::to(value, _obj->next_check);
   }
   else if (key == "check_options") {
-    if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
+    // if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
       string::to(value, _obj->check_options);
   }
   else if (key == "notified_on_unknown")

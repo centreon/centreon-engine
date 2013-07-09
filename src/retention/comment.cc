@@ -18,12 +18,33 @@
 */
 
 #include "com/centreon/engine/comments.hh"
-#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/retention/comment.hh"
 #include "com/centreon/engine/string.hh"
 
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine;
+
+#define SETTER(type, method) \
+  &retention::object::setter< \
+     retention::comment, \
+     type, \
+     &retention::comment::method>::generic
+
+static struct {
+  std::string const name;
+  bool (*func)(retention::comment&, std::string const&);
+} gl_setters[] = {
+  { "author",              SETTER(std::string const&, _set_author) },
+  { "comment_data",        SETTER(std::string const&, _set_comment_data) },
+  { "comment_id",          SETTER(unsigned long, _set_comment_id) },
+  { "entry_time",          SETTER(time_t, _set_entry_time) },
+  { "entry_type",          SETTER(unsigned int, _set_entry_type) },
+  { "expire_time",         SETTER(time_t, _set_expire_time) },
+  { "expires",             SETTER(bool, _set_expires) },
+  { "host_name",           SETTER(std::string const&, _set_host_name) },
+  { "persistent",          SETTER(bool, _set_persistent) },
+  { "service_description", SETTER(std::string const&, _set_service_description) },
+  { "source",              SETTER(int, _set_source) }
+};
 
 /**
  *  Constructor.
@@ -43,10 +64,80 @@ retention::comment::comment(type_id comment_type)
 }
 
 /**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+retention::comment::comment(comment const& right)
+  : object(right) {
+  operator=(right);
+}
+
+/**
  *  Destructor.
  */
 retention::comment::~comment() throw () {
-  _finished();
+
+}
+
+/**
+ *  Copy operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+retention::comment& retention::comment::operator=(comment const& right) {
+  if (this != &right) {
+    object::operator=(right);
+    _author = right._author;
+    _comment_data = right._comment_data;
+    _comment_id = right._comment_id;
+    _comment_type = right._comment_type;
+    _entry_time = right._entry_time;
+    _entry_type = right._entry_type;
+    _expire_time = right._expire_time;
+    _expires = right._expires;
+    _host_name = right._host_name;
+    _persistent = right._persistent;
+    _service_description = right._service_description;
+    _source = right._source;
+  }
+  return (*this);
+}
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool retention::comment::operator==(comment const& right) const throw () {
+  return (object::operator==(right)
+          && _author == right._author
+          && _comment_data == right._comment_data
+          && _comment_id == right._comment_id
+          && _comment_type == right._comment_type
+          && _entry_time == right._entry_time
+          && _entry_type == right._entry_type
+          && _expire_time == right._expire_time
+          && _expires == right._expires
+          && _host_name == right._host_name
+          && _persistent == right._persistent
+          && _service_description == right._service_description
+          && _source == right._source);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool retention::comment::operator!=(comment const& right) const throw () {
+  return (!operator==(right));
 }
 
 /**
@@ -60,122 +151,228 @@ retention::comment::~comment() throw () {
 bool retention::comment::set(
        std::string const& key,
        std::string const& value) {
-  if (key == "host_name")
-    _host_name = value;
-  else if (key == "service_description")
-    _service_description = value;
-  else if (key == "entry_type")
-    string::to(value, _entry_type);
-  else if (key == "comment_id")
-    string::to(value, _comment_id);
-  else if (key == "source")
-    string::to(value, _source);
-  else if (key == "persistent")
-    string::to(value, _persistent);
-  else if (key == "entry_time")
-    string::to(value, _entry_time);
-  else if (key == "expires")
-    string::to(value, _expires);
-  else if (key == "expire_time")
-    string::to(value, _expire_time);
-  else if (key == "author")
-    _author = value;
-  else if (key == "comment_data")
-    _comment_data = value;
-  else
-    return (false);
+  for (unsigned int i(0);
+       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       ++i)
+    if (gl_setters[i].name == key)
+      return ((gl_setters[i].func)(*this, value));
+  return (false);
+}
+
+/**
+ *  Get author.
+ *
+ *  @return The author.
+ */
+std::string const& retention::comment::author() const throw () {
+  return (_author);
+}
+
+/**
+ *  Get comment_data.
+ *
+ *  @return The comment_data.
+ */
+std::string const& retention::comment::comment_data() const throw () {
+  return (_comment_data);
+}
+
+/**
+ *  Get comment_id.
+ *
+ *  @return The comment_id.
+ */
+unsigned long retention::comment::comment_id() const throw () {
+  return (_comment_id);
+}
+
+/**
+ *  Get comment_type.
+ *
+ *  @return The comment_type.
+ */
+retention::comment::type_id retention::comment::comment_type() const throw () {
+  return (_comment_type);
+}
+
+/**
+ *  Get entry_time.
+ *
+ *  @return The entry_time.
+ */
+time_t retention::comment::entry_time() const throw () {
+  return (_entry_time);
+}
+
+/**
+ *  Get entry_type.
+ *
+ *  @return The entry_type.
+ */
+unsigned int retention::comment::entry_type() const throw () {
+  return (_entry_type);
+}
+
+/**
+ *  Get expire_time.
+ *
+ *  @return The expire_time.
+ */
+time_t retention::comment::expire_time() const throw () {
+  return (_expire_time);
+}
+
+/**
+ *  Get expires.
+ *
+ *  @return The expires.
+ */
+bool retention::comment::expires() const throw () {
+  return (_expires);
+}
+
+/**
+ *  Get host_name.
+ *
+ *  @return The host_name.
+ */
+std::string const& retention::comment::host_name() const throw () {
+  return (_host_name);
+}
+
+/**
+ *  Get persistent.
+ *
+ *  @return The persistent.
+ */
+bool retention::comment::persistent() const throw () {
+  return (_persistent);
+}
+
+/**
+ *  Get service_description.
+ *
+ *  @return The service_description.
+ */
+std::string const& retention::comment::service_description() const throw () {
+  return (_service_description);
+}
+
+/**
+ *  Get source.
+ *
+ *  @return The source.
+ */
+int retention::comment::source() const throw () {
+  return (_source);
+}
+
+/**
+ *  Set author.
+ *
+ *  @param[in] value The author.
+ */
+bool retention::comment::_set_author(std::string const& value) {
+  _author = value;
   return (true);
 }
 
 /**
- *  Add host comment.
+ *  Set comment_data.
+ *
+ *  @param[in] value The comment_data.
  */
-void retention::comment::_add_host_comment() throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it(state::instance().hosts().find(_host_name));
-  if (it == state::instance().hosts().end())
-    return;
-  host_struct* hst(it->second.get());
-
-  // add the comment.
-  add_comment(
-    HOST_COMMENT,
-    _entry_type,
-    _host_name.c_str(),
-    NULL,
-    _entry_time,
-    _author.c_str(),
-    _comment_data.c_str(),
-    _comment_id,
-    _persistent,
-    _expires,
-    _expire_time,
-    _source);
-
-  // acknowledgement comments get deleted if they're not persistent
-  // and the original problem is no longer acknowledged.
-  if (_entry_type == ACKNOWLEDGEMENT_COMMENT) {
-    if (!hst->problem_has_been_acknowledged && !_persistent)
-      delete_comment(HOST_COMMENT, _comment_id);
-  }
-  // non-persistent comments don't last past restarts UNLESS
-  // they're acks (see above).
-  else if (!_persistent)
-    delete_comment(HOST_COMMENT, _comment_id);
+bool retention::comment::_set_comment_data(std::string const& value) {
+  _comment_data = value;
+  return (true);
 }
 
 /**
- *  Add serivce comment.
+ *  Set comment_id.
+ *
+ *  @param[in] value The comment_id.
  */
-void retention::comment::_add_service_comment() throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it_hst(state::instance().hosts().find(_host_name));
-  if (it_hst == state::instance().hosts().end())
-    return ;
-  host_struct* hst(it_hst->second.get());
-  if (!hst)
-    return ;
-
-  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-    it_svc(state::instance().services().find(std::make_pair(_host_name, _service_description)));
-  if (it_svc == state::instance().services().end())
-    return;
-  service_struct* svc(&*it_svc->second);
-
-  // add the comment.
-  add_comment(
-    SERVICE_COMMENT,
-    _entry_type,
-    _host_name.c_str(),
-    _service_description.c_str(),
-    _entry_time,
-    _author.c_str(),
-    _comment_data.c_str(),
-    _comment_id,
-    _persistent,
-    _expires,
-    _expire_time,
-    _source);
-
-  // acknowledgement comments get deleted if they're not persistent
-  // and the original problem is no longer acknowledged.
-  if (_entry_type == ACKNOWLEDGEMENT_COMMENT) {
-    if (!svc->problem_has_been_acknowledged && !_persistent)
-      delete_comment(SERVICE_COMMENT, _comment_id);
-  }
-  // non-persistent comments don't last past restarts UNLESS
-  // they're acks (see above).
-  else if (!_persistent)
-    delete_comment(SERVICE_COMMENT, _comment_id);
+bool retention::comment::_set_comment_id(unsigned long value) {
+  _comment_id = value;
+  return (true);
 }
 
 /**
- *  Finish all comment update.
+ *  Set entry_time.
+ *
+ *  @param[in] value The entry_time.
  */
-void retention::comment::_finished() throw () {
-  if (_comment_type == host)
-    _add_host_comment();
-  else
-    _add_service_comment();
+bool retention::comment::_set_entry_time(time_t value) {
+  _entry_time = value;
+  return (true);
 }
 
+/**
+ *  Set entry_type.
+ *
+ *  @param[in] value The entry_type.
+ */
+bool retention::comment::_set_entry_type(unsigned int value) {
+  _entry_type = value;
+  return (true);
+}
+
+/**
+ *  Set expire_time.
+ *
+ *  @param[in] value The expire_time.
+ */
+bool retention::comment::_set_expire_time(time_t value) {
+  _expire_time = value;
+  return (true);
+}
+
+/**
+ *  Set expires.
+ *
+ *  @param[in] value The expires.
+ */
+bool retention::comment::_set_expires(bool value) {
+  _expires = value;
+  return (true);
+}
+
+/**
+ *  Set host_name.
+ *
+ *  @param[in] value The host_name.
+ */
+bool retention::comment::_set_host_name(std::string const& value) {
+  _host_name = value;
+  return (true);
+}
+
+/**
+ *  Set persistent.
+ *
+ *  @param[in] value The persistent.
+ */
+bool retention::comment::_set_persistent(bool value) {
+  _persistent = value;
+  return (true);
+}
+
+/**
+ *  Set service_description.
+ *
+ *  @param[in] value The service_description.
+ */
+bool retention::comment::_set_service_description(std::string const& value) {
+  _service_description = value;
+  return (true);
+}
+
+/**
+ *  Set source.
+ *
+ *  @param[in] value The source.
+ */
+bool retention::comment::_set_source(int value) {
+  _source = value;
+  return (true);
+}

@@ -42,6 +42,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
@@ -56,12 +57,16 @@ static applier::state* _instance(NULL);
 /**
  *  Apply new configuration.
  *
- *  @param[in] new_cfg The new configuration.
+ *  @param[in] new_cfg        The new configuration.
+ *  @param[in] retention_path The retention path to use for
+ *             load retention.
  */
-void applier::state::apply(configuration::state& new_cfg) {
+void applier::state::apply(
+       configuration::state& new_cfg,
+       std::string const& retention_path) {
   configuration::state save(*config);
   try {
-    _processing(new_cfg);
+    _processing(new_cfg, retention_path);
   }
   catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
@@ -75,7 +80,7 @@ void applier::state::apply(configuration::state& new_cfg) {
       << e.what();
     logger(dbg_config, more)
       << "configuration: try to restore old configuration";
-    _processing(*config);
+    _processing(save, retention_path);
   }
   return ;
 }
@@ -647,8 +652,15 @@ void applier::state::_expand(
 }
 
 /**
+ *  Process new configuration and apply it.
+ *
+ *  @param[in] new_cfg        The new configuration.
+ *  @param[in] retention_path The retention path to use for
+ *             load retention.
  */
-void applier::state::_processing(configuration::state& new_cfg) {
+void applier::state::_processing(
+       configuration::state& new_cfg,
+       std::string const& retention_path) {
   // Apply logging configurations.
   applier::logging::instance().apply(new_cfg);
 
@@ -885,6 +897,11 @@ void applier::state::_processing(configuration::state& new_cfg) {
   _resolve<configuration::serviceescalation, applier::serviceescalation>(
     config->serviceescalations());
 
+
+  if (!retention_path.empty()) {
+    retention::parser p;
+    p.parse(retention_path);
+  }
 
   // Pre-flight check.
   {

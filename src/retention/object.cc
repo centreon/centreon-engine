@@ -120,15 +120,6 @@ retention::object_ptr retention::object::create(std::string const& type_name) {
 }
 
 /**
- *  Set scheduling info is ok.
- *
- *  @param[in] value Unused.
- */
-void retention::object::scheduling_info_is_ok(bool value) {
-  (void)value;
-}
-
-/**
  *  Get the object type.
  *
  *  @return The object type.

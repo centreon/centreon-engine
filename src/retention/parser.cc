@@ -56,7 +56,7 @@ void parser::parse(std::string const& path) {
   defer_comment_sorting = 1;
 
   unsigned int current_line(0);
-  bool scheduling_info_is_ok(false);
+  // XXX: bool scheduling_info_is_ok(false);
 
   shared_ptr<object> obj;
   std::string input;
@@ -66,8 +66,8 @@ void parser::parse(std::string const& path) {
       if (pos == std::string::npos)
         continue;
       obj = object::create(input.substr(0, pos));
-      if (!obj.is_null())
-        obj->scheduling_info_is_ok(scheduling_info_is_ok);
+      // XXX: if (!obj.is_null())
+      //   obj->scheduling_info_is_ok(scheduling_info_is_ok);
     }
     else if (input != "}") {
       std::string key;
@@ -78,7 +78,7 @@ void parser::parse(std::string const& path) {
     else {
       if (obj->type() == object::info) {
         shared_ptr<info> info(obj);
-        scheduling_info_is_ok = info->scheduling_info_is_ok();
+        // XXX: scheduling_info_is_ok = info->scheduling_info_is_ok();
       }
       obj.clear();
     }

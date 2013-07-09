@@ -35,7 +35,6 @@ namespace           retention {
   public:
                     service(service_struct* obj = NULL);
                     ~service() throw ();
-    void            scheduling_info_is_ok(bool value);
     bool            set(
                       std::string const& key,
                       std::string const& value);
@@ -54,7 +53,6 @@ namespace           retention {
 
     std::string     _host_name;
     service_struct* _obj;
-    bool            _scheduling_info_is_ok;
     std::string     _service_description;
     bool            _was_flapping;
   };

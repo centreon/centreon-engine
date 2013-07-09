@@ -20,41 +20,67 @@
 #ifndef CCE_RETENTION_CONTACT_HH
 #  define CCE_RETENTION_CONTACT_HH
 
+#  include <ctime>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
-
-// forward declaration.
-struct contact_struct;
 
 CCE_BEGIN()
 
-namespace           retention {
-  class             contact
+namespace                     retention {
+  class                       contact
     : public object {
   public:
-                    contact(contact_struct* obj = NULL);
-                    ~contact() throw ();
-    bool            set(
-                      std::string const& key,
-                      std::string const& value);
+                              contact();
+                              contact(contact const& right);
+                              ~contact() throw ();
+    contact&                  operator=(contact const& right);
+    bool                      operator==(contact const& right) const throw ();
+    bool                      operator!=(contact const& right) const throw ();
+    bool                      set(
+                                std::string const& key,
+                                std::string const& value);
+
+    std::string const&        contact_name() const throw ();
+    // XXX: customvariables() const throw ();
+    opt<std::string> const&   host_notification_period() const throw ();
+    opt<bool> const&          host_notifications_enabled() const throw ();
+    opt<time_t> const&        last_host_notification() const throw ();
+    opt<time_t> const&        last_service_notification() const throw ();
+    opt<unsigned long> const& modified_attributes() const throw ();
+    opt<unsigned long> const& modified_host_attributes() const throw ();
+    opt<unsigned long> const& modified_service_attributes() const throw ();
+    opt<std::string> const&   service_notification_period() const throw ();
+    opt<bool> const&          service_notifications_enabled() const throw ();
 
   private:
-    void            _finished() throw ();
-    bool            _modified_attributes(
-                      std::string const& key,
-                      std::string const& value);
-    bool            _retain_nonstatus_information(
-                      std::string const& key,
-                      std::string const& value);
-    bool            _retain_status_information(
-                      std::string const& key,
-                      std::string const& value);
+    bool                      _set_contact_name(std::string const& value);
+    bool                      _set_host_notification_period(std::string const& value);
+    bool                      _set_host_notifications_enabled(bool value);
+    bool                      _set_last_host_notification(time_t value);
+    bool                      _set_last_service_notification(time_t value);
+    bool                      _set_modified_attributes(unsigned long value);
+    bool                      _set_modified_host_attributes(unsigned long value);
+    bool                      _set_modified_service_attributes(unsigned long value);
+    bool                      _set_service_notification_period(std::string const& value);
+    bool                      _set_service_notifications_enabled(bool value);
 
-    contact_struct* _obj;
+    std::string               _contact_name;
+    // XXX: _customvariables;
+    opt<std::string>          _host_notification_period;
+    opt<bool>                 _host_notifications_enabled;
+    opt<time_t>               _last_host_notification;
+    opt<time_t>               _last_service_notification;
+    opt<unsigned long>        _modified_attributes;
+    opt<unsigned long>        _modified_host_attributes;
+    opt<unsigned long>        _modified_service_attributes;
+    opt<std::string>          _service_notification_period;
+    opt<bool>                 _service_notifications_enabled;
   };
 }
 
 CCE_END()
 
 #endif // !CCE_RETENTION_CONTACT_HH
+

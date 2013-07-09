@@ -20,6 +20,10 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/retention")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/retention")
+set(TEST_DIR "${TEST_DIR}/retention")
+
+# Subdirectory.
+add_subdirectory("applier")
 
 # cce_retention target.
 add_library("cce_retention"
@@ -51,6 +55,5 @@ add_library("cce_retention"
 target_link_libraries("cce_retention" "cce_core")
 
 if (WITH_TESTING)
-  # Set directories.
-  set(TEST_DIR "${TEST_DIR}/retention")
+
 endif ()

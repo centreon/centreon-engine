@@ -41,15 +41,6 @@ retention::info::~info() throw () {
 }
 
 /**
- *  Get the scheduling state.
- *
- *  @return True if the scheduling is ok.
- */
-bool retention::info::scheduling_info_is_ok() {
-  return (_scheduling_info_is_ok);
-}
-
-/**
  *  Set new value on specific property.
  *
  *  @param[in] key   The property to set.

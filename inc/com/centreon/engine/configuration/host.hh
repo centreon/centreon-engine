@@ -25,7 +25,7 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/configuration/opt.hh"
+#  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/configuration/point_2d.hh"
 #  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"

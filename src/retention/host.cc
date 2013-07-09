@@ -17,41 +17,241 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/flapping.hh"
-#include "com/centreon/engine/globals.hh"
+#include <list>
+#include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/retention/host.hh"
-#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::retention;
+
+#define SETTER(type, method) \
+  &object::setter<host, type, &host::method>::generic
+
+static struct {
+  std::string const name;
+  bool (*func)(host&, std::string const&);
+} gl_setters[] = {
+  { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
+  { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
+  { "check_command",                        SETTER(std::string const&, _set_check_command) },
+  { "check_execution_time",                 SETTER(double, _set_check_execution_time) },
+  { "check_flapping_recovery_notification", SETTER(int, _set_check_flapping_recovery_notification) },
+  { "check_latency",                        SETTER(double, _set_check_latency) },
+  { "check_options",                        SETTER(int, _set_check_options) },
+  { "check_period",                         SETTER(std::string const&, _set_check_period) },
+  { "check_type",                           SETTER(int, _set_check_type) },
+  { "current_attempt",                      SETTER(int, _set_current_attempt) },
+  { "current_event_id",                     SETTER(unsigned long, _set_current_event_id) },
+  { "current_notification_id",              SETTER(unsigned long, _set_current_notification_id) },
+  { "current_notification_number",          SETTER(int, _set_current_notification_number) },
+  { "current_problem_id",                   SETTER(unsigned long, _set_current_problem_id) },
+  { "current_state",                        SETTER(int, _set_current_state) },
+  { "event_handler",                        SETTER(std::string const&, _set_event_handler) },
+  { "event_handler_enabled",                SETTER(bool, _set_event_handler_enabled) },
+  { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
+  { "flap_detection_enabled",               SETTER(bool, _set_flap_detection_enabled) },
+  { "has_been_checked",                     SETTER(bool, _set_has_been_checked) },
+  { "host_name",                            SETTER(std::string const&, _set_host_name) },
+  { "is_flapping",                          SETTER(bool, _set_is_flapping) },
+  { "last_check",                           SETTER(time_t, _set_last_check) },
+  { "last_event_id",                        SETTER(unsigned long, _set_last_event_id) },
+  { "last_hard_state",                      SETTER(time_t, _set_last_hard_state) },
+  { "last_hard_state_change",               SETTER(time_t, _set_last_hard_state_change) },
+  { "last_notification",                    SETTER(time_t, _set_last_notification) },
+  { "last_problem_id",                      SETTER(unsigned long, _set_last_problem_id) },
+  { "last_state",                           SETTER(time_t, _set_last_state) },
+  { "last_state_change",                    SETTER(time_t, _set_last_state_change) },
+  { "last_time_down",                       SETTER(time_t, _set_last_time_down) },
+  { "last_time_unreachable",                SETTER(time_t, _set_last_time_unreachable) },
+  { "last_time_up",                         SETTER(time_t, _set_last_time_up) },
+  { "long_plugin_output",                   SETTER(std::string const&, _set_long_plugin_output) },
+  { "max_attempts",                         SETTER(unsigned int, _set_max_attempts) },
+  { "modified_attributes",                  SETTER(unsigned long, _set_modified_attributes) },
+  { "next_check",                           SETTER(time_t, _set_next_check) },
+  { "normal_check_interval",                SETTER(unsigned int, _set_normal_check_interval) },
+  { "notification_period",                  SETTER(std::string const&, _set_notification_period) },
+  { "notifications_enabled",                SETTER(bool, _set_notifications_enabled) },
+  { "notified_on_down",                     SETTER(bool, _set_notified_on_down) },
+  { "notified_on_unreachable",              SETTER(bool, _set_notified_on_unreachable) },
+  { "obsess_over_host",                     SETTER(int, _set_obsess_over_host) },
+  { "passive_checks_enabled",               SETTER(bool, _set_passive_checks_enabled) },
+  { "percent_state_change",                 SETTER(double, _set_percent_state_change) },
+  { "performance_data",                     SETTER(std::string const&, _set_performance_data) },
+  { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
+  { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
+  { "process_performance_data",             SETTER(int, _set_process_performance_data) },
+  { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
+  { "state_history",                        SETTER(std::string const&, _set_state_history) },
+  { "state_type",                           SETTER(int, _set_state_type) }
+};
 
 /**
  *  Constructor.
- *
- *  @param[in] obj The host to use for retention.
  */
-retention::host::host(host_struct* obj)
+host::host()
   : object(object::host),
-    _obj(obj),
-    _scheduling_info_is_ok(false),
-    _was_flapping(false) {}
+    _was_flapping(false) {
+
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+host::host(host const& right)
+  : object(right) {
+  operator=(right);
+}
 
 /**
  *  Destructor.
  */
-retention::host::~host() throw () {
-  _finished();
+host::~host() throw () {
+
 }
 
 /**
- *  Set scheduling info is ok.
+ *  Copy operator.
  *
- *  @param[in] value The new scheduling info.
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
  */
-void retention::host::scheduling_info_is_ok(bool value) {
-  _scheduling_info_is_ok = value;
+host& host::operator=(host const& right) {
+  if (this != &right) {
+    object::operator=(right);
+    _acknowledgement_type = right._acknowledgement_type;
+    _active_checks_enabled = right._active_checks_enabled;
+    _check_command = right._check_command;
+    _check_execution_time = right._check_execution_time;
+    _check_flapping_recovery_notification = right._check_flapping_recovery_notification;
+    _check_latency = right._check_latency;
+    _check_options = right._check_options;
+    _check_period = right._check_period;
+    _check_type = right._check_type;
+    _current_attempt = right._current_attempt;
+    _current_event_id = right._current_event_id;
+    _current_notification_id = right._current_notification_id;
+    _current_notification_number = right._current_notification_number;
+    _current_problem_id = right._current_problem_id;
+    _current_state = right._current_state;
+    _event_handler = right._event_handler;
+    _event_handler_enabled = right._event_handler_enabled;
+    _failure_prediction_enabled = right._failure_prediction_enabled;
+    _flap_detection_enabled = right._flap_detection_enabled;
+    _has_been_checked = right._has_been_checked;
+    _host_name = right._host_name;
+    _is_flapping = right._is_flapping;
+    _last_check = right._last_check;
+    _last_event_id = right._last_event_id;
+    _last_hard_state = right._last_hard_state;
+    _last_hard_state_change = right._last_hard_state_change;
+    _last_notification = right._last_notification;
+    _last_problem_id = right._last_problem_id;
+    _last_state = right._last_state;
+    _last_state_change = right._last_state_change;
+    _last_time_down = right._last_time_down;
+    _last_time_unreachable = right._last_time_unreachable;
+    _last_time_up = right._last_time_up;
+    _long_plugin_output = right._long_plugin_output;
+    _max_attempts = right._max_attempts;
+    _modified_attributes = right._modified_attributes;
+    _next_check = right._next_check;
+    _normal_check_interval = right._normal_check_interval;
+    _notification_period = right._notification_period;
+    _notifications_enabled = right._notifications_enabled;
+    _notified_on_down = right._notified_on_down;
+    _notified_on_unreachable = right._notified_on_unreachable;
+    _obsess_over_host = right._obsess_over_host;
+    _passive_checks_enabled = right._passive_checks_enabled;
+    _percent_state_change = right._percent_state_change;
+    _performance_data = right._performance_data;
+    _plugin_output = right._plugin_output;
+    _problem_has_been_acknowledged = right._problem_has_been_acknowledged;
+    _process_performance_data = right._process_performance_data;
+    _retry_check_interval = right._retry_check_interval;
+    _state_history = right._state_history;
+    _state_type = right._state_type;
+    _was_flapping = right._was_flapping;
+  }
+  return (*this);
+}
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool host::operator==(host const& right) const throw () {
+  return (object::operator==(right)
+          && _acknowledgement_type == right._acknowledgement_type
+          && _active_checks_enabled == right._active_checks_enabled
+          && _check_command == right._check_command
+          && _check_execution_time == right._check_execution_time
+          && _check_flapping_recovery_notification == right._check_flapping_recovery_notification
+          && _check_latency == right._check_latency
+          && _check_options == right._check_options
+          && _check_period == right._check_period
+          && _check_type == right._check_type
+          && _current_attempt == right._current_attempt
+          && _current_event_id == right._current_event_id
+          && _current_notification_id == right._current_notification_id
+          && _current_notification_number == right._current_notification_number
+          && _current_problem_id == right._current_problem_id
+          && _current_state == right._current_state
+          && _event_handler == right._event_handler
+          && _event_handler_enabled == right._event_handler_enabled
+          && _failure_prediction_enabled == right._failure_prediction_enabled
+          && _flap_detection_enabled == right._flap_detection_enabled
+          && _has_been_checked == right._has_been_checked
+          && _host_name == right._host_name
+          && _is_flapping == right._is_flapping
+          && _last_check == right._last_check
+          && _last_event_id == right._last_event_id
+          && _last_hard_state == right._last_hard_state
+          && _last_hard_state_change == right._last_hard_state_change
+          && _last_notification == right._last_notification
+          && _last_problem_id == right._last_problem_id
+          && _last_state == right._last_state
+          && _last_state_change == right._last_state_change
+          && _last_time_down == right._last_time_down
+          && _last_time_unreachable == right._last_time_unreachable
+          && _last_time_up == right._last_time_up
+          && _long_plugin_output == right._long_plugin_output
+          && _max_attempts == right._max_attempts
+          && _modified_attributes == right._modified_attributes
+          && _next_check == right._next_check
+          && _normal_check_interval == right._normal_check_interval
+          && _notification_period == right._notification_period
+          && _notifications_enabled == right._notifications_enabled
+          && _notified_on_down == right._notified_on_down
+          && _notified_on_unreachable == right._notified_on_unreachable
+          && _obsess_over_host == right._obsess_over_host
+          && _passive_checks_enabled == right._passive_checks_enabled
+          && _percent_state_change == right._percent_state_change
+          && _performance_data == right._performance_data
+          && _plugin_output == right._plugin_output
+          && _problem_has_been_acknowledged == right._problem_has_been_acknowledged
+          && _process_performance_data == right._process_performance_data
+          && _retry_check_interval == right._retry_check_interval
+          && _state_history == right._state_history
+          && _state_type == right._state_type
+          && _was_flapping == right._was_flapping);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool host::operator!=(host const& right) const throw () {
+  return (!operator==(right));
 }
 
 /**
@@ -62,353 +262,1031 @@ void retention::host::scheduling_info_is_ok(bool value) {
  *
  *  @return True on success, otherwise false.
  */
-bool retention::host::set(
+bool host::set(
        std::string const& key,
        std::string const& value) {
-  if (!_obj && value == "host_name") {
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
-      it(state::instance().hosts().find(value));
-    if (it != state::instance().hosts().end())
-      _obj = it->second.get();
+    for (unsigned int i(0);
+       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       ++i)
+    if (gl_setters[i].name == key)
+      return ((gl_setters[i].func)(*this, value));
+  if (!key.empty() && key[0] == '_' && value.size() > 3) {
+    char const* cvname(key.c_str() + 1);
+    char const* cvvalue(value.c_str() + 2);
+    // XXX: todo.
     return (true);
   }
-  else if (!_obj)
-    return (false);
-  if (_modified_attributes(key, value))
-    return (true);
-  if (_retain_status_information(key, value))
-    return (true);
-  return (_retain_nonstatus_information(key, value));
+  return (false);
 }
 
 /**
- *  Finish all host update.
+ *  Get acknowledgement_type.
+ *
+ *  @return The acknowledgement_type.
  */
-void retention::host::_finished() throw () {
-  if (!_obj)
-    return;
-
-  bool allow_flapstart_notification(true);
-
-  // adjust modified attributes if necessary.
-  if (!_obj->retain_nonstatus_information)
-    _obj->modified_attributes = MODATTR_NONE;
-
-  // adjust modified attributes if no custom variables
-  // have been changed.
-  if (_obj->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-    for (customvariablesmember* member(_obj->custom_variables);
-         member;
-         member = member->next)
-      if (member->has_been_modified) {
-        _obj->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
-        break;
-      }
-  }
-
-  // calculate next possible notification time.
-  if (_obj->current_state != HOST_UP && _obj->last_host_notification)
-    _obj->next_host_notification
-      = get_next_host_notification_time(
-          _obj,
-          _obj->last_host_notification);
-
-  // ADDED 01/23/2009 adjust current check attempts if host in hard
-  // problem state (max attempts may have changed in config
-  // since restart).
-  if (_obj->current_state != HOST_UP && _obj->state_type == HARD_STATE)
-    _obj->current_attempt = _obj->max_attempts;
-
-  // ADDED 02/20/08 assume same flapping state if large install
-  // tweaks enabled.
-  if (config->use_large_installation_tweaks())
-    _obj->is_flapping =_was_flapping;
-  // else use normal startup flap detection logic.
-  else {
-    // host was flapping before program started.
-    // 11/10/07 don't allow flapping notifications to go out.
-    allow_flapstart_notification = (_was_flapping ? false : true);
-
-    // check for flapping.
-    check_for_host_flapping(
-      _obj,
-      false,
-      false,
-      allow_flapstart_notification);
-
-    // host was flapping before and isn't now, so clear recovery
-    // check variable if host isn't flapping now.
-    if (_was_flapping && !_obj->is_flapping)
-      _obj->check_flapping_recovery_notification = false;
-  }
-
-  // handle new vars added in 2.x.
-  if (!_obj->last_hard_state_change)
-    _obj->last_hard_state_change = _obj->last_state_change;
-
-  // update host status.
-  update_host_status(_obj, false);
+opt<int> const& host::acknowledgement_type() const throw () {
+  return (_acknowledgement_type);
 }
 
 /**
- *  Set new value on specific modified attrivute property.
+ *  Get active_checks_enabled.
  *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
+ *  @return The active_checks_enabled.
  */
-bool retention::host::_modified_attributes(
-       std::string const& key,
-       std::string const& value) {
-  if (key == "modified_attributes") {
-    string::to(value, _obj->modified_attributes);
-    // mask out attributes we don't want to retain.
-    _obj->modified_attributes
-      &= ~config->retained_host_attribute_mask();
-  }
-  else
-    return (false);
+opt<bool> const& host::active_checks_enabled() const throw () {
+  return (_active_checks_enabled);
+}
+
+/**
+ *  Get check_command.
+ *
+ *  @return The check_command.
+ */
+opt<std::string> const& host::check_command() const throw () {
+  return (_check_command);
+}
+
+/**
+ *  Get check_execution_time.
+ *
+ *  @return The check_execution_time.
+ */
+opt<double> const& host::check_execution_time() const throw () {
+  return (_check_execution_time);
+}
+
+/**
+ *  Get check_flapping_recovery_notification.
+ *
+ *  @return The check_flapping_recovery_notification.
+ */
+opt<int> const& host::check_flapping_recovery_notification() const throw () {
+  return (_check_flapping_recovery_notification);
+}
+
+/**
+ *  Get check_latency.
+ *
+ *  @return The check_latency.
+ */
+opt<double> const& host::check_latency() const throw () {
+  return (_check_latency);
+}
+
+/**
+ *  Get check_options.
+ *
+ *  @return The check_options.
+ */
+opt<int> const& host::check_options() const throw () {
+  return (_check_options);
+}
+
+/**
+ *  Get check_period.
+ *
+ *  @return The check_period.
+ */
+opt<std::string> const& host::check_period() const throw () {
+  return (_check_period);
+}
+
+/**
+ *  Get check_type.
+ *
+ *  @return The check_type.
+ */
+opt<int> const& host::check_type() const throw () {
+  return (_check_type);
+}
+
+/**
+ *  Get current_attempt.
+ *
+ *  @return The current_attempt.
+ */
+opt<int> const& host::current_attempt() const throw () {
+  return (_current_attempt);
+}
+
+/**
+ *  Get current_event_id.
+ *
+ *  @return The current_event_id.
+ */
+opt<unsigned long> const& host::current_event_id() const throw () {
+  return (_current_event_id);
+}
+
+/**
+ *  Get current_notification_id.
+ *
+ *  @return The current_notification_id.
+ */
+opt<unsigned long> const& host::current_notification_id() const throw () {
+  return (_current_notification_id);
+}
+
+/**
+ *  Get current_notification_number.
+ *
+ *  @return The current_notification_number.
+ */
+opt<int> const& host::current_notification_number() const throw () {
+  return (_current_notification_number);
+}
+
+/**
+ *  Get current_problem_id.
+ *
+ *  @return The current_problem_id.
+ */
+opt<unsigned long> const& host::current_problem_id() const throw () {
+  return (_current_problem_id);
+}
+
+/**
+ *  Get current_state.
+ *
+ *  @return The current_state.
+ */
+opt<int> const& host::current_state() const throw () {
+  return (_current_state);
+}
+
+/**
+ *  Get event_handler.
+ *
+ *  @return The event_handler.
+ */
+opt<std::string> const& host::event_handler() const throw () {
+  return (_event_handler);
+}
+
+/**
+ *  Get event_handler_enabled.
+ *
+ *  @return The event_handler_enabled.
+ */
+opt<bool> const& host::event_handler_enabled() const throw () {
+  return (_event_handler_enabled);
+}
+
+/**
+ *  Get failure_prediction_enabled.
+ *
+ *  @return The failure_prediction_enabled.
+ */
+opt<bool> const& host::failure_prediction_enabled() const throw () {
+  return (_failure_prediction_enabled);
+}
+
+/**
+ *  Get flap_detection_enabled.
+ *
+ *  @return The flap_detection_enabled.
+ */
+opt<bool> const& host::flap_detection_enabled() const throw () {
+  return (_flap_detection_enabled);
+}
+
+/**
+ *  Get has_been_checked.
+ *
+ *  @return The has_been_checked.
+ */
+opt<bool> const& host::has_been_checked() const throw () {
+  return (_has_been_checked);
+}
+
+/**
+ *  Get host_name.
+ *
+ *  @return The host_name.
+ */
+std::string const& host::host_name() const throw () {
+  return (_host_name);
+}
+
+/**
+ *  Get is_flapping.
+ *
+ *  @return The is_flapping.
+ */
+opt<bool> const& host::is_flapping() const throw () {
+  return (_is_flapping);
+}
+
+/**
+ *  Get last_check.
+ *
+ *  @return The last_check.
+ */
+opt<time_t> const& host::last_check() const throw () {
+  return (_last_check);
+}
+
+/**
+ *  Get last_event_id.
+ *
+ *  @return The last_event_id.
+ */
+opt<unsigned long> const& host::last_event_id() const throw () {
+  return (_last_event_id);
+}
+
+/**
+ *  Get last_hard_state.
+ *
+ *  @return The last_hard_state.
+ */
+opt<time_t> const& host::last_hard_state() const throw () {
+  return (_last_hard_state);
+}
+
+/**
+ *  Get last_hard_state_change.
+ *
+ *  @return The last_hard_state_change.
+ */
+opt<time_t> const& host::last_hard_state_change() const throw () {
+  return (_last_hard_state_change);
+}
+
+/**
+ *  Get last_notification.
+ *
+ *  @return The last_notification.
+ */
+opt<time_t> const& host::last_notification() const throw () {
+  return (_last_notification);
+}
+
+/**
+ *  Get last_problem_id.
+ *
+ *  @return The last_problem_id.
+ */
+opt<unsigned long> const& host::last_problem_id() const throw () {
+  return (_last_problem_id);
+}
+
+/**
+ *  Get last_state.
+ *
+ *  @return The last_state.
+ */
+opt<time_t> const& host::last_state() const throw () {
+  return (_last_state);
+}
+
+/**
+ *  Get last_state_change.
+ *
+ *  @return The last_state_change.
+ */
+opt<time_t> const& host::last_state_change() const throw () {
+  return (_last_state_change);
+}
+
+/**
+ *  Get last_time_down.
+ *
+ *  @return The last_time_down.
+ */
+opt<time_t> const& host::last_time_down() const throw () {
+  return (_last_time_down);
+}
+
+/**
+ *  Get last_time_unreachable.
+ *
+ *  @return The last_time_unreachable.
+ */
+opt<time_t> const& host::last_time_unreachable() const throw () {
+  return (_last_time_unreachable);
+}
+
+/**
+ *  Get last_time_up.
+ *
+ *  @return The last_time_up.
+ */
+opt<time_t> const& host::last_time_up() const throw () {
+  return (_last_time_up);
+}
+
+/**
+ *  Get long_plugin_output.
+ *
+ *  @return The long_plugin_output.
+ */
+opt<std::string> const& host::long_plugin_output() const throw () {
+  return (_long_plugin_output);
+}
+
+/**
+ *  Get max_attempts.
+ *
+ *  @return The max_attempts.
+ */
+opt<unsigned int> const& host::max_attempts() const throw () {
+  return (_max_attempts);
+}
+
+/**
+ *  Get modified_attributes.
+ *
+ *  @return The modified_attributes.
+ */
+opt<unsigned long> const& host::modified_attributes() const throw () {
+  return (_modified_attributes);
+}
+
+/**
+ *  Get next_check.
+ *
+ *  @return The next_check.
+ */
+opt<time_t> const& host::next_check() const throw () {
+  return (_next_check);
+}
+
+/**
+ *  Get normal_check_interval.
+ *
+ *  @return The normal_check_interval.
+ */
+opt<unsigned int> const& host::normal_check_interval() const throw () {
+  return (_normal_check_interval);
+}
+
+/**
+ *  Get notification_period.
+ *
+ *  @return The notification_period.
+ */
+opt<std::string> const& host::notification_period() const throw () {
+  return (_notification_period);
+}
+
+/**
+ *  Get notifications_enabled.
+ *
+ *  @return The notifications_enabled.
+ */
+opt<bool> const& host::notifications_enabled() const throw () {
+  return (_notifications_enabled);
+}
+
+/**
+ *  Get notified_on_down.
+ *
+ *  @return The notified_on_down.
+ */
+opt<bool> const& host::notified_on_down() const throw () {
+  return (_notified_on_down);
+}
+
+/**
+ *  Get notified_on_unreachable.
+ *
+ *  @return The notified_on_unreachable.
+ */
+opt<bool> const& host::notified_on_unreachable() const throw () {
+  return (_notified_on_unreachable);
+}
+
+/**
+ *  Get obsess_over_host.
+ *
+ *  @return The obsess_over_host.
+ */
+opt<int> const& host::obsess_over_host() const throw () {
+  return (_obsess_over_host);
+}
+
+/**
+ *  Get passive_checks_enabled.
+ *
+ *  @return The passive_checks_enabled.
+ */
+opt<bool> const& host::passive_checks_enabled() const throw () {
+  return (_passive_checks_enabled);
+}
+
+/**
+ *  Get percent_state_change.
+ *
+ *  @return The percent_state_change.
+ */
+opt<double> const& host::percent_state_change() const throw () {
+  return (_percent_state_change);
+}
+
+/**
+ *  Get performance_data.
+ *
+ *  @return The performance_data.
+ */
+opt<std::string> const& host::performance_data() const throw () {
+  return (_performance_data);
+}
+
+/**
+ *  Get plugin_output.
+ *
+ *  @return The plugin_output.
+ */
+opt<std::string> const& host::plugin_output() const throw () {
+  return (_plugin_output);
+}
+
+/**
+ *  Get problem_has_been_acknowledged.
+ *
+ *  @return The problem_has_been_acknowledged.
+ */
+opt<bool> const& host::problem_has_been_acknowledged() const throw () {
+  return (_problem_has_been_acknowledged);
+}
+
+/**
+ *  Get process_performance_data.
+ *
+ *  @return The process_performance_data.
+ */
+opt<int> const& host::process_performance_data() const throw () {
+  return (_process_performance_data);
+}
+
+/**
+ *  Get retry_check_interval.
+ *
+ *  @return The retry_check_interval.
+ */
+opt<unsigned int> const& host::retry_check_interval() const throw () {
+  return (_retry_check_interval);
+}
+
+/**
+ *  Get state_history.
+ *
+ *  @return The state_history.
+ */
+opt<std::vector<int> > const& host::state_history() const throw () {
+  return (_state_history);
+}
+
+/**
+ *  Get state_type.
+ *
+ *  @return The state_type.
+ */
+opt<int> const& host::state_type() const throw () {
+  return (_state_type);
+}
+
+/**
+ *  Set acknowledgement_type.
+ *
+ *  @param[in] value The new acknowledgement_type.
+ */
+bool host::_set_acknowledgement_type(int value) {
+  _acknowledgement_type = value;
   return (true);
 }
 
 /**
- *  Set new value on specific retain nonstatus information property.
+ *  Set active_checks_enabled.
  *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
+ *  @param[in] value The new active_checks_enabled.
  */
-bool retention::host::_retain_nonstatus_information(
-       std::string const& key,
-       std::string const& value) {
-  if (!_obj->retain_nonstatus_information)
-    return (false);
-
-  if (key == "problem_has_been_acknowledged")
-    string::to<bool, int>(value, _obj->problem_has_been_acknowledged);
-  else if (key == "acknowledgement_type")
-    string::to(value, _obj->acknowledgement_type);
-  else if (key == "notifications_enabled") {
-    if (_obj->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-      string::to<bool, int>(value, _obj->notifications_enabled);
-  }
-  else if (key == "active_checks_enabled") {
-    if (_obj->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-      string::to<bool, int>(value, _obj->checks_enabled);
-  }
-  else if (key == "passive_checks_enabled") {
-    if (_obj->modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-      string::to<bool, int>(value, _obj->accept_passive_host_checks);
-  }
-  else if (key == "event_handler_enabled") {
-    if (_obj->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-      string::to<bool, int>(value, _obj->event_handler_enabled);
-  }
-  else if (key == "flap_detection_enabled") {
-    if (_obj->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-      string::to<bool, int>(value, _obj->flap_detection_enabled);
-  }
-  else if (key == "failure_prediction_enabled") {
-    if (_obj->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-      string::to<bool, int>(value, _obj->failure_prediction_enabled);
-  }
-  else if (key == "process_performance_data") {
-    if (_obj->modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
-      string::to<bool, int>(value, _obj->process_performance_data);
-  }
-  else if (key == "obsess_over_host") {
-    if (_obj->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-      string::to<bool, int>(value, _obj->obsess_over_host);
-  }
-  else if (key == "check_command") {
-    if (_obj->modified_attributes & MODATTR_CHECK_COMMAND) {
-      std::size_t pos(value.find('!'));
-      if (pos != std::string::npos) {
-        std::string command(value.substr(pos + 1));
-        if (!find_command(command.c_str()))
-          _obj->modified_attributes -= MODATTR_CHECK_COMMAND;
-        else
-          string::setstr(_obj->host_check_command, value);
-      }
-    }
-  }
-  else if (key == "check_period") {
-    if (_obj->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
-      if (!find_timeperiod(value.c_str()))
-        _obj->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-      else
-        string::setstr(_obj->check_period, value);
-    }
-  }
-  else if (key == "notification_period") {
-    if (_obj->modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-      if (!find_timeperiod(value.c_str()))
-        _obj->modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      else
-        string::setstr(_obj->notification_period, value);
-    }
-  }
-  else if (key == "event_handler") {
-    if (_obj->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-      std::size_t pos(value.find('!'));
-      if (pos != std::string::npos) {
-        std::string command(value.substr(pos + 1));
-        if (!find_command(command.c_str()))
-          _obj->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
-        else
-          string::setstr(_obj->event_handler, value);
-      }
-    }
-  }
-  else if (key == "normal_check_interval") {
-    if (_obj->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL) {
-      double val;
-      if (string::to(value, val) && val >= 0)
-        _obj->check_interval = val;
-    }
-  }
-  else if (key == "retry_check_interval") {
-    if (_obj->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL) {
-      double val;
-      if (string::to(value, val) && val >= 0)
-        _obj->retry_interval = val;
-    }
-  }
-  else if (key == "max_attempts") {
-    if (_obj->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS) {
-      int val;
-      if (string::to(value, val) && val > 0) {
-        _obj->max_attempts = val;
-
-        // adjust current attempt number if in a hard state.
-        if (_obj->state_type == HARD_STATE
-            && _obj->current_state != HOST_UP
-            && _obj->current_attempt > 1)
-          _obj->current_attempt = _obj->max_attempts;
-      }
-    }
-  }
-  else if (!key.empty() && key[0] == '_') {
-    if (_obj->modified_attributes & MODATTR_CUSTOM_VARIABLE
-        && value.size() > 3) {
-      char const* cvname(key.c_str() + 1);
-      char const* cvvalue(value.c_str() + 2);
-
-      for (customvariablesmember* member = _obj->custom_variables;
-           member;
-           member = member->next) {
-        if (!strcmp(cvname, member->variable_name)) {
-          if (strcmp(cvvalue, member->variable_value)) {
-            string::setstr(member->variable_value, cvvalue);
-            member->has_been_modified = true;
-          }
-          break;
-        }
-      }
-    }
-  }
-  else
-    return (false);
+bool host::_set_active_checks_enabled(bool value) {
+  _active_checks_enabled = value;
   return (true);
 }
 
 /**
- *  Set new value on specific retain nonstatus information property.
+ *  Set check_command.
  *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
+ *  @param[in] value The new check_command.
  */
-bool retention::host::_retain_status_information(
-       std::string const& key,
-       std::string const& value) {
-  if (!_obj->retain_status_information)
-    return (false);
+bool host::_set_check_command(std::string const& value) {
+  _check_command = value;
+  return (true);
+}
 
-  if (key == "has_been_checked")
-    string::to<bool, int>(value, _obj->has_been_checked);
-  else if (key == "check_execution_time")
-    string::to(value, _obj->execution_time);
-  else if (key == "check_latency")
-    string::to(value, _obj->latency);
-  else if (key == "check_type")
-    string::to(value, _obj->check_type);
-  else if (key == "current_state")
-    string::to(value, _obj->current_state);
-  else if (key == "last_state")
-    string::to(value, _obj->last_state);
-  else if (key == "last_hard_state")
-    string::to(value, _obj->last_hard_state);
-  else if (key == "plugin_output")
-    string::setstr(_obj->plugin_output, value);
-  else if (key == "long_plugin_output")
-    string::setstr(_obj->long_plugin_output, value);
-  else if (key == "performance_data")
-    string::setstr(_obj->perf_data, value);
-  else if (key == "last_check")
-    string::to(value, _obj->last_check);
-  else if (key == "next_check") {
-    if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
-      string::to(value, _obj->next_check);
+/**
+ *  Set check_execution_time.
+ *
+ *  @param[in] value The new check_execution_time.
+ */
+bool host::_set_check_execution_time(double value) {
+  _check_execution_time = value;
+  return (true);
+}
+
+/**
+ *  Set check_flapping_recovery_notification.
+ *
+ *  @param[in] value The new check_flapping_recovery_notification.
+ */
+bool host::_set_check_flapping_recovery_notification(int value) {
+  _check_flapping_recovery_notification = value;
+  return (true);
+}
+
+/**
+ *  Set check_latency.
+ *
+ *  @param[in] value The new check_latency.
+ */
+bool host::_set_check_latency(double value) {
+  _check_latency = value;
+  return (true);
+}
+
+/**
+ *  Set check_options.
+ *
+ *  @param[in] value The new check_options.
+ */
+bool host::_set_check_options(int value) {
+  _check_options = value;
+  return (true);
+}
+
+/**
+ *  Set check_period.
+ *
+ *  @param[in] value The new check_period.
+ */
+bool host::_set_check_period(std::string const& value) {
+  _check_period = value;
+  return (true);
+}
+
+/**
+ *  Set check_type.
+ *
+ *  @param[in] value The new check_type.
+ */
+bool host::_set_check_type(int value) {
+  _check_type = value;
+  return (true);
+}
+
+/**
+ *  Set current_attempt.
+ *
+ *  @param[in] value The new current_attempt.
+ */
+bool host::_set_current_attempt(int value) {
+  _current_attempt = value;
+  return (true);
+}
+
+/**
+ *  Set current_event_id.
+ *
+ *  @param[in] value The new current_event_id.
+ */
+bool host::_set_current_event_id(unsigned long value) {
+  _current_event_id = value;
+  return (true);
+}
+
+/**
+ *  Set current_notification_id.
+ *
+ *  @param[in] value The new current_notification_id.
+ */
+bool host::_set_current_notification_id(unsigned long value) {
+  _current_notification_id = value;
+  return (true);
+}
+
+/**
+ *  Set current_notification_number.
+ *
+ *  @param[in] value The new current_notification_number.
+ */
+bool host::_set_current_notification_number(int value) {
+  _current_notification_number = value;
+  return (true);
+}
+
+/**
+ *  Set current_problem_id.
+ *
+ *  @param[in] value The new current_problem_id.
+ */
+bool host::_set_current_problem_id(unsigned long value) {
+  _current_problem_id = value;
+  return (true);
+}
+
+/**
+ *  Set current_state.
+ *
+ *  @param[in] value The new current_state.
+ */
+bool host::_set_current_state(int value) {
+  _current_state = value;
+  return (true);
+}
+
+/**
+ *  Set event_handler.
+ *
+ *  @param[in] value The new event_handler.
+ */
+bool host::_set_event_handler(std::string const& value) {
+  _event_handler = value;
+  return (true);
+}
+
+/**
+ *  Set event_handler_enabled.
+ *
+ *  @param[in] value The new event_handler_enabled.
+ */
+bool host::_set_event_handler_enabled(bool value) {
+  _event_handler_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set failure_prediction_enabled.
+ *
+ *  @param[in] value The new failure_prediction_enabled.
+ */
+bool host::_set_failure_prediction_enabled(bool value) {
+  _failure_prediction_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set flap_detection_enabled.
+ *
+ *  @param[in] value The new flap_detection_enabled.
+ */
+bool host::_set_flap_detection_enabled(bool value) {
+  _flap_detection_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set has_been_checked.
+ *
+ *  @param[in] value The new has_been_checked.
+ */
+bool host::_set_has_been_checked(bool value) {
+  _has_been_checked = value;
+  return (true);
+}
+
+/**
+ *  Set host_name.
+ *
+ *  @param[in] value The new host_name.
+ */
+bool host::_set_host_name(std::string const& value) {
+  _host_name = value;
+  return (true);
+}
+
+/**
+ *  Set is_flapping.
+ *
+ *  @param[in] value The new is_flapping.
+ */
+bool host::_set_is_flapping(bool value) {
+  _is_flapping = value;
+  return (true);
+}
+
+/**
+ *  Set last_check.
+ *
+ *  @param[in] value The new last_check.
+ */
+bool host::_set_last_check(time_t value) {
+  _last_check = value;
+  return (true);
+}
+
+/**
+ *  Set last_event_id.
+ *
+ *  @param[in] value The new last_event_id.
+ */
+bool host::_set_last_event_id(unsigned long value) {
+  _last_event_id = value;
+  return (true);
+}
+
+/**
+ *  Set last_hard_state.
+ *
+ *  @param[in] value The new last_hard_state.
+ */
+bool host::_set_last_hard_state(time_t value) {
+  _last_hard_state = value;
+  return (true);
+}
+
+/**
+ *  Set last_hard_state_change.
+ *
+ *  @param[in] value The new last_hard_state_change.
+ */
+bool host::_set_last_hard_state_change(time_t value) {
+  _last_hard_state_change = value;
+  return (true);
+}
+
+/**
+ *  Set last_notification.
+ *
+ *  @param[in] value The new last_notification.
+ */
+bool host::_set_last_notification(time_t value) {
+  _last_notification = value;
+  return (true);
+}
+
+/**
+ *  Set last_problem_id.
+ *
+ *  @param[in] value The new last_problem_id.
+ */
+bool host::_set_last_problem_id(unsigned long value) {
+  _last_problem_id = value;
+  return (true);
+}
+
+/**
+ *  Set last_state.
+ *
+ *  @param[in] value The new last_state.
+ */
+bool host::_set_last_state(time_t value) {
+  _last_state = value;
+  return (true);
+}
+
+/**
+ *  Set last_state_change.
+ *
+ *  @param[in] value The new last_state_change.
+ */
+bool host::_set_last_state_change(time_t value) {
+  _last_state_change = value;
+  return (true);
+}
+
+/**
+ *  Set last_time_down.
+ *
+ *  @param[in] value The new last_time_down.
+ */
+bool host::_set_last_time_down(time_t value) {
+  _last_time_down = value;
+  return (true);
+}
+
+/**
+ *  Set last_time_unreachable.
+ *
+ *  @param[in] value The new last_time_unreachable.
+ */
+bool host::_set_last_time_unreachable(time_t value) {
+  _last_time_unreachable = value;
+  return (true);
+}
+
+/**
+ *  Set last_time_up.
+ *
+ *  @param[in] value The new last_time_up.
+ */
+bool host::_set_last_time_up(time_t value) {
+  _last_time_up = value;
+  return (true);
+}
+
+/**
+ *  Set long_plugin_output.
+ *
+ *  @param[in] value The new long_plugin_output.
+ */
+bool host::_set_long_plugin_output(std::string const& value) {
+  _long_plugin_output = value;
+  return (true);
+}
+
+/**
+ *  Set max_attempts.
+ *
+ *  @param[in] value The new max_attempts.
+ */
+bool host::_set_max_attempts(unsigned int value) {
+  if (value) {
+    _max_attempts = value;
+    return (true);
   }
-  else if (key == "check_options") {
-    if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
-      string::to(value, _obj->check_options);
+  return (false);
+}
+
+/**
+ *  Set modified_attributes.
+ *
+ *  @param[in] value The new modified_attributes.
+ */
+bool host::_set_modified_attributes(unsigned long value) {
+  _modified_attributes = value;
+  return (true);
+}
+
+/**
+ *  Set next_check.
+ *
+ *  @param[in] value The new next_check.
+ */
+bool host::_set_next_check(time_t value) {
+  _next_check = value;
+  return (true);
+}
+
+/**
+ *  Set normal_check_interval.
+ *
+ *  @param[in] value The new normal_check_interval.
+ */
+bool host::_set_normal_check_interval(unsigned int value) {
+  if (value) {
+    _normal_check_interval = value;
+    return (true);
   }
-  else if (key == "current_attempt")
-    string::to<bool, int>(value, _obj->current_attempt);
-  else if (key == "current_event_id")
-    string::to(value, _obj->current_event_id);
-  else if (key == "last_event_id")
-    string::to(value, _obj->last_event_id);
-  else if (key == "current_problem_id")
-    string::to(value, _obj->current_problem_id);
-  else if (key == "last_problem_id")
-    string::to(value, _obj->last_problem_id);
-  else if (key == "state_type")
-    string::to(value, _obj->state_type);
-  else if (key == "last_state_change")
-    string::to(value, _obj->last_state_change);
-  else if (key == "last_hard_state_change")
-    string::to(value, _obj->last_hard_state_change);
-  else if (key == "last_time_up")
-    string::to(value, _obj->last_time_up);
-  else if (key == "last_time_down")
-    string::to(value, _obj->last_time_down);
-  else if (key == "last_time_unreachable")
-    string::to(value, _obj->last_time_unreachable);
-  else if (key == "notified_on_down")
-    string::to(value, _obj->notified_on_down);
-  else if (key == "notified_on_unreachable")
-    string::to<bool, int>(value, _obj->notified_on_unreachable);
-  else if (key == "last_notification")
-    string::to(value, _obj->last_host_notification);
-  else if (key == "current_notification_number")
-    string::to(value, _obj->current_notification_number);
-  else if (key == "current_notification_id")
-    string::to(value, _obj->current_notification_id);
-  else if (key == "is_flapping")
-    string::to(value, _was_flapping);
-  else if (key == "percent_state_change")
-    string::to(value, _obj->percent_state_change);
-  else if (key == "check_flapping_recovery_notification")
-    string::to(value, _obj->check_flapping_recovery_notification);
-  else if (key == "state_history") {
-    unsigned int x(0);
-    std::list<std::string> lst_history;
-    string::split(value, lst_history, ',');
-    for (std::list<std::string>::const_iterator
-           it(lst_history.begin()), end(lst_history.end());
-         it != end && x < MAX_STATE_HISTORY_ENTRIES;
-         ++it) {
-      string::to(*it, _obj->state_history[x++]);
+  return (false);
+}
+
+/**
+ *  Set notification_period.
+ *
+ *  @param[in] value The new notification_period.
+ */
+bool host::_set_notification_period(std::string const& value) {
+  _notification_period = value;
+  return (true);
+}
+
+/**
+ *  Set notifications_enabled.
+ *
+ *  @param[in] value The new notifications_enabled.
+ */
+bool host::_set_notifications_enabled(bool value) {
+  _notifications_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set notified_on_down.
+ *
+ *  @param[in] value The new notified_on_down.
+ */
+bool host::_set_notified_on_down(bool value) {
+  _notified_on_down = value;
+  return (true);
+}
+
+/**
+ *  Set notified_on_unreachable.
+ *
+ *  @param[in] value The new notified_on_unreachable.
+ */
+bool host::_set_notified_on_unreachable(bool value) {
+  _notified_on_unreachable = value;
+  return (true);
+}
+
+/**
+ *  Set obsess_over_host.
+ *
+ *  @param[in] value The new obsess_over_host.
+ */
+bool host::_set_obsess_over_host(int value) {
+  _obsess_over_host = value;
+  return (true);
+}
+
+/**
+ *  Set passive_checks_enabled.
+ *
+ *  @param[in] value The new passive_checks_enabled.
+ */
+bool host::_set_passive_checks_enabled(bool value) {
+  _passive_checks_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set percent_state_change.
+ *
+ *  @param[in] value The new percent_state_change.
+ */
+bool host::_set_percent_state_change(double value) {
+  _percent_state_change = value;
+  return (true);
+}
+
+/**
+ *  Set performance_data.
+ *
+ *  @param[in] value The new performance_data.
+ */
+bool host::_set_performance_data(std::string const& value) {
+  _performance_data = value;
+  return (true);
+}
+
+/**
+ *  Set plugin_output.
+ *
+ *  @param[in] value The new plugin_output.
+ */
+bool host::_set_plugin_output(std::string const& value) {
+  _plugin_output = value;
+  return (true);
+}
+
+/**
+ *  Set problem_has_been_acknowledged.
+ *
+ *  @param[in] value The new problem_has_been_acknowledged.
+ */
+bool host::_set_problem_has_been_acknowledged(bool value) {
+  _problem_has_been_acknowledged = value;
+  return (true);
+}
+
+/**
+ *  Set process_performance_data.
+ *
+ *  @param[in] value The new process_performance_data.
+ */
+bool host::_set_process_performance_data(int value) {
+  _process_performance_data = value;
+  return (true);
+}
+
+/**
+ *  Set retry_check_interval.
+ *
+ *  @param[in] value The new retry_check_interval.
+ */
+bool host::_set_retry_check_interval(unsigned int value) {
+  if (value) {
+    _retry_check_interval = value;
+    return (true);
+  }
+  return (false);
+}
+
+/**
+ *  Set state_history.
+ *
+ *  @param[in] value The new state_history.
+ */
+bool host::_set_state_history(std::string const& value) {
+  unsigned int x(0);
+  std::list<std::string> lst_history;
+  string::split(value, lst_history, ',');
+  std::vector<int>& state_history(*_state_history);
+  for (std::list<std::string>::const_iterator
+         it(lst_history.begin()), end(lst_history.end());
+       it != end && x < MAX_STATE_HISTORY_ENTRIES;
+       ++it) {
+    int state(0);
+    if (!string::to(*it, state)) {
+      _state_history.reset();
+      return (false);
     }
-    _obj->state_history_index = 0;
+    state_history.push_back(state);
   }
-  else
-    return (false);
+  _state_history.set(state_history);
+  return (true);
+}
+
+/**
+ *  Set state_type.
+ *
+ *  @param[in] value The new state_type.
+ */
+bool host::_set_state_type(int value) {
+  _state_type = value;
   return (true);
 }

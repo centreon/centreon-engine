@@ -20,6 +20,7 @@
 #ifndef CCE_RETENTION_OBJECT_HH
 #  define CCE_RETENTION_OBJECT_HH
 
+#  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -47,12 +48,30 @@ namespace              retention {
     bool               operator!=(object const& right) const throw ();
     static shared_ptr<object>
                        create(std::string const& type_name);
-    virtual void       scheduling_info_is_ok(bool value);
     virtual bool       set(
                          std::string const& key,
                          std::string const& value) = 0;
     type_id            type() const throw ();
     std::string const& type_name() const throw ();
+
+  protected:
+    template<typename T, typename U, bool (T::*ptr)(U)>
+    struct setter {
+      static bool generic(T& obj, std::string const& value) {
+        U val;
+        std::istringstream iss(value);
+        if (!(iss >> val) || !iss.eof())
+          return (false);
+        return ((obj.*ptr)(val));
+      }
+    };
+
+    template<typename T, bool (T::*ptr)(std::string const&)>
+    struct              setter<T, std::string const&, ptr> {
+      static bool       generic(T& obj, std::string const& value) {
+        return ((obj.*ptr)(value));
+      }
+    };
 
   private:
     type_id            _type;

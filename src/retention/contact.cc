@@ -17,31 +17,112 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/retention/contact.hh"
-#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::retention;
+
+#define SETTER(type, method) \
+  &object::setter<contact, type, &contact::method>::generic
+
+static struct {
+  std::string const name;
+  bool (*func)(contact&, std::string const&);
+} gl_setters[] = {
+  { "contact_name",                  SETTER(std::string const&, _set_contact_name) },
+  { "host_notification_period",      SETTER(std::string const&, _set_host_notification_period) },
+  { "host_notifications_enabled",    SETTER(bool, _set_host_notifications_enabled) },
+  { "last_host_notification",        SETTER(time_t, _set_last_host_notification) },
+  { "last_service_notification",     SETTER(time_t, _set_last_service_notification) },
+  { "modified_attributes",           SETTER(unsigned long, _set_modified_attributes) },
+  { "modified_host_attributes",      SETTER(unsigned long, _set_modified_host_attributes) },
+  { "modified_service_attributes",   SETTER(unsigned long, _set_modified_service_attributes) },
+  { "service_notification_period",   SETTER(std::string const&, _set_service_notification_period) },
+  { "service_notifications_enabled", SETTER(bool, _set_service_notifications_enabled) }
+};
 
 /**
  *  Constructor.
- *
- *  @param[in] obj The contact to use for retention.
  */
-retention::contact::contact(contact_struct* obj)
-  : object(object::contact),
-    _obj(obj) {
+contact::contact()
+  : object(object::contact) {
 
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+contact::contact(contact const& right)
+  : object(right) {
+  operator=(right);
 }
 
 /**
  *  Destructor.
  */
-retention::contact::~contact() throw () {
-  _finished();
+contact::~contact() throw () {
+
+}
+
+/**
+ *  Copy operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+contact& contact::operator=(contact const& right) {
+  if (this != &right) {
+    object::operator=(right);
+    _contact_name = right._contact_name;
+    // XXX: _customvariables = right._customvariables;
+    _host_notification_period = right._host_notification_period;
+    _host_notifications_enabled = right._host_notifications_enabled;
+    _last_host_notification = right._last_host_notification;
+    _last_service_notification = right._last_service_notification;
+    _modified_attributes = right._modified_attributes;
+    _modified_host_attributes = right._modified_host_attributes;
+    _modified_service_attributes = right._modified_service_attributes;
+    _service_notification_period = right._service_notification_period;
+    _service_notifications_enabled = right._service_notifications_enabled;
+  }
+  return (*this);
+}
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool contact::operator==(contact const& right) const throw () {
+  return (object::operator==(right)
+          && _contact_name == right._contact_name
+          // XXX: && _customvariables == right._customvariables
+          && _host_notification_period == right._host_notification_period
+          && _host_notifications_enabled == right._host_notifications_enabled
+          && _last_host_notification == right._last_host_notification
+          && _last_service_notification == right._last_service_notification
+          && _modified_attributes == right._modified_attributes
+          && _modified_host_attributes == right._modified_host_attributes
+          && _modified_service_attributes == right._modified_service_attributes
+          && _service_notification_period == right._service_notification_period
+          && _service_notifications_enabled == right._service_notifications_enabled);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool contact::operator!=(contact const& right) const throw () {
+  return (!operator==(right));
 }
 
 /**
@@ -52,166 +133,218 @@ retention::contact::~contact() throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool retention::contact::set(
+bool contact::set(
        std::string const& key,
        std::string const& value) {
-  if (!_obj && key == "contact_name") {
-    umap<std::string, shared_ptr<contact_struct> >::const_iterator
-      it(state::instance().contacts().find(value));
-    if (it != state::instance().contacts().end())
-      _obj = it->second.get();
+  for (unsigned int i(0);
+       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       ++i)
+    if (gl_setters[i].name == key)
+      return ((gl_setters[i].func)(*this, value));
+  if (!key.empty() && key[0] == '_' && value.size() > 3) {
+    char const* cvname(key.c_str() + 1);
+    char const* cvvalue(value.c_str() + 2);
+    // XXX: todo.
     return (true);
   }
-  else if (!_obj)
-    return (false);
-  if (_modified_attributes(key, value))
-    return (true);
-  if (_retain_status_information(key, value))
-    return (true);
-  return (_retain_nonstatus_information(key, value));
+  return (false);
 }
 
 /**
- *  Finish all contact update.
+ * Get contact_name.
+ *
+ * @return The contact_name.
  */
-void retention::contact::_finished() throw () {
-  if (!_obj)
-    return;
+std::string const& contact::contact_name() const throw () {
+ return (_contact_name);
+}
 
-  // adjust modified attributes if necessary.
-  if (!_obj->retain_nonstatus_information)
-    _obj->modified_attributes = MODATTR_NONE;
+// /**
+//  * Get customvariables.
+//  *
+//  * @return The customvariables.
+//  */
+// umap contact::customvariables() const throw () {
+//  return (_customvariables);
+// }
 
-  // adjust modified attributes if no custom variables have been changed.
-  if (_obj->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-    for (customvariablesmember* member(_obj->custom_variables);
-         member;
-         member = member->next)
-      if (member->has_been_modified) {
-        _obj->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
-        break;
-      }
-  }
-
-  // update contact status.
-  update_contact_status(_obj, false);
+/**
+ * Get host_notification_period.
+ *
+ * @return The host_notification_period.
+ */
+opt<std::string> const& contact::host_notification_period() const throw () {
+ return (_host_notification_period);
 }
 
 /**
- *  Set new value on specific modified attrivute property.
+ * Get host_notifications_enabled.
  *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
+ * @return The host_notifications_enabled.
  */
-bool retention::contact::_modified_attributes(
-       std::string const& key,
-       std::string const& value) {
+opt<bool> const& contact::host_notifications_enabled() const throw () {
+ return (_host_notifications_enabled);
+}
 
-  if (key == "modified_attributes") {
-    string::to(value, _obj->modified_attributes);
-    // mask out attributes we don't want to retain.
-    _obj->modified_attributes &= ~0L;
-  }
-  else if (key == "modified_host_attributes") {
-    string::to(value, _obj->modified_host_attributes);
-    // mask out attributes we don't want to retain.
-    _obj->modified_host_attributes
-      &= ~config->retained_contact_host_attribute_mask();
-  }
-  else if (key == "modified_service_attributes") {
-    string::to(value, _obj->modified_service_attributes);
-    // mask out attributes we don't want to retain.
-    _obj->modified_service_attributes
-      &= ~config->retained_contact_service_attribute_mask();
-  }
-  else
-    return (false);
+/**
+ * Get last_host_notification.
+ *
+ * @return The last_host_notification.
+ */
+opt<time_t> const& contact::last_host_notification() const throw () {
+ return (_last_host_notification);
+}
+
+/**
+ * Get last_service_notification.
+ *
+ * @return The last_service_notification.
+ */
+opt<time_t> const& contact::last_service_notification() const throw () {
+ return (_last_service_notification);
+}
+
+/**
+ * Get modified_attributes.
+ *
+ * @return The modified_attributes.
+ */
+opt<unsigned long> const& contact::modified_attributes() const throw () {
+ return (_modified_attributes);
+}
+
+/**
+ * Get modified_host_attributes.
+ *
+ * @return The modified_host_attributes.
+ */
+opt<unsigned long> const& contact::modified_host_attributes() const throw () {
+ return (_modified_host_attributes);
+}
+
+/**
+ * Get modified_service_attributes.
+ *
+ * @return The modified_service_attributes.
+ */
+opt<unsigned long> const& contact::modified_service_attributes() const throw () {
+ return (_modified_service_attributes);
+}
+
+/**
+ * Get service_notification_period.
+ *
+ * @return The service_notification_period.
+ */
+opt<std::string> const& contact::service_notification_period() const throw () {
+ return (_service_notification_period);
+}
+
+/**
+ * Get service_notifications_enabled.
+ *
+ * @return The service_notifications_enabled.
+ */
+opt<bool> const& contact::service_notifications_enabled() const throw () {
+ return (_service_notifications_enabled);
+}
+
+/**
+ *  Set contact_name.
+ *
+ *  @param[in] value The new contact_name.
+ */
+bool contact::_set_contact_name(std::string const& value) {
+  _contact_name = value;
   return (true);
 }
 
 /**
- *  Set new value on specific retain nonstatus information property.
+ *  Set host_notification_period.
  *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
+ *  @param[in] value The new host_notification_period.
  */
-bool retention::contact::_retain_nonstatus_information(
-       std::string const& key,
-       std::string const& value) {
-  if (!_obj->retain_nonstatus_information)
-    return (false);
-
-  if (key == "host_notification_period") {
-    if (_obj->modified_host_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-      if (!find_timeperiod(value.c_str()))
-        _obj->modified_host_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      else
-        string::setstr(_obj->host_notification_period, value);
-    }
-  }
-  else if (key == "service_notification_period") {
-    if (_obj->modified_service_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-      if (!find_timeperiod(value.c_str()))
-        _obj->modified_service_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      else
-        string::setstr(_obj->service_notification_period, value);
-    }
-  }
-  else if (key == "host_notifications_enabled") {
-    if (_obj->modified_host_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-      string::to<bool, int>(value, _obj->host_notifications_enabled);
-  }
-  else if (key == "service_notifications_enabled") {
-    if (_obj->modified_service_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-      string::to<bool, int>(value, _obj->service_notifications_enabled);
-  }
-  else if (!key.empty() && key[0] == '_') {
-    if (_obj->modified_attributes & MODATTR_CUSTOM_VARIABLE
-        && value.size() > 3) {
-      char const* cvname(key.c_str() + 1);
-      char const* cvvalue(value.c_str() + 2);
-
-      for (customvariablesmember* member = _obj->custom_variables;
-           member;
-           member = member->next) {
-        if (!strcmp(cvname, member->variable_name)) {
-          if (strcmp(cvvalue, member->variable_value)) {
-            string::setstr(member->variable_value, cvvalue);
-            member->has_been_modified = true;
-          }
-          break;
-        }
-      }
-    }
-  }
-  else
-    return (false);
+bool contact::_set_host_notification_period(std::string const& value) {
+  _host_notification_period = value;
   return (true);
 }
 
 /**
- *  Set new value on specific retain nonstatus information property.
+ *  Set host_notifications_enabled.
  *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
+ *  @param[in] value The new host_notifications_enabled.
  */
-bool retention::contact::_retain_status_information(
-       std::string const& key,
-       std::string const& value) {
-  if (!_obj->retain_status_information)
-    return (false);
+bool contact::_set_host_notifications_enabled(bool value) {
+  _host_notifications_enabled = value;
+  return (true);
+}
 
-  if (key == "last_host_notification")
-    string::to(value, _obj->last_host_notification);
-  else if (key == "last_service_notification")
-    string::to(value, _obj->last_service_notification);
-  else
-    return (false);
+/**
+ *  Set last_host_notification.
+ *
+ *  @param[in] value The new last_host_notification.
+ */
+bool contact::_set_last_host_notification(time_t value) {
+  _last_host_notification = value;
+  return (true);
+}
+
+/**
+ *  Set last_service_notification.
+ *
+ *  @param[in] value The new last_service_notification.
+ */
+bool contact::_set_last_service_notification(time_t value) {
+  _last_service_notification = value;
+  return (true);
+}
+
+/**
+ *  Set modified_attributes.
+ *
+ *  @param[in] value The new modified_attributes.
+ */
+bool contact::_set_modified_attributes(unsigned long value) {
+  _modified_attributes = value;
+  return (true);
+}
+
+/**
+ *  Set modified_host_attributes.
+ *
+ *  @param[in] value The new modified_host_attributes.
+ */
+bool contact::_set_modified_host_attributes(unsigned long value) {
+  _modified_host_attributes = value;
+  return (true);
+}
+
+/**
+ *  Set modified_service_attributes.
+ *
+ *  @param[in] value The new modified_service_attributes.
+ */
+bool contact::_set_modified_service_attributes(unsigned long value) {
+  _modified_service_attributes = value;
+  return (true);
+}
+
+/**
+ *  Set service_notification_period.
+ *
+ *  @param[in] value The new service_notification_period.
+ */
+bool contact::_set_service_notification_period(std::string const& value) {
+  _service_notification_period = value;
+  return (true);
+}
+
+/**
+ *  Set service_notifications_enabled.
+ *
+ *  @param[in] value The new service_notifications_enabled.
+ */
+bool contact::_set_service_notifications_enabled(bool value) {
+  _service_notifications_enabled = value;
   return (true);
 }

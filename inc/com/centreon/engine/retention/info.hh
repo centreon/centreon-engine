@@ -32,7 +32,6 @@ namespace retention {
   public:
           info();
           ~info() throw ();
-    bool  scheduling_info_is_ok();
     bool  set(
             std::string const& key,
             std::string const& value);

@@ -23,6 +23,29 @@
 
 using namespace com::centreon::engine;
 
+#define SETTER(type, method) \
+  &retention::object::setter< \
+     retention::downtime, \
+     type, \
+     &retention::downtime::method>::generic
+
+static struct {
+  std::string const name;
+  bool (*func)(retention::downtime&, std::string const&);
+} gl_setters[] = {
+  { "author",              SETTER(std::string const&, _set_author) },
+  { "comment",             SETTER(std::string const&, _set_comment_data) },
+  { "downtime_id",         SETTER(unsigned long, _set_downtime_id) },
+  { "duration",            SETTER(unsigned long, _set_duration) },
+  { "end_time",            SETTER(time_t, _set_end_time) },
+  { "entry_time",          SETTER(time_t, _set_entry_time) },
+  { "fixed",               SETTER(bool, _set_fixed) },
+  { "host_name",           SETTER(std::string const&, _set_host_name) },
+  { "service_description", SETTER(std::string const&, _set_service_description) },
+  { "start_time",          SETTER(time_t, _set_start_time) },
+  { "triggered_by",        SETTER(unsigned long, _set_triggered_by) }
+};
+
 /**
  *  Constructor.
  *
@@ -42,10 +65,80 @@ retention::downtime::downtime(type_id downtime_type)
 }
 
 /**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+retention::downtime::downtime(downtime const& right)
+  : object(right) {
+  operator=(right);
+}
+
+/**
  *  Destructor.
  */
 retention::downtime::~downtime() throw () {
-  _finished();
+
+}
+
+/**
+ *  Copy operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+retention::downtime& retention::downtime::operator=(downtime const& right) {
+  if (this != &right) {
+    object::operator=(right);
+    _author = right._author;
+    _comment_data = right._comment_data;
+    _downtime_id = right._downtime_id;
+    _downtime_type = right._downtime_type;
+    _duration = right._duration;
+    _end_time = right._end_time;
+    _entry_time = right._entry_time;
+    _fixed = right._fixed;
+    _host_name = right._host_name;
+    _service_description = right._service_description;
+    _start_time = right._start_time;
+    _triggered_by = right._triggered_by;
+  }
+  return (*this);
+}
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool retention::downtime::operator==(downtime const& right) const throw () {
+  return (object::operator==(right)
+          && _author == right._author
+          && _comment_data == right._comment_data
+          && _downtime_id == right._downtime_id
+          && _downtime_type == right._downtime_type
+          && _duration == right._duration
+          && _end_time == right._end_time
+          && _entry_time == right._entry_time
+          && _fixed == right._fixed
+          && _host_name == right._host_name
+          && _service_description == right._service_description
+          && _start_time == right._start_time
+          && _triggered_by == right._triggered_by);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool retention::downtime::operator!=(downtime const& right) const throw () {
+  return (!operator==(right));
 }
 
 /**
@@ -59,77 +152,228 @@ retention::downtime::~downtime() throw () {
 bool retention::downtime::set(
        std::string const& key,
        std::string const& value) {
-  if (key == "host_name")
-    _host_name = value;
-  else if (key == "service_description")
-    _service_description = value;
-  else if (key == "downtime_id")
-    string::to(value, _downtime_id);
-  else if (key == "entry_time")
-    string::to(value, _entry_time);
-  else if (key == "start_time")
-    string::to(value, _start_time);
-  else if (key == "end_time")
-    string::to(value, _end_time);
-  else if (key == "fixed")
-    string::to(value, _fixed);
-  else if (key == "triggered_by")
-    string::to(value, _triggered_by);
-  else if (key == "duration")
-    string::to(value, _duration);
-  else if (key == "author")
-    _author = value;
-  else if (key == "comment")
-    _comment_data = value;
-  else
-    return (false);
+  for (unsigned int i(0);
+       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       ++i)
+    if (gl_setters[i].name == key)
+      return ((gl_setters[i].func)(*this, value));
+  return (false);
+}
+
+/**
+ * Get author.
+ *
+ * @return The author.
+ */
+std::string retention::downtime::author() const throw () {
+ return (_author);
+}
+
+/**
+ * Get comment_data.
+ *
+ * @return The comment_data.
+ */
+std::string retention::downtime::comment_data() const throw () {
+ return (_comment_data);
+}
+
+/**
+ * Get downtime_id.
+ *
+ * @return The downtime_id.
+ */
+unsigned long retention::downtime::downtime_id() const throw () {
+ return (_downtime_id);
+}
+
+/**
+ * Get downtime_type.
+ *
+ * @return The downtime_type.
+ */
+retention::downtime::type_id retention::downtime::downtime_type() const throw () {
+ return (_downtime_type);
+}
+
+/**
+ * Get duration.
+ *
+ * @return The duration.
+ */
+unsigned long retention::downtime::duration() const throw () {
+ return (_duration);
+}
+
+/**
+ * Get end_time.
+ *
+ * @return The end_time.
+ */
+time_t retention::downtime::end_time() const throw () {
+ return (_end_time);
+}
+
+/**
+ * Get entry_time.
+ *
+ * @return The entry_time.
+ */
+time_t retention::downtime::entry_time() const throw () {
+ return (_entry_time);
+}
+
+/**
+ * Get fixed.
+ *
+ * @return The fixed.
+ */
+bool retention::downtime::fixed() const throw () {
+ return (_fixed);
+}
+
+/**
+ * Get host_name.
+ *
+ * @return The host_name.
+ */
+std::string retention::downtime::host_name() const throw () {
+ return (_host_name);
+}
+
+/**
+ * Get service_description.
+ *
+ * @return The service_description.
+ */
+std::string retention::downtime::service_description() const throw () {
+ return (_service_description);
+}
+
+/**
+ * Get start_time.
+ *
+ * @return The start_time.
+ */
+time_t retention::downtime::start_time() const throw () {
+ return (_start_time);
+}
+
+/**
+ * Get triggered_by.
+ *
+ * @return The triggered_by.
+ */
+unsigned long retention::downtime::triggered_by() const throw () {
+ return (_triggered_by);
+}
+
+/**
+ *  Set author.
+ *
+ *  @param[in] value The new author.
+ */
+bool retention::downtime::_set_author(std::string const& value) {
+  _author = value;
   return (true);
 }
 
 /**
- *  Add host downtime.
+ *  Set comment_data.
+ *
+ *  @param[in] value The new comment_data.
  */
-void retention::downtime::_add_host_downtime() throw () {
-  add_host_downtime(
-    _host_name.c_str(),
-    _entry_time,
-    _author.c_str(),
-    _comment_data.c_str(),
-    _start_time,
-    _end_time,
-    _fixed,
-    _triggered_by,
-    _duration,
-    _downtime_id);
-  register_downtime(HOST_DOWNTIME, _downtime_id);
+bool retention::downtime::_set_comment_data(std::string const& value) {
+  _comment_data = value;
+  return (true);
 }
 
 /**
- *  Add serivce downtime.
+ *  Set downtime_id.
+ *
+ *  @param[in] value The new downtime_id.
  */
-void retention::downtime::_add_service_downtime() throw () {
-  add_service_downtime(
-    _host_name.c_str(),
-    _service_description.c_str(),
-    _entry_time,
-    _author.c_str(),
-    _comment_data.c_str(),
-    _start_time,
-    _end_time,
-    _fixed,
-    _triggered_by,
-    _duration,
-    _downtime_id);
-  register_downtime(SERVICE_DOWNTIME, _downtime_id);
+bool retention::downtime::_set_downtime_id(unsigned long value) {
+  _downtime_id = value;
+  return (true);
 }
 
 /**
- *  Finish all downtime update.
+ *  Set duration.
+ *
+ *  @param[in] value The new duration.
  */
-void retention::downtime::_finished() throw () {
-  if (_downtime_type == host)
-    _add_host_downtime();
-  else
-    _add_service_downtime();
+bool retention::downtime::_set_duration(unsigned long value) {
+  _duration = value;
+  return (true);
 }
 
+/**
+ *  Set end_time.
+ *
+ *  @param[in] value The new end_time.
+ */
+bool retention::downtime::_set_end_time(time_t value) {
+  _end_time = value;
+  return (true);
+}
+
+/**
+ *  Set entry_time.
+ *
+ *  @param[in] value The new entry_time.
+ */
+bool retention::downtime::_set_entry_time(time_t value) {
+  _entry_time = value;
+  return (true);
+}
+
+/**
+ *  Set fixed.
+ *
+ *  @param[in] value The new fixed.
+ */
+bool retention::downtime::_set_fixed(bool value) {
+  _fixed = value;
+  return (true);
+}
+
+/**
+ *  Set host_name.
+ *
+ *  @param[in] value The new host_name.
+ */
+bool retention::downtime::_set_host_name(std::string const& value) {
+  _host_name = value;
+  return (true);
+}
+
+/**
+ *  Set service_description.
+ *
+ *  @param[in] value The new service_description.
+ */
+bool retention::downtime::_set_service_description(std::string const& value) {
+  _service_description = value;
+  return (true);
+}
+
+/**
+ *  Set start_time.
+ *
+ *  @param[in] value The new start_time.
+ */
+bool retention::downtime::_set_start_time(time_t value) {
+  _start_time = value;
+  return (true);
+}
+
+/**
+ *  Set triggered_by.
+ *
+ *  @param[in] value The new triggered_by.
+ */
+bool retention::downtime::_set_triggered_by(unsigned long value) {
+  _triggered_by = value;
+  return (true);
+}

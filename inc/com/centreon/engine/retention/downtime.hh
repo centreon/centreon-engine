@@ -36,15 +36,40 @@ namespace         retention {
     };
 
                   downtime(type_id type);
+                  downtime(downtime const& right);
                   ~downtime() throw ();
+    downtime&     operator=(downtime const& right);
+    bool          operator==(downtime const& right) const throw ();
+    bool          operator!=(downtime const& right) const throw ();
     bool          set(
                     std::string const& key,
                     std::string const& value);
 
+    std::string   author() const throw ();
+    std::string   comment_data() const throw ();
+    unsigned long downtime_id() const throw ();
+    type_id       downtime_type() const throw ();
+    unsigned long duration() const throw ();
+    time_t        end_time() const throw ();
+    time_t        entry_time() const throw ();
+    bool          fixed() const throw ();
+    std::string   host_name() const throw ();
+    std::string   service_description() const throw ();
+    time_t        start_time() const throw ();
+    unsigned long triggered_by() const throw ();
+
   private:
-    void          _add_host_downtime() throw ();
-    void          _add_service_downtime() throw ();
-    void          _finished() throw ();
+    bool          _set_author(std::string const& value);
+    bool          _set_comment_data(std::string const& value);
+    bool          _set_downtime_id(unsigned long value);
+    bool          _set_duration(unsigned long value);
+    bool          _set_end_time(time_t value);
+    bool          _set_entry_time(time_t value);
+    bool          _set_fixed(bool value);
+    bool          _set_host_name(std::string const& value);
+    bool          _set_service_description(std::string const& value);
+    bool          _set_start_time(time_t value);
+    bool          _set_triggered_by(unsigned long value);
 
     std::string   _author;
     std::string   _comment_data;
@@ -64,3 +89,5 @@ namespace         retention {
 CCE_END()
 
 #endif // !CCE_RETENTION_DOWNTIME_HH
+
+
