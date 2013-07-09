@@ -353,6 +353,16 @@ list_string const& contact::contactgroups() const throw () {
 }
 
 /**
+ *  Get contact name.
+ *
+ *  @param[in] name New contact name.
+ */
+void contact::contact_name(std::string const& name) {
+  _contact_name = name;
+  return ;
+}
+
+/**
  *  Get contact_name.
  *
  *  @return The contact_name.

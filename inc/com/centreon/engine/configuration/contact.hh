@@ -59,6 +59,7 @@ namespace                  configuration {
     bool                   can_submit_commands() const throw ();
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
+    void                   contact_name(std::string const& name);
     std::string const&     contact_name() const throw ();
     properties const&      customvariables() const throw ();
     std::string const&     email() const throw ();

@@ -160,6 +160,10 @@ namespace              configuration {
     set_connector&     connectors() throw ();
     set_contact const& contacts() const throw ();
     set_contact&       contacts() throw ();
+    set_contact::const_iterator
+                       contacts_find(contact::key_type const& k) const;
+    set_contact::iterator
+                       contacts_find(contact::key_type const& k);
     set_contactgroup const&
                        contactgroups() const throw ();
     set_contactgroup&  contactgroups() throw ();

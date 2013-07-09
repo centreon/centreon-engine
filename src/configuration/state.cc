@@ -1273,6 +1273,52 @@ set_contact& state::contacts() throw () {
 }
 
 /**
+ *  Find a contact by its key.
+ *
+ *  @param[in] k Contact name.
+ *
+ *  @return Iterator to the element if found, contacts().end()
+ *          otherwise.
+ */
+set_contact::const_iterator state::contacts_find(
+                                     contact::key_type const& k) const {
+  shared_ptr<configuration::contact>
+    below_searched(new configuration::contact);
+  below_searched->contact_name(k);
+  set_contact::const_iterator
+    it(_contacts.upper_bound(below_searched));
+  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
+    return (it);
+  else if ((it != _contacts.begin())
+           && ((*--it)->contact_name() == k))
+    return (it);
+  return (_contacts.end());
+}
+
+/**
+ *  Find a contact by its key.
+ *
+ *  @param[in] k Contact name.
+ *
+ *  @return Iterator to the element if found, contacts().end()
+ *          otherwise.
+ */
+set_contact::iterator state::contacts_find(
+                               contact::key_type const& k) {
+  shared_ptr<configuration::contact>
+    below_searched(new configuration::contact);
+  below_searched->contact_name(k);
+  set_contact::iterator
+    it(_contacts.upper_bound(below_searched));
+  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
+    return (it);
+  else if ((it != _contacts.begin())
+           && ((*--it)->contact_name() == k))
+    return (it);
+  return (_contacts.end());
+}
+
+/**
  *  Get all engine contactgroups.
  *
  *  @return All engine contactgroups.
