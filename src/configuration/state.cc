@@ -1273,6 +1273,52 @@ set_contact& state::contacts() throw () {
 }
 
 /**
+ *  Find a contact by its key.
+ *
+ *  @param[in] k Contact name.
+ *
+ *  @return Iterator to the element if found, contacts().end()
+ *          otherwise.
+ */
+set_contact::const_iterator state::contacts_find(
+                                     contact::key_type const& k) const {
+  shared_ptr<configuration::contact>
+    below_searched(new configuration::contact);
+  below_searched->contact_name(k);
+  set_contact::const_iterator
+    it(_contacts.upper_bound(below_searched));
+  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
+    return (it);
+  else if ((it != _contacts.begin())
+           && ((*--it)->contact_name() == k))
+    return (it);
+  return (_contacts.end());
+}
+
+/**
+ *  Find a contact by its key.
+ *
+ *  @param[in] k Contact name.
+ *
+ *  @return Iterator to the element if found, contacts().end()
+ *          otherwise.
+ */
+set_contact::iterator state::contacts_find(
+                               contact::key_type const& k) {
+  shared_ptr<configuration::contact>
+    below_searched(new configuration::contact);
+  below_searched->contact_name(k);
+  set_contact::iterator
+    it(_contacts.upper_bound(below_searched));
+  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
+    return (it);
+  else if ((it != _contacts.begin())
+           && ((*--it)->contact_name() == k))
+    return (it);
+  return (_contacts.end());
+}
+
+/**
  *  Get all engine contactgroups.
  *
  *  @return All engine contactgroups.
@@ -1720,6 +1766,51 @@ set_hostgroup const& state::hostgroups() const throw () {
  */
 set_hostgroup& state::hostgroups() throw () {
   return (_hostgroups);
+}
+
+/**
+ *  Find a host group by its key.
+ *
+ *  @param[in] k Host group key.
+ *
+ *  @return Iterator to the element if found, hostgroups().end()
+ *          otherwise.
+ */
+set_hostgroup::const_iterator state::hostgroups_find(
+                                hostgroup::key_type const& k) const {
+  shared_ptr<configuration::hostgroup>
+    below_searched(new configuration::hostgroup);
+  below_searched->hostgroup_name(k);
+  set_hostgroup::const_iterator
+    it(_hostgroups.upper_bound(below_searched));
+  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
+    return (it);
+  else if ((it != _hostgroups.begin())
+           && ((*--it)->hostgroup_name() == k))
+    return (it);
+  return (_hostgroups.end());
+}
+
+/**
+ *  Find a host group by its key.
+ *
+ *  @param[in] k Host group key.
+ *
+ *  @return Iterator to the element if found, hostgroups().end()
+ *          otherwise.
+ */
+set_hostgroup::iterator state::hostgroups_find(
+                                 hostgroup::key_type const& k) {
+  shared_ptr<configuration::hostgroup>
+    below_searched(new configuration::hostgroup);
+  below_searched->hostgroup_name(k);
+  set_hostgroup::iterator it(_hostgroups.upper_bound(below_searched));
+  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
+    return (it);
+  else if ((it != _hostgroups.begin())
+           && ((*--it)->hostgroup_name() == k))
+    return (it);
+  return (_hostgroups.end());
 }
 
 /**
@@ -2761,6 +2852,52 @@ set_servicegroup& state::servicegroups() throw () {
 }
 
 /**
+ *  Get service group by its key.
+ *
+ *  @param[in] k Service group name.
+ *
+ *  @return Iterator to the element if found, servicegroups().end()
+ *          otherwise.
+ */
+set_servicegroup::const_iterator state::servicegroups_find(
+                                   servicegroup::key_type const& k) const {
+  shared_ptr<configuration::servicegroup>
+    below_searched(new configuration::servicegroup);
+  below_searched->servicegroup_name(k);
+  set_servicegroup::const_iterator
+    it(_servicegroups.upper_bound(below_searched));
+  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
+    return (it);
+  else if ((it != _servicegroups.begin())
+           && ((*--it)->servicegroup_name() == k))
+    return (it);
+  return (_servicegroups.end());
+}
+
+/**
+ *  Get service group by its key.
+ *
+ *  @param[in] k Service group name.
+ *
+ *  @return Iterator to the element if found, servicegroups().end()
+ *          otherwise.
+ */
+set_servicegroup::iterator state::servicegroups_find(
+                             servicegroup::key_type const& k) {
+  shared_ptr<configuration::servicegroup>
+    below_searched(new configuration::servicegroup);
+  below_searched->servicegroup_name(k);
+  set_servicegroup::iterator
+    it(_servicegroups.upper_bound(below_searched));
+  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
+    return (it);
+  else if ((it != _servicegroups.begin())
+           && ((*--it)->servicegroup_name() == k))
+    return (it);
+  return (_servicegroups.end());
+}
+
+/**
  *  Get all engine services.
  *
  *  @return All engine services.
@@ -3099,6 +3236,50 @@ set_timeperiod const& state::timeperiods() const throw () {
  */
 set_timeperiod& state::timeperiods() throw () {
   return (_timeperiods);
+}
+
+/**
+ *  Find a time period by its key.
+ *
+ *  @param[in] k Time period name.
+ *
+ *  @return Iterator to the element if found, timeperiods().end()
+ *          otherwise.
+ */
+set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type const& k) const {
+  shared_ptr<configuration::timeperiod>
+    below_searched(new configuration::timeperiod);
+  below_searched->timeperiod_name(k);
+  set_timeperiod::const_iterator
+    it(_timeperiods.upper_bound(below_searched));
+  if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
+    return (it);
+  else if ((it != _timeperiods.begin())
+           && ((*--it)->timeperiod_name() == k))
+    return (it);
+  return (_timeperiods.end());
+}
+
+/**
+ *  Find a time period by its key.
+ *
+ *  @param[in] k Time period name.
+ *
+ *  @return Iterator to the element if found, timeperiods().end()
+ *          otherwise.
+ */
+set_timeperiod::iterator state::timeperiods_find(timeperiod::key_type const& k) {
+  shared_ptr<configuration::timeperiod>
+    below_searched(new configuration::timeperiod);
+  below_searched->timeperiod_name(k);
+  set_timeperiod::iterator
+    it(_timeperiods.upper_bound(below_searched));
+  if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
+    return (it);
+  else if ((it != _timeperiods.begin())
+           && ((*--it)->timeperiod_name() == k))
+    return (it);
+  return (_timeperiods.end());
 }
 
 /**

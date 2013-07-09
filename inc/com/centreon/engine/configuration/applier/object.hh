@@ -84,10 +84,10 @@ namespace          configuration {
            std::vector<std::string> const& t2,
            unsigned int size);
 
-    template<typename T, char* T::*member>
-    void unregister_object(T** lst, char const* name) {
+    template<typename T>
+    void unregister_object(T** lst, T* ptr) {
       for (T** node(lst); *node; node = &(*node)->next)
-        if (!strcmp((*node)->*member, name)) {
+        if (*node == ptr) {
           (*node) = (*node)->next;
           break ;
         }

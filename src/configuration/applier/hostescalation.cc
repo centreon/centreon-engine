@@ -214,7 +214,27 @@ void applier::hostescalation::modify_object(
  */
 void applier::hostescalation::remove_object(
                                 shared_ptr<configuration::hostescalation> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing a host escalation.";
+
+  // Find host escalation.
+  umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator
+    it(applier::state::instance().hostescalations_find(obj->key()));
+  if (it != applier::state::instance().hostescalations().end()) {
+    // Remove host escalation from its list.
+    unregister_object<hostescalation_struct>(
+      &hostescalation_list,
+      it->second.get());
+
+    // Erase host escalation (will effectively delete the object).
+    applier::state::instance().hostescalations().erase(it);
+  }
+
+  // Remove escalation from the global configuration set.
+  config->hostescalations().erase(obj);
+
+  return ;
 }
 
 /**

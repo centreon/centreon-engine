@@ -160,6 +160,10 @@ namespace              configuration {
     set_connector&     connectors() throw ();
     set_contact const& contacts() const throw ();
     set_contact&       contacts() throw ();
+    set_contact::const_iterator
+                       contacts_find(contact::key_type const& k) const;
+    set_contact::iterator
+                       contacts_find(contact::key_type const& k);
     set_contactgroup const&
                        contactgroups() const throw ();
     set_contactgroup&  contactgroups() throw ();
@@ -214,6 +218,10 @@ namespace              configuration {
     set_hostgroup const&
                        hostgroups() const throw ();
     set_hostgroup&     hostgroups() throw ();
+    set_hostgroup::const_iterator
+                       hostgroups_find(hostgroup::key_type const& k) const;
+    set_hostgroup::iterator
+                       hostgroups_find(hostgroup::key_type const& k);
     set_host const&    hosts() const throw ();
     set_host&          hosts() throw ();
     set_host::const_iterator
@@ -329,6 +337,10 @@ namespace              configuration {
     set_servicegroup const&
                        servicegroups() const throw ();
     set_servicegroup&  servicegroups() throw ();
+    set_servicegroup::const_iterator
+                       servicegroups_find(servicegroup::key_type const& k) const;
+    set_servicegroup::iterator
+                       servicegroups_find(servicegroup::key_type const& k);
     set_service const& services() const throw ();
     set_service&       services() throw ();
     unsigned int       service_check_timeout() const throw ();
@@ -365,6 +377,10 @@ namespace              configuration {
     set_timeperiod const&
                        timeperiods() const throw ();
     set_timeperiod&    timeperiods() throw ();
+    set_timeperiod::const_iterator
+                       timeperiods_find(timeperiod::key_type const& k) const;
+    set_timeperiod::iterator
+                       timeperiods_find(timeperiod::key_type const& k);
     unsigned int       time_change_threshold() const throw ();
     void               time_change_threshold(unsigned int value);
     bool               translate_passive_host_checks() const throw ();

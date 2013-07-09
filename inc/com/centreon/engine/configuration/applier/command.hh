@@ -60,17 +60,4 @@ namespace             configuration {
 
 CCE_END()
 
-bool                  operator==(
-                        commandsmember_struct const* left,
-                        std::list<std::string> const& right);
-bool                  operator==(
-                        std::list<std::string> const& left,
-                        commandsmember_struct const* right);
-bool                  operator!=(
-                        commandsmember_struct const* left,
-                        std::list<std::string> const& right);
-bool                  operator!=(
-                        std::list<std::string> const& left,
-                        commandsmember_struct const* right);
-
 #endif // !CCE_CONFIGURATION_APPLIER_COMMAND_HH

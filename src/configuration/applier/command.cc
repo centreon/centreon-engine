@@ -149,13 +149,20 @@ void applier::command::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing command '" << obj->command_name() << "'.";
 
-  // Unregister command.
-  unregister_object<command_struct, &command_struct::name>(
-    &command_list,
-    obj->command_name().c_str());
+  // Find command.
+  umap<std::string, shared_ptr<command_struct> >::iterator
+    it(applier::state::instance().commands_find(obj->key()));
+  if (it != applier::state::instance().commands().end()) {
+    // Remove command from its list.
+    unregister_object<command_struct>(
+      &command_list,
+      it->second.get());
+
+    // Erase command (will effectively delete the object).
+    applier::state::instance().commands().erase(it);
+  }
 
   // Remove command objects.
-  applier::state::instance().commands().erase(obj->command_name());
   commands::set::instance().remove_command(obj->command_name());
 
   // Remove command from the global configuration set.
@@ -212,69 +219,4 @@ void applier::command::_create_command(
   }
 
   return ;
-}
-
-/**
- *  Compare a commandsmember list with a list of string.
- *
- *  @param[in] left  First list.
- *  @param[in] right Second list.
- *
- *  @return True if both lists contain the same entries.
- */
-bool operator==(
-       commandsmember_struct const* left,
-       std::list<std::string> const& right) {
-  std::list<std::string>::const_iterator
-    it(right.begin()),
-    end(right.end());
-  while (left && (it != end)) {
-    if (strcmp(left->cmd, it->c_str()))
-      return (false);
-    left = left->next;
-    ++it;
-  }
-  return (!left && (it == end));
-}
-
-/**
- *  Compare a list of string with a commandsmember list.
- *
- *  @param[in] left  First list.
- *  @param[in] right Second list.
- *
- *  @return True if both lists contain the same entries.
- */
-bool operator==(
-       std::list<std::string> const& left,
-       commandsmember_struct const* right) {
-  return (operator==(right, left));
-}
-
-/**
- *  Compare a commandsmember list with a list of string.
- *
- *  @param[in] left  First list.
- *  @param[in] right Second list.
- *
- *  @return False if both lists contain the same entries.
- */
-bool operator!=(
-       commandsmember_struct const* left,
-       std::list<std::string> const& right) {
-  return (!operator==(left, right));
-}
-
-/**
- *  Compare a list of string with a commandsmember list.
- *
- *  @param[in] left  First list.
- *  @param[in] right Second list.
- *
- *  @return False if both lists contain the same entries.
- */
-bool operator!=(
-       std::list<std::string> const& left,
-       commandsmember_struct const* right) {
-  return (!operator==(left, right));
 }

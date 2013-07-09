@@ -20,6 +20,9 @@
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/daterange.hh"
+#include "com/centreon/engine/deleter/timeperiodexclusion.hh"
+#include "com/centreon/engine/deleter/timerange.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -78,7 +81,9 @@ void applier::timeperiod::add_object(
            << obj->timeperiod_name() << "'.");
 
   // Fill time period structure.
-  _fill_timeperiod_struct(*obj, tp);
+  _add_time_ranges(obj->timeranges(), tp);
+  _add_exceptions(obj->exceptions(), tp);
+  _add_exclusions(obj->exclude(), tp);
 
   return ;
 }
@@ -111,10 +116,80 @@ void applier::timeperiod::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying time period '" << obj->timeperiod_name() << "'.";
 
-  // Modify time period in global configuration set.
-  // XXX
+  // Find old configuration.
+  set_timeperiod::iterator
+    it_cfg(config->timeperiods_find(obj->key()));
+  if (it_cfg == config->timeperiods().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "time period '" << obj->timeperiod_name() << "'.");
 
+  // Find time period object.
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+    it_obj(applier::state::instance().timeperiods_find(obj->key()));
+  if (it_obj == applier::state::instance().timeperiods().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "time period object '" << obj->timeperiod_name() << "'.");
+  timeperiod_struct* tp(it_obj->second.get());
 
+  // Update the global configuration set.
+  shared_ptr<configuration::timeperiod> old_cfg(*it_cfg);
+  config->timeperiods().insert(obj);
+  config->timeperiods().erase(it_cfg);
+
+  // Modify properties.
+  modify_if_different(
+    tp->alias,
+    NULL_IF_EMPTY(obj->alias()));
+
+  // Time ranges modified ?
+  if (obj->timeranges() != old_cfg->timeranges()) {
+    // Delete old time ranges.
+    for (unsigned int i(0);
+         i < sizeof(tp->days) / sizeof(*tp->days);
+         ++i) {
+      for (timerange_struct* tr(tp->days[i]); tr;) {
+        timerange_struct* to_delete(tr);
+        tr = tr->next;
+        deleter::timerange(to_delete);
+      }
+      tp->days[i] = NULL;
+    }
+
+    // Create new time ranges.
+    _add_time_ranges(obj->timeranges(), tp);
+  }
+
+  // Exceptions modified ?
+  if (obj->exceptions() != old_cfg->exceptions()) {
+    // Delete old exceptions.
+    for (unsigned int i(0);
+         i < sizeof(tp->exceptions) / sizeof(*tp->exceptions);
+         ++i) {
+      for (daterange_struct* dr(tp->exceptions[i]); dr;) {
+        daterange_struct* to_delete(dr);
+        dr = dr->next;
+        deleter::daterange(to_delete);
+      }
+      tp->exceptions[i] = NULL;
+    }
+
+    // Create new exceptions.
+    _add_exceptions(obj->exceptions(), tp);
+  }
+
+  // Exclusions modified ?
+  if (obj->exclude() != old_cfg->exclude()) {
+    // Delete old exclusions.
+    for (timeperiodexclusion_struct* te(tp->exclusions); te;) {
+      timeperiodexclusion_struct* to_delete(te);
+      te = te->next;
+      deleter::timeperiodexclusion(to_delete);
+    }
+    tp->exclusions = NULL;
+
+    // Create new exclusions.
+    _add_exclusions(obj->exclude(), tp);
+  }
 
   return ;
 }
@@ -130,14 +205,18 @@ void applier::timeperiod::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing time period '" << obj->timeperiod_name() << "'.";
 
-  // Unregister time period from the compatibility list.
-  unregister_object<timeperiod_struct, &timeperiod_struct::name>(
-    &timeperiod_list,
-    obj->timeperiod_name().c_str());
+  // Find time period.
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+    it(applier::state::instance().timeperiods_find(obj->key()));
+  if (it != applier::state::instance().timeperiods().end()) {
+    // Remove timeperiod from its list.
+    unregister_object<timeperiod_struct>(
+      &timeperiod_list,
+      it->second.get());
 
-  // Remove time period from the object list (will effectively deleted
-  // the time periiod object).
-  applier::state::instance().timeperiods().erase(obj->timeperiod_name());
+    // Erase time period (will effectively delete the object).
+    applier::state::instance().timeperiods().erase(it);
+  }
 
   // Remove time period from the global configuration set.
   config->timeperiods().erase(obj);
@@ -160,41 +239,39 @@ void applier::timeperiod::resolve_object(
 }
 
 /**
- *  Fill an already created time period struct from its configuration.
+ *  Add exclusions to a time period.
  *
- *  @param[in]  cfg Time period configuration.
- *  @param[out] obj Real time period object.
+ *  @param[in]  exclusions Exclusions.
+ *  @param[out] tp         Time period object.
  */
-void applier::timeperiod::_fill_timeperiod_struct(
-                            configuration::timeperiod const& cfg,
-                            timeperiod_struct* obj) {
-  // Add time ranges to time period.
-  {
-    unsigned short day(0);
-    for (std::vector<std::list<timerange> >::const_iterator
-           it(cfg.timeranges().begin()),
-           end(cfg.timeranges().end());
-         it != end;
-         ++it, ++day)
-      for (std::list<timerange>::const_iterator
-             it2(it->begin()),
-             end2(it->end());
-           it2 != end2;
-           ++it2)
-        if (!add_timerange_to_timeperiod(
-               obj,
-               day,
-               it2->start(),
-               it2->end()))
-          throw (engine_error()
-                 << "Error: Could not add time range to time period '"
-                 << cfg.timeperiod_name() << "'.");
-  }
+void applier::timeperiod::_add_exclusions(
+                            std::list<std::string> const& exclusions,
+                            timeperiod_struct* tp) {
+  for (list_string::const_iterator
+         it(exclusions.begin()),
+         end(exclusions.end());
+       it != end;
+       ++it)
+    if (!add_exclusion_to_timeperiod(
+           tp,
+           it->c_str()))
+      throw (engine_error() << "Error: Could not add exclusion '"
+             << *it << "' to time period '" << tp->name << "'.");
+  return ;
+}
 
-  // Add exceptions to time period.
+/**
+ *  Add exceptions to a time period.
+ *
+ *  @param[in]  exceptions Exceptions.
+ *  @param[out] tp         Time period object.
+ */
+void applier::timeperiod::_add_exceptions(
+                            std::vector<std::list<configuration::daterange> > const& exceptions,
+                            timeperiod_struct* tp) {
   for (std::vector<std::list<daterange> >::const_iterator
-         it(cfg.exceptions().begin()),
-         end(cfg.exceptions().end());
+         it(exceptions.begin()),
+         end(exceptions.end());
        it != end;
        ++it)
     for (std::list<daterange>::const_iterator
@@ -203,7 +280,7 @@ void applier::timeperiod::_fill_timeperiod_struct(
          it2 != end2;
          ++it2) {
       if (!add_exception_to_timeperiod(
-             obj,
+             tp,
              it2->type(),
              it2->year_start(),
              it2->month_start(),
@@ -218,34 +295,51 @@ void applier::timeperiod::_fill_timeperiod_struct(
              it2->skip_interval()))
         throw (engine_error()
                << "Error: Could not add exception to time period '"
-               << cfg.timeperiod_name() << "'.");
+               << tp->name << "'.");
       for (std::list<timerange>::const_iterator
              it3(it2->timeranges().begin()),
              end3(it2->timeranges().end());
            it3 != end3;
            ++it3)
         if (!add_timerange_to_daterange(
-               obj->exceptions[it2->type()],
+               tp->exceptions[it2->type()],
                it3->start(),
                it3->end()))
           throw (engine_error()
                  << "Error: Could not add time range to date range of "
                  << "type " << it2->type() << " of time period '"
-                 << cfg.timeperiod_name() << "'.");
+                 << tp->name << "'.");
     }
+  return ;
+}
 
-  // Add exclusions to time period.
-  for (list_string::const_iterator
-         it(cfg.exclude().begin()),
-         end(cfg.exclude().end());
+/**
+ *  Add time ranges to a time period.
+ *
+ *  @param[in]  ranges Time ranges.
+ *  @param[out] tp     Time period object.
+ */
+void applier::timeperiod::_add_time_ranges(
+                            std::vector<std::list<configuration::timerange> > const& ranges,
+                             timeperiod_struct* tp) {
+  unsigned short day(0);
+  for (std::vector<std::list<timerange> >::const_iterator
+         it(ranges.begin()),
+         end(ranges.end());
        it != end;
-       ++it)
-    if (!add_exclusion_to_timeperiod(
-           obj,
-           it->c_str()))
-      throw (engine_error() << "Error: Could not add exclusion '"
-             << *it << "' to time period '" << cfg.timeperiod_name()
-             << "'.");
-
+       ++it, ++day)
+    for (std::list<timerange>::const_iterator
+           it2(it->begin()),
+           end2(it->end());
+         it2 != end2;
+         ++it2)
+      if (!add_timerange_to_timeperiod(
+             tp,
+             day,
+             it2->start(),
+             it2->end()))
+        throw (engine_error()
+               << "Error: Could not add time range to time period '"
+               << tp->name << "'.");
   return ;
 }

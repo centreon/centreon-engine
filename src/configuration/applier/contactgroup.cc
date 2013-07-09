@@ -147,14 +147,18 @@ void applier::contactgroup::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing contactgroup '" << obj->contactgroup_name() << "'.";
 
-  // Unregister contact group.
-  unregister_object<contactgroup_struct, &contactgroup_struct::group_name>(
-    &contactgroup_list,
-    obj->contactgroup_name().c_str());
+  // Find contact group.
+  umultimap<std::string, shared_ptr<contactgroup_struct> >::iterator
+    it(applier::state::instance().contactgroups_find(obj->key()));
+  if (it != applier::state::instance().contactgroups().end()) {
+    // Remove contact group from its list.
+    unregister_object<contactgroup_struct>(
+      &contactgroup_list,
+      it->second.get());
 
-  // Remove contact group object
-  // (this will effectively delete the object).
-  applier::state::instance().contactgroups().erase(obj->contactgroup_name());
+    // Remove contact group (this will effectively delete the object).
+    applier::state::instance().contactgroups().erase(it);
+  }
 
   // Remove contact group from the global configuration set.
   config->contactgroups().erase(obj);

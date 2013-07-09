@@ -277,12 +277,32 @@ void applier::servicedependency::modify_object(
 /**
  *  Remove old service dependency.
  *
- *  @param[in] obj The new servicedependency to remove from the
- *                 monitoring engine.
+ *  @param[in] obj The service dependency to remove from the monitoring
+ *                 engine.
  */
 void applier::servicedependency::remove_object(
                                    shared_ptr<configuration::servicedependency> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing a service dependency.";
+
+  // Find service dependency.
+  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
+    it(applier::state::instance().servicedependencies_find(obj->key()));
+  if (it != applier::state::instance().servicedependencies().end()) {
+    // Remove service dependency from its list.
+    unregister_object<servicedependency_struct>(
+      &servicedependency_list,
+      it->second.get());
+
+    // Erase service dependency (will effectively delete the object).
+    applier::state::instance().servicedependencies().erase(it);
+  }
+
+  // Remove dependency from the global configuration set.
+  config->servicedependencies().erase(obj);
+
+  return ;
 }
 
 /**

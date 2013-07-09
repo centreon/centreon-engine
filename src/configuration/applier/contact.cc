@@ -21,7 +21,6 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/customvariable.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
@@ -190,12 +189,6 @@ void applier::contact::add_object(
 	     << "Error: Could not add custom variable '" << it->first
 	     << "' to contact '" << obj->contact_name() << "'.");
 
-  // XXX : c->last_host_notification = obj->last_host_notification();
-  // XXX : c->last_service_notification = obj->last_service_notification();
-  // XXX : c->modified_attributes = obj->modified_attributes();
-  // XXX : c->modified_host_attributes = obj->modified_host_attributes();
-  // XXX : c->modified_service_attributes = obj->modified_service_attributes();
-
   return ;
 }
 
@@ -256,11 +249,26 @@ void applier::contact::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying contact '" << obj-> contact_name() << "'.";
 
-  // XXX : modify command in configuration set
+  // Find old configuration.
+  set_contact::iterator it_cfg(config->contacts_find(obj->key()));
+  if (it_cfg == config->contacts().end())
+    throw (engine_error() << "Error: Cannot modify non-existing "
+           << "contact '" << obj->contact_name() << "'.");
+
+  // Find contact object.
+  umap<std::string, shared_ptr<contact_struct> >::iterator
+    it_obj(applier::state::instance().contacts_find(obj->key()));
+  if (it_obj == applier::state::instance().contacts().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "contact object '" << obj->contact_name() << "'.");
+  contact_struct* c(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::contact> old_cfg(*it_cfg);
+  config->contacts().insert(obj);
+  config->contacts().erase(it_cfg);
 
   // Modify command.
-  shared_ptr<contact_struct>&
-    c(applier::state::instance().contacts()[obj->contact_name()]);
   modify_if_different(c->alias, NULL_IF_EMPTY(obj->alias()));
   modify_if_different(c->email, NULL_IF_EMPTY(obj->email()));
   modify_if_different(c->pager, NULL_IF_EMPTY(obj->pager()));
@@ -333,8 +341,10 @@ void applier::contact::modify_object(
   modify_if_different(
     c->retain_nonstatus_information,
     static_cast<int>(obj->retain_nonstatus_information()));
-  if (c->host_notification_commands // Overloaded operator.
-      != obj->host_notification_commands()) {
+
+  // Host notification commands.
+  if (obj->host_notification_commands()
+      != old_cfg->host_notification_commands()) {
     for (commandsmember* m(c->host_notification_commands); m;) {
       commandsmember* to_delete(m);
       m = m->next;
@@ -348,15 +358,17 @@ void applier::contact::modify_object(
          it != end;
          ++it)
       if (!add_host_notification_command_to_contact(
-             c.get(),
+             c,
              it->c_str()))
         throw (engine_error()
                << "Error: Could not add host notification command '"
                << *it << "' to contact '" << obj->contact_name()
                << "'.");
   }
-  if (c->service_notification_commands // Overloaded operator.
-      != obj->service_notification_commands()) {
+
+  // Service notification commands.
+  if (obj->service_notification_commands()
+      != old_cfg->service_notification_commands()) {
     for (commandsmember* m(c->service_notification_commands); m;) {
       commandsmember* to_delete(m);
       m = m->next;
@@ -370,15 +382,16 @@ void applier::contact::modify_object(
          it != end;
          ++it)
       if (!add_service_notification_command_to_contact(
-             c.get(),
+             c,
              it->c_str()))
         throw (engine_error()
                << "Error: Could not add service notification command '"
                << *it << "' to contact '" << obj->contact_name()
                << "'.");
   }
-  if (c->custom_variables // Overloaded operator.
-      != obj->customvariables()) {
+
+  // Custom variables.
+  if (obj->customvariables() != old_cfg->customvariables()) {
     for (customvariablesmember* cv(c->custom_variables); cv; ) {
       customvariablesmember* to_delete(cv);
       cv = cv->next;
@@ -393,19 +406,13 @@ void applier::contact::modify_object(
          it != end;
          ++it)
       if (!add_custom_variable_to_contact(
-             c.get(),
+             c,
              it->first.c_str(),
              it->second.c_str()))
         throw (engine_error()
                << "Error: Could not add custom variable '" << it->first
                << "' to contact '" << obj->contact_name() << "'.");
   }
-
-  // XXX : c->last_host_notification = obj->last_host_notification();
-  // XXX : c->last_service_notification = obj->last_service_notification();
-  // XXX : c->modified_attributes = obj->modified_attributes();
-  // XXX : c->modified_host_attributes = obj->modified_host_attributes();
-  // XXX : c->modified_service_attributes = obj->modified_service_attributes();
 
   return ;
 }
@@ -421,13 +428,18 @@ void applier::contact::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing contact '" << obj->contact_name() << "'.";
 
-  // Unregister contact.
-  unregister_object<contact_struct, &contact_struct::name>(
-    &contact_list,
-    obj->contact_name().c_str());
+  // Find contact.
+  umap<std::string, shared_ptr<contact_struct> >::iterator
+    it(applier::state::instance().contacts_find(obj->key()));
+  if (it != applier::state::instance().contacts().end()) {
+    // Remove contact from its list.
+    unregister_object<contact_struct>(
+      &contact_list,
+      it->second.get());
 
-  // Remove contact object (this will effectively delete the object).
-  applier::state::instance().contacts().erase(obj->contact_name());
+    // Erase contact object (this will effectively delete the object).
+    applier::state::instance().contacts().erase(it);
+  }
 
   // Remove contact from the global configuration set.
   config->contacts().erase(obj);
