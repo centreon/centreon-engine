@@ -20,26 +20,45 @@
 #ifndef CCE_OBJECTS_HOSTSMEMBER_HH
 #  define CCE_OBJECTS_HOSTSMEMBER_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct host_struct;
+struct hostgroup_struct;
+
+typedef struct               hostsmember_struct {
+  char*                      host_name;
+  host_struct*               host_ptr;
+  struct hostsmember_struct* next;
+}                            hostsmember;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-hostsmember const* release_hostsmember(hostsmember const* obj);
+hostsmember* add_child_link_to_host(
+               host_struct* hst,
+               host_struct* child_ptr);
+hostsmember* add_host_to_hostgroup(
+               hostgroup_struct* temp_hostgroup,
+               char const* host_name);
+hostsmember* add_parent_host_to_host(
+               host_struct* hst,
+               char const* host_name);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace            objects {
-  hostsmember const* release(hostsmember const* obj);
-}
+bool          operator==(
+                hostsmember const& obj1,
+                hostsmember const& obj2) throw ();
+bool          operator!=(
+                hostsmember const& obj1,
+                hostsmember const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, hostsmember const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTSMEMBER_HH
+
+

@@ -34,12 +34,12 @@ static int check_enable_host_freshness_checks(int argc, char** argv) {
   (void)argv;
 
   // Action.
-  config->set_check_host_freshness(false);
+  config->check_host_freshness(false);
   char const* cmd("[1317196300] ENABLE_HOST_FRESHNESS_CHECKS");
   process_external_command(cmd);
 
   // Check.
-  if (!config->get_check_host_freshness())
+  if (!config->check_host_freshness())
     throw (engine_error() << "enable_host_freshness_checks failed.");
 
   // Success.

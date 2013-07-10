@@ -21,5 +21,6 @@
 #  define CCE_COMPATIBILITY_SHARED_H
 
 #  include "com/centreon/engine/shared.hh"
+#  include "mmap.h"
 
 #endif // !CCE_COMPATIBILITY_SHARED_H

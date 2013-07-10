@@ -33,8 +33,6 @@ static int check_change_retry_svc_check_interval(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   service* svc = add_service("name", "description", NULL,
                              NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
@@ -50,15 +48,6 @@ static int check_change_retry_svc_check_interval(int argc, char** argv) {
 
   if (svc->retry_interval != 42)
     throw (engine_error() << "change_retry_svc_check_interval failed.");
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete svc;
-
-  free_object_skiplists();
-
   return (0);
 }
 

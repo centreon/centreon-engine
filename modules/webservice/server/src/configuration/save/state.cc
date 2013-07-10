@@ -20,6 +20,7 @@
 #include <fstream>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/state.hh"
 
 using namespace com::centreon::engine::modules::webservice::configuration::save;
@@ -64,28 +65,28 @@ state& state::operator=(state const& right) {
  *  @param[in] obj  The configuration to save.
  */
 state& state::operator<<(engine::configuration::state const& obj) {
-  std::list<std::string> const& lst_dir(obj.get_cfg_dir());
+  std::list<std::string> const& lst_dir(obj.cfg_dir());
   for (std::list<std::string>::const_iterator
          it(lst_dir.begin()), end(lst_dir.end());
        it != end;
        ++it)
     _stream << "cfg_dir=" << *it << std::endl;
 
-  std::list<std::string> const& lst_file(obj.get_cfg_file());
+  std::list<std::string> const& lst_file(obj.cfg_file());
   for (std::list<std::string>::const_iterator
          it(lst_file.begin()), end(lst_file.end());
        it != end;
        ++it)
     _stream << "cfg_file=" << *it << std::endl;
 
-  std::list<std::string> const& lst_resource(obj.get_resource_file());
+  std::list<std::string> const& lst_resource(obj.resource_file());
   for (std::list<std::string>::const_iterator
          it(lst_resource.begin()), end(lst_resource.end());
        it != end;
        ++it)
     _stream << "resource_file=" << *it << std::endl;
 
-  std::list<std::string> const& lst_module(obj.get_broker_module());
+  std::list<std::string> const& lst_module(obj.broker_module());
   for (std::list<std::string>::const_iterator
          it(lst_module.begin()), end(lst_module.end());
        it != end;
@@ -93,7 +94,7 @@ state& state::operator<<(engine::configuration::state const& obj) {
     _stream << "broker_module=" << *it << std::endl;
 
   int command_check_interval
-    = obj.get_command_check_interval() / obj.get_interval_length();
+    = obj.command_check_interval() / obj.interval_length();
 
   static char const* date_format[] = {
     "us",
@@ -111,198 +112,198 @@ state& state::operator<<(engine::configuration::state const& obj) {
 
   _stream
     << "accept_passive_host_checks="
-    << obj.get_accept_passive_host_checks() << std::endl
+    << obj.accept_passive_host_checks() << std::endl
     << "accept_passive_service_checks="
-    << obj.get_accept_passive_service_checks() << std::endl
+    << obj.accept_passive_service_checks() << std::endl
     << "additional_freshness_latency="
-    << obj.get_additional_freshness_latency() << std::endl
+    << obj.additional_freshness_latency() << std::endl
     << "admin_email="
-    << obj.get_admin_email() << std::endl
+    << obj.admin_email() << std::endl
     << "admin_pager="
-    << obj.get_admin_pager() << std::endl
+    << obj.admin_pager() << std::endl
     << "allow_empty_hostgroup_assignment="
-    << obj.get_allow_empty_hostgroup_assignment() << std::endl
+    << obj.allow_empty_hostgroup_assignment() << std::endl
     << "auto_reschedule_checks="
-    << obj.get_auto_reschedule_checks() << std::endl
+    << obj.auto_reschedule_checks() << std::endl
     << "auto_rescheduling_interval="
-    << obj.get_auto_rescheduling_interval() << std::endl
+    << obj.auto_rescheduling_interval() << std::endl
     << "auto_rescheduling_window="
-    << obj.get_auto_rescheduling_window() << std::endl
+    << obj.auto_rescheduling_window() << std::endl
     << "broker_module_directory="
-    << obj.get_broker_module_directory() << std::endl
+    << obj.broker_module_directory() << std::endl
     << "cached_host_check_horizon="
-    << obj.get_cached_host_check_horizon() << std::endl
+    << obj.cached_host_check_horizon() << std::endl
     << "cached_service_check_horizon="
-    << obj.get_cached_service_check_horizon() << std::endl
+    << obj.cached_service_check_horizon() << std::endl
     << "check_external_commands="
-    << obj.get_check_external_commands() << std::endl
+    << obj.check_external_commands() << std::endl
     << "check_for_orphaned_hosts="
-    << obj.get_check_orphaned_hosts() << std::endl
+    << obj.check_orphaned_hosts() << std::endl
     << "check_for_orphaned_services="
-    << obj.get_check_orphaned_services() << std::endl
+    << obj.check_orphaned_services() << std::endl
     << "check_host_freshness="
-    << obj.get_check_host_freshness() << std::endl
+    << obj.check_host_freshness() << std::endl
     << "check_result_reaper_frequency="
-    << obj.get_check_reaper_interval() << std::endl
+    << obj.check_reaper_interval() << std::endl
     << "check_service_freshness="
-    << obj.get_check_service_freshness() << std::endl
+    << obj.check_service_freshness() << std::endl
     << "command_check_interval="
     << command_check_interval << std::endl
     << "command_file="
-    << obj.get_command_file() << std::endl
+    << obj.command_file() << std::endl
     << "date_format="
-    << date_format[obj.get_date_format()] << std::endl
+    << date_format[obj.date_format()] << std::endl
     << "debug_file="
-    << obj.get_debug_file() << std::endl
+    << obj.debug_file() << std::endl
     << "debug_level="
-    << obj.get_debug_level() << std::endl
+    << obj.debug_level() << std::endl
     << "debug_verbosity="
-    << obj.get_debug_verbosity() << std::endl
+    << obj.debug_verbosity() << std::endl
     << "enable_environment_macros="
-    << obj.get_enable_environment_macros() << std::endl
+    << obj.enable_environment_macros() << std::endl
     << "enable_event_handlers="
-    << obj.get_enable_event_handlers() << std::endl
+    << obj.enable_event_handlers() << std::endl
     << "enable_failure_prediction="
-    << obj.get_enable_failure_prediction() << std::endl
+    << obj.enable_failure_prediction() << std::endl
     << "enable_flap_detection="
-    << obj.get_enable_flap_detection() << std::endl
+    << obj.enable_flap_detection() << std::endl
     << "enable_notifications="
-    << obj.get_enable_notifications() << std::endl
+    << obj.enable_notifications() << std::endl
     << "enable_predictive_host_dependency_checks="
-    << obj.get_enable_predictive_host_dependency_checks() << std::endl
+    << obj.enable_predictive_host_dependency_checks() << std::endl
     << "enable_predictive_service_dependency_checks="
-    << obj.get_enable_predictive_service_dependency_checks() << std::endl;
+    << obj.enable_predictive_service_dependency_checks() << std::endl;
 
   _stream << "event_broker_options=";
-  if (obj.get_event_broker_options()
+  if (obj.event_broker_options()
       == static_cast<unsigned long>(BROKER_EVERYTHING))
     _stream << "-1";
   else
-    _stream << obj.get_event_broker_options();
+    _stream << obj.event_broker_options();
   _stream << std::endl;
 
   _stream
     << "event_handler_timeout="
-    << obj.get_event_handler_timeout() << std::endl
+    << obj.event_handler_timeout() << std::endl
     << "execute_host_checks="
-    << obj.get_execute_host_checks() << std::endl
+    << obj.execute_host_checks() << std::endl
     << "execute_service_checks="
-    << obj.get_execute_service_checks() << std::endl
+    << obj.execute_service_checks() << std::endl
     << "external_command_buffer_slots="
-    << obj.get_external_command_buffer_slots() << std::endl
+    << obj.external_command_buffer_slots() << std::endl
     << "global_host_event_handler="
-    << obj.get_global_host_event_handler() << std::endl
+    << obj.global_host_event_handler() << std::endl
     << "global_service_event_handler="
-    << obj.get_global_service_event_handler() << std::endl
+    << obj.global_service_event_handler() << std::endl
     << "high_host_flap_threshold="
-    << obj.get_high_host_flap_threshold() << std::endl
+    << obj.high_host_flap_threshold() << std::endl
     << "high_service_flap_threshold="
-    << obj.get_high_service_flap_threshold() << std::endl
+    << obj.high_service_flap_threshold() << std::endl
     << "host_check_timeout="
-    << obj.get_host_check_timeout() << std::endl
+    << obj.host_check_timeout() << std::endl
     << "host_freshness_check_interval="
-    << obj.get_host_freshness_check_interval() << std::endl;
+    << obj.host_freshness_check_interval() << std::endl;
 
   _stream << "host_inter_check_delay_method=";
-  if (obj.get_host_inter_check_delay_method()
+  if (obj.host_inter_check_delay_method()
       == com::centreon::engine::configuration::state::icd_user)
     _stream << scheduling_info.host_inter_check_delay;
   else
-    _stream << delay_method[obj.get_host_inter_check_delay_method()];
+    _stream << delay_method[obj.host_inter_check_delay_method()];
   _stream << std::endl;
 
   _stream
     << "illegal_macro_output_chars="
-    << obj.get_illegal_output_chars() << std::endl
+    << obj.illegal_output_chars() << std::endl
     << "illegal_object_name_chars="
-    << obj.get_illegal_object_chars() << std::endl
+    << obj.illegal_object_chars() << std::endl
     << "interval_length="
-    << obj.get_interval_length() << std::endl
+    << obj.interval_length() << std::endl
     << "log_event_handlers="
-    << obj.get_log_event_handlers() << std::endl
+    << obj.log_event_handlers() << std::endl
     << "log_external_commands="
-    << obj.get_log_external_commands() << std::endl
+    << obj.log_external_commands() << std::endl
     << "log_file="
-    << obj.get_log_file() << std::endl
+    << obj.log_file() << std::endl
     << "log_host_retries="
-    << obj.get_log_host_retries() << std::endl
+    << obj.log_host_retries() << std::endl
     << "log_initial_states="
-    << obj.get_log_initial_state() << std::endl
+    << obj.log_initial_states() << std::endl
     << "log_notifications="
-    << obj.get_log_notifications() << std::endl
+    << obj.log_notifications() << std::endl
     << "log_passive_checks="
-    << obj.get_log_passive_checks() << std::endl
+    << obj.log_passive_checks() << std::endl
     << "log_service_retries="
-    << obj.get_log_service_retries() << std::endl
+    << obj.log_service_retries() << std::endl
     << "low_host_flap_threshold="
-    << obj.get_low_host_flap_threshold() << std::endl
+    << obj.low_host_flap_threshold() << std::endl
     << "low_service_flap_threshold="
-    << obj.get_low_service_flap_threshold() << std::endl
+    << obj.low_service_flap_threshold() << std::endl
     << "max_check_result_reaper_time="
-    << obj.get_max_check_reaper_time() << std::endl
+    << obj.max_check_reaper_time() << std::endl
     << "max_concurrent_checks="
-    << obj.get_max_parallel_service_checks() << std::endl
+    << obj.max_parallel_service_checks() << std::endl
     << "max_debug_file_size="
-    << obj.get_max_debug_file_size() << std::endl
+    << obj.max_debug_file_size() << std::endl
     << "max_host_check_spread="
-    << obj.get_max_host_check_spread() << std::endl
+    << obj.max_host_check_spread() << std::endl
     << "max_log_file_size="
-    << obj.get_max_log_file_size() << std::endl
+    << obj.max_log_file_size() << std::endl
     << "max_service_check_spread="
-    << obj.get_max_service_check_spread() << std::endl
+    << obj.max_service_check_spread() << std::endl
     << "notification_timeout="
-    << obj.get_notification_timeout() << std::endl
+    << obj.notification_timeout() << std::endl
     << "object_cache_file="
-    << obj.get_object_cache_file() << std::endl
+    << obj.object_cache_file() << std::endl
     << "obsess_over_hosts="
-    << obj.get_obsess_over_hosts() << std::endl
+    << obj.obsess_over_hosts() << std::endl
     << "obsess_over_services="
-    << obj.get_obsess_over_services() << std::endl
+    << obj.obsess_over_services() << std::endl
     << "ochp_command="
-    << obj.get_ochp_command() << std::endl
+    << obj.ochp_command() << std::endl
     << "ochp_timeout="
-    << obj.get_ochp_timeout() << std::endl
+    << obj.ochp_timeout() << std::endl
     << "ocsp_command="
-    << obj.get_ocsp_command() << std::endl
+    << obj.ocsp_command() << std::endl
     << "ocsp_timeout="
-    << obj.get_ocsp_timeout() << std::endl
+    << obj.ocsp_timeout() << std::endl
     << "passive_host_checks_are_soft="
-    << obj.get_passive_host_checks_are_soft() << std::endl
+    << obj.passive_host_checks_are_soft() << std::endl
     << "perfdata_timeout="
-    << obj.get_perfdata_timeout() << std::endl
+    << obj.perfdata_timeout() << std::endl
     << "precached_object_file="
-    << obj.get_precached_object_file() << std::endl
+    << obj.precached_object_file() << std::endl
     << "process_performance_data="
-    << obj.get_process_performance_data() << std::endl
+    << obj.process_performance_data() << std::endl
     << "retained_contact_host_attribute_mask="
-    << obj.get_retained_contact_host_attribute_mask() << std::endl
+    << obj.retained_contact_host_attribute_mask() << std::endl
     << "retained_contact_service_attribute_mask="
-    << obj.get_retained_contact_service_attribute_mask() << std::endl
+    << obj.retained_contact_service_attribute_mask() << std::endl
     << "retained_host_attribute_mask="
-    << obj.get_retained_host_attribute_mask() << std::endl
+    << obj.retained_host_attribute_mask() << std::endl
     << "retained_process_host_attribute_mask="
-    << obj.get_retained_process_host_attribute_mask() << std::endl
+    << obj.retained_process_host_attribute_mask() << std::endl
     << "retain_state_information="
-    << obj.get_retain_state_information() << std::endl
+    << obj.retain_state_information() << std::endl
     << "retention_scheduling_horizon="
-    << obj.get_retention_scheduling_horizon() << std::endl
+    << obj.retention_scheduling_horizon() << std::endl
     << "retention_update_interval="
-    << obj.get_retention_update_interval() << std::endl
+    << obj.retention_update_interval() << std::endl
     << "service_check_timeout="
-    << obj.get_service_check_timeout() << std::endl
+    << obj.service_check_timeout() << std::endl
     << "service_freshness_check_interval="
-    << obj.get_service_freshness_check_interval() << std::endl;
+    << obj.service_freshness_check_interval() << std::endl;
 
   _stream  << "service_inter_check_delay_method=";
-  if (obj.get_service_inter_check_delay_method()
+  if (obj.service_inter_check_delay_method()
       == com::centreon::engine::configuration::state::icd_user)
     _stream << scheduling_info.service_inter_check_delay;
   else
-    _stream << delay_method[obj.get_service_inter_check_delay_method()];
+    _stream << delay_method[obj.service_inter_check_delay_method()];
   _stream << std::endl;
 
   _stream << "service_interleave_factor=";
-  if (obj.get_service_interleave_factor_method()
+  if (obj.service_interleave_factor_method()
       == com::centreon::engine::configuration::state::ilf_user)
     _stream << scheduling_info.service_interleave_factor;
   else
@@ -311,37 +312,37 @@ state& state::operator<<(engine::configuration::state const& obj) {
 
   _stream
     << "service_reaper_frequency="
-    << obj.get_check_reaper_interval() << std::endl
+    << obj.check_reaper_interval() << std::endl
     << "sleep_time="
-    << obj.get_sleep_time() << std::endl
+    << obj.sleep_time() << std::endl
     << "soft_state_dependencies="
-    << obj.get_soft_state_dependencies() << std::endl
+    << obj.soft_state_dependencies() << std::endl
     << "state_retention_file="
-    << obj.get_state_retention_file() << std::endl
+    << obj.state_retention_file() << std::endl
     << "status_file="
-    << obj.get_status_file() << std::endl
+    << obj.status_file() << std::endl
     << "status_update_interval="
-    << obj.get_status_update_interval() << std::endl
+    << obj.status_update_interval() << std::endl
     << "time_change_threshold="
-    << obj.get_time_change_threshold() << std::endl
+    << obj.time_change_threshold() << std::endl
     << "translate_passive_host_checks="
-    << obj.get_translate_passive_host_checks() << std::endl
+    << obj.translate_passive_host_checks() << std::endl
     << "use_aggressive_host_checking="
-    << obj.get_use_aggressive_host_checking() << std::endl
+    << obj.use_aggressive_host_checking() << std::endl
     << "use_large_installation_tweaks="
-    << obj.get_use_large_installation_tweaks() << std::endl
+    << obj.use_large_installation_tweaks() << std::endl
     << "use_regexp_matching="
-    << obj.get_use_regexp_matches() << std::endl
+    << obj.use_regexp_matches() << std::endl
     << "use_retained_program_state="
-    << obj.get_use_retained_program_state() << std::endl
+    << obj.use_retained_program_state() << std::endl
     << "use_retained_scheduling_info="
-    << obj.get_use_retained_scheduling_info() << std::endl
+    << obj.use_retained_scheduling_info() << std::endl
     << "use_syslog="
-    << obj.get_use_syslog() << std::endl
+    << obj.use_syslog() << std::endl
     << "use_timezone="
-    << obj.get_use_timezone() << std::endl
+    << obj.use_timezone() << std::endl
     << "use_true_regexp_matching="
-    << obj.get_use_true_regexp_matching() << std::endl;
+    << obj.use_true_regexp_matching() << std::endl;
   return (*this);
 }
 

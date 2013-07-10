@@ -33,11 +33,11 @@ static int check_start_obsessing_over_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  obsess_over_services = false;
+  config->obsess_over_services(false);
   char const* cmd("[1317196300] START_OBSESSING_OVER_SVC_CHECKS");
   process_external_command(cmd);
 
-  if (!obsess_over_services)
+  if (!config->obsess_over_services())
     throw (engine_error() << "start_obsessing_over_svc_checks failed.");
 
   return (0);

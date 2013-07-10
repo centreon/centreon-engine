@@ -57,9 +57,9 @@ connector::connector(
   // Disable stderr.
   _process.enable_stream(process::err, false);
   // Set use setpgid.
-  _process.setpgid_on_exec(config->get_use_setpgid());
+  _process.setpgid_on_exec(config->use_setpgid());
 
-  if (config->get_enable_environment_macros())
+  if (config->enable_environment_macros())
     logger(log_runtime_warning, basic)
       << "warning: Connector dosn't use enable environement macros!";
 }
@@ -409,7 +409,7 @@ void connector::_connector_close() {
     // Waiting connector quit.
     bool is_timeout(!_cv_query.wait(
                        &_lock,
-                       config->get_service_check_timeout() * 1000));
+                       config->service_check_timeout() * 1000));
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
       logger(log_runtime_warning, basic)
@@ -452,7 +452,7 @@ void connector::_connector_start() {
     // Waiting connector version, or 1 seconds.
     bool is_timeout(!_cv_query.wait(
                        &_lock,
-                       config->get_service_check_timeout() * 1000));
+                       config->service_check_timeout() * 1000));
     if (is_timeout || !_query_version_ok) {
       _process.kill();
       _try_to_restart = false;

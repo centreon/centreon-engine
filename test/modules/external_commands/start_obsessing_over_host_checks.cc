@@ -33,11 +33,11 @@ static int check_start_obsessing_over_host_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  obsess_over_hosts = false;
+  config->obsess_over_hosts(false);
   char const* cmd("[1317196300] START_OBSESSING_OVER_HOST_CHECKS");
   process_external_command(cmd);
 
-  if (!obsess_over_hosts)
+  if (!config->obsess_over_hosts())
     throw (engine_error() << "start_obsessing_over_host_checks failed.");
 
   return (0);

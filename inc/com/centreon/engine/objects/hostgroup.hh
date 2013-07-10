@@ -20,35 +20,50 @@
 #ifndef CCE_OBJECTS_HOSTGROUP_HH
 #  define CCE_OBJECTS_HOSTGROUP_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct host_struct;
+struct hostsmember_struct;
+
+typedef struct             hostgroup_struct {
+  char*                    group_name;
+  char*                    alias;
+  hostsmember_struct*      members;
+  char*                    notes;
+  char*                    notes_url;
+  char*                    action_url;
+  struct hostgroup_struct* next;
+  struct hostgroup_struct* nexthash;
+}                          hostgroup;
 
 #  ifdef __cplusplus
-#    include <vector>
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-bool link_hostgroup(
-       hostgroup* obj,
-       host** members,
-       hostgroup** groups);
-void release_hostgroup(hostgroup const* obj);
+hostgroup* add_hostgroup(
+             char const* name,
+             char const* alias,
+             char const* notes,
+             char const* notes_url,
+             char const* action_url);
+int        is_host_member_of_hostgroup(
+             hostgroup_struct* group,
+             host_struct* hst);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    link(
-            hostgroup* obj,
-            std::vector<host*> const& members,
-            std::vector<hostgroup*> const& groups);
-  void    release(hostgroup const* obj);
-}
+bool          operator==(
+                hostgroup const& obj1,
+                hostgroup const& obj2) throw ();
+bool          operator!=(
+                hostgroup const& obj1,
+                hostgroup const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, hostgroup const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTGROUP_HH
+
+

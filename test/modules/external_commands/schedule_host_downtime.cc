@@ -39,9 +39,6 @@ static int check_schedule_host_downtime(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  // Initialization.
-  init_object_skiplists();
-
   // Create target hosts.
   host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0,
                             0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,

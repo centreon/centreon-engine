@@ -27,8 +27,12 @@
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/engine/objects/objectlist.hh"
+#include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::macros;
 using namespace com::centreon::engine::logging;
 
@@ -80,16 +84,11 @@ static void generate_host_total_services(
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
-    delete[] mac->x[MACRO_TOTALHOSTSERVICES];
-    delete[] mac->x[MACRO_TOTALHOSTSERVICESOK];
-    delete[] mac->x[MACRO_TOTALHOSTSERVICESWARNING];
-    delete[] mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN];
-    delete[] mac->x[MACRO_TOTALHOSTSERVICESCRITICAL];
-    mac->x[MACRO_TOTALHOSTSERVICES] = obj2pchar(total_host_services);
-    mac->x[MACRO_TOTALHOSTSERVICESOK] = obj2pchar(total_host_services_ok);
-    mac->x[MACRO_TOTALHOSTSERVICESWARNING] = obj2pchar(total_host_services_warning);
-    mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN] = obj2pchar(total_host_services_unknown);
-    mac->x[MACRO_TOTALHOSTSERVICESCRITICAL] = obj2pchar(total_host_services_critical);
+    string::setstr(mac->x[MACRO_TOTALHOSTSERVICES], total_host_services);
+    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESOK], total_host_services_ok);
+    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESWARNING], total_host_services_warning);
+    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN], total_host_services_unknown);
+    string::setstr(mac->x[MACRO_TOTALHOSTSERVICESCRITICAL], total_host_services_critical);
   }
   return;
 }
@@ -105,7 +104,7 @@ static void generate_host_total_services(
  */
 static char* get_host_check_type(host& hst, nagios_macros* mac) {
   (void)mac;
-  return (my_strdup(
+  return (string::dup(
            (HOST_CHECK_PASSIVE == hst.check_type
             ? "PASSIVE"
             : "ACTIVE")));
@@ -135,7 +134,7 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
       buf.append(temp_hostgroup->group_name);
     }
   }
-  return (my_strdup(buf.c_str()));
+  return (string::dup(buf));
 }
 
 /**
@@ -156,7 +155,7 @@ static char* get_host_state(host& hst, nagios_macros* mac) {
     state = "UNREACHABLE";
   else
     state = "UP";
-  return (my_strdup(state));
+  return (string::dup(state));
 }
 
 /**

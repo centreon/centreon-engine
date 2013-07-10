@@ -21,7 +21,6 @@
 #  define CCE_CONFIGURATION_APPLIER_LOGGING_HH
 
 #  include <string>
-#  include "com/centreon/engine/configuration/applier/base.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/logging/file.hh"
@@ -37,19 +36,19 @@ namespace                configuration {
      *
      *  Simple configuration applier for logging class.
      */
-    class                logging : public base {
+    class                logging {
     public:
-      void               apply(state const& config);
+      void               apply(state& config);
       static logging&    instance();
       static void        load();
       static void        unload();
 
     private:
                          logging();
-                         logging(state const& config);
-                         logging(logging& right);
+                         logging(state& config);
+                         logging(logging const&);
                          ~logging() throw ();
-      logging&           operator=(logging& right);
+      logging&           operator=(logging const&);
       void               _add_stdout();
       void               _add_stderr();
       void               _add_syslog();

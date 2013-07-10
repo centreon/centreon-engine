@@ -18,17 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "com/centreon/unique_array_ptr.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
+
+using namespace com::centreon::engine;
 
 #ifdef HAVE_TZNAME
 #  ifdef CYGWIN
@@ -43,11 +40,6 @@ extern char* tzname[2];
  * core.
  */
 
-char* my_strdup(char const* str) {
-  char* new_str = new char[strlen(str) + 1];
-  return (strcpy(new_str, str));
-}
-
 /* fix the problem with strtok() skipping empty options between tokens */
 char* my_strtok(char const* buffer, char const* tokens) {
   char* token_position = NULL;
@@ -57,7 +49,7 @@ char* my_strtok(char const* buffer, char const* tokens) {
     original_my_strtok_buffer;
 
   if (buffer != NULL) {
-    original_my_strtok_buffer.reset(my_strdup(buffer));
+    original_my_strtok_buffer.reset(string::dup(buffer));
     my_strtok_buffer = original_my_strtok_buffer.get();
   }
 
@@ -116,196 +108,6 @@ char* my_strsep(char** stringp, char const* delim) {
     /* no more delimiters; this is the last token.  */
     *stringp = NULL;
   return (begin);
-}
-
-/* open a file read-only via mmap() */
-mmapfile* mmap_fopen(char const* filename) {
-  int fd = 0;
-  void* mmap_buf = NULL;
-  struct stat statbuf;
-  int mode = O_RDONLY;
-  unsigned long file_size = 0L;
-
-  if (filename == NULL)
-    return (NULL);
-
-  /* open the file */
-  if ((fd = open(filename, mode)) == -1) {
-    return (NULL);
-  }
-
-  /* get file info */
-  if ((fstat(fd, &statbuf)) == -1) {
-    close(fd);
-    return (NULL);
-  }
-
-  /* get file size */
-  file_size = (unsigned long)statbuf.st_size;
-
-  /* only mmap() if we have a file greater than 0 bytes */
-  if (file_size > 0) {
-    /* mmap() the file - allocate one extra byte for processing zero-byte files */
-    if ((mmap_buf = (void*)mmap(
-                             0,
-                             file_size,
-                             PROT_READ,
-                             MAP_PRIVATE,
-                             fd,
-                             0)) == MAP_FAILED) {
-      close(fd);
-      return (NULL);
-    }
-  }
-  else
-    mmap_buf = NULL;
-
-  /* allocate memory */
-  mmapfile* new_mmapfile = new mmapfile();
-
-  /* populate struct info for later use */
-  new_mmapfile->path = my_strdup(filename);
-  new_mmapfile->fd = fd;
-  new_mmapfile->file_size = (unsigned long)file_size;
-  new_mmapfile->current_position = 0L;
-  new_mmapfile->current_line = 0L;
-  new_mmapfile->mmap_buf = mmap_buf;
-  return (new_mmapfile);
-}
-
-/* close a file originally opened via mmap() */
-int mmap_fclose(mmapfile* temp_mmapfile) {
-  if (temp_mmapfile == NULL)
-    return (ERROR);
-
-  /* un-mmap() the file */
-  if (temp_mmapfile->file_size > 0L)
-    munmap(temp_mmapfile->mmap_buf, temp_mmapfile->file_size);
-
-  /* close the file */
-  close(temp_mmapfile->fd);
-
-  /* free memory */
-  delete[] temp_mmapfile->path;
-  delete temp_mmapfile;
-  return (OK);
-}
-
-/* gets one line of input from an mmap()'ed file */
-char* mmap_fgets(mmapfile* temp_mmapfile) {
-  char* buf = NULL;
-  unsigned long x = 0L;
-  int len = 0;
-
-  if (temp_mmapfile == NULL)
-    return (NULL);
-
-  /* size of file is 0 bytes */
-  if (temp_mmapfile->file_size == 0L)
-    return (NULL);
-
-  /* we've reached the end of the file */
-  if (temp_mmapfile->current_position >= temp_mmapfile->file_size)
-    return (NULL);
-
-  /* find the end of the string (or buffer) */
-  for (x = temp_mmapfile->current_position;
-       x < temp_mmapfile->file_size;
-       x++) {
-    if (*((char*)(temp_mmapfile->mmap_buf) + x) == '\n') {
-      x++;
-      break;
-    }
-  }
-
-  /* calculate length of line we just read */
-  len = (int)(x - temp_mmapfile->current_position);
-
-  /* allocate memory for the new line */
-  buf = new char[len + 1];
-
-  /* copy string to newly allocated memory and terminate the string */
-  memcpy(
-    buf,
-    ((char*)(temp_mmapfile->mmap_buf) + temp_mmapfile->current_position),
-    len);
-  buf[len] = '\x0';
-
-  /* update the current position */
-  temp_mmapfile->current_position = x;
-
-  /* increment the current line */
-  temp_mmapfile->current_line++;
-  return (buf);
-}
-
-/* gets one line of input from an mmap()'ed file (may be contained on more than one line in the source file) */
-char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
-  char* buf = NULL;
-  char* tempbuf = NULL;
-  char* stripped = NULL;
-  int len = 0;
-  int len2 = 0;
-  int end = 0;
-
-  if (temp_mmapfile == NULL)
-    return (NULL);
-
-  while (1) {
-    delete[] tempbuf;
-
-    if ((tempbuf = mmap_fgets(temp_mmapfile)) == NULL)
-      break;
-
-    if (buf == NULL) {
-      len = strlen(tempbuf);
-      buf = new char[len + 1];
-      memcpy(buf, tempbuf, len);
-      buf[len] = '\x0';
-    }
-    else {
-      /* strip leading white space from continuation lines */
-      stripped = tempbuf;
-      while (*stripped == ' ' || *stripped == '\t')
-        stripped++;
-      len = strlen(stripped);
-      len2 = strlen(buf);
-      buf = resize_string(buf, len + len2 + 1);
-      strcat(buf, stripped);
-      len += len2;
-      buf[len] = '\x0';
-    }
-
-    if (len == 0)
-      break;
-
-    /* handle Windows/DOS CR/LF */
-    if (len >= 2 && buf[len - 2] == '\r')
-      end = len - 3;
-    /* normal Unix LF */
-    else if (len >= 1 && buf[len - 1] == '\n')
-      end = len - 2;
-    else
-      end = len - 1;
-
-    /* two backslashes found. unescape first backslash first and break */
-    if (end >= 1 && buf[end - 1] == '\\' && buf[end] == '\\') {
-      buf[end] = '\n';
-      buf[end + 1] = '\x0';
-      break;
-    }
-
-    /* one backslash found. continue reading the next line */
-    else if (end > 0 && buf[end] == '\\')
-      buf[end] = '\x0';
-
-    /* no continuation marker was found, so break */
-    else
-      break;
-  }
-
-  delete[] tempbuf;
-  return (buf);
 }
 
 /* strip newline, carriage return, and tab characters from beginning and end of a string */
@@ -465,7 +267,7 @@ void get_datetime_string(
 
   /* short date/time */
   else if (type == SHORT_DATE_TIME) {
-    if (config->get_date_format() == DATE_FORMAT_EURO)
+    if (config->date_format() == DATE_FORMAT_EURO)
       snprintf(
         buffer,
         buffer_length,
@@ -476,8 +278,8 @@ void get_datetime_string(
         hour,
         minute,
         second);
-    else if (config->get_date_format() == DATE_FORMAT_ISO8601
-             || config->get_date_format() == DATE_FORMAT_STRICT_ISO8601)
+    else if (config->date_format() == DATE_FORMAT_ISO8601
+             || config->date_format() == DATE_FORMAT_STRICT_ISO8601)
       snprintf(
         buffer,
         buffer_length,
@@ -485,7 +287,7 @@ void get_datetime_string(
         year,
         month,
         day,
-        (config->get_date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
+        (config->date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
         hour,
         minute,
         second);
@@ -504,7 +306,7 @@ void get_datetime_string(
 
   /* short date */
   else if (type == SHORT_DATE) {
-    if (config->get_date_format() == DATE_FORMAT_EURO)
+    if (config->date_format() == DATE_FORMAT_EURO)
       snprintf(
         buffer,
         buffer_length,
@@ -512,8 +314,8 @@ void get_datetime_string(
         day,
         month,
         year);
-    else if (config->get_date_format() == DATE_FORMAT_ISO8601
-             || config->get_date_format() == DATE_FORMAT_STRICT_ISO8601)
+    else if (config->date_format() == DATE_FORMAT_ISO8601
+             || config->date_format() == DATE_FORMAT_STRICT_ISO8601)
       snprintf(
         buffer,
         buffer_length,
@@ -600,9 +402,4 @@ char* resize_string(char* str, size_t size) {
   strcpy(new_str, str);
   delete[] str;
   return (new_str);
-}
-
-template <>
-char* obj2pchar<char const*>(char const* str) {
-  return (my_strdup(str ? str : ""));
 }

@@ -33,6 +33,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "compatibility/check_result.h"
 
@@ -91,8 +94,8 @@ void checker::reap() {
   time_t reaper_start_time;
   time(&reaper_start_time);
 
-  if (config->get_use_check_result_path()) {
-    std::string const& path(config->get_check_result_path());
+  if (config->use_check_result_path()) {
+    std::string const& path(config->check_result_path());
     process_check_result_queue(path.c_str());
   }
 
@@ -167,7 +170,7 @@ void checker::reap() {
       time_t current_time;
       time(&current_time);
       if ((current_time - reaper_start_time)
-          > static_cast<time_t>(config->get_max_check_reaper_time())) {
+          > static_cast<time_t>(config->max_check_reaper_time())) {
         logger(dbg_checks, basic)
           << "Breaking out of check result reaper: "
           << "max reaper time exceeded";
@@ -275,7 +278,7 @@ void checker::run(
             hst->host_check_command,
             hst->latency,
             0.0,
-            config->get_host_check_timeout(),
+            config->host_check_timeout(),
             false,
             0,
             NULL,
@@ -347,7 +350,7 @@ void checker::run(
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = NULL;
   check_result_info.output_file = NULL;
-  check_result_info.host_name = my_strdup(hst->name);
+  check_result_info.host_name = string::dup(hst->name);
   check_result_info.service_description = NULL;
   check_result_info.latency = latency;
   check_result_info.next = NULL;
@@ -357,7 +360,7 @@ void checker::run(
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
+  char* processed_cmd_ptr(string::dup(processed_cmd));
 
   // Send event broker.
   broker_host_check(
@@ -373,7 +376,7 @@ void checker::run(
     hst->host_check_command,
     hst->latency,
     0.0,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     false,
     0,
     processed_cmd_ptr,
@@ -401,7 +404,7 @@ void checker::run(
     unsigned long id(cmd->run(
                             processed_cmd,
                             macros,
-                            config->get_host_check_timeout()));
+                            config->host_check_timeout()));
     if (id != 0)
       _list_id[id] = check_result_info;
   }
@@ -415,7 +418,7 @@ void checker::run(
     check_result_info.early_timeout = false;
     check_result_info.return_code = STATE_UNKNOWN;
     check_result_info.exited_ok = true;
-    check_result_info.output = my_strdup("(Execute command failed)");
+    check_result_info.output = string::dup("(Execute command failed)");
 
     // Queue check result.
     concurrency::locker lock(&_mut_reap);
@@ -507,7 +510,7 @@ void checker::run(
     if (preferred_time != NULL)
       *preferred_time += static_cast<time_t>(
                            svc->check_interval
-                           * config->get_interval_length());
+                           * config->interval_length());
     throw (engine_error() << "broker callback cancel");
   }
   // Service check was override by NEB module.
@@ -564,8 +567,8 @@ void checker::run(
   check_result_info.output_file_fd = -1;
   check_result_info.output_file_fp = NULL;
   check_result_info.output_file = NULL;
-  check_result_info.host_name = my_strdup(svc->host_name);
-  check_result_info.service_description = my_strdup(svc->description);
+  check_result_info.host_name = string::dup(svc->host_name);
+  check_result_info.service_description = string::dup(svc->description);
   check_result_info.latency = latency;
   check_result_info.next = NULL;
 
@@ -574,7 +577,7 @@ void checker::run(
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(svc->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
+  char* processed_cmd_ptr(string::dup(processed_cmd));
 
   // Send event broker.
   res = broker_service_check(
@@ -588,7 +591,7 @@ void checker::run(
           svc->service_check_command,
           svc->latency,
           0.0,
-          config->get_service_check_timeout(),
+          config->service_check_timeout(),
           false,
           0,
           processed_cmd_ptr,
@@ -617,7 +620,7 @@ void checker::run(
     unsigned long id(cmd->run(
                             processed_cmd,
                             macros,
-                            config->get_service_check_timeout()));
+                            config->service_check_timeout()));
     if (id != 0)
       _list_id[id] = check_result_info;
   }
@@ -631,7 +634,7 @@ void checker::run(
     check_result_info.early_timeout = false;
     check_result_info.return_code = STATE_UNKNOWN;
     check_result_info.exited_ok = true;
-    check_result_info.output = my_strdup("(Execute command failed)");
+    check_result_info.output = string::dup("(Execute command failed)");
 
     // Queue check result.
     concurrency::locker lock(&_mut_reap);
@@ -739,7 +742,7 @@ void checker::run_sync(
   // Save old plugin output for state stalking.
   char* old_plugin_output(NULL);
   if (hst->plugin_output)
-    old_plugin_output = my_strdup(hst->plugin_output);
+    old_plugin_output = string::dup(hst->plugin_output);
 
   // Set the checked flag.
   hst->has_been_checked = true;
@@ -769,7 +772,7 @@ void checker::run_sync(
     hst->host_check_command,
     hst->latency,
     0.0,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     false,
     0,
     NULL,
@@ -817,7 +820,7 @@ void checker::run_sync(
     hst->host_check_command,
     hst->latency,
     hst->execution_time,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     false,
     hst->current_state,
     NULL,
@@ -904,7 +907,7 @@ void checker::finished(commands::result const& res) throw () {
   result.early_timeout = (res.exit_status == process::timeout);
   result.return_code = res.exit_code;
   result.exited_ok = (res.exit_status == process::normal);
-  result.output = my_strdup(res.output.c_str());
+  result.output = string::dup(res.output);
 
   // Queue check result.
   concurrency::locker lock(&_mut_reap);
@@ -951,7 +954,7 @@ int checker::_execute_sync(host* hst) {
             hst->host_check_command,
             hst->latency,
             0.0,
-            config->get_host_check_timeout(),
+            config->host_check_timeout(),
             false,
             0,
             NULL,
@@ -987,7 +990,7 @@ int checker::_execute_sync(host* hst) {
   shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
-  char* tmp_processed_cmd(my_strdup(processed_cmd.c_str()));
+  char* tmp_processed_cmd(string::dup(processed_cmd));
 
   // Send broker event.
   broker_host_check(
@@ -1003,7 +1006,7 @@ int checker::_execute_sync(host* hst) {
     hst->host_check_command,
     0.0,
     0.0,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     false,
     STATE_OK,
     tmp_processed_cmd,
@@ -1038,7 +1041,7 @@ int checker::_execute_sync(host* hst) {
     start_cmd,
     end_cmd,
     0,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     false,
     0,
     tmp_processed_cmd,
@@ -1051,7 +1054,7 @@ int checker::_execute_sync(host* hst) {
     cmd->run(
            processed_cmd,
            macros,
-           config->get_host_check_timeout(),
+           config->host_check_timeout(),
            res);
   }
   catch (std::exception const& e) {
@@ -1068,7 +1071,7 @@ int checker::_execute_sync(host* hst) {
   }
 
   // Get output.
-  char* output(my_strdup(res.output.c_str()));
+  char* output(string::dup(res.output));
 
   unsigned int execution_time(0);
   if (res.end_time >= res.start_time)
@@ -1091,7 +1094,7 @@ int checker::_execute_sync(host* hst) {
     start_cmd,
     end_cmd,
     execution_time,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     res.exit_status == process::timeout,
     res.exit_code,
     tmp_processed_cmd,
@@ -1106,13 +1109,13 @@ int checker::_execute_sync(host* hst) {
   if (res.exit_status == process::timeout) {
     std::ostringstream oss;
     oss << "Host check timed out after "
-        << config->get_host_check_timeout()
+        << config->host_check_timeout()
         << "  seconds";
     res.output = oss.str();
     logger(log_runtime_warning, basic)
       << "Warning: Host check command '" << processed_cmd
       << "' for host '" << hst->name << "' timed out after "
-      << config->get_host_check_timeout() << " seconds";
+      << config->host_check_timeout() << " seconds";
   }
 
   // Update values.
@@ -1120,7 +1123,7 @@ int checker::_execute_sync(host* hst) {
   hst->check_type = HOST_CHECK_ACTIVE;
 
   // Get plugin output.
-  char* tmp_plugin_output(my_strdup(res.output.c_str()));
+  char* tmp_plugin_output(string::dup(res.output));
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(
@@ -1135,7 +1138,7 @@ int checker::_execute_sync(host* hst) {
   // A NULL host check command means we should assume the host is UP.
   if (!hst->host_check_command) {
     delete[] hst->plugin_output;
-    hst->plugin_output = my_strdup("(Host assumed to be UP)");
+    hst->plugin_output = string::dup("(Host assumed to be UP)");
     res.exit_code = STATE_OK;
   }
 
@@ -1143,7 +1146,7 @@ int checker::_execute_sync(host* hst) {
   if (!hst->plugin_output || !strcmp(hst->plugin_output, "")) {
     delete[] hst->plugin_output;
     hst->plugin_output
-      = my_strdup("(No output returned from host check)");
+      = string::dup("(No output returned from host check)");
   }
 
   // Replace semicolons with colons in plugin output
@@ -1154,7 +1157,7 @@ int checker::_execute_sync(host* hst) {
 
   // If we're not doing aggressive host checking, let WARNING
   // states indicate the host is up (fake the result to be STATE_OK).
-  if (!config->get_use_aggressive_host_checking()
+  if (!config->use_aggressive_host_checking()
       && (res.exit_code == STATE_WARNING))
     res.exit_code = STATE_OK;
 
@@ -1181,7 +1184,7 @@ int checker::_execute_sync(host* hst) {
     hst->host_check_command,
     0.0,
     execution_time,
-    config->get_host_check_timeout(),
+    config->host_check_timeout(),
     res.exit_status == process::timeout,
     res.exit_code,
     tmp_processed_cmd,

@@ -100,7 +100,12 @@ int neb_free_module_list() {
 int neb_load_all_modules() {
   int unloaded(0);
   try {
-    broker::loader& loader = broker::loader::instance();
+    broker::loader& loader(broker::loader::instance());
+
+    std::string const& mod_dir(config->broker_module_directory());
+    if (!mod_dir.empty())
+      loader.load_directory(mod_dir);
+
     std::list<shared_ptr<broker::handle> >
       modules(loader.get_modules());
     for (std::list<shared_ptr<broker::handle> >::const_iterator

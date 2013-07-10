@@ -25,8 +25,6 @@
 extern "C" {
 #  endif // C++
 
-int initialize_retention_data(char* config_file);
-int cleanup_retention_data(char* config_file);
 // saves all host and state information
 int save_state_information(int autosave);
 // reads in initial host and state information

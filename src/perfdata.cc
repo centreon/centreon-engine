@@ -27,14 +27,14 @@
 /******************************************************************/
 
 /* initializes performance data */
-int initialize_performance_data(char* config_file) {
-  xpddefault_initialize_performance_data(config_file);
+int initialize_performance_data() {
+  xpddefault_initialize_performance_data();
   return (OK);
 }
 
 /* cleans up performance data */
-int cleanup_performance_data(char* config_file) {
-  xpddefault_cleanup_performance_data(config_file);
+int cleanup_performance_data() {
+  xpddefault_cleanup_performance_data();
   return (OK);
 }
 
@@ -45,7 +45,7 @@ int cleanup_performance_data(char* config_file) {
 /* updates service performance data */
 int update_service_performance_data(service* svc) {
   /* should we be processing performance data for anything? */
-  if (config->get_process_performance_data() == false)
+  if (config->process_performance_data() == false)
     return (OK);
 
   /* should we process performance data for this service? */
@@ -60,7 +60,7 @@ int update_service_performance_data(service* svc) {
 /* updates host performance data */
 int update_host_performance_data(host* hst) {
   /* should we be processing performance data for anything? */
-  if (config->get_process_performance_data() == false)
+  if (config->process_performance_data() == false)
     return (OK);
 
   /* should we process performance data for this host? */

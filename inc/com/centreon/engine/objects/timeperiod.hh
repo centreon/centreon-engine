@@ -20,37 +20,44 @@
 #ifndef CCE_OBJECTS_TIMEPERIOD_HH
 #  define CCE_OBJECTS_TIMEPERIOD_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/common.hh"
+
+/* Forward declaration. */
+struct daterange_struct;
+struct timeperiodexclusion_struct;
+struct timerange_struct;
+
+typedef struct                timeperiod_struct {
+  char*                       name;
+  char*                       alias;
+  timerange_struct*           days[7];
+  daterange_struct*           exceptions[DATERANGE_TYPES];
+  timeperiodexclusion_struct* exclusions;
+  struct timeperiod_struct*   next;
+  struct timeperiod_struct*   nexthash;
+}                             timeperiod;
 
 #  ifdef __cplusplus
-#  include <string>
-#  include <vector>
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-  // void add_timeperiod(char const* name,
-  //                     char const* alias,
-  //                     char const** range,
-  //                     char const** exclude);
-void release_timeperiod(timeperiod const* obj);
+timeperiod* add_timeperiod(char const* name, char const* alias);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    add_timeperiod(
-            std::string const& name,
-            std::string const& alias,
-            std::vector<std::string> const& range,
-            std::vector<std::string> const& exclude);
-  void    release(timeperiod const* obj);
-}
+bool          operator==(
+                timeperiod const& obj1,
+                timeperiod const& obj2) throw ();
+bool          operator!=(
+                timeperiod const& obj1,
+                timeperiod const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, timeperiod const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_TIMEPERIOD_HH
+
+

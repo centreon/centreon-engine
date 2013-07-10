@@ -33,8 +33,6 @@ static int check_enable_contactgroup_svc_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
@@ -55,20 +53,6 @@ static int check_enable_contactgroup_svc_notifications(int argc, char** argv) {
 
   if (!cntct->service_notifications_enabled)
     throw (engine_error() << "enable_contactgroup_svc_notifications failed.");
-
-  delete[] member->contact_name;
-  delete member;
-
-  delete[] group->group_name;
-  delete[] group->alias;
-  delete group;
-
-  delete[] cntct->name;
-  delete[] cntct->alias;
-  delete cntct;
-
-  free_object_skiplists();
-
   return (0);
 }
 

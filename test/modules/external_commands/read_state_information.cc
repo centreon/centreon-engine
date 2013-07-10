@@ -56,10 +56,10 @@ static int check_read_state_information(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config->set_retain_state_information(true);
+  config->retain_state_information(true);
 
   // register broker callback to catch event.
-  config->set_event_broker_options(BROKER_RETENTION_DATA);
+  config->event_broker_options(BROKER_RETENTION_DATA);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_RETENTION_DATA,
                         module_id,

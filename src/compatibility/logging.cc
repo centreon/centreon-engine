@@ -26,8 +26,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/logging/file.hh"
 
@@ -190,7 +190,7 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  */
 int log_service_event(service const* svc) {
   if (svc->state_type == SOFT_STATE
-      && !config->get_log_service_retries())
+      && !config->log_service_retries())
     return (OK);
 
   if (!svc->host_ptr || !svc->host_name || !svc->description)
@@ -260,7 +260,7 @@ int log_host_event(host const* hst) {
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES && !config->get_log_initial_state())
+  if (type == INITIAL_STATES && !config->log_initial_states())
     return (OK);
 
   char const* type_str(tab_initial_state[type]);
@@ -299,7 +299,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES && !config->get_log_initial_state())
+  if (type == INITIAL_STATES && !config->log_initial_states())
     return (OK);
 
   char const* type_str(tab_initial_state[type]);

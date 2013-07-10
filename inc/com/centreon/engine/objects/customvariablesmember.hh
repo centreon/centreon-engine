@@ -20,32 +20,56 @@
 #ifndef CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 #  define CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declarations. */
+struct contact_struct;
+struct host_struct;
+struct service_struct;
+
+typedef struct                         customvariablesmember_struct {
+  char*                                variable_name;
+  char*                                variable_value;
+  int                                  has_been_modified;
+  struct customvariablesmember_struct* next;
+}                                      customvariablesmember;
 
 #  ifdef __cplusplus
-#    include <string>
-#    include <vector>
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-customvariablesmember const* release_customvariablesmember(
-                               customvariablesmember const* obj);
+customvariablesmember* add_custom_variable_to_contact(
+                         contact_struct* cntct,
+                         char const* varname,
+                         char const* varvalue);
+customvariablesmember* add_custom_variable_to_host(
+                         host_struct* hst,
+                         char const* varname,
+                         char const* varvalue);
+customvariablesmember* add_custom_variable_to_object(
+                         customvariablesmember** object_ptr,
+                         char const* varname,
+                         char const* varvalue);
+customvariablesmember* add_custom_variable_to_service(
+                         service_struct* svc,
+                         char const* varname,
+                         char const* varvalue);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace                      objects {
-  bool                         add_custom_variables_to_object(
-                                 std::vector<std::string> const& custom_vars,
-                                 customvariablesmember** list_customvar);
-  customvariablesmember const* release(customvariablesmember const* obj);
-}
+bool          operator==(
+                customvariablesmember const& obj1,
+                customvariablesmember const& obj2) throw ();
+bool          operator!=(
+                customvariablesmember const& obj1,
+                customvariablesmember const& obj2) throw ();
+std::ostream& operator<<(
+                std::ostream& os,
+                customvariablesmember const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
+
+

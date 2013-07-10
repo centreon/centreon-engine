@@ -21,8 +21,6 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/xcddefault.hh"
 
 /******************************************************************/
@@ -30,10 +28,8 @@
 /******************************************************************/
 
 /* initialize comment data */
-int xcddefault_initialize_comment_data(char const* main_config_file) {
+int xcddefault_initialize_comment_data() {
   comment* temp_comment = NULL;
-
-  (void)main_config_file;
 
   /* find the new starting index for comment id if its missing */
   if (next_comment_id == 0L) {
@@ -49,14 +45,6 @@ int xcddefault_initialize_comment_data(char const* main_config_file) {
   if (next_comment_id == 0L)
     next_comment_id = 1;
 
-  return (OK);
-}
-
-/* removes invalid and old comments from the comment file */
-int xcddefault_cleanup_comment_data(char const* main_config_file) {
-  (void)main_config_file;
-
-  /* nothing to do anymore */
   return (OK);
 }
 

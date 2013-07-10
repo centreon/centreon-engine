@@ -20,26 +20,40 @@
 #ifndef CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
 #  define CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct timeperiod_struct;
+
+typedef struct                       timeperiodexclusion_struct {
+  char*                              timeperiod_name;
+  struct timeperiod_struct*          timeperiod_ptr;
+  struct timeperiodexclusion_struct* next;
+}                                    timeperiodexclusion;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-void release_timeperiodexclusion(timeperiodexclusion const* obj);
+timeperiodexclusion* add_exclusion_to_timeperiod(
+                       timeperiod_struct* period,
+                       char const* name);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    release(timeperiodexclusion const* obj);
-}
+bool          operator==(
+                timeperiodexclusion const& obj1,
+                timeperiodexclusion const& obj2) throw ();
+bool          operator!=(
+                timeperiodexclusion const& obj1,
+                timeperiodexclusion const& obj2) throw ();
+std::ostream& operator<<(
+                std::ostream& os,
+                timeperiodexclusion const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
+
+

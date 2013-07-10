@@ -55,7 +55,7 @@ int main_test(int argc, char** argv) {
   (void)argv;
 
   // Add event logged data to broker.
-  config->set_event_broker_options(BROKER_LOGGED_DATA);
+  config->event_broker_options(BROKER_LOGGED_DATA);
 
   // Get instance of the module loader.
   engine::broker::loader& loader(engine::broker::loader::instance());

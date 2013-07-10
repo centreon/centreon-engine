@@ -29,8 +29,10 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 #include "globals.h"
+#include "mmap.h"
 
 using namespace com::centreon::engine;
 
@@ -141,7 +143,7 @@ extern "C" {
     // Create a safe temp file.
     std::ostringstream oss;
     oss << check_result_path << "/cXXXXXX";
-    char* output_file(my_strdup(oss.str().c_str()));
+    char* output_file(string::dup(oss.str()));
     int output_file_fd(mkstemp(output_file));
 
     // File created okay.
@@ -263,7 +265,7 @@ extern "C" {
           else {
             free_check_result(new_cr);
             init_check_result(new_cr);
-            new_cr->output_file = my_strdup(fname);
+            new_cr->output_file = string::dup(fname);
           }
         }
       }
@@ -274,9 +276,9 @@ extern "C" {
 
       // if file is too old, remove it.
       if (!strcmp(var, "file_time")
-          && config->get_max_check_result_file_age() > 0) {
+          && config->max_check_result_file_age() > 0) {
         unsigned long diff(current_time - strtoul(val, NULL, 0));
-        if (diff > config->get_max_check_result_file_age()) {
+        if (diff > config->max_check_result_file_age()) {
           free_check_result(new_cr);
           delete new_cr;
           new_cr = NULL;
@@ -288,14 +290,14 @@ extern "C" {
       if (!new_cr) {
         new_cr = new check_result;
         init_check_result(new_cr);
-        new_cr->output_file = my_strdup(fname);
+        new_cr->output_file = string::dup(fname);
       }
 
       // Process variable.
       if (!strcmp(var, "host_name"))
-        new_cr->host_name = my_strdup(val);
+        new_cr->host_name = string::dup(val);
       else if (!strcmp(var, "service_description")) {
-        new_cr->service_description = my_strdup(val);
+        new_cr->service_description = string::dup(val);
         new_cr->object_check_type = SERVICE_CHECK;
       }
       else if (!strcmp(var, "check_type"))
@@ -331,7 +333,7 @@ extern "C" {
       else if (!strcmp(var, "return_code"))
         new_cr->return_code = strtol(val, NULL, 0);
       else if (!strcmp(var, "output"))
-        new_cr->output = my_strdup(val);
+        new_cr->output = string::dup(val);
     }
 
     // We have something.

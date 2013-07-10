@@ -20,26 +20,45 @@
 #ifndef CCE_OBJECTS_SERVICESMEMBER_HH
 #  define CCE_OBJECTS_SERVICESMEMBER_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct host_struct;
+struct service_struct;
+struct servicegroup_struct;
+
+typedef struct                  servicesmember_struct {
+  char*                         host_name;
+  char*                         service_description;
+  service_struct*               service_ptr;
+  struct servicesmember_struct* next;
+}                               servicesmember;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-servicesmember const* release_servicesmember(servicesmember const* obj);
+servicesmember* add_service_link_to_host(
+                  host_struct* hst,
+                  service_struct* service_ptr);
+servicesmember* add_service_to_servicegroup(
+                  servicegroup_struct* temp_servicegroup,
+                  char const* host_name,
+                  char const* svc_description);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace               objects {
-  servicesmember const* release(servicesmember const* obj);
-}
+bool          operator==(
+                servicesmember const& obj1,
+                servicesmember const& obj2) throw ();
+bool          operator!=(
+                servicesmember const& obj1,
+                servicesmember const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, servicesmember const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICESMEMBER_HH
+
+

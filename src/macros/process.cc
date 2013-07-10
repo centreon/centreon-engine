@@ -21,7 +21,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/process.hh"
+#include "com/centreon/engine/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /*
@@ -53,7 +55,7 @@ int process_macros_r(
   if (output_buffer == NULL)
     return (ERROR);
 
-  *output_buffer = my_strdup("");
+  *output_buffer = string::dup("");
 
   if (input_buffer == NULL)
     return (ERROR);
@@ -65,7 +67,7 @@ int process_macros_r(
     "Processing: '" << input_buffer << "'";
 
   /* use a duplicate of original buffer, so we don't modify the original */
-  save_buffer = buf_ptr = (input_buffer ? my_strdup(input_buffer) : NULL);
+  save_buffer = buf_ptr = (input_buffer ? string::dup(input_buffer) : NULL);
 
   while (buf_ptr) {
     /* save pointer to this working part of buffer */

@@ -18,150 +18,166 @@
 */
 
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/hostgroup.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostgroup.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
-#include "com/centreon/engine/objects/utils.hh"
-#include "com/centreon/engine/skiplist.hh"
+#include "com/centreon/engine/objects/tool.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/string.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::objects::utils;
+using namespace com::centreon::engine::string;
 
 /**
- *  Wrapper C
+ *  Equal operator.
  *
- *  @see com::centreon::engine::objects::link
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
  */
-bool link_hostgroup(
-       hostgroup* obj,
-       host** members,
-       hostgroup** groups) {
-  try {
-    objects::link(
-               obj,
-               tab2vec(members),
-               tab2vec(groups));
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-    return (false);
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: link_hostgroup: unknow exception";
-    return (false);
-  }
-  return (true);
+bool operator==(
+       hostgroup const& obj1,
+       hostgroup const& obj2) throw () {
+  return (is_equal(obj1.group_name, obj2.group_name)
+          && is_equal(obj1.alias, obj2.alias)
+          && is_equal(obj1.members, obj2.members)
+          && is_equal(obj1.notes, obj2.notes)
+          && is_equal(obj1.notes_url, obj2.notes_url)
+          && is_equal(obj1.action_url, obj2.action_url));
 }
 
 /**
- *  Wrapper C
+ *  Not equal operator.
  *
- *  @see com::centreon::engine::objects::release
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
  */
-void release_hostgroup(hostgroup const* obj) {
-  try {
-    objects::release(obj);
-  }
-  catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << "error: " << e.what();
-  }
-  catch (...) {
-    logger(log_runtime_error, basic)
-      << "error: release_hostgroup: unknow exception";
-  }
-  return;
+bool operator!=(
+       hostgroup const& obj1,
+       hostgroup const& obj2) throw () {
+  return (!operator==(obj1, obj2));
 }
 
 /**
- *  Link an hostgroup with hosts and groups into the engine.
+ *  Dump hostgroup content into the stream.
  *
- *  @param[in,out] obj     Object to link with correct group_name.
- *  @param[in]     members The table with hosts member name.
- *  @param[in]     groups  The table with host groups member name.
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The hostgroup to dump.
+ *
+ *  @return The output stream.
  */
-void objects::link(
-                hostgroup* obj,
-                std::vector<host*> const& members,
-                std::vector<hostgroup*> const& groups) {
-  // Check object contents.
-  if (!obj)
-    throw (engine_error() << "hostgroup is a NULL pointer");
-  if (!obj->group_name)
-    throw (engine_error() << "hostgroup invalid group name");
+std::ostream& operator<<(std::ostream& os, hostgroup const& obj) {
+  os << "hostgroup {\n"
+    "  group_name: " << chkstr(obj.group_name) << "\n"
+    "  alias:      " << chkstr(obj.alias) << "\n"
+    "  members:    " << chkobj(obj.members) << "\n"
+    "  notes:      " << chkstr(obj.notes) << "\n"
+    "  notes_url:  " << chkstr(obj.notes_url) << "\n"
+    "  action_url: " << chkstr(obj.action_url) << "\n"
+    "}\n";
+  return (os);
+}
 
-  // Add all hosts into the hostgroup.
-  if (!add_hosts_to_object(members, &obj->members))
-    throw (engine_error() << "hostgroup '" << obj->group_name
-           << "' invalid member");
+/**
+ *  Add a new host group to the list in memory.
+ *
+ *  @param[in] name       Host group name.
+ *  @param[in] alias      Host group alias.
+ *  @param[in] notes      Notes.
+ *  @param[in] notes_url  URL.
+ *  @param[in] action_url Action URL.
+ *
+ *  @return New host group.
+ */
+hostgroup* add_hostgroup(
+             char const* name,
+             char const* alias,
+             char const* notes,
+             char const* notes_url,
+             char const* action_url) {
+  // Make sure we have the data we need.
+  if (!name || !name[0]) {
+    logger(log_config_error, basic)
+      << "Error: Hostgroup name is NULL";
+    return (NULL);
+  }
 
-  // Broker timestamp.
-  timeval tv(get_broker_timestamp(NULL));
+  // Allocate memory.
+  shared_ptr<hostgroup> obj(new hostgroup, deleter::hostgroup);
+  memset(obj.get(), 0, sizeof(hostgroup));
 
-  // Browse hosts.
-  for (std::vector<host*>::const_iterator
-         it(members.begin()), end(members.end());
-       it != end;
-       ++it) {
-    // Link host group to host.
-    add_object_to_objectlist(&(*it)->hostgroups_ptr, obj);
+  try {
+    // Duplicate vars.
+    obj->group_name = string::dup(name);
+    obj->alias = string::dup(alias ? alias : name);
+    if (action_url)
+      obj->action_url = string::dup(action_url);
+    if (notes)
+      obj->notes = string::dup(notes);
+    if (notes_url)
+      obj->notes_url = string::dup(notes_url);
 
-    // Notify event broker of new member.
-    broker_group_member(
-      NEBTYPE_HOSTGROUPMEMBER_ADD,
+    // Add new hostgroup to the monitoring engine.
+    std::string id(name);
+    umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
+      it(state::instance().hostgroups().find(id));
+    if (it != state::instance().hostgroups().end()) {
+      logger(log_config_error, basic)
+        << "Error: Hostgroup '" << name << "' has already been defined";
+      return (NULL);
+    }
+
+    // Add new items to the configuration state.
+    state::instance().hostgroups()[id] = obj;
+
+    // Add new items to the list.
+    obj->next = hostgroup_list;
+    hostgroup_list = obj.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_HOSTGROUP_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      obj,
-      *it,
+      obj.get(),
       &tv);
   }
-
-  // Add the content of other hostgroups into this hostgroup.
-  std::vector<host*> other_members;
-  for (std::vector<hostgroup*>::const_iterator
-         it(groups.begin()), end(groups.end());
-       it != end;
-       ++it) {
-    if (!*it)
-      throw (engine_error() << "hostgroup '" << obj->group_name
-             << "' invalid group member");
-    // Browse members.
-    for (hostsmember* mbr((*it)->members);
-         mbr;
-         mbr = mbr->next)
-      other_members.push_back(mbr->host_ptr);
+  catch (...) {
+    obj.clear();
   }
 
-  // Recursive call.
-  if (!other_members.empty())
-    objects::link(obj, other_members, std::vector<hostgroup*>());
-  return;
+  return (obj.get());
 }
 
 /**
- *  Cleanup memory of hostgroup.
+ *  Tests whether a host is a member of a particular hostgroup.
  *
- *  @param[in] obj The hostgroup to cleanup memory.
+ *  @deprecated This function is only used by the CGIS.
+ *
+ *  @param[in] group Target host group.
+ *  @param[in] hst   Target host.
+ *
+ *  @return true or false.
  */
-void objects::release(hostgroup const* obj) {
-  if (obj == NULL)
-    return;
+int is_host_member_of_hostgroup(hostgroup* group, host* hst) {
+  if (!group || !hst)
+    return (false);
 
-  hostsmember const* member = obj->members;
-  while ((member = release(member))) {}
-
-  skiplist_delete(object_skiplists[HOSTGROUP_SKIPLIST], obj);
-  remove_object_list(obj, &hostgroup_list, &hostgroup_list_tail);
-
-  delete[] obj->group_name;
-  delete[] obj->alias;
-  delete[] obj->notes;
-  delete[] obj->notes_url;
-  delete[] obj->action_url;
-  delete obj;
-  return;
+  for (hostsmember* member(group->members);
+       member;
+       member = member->next)
+    if (member->host_ptr == hst)
+      return (true);
+  return (false);
 }

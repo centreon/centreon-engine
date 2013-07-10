@@ -20,8 +20,33 @@
 #ifndef CCE_COMPATIBILITY_OBJECTS_H
 #  define CCE_COMPATIBILITY_OBJECTS_H
 
-#  include "com/centreon/engine/objects.hh"
+#  include <time.h>
+#  include "com/centreon/engine/common.hh"
+#  include "com/centreon/engine/objects/command.hh"
+#  include "com/centreon/engine/objects/commandsmember.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/contactgroup.hh"
+#  include "com/centreon/engine/objects/contactgroupsmember.hh"
+#  include "com/centreon/engine/objects/contactsmember.hh"
+#  include "com/centreon/engine/objects/customvariablesmember.hh"
+#  include "com/centreon/engine/objects/daterange.hh"
+#  include "com/centreon/engine/objects/defines.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/hostdependency.hh"
+#  include "com/centreon/engine/objects/hostescalation.hh"
+#  include "com/centreon/engine/objects/hostgroup.hh"
+#  include "com/centreon/engine/objects/hostsmember.hh"
+#  include "com/centreon/engine/objects/objectlist.hh"
+#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/objects/servicedependency.hh"
+#  include "com/centreon/engine/objects/serviceescalation.hh"
+#  include "com/centreon/engine/objects/servicegroup.hh"
+#  include "com/centreon/engine/objects/servicesmember.hh"
+#  include "com/centreon/engine/objects/timeperiod.hh"
+#  include "com/centreon/engine/objects/timeperiodexclusion.hh"
+#  include "com/centreon/engine/objects/timerange.hh"
 #  include "common.h"
 #  include "config.h"
+#  include "find.hh"
 
 #endif // !CCE_COMPATIBILITY_OBJECTS_H

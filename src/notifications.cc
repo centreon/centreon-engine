@@ -20,14 +20,20 @@
 */
 
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon;
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::logging;
 
 static char const* tab_notification_str[] = {
@@ -184,80 +190,63 @@ int service_notification(
     }
 
     /* get author and comment macros */
-    delete[] mac.x[MACRO_NOTIFICATIONAUTHOR];
-    delete[] mac.x[MACRO_NOTIFICATIONAUTHORNAME];
-    delete[] mac.x[MACRO_NOTIFICATIONAUTHORALIAS];
-    delete[] mac.x[MACRO_NOTIFICATIONCOMMENT];
-
-    mac.x[MACRO_NOTIFICATIONAUTHOR] = not_author ? my_strdup(not_author) : 0;
-    mac.x[MACRO_NOTIFICATIONCOMMENT] = not_data ? my_strdup(not_data) : 0;
-    if (temp_contact != NULL) {
-      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = my_strdup(temp_contact->name);
-      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = my_strdup(temp_contact->alias);
+    string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
+    string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
+    if (temp_contact) {
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->name);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->alias);
     }
     else {
-      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = 0;
-      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
     }
 
     /* NOTE: these macros are deprecated and will likely disappear in next major release */
     /* if this is an acknowledgement, get author and comment macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-
-      delete[] mac.x[MACRO_SERVICEACKAUTHOR];
-      delete[] mac.x[MACRO_SERVICEACKAUTHORNAME];
-      delete[] mac.x[MACRO_SERVICEACKAUTHORALIAS];
-      delete[] mac.x[MACRO_SERVICEACKCOMMENT];
-
-      mac.x[MACRO_SERVICEACKAUTHOR] = not_author ? my_strdup(not_author) : 0;
-      mac.x[MACRO_SERVICEACKCOMMENT] = not_data ? my_strdup(not_data) : 0;
-      if (temp_contact != NULL) {
-        mac.x[MACRO_SERVICEACKAUTHORNAME] = my_strdup(temp_contact->name);
-        mac.x[MACRO_SERVICEACKAUTHORALIAS] = my_strdup(temp_contact->alias);
+      string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
+      string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
+      if (temp_contact) {
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
       }
       else {
-        mac.x[MACRO_SERVICEACKAUTHORNAME] = 0;
-        mac.x[MACRO_SERVICEACKAUTHORALIAS] = 0;
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS]);
       }
     }
 
     /* set the notification type macro */
-    delete[] mac.x[MACRO_NOTIFICATIONTYPE];
     if (type == NOTIFICATION_ACKNOWLEDGEMENT)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("ACKNOWLEDGEMENT");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
     else if (type == NOTIFICATION_FLAPPINGSTART)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTART");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
     else if (type == NOTIFICATION_FLAPPINGSTOP)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTOP");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
     else if (type == NOTIFICATION_FLAPPINGDISABLED)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGDISABLED");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
     else if (type == NOTIFICATION_DOWNTIMESTART)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMESTART");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
     else if (type == NOTIFICATION_DOWNTIMEEND)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMEEND");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
     else if (type == NOTIFICATION_DOWNTIMECANCELLED)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMECANCELLED");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("CUSTOM");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
     else if (svc->current_state == STATE_OK)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("RECOVERY");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("PROBLEM");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    delete[] mac.x[MACRO_SERVICENOTIFICATIONNUMBER];
-    mac.x[MACRO_SERVICENOTIFICATIONNUMBER]
-      = obj2pchar(svc->current_notification_number);
+    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONNUMBER], svc->current_notification_number);
 
     /* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
-    delete[] mac.x[MACRO_NOTIFICATIONNUMBER];
-    mac.x[MACRO_NOTIFICATIONNUMBER]
-      = my_strdup((mac.x[MACRO_SERVICENOTIFICATIONNUMBER] == NULL) ? "" : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]);
+    char const* notificationnumber(mac.x[MACRO_SERVICENOTIFICATIONNUMBER]);
+    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER], notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    delete[] mac.x[MACRO_SERVICENOTIFICATIONID];
-    mac.x[MACRO_SERVICENOTIFICATIONID]
-      = obj2pchar(svc->current_notification_id);
+    string::setstr(mac.x[MACRO_SERVICENOTIFICATIONID], svc->current_notification_id);
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
@@ -398,7 +387,7 @@ int check_service_notification_viability(
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config->get_enable_notifications() == false) {
+  if (config->enable_notifications() == false) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so service notifications will "
       "not be sent out.";
@@ -649,7 +638,7 @@ int check_service_notification_viability(
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(svc->first_notification_delay
-                              * config->get_interval_length()))) {
+                              * config->interval_length()))) {
       logger(dbg_notifications, more)
         << "Not enough time has elapsed since the service changed to a "
         "non-OK state, so we should not notify about this problem yet";
@@ -971,7 +960,7 @@ int notify_contact_of_service(
       continue;
 
     /* get the command name */
-    command_name = my_strdup(temp_commandsmember->cmd);
+    command_name = string::dup(temp_commandsmember->cmd);
     command_name_ptr = strtok(command_name, "!");
 
     /* run the notification command... */
@@ -980,7 +969,7 @@ int notify_contact_of_service(
       << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->get_log_notifications() == true) {
+    if (config->log_notifications() == true) {
       char const* service_state_str("UNKNOWN");
       if ((unsigned int)svc->current_state < sizeof(tab_service_state_str) / sizeof(*tab_service_state_str))
         service_state_str = tab_service_state_str[svc->current_state];
@@ -1014,7 +1003,7 @@ int notify_contact_of_service(
     my_system_r(
       mac,
       processed_command,
-      config->get_notification_timeout(),
+      config->notification_timeout(),
       &early_timeout,
       &exectime,
       NULL,
@@ -1025,7 +1014,7 @@ int notify_contact_of_service(
       logger(log_service_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' service notification command '" << processed_command
-        << "' timed out after " << config->get_notification_timeout()
+        << "' timed out after " << config->notification_timeout()
         << " seconds";
     }
 
@@ -1145,17 +1134,19 @@ int is_valid_escalation_for_service_notification(
 
 /* checks to see whether a service notification should be escalation */
 int should_service_notification_be_escalated(service* svc) {
-  serviceescalation* temp_se = NULL;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "should_service_notification_be_escalated()";
 
-  /* search the service escalation list */
-  for (temp_se = get_first_service_escalation_by_service(svc->host_name, svc->description, &ptr);
-       temp_se != NULL;
-       temp_se = get_next_service_escalation_by_service(svc->host_name, svc->description, &ptr)) {
-
+  std::pair<std::string, std::string>
+    id(std::make_pair(svc->host_name, svc->description));
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
+    escalations(state::instance().serviceescalations());
+  for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
+         it(escalations.find(id)), end(escalations.end());
+       it != end && it->first == id;
+       ++it) {
+    serviceescalation* temp_se(&*it->second);
     /* we found a matching entry, so escalate this notification! */
     if (is_valid_escalation_for_service_notification(
           svc,
@@ -1177,13 +1168,11 @@ int create_notification_list_from_service(
       nagios_macros* mac,
       service* svc, int options,
       int* escalated) {
-  serviceescalation* temp_se = NULL;
   contactsmember* temp_contactsmember = NULL;
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   int escalate_notification = FALSE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_service()";
@@ -1198,8 +1187,7 @@ int create_notification_list_from_service(
   free_notification_list();
 
   /* set the escalation macro */
-  delete[] mac->x[MACRO_NOTIFICATIONISESCALATED];
-  mac->x[MACRO_NOTIFICATIONISESCALATED] = obj2pchar(escalate_notification);
+  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
 
   if (options & NOTIFICATION_OPTION_BROADCAST)
     logger(dbg_notifications, more)
@@ -1214,10 +1202,15 @@ int create_notification_list_from_service(
       << "Adding contacts from service escalation(s) to "
       "notification list.";
 
-    /* search all the escalation entries for valid matches */
-    for (temp_se = get_first_service_escalation_by_service(svc->host_name, svc->description, &ptr);
-         temp_se != NULL;
-         temp_se = get_next_service_escalation_by_service(svc->host_name, svc->description, &ptr)) {
+    std::pair<std::string, std::string>
+      id(std::make_pair(svc->host_name, svc->description));
+    umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
+      escalations(state::instance().serviceescalations());
+    for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
+           it(escalations.find(id)), end(escalations.end());
+         it != end && it->first == id;
+         ++it) {
+      serviceescalation* temp_se(&*it->second);
 
       /* skip this entry if it isn't appropriate */
       if (is_valid_escalation_for_service_notification(
@@ -1424,89 +1417,63 @@ int host_notification(
     }
 
     /* get author and comment macros */
-    delete[] mac.x[MACRO_NOTIFICATIONAUTHOR];
-    delete[] mac.x[MACRO_NOTIFICATIONAUTHORNAME];
-    delete[] mac.x[MACRO_NOTIFICATIONAUTHORALIAS];
-    delete[] mac.x[MACRO_NOTIFICATIONCOMMENT];
-
-    mac.x[MACRO_NOTIFICATIONAUTHOR]
-      = not_author ? my_strdup(not_author) : 0;
-    mac.x[MACRO_NOTIFICATIONCOMMENT]
-      = not_data ? my_strdup(not_data) : 0;
-    if (temp_contact != NULL) {
-      mac.x[MACRO_NOTIFICATIONAUTHORNAME]
-        = my_strdup(temp_contact->name);
-      mac.x[MACRO_NOTIFICATIONAUTHORALIAS]
-        = my_strdup(temp_contact->alias);
+    string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
+    string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
+    if (temp_contact) {
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->name);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->alias);
     }
     else {
-      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = 0;
-      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME]);
+      string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
     }
 
     /* NOTE: these macros are deprecated and will likely disappear in next major release */
     /* if this is an acknowledgement, get author and comment macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-
-      delete[] mac.x[MACRO_HOSTACKAUTHOR];
-      delete[] mac.x[MACRO_HOSTACKCOMMENT];
-      delete[] mac.x[MACRO_SERVICEACKAUTHORNAME];
-      delete[] mac.x[MACRO_SERVICEACKAUTHORALIAS];
-
-      mac.x[MACRO_HOSTACKAUTHOR]
-        = not_author ? my_strdup(not_author) : 0;
-      mac.x[MACRO_HOSTACKCOMMENT]
-        = not_data ? my_strdup(not_data) : 0;
-
-      if (temp_contact != NULL) {
-        mac.x[MACRO_SERVICEACKAUTHORNAME]
-          = my_strdup(temp_contact->name);
-        mac.x[MACRO_SERVICEACKAUTHORALIAS]
-          = my_strdup(temp_contact->alias);
+      string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
+      string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
+      if (temp_contact) {
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
       }
       else {
-        mac.x[MACRO_SERVICEACKAUTHORNAME] = 0;
-        mac.x[MACRO_SERVICEACKAUTHORALIAS] = 0;
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
+        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS]);
       }
     }
 
     /* set the notification type macro */
-    delete[] mac.x[MACRO_NOTIFICATIONTYPE];
     if (type == NOTIFICATION_ACKNOWLEDGEMENT)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("ACKNOWLEDGEMENT");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
     else if (type == NOTIFICATION_FLAPPINGSTART)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTART");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
     else if (type == NOTIFICATION_FLAPPINGSTOP)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTOP");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
     else if (type == NOTIFICATION_FLAPPINGDISABLED)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGDISABLED");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
     else if (type == NOTIFICATION_DOWNTIMESTART)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMESTART");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
     else if (type == NOTIFICATION_DOWNTIMEEND)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMEEND");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
     else if (type == NOTIFICATION_DOWNTIMECANCELLED)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMECANCELLED");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("CUSTOM");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
     else if (hst->current_state == HOST_UP)
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("RECOVERY");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "RECOVERY");
     else
-      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("PROBLEM");
+      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "PROBLEM");
 
     /* set the notification number macro */
-    delete[] mac.x[MACRO_HOSTNOTIFICATIONNUMBER];
-    mac.x[MACRO_HOSTNOTIFICATIONNUMBER]
-      = obj2pchar(hst->current_notification_number);
+    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONNUMBER], hst->current_notification_number);
 
     /* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
-    delete[] mac.x[MACRO_NOTIFICATIONNUMBER];
-    mac.x[MACRO_NOTIFICATIONNUMBER]
-      = my_strdup(mac.x[MACRO_HOSTNOTIFICATIONNUMBER] ? mac.x[MACRO_HOSTNOTIFICATIONNUMBER] : "");
+    char const* notificationnumber(mac.x[MACRO_HOSTNOTIFICATIONNUMBER]);
+    string::setstr(mac.x[MACRO_NOTIFICATIONNUMBER], notificationnumber ? notificationnumber : "");
 
     /* set the notification id macro */
-    delete[] mac.x[MACRO_HOSTNOTIFICATIONID];
-    mac.x[MACRO_HOSTNOTIFICATIONID]
-      = obj2pchar(hst->current_notification_id);
+    string::setstr(mac.x[MACRO_HOSTNOTIFICATIONID], hst->current_notification_id);
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
@@ -1645,7 +1612,7 @@ int check_host_notification_viability(
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config->get_enable_notifications() == false) {
+  if (config->enable_notifications() == false) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so host notifications will not "
       "be sent out.";
@@ -1857,7 +1824,7 @@ int check_host_notification_viability(
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(hst->first_notification_delay
-                              * config->get_interval_length()))) {
+                              * config->interval_length()))) {
       logger(dbg_notifications, more)
         << "Not enough time has elapsed since the host changed to a "
         "non-UP state (or since program start), so we shouldn't notify "
@@ -2152,7 +2119,7 @@ int notify_contact_of_host(
       continue;
 
     /* get the command name */
-    command_name = my_strdup(temp_commandsmember->cmd);
+    command_name = string::dup(temp_commandsmember->cmd);
     command_name_ptr = strtok(command_name, "!");
 
     /* run the notification command... */
@@ -2161,7 +2128,7 @@ int notify_contact_of_host(
       << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config->get_log_notifications() == true) {
+    if (config->log_notifications() == true) {
       char const* host_state_str("UP");
       if ((unsigned int)hst->current_state < sizeof(tab_host_state_str) / sizeof(*tab_host_state_str))
         host_state_str = tab_host_state_str[hst->current_state];
@@ -2194,7 +2161,7 @@ int notify_contact_of_host(
     my_system_r(
       mac,
       processed_command,
-      config->get_notification_timeout(),
+      config->notification_timeout(),
       &early_timeout,
       &exectime,
       NULL,
@@ -2205,7 +2172,7 @@ int notify_contact_of_host(
       logger(log_host_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' host notification command '" << processed_command
-        << "' timed out after " << config->get_notification_timeout()
+        << "' timed out after " << config->notification_timeout()
         << " seconds";
     }
 
@@ -2323,19 +2290,20 @@ int is_valid_escalation_for_host_notification(
 
 /* checks to see whether a host notification should be escalation */
 int should_host_notification_be_escalated(host* hst) {
-  hostescalation* temp_he = NULL;
-  void* ptr = NULL;
-
   logger(dbg_functions, basic)
     << "should_host_notification_be_escalated()";
 
   if (hst == NULL)
     return (FALSE);
 
-  /* search the host escalation list */
-  for (temp_he = get_first_host_escalation_by_host(hst->name, &ptr);
-       temp_he != NULL;
-       temp_he = get_next_host_escalation_by_host(hst->name, &ptr)) {
+  std::string id(hst->name);
+  umultimap<std::string, shared_ptr<hostescalation> > const&
+    escalations(state::instance().hostescalations());
+  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+         it(escalations.find(id)), end(escalations.end());
+       it != end && it->first == id;
+       ++it) {
+    hostescalation* temp_he(&*it->second);
 
     /* we found a matching entry, so escalate this notification! */
     if (is_valid_escalation_for_host_notification(
@@ -2357,13 +2325,11 @@ int create_notification_list_from_host(
       host* hst,
       int options,
       int* escalated) {
-  hostescalation* temp_he = NULL;
   contactsmember* temp_contactsmember = NULL;
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   int escalate_notification = FALSE;
-  void* ptr = NULL;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_host()";
@@ -2378,9 +2344,7 @@ int create_notification_list_from_host(
   free_notification_list();
 
   /* set the escalation macro */
-  delete[] mac->x[MACRO_NOTIFICATIONISESCALATED];
-  mac->x[MACRO_NOTIFICATIONISESCALATED]
-    = obj2pchar(escalate_notification);
+  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
 
   if (options & NOTIFICATION_OPTION_BROADCAST)
     logger(dbg_notifications, more)
@@ -2395,10 +2359,14 @@ int create_notification_list_from_host(
       << "Adding contacts from host escalation(s) to "
       "notification list.";
 
-    /* check all the host escalation entries */
-    for (temp_he = get_first_host_escalation_by_host(hst->name, &ptr);
-         temp_he != NULL;
-         temp_he = get_next_host_escalation_by_host(hst->name, &ptr)) {
+    std::string id(hst->name);
+    umultimap<std::string, shared_ptr<hostescalation> > const&
+      escalations(state::instance().hostescalations());
+    for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
+           it(escalations.find(id)), end(escalations.end());
+         it != end && it->first == id;
+         ++it) {
+      hostescalation* temp_he(&*it->second);
 
       /* see if this escalation if valid for this notification */
       if (is_valid_escalation_for_host_notification(
@@ -2560,7 +2528,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
     "notification time: " << interval_to_use;
 
   /* calculate next notification time */
-  next_notification = offset + static_cast<time_t>(interval_to_use * config->get_interval_length());
+  next_notification = offset + static_cast<time_t>(interval_to_use * config->interval_length());
   return (next_notification);
 }
 
@@ -2628,7 +2596,7 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
 
   /* calculate next notification time */
   next_notification = static_cast<time_t>(offset
-                                          + (interval_to_use * config->get_interval_length()));
+                                          + (interval_to_use * config->interval_length()));
 
   return (next_notification);
 }
@@ -2682,16 +2650,13 @@ int add_notification(nagios_macros* mac, contact* cntct) {
   notification_list = new_notification;
 
   /* add contact to notification recipients macro */
-  if (mac->x[MACRO_NOTIFICATIONRECIPIENTS] == NULL)
-    mac->x[MACRO_NOTIFICATIONRECIPIENTS] = my_strdup(cntct->name);
+  if (!mac->x[MACRO_NOTIFICATIONRECIPIENTS])
+    string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], cntct->name);
   else {
-    mac->x[MACRO_NOTIFICATIONRECIPIENTS] =
-      resize_string(
-        mac->x[MACRO_NOTIFICATIONRECIPIENTS],
-        strlen(mac->x[MACRO_NOTIFICATIONRECIPIENTS])
-        + strlen(cntct->name) + 2);
-    strcat(mac->x[MACRO_NOTIFICATIONRECIPIENTS], ",");
-    strcat(mac->x[MACRO_NOTIFICATIONRECIPIENTS], cntct->name);
+    std::string buffer(mac->x[MACRO_NOTIFICATIONRECIPIENTS]);
+    buffer += ",";
+    buffer += cntct->name;
+    string::setstr(mac->x[MACRO_NOTIFICATIONRECIPIENTS], buffer);
   }
 
   return (OK);

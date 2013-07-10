@@ -88,7 +88,7 @@ int main_test(int argc, char* argv[]) {
   (void)argv;
 
   // Initialization.
-  config->set_log_archive_path(".");
+  config->log_archive_path(".");
 
   // Tests.
   check_directory();

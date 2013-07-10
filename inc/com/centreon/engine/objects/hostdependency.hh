@@ -20,32 +20,67 @@
 #ifndef CCE_OBJECTS_HOSTDEPENDENCY_HH
 #  define CCE_OBJECTS_HOSTDEPENDENCY_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct host_struct;
+struct timeperiod_struct;
+
+typedef struct                  hostdependency_struct {
+  int                           dependency_type;
+  char*                         dependent_host_name;
+  char*                         host_name;
+  char*                         dependency_period;
+  int                           inherits_parent;
+  int                           fail_on_up;
+  int                           fail_on_down;
+  int                           fail_on_unreachable;
+  int                           fail_on_pending;
+  int                           circular_path_checked;
+  int                           contains_circular_path;
+
+  host_struct*                  master_host_ptr;
+  host_struct*                  dependent_host_ptr;
+  timeperiod_struct*            dependency_period_ptr;
+  struct hostdependency_struct* next;
+  struct hostdependency_struct* nexthash;
+}                               hostdependency;
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-bool link_hostdependency(
-       hostdependency* obj,
-       timeperiod* dependency_period);
-void release_hostdependency(hostdependency const* obj);
+hostdependency* add_host_dependency(
+                  char const* dependent_host_name,
+                  char const* host_name,
+                  int dependency_type,
+                  int inherits_parent,
+                  int fail_on_up,
+                  int fail_on_down,
+                  int fail_on_unreachable,
+                  int fail_on_pending,
+                  char const* dependency_period);
+int             check_for_circular_hostdependency_path(
+                  hostdependency* root_dep,
+                  hostdependency* dep,
+                  int dependency_type);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    link(
-            hostdependency* obj,
-            timeperiod* dependency_period = NULL);
-  void    release(hostdependency const* obj);
-}
+bool          operator==(
+                hostdependency const& obj1,
+                hostdependency const& obj2) throw ();
+bool          operator!=(
+                hostdependency const& obj1,
+                hostdependency const& obj2) throw ();
+bool          operator<(
+                hostdependency const& obj1,
+                hostdependency const& obj2) throw ();
+std::ostream& operator<<(std::ostream& os, hostdependency const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH
+
+

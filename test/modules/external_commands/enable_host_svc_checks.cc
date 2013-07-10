@@ -33,8 +33,6 @@ static int check_enable_host_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  init_object_skiplists();
-
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
@@ -62,23 +60,6 @@ static int check_enable_host_svc_checks(int argc, char** argv) {
 
   if (scheduled_downtime_list)
     throw (engine_error() << "enable_host_svc_checks failed.");
-
-  delete member;
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete svc;
-
-  free_object_skiplists();
-
   return (0);
 }
 

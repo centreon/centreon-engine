@@ -20,38 +20,61 @@
 #ifndef CCE_OBJECTS_HOSTESCALATION_HH
 #  define CCE_OBJECTS_HOSTESCALATION_HH
 
-#  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/objects.hh"
+/* Forward declaration. */
+struct contactgroupsmember_struct;
+struct contactsmember_struct;
+struct host_struct;
+struct timeperiod_struct;
+
+typedef struct                   hostescalation_struct {
+  char*                          host_name;
+  int                            first_notification;
+  int                            last_notification;
+  double                         notification_interval;
+  char*                          escalation_period;
+  int                            escalate_on_recovery;
+  int                            escalate_on_down;
+  int                            escalate_on_unreachable;
+  contactgroupsmember_struct*    contact_groups;
+  contactsmember_struct*         contacts;
+  host_struct*                   host_ptr;
+  timeperiod_struct*             escalation_period_ptr;
+  struct hostescalation_struct*  next;
+  struct hostescalation_struct*  nexthash;
+}                                hostescalation;
 
 #  ifdef __cplusplus
-#    include <string>
-#    include <vector>
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-bool link_hostescalation(
-       hostescalation* obj,
-       contact** contacts,
-       contactgroup** contactgroups,
-       timeperiod* escalation_period);
-void release_hostescalation(hostescalation const* obj);
+hostescalation* add_host_escalation(
+                  char const* host_name,
+                  int first_notification,
+                  int last_notification,
+                  double notification_interval,
+                  char const* escalation_period,
+                  int escalate_on_down,
+                  int escalate_on_unreachable,
+                  int escalate_on_recovery);
 
 #  ifdef __cplusplus
 }
 
-CCE_BEGIN()
+#    include <ostream>
 
-namespace objects {
-  void    link(
-            hostescalation* obj,
-            std::vector<contact*> const& contacts = std::vector<contact*>(),
-            std::vector<contactgroup*> const& contactgroups = std::vector<contactgroup*>(),
-            timeperiod* escalation_period = NULL);
-  void    release(hostescalation const* obj);
-}
+bool          operator==(
+                hostescalation const& obj1,
+                hostescalation const& obj2) throw ();
+bool          operator!=(
+                hostescalation const& obj1,
+                hostescalation const& obj2) throw ();
+bool          operator<(
+                hostescalation const& obj1,
+                hostescalation const& obj2);
+std::ostream& operator<<(std::ostream& os, hostescalation const& obj);
 
-CCE_END()
-
-#  endif // C++
+#  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTESCALATION_HH
+
+

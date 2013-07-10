@@ -23,12 +23,15 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xdddefault.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
@@ -36,17 +39,15 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* initializes scheduled downtime data */
-int initialize_downtime_data(char const* config_file) {
-  return (xdddefault_initialize_downtime_data(config_file));
+int initialize_downtime_data() {
+  return (xdddefault_initialize_downtime_data());
 }
 
 /* cleans up scheduled downtime data */
-int cleanup_downtime_data(char const* config_file) {
-  int result = xdddefault_cleanup_downtime_data(config_file);
-
+int cleanup_downtime_data() {
   /* free memory allocated to downtime data */
   free_downtime_data();
-  return (result);
+  return (OK);
 }
 
 /******************************************************************/
@@ -1196,13 +1197,13 @@ int add_downtime(
   memset(new_downtime, 0, sizeof(*new_downtime));
 
   /* duplicate vars */
-  new_downtime->host_name = my_strdup(host_name);
+  new_downtime->host_name = string::dup(host_name);
   if (downtime_type == SERVICE_DOWNTIME)
-    new_downtime->service_description = my_strdup(svc_description);
+    new_downtime->service_description = string::dup(svc_description);
   if (author)
-    new_downtime->author = my_strdup(author);
+    new_downtime->author = string::dup(author);
   if (comment_data)
-    new_downtime->comment = my_strdup(comment_data);
+    new_downtime->comment = string::dup(comment_data);
 
   new_downtime->type = downtime_type;
   new_downtime->entry_time = entry_time;
