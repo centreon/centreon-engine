@@ -236,6 +236,7 @@ void checker::run(
   if (!hst->check_command_ptr)
     throw (engine_error() << "attempt to run active check on host '"
            << hst->name << "' with no check command");
+
   logger(dbg_checks, basic)
     << "** Running async check of host '" << hst->name << "'...";
 
@@ -460,10 +461,10 @@ void checker::run(
   // Preamble.
   if (!svc)
     throw (engine_error() << "attempt to run check on NULL service");
-  else if (!svc->host_ptr)
+  if (!svc->host_ptr)
     throw (engine_error()
            << "attempt to run check on service with NULL host");
-  else if (!svc->check_command_ptr)
+  if (!svc->check_command_ptr)
     throw (engine_error() << "attempt to run active check on service '"
            << svc->description << "' on host '" << svc->host_ptr->name
            << "' with no check command");
@@ -669,6 +670,10 @@ void checker::run_sync(
   // Preamble.
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
+  if (!hst->check_command_ptr)
+    throw (engine_error() << "attempt to run active check on host '"
+           << hst->name << "' with no check command");
+
   logger(dbg_checks, basic)
     << "** Run sync check of host '" << hst->name << "'...";
 
@@ -921,6 +926,10 @@ int checker::_execute_sync(host* hst) {
   // Preamble.
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
+  if (!hst->check_command_ptr)
+    throw (engine_error() << "attempt to run active check on host '"
+           << hst->name << "' with no check command");
+
   logger(dbg_checks, basic)
     << "** Executing sync check of host '" << hst->name << "'...";
 
