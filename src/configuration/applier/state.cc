@@ -1138,10 +1138,11 @@ void applier::state::_processing(
     config->serviceescalations());
 
 
-  if (!retention_path.empty()) {
-    retention::parser p;
-    p.parse(retention_path);
-  }
+  // XXX:
+  // if (!retention_path.empty()) {
+  //   retention::parser p;
+  //   p.parse(retention_path);
+  // }
 
   // Pre-flight check.
   {

@@ -24,6 +24,7 @@
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -376,7 +377,7 @@ std::string const& contact::contact_name() const throw () {
  *
  *  @return The customvariables.
  */
-properties const& contact::customvariables() const throw () {
+map_customvar const& contact::customvariables() const throw () {
   return (_customvariables);
 }
 

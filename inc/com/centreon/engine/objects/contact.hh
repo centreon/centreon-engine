@@ -104,6 +104,8 @@ contact* add_contact(
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 contact const& obj1,
@@ -112,6 +114,13 @@ bool          operator!=(
                 contact const& obj1,
                 contact const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, contact const& obj);
+
+CCE_BEGIN()
+
+contact&      find_contact(std::string const& name);
+bool          is_contact_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

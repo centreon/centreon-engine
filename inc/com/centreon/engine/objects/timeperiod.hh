@@ -47,6 +47,8 @@ timeperiod* add_timeperiod(char const* name, char const* alias);
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 timeperiod const& obj1,
@@ -55,6 +57,13 @@ bool          operator!=(
                 timeperiod const& obj1,
                 timeperiod const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, timeperiod const& obj);
+
+CCE_BEGIN()
+
+timeperiod&   find_timperiod(std::string const& name);
+bool          is_timeperiod_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

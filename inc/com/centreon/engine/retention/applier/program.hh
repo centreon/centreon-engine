@@ -17,30 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_RETENTION_PROGRAM_HH
-#  define CCE_RETENTION_PROGRAM_HH
+#ifndef CCE_RETENTION_APPLIER_PROGRAM_HH
+#  define CCE_RETENTION_APPLIER_PROGRAM_HH
 
-#  include <string>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/object.hh"
+#  include "com/centreon/engine/retention/program.hh"
 
 CCE_BEGIN()
 
-namespace         retention {
-  class           program
-    : public object {
+namespace   retention {
+  namespace applier {
+    class   program {
   public:
-                  program();
-                  ~program() throw ();
-    bool          set(
-                    std::string const& key,
-                    std::string const& value);
+            program();
+            ~program() throw ();
+      void  apply(retention::program const& obj);
 
-  private:
-    void          _finished() throw ();
-  };
+    private:
+      bool  _find_command(std::string const& command_line);
+    };
+  }
 }
 
 CCE_END()
 
-#endif // !CCE_RETENTION_PROGRAM_HH
+#endif // !CCE_RETENTION_APPLIER_PROGRAM_HH

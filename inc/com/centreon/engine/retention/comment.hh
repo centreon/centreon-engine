@@ -20,6 +20,7 @@
 #ifndef CCE_RETENTION_COMMENT_HH
 #  define CCE_RETENTION_COMMENT_HH
 
+#  include <list>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
@@ -84,6 +85,8 @@ namespace              retention {
     std::string        _service_description;
     int                _source;
   };
+
+  typedef std::list<comment> list_comment;
 }
 
 CCE_END()

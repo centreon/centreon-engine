@@ -57,6 +57,8 @@ int           is_service_member_of_servicegroup(
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 servicegroup const& obj1,
@@ -65,6 +67,13 @@ bool          operator!=(
                 servicegroup const& obj1,
                 servicegroup const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, servicegroup const& obj);
+
+CCE_BEGIN()
+
+servicegroup& find_servicegroup(std::string const& name);
+bool          is_servicegroup_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

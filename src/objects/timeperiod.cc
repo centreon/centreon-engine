@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/timeperiod.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/daterange.hh"
@@ -130,9 +131,7 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
 
     // Add new timeperiod to the monitoring engine.
     std::string id(name);
-    umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
-      it(state::instance().timeperiods().find(id));
-    if (it != state::instance().timeperiods().end()) {
+    if (is_timeperiod_exist(id)) {
       logger(log_config_error, basic)
         << "Error: Timeperiod '" << name << "' has already been defined";
       return (NULL);
@@ -153,4 +152,33 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
   }
 
   return (obj.get());
+}
+
+/**
+ *  Get timeperiod by name.
+ *
+ *  @param[in] name The timeperiod name.
+ *
+ *  @return The struct timeperiod or throw exception if the
+ *          timeperiod is not found.
+ */
+timeperiod& engine::find_timperiod(std::string const& name) {
+  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+    it(state::instance().timeperiods().find(name));
+  if (it == state::instance().timeperiods().end())
+    throw (engine_error() << "timeperiod " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if timeperiod exist.
+ *
+ *  @param[in] name The timeperiod name.
+ *
+ *  @return True if the timeperiod is found, otherwise false.
+ */
+bool engine::is_timeperiod_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+    it(state::instance().timeperiods().find(name));
+  return (it != state::instance().timeperiods().end());
 }

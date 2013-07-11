@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/contactgroup.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
@@ -165,4 +166,33 @@ int is_contact_member_of_contactgroup(
       return (true);
 
   return (false);
+}
+
+/**
+ *  Get contactgroup by name.
+ *
+ *  @param[in] name The contactgroup name.
+ *
+ *  @return The struct contactgroup or throw exception if the
+ *          contactgroup is not found.
+ */
+contactgroup& engine::find_contactgroup(std::string const& name) {
+  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+    it(state::instance().contactgroups().find(name));
+  if (it == state::instance().contactgroups().end())
+    throw (engine_error() << "contactgroup " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if contactgroup exist.
+ *
+ *  @param[in] name The contactgroup name.
+ *
+ *  @return True if the contactgroup is found, otherwise false.
+ */
+bool engine::is_contactgroup_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+    it(state::instance().contactgroups().find(name));
+  return (it != state::instance().contactgroups().end());
 }

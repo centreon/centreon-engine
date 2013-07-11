@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/host.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
@@ -596,9 +597,7 @@ host* add_host(
 
     // Add new host to the monitoring engine.
     std::string id(name);
-    umap<std::string, shared_ptr<host_struct> >::const_iterator
-      it(state::instance().hosts().find(id));
-    if (it != state::instance().hosts().end()) {
+    if (is_host_exist(id)) {
       logger(log_config_error, basic)
         << "Error: Host '" << name << "' has already been defined";
       return (NULL);
@@ -824,4 +823,33 @@ int number_of_total_parent_hosts(host* hst) {
     if (is_host_immediate_parent_of_host(hst, tmp))
       parents += number_of_total_parent_hosts(tmp) + 1;
   return (parents);
+}
+
+/**
+ *  Get host by name.
+ *
+ *  @param[in] name The host name.
+ *
+ *  @return The struct host or throw exception if the
+ *          host is not found.
+ */
+host& engine::find_host(std::string const& name) {
+  umap<std::string, shared_ptr<host_struct> >::const_iterator
+    it(state::instance().hosts().find(name));
+  if (it == state::instance().hosts().end())
+    throw (engine_error() << "host " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if host exist.
+ *
+ *  @param[in] name The host name.
+ *
+ *  @return True if the host is found, otherwise false.
+ */
+bool engine::is_host_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<host_struct> >::const_iterator
+    it(state::instance().hosts().find(name));
+  return (it != state::instance().hosts().end());
 }

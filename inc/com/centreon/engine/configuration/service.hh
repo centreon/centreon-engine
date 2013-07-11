@@ -26,6 +26,7 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -78,7 +79,7 @@ namespace                  configuration {
     list_string const&     contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
     list_string const&     contacts() const throw ();
-    properties const&      customvariables() const throw ();
+    map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
     bool                   event_handler_enabled() const throw ();
@@ -172,7 +173,7 @@ namespace                  configuration {
     std::string            _check_period;
     group                  _contactgroups;
     group                  _contacts;
-    properties             _customvariables;
+    map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
     opt<bool>              _event_handler_enabled;

@@ -21,8 +21,10 @@
 #  define CCE_RETENTION_CONTACT_HH
 
 #  include <ctime>
+#  include <list>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
 
@@ -43,7 +45,7 @@ namespace                     retention {
                                 std::string const& value);
 
     std::string const&        contact_name() const throw ();
-    // XXX: customvariables() const throw ();
+    map_customvar const&      customvariables() const throw ();
     opt<std::string> const&   host_notification_period() const throw ();
     opt<bool> const&          host_notifications_enabled() const throw ();
     opt<time_t> const&        last_host_notification() const throw ();
@@ -67,7 +69,7 @@ namespace                     retention {
     bool                      _set_service_notifications_enabled(bool value);
 
     std::string               _contact_name;
-    // XXX: _customvariables;
+    map_customvar             _customvariables;
     opt<std::string>          _host_notification_period;
     opt<bool>                 _host_notifications_enabled;
     opt<time_t>               _last_host_notification;
@@ -78,6 +80,8 @@ namespace                     retention {
     opt<std::string>          _service_notification_period;
     opt<bool>                 _service_notifications_enabled;
   };
+
+  typedef std::list<contact> list_contact;
 }
 
 CCE_END()

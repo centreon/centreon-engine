@@ -98,8 +98,9 @@ int read_initial_state_information() {
 
   int result(OK);
   try {
-    parser p;
-    p.parse(config->state_retention_file());
+    // XXX:
+    // parser p;
+    // p.parse(config->state_retention_file());
   }
   catch (...) {
     result = ERROR;

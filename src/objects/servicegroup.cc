@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/servicegroup.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
@@ -129,9 +130,7 @@ servicegroup* add_servicegroup(
 
     // Add new servicegroup to the monitoring engine.
     std::string id(name);
-    umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
-      it(state::instance().servicegroups().find(id));
-    if (it != state::instance().servicegroups().end()) {
+    if (is_servicegroup_exist(id)) {
       logger(log_config_error, basic)
         << "Error: Servicegroup '" << name << "' has already been defined";
       return (NULL);
@@ -207,3 +206,31 @@ int is_service_member_of_servicegroup(
   return (false);
 }
 
+/**
+ *  Get servicegroup by name.
+ *
+ *  @param[in] name The servicegroup name.
+ *
+ *  @return The struct servicegroup or throw exception if the
+ *          servicegroup is not found.
+ */
+servicegroup& engine::find_servicegroup(std::string const& name) {
+  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+    it(state::instance().servicegroups().find(name));
+  if (it == state::instance().servicegroups().end())
+    throw (engine_error() << "servicegroup " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if servicegroup exist.
+ *
+ *  @param[in] name The servicegroup name.
+ *
+ *  @return True if the servicegroup is found, otherwise false.
+ */
+bool engine::is_servicegroup_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+    it(state::instance().servicegroups().find(name));
+  return (it != state::instance().servicegroups().end());
+}

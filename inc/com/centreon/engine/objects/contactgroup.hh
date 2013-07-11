@@ -45,6 +45,8 @@ int           is_contact_member_of_contactgroup(
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 contactgroup const& obj1,
@@ -53,6 +55,13 @@ bool          operator!=(
                 contactgroup const& obj1,
                 contactgroup const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, contactgroup const& obj);
+
+CCE_BEGIN()
+
+contactgroup& find_contactgroup(std::string const& name);
+bool          is_contactgroup_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

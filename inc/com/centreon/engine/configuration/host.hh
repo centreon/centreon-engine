@@ -25,10 +25,11 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/configuration/point_2d.hh"
 #  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/objects/customvariable.hh"
+#  include "com/centreon/engine/opt.hh"
 
 CCE_BEGIN()
 
@@ -76,7 +77,7 @@ namespace                  configuration {
     list_string const&     contacts() const throw ();
     point_2d const&        coords_2d() const throw ();
     point_3d const&        coords_3d() const throw ();
-    properties const&      customvariables() const throw ();
+    map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
     bool                   event_handler_enabled() const throw ();
@@ -173,7 +174,7 @@ namespace                  configuration {
     group                  _contacts;
     opt<point_2d>          _coords_2d;
     opt<point_3d>          _coords_3d;
-    properties             _customvariables;
+    map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
     opt<bool>              _event_handler_enabled;

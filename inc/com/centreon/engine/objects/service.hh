@@ -217,6 +217,8 @@ int      is_escalated_contact_for_service(
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 service const& obj1,
@@ -225,6 +227,17 @@ bool          operator!=(
                 service_struct const& obj1,
                 service_struct const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, service const& obj);
+
+CCE_BEGIN()
+
+service&      find_service(
+                std::string const& host_name,
+                std::string const& service_description);
+bool          is_service_exist(
+                std::string const& host_name,
+                std::string const& service_description);
+
+CCE_END()
 
 #  endif /* C++ */
 

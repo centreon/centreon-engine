@@ -124,42 +124,44 @@ void checker::reap() {
 
       // Service check result.
       if (SERVICE_CHECK == result.object_check_type) {
-        // Check if the service exists.
-        service* svc(find_service(
-                       result.host_name,
-                       result.service_description));
-        if (!svc)
+        try {
+          // Check if the service exists.
+          service& svc(find_service(
+                         result.host_name,
+                         result.service_description));
+          // Process the check result.
+          logger(dbg_checks, more)
+            << "Handling check result for service '"
+            << result.service_description << "' on host '"
+            << result.host_name << "'...";
+          handle_async_service_check_result(&svc, &result);
+        }
+        catch (std::exception const& e) {
           logger(log_runtime_warning, basic)
             << "Warning: Check result queue contained results for "
             << "service '" << result.service_description << "' on "
             << "host '" << result.host_name << "', but the service "
             << "could not be found! Perhaps you forgot to define the "
             << "service in your config files ?";
-        else {
-          // Process the check result.
-          logger(dbg_checks, more)
-            << "Handling check result for service '"
-            << result.service_description << "' on host '"
-            << result.host_name << "'...";
-          handle_async_service_check_result(svc, &result);
         }
       }
       // Host check result.
       else {
-        host* hst(find_host(result.host_name));
-        if (!hst)
+        try {
+          host& hst(find_host(result.host_name));
+          // Process the check result.
+          logger(dbg_checks, more)
+            << "Handling check result for host '"
+            << result.host_name << "'...";
+          handle_async_host_check_result_3x(&hst, &result);
+        }
+        catch (std::exception const& e) {
           // Check if the host exists.
           logger(log_runtime_warning, basic)
             << "Warning: Check result queue contained results for "
             << "host '" << result.host_name << "', but the host could "
             << "not be found! Perhaps you forgot to define the host in "
             << "your config files ?";
-        else {
-          // Process the check result.
-          logger(dbg_checks, more)
-            << "Handling check result for host '"
-            << result.host_name << "'...";
-          handle_async_host_check_result_3x(hst, &result);
         }
       }
 

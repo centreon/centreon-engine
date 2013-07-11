@@ -20,6 +20,7 @@
 #ifndef CCE_RETENTION_DOWNTIME_HH
 #  define CCE_RETENTION_DOWNTIME_HH
 
+#  include <list>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
@@ -84,6 +85,8 @@ namespace         retention {
     time_t        _start_time;
     unsigned long _triggered_by;
   };
+
+  typedef std::list<downtime> list_downtime;
 }
 
 CCE_END()

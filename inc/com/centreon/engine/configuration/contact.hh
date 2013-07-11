@@ -25,6 +25,7 @@
 #  include <vector>
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
+#  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -61,7 +62,7 @@ namespace                  configuration {
     list_string const&     contactgroups() const throw ();
     void                   contact_name(std::string const& name);
     std::string const&     contact_name() const throw ();
-    properties const&      customvariables() const throw ();
+    map_customvar const&   customvariables() const throw ();
     std::string const&     email() const throw ();
     bool                   host_notifications_enabled() const throw ();
     list_string const&     host_notification_commands() const throw ();
@@ -101,7 +102,7 @@ namespace                  configuration {
     opt<bool>              _can_submit_commands;
     group                  _contactgroups;
     std::string            _contact_name;
-    properties             _customvariables;
+    map_customvar          _customvariables;
     std::string            _email;
     opt<bool>              _host_notifications_enabled;
     group                  _host_notification_commands;

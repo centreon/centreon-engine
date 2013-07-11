@@ -171,7 +171,7 @@ void applier::host::add_object(
              << *it << "' to host '" << obj->host_name() << "'.");
 
   // Custom variables.
-  for (properties::const_iterator
+  for (map_customvar::const_iterator
          it(obj->customvariables().begin()),
          end(obj->customvariables().end());
        it != end;

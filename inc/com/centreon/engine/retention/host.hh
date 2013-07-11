@@ -20,9 +20,11 @@
 #ifndef CCE_RETENTION_HOST_HH
 #  define CCE_RETENTION_HOST_HH
 
+#  include <list>
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
 
@@ -57,6 +59,7 @@ namespace                         retention {
     opt<int> const&               current_notification_number() const throw ();
     opt<unsigned long> const&     current_problem_id() const throw ();
     opt<int> const&               current_state() const throw ();
+    map_customvar const&          customvariables() const throw ();
     opt<std::string> const&       event_handler() const throw ();
     opt<bool> const&              event_handler_enabled() const throw ();
     opt<bool> const&              failure_prediction_enabled() const throw ();
@@ -164,6 +167,7 @@ namespace                         retention {
     opt<int>                      _current_notification_number;
     opt<unsigned long>            _current_problem_id;
     opt<int>                      _current_state;
+    map_customvar                 _customvariables;
     opt<std::string>              _event_handler;
     opt<bool>                     _event_handler_enabled;
     opt<bool>                     _failure_prediction_enabled;
@@ -203,6 +207,8 @@ namespace                         retention {
     opt<int>                      _state_type;
     bool                          _was_flapping;
   };
+
+  typedef std::list<host> list_host;
 }
 
 CCE_END()

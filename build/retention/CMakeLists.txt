@@ -38,6 +38,7 @@ add_library("cce_retention"
   "${SRC_DIR}/program.cc"
   "${SRC_DIR}/object.cc"
   "${SRC_DIR}/service.cc"
+  "${SRC_DIR}/state.cc"
 
   "${INC_DIR}/comment.hh"
   "${INC_DIR}/contact.hh"
@@ -49,6 +50,7 @@ add_library("cce_retention"
   "${INC_DIR}/program.hh"
   "${INC_DIR}/object.hh"
   "${INC_DIR}/service.hh"
+  "${INC_DIR}/state.hh"
 )
 
 # Link target with necessary libraries.

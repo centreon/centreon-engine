@@ -20,24 +20,31 @@
 #ifndef CCE_RETENTION_INFO_HH
 #  define CCE_RETENTION_INFO_HH
 
+#  include <ctime>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
 
 CCE_BEGIN()
 
-namespace retention {
-  class   info
+namespace  retention {
+  class    info
     : public object {
   public:
-          info();
-          ~info() throw ();
-    bool  set(
-            std::string const& key,
-            std::string const& value);
+           info();
+           info(info const& right);
+           ~info() throw ();
+    info&  operator=(info const& right);
+    bool   operator==(info const& right) const throw ();
+    bool   operator!=(info const& right) const throw ();
+    bool   set(
+             std::string const& key,
+             std::string const& value);
+
+    time_t created() const throw ();
 
   private:
-    bool  _scheduling_info_is_ok;
+    time_t _created;
   };
 }
 

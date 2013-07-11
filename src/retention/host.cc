@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <list>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/retention/host.hh"
 #include "com/centreon/engine/string.hh"
@@ -137,6 +136,7 @@ host& host::operator=(host const& right) {
     _current_notification_number = right._current_notification_number;
     _current_problem_id = right._current_problem_id;
     _current_state = right._current_state;
+    _customvariables = right._customvariables;
     _event_handler = right._event_handler;
     _event_handler_enabled = right._event_handler_enabled;
     _failure_prediction_enabled = right._failure_prediction_enabled;
@@ -203,6 +203,7 @@ bool host::operator==(host const& right) const throw () {
           && _current_notification_number == right._current_notification_number
           && _current_problem_id == right._current_problem_id
           && _current_state == right._current_state
+          && std::operator==(_customvariables, right._customvariables)
           && _event_handler == right._event_handler
           && _event_handler_enabled == right._event_handler_enabled
           && _failure_prediction_enabled == right._failure_prediction_enabled
@@ -271,9 +272,9 @@ bool host::set(
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
   if (!key.empty() && key[0] == '_' && value.size() > 3) {
-    char const* cvname(key.c_str() + 1);
-    char const* cvvalue(value.c_str() + 2);
-    // XXX: todo.
+    char const* cv_name(key.c_str() + 1);
+    char const* cv_value(value.c_str() + 2);
+    _customvariables[cv_name] = cv_value;
     return (true);
   }
   return (false);
@@ -412,6 +413,15 @@ opt<unsigned long> const& host::current_problem_id() const throw () {
  */
 opt<int> const& host::current_state() const throw () {
   return (_current_state);
+}
+
+/**
+ *  Get customvariables.
+ *
+ *  @return The customvariables.
+ */
+map_customvar const& host::customvariables() const throw () {
+  return (_customvariables);
 }
 
 /**
@@ -1126,11 +1136,8 @@ bool host::_set_next_check(time_t value) {
  *  @param[in] value The new normal_check_interval.
  */
 bool host::_set_normal_check_interval(unsigned int value) {
-  if (value) {
-    _normal_check_interval = value;
-    return (true);
-  }
-  return (false);
+  _normal_check_interval = value;
+  return (true);
 }
 
 /**
@@ -1249,11 +1256,8 @@ bool host::_set_process_performance_data(int value) {
  *  @param[in] value The new retry_check_interval.
  */
 bool host::_set_retry_check_interval(unsigned int value) {
-  if (value) {
-    _retry_check_interval = value;
-    return (true);
-  }
-  return (false);
+  _retry_check_interval = value;
+  return (true);
 }
 
 /**

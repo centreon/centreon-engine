@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/service.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
@@ -558,11 +559,7 @@ service* add_service(
     for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
       obj->state_history[x] = STATE_OK;
 
-    std::pair<std::string, std::string>
-      id(std::make_pair(host_name, description));
-    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-      it(state::instance().services().find(id));
-    if (it != state::instance().services().end()) {
+    if (is_service_exist(host_name, description)) {
       logger(log_config_error, basic)
         << "Error: Service '" << description << "' on host '"
         << host_name << "' has already been defined";
@@ -570,6 +567,8 @@ service* add_service(
     }
 
     // Add new items to the configuration state.
+    std::pair<std::string, std::string>
+      id(std::make_pair(host_name, description));
     state::instance().services()[id] = obj;
 
     // Add new items to the list.
@@ -672,4 +671,44 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
   }
 
   return (false);
+}
+
+/**
+ *  Get service by host name and service description.
+ *
+ *  @param[in] host_name           The host name.
+ *  @param[in] service_description The service_description.
+ *
+ *  @return The struct service or throw exception if the
+ *          service is not found.
+ */
+service& engine::find_service(
+           std::string const& host_name,
+           std::string const& service_description) {
+  std::pair<std::string, std::string>
+    id(std::make_pair(host_name, service_description));
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+    it(state::instance().services().find(id));
+  if (it == state::instance().services().end())
+    throw (engine_error() << "service " << host_name
+           << ", " << service_description << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if service exist.
+ *
+ *  @param[in] host_name           The host name.
+ *  @param[in] service_description The service_description.
+ *
+ *  @return True if the service is found, otherwise false.
+ */
+bool engine::is_service_exist(
+           std::string const& host_name,
+           std::string const& service_description) {
+  std::pair<std::string, std::string>
+    id(std::make_pair(host_name, service_description));
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+    it(state::instance().services().find(id));
+  return (it != state::instance().services().end());
 }

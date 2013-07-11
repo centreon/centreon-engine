@@ -53,6 +53,8 @@ int        is_host_member_of_hostgroup(
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 hostgroup const& obj1,
@@ -61,6 +63,13 @@ bool          operator!=(
                 hostgroup const& obj1,
                 hostgroup const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, hostgroup const& obj);
+
+CCE_BEGIN()
+
+hostgroup&    find_hostgroup(std::string const& name);
+bool          is_hostgroup_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

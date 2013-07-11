@@ -17,25 +17,32 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_RETENTION_PARSER_HH
-#  define CCE_RETENTION_PARSER_HH
+#ifndef CCE_RETENTION_APPLIER_SERVICE_HH
+#  define CCE_RETENTION_APPLIER_SERVICE_HH
 
-#  include <string>
+#  include <list>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/retention/service.hh"
+
+// forward declaration.
+struct service_struct;
 
 CCE_BEGIN()
 
-namespace              retention {
-  class                state;
+namespace   retention {
+  namespace applier {
+    class   service {
+    public:
+            service();
+            ~service() throw ();
+      void  apply(std::list<retention::service> const& lst);
 
-  class                parser {
-  public:
-                       parser();
-                       ~parser() throw ();
-    void               parse(std::string const& path, state& retention);
-  };
+    private:
+      void  _update(retention::service const& state, service_struct& obj);
+    };
+  }
 }
 
 CCE_END()
 
-#endif // !CCE_RETENTION_PARSER_HH
+#endif // !CCE_RETENTION_APPLIER_SERVICE_HH

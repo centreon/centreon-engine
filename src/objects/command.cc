@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/command.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/command.hh"
@@ -106,9 +107,7 @@ command* add_command(char const* name, char const* value) {
 
     // Add new command to the monitoring engine.
     std::string id(name);
-    umap<std::string, shared_ptr<command_struct> >::const_iterator
-      it(state::instance().commands().find(id));
-    if (it != state::instance().commands().end()) {
+    if (is_command_exist(id)) {
       logger(log_config_error, basic)
         << "Error: Command '" << name << "' has already been defined";
       return (NULL);
@@ -136,4 +135,33 @@ command* add_command(char const* name, char const* value) {
   }
 
   return (obj.get());
+}
+
+/**
+ *  Get command by name.
+ *
+ *  @param[in] name The command name.
+ *
+ *  @return The struct command or throw exception if the
+ *          command is not found.
+ */
+command& engine::find_command(std::string const& name) {
+  umap<std::string, shared_ptr<command_struct> >::const_iterator
+    it(state::instance().commands().find(name));
+  if (it == state::instance().commands().end())
+    throw (engine_error() << "command " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if command exist.
+ *
+ *  @param[in] name The command name.
+ *
+ *  @return True if the command is found, otherwise false.
+ */
+bool engine::is_command_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<command_struct> >::const_iterator
+    it(state::instance().commands().find(name));
+  return (it != state::instance().commands().end());
 }

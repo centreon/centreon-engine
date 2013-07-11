@@ -51,10 +51,7 @@ void applier::contact::apply(std::list<retention::contact> const& lst) {
          it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
-    umap<std::string, shared_ptr<contact_struct> >::const_iterator
-      cntct(state::instance().contacts().find(it->contact_name()));
-    if (cntct != state::instance().contacts().end())
-      ;
+    contact_struct& cntct(find_contact(it->contact_name()));
     // XXX: replace state
     // _update(*config, *cntct->second);
   }

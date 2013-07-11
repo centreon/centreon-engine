@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/hostgroup.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/hostgroup.hh"
@@ -129,9 +130,7 @@ hostgroup* add_hostgroup(
 
     // Add new hostgroup to the monitoring engine.
     std::string id(name);
-    umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
-      it(state::instance().hostgroups().find(id));
-    if (it != state::instance().hostgroups().end()) {
+    if (is_hostgroup_exist(id)) {
       logger(log_config_error, basic)
         << "Error: Hostgroup '" << name << "' has already been defined";
       return (NULL);
@@ -180,4 +179,33 @@ int is_host_member_of_hostgroup(hostgroup* group, host* hst) {
     if (member->host_ptr == hst)
       return (true);
   return (false);
+}
+
+/**
+ *  Get hostgroup by name.
+ *
+ *  @param[in] name The hostgroup name.
+ *
+ *  @return The struct hostgroup or throw exception if the
+ *          hostgroup is not found.
+ */
+hostgroup& engine::find_hostgroup(std::string const& name) {
+  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
+    it(state::instance().hostgroups().find(name));
+  if (it == state::instance().hostgroups().end())
+    throw (engine_error() << "hostgroup " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if hostgroup exist.
+ *
+ *  @param[in] name The hostgroup name.
+ *
+ *  @return True if the hostgroup is found, otherwise false.
+ */
+bool engine::is_hostgroup_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
+    it(state::instance().hostgroups().find(name));
+  return (it != state::instance().hostgroups().end());
 }

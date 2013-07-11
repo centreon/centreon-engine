@@ -240,6 +240,8 @@ int   number_of_total_parent_hosts(host* hst);
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 host const& obj1,
@@ -248,6 +250,13 @@ bool          operator!=(
                 host const& obj1,
                 host const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, host const& obj);
+
+CCE_BEGIN()
+
+host&         find_host(std::string const& name);
+bool          is_host_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

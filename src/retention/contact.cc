@@ -78,7 +78,7 @@ contact& contact::operator=(contact const& right) {
   if (this != &right) {
     object::operator=(right);
     _contact_name = right._contact_name;
-    // XXX: _customvariables = right._customvariables;
+    _customvariables = right._customvariables;
     _host_notification_period = right._host_notification_period;
     _host_notifications_enabled = right._host_notifications_enabled;
     _last_host_notification = right._last_host_notification;
@@ -102,7 +102,7 @@ contact& contact::operator=(contact const& right) {
 bool contact::operator==(contact const& right) const throw () {
   return (object::operator==(right)
           && _contact_name == right._contact_name
-          // XXX: && _customvariables == right._customvariables
+          && std::operator==(_customvariables, right._customvariables)
           && _host_notification_period == right._host_notification_period
           && _host_notifications_enabled == right._host_notifications_enabled
           && _last_host_notification == right._last_host_notification
@@ -142,9 +142,9 @@ bool contact::set(
     if (gl_setters[i].name == key)
       return ((gl_setters[i].func)(*this, value));
   if (!key.empty() && key[0] == '_' && value.size() > 3) {
-    char const* cvname(key.c_str() + 1);
-    char const* cvvalue(value.c_str() + 2);
-    // XXX: todo.
+    char const* cv_name(key.c_str() + 1);
+    char const* cv_value(value.c_str() + 2);
+    _customvariables[cv_name] = cv_value;
     return (true);
   }
   return (false);
@@ -159,14 +159,14 @@ std::string const& contact::contact_name() const throw () {
  return (_contact_name);
 }
 
-// /**
-//  * Get customvariables.
-//  *
-//  * @return The customvariables.
-//  */
-// umap contact::customvariables() const throw () {
-//  return (_customvariables);
-// }
+/**
+ * Get customvariables.
+ *
+ * @return The customvariables.
+ */
+map_customvar const& contact::customvariables() const throw () {
+ return (_customvariables);
+}
 
 /**
  * Get host_notification_period.

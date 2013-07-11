@@ -22,6 +22,7 @@
 #include "com/centreon/engine/retention/info.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/object.hh"
+#include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine::retention;
@@ -45,7 +46,7 @@ parser::~parser() throw () {
  *
  *  @param[in] path The configuration file path.
  */
-void parser::parse(std::string const& path) {
+void parser::parse(std::string const& path, state& retention) {
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
     throw (engine_error() << "retention: parse retention "

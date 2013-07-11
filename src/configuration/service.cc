@@ -24,6 +24,7 @@
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -607,7 +608,7 @@ list_string const& service::contacts() const throw () {
  *
  *  @return The customvariables.
  */
-properties const& service::customvariables() const throw () {
+map_customvar const& service::customvariables() const throw () {
   return (_customvariables);
 }
 

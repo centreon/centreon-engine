@@ -17,25 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_RETENTION_PARSER_HH
-#  define CCE_RETENTION_PARSER_HH
+#ifndef CCE_OBJECTS_CUSTOMVARIABLE_HH
+#  define CCE_OBJECTS_CUSTOMVARIABLE_HH
 
-#  include <string>
+#  include <map>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace              retention {
-  class                state;
-
-  class                parser {
-  public:
-                       parser();
-                       ~parser() throw ();
-    void               parse(std::string const& path, state& retention);
-  };
-}
+typedef std::map<std::string, std::string> map_customvar;
 
 CCE_END()
 
-#endif // !CCE_RETENTION_PARSER_HH
+#endif // !CCE_OBJECTS_CUSTOMVARIABLE_HH

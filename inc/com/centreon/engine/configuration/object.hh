@@ -31,7 +31,6 @@
 #  include "com/centreon/unordered_hash.hh"
 
 typedef std::list<std::string>             list_string;
-typedef std::map<std::string, std::string> properties;
 typedef std::set<std::string>              set_string;
 
 CCE_BEGIN()

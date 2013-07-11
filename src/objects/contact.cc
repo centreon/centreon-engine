@@ -20,6 +20,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/contact.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
@@ -278,9 +279,7 @@ contact* add_contact(
 
     // Add new contact to the monitoring engine.
     std::string id(name);
-    umap<std::string, shared_ptr<contact_struct> >::const_iterator
-      it(state::instance().contacts().find(id));
-    if (it != state::instance().contacts().end()) {
+    if (is_contact_exist(id)) {
       logger(log_config_error, basic)
         << "Error: Contact '" << name << "' has already been defined";
       return (NULL);
@@ -314,4 +313,33 @@ contact* add_contact(
   }
 
   return (obj.get());
+}
+
+/**
+ *  Get contact by name.
+ *
+ *  @param[in] name The contact name.
+ *
+ *  @return The struct contact or throw exception if the
+ *          contact is not found.
+ */
+contact& engine::find_contact(std::string const& name) {
+  umap<std::string, shared_ptr<contact_struct> >::const_iterator
+    it(state::instance().contacts().find(name));
+  if (it == state::instance().contacts().end())
+    throw (engine_error() << "contact " << name << " not found");
+  return (*it->second);
+}
+
+/**
+ *  Get if contact exist.
+ *
+ *  @param[in] name The contact name.
+ *
+ *  @return True if the contact is found, otherwise false.
+ */
+bool engine::is_contact_exist(std::string const& name) throw () {
+  umap<std::string, shared_ptr<contact_struct> >::const_iterator
+    it(state::instance().contacts().find(name));
+  return (it != state::instance().contacts().end());
 }

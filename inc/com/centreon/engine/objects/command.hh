@@ -37,6 +37,8 @@ command* add_command(char const* name, char const* value);
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 command const& obj1,
@@ -45,6 +47,13 @@ bool          operator!=(
                 command const& obj1,
                 command const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, command const& obj);
+
+CCE_BEGIN()
+
+command&      find_command(std::string const& name);
+bool          is_command_exist(std::string const& name) throw ();
+
+CCE_END()
 
 #  endif /* C++ */
 

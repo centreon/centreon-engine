@@ -24,6 +24,7 @@
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
@@ -624,7 +625,7 @@ point_3d const& host::coords_3d() const throw () {
  *
  *  @return The customvariables.
  */
-properties const& host::customvariables() const throw () {
+map_customvar const& host::customvariables() const throw () {
   return (_customvariables);
 }
 

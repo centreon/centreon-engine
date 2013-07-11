@@ -176,7 +176,7 @@ void applier::contact::add_object(
 	     << *it << "' to contact '" << obj->contact_name() << "'.");
 
   // Add all custom variables.
-  for (properties::const_iterator
+  for (map_customvar::const_iterator
            it(obj->customvariables().begin()),
            end(obj->customvariables().end());
        it != end;
@@ -391,7 +391,7 @@ void applier::contact::modify_object(
   }
 
   // Custom variables.
-  if (obj->customvariables() != old_cfg->customvariables()) {
+  if (std::operator!=(obj->customvariables(), old_cfg->customvariables())) {
     for (customvariablesmember* cv(c->custom_variables); cv; ) {
       customvariablesmember* to_delete(cv);
       cv = cv->next;
@@ -400,7 +400,7 @@ void applier::contact::modify_object(
       delete to_delete;
     }
     c->custom_variables = NULL;
-    for (properties::const_iterator
+    for (map_customvar::const_iterator
            it(obj->customvariables().begin()),
            end(obj->customvariables().end());
          it != end;
