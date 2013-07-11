@@ -24,6 +24,9 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contactsmember.hh"
+#include "com/centreon/engine/deleter/contactgroupsmember.hh"
+#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -402,9 +405,72 @@ void applier::host::modify_object(
     h->obsess_over_host,
     static_cast<int>(obj->obsess_over_host()));
 
-  // XXX : contacts
-  // XXX : contactgroups
-  // XXX : customvariables
+  // Contacts.
+  if (obj->contacts() != obj_old->contacts()) {
+    // Delete old contacts.
+    for (contactsmember* m(h->contacts); m;) {
+      contactsmember* to_delete(m);
+      m = m->next;
+      deleter::contactsmember(to_delete);
+    }
+    h->contacts = NULL;
+
+    // Add contacts to host.
+    for (list_string::const_iterator
+           it(obj->contacts().begin()),
+           end(obj->contacts().end());
+         it != end;
+         ++it)
+      if (!add_contact_to_host(h.get(), it->c_str()))
+        throw (engine_error() << "Error: Could not add contact '"
+               << *it << "' to host '" << obj->host_name() << "'.");
+  }
+
+  // Contact groups.
+  if (obj->contactgroups() != obj_old->contactgroups()) {
+    // Delete old contact groups.
+    for (contactgroupsmember* m(h->contact_groups); m;) {
+      contactgroupsmember* to_delete(m);
+      m = m->next;
+      deleter::contactgroupsmember(to_delete);
+    }
+    h->contact_groups = NULL;
+
+    // Add contact groups to host.
+    for (list_string::const_iterator
+           it(obj->contactgroups().begin()),
+           end(obj->contactgroups().end());
+         it != end;
+         ++it)
+      if (!add_contactgroup_to_host(h.get(), it->c_str()))
+        throw (engine_error() << "Error: Could not add contact group '"
+               << *it << "' to host '" << obj->host_name() << "'.");
+  }
+
+  // Custom variables.
+  if (obj->customvariables() != obj_old->customvariables()) {
+    // Delete old custom variables.
+    for (customvariablesmember* m(h->custom_variables); m;) {
+      customvariablesmember* to_delete(m);
+      m = m->next;
+      deleter::customvariablesmember(to_delete);
+    }
+    h->custom_variables = NULL;
+
+    // Add custom variables.
+    for (properties::const_iterator
+           it(obj->customvariables().begin()),
+           end(obj->customvariables().end());
+         it != end;
+         ++it)
+      if (!add_custom_variable_to_host(
+             h.get(),
+             it->first.c_str(),
+             it->second.c_str()))
+        throw (engine_error()
+               << "Error: Could not add custom variable '" << it->first
+               << "' to host '" << obj->host_name() << "'.");
+  }
 
   // Parents.
   if (obj->parents() != obj_old->parents()) {
@@ -426,8 +492,6 @@ void applier::host::modify_object(
         throw (engine_error() << "Error: Could not add parent '"
                << *it << "' to host '" << obj->host_name() << "'.");
   }
-
-  // XXX : hostgroups
 
   return ;
 }
