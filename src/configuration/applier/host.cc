@@ -475,7 +475,7 @@ void applier::host::resolve_object(
 
   // Find host.
   umap<std::string, shared_ptr<host_struct> >::iterator
-    it(applier::state::instance().hosts().find(obj->key()));
+    it(applier::state::instance().hosts_find(obj->key()));
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Error: Cannot resolve non-existing host '"
            << obj->host_name() << "'.");

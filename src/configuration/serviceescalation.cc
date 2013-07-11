@@ -298,6 +298,17 @@ bool serviceescalation::contacts_defined() const throw () {
 }
 
 /**
+ *  Set escalation options.
+ *
+ *  @param[in] options New escalation options.
+ */
+void serviceescalation::escalation_options(
+                          unsigned int options) throw () {
+  _escalation_options = options;
+  return ;
+}
+
+/**
  *  Get escalation_options.
  *
  *  @return The escalation_options.
@@ -332,6 +343,16 @@ std::string const& serviceescalation::escalation_period() const throw () {
  */
 bool serviceescalation::escalation_period_defined() const throw () {
   return (_escalation_period.is_set());
+}
+
+/**
+ *  Set the first notification number.
+ *
+ *  @param[in] n First notification number.
+ */
+void serviceescalation::first_notification(unsigned int n) throw () {
+  _first_notification = n;
+  return ;
 }
 
 /**
@@ -377,6 +398,16 @@ list_string& serviceescalation::hosts() throw () {
  */
 list_string const& serviceescalation::hosts() const throw () {
   return (*_hosts);
+}
+
+/**
+ *  Set the last notification number.
+ *
+ *  @param[in] n Last notification number.
+ */
+void serviceescalation::last_notification(unsigned int n) throw () {
+  _last_notification = n;
+  return ;
 }
 
 /**

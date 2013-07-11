@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -268,8 +269,23 @@ void applier::hostdependency::remove_object(
  *  @param[in] obj Hostdependency object.
  */
 void applier::hostdependency::resolve_object(
-                                shared_ptr<configuration::hostdependency> obj) {
-  // XXX
+                shared_ptr<configuration::hostdependency> obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving a host dependency.";
+
+  // Find host dependency.
+  umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
+    it(applier::state::instance().hostdependencies_find(obj->key()));
+  if (applier::state::instance().hostdependencies().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "host dependency.");
+
+  // Resolve host dependency.
+  if (!check_hostdependency(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve host dependency.");
+
+  return ;
 }
 
 /**

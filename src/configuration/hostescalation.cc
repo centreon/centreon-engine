@@ -278,6 +278,17 @@ bool hostescalation::contacts_defined() const throw () {
 }
 
 /**
+ *  Set escalation options.
+ *
+ *  @param[in] options New escalation options.
+ */
+void hostescalation::escalation_options(
+                       unsigned short options) throw () {
+  _escalation_options = options;
+  return ;
+}
+
+/**
  *  Get escalation_options.
  *
  *  @return The escalation_options.
@@ -312,6 +323,16 @@ std::string const& hostescalation::escalation_period() const throw () {
  */
 bool hostescalation::escalation_period_defined() const throw () {
   return (_escalation_period.is_set());
+}
+
+/**
+ *  Set the first notification.
+ *
+ *  @param[in] n New first notification number.
+ */
+void hostescalation::first_notification(unsigned int n) throw () {
+  _first_notification = n;
+  return ;
 }
 
 /**
@@ -357,6 +378,16 @@ list_string& hostescalation::hosts() throw () {
  */
 list_string const& hostescalation::hosts() const throw () {
   return (*_hosts);
+}
+
+/**
+ *  Set the last notification.
+ *
+ *  @param[in] n New last notification number.
+ */
+void hostescalation::last_notification(unsigned int n) throw () {
+  _last_notification = n;
+  return ;
 }
 
 /**

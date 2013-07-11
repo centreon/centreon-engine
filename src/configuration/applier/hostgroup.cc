@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -199,7 +200,7 @@ void applier::hostgroup::remove_object(
                            shared_ptr<configuration::hostgroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing hostgroup '" << obj->hostgroup_name() << "'.";
+    << "Removing host group '" << obj->hostgroup_name() << "'.";
 
   // Find host group.
   umap<std::string, shared_ptr<hostgroup_struct> >::iterator
@@ -228,7 +229,23 @@ void applier::hostgroup::remove_object(
  */
 void applier::hostgroup::resolve_object(
                            shared_ptr<configuration::hostgroup> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving host group '" << obj->hostgroup_name() << "'.";
+
+  // Find host group.
+  umap<std::string, shared_ptr<hostgroup_struct> >::iterator
+    it(applier::state::instance().hostgroups_find(obj->key()));
+  if (applier::state::instance().hostgroups().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "host group '" << obj->hostgroup_name() << "'.");
+
+  // Resolve host group.
+  if (!check_hostgroup(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve host group '"
+           << obj->hostgroup_name() << "'.");
+
+  return ;
 }
 
 /**

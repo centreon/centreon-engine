@@ -356,7 +356,7 @@ void applier::service::resolve_object(
 
   // Find service.
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
-    it(applier::state::instance().services().find(obj->key()));
+    it(applier::state::instance().services_find(obj->key()));
   if (applier::state::instance().services().end() == it)
     throw (engine_error()
            << "Error: Cannot resolve non-existing service '"

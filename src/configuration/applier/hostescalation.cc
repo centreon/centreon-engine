@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -243,8 +244,23 @@ void applier::hostescalation::remove_object(
  *  @param[in] obj Hostescalation object.
  */
 void applier::hostescalation::resolve_object(
-                                shared_ptr<configuration::hostescalation> obj) {
-  // XXX
+                shared_ptr<configuration::hostescalation> obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving a host escalation.";
+
+  // Find host escalation.
+  umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator
+    it(applier::state::instance().hostescalations_find(obj->key()));
+  if (applier::state::instance().hostescalations().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "host escalation.");
+
+  // Resolve host escalation.
+  if (!check_hostescalation(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve host escalation.");
+
+  return ;
 }
 
 /**

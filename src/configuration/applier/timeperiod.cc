@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -234,7 +235,22 @@ void applier::timeperiod::remove_object(
  */
 void applier::timeperiod::resolve_object(
                             shared_ptr<configuration::timeperiod> obj) {
-  (void)obj;
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving time period '" << obj->timeperiod_name() << "'.";
+
+  // Find time period.
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator
+    it(applier::state::instance().timeperiods_find(obj->key()));
+  if (applier::state::instance().timeperiods().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "time period '" << obj->timeperiod_name() << "'.");
+
+  // Resolve time period.
+  if (!check_timeperiod(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve time period '"
+           << obj->timeperiod_name() << "'.");
+
   return ;
 }
 

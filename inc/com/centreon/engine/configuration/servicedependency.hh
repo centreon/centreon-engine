@@ -66,6 +66,7 @@ namespace                  configuration {
                              std::string const& key,
                              std::string const& value);
 
+    void                   dependency_period(std::string const& period);
     std::string const&     dependency_period() const throw ();
     void                   dependency_type(
                              dependency_kind type) throw ();
@@ -78,12 +79,17 @@ namespace                  configuration {
     list_string const&     dependent_servicegroups() const throw ();
     list_string&           dependent_service_description() throw ();
     list_string const&     dependent_service_description() const throw ();
+    void                   execution_failure_options(
+                             unsigned int options) throw ();
     unsigned int           execution_failure_options() const throw ();
+    void                   inherits_parent(bool inherit) throw ();
     bool                   inherits_parent() const throw ();
     list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
+    void                   notification_failure_options(
+                             unsigned int options) throw ();
     unsigned int           notification_failure_options() const throw ();
     list_string&           servicegroups() throw ();
     list_string const&     servicegroups() const throw ();

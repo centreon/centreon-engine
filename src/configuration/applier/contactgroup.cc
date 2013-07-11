@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
@@ -173,7 +174,23 @@ void applier::contactgroup::remove_object(
  */
 void applier::contactgroup::resolve_object(
                               shared_ptr<configuration::contactgroup> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving contact group '" << obj->contactgroup_name() << "'.";
+
+  // Find contact group.
+  umap<std::string, shared_ptr<contactgroup_struct> >::iterator
+    it(applier::state::instance().contactgroups_find(obj->key()));
+  if (applier::state::instance().contactgroups().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "contact group '" << obj->contactgroup_name() << "'.");
+
+  // Resolve contact group.
+  if (!check_contactgroup(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve contact group "
+           << obj->contactgroup_name() << "'.");
+
+  return ;
 }
 
 /**

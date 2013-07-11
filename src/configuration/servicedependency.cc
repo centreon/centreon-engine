@@ -279,6 +279,16 @@ bool servicedependency::parse(
 }
 
 /**
+ *  Set the dependency period.
+ *
+ *  @param[in] period Dependency period.
+ */
+void servicedependency::dependency_period(std::string const& period) {
+  _dependency_period = period;
+  return ;
+}
+
+/**
  *  Get dependency_period.
  *
  *  @return The dependency_period.
@@ -380,12 +390,33 @@ list_string const& servicedependency::dependent_service_description() const thro
 }
 
 /**
+ *  Set the execution failure options.
+ *
+ *  @param[in] options New execution failure options.
+ */
+void servicedependency::execution_failure_options(
+                          unsigned int options) throw () {
+  _execution_failure_options = options;
+  return ;
+}
+
+/**
  *  Get execution_failure_options.
  *
  *  @return The execution_failure_options.
  */
 unsigned int servicedependency::execution_failure_options() const throw () {
   return (_execution_failure_options);
+}
+
+/**
+ *  Set parent inheritance.
+ *
+ *  @param[in] inherit Parent inheritance.
+ */
+void servicedependency::inherits_parent(bool inherit) throw () {
+  _inherits_parent = inherit;
+  return ;
 }
 
 /**
@@ -431,6 +462,17 @@ list_string& servicedependency::hosts() throw () {
  */
 list_string const& servicedependency::hosts() const throw () {
   return (*_hosts);
+}
+
+/**
+ *  Set the notification failure options.
+ *
+ *  @param[in] options New notification failure options.
+ */
+void servicedependency::notification_failure_options(
+                          unsigned int options) throw () {
+  _notification_failure_options = options;
+  return ;
 }
 
 /**

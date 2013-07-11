@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -311,8 +312,24 @@ void applier::servicedependency::remove_object(
  *  @param[in] obj Servicedependency object.
  */
 void applier::servicedependency::resolve_object(
-                                   shared_ptr<configuration::servicedependency> obj) {
-  // XXX
+                shared_ptr<configuration::servicedependency> obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving a service dependency.";
+
+  // Find service dependency.
+  umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
+    it(applier::state::instance().servicedependencies_find(obj->key()));
+  if (applier::state::instance().servicedependencies().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "service dependency.");
+
+  // Resolve service dependency.
+  if (!check_servicedependency(it->second.get(), NULL, NULL))
+    throw (engine_error()
+           << "Error: Cannot resolve service dependency.");
+
+  return ;
 }
 
 /**
