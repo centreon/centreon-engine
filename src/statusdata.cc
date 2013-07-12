@@ -66,7 +66,7 @@ int cleanup_status_data(int delete_status_data) {
 /* updates program status info */
 int update_program_status(int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == FALSE)
+  if (aggregated_dump == false)
     broker_program_status(
       NEBTYPE_PROGRAMSTATUS_UPDATE,
       NEBFLAG_NONE,
@@ -78,7 +78,7 @@ int update_program_status(int aggregated_dump) {
 /* updates host status info */
 int update_host_status(host* hst, int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == FALSE)
+  if (aggregated_dump == false)
     broker_host_status(
       NEBTYPE_HOSTSTATUS_UPDATE,
       NEBFLAG_NONE,
@@ -91,7 +91,7 @@ int update_host_status(host* hst, int aggregated_dump) {
 /* updates service status info */
 int update_service_status(service* svc, int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == FALSE)
+  if (aggregated_dump == false)
     broker_service_status(
       NEBTYPE_SERVICESTATUS_UPDATE,
       NEBFLAG_NONE,
@@ -104,7 +104,7 @@ int update_service_status(service* svc, int aggregated_dump) {
 /* updates contact status info */
 int update_contact_status(contact* cntct, int aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == FALSE)
+  if (aggregated_dump == false)
     broker_contact_status(
       NEBTYPE_CONTACTSTATUS_UPDATE,
       NEBFLAG_NONE,

@@ -110,8 +110,8 @@ extern "C" {
     info->service_description = NULL;
     info->check_type = HOST_CHECK_ACTIVE;
     info->check_options = CHECK_OPTION_NONE;
-    info->scheduled_check = FALSE;
-    info->reschedule_check = FALSE;
+    info->scheduled_check = false;
+    info->reschedule_check = false;
     info->output_file_fp = NULL;
     info->output_file_fd = -1;
     info->latency = 0.0;
@@ -119,8 +119,8 @@ extern "C" {
     info->start_time.tv_usec = 0;
     info->finish_time.tv_sec = 0;
     info->finish_time.tv_usec = 0;
-    info->early_timeout = FALSE;
-    info->exited_ok = TRUE;
+    info->early_timeout = false;
+    info->exited_ok = true;
     info->return_code = 0;
     info->output = NULL;
     info->next = NULL;

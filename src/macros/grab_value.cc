@@ -85,7 +85,7 @@ static int handle_host_macro(
         if (hst) {
           // Get the macro value for this host.
           char* buffer(NULL);
-          int free_sub_macro(FALSE);
+          int free_sub_macro(false);
           grab_standard_host_macro_r(
             mac,
             macro_type,
@@ -104,7 +104,7 @@ static int handle_host_macro(
               strcat(*output, arg2);
               strcat(*output, buffer);
             }
-            if (free_sub_macro == TRUE)
+            if (free_sub_macro == true)
               delete[] buffer;
             *free_macro = true;
           }
@@ -245,7 +245,7 @@ static int handle_service_macro(
             if (svc) {
               // Get the macro value for this service.
               char* buffer(NULL);
-              int free_sub_macro(FALSE);
+              int free_sub_macro(false);
               grab_standard_service_macro_r(
                 mac,
                 macro_type,
@@ -266,7 +266,7 @@ static int handle_service_macro(
                   strcat(*output, arg2);
                   strcat(*output, buffer);
                 }
-                if (free_sub_macro != FALSE) {
+                if (free_sub_macro != false) {
                   delete[] buffer;
                   buffer = NULL;
                 }
@@ -543,7 +543,7 @@ static int handle_static_macro(
 
   // No need to do any more work - these are already precomputed for us.
   *output = get_global_macros()->x[macro_type];
-  *free_macro = FALSE;
+  *free_macro = false;
   return (OK);
 }
 
@@ -591,14 +591,14 @@ static int handle_summary_macro(
       if (authorized) {
         bool problem(true);
         if ((temp_host->current_state == HOST_UP)
-            && (temp_host->has_been_checked == TRUE))
+            && (temp_host->has_been_checked == true))
           hosts_up++;
         else if (temp_host->current_state == HOST_DOWN) {
           if (temp_host->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_host->problem_has_been_acknowledged == TRUE)
+          if (temp_host->problem_has_been_acknowledged == true)
             problem = false;
-          if (temp_host->checks_enabled == FALSE)
+          if (temp_host->checks_enabled == false)
             problem = false;
           if (problem)
             hosts_down_unhandled++;
@@ -607,9 +607,9 @@ static int handle_summary_macro(
         else if (temp_host->current_state == HOST_UNREACHABLE) {
           if (temp_host->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_host->problem_has_been_acknowledged == TRUE)
+          if (temp_host->problem_has_been_acknowledged == true)
             problem = false;
-          if (temp_host->checks_enabled == FALSE)
+          if (temp_host->checks_enabled == false)
             problem = false;
           if (problem)
             hosts_down_unhandled++;
@@ -644,7 +644,7 @@ static int handle_summary_macro(
       if (authorized) {
         bool problem(true);
         if (temp_service->current_state == STATE_OK
-            && temp_service->has_been_checked == TRUE)
+            && temp_service->has_been_checked == true)
           services_ok++;
         else if (temp_service->current_state == STATE_WARNING) {
           host* temp_host(find_host(temp_service->host_name));
@@ -654,9 +654,9 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == TRUE)
+          if (temp_service->problem_has_been_acknowledged == true)
             problem = false;
-          if (temp_service->checks_enabled == FALSE)
+          if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
             services_warning_unhandled++;
@@ -670,9 +670,9 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == TRUE)
+          if (temp_service->problem_has_been_acknowledged == true)
             problem = false;
-          if (temp_service->checks_enabled == FALSE)
+          if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
             services_unknown_unhandled++;
@@ -686,9 +686,9 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == TRUE)
+          if (temp_service->problem_has_been_acknowledged == true)
             problem = false;
-          if (temp_service->checks_enabled == FALSE)
+          if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
             services_critical_unhandled++;
@@ -1020,7 +1020,7 @@ int grab_macro_value_r(
   buf = string::dup(macro_buffer);
 
   /* BY DEFAULT, TELL CALLER TO FREE MACRO BUFFER WHEN DONE */
-  *free_macro = TRUE;
+  *free_macro = true;
 
   /* macro name is at start of buffer */
   macro_name = buf;
@@ -1097,7 +1097,7 @@ int grab_macro_value_r(
 
     /* use a pre-computed macro value */
     *output = mac->argv[x - 1];
-    *free_macro = FALSE;
+    *free_macro = false;
   }
   /***** USER MACROS *****/
   else if (strstr(macro_name, "USER") == macro_name) {
@@ -1111,7 +1111,7 @@ int grab_macro_value_r(
 
     /* use a pre-computed macro value */
     *output = macro_user[x - 1];
-    *free_macro = FALSE;
+    *free_macro = false;
   }
 
   /***** CONTACT ADDRESS MACROS *****/

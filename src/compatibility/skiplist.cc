@@ -67,7 +67,7 @@ int skiplist_insert(skiplist* list, void* data) {
 
   /* check to make sure we don't have duplicates */
   /* NOTE: this could made be more efficient */
-  if (list->allow_duplicates == FALSE) {
+  if (list->allow_duplicates == false) {
     if (skiplist_find_first(list, data, NULL))
       return (SKIPLIST_ERROR_DUPLICATE);
   }
@@ -76,7 +76,7 @@ int skiplist_insert(skiplist* list, void* data) {
   thisnode = list->head;
   for (level = list->current_level; level >= 0; level--) {
     while ((nextnode = thisnode->forward[level])) {
-      if (list->append_duplicates == TRUE) {
+      if (list->append_duplicates == true) {
         if (list->compare_function(nextnode->data, data) > 0)
           break;
       }
@@ -354,7 +354,7 @@ int skiplist_delete_first(skiplist* list, void const* data) {
   skiplistnode* nextnode = NULL;
   int level = 0;
   int top_level = 0;
-  int deleted = FALSE;
+  int deleted = false;
   int x = 0;
 
   if (list == NULL || data == NULL)
@@ -402,7 +402,7 @@ int skiplist_delete_first(skiplist* list, void const* data) {
     /* adjust items */
     list->items--;
 
-    deleted = TRUE;
+    deleted = true;
   }
 
   /* free memory */
@@ -430,7 +430,7 @@ int skiplist_delete_node(skiplist* list, void const* node_ptr) {
   skiplistnode* nextnode = NULL;
   int level = 0;
   int top_level = 0;
-  int deleted = FALSE;
+  int deleted = false;
   int x = 0;
 
   if (list == NULL || node_ptr == NULL)
@@ -488,7 +488,7 @@ int skiplist_delete_node(skiplist* list, void const* node_ptr) {
     /* adjust items */
     list->items--;
 
-    deleted = TRUE;
+    deleted = true;
   }
 
   /* free memory */

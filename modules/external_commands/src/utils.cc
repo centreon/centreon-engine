@@ -39,7 +39,7 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 static int   command_file_fd = -1;
-static int   command_file_created = FALSE;
+static int   command_file_created = false;
 static FILE* command_file_fp = NULL;
 
 /* creates external command file as a named pipe (FIFO) and opens it for reading (non-blocked mode) */
@@ -138,11 +138,11 @@ int close_command_file(void) {
     return (OK);
 
   /* the command file wasn't created or was already cleaned up */
-  if (command_file_created == FALSE)
+  if (command_file_created == false)
     return (OK);
 
   /* reset our flag */
-  command_file_created = FALSE;
+  command_file_created = false;
 
   /* close the command file */
   fclose(command_file_fp);
@@ -166,7 +166,7 @@ int init_command_file_worker_thread(void) {
     return (ERROR);
 
   /* initialize mutex (only on cold startup) */
-  if (sigrestart == FALSE)
+  if (sigrestart == false)
     pthread_mutex_init(&external_command_buffer.buffer_lock, NULL);
 
   /* new thread should block all signals */

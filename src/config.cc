@@ -48,27 +48,27 @@ int pre_flight_check() {
   struct timeval tv[4];
   double runtime[4];
 
-  if (test_scheduling == TRUE)
+  if (test_scheduling == true)
     gettimeofday(&tv[0], NULL);
 
   /********************************************/
   /* check object relationships               */
   /********************************************/
   pre_flight_object_check(&warnings, &errors);
-  if (test_scheduling == TRUE)
+  if (test_scheduling == true)
     gettimeofday(&tv[1], NULL);
 
   /********************************************/
   /* check for circular paths between hosts   */
   /********************************************/
   pre_flight_circular_check(&warnings, &errors);
-  if (test_scheduling == TRUE)
+  if (test_scheduling == true)
     gettimeofday(&tv[2], NULL);
 
   /********************************************/
   /* check global event handler commands...   */
   /********************************************/
-  if (verify_config == TRUE)
+  if (verify_config == true)
     printf("Checking global event handlers...\n");
 
   if (config->global_host_event_handler() != "") {
@@ -118,7 +118,7 @@ int pre_flight_check() {
   /**************************************************/
   /* check obsessive processor commands...          */
   /**************************************************/
-  if (verify_config == TRUE)
+  if (verify_config == true)
     printf("Checking obsessive compulsive processor commands...\n");
 
   if (!config->ocsp_command().empty()) {
@@ -174,21 +174,21 @@ int pre_flight_check() {
     }
   }
 
-  if (verify_config == TRUE) {
+  if (verify_config == true) {
     printf("\n");
     printf("Total Warnings: %d\n", warnings);
     printf("Total Errors:   %d\n", errors);
   }
 
-  if (test_scheduling == TRUE)
+  if (test_scheduling == true)
     gettimeofday(&tv[3], NULL);
 
-  if (test_scheduling == TRUE) {
+  if (test_scheduling == true) {
 
     runtime[0]
       = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
                  + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
-    if (verify_circular_paths == TRUE)
+    if (verify_circular_paths == true)
       runtime[1]
         = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
                    + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
@@ -232,79 +232,79 @@ int pre_flight_object_check(int* w, int* e) {
   int errors(0);
 
   // Check each service...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking services...";
   int total_objects(0);
   for (service* temp_service(service_list);
        temp_service;
        temp_service = temp_service->next, ++total_objects)
     check_service(temp_service, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " services.";
 
   // Check all hosts...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking hosts...";
   total_objects = 0;
   for (host* temp_host(host_list);
        temp_host;
        temp_host = temp_host->next, ++total_objects)
     check_host(temp_host, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " hosts.";
 
   // Check each host group...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking host groups...";
   total_objects = 0;
   for (hostgroup* temp_hostgroup(hostgroup_list);
        temp_hostgroup;
        temp_hostgroup = temp_hostgroup->next, ++total_objects)
     check_hostgroup(temp_hostgroup, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host groups.";
 
   // Check each service group...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking service groups...";
   total_objects = 0;
   for (servicegroup* temp_servicegroup(servicegroup_list);
        temp_servicegroup;
        temp_servicegroup = temp_servicegroup->next, ++total_objects)
     check_servicegroup(temp_servicegroup, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service groups.";
 
   // Check all contacts...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking contacts...";
   total_objects = 0;
   for (contact* temp_contact(contact_list);
        temp_contact;
        temp_contact = temp_contact->next, ++total_objects)
     check_contact(temp_contact, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " contacts.";
 
   // Check each contact group...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking contact groups...";
   total_objects = 0;
   for (contactgroup* temp_contactgroup(contactgroup_list);
        temp_contactgroup;
        temp_contactgroup = temp_contactgroup->next, ++total_objects)
     check_contactgroup(temp_contactgroup, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " contact groups.";
 
   // Check all service escalations...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "Checking service escalations...";
   total_objects = 0;
@@ -312,12 +312,12 @@ int pre_flight_object_check(int* w, int* e) {
        temp_se;
        temp_se = temp_se->next, ++total_objects)
     check_serviceescalation(temp_se, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service escalations.";
 
   // Check all service dependencies...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "Checking service dependencies...";
   total_objects = 0;
@@ -325,64 +325,64 @@ int pre_flight_object_check(int* w, int* e) {
        temp_sd;
        temp_sd = temp_sd->next, ++total_objects)
     check_servicedependency(temp_sd, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service dependencies.";
 
   // Check all host escalations...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking host escalations...";
   total_objects = 0;
   for (hostescalation* temp_he(hostescalation_list);
        temp_he;
        temp_he = temp_he->next, ++total_objects)
     check_hostescalation(temp_he, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host escalations.";
 
   // Check all host dependencies...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking host dependencies...";
   total_objects = 0;
   for (hostdependency* temp_hd(hostdependency_list);
        temp_hd;
        temp_hd = temp_hd->next, ++total_objects)
     check_hostdependency(temp_hd, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " host dependencies.";
 
   // Check all commands...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking commands...";
   total_objects = 0;
   for (command* temp_command(command_list);
        temp_command;
        temp_command = temp_command->next, ++total_objects) {
     // Check for illegal characters in command name.
-    if ((use_precached_objects == FALSE)
+    if ((use_precached_objects == false)
         && (contains_illegal_object_chars(temp_command->name)
-            == TRUE)) {
+            == true)) {
       logger(log_verification_error, basic)
         << "Error: The name of command '" << temp_command->name
         << "' contains one or more illegal characters.";
       errors++;
     }
   }
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " commands.\n";
 
   // Check all timeperiods...
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_info_message, basic) << "Checking time periods...";
   total_objects = 0;
   for (timeperiod* temp_timeperiod(timeperiod_list);
        temp_timeperiod;
        temp_timeperiod = temp_timeperiod->next, ++total_objects)
     check_timeperiod(temp_timeperiod, &warnings, &errors);
-  if (verify_config == TRUE)
+  if (verify_config == true)
     logger(log_verification_error, basic)
       << "\tChecked " << total_objects << " time periods.";
 
@@ -464,22 +464,22 @@ int pre_flight_circular_check(int* w, int* e) {
   servicedependency* temp_sd2(NULL);
   hostdependency* temp_hd(NULL);
   hostdependency* temp_hd2(NULL);
-  int found(FALSE);
+  int found(false);
   int warnings(0);
   int errors(0);
 
   /* bail out if we aren't supposed to verify circular paths */
-  if (verify_circular_paths == FALSE)
+  if (verify_circular_paths == false)
     return (OK);
 
   /********************************************/
   /* check for circular paths between hosts   */
   /********************************************/
-  if (verify_config == TRUE)
+  if (verify_config == true)
     printf("Checking for circular paths between hosts...\n");
 
   /* check routes between all hosts */
-  found = FALSE;
+  found = false;
 
   /* We clean the dsf status from previous check */
   for (temp_host = host_list;
@@ -509,7 +509,7 @@ int pre_flight_circular_check(int* w, int* e) {
   /********************************************/
   /* check for circular dependencies         */
   /********************************************/
-  if (verify_config == TRUE)
+  if (verify_config == true)
     printf("Checking for circular host and service dependencies...\n");
 
   /* check execution dependencies between all services */
@@ -521,13 +521,13 @@ int pre_flight_circular_check(int* w, int* e) {
     for (temp_sd2 = servicedependency_list;
 	 temp_sd2 != NULL;
          temp_sd2 = temp_sd2->next)
-      temp_sd2->circular_path_checked = FALSE;
+      temp_sd2->circular_path_checked = false;
 
     found = check_for_circular_servicedependency_path(
               temp_sd,
               temp_sd,
               EXECUTION_DEPENDENCY);
-    if (found == TRUE) {
+    if (found == true) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could result "
         "in a deadlock) exists for service '"
@@ -546,13 +546,13 @@ int pre_flight_circular_check(int* w, int* e) {
     for (temp_sd2 = servicedependency_list;
 	 temp_sd2 != NULL;
          temp_sd2 = temp_sd2->next)
-      temp_sd2->circular_path_checked = FALSE;
+      temp_sd2->circular_path_checked = false;
 
     found = check_for_circular_servicedependency_path(
               temp_sd,
               temp_sd,
               NOTIFICATION_DEPENDENCY);
-    if (found == TRUE) {
+    if (found == true) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "
         "result in a deadlock) exists for service '"
@@ -566,7 +566,7 @@ int pre_flight_circular_check(int* w, int* e) {
   for (temp_sd = servicedependency_list;
        temp_sd != NULL;
        temp_sd = temp_sd->next)
-    temp_sd->circular_path_checked = FALSE;
+    temp_sd->circular_path_checked = false;
 
   /* check execution dependencies between all hosts */
   for (temp_hd = hostdependency_list;
@@ -577,13 +577,13 @@ int pre_flight_circular_check(int* w, int* e) {
     for (temp_hd2 = hostdependency_list;
 	 temp_hd2 != NULL;
          temp_hd2 = temp_hd2->next)
-      temp_hd2->circular_path_checked = FALSE;
+      temp_hd2->circular_path_checked = false;
 
     found = check_for_circular_hostdependency_path(
               temp_hd,
               temp_hd,
               EXECUTION_DEPENDENCY);
-    if (found == TRUE) {
+    if (found == true) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could "
         "result in a deadlock) exists for host '"
@@ -601,13 +601,13 @@ int pre_flight_circular_check(int* w, int* e) {
     for (temp_hd2 = hostdependency_list;
 	 temp_hd2 != NULL;
          temp_hd2 = temp_hd2->next)
-      temp_hd2->circular_path_checked = FALSE;
+      temp_hd2->circular_path_checked = false;
 
     found = check_for_circular_hostdependency_path(
               temp_hd,
               temp_hd,
               NOTIFICATION_DEPENDENCY);
-    if (found == TRUE) {
+    if (found == true) {
       logger(log_verification_error, basic)
         << "Error: A circular notification dependency (which could "
         "result in a deadlock) exists for host '"
@@ -620,7 +620,7 @@ int pre_flight_circular_check(int* w, int* e) {
   for (temp_hd = hostdependency_list;
        temp_hd != NULL;
        temp_hd = temp_hd->next)
-    temp_hd->circular_path_checked = FALSE;
+    temp_hd->circular_path_checked = false;
 
   /* update warning and error count */
   if (w != NULL)
@@ -698,9 +698,9 @@ int check_service(service* svc, int* w, int* e) {
   svc->check_command_ptr = temp_command;
 
   /* check for sane recovery options */
-  if (svc->notify_on_recovery == TRUE
-      && svc->notify_on_warning == FALSE
-      && svc->notify_on_critical == FALSE) {
+  if (svc->notify_on_recovery == true
+      && svc->notify_on_warning == false
+      && svc->notify_on_critical == false) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
       << svc->description << "' for host '" << svc->host_name
@@ -816,8 +816,8 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check for illegal characters in service description */
-  if (use_precached_objects == FALSE) {
-    if (contains_illegal_object_chars(svc->description) == TRUE) {
+  if (use_precached_objects == false) {
+    if (contains_illegal_object_chars(svc->description) == true) {
       logger(log_verification_error, basic)
         << "Error: The description string for service '"
         << svc->description << "' on host '" << svc->host_name
@@ -839,7 +839,7 @@ int check_host(host* hst, int* w, int* e) {
 
   /* make sure each host has at least one service associated with it */
   /* 02/21/08 NOTE: this is extremely inefficient */
-  if (use_precached_objects == FALSE
+  if (use_precached_objects == false
       && config->use_large_installation_tweaks() == false) {
 
     bool found = false;
@@ -1009,9 +1009,9 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* check for sane recovery options */
-  if (hst->notify_on_recovery == TRUE
-      && hst->notify_on_down == FALSE
-      && hst->notify_on_unreachable == FALSE) {
+  if (hst->notify_on_recovery == true
+      && hst->notify_on_down == false
+      && hst->notify_on_unreachable == false) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in host '" << hst->name
       << "' definition doesn't make any sense - specify down and/or "
@@ -1020,8 +1020,8 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* check for illegal characters in host name */
-  if (use_precached_objects == FALSE) {
-    if (contains_illegal_object_chars(hst->name) == TRUE) {
+  if (use_precached_objects == false) {
+    if (contains_illegal_object_chars(hst->name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of host '" << hst->name
         << "' contains one or more illegal characters.";
@@ -1155,9 +1155,9 @@ int check_contact(contact* cntct, int* w, int* e) {
   }
 
   /* check for sane host recovery options */
-  if (cntct->notify_on_host_recovery == TRUE
-      && cntct->notify_on_host_down == FALSE
-      && cntct->notify_on_host_unreachable == FALSE) {
+  if (cntct->notify_on_host_recovery == true
+      && cntct->notify_on_host_down == false
+      && cntct->notify_on_host_unreachable == false) {
     logger(log_verification_error, basic)
       << "Warning: Host recovery notification option for contact '"
       << cntct->name << "' doesn't make any sense - specify down "
@@ -1166,9 +1166,9 @@ int check_contact(contact* cntct, int* w, int* e) {
   }
 
   /* check for sane service recovery options */
-  if (cntct->notify_on_service_recovery == TRUE
-      && cntct->notify_on_service_critical == FALSE
-      && cntct->notify_on_service_warning == FALSE) {
+  if (cntct->notify_on_service_recovery == true
+      && cntct->notify_on_service_critical == false
+      && cntct->notify_on_service_warning == false) {
     logger(log_verification_error, basic)
       << "Warning: Service recovery notification option for contact '"
       << cntct->name << "' doesn't make any sense - specify critical "
@@ -1177,8 +1177,8 @@ int check_contact(contact* cntct, int* w, int* e) {
   }
 
   /* check for illegal characters in contact name */
-  if (use_precached_objects == FALSE) {
-    if (contains_illegal_object_chars(cntct->name) == TRUE) {
+  if (use_precached_objects == false) {
+    if (contains_illegal_object_chars(cntct->name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of contact '" << cntct->name
         << "' contains one or more illegal characters.";
@@ -1233,8 +1233,8 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   }
 
   // Check for illegal characters in servicegroup name.
-  if (use_precached_objects == FALSE) {
-    if (contains_illegal_object_chars(sg->group_name) == TRUE) {
+  if (use_precached_objects == false) {
+    if (contains_illegal_object_chars(sg->group_name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of servicegroup '" << sg->group_name
         << "' contains one or more illegal characters.";
@@ -1285,8 +1285,8 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
   }
 
   // Check for illegal characters in hostgroup name.
-  if (use_precached_objects == FALSE) {
-    if (contains_illegal_object_chars(hg->group_name) == TRUE) {
+  if (use_precached_objects == false) {
+    if (contains_illegal_object_chars(hg->group_name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of hostgroup '" << hg->group_name
         << "' contains one or more illegal characters.";
@@ -1338,8 +1338,8 @@ int check_contactgroup(contactgroup* cg, int* w, int* e) {
   }
 
   // Check for illegal characters in contact group name.
-  if (use_precached_objects == FALSE) {
-    if (contains_illegal_object_chars(cg->group_name) == TRUE) {
+  if (use_precached_objects == false) {
+    if (contains_illegal_object_chars(cg->group_name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of contact group '" << cg->group_name
         << "' contains one or more illegal characters.";
@@ -1698,8 +1698,8 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
   int errors(0);
 
   // Check for illegal characters in timeperiod name.
-  if ((use_precached_objects == FALSE)
-      && (contains_illegal_object_chars(tp->name) == TRUE)) {
+  if ((use_precached_objects == false)
+      && (contains_illegal_object_chars(tp->name) == true)) {
     logger(log_verification_error, basic)
       << "Error: The name of time period '" << tp->name
       << "' contains one or more illegal characters.";

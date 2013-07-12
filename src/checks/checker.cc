@@ -394,7 +394,7 @@ void checker::run(
 
   // Update statistics.
   update_check_stats(
-    (scheduled_check == TRUE)
+    (scheduled_check == true)
     ? ACTIVE_SCHEDULED_HOST_CHECK_STATS
     : ACTIVE_ONDEMAND_HOST_CHECK_STATS,
     start_time.tv_sec);
@@ -611,7 +611,7 @@ void checker::run(
 
   // Update statistics.
   update_check_stats(
-    (scheduled_check == TRUE)
+    (scheduled_check == true)
     ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
     start_time.tv_sec);

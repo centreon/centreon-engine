@@ -1425,25 +1425,25 @@ int set_all_macro_environment_vars(int set) {
 /* sets or unsets macrox environment variables */
 int set_macrox_environment_vars_r(nagios_macros* mac, int set) {
   unsigned int x = 0;
-  int free_macro = FALSE;
-  int generate_macro = TRUE;
+  int free_macro = false;
+  int generate_macro = true;
 
   /* set each of the macrox environment variables */
   for (x = 0; x < MACRO_X_COUNT; x++) {
-    free_macro = FALSE;
+    free_macro = false;
 
     /* generate the macro value if it hasn't already been done */
     /* THIS IS EXPENSIVE */
-    if (set == TRUE) {
-      generate_macro = TRUE;
+    if (set == true) {
+      generate_macro = true;
 
       /* skip summary macro generation if lage installation tweaks are enabled */
       if ((x >= MACRO_TOTALHOSTSUP
            && x <= MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
           && config->use_large_installation_tweaks() == true)
-        generate_macro = FALSE;
+        generate_macro = false;
 
-      if (mac->x[x] == NULL && generate_macro == TRUE)
+      if (mac->x[x] == NULL && generate_macro == true)
         grab_macrox_value_r(
           mac,
           x,
@@ -1489,7 +1489,7 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
 
   /***** CUSTOM HOST VARIABLES *****/
   /* generate variables and save them for later */
-  if ((temp_host = mac->host_ptr) && set == TRUE) {
+  if ((temp_host = mac->host_ptr) && set == true) {
     for (temp_customvariablesmember = temp_host->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
@@ -1515,7 +1515,7 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
 
   /***** CUSTOM SERVICE VARIABLES *****/
   /* generate variables and save them for later */
-  if ((temp_service = mac->service_ptr) && set == TRUE) {
+  if ((temp_service = mac->service_ptr) && set == true) {
     for (temp_customvariablesmember = temp_service->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
@@ -1540,7 +1540,7 @@ int set_custom_macro_environment_vars_r(nagios_macros* mac, int set) {
 
   /***** CUSTOM CONTACT VARIABLES *****/
   /* generate variables and save them for later */
-  if ((temp_contact = mac->contact_ptr) && set == TRUE) {
+  if ((temp_contact = mac->contact_ptr) && set == true) {
     for (temp_customvariablesmember = temp_contact->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {

@@ -53,65 +53,65 @@ int status_host_entries = 0;
 unsigned long nagios_pid = 0L;
 
 double min_service_state_change = 0.0;
-int have_min_service_state_change = FALSE;
+int have_min_service_state_change = false;
 double max_service_state_change = 0.0;
-int have_max_service_state_change = FALSE;
+int have_max_service_state_change = false;
 double average_service_state_change = 0.0;
 double min_active_service_state_change = 0.0;
-int have_min_active_service_state_change = FALSE;
+int have_min_active_service_state_change = false;
 double max_active_service_state_change = 0.0;
-int have_max_active_service_state_change = FALSE;
+int have_max_active_service_state_change = false;
 double average_active_service_state_change = 0.0;
 double min_active_service_latency = 0.0;
-int have_min_active_service_latency = FALSE;
+int have_min_active_service_latency = false;
 double max_active_service_latency = 0.0;
-int have_max_active_service_latency = FALSE;
+int have_max_active_service_latency = false;
 double average_active_service_latency = 0.0;
 double min_active_service_execution_time = 0.0;
-int have_min_active_service_execution_time = FALSE;
+int have_min_active_service_execution_time = false;
 double max_active_service_execution_time = 0.0;
-int have_max_active_service_execution_time = FALSE;
+int have_max_active_service_execution_time = false;
 double average_active_service_execution_time = 0.0;
 double min_passive_service_state_change = 0.0;
-int have_min_passive_service_state_change = FALSE;
+int have_min_passive_service_state_change = false;
 double max_passive_service_state_change = 0.0;
-int have_max_passive_service_state_change = FALSE;
+int have_max_passive_service_state_change = false;
 double average_passive_service_state_change = 0.0;
 double min_passive_service_latency = 0.0;
-int have_min_passive_service_latency = FALSE;
+int have_min_passive_service_latency = false;
 double max_passive_service_latency = 0.0;
-int have_max_passive_service_latency = FALSE;
+int have_max_passive_service_latency = false;
 double average_passive_service_latency = 0.0;
 
-int have_min_host_state_change = FALSE;
+int have_min_host_state_change = false;
 double min_host_state_change = 0.0;
-int have_max_host_state_change = FALSE;
+int have_max_host_state_change = false;
 double max_host_state_change = 0.0;
 double average_host_state_change = 0.0;
-int have_min_active_host_state_change = FALSE;
+int have_min_active_host_state_change = false;
 double min_active_host_state_change = 0.0;
-int have_max_active_host_state_change = FALSE;
+int have_max_active_host_state_change = false;
 double max_active_host_state_change = 0.0;
 double average_active_host_state_change = 0.0;
-int have_min_active_host_latency = FALSE;
+int have_min_active_host_latency = false;
 double min_active_host_latency = 0.0;
-int have_max_active_host_latency = FALSE;
+int have_max_active_host_latency = false;
 double max_active_host_latency = 0.0;
 double average_active_host_latency = 0.0;
-int have_min_active_host_execution_time = FALSE;
+int have_min_active_host_execution_time = false;
 double min_active_host_execution_time = 0.0;
-int have_max_active_host_execution_time = FALSE;
+int have_max_active_host_execution_time = false;
 double max_active_host_execution_time = 0.0;
 double average_active_host_execution_time = 0.0;
-int have_min_passive_host_latency = FALSE;
+int have_min_passive_host_latency = false;
 double min_passive_host_latency = 0.0;
-int have_max_passive_host_latency = FALSE;
+int have_max_passive_host_latency = false;
 double max_passive_host_latency = 0.0;
 double average_passive_host_latency = 0.0;
 double min_passive_host_state_change = 0.0;
-int have_min_passive_host_state_change = FALSE;
+int have_min_passive_host_state_change = false;
 double max_passive_host_state_change = 0.0;
-int have_max_passive_host_state_change = FALSE;
+int have_max_passive_host_state_change = false;
 double average_passive_host_state_change = 0.0;
 
 int passive_service_checks = 0;
@@ -595,11 +595,11 @@ int read_status_file() {
   int check_type = SERVICE_CHECK_ACTIVE;
   int current_state = STATE_OK;
   double state_change = 0.0;
-  int is_flapping = FALSE;
+  int is_flapping = false;
   int downtime_depth = 0;
   time_t last_check = 0L;
-  int should_be_scheduled = TRUE;
-  int has_been_checked = TRUE;
+  int should_be_scheduled = true;
+  int has_been_checked = true;
 
   time(&current_time);
 
@@ -651,47 +651,47 @@ int read_status_file() {
 
       case STATUS_HOST_DATA:
         average_host_state_change = (((average_host_state_change * ((double)status_host_entries - 1.0)) + state_change) / (double)status_host_entries);
-        if (have_min_host_state_change == FALSE || min_host_state_change > state_change) {
-          have_min_host_state_change = TRUE;
+        if (have_min_host_state_change == false || min_host_state_change > state_change) {
+          have_min_host_state_change = true;
           min_host_state_change = state_change;
         }
-        if (have_max_host_state_change == FALSE || max_host_state_change < state_change) {
-          have_max_host_state_change = TRUE;
+        if (have_max_host_state_change == false || max_host_state_change < state_change) {
+          have_max_host_state_change = true;
           max_host_state_change = state_change;
         }
         if (check_type == HOST_CHECK_ACTIVE) {
           active_host_checks++;
           average_active_host_latency = (((average_active_host_latency * ((double)active_host_checks - 1.0)) + latency) / (double)active_host_checks);
-          if (have_min_active_host_latency == FALSE
+          if (have_min_active_host_latency == false
               || min_active_host_latency > latency) {
-            have_min_active_host_latency = TRUE;
+            have_min_active_host_latency = true;
             min_active_host_latency = latency;
           }
-          if (have_max_active_host_latency == FALSE
+          if (have_max_active_host_latency == false
               || max_active_host_latency < latency) {
-            have_max_active_host_latency = TRUE;
+            have_max_active_host_latency = true;
             max_active_host_latency = latency;
           }
           average_active_host_execution_time = (((average_active_host_execution_time * ((double)active_host_checks - 1.0)) + execution_time) / (double)active_host_checks);
-          if (have_min_active_host_execution_time == FALSE
+          if (have_min_active_host_execution_time == false
 	      || min_active_host_execution_time > execution_time) {
-            have_min_active_host_execution_time = TRUE;
+            have_min_active_host_execution_time = true;
             min_active_host_execution_time = execution_time;
           }
-          if (have_max_active_host_execution_time == FALSE
+          if (have_max_active_host_execution_time == false
               || max_active_host_execution_time < execution_time) {
-            have_max_active_host_execution_time = TRUE;
+            have_max_active_host_execution_time = true;
             max_active_host_execution_time = execution_time;
           }
           average_active_host_state_change = (((average_active_host_state_change * ((double)active_host_checks - 1.0)) + state_change) / (double)active_host_checks);
-          if (have_min_active_host_state_change == FALSE
+          if (have_min_active_host_state_change == false
 	      || min_active_host_state_change > state_change) {
-            have_min_active_host_state_change = TRUE;
+            have_min_active_host_state_change = true;
             min_active_host_state_change = state_change;
           }
-          if (have_max_active_host_state_change == FALSE
+          if (have_max_active_host_state_change == false
               || max_active_host_state_change < state_change) {
-            have_max_active_host_state_change = TRUE;
+            have_max_active_host_state_change = true;
             max_active_host_state_change = state_change;
           }
           time_difference = current_time - last_check;
@@ -707,23 +707,23 @@ int read_status_file() {
         else {
           passive_host_checks++;
           average_passive_host_latency = (((average_passive_host_latency * ((double)passive_host_checks - 1.0)) + latency) / (double)passive_host_checks);
-          if (have_min_passive_host_latency == FALSE || min_passive_host_latency > latency) {
-            have_min_passive_host_latency = TRUE;
+          if (have_min_passive_host_latency == false || min_passive_host_latency > latency) {
+            have_min_passive_host_latency = true;
             min_passive_host_latency = latency;
           }
-          if (have_max_passive_host_latency == FALSE || max_passive_host_latency < latency) {
-            have_max_passive_host_latency = TRUE;
+          if (have_max_passive_host_latency == false || max_passive_host_latency < latency) {
+            have_max_passive_host_latency = true;
             max_passive_host_latency = latency;
           }
           average_passive_host_state_change = (((average_passive_host_state_change * ((double)passive_host_checks - 1.0)) + state_change) / (double)passive_host_checks);
-          if (have_min_passive_host_state_change == FALSE
+          if (have_min_passive_host_state_change == false
 	      || min_passive_host_state_change > state_change) {
-            have_min_passive_host_state_change = TRUE;
+            have_min_passive_host_state_change = true;
             min_passive_host_state_change = state_change;
           }
-          if (have_max_passive_host_state_change == FALSE
+          if (have_max_passive_host_state_change == false
               || max_passive_host_state_change < state_change) {
-            have_max_passive_host_state_change = TRUE;
+            have_max_passive_host_state_change = true;
             max_passive_host_state_change = state_change;
           }
           time_difference = current_time - last_check;
@@ -749,13 +749,13 @@ int read_status_file() {
         default:
           break;
         }
-        if (is_flapping == TRUE)
+        if (is_flapping == true)
           hosts_flapping++;
         if (downtime_depth > 0)
           hosts_in_downtime++;
-        if (has_been_checked == TRUE)
+        if (has_been_checked == true)
           hosts_checked++;
-        if (should_be_scheduled == TRUE)
+        if (should_be_scheduled == true)
           hosts_scheduled++;
         break;
 
@@ -763,14 +763,14 @@ int read_status_file() {
         average_service_state_change = (((average_service_state_change
 					  * ((double)status_service_entries - 1.0))
 					 + state_change) / (double)status_service_entries);
-        if (have_min_service_state_change == FALSE
+        if (have_min_service_state_change == false
             || min_service_state_change > state_change) {
-          have_min_service_state_change = TRUE;
+          have_min_service_state_change = true;
           min_service_state_change = state_change;
         }
-        if (have_max_service_state_change == FALSE
+        if (have_max_service_state_change == false
             || max_service_state_change < state_change) {
-          have_max_service_state_change = TRUE;
+          have_max_service_state_change = true;
           max_service_state_change = state_change;
         }
         if (check_type == SERVICE_CHECK_ACTIVE) {
@@ -778,40 +778,40 @@ int read_status_file() {
           average_active_service_latency = (((average_active_service_latency
 					      * ((double)active_service_checks - 1.0))
 					     + latency) / (double)active_service_checks);
-          if (have_min_active_service_latency == FALSE
+          if (have_min_active_service_latency == false
               || min_active_service_latency > latency) {
-            have_min_active_service_latency = TRUE;
+            have_min_active_service_latency = true;
             min_active_service_latency = latency;
           }
-          if (have_max_active_service_latency == FALSE
+          if (have_max_active_service_latency == false
               || max_active_service_latency < latency) {
-            have_max_active_service_latency = TRUE;
+            have_max_active_service_latency = true;
             max_active_service_latency = latency;
           }
           average_active_service_execution_time = (((average_active_service_execution_time
 						     * ((double)active_service_checks - 1.0))
 						    + execution_time) / (double)active_service_checks);
-          if (have_min_active_service_execution_time == FALSE
+          if (have_min_active_service_execution_time == false
               || min_active_service_execution_time > execution_time) {
-            have_min_active_service_execution_time = TRUE;
+            have_min_active_service_execution_time = true;
             min_active_service_execution_time = execution_time;
           }
-          if (have_max_active_service_execution_time == FALSE
+          if (have_max_active_service_execution_time == false
               || max_active_service_execution_time < execution_time) {
-            have_max_active_service_execution_time = TRUE;
+            have_max_active_service_execution_time = true;
             max_active_service_execution_time = execution_time;
           }
           average_active_service_state_change = (((average_active_service_state_change
 						   * ((double)active_service_checks - 1.0))
 						  + state_change) / (double)active_service_checks);
-          if (have_min_active_service_state_change == FALSE
+          if (have_min_active_service_state_change == false
               || min_active_service_state_change > state_change) {
-            have_min_active_service_state_change = TRUE;
+            have_min_active_service_state_change = true;
             min_active_service_state_change = state_change;
           }
-          if (have_max_active_service_state_change == FALSE
+          if (have_max_active_service_state_change == false
               || max_active_service_state_change < state_change) {
-            have_max_active_service_state_change = TRUE;
+            have_max_active_service_state_change = true;
             max_active_service_state_change = state_change;
           }
           time_difference = current_time - last_check;
@@ -829,27 +829,27 @@ int read_status_file() {
           average_passive_service_latency = (((average_passive_service_latency
 					       * ((double)passive_service_checks - 1.0))
 					      + latency) / (double)passive_service_checks);
-          if (have_min_passive_service_latency == FALSE
+          if (have_min_passive_service_latency == false
               || min_passive_service_latency > latency) {
-            have_min_passive_service_latency = TRUE;
+            have_min_passive_service_latency = true;
             min_passive_service_latency = latency;
           }
-          if (have_max_passive_service_latency == FALSE
+          if (have_max_passive_service_latency == false
               || max_passive_service_latency < latency) {
-            have_max_passive_service_latency = TRUE;
+            have_max_passive_service_latency = true;
             max_passive_service_latency = latency;
           }
           average_passive_service_state_change = (((average_passive_service_state_change
 						    * ((double)passive_service_checks - 1.0))
 						   + state_change) / (double)passive_service_checks);
-          if (have_min_passive_service_state_change == FALSE
+          if (have_min_passive_service_state_change == false
               || min_passive_service_state_change > state_change) {
-            have_min_passive_service_state_change = TRUE;
+            have_min_passive_service_state_change = true;
             min_passive_service_state_change = state_change;
           }
-          if (have_max_passive_service_state_change == FALSE
+          if (have_max_passive_service_state_change == false
               || max_passive_service_state_change < state_change) {
-            have_max_passive_service_state_change = TRUE;
+            have_max_passive_service_state_change = true;
             max_passive_service_state_change = state_change;
           }
           time_difference = current_time - last_check;
@@ -882,13 +882,13 @@ int read_status_file() {
         default:
           break;
         }
-        if (is_flapping == TRUE)
+        if (is_flapping == true)
           services_flapping++;
         if (downtime_depth > 0)
           services_in_downtime++;
-        if (has_been_checked == TRUE)
+        if (has_been_checked == true)
           services_checked++;
-        if (should_be_scheduled == TRUE)
+        if (should_be_scheduled == true)
           services_scheduled++;
         break;
 
@@ -903,11 +903,11 @@ int read_status_file() {
       check_type = 0;
       current_state = 0;
       state_change = 0.0;
-      is_flapping = FALSE;
+      is_flapping = false;
       downtime_depth = 0;
       last_check = (time_t) 0;
-      has_been_checked = FALSE;
-      should_be_scheduled = FALSE;
+      has_been_checked = false;
+      should_be_scheduled = false;
     }
 
 
@@ -1040,15 +1040,15 @@ int read_status_file() {
         else if (!strcmp(var, "current_state"))
           current_state = atoi(val);
         else if (!strcmp(var, "is_flapping"))
-          is_flapping = (atoi(val) > 0) ? TRUE : FALSE;
+          is_flapping = (atoi(val) > 0) ? true : false;
         else if (!strcmp(var, "scheduled_downtime_depth"))
           downtime_depth = atoi(val);
         else if (!strcmp(var, "last_check"))
           last_check = strtoul(val, NULL, 10);
         else if (!strcmp(var, "has_been_checked"))
-          has_been_checked = (atoi(val) > 0) ? TRUE : FALSE;
+          has_been_checked = (atoi(val) > 0) ? true : false;
         else if (!strcmp(var, "should_be_scheduled"))
-          should_be_scheduled = (atoi(val) > 0) ? TRUE : FALSE;
+          should_be_scheduled = (atoi(val) > 0) ? true : false;
 	    break;
 
       case STATUS_SERVICE_DATA:
@@ -1063,15 +1063,15 @@ int read_status_file() {
         else if (!strcmp(var, "current_state"))
           current_state = atoi(val);
         else if (!strcmp(var, "is_flapping"))
-          is_flapping = (atoi(val) > 0) ? TRUE : FALSE;
+          is_flapping = (atoi(val) > 0) ? true : false;
         else if (!strcmp(var, "scheduled_downtime_depth"))
           downtime_depth = atoi(val);
         else if (!strcmp(var, "last_check"))
           last_check = strtoul(val, NULL, 10);
         else if (!strcmp(var, "has_been_checked"))
-          has_been_checked = (atoi(val) > 0) ? TRUE : FALSE;
+          has_been_checked = (atoi(val) > 0) ? true : false;
         else if (!strcmp(var, "should_be_scheduled"))
-          should_be_scheduled = (atoi(val) > 0) ? TRUE : FALSE;
+          should_be_scheduled = (atoi(val) > 0) ? true : false;
 	    break;
 
       default:

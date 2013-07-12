@@ -128,8 +128,8 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
     return (ERROR);
 
   /* decrement pending flex downtime if necessary ... */
-  if (temp_downtime->fixed == FALSE
-      && temp_downtime->incremented_pending_downtime == TRUE) {
+  if (temp_downtime->fixed == false
+      && temp_downtime->incremented_pending_downtime == true) {
     if (temp_downtime->type == HOST_DOWNTIME)
       hst->pending_flex_downtime--;
     else
@@ -137,7 +137,7 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
   }
 
   /* decrement the downtime depth variable and update status data if necessary */
-  if (temp_downtime->is_in_effect == TRUE) {
+  if (temp_downtime->is_in_effect == true) {
 
     /* send data to event broker */
     attr = NEBATTR_DOWNTIME_STOP_CANCELLED;
@@ -161,7 +161,7 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
 
     if (temp_downtime->type == HOST_DOWNTIME) {
       hst->scheduled_downtime_depth--;
-      update_host_status(hst, FALSE);
+      update_host_status(hst, false);
 
       /* log a notice - this is parsed by the history CGI */
       if (hst->scheduled_downtime_depth == 0) {
@@ -181,7 +181,7 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
     }
     else {
       svc->scheduled_downtime_depth--;
-      update_service_status(svc, FALSE);
+      update_service_status(svc, false);
 
       /* log a notice - this is parsed by the history CGI */
       if (svc->scheduled_downtime_depth == 0) {
@@ -285,7 +285,7 @@ int register_downtime(int type, unsigned long downtime_id) {
   seconds = temp_downtime->duration - (hours * 3600) - (minutes * 60);
   type_string = temp_downtime->type == HOST_DOWNTIME ? "host" : "service";
   std::ostringstream oss;
-  if (temp_downtime->fixed == TRUE)
+  if (temp_downtime->fixed == true)
     oss << "This " << type_string
         << " has been scheduled for fixed downtime from "
         << start_time_string << " to " << end_time_string
@@ -313,7 +313,7 @@ int register_downtime(int type, unsigned long downtime_id) {
       " Service:     " << svc->description;
   }
   logger(dbg_downtime, basic)
-    << " Fixed/Flex:  " << (temp_downtime->fixed == TRUE ? "Fixed\n" : "Flexible\n")
+    << " Fixed/Flex:  " << (temp_downtime->fixed == true ? "Fixed\n" : "Flexible\n")
     << " Start:       " << temp_downtime->downtime_id << "\n"
     " End:         " << temp_downtime->downtime_id << "\n"
     " Duration:    " << hours << "h " << minutes << "m " << seconds << "s\n"
@@ -332,7 +332,7 @@ int register_downtime(int type, unsigned long downtime_id) {
       oss.str().c_str(),
       0,
       COMMENTSOURCE_INTERNAL,
-      FALSE,
+      false,
       (time_t)0,
       &(temp_downtime->comment_id));
   else
@@ -346,7 +346,7 @@ int register_downtime(int type, unsigned long downtime_id) {
       oss.str().c_str(),
       0,
       COMMENTSOURCE_INTERNAL,
-      FALSE,
+      false,
       (time_t)0,
       &(temp_downtime->comment_id));
 
@@ -358,12 +358,12 @@ int register_downtime(int type, unsigned long downtime_id) {
     *new_downtime_id = downtime_id;
     schedule_new_event(
       EVENT_SCHEDULED_DOWNTIME,
-      TRUE,
+      true,
       temp_downtime->start_time,
-      FALSE,
+      false,
       0,
       NULL,
-      FALSE,
+      false,
       (void*)new_downtime_id,
       NULL,
       0);
@@ -374,7 +374,7 @@ int register_downtime(int type, unsigned long downtime_id) {
 
   /* if host/service is in a non-OK/UP state right now, see if we should start flexible time immediately */
   /* this is new logic added in 3.0rc3 */
-  if (temp_downtime->fixed == FALSE) {
+  if (temp_downtime->fixed == false) {
     if (temp_downtime->type == HOST_DOWNTIME)
       check_pending_flex_host_downtime(hst);
     else
@@ -420,11 +420,11 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     return (ERROR);
 
   /* if downtime if flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */
-  /* start_flex_downtime variable is set to TRUE by event handler functions */
-  if (temp_downtime->fixed == FALSE) {
+  /* start_flex_downtime variable is set to true by event handler functions */
+  if (temp_downtime->fixed == false) {
 
     /* we're not supposed to force a start of flex downtime... */
-    if (temp_downtime->start_flex_downtime == FALSE) {
+    if (temp_downtime->start_flex_downtime == false) {
 
       /* host is up or service is ok, so we don't really do anything right now */
       if ((temp_downtime->type == HOST_DOWNTIME
@@ -437,18 +437,18 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
           hst->pending_flex_downtime++;
         else
           svc->pending_flex_downtime++;
-        temp_downtime->incremented_pending_downtime = TRUE;
+        temp_downtime->incremented_pending_downtime = true;
 
         /*** SINCE THE FLEX DOWNTIME MAY NEVER START, WE HAVE TO PROVIDE A WAY OF EXPIRING UNUSED DOWNTIME... ***/
 
         schedule_new_event(
           EVENT_EXPIRE_DOWNTIME,
-          TRUE,
+          true,
           temp_downtime->end_time + 1,
-          FALSE,
+          false,
           0,
           NULL,
-          FALSE,
+          false,
           NULL,
           NULL,
           0);
@@ -458,7 +458,7 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
   }
 
   /* have we come to the end of the scheduled downtime? */
-  if (temp_downtime->is_in_effect == TRUE) {
+  if (temp_downtime->is_in_effect == true) {
 
     /* send data to event broker */
     attr = NEBATTR_DOWNTIME_STOP_NORMAL;
@@ -534,13 +534,13 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
     /* update the status data */
     if (temp_downtime->type == HOST_DOWNTIME)
-      update_host_status(hst, FALSE);
+      update_host_status(hst, false);
     else
-      update_service_status(svc, FALSE);
+      update_service_status(svc, false);
 
     /* decrement pending flex downtime if necessary */
-    if (temp_downtime->fixed == FALSE
-        && temp_downtime->incremented_pending_downtime == TRUE) {
+    if (temp_downtime->fixed == false
+        && temp_downtime->incremented_pending_downtime == true) {
       if (temp_downtime->type == HOST_DOWNTIME) {
         if (hst->pending_flex_downtime > 0)
           hst->pending_flex_downtime--;
@@ -644,16 +644,16 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
       svc->scheduled_downtime_depth++;
 
     /* set the in effect flag */
-    temp_downtime->is_in_effect = TRUE;
+    temp_downtime->is_in_effect = true;
 
     /* update the status data */
     if (temp_downtime->type == HOST_DOWNTIME)
-      update_host_status(hst, FALSE);
+      update_host_status(hst, false);
     else
-      update_service_status(svc, FALSE);
+      update_service_status(svc, false);
 
     /* schedule an event */
-    if (temp_downtime->fixed == FALSE)
+    if (temp_downtime->fixed == false)
       event_time
         = (time_t)((unsigned long)time(NULL) + temp_downtime->duration);
     else
@@ -662,12 +662,12 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     *new_downtime_id = temp_downtime->downtime_id;
     schedule_new_event(
       EVENT_SCHEDULED_DOWNTIME,
-      TRUE,
+      true,
       event_time,
-      FALSE,
+      false,
       0,
       NULL,
-      FALSE,
+      false,
       (void*)new_downtime_id,
       NULL,
       0);
@@ -705,8 +705,8 @@ int check_pending_flex_host_downtime(host* hst) {
        temp_downtime != NULL;
        temp_downtime = temp_downtime->next) {
     if (temp_downtime->type != HOST_DOWNTIME
-        || temp_downtime->fixed == TRUE
-        || temp_downtime->is_in_effect == TRUE
+        || temp_downtime->fixed == true
+        || temp_downtime->is_in_effect == true
         || temp_downtime->triggered_by != 0)
       continue;
 
@@ -720,7 +720,7 @@ int check_pending_flex_host_downtime(host* hst) {
           << "Flexible downtime (id=" << temp_downtime->downtime_id
           << ") for host '" << hst->name << "' starting now...";
 
-        temp_downtime->start_flex_downtime = TRUE;
+        temp_downtime->start_flex_downtime = true;
         handle_scheduled_downtime(temp_downtime);
       }
     }
@@ -751,8 +751,8 @@ int check_pending_flex_service_downtime(service* svc) {
        temp_downtime = temp_downtime->next) {
 
     if (temp_downtime->type != SERVICE_DOWNTIME
-        || temp_downtime->fixed == TRUE
-        || temp_downtime->is_in_effect == TRUE
+        || temp_downtime->fixed == true
+        || temp_downtime->is_in_effect == true
         || temp_downtime->triggered_by != 0)
       continue;
 
@@ -768,7 +768,7 @@ int check_pending_flex_service_downtime(service* svc) {
           << ") for service '" << svc->description << "' on host '"
           << svc->host_name << "' starting now...";
 
-        temp_downtime->start_flex_downtime = TRUE;
+        temp_downtime->start_flex_downtime = true;
         handle_scheduled_downtime(temp_downtime);
       }
     }
@@ -794,7 +794,7 @@ int check_for_expired_downtime() {
     next_downtime = temp_downtime->next;
 
     /* this entry should be removed */
-    if (temp_downtime->is_in_effect == FALSE
+    if (temp_downtime->is_in_effect == false
         && temp_downtime->end_time < current_time) {
       logger(dbg_downtime, basic)
         << "Expiring "
@@ -1209,7 +1209,7 @@ int add_downtime(
   new_downtime->entry_time = entry_time;
   new_downtime->start_time = start_time;
   new_downtime->end_time = end_time;
-  new_downtime->fixed = (fixed > 0) ? TRUE : FALSE;
+  new_downtime->fixed = (fixed > 0) ? true : false;
   new_downtime->triggered_by = triggered_by;
   new_downtime->duration = duration;
   new_downtime->downtime_id = downtime_id;

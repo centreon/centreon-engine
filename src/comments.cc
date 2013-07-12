@@ -88,15 +88,15 @@ int add_new_comment(
                &new_comment_id);
 
   /* add an event to expire comment data if necessary... */
-  if (expires == TRUE)
+  if (expires == true)
     schedule_new_event(
       EVENT_EXPIRE_COMMENT,
-      FALSE,
+      false,
       expire_time,
-      FALSE,
+      false,
       0,
       NULL,
-      TRUE,
+      true,
       (void*)new_comment_id,
       NULL,
       0);
@@ -364,7 +364,7 @@ int delete_host_acknowledgement_comments(host* hst) {
     next_comment = get_next_comment_by_host(hst->name, temp_comment);
     if (temp_comment->comment_type == HOST_COMMENT
         && temp_comment->entry_type == ACKNOWLEDGEMENT_COMMENT
-        && temp_comment->persistent == FALSE)
+        && temp_comment->persistent == false)
       delete_comment(HOST_COMMENT, temp_comment->comment_id);
   }
   return (OK);
@@ -410,7 +410,7 @@ int delete_service_acknowledgement_comments(service* svc) {
         && !strcmp(temp_comment->host_name, svc->host_name)
         && !strcmp(temp_comment->service_description, svc->description)
         && temp_comment->entry_type == ACKNOWLEDGEMENT_COMMENT
-        && temp_comment->persistent == FALSE)
+        && temp_comment->persistent == false)
       delete_comment(SERVICE_COMMENT, temp_comment->comment_id);
   }
   return (OK);
@@ -427,7 +427,7 @@ int check_for_expired_comment(unsigned long comment_id) {
 
     /* delete the now expired comment */
     if (temp_comment->comment_id == comment_id
-        && temp_comment->expires == TRUE
+        && temp_comment->expires == true
         && temp_comment->expire_time < time(NULL)) {
       delete_comment(temp_comment->comment_type, comment_id);
       break;
@@ -578,8 +578,8 @@ int add_comment(
   new_comment->source = source;
   new_comment->entry_time = entry_time;
   new_comment->comment_id = comment_id;
-  new_comment->persistent = (persistent == TRUE) ? TRUE : FALSE;
-  new_comment->expires = (expires == TRUE) ? TRUE : FALSE;
+  new_comment->persistent = (persistent == true) ? true : false;
+  new_comment->expires = (expires == true) ? true : false;
   new_comment->expire_time = expire_time;
 
   /* add comment to hash list */

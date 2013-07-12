@@ -43,7 +43,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
   host* temp_host = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
@@ -57,7 +57,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   /* bail out if we shouldn't be obsessing */
   if (config->obsess_over_services() == false)
     return (OK);
-  if (svc->obsess_over_service == FALSE)
+  if (svc->obsess_over_service == false)
     return (OK);
 
   /* if there is no valid command, exit */
@@ -116,7 +116,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
-  if (early_timeout == TRUE)
+  if (early_timeout == true)
     logger(log_runtime_warning, basic)
       << "Warning: OCSP command '" << processed_command
       << "' for service '" << svc->description << "' on host '"
@@ -134,7 +134,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
 int obsessive_compulsive_host_check_processor(host* hst) {
   char* raw_command = NULL;
   char* processed_command = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime = 0.0;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
@@ -148,7 +148,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   /* bail out if we shouldn't be obsessing */
   if (config->obsess_over_hosts() == false)
     return (OK);
-  if (hst->obsess_over_host == FALSE)
+  if (hst->obsess_over_host == false)
     return (OK);
 
   /* if there is no valid command, exit */
@@ -201,7 +201,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
-  if (early_timeout == TRUE)
+  if (early_timeout == true)
     logger(log_runtime_warning, basic)
       << "Warning: OCHP command '" << processed_command
       << "' for host '" << hst->name << "' timed out after "
@@ -245,7 +245,7 @@ int handle_service_event(service* svc) {
   /* bail out if we shouldn't be running event handlers */
   if (config->enable_event_handlers() == false)
     return (OK);
-  if (svc->event_handler_enabled == FALSE)
+  if (svc->event_handler_enabled == false)
     return (OK);
 
   /* find the host */
@@ -285,7 +285,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   char* processed_command = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
   struct timeval start_time;
@@ -394,7 +394,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
              0);
 
   /* check to see if the event handler timed out */
-  if (early_timeout == TRUE)
+  if (early_timeout == true)
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Global service event handler command '"
       << processed_command << "' timed out after "
@@ -438,7 +438,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   char* processed_command = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
   struct timeval start_time;
@@ -547,7 +547,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
              0);
 
   /* check to see if the event handler timed out */
-  if (early_timeout == TRUE)
+  if (early_timeout == true)
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Service event handler command '" << processed_command
       << "' timed out after " << config->event_handler_timeout()
@@ -615,7 +615,7 @@ int handle_host_event(host* hst) {
   /* bail out if we shouldn't be running event handlers */
   if (config->enable_event_handlers() == false)
     return (OK);
-  if (hst->event_handler_enabled == FALSE)
+  if (hst->event_handler_enabled == false)
     return (OK);
 
   /* update host macros */
@@ -649,7 +649,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   char* processed_command = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
   struct timeval start_time;
@@ -758,7 +758,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
              0);
 
   /* check for a timeout in the execution of the event handler command */
-  if (early_timeout == TRUE)
+  if (early_timeout == true)
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Global host event handler command '"
       << processed_command << "' timed out after "
@@ -802,7 +802,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   char* processed_command = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime = 0.0;
   int result = 0;
   struct timeval start_time;
@@ -908,7 +908,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
              0);
 
   /* check to see if the event handler timed out */
-  if (early_timeout == TRUE)
+  if (early_timeout == true)
     logger(log_event_handler | log_runtime_warning, basic)
       << "Warning: Host event handler command '" << processed_command
       << "' timed out after " << config->event_handler_timeout()
@@ -952,7 +952,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
 
 /* top level host state handler - occurs after every host check (soft/hard and active/passive) */
 int handle_host_state(host* hst) {
-  int state_change = FALSE;
+  int state_change = false;
   time_t current_time = 0L;
 
   logger(dbg_functions, basic)
@@ -990,10 +990,10 @@ int handle_host_state(host* hst) {
       || hst->last_hard_state != hst->current_state
       || (hst->current_state == HOST_UP
           && hst->state_type == SOFT_STATE))
-    state_change = TRUE;
+    state_change = true;
 
   /* if the host state has changed... */
-  if (state_change == TRUE) {
+  if (state_change == true) {
 
     /* update last state change times */
     hst->last_state_change = current_time;
@@ -1022,7 +1022,7 @@ int handle_host_state(host* hst) {
     /* reset the acknowledgement flag if necessary */
     if (hst->acknowledgement_type == ACKNOWLEDGEMENT_NORMAL) {
 
-      hst->problem_has_been_acknowledged = FALSE;
+      hst->problem_has_been_acknowledged = false;
       hst->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
       /* remove any non-persistant comments associated with the ack */
@@ -1031,7 +1031,7 @@ int handle_host_state(host* hst) {
     else if (hst->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
              && hst->current_state == HOST_UP) {
 
-      hst->problem_has_been_acknowledged = FALSE;
+      hst->problem_has_been_acknowledged = false;
       hst->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
       /* remove any non-persistant comments associated with the ack */
@@ -1043,7 +1043,7 @@ int handle_host_state(host* hst) {
     hst->next_host_notification = (time_t)0;
 
     /* reset notification suppression option */
-    hst->no_more_notifications = FALSE;
+    hst->no_more_notifications = false;
 
     /* write the host state change to the main log file */
     if (hst->state_type == HARD_STATE
@@ -1075,8 +1075,8 @@ int handle_host_state(host* hst) {
     /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
     if (hst->current_state == HOST_UP) {
       hst->current_notification_number = 0;
-      hst->notified_on_down = FALSE;
-      hst->notified_on_unreachable = FALSE;
+      hst->notified_on_down = false;
+      hst->notified_on_unreachable = false;
       host_other_props[hst->name].initial_notif_time = 0;
     }
   }

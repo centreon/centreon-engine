@@ -87,7 +87,7 @@ void broker_acknowledgement_data(
   ds.object_ptr = data;
   ds.author_name = ack_author;
   ds.comment_data = ack_data;
-  ds.is_sticky = (subtype == ACKNOWLEDGEMENT_STICKY) ? TRUE : FALSE;
+  ds.is_sticky = (subtype == ACKNOWLEDGEMENT_STICKY) ? true : false;
   ds.notify_contacts = notify_contacts;
   ds.persistent_comment = persistent_comment;
 

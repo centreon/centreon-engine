@@ -76,9 +76,9 @@ int service_notification(
   time_t current_time;
   struct timeval start_time;
   struct timeval end_time;
-  int escalated = FALSE;
+  int escalated = false;
   int contacts_notified = 0;
-  int increment_notification_number = FALSE;
+  int increment_notification_number = false;
   nagios_macros mac;
   int neb_result;
 
@@ -122,7 +122,7 @@ int service_notification(
   if (type == NOTIFICATION_NORMAL
       || (options & NOTIFICATION_OPTION_INCREMENT)) {
     svc->current_notification_number++;
-    increment_notification_number = TRUE;
+    increment_notification_number = true;
   }
 
   logger(dbg_notifications, more)
@@ -301,15 +301,15 @@ int service_notification(
 
         /* update notifications flags */
         if (svc->current_state == STATE_UNKNOWN)
-          svc->notified_on_unknown = TRUE;
+          svc->notified_on_unknown = true;
         else if (svc->current_state == STATE_WARNING)
-          svc->notified_on_warning = TRUE;
+          svc->notified_on_warning = true;
         else if (svc->current_state == STATE_CRITICAL)
-          svc->notified_on_critical = TRUE;
+          svc->notified_on_critical = true;
       }
 
       /* we didn't end up notifying anyone */
-      else if (increment_notification_number == TRUE) {
+      else if (increment_notification_number == true) {
 
         /* adjust current notification number */
         svc->current_notification_number--;
@@ -327,7 +327,7 @@ int service_notification(
   /* there were no contacts, so no notification really occurred... */
   else {
     /* readjust current notification number, since one didn't go out */
-    if (increment_notification_number == TRUE)
+    if (increment_notification_number == true)
       svc->current_notification_number--;
 
     logger(dbg_notifications, basic)
@@ -355,7 +355,7 @@ int service_notification(
     NULL);
 
   /* update the status log with the service information */
-  update_service_status(svc, FALSE);
+  update_service_status(svc, false);
 
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);
@@ -444,7 +444,7 @@ int check_service_notification_viability(
   }
 
   /* are notifications temporarily disabled for this service? */
-  if (svc->notifications_enabled == FALSE) {
+  if (svc->notifications_enabled == false) {
     logger(dbg_notifications, more)
       << "Notifications are temporarily disabled for "
       "this service, so we won't send one out.";
@@ -497,7 +497,7 @@ int check_service_notification_viability(
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
     /* don't send a notification if we're not supposed to... */
-    if (svc->notify_on_flapping == FALSE) {
+    if (svc->notify_on_flapping == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events for this "
         "service.";
@@ -527,7 +527,7 @@ int check_service_notification_viability(
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
     /* don't send a notification if we're not supposed to... */
-    if (svc->notify_on_downtime == FALSE) {
+    if (svc->notify_on_downtime == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events for "
         "this service.";
@@ -559,7 +559,7 @@ int check_service_notification_viability(
   }
 
   /* has this problem already been acknowledged? */
-  if (svc->problem_has_been_acknowledged == TRUE) {
+  if (svc->problem_has_been_acknowledged == true) {
     logger(dbg_notifications, more)
       << "This service problem has already been acknowledged, "
       "so we won't send a notification out.";
@@ -588,32 +588,32 @@ int check_service_notification_viability(
 
   /* see if we should notify about problems with this service */
   if (svc->current_state == STATE_UNKNOWN
-      && svc->notify_on_unknown == FALSE) {
+      && svc->notify_on_unknown == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about UNKNOWN states for this service.";
     return (ERROR);
   }
   if (svc->current_state == STATE_WARNING
-      && svc->notify_on_warning == FALSE) {
+      && svc->notify_on_warning == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about WARNING states for this service.";
     return (ERROR);
   }
   if (svc->current_state == STATE_CRITICAL
-      && svc->notify_on_critical == FALSE) {
+      && svc->notify_on_critical == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about CRITICAL states for this service.";
     return (ERROR);
   }
   if (svc->current_state == STATE_OK) {
-    if (svc->notify_on_recovery == FALSE) {
+    if (svc->notify_on_recovery == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about RECOVERY states for this service.";
       return (ERROR);
     }
-    if (!(svc->notified_on_unknown == TRUE
-          || svc->notified_on_warning == TRUE
-          || svc->notified_on_critical == TRUE)) {
+    if (!(svc->notified_on_unknown == true
+          || svc->notified_on_warning == true
+          || svc->notified_on_critical == true)) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about this recovery.";
       return (ERROR);
@@ -647,7 +647,7 @@ int check_service_notification_viability(
   }
 
   /* if this service is currently flapping, don't send the notification */
-  if (svc->is_flapping == TRUE) {
+  if (svc->is_flapping == true) {
     logger(dbg_notifications, more)
       << "This service is currently flapping, so we won't send "
       "notifications.";
@@ -659,7 +659,7 @@ int check_service_notification_viability(
     return (OK);
 
   /* don't notify contacts about this service problem again if the notification interval is set to 0 */
-  if (svc->no_more_notifications == TRUE) {
+  if (svc->no_more_notifications == true) {
     logger(dbg_notifications, more)
       << "We shouldn't re-notify contacts about this service problem.";
     return (ERROR);
@@ -675,7 +675,7 @@ int check_service_notification_viability(
 
   /* don't notify if we haven't waited long enough since the last time (and the service is not marked as being volatile) */
   if ((current_time < svc->next_notification)
-      && svc->is_volatile == FALSE) {
+      && svc->is_volatile == false) {
     logger(dbg_notifications, more)
       << "We haven't waited long enough to re-notify contacts "
       "about this service.";
@@ -727,7 +727,7 @@ int check_contact_service_notification_viability(
   }
 
   /* are notifications enabled? */
-  if (cntct->service_notifications_enabled == FALSE) {
+  if (cntct->service_notifications_enabled == false) {
     logger(dbg_notifications, most)
       << "Service notifications are disabled for this contact.";
     return (ERROR);
@@ -757,7 +757,7 @@ int check_contact_service_notification_viability(
       || type == NOTIFICATION_FLAPPINGSTOP
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
-    if (cntct->notify_on_service_flapping == FALSE) {
+    if (cntct->notify_on_service_flapping == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
         "service events.";
@@ -775,7 +775,7 @@ int check_contact_service_notification_viability(
       || type == NOTIFICATION_DOWNTIMEEND
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
-    if (cntct->notify_on_service_downtime == FALSE) {
+    if (cntct->notify_on_service_downtime == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about DOWNTIME "
         "service events.";
@@ -791,7 +791,7 @@ int check_contact_service_notification_viability(
 
   /* see if we should notify about problems with this service */
   if (svc->current_state == STATE_UNKNOWN
-      && cntct->notify_on_service_unknown == FALSE) {
+      && cntct->notify_on_service_unknown == false) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNKNOWN "
       "service states.";
@@ -799,7 +799,7 @@ int check_contact_service_notification_viability(
   }
 
   if (svc->current_state == STATE_WARNING
-      && cntct->notify_on_service_warning == FALSE) {
+      && cntct->notify_on_service_warning == false) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about WARNING "
       "service states.";
@@ -807,7 +807,7 @@ int check_contact_service_notification_viability(
   }
 
   if (svc->current_state == STATE_CRITICAL
-      && cntct->notify_on_service_critical == FALSE) {
+      && cntct->notify_on_service_critical == false) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about CRITICAL "
       "service states.";
@@ -816,19 +816,19 @@ int check_contact_service_notification_viability(
 
   if (svc->current_state == STATE_OK) {
 
-    if (cntct->notify_on_service_recovery == FALSE) {
+    if (cntct->notify_on_service_recovery == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about RECOVERY "
         "service states.";
       return (ERROR);
     }
 
-    if (!((svc->notified_on_unknown == TRUE
-           && cntct->notify_on_service_unknown == TRUE)
-          || (svc->notified_on_warning == TRUE
-              && cntct->notify_on_service_warning == TRUE)
-          || (svc->notified_on_critical == TRUE
-              && cntct->notify_on_service_critical == TRUE))) {
+    if (!((svc->notified_on_unknown == true
+           && cntct->notify_on_service_unknown == true)
+          || (svc->notified_on_warning == true
+              && cntct->notify_on_service_warning == true)
+          || (svc->notified_on_critical == true
+              && cntct->notify_on_service_critical == true))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
       return (ERROR);
@@ -857,7 +857,7 @@ int notify_contact_of_service(
   char* command_name_ptr = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime;
   struct timeval start_time, end_time;
   struct timeval method_start_time, method_end_time;
@@ -1010,7 +1010,7 @@ int notify_contact_of_service(
       0);
 
     /* check to see if the notification command timed out */
-    if (early_timeout == TRUE) {
+    if (early_timeout == true) {
       logger(log_service_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' service notification command '" << processed_command
@@ -1092,44 +1092,44 @@ int is_valid_escalation_for_service_notification(
   /* this entry if it is not for this service */
   temp_service = se->service_ptr;
   if (temp_service == NULL || temp_service != svc)
-    return (FALSE);
+    return (false);
 
   /*** EXCEPTION ***/
   /* broadcast options go to everyone, so this escalation is valid */
   if (options & NOTIFICATION_OPTION_BROADCAST)
-    return (TRUE);
+    return (true);
 
   /* skip this escalation if it happens later */
   if (se->first_notification > notification_number)
-    return (FALSE);
+    return (false);
 
   /* skip this escalation if it has already passed */
   if (se->last_notification != 0
       && se->last_notification < notification_number)
-    return (FALSE);
+    return (false);
 
   /* skip this escalation if it has a timeperiod and the current time isn't valid */
   if (se->escalation_period != NULL
       && check_time_against_period(
            current_time,
            se->escalation_period_ptr) == ERROR)
-    return (FALSE);
+    return (false);
 
   /* skip this escalation if the state options don't match */
   if (svc->current_state == STATE_OK
-      && se->escalate_on_recovery == FALSE)
-    return (FALSE);
+      && se->escalate_on_recovery == false)
+    return (false);
   else if (svc->current_state == STATE_WARNING
-           && se->escalate_on_warning == FALSE)
-    return (FALSE);
+           && se->escalate_on_warning == false)
+    return (false);
   else if (svc->current_state == STATE_UNKNOWN
-           && se->escalate_on_unknown == FALSE)
-    return (FALSE);
+           && se->escalate_on_unknown == false)
+    return (false);
   else if (svc->current_state == STATE_CRITICAL
-           && se->escalate_on_critical == FALSE)
-    return (FALSE);
+           && se->escalate_on_critical == false)
+    return (false);
 
-  return (TRUE);
+  return (true);
 }
 
 /* checks to see whether a service notification should be escalation */
@@ -1151,16 +1151,16 @@ int should_service_notification_be_escalated(service* svc) {
     if (is_valid_escalation_for_service_notification(
           svc,
           temp_se,
-          NOTIFICATION_OPTION_NONE) == TRUE) {
+          NOTIFICATION_OPTION_NONE) == true) {
       logger(dbg_notifications, more)
         << "Service notification WILL be escalated.";
-      return (TRUE);
+      return (true);
     }
   }
 
   logger(dbg_notifications, more)
     << "Service notification will NOT be escalated.";
-  return (FALSE);
+  return (false);
 }
 
 /* given a service, create a list of contacts to be notified, removing duplicates */
@@ -1172,7 +1172,7 @@ int create_notification_list_from_service(
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
-  int escalate_notification = FALSE;
+  int escalate_notification = false;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_service()";
@@ -1195,7 +1195,7 @@ int create_notification_list_from_service(
       "(escalated and normal) contacts...";
 
   /* use escalated contacts for this notification */
-  if (escalate_notification == TRUE
+  if (escalate_notification == true
       || (options & NOTIFICATION_OPTION_BROADCAST)) {
 
     logger(dbg_notifications, more)
@@ -1216,7 +1216,7 @@ int create_notification_list_from_service(
       if (is_valid_escalation_for_service_notification(
             svc,
             temp_se,
-            options) == FALSE)
+            options) == false)
         continue;
 
       logger(dbg_notifications, most)
@@ -1259,7 +1259,7 @@ int create_notification_list_from_service(
   }
 
   /* else use normal, non-escalated contacts */
-  if (escalate_notification == FALSE
+  if (escalate_notification == false
       || (options & NOTIFICATION_OPTION_BROADCAST)) {
 
     logger(dbg_notifications, more)
@@ -1314,9 +1314,9 @@ int host_notification(
   time_t current_time;
   struct timeval start_time;
   struct timeval end_time;
-  int escalated = FALSE;
+  int escalated = false;
   int contacts_notified = 0;
-  int increment_notification_number = FALSE;
+  int increment_notification_number = false;
   nagios_macros mac;
   int neb_result;
 
@@ -1350,7 +1350,7 @@ int host_notification(
   if (type == NOTIFICATION_NORMAL
       || (options & NOTIFICATION_OPTION_INCREMENT)) {
     hst->current_notification_number++;
-    increment_notification_number = TRUE;
+    increment_notification_number = true;
   }
 
   logger(dbg_notifications, more)
@@ -1523,9 +1523,9 @@ int host_notification(
 
         /* update notifications flags */
         if (hst->current_state == HOST_DOWN)
-          hst->notified_on_down = TRUE;
+          hst->notified_on_down = true;
         else if (hst->current_state == HOST_UNREACHABLE)
-          hst->notified_on_unreachable = TRUE;
+          hst->notified_on_unreachable = true;
 
         logger(dbg_notifications, basic)
           << contacts_notified << " contacts were notified.  "
@@ -1534,7 +1534,7 @@ int host_notification(
       }
 
       /* we didn't end up notifying anyone */
-      else if (increment_notification_number == TRUE) {
+      else if (increment_notification_number == true) {
 
         /* adjust current notification number */
         hst->current_notification_number--;
@@ -1554,7 +1554,7 @@ int host_notification(
   else {
 
     /* adjust notification number, since no notification actually went out */
-    if (increment_notification_number == TRUE)
+    if (increment_notification_number == true)
       hst->current_notification_number--;
 
     logger(dbg_notifications, basic)
@@ -1582,7 +1582,7 @@ int host_notification(
     NULL);
 
   /* update the status log with the host info */
-  update_host_status(hst, FALSE);
+  update_host_status(hst, false);
 
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);
@@ -1653,7 +1653,7 @@ int check_host_notification_viability(
   }
 
   /* are notifications temporarily disabled for this host? */
-  if (hst->notifications_enabled == FALSE) {
+  if (hst->notifications_enabled == false) {
     logger(dbg_notifications, more)
       << "Notifications are temporarily disabled for this host, "
       "so we won't send one out.";
@@ -1704,7 +1704,7 @@ int check_host_notification_viability(
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
     /* don't send a notification if we're not supposed to... */
-    if (hst->notify_on_flapping == FALSE) {
+    if (hst->notify_on_flapping == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about FLAPPING events for this host.";
       return (ERROR);
@@ -1732,7 +1732,7 @@ int check_host_notification_viability(
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
     /* don't send a notification if we're not supposed to... */
-    if (hst->notify_on_downtime == FALSE) {
+    if (hst->notify_on_downtime == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about DOWNTIME events for this host.";
       return (ERROR);
@@ -1763,7 +1763,7 @@ int check_host_notification_viability(
   }
 
   /* has this problem already been acknowledged? */
-  if (hst->problem_has_been_acknowledged == TRUE) {
+  if (hst->problem_has_been_acknowledged == true) {
     logger(dbg_notifications, more)
       << "This host problem has already been acknowledged, "
       "so we won't send a notification out!";
@@ -1782,26 +1782,26 @@ int check_host_notification_viability(
 
   /* see if we should notify about problems with this host */
   if (hst->current_state == HOST_UNREACHABLE
-      && hst->notify_on_unreachable == FALSE) {
+      && hst->notify_on_unreachable == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about UNREACHABLE status for this host.";
     return (ERROR);
   }
   if (hst->current_state == HOST_DOWN
-      && hst->notify_on_down == FALSE) {
+      && hst->notify_on_down == false) {
     logger(dbg_notifications, more)
       << "We shouldn't notify about DOWN states for this host.";
     return (ERROR);
   }
   if (hst->current_state == HOST_UP) {
 
-    if (hst->notify_on_recovery == FALSE) {
+    if (hst->notify_on_recovery == false) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about RECOVERY states for this host.";
       return (ERROR);
     }
-    if (!(hst->notified_on_down == TRUE
-          || hst->notified_on_unreachable == TRUE)) {
+    if (!(hst->notified_on_down == true
+          || hst->notified_on_unreachable == true)) {
       logger(dbg_notifications, more)
         << "We shouldn't notify about this recovery.";
       return (ERROR);
@@ -1834,7 +1834,7 @@ int check_host_notification_viability(
   }
 
   /* if this host is currently flapping, don't send the notification */
-  if (hst->is_flapping == TRUE) {
+  if (hst->is_flapping == true) {
     logger(dbg_notifications, more)
       << "This host is currently flapping, so we won't "
       "send notifications.";
@@ -1854,7 +1854,7 @@ int check_host_notification_viability(
   }
 
   /* check if we shouldn't renotify contacts about the host problem */
-  if (hst->no_more_notifications == TRUE) {
+  if (hst->no_more_notifications == true) {
     logger(dbg_notifications, more)
       << "We shouldn't re-notify contacts about this host problem.";
     return (ERROR);
@@ -1895,7 +1895,7 @@ int check_contact_host_notification_viability(
   }
 
   /* are notifications enabled? */
-  if (cntct->host_notifications_enabled == FALSE) {
+  if (cntct->host_notifications_enabled == false) {
     logger(dbg_notifications, most)
       << "Host notifications are disabled for this contact.";
     return (ERROR);
@@ -1926,7 +1926,7 @@ int check_contact_host_notification_viability(
       || type == NOTIFICATION_FLAPPINGSTOP
       || type == NOTIFICATION_FLAPPINGDISABLED) {
 
-    if (cntct->notify_on_host_flapping == FALSE) {
+    if (cntct->notify_on_host_flapping == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
         "host events.";
@@ -1944,7 +1944,7 @@ int check_contact_host_notification_viability(
       || type == NOTIFICATION_DOWNTIMEEND
       || type == NOTIFICATION_DOWNTIMECANCELLED) {
 
-    if (cntct->notify_on_host_downtime == FALSE) {
+    if (cntct->notify_on_host_downtime == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about DOWNTIME "
         "host events.";
@@ -1960,14 +1960,14 @@ int check_contact_host_notification_viability(
 
   /* see if we should notify about problems with this host */
   if (hst->current_state == HOST_DOWN
-      && cntct->notify_on_host_down == FALSE) {
+      && cntct->notify_on_host_down == false) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about DOWN states.";
     return (ERROR);
   }
 
   if (hst->current_state == HOST_UNREACHABLE
-      && cntct->notify_on_host_unreachable == FALSE) {
+      && cntct->notify_on_host_unreachable == false) {
     logger(dbg_notifications, most)
       << "We shouldn't notify this contact about UNREACHABLE states,";
     return (ERROR);
@@ -1975,16 +1975,16 @@ int check_contact_host_notification_viability(
 
   if (hst->current_state == HOST_UP) {
 
-    if (cntct->notify_on_host_recovery == FALSE) {
+    if (cntct->notify_on_host_recovery == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about RECOVERY states.";
       return (ERROR);
     }
 
-    if (!((hst->notified_on_down == TRUE
-           && cntct->notify_on_host_down == TRUE)
-          || (hst->notified_on_unreachable == TRUE
-              && cntct->notify_on_host_unreachable == TRUE))) {
+    if (!((hst->notified_on_down == true
+           && cntct->notify_on_host_down == true)
+          || (hst->notified_on_unreachable == true
+              && cntct->notify_on_host_unreachable == true))) {
       logger(dbg_notifications, most)
         << "We shouldn't notify about this recovery.";
       return (ERROR);
@@ -2014,7 +2014,7 @@ int notify_contact_of_host(
   char* command_name_ptr = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
-  int early_timeout = FALSE;
+  int early_timeout = false;
   double exectime;
   struct timeval start_time;
   struct timeval end_time;
@@ -2168,7 +2168,7 @@ int notify_contact_of_host(
       0);
 
     /* check to see if the notification timed out */
-    if (early_timeout == TRUE) {
+    if (early_timeout == true) {
       logger(log_host_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' host notification command '" << processed_command
@@ -2251,41 +2251,41 @@ int is_valid_escalation_for_host_notification(
   /* find the host this escalation entry is associated with */
   temp_host = he->host_ptr;
   if (temp_host == NULL || temp_host != hst)
-    return (FALSE);
+    return (false);
 
   /*** EXCEPTION ***/
   /* broadcast options go to everyone, so this escalation is valid */
   if (options & NOTIFICATION_OPTION_BROADCAST)
-    return (TRUE);
+    return (true);
 
   /* skip this escalation if it happens later */
   if (he->first_notification > notification_number)
-    return (FALSE);
+    return (false);
 
   /* skip this escalation if it has already passed */
   if (he->last_notification != 0
       && he->last_notification < notification_number)
-    return (FALSE);
+    return (false);
 
   /* skip this escalation if it has a timeperiod and the current time isn't valid */
   if (he->escalation_period != NULL
       && check_time_against_period(
            current_time,
            he->escalation_period_ptr) == ERROR)
-    return (FALSE);
+    return (false);
 
   /* skip this escalation if the state options don't match */
   if (hst->current_state == HOST_UP
-      && he->escalate_on_recovery == FALSE)
-    return (FALSE);
+      && he->escalate_on_recovery == false)
+    return (false);
   else if (hst->current_state == HOST_DOWN
-           && he->escalate_on_down == FALSE)
-    return (FALSE);
+           && he->escalate_on_down == false)
+    return (false);
   else if (hst->current_state == HOST_UNREACHABLE
-           && he->escalate_on_unreachable == FALSE)
-    return (FALSE);
+           && he->escalate_on_unreachable == false)
+    return (false);
 
-  return (TRUE);
+  return (true);
 }
 
 /* checks to see whether a host notification should be escalation */
@@ -2294,7 +2294,7 @@ int should_host_notification_be_escalated(host* hst) {
     << "should_host_notification_be_escalated()";
 
   if (hst == NULL)
-    return (FALSE);
+    return (false);
 
   std::string id(hst->name);
   umultimap<std::string, shared_ptr<hostescalation> > const&
@@ -2309,14 +2309,14 @@ int should_host_notification_be_escalated(host* hst) {
     if (is_valid_escalation_for_host_notification(
           hst,
           temp_he,
-          NOTIFICATION_OPTION_NONE) == TRUE)
-      return (TRUE);
+          NOTIFICATION_OPTION_NONE) == true)
+      return (true);
   }
 
   logger(dbg_notifications, more)
     << "Host notification will NOT be escalated.";
 
-  return (FALSE);
+  return (false);
 }
 
 /* given a host, create a list of contacts to be notified, removing duplicates */
@@ -2329,7 +2329,7 @@ int create_notification_list_from_host(
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
-  int escalate_notification = FALSE;
+  int escalate_notification = false;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_host()";
@@ -2352,7 +2352,7 @@ int create_notification_list_from_host(
       "normal) contacts...";
 
   /* use escalated contacts for this notification */
-  if (escalate_notification == TRUE
+  if (escalate_notification == true
       || (options & NOTIFICATION_OPTION_BROADCAST)) {
 
     logger(dbg_notifications, more)
@@ -2372,7 +2372,7 @@ int create_notification_list_from_host(
       if (is_valid_escalation_for_host_notification(
             hst,
             temp_he,
-            options) == FALSE)
+            options) == false)
         continue;
 
       logger(dbg_notifications, most)
@@ -2415,7 +2415,7 @@ int create_notification_list_from_host(
   }
 
   /* use normal, non-escalated contacts for this notification */
-  if (escalate_notification == FALSE
+  if (escalate_notification == false
       || (options & NOTIFICATION_OPTION_BROADCAST)) {
 
     logger(dbg_notifications, more)
@@ -2470,7 +2470,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
   serviceescalation* temp_se = NULL;
-  int have_escalated_interval = FALSE;
+  int have_escalated_interval = false;
 
   logger(dbg_functions, basic)
     << "get_next_service_notification_time()";
@@ -2496,7 +2496,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
     if (is_valid_escalation_for_service_notification(
           svc,
           temp_se,
-          NOTIFICATION_OPTION_NONE) == FALSE)
+          NOTIFICATION_OPTION_NONE) == false)
       continue;
 
     logger(dbg_notifications, most)
@@ -2504,8 +2504,8 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
       << temp_se->notification_interval;
 
     /* if we haven't used a notification interval from an escalation yet, use this one */
-    if (have_escalated_interval == FALSE) {
-      have_escalated_interval = TRUE;
+    if (have_escalated_interval == false) {
+      have_escalated_interval = true;
       interval_to_use = temp_se->notification_interval;
     }
 
@@ -2518,10 +2518,10 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
   }
 
   /* if notification interval is 0, we shouldn't send any more problem notifications (unless service is volatile) */
-  if (interval_to_use == 0.0 && svc->is_volatile == FALSE)
-    svc->no_more_notifications = TRUE;
+  if (interval_to_use == 0.0 && svc->is_volatile == false)
+    svc->no_more_notifications = true;
   else
-    svc->no_more_notifications = FALSE;
+    svc->no_more_notifications = false;
 
   logger(dbg_notifications, most)
     << "Interval used for calculating next valid "
@@ -2537,7 +2537,7 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
   hostescalation* temp_he = NULL;
-  int have_escalated_interval = FALSE;
+  int have_escalated_interval = false;
 
   logger(dbg_functions, basic)
     << "get_next_host_notification_time()";
@@ -2563,7 +2563,7 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
     if (is_valid_escalation_for_host_notification(
           hst,
           temp_he,
-          NOTIFICATION_OPTION_NONE) == FALSE)
+          NOTIFICATION_OPTION_NONE) == false)
       continue;
 
     logger(dbg_notifications, most)
@@ -2571,8 +2571,8 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
       << temp_he->notification_interval;
 
     /* if we haven't used a notification interval from an escalation yet, use this one */
-    if (have_escalated_interval == FALSE) {
-      have_escalated_interval = TRUE;
+    if (have_escalated_interval == false) {
+      have_escalated_interval = true;
       interval_to_use = temp_he->notification_interval;
     }
 
@@ -2586,9 +2586,9 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
 
   /* if interval is 0, no more notifications should be sent */
   if (interval_to_use == 0.0)
-    hst->no_more_notifications = TRUE;
+    hst->no_more_notifications = true;
   else
-    hst->no_more_notifications = FALSE;
+    hst->no_more_notifications = false;
 
   logger(dbg_notifications, most)
     << "Interval used for calculating next valid notification time: "

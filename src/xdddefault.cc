@@ -54,8 +54,8 @@ int xdddefault_initialize_downtime_data() {
 int xdddefault_validate_downtime_data() {
   scheduled_downtime* temp_downtime;
   scheduled_downtime* next_downtime;
-  int update_file = FALSE;
-  int save = TRUE;
+  int update_file = false;
+  int save = true;
 
   /* remove stale downtimes */
   for (temp_downtime = scheduled_downtime_list;
@@ -63,26 +63,26 @@ int xdddefault_validate_downtime_data() {
        temp_downtime = next_downtime) {
 
     next_downtime = temp_downtime->next;
-    save = TRUE;
+    save = true;
 
     /* delete downtimes with invalid host names */
     if (find_host(temp_downtime->host_name) == NULL)
-      save = FALSE;
+      save = false;
 
     /* delete downtimes with invalid service descriptions */
     if (temp_downtime->type == SERVICE_DOWNTIME
         && find_service(
              temp_downtime->host_name,
              temp_downtime->service_description) == NULL)
-      save = FALSE;
+      save = false;
 
     /* delete downtimes that have expired */
     if (temp_downtime->end_time < time(NULL))
-      save = FALSE;
+      save = false;
 
     /* delete the downtime */
-    if (save == FALSE) {
-      update_file = TRUE;
+    if (save == false) {
+      update_file = true;
       delete_downtime(temp_downtime->type, temp_downtime->downtime_id);
     }
   }
@@ -93,24 +93,24 @@ int xdddefault_validate_downtime_data() {
        temp_downtime = next_downtime) {
 
     next_downtime = temp_downtime->next;
-    save = TRUE;
+    save = true;
 
     if (temp_downtime->triggered_by == 0)
       continue;
 
     if (find_host_downtime(temp_downtime->triggered_by) == NULL
         && find_service_downtime(temp_downtime->triggered_by) == NULL)
-      save = FALSE;
+      save = false;
 
     /* delete the downtime */
-    if (save == FALSE) {
-      update_file = TRUE;
+    if (save == false) {
+      update_file = true;
       delete_downtime(temp_downtime->type, temp_downtime->downtime_id);
     }
   }
 
   /* update downtime file */
-  if (update_file == TRUE)
+  if (update_file == true)
     xdddefault_save_downtime_data();
   return (OK);
 }

@@ -49,7 +49,7 @@ int update_service_performance_data(service* svc) {
     return (OK);
 
   /* should we process performance data for this service? */
-  if (svc->process_performance_data == FALSE)
+  if (svc->process_performance_data == false)
     return (OK);
 
   /* process the performance data! */
@@ -64,7 +64,7 @@ int update_host_performance_data(host* hst) {
     return (OK);
 
   /* should we process performance data for this host? */
-  if (hst->process_performance_data == FALSE)
+  if (hst->process_performance_data == false)
     return (OK);
 
   /* process the performance data! */

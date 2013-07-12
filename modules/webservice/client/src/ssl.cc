@@ -27,7 +27,7 @@
 
 # if defined(WIN32)
 #  define MUTEX_TYPE             HANDLE
-#  define MUTEX_SETUP(x)         (x) = CreateMutex(NULL, FALSE, NULL)
+#  define MUTEX_SETUP(x)         (x) = CreateMutex(NULL, false, NULL)
 #  define MUTEX_CLEANUP(x)       CloseHandle(x)
 #  define MUTEX_LOCK(x)          WaitForSingleObject((x), INFINITE)
 #  define MUTEX_UNLOCK(x)        ReleaseMutex(x)
