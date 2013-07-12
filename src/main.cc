@@ -58,7 +58,7 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/retention/parser.hh"
-#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
@@ -189,6 +189,9 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    // reset umask.
+    umask(S_IWGRP | S_IWOTH);
+
     // Just display the license.
     if (display_license) {
       logger(logging::log_info_message, logging::basic)
@@ -241,9 +244,6 @@ int main(int argc, char* argv[]) {
         logger(logging::log_info_message, logging::basic)
           << "reading main config file";
 
-        // Reset program variables.
-        reset_variables();
-
         // Read in the configuration files (main config file,
         // resource and object config files).
         configuration::state config;
@@ -263,28 +263,30 @@ int main(int argc, char* argv[]) {
     // We're just testing scheduling.
     else if (test_scheduling) {
       try {
-        // Reset program variables.
-        reset_variables();
-
         // Parse configuration.
         configuration::state config;
-        configuration::parser p;
-        p.parse(config_file, config);
+        {
+          configuration::parser p;
+          p.parse(config_file, config);
+        }
+
+        // Parse retention.
+        retention::state state;
+        {
+          retention::parser p;
+          p.parse(config.state_retention_file(), state);
+        }
 
         // Apply configuration.
-        configuration::applier::state::instance().apply(config);
+        configuration::applier::state::instance().apply(config, state);
 
-        // Load retention files.
-        if (read_initial_state_information()) {
-          // Display scheduling information.
-          display_scheduling_info();
-          if (precache_objects)
-            logger(logging::log_info_message, logging::basic)
-              << "\n"
-              << "OBJECT PRECACHING\n"
-              << "-----------------\n"
-              << "Object config files were precached.";
-        }
+        display_scheduling_info();
+        if (precache_objects)
+          logger(logging::log_info_message, logging::basic)
+            << "\n"
+            << "OBJECT PRECACHING\n"
+            << "-----------------\n"
+            << "Object config files were precached.";
         retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {
@@ -295,9 +297,6 @@ int main(int argc, char* argv[]) {
     // Else start to monitor things.
     else {
       try {
-        // Reset program variables.
-        reset_variables();
-
         // Parse configuration.
         configuration::state config;
         configuration::parser p;
@@ -334,13 +333,6 @@ int main(int argc, char* argv[]) {
         neb_init_callback_list();
         neb_load_all_modules();
 
-        // Send program data to broker.
-        broker_program_state(
-          NEBTYPE_PROCESS_PRELAUNCH,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          NULL);
-
         // Apply configuration.
         configuration::applier::state::instance().apply(config);
 
@@ -353,18 +345,8 @@ int main(int argc, char* argv[]) {
         // Handle signals (interrupts).
         setup_sighandler();
 
-        // Send program data to broker.
-        broker_program_state(
-          NEBTYPE_PROCESS_START,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          NULL);
-
         // Initialize status data.
         initialize_status_data();
-
-        // Read initial service and host state information.
-        read_initial_state_information();
 
         // Initialize comment data.
         initialize_comment_data();
@@ -418,7 +400,7 @@ int main(int argc, char* argv[]) {
             NULL);
 
         // Save service and host state information.
-        save_state_information(false);
+        // XXX: save_state_information(false);
 
         // Clean up performance data.
         cleanup_performance_data();

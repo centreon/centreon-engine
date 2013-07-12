@@ -85,6 +85,8 @@ applier::macros::macros()
   memset(_mac, 0, sizeof(*_mac));
   memset(macro_user, 0, sizeof(*macro_user) * MAX_USER_MACROS);
 
+  init_macros();
+
   _set_macro(MACRO_TEMPFILE, "/tmp/centengine.tmp");
   _set_macro(MACRO_TEMPPATH, "/tmp");
 }

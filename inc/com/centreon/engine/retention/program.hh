@@ -24,6 +24,7 @@
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -111,6 +112,8 @@ namespace                     retention {
     opt<bool>                 _passive_service_checks_enabled;
     opt<bool>                 _process_performance_data;
   };
+
+  typedef shared_ptr<program> program_ptr;
 }
 
 CCE_END()

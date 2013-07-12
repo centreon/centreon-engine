@@ -24,6 +24,7 @@
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -44,8 +45,13 @@ namespace  retention {
     time_t created() const throw ();
 
   private:
+    bool   _set_created(time_t value);
+    bool   _set_unused(std::string const& value);
+
     time_t _created;
   };
+
+  typedef shared_ptr<info> info_ptr;
 }
 
 CCE_END()

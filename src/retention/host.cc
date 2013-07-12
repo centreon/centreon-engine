@@ -89,8 +89,7 @@ static struct {
  *  Constructor.
  */
 host::host()
-  : object(object::host),
-    _was_flapping(false) {
+  : object(object::host) {
 
 }
 
@@ -174,7 +173,6 @@ host& host::operator=(host const& right) {
     _retry_check_interval = right._retry_check_interval;
     _state_history = right._state_history;
     _state_type = right._state_type;
-    _was_flapping = right._was_flapping;
   }
   return (*this);
 }
@@ -240,8 +238,7 @@ bool host::operator==(host const& right) const throw () {
           && _process_performance_data == right._process_performance_data
           && _retry_check_interval == right._retry_check_interval
           && _state_history == right._state_history
-          && _state_type == right._state_type
-          && _was_flapping == right._was_flapping);
+          && _state_type == right._state_type);
 }
 
 /**

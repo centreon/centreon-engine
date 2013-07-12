@@ -1,5 +1,4 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
 ** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
@@ -18,20 +17,26 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_SRETENTION_HH
-#  define CCE_SRETENTION_HH
+#ifndef CCE_RETENTION_APPLIER_UTILS_HH
+#  define CCE_RETENTION_APPLIER_UTILS_HH
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif // C++
+#  include <string>
+#  include <vector>
+#  include "com/centreon/engine/namespace.hh"
 
-// saves all host and state information
-int save_state_information(int autosave);
-// reads in initial host and state information
-int read_initial_state_information();
+CCE_BEGIN()
 
-#  ifdef __cplusplus
+namespace     retention {
+  namespace   applier {
+    namespace utils {
+      bool    is_command_exist(std::string const& command_line);
+      void    set_state_history(
+                std::vector<int> const& values,
+                int state_history[]);
+    }
+  }
 }
-#  endif // C++
 
-#endif // !CCE_SRETENTION_HH
+CCE_END()
+
+#endif // !CCE_RETENTION_APPLIER_UTILS_HH

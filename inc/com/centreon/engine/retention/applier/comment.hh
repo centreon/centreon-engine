@@ -20,7 +20,6 @@
 #ifndef CCE_RETENTION_APPLIER_COMMENT_HH
 #  define CCE_RETENTION_APPLIER_COMMENT_HH
 
-#  include <list>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/comment.hh"
 
@@ -30,13 +29,13 @@ namespace   retention {
   namespace applier {
     class   comment {
     public:
-            comment();
-            ~comment() throw ();
-      void  apply(std::list<retention::comment> const& lst);
+      void  apply(list_comment const& lst);
 
     private:
-      void  _add_host_comment(retention::comment const& obj) throw ();
-      void  _add_service_comment(retention::comment const& obj) throw ();
+      void  _add_host_comment(
+              retention::comment const& obj) throw ();
+      void  _add_service_comment(
+              retention::comment const& obj) throw ();
     };
   }
 }

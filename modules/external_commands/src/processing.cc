@@ -24,8 +24,12 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/modules/external_commands/processing.hh"
-#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/retention/applier/state.hh"
+#include "com/centreon/engine/retention/dump.hh"
+#include "com/centreon/engine/retention/parser.hh"
+#include "com/centreon/engine/retention/state.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules::external_command;
 
@@ -60,7 +64,7 @@ processing::processing() {
                  &_redirector<&_wrapper_save_state_information>);
   _lst_command["READ_STATE_INFORMATION"] =
     command_info(CMD_READ_STATE_INFORMATION,
-                 &_redirector<&read_initial_state_information>);
+                 &_redirector<&_wrapper_read_state_information>);
   _lst_command["ENABLE_EVENT_HANDLERS"] =
     command_info(CMD_ENABLE_EVENT_HANDLERS,
                  &_redirector<&start_using_event_handlers>);
@@ -643,8 +647,16 @@ bool processing::execute(char const* cmd) const {
   return (true);
 }
 
+void processing::_wrapper_read_state_information() {
+  retention::state state;
+  retention::parser p;
+  p.parse(config->state_retention_file(), state);
+  retention::applier::state app_state;
+  app_state.apply(*config, state);
+}
+
 void processing::_wrapper_save_state_information() {
-  save_state_information(false);
+  retention::dump::save(config->state_retention_file());
 }
 
 void processing::_wrapper_enable_host_and_child_notifications(host* hst) {

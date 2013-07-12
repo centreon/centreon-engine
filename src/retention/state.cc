@@ -22,7 +22,7 @@
 using namespace com::centreon::engine::retention;
 
 /**
- *  Constructor.
+ *  Default constructor.
  */
 state::state() {
 
@@ -56,9 +56,9 @@ state& state::operator=(state const& right) {
     _comments = right._comments;
     _contacts = right._contacts;
     _downtimes = right._downtimes;
+    _globals = right._globals;
     _hosts = right._hosts;
     _info = right._info;
-    _globals = right._globals;
     _services = right._services;
   }
   return (*this);
@@ -75,9 +75,9 @@ bool state::operator==(state const& right) const throw () {
   return (_comments == right._comments
           && _contacts == right._contacts
           && _downtimes == right._downtimes
+          && _globals == right._globals
           && _hosts == right._hosts
           && _info == right._info
-          && _globals == right._globals
           && _services == right._services);
 }
 
@@ -97,8 +97,26 @@ bool state::operator!=(state const& right) const throw () {
  *
  *  @return The comment list.
  */
+list_comment& state::comments() throw () {
+  return (_comments);
+}
+
+/**
+ *  Get comments.
+ *
+ *  @return The comment list.
+ */
 list_comment const& state::comments() const throw () {
   return (_comments);
+}
+
+/**
+ *  Get contacts.
+ *
+ *  @return The contact list.
+ */
+list_contact& state::contacts() throw () {
+  return (_contacts);
 }
 
 /**
@@ -115,8 +133,44 @@ list_contact const& state::contacts() const throw () {
  *
  *  @return The downtime list.
  */
+list_downtime& state::downtimes() throw () {
+  return (_downtimes);
+}
+
+/**
+ *  Get downtimes.
+ *
+ *  @return The downtime list.
+ */
 list_downtime const& state::downtimes() const throw () {
   return (_downtimes);
+}
+
+/**
+ *  Get globals.
+ *
+ *  @return The globals.
+ */
+program& state::globals() throw () {
+  return (_globals);
+}
+
+/**
+ *  Get globals.
+ *
+ *  @return The globals.
+ */
+program const& state::globals() const throw () {
+  return (_globals);
+}
+
+/**
+ *  Get hosts.
+ *
+ *  @return The host list.
+ */
+list_host& state::hosts() throw () {
+  return (_hosts);
 }
 
 /**
@@ -133,17 +187,26 @@ list_host const& state::hosts() const throw () {
  *
  *  @return The informations.
  */
+info& state::informations() throw () {
+  return (_info);
+}
+
+/**
+ *  Get informations.
+ *
+ *  @return The informations.
+ */
 info const& state::informations() const throw () {
   return (_info);
 }
 
 /**
- *  Get globals.
+ *  Get services.
  *
- *  @return The globals.
+ *  @return The service list.
  */
-program const& state::globals() const throw () {
-  return (_globals);
+list_service& state::services() throw () {
+  return (_services);
 }
 
 /**

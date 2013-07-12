@@ -17,14 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_RETENTION_APPLIER_HOST_HH
-#  define CCE_RETENTION_APPLIER_HOST_HH
+#ifndef CCE_RETENTION_APPLIER_STATE_HH
+#  define CCE_RETENTION_APPLIER_STATE_HH
 
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/host.hh"
-
-// Forward declaration.
-struct host_struct;
+#  include "com/centreon/engine/retention/state.hh"
 
 CCE_BEGIN()
 
@@ -35,23 +32,15 @@ namespace configuration {
 
 namespace   retention {
   namespace applier {
-    class   host {
+    class   state {
     public:
       void  apply(
-              configuration::state const& config,
-              list_host const& lst,
-              bool scheduling_info_is_ok);
-
-    private:
-      void  _update(
-              configuration::state const& config,
-              retention::host const& state,
-              host_struct& obj,
-              bool scheduling_info_is_ok);
+              configuration::state& config,
+              retention::state const& state);
     };
   }
 }
 
 CCE_END()
 
-#endif // !CCE_RETENTION_APPLIER_HOST_HH
+#endif // !CCE_RETENTION_APPLIER_STATE_HH

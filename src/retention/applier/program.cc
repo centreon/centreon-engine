@@ -21,45 +21,36 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/retention/applier/program.hh"
+#include "com/centreon/engine/retention/applier/utils.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::retention;
 
 /**
- *  Constructor.
- */
-applier::program::program() {
-
-}
-
-/**
- *  Destructor.
- */
-applier::program::~program() throw () {
-
-}
-
-/**
  *  Restore programe informations.
  *
- *  @param[in] obj The program informations.
+ *  @param[in, out] config The global configuration to update.
+ *  @param[in]      obj    The global informations.
  */
-void applier::program::apply(retention::program const& obj) {
+void applier::program::apply(
+       configuration::state& config,
+       retention::program const& obj) {
+  // XXX: don't use globals, replace it by config!
+
   if (obj.modified_host_attributes().is_set()) {
     modified_host_process_attributes = *obj.modified_host_attributes();
     // mask out attributes we don't want to retain.
-    // XXX: modified_host_process_attributes &= ~config->retained_process_host_attribute_mask();
+    modified_host_process_attributes &= ~config.retained_process_host_attribute_mask();
   }
 
   if (obj.modified_service_attributes().is_set()) {
     modified_service_process_attributes = *obj.modified_service_attributes();
     // mask out attributes we don't want to retain.
-    // XXX: modified_service_process_attributes &= ~config->retained_process_host_attribute_mask();
+    modified_service_process_attributes &= ~config.retained_process_host_attribute_mask();
   }
 
-  // XXX:
-  if (config->use_retained_program_state()) {
+  if (config.use_retained_program_state()) {
     if (obj.enable_notifications().is_set()
         && (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED))
       enable_notifications = *obj.enable_notifications();
@@ -114,13 +105,13 @@ void applier::program::apply(retention::program const& obj) {
 
     if (obj.global_host_event_handler().is_set()
         && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)
-        && _find_command(*obj.global_host_event_handler()))
-      global_host_event_handler = string::dup(*obj.global_host_event_handler());
+        && utils::is_command_exist(*obj.global_host_event_handler()))
+      string::setstr(global_host_event_handler, *obj.global_host_event_handler());
 
     if (obj.global_service_event_handler().is_set()
         && (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)
-        && _find_command(*obj.global_service_event_handler()))
-      global_service_event_handler = string::dup(*obj.global_service_event_handler());
+        && utils::is_command_exist(*obj.global_service_event_handler()))
+      string::setstr(global_service_event_handler, *obj.global_service_event_handler());
 
     if (obj.next_comment_id().is_set())
       next_comment_id = *obj.next_comment_id();
@@ -138,24 +129,8 @@ void applier::program::apply(retention::program const& obj) {
       next_notification_id = *obj.next_notification_id();
   }
 
-  // XXX:
-  if (!config->use_retained_program_state()) {
+  if (!config.use_retained_program_state()) {
     modified_host_process_attributes = MODATTR_NONE;
     modified_service_process_attributes = MODATTR_NONE;
   }
-}
-
-/**
- *  Check if command from the command line exist.
- *
- *  @return True is the command exist, otherwise false.
- */
-bool applier::program::_find_command(std::string const& command_line) {
-  std::size_t pos(command_line.find('!'));
-  if (pos != std::string::npos) {
-    std::string name(command_line.substr(pos + 1));
-    if (is_command_exist(name))
-      return (true);
-  }
-  return (false);
 }

@@ -140,8 +140,6 @@ void cleanup();
 void free_memory(nagios_macros* mac);
 // frees all memory allocated to the notification list
 void free_notification_list();
-// reset all global variables
-int reset_variables();
 
 // frees memory associated with a host/service check result
 int free_check_result(check_result* info);

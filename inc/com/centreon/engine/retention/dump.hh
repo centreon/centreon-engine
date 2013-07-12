@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_RETENTION_OBJECT_HH
-#  define CCE_RETENTION_OBJECT_HH
+#ifndef CCE_RETENTION_DUMP_HH
+#  define CCE_RETENTION_DUMP_HH
 
 #  include <ostream>
 #  include "com/centreon/engine/namespace.hh"
@@ -47,10 +47,11 @@ namespace         retention {
     std::ostream& hosts(std::ostream& os);
     std::ostream& info(std::ostream& os);
     std::ostream& program(std::ostream& os);
+    bool          save(std::string const& path);
     std::ostream& service(std::ostream& os, service_struct const& obj);
     std::ostream& services(std::ostream& os);
   }
 }
 CCE_END()
 
-#endif // !CCE_RETENTION_OBJECT_HH
+#endif // !CCE_RETENTION_DUMP_HH

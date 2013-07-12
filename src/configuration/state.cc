@@ -3598,24 +3598,6 @@ void state::_set_bare_update_check(std::string const& value) {
  *  @param[in] value The new broker module.
  */
 void state::_set_broker_module(std::string const& value) {
-  // XXX: broker register.
-  // // Copy string.
-  // std::string val(value);
-
-  // // Find delimiter between module and its arguments.
-  // size_t pos(val.find_first_of(" \n"));
-
-  // // Extract module arguments (end of string).
-  // std::string args;
-  // if (pos != std::string::npos) {
-  //   args = val.substr(pos + 1);
-
-  //   // Module path is now in val.
-  //   val.erase(pos);
-  // }
-
-  // // Add module.
-  // neb_add_module(val.c_str(), args.c_str(), TRUE);
   _broker_module.push_back(value);
 }
 

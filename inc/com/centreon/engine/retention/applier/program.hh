@@ -25,13 +25,18 @@
 
 CCE_BEGIN()
 
+// Forward declaration.
+namespace configuration {
+  class   state;
+}
+
 namespace   retention {
   namespace applier {
     class   program {
   public:
-            program();
-            ~program() throw ();
-      void  apply(retention::program const& obj);
+      void  apply(
+              configuration::state& config,
+              retention::program const& obj);
 
     private:
       bool  _find_command(std::string const& command_line);

@@ -20,10 +20,13 @@
 */
 
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "nagios.h"
 
-com::centreon::engine::configuration::state* config(NULL);
-com::centreon::engine::events::hash_timed_event quick_timed_event;
+using namespace com::centreon::engine;
+
+configuration::state* config(NULL);
+events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
 std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
 
@@ -47,8 +50,8 @@ char*               global_service_event_handler(NULL);
 char*               illegal_object_chars(NULL);
 char*               illegal_output_chars(NULL);
 char*               log_file(NULL);
-char*               macro_user[MAX_USER_MACROS];      /* $USERx$ macros */
-char*               macro_x_names[MACRO_X_COUNT];     /* the macro names */
+char*               macro_user[MAX_USER_MACROS];  // $USERx$ macros
+char*               macro_x_names[MACRO_X_COUNT]; // The macro names
 char*               ochp_command(NULL);
 char*               ocsp_command(NULL);
 char*               use_timezone(NULL);
@@ -193,18 +196,58 @@ unsigned int        use_true_regexp_matching(false);
 unsigned long       cached_host_check_horizon(15);
 unsigned long       cached_service_check_horizon(15);
 unsigned long       event_broker_options(~0);
-unsigned long       logging_options(0);
+unsigned long       logging_options(
+                      logging::log_runtime_error
+                      | logging::log_runtime_warning
+                      | logging::log_verification_error
+                      | logging::log_verification_warning
+                      | logging::log_config_error
+                      | logging::log_config_warning
+                      | logging::log_process_info
+                      | logging::log_host_notification
+                      | logging::log_service_notification
+                      | logging::log_event_handler
+                      | logging::log_external_command
+                      | logging::log_passive_check
+                      | logging::log_host_up
+                      | logging::log_host_down
+                      | logging::log_host_unreachable
+                      | logging::log_service_ok
+                      | logging::log_service_warning
+                      | logging::log_service_unknown
+                      | logging::log_service_critical
+                      | logging::log_info_message);
 unsigned long       max_check_result_file_age(3600);
 unsigned long       max_debug_file_size(1000000);
 unsigned long       modified_host_process_attributes(MODATTR_NONE);
 unsigned long       modified_service_process_attributes(MODATTR_NONE);
 unsigned long       next_comment_id(0L);
 unsigned long       next_downtime_id(0L);
-unsigned long       next_event_id(0L);
-unsigned long       next_notification_id(0L);
+unsigned long       next_event_id(1);
+unsigned long       next_notification_id(1);
 unsigned long       next_problem_id(0L);
 unsigned long       retained_contact_host_attribute_mask(0);
 unsigned long       retained_contact_service_attribute_mask(0);
 unsigned long       retained_host_attribute_mask(0);
 unsigned long       retained_process_host_attribute_mask(0);
-unsigned long       syslog_options(0);
+unsigned long       syslog_options(
+                      logging::log_runtime_error
+                      | logging::log_runtime_warning
+                      | logging::log_verification_error
+                      | logging::log_verification_warning
+                      | logging::log_config_error
+                      | logging::log_config_warning
+                      | logging::log_process_info
+                      | logging::log_host_notification
+                      | logging::log_service_notification
+                      | logging::log_event_handler
+                      | logging::log_external_command
+                      | logging::log_passive_check
+                      | logging::log_host_up
+                      | logging::log_host_down
+                      | logging::log_host_unreachable
+                      | logging::log_service_ok
+                      | logging::log_service_warning
+                      | logging::log_service_unknown
+                      | logging::log_service_critical
+                      | logging::log_info_message);

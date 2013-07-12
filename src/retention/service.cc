@@ -92,8 +92,7 @@ static struct {
  *  Constructor.
  */
 service::service()
-  : object(object::service),
-    _was_flapping(false) {
+  : object(object::service) {
 
 }
 
@@ -180,7 +179,6 @@ service& service::operator=(service const& right) {
     _service_description = right._service_description;
     _state_history = right._state_history;
     _state_type = right._state_type;
-    _was_flapping = right._was_flapping;
   }
   return (*this);
 }
@@ -249,8 +247,7 @@ bool service::operator==(service const& right) const throw () {
           && _retry_check_interval == right._retry_check_interval
           && _service_description == right._service_description
           && _state_history == right._state_history
-          && _state_type == right._state_type
-          && _was_flapping == right._was_flapping);
+          && _state_type == right._state_type);
 }
 
 /**

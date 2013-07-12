@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
@@ -42,7 +43,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
-#include "com/centreon/engine/retention/parser.hh"
+#include "com/centreon/engine/retention/applier/state.hh"
+#include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
@@ -57,16 +59,12 @@ static applier::state* _instance(NULL);
 /**
  *  Apply new configuration.
  *
- *  @param[in] new_cfg        The new configuration.
- *  @param[in] retention_path The retention path to use for
- *             load retention.
+ *  @param[in] new_cfg The new configuration.
  */
-void applier::state::apply(
-       configuration::state& new_cfg,
-       std::string const& retention_path) {
+void applier::state::apply(configuration::state& new_cfg) {
   configuration::state save(*config);
   try {
-    _processing(new_cfg, retention_path);
+    _processing(new_cfg);
   }
   catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
@@ -80,7 +78,37 @@ void applier::state::apply(
       << e.what();
     logger(dbg_config, more)
       << "configuration: try to restore old configuration";
-    _processing(save, retention_path);
+    _processing(save);
+  }
+  return ;
+}
+
+/**
+ *  Apply new configuration.
+ *
+ *  @param[in] new_cfg The new configuration.
+ *  @param[in] state   The retention to use.
+ */
+void applier::state::apply(
+       configuration::state& new_cfg,
+       retention::state& state) {
+  configuration::state save(*config);
+  try {
+    _processing(new_cfg, &state);
+  }
+  catch (std::exception const& e) {
+    // If is the first time to load configuration, we don't
+    // have a valid configuration to restore.
+    if (!has_already_been_loaded)
+      throw;
+
+    // If is not the first time, we can restore the old one.
+    logger(log_config_error, basic)
+      << "configuration: apply new configuration failed: "
+      << e.what();
+    logger(dbg_config, more)
+      << "configuration: try to restore old configuration";
+    _processing(save, &state);
   }
   return ;
 }
@@ -894,13 +922,20 @@ void applier::state::_expand(
 /**
  *  Process new configuration and apply it.
  *
- *  @param[in] new_cfg        The new configuration.
- *  @param[in] retention_path The retention path to use for
- *             load retention.
+ *  @param[in] new_cfg The new configuration.
+ *  @param[in] state   The retention to use.
  */
 void applier::state::_processing(
        configuration::state& new_cfg,
-       std::string const& retention_path) {
+       retention::state* state) {
+  // Call prelauch broker event the first time to run applier state.
+  if (!has_already_been_loaded)
+    broker_program_state(
+      NEBTYPE_PROCESS_PRELAUNCH,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      NULL);
+
   // Apply logging configurations.
   applier::logging::instance().apply(new_cfg);
 
@@ -1137,19 +1172,29 @@ void applier::state::_processing(
   _resolve<configuration::serviceescalation, applier::serviceescalation>(
     config->serviceescalations());
 
-
-  // XXX:
-  // if (!retention_path.empty()) {
-  //   retention::parser p;
-  //   p.parse(retention_path);
-  // }
-
   // Pre-flight check.
   {
     bool old_verify_config(verify_config);
     verify_config = true;
-    pre_flight_check();
+    bool ret(pre_flight_check() == OK);
     verify_config = old_verify_config;
+    if (!ret)
+      throw (engine_error() << "Bailing out due to errors "
+             "encountered while running the pre-flight check.");
+  }
+
+  // Call start broker event the first time to run applier state.
+  if (!has_already_been_loaded)
+    broker_program_state(
+      NEBTYPE_PROCESS_START,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      NULL);
+
+  // Load retention.
+  if (state) {
+    retention::applier::state app_state;
+    app_state.apply(new_cfg, *state);
   }
 
   // Schedule host and service checks.

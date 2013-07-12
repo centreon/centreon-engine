@@ -24,6 +24,7 @@
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -86,7 +87,8 @@ namespace              retention {
     int                _source;
   };
 
-  typedef std::list<comment> list_comment;
+  typedef shared_ptr<comment>    comment_ptr;
+  typedef std::list<comment_ptr> list_comment;
 }
 
 CCE_END()

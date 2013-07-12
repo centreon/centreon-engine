@@ -18,41 +18,32 @@
 */
 
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/retention/applier/downtime.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::retention;
 
 /**
- *  Constructor.
- */
-applier::downtime::downtime() {
-
-}
-
-/**
- *  Destructor.
- */
-applier::downtime::~downtime() throw () {
-
-}
-
-/**
  *  Add downtimes on appropriate hosts and services.
  *
  *  @param[in] lst The downtime list to add.
  */
-void applier::downtime::apply(
-       std::list<retention::downtime> const& lst) {
-  for (std::list<retention::downtime>::const_iterator
-         it(lst.begin()), end(lst.end());
+void applier::downtime::apply(list_downtime const& lst) {
+  // Big speedup when reading retention.dat in bulk.
+  defer_downtime_sorting = 1;
+
+  for (list_downtime::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
-    if (it->downtime_type() == retention::downtime::host)
-      _add_host_downtime(*it);
+    if ((*it)->downtime_type() == retention::downtime::host)
+      _add_host_downtime(**it);
     else
-      _add_service_downtime(*it);
+      _add_service_downtime(**it);
   }
+
+  // Sort all downtimes.
+  sort_downtime();
 }
 
 /**

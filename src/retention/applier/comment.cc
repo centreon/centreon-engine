@@ -19,41 +19,32 @@
 
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/retention/applier/comment.hh"
 
-using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::retention;
 using namespace com::centreon::engine;
-
-/**
- *  Constructor.
- */
-applier::comment::comment() {
-
-}
-
-/**
- *  Destructor.
- */
-applier::comment::~comment() throw () {
-
-}
 
 /**
  *  Add comments on appropriate hosts and services.
  *
  *  @param[in] lst The comment list to add.
  */
-void applier::comment::apply(std::list<retention::comment> const& lst) {
-  for (std::list<retention::comment>::const_iterator
-         it(lst.begin()), end(lst.end());
+void applier::comment::apply(list_comment const& lst) {
+  // Big speedup when reading retention.dat in bulk.
+  defer_comment_sorting = 1;
+
+  for (list_comment::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
-    if (it->comment_type() == retention::comment::host)
-      _add_host_comment(*it);
+    if ((*it)->comment_type() == retention::comment::host)
+      _add_host_comment(**it);
     else
-      _add_service_comment(*it);
+      _add_service_comment(**it);
   }
+
+  // Sort all comments.
+  sort_comments();
 }
 
 /**
@@ -64,8 +55,8 @@ void applier::comment::apply(std::list<retention::comment> const& lst) {
 void applier::comment::_add_host_comment(
        retention::comment const& obj) throw () {
   umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it(state::instance().hosts().find(obj.host_name()));
-  if (it == state::instance().hosts().end())
+    it(configuration::applier::state::instance().hosts().find(obj.host_name()));
+  if (it == configuration::applier::state::instance().hosts().end())
     return;
   host_struct* hst(it->second.get());
 
@@ -103,17 +94,14 @@ void applier::comment::_add_host_comment(
  */
 void applier::comment::_add_service_comment(
        retention::comment const& obj) throw () {
-  umap<std::string, shared_ptr<host_struct> >::const_iterator
-    it_hst(state::instance().hosts().find(obj.host_name()));
-  if (it_hst == state::instance().hosts().end())
-    return ;
-  host_struct* hst(it_hst->second.get());
-  if (!hst)
-    return ;
+  if (!is_host_exist(obj.host_name()))
+    return;
 
+  std::pair<std::string, std::string>
+    id(std::make_pair(obj.host_name(), obj.service_description()));
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-    it_svc(state::instance().services().find(std::make_pair(obj.host_name(), obj.service_description())));
-  if (it_svc == state::instance().services().end())
+    it_svc(configuration::applier::state::instance().services().find(id));
+  if (it_svc == configuration::applier::state::instance().services().end())
     return;
   service_struct* svc(&*it_svc->second);
 

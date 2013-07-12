@@ -28,39 +28,36 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::retention;
 
 /**
- *  Constructor.
- */
-applier::contact::contact() {
-
-}
-
-/**
- *  Destructor.
- */
-applier::contact::~contact() throw () {
-
-}
-
-/**
  *  Update contact list.
  *
- *  @param[in] lst The contact list to update.
+ *  @param[in] config The global configuration.
+ *  @param[in] lst    The contact list to update.
  */
-void applier::contact::apply(std::list<retention::contact> const& lst) {
-  for (std::list<retention::contact>::const_iterator
-         it(lst.begin()), end(lst.end());
+void applier::contact::apply(
+       configuration::state const& config,
+       list_contact const& lst) {
+  for (list_contact::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
-    contact_struct& cntct(find_contact(it->contact_name()));
-    // XXX: replace state
-    // _update(*config, *cntct->second);
+    try {
+      contact_struct& cntct(find_contact((*it)->contact_name()));
+      _update(config, **it, cntct);
+    }
+    catch (...) {
+      // ignore exception for the retention.
+    }
   }
 }
 
 /**
- * XXX
+ *  Update internal contact base on contact retention.
+ *
+ *  @param[in]      config The global configuration.
+ *  @param[in]      state The contact retention state.
+ *  @param[in, out] obj   The contact to update.
  */
 void applier::contact::_update(
+       configuration::state const& config,
        retention::contact const& state,
        contact_struct& obj) {
   if (state.modified_attributes().is_set()) {
@@ -71,12 +68,12 @@ void applier::contact::_update(
   if (state.modified_host_attributes().is_set()) {
     obj.modified_host_attributes = *state.modified_host_attributes();
     // mask out attributes we don't want to retain.
-    obj.modified_host_attributes &= ~config->retained_contact_host_attribute_mask();
+    obj.modified_host_attributes &= ~config.retained_contact_host_attribute_mask();
   }
   if (state.modified_service_attributes().is_set()) {
     obj.modified_service_attributes = *state.modified_service_attributes();
     // mask out attributes we don't want to retain.
-    obj.modified_service_attributes &= ~config->retained_contact_service_attribute_mask();
+    obj.modified_service_attributes &= ~config.retained_contact_service_attribute_mask();
   }
 
   if (obj.retain_status_information) {
@@ -116,26 +113,20 @@ void applier::contact::_update(
       if (obj.modified_service_attributes & MODATTR_NOTIFICATIONS_ENABLED)
         obj.service_notifications_enabled = *state.service_notifications_enabled();
     }
-    // XXX: custom var.
-    // if (!key.empty() && key[0] == '_') {
-    //   if (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE
-    //       && value.size() > 3) {
-    //     char const* cvname(key.c_str() + 1);
-    //     char const* cvvalue(value.c_str() + 2);
 
-    //     for (customvariablesmember* member = obj.custom_variables;
-    //          member;
-    //          member = member->next) {
-    //       if (!strcmp(cvname, member->variable_name)) {
-    //         if (strcmp(cvvalue, member->variable_value)) {
-    //           string::setstr(member->variable_value, cvvalue);
-    //           member->has_been_modified = true;
-    //         }
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
+    if (!state.customvariables().empty()
+        && (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE)) {
+      for (map_customvar::const_iterator
+             it(state.customvariables().begin()),
+             end(state.customvariables().end());
+           it != end;
+           ++it) {
+        update_customvariable(
+          obj.custom_variables,
+          it->first,
+          it->second);
+      }
+    }
   }
 
   // adjust modified attributes if necessary.

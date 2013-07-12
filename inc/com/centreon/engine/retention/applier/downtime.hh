@@ -20,7 +20,6 @@
 #ifndef CCE_RETENTION_APPLIER_DOWNTIME_HH
 #  define CCE_RETENTION_APPLIER_DOWNTIME_HH
 
-#  include <list>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/downtime.hh"
 
@@ -28,15 +27,15 @@ CCE_BEGIN()
 
 namespace   retention {
   namespace applier {
-    class     downtime {
+    class   downtime {
     public:
-              downtime();
-              ~downtime() throw ();
-      void    apply(std::list<retention::downtime> const& lst);
+      void  apply(list_downtime const& lst);
 
     private:
-      void    _add_host_downtime(retention::downtime const& obj) throw ();
-      void    _add_service_downtime(retention::downtime const& obj) throw ();
+      void  _add_host_downtime(
+              retention::downtime const& obj) throw ();
+      void  _add_service_downtime(
+              retention::downtime const& obj) throw ();
     };
   }
 }

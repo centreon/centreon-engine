@@ -35,17 +35,24 @@ namespace                retention {
   class                  state {
   public:
                          state();
-                         state(state const& right);
                          ~state() throw ();
+                         state(state const& right);
     state&               operator=(state const& right);
     bool                 operator==(state const& right) const throw ();
     bool                 operator!=(state const& right) const throw ();
+    list_comment&        comments() throw ();
     list_comment const&  comments() const throw ();
+    list_contact&        contacts() throw ();
     list_contact const&  contacts() const throw ();
+    list_downtime&       downtimes() throw ();
     list_downtime const& downtimes() const throw ();
-    list_host const&     hosts() const throw ();
-    info const&          informations() const throw ();
+    program&             globals() throw ();
     program const&       globals() const throw ();
+    list_host&           hosts() throw ();
+    list_host const&     hosts() const throw ();
+    info&                informations() throw ();
+    info const&          informations() const throw ();
+    list_service&        services() throw ();
     list_service const&  services() const throw ();
 
   private:

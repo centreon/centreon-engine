@@ -22,17 +22,28 @@
 
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/retention/object.hh"
 
 CCE_BEGIN()
 
-namespace              retention {
-  class                state;
+namespace        retention {
+  class          state;
 
-  class                parser {
+  class          parser {
   public:
-                       parser();
-                       ~parser() throw ();
-    void               parse(std::string const& path, state& retention);
+                 parser();
+                 ~parser() throw ();
+    void         parse(std::string const& path, state& retention);
+
+  private:
+    typedef void (parser::*store)(state&, object_ptr obj);
+
+    template<typename T, T& (state::*ptr)() throw ()>
+    void         _store_into_list(state& retention, object_ptr obj);
+    template<typename T, T& (state::*ptr)() throw ()>
+    void         _store_object(state& retention, object_ptr obj);
+
+    static store _store[];
   };
 }
 

@@ -45,6 +45,7 @@ namespace         modules {
         void (*   func)(int id, time_t entry_time, char* args);
       };
 
+      static void _wrapper_read_state_information();
       static void _wrapper_save_state_information();
       static void _wrapper_enable_host_and_child_notifications(host* hst);
       static void _wrapper_disable_host_and_child_notifications(host* hst);
@@ -130,7 +131,7 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        host* hst(find_host(name));
+        host* hst(::find_host(name));
         if (!hst)
           return ;
         (*fptr)(hst);
@@ -145,7 +146,7 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        host* hst(find_host(name));
+        host* hst(::find_host(name));
         if (!hst)
           return ;
         (*fptr)(hst, args + strlen(name) + 1);
@@ -160,7 +161,7 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        hostgroup* group(find_hostgroup(group_name));
+        hostgroup* group(::find_hostgroup(group_name));
         if (!group)
           return ;
 
@@ -181,7 +182,7 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        service* svc(find_service(name, description));
+        service* svc(::find_service(name, description));
         if (!svc)
           return ;
         (*fptr)(svc);
@@ -197,7 +198,7 @@ namespace         modules {
 
         char* name(my_strtok(args, ";"));
         char* description(my_strtok(NULL, ";"));
-        service* svc(find_service(name, description));
+        service* svc(::find_service(name, description));
         if (!svc)
           return ;
         (*fptr)(svc, args + strlen(name) + strlen(description) + 2);
@@ -212,7 +213,7 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        servicegroup* group(find_servicegroup(group_name));
+        servicegroup* group(::find_servicegroup(group_name));
         if (!group)
           return ;
 
@@ -232,7 +233,7 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        servicegroup* group(find_servicegroup(group_name));
+        servicegroup* group(::find_servicegroup(group_name));
         if (!group)
           return ;
 
@@ -240,7 +241,7 @@ namespace         modules {
         for (servicesmember* member = group->members;
              member != NULL;
              member = member->next) {
-          host* hst(find_host(member->host_name));
+          host* hst(::find_host(member->host_name));
           if (!hst || hst == last_host)
             continue ;
           (*fptr)(hst);
@@ -257,7 +258,7 @@ namespace         modules {
         (void)entry_time;
 
         char* name(my_strtok(args, ";"));
-        contact* cntc(find_contact(name));
+        contact* cntc(::find_contact(name));
         if (!cntc)
           return ;
         (*fptr)(cntc);
@@ -272,7 +273,7 @@ namespace         modules {
         (void)entry_time;
 
         char* group_name(my_strtok(args, ";"));
-        contactgroup* group(find_contactgroup(group_name));
+        contactgroup* group(::find_contactgroup(group_name));
         if (!group)
           return ;
 

@@ -25,6 +25,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::string;
@@ -222,4 +223,31 @@ customvariablesmember* add_custom_variable_to_service(
     &tv);
 
   return (retval);
+}
+
+/**
+ *  Update the custom variable value.
+ *
+ *  @param[in,out] lst   The custom variables list.
+ *  @param[in]     key   The key to find.
+ *  @param[in]     value The new value to set.
+ *
+ *  @return True if the custom variable change.
+ */
+bool engine::update_customvariable(
+       customvariablesmember* lst,
+       std::string const& key,
+       std::string const& value) {
+  char const* cv_name(key.c_str());
+  char const* cv_value(value.c_str());
+  for (customvariablesmember* m(lst); m; m = m->next) {
+    if (!strcmp(cv_name, m->variable_name)) {
+      if (strcmp(cv_value, m->variable_value)) {
+        string::setstr(m->variable_value, value);
+        m->has_been_modified = true;
+      }
+      return (true);
+    }
+  }
+  return (false);
 }

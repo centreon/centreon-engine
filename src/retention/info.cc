@@ -22,6 +22,21 @@
 
 using namespace com::centreon::engine::retention;
 
+#define SETTER(type, method) \
+  &object::setter<info, type, &info::method>::generic
+
+static struct {
+  std::string const name;
+  bool (*func)(info&, std::string const&);
+} gl_setters[] = {
+  { "created",          SETTER(time_t, _set_created) },
+  { "version",          SETTER(std::string const&, _set_unused) },
+  { "update_available", SETTER(std::string const&, _set_unused) },
+  { "update_uid",       SETTER(std::string const&, _set_unused) },
+  { "last_version",     SETTER(std::string const&, _set_unused) },
+  { "new_version",      SETTER(std::string const&, _set_unused) }
+};
+
 /**
  *  Constructor.
  */
@@ -97,28 +112,12 @@ bool info::operator!=(info const& right) const throw () {
 bool info::set(
        std::string const& key,
        std::string const& value) {
-  if (key == "created") {
-    time_t current_time(time(NULL));
-    time_t creation_time;
-    string::to(value, creation_time);
-    // XXX:
-    // if ((current_time - creation_time)
-    //     < static_cast<time_t>(config->retention_scheduling_horizon()))
-    //   _scheduling_info_is_ok = true;
-    // else
-    //   _scheduling_info_is_ok = false;
-  }
-  // else if (key == "version")
-  //   ;
-  // else if (key == "update_available")
-  //   ;
-  // else if (key == "update_uid")
-  //   ;
-  // else if (key == "last_version")
-  //   ;
-  // else if (key == "new_version")
-  //   ;
-  return (true);
+  for (unsigned int i(0);
+       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       ++i)
+    if (gl_setters[i].name == key)
+      return ((gl_setters[i].func)(*this, value));
+  return (false);
 }
 
 /**
@@ -128,4 +127,24 @@ bool info::set(
  */
 time_t info::created() const throw () {
   return (_created);
+}
+
+/**
+ *  Set created time.
+ *
+ *  @param[in] value The new created time.
+ */
+bool info::_set_created(time_t value) {
+  _created = value;
+  return (true);
+}
+
+/**
+ *  Do nothing.
+ *
+ *  @param[in] value unused.
+ */
+bool info::_set_unused(std::string const& value) {
+  (void)value;
+  return (true);
 }

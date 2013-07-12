@@ -26,7 +26,7 @@
 #include "com/centreon/engine/events/timed_event.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -172,7 +172,7 @@ static void _exec_event_retention_save(timed_event* event) {
     << "** Retention Data Save Event";
 
   // save state retention data.
-  save_state_information(true);
+  retention::dump::save(config->state_retention_file());
   return;
 }
 

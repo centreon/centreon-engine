@@ -31,16 +31,21 @@ add_library("cce_retention_applier"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/program.cc"
   "${SRC_DIR}/service.cc"
+  "${SRC_DIR}/state.cc"
+  "${SRC_DIR}/utils.cc"
 
   "${INC_DIR}/comment.hh"
   "${INC_DIR}/contact.hh"
   "${INC_DIR}/downtime.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/program.hh"
-  "${INC_DIR}/service.hh")
+  "${INC_DIR}/service.hh"
+  "${INC_DIR}/state.hh"
+  "${INC_DIR}/utils.hh"
+)
 
 # Link target with required libraries.
-target_link_libraries("cce_retention_applier" "cce_core")
+target_link_libraries("cce_retention_applier" "cce_logging")
 
 if (WITH_TESTING)
 

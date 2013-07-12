@@ -17,12 +17,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <fstream>
 #include <iomanip>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::retention;
 
 /**
@@ -320,6 +325,57 @@ std::ostream& dump::program(std::ostream& os) {
     "process_performance_data=" << config->process_performance_data() << "\n"
     "}\n";
   return (os);
+}
+
+/**
+ *  Save all data.
+ *
+ *  @param[in] path The file path to use to save.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool dump::save(std::string const& path) {
+  if (!config->retain_state_information())
+    return (true);
+
+  // send data to event broker
+  broker_retention_data(
+    NEBTYPE_RETENTIONDATA_STARTSAVE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
+
+  bool ret(false);
+  try {
+    std::ofstream stream(
+                    path.c_str(),
+                    std::ios::out | std::ios::trunc);
+    if (!stream.is_open())
+      throw (engine_error() << "retention: can't open file "
+             << config->state_retention_file());
+    dump::header(stream);
+    dump::info(stream);
+    dump::program(stream);
+    dump::hosts(stream);
+    dump::services(stream);
+    dump::contacts(stream);
+    dump::comments(stream);
+    dump::downtimes(stream);
+
+    ret = true;
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << e.what();
+  }
+
+  // send data to event broker.
+  broker_retention_data(
+    NEBTYPE_RETENTIONDATA_ENDSAVE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
+  return (ret);
 }
 
 /**

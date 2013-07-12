@@ -25,7 +25,10 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/modules/external_commands/compatibility.hh"
-#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/retention/applier/state.hh"
+#include "com/centreon/engine/retention/dump.hh"
+#include "com/centreon/engine/retention/parser.hh"
+#include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
@@ -606,11 +609,17 @@ int process_external_command2(int cmd,
     break;
 
   case CMD_SAVE_STATE_INFORMATION:
-    save_state_information(false);
+    retention::dump::save(config->state_retention_file());
     break;
 
   case CMD_READ_STATE_INFORMATION:
-    read_initial_state_information();
+    {
+      retention::state state;
+      retention::parser p;
+      p.parse(config->state_retention_file(), state);
+      retention::applier::state app_state;
+      app_state.apply(*config, state);
+    }
     break;
 
   case CMD_ENABLE_NOTIFICATIONS:

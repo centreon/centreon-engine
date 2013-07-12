@@ -20,25 +20,34 @@
 #ifndef CCE_RETENTION_APPLIER_SERVICE_HH
 #  define CCE_RETENTION_APPLIER_SERVICE_HH
 
-#  include <list>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/service.hh"
 
-// forward declaration.
+// Forward declaration.
 struct service_struct;
 
 CCE_BEGIN()
+
+// Forward declaration.
+namespace configuration {
+  class   state;
+}
 
 namespace   retention {
   namespace applier {
     class   service {
     public:
-            service();
-            ~service() throw ();
-      void  apply(std::list<retention::service> const& lst);
+      void  apply(
+              configuration::state const& config,
+              list_service const& lst,
+              bool scheduling_info_is_ok);
 
     private:
-      void  _update(retention::service const& state, service_struct& obj);
+      void  _update(
+              configuration::state const& config,
+              retention::service const& state,
+              service_struct& obj,
+              bool scheduling_info_is_ok);
     };
   }
 }

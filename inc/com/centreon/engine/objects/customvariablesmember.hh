@@ -57,6 +57,8 @@ customvariablesmember* add_custom_variable_to_service(
 }
 
 #    include <ostream>
+#    include <string>
+#    include "com/centreon/engine/namespace.hh"
 
 bool          operator==(
                 customvariablesmember const& obj1,
@@ -67,6 +69,15 @@ bool          operator!=(
 std::ostream& operator<<(
                 std::ostream& os,
                 customvariablesmember const& obj);
+
+CCE_BEGIN()
+
+bool          update_customvariable(
+                customvariablesmember* lst,
+                std::string const& key,
+                std::string const& value);
+
+CCE_END()
 
 #  endif /* C++ */
 

@@ -27,6 +27,7 @@
 #  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
 #  include "com/centreon/engine/retention/object.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -81,7 +82,8 @@ namespace                     retention {
     opt<bool>                 _service_notifications_enabled;
   };
 
-  typedef std::list<contact> list_contact;
+  typedef shared_ptr<contact>    contact_ptr;
+  typedef std::list<contact_ptr> list_contact;
 }
 
 CCE_END()

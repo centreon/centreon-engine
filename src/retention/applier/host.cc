@@ -21,6 +21,7 @@
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/retention/applier/host.hh"
+#include "com/centreon/engine/retention/applier/utils.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -29,45 +30,48 @@ using namespace com::centreon::engine::configuration::applier;
 using namespace com::centreon::engine::retention;
 
 /**
- *  Constructor.
- */
-applier::host::host() {
-
-}
-
-/**
- *  Destructor.
- */
-applier::host::~host() throw () {
-
-}
-
-/**
  *  Update host list.
  *
- *  @param[in] lst The host list to update.
+ *  @param[in] config                The global configuration.
+ *  @param[in] lst                   The host list to update.
+ *  @param[in] scheduling_info_is_ok True if the retention is not
+ *                                   outdated.
  */
-void applier::host::apply(std::list<retention::host> const& lst) {
-  for (std::list<retention::host>::const_iterator
-         it(lst.begin()), end(lst.end());
+void applier::host::apply(
+       configuration::state const& config,
+       list_host const& lst,
+       bool scheduling_info_is_ok) {
+  for (list_host::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
-    host_struct& hst(find_host(it->host_name()));
-    // XXX: replace state
-    // _update(*config, hst);
+    try {
+      host_struct& hst(find_host((*it)->host_name()));
+      _update(config, **it, hst, scheduling_info_is_ok);
+    }
+    catch (...) {
+      // ignore exception for the retention.
+    }
   }
 }
 
 /**
- * XXX:
+ *  Update internal host base on host retention.
+ *
+ *  @param[in]      config                The global configuration.
+ *  @param[in]      state                 The host retention state.
+ *  @param[in, out] obj                   The host to update.
+ *  @param[in]      scheduling_info_is_ok True if the retention is
+ *                                        not outdated.
  */
 void applier::host::_update(
+       configuration::state const& config,
        retention::host const& state,
-       host_struct& obj) {
+       host_struct& obj,
+       bool scheduling_info_is_ok) {
   if (state.modified_attributes().is_set()) {
     obj.modified_attributes = *state.modified_attributes();
     // mask out attributes we don't want to retain.
-    obj.modified_attributes &= ~config->retained_host_attribute_mask();
+    obj.modified_attributes &= ~config.retained_host_attribute_mask();
   }
 
   if (obj.retain_status_information) {
@@ -86,21 +90,21 @@ void applier::host::_update(
     if (state.last_hard_state().is_set())
       obj.last_hard_state = *state.last_hard_state();
     if (state.plugin_output().is_set())
-      obj.plugin_output = string::dup(*state.plugin_output());
+      string::setstr(obj.plugin_output, *state.plugin_output());
     if (state.long_plugin_output().is_set())
-      obj.long_plugin_output = string::dup(*state.long_plugin_output());
+      string::setstr(obj.long_plugin_output, *state.long_plugin_output());
     if (state.performance_data().is_set())
-      obj.perf_data = string::dup(*state.performance_data());
+      string::setstr(obj.perf_data, *state.performance_data());
     if (state.last_check().is_set())
       obj.last_check = *state.last_check();
-    if (state.next_check().is_set()) {
-      // XXX: if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
-        obj.next_check = *state.next_check();
-    }
-    if (state.check_options().is_set()) {
-      // XXX: if (config->use_retained_scheduling_info() && _scheduling_info_is_ok)
-        obj.check_options = *state.check_options();
-    }
+    if (state.next_check().is_set()
+        && config.use_retained_scheduling_info()
+        && scheduling_info_is_ok)
+      obj.next_check = *state.next_check();
+    if (state.check_options().is_set()
+        && config.use_retained_scheduling_info()
+        && scheduling_info_is_ok)
+      obj.check_options = *state.check_options();
     if (state.current_attempt().is_set())
       obj.current_attempt = *state.current_attempt();
     if (state.current_event_id().is_set())
@@ -138,17 +142,10 @@ void applier::host::_update(
     if (state.check_flapping_recovery_notification().is_set())
       obj.check_flapping_recovery_notification = *state.check_flapping_recovery_notification();
     if (state.state_history().is_set()) {
-      // XXX:
-      // unsigned int x(0);
-      // std::list<std::string> lst_history;
-      // string::split(value, lst_history, ',');
-      // for (std::list<std::string>::const_iterator
-      //        it(lst_history.begin()), end(lst_history.end());
-      //      it != end && x < MAX_STATE_HISTORY_ENTRIES;
-      //      ++it) {
-      //   string::to(*it, obj.state_history[x++]);
-      // }
-      // obj.state_history_index = 0;
+      utils::set_state_history(
+        *state.state_history(),
+        obj.state_history);
+      obj.state_history_index = 0;
     }
   }
 
@@ -193,48 +190,34 @@ void applier::host::_update(
 
     if (state.check_command().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_COMMAND)) {
-        // XXX:
-        // std::size_t pos(value.find('!'));
-        // if (pos != std::string::npos) {
-        //   std::string command(value.substr(pos + 1));
-        //   if (!find_command(command.c_str()))
-        //     obj.modified_attributes -= MODATTR_CHECK_COMMAND;
-        //   else
-        //     string::setstr(obj.host_check_command, value);
-        // }
-      }
+      if (utils::is_command_exist(*state.check_command()))
+        string::setstr(obj.host_check_command, *state.check_command());
+      else
+        obj.modified_attributes -= MODATTR_CHECK_COMMAND;
+    }
 
     if (state.check_period().is_set()
         && (obj.modified_attributes & MODATTR_CHECK_TIMEPERIOD)) {
-      // XXX:
-      //   if (!find_timeperiod(state.check_period()->c_str()))
-      //     obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-      //   else
-      //     string::setstr(obj.check_period, *state.check_period());
-      // }
+      if (is_timeperiod_exist(*state.check_period()))
+        string::setstr(obj.check_period, *state.check_period());
+      else
+        obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
     }
 
     if (state.notification_period().is_set()
         && (obj.modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD)) {
-      // XXX:
-      //   if (!find_timeperiod(state.notification_period()->c_str()))
-      //     obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-      //   else
-      //     string::setstr(obj.notification_period, *state.notification_period());
-      // }
+      if (is_timeperiod_exist(*state.notification_period()))
+          string::setstr(obj.notification_period, *state.notification_period());
+      else
+        obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
     }
 
     if (state.event_handler().is_set()
         && (obj.modified_attributes & MODATTR_EVENT_HANDLER_COMMAND)) {
-      // XXX:
-      //   std::size_t pos(value.find('!'));
-      //   if (pos != std::string::npos) {
-      //     std::string command(value.substr(pos + 1));
-      //     if (!find_command(command.c_str()))
-      //       obj.modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
-      //     else
-      //       string::setstr(obj.event_handler, value);
-      //   }
+      if (utils::is_command_exist(*state.event_handler()))
+        string::setstr(obj.host_check_command, *state.event_handler());
+      else
+        obj.modified_attributes -= MODATTR_CHECK_COMMAND;
     }
 
     if (state.normal_check_interval().is_set()
@@ -256,26 +239,19 @@ void applier::host::_update(
         obj.current_attempt = obj.max_attempts;
     }
 
-    // XXX:
-    // if (!key.empty() && key[0] == '_') {
-    //   if (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE
-    //       && value.size() > 3) {
-    //     char const* cvname(key.c_str() + 1);
-    //     char const* cvvalue(value.c_str() + 2);
-
-    //     for (customvariablesmember* member = obj.custom_variables;
-    //          member;
-    //          member = member->next) {
-    //       if (!strcmp(cvname, member->variable_name)) {
-    //         if (strcmp(cvvalue, member->variable_value)) {
-    //           string::setstr(member->variable_value, cvvalue);
-    //           member->has_been_modified = true;
-    //         }
-    //         break;
-    //       }
-    //     }
-    //   }
-    // }
+    if (!state.customvariables().empty()
+        && (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE)) {
+      for (map_customvar::const_iterator
+             it(state.customvariables().begin()),
+             end(state.customvariables().end());
+           it != end;
+           ++it) {
+        update_customvariable(
+          obj.custom_variables,
+          it->first,
+          it->second);
+      }
+    }
   }
 
   bool allow_flapstart_notification(true);
@@ -311,27 +287,26 @@ void applier::host::_update(
 
   // ADDED 02/20/08 assume same flapping state if large install
   // tweaks enabled.
-  // XXX:
-  // if (config->use_large_installation_tweaks())
-  //   obj.is_flapping = _was_flapping;
-  // // else use normal startup flap detection logic.
-  // else {
-  //   // host was flapping before program started.
-  //   // 11/10/07 don't allow flapping notifications to go out.
-  //   allow_flapstart_notification = (_was_flapping ? false : true);
+  if (config.use_large_installation_tweaks())
+    obj.is_flapping = state.is_flapping();
+  // else use normal startup flap detection logic.
+  else {
+    // host was flapping before program started.
+    // 11/10/07 don't allow flapping notifications to go out.
+    allow_flapstart_notification = !state.is_flapping();
 
-  //   // check for flapping.
-  //   check_for_host_flapping(
-  //     &obj,
-  //     false,
-  //     false,
-  //     allow_flapstart_notification);
+    // check for flapping.
+    check_for_host_flapping(
+      &obj,
+      false,
+      false,
+      allow_flapstart_notification);
 
-  //   // host was flapping before and isn't now, so clear recovery
-  //   // check variable if host isn't flapping now.
-  //   if (_was_flapping && !obj.is_flapping)
-  //     obj.check_flapping_recovery_notification = false;
-  // }
+    // host was flapping before and isn't now, so clear recovery
+    // check variable if host isn't flapping now.
+    if (state.is_flapping() && !obj.is_flapping)
+      obj.check_flapping_recovery_notification = false;
+  }
 
   // handle new vars added in 2.x.
   if (!obj.last_hard_state_change)

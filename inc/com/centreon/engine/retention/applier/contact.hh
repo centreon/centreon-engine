@@ -20,25 +20,30 @@
 #ifndef CCE_RETENTION_APPLIER_CONTACT_HH
 #  define CCE_RETENTION_APPLIER_CONTACT_HH
 
-#  include <list>
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/contact.hh"
 
-// forward declaration.
+// Forward declaration.
 struct contact_struct;
 
 CCE_BEGIN()
+
+// Forward declaration.
+namespace configuration {
+  class   state;
+}
 
 namespace   retention {
   namespace applier {
     class   contact {
     public:
-            contact();
-            ~contact() throw ();
-      void  apply(std::list<retention::contact> const& lst);
+      void  apply(
+              configuration::state const& config,
+              list_contact const& lst);
 
     private:
       void  _update(
+              configuration::state const& config,
               retention::contact const& state,
               contact_struct& obj);
 

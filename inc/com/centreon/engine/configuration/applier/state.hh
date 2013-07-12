@@ -48,6 +48,10 @@ namespace commands {
   class   connector;
 }
 
+namespace retention {
+  class   state;
+}
+
 namespace           configuration {
   namespace         applier {
     /**
@@ -58,9 +62,10 @@ namespace           configuration {
      */
     class           state {
     public:
+      void          apply(configuration::state& new_cfg);
       void          apply(
                       configuration::state& new_cfg,
-                      std::string const& retention_path = "");
+                      retention::state& state);
       static state& instance();
       static void   load();
       static void   unload();
@@ -179,7 +184,7 @@ namespace           configuration {
                       std::set<shared_ptr<ConfigurationType> >& cfg);
       void          _processing(
                       configuration::state& new_cfg,
-                      std::string const& retention_path);
+                      retention::state* state = NULL);
       template      <typename ConfigurationType,
                      typename ApplierType>
       void          _resolve(

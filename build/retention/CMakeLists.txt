@@ -54,7 +54,7 @@ add_library("cce_retention"
 )
 
 # Link target with necessary libraries.
-target_link_libraries("cce_retention" "cce_core")
+target_link_libraries("cce_retention" "cce_retention_applier" "cce_core")
 
 if (WITH_TESTING)
 
