@@ -232,6 +232,16 @@ bool hostdependency::parse(
 }
 
 /**
+ *  Set the dependency period.
+ *
+ *  @param[in] period New dependency period.
+ */
+void hostdependency::dependency_period(std::string const& period) {
+  _dependency_period = period;
+  return ;
+}
+
+/**
  *  Get dependency_period.
  *
  *  @return The dependency_period.
@@ -350,6 +360,16 @@ list_string& hostdependency::hosts() throw () {
  */
 list_string const& hostdependency::hosts() const throw () {
   return (*_hosts);
+}
+
+/**
+ *  Set parent inheritance.
+ *
+ *  @param[in] inherit True if dependency inherits parent.
+ */
+void hostdependency::inherits_parent(bool inherit) throw () {
+  _inherits_parent = inherit;
+  return ;
 }
 
 /**

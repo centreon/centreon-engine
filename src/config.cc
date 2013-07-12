@@ -218,617 +218,175 @@ int pre_flight_check() {
   return ((errors > 0) ? ERROR : OK);
 }
 
-/* do a pre-flight check to make sure object relationships make sense */
+/**
+ *  Do a pre-flight check to make sure object relationships make sense.
+ *
+ *  @param[out] w Warning counter.
+ *  @param[out] e Error counter.
+ *
+ *  @return OK on success.
+ */
 int pre_flight_object_check(int* w, int* e) {
-  contact* temp_contact(NULL);
-  contactgroup* temp_contactgroup(NULL);
-  contactsmember* temp_contactsmember(NULL);
-  contactgroupsmember* temp_contactgroupsmember(NULL);
-  host* temp_host(NULL);
-  host* temp_host2(NULL);
-  hostsmember* temp_hostsmember(NULL);
-  hostgroup* temp_hostgroup(NULL);
-  servicegroup* temp_servicegroup(NULL);
-  servicesmember* temp_servicesmember(NULL);
-  service* temp_service(NULL);
-  service* temp_service2(NULL);
-  command* temp_command(NULL);
-  timeperiod* temp_timeperiod(NULL);
-  timeperiod* temp_timeperiod2(NULL);
-  timeperiodexclusion* temp_timeperiodexclusion(NULL);
-  serviceescalation* temp_se(NULL);
-  hostescalation* temp_he(NULL);
-  servicedependency* temp_sd(NULL);
-  hostdependency* temp_hd(NULL);
-  int total_objects(0);
+  // Counters.
   int warnings(0);
   int errors(0);
 
-  /*****************************************/
-  /* check each service...                 */
-  /*****************************************/
+  // Check each service...
   if (verify_config == TRUE)
-    printf("Checking services...\n");
-  // if (get_service_count() == 0) {
-  //   logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no services defined!");
-  //   errors++;
-  // }
-  total_objects = 0;
-  for (temp_service = service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
-    total_objects++;
+    logger(log_info_message, basic) << "Checking services...";
+  int total_objects(0);
+  for (service* temp_service(service_list);
+       temp_service;
+       temp_service = temp_service->next, ++total_objects)
     check_service(temp_service, &warnings, &errors);
-  }
-
   if (verify_config == TRUE)
-    printf("\tChecked %d services.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " services.";
 
-  /*****************************************/
-  /* check all hosts...                    */
-  /*****************************************/
+  // Check all hosts...
   if (verify_config == TRUE)
-    printf("Checking hosts...\n");
-
-  // if (get_host_count() == 0) {
-  //   logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no hosts defined!");
-  //   errors++;
-  // }
-
+    logger(log_info_message, basic) << "Checking hosts...";
   total_objects = 0;
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-    total_objects++;
+  for (host* temp_host(host_list);
+       temp_host;
+       temp_host = temp_host->next, ++total_objects)
     check_host(temp_host, &warnings, &errors);
-  }
-
   if (verify_config == TRUE)
-    printf("\tChecked %d hosts.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " hosts.";
 
-  /*****************************************/
-  /* check each host group...              */
-  /*****************************************/
+  // Check each host group...
   if (verify_config == TRUE)
-    printf("Checking host groups...\n");
-  for (temp_hostgroup = hostgroup_list, total_objects = 0;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next, total_objects++) {
-
-    /* check all group members */
-    for (temp_hostsmember = temp_hostgroup->members;
-	 temp_hostsmember != NULL;
-         temp_hostsmember = temp_hostsmember->next) {
-
-      temp_host = find_host(temp_hostsmember->host_name);
-      if (temp_host == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Host '" << temp_hostsmember->host_name
-          << "' specified in host group '" << temp_hostgroup->group_name
-          << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save a pointer to this hostgroup for faster host/group membership lookups later */
-      else
-        add_object_to_objectlist(
-          &temp_host->hostgroups_ptr,
-          (void*)temp_hostgroup);
-
-      /* save host pointer for later */
-      temp_hostsmember->host_ptr = temp_host;
-    }
-
-    /* check for illegal characters in hostgroup name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_hostgroup->group_name) == TRUE) {
-        logger(log_verification_error, basic)
-          << "Error: The name of hostgroup '"
-          << temp_hostgroup->group_name
-          << "' contains one or more illegal characters.";
-        errors++;
-      }
-    }
-  }
-
+    logger(log_info_message, basic) << "Checking host groups...";
+  total_objects = 0;
+  for (hostgroup* temp_hostgroup(hostgroup_list);
+       temp_hostgroup;
+       temp_hostgroup = temp_hostgroup->next, ++total_objects)
+    check_hostgroup(temp_hostgroup, &warnings, &errors);
   if (verify_config == TRUE)
-    printf("\tChecked %d host groups.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " host groups.";
 
-  /*****************************************/
-  /* check each service group...           */
-  /*****************************************/
+  // Check each service group...
   if (verify_config == TRUE)
-    printf("Checking service groups...\n");
-  for (temp_servicegroup = servicegroup_list, total_objects = 0;
-       temp_servicegroup != NULL;
-       temp_servicegroup = temp_servicegroup->next, total_objects++) {
-
-    /* check all group members */
-    for (temp_servicesmember = temp_servicegroup->members;
-         temp_servicesmember != NULL;
-         temp_servicesmember = temp_servicesmember->next) {
-
-      temp_service = find_service(
-                       temp_servicesmember->host_name,
-                       temp_servicesmember->service_description);
-      if (temp_service == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Service '"
-          << temp_servicesmember->service_description
-          << "' on host '" << temp_servicesmember->host_name
-          << "' specified in service group '"
-          << temp_servicegroup->group_name
-          << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save a pointer to this servicegroup for faster service/group membership lookups later */
-      else
-        add_object_to_objectlist(
-          &temp_service->servicegroups_ptr,
-          (void*)temp_servicegroup);
-
-      /* save service pointer for later */
-      temp_servicesmember->service_ptr = temp_service;
-    }
-
-    /* check for illegal characters in servicegroup name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_servicegroup->group_name) == TRUE) {
-        logger(log_verification_error, basic)
-          << "Error: The name of servicegroup '"
-          << temp_servicegroup->group_name
-          << "' contains one or more illegal characters.";
-        errors++;
-      }
-    }
-  }
-
+    logger(log_info_message, basic) << "Checking service groups...";
+  total_objects = 0;
+  for (servicegroup* temp_servicegroup(servicegroup_list);
+       temp_servicegroup;
+       temp_servicegroup = temp_servicegroup->next, ++total_objects)
+    check_servicegroup(temp_servicegroup, &warnings, &errors);
   if (verify_config == TRUE)
-    printf("\tChecked %d service groups.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " service groups.";
 
-  /*****************************************/
-  /* check all contacts...                 */
-  /*****************************************/
+  // Check all contacts...
   if (verify_config == TRUE)
-    printf("Checking contacts...\n");
-  // if (contact_list == NULL) {
-  //   logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no contacts defined!");
-  //   errors++;
-  // }
-  for (temp_contact = contact_list, total_objects = 0;
-       temp_contact != NULL;
-       temp_contact = temp_contact->next, total_objects++) {
+    logger(log_info_message, basic) << "Checking contacts...";
+  total_objects = 0;
+  for (contact* temp_contact(contact_list);
+       temp_contact;
+       temp_contact = temp_contact->next, ++total_objects)
     check_contact(temp_contact, &warnings, &errors);
-  }
-
   if (verify_config == TRUE)
-    printf("\tChecked %d contacts.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " contacts.";
 
-  /*****************************************/
-  /* check each contact group...           */
-  /*****************************************/
+  // Check each contact group...
   if (verify_config == TRUE)
-    printf("Checking contact groups...\n");
-  for (temp_contactgroup = contactgroup_list, total_objects = 0;
-       temp_contactgroup != NULL;
-       temp_contactgroup = temp_contactgroup->next, total_objects++) {
-
-    /* check all the group members */
-    for (temp_contactsmember = temp_contactgroup->members;
-         temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-
-      temp_contact = find_contact(temp_contactsmember->contact_name);
-      if (temp_contact == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Contact '" << temp_contactsmember->contact_name
-          << "' specified in contact group '"
-          << temp_contactgroup->group_name
-          << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save a pointer to this contactgroup for faster contact/group membership lookups later */
-      else
-        add_object_to_objectlist(
-          &temp_contact->contactgroups_ptr,
-          (void*)temp_contactgroup);
-
-      /* save the contact pointer for later */
-      temp_contactsmember->contact_ptr = temp_contact;
-    }
-
-    /* check for illegal characters in contactgroup name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_contactgroup->group_name) == TRUE) {
-        logger(log_verification_error, basic)
-          << "Error: The name of contact group '"
-          << temp_contactgroup->group_name
-          << "' contains one or more illegal characters.";
-        errors++;
-      }
-    }
-  }
-
+    logger(log_info_message, basic) << "Checking contact groups...";
+  total_objects = 0;
+  for (contactgroup* temp_contactgroup(contactgroup_list);
+       temp_contactgroup;
+       temp_contactgroup = temp_contactgroup->next, ++total_objects)
+    check_contactgroup(temp_contactgroup, &warnings, &errors);
   if (verify_config == TRUE)
-    printf("\tChecked %d contact groups.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " contact groups.";
 
-  /*****************************************/
-  /* check all service escalations...     */
-  /*****************************************/
+  // Check all service escalations...
   if (verify_config == TRUE)
-    printf("Checking service escalations...\n");
+    logger(log_info_message, basic)
+      << "Checking service escalations...";
+  total_objects = 0;
+  for (serviceescalation* temp_se(serviceescalation_list);
+       temp_se;
+       temp_se = temp_se->next, ++total_objects)
+    check_serviceescalation(temp_se, &warnings, &errors);
+  if (verify_config == TRUE)
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " service escalations.";
 
-  for (temp_se = serviceescalation_list, total_objects = 0;
-       temp_se != NULL;
-       temp_se = temp_se->next, total_objects++) {
+  // Check all service dependencies...
+  if (verify_config == TRUE)
+    logger(log_info_message, basic)
+      << "Checking service dependencies...";
+  total_objects = 0;
+  for (servicedependency* temp_sd(servicedependency_list);
+       temp_sd;
+       temp_sd = temp_sd->next, ++total_objects)
+    check_servicedependency(temp_sd, &warnings, &errors);
+  if (verify_config == TRUE)
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " service dependencies.";
 
-    /* find the service */
-    temp_service = find_service(
-                     temp_se->host_name,
-                     temp_se->description);
-    if (temp_service == NULL) {
+  // Check all host escalations...
+  if (verify_config == TRUE)
+    logger(log_info_message, basic) << "Checking host escalations...";
+  total_objects = 0;
+  for (hostescalation* temp_he(hostescalation_list);
+       temp_he;
+       temp_he = temp_he->next, ++total_objects)
+    check_hostescalation(temp_he, &warnings, &errors);
+  if (verify_config == TRUE)
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " host escalations.";
+
+  // Check all host dependencies...
+  if (verify_config == TRUE)
+    logger(log_info_message, basic) << "Checking host dependencies...";
+  total_objects = 0;
+  for (hostdependency* temp_hd(hostdependency_list);
+       temp_hd;
+       temp_hd = temp_hd->next, ++total_objects)
+    check_hostdependency(temp_hd, &warnings, &errors);
+  if (verify_config == TRUE)
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " host dependencies.";
+
+  // Check all commands...
+  if (verify_config == TRUE)
+    logger(log_info_message, basic) << "Checking commands...";
+  total_objects = 0;
+  for (command* temp_command(command_list);
+       temp_command;
+       temp_command = temp_command->next, ++total_objects) {
+    // Check for illegal characters in command name.
+    if ((use_precached_objects == FALSE)
+        && (contains_illegal_object_chars(temp_command->name)
+            == TRUE)) {
       logger(log_verification_error, basic)
-        << "Error: Service '" << temp_se->description
-        << "' on host '" << temp_se->host_name
-        << "' specified in service escalation is not defined anywhere!";
+        << "Error: The name of command '" << temp_command->name
+        << "' contains one or more illegal characters.";
       errors++;
     }
-
-    /* save the service pointer for later */
-    temp_se->service_ptr = temp_service;
-
-    /* find the timeperiod */
-    if (temp_se->escalation_period != NULL) {
-      temp_timeperiod = find_timeperiod(temp_se->escalation_period);
-      if (temp_timeperiod == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Escalation period '" << temp_se->escalation_period
-          << "' specified in service escalation for service '"
-          << temp_se->description << "' on host '"
-          << temp_se->host_name << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the timeperiod pointer for later */
-      temp_se->escalation_period_ptr = temp_timeperiod;
-    }
-
-    /* find the contacts */
-    for (temp_contactsmember = temp_se->contacts;
-	 temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-
-      /* find the contact */
-      temp_contact = find_contact(temp_contactsmember->contact_name);
-      if (temp_contact == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Contact '" << temp_contactsmember->contact_name
-          << "' specified in service escalation for service '"
-          << temp_se->description << "' on host '"
-          << temp_se->host_name << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the contact pointer for later */
-      temp_contactsmember->contact_ptr = temp_contact;
-    }
-
-    /* check all contact groups */
-    for (temp_contactgroupsmember = temp_se->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-      temp_contactgroup
-        = find_contactgroup(temp_contactgroupsmember->group_name);
-
-      if (temp_contactgroup == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Contact group '"
-          << temp_contactgroupsmember->group_name
-          << "' specified in service escalation for service '"
-          << temp_se->description << "' on host '" << temp_se->host_name
-          << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the contact group pointer for later */
-      temp_contactgroupsmember->group_ptr = temp_contactgroup;
-    }
   }
-
   if (verify_config == TRUE)
-    printf("\tChecked %d service escalations.\n", total_objects);
+    logger(log_info_message, basic)
+      << "\tChecked " << total_objects << " commands.\n";
 
-  /*****************************************/
-  /* check all service dependencies...     */
-  /*****************************************/
+  // Check all timeperiods...
   if (verify_config == TRUE)
-    printf("Checking service dependencies...\n");
-
-  for (temp_sd = servicedependency_list, total_objects = 0;
-       temp_sd != NULL;
-       temp_sd = temp_sd->next, total_objects++) {
-
-    /* find the dependent service */
-    temp_service = find_service(
-                     temp_sd->dependent_host_name,
-                     temp_sd->dependent_service_description);
-    if (temp_service == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Dependent service '"
-        << temp_sd->dependent_service_description
-        << "' on host '" << temp_sd->dependent_host_name
-        << "' specified in service dependency for service '"
-        << temp_sd->service_description << "' on host '"
-        << temp_sd->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save pointer for later */
-    temp_sd->dependent_service_ptr = temp_service;
-
-    /* find the service we're depending on */
-    temp_service2 = find_service(
-                      temp_sd->host_name,
-                      temp_sd->service_description);
-    if (temp_service2 == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Service '" << temp_sd->service_description << "' on host '"
-        << temp_sd->host_name << "' specified in service dependency for service '"
-        << temp_sd->dependent_service_description << "' on host '"
-        << temp_sd->dependent_host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save pointer for later */
-    temp_sd->master_service_ptr = temp_service2;
-
-    /* make sure they're not the same service */
-    if (temp_service == temp_service2) {
-      logger(log_verification_error, basic)
-        << "Error: Service dependency definition for service '"
-        << temp_sd->dependent_service_description << "' on host '"
-        << temp_sd->dependent_host_name
-        << "' is circular (it depends on itself)!";
-      errors++;
-    }
-
-    /* find the timeperiod */
-    if (temp_sd->dependency_period != NULL) {
-      temp_timeperiod = find_timeperiod(temp_sd->dependency_period);
-      if (temp_timeperiod == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Dependency period '" << temp_sd->dependency_period
-          << "' specified in service dependency for service '"
-          << temp_sd->dependent_service_description << "' on host '"
-          << temp_sd->dependent_host_name << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the timeperiod pointer for later */
-      temp_sd->dependency_period_ptr = temp_timeperiod;
-    }
-  }
-
+    logger(log_info_message, basic) << "Checking time periods...";
+  total_objects = 0;
+  for (timeperiod* temp_timeperiod(timeperiod_list);
+       temp_timeperiod;
+       temp_timeperiod = temp_timeperiod->next, ++total_objects)
+    check_timeperiod(temp_timeperiod, &warnings, &errors);
   if (verify_config == TRUE)
-    printf("\tChecked %d service dependencies.\n", total_objects);
+    logger(log_verification_error, basic)
+      << "\tChecked " << total_objects << " time periods.";
 
-  /*****************************************/
-  /* check all host escalations...     */
-  /*****************************************/
-  if (verify_config == TRUE)
-    printf("Checking host escalations...\n");
-
-  for (temp_he = hostescalation_list, total_objects = 0;
-       temp_he != NULL;
-       temp_he = temp_he->next, total_objects++) {
-
-    /* find the host */
-    temp_host = find_host(temp_he->host_name);
-    if (temp_host == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Host '" << temp_he->host_name
-        << "' specified in host escalation is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the host pointer for later */
-    temp_he->host_ptr = temp_host;
-
-    /* find the timeperiod */
-    if (temp_he->escalation_period != NULL) {
-      temp_timeperiod = find_timeperiod(temp_he->escalation_period);
-      if (temp_timeperiod == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Escalation period '" << temp_he->escalation_period
-          << "' specified in host escalation for host '"
-          << temp_he->host_name << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the timeperiod pointer for later */
-      temp_he->escalation_period_ptr = temp_timeperiod;
-    }
-
-    /* find the contacts */
-    for (temp_contactsmember = temp_he->contacts;
-	 temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-
-      /* find the contact */
-      temp_contact = find_contact(temp_contactsmember->contact_name);
-      if (temp_contact == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Contact '" << temp_contactsmember->contact_name
-          << "' specified in host escalation for host '"
-          << temp_he->host_name << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the contact pointer for later */
-      temp_contactsmember->contact_ptr = temp_contact;
-    }
-
-    /* check all contact groups */
-    for (temp_contactgroupsmember = temp_he->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-      temp_contactgroup
-        = find_contactgroup(temp_contactgroupsmember->group_name);
-
-      if (temp_contactgroup == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Contact group '"
-          << temp_contactgroupsmember->group_name
-          << "' specified in host escalation for host '"
-          << temp_he->host_name << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the contact group pointer for later */
-      temp_contactgroupsmember->group_ptr = temp_contactgroup;
-    }
-  }
-
-  if (verify_config == TRUE)
-    printf("\tChecked %d host escalations.\n", total_objects);
-
-  /*****************************************/
-  /* check all host dependencies...     */
-  /*****************************************/
-  if (verify_config == TRUE)
-    printf("Checking host dependencies...\n");
-
-  for (temp_hd = hostdependency_list, total_objects = 0;
-       temp_hd != NULL;
-       temp_hd = temp_hd->next, total_objects++) {
-
-    /* find the dependent host */
-    temp_host = find_host(temp_hd->dependent_host_name);
-    if (temp_host == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Dependent host specified in host dependency for "
-        "host '" << temp_hd->dependent_host_name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save pointer for later */
-    temp_hd->dependent_host_ptr = temp_host;
-
-    /* find the host we're depending on */
-    temp_host2 = find_host(temp_hd->host_name);
-    if (temp_host2 == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Host specified in host dependency for host '"
-        << temp_hd->dependent_host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save pointer for later */
-    temp_hd->master_host_ptr = temp_host2;
-
-    /* make sure they're not the same host */
-    if (temp_host == temp_host2) {
-      logger(log_verification_error, basic)
-        << "Error: Host dependency definition for host '"
-        <<  temp_hd->dependent_host_name
-        << "' is circular (it depends on itself)!";
-      errors++;
-    }
-
-    /* find the timeperiod */
-    if (temp_hd->dependency_period != NULL) {
-      temp_timeperiod = find_timeperiod(temp_hd->dependency_period);
-      if (temp_timeperiod == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Dependency period '" << temp_hd->dependency_period
-          << "' specified in host dependency for host '"
-          << temp_hd->dependent_host_name
-          << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the timeperiod pointer for later */
-      temp_hd->dependency_period_ptr = temp_timeperiod;
-    }
-  }
-
-  if (verify_config == TRUE)
-    printf("\tChecked %d host dependencies.\n", total_objects);
-
-  /*****************************************/
-  /* check all commands...                 */
-  /*****************************************/
-  if (verify_config == TRUE)
-    printf("Checking commands...\n");
-
-  for (temp_command = command_list, total_objects = 0;
-       temp_command != NULL;
-       temp_command = temp_command->next, total_objects++) {
-
-    /* check for illegal characters in command name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_command->name) == TRUE) {
-        logger(log_verification_error, basic)
-          << "Error: The name of command '" << temp_command->name
-          << "' contains one or more illegal characters.";
-        errors++;
-      }
-    }
-  }
-
-  if (verify_config == TRUE)
-    printf("\tChecked %d commands.\n", total_objects);
-
-  /*****************************************/
-  /* check all timeperiods...              */
-  /*****************************************/
-  if (verify_config == TRUE)
-    printf("Checking time periods...\n");
-
-  for (temp_timeperiod = timeperiod_list, total_objects = 0;
-       temp_timeperiod != NULL;
-       temp_timeperiod = temp_timeperiod->next, total_objects++) {
-
-    /* check for illegal characters in timeperiod name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_timeperiod->name) == TRUE) {
-        logger(log_verification_error, basic)
-          << "Error: The name of time period '" << temp_timeperiod->name
-          << "' contains one or more illegal characters.";
-        errors++;
-      }
-    }
-
-    /* check for valid timeperiod names in exclusion list */
-    for (temp_timeperiodexclusion = temp_timeperiod->exclusions;
-         temp_timeperiodexclusion != NULL;
-         temp_timeperiodexclusion = temp_timeperiodexclusion->next) {
-
-      temp_timeperiod2
-        = find_timeperiod(temp_timeperiodexclusion->timeperiod_name);
-      if (temp_timeperiod2 == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Excluded time period '"
-          << temp_timeperiodexclusion->timeperiod_name
-          << "' specified in timeperiod '" << temp_timeperiod->name
-          << "' is not defined anywhere!";
-        errors++;
-      }
-
-      /* save the timeperiod pointer for later */
-      temp_timeperiodexclusion->timeperiod_ptr = temp_timeperiod2;
-    }
-  }
-
-  if (verify_config == TRUE)
-    printf("\tChecked %d time periods.\n", total_objects);
-
-  /* update warning and error count */
+  // Update warning and error count.
   *w += warnings;
   *e += errors;
 
@@ -1632,5 +1190,546 @@ int check_contact(contact* cntct, int* w, int* e) {
     *w += warnings;
   if (e != NULL)
     *e += errors;
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve service groups.
+ *
+ *  @param[in,out] sg Service group object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_servicegroup(servicegroup* sg, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Check all group members.
+  for (servicesmember* temp_servicesmember(sg->members);
+       temp_servicesmember;
+       temp_servicesmember = temp_servicesmember->next) {
+    service* temp_service(find_service(
+                            temp_servicesmember->host_name,
+                            temp_servicesmember->service_description));
+    if (!temp_service) {
+      logger(log_verification_error, basic)
+        << "Error: Service '"
+        << temp_servicesmember->service_description
+        << "' on host '" << temp_servicesmember->host_name
+        << "' specified in service group '" << sg->group_name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save a pointer to this servicegroup for faster service/group
+    // membership lookups later.
+    else
+      add_object_to_objectlist(&temp_service->servicegroups_ptr, sg);
+
+    // Save service pointer for later.
+    temp_servicesmember->service_ptr = temp_service;
+  }
+
+  // Check for illegal characters in servicegroup name.
+  if (use_precached_objects == FALSE) {
+    if (contains_illegal_object_chars(sg->group_name) == TRUE) {
+      logger(log_verification_error, basic)
+        << "Error: The name of servicegroup '" << sg->group_name
+        << "' contains one or more illegal characters.";
+      errors++;
+    }
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve host groups.
+ *
+ *  @param[in,out] hg Host group object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_hostgroup(hostgroup* hg, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Check all group members.
+  for (hostsmember* temp_hostsmember(hg->members);
+       temp_hostsmember;
+       temp_hostsmember = temp_hostsmember->next) {
+    host* temp_host(find_host(temp_hostsmember->host_name));
+    if (!temp_host) {
+      logger(log_verification_error, basic)
+        << "Error: Host '" << temp_hostsmember->host_name
+        << "' specified in host group '" << hg->group_name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save a pointer to this hostgroup for faster host/group
+    // membership lookups later.
+    else
+      add_object_to_objectlist(&temp_host->hostgroups_ptr, hg);
+
+    // Save host pointer for later.
+    temp_hostsmember->host_ptr = temp_host;
+  }
+
+  // Check for illegal characters in hostgroup name.
+  if (use_precached_objects == FALSE) {
+    if (contains_illegal_object_chars(hg->group_name) == TRUE) {
+      logger(log_verification_error, basic)
+        << "Error: The name of hostgroup '" << hg->group_name
+        << "' contains one or more illegal characters.";
+      errors++;
+    }
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve a contact group.
+ *
+ *  @param[in,out] cg Contact group object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_contactgroup(contactgroup* cg, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Check all the group members.
+  for (contactsmember* temp_contactsmember(cg->members);
+       temp_contactsmember;
+       temp_contactsmember = temp_contactsmember->next) {
+    contact* temp_contact(
+               find_contact(temp_contactsmember->contact_name));
+    if (!temp_contact) {
+      logger(log_verification_error, basic)
+        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "' specified in contact group '" << cg->group_name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save a pointer to this contact group for faster contact/group
+    // membership lookups later.
+    else
+      add_object_to_objectlist(&temp_contact->contactgroups_ptr, cg);
+
+    // Save the contact pointer for later.
+    temp_contactsmember->contact_ptr = temp_contact;
+  }
+
+  // Check for illegal characters in contact group name.
+  if (use_precached_objects == FALSE) {
+    if (contains_illegal_object_chars(cg->group_name) == TRUE) {
+      logger(log_verification_error, basic)
+        << "Error: The name of contact group '" << cg->group_name
+        << "' contains one or more illegal characters.";
+      errors++;
+    }
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve a service dependency.
+ *
+ *  @param[in,out] sd Service dependency object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_servicedependency(servicedependency* sd, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Find the dependent service.
+  service* temp_service(find_service(
+                          sd->dependent_host_name,
+                          sd->dependent_service_description));
+  if (!temp_service) {
+    logger(log_verification_error, basic)
+      << "Error: Dependent service '"
+      << sd->dependent_service_description << "' on host '"
+      << sd->dependent_host_name
+      << "' specified in service dependency for service '"
+      << sd->service_description << "' on host '"
+      << sd->host_name << "' is not defined anywhere!";
+    errors++;
+  }
+
+  // Save pointer for later.
+  sd->dependent_service_ptr = temp_service;
+
+  // Find the service we're depending on.
+  temp_service = find_service(
+                   sd->host_name,
+                   sd->service_description);
+  if (!temp_service) {
+    logger(log_verification_error, basic)
+      << "Error: Service '" << sd->service_description << "' on host '"
+      << sd->host_name
+      << "' specified in service dependency for service '"
+      << sd->dependent_service_description << "' on host '"
+      << sd->dependent_host_name << "' is not defined anywhere!";
+    errors++;
+  }
+
+  // Save pointer for later.
+  sd->master_service_ptr = temp_service;
+
+  // Make sure they're not the same service.
+  if (sd->dependent_service_ptr == sd->master_service_ptr) {
+    logger(log_verification_error, basic)
+      << "Error: Service dependency definition for service '"
+      << sd->dependent_service_description << "' on host '"
+      << sd->dependent_host_name
+      << "' is circular (it depends on itself)!";
+    errors++;
+  }
+
+  // Find the timeperiod.
+  if (sd->dependency_period) {
+    timeperiod* temp_timeperiod(find_timeperiod(sd->dependency_period));
+    if (!temp_timeperiod) {
+      logger(log_verification_error, basic)
+        << "Error: Dependency period '" << sd->dependency_period
+        << "' specified in service dependency for service '"
+        << sd->dependent_service_description << "' on host '"
+        << sd->dependent_host_name << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the timeperiod pointer for later.
+    sd->dependency_period_ptr = temp_timeperiod;
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve a host dependency.
+ *
+ *  @param[in,out] hd Host dependency object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_hostdependency(hostdependency* hd, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Find the dependent host.
+  host* temp_host(find_host(hd->dependent_host_name));
+  if (!temp_host) {
+    logger(log_verification_error, basic)
+      << "Error: Dependent host specified in host dependency for "
+         "host '" << hd->dependent_host_name
+      << "' is not defined anywhere!";
+    errors++;
+  }
+
+  // Save pointer for later.
+  hd->dependent_host_ptr = temp_host;
+
+  // Find the host we're depending on.
+  temp_host = find_host(hd->host_name);
+  if (!temp_host) {
+    logger(log_verification_error, basic)
+      << "Error: Host specified in host dependency for host '"
+      << hd->dependent_host_name << "' is not defined anywhere!";
+    errors++;
+  }
+
+  // Save pointer for later.
+  hd->master_host_ptr = temp_host;
+
+  // Make sure they're not the same host.
+  if (hd->dependent_host_ptr == hd->master_host_ptr) {
+    logger(log_verification_error, basic)
+      << "Error: Host dependency definition for host '"
+      << hd->dependent_host_name
+      << "' is circular (it depends on itself)!";
+    errors++;
+  }
+
+  // Find the timeperiod.
+  if (hd->dependency_period) {
+    timeperiod* temp_timeperiod(find_timeperiod(hd->dependency_period));
+    if (!temp_timeperiod) {
+      logger(log_verification_error, basic)
+        << "Error: Dependency period '" << hd->dependency_period
+        << "' specified in host dependency for host '"
+        << hd->dependent_host_name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the timeperiod pointer for later.
+    hd->dependency_period_ptr = temp_timeperiod;
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve a service escalation.
+ *
+ *  @param[in,out] se Service escalation object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_serviceescalation(serviceescalation* se, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Find the service.
+  service* temp_service(find_service(se->host_name, se->description));
+  if (!temp_service) {
+    logger(log_verification_error, basic) << "Error: Service '"
+        << se->description << "' on host '" << se->host_name
+        << "' specified in service escalation is not defined anywhere!";
+    errors++;
+  }
+
+  // Save the service pointer for later.
+  se->service_ptr = temp_service;
+
+  // Find the timeperiod.
+  if (se->escalation_period) {
+    timeperiod* temp_timeperiod(find_timeperiod(se->escalation_period));
+    if (!temp_timeperiod) {
+      logger(log_verification_error, basic)
+        << "Error: Escalation period '" << se->escalation_period
+        << "' specified in service escalation for service '"
+        << se->description << "' on host '"
+        << se->host_name << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the timeperiod pointer for later.
+    se->escalation_period_ptr = temp_timeperiod;
+  }
+
+  // Check all contacts.
+  for (contactsmember* temp_contactsmember(se->contacts);
+       temp_contactsmember;
+       temp_contactsmember = temp_contactsmember->next) {
+    // Find the contact.
+    contact* temp_contact(find_contact(
+                            temp_contactsmember->contact_name));
+    if (!temp_contact) {
+      logger(log_verification_error, basic)
+        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "' specified in service escalation for service '"
+        << se->description << "' on host '"
+        << se->host_name << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the contact pointer for later.
+    temp_contactsmember->contact_ptr = temp_contact;
+  }
+
+  // Check all contact groups.
+  for (contactgroupsmember*
+         temp_contactgroupsmember(se->contact_groups);
+       temp_contactgroupsmember;
+       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+    // Find the contact group.
+    contactgroup* temp_contactgroup(
+                    find_contactgroup(
+                      temp_contactgroupsmember->group_name));
+    if (!temp_contactgroup) {
+      logger(log_verification_error, basic)
+        << "Error: Contact group '"
+        << temp_contactgroupsmember->group_name
+        << "' specified in service escalation for service '"
+        << se->description << "' on host '" << se->host_name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the contact group pointer for later.
+    temp_contactgroupsmember->group_ptr = temp_contactgroup;
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve a host escalation.
+ *
+ *  @param[in,out] he Host escalation object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_hostescalation(hostescalation* he, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Find the host.
+  host* temp_host(find_host(he->host_name));
+  if (!temp_host) {
+    logger(log_verification_error, basic)
+      << "Error: Host '" << he->host_name
+      << "' specified in host escalation is not defined anywhere!";
+    errors++;
+  }
+
+  // Save the host pointer for later.
+  he->host_ptr = temp_host;
+
+  // Find the timeperiod.
+  if (he->escalation_period) {
+    timeperiod* temp_timeperiod(find_timeperiod(he->escalation_period));
+    if (!temp_timeperiod) {
+      logger(log_verification_error, basic)
+        << "Error: Escalation period '" << he->escalation_period
+        << "' specified in host escalation for host '"
+        << he->host_name << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the timeperiod pointer for later.
+    he->escalation_period_ptr = temp_timeperiod;
+  }
+
+  // Check all contacts.
+  for (contactsmember* temp_contactsmember(he->contacts);
+       temp_contactsmember;
+       temp_contactsmember = temp_contactsmember->next) {
+    // Find the contact.
+    contact* temp_contact(find_contact(
+                            temp_contactsmember->contact_name));
+    if (!temp_contact) {
+      logger(log_verification_error, basic)
+        << "Error: Contact '" << temp_contactsmember->contact_name
+        << "' specified in host escalation for host '"
+        << he->host_name << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the contact pointer for later.
+    temp_contactsmember->contact_ptr = temp_contact;
+  }
+
+  // Check all contact groups.
+  for (contactgroupsmember*
+         temp_contactgroupsmember(he->contact_groups);
+       temp_contactgroupsmember;
+       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+    // Find the contact group.
+    contactgroup* temp_contactgroup(
+                    find_contactgroup(
+                      temp_contactgroupsmember->group_name));
+    if (!temp_contactgroup) {
+      logger(log_verification_error, basic)
+        << "Error: Contact group '"
+        << temp_contactgroupsmember->group_name
+        << "' specified in host escalation for host '"
+        << he->host_name << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the contact group pointer for later.
+    temp_contactgroupsmember->group_ptr = temp_contactgroup;
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
+  return (errors == 0);
+}
+
+/**
+ *  Check and resolve a time period.
+ *
+ *  @param[in,out] tp Time period object.
+ *  @param[out]    w  Warnings.
+ *  @param[out]    e  Errors.
+ *
+ *  @return Non-zero on success.
+ */
+int check_timeperiod(timeperiod* tp, int* w, int* e) {
+  (void)w;
+  int errors(0);
+
+  // Check for illegal characters in timeperiod name.
+  if ((use_precached_objects == FALSE)
+      && (contains_illegal_object_chars(tp->name) == TRUE)) {
+    logger(log_verification_error, basic)
+      << "Error: The name of time period '" << tp->name
+      << "' contains one or more illegal characters.";
+    errors++;
+  }
+
+  // Check for valid timeperiod names in exclusion list.
+  for (timeperiodexclusion*
+         temp_timeperiodexclusion(tp->exclusions);
+       temp_timeperiodexclusion;
+       temp_timeperiodexclusion = temp_timeperiodexclusion->next) {
+    timeperiod* temp_timeperiod2(
+                  find_timeperiod(
+                    temp_timeperiodexclusion->timeperiod_name));
+    if (!temp_timeperiod2) {
+      logger(log_verification_error, basic)
+        << "Error: Excluded time period '"
+        << temp_timeperiodexclusion->timeperiod_name
+        << "' specified in timeperiod '" << tp->name
+        << "' is not defined anywhere!";
+      errors++;
+    }
+
+    // Save the timeperiod pointer for later.
+    temp_timeperiodexclusion->timeperiod_ptr = temp_timeperiod2;
+  }
+
+  // Add errors.
+  if (e)
+    *e += errors;
+
   return (errors == 0);
 }

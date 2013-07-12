@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -234,7 +235,23 @@ void applier::servicegroup::remove_object(
  */
 void applier::servicegroup::resolve_object(
                               shared_ptr<configuration::servicegroup> obj) {
-  // XXX
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing service group '" << obj->servicegroup_name() << "'.";
+
+  // Find service group.
+  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
+    it(applier::state::instance().servicegroups_find(obj->key()));
+  if (applier::state::instance().servicegroups().end() == it)
+    throw (engine_error() << "Error: Cannot resolve non-existing "
+           << "service group '" << obj->servicegroup_name() << "'.");
+
+  // Resolve service group.
+  if (!check_servicegroup(it->second.get(), NULL, NULL))
+    throw (engine_error() << "Error: Cannot resolve service group '"
+           << obj->servicegroup_name() << "'.");
+
+  return ;
 }
 
 /**

@@ -63,15 +63,19 @@ namespace                  configuration {
     list_string&           contacts() throw ();
     list_string const&     contacts() const throw ();
     bool                   contacts_defined() const throw ();
+    void                   escalation_options(
+                             unsigned short options) throw ();
     unsigned short         escalation_options() const throw ();
     void                   escalation_period(std::string const& period);
     std::string const&     escalation_period() const throw ();
     bool                   escalation_period_defined() const throw ();
+    void                   first_notification(unsigned int n) throw ();
     unsigned int           first_notification() const throw ();
     list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
+    void                   last_notification(unsigned int n) throw ();
     unsigned int           last_notification() const throw ();
     void                   notification_interval(unsigned int interval);
     unsigned int           notification_interval() const throw ();

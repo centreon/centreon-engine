@@ -57,6 +57,7 @@
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/perfdata.hh"
+#include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -400,7 +401,7 @@ int main(int argc, char* argv[]) {
             NULL);
 
         // Save service and host state information.
-        // XXX: save_state_information(false);
+        retention::dump::save(::config->state_retention_file());
 
         // Clean up performance data.
         cleanup_performance_data();

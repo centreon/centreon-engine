@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
@@ -264,8 +265,19 @@ void applier::serviceescalation::remove_object(
  *  @param[in] obj Serviceescalation object.
  */
 void applier::serviceescalation::resolve_object(
-                                   shared_ptr<configuration::serviceescalation> obj) {
-  // XXX
+                shared_ptr<configuration::serviceescalation> obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Resolving a service escalation.";
+
+  // Find service escalation.
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
+    it(applier::state::instance().serviceescalations_find(obj->key()));
+  if (applier::state::instance().serviceescalations().end() == it)
+    throw (engine_error()
+           << "Error: Cannot resolve service escalation.");
+
+  return ;
 }
 
 /**

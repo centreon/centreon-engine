@@ -378,7 +378,7 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >& applier::state::host
  *          otherwise.
  */
 umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) const {
-  // XXX
+  return (const_cast<state*>(this)->hostdependencies_find(k));
 }
 
 /**
@@ -390,7 +390,46 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::const_iterator appli
  *          otherwise.
  */
 umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::state::hostdependencies_find(configuration::hostdependency::key_type const& k) {
-  // XXX
+  typedef umultimap<std::string, shared_ptr<hostdependency_struct> > collection;
+  std::pair<collection::iterator, collection::iterator> p;
+  p = _hostdependencies.equal_range(k.dependent_hosts().front());
+  while (p.first != p.second) {
+    configuration::hostdependency current;
+    current.dependent_hosts().push_back(
+                                p.first->second->dependent_host_name);
+    current.hosts().push_back(p.first->second->host_name);
+    current.dependency_period(p.first->second->dependency_period
+                              ? p.first->second->dependency_period
+                              : "");
+    current.inherits_parent(p.first->second->inherits_parent);
+    unsigned int options(
+      (p.first->second->fail_on_up
+       ? configuration::hostdependency::up
+       : 0)
+      | (p.first->second->fail_on_down
+         ? configuration::hostdependency::down
+         : 0)
+      | (p.first->second->fail_on_unreachable
+         ? configuration::hostdependency::unreachable
+         : 0)
+      | (p.first->second->fail_on_pending
+         ? configuration::hostdependency::pending
+         : 0));
+    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
+      current.dependency_type(
+                configuration::hostdependency::notification_dependency);
+      current.notification_failure_options(options);
+    }
+    else {
+      current.dependency_type(
+                configuration::hostdependency::execution_dependency);
+      current.execution_failure_options(options);
+    }
+    if (current == k)
+      break ;
+    ++p.first;
+  }
+  return ((p.first == p.second) ? _hostdependencies.end() : p.first);
 }
 
 /**
@@ -420,7 +459,7 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >& applier::state::host
  *          otherwise.
  */
 umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
-  // XXX
+  return (const_cast<state*>(this)->hostescalations_find(k));
 }
 
 /**
@@ -432,7 +471,47 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator appli
  *          otherwise.
  */
 umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
-  // XXX
+  typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
+  std::pair<collection::iterator, collection::iterator> p;
+  p = _hostescalations.equal_range(k.hosts().front());
+  while (p.first != p.second) {
+    configuration::hostescalation current;
+    current.hosts().push_back(p.first->second->host_name);
+    current.first_notification(p.first->second->first_notification);
+    current.last_notification(p.first->second->last_notification);
+    current.notification_interval(
+              p.first->second->notification_interval);
+    current.escalation_period(p.first->second->escalation_period
+                              ? p.first->second->escalation_period
+                              : "");
+    unsigned int options(
+                   (p.first->second->escalate_on_recovery
+                    ? configuration::hostescalation::recovery
+                    : 0)
+                   | (p.first->second->escalate_on_down
+                      ? configuration::hostescalation::down
+                      : 0)
+                   | (p.first->second->escalate_on_unreachable
+                      ? configuration::hostescalation::unreachable
+                      : 0));
+    current.escalation_options(options);
+    for (contactsmember_struct* m(p.first->second->contacts);
+         m;
+         m = m->next)
+      current.contacts().push_front(m->contact_ptr
+                                    ? m->contact_ptr->name
+                                    : m->contact_name);
+    for (contactgroupsmember_struct* m(p.first->second->contact_groups);
+         m;
+         m = m->next)
+      current.contactgroups().push_front(m->group_ptr
+                                         ? m->group_ptr->group_name
+                                         : m->group_name);
+    if (current == k)
+      break ;
+    ++p.first;
+  }
+  return ((p.first == p.second) ? _hostescalations.end() : p.first);
 }
 
 /**
@@ -496,6 +575,30 @@ umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >& applier:
 }
 
 /**
+ *  Find a service by its key.
+ *
+ *  @param[in] k Pair of host name / service description.
+ *
+ *  @return Iterator to the element if found, services().end()
+ *          otherwise.
+ */
+umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator applier::state::services_find(configuration::service::key_type const& k) const {
+  return (_services.find(k));
+}
+
+/**
+ *  Find a service by its key.
+ *
+ *  @param[in] k Pair of host name / service description.
+ *
+ *  @return Iterator to the element if found, services().end()
+ *          otherwise.
+ */
+umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator applier::state::services_find(configuration::service::key_type const& k) {
+  return (_services.find(k));
+}
+
+/**
  *  Get the current servicedependencies.
  *
  *  @return The current servicedependencies.
@@ -522,7 +625,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
  *          servicedependencies().end() otherwise.
  */
 umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::const_iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) const {
-  // XXX
+  return (const_cast<state*>(this)->servicedependencies_find(k));
 }
 
 /**
@@ -534,7 +637,53 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
  *          servicedependencies().end() otherwise.
  */
 umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator applier::state::servicedependencies_find(configuration::servicedependency::key_type const& k) {
-  // XXX
+  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> > collection;
+  std::pair<collection::iterator, collection::iterator> p;
+  p = _servicedependencies.equal_range(std::make_pair(k.dependent_hosts().front(), k.dependent_service_description().front()));
+  while (p.first != p.second) {
+    configuration::servicedependency current;
+    current.dependent_hosts().push_back(
+                                p.first->second->dependent_host_name);
+    current.dependent_service_description().push_back(
+              p.first->second->dependent_service_description);
+    current.hosts().push_back(p.first->second->host_name);
+    current.service_description().push_back(
+              p.first->second->service_description);
+    current.dependency_period(p.first->second->dependency_period
+                              ? p.first->second->dependency_period
+                              : "");
+    current.inherits_parent(p.first->second->inherits_parent);
+    unsigned int options(
+                   (p.first->second->fail_on_ok
+                    ? configuration::servicedependency::ok
+                    : 0)
+                   | (p.first->second->fail_on_warning
+                      ? configuration::servicedependency::warning
+                      : 0)
+                   | (p.first->second->fail_on_unknown
+                      ? configuration::servicedependency::unknown
+                      : 0)
+                   | (p.first->second->fail_on_critical
+                      ? configuration::servicedependency::critical
+                      : 0)
+                   | (p.first->second->fail_on_pending
+                      ? configuration::servicedependency::pending
+                      : 0));
+    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
+      current.dependency_type(
+        configuration::servicedependency::notification_dependency);
+      current.notification_failure_options(options);
+    }
+    else {
+      current.dependency_type(
+        configuration::servicedependency::execution_dependency);
+      current.execution_failure_options(options);
+    }
+    if (current == k)
+      break ;
+    ++p.first;
+  }
+  return ((p.first == p.second) ? _servicedependencies.end() : p.first);
 }
 
 /**
@@ -564,7 +713,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
  *          otherwise.
  */
 umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
-  // XXX
+  return (const_cast<state*>(this)->serviceescalations_find(k));
 }
 
 /**
@@ -576,7 +725,51 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
  *          otherwise.
  */
 umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
-  // XXX
+  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > collection;
+  std::pair<collection::iterator, collection::iterator> p;
+  p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
+  while (p.first != p.second) {
+    configuration::serviceescalation current;
+    current.hosts().push_back(p.first->second->host_name);
+    current.service_description().push_back(
+                                    p.first->second->description);
+    current.first_notification(p.first->second->first_notification);
+    current.last_notification(p.first->second->last_notification);
+    current.notification_interval(
+              p.first->second->notification_interval);
+    current.escalation_period(p.first->second->escalation_period
+                              ? p.first->second->escalation_period
+                              : "");
+    unsigned int options((p.first->second->escalate_on_recovery
+                          ? configuration::serviceescalation::recovery
+                          : 0)
+                         | (p.first->second->escalate_on_warning
+                            ? configuration::serviceescalation::warning
+                            : 0)
+                         | (p.first->second->escalate_on_unknown
+                            ? configuration::serviceescalation::unknown
+                            : 0)
+                         | (p.first->second->escalate_on_critical
+                            ? configuration::serviceescalation::critical
+                            : 0));
+    current.escalation_options(options);
+    for (contactsmember_struct* m(p.first->second->contacts);
+         m;
+         m = m->next)
+      current.contacts().push_front(m->contact_ptr
+                                    ? m->contact_ptr->name
+                                    : m->contact_name);
+    for (contactgroupsmember_struct* m(p.first->second->contact_groups);
+         m;
+         m = m->next)
+      current.contactgroups().push_front(m->group_ptr
+                                         ? m->group_ptr->group_name
+                                         : m->group_name);
+    if (current == k)
+      break ;
+    ++p.first;
+  }
+  return ((p.first == p.second) ? _serviceescalations.end() : p.first);
 }
 
 /**
@@ -1103,74 +1296,74 @@ void applier::state::_processing(
   // Apply timeperiods.
   _apply<configuration::timeperiod, applier::timeperiod>(
     diff_timeperiods);
-  _resolve<configuration::timeperiod, applier::timeperiod>(
-    config->timeperiods());
+  // _resolve<configuration::timeperiod, applier::timeperiod>(
+  //   config->timeperiods());
 
   // Apply connectors.
   _apply<configuration::connector, applier::connector>(
     diff_connectors);
-  _resolve<configuration::connector, applier::connector>(
-    config->connectors());
+  // _resolve<configuration::connector, applier::connector>(
+  //   config->connectors());
 
   // Apply commands.
   _apply<configuration::command, applier::command>(
     diff_commands);
-  _resolve<configuration::command, applier::command>(
-    config->commands());
+  // _resolve<configuration::command, applier::command>(
+  //   config->commands());
 
   // Apply contacts and contactgroups.
   _apply<configuration::contact, applier::contact>(
     diff_contacts);
   _apply<configuration::contactgroup, applier::contactgroup>(
     diff_contactgroups);
-  _resolve<configuration::contactgroup, applier::contactgroup>(
-    config->contactgroups());
-  _resolve<configuration::contact, applier::contact>(
-    config->contacts());
+  // _resolve<configuration::contactgroup, applier::contactgroup>(
+  //   config->contactgroups());
+  // _resolve<configuration::contact, applier::contact>(
+  //   config->contacts());
 
   // Apply hosts and hostgroups.
   _apply<configuration::host, applier::host>(
     diff_hosts);
   _apply<configuration::hostgroup, applier::hostgroup>(
     diff_hostgroups);
-  _resolve<configuration::hostgroup, applier::hostgroup>(
-    config->hostgroups());
-  _resolve<configuration::host, applier::host>(
-    config->hosts());
+  // _resolve<configuration::hostgroup, applier::hostgroup>(
+  //   config->hostgroups());
+  // _resolve<configuration::host, applier::host>(
+  //   config->hosts());
 
   // Apply services and servicegroups.
   _apply<configuration::service, applier::service>(
     diff_services);
   _apply<configuration::servicegroup, applier::servicegroup>(
     diff_servicegroups);
-  _resolve<configuration::servicegroup, applier::servicegroup>(
-    config->servicegroups());
-  _resolve<configuration::service, applier::service>(
-    config->services());
+  // _resolve<configuration::servicegroup, applier::servicegroup>(
+  //   config->servicegroups());
+  // _resolve<configuration::service, applier::service>(
+  //   config->services());
 
   // Apply host dependencies.
   _apply<configuration::hostdependency, applier::hostdependency>(
     diff_hostdependencies);
-  _resolve<configuration::hostdependency, applier::hostdependency>(
-    config->hostdependencies());
+  // _resolve<configuration::hostdependency, applier::hostdependency>(
+  //   config->hostdependencies());
 
   // Apply service dependencies.
   _apply<configuration::servicedependency, applier::servicedependency>(
     diff_servicedependencies);
-  _resolve<configuration::servicedependency, applier::servicedependency>(
-    config->servicedependencies());
+  // _resolve<configuration::servicedependency, applier::servicedependency>(
+  //   config->servicedependencies());
 
   // Apply host escalations.
   _apply<configuration::hostescalation, applier::hostescalation>(
     diff_hostescalations);
-  _resolve<configuration::hostescalation, applier::hostescalation>(
-    config->hostescalations());
+  // _resolve<configuration::hostescalation, applier::hostescalation>(
+  //   config->hostescalations());
 
   // Apply service escalations.
   _apply<configuration::serviceescalation, applier::serviceescalation>(
     diff_serviceescalations);
-  _resolve<configuration::serviceescalation, applier::serviceescalation>(
-    config->serviceescalations());
+  // _resolve<configuration::serviceescalation, applier::serviceescalation>(
+  //   config->serviceescalations());
 
   // Pre-flight check.
   {
