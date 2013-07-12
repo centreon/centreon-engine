@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/servicedependency.hh"
 #include "com/centreon/engine/globals.hh"
@@ -257,7 +258,14 @@ servicedependency* add_service_dependency(
     servicedependency_list = obj.get();
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_servicedependency_data(
+      NEBTYPE_DEPENDENCY_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj.get(),
+      CMD_NONE,
+      &tv);
   }
   catch (...) {
     obj.clear();

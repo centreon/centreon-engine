@@ -76,6 +76,30 @@ typedef struct   nebstruct_adaptive_host_data_struct {
   void*          object_ptr;
 }                nebstruct_adaptive_host_data;
 
+/* Adaptive hostdependency data structure. */
+typedef struct   nebstruct_adaptive_hostdependency_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  int            command_type;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_hostdependency_data;
+
+/* Adaptive hostescalation data structure. */
+typedef struct   nebstruct_adaptive_hostescalation_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  int            command_type;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_hostescalation_data;
+
 /* Adaptive program data structure. */
 typedef struct   nebstruct_adaptive_program_data_struct {
   int            type;
@@ -103,6 +127,42 @@ typedef struct   nebstruct_adaptive_service_data_struct {
 
   void*          object_ptr;
 }                nebstruct_adaptive_service_data;
+
+/* Adaptive servicedependency data structure. */
+typedef struct   nebstruct_adaptive_servicedependency_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  int            command_type;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_servicedependency_data;
+
+/* Adaptive serviceescalation data structure. */
+typedef struct   nebstruct_adaptive_serviceescalation_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  int            command_type;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_serviceescalation_data;
+
+/* Adaptive timeperiod data structure. */
+typedef struct   nebstruct_adaptive_timeperiod_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  int            command_type;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_timeperiod_data;
 
 /* Aggregated status data structure. */
 typedef struct   nebstruct_aggregated_status_struct {

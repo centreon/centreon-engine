@@ -63,7 +63,14 @@
 #  define NEBCALLBACK_GROUP_MEMBER_DATA                 36
 #  define NEBCALLBACK_MODULE_DATA                       37
 #  define NEBCALLBACK_RELATION_DATA                     38
-#  define NEBCALLBACK_NUMITEMS                          39 /* Total number of callback types we have. */
+
+#  define NEBCALLBACK_ADAPTIVE_HOSTDEPENDENCY_DATA      39
+#  define NEBCALLBACK_ADAPTIVE_HOSTESCALATION_DATA      40
+#  define NEBCALLBACK_ADAPTIVE_SERVICEDEPENDENCY_DATA   41
+#  define NEBCALLBACK_ADAPTIVE_SERVICEESCALATION_DATA   42
+#  define NEBCALLBACK_ADAPTIVE_TIMEPERIOD_DATA          43
+
+#  define NEBCALLBACK_NUMITEMS                          44 /* Total number of callback types we have. */
 
 #  ifdef __cplusplus
 extern "C" {

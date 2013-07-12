@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/serviceescalation.hh"
 #include "com/centreon/engine/globals.hh"
@@ -189,7 +190,14 @@ serviceescalation* add_service_escalation(
     serviceescalation_list = obj.get();
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_serviceescalation_data(
+      NEBTYPE_ESCALATION_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj.get(),
+      CMD_NONE,
+      &tv);
   }
   catch (...) {
     obj.clear();

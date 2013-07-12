@@ -203,6 +203,7 @@
 /* Dependencies. */
 #  define NEBTYPE_DEPENDENCY_ADD                   2400
 #  define NEBTYPE_DEPENDENCY_DELETE                2401
+#  define NEBTYPE_DEPENDENCY_UPDATE                2402
 
 /* Hosts. */
 #  define NEBTYPE_HOST_ADD                         2500
@@ -250,6 +251,18 @@
 #  define NEBTYPE_SERVICEGROUPMEMBER_ADD           3400
 #  define NEBTYPE_SERVICEGROUPMEMBER_DELETE        3401
 
+// XXX -> update id!!
+
+/* Escalation. */
+#  define NEBTYPE_ESCALATION_ADD                   3500
+#  define NEBTYPE_ESCALATION_DELETE                3501
+#  define NEBTYPE_ESCALATION_UPDATE                3502
+
+/* Timeperiod. */
+#  define NEBTYPE_TIMEPERIOD_ADD                   3600
+#  define NEBTYPE_TIMEPERIOD_DELETE                3601
+#  define NEBTYPE_TIMEPERIOD_UPDATE                3602
+
 /*
 ** Event flags.
 */
@@ -276,7 +289,12 @@
 #  define NEBATTR_DOWNTIME_STOP_CANCELLED          2
 
 // Forward declaration.
+struct hostdependency_struct;
+struct hostescalation_struct;
+struct servicedependency_struct;
+struct serviceescalation_struct;
 struct timed_event_struct;
+struct timeperiod_struct;
 
 #  ifdef __cplusplus
 extern "C" {
@@ -316,6 +334,20 @@ void           broker_adaptive_host_data(
                  unsigned long modattr,
                  unsigned long modattrs,
                  struct timeval const* timestamp);
+void           broker_adaptive_hostdependency_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 hostdependency_struct* dependency,
+                 int command_type,
+                 struct timeval const* timestamp);
+void           broker_adaptive_hostescalation_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 hostescalation_struct* escalation,
+                 int command_type,
+                 struct timeval const* timestamp);
 void           broker_adaptive_program_data(
                  int type,
                  int flags,
@@ -334,6 +366,27 @@ void           broker_adaptive_service_data(
                  int command_type,
                  unsigned long modattr,
                  unsigned long modattrs,
+                 struct timeval const* timestamp);
+void           broker_adaptive_servicedependency_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 servicedependency_struct* dependency,
+                 int command_type,
+                 struct timeval const* timestamp);
+void           broker_adaptive_serviceescalation_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 serviceescalation_struct* escalation,
+                 int command_type,
+                 struct timeval const* timestamp);
+void           broker_adaptive_timeperiod_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 timeperiod_struct* tp,
+                 int command_type,
                  struct timeval const* timestamp);
 void           broker_aggregated_status_data(
                  int type,

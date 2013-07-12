@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
@@ -145,7 +146,14 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     timeperiod_list = obj.get();
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_timeperiod_data(
+      NEBTYPE_TIMEPERIOD_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj.get(),
+      CMD_NONE,
+      &tv);
   }
   catch (...) {
     obj.clear();
