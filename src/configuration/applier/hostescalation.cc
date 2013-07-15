@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
@@ -223,10 +224,22 @@ void applier::hostescalation::remove_object(
   umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator
     it(applier::state::instance().hostescalations_find(obj->key()));
   if (it != applier::state::instance().hostescalations().end()) {
+    hostescalation_struct* escalation(it->second.get());
+
     // Remove host escalation from its list.
     unregister_object<hostescalation_struct>(
       &hostescalation_list,
-      it->second.get());
+      escalation);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_escalation_data(
+      NEBTYPE_HOSTESCALATION_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      escalation,
+      &tv);
+
 
     // Erase host escalation (will effectively delete the object).
     applier::state::instance().hostescalations().erase(it);

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
@@ -291,10 +292,21 @@ void applier::servicedependency::remove_object(
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
     it(applier::state::instance().servicedependencies_find(obj->key()));
   if (it != applier::state::instance().servicedependencies().end()) {
+    servicedependency_struct* dependency(it->second.get());
+
     // Remove service dependency from its list.
     unregister_object<servicedependency_struct>(
       &servicedependency_list,
-      it->second.get());
+      dependency);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_dependency_data(
+      NEBTYPE_SERVICEDEPENDENCY_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      dependency,
+      &tv);
 
     // Erase service dependency (will effectively delete the object).
     applier::state::instance().servicedependencies().erase(it);

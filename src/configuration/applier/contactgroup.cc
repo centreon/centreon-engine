@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/member.hh"
@@ -152,10 +153,21 @@ void applier::contactgroup::remove_object(
   umultimap<std::string, shared_ptr<contactgroup_struct> >::iterator
     it(applier::state::instance().contactgroups_find(obj->key()));
   if (it != applier::state::instance().contactgroups().end()) {
+    contactgroup_struct* grp(it->second.get());
+
     // Remove contact group from its list.
-    unregister_object<contactgroup_struct>(
-      &contactgroup_list,
-      it->second.get());
+    unregister_object<contactgroup_struct>(&contactgroup_list, grp);
+
+    // XXX: call unregister broker members.
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_CONTACTGROUP_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      grp,
+      &tv);
 
     // Remove contact group (this will effectively delete the object).
     applier::state::instance().contactgroups().erase(it);

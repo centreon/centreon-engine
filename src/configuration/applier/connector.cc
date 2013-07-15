@@ -147,6 +147,8 @@ void applier::connector::remove_object(
   // Remove connector object.
   commands::set::instance().remove_command(obj->connector_name());
 
+  // XXX: broker.
+
   // Remove connector from the global configuration set.
   config->connectors().erase(obj);
 

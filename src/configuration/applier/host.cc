@@ -18,6 +18,7 @@
 */
 
 #include <algorithm>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
@@ -511,10 +512,22 @@ void applier::host::remove_object(
   umap<std::string, shared_ptr<host_struct> >::iterator
     it(applier::state::instance().hosts_find(obj->key()));
   if (it != applier::state::instance().hosts().end()) {
+    host_struct* hst(it->second.get());
+
     // Remove host from its list.
-    unregister_object<host_struct>(
-      &host_list,
-      it->second.get());
+    unregister_object<host_struct>(&host_list, hst);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_host_data(
+      NEBTYPE_HOST_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      hst,
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
 
     // Erase host object (will effectively delete the object).
     applier::state::instance().hosts().erase(it);

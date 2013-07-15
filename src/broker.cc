@@ -150,6 +150,70 @@ void broker_adaptive_contact_data(
 }
 
 /**
+ *  Send adaptive dependency updates to broker.
+ *
+ *  @param[in] type      Type.
+ *  @param[in] flags     Flags.
+ *  @param[in] attr      Attributes.
+ *  @param[in] data      Target dependency.
+ *  @param[in] timestamp Timestamp.
+ */
+void broker_adaptive_dependency_data(
+       int type,
+       int flags,
+       int attr,
+       void* data,
+       struct timeval const* timestamp) {
+  // Config check.
+  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
+    return;
+
+  // Fill struct with relevant data.
+  nebstruct_adaptive_dependency_data ds;
+  ds.type = type;
+  ds.flags = flags;
+  ds.attr = attr;
+  ds.timestamp = get_broker_timestamp(timestamp);
+  ds.object_ptr = data;
+
+  // Make callbacks.
+  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_DEPENDENCY_DATA, &ds);
+  return;
+}
+
+/**
+ *  Sends adaptative escalation updates to broker.
+ *
+ *  @param[in] type      Type.
+ *  @param[in] flags     Flags.
+ *  @param[in] attr      Attributes.
+ *  @param[in] data      Target escalation.
+ *  @param[in] timestamp Timestamp.
+ */
+void broker_adaptive_escalation_data(
+       int type,
+       int flags,
+       int attr,
+       void* data,
+       struct timeval const* timestamp) {
+  // Config check.
+  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
+    return;
+
+  // Fill struct with relevant data.
+  nebstruct_adaptive_escalation_data ds;
+  ds.type = type;
+  ds.flags = flags;
+  ds.attr = attr;
+  ds.timestamp = get_broker_timestamp(timestamp);
+  ds.object_ptr = data;
+
+  // Make callbacks.
+  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_ESCALATION_DATA, &ds);
+  return;
+}
+
+/**
  *  Sends adaptive host updates to broker.
  *
  *  @param[in] type         Type.
@@ -187,76 +251,6 @@ void broker_adaptive_host_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_HOST_DATA, &ds);
-  return;
-}
-
-/**
- *  Sends adaptive hostdependency updates to broker.
- *
- *  @param[in] type         Type.
- *  @param[in] flags        Flags.
- *  @param[in] attr         Attributes.
- *  @param[in] dependency   Target dependency.
- *  @param[in] command_type Command type.
- *  @param[in] timestamp    Timestamp.
- */
-void broker_adaptive_hostdependency_data(
-       int type,
-       int flags,
-       int attr,
-       hostdependency* dependency,
-       int command_type,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  nebstruct_adaptive_hostdependency_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.command_type = command_type;
-  ds.object_ptr = dependency;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_HOSTDEPENDENCY_DATA, &ds);
-  return;
-}
-
-/**
- *  Sends adaptive hostescalation updates to broker.
- *
- *  @param[in] type         Type.
- *  @param[in] flags        Flags.
- *  @param[in] attr         Attributes.
- *  @param[in] escalation   Target escalation.
- *  @param[in] command_type Command type.
- *  @param[in] timestamp    Timestamp.
- */
-void broker_adaptive_hostescalation_data(
-       int type,
-       int flags,
-       int attr,
-       hostescalation* escalation,
-       int command_type,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  nebstruct_adaptive_hostescalation_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.command_type = command_type;
-  ds.object_ptr = escalation;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_HOSTESCALATION_DATA, &ds);
   return;
 }
 
@@ -346,76 +340,6 @@ void broker_adaptive_service_data(
 }
 
 /**
- *  Sends adaptive servicedependency updates to broker.
- *
- *  @param[in] type         Type.
- *  @param[in] flags        Flags.
- *  @param[in] attr         Attributes.
- *  @param[in] dependency   Target dependency.
- *  @param[in] command_type Command type.
- *  @param[in] timestamp    Timestamp.
- */
-void broker_adaptive_servicedependency_data(
-       int type,
-       int flags,
-       int attr,
-       servicedependency* dependency,
-       int command_type,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  nebstruct_adaptive_servicedependency_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.command_type = command_type;
-  ds.object_ptr = dependency;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_SERVICEDEPENDENCY_DATA, &ds);
-  return;
-}
-
-/**
- *  Sends adaptive serviceescalation updates to broker.
- *
- *  @param[in] type         Type.
- *  @param[in] flags        Flags.
- *  @param[in] attr         Attributes.
- *  @param[in] escalation   Target escalation.
- *  @param[in] command_type Command type.
- *  @param[in] timestamp    Timestamp.
- */
-void broker_adaptive_serviceescalation_data(
-       int type,
-       int flags,
-       int attr,
-       serviceescalation* escalation,
-       int command_type,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  nebstruct_adaptive_serviceescalation_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.command_type = command_type;
-  ds.object_ptr = escalation;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_SERVICEESCALATION_DATA, &ds);
-  return;
-}
-
-/**
  *  Sends adaptive timeperiod updates to broker.
  *
  *  @param[in] type         Type.
@@ -486,16 +410,14 @@ void broker_aggregated_status_data(
  *  @param[in] type      Type.
  *  @param[in] flags     Flags.
  *  @param[in] attr      Attributes.
- *  @param[in] name      Command name.
- *  @param[in] cmd_line  Command line.
+ *  @param[in] cmd       The command.
  *  @param[in] timestamp Timestamp.
  */
 void broker_command_data(
        int type,
        int flags,
        int attr,
-       char const* name,
-       char const* cmd_line,
+       command* cmd,
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_COMMAND_DATA))
@@ -507,8 +429,7 @@ void broker_command_data(
   ds.flags = flags;
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
-  ds.cmd_name = name;
-  ds.cmd_line = cmd_line;
+  ds.cmd = cmd;
 
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_COMMAND_DATA, &ds);
@@ -1532,19 +1453,13 @@ void broker_program_status(
 /**
  *  Send relationship data to broker.
  *
- *  @param[in] type                         Type.
- *  @param[in] flags                        Flags.
- *  @param[in] attr                         Attributes.
- *  @param[in] hst                          Host.
- *  @param[in] svc                          Service (might be null).
- *  @param[in] dep_hst                      Dependant host object.
- *  @param[in] dep_svc                      Dependant service object
- *                                          (might be null).
- *  @param[in] dependency_period            Dependency period.
- *  @param[in] execution_failure_options    Execution failure options.
- *  @param[in] inherits_parent              Inherits parent ?
- *  @param[in] notification_failure_options Notification failure
- *                                          options.
+ *  @param[in] type      Type.
+ *  @param[in] flags     Flags.
+ *  @param[in] attr      Attributes.
+ *  @param[in] hst       Host.
+ *  @param[in] svc       Service (might be null).
+ *  @param[in] dep_hst   Dependant host object.
+ *  @param[in] dep_svc   Dependant service object (might be null).
  *  @param[in] timestamp Timestamp.
  */
 void broker_relation_data(
@@ -1555,10 +1470,6 @@ void broker_relation_data(
        service* svc,
        host* dep_hst,
        service* dep_svc,
-       char const* dependency_period,
-       char const* execution_failure_options,
-       int inherits_parent,
-       char const* notification_failure_options,
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_RELATION_DATA))
@@ -1576,10 +1487,6 @@ void broker_relation_data(
   ds.svc = svc;
   ds.dep_hst = dep_hst;
   ds.dep_svc = dep_svc;
-  ds.dependency_period = dependency_period;
-  ds.execution_failure_options = execution_failure_options;
-  ds.inherits_parent = inherits_parent;
-  ds.notification_failure_options = notification_failure_options;
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_RELATION_DATA, &ds);

@@ -210,12 +210,11 @@ hostdependency* add_host_dependency(
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_hostdependency_data(
-      NEBTYPE_DEPENDENCY_ADD,
+    broker_adaptive_dependency_data(
+      NEBTYPE_HOSTDEPENDENCY_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       obj.get(),
-      CMD_NONE,
       &tv);
   }
   catch (...) {

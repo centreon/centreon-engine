@@ -126,8 +126,7 @@ command* add_command(char const* name, char const* value) {
       NEBTYPE_COMMAND_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
-      name,
-      value,
+      obj.get(),
       &tv);
   }
   catch (...) {

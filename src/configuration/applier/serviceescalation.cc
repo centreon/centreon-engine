@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/serviceescalation.hh"
@@ -244,10 +245,20 @@ void applier::serviceescalation::remove_object(
   umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
     it(applier::state::instance().serviceescalations_find(obj->key()));
   if (it != applier::state::instance().serviceescalations().end()) {
+    serviceescalation_struct* escalation(it->second.get());
     // Remove service escalation from its list.
     unregister_object<serviceescalation_struct>(
       &serviceescalation_list,
-      it->second.get());
+      escalation);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_escalation_data(
+      NEBTYPE_SERVICEESCALATION_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      escalation,
+      &tv);
 
     // Erase service escalation (will effectively delete the object).
     applier::state::instance().serviceescalations().erase(it);

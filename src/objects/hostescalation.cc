@@ -226,12 +226,11 @@ hostescalation* add_host_escalation(
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_hostescalation_data(
-      NEBTYPE_ESCALATION_ADD,
+    broker_adaptive_escalation_data(
+      NEBTYPE_HOSTESCALATION_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       obj.get(),
-      CMD_NONE,
       &tv);
   }
   catch (...) {

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
@@ -213,10 +214,21 @@ void applier::servicegroup::remove_object(
   umap<std::string, shared_ptr<servicegroup_struct> >::iterator
     it(applier::state::instance().servicegroups_find(obj->key()));
   if (it != applier::state::instance().servicegroups().end()) {
+    servicegroup_struct* grp(it->second.get());
+
     // Remove service dependency from its list.
-    unregister_object<servicegroup_struct>(
-      &servicegroup_list,
-      it->second.get());
+    unregister_object<servicegroup_struct>(&servicegroup_list, grp);
+
+    // XXX: call unregister broker members.
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_SERVICEGROUP_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      grp,
+      &tv);
 
     // Erase service group object (will effectively delete the object).
     applier::state::instance().servicegroups().erase(it);

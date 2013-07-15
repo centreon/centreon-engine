@@ -21,6 +21,7 @@
 #ifndef CCE_NEBSTRUCTS_HH
 #  define CCE_NEBSTRUCTS_HH
 
+#  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -62,6 +63,26 @@ typedef struct   nebstruct_adaptive_contact_data_struct {
   void*          object_ptr;
 }                nebstruct_adaptive_contact_data;
 
+/* Adaptive dependency data structure. */
+typedef struct   nebstruct_adaptive_dependency_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_dependency_data;
+
+/* Adaptive escalation data structure. */
+typedef struct   nebstruct_adaptive_escalation_data_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  void*          object_ptr;
+}                nebstruct_adaptive_escalation_data;
+
 /* Adaptive host data structure. */
 typedef struct   nebstruct_adaptive_host_data_struct {
   int            type;
@@ -75,30 +96,6 @@ typedef struct   nebstruct_adaptive_host_data_struct {
 
   void*          object_ptr;
 }                nebstruct_adaptive_host_data;
-
-/* Adaptive hostdependency data structure. */
-typedef struct   nebstruct_adaptive_hostdependency_data_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  int            command_type;
-
-  void*          object_ptr;
-}                nebstruct_adaptive_hostdependency_data;
-
-/* Adaptive hostescalation data structure. */
-typedef struct   nebstruct_adaptive_hostescalation_data_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  int            command_type;
-
-  void*          object_ptr;
-}                nebstruct_adaptive_hostescalation_data;
 
 /* Adaptive program data structure. */
 typedef struct   nebstruct_adaptive_program_data_struct {
@@ -128,30 +125,6 @@ typedef struct   nebstruct_adaptive_service_data_struct {
   void*          object_ptr;
 }                nebstruct_adaptive_service_data;
 
-/* Adaptive servicedependency data structure. */
-typedef struct   nebstruct_adaptive_servicedependency_data_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  int            command_type;
-
-  void*          object_ptr;
-}                nebstruct_adaptive_servicedependency_data;
-
-/* Adaptive serviceescalation data structure. */
-typedef struct   nebstruct_adaptive_serviceescalation_data_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  int            command_type;
-
-  void*          object_ptr;
-}                nebstruct_adaptive_serviceescalation_data;
-
 /* Adaptive timeperiod data structure. */
 typedef struct   nebstruct_adaptive_timeperiod_data_struct {
   int            type;
@@ -179,8 +152,7 @@ typedef struct   nebstruct_command_struct {
   int            attr;
   struct timeval timestamp;
 
-  char const*    cmd_line;
-  char const*    cmd_name;
+  command*       cmd;
 }                nebstruct_command_data;
 
 /* Comment data structure. */
@@ -514,10 +486,6 @@ typedef struct   nebstruct_relation_struct {
   service*       svc;
   host*          dep_hst;
   service*       dep_svc;
-  char const*    dependency_period;
-  char const*    execution_failure_options;
-  int            inherits_parent;
-  char const*    notification_failure_options;
 }                nebstruct_relation_data;
 
 /* Retention data structure. */

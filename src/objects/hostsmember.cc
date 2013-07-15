@@ -114,10 +114,6 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
       NULL,
       child,
       NULL,
-      NULL,
-      NULL,
-      0,
-      NULL,
       &tv);
   }
   catch (...) {
@@ -137,10 +133,10 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
  *  @return Host group membership.
  */
 hostsmember* add_host_to_hostgroup(
-               hostgroup* temp_hostgroup,
+               hostgroup* grp,
                char const* host_name) {
   // Make sure we have the data we need.
-  if (!temp_hostgroup || !host_name || !host_name[0]) {
+  if (!grp || !host_name || !host_name[0]) {
     logger(log_config_error, basic)
       << "Error: Hostgroup or group member is NULL";
     return (NULL);
@@ -155,13 +151,13 @@ hostsmember* add_host_to_hostgroup(
     obj->host_name = string::dup(host_name);
 
     // Add the new member to the member list, sorted by host name.
-    hostsmember* last(temp_hostgroup->members);
+    hostsmember* last(grp->members);
     hostsmember* temp;
-    for (temp = temp_hostgroup->members; temp; temp = temp->next) {
+    for (temp = grp->members; temp; temp = temp->next) {
       if (strcmp(obj->host_name, temp->host_name) < 0) {
         obj->next = temp;
-        if (temp == temp_hostgroup->members)
-          temp_hostgroup->members = obj;
+        if (temp == grp->members)
+          grp->members = obj;
         else
           last->next = obj;
         break;
@@ -169,13 +165,20 @@ hostsmember* add_host_to_hostgroup(
       else
         last = temp;
     }
-    if (!temp_hostgroup->members)
-      temp_hostgroup->members = obj;
+    if (!grp->members)
+      grp->members = obj;
     else if (!temp)
       last->next = obj;
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group_member(
+      NEBTYPE_HOSTGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj,
+      grp,
+      &tv);
   }
   catch (...) {
     deleter::hostsmember(obj);
@@ -223,8 +226,8 @@ hostsmember* add_parent_host_to_host(
     obj->next = hst->parent_hosts;
     hst->parent_hosts = obj;
 
-    // Notify event broker.
-    // XXX
+    // Warning: the notify event broker was call into the
+    // add_child_link_to_host, after the host configuration applier.
   }
   catch (...) {
     deleter::hostsmember(obj);

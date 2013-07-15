@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
@@ -132,7 +133,14 @@ contactsmember* add_contact_to_contactgroup(
     grp->members = obj;
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group_member(
+      NEBTYPE_CONTACTGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj,
+      grp,
+      &tv);
   }
   catch (...) {
     deleter::contactsmember(obj);

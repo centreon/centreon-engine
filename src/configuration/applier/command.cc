@@ -18,6 +18,7 @@
 */
 
 #include <cstring>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/commands/forward.hh"
@@ -153,10 +154,19 @@ void applier::command::remove_object(
   umap<std::string, shared_ptr<command_struct> >::iterator
     it(applier::state::instance().commands_find(obj->key()));
   if (it != applier::state::instance().commands().end()) {
+    command_struct* cmd(it->second.get());
+
     // Remove command from its list.
-    unregister_object<command_struct>(
-      &command_list,
-      it->second.get());
+    unregister_object<command_struct>(&command_list, cmd);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_command_data(
+      NEBTYPE_COMMAND_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      cmd,
+      &tv);
 
     // Erase command (will effectively delete the object).
     applier::state::instance().commands().erase(it);

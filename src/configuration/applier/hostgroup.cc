@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
@@ -206,10 +207,21 @@ void applier::hostgroup::remove_object(
   umap<std::string, shared_ptr<hostgroup_struct> >::iterator
     it(applier::state::instance().hostgroups_find(obj->key()));
   if (it != applier::state::instance().hostgroups().end()) {
+    hostgroup_struct* grp(it->second.get());
+
     // Remove host group from its list.
-    unregister_object<hostgroup_struct>(
-      &hostgroup_list,
-      it->second.get());
+    unregister_object<hostgroup_struct>(&hostgroup_list, grp);
+
+    // XXX: call unregister broker members.
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_HOSTGROUP_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      grp,
+      &tv);
 
     // Erase host group object (will effectively delete the object).
     applier::state::instance().hostgroups().erase(it);

@@ -191,12 +191,11 @@ serviceescalation* add_service_escalation(
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_serviceescalation_data(
-      NEBTYPE_ESCALATION_ADD,
+    broker_adaptive_escalation_data(
+      NEBTYPE_SERVICEESCALATION_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       obj.get(),
-      CMD_NONE,
       &tv);
   }
   catch (...) {

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
@@ -210,10 +211,20 @@ void applier::timeperiod::remove_object(
   umap<std::string, shared_ptr<timeperiod_struct> >::iterator
     it(applier::state::instance().timeperiods_find(obj->key()));
   if (it != applier::state::instance().timeperiods().end()) {
+    timeperiod_struct* tp(it->second.get());
+
     // Remove timeperiod from its list.
-    unregister_object<timeperiod_struct>(
-      &timeperiod_list,
-      it->second.get());
+    unregister_object<timeperiod_struct>(&timeperiod_list, tp);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_timeperiod_data(
+      NEBTYPE_TIMEPERIOD_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      tp,
+      CMD_NONE,
+      &tv);
 
     // Erase time period (will effectively delete the object).
     applier::state::instance().timeperiods().erase(it);

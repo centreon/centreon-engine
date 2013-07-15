@@ -185,83 +185,91 @@
 #  define NEBTYPE_CONTACT_DELETE                   2001
 #  define NEBTYPE_CONTACT_UPDATE                   NEBTYPE_ADAPTIVECONTACT_UPDATE
 
-/* Contact groups. */
-#  define NEBTYPE_CONTACTGROUP_ADD                 2100
-#  define NEBTYPE_CONTACTGROUP_DELETE              2101
-#  define NEBTYPE_CONTACTGROUP_UPDATE              2102
-
 /* Contact custom variables. */
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_ADD        2200
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE     2201
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_UPDATE     2202
+#  define NEBTYPE_CONTACTCUSTOMVARIABLE_ADD        2100
+#  define NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE     2101
+#  define NEBTYPE_CONTACTCUSTOMVARIABLE_UPDATE     2102
+
+/* Contact groups. */
+#  define NEBTYPE_CONTACTGROUP_ADD                 2200
+#  define NEBTYPE_CONTACTGROUP_DELETE              2201
+#  define NEBTYPE_CONTACTGROUP_UPDATE              2202
 
 /* Contact group members. */
 #  define NEBTYPE_CONTACTGROUPMEMBER_ADD           2300
 #  define NEBTYPE_CONTACTGROUPMEMBER_DELETE        2301
 #  define NEBTYPE_CONTACTGROUPMEMBER_UPDATE        2302
 
-/* Dependencies. */
-#  define NEBTYPE_DEPENDENCY_ADD                   2400
-#  define NEBTYPE_DEPENDENCY_DELETE                2401
-#  define NEBTYPE_DEPENDENCY_UPDATE                2402
-
 /* Hosts. */
-#  define NEBTYPE_HOST_ADD                         2500
-#  define NEBTYPE_HOST_DELETE                      2501
+#  define NEBTYPE_HOST_ADD                         2400
+#  define NEBTYPE_HOST_DELETE                      2401
 #  define NEBTYPE_HOST_UPDATE                      NEBTYPE_ADAPTIVEHOST_UPDATE
 
 /* Host custom variables. */
-#  define NEBTYPE_HOSTCUSTOMVARIABLE_ADD           2600
-#  define NEBTYPE_HOSTCUSTOMVARIABLE_DELETE        2601
-#  define NEBTYPE_HOSTCUSTOMVARIABLE_UPDATE        2602
+#  define NEBTYPE_HOSTCUSTOMVARIABLE_ADD           2500
+#  define NEBTYPE_HOSTCUSTOMVARIABLE_DELETE        2501
+#  define NEBTYPE_HOSTCUSTOMVARIABLE_UPDATE        2502
+
+/* Hostdependencies. */
+#  define NEBTYPE_HOSTDEPENDENCY_ADD               2600
+#  define NEBTYPE_HOSTDEPENDENCY_DELETE            2601
+#  define NEBTYPE_HOSTDEPENDENCY_UPDATE            2602
+
+/* Hostescalation. */
+#  define NEBTYPE_HOSTESCALATION_ADD               2700
+#  define NEBTYPE_HOSTESCALATION_DELETE            2701
+#  define NEBTYPE_HOSTESCALATION_UPDATE            2702
 
 /* Host groups. */
-#  define NEBTYPE_HOSTGROUP_ADD                    2700
-#  define NEBTYPE_HOSTGROUP_DELETE                 2701
-#  define NEBTYPE_HOSTGROUP_UPDATE                 2702
+#  define NEBTYPE_HOSTGROUP_ADD                    2800
+#  define NEBTYPE_HOSTGROUP_DELETE                 2801
+#  define NEBTYPE_HOSTGROUP_UPDATE                 2802
 
 /* Host group members. */
-#  define NEBTYPE_HOSTGROUPMEMBER_ADD              2800
-#  define NEBTYPE_HOSTGROUPMEMBER_DELETE           2801
+#  define NEBTYPE_HOSTGROUPMEMBER_ADD              2900
+#  define NEBTYPE_HOSTGROUPMEMBER_DELETE           2901
 
 /* Modules. */
-#  define NEBTYPE_MODULE_ADD                       2900
-#  define NEBTYPE_MODULE_DELETE                    2900
+#  define NEBTYPE_MODULE_ADD                       3000
+#  define NEBTYPE_MODULE_DELETE                    3000
 
 /* Parents. */
-#  define NEBTYPE_PARENT_ADD                       3000
-#  define NEBTYPE_PARENT_DELETE                    3001
+#  define NEBTYPE_PARENT_ADD                       3100
+#  define NEBTYPE_PARENT_DELETE                    3101
 
 /* Services. */
-#  define NEBTYPE_SERVICE_ADD                      3100
-#  define NEBTYPE_SERVICE_DELETE                   3101
+#  define NEBTYPE_SERVICE_ADD                      3200
+#  define NEBTYPE_SERVICE_DELETE                   3201
 #  define NEBTYPE_SERVICE_UPDATE                   NEBTYPE_ADAPTIVESERVICE_UPDATE
 
 /* Service custom variables. */
-#  define NEBTYPE_SERVICECUSTOMVARIABLE_ADD        3200
-#  define NEBTYPE_SERVICECUSTOMVARIABLE_DELETE     3201
-#  define NEBTYPE_SERVICECUSTOMVARIABLE_UPDATE     3202
+#  define NEBTYPE_SERVICECUSTOMVARIABLE_ADD        3300
+#  define NEBTYPE_SERVICECUSTOMVARIABLE_DELETE     3301
+#  define NEBTYPE_SERVICECUSTOMVARIABLE_UPDATE     3302
+
+/* Servicedependencies. */
+#  define NEBTYPE_SERVICEDEPENDENCY_ADD            3400
+#  define NEBTYPE_SERVICEDEPENDENCY_DELETE         3401
+#  define NEBTYPE_SERVICEDEPENDENCY_UPDATE         3402
+
+/* Serviceescalation. */
+#  define NEBTYPE_SERVICEESCALATION_ADD            3500
+#  define NEBTYPE_SERVICEESCALATION_DELETE         3501
+#  define NEBTYPE_SERVICEESCALATION_UPDATE         3502
 
 /* Service group. */
-#  define NEBTYPE_SERVICEGROUP_ADD                 3300
-#  define NEBTYPE_SERVICEGROUP_DELETE              3301
-#  define NEBTYPE_SERVICEGROUP_UPDATE              3302
+#  define NEBTYPE_SERVICEGROUP_ADD                 3600
+#  define NEBTYPE_SERVICEGROUP_DELETE              3601
+#  define NEBTYPE_SERVICEGROUP_UPDATE              3602
 
 /*  Service group members. */
-#  define NEBTYPE_SERVICEGROUPMEMBER_ADD           3400
-#  define NEBTYPE_SERVICEGROUPMEMBER_DELETE        3401
-
-// XXX -> update id!!
-
-/* Escalation. */
-#  define NEBTYPE_ESCALATION_ADD                   3500
-#  define NEBTYPE_ESCALATION_DELETE                3501
-#  define NEBTYPE_ESCALATION_UPDATE                3502
+#  define NEBTYPE_SERVICEGROUPMEMBER_ADD           3700
+#  define NEBTYPE_SERVICEGROUPMEMBER_DELETE        3701
 
 /* Timeperiod. */
-#  define NEBTYPE_TIMEPERIOD_ADD                   3600
-#  define NEBTYPE_TIMEPERIOD_DELETE                3601
-#  define NEBTYPE_TIMEPERIOD_UPDATE                3602
+#  define NEBTYPE_TIMEPERIOD_ADD                   3800
+#  define NEBTYPE_TIMEPERIOD_DELETE                3801
+#  define NEBTYPE_TIMEPERIOD_UPDATE                3802
 
 /*
 ** Event flags.
@@ -289,10 +297,7 @@
 #  define NEBATTR_DOWNTIME_STOP_CANCELLED          2
 
 // Forward declaration.
-struct hostdependency_struct;
-struct hostescalation_struct;
-struct servicedependency_struct;
-struct serviceescalation_struct;
+struct command_struct;
 struct timed_event_struct;
 struct timeperiod_struct;
 
@@ -325,6 +330,18 @@ void           broker_adaptive_contact_data(
                  unsigned long modsattr,
                  unsigned long modsattrs,
                  struct timeval const* timestamp);
+void           broker_adaptive_dependency_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 void* data,
+                 struct timeval const* timestamp);
+void           broker_adaptive_escalation_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 void* data,
+                 struct timeval const* timestamp);
 void           broker_adaptive_host_data(
                  int type,
                  int flags,
@@ -333,20 +350,6 @@ void           broker_adaptive_host_data(
                  int command_type,
                  unsigned long modattr,
                  unsigned long modattrs,
-                 struct timeval const* timestamp);
-void           broker_adaptive_hostdependency_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 hostdependency_struct* dependency,
-                 int command_type,
-                 struct timeval const* timestamp);
-void           broker_adaptive_hostescalation_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 hostescalation_struct* escalation,
-                 int command_type,
                  struct timeval const* timestamp);
 void           broker_adaptive_program_data(
                  int type,
@@ -367,20 +370,6 @@ void           broker_adaptive_service_data(
                  unsigned long modattr,
                  unsigned long modattrs,
                  struct timeval const* timestamp);
-void           broker_adaptive_servicedependency_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 servicedependency_struct* dependency,
-                 int command_type,
-                 struct timeval const* timestamp);
-void           broker_adaptive_serviceescalation_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 serviceescalation_struct* escalation,
-                 int command_type,
-                 struct timeval const* timestamp);
 void           broker_adaptive_timeperiod_data(
                  int type,
                  int flags,
@@ -397,8 +386,7 @@ void           broker_command_data(
                  int type,
                  int flags,
                  int attr,
-                 char const* name,
-                 char const* cmd_line,
+                 command_struct* cmd,
                  struct timeval const* timestamp);
 void           broker_comment_data(
                  int type,
@@ -601,10 +589,6 @@ void           broker_relation_data(
                  service* svc,
                  host* dep_hst,
                  service* dep_svc,
-                 char const* dependency_period,
-                 char const* execution_failure_options,
-                 int inherits_parent,
-                 char const* notification_failure_options,
                  struct timeval const* timestamp);
 void           broker_retention_data(
                  int type,

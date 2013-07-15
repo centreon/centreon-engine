@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/contact.hh"
@@ -108,7 +109,16 @@ servicesmember* add_service_link_to_host(host* hst, service* svc) {
     hst->services = obj;
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_relation_data(
+      NEBTYPE_PARENT_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      hst,
+      NULL,
+      NULL,
+      svc,
+      &tv);
   }
   catch (...) {
     deleter::servicesmember(obj);
@@ -128,11 +138,11 @@ servicesmember* add_service_link_to_host(host* hst, service* svc) {
  *  @return Service group membership.
  */
 servicesmember* add_service_to_servicegroup(
-                  servicegroup* temp_servicegroup,
+                  servicegroup* grp,
                   char const* host_name,
                   char const* svc_description) {
   // Make sure we have the data we need.
-  if (!temp_servicegroup
+  if (!grp
       || !host_name
       || !host_name[0]
       || !svc_description
@@ -153,13 +163,13 @@ servicesmember* add_service_to_servicegroup(
 
     // Add new member to member list, sorted by host name then
     // service description.
-    servicesmember* last(temp_servicegroup->members);
+    servicesmember* last(grp->members);
     servicesmember* temp;
-    for (temp = temp_servicegroup->members; temp; temp = temp->next) {
+    for (temp = grp->members; temp; temp = temp->next) {
       if (strcmp(obj->host_name, temp->host_name) < 0) {
         obj->next = temp;
-        if (temp == temp_servicegroup->members)
-          temp_servicegroup->members = obj;
+        if (temp == grp->members)
+          grp->members = obj;
         else
           last->next = obj;
         break;
@@ -167,8 +177,8 @@ servicesmember* add_service_to_servicegroup(
       else if (!strcmp(obj->host_name, temp->host_name)
                && (strcmp(obj->service_description, temp->service_description) < 0)) {
         obj->next = temp;
-        if (temp == temp_servicegroup->members)
-          temp_servicegroup->members = obj;
+        if (temp == grp->members)
+          grp->members = obj;
         else
           last->next = obj;
         break;
@@ -176,13 +186,20 @@ servicesmember* add_service_to_servicegroup(
       else
         last = temp;
     }
-    if (!temp_servicegroup->members)
-      temp_servicegroup->members = obj;
+    if (!grp->members)
+      grp->members = obj;
     else if (!temp)
       last->next = obj;
 
     // Notify event broker.
-    // XXX
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group_member(
+      NEBTYPE_SERVICEGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj,
+      grp,
+      &tv);
   }
   catch (...) {
     deleter::servicesmember(obj);

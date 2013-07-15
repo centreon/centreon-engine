@@ -18,6 +18,7 @@
 */
 
 #include <algorithm>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
@@ -318,23 +319,47 @@ void applier::service::modify_object(
  */
 void applier::service::remove_object(
                          shared_ptr<configuration::service> obj) {
+  std::string const& host_name(obj->hosts().front());
+  std::string const& service_description(obj->service_description());
+
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing service '" << obj->service_description()
-    << "' of host '" << obj->hosts().front() << "'.";
+    << "Removing service '" << service_description
+    << "' of host '" << host_name << "'.";
 
-  // Unregister service.
-  for (service_struct** s(&service_list); *s; s = &(*s)->next)
-    if (!strcmp((*s)->host_name, obj->hosts().front().c_str())
-        && !strcmp(
-              (*s)->description,
-              obj->service_description().c_str())) {
-      *s = (*s)->next;
-      break ;
-    }
+  // Find service.
+  std::pair<std::string, std::string>
+    id(std::make_pair(host_name, service_description));
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+    it(applier::state::instance().services_find(obj->key()));
+  if (it != applier::state::instance().services().end()) {
+    service_struct* svc(it->second.get());
 
-  // Remove service object (will effectively delete the object).
-  applier::state::instance().services().erase(obj->key());
+    // Unregister service.
+    for (service_struct** s(&service_list); *s; s = &(*s)->next)
+      if (!strcmp((*s)->host_name, host_name.c_str())
+          && !strcmp(
+                (*s)->description,
+                service_description.c_str())) {
+        *s = (*s)->next;
+        break ;
+      }
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_service_data(
+      NEBTYPE_SERVICE_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      svc,
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
+
+    // Remove service object (will effectively delete the object).
+    applier::state::instance().services().erase(it);
+  }
 
   // Remove service from the global configuration set.
   config->services().erase(obj);
