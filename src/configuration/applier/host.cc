@@ -260,14 +260,20 @@ void applier::host::modify_object(
     throw (engine_error() << "Error: Cannot modify non-existing host '"
            << obj->host_name() << "'.");
 
+  // Find host object.
+  umap<std::string, shared_ptr<host_struct> >::iterator
+    it_obj(applier::state::instance().hosts_find(obj->key()));
+  if (it_obj == applier::state::instance().hosts().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "host object '" << obj->host_name() << "'.");
+  host_struct* h(it_obj->second.get());
+
   // Update the global configuration set.
   shared_ptr<configuration::host> obj_old(*it_cfg);
   config->hosts().insert(obj);
   config->hosts().erase(it_cfg);
 
-  // Modify host.
-  shared_ptr<host_struct>&
-    h(applier::state::instance().hosts()[obj->host_name()]);
+  // Modify properties.
   modify_if_different(
     h->display_name,
     NULL_IF_EMPTY(obj->display_name()));
@@ -422,7 +428,7 @@ void applier::host::modify_object(
            end(obj->contacts().end());
          it != end;
          ++it)
-      if (!add_contact_to_host(h.get(), it->c_str()))
+      if (!add_contact_to_host(h, it->c_str()))
         throw (engine_error() << "Error: Could not add contact '"
                << *it << "' to host '" << obj->host_name() << "'.");
   }
@@ -443,7 +449,7 @@ void applier::host::modify_object(
            end(obj->contactgroups().end());
          it != end;
          ++it)
-      if (!add_contactgroup_to_host(h.get(), it->c_str()))
+      if (!add_contactgroup_to_host(h, it->c_str()))
         throw (engine_error() << "Error: Could not add contact group '"
                << *it << "' to host '" << obj->host_name() << "'.");
   }
@@ -465,7 +471,7 @@ void applier::host::modify_object(
          it != end;
          ++it)
       if (!add_custom_variable_to_host(
-             h.get(),
+             h,
              it->first.c_str(),
              it->second.c_str()))
         throw (engine_error()
@@ -489,7 +495,7 @@ void applier::host::modify_object(
            end(obj->parents().end());
          it != end;
          ++it)
-      if (!add_parent_host_to_host(h.get(), it->c_str()))
+      if (!add_parent_host_to_host(h, it->c_str()))
         throw (engine_error() << "Error: Could not add parent '"
                << *it << "' to host '" << obj->host_name() << "'.");
   }
@@ -500,7 +506,7 @@ void applier::host::modify_object(
     NEBTYPE_HOST_UPDATE,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    hst,
+    h,
     CMD_NONE,
     MODATTR_ALL,
     MODATTR_ALL,
