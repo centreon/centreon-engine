@@ -106,8 +106,7 @@ customvariablesmember* add_custom_variable_to_contact(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     cntct,
-    varname,
-    varvalue,
+    retval,
     &tv);
 
   return (retval);
@@ -139,8 +138,7 @@ customvariablesmember* add_custom_variable_to_host(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     hst,
-    varname,
-    varvalue,
+    retval,
     &tv);
 
   return (retval);
@@ -218,8 +216,7 @@ customvariablesmember* add_custom_variable_to_service(
     NEBFLAG_NONE,
     NEBATTR_NONE,
     svc,
-    varname,
-    varvalue,
+    retval,
     &tv);
 
   return (retval);

@@ -22,6 +22,7 @@
 #  define CCE_NEBSTRUCTS_HH
 
 #  include "com/centreon/engine/objects/command.hh"
+#  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -239,17 +240,15 @@ typedef struct   nebstruct_contact_status_struct {
 }                nebstruct_contact_status_data;
 
 /* Custom variable structure. */
-typedef struct   nebstruct_custom_variable_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
+typedef struct           nebstruct_custom_variable_struct {
+  int                    type;
+  int                    flags;
+  int                    attr;
+  struct timeval         timestamp;
 
-  char*          var_name;
-  char*          var_value;
-
-  void*          object_ptr;
-}                nebstruct_custom_variable_data;
+  customvariablesmember* cv;
+  void*                  object_ptr;
+}                        nebstruct_custom_variable_data;
 
 /* Downtime data structure. */
 typedef struct   nebstruct_downtime_struct {

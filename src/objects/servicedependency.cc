@@ -260,7 +260,7 @@ servicedependency* add_service_dependency(
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
     broker_adaptive_dependency_data(
-      NEBTYPE_HOSTDEPENDENCY_ADD,
+      NEBTYPE_SERVICEDEPENDENCY_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       obj.get(),

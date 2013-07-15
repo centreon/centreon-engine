@@ -536,16 +536,31 @@ void applier::host::remove_object(
     unregister_object<host_struct>(&host_list, hst);
 
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_host_data(
-      NEBTYPE_HOST_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      hst,
-      CMD_NONE,
-      MODATTR_ALL,
-      MODATTR_ALL,
-      &tv);
+    {
+      timeval tv(get_broker_timestamp(NULL));
+
+      // XXX: is it necessary to unregister customvariables ?
+      for (customvariablesmember* cv(hst->custom_variables);
+           cv;
+           cv = cv->next)
+        broker_custom_variable(
+          NEBTYPE_HOSTCUSTOMVARIABLE_ADD,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          hst,
+          cv,
+          &tv);
+
+      broker_adaptive_host_data(
+        NEBTYPE_HOST_DELETE,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        hst,
+        CMD_NONE,
+        MODATTR_ALL,
+        MODATTR_ALL,
+        &tv);
+    }
 
     // Erase host object (will effectively delete the object).
     applier::state::instance().hosts().erase(it);

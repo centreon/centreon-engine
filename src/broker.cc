@@ -706,20 +706,18 @@ void broker_contact_status(
 /**
  *  Sends host custom variables updates to broker.
  *
- *  @param[in] type     Type.
- *  @param[in] flags    Flags.
- *  @param[in] attr     Attributes.
- *  @param[in] data     Host or service.
- *  @param[in] varname  Custom variable name.
- *  @param[in] varvalue Custom variable value.
+ *  @param[in] type  Type.
+ *  @param[in] flags Flags.
+ *  @param[in] attr  Attributes.
+ *  @param[in] data  Host or service.
+ *  @param[in] cv    Custom variable.
  */
 void broker_custom_variable(
        int type,
        int flags,
        int attr,
        void* data,
-       char const* varname,
-       char const* varvalue,
+       customvariablesmember* cv,
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->event_broker_options() & BROKER_CUSTOMVARIABLE_DATA))
@@ -732,15 +730,10 @@ void broker_custom_variable(
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.object_ptr = data;
-  ds.var_name = string::dup(varname);
-  ds.var_value = string::dup(varvalue);
+  ds.cv = cv;
 
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_CUSTOM_VARIABLE_DATA, &ds);
-
-  // Free memory.
-  delete[] ds.var_name;
-  delete[] ds.var_value;
   return;
 }
 

@@ -298,6 +298,7 @@
 
 // Forward declaration.
 struct command_struct;
+struct customvariablesmember_struct;
 struct timed_event_struct;
 struct timeperiod_struct;
 
@@ -445,8 +446,7 @@ void           broker_custom_variable(
                  int flags,
                  int attr,
                  void* data,
-                 char const* varname,
-                 char const* varvalue,
+                 customvariablesmember_struct* cv,
                  struct timeval const* timestamp);
 void           broker_downtime_data(
                  int type,

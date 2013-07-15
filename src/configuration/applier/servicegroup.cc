@@ -228,16 +228,27 @@ void applier::servicegroup::remove_object(
     // Remove service dependency from its list.
     unregister_object<servicegroup_struct>(&servicegroup_list, grp);
 
-    // XXX: call unregister broker members.
-
     // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_group(
-      NEBTYPE_SERVICEGROUP_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      grp,
-      &tv);
+    {
+      timeval tv(get_broker_timestamp(NULL));
+
+      // XXX: is it necessary to unregister members ?
+      for (servicesmember* m(grp->members); m; m = m->next)
+        broker_group_member(
+          NEBTYPE_SERVICEGROUPMEMBER_DELETE,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          m->service_ptr,
+          grp,
+          &tv);
+
+      broker_group(
+        NEBTYPE_SERVICEGROUP_DELETE,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        grp,
+        &tv);
+    }
 
     // Erase service group object (will effectively delete the object).
     applier::state::instance().servicegroups().erase(it);
