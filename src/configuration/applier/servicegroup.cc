@@ -196,6 +196,15 @@ void applier::servicegroup::modify_object(
                << "'.");
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_SERVICEGROUP_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    sg,
+    &tv);
+
   return ;
 }
 

@@ -494,6 +494,18 @@ void applier::host::modify_object(
                << *it << "' to host '" << obj->host_name() << "'.");
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_host_data(
+    NEBTYPE_HOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hst,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return ;
 }
 

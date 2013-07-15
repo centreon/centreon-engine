@@ -415,6 +415,22 @@ void applier::contact::modify_object(
                << "' to contact '" << obj->contact_name() << "'.");
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_contact_data(
+    NEBTYPE_CONTACT_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    c,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return ;
 }
 
@@ -433,10 +449,26 @@ void applier::contact::remove_object(
   umap<std::string, shared_ptr<contact_struct> >::iterator
     it(applier::state::instance().contacts_find(obj->key()));
   if (it != applier::state::instance().contacts().end()) {
+    contact_struct* cntct(it->second.get());
+
     // Remove contact from its list.
-    unregister_object<contact_struct>(
-      &contact_list,
-      it->second.get());
+    unregister_object<contact_struct>(&contact_list, cntct);
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_contact_data(
+      NEBTYPE_CONTACT_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      cntct,
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
 
     // Erase contact object (this will effectively delete the object).
     applier::state::instance().contacts().erase(it);

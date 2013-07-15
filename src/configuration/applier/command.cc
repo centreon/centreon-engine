@@ -136,6 +136,16 @@ void applier::command::modify_object(
   commands::set::instance().remove_command(obj->command_name());
   _create_command(obj);
 
+  // XXX: call broker.
+  // // Notify event broker.
+  // timeval tv(get_broker_timestamp(NULL));
+  // broker_command_data(
+  //   NEBTYPE_COMMAND_UPDATE,
+  //   NEBFLAG_NONE,
+  //   NEBATTR_NONE,
+  //   cmd,
+  //   &tv);
+
   return ;
 }
 

@@ -136,6 +136,16 @@ void applier::contactgroup::modify_object(
   // modify_if_different(g->alias, obj->alias().c_str());
   // if (applier::members_has_change<contactsmember_struct, &contactsmember_struct::contact_name>(obj->members(), g->members))
   //   applier::update_members(applier::state::instance().contacts(), obj->members(), g->members);
+
+  // XXX: call broker.
+  // // Notify event broker.
+  // timeval tv(get_broker_timestamp(NULL));
+  // broker_group(
+  //   NEBTYPE_CONTACTGROUP_UPDATE,
+  //   NEBFLAG_NONE,
+  //   NEBATTR_NONE,
+  //   grp,
+  //   &tv);
 }
 
 /**

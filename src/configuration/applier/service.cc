@@ -309,6 +309,18 @@ void applier::service::expand_object(
 void applier::service::modify_object(
                          shared_ptr<configuration::service> obj) {
   // XXX
+
+  // // Notify event broker.
+  // timeval tv(get_broker_timestamp(NULL));
+  // broker_adaptive_service_data(
+  //   NEBTYPE_SERVICE_UPDATE,
+  //   NEBFLAG_NONE,
+  //   NEBATTR_NONE,
+  //   svc,
+  //   CMD_NONE,
+  //   MODATTR_ALL,
+  //   MODATTR_ALL,
+  //   &tv);
   return ;
 }
 

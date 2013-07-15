@@ -193,6 +193,16 @@ void applier::timeperiod::modify_object(
     _add_exclusions(obj->exclude(), tp);
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_timeperiod_data(
+    NEBTYPE_TIMEPERIOD_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    tp,
+    CMD_NONE,
+    &tv);
+
   return ;
 }
 
