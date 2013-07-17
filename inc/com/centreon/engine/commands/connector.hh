@@ -62,6 +62,8 @@ namespace                commands {
                            nagios_macros& macros,
                            unsigned int timeout,
                            result& res);
+    void                 set_command_line(
+                           std::string const& command_line);
 
   private:
     class                restart : public concurrency::thread {

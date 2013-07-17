@@ -82,6 +82,10 @@ namespace           configuration {
                     connectors() const throw ();
       umap<std::string, shared_ptr<commands::connector> >&
                     connectors() throw ();
+      umap<std::string, shared_ptr<commands::connector> >::const_iterator
+                    connectors_find(configuration::connector::key_type const& k) const;
+      umap<std::string, shared_ptr<commands::connector> >::iterator
+                    connectors_find(configuration::connector::key_type const& k);
       umap<std::string, shared_ptr<contact_struct> > const&
                     contacts() const throw ();
       umap<std::string, shared_ptr<contact_struct> >&

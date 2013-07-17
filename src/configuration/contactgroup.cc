@@ -37,10 +37,16 @@ static struct {
 };
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-contactgroup::contactgroup()
-  : object(object::contactgroup), _resolved(false) {}
+contactgroup::contactgroup(key_type const& key)
+  : object(object::contactgroup),
+    _contactgroup_name(key),
+    _resolved(false) {
+
+}
 
 /**
  *  Copy constructor.

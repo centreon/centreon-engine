@@ -41,10 +41,16 @@ static struct {
 
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-servicegroup::servicegroup()
-  : object(object::servicegroup), _resolved(false) {}
+servicegroup::servicegroup(key_type const& key)
+  : object(object::servicegroup),
+    _resolved(false),
+    _servicegroup_name(key) {
+
+}
 
 /**
  *  Copy constructor.
@@ -254,16 +260,6 @@ std::string const& servicegroup::notes_url() const throw () {
  */
 list_string const& servicegroup::servicegroup_members() const throw () {
   return (*_servicegroup_members);
-}
-
-/**
- *  Set service group name.
- *
- *  @param[in] name New service group name.
- */
-void servicegroup::servicegroup_name(std::string const& name) {
-  _servicegroup_name = name;
-  return ;
 }
 
 /**

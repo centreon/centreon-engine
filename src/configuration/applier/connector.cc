@@ -22,6 +22,7 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/macros/process.hh"
@@ -124,11 +125,40 @@ void applier::connector::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying connector '" << obj->connector_name() << "'.";
 
-  // XXX : cannot modify a connector because
-  //       1) unmodified commands might hold a pointer on the connector
-  //       2) even if we cast the command, there's no public API to
-  //          restart a connector
+  // Find old configuration.
+  set_connector::iterator it_cfg(config->connectors_find(obj->key()));
+  if (it_cfg == config->connectors().end())
+    throw (engine_error() << "Error: Cannot modify non-existing "
+           << "connector '" << obj->connector_name() << "'.");
 
+  // Find connector object.
+  umap<std::string, shared_ptr<commands::connector> >::iterator
+    it_obj(applier::state::instance().connectors_find(obj->key()));
+  if (it_obj == applier::state::instance().connectors().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "connector object '" << obj->connector_name() << "'.");
+  commands::connector* c(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::connector> old_cfg(*it_cfg);
+  config->connectors().insert(obj);
+  config->connectors().erase(it_cfg);
+
+  // Expand command line.
+  nagios_macros* macros(get_global_macros());
+  char* command_line(NULL);
+  process_macros_r(
+    macros,
+    obj->connector_line().c_str(),
+    &command_line,
+    0);
+  std::string processed_cmd(command_line);
+  delete [] command_line;
+
+  // Set the new command line.
+  c->set_command_line(processed_cmd);
+
+  // XXX: broker.
   return ;
 }
 

@@ -24,6 +24,9 @@
 #include "com/centreon/engine/configuration/applier/contact.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/commandsmember.hh"
+#include "com/centreon/engine/deleter/customvariablesmember.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -44,7 +47,7 @@ public:
 
   bool        operator()(shared_ptr<configuration::contactgroup> cg) {
     return (_contactgroup_name == cg->contactgroup_name());
-  }
+ }
 
 private:
   std::string _contactgroup_name;
@@ -269,7 +272,7 @@ void applier::contact::modify_object(
   config->contacts().insert(obj);
   config->contacts().erase(it_cfg);
 
-  // Modify command.
+  // Modify contact.
   modify_if_different(c->alias, NULL_IF_EMPTY(obj->alias()));
   modify_if_different(c->email, NULL_IF_EMPTY(obj->email()));
   modify_if_different(c->pager, NULL_IF_EMPTY(obj->pager()));
@@ -346,13 +349,10 @@ void applier::contact::modify_object(
   // Host notification commands.
   if (obj->host_notification_commands()
       != old_cfg->host_notification_commands()) {
-    for (commandsmember* m(c->host_notification_commands); m;) {
-      commandsmember* to_delete(m);
-      m = m->next;
-      delete [] to_delete->cmd;
-      delete to_delete;
-    }
-    c->host_notification_commands = NULL;
+    deleter::listmember(
+      c->host_notification_commands,
+      &deleter::commandsmember);
+
     for (list_string::const_iterator
            it(obj->host_notification_commands().begin()),
            end(obj->host_notification_commands().end());
@@ -370,13 +370,10 @@ void applier::contact::modify_object(
   // Service notification commands.
   if (obj->service_notification_commands()
       != old_cfg->service_notification_commands()) {
-    for (commandsmember* m(c->service_notification_commands); m;) {
-      commandsmember* to_delete(m);
-      m = m->next;
-      delete [] to_delete->cmd;
-      delete to_delete;
-    }
-    c->service_notification_commands = NULL;
+    deleter::listmember(
+      c->service_notification_commands,
+      &deleter::commandsmember);
+
     for (list_string::const_iterator
            it(obj->service_notification_commands().begin()),
            end(obj->service_notification_commands().end());
@@ -393,14 +390,10 @@ void applier::contact::modify_object(
 
   // Custom variables.
   if (std::operator!=(obj->customvariables(), old_cfg->customvariables())) {
-    for (customvariablesmember* cv(c->custom_variables); cv; ) {
-      customvariablesmember* to_delete(cv);
-      cv = cv->next;
-      delete [] to_delete->variable_name;
-      delete [] to_delete->variable_value;
-      delete to_delete;
-    }
-    c->custom_variables = NULL;
+    deleter::listmember(
+      c->custom_variables,
+      &deleter::customvariablesmember);
+
     for (map_customvar::const_iterator
            it(obj->customvariables().begin()),
            end(obj->customvariables().end());

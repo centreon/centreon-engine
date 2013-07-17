@@ -29,6 +29,7 @@
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -415,12 +416,7 @@ void applier::host::modify_object(
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {
     // Delete old contacts.
-    for (contactsmember* m(h->contacts); m;) {
-      contactsmember* to_delete(m);
-      m = m->next;
-      deleter::contactsmember(to_delete);
-    }
-    h->contacts = NULL;
+    deleter::listmember(h->contacts, &deleter::contactsmember);
 
     // Add contacts to host.
     for (list_string::const_iterator
@@ -436,12 +432,9 @@ void applier::host::modify_object(
   // Contact groups.
   if (obj->contactgroups() != obj_old->contactgroups()) {
     // Delete old contact groups.
-    for (contactgroupsmember* m(h->contact_groups); m;) {
-      contactgroupsmember* to_delete(m);
-      m = m->next;
-      deleter::contactgroupsmember(to_delete);
-    }
-    h->contact_groups = NULL;
+    deleter::listmember(
+      h->contact_groups,
+      &deleter::contactgroupsmember);
 
     // Add contact groups to host.
     for (list_string::const_iterator
@@ -457,12 +450,9 @@ void applier::host::modify_object(
   // Custom variables.
   if (obj->customvariables() != obj_old->customvariables()) {
     // Delete old custom variables.
-    for (customvariablesmember* m(h->custom_variables); m;) {
-      customvariablesmember* to_delete(m);
-      m = m->next;
-      deleter::customvariablesmember(to_delete);
-    }
-    h->custom_variables = NULL;
+    deleter::listmember(
+      h->custom_variables,
+      &deleter::customvariablesmember);
 
     // Add custom variables.
     for (map_customvar::const_iterator
@@ -482,12 +472,7 @@ void applier::host::modify_object(
   // Parents.
   if (obj->parents() != obj_old->parents()) {
     // Delete old parents.
-    for (hostsmember* m(h->parent_hosts); m;) {
-      hostsmember* to_delete(m);
-      m = m->next;
-      deleter::hostsmember(to_delete);
-    }
-    h->parent_hosts = NULL;
+    deleter::listmember(h->parent_hosts, &deleter::hostsmember);
 
     // Create parents.
     for (list_string::const_iterator

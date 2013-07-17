@@ -36,7 +36,7 @@ namespace                   configuration {
   public:
     typedef std::string     key_type;
 
-                            servicegroup();
+                            servicegroup(key_type const& key = "");
                             servicegroup(servicegroup const& right);
                             ~servicegroup() throw ();
     servicegroup&           operator=(servicegroup const& right);
@@ -60,7 +60,6 @@ namespace                   configuration {
     std::string const&      notes() const throw ();
     std::string const&      notes_url() const throw ();
     list_string const&      servicegroup_members() const throw ();
-    void                    servicegroup_name(std::string const& name);
     std::string const&      servicegroup_name() const throw ();
 
     bool                    is_resolved() const throw ();

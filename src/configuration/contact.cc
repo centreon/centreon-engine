@@ -65,11 +65,14 @@ static bool const           default_service_notifications_enabled(true);
 static unsigned int const   MAX_ADDRESSES(6);
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-contact::contact()
+contact::contact(key_type const& key)
   : object(object::contact),
     _can_submit_commands(default_can_submit_commands),
+    _contact_name(key),
     _host_notifications_enabled(default_host_notifications_enabled),
     _host_notification_options(default_host_notification_options),
     _retain_nonstatus_information(default_retain_nonstatus_information),
@@ -351,16 +354,6 @@ list_string& contact::contactgroups() throw () {
  */
 list_string const& contact::contactgroups() const throw () {
   return (*_contactgroups);
-}
-
-/**
- *  Get contact name.
- *
- *  @param[in] name New contact name.
- */
-void contact::contact_name(std::string const& name) {
-  _contact_name = name;
-  return ;
 }
 
 /**

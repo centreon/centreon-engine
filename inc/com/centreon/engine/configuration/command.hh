@@ -32,7 +32,7 @@ namespace                  configuration {
   public:
     typedef std::string    key_type;
 
-                           command();
+                           command(key_type const& key = "");
                            command(command const& right);
                            ~command() throw ();
     command&               operator=(command const& right);

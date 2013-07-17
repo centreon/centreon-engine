@@ -208,6 +208,30 @@ umap<std::string, shared_ptr<command_struct> >::iterator applier::state::command
 }
 
 /**
+ *  Find a connector from its key.
+ *
+ *  @param[in] k Connector name.
+ *
+ *  @return Iterator to the element if found, connectors().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<commands::connector> >::const_iterator applier::state::connectors_find(configuration::connector::key_type const& k) const {
+  return (_connectors.find(k));
+}
+
+/**
+ *  Find a connector from its key.
+ *
+ *  @param[in] k Connector name.
+ *
+ *  @return Iterator to the element if found, connectors().end()
+ *          otherwise.
+ */
+umap<std::string, shared_ptr<commands::connector> >::iterator applier::state::connectors_find(configuration::connector::key_type const& k) {
+  return (_connectors.find(k));
+}
+
+/**
  *  Get the current connectors.
  *
  *  @return The current connectors.

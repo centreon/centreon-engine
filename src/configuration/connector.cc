@@ -36,9 +36,15 @@ static struct {
 };
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-connector::connector() : object(object::connector) {}
+connector::connector(key_type const& key)
+  : object(object::connector),
+    _connector_name(key) {
+
+}
 
 /**
  *  Copy constructor.

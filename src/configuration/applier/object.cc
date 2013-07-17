@@ -27,11 +27,8 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 void applier::modify_if_different(char*& s1, char const* s2) {
-  if (strcmp(s1, s2)) {
-    delete [] s1;
-    s1 = NULL;
-    s1 = string::dup(s2);
-  }
+  if (strcmp(s1, s2))
+    string::setstr(s1, s2);
   return ;
 }
 
@@ -45,11 +42,8 @@ void applier::modify_if_different(
          end(t2.end());
        (it != end) && (i < size);
        ++it, ++i)
-    if (!t1[i] || strcmp(t1[i], it->c_str())) {
-      delete [] t1[i];
-      t1[i] = NULL;
-      t1[i] = string::dup(it->c_str());
-    }
+    if (!t1[i] || strcmp(t1[i], it->c_str()))
+      string::setstr(t1[i], it->c_str());
   while (i < size) {
     delete [] t1[i];
     t1[i] = NULL;

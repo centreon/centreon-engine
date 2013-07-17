@@ -37,9 +37,15 @@ static struct {
 };
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-command::command() : object(object::command) {}
+command::command(key_type const& key)
+  : object(object::command),
+    _command_name(key) {
+
+}
 
 /**
  *  Copy constructor.

@@ -49,7 +49,7 @@ namespace                  configuration {
     };
     typedef std::string    key_type;
 
-                           host();
+                           host(key_type const& key = "");
                            host(host const& right);
                            ~host() throw ();
     host&                  operator=(host const& right);
@@ -90,7 +90,6 @@ namespace                  configuration {
     unsigned int           high_flap_threshold() const throw ();
     list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
-    void                   host_name(std::string const& name);
     std::string const&     host_name() const throw ();
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();

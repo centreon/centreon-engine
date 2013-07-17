@@ -33,7 +33,7 @@ namespace                  configuration {
   public:
     typedef std::string    key_type;
 
-                           connector();
+                           connector(key_type const& key = "");
                            connector(connector const& right);
                            ~connector() throw ();
     connector&             operator=(connector const& right);

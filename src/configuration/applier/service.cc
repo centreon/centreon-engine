@@ -23,6 +23,10 @@
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contactgroupsmember.hh"
+#include "com/centreon/engine/deleter/contactsmember.hh"
+#include "com/centreon/engine/deleter/customvariablesmember.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -308,19 +312,242 @@ void applier::service::expand_object(
  */
 void applier::service::modify_object(
                          shared_ptr<configuration::service> obj) {
-  // XXX
+  std::string const& host_name(obj->hosts().front());
+  std::string const& service_description(obj->service_description());
 
-  // // Notify event broker.
-  // timeval tv(get_broker_timestamp(NULL));
-  // broker_adaptive_service_data(
-  //   NEBTYPE_SERVICE_UPDATE,
-  //   NEBFLAG_NONE,
-  //   NEBATTR_NONE,
-  //   svc,
-  //   CMD_NONE,
-  //   MODATTR_ALL,
-  //   MODATTR_ALL,
-  //   &tv);
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Modifying new service '" << service_description
+    << "' of host '" << host_name << "'.";
+
+  // Find the configuration object.
+  set_service::iterator it_cfg(config->services_find(obj->key()));
+  if (it_cfg == config->services().end())
+    throw (engine_error() << "Error: Cannot modify non-existing "
+           "service '" << service_description << "' of host '"
+           << host_name << "'.");
+
+  // Find service object.
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
+    it_obj(applier::state::instance().services_find(obj->key()));
+  if (it_obj == applier::state::instance().services().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "service object '" << service_description
+           << "' of host '" << host_name << "'.");
+  service_struct* s(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::service> obj_old(*it_cfg);
+  config->services().insert(obj);
+  config->services().erase(it_cfg);
+
+  // Modify properties.
+  modify_if_different(
+    s->display_name,
+    NULL_IF_EMPTY(obj->display_name()));
+  modify_if_different(
+    s->service_check_command,
+    NULL_IF_EMPTY(obj->check_command()));
+  modify_if_different(
+    s->event_handler,
+    NULL_IF_EMPTY(obj->event_handler()));
+  modify_if_different(
+    s->initial_state,
+    static_cast<int>(obj->initial_state()));
+  modify_if_different(
+    s->check_interval,
+    static_cast<double>(obj->check_interval()));
+  modify_if_different(
+    s->retry_interval,
+    static_cast<double>(obj->retry_interval()));
+  modify_if_different(
+    s->max_attempts,
+    static_cast<int>(obj->max_check_attempts()));
+  modify_if_different(
+    s->notification_interval,
+    static_cast<double>(obj->notification_interval()));
+  modify_if_different(
+    s->first_notification_delay,
+    static_cast<double>(obj->first_notification_delay()));
+  modify_if_different(
+    s->notify_on_unknown,
+    static_cast<int>(static_cast<bool>(
+      obj->notification_options() & configuration::service::unknown)));
+  modify_if_different(
+    s->notify_on_warning,
+    static_cast<int>(static_cast<bool>(
+      obj->notification_options() & configuration::service::warning)));
+  modify_if_different(
+    s->notify_on_critical,
+    static_cast<int>(static_cast<bool>(
+      obj->notification_options() & configuration::service::critical)));
+  modify_if_different(
+    s->notify_on_recovery,
+    static_cast<int>(static_cast<bool>(
+      obj->notification_options() & configuration::service::recovery)));
+  modify_if_different(
+    s->notify_on_flapping,
+    static_cast<int>(static_cast<bool>(
+      obj->notification_options() & configuration::service::flapping)));
+  modify_if_different(
+    s->notify_on_downtime,
+    static_cast<int>(static_cast<bool>(
+      obj->notification_options() & configuration::service::downtime)));
+  modify_if_different(
+    s->stalk_on_ok,
+    static_cast<int>(static_cast<bool>(
+      obj->stalking_options() & configuration::service::ok)));
+  modify_if_different(
+    s->stalk_on_warning,
+    static_cast<int>(static_cast<bool>(
+      obj->stalking_options() & configuration::service::warning)));
+  modify_if_different(
+    s->stalk_on_unknown,
+    static_cast<int>(static_cast<bool>(
+      obj->stalking_options() & configuration::service::unknown)));
+  modify_if_different(
+    s->stalk_on_critical,
+    static_cast<int>(static_cast<bool>(
+      obj->stalking_options() & configuration::service::critical)));
+  modify_if_different(
+    s->notification_period,
+    NULL_IF_EMPTY(obj->notification_period()));
+  modify_if_different(
+    s->check_period,
+    NULL_IF_EMPTY(obj->check_period()));
+  modify_if_different(
+    s->flap_detection_enabled,
+    static_cast<int>(obj->flap_detection_enabled()));
+  modify_if_different(
+    s->low_flap_threshold,
+    static_cast<double>(obj->low_flap_threshold()));
+  modify_if_different(
+    s->high_flap_threshold,
+    static_cast<double>(obj->high_flap_threshold()));
+  modify_if_different(
+    s->flap_detection_on_ok,
+    static_cast<int>(static_cast<bool>(
+      obj->flap_detection_options() & configuration::service::ok)));
+  modify_if_different(
+    s->flap_detection_on_warning,
+    static_cast<int>(static_cast<bool>(
+      obj->flap_detection_options() & configuration::service::warning)));
+  modify_if_different(
+    s->flap_detection_on_unknown,
+    static_cast<int>(static_cast<bool>(
+      obj->flap_detection_options() & configuration::service::unknown)));
+  modify_if_different(
+    s->flap_detection_on_critical,
+    static_cast<int>(static_cast<bool>(
+      obj->flap_detection_options() & configuration::service::critical)));
+  modify_if_different(
+    s->process_performance_data,
+    static_cast<int>(obj->process_perf_data()));
+  modify_if_different(
+    s->check_freshness,
+    static_cast<int>(obj->check_freshness()));
+  modify_if_different(
+    s->freshness_threshold,
+    static_cast<int>(obj->freshness_threshold()));
+  modify_if_different(
+    s->accept_passive_service_checks,
+    static_cast<int>(obj->checks_passive()));
+  modify_if_different(
+    s->event_handler,
+    NULL_IF_EMPTY(obj->event_handler()));
+  modify_if_different(
+    s->checks_enabled,
+    static_cast<int>(obj->checks_active()));
+  modify_if_different(
+    s->retain_status_information,
+    static_cast<int>(obj->retain_status_information()));
+  modify_if_different(
+    s->retain_nonstatus_information,
+    static_cast<int>(obj->retain_nonstatus_information()));
+  modify_if_different(
+    s->notifications_enabled,
+    static_cast<int>(obj->notifications_enabled()));
+  modify_if_different(
+    s->obsess_over_service,
+    static_cast<int>(obj->obsess_over_service()));
+  modify_if_different(s->notes, NULL_IF_EMPTY(obj->notes()));
+  modify_if_different(s->notes_url, NULL_IF_EMPTY(obj->notes_url()));
+  modify_if_different(s->action_url, NULL_IF_EMPTY(obj->action_url()));
+  modify_if_different(s->icon_image, NULL_IF_EMPTY(obj->icon_image()));
+  modify_if_different(
+    s->icon_image_alt,
+    NULL_IF_EMPTY(obj->icon_image_alt()));
+
+  // Contacts.
+  if (obj->contacts() != obj_old->contacts()) {
+    // Delete old contacts.
+    deleter::listmember(s->contacts, &deleter::contactsmember);
+
+    // Add contacts to host.
+    for (list_string::const_iterator
+           it(obj->contacts().begin()),
+           end(obj->contacts().end());
+         it != end;
+         ++it)
+      if (!add_contact_to_service(s, it->c_str()))
+        throw (engine_error() << "Error: Could not add contact '"
+               << *it << "' to service '" << service_description
+               << "' on host '" << host_name << "'.");
+  }
+
+  // Contact groups.
+  if (obj->contactgroups() != obj_old->contactgroups()) {
+    // Delete old contact groups.
+    deleter::listmember(
+      s->contact_groups,
+      &deleter::contactgroupsmember);
+
+    // Add contact groups to host.
+    for (list_string::const_iterator
+           it(obj->contactgroups().begin()),
+           end(obj->contactgroups().end());
+         it != end;
+         ++it)
+      if (!add_contactgroup_to_service(s, it->c_str()))
+        throw (engine_error() << "Error: Could not add contact group '"
+               << *it << "' to service '" << service_description
+               << "' on host '" << host_name << "'.");
+  }
+
+  // Custom variables.
+  if (obj->customvariables() != obj_old->customvariables()) {
+    // Delete old custom variables.
+    deleter::listmember(
+      s->custom_variables,
+      &deleter::customvariablesmember);
+
+    // Add custom variables.
+    for (map_customvar::const_iterator
+           it(obj->customvariables().begin()),
+           end(obj->customvariables().end());
+         it != end;
+         ++it)
+      if (!add_custom_variable_to_service(
+             s,
+             it->first.c_str(),
+             it->second.c_str()))
+        throw (engine_error()
+               << "Error: Could not add custom variable '" << it->first
+               << "' to service '" << service_description
+               << "' on host '" << host_name << "'.");
+  }
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_service_data(
+    NEBTYPE_SERVICE_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    s,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
   return ;
 }
 

@@ -122,29 +122,43 @@ void applier::command::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying command '" << obj->command_name() << "'.";
 
-  // XXX : modify global configuration set
+  // Find old configuration.
+  set_command::iterator it_cfg(config->commands_find(obj->key()));
+  if (it_cfg == config->commands().end())
+    throw (engine_error() << "Error: Cannot modify non-existing "
+           << "command '" << obj->command_name() << "'.");
+
+  // Find command object.
+  umap<std::string, shared_ptr<command_struct> >::iterator
+    it_obj(applier::state::instance().commands_find(obj->key()));
+  if (it_obj == applier::state::instance().commands().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "command object '" << obj->command_name() << "'.");
+  command_struct* c(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::command> old_cfg(*it_cfg);
+  config->commands().insert(obj);
+  config->commands().erase(it_cfg);
 
   // Modify command.
-  shared_ptr<command_struct>&
-    c(applier::state::instance().commands()[obj->command_name()]);
   modify_if_different(c->command_line, obj->command_line().c_str());
 
-  // Command will be temporarily removed from the command set but will
-  // be added back right after with _create_command. This does not
-  // create dangling pointers since commands::command object are not
-  // referenced anywhere, only ::command objects are.
+  // Command will be temporarily removed from the command set but
+  // will be added back right after with _create_command. This does
+  // not create dangling pointers since commands::command object are
+  // not referenced anywhere, only ::command objects are.
   commands::set::instance().remove_command(obj->command_name());
   _create_command(obj);
 
-  // XXX: call broker.
-  // // Notify event broker.
-  // timeval tv(get_broker_timestamp(NULL));
-  // broker_command_data(
-  //   NEBTYPE_COMMAND_UPDATE,
-  //   NEBFLAG_NONE,
-  //   NEBATTR_NONE,
-  //   cmd,
-  //   &tv);
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_command_data(
+    NEBTYPE_COMMAND_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    c,
+    &tv);
 
   return ;
 }

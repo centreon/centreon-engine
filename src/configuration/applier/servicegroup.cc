@@ -22,6 +22,7 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -173,12 +174,9 @@ void applier::servicegroup::modify_object(
   // Were members modified ?
   if (obj->members() != old_cfg->members()) {
     // Delete all old service group members.
-    for (servicesmember* m((*it_obj).second->members); m;) {
-      servicesmember* to_delete(m);
-      m = m->next;
-      deleter::servicesmember(to_delete);
-    }
-    (*it_obj).second->members = NULL;
+    deleter::listmember(
+      (*it_obj).second->members,
+      &deleter::servicesmember);
 
     // Create new service group members.
     for (set_pair_string::const_iterator

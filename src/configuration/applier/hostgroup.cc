@@ -23,6 +23,7 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -168,12 +169,9 @@ void applier::hostgroup::modify_object(
   // Were members modified ?
   if (obj->members() != old_cfg->members()) {
     // Delete all old host group members.
-    for (hostsmember* m((*it_obj).second->members); m;) {
-      hostsmember* to_delete(m);
-      m = m->next;
-      deleter::hostsmember(to_delete);
-    }
-    (*it_obj).second->members = NULL;
+    deleter::listmember(
+      (*it_obj).second->members,
+      &deleter::hostsmember);
 
     // Create new host group members.
     for (set_string::const_iterator

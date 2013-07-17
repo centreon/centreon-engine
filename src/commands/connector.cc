@@ -253,6 +253,25 @@ void connector::run(
 }
 
 /**
+ *  Set connector command line.
+ *
+ *  @param[in] command_line The new command line.
+ */
+void connector::set_command_line(std::string const& command_line) {
+    // Wait restart thread.
+    _restart.wait();
+
+    // Change command line.
+    {
+      concurrency::locker lock(&_lock);
+      command::set_command_line(command_line);
+    }
+
+    // Close connector properly.
+    _connector_close();
+}
+
+/**
  *  Provide by process_listener interface to get data on stdout.
  *
  *  @param[in] p  The process to get data on stdout.

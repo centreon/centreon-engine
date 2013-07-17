@@ -33,7 +33,7 @@ namespace                  configuration {
   public:
     typedef std::string    key_type;
 
-                           contactgroup();
+                           contactgroup(key_type const& key = "");
                            contactgroup(contactgroup const& right);
                            ~contactgroup() throw ();
     contactgroup&          operator=(contactgroup const& right);

@@ -95,7 +95,11 @@ static unsigned int const   default_check_interval(5);
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
-static unsigned short const default_flap_detection_options(service::ok | service::warning | service::unknown | service::critical);
+static unsigned short const default_flap_detection_options(
+                              service::ok
+                              | service::warning
+                              | service::unknown
+                              | service::critical);
 static unsigned int const   default_freshness_threshold(0);
 static unsigned int const   default_high_flap_threshold(0);
 static unsigned int const   default_initial_state(STATE_OK);
@@ -104,7 +108,13 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(service::ok | service::warning | service::critical | service::unknown | service::flapping | service::downtime);
+static unsigned short const default_notification_options(
+                              service::recovery
+                              | service::warning
+                              | service::critical
+                              | service::unknown
+                              | service::flapping
+                              | service::downtime);
 static std::string const    default_notification_period;
 static bool const           default_obsess_over_service(true);
 static bool const           default_process_perf_data(true);
@@ -925,6 +935,15 @@ list_string const& service::servicegroups() const throw () {
  *
  *  @return The service_description.
  */
+std::string& service::service_description() throw () {
+  return (_service_description);
+}
+
+/**
+ *  Get service_description.
+ *
+ *  @return The service_description.
+ */
 std::string const& service::service_description() const throw () {
   return (_service_description);
 }
@@ -1368,7 +1387,7 @@ bool service::_set_notification_options(std::string const& value) {
     else if (*it == "c" || *it == "critical")
       options |= critical;
     else if (*it == "r" || *it == "recovery")
-      options |= ok;
+      options |= recovery;
     else if (*it == "f" || *it == "flapping")
       options |= flapping;
     else if (*it == "s" || *it == "downtime")
@@ -1376,7 +1395,7 @@ bool service::_set_notification_options(std::string const& value) {
     else if (*it == "n" || *it == "none")
       options = none;
     else if (*it == "a" || *it == "all")
-      options = unknown | warning | critical | ok | flapping | downtime;
+      options = unknown | warning | critical | recovery | flapping | downtime;
     else
       return (false);
   }

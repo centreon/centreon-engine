@@ -40,9 +40,16 @@ static struct {
 };
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-hostgroup::hostgroup() : object(object::hostgroup), _resolved(false) {}
+hostgroup::hostgroup(key_type const& key)
+  : object(object::hostgroup),
+    _hostgroup_name(key),
+    _resolved(false) {
+
+}
 
 /**
  *  Copy constructor.
@@ -218,16 +225,6 @@ std::string const& hostgroup::alias() const throw () {
  */
 list_string const& hostgroup::hostgroup_members() const throw () {
   return (*_hostgroup_members);
-}
-
-/**
- *  Set the host group name.
- *
- *  @param[in] name Host group name.
- */
-void hostgroup::hostgroup_name(std::string const& name) {
-  _hostgroup_name = name;
-  return ;
 }
 
 /**

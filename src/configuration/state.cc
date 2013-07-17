@@ -1182,6 +1182,50 @@ set_command& state::commands() throw () {
 }
 
 /**
+ *  Find a command by its key.
+ *
+ *  @param[in] k Command name.
+ *
+ *  @return Iterator to the element if found, commands().end()
+ *          otherwise.
+ */
+set_command::const_iterator state::commands_find(
+                                     command::key_type const& k) const {
+  shared_ptr<configuration::command>
+    below_searched(new configuration::command(k));
+  set_command::const_iterator
+    it(_commands.upper_bound(below_searched));
+  if ((it != _commands.end()) && ((*it)->command_name() == k))
+    return (it);
+  else if ((it != _commands.begin())
+           && ((*--it)->command_name() == k))
+    return (it);
+  return (_commands.end());
+}
+
+/**
+ *  Find a command by its key.
+ *
+ *  @param[in] k Command name.
+ *
+ *  @return Iterator to the element if found, commands().end()
+ *          otherwise.
+ */
+set_command::iterator state::commands_find(
+                               command::key_type const& k) {
+  shared_ptr<configuration::command>
+    below_searched(new configuration::command(k));
+  set_command::iterator
+    it(_commands.upper_bound(below_searched));
+  if ((it != _commands.end()) && ((*it)->command_name() == k))
+    return (it);
+  else if ((it != _commands.begin())
+           && ((*--it)->command_name() == k))
+    return (it);
+  return (_commands.end());
+}
+
+/**
  *  Get command_check_interval value.
  *
  *  @return The command_check_interval value.
@@ -1255,6 +1299,50 @@ set_connector& state::connectors() throw () {
 }
 
 /**
+ *  Find a connector by its key.
+ *
+ *  @param[in] k Connector name.
+ *
+ *  @return Iterator to the element if found, connectors().end()
+ *          otherwise.
+ */
+set_connector::const_iterator state::connectors_find(
+                                     connector::key_type const& k) const {
+  shared_ptr<configuration::connector>
+    below_searched(new configuration::connector(k));
+  set_connector::const_iterator
+    it(_connectors.upper_bound(below_searched));
+  if ((it != _connectors.end()) && ((*it)->connector_name() == k))
+    return (it);
+  else if ((it != _connectors.begin())
+           && ((*--it)->connector_name() == k))
+    return (it);
+  return (_connectors.end());
+}
+
+/**
+ *  Find a connector by its key.
+ *
+ *  @param[in] k Connector name.
+ *
+ *  @return Iterator to the element if found, connectors().end()
+ *          otherwise.
+ */
+set_connector::iterator state::connectors_find(
+                               connector::key_type const& k) {
+  shared_ptr<configuration::connector>
+    below_searched(new configuration::connector(k));
+  set_connector::iterator
+    it(_connectors.upper_bound(below_searched));
+  if ((it != _connectors.end()) && ((*it)->connector_name() == k))
+    return (it);
+  else if ((it != _connectors.begin())
+           && ((*--it)->connector_name() == k))
+    return (it);
+  return (_connectors.end());
+}
+
+/**
  *  Get all engine contacts.
  *
  *  @return All engine contacts.
@@ -1283,8 +1371,7 @@ set_contact& state::contacts() throw () {
 set_contact::const_iterator state::contacts_find(
                                      contact::key_type const& k) const {
   shared_ptr<configuration::contact>
-    below_searched(new configuration::contact);
-  below_searched->contact_name(k);
+    below_searched(new configuration::contact(k));
   set_contact::const_iterator
     it(_contacts.upper_bound(below_searched));
   if ((it != _contacts.end()) && ((*it)->contact_name() == k))
@@ -1306,8 +1393,7 @@ set_contact::const_iterator state::contacts_find(
 set_contact::iterator state::contacts_find(
                                contact::key_type const& k) {
   shared_ptr<configuration::contact>
-    below_searched(new configuration::contact);
-  below_searched->contact_name(k);
+    below_searched(new configuration::contact(k));
   set_contact::iterator
     it(_contacts.upper_bound(below_searched));
   if ((it != _contacts.end()) && ((*it)->contact_name() == k))
@@ -1779,8 +1865,7 @@ set_hostgroup& state::hostgroups() throw () {
 set_hostgroup::const_iterator state::hostgroups_find(
                                 hostgroup::key_type const& k) const {
   shared_ptr<configuration::hostgroup>
-    below_searched(new configuration::hostgroup);
-  below_searched->hostgroup_name(k);
+    below_searched(new configuration::hostgroup(k));
   set_hostgroup::const_iterator
     it(_hostgroups.upper_bound(below_searched));
   if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
@@ -1802,8 +1887,7 @@ set_hostgroup::const_iterator state::hostgroups_find(
 set_hostgroup::iterator state::hostgroups_find(
                                  hostgroup::key_type const& k) {
   shared_ptr<configuration::hostgroup>
-    below_searched(new configuration::hostgroup);
-  below_searched->hostgroup_name(k);
+    below_searched(new configuration::hostgroup(k));
   set_hostgroup::iterator it(_hostgroups.upper_bound(below_searched));
   if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
     return (it);
@@ -1841,8 +1925,7 @@ set_host& state::hosts() throw () {
 set_host::const_iterator state::hosts_find(
                                   host::key_type const& k) const {
   shared_ptr<configuration::host>
-    below_searched(new configuration::host);
-  below_searched->host_name(k);
+    below_searched(new configuration::host(k));
   set_host::const_iterator it(_hosts.upper_bound(below_searched));
   if ((it != _hosts.end()) && ((*it)->host_name() == k))
     return (it);
@@ -1861,8 +1944,7 @@ set_host::const_iterator state::hosts_find(
 set_host::iterator state::hosts_find(
                             host::key_type const& k) {
   shared_ptr<configuration::host>
-    below_searched(new configuration::host);
-  below_searched->host_name(k);
+    below_searched(new configuration::host(k));
   set_host::iterator it(_hosts.upper_bound(below_searched));
   if ((it != _hosts.end()) && ((*it)->host_name() == k))
     return (it);
@@ -2862,8 +2944,7 @@ set_servicegroup& state::servicegroups() throw () {
 set_servicegroup::const_iterator state::servicegroups_find(
                                    servicegroup::key_type const& k) const {
   shared_ptr<configuration::servicegroup>
-    below_searched(new configuration::servicegroup);
-  below_searched->servicegroup_name(k);
+    below_searched(new configuration::servicegroup(k));
   set_servicegroup::const_iterator
     it(_servicegroups.upper_bound(below_searched));
   if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
@@ -2885,8 +2966,7 @@ set_servicegroup::const_iterator state::servicegroups_find(
 set_servicegroup::iterator state::servicegroups_find(
                              servicegroup::key_type const& k) {
   shared_ptr<configuration::servicegroup>
-    below_searched(new configuration::servicegroup);
-  below_searched->servicegroup_name(k);
+    below_searched(new configuration::servicegroup(k));
   set_servicegroup::iterator
     it(_servicegroups.upper_bound(below_searched));
   if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
@@ -2913,6 +2993,60 @@ set_service const& state::services() const throw () {
  */
 set_service& state::services() throw () {
   return (_services);
+}
+
+/**
+ *  Get service by its key.
+ *
+ *  @param[in] k Service name.
+ *
+ *  @return Iterator to the element if found, services().end()
+ *          otherwise.
+ */
+set_service::const_iterator state::services_find(
+                                   service::key_type const& k) const {
+  shared_ptr<configuration::service>
+    below_searched(new configuration::service);
+  below_searched->hosts().push_back(k.first);
+  below_searched->service_description() = k.second;
+  set_service::const_iterator
+    it(_services.upper_bound(below_searched));
+  if ((it != _services.end())
+      && ((*it)->hosts().front() == k.first)
+      && ((*it)->service_description() == k.second))
+    return (it);
+  else if ((it != _services.begin())
+           && ((*--it)->hosts().front() == k.first)
+           && ((*it)->service_description() == k.second))
+    return (it);
+  return (_services.end());
+}
+
+/**
+ *  Get service by its key.
+ *
+ *  @param[in] k Service name.
+ *
+ *  @return Iterator to the element if found, services().end()
+ *          otherwise.
+ */
+set_service::iterator state::services_find(
+                             service::key_type const& k) {
+  shared_ptr<configuration::service>
+    below_searched(new configuration::service);
+  below_searched->hosts().push_back(k.first);
+  below_searched->service_description() = k.second;
+  set_service::iterator
+    it(_services.upper_bound(below_searched));
+  if ((it != _services.end())
+      && ((*it)->hosts().front() == k.first)
+      && ((*it)->service_description() == k.second))
+    return (it);
+  else if ((it != _services.begin())
+           && ((*--it)->hosts().front() == k.first)
+           && ((*it)->service_description() == k.second))
+    return (it);
+  return (_services.end());
 }
 
 /**
@@ -3248,8 +3382,7 @@ set_timeperiod& state::timeperiods() throw () {
  */
 set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type const& k) const {
   shared_ptr<configuration::timeperiod>
-    below_searched(new configuration::timeperiod);
-  below_searched->timeperiod_name(k);
+    below_searched(new configuration::timeperiod(k));
   set_timeperiod::const_iterator
     it(_timeperiods.upper_bound(below_searched));
   if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
@@ -3270,8 +3403,7 @@ set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type cons
  */
 set_timeperiod::iterator state::timeperiods_find(timeperiod::key_type const& k) {
   shared_ptr<configuration::timeperiod>
-    below_searched(new configuration::timeperiod);
-  below_searched->timeperiod_name(k);
+    below_searched(new configuration::timeperiod(k));
   set_timeperiod::iterator
     it(_timeperiods.upper_bound(below_searched));
   if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))

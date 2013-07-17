@@ -34,7 +34,7 @@ namespace                  configuration {
   public:
     typedef std::string    key_type;
 
-                           hostgroup();
+                           hostgroup(key_type const& key = "");
                            hostgroup(hostgroup const& right);
                            ~hostgroup() throw ();
     hostgroup&             operator=(hostgroup const& right);
@@ -54,7 +54,6 @@ namespace                  configuration {
     std::string const&     action_url() const throw ();
     std::string const&     alias() const throw ();
     list_string const&     hostgroup_members() const throw ();
-    void                   hostgroup_name(std::string const& name);
     std::string const&     hostgroup_name() const throw ();
     list_string&           members() throw ();
     list_string const&     members() const throw ();

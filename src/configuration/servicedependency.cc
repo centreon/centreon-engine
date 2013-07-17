@@ -76,8 +76,9 @@ servicedependency::servicedependency()
     _dependency_type(unknown_type),
     _execution_failure_options(default_execution_failure_options),
     _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options)
-{}
+    _notification_failure_options(default_notification_failure_options) {
+
+}
 
 /**
  *  Copy constructor.

@@ -38,7 +38,7 @@ namespace                  configuration {
   public:
     typedef std::string    key_type;
 
-                           contact();
+                           contact(key_type const& key = "");
                            contact(contact const& right);
                            ~contact() throw ();
     contact&               operator=(contact const& right);
@@ -60,7 +60,6 @@ namespace                  configuration {
     bool                   can_submit_commands() const throw ();
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
-    void                   contact_name(std::string const& name);
     std::string const&     contact_name() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     email() const throw ();

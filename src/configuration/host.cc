@@ -115,9 +115,11 @@ static unsigned int const   default_retry_interval(1);
 static unsigned short const default_stalking_options(host::none);
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-host::host()
+host::host(key_type const& key)
   : object(object::host),
     _checks_active(default_checks_active),
     _checks_passive(default_checks_passive),
@@ -129,6 +131,7 @@ host::host()
     _flap_detection_options(default_flap_detection_options),
     _freshness_threshold(default_freshness_threshold),
     _high_flap_threshold(default_high_flap_threshold),
+    _host_name(key),
     _initial_state(default_initial_state),
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
@@ -140,7 +143,9 @@ host::host()
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {}
+    _stalking_options(default_stalking_options) {
+
+}
 
 /**
  *  Copy constructor.
@@ -735,16 +740,6 @@ list_string& host::hostgroups() throw () {
  */
 list_string const& host::hostgroups() const throw () {
   return (*_hostgroups);
-}
-
-/**
- *  Set host name.
- *
- *  @param[in] name New host name.
- */
-void host::host_name(std::string const& name) {
-  _host_name = name;
-  return ;
 }
 
 /**

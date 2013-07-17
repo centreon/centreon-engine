@@ -23,6 +23,7 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/daterange.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/timeperiodexclusion.hh"
 #include "com/centreon/engine/deleter/timerange.hh"
 #include "com/centreon/engine/error.hh"
@@ -148,15 +149,8 @@ void applier::timeperiod::modify_object(
     // Delete old time ranges.
     for (unsigned int i(0);
          i < sizeof(tp->days) / sizeof(*tp->days);
-         ++i) {
-      for (timerange_struct* tr(tp->days[i]); tr;) {
-        timerange_struct* to_delete(tr);
-        tr = tr->next;
-        deleter::timerange(to_delete);
-      }
-      tp->days[i] = NULL;
-    }
-
+         ++i)
+      deleter::listmember(tp->days[i], &deleter::timerange);
     // Create new time ranges.
     _add_time_ranges(obj->timeranges(), tp);
   }
@@ -166,15 +160,8 @@ void applier::timeperiod::modify_object(
     // Delete old exceptions.
     for (unsigned int i(0);
          i < sizeof(tp->exceptions) / sizeof(*tp->exceptions);
-         ++i) {
-      for (daterange_struct* dr(tp->exceptions[i]); dr;) {
-        daterange_struct* to_delete(dr);
-        dr = dr->next;
-        deleter::daterange(to_delete);
-      }
-      tp->exceptions[i] = NULL;
-    }
-
+         ++i)
+      deleter::listmember(tp->exceptions[i], &deleter::daterange);
     // Create new exceptions.
     _add_exceptions(obj->exceptions(), tp);
   }
@@ -182,13 +169,7 @@ void applier::timeperiod::modify_object(
   // Exclusions modified ?
   if (obj->exclude() != old_cfg->exclude()) {
     // Delete old exclusions.
-    for (timeperiodexclusion_struct* te(tp->exclusions); te;) {
-      timeperiodexclusion_struct* to_delete(te);
-      te = te->next;
-      deleter::timeperiodexclusion(to_delete);
-    }
-    tp->exclusions = NULL;
-
+    deleter::listmember(tp->exclusions, &deleter::timeperiodexclusion);
     // Create new exclusions.
     _add_exclusions(obj->exclude(), tp);
   }

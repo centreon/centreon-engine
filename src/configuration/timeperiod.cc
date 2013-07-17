@@ -40,10 +40,13 @@ static struct {
 };
 
 /**
- *  Default constructor.
+ *  Constructor.
+ *
+ *  @param[in] key The object key.
  */
-timeperiod::timeperiod()
-  : object(object::timeperiod) {
+timeperiod::timeperiod(key_type const& key)
+  : object(object::timeperiod),
+    _timeperiod_name(key) {
   _exceptions.resize(DATERANGE_TYPES);
   _timeranges.resize(7);
 }
@@ -247,16 +250,6 @@ std::vector<std::list<daterange> > const& timeperiod::exceptions() const throw (
  */
 list_string const& timeperiod::exclude() const throw () {
   return (*_exclude);
-}
-
-/**
- *  Set the time period name.
- *
- *  @param[in] name New time period name.
- */
-void timeperiod::timeperiod_name(std::string const& name) {
-  _timeperiod_name = name;
-  return ;
 }
 
 /**

@@ -59,7 +59,9 @@ hostescalation::hostescalation()
     _escalation_options(default_escalation_options),
     _first_notification(default_first_notification),
     _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {}
+    _notification_interval(default_notification_interval) {
+
+}
 
 /**
  *  Copy constructor.

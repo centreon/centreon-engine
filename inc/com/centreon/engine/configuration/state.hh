@@ -150,6 +150,10 @@ namespace              configuration {
     void               check_service_freshness(bool value);
     set_command const& commands() const throw ();
     set_command&       commands() throw ();
+    set_command::const_iterator
+                       commands_find(command::key_type const& k) const;
+    set_command::iterator
+                       commands_find(command::key_type const& k);
     int                command_check_interval() const throw ();
     void               command_check_interval(int value);
     void               command_check_interval(int value, bool is_second);
@@ -158,6 +162,10 @@ namespace              configuration {
     set_connector const&
                        connectors() const throw ();
     set_connector&     connectors() throw ();
+    set_connector::const_iterator
+                       connectors_find(connector::key_type const& k) const;
+    set_connector::iterator
+                       connectors_find(connector::key_type const& k);
     set_contact const& contacts() const throw ();
     set_contact&       contacts() throw ();
     set_contact::const_iterator
@@ -343,6 +351,10 @@ namespace              configuration {
                        servicegroups_find(servicegroup::key_type const& k);
     set_service const& services() const throw ();
     set_service&       services() throw ();
+    set_service::const_iterator
+                       services_find(service::key_type const& k) const;
+    set_service::iterator
+                       services_find(service::key_type const& k);
     unsigned int       service_check_timeout() const throw ();
     void               service_check_timeout(unsigned int value);
     unsigned int       service_freshness_check_interval() const throw ();
