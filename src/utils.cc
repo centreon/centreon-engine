@@ -1779,14 +1779,11 @@ void sighandler(int sig) {
   if (sig < 0)
     sig = -sig;
 
-  int x;
-  for (x = 0; sigs[x]; ++x) {}
-  sig %= x;
-
-  sig_id = sig;
+  int const sigs_size(sizeof(sigs) / sizeof(sigs[0]) - 1);
+  sig_id = sig % sigs_size;
 
   /* we received a SIGHUP */
-  if (sig == SIGHUP)
+  if (sig_id == SIGHUP)
     sighup = true;
   /* else begin shutting down... */
   else

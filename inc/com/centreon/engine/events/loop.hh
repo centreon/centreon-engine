@@ -23,6 +23,7 @@
 #  define CCE_EVENTS_LOOP_HH
 
 #  include <ctime>
+#  include "com/centreon/engine/configuration/reload.hh"
 #  include "com/centreon/engine/events/timed_event.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -45,13 +46,17 @@ namespace             events {
 
   private:
                       loop();
-                      loop(loop const& right);
+                      loop(loop const&);
                       ~loop() throw ();
-    loop&             operator=(loop const& right);
+    loop&             operator=(loop const&);
     void              _dispatching();
 
     time_t            _last_status_update;
     time_t            _last_time;
+    unsigned int      _need_reload;
+    configuration::reload
+                      _reload_configuration;
+    bool              _reload_running;
     timed_event       _sleep_event;
   };
 }

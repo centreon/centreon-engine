@@ -22,6 +22,8 @@
 
 #  include <string>
 #  include <utility>
+#  include "com/centreon/concurrency/condvar.hh"
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/configuration/applier/difference.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -174,6 +176,7 @@ namespace           configuration {
                     timeperiods_find(configuration::timeperiod::key_type const& k) const;
       umap<std::string, shared_ptr<timeperiod_struct> >::iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k);
+      void          try_lock();
 
     private:
                     state();
@@ -208,6 +211,8 @@ namespace           configuration {
                     _contacts;
       umap<std::string, shared_ptr<contactgroup_struct> >
                     _contactgroups;
+      concurrency::condvar
+                    _cv_lock;
       umap<std::string, shared_ptr<host_struct> >
                     _hosts;
       umultimap<std::string, shared_ptr<hostdependency_struct> >
@@ -216,6 +221,8 @@ namespace           configuration {
                     _hostescalations;
       umap<std::string, shared_ptr<hostgroup_struct> >
                     _hostgroups;
+      concurrency::mutex
+                    _lock;
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >
                     _services;
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >
@@ -226,6 +233,7 @@ namespace           configuration {
                     _servicegroups;
       umap<std::string, shared_ptr<timeperiod_struct> >
                     _timeperiods;
+      bool          _waiting;
     };
   }
 }

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/config.hh"
@@ -148,7 +149,8 @@ void applier::state::unload() {
  *  Default constructor.
  */
 applier::state::state()
-  : _config(NULL) {
+  : _config(NULL),
+    _waiting(false) {
   applier::logging::load();
   applier::globals::load();
   applier::macros::load();
@@ -880,6 +882,19 @@ umap<std::string, shared_ptr<timeperiod_struct> >::iterator applier::state::time
   return (_timeperiods.find(k));
 }
 
+/**
+ *  Try to lock.
+ */
+void applier::state::try_lock() {
+  if (has_already_been_loaded) {
+    concurrency::locker lock(&_lock);
+    if (_waiting) {
+      _cv_lock.wake_one();
+      _cv_lock.wait(&_lock);
+    }
+  }
+}
+
 /*
  *  Update all new globals.
  *
@@ -1313,6 +1328,15 @@ void applier::state::_processing(
     config->serviceescalations(),
     new_cfg.serviceescalations());
 
+  concurrency::locker lock(&_lock);
+  // Check if the engine is running.
+  if (has_already_been_loaded) {
+    _waiting = true;
+    // Wait to stop engine before apply configuration.
+    _cv_lock.wait(&_lock);
+    _waiting = false;
+  }
+
   //
   //  Apply and resolve all objects.
   //
@@ -1422,6 +1446,11 @@ void applier::state::_processing(
 
   // Apply new global on the current state.
   _apply(new_cfg);
+
+  if (has_already_been_loaded) {
+    // wake up waiting thread.
+    _cv_lock.wake_one();
+  }
 }
 
 /**

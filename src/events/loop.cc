@@ -104,6 +104,15 @@ void loop::unload() {
 **************************************/
 
 /**
+ *  Default constructor.
+ */
+loop::loop()
+  : _need_reload(0),
+    _reload_running(false) {
+
+}
+
+/**
  *  Destructor.
  */
 loop::~loop() throw () {
@@ -133,8 +142,25 @@ void loop::_dispatching() {
 
     if (sighup) {
       com::centreon::logging::engine::instance().reopen();
+      ++_need_reload;
       sighup = false;
     }
+
+    // Start reload configuration.
+    if (_need_reload && !_reload_running) {
+      _reload_configuration.exec();
+      _reload_running = true;
+      _need_reload = 0;
+    }
+    else if (_reload_running) {
+      // Start locking engine to apply configuration.
+      if (!_reload_configuration.is_finished())
+        _reload_configuration.try_lock();
+      // Reaload configuration ending.
+      else
+        _reload_running = false;
+    }
+
 
     // Get the current time.
     time_t current_time;
@@ -430,11 +456,4 @@ void loop::_dispatching() {
       }
   }
   return;
-}
-
-/**
- *  Default constructor.
- */
-loop::loop() {
-
 }

@@ -300,8 +300,17 @@ int main(int argc, char* argv[]) {
       try {
         // Parse configuration.
         configuration::state config;
-        configuration::parser p;
-        p.parse(config_file, config);
+        {
+          configuration::parser p;
+          p.parse(config_file, config);
+        }
+
+        // Parse retention.
+        retention::state state;
+        {
+          retention::parser p;
+          p.parse(config.state_retention_file(), state);
+        }
 
         // Get program (re)start time and save as macro. Needs to be
         // done after we read config files, as user may have overridden
@@ -335,7 +344,7 @@ int main(int argc, char* argv[]) {
         neb_load_all_modules();
 
         // Apply configuration.
-        configuration::applier::state::instance().apply(config);
+        configuration::applier::state::instance().apply(config, state);
 
         // Add broker backend.
         com::centreon::logging::engine::instance().add(
