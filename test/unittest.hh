@@ -56,20 +56,23 @@ public:
    *
    *  @return Return value of func.
    */
-          unittest(int argc, char** argv, int (* func)(int, char**))
-            : _argc(argc), _argv(argv), _func(func), _log(stdout) {}
+             unittest(
+               int argc,
+               char** argv,
+               int (* func)(int, char**))
+    : _argc(argc), _argv(argv), _func(func), _log(stdout) {}
 
   /**
    *  Destructor.
    */
-          ~unittest() throw () {}
+             ~unittest() throw () {}
 
   /**
    *  Entry point.
    *
    *  @return Return value of unit test routine.
    */
-  int     run() {
+  int        run() {
     int ret(EXIT_FAILURE);
     if (!_init())
       return (ret);
@@ -88,25 +91,33 @@ public:
   }
 
 private:
-  class   nothing
+  class      nothing
     : public com::centreon::logging::backend {
   public:
-    void  close() throw () {}
-    void  log(
-            unsigned long long types,
-            unsigned int verbose,
-            char const* msg,
-            unsigned int size) throw () {
+             nothing() {}
+             nothing(nothing const& right)
+      : com::centreon::logging::backend(right) { (void)right; }
+             ~nothing() throw () {}
+    nothing& operator=(nothing const& right) {
+      (void)right;
+      return (*this);
+    }
+    void     close() throw () {}
+    void     log(
+               unsigned long long types,
+               unsigned int verbose,
+               char const* msg,
+               unsigned int size) throw () {
       (void)types;
       (void)verbose;
       (void)msg;
       (void)size;
     }
-    void  open() {}
-    void  reopen() {}
+    void     open() {}
+    void     reopen() {}
   };
 
-  bool    _init() {
+  bool       _init() {
     try {
       com::centreon::clib::load();
       com::centreon::logging::engine::instance()
@@ -134,7 +145,7 @@ private:
     return (true);
   }
 
-  bool    _deinit() {
+  bool       _deinit() {
     try {
       broker::compatibility::unload();
       broker::loader::unload();
