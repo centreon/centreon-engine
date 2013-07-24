@@ -28,27 +28,33 @@
 
 CCE_BEGIN()
 
-namespace  retention {
-  class    info
+namespace               retention {
+  class                 info
     : public object {
   public:
-           info();
-           info(info const& right);
-           ~info() throw ();
-    info&  operator=(info const& right);
-    bool   operator==(info const& right) const throw ();
-    bool   operator!=(info const& right) const throw ();
-    bool   set(
-             std::string const& key,
-             std::string const& value);
+                        info();
+                        info(info const& right);
+                        ~info() throw ();
+    info&               operator=(info const& right);
+    bool                operator==(info const& right) const throw ();
+    bool                operator!=(info const& right) const throw ();
+    bool                set(
+                          std::string const& key,
+                          std::string const& value);
 
-    time_t created() const throw ();
+    time_t              created() const throw ();
 
   private:
-    bool   _set_created(time_t value);
-    bool   _set_unused(std::string const& value);
+    struct              setters {
+      std::string const name;
+      bool              (*func)(info&, std::string const&);
+    };
 
-    time_t _created;
+    bool                _set_created(time_t value);
+    bool                _set_unused(std::string const& value);
+
+    time_t              _created;
+    static setters      _setters[];
   };
 
   typedef shared_ptr<info> info_ptr;

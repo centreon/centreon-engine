@@ -130,9 +130,6 @@ contactgroupsmember* add_contactgroup_to_host(
     // Add the new member to the head of the member list.
     obj->next = hst->contact_groups;
     hst->contact_groups = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::contactgroupsmember(obj);
@@ -171,9 +168,6 @@ contactgroupsmember* add_contactgroup_to_host_escalation(
     // Add this contactgroup to the host escalation.
     obj->next = he->contact_groups;
     he->contact_groups = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::contactgroupsmember(obj);
@@ -212,9 +206,6 @@ contactgroupsmember* add_contactgroup_to_service(
     // Add this contactgroup to the service.
     obj->next = svc->contact_groups;
     svc->contact_groups = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::contactgroupsmember(obj);
@@ -253,9 +244,6 @@ contactgroupsmember* add_contactgroup_to_serviceescalation(
     // Add this contactgroup to the service escalation.
     obj->next = se->contact_groups;
     se->contact_groups = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::contactgroupsmember(obj);

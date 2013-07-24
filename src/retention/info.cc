@@ -25,10 +25,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<info, type, &info::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(info&, std::string const&);
-} gl_setters[] = {
+info::setters info::_setters[] = {
   { "created",          SETTER(time_t, _set_created) },
   { "version",          SETTER(std::string const&, _set_unused) },
   { "update_available", SETTER(std::string const&, _set_unused) },
@@ -113,10 +110,10 @@ bool info::set(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

@@ -27,10 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<command, type, &command::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(command&, std::string const&);
-} gl_setters[] = {
+command::setters command::_setters[] = {
   { "command_line", SETTER(std::string const&, _set_command_line) },
   { "command_name", SETTER(std::string const&, _set_command_name) },
   { "connector",    SETTER(std::string const&, _set_connector) }
@@ -168,10 +165,10 @@ bool command::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

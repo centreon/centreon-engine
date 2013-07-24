@@ -122,6 +122,11 @@ namespace                  configuration {
     unsigned short         stalking_options() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(service&, std::string const&);
+    };
+
     bool                   _set_action_url(std::string const& value);
     bool                   _set_check_command(std::string const& value);
     bool                   _set_checks_active(bool value);
@@ -205,6 +210,7 @@ namespace                  configuration {
     opt<unsigned int>      _retry_interval;
     group                  _servicegroups;
     std::string            _service_description;
+    static setters         _setters[];
     opt<unsigned short>    _stalking_options;
  };
 

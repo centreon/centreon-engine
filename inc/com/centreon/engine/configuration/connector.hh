@@ -54,11 +54,17 @@ namespace                  configuration {
     std::string const&     connector_name() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(connector&, std::string const&);
+    };
+
     bool                   _set_connector_line(std::string const& value);
     bool                   _set_connector_name(std::string const& value);
 
     std::string            _connector_line;
     std::string            _connector_name;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<connector>   connector_ptr;

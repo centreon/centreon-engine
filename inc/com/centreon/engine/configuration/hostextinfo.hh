@@ -63,6 +63,11 @@ namespace                  configuration {
     std::string const&     vrml_image() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(hostextinfo&, std::string const&);
+    };
+
     bool                   _set_action_url(std::string const& value);
     bool                   _set_coords_2d(std::string const& value);
     bool                   _set_coords_3d(std::string const& value);
@@ -84,6 +89,7 @@ namespace                  configuration {
     std::string            _icon_image_alt;
     std::string            _notes;
     std::string            _notes_url;
+    static setters         _setters[];
     std::string            _statusmap_image;
     std::string            _vrml_image;
   };

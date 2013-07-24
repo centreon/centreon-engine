@@ -27,10 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<serviceescalation, type, &serviceescalation::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(serviceescalation&, std::string const&);
-} gl_setters[] = {
+serviceescalation::setters serviceescalation::_setters[] = {
   { "host",                  SETTER(std::string const&, _set_hosts) },
   { "host_name",             SETTER(std::string const&, _set_hosts) },
   { "description",           SETTER(std::string const&, _set_service_description) },
@@ -238,10 +235,10 @@ bool serviceescalation::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

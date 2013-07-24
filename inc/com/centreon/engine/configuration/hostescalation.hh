@@ -82,6 +82,11 @@ namespace                  configuration {
     bool                   notification_interval_defined() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(hostescalation&, std::string const&);
+    };
+
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
     bool                   _set_escalation_options(std::string const& value);
@@ -101,6 +106,7 @@ namespace                  configuration {
     group                  _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<hostescalation>   hostescalation_ptr;

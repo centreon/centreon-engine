@@ -585,32 +585,16 @@ void applier::service::remove_object(
       }
 
     // Notify event broker.
-    {
-      timeval tv(get_broker_timestamp(NULL));
-
-      // XXX: is it necessary to unregister customvariables ?
-      for (customvariablesmember* cv(svc->custom_variables);
-           cv;
-           cv = cv->next)
-        broker_custom_variable(
-          NEBTYPE_SERVICECUSTOMVARIABLE_ADD,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          svc,
-          cv,
-          &tv);
-
-
-      broker_adaptive_service_data(
-        NEBTYPE_SERVICE_DELETE,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        svc,
-        CMD_NONE,
-        MODATTR_ALL,
-        MODATTR_ALL,
-        &tv);
-    }
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_service_data(
+      NEBTYPE_SERVICE_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      svc,
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
 
     // Remove service object (will effectively delete the object).
     applier::state::instance().services().erase(it);

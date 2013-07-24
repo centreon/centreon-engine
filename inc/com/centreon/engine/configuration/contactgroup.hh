@@ -61,6 +61,11 @@ namespace                  configuration {
     void                   set_resolved(bool resolved) const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(contactgroup&, std::string const&);
+    };
+
     bool                   _set_alias(std::string const& value);
     bool                   _set_contactgroup_members(std::string const& value);
     bool                   _set_contactgroup_name(std::string const& value);
@@ -72,6 +77,7 @@ namespace                  configuration {
     group                  _members;
     mutable bool           _resolved;
     mutable set_string     _resolved_members;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<contactgroup>   contactgroup_ptr;

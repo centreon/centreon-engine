@@ -42,10 +42,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<object, type, &object::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(object&, std::string const&);
-} gl_setters[] = {
+object::setters object::_setters[] = {
   { "use",      SETTER(std::string const&, _set_templates) },
   { "name",     SETTER(std::string const&, _set_name) },
   { "register", SETTER(bool, _set_is_not_template) }
@@ -189,10 +186,10 @@ std::string const& object::name() const throw () {
  */
 bool object::parse(std::string const& key, std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

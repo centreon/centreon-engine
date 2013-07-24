@@ -114,6 +114,11 @@ namespace                  configuration {
     std::string const&     vrml_image() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(host&, std::string const&);
+    };
+
     bool                   _set_action_url(std::string const& value);
     bool                   _set_address(std::string const& value);
     bool                   _set_alias(std::string const& value);
@@ -201,6 +206,7 @@ namespace                  configuration {
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
+    static setters         _setters[];
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;
     std::string            _vrml_image;

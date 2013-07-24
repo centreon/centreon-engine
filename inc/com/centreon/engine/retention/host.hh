@@ -100,6 +100,11 @@ namespace                         retention {
     opt<int> const&               state_type() const throw ();
 
   private:
+    struct                        setters {
+      std::string const           name;
+      bool                        (*func)(host&, std::string const&);
+    };
+
     bool                          _set_acknowledgement_type(int value);
     bool                          _set_active_checks_enabled(bool value);
     bool                          _set_check_command(std::string const& value);
@@ -204,6 +209,7 @@ namespace                         retention {
     opt<bool>                     _problem_has_been_acknowledged;
     opt<int>                      _process_performance_data;
     opt<unsigned int>             _retry_check_interval;
+    static setters                _setters[];
     opt<std::vector<int> >        _state_history;
     opt<int>                      _state_type;
   };

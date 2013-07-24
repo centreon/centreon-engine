@@ -67,6 +67,11 @@ namespace                   configuration {
     void                    set_resolved(bool resolved) const throw ();
 
   private:
+    struct                  setters {
+      std::string const     name;
+      bool                  (*func)(servicegroup&, std::string const&);
+    };
+
     bool                    _set_action_url(std::string const& value);
     bool                    _set_alias(std::string const& value);
     bool                    _set_members(std::string const& value);
@@ -84,6 +89,7 @@ namespace                   configuration {
     mutable set_pair_string _resolved_members;
     group                   _servicegroup_members;
     std::string             _servicegroup_name;
+    static setters          _setters[];
   };
 
   typedef shared_ptr<servicegroup>   servicegroup_ptr;

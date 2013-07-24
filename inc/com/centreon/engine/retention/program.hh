@@ -66,6 +66,11 @@ namespace                     retention {
     opt<bool> const&          process_performance_data() const throw ();
 
   private:
+    struct                    setters {
+      std::string const       name;
+      bool                    (*func)(program&, std::string const&);
+    };
+
     bool                      _set_active_host_checks_enabled(bool value);
     bool                      _set_active_service_checks_enabled(bool value);
     bool                      _set_check_host_freshness(bool value);
@@ -111,6 +116,7 @@ namespace                     retention {
     opt<bool>                 _passive_host_checks_enabled;
     opt<bool>                 _passive_service_checks_enabled;
     opt<bool>                 _process_performance_data;
+    static setters            _setters[];
   };
 
   typedef shared_ptr<program> program_ptr;

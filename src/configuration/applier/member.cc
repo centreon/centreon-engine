@@ -59,9 +59,6 @@ void applier::add_member(
   obj->contact_ptr = &(*it->second);
   obj->next = members;
   members = obj.release();
-
-  // Notify event broker.
-  // XXX
 }
 
 /**
@@ -92,18 +89,13 @@ void applier::add_member(
   obj->command_ptr = &(*it->second);
   obj->next = members;
   members = obj.release();
-
-  // Notify event broker.
-  // XXX
 }
 
 void applier::update_members(
        umap<std::string, shared_ptr<contact_struct> > const& contacts,
        std::list<std::string> const& lst,
        contactsmember_struct*& members) {
-  // XXX: call broker callback to notify del.
   deleter::contactsmember(members);
   members = NULL;
   add_members(contacts, lst, members);
-  // XXX: call broker callback to notify add.
 }

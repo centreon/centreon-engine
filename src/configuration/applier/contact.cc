@@ -448,35 +448,20 @@ void applier::contact::remove_object(
     unregister_object<contact_struct>(&contact_list, cntct);
 
     // Notify event broker.
-    {
-      timeval tv(get_broker_timestamp(NULL));
-
-      // XXX: is it necessary to unregister customvariables ?
-      for (customvariablesmember* cv(cntct->custom_variables);
-           cv;
-           cv = cv->next)
-        broker_custom_variable(
-          NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          cntct,
-          cv,
-          &tv);
-
-      broker_adaptive_contact_data(
-        NEBTYPE_CONTACT_DELETE,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        cntct,
-        CMD_NONE,
-        MODATTR_ALL,
-        MODATTR_ALL,
-        MODATTR_ALL,
-        MODATTR_ALL,
-        MODATTR_ALL,
-        MODATTR_ALL,
-        &tv);
-    }
+    timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_contact_data(
+      NEBTYPE_CONTACT_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      cntct,
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);
 
     // Erase contact object (this will effectively delete the object).
     applier::state::instance().contacts().erase(it);

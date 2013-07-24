@@ -313,9 +313,6 @@ daterange* add_exception_to_timeperiod(
     // list for this exception type.
     obj->next = period->exceptions[type];
     period->exceptions[type] = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::daterange(obj);
