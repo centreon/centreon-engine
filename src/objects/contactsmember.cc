@@ -159,7 +159,6 @@ contactsmember* add_contact_to_contactgroup(
  *  @return Contact membership object.
  */
 contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
-  // XXX: event broker
   return (add_contact_to_object(&hst->contacts, contact_name));
 }
 
@@ -174,7 +173,6 @@ contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
 contactsmember* add_contact_to_host_escalation(
                   hostescalation* he,
                   char const* contact_name) {
-  // XXX: event broker
   return (add_contact_to_object(&he->contacts, contact_name));
 }
 
@@ -232,7 +230,6 @@ contactsmember* add_contact_to_object(
 contactsmember* add_contact_to_service(
                   service* svc,
                   char const* contact_name) {
-  // XXX: event broker
   return (add_contact_to_object(&svc->contacts, contact_name));
 }
 
@@ -247,6 +244,5 @@ contactsmember* add_contact_to_service(
 contactsmember* add_contact_to_serviceescalation(
                   serviceescalation* se,
                   char const* contact_name) {
-  // XXX: event broker
   return (add_contact_to_object(&se->contacts, contact_name));
 }

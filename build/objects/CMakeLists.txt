@@ -21,9 +21,12 @@
 set(SRC_DIR "${SRC_DIR}/objects")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/objects")
 
-# cce_objects target.
-add_library("cce_objects"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/commandsmember.cc"
   "${SRC_DIR}/contact.cc"
@@ -47,6 +50,7 @@ add_library("cce_objects"
   "${SRC_DIR}/timeperiodexclusion.cc"
   "${SRC_DIR}/timerange.cc"
 
+  # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/commandsmember.hh"
   "${INC_DIR}/contact.hh"
@@ -72,13 +76,6 @@ add_library("cce_objects"
   "${INC_DIR}/timeperiodexclusion.hh"
   "${INC_DIR}/timerange.hh"
   "${INC_DIR}/tool.hh"
+
+  PARENT_SCOPE
 )
-
-# Link target with necessary libraries.
-target_link_libraries("cce_objects" "cce_core")
-
-if (WITH_TESTING)
-  # Set directories.
-  set(TEST_DIR "${TEST_DIR}/objects")
-
-endif ()

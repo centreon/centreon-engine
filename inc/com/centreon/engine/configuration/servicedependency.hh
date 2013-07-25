@@ -97,6 +97,11 @@ namespace                  configuration {
     list_string const&     service_description() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(servicedependency&, std::string const&);
+    };
+
     bool                   _set_dependency_period(std::string const& value);
     bool                   _set_dependent_hostgroups(std::string const& value);
     bool                   _set_dependent_hosts(std::string const& value);
@@ -123,6 +128,7 @@ namespace                  configuration {
     opt<unsigned int>      _notification_failure_options;
     group                  _servicegroups;
     group                  _service_description;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<servicedependency>    servicedependency_ptr;

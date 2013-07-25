@@ -28,7 +28,6 @@ set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
-set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
 
@@ -596,12 +595,11 @@ if (WITH_LOGROTATE_SCRIPT)
     )
 endif ()
 
-# Unit test.
-option(WITH_TESTING "Build unit tests." OFF)
-if (WITH_TESTING)
-  set(CTEST_TESTING_TIMEOUT 20)
-  include(CTest)
-  include_directories("${PROJECT_SOURCE_DIR}")
+option(WITH_SHARED_LIB "Define if the core library was build staticly or not" OFF)
+if (WITH_SHARED_LIB)
+  set(LIBRARY_TYPE SHARED)
+else ()
+  set(LIBRARY_TYPE STATIC)
 endif ()
 
 # Configure files.
@@ -623,8 +621,9 @@ add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 # Targets.
 #
 
-# Library engine target.
-add_library("cce_core" STATIC
+set(
+  FILES
+
   # Sources.
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
@@ -647,6 +646,7 @@ add_library("cce_core" STATIC
   "${SRC_DIR}/xdddefault.cc"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
+
   # Headers.
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
@@ -687,7 +687,6 @@ add_subdirectory("conf")
 add_subdirectory("configuration")
 add_subdirectory("commands")
 add_subdirectory("compatibility")
-add_subdirectory("core")
 add_subdirectory("deleter")
 add_subdirectory("events")
 add_subdirectory("logging")
@@ -697,24 +696,23 @@ add_subdirectory("objects")
 add_subdirectory("retention")
 add_subdirectory("scripts")
 
+# Unit test.
+option(WITH_TESTING "Build unit tests." OFF)
+if (WITH_TESTING)
+  set(CTEST_TESTING_TIMEOUT 20)
+  include(CTest)
+  add_subdirectory("test")
+endif ()
+
+# Library engine target.
+add_library("cce_core" ${LIBRARY_TYPE} ${FILES})
+
 # Link target with required libraries.
 target_link_libraries("cce_core"
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${CLIB_LIBRARIES}
-  "cce_configuration_applier"
-  "cce_events"
-  "cce_logging"
-  "cce_broker"
-  "cce_configuration"
-  "cce_checks"
-  "cce_macros"
-  "cce_commands"
-  "cce_compatibility"
-  "cce_objects"
-  "cce_deleter"
-  "cce_retention"
 )
 
 # centengine target.
@@ -725,13 +723,12 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries("centengine" "-all_load")
   else ()
     target_link_libraries("centengine"
-      "-Wl,-whole-archive -lcce_objects -L./objects -lcce_compatibility -L./compatibility -Wl,-no-whole-archive")
+      "-Wl,-whole-archive -lcce_core -L. -Wl,-no-whole-archive")
   endif ()
 endif ()
 get_property(CENTENGINE_BINARY
     TARGET "centengine"
     PROPERTY LOCATION)
-configure_file("${TEST_DIR}/paths.hh.in" "${TEST_DIR}/paths.hh")
 
 # Link centengine with required libraries.
 target_link_libraries("centengine"
@@ -806,270 +803,14 @@ install(DIRECTORY "${INC_DIR}/"
   DESTINATION "${PREFIX_INC}"
   COMPONENT "development"
   FILES_MATCHING PATTERN "*.hh"
-  PATTERN "${INC_DIR}/compatibility/" EXCLUDE)
+  PATTERN "${INC_DIR}/compatibility/" EXCLUDE
+)
 
 #
 # Packaging.
 #
 
 include("package.cmake")
-
-#
-# Unit tests.
-#
-
-if (WITH_TESTING)
-  #
-  # Error tests.
-  #
-  # Integer insertion.
-  set(TEST_NAME "error_insert_integer")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_integer.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Unsigned integer insertion.
-  set(TEST_NAME "error_insert_unsigned_integer")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_unsigned_integer.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Long insertion.
-  set(TEST_NAME "error_insert_long")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_long.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Long long insertion.
-  set(TEST_NAME "error_insert_long_long")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_long_long.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Unsigned long long insertion.
-  set(TEST_NAME "error_insert_unsigned_long_long")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_unsigned_long_long.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Char insertion.
-  set(TEST_NAME "error_insert_char")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_char.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Char array (C string) insertion.
-  set(TEST_NAME "error_insert_char_array")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_char_array.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # String insertion.
-  set(TEST_NAME "error_insert_string")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_string.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Mixed insertions.
-  set(TEST_NAME "error_insert_mixed")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/insert_mixed.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Copy constructor.
-  set(TEST_NAME "error_copy_ctor")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/copy_ctor.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Assignment operator.
-  set(TEST_NAME "error_assignment")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/error/assignment.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-
-
-  #
-  # Notifications tests.
-  #
-  # First notification delay on host.
-  set(TEST_NAME "notifications_first_notif_delay_host")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-    "${TEST_DIR}/notifications/first_notif_delay/host.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # First notification delay on service.
-  set(TEST_NAME "notifications_first_notif_delay_service")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-    "${TEST_DIR}/notifications/first_notif_delay/service.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # First notification delay on host recovery.
-  set(TEST_NAME "notifications_first_notif_delay_host_recovery")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-    "${TEST_DIR}/notifications/first_notif_delay/host_recovery.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # First notification delay on service recovery.
-  set(TEST_NAME "notifications_first_notif_delay_service_recovery")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-    "${TEST_DIR}/notifications/first_notif_delay/service_recovery.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-
-  #
-  # Stats tests.
-  #
-  # Non-existent configuration file.
-  set(TEST_NAME "running_stats_no_config_file")
-  add_test("${TEST_NAME}"
-    "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg")
-  set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-  # Non-existent status file.
-  set(TEST_NAME "running_stats_no_status_file")
-  add_test("${TEST_NAME}"
-    "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg")
-  set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-
-  #
-  # Engine tests.
-  #
-  set(CENTENGINE_RUNNER "centengine_must_run")
-  add_executable("${CENTENGINE_RUNNER}"
-    "${TEST_DIR}/running/centengine_must_run.cc")
-  target_link_libraries("${CENTENGINE_RUNNER}" "cce_core")
-  # Help flag.
-  add_test("running_engine_help"
-    "centengine" "-h")
-  # License flag.
-  add_test("running_engine_license"
-    "centengine" "-V")
-  # Without any service.
-  add_test("running_engine_no_service"
-    "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
-  set_tests_properties("running_engine_no_service"
-    PROPERTIES WILL_SUCCESS TRUE)
-  # Empty host group.
-  set(TEST_NAME "running_engine_empty_hostgroup")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup.cfg")
-  # Empty service group.
-  set(TEST_NAME "running_engine_empty_servicegroup")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg")
-  # Empty host group assignment error.
-  set(TEST_NAME "running_engine_empty_hostgroup_assignment_error")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_error.cfg")
-  set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-  # Empty host group assignment success.
-  set(TEST_NAME "running_engine_empty_hostgroup_assignment_success")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg")
-  # Invalid contactgroup on contact.
-  set(TEST_NAME "invalid_contactgroup_on_contact")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/invalid_contactgroup_on_contact.cfg")
-  set_tests_properties("${TEST_NAME}"
-    PROPERTIES WILL_FAIL TRUE)
-  # broker_module with only path to module.
-  set(TEST_NAME "running_engine_broker_module_without_args")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg")
-  # Check that all symbols required by modules are present.
-  set(TEST_NAME "running_engine_broker_modules_symbols")
-  add_library("running_engine_broker_modules_symbols_checker" SHARED
-    "${TEST_DIR}/running/modules_symbols_checker.cc")
-  set_property(TARGET "running_engine_broker_modules_symbols_checker"
-    PROPERTY PREFIX "")
-  add_library("running_engine_broker_modules_symbols" SHARED
-    "${TEST_DIR}/running/modules_symbols.cc")
-  set_property(TARGET "running_engine_broker_modules_symbols"
-    PROPERTY PREFIX "")
-  get_property(EXTERNAL_COMMAND_PATH
-    TARGET "externalcmd"
-    PROPERTY LOCATION)
-  get_property(MODULE_PATH
-    TARGET "running_engine_broker_modules_symbols_checker"
-    PROPERTY LOCATION)
-  get_property(MODULE_ARGS
-    TARGET "running_engine_broker_modules_symbols"
-    PROPERTY LOCATION)
-  set(CFG_CONTENT
-"command_file=/tmp/running_engine_broker_modules_symbols.tmp
-broker_module=${EXTERNAL_COMMAND_PATH}
-broker_module=${MODULE_PATH} ${MODULE_ARGS}")
-  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
-    "${TEST_DIR}/running/etc/modules_symbols.cfg")
-  add_test("${TEST_NAME}"
-    "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg")
-  # Check that the webservice module can be loaded.
-  if (WITH_WEBSERVICE)
-    set(TEST_NAME "running_engine_broker_modules_webservice")
-    unset(MODULE_ARGS)
-    get_property(MODULE_ARGS
-      TARGET "webservice"
-      PROPERTY LOCATION)
-    set(CFG_CONTENT
-"command_file=/tmp/running_engine_broker_modules_webservice.tmp
-broker_module=${EXTERNAL_COMMAND_PATH}
-broker_module=${MODULE_PATH} ${MODULE_ARGS}")
-    configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
-      "${TEST_DIR}/running/etc/modules_webservice.cfg")
-    add_test("${TEST_NAME}"
-      "centengine" "${TEST_DIR}/running/etc/modules_webservice.cfg")
-  endif ()
-  # Active check of host with no command.
-  set(CFG_CONTENT
-    "cfg_file=${TEST_DIR}/running/etc/host_with_no_check_cmd_objects.cfg")
-  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
-    "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg")
-  set(TEST_NAME "running_host_check_with_no_check_cmd")
-  add_test("${TEST_NAME}"
-    "${CENTENGINE_RUNNER}" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg" "5")
-  # Active check of service with no command.
-  set(CFG_CONTENT
-    "cfg_file=${TEST_DIR}/running/etc/service_with_no_check_cmd_objects.cfg")
-  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
-    "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg")
-  set(TEST_NAME "running_service_check_with_no_check_cmd")
-  add_test("${TEST_NAME}"
-    "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg")
-  set_tests_properties("${TEST_NAME}"
-    PROPERTIES WILL_FAIL TRUE)
-  # Logs are generated for broker modules.
-  set(TEST_NAME "running_logs_for_modules")
-  add_library("logs_for_modules" SHARED
-    "${TEST_DIR}/running/logs_for_modules.cc")
-  unset(MODULE_PATH)
-  get_property(MODULE_PATH
-    TARGET "logs_for_modules"
-    PROPERTY LOCATION)
-  set(CFG_CONTENT
-    "broker_module=${MODULE_PATH}")
-  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
-    "${TEST_DIR}/running/etc/logs_for_modules.cfg")
-  add_test("${TEST_NAME}"
-    "centengine" "${TEST_DIR}/running/etc/logs_for_modules.cfg")
-  # Precache file generation.
-  set(TEST_NAME "running_precache_file_generation")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/running/precache_file_generation.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}"
-    "${TEST_NAME}"
-    "${TEST_DIR}/running/etc/precache/main.cfg"
-    "${TEST_DIR}/running/etc/precache/objects.precache.expected")
-endif ()
 
 #
 # Print summary.
@@ -1081,66 +822,71 @@ message(STATUS "Configuration Summary")
 message(STATUS "---------------------")
 message(STATUS "")
 message(STATUS "  Project")
-message(STATUS "    - Name                       Centreon Engine")
-message(STATUS "    - Version                    ${CENTREON_ENGINE_VERSION}")
+message(STATUS "    - Name                        Centreon Engine")
+message(STATUS "    - Version                     ${CENTREON_ENGINE_VERSION}")
 message(STATUS "")
 message(STATUS "  System")
-message(STATUS "    - Name                       ${CMAKE_SYSTEM_NAME}")
-message(STATUS "    - Version                    ${CMAKE_SYSTEM_VERSION}")
-message(STATUS "    - Processor                  ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "    - Name                        ${CMAKE_SYSTEM_NAME}")
+message(STATUS "    - Version                     ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "    - Processor                   ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "")
 message(STATUS "  Build")
-message(STATUS "    - Compiler                   ${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID})")
-message(STATUS "    - Extra compilation flags    ${CMAKE_CXX_FLAGS}")
-message(STATUS "    - External commands module   enabled")
-if (WITH_WEBSERVICE)
-  message(STATUS "    - Webservice module          enabled")
+message(STATUS "    - Compiler                    ${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID})")
+message(STATUS "    - Extra compilation flags     ${CMAKE_CXX_FLAGS}")
+if (WITH_SHARED_LIB)
+  message(STATUS "    - Build core library staticly yes")
 else ()
-  message(STATUS "    - Webservice module          disabled")
+  message(STATUS "    - Build core library staticly no")
+endif ()
+message(STATUS "    - External commands module    enabled")
+if (WITH_WEBSERVICE)
+  message(STATUS "    - Webservice module           enabled")
+else ()
+  message(STATUS "    - Webservice module           disabled")
 endif ()
 if (WITH_TESTING)
-  message(STATUS "    - Unit tests                 enabled")
+  message(STATUS "    - Unit tests                  enabled")
 else ()
-  message(STATUS "    - Unit tests                 disabled")
+  message(STATUS "    - Unit tests                  disabled")
 endif ()
 if (WITH_PKGCONFIG_SCRIPT)
-  message(STATUS "    - pkg-config script          enabled")
+  message(STATUS "    - pkg-config script           enabled")
 else ()
-  message(STATUS "    - pkg-config script          disabled")
+  message(STATUS "    - pkg-config script           disabled")
 endif ()
 if (WITH_LOGROTATE_SCRIPT)
-  message(STATUS "    - logrotate script           enabled")
+  message(STATUS "    - logrotate script            enabled")
 else ()
-  message(STATUS "    - logrotate script           disabled")
+  message(STATUS "    - logrotate script            disabled")
 endif ()
-message(STATUS "    - Startup script             ${STARTUP_SCRIPT}")
+message(STATUS "    - Startup script              ${STARTUP_SCRIPT}")
 message(STATUS "")
 message(STATUS "  Install")
-message(STATUS "    - Prefix                     ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "    - Binary prefix              ${PREFIX_BIN}")
-message(STATUS "    - Configuration prefix       ${PREFIX_CONF}")
-message(STATUS "    - Library prefix             ${PREFIX_LIB}")
-message(STATUS "    - Include prefix             ${PREFIX_INC}")
-message(STATUS "    - var directory              ${VAR_DIR}")
-message(STATUS "    - Log archive directory      ${LOG_ARCHIVE_DIR}")
-message(STATUS "    - RW directory               ${RW_DIR}")
+message(STATUS "    - Prefix                      ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "    - Binary prefix               ${PREFIX_BIN}")
+message(STATUS "    - Configuration prefix        ${PREFIX_CONF}")
+message(STATUS "    - Library prefix              ${PREFIX_LIB}")
+message(STATUS "    - Include prefix              ${PREFIX_INC}")
+message(STATUS "    - var directory               ${VAR_DIR}")
+message(STATUS "    - Log archive directory       ${LOG_ARCHIVE_DIR}")
+message(STATUS "    - RW directory                ${RW_DIR}")
 if (LOCK_FILE)
-  message(STATUS "    - Lock prefix                ${LOCK_FILE}")
+  message(STATUS "    - Lock prefix                 ${LOCK_FILE}")
 endif ()
 if (WITH_PKGCONFIG_SCRIPT)
-  message(STATUS "    - pkg-config directory       ${PKGCONFIG_DIR}")
+  message(STATUS "    - pkg-config directory        ${PKGCONFIG_DIR}")
 endif ()
 if (WITH_LOGROTATE_SCRIPT)
-  message(STATUS "    - logrotate directory        ${LOGROTATE_DIR}")
+  message(STATUS "    - logrotate directory         ${LOGROTATE_DIR}")
 endif ()
 if (STARTUP_DIR)
-  message(STATUS "    - Startup directory          ${STARTUP_DIR}")
+  message(STATUS "    - Startup directory           ${STARTUP_DIR}")
 endif ()
-message(STATUS "    - User                       ${USER}")
-message(STATUS "    - Group                      ${GROUP}")
-message(STATUS "    - Package                    ${PACKAGE_LIST}")
+message(STATUS "    - User                        ${USER}")
+message(STATUS "    - Group                       ${GROUP}")
+message(STATUS "    - Package                     ${PACKAGE_LIST}")
 message(STATUS "")
 message(STATUS "  Libraries")
-message(STATUS "    - clib include directory     ${CLIB_INCLUDE_DIR}")
-message(STATUS "    - clib library directory     ${CLIB_LIBRARIES}")
+message(STATUS "    - clib include directory      ${CLIB_INCLUDE_DIR}")
+message(STATUS "    - clib library directory      ${CLIB_LIBRARIES}")
 

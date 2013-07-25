@@ -80,6 +80,11 @@ namespace                  configuration {
     std::string const&     type_name() const throw ();
 
   protected:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(object&, std::string const&);
+    };
+
     template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
       static bool generic(T& obj, std::string const& value) {
@@ -105,6 +110,7 @@ namespace                  configuration {
     bool                   _is_resolve;
     bool                   _is_template;
     std::string            _name;
+    static setters         _setters[];
     list_string            _templates;
     object_type            _type;
   };

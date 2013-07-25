@@ -27,10 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<connector, type, &connector::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(connector&, std::string const&);
-} gl_setters[] = {
+connector::setters connector::_setters[] = {
   { "connector_line", SETTER(std::string const&, _set_connector_line) },
   { "connector_name", SETTER(std::string const&, _set_connector_name) }
 };
@@ -163,10 +160,10 @@ bool connector::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

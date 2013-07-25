@@ -20,16 +20,20 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/checks")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/checks")
-set(TEST_DIR "${TEST_DIR}/checks")
 
-# cce_checks target.
-add_library("cce_checks" STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
   # Sources.
   "${SRC_DIR}/checker.cc"
   "${SRC_DIR}/stats.cc"
+
   # Headers.
   "${INC_DIR}/checker.hh"
-  "${INC_DIR}/stats.hh")
+  "${INC_DIR}/stats.hh"
 
-# Link target with required libraries.
-target_link_libraries("cce_checks" "cce_commands" "cce_compatibility")
+  PARENT_SCOPE
+)
+

@@ -905,7 +905,7 @@ void applier::scheduler::_unscheduling_host_checks(
   for (set_host::const_iterator it(hosts.begin()), end(hosts.end());
        it != end;
        ++it) {
-    umap<std::string, timed_event_struct*>::const_iterator
+    umap<std::string, timed_event_struct*>::iterator
       evt(_evt_host_check.find((*it)->host_name()));
     if (evt != _evt_host_check.end()) {
       remove_event(evt->second, &event_list_low, &event_list_low_tail);
@@ -928,7 +928,7 @@ void applier::scheduler::_unscheduling_service_checks(
     std::string const& service_description((*it)->service_description());
     std::pair<std::string, std::string>
       id(std::make_pair(host_name, service_description));
-    umap<std::pair<std::string, std::string>, timed_event_struct*>::const_iterator
+    umap<std::pair<std::string, std::string>, timed_event_struct*>::iterator
       evt(_evt_service_check.find(id));
     if (evt != _evt_service_check.end()) {
       remove_event(evt->second, &event_list_low, &event_list_low_tail);

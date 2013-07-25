@@ -92,6 +92,11 @@ namespace                  configuration {
     list_string const&     service_description() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(serviceescalation&, std::string const&);
+    };
+
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
     bool                   _set_escalation_options(std::string const& value);
@@ -115,6 +120,7 @@ namespace                  configuration {
     opt<unsigned int>      _notification_interval;
     group                  _servicegroups;
     group                  _service_description;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<serviceescalation>   serviceescalation_ptr;

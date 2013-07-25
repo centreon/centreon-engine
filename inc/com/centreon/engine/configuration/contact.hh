@@ -76,6 +76,11 @@ namespace                  configuration {
     bool                   service_notifications_enabled() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(contact&, std::string const&);
+    };
+
     bool                   _set_address(
                              std::string const& key,
                              std::string const& value);
@@ -114,6 +119,7 @@ namespace                  configuration {
     opt<unsigned int>      _service_notification_options;
     std::string            _service_notification_period;
     opt<bool>              _service_notifications_enabled;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<contact>   contact_ptr;

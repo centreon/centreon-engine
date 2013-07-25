@@ -34,10 +34,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &state::setter<type, &state::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(state&, std::string const&);
-} gl_setters[] = {
+state::setters state::_setters[] = {
   { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
   { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
@@ -3341,10 +3338,10 @@ void state::status_update_interval(unsigned int value) {
 bool state::set(std::string const& key, std::string const& value) {
   try {
     for (unsigned int i(0);
-         i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+         i < sizeof(_setters) / sizeof(_setters[0]);
          ++i)
-      if (gl_setters[i].name == key)
-        return ((gl_setters[i].func)(*this, value));
+      if (_setters[i].name == key)
+        return ((_setters[i].func)(*this, value));
   }
   catch (std::exception const& e) {
     logger(log_config_error, basic)

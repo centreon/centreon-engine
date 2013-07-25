@@ -25,8 +25,11 @@ set(INC_DIR "${INC_DIR}/compatibility")
 configure_file("${INC_DIR}/locations.h.in"
   "${INC_DIR}/locations.h")
 
-# cce_compatibility target.
-add_library("cce_compatibility" STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
   # Sources.
   "${SRC_DIR}/check_result.cc"
   "${SRC_DIR}/common.cc"
@@ -38,6 +41,7 @@ add_library("cce_compatibility" STATIC
   "${SRC_DIR}/sighandlers.cc"
   "${SRC_DIR}/skiplist.cc"
   "${SRC_DIR}/utils.cc"
+
   # Headers.
   "${INC_DIR}/broker.h"
   "${INC_DIR}/check_result.h"
@@ -73,10 +77,9 @@ add_library("cce_compatibility" STATIC
   "${INC_DIR}/xpddefault.h"
   "${INC_DIR}/xrddefault.h"
   "${INC_DIR}/xsddefault.h"
-)
 
-# Link target.
-target_link_libraries("cce_compatibility" "cce_core")
+  PARENT_SCOPE
+)
 
 # Install header files for development.
 install(DIRECTORY "${INC_DIR}"

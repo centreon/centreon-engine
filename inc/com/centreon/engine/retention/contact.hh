@@ -58,6 +58,11 @@ namespace                     retention {
     opt<bool> const&          service_notifications_enabled() const throw ();
 
   private:
+    struct                    setters {
+      std::string const       name;
+      bool                    (*func)(contact&, std::string const&);
+    };
+
     bool                      _set_contact_name(std::string const& value);
     bool                      _set_host_notification_period(std::string const& value);
     bool                      _set_host_notifications_enabled(bool value);
@@ -80,6 +85,7 @@ namespace                     retention {
     opt<unsigned long>        _modified_service_attributes;
     opt<std::string>          _service_notification_period;
     opt<bool>                 _service_notifications_enabled;
+    static setters            _setters[];
   };
 
   typedef shared_ptr<contact>    contact_ptr;

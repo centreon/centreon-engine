@@ -28,63 +28,69 @@
 
 CCE_BEGIN()
 
-namespace         retention {
-  class           downtime
+namespace               retention {
+  class                 downtime
     : public object {
   public:
-    enum          type_id {
+    enum                type_id {
       host = 0,
       service = 1
     };
 
-                  downtime(type_id type);
-                  downtime(downtime const& right);
-                  ~downtime() throw ();
-    downtime&     operator=(downtime const& right);
-    bool          operator==(downtime const& right) const throw ();
-    bool          operator!=(downtime const& right) const throw ();
-    bool          set(
-                    std::string const& key,
-                    std::string const& value);
+                        downtime(type_id type);
+                        downtime(downtime const& right);
+                        ~downtime() throw ();
+    downtime&           operator=(downtime const& right);
+    bool                operator==(downtime const& right) const throw ();
+    bool                operator!=(downtime const& right) const throw ();
+    bool                set(
+                          std::string const& key,
+                          std::string const& value);
 
-    std::string   author() const throw ();
-    std::string   comment_data() const throw ();
-    unsigned long downtime_id() const throw ();
-    type_id       downtime_type() const throw ();
-    unsigned long duration() const throw ();
-    time_t        end_time() const throw ();
-    time_t        entry_time() const throw ();
-    bool          fixed() const throw ();
-    std::string   host_name() const throw ();
-    std::string   service_description() const throw ();
-    time_t        start_time() const throw ();
-    unsigned long triggered_by() const throw ();
+    std::string         author() const throw ();
+    std::string         comment_data() const throw ();
+    unsigned long       downtime_id() const throw ();
+    type_id             downtime_type() const throw ();
+    unsigned long       duration() const throw ();
+    time_t              end_time() const throw ();
+    time_t              entry_time() const throw ();
+    bool                fixed() const throw ();
+    std::string         host_name() const throw ();
+    std::string         service_description() const throw ();
+    time_t              start_time() const throw ();
+    unsigned long       triggered_by() const throw ();
 
   private:
-    bool          _set_author(std::string const& value);
-    bool          _set_comment_data(std::string const& value);
-    bool          _set_downtime_id(unsigned long value);
-    bool          _set_duration(unsigned long value);
-    bool          _set_end_time(time_t value);
-    bool          _set_entry_time(time_t value);
-    bool          _set_fixed(bool value);
-    bool          _set_host_name(std::string const& value);
-    bool          _set_service_description(std::string const& value);
-    bool          _set_start_time(time_t value);
-    bool          _set_triggered_by(unsigned long value);
+    struct              setters {
+      std::string const name;
+      bool              (*func)(retention::downtime&, std::string const&);
+    };
 
-    std::string   _author;
-    std::string   _comment_data;
-    unsigned long _downtime_id;
-    type_id       _downtime_type;
-    unsigned long _duration;
-    time_t        _end_time;
-    time_t        _entry_time;
-    bool          _fixed;
-    std::string   _host_name;
-    std::string   _service_description;
-    time_t        _start_time;
-    unsigned long _triggered_by;
+    bool                _set_author(std::string const& value);
+    bool                _set_comment_data(std::string const& value);
+    bool                _set_downtime_id(unsigned long value);
+    bool                _set_duration(unsigned long value);
+    bool                _set_end_time(time_t value);
+    bool                _set_entry_time(time_t value);
+    bool                _set_fixed(bool value);
+    bool                _set_host_name(std::string const& value);
+    bool                _set_service_description(std::string const& value);
+    bool                _set_start_time(time_t value);
+    bool                _set_triggered_by(unsigned long value);
+
+    std::string         _author;
+    std::string         _comment_data;
+    unsigned long       _downtime_id;
+    type_id             _downtime_type;
+    unsigned long       _duration;
+    time_t              _end_time;
+    time_t              _entry_time;
+    bool                _fixed;
+    std::string         _host_name;
+    std::string         _service_description;
+    static setters      _setters[];
+    time_t              _start_time;
+    unsigned long       _triggered_by;
   };
 
   typedef shared_ptr<downtime> downtime_ptr;

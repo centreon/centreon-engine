@@ -25,10 +25,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<program, type, &program::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(program&, std::string const&);
-} gl_setters[] = {
+program::setters program::_setters[] = {
   { "active_host_checks_enabled",     SETTER(bool, _set_active_host_checks_enabled) },
   { "active_service_checks_enabled",  SETTER(bool, _set_active_service_checks_enabled) },
   { "check_host_freshness",           SETTER(bool, _set_check_host_freshness) },
@@ -170,10 +167,10 @@ bool program::set(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

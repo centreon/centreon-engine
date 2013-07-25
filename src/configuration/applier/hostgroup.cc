@@ -220,26 +220,13 @@ void applier::hostgroup::remove_object(
     unregister_object<hostgroup_struct>(&hostgroup_list, grp);
 
     // Notify event broker.
-    {
-      timeval tv(get_broker_timestamp(NULL));
-
-      // XXX: is it necessary to unregister members ?
-      for (hostsmember* m(grp->members); m; m = m->next)
-        broker_group_member(
-          NEBTYPE_HOSTGROUPMEMBER_DELETE,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          m->host_ptr,
-          grp,
-          &tv);
-
-      broker_group(
-        NEBTYPE_HOSTGROUP_DELETE,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        grp,
-        &tv);
-    }
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_HOSTGROUP_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      grp,
+      &tv);
 
     // Erase host group object (will effectively delete the object).
     applier::state::instance().hostgroups().erase(it);

@@ -64,6 +64,11 @@ namespace                  configuration {
                            timeranges() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(timeperiod&, std::string const&);
+    };
+
     bool                   _add_calendar_date(std::string const& line);
     bool                   _add_other_date(std::string const& line);
     bool                   _add_week_day(
@@ -89,6 +94,7 @@ namespace                  configuration {
     bool                   _set_timeperiod_name(std::string const& value);
 
     std::string            _alias;
+    static setters         _setters[];
     std::vector<std::list<daterange> >
                            _exceptions;
     group                  _exclude;

@@ -65,6 +65,11 @@ namespace                  configuration {
     void                   set_resolved(bool resolved) const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(hostgroup&, std::string const&);
+    };
+
     bool                   _set_action_url(std::string const& value);
     bool                   _set_alias(std::string const& value);
     bool                   _set_hostgroup_members(std::string const& value);
@@ -82,6 +87,7 @@ namespace                  configuration {
     std::string            _notes_url;
     mutable bool           _resolved;
     mutable set_string     _resolved_members;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<hostgroup>   hostgroup_ptr;

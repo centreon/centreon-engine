@@ -105,9 +105,6 @@ commandsmember* add_host_notification_command_to_contact(
     // Add the notification command.
     obj->next = cntct->host_notification_commands;
     cntct->host_notification_commands = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::commandsmember(obj);
@@ -146,9 +143,6 @@ commandsmember* add_service_notification_command_to_contact(
     // Add the notification command.
     obj->next = cntct->service_notification_commands;
     cntct->service_notification_commands = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::commandsmember(obj);

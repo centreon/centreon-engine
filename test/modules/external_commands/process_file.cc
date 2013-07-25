@@ -19,15 +19,16 @@
 
 #include <exception>
 #include <fstream>
-#include <stdio.h>
 #include <string>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::io;
 
 /**
  *  Run process_file test.
@@ -36,7 +37,7 @@ static int check_process_file(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  char* tmp(tempnam("./", "extc."));
+  char* tmp(io::file_stream::temp_path());
   try {
     if (!tmp)
       throw (engine_error() << "bad_alloc");
@@ -53,15 +54,14 @@ static int check_process_file(int argc, char** argv) {
     cmd.append(";0\n");
     process_external_command(cmd.c_str());
 
-    remove(tmp);
-    free(tmp);
+    io::file_stream::remove(tmp);
+    delete[] tmp;
     tmp = NULL;
     if (!config->enable_notifications())
       throw (engine_error() << "process_file failed.");
   }
   catch (...) {
-    if (tmp)
-      free(tmp);
+    delete[] tmp;
     throw;
   }
   return (0);

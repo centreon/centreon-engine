@@ -29,10 +29,7 @@ using namespace com::centreon::engine;
      type, \
      &retention::comment::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(retention::comment&, std::string const&);
-} gl_setters[] = {
+retention::comment::setters retention::comment::_setters[] = {
   { "author",              SETTER(std::string const&, _set_author) },
   { "comment_data",        SETTER(std::string const&, _set_comment_data) },
   { "comment_id",          SETTER(unsigned long, _set_comment_id) },
@@ -152,10 +149,10 @@ bool retention::comment::set(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

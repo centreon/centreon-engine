@@ -18,13 +18,18 @@
 ##
 
 # ws_stub_builder target.
-add_executable("ws_stub_builder"
+add_executable(
+  "ws_stub_builder"
+
+  # Sources.
   "${SCRIPT_DIR}/ws_stub_builder/main.cc"
   "${SCRIPT_DIR}/ws_stub_builder/builder.cc"
   "${SCRIPT_DIR}/ws_stub_builder/function.cc"
   "${SCRIPT_DIR}/ws_stub_builder/argument.cc"
   "${SCRIPT_DIR}/ws_stub_builder/arg_definition.cc"
   "${SCRIPT_DIR}/ws_stub_builder/error.cc"
+
+  # Headers.
   "${SCRIPT_DIR}/ws_stub_builder/builder.hh"
   "${SCRIPT_DIR}/ws_stub_builder/function.hh"
   "${SCRIPT_DIR}/ws_stub_builder/argument.hh"

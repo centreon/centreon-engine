@@ -27,10 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostdependency, type, &hostdependency::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(hostdependency&, std::string const&);
-} gl_setters[] = {
+hostdependency::setters hostdependency::_setters[] = {
   { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",                SETTER(std::string const&, _set_hostgroups) },
@@ -225,10 +222,10 @@ bool hostdependency::parse(
        std::string const& key,
        std::string const& value) {
   for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   return (false);
 }
 

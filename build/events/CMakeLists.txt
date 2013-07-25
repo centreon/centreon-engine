@@ -21,33 +21,23 @@
 set(SRC_DIR "${SRC_DIR}/events")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/events")
 
-# cce_macros target.
-add_library(
-  "cce_events"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
   # Sources.
   "${SRC_DIR}/loop.cc"
   "${SRC_DIR}/hash_timed_event.cc"
   "${SRC_DIR}/sched_info.cc"
   "${SRC_DIR}/timed_event.cc"
+
   # Headers.
   "${INC_DIR}/defines.hh"
   "${INC_DIR}/loop.hh"
   "${INC_DIR}/hash_timed_event.hh"
   "${INC_DIR}/sched_info.hh"
-  "${INC_DIR}/timed_event.hh")
+  "${INC_DIR}/timed_event.hh"
 
-# Link target with necessary libraries.
-target_link_libraries("cce_events" "cce_core")
-
-if (WITH_TESTING)
-  # Set directories.
-  set(TEST_DIR "${TEST_DIR}/events")
-
-  # Events tests.
-  set(TEST_NAME "events_handle_timed_event")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/handle_timed_event.cc")
-  target_link_libraries("${TEST_NAME}" "cce_events")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-endif ()
+  PARENT_SCOPE
+)

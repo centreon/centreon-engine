@@ -54,6 +54,10 @@ namespace                  configuration {
     std::string const&     connector() const throw ();
 
   private:
+    struct                 setters {
+      std::string const    name;
+      bool                 (*func)(command&, std::string const&);
+    };
     bool                   _set_command_line(std::string const& value);
     bool                   _set_command_name(std::string const& value);
     bool                   _set_connector(std::string const& value);
@@ -61,6 +65,7 @@ namespace                  configuration {
     std::string            _command_line;
     std::string            _command_name;
     std::string            _connector;
+    static setters         _setters[];
   };
 
   typedef shared_ptr<command>   command_ptr;

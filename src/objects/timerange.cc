@@ -127,9 +127,6 @@ timerange* add_timerange_to_daterange(
     // list for this date range.
     obj->next = drange->times;
     drange->times = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::timerange(obj);
@@ -187,9 +184,6 @@ timerange* add_timerange_to_timeperiod(
     // Add the new time range to the head of the range list for this day.
     obj->next = period->days[day];
     period->days[day] = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::timerange(obj);

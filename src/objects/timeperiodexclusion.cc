@@ -99,9 +99,6 @@ timeperiodexclusion* add_exclusion_to_timeperiod(
     obj->timeperiod_name = string::dup(name);
     obj->next = period->exclusions;
     period->exclusions = obj;
-
-    // Notify event broker.
-    // XXX
   }
   catch (...) {
     deleter::timeperiodexclusion(obj);

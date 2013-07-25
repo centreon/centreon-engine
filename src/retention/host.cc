@@ -27,10 +27,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<host, type, &host::method>::generic
 
-static struct {
-  std::string const name;
-  bool (*func)(host&, std::string const&);
-} gl_setters[] = {
+host::setters host::_setters[] = {
   { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
   { "check_command",                        SETTER(std::string const&, _set_check_command) },
@@ -264,10 +261,10 @@ bool host::set(
        std::string const& key,
        std::string const& value) {
     for (unsigned int i(0);
-       i < sizeof(gl_setters) / sizeof(gl_setters[0]);
+       i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (gl_setters[i].name == key)
-      return ((gl_setters[i].func)(*this, value));
+    if (_setters[i].name == key)
+      return ((_setters[i].func)(*this, value));
   if (!key.empty() && key[0] == '_' && value.size() > 3) {
     char const* cv_name(key.c_str() + 1);
     char const* cv_value(value.c_str() + 2);

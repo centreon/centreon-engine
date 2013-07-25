@@ -312,6 +312,7 @@ WITH_PREFIX_LIB                Define specific directory for Centreon Engine    
                                modules.
 WITH_RW_DIR                    Use for files to need read/write access.         ``${WITH_VAR_DIR}/rw``
 WITH_SAMPLE_CONFIG             Install sample configuration files.              ON
+WITH_SHARED_LIB                Build shared library for the core library.       OFF
 WITH_SSL                       Enable or disable SSL support in web service.    OFF
 WITH_STARTUP_DIR               Define the startup directory.                    Generaly in ``/etc/init.d`` or ``/etc/init``
 WITH_STARTUP_SCRIPT            Generate and install startup script.             auto

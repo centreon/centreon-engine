@@ -169,26 +169,13 @@ void applier::contactgroup::remove_object(
     unregister_object<contactgroup_struct>(&contactgroup_list, grp);
 
     // Notify event broker.
-    {
-      timeval tv(get_broker_timestamp(NULL));
-
-      // XXX: is it necessary to unregister members ?
-      for (contactsmember* m(grp->members); m; m = m->next)
-        broker_group_member(
-          NEBTYPE_CONTACTGROUPMEMBER_DELETE,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          m->contact_ptr,
-          grp,
-          &tv);
-
-      broker_group(
-        NEBTYPE_CONTACTGROUP_DELETE,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        grp,
-        &tv);
-    }
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group(
+      NEBTYPE_CONTACTGROUP_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      grp,
+      &tv);
 
     // Remove contact group (this will effectively delete the object).
     applier::state::instance().contactgroups().erase(it);
