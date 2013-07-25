@@ -21,9 +21,12 @@
 set(SRC_DIR "${SRC_DIR}/deleter")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/deleter")
 
-# cce_deleter target.
-add_library("cce_deleter"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/commandsmember.cc"
   "${SRC_DIR}/contact.cc"
@@ -47,6 +50,7 @@ add_library("cce_deleter"
   "${SRC_DIR}/timeperiodexclusion.cc"
   "${SRC_DIR}/timerange.cc"
 
+  # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/commandsmember.hh"
   "${INC_DIR}/contact.hh"
@@ -69,10 +73,7 @@ add_library("cce_deleter"
   "${INC_DIR}/servicesmember.hh"
   "${INC_DIR}/timeperiod.hh"
   "${INC_DIR}/timeperiodexclusion.hh"
-  "${INC_DIR}/timerange.hh")
+  "${INC_DIR}/timerange.hh"
 
-if (WITH_TESTING)
-  #Set directories.
-  set(TEST_DIR "${TEST_DIR}/deleter")
-endif ()
-
+  PARENT_SCOPE
+)

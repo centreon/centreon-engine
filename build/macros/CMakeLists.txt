@@ -21,9 +21,12 @@
 set(SRC_DIR "${SRC_DIR}/macros")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/macros")
 
-# cce_macros target.
-add_library("cce_macros"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/clear_host.cc"
   "${SRC_DIR}/clear_hostgroup.cc"
   "${SRC_DIR}/clear_service.cc"
@@ -33,6 +36,8 @@ add_library("cce_macros"
   "${SRC_DIR}/grab_value.cc"
   "${SRC_DIR}/misc.cc"
   "${SRC_DIR}/process.cc"
+
+  # Headers.
   "${INC_DIR}/defines.hh"
   "${INC_DIR}/clear_host.hh"
   "${INC_DIR}/clear_hostgroup.hh"
@@ -43,29 +48,7 @@ add_library("cce_macros"
   "${INC_DIR}/grab_service.hh"
   "${INC_DIR}/grab_value.hh"
   "${INC_DIR}/misc.hh"
-  "${INC_DIR}/process.hh")
+  "${INC_DIR}/process.hh"
 
-# Link target with necessary libraries.
-target_link_libraries("cce_macros" "cce_core")
-
-if (WITH_TESTING)
-  # Set directories.
-  set(TEST_DIR "${TEST_DIR}/macros")
-
-  # Grab standard host macro.
-  set(TEST_NAME "macros_grab_standard_host_macro")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/grab_standard_host_macro.cc"
-    "${TEST_DIR}/minimal_setup.cc"
-    "${TEST_DIR}/minimal_setup.hh")
-  target_link_libraries("${TEST_NAME}" "cce_macros")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Grab standard service macro.
-  set(TEST_NAME "macros_grab_standard_service_macro")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/grab_standard_service_macro.cc"
-    "${TEST_DIR}/minimal_setup.cc"
-    "${TEST_DIR}/minimal_setup.hh")
-  target_link_libraries("${TEST_NAME}" "cce_macros")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-endif ()
+  PARENT_SCOPE
+)

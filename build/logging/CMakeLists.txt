@@ -21,33 +21,19 @@
 set(SRC_DIR "${SRC_DIR}/logging")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/logging")
 
-# cce_logging target.
-add_library("cce_logging"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/broker.cc"
   # "${SRC_DIR}/dumpers.cc"
+
+  # Headers.
   "${INC_DIR}/logger.hh"
   "${INC_DIR}/broker.hh"
   # "${INC_DIR}/dumpers.hh"
+
+  PARENT_SCOPE
 )
-
-# Link target with necessary libraries.
-target_link_libraries("cce_logging" "cce_core")
-
-if (WITH_TESTING)
-  # Set directories.
-  set(TEST_DIR "${TEST_DIR}/logging")
-
-  # Test broker log.
-  add_library("dummymod" SHARED "${TEST_DIR}/dummymod.cc")
-  set_target_properties("dummymod" PROPERTIES PREFIX "")
-  add_executable("logging_broker_log" "${TEST_DIR}/broker_log.cc")
-  target_link_libraries("logging_broker_log" "cce_core")
-  add_test("logging_broker_log" "logging_broker_log")
-
-  # Test broker show information.
-  add_executable("logging_broker_show_info" "${TEST_DIR}/broker_show_info.cc")
-  target_link_libraries("logging_broker_show_info" "cce_core")
-  add_test("logging_broker_show_info" "logging_broker_show_info")
-
-endif ()

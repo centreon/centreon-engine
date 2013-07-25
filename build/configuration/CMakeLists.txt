@@ -20,14 +20,16 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/configuration")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/configuration")
-set(TEST_DIR "${TEST_DIR}/configuration")
 
 # Subdirectory.
 add_subdirectory("applier")
 
-# cce_configuration target.
-add_library("cce_configuration"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/connector.cc"
   "${SRC_DIR}/contact.cc"
@@ -53,6 +55,7 @@ add_library("cce_configuration"
   "${SRC_DIR}/timeperiod.cc"
   "${SRC_DIR}/timerange.cc"
 
+  # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
   "${INC_DIR}/contactgroup.hh"
@@ -77,94 +80,7 @@ add_library("cce_configuration"
   "${INC_DIR}/service.hh"
   "${INC_DIR}/state.hh"
   "${INC_DIR}/timeperiod.hh"
-  "${INC_DIR}/timerange.hh")
+  "${INC_DIR}/timerange.hh"
 
-
-
-# Link target with subdirectory's library.
-target_link_libraries("cce_configuration"
-  "cce_configuration_applier"
-  "cce_core")
-
-if (WITH_TESTING)
-  # # Basic test.
-  # set(TEST_NAME "configuration_basic")
-  # add_executable("${TEST_NAME}" "${TEST_DIR}/basic.cc")
-  # target_link_libraries("${TEST_NAME}" "cce_core")
-  # add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
-
-  # # Parsing test.
-  # set(TEST_NAME "configuration_parsing")
-  # add_executable("${TEST_NAME}" "${TEST_DIR}/parsing.cc")
-  # target_link_libraries("${TEST_NAME}" "cce_core")
-  # add_test("${TEST_NAME}" "${TEST_NAME}")
-
-  # Objects copy.
-  set(TEST_BIN_NAME "configuration_objects_copy")
-  add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/objects_copy.cc")
-  target_link_libraries("${TEST_BIN_NAME}" "cce_core")
-
-  ## check object copy configuration path.
-  set(CONF_DIR "${TEST_DIR}/etc")
-
-  # parse_and_copy_configuration_command
-  set(TEST_NAME "parse_and_copy_configuration_command")
-  set(TEST_CONF_FILE "command.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_contactgroup
-  set(TEST_NAME "parse_and_copy_configuration_contactgroup")
-  set(TEST_CONF_FILE "contactgroup.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_contact
-  set(TEST_NAME "parse_and_copy_configuration_contact")
-  set(TEST_CONF_FILE "contact.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_hostdependency
-  set(TEST_NAME "parse_and_copy_configuration_hostdependency")
-  set(TEST_CONF_FILE "hostdependency.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_hostescalation
-  set(TEST_NAME "parse_and_copy_configuration_hostescalation")
-  set(TEST_CONF_FILE "hostescalation.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_hostgroup
-  set(TEST_NAME "parse_and_copy_configuration_hostgroup")
-  set(TEST_CONF_FILE "hostgroup.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_host
-  set(TEST_NAME "parse_and_copy_configuration_host")
-  set(TEST_CONF_FILE "host.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_servicedependency
-  set(TEST_NAME "parse_and_copy_configuration_servicedependency")
-  set(TEST_CONF_FILE "servicedependency.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_serviceescalation
-  set(TEST_NAME "parse_and_copy_configuration_serviceescalation")
-  set(TEST_CONF_FILE "serviceescalation.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_servicegroup
-  set(TEST_NAME "parse_and_copy_configuration_servicegroup")
-  set(TEST_CONF_FILE "servicegroup.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_service
-  set(TEST_NAME "parse_and_copy_configuration_service")
-  set(TEST_CONF_FILE "service.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-  # parse_and_copy_configuration_timeperiod
-  set(TEST_NAME "parse_and_copy_configuration_timeperiod")
-  set(TEST_CONF_FILE "timeperiod.cfg")
-  add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-endif ()
+  PARENT_SCOPE
+)

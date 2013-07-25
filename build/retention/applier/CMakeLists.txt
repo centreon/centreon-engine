@@ -20,11 +20,13 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/applier")
 set(INC_DIR "${INC_DIR}/applier")
-set(TEST_DIR "${TEST_DIR}/applier")
 
-# cce_retention_applier target.
-add_library("cce_retention_applier"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/downtime.cc"
@@ -34,6 +36,7 @@ add_library("cce_retention_applier"
   "${SRC_DIR}/state.cc"
   "${SRC_DIR}/utils.cc"
 
+  # Headers.
   "${INC_DIR}/comment.hh"
   "${INC_DIR}/contact.hh"
   "${INC_DIR}/downtime.hh"
@@ -42,11 +45,6 @@ add_library("cce_retention_applier"
   "${INC_DIR}/service.hh"
   "${INC_DIR}/state.hh"
   "${INC_DIR}/utils.hh"
+
+  PARENT_SCOPE
 )
-
-# Link target with required libraries.
-target_link_libraries("cce_retention_applier" "cce_logging")
-
-if (WITH_TESTING)
-
-endif ()

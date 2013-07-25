@@ -20,14 +20,16 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/retention")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/retention")
-set(TEST_DIR "${TEST_DIR}/retention")
 
 # Subdirectory.
 add_subdirectory("applier")
 
-# cce_retention target.
-add_library("cce_retention"
-  STATIC
+# Set files.
+set(
+  FILES
+  ${FILES}
+
+  # Sources.
   "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/downtime.cc"
@@ -40,6 +42,7 @@ add_library("cce_retention"
   "${SRC_DIR}/service.cc"
   "${SRC_DIR}/state.cc"
 
+  # Headers.
   "${INC_DIR}/comment.hh"
   "${INC_DIR}/contact.hh"
   "${INC_DIR}/downtime.hh"
@@ -51,11 +54,6 @@ add_library("cce_retention"
   "${INC_DIR}/object.hh"
   "${INC_DIR}/service.hh"
   "${INC_DIR}/state.hh"
+
+  PARENT_SCOPE
 )
-
-# Link target with necessary libraries.
-target_link_libraries("cce_retention" "cce_retention_applier" "cce_core")
-
-if (WITH_TESTING)
-
-endif ()
