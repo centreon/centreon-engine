@@ -30,6 +30,8 @@
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/objectlist.hh"
+#include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -559,6 +561,34 @@ void applier::host::resolve_object(
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Error: Cannot resolve non-existing host '"
            << obj->host_name() << "'.");
+
+  // Remove child backlinks.
+  for (hostsmember* m(it->second->child_hosts); m;) {
+    hostsmember* to_delete(m);
+    m = m->next;
+    deleter::hostsmember(to_delete);
+  }
+  it->second->child_hosts = NULL;
+
+  // Remove service backlinks.
+  for (servicesmember* m(it->second->services); m;) {
+    servicesmember* to_delete(m);
+    m = m->next;
+    deleter::servicesmember(to_delete);
+  }
+  it->second->services = NULL;
+
+  // Remove host group links.
+  for (objectlist_struct* m(it->second->hostgroups_ptr); m;) {
+    objectlist_struct* to_delete(m);
+    m = m->next;
+    deleter::objectlist(to_delete);
+  }
+  it->second->hostgroups_ptr = NULL;
+
+  // Reset host counters.
+  it->second->total_services = 0;
+  it->second->total_service_check_interval = 0;
 
   // Resolve host.
   if (!check_host(it->second.get(), NULL, NULL))
