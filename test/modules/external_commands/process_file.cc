@@ -27,8 +27,8 @@
 #include "com/centreon/logging/engine.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
-using namespace com::centreon::io;
 
 /**
  *  Run process_file test.
