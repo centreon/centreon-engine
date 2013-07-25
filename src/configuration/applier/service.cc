@@ -27,6 +27,7 @@
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
@@ -642,6 +643,14 @@ void applier::service::resolve_object(
            << "Error: Cannot resolve non-existing service '"
            << obj->service_description() << "' of host '"
            << obj->hosts().front() << "'.");
+
+  // Remove service group links.
+  for (objectlist_struct* m(it->second->servicegroups_ptr); m;) {
+    objectlist_struct* to_delete(m);
+    m = m->next;
+    deleter::objectlist(to_delete);
+  }
+  it->second->servicegroups_ptr = NULL;
 
   // Resolve service.
   if (!check_service(it->second.get(), NULL, NULL))

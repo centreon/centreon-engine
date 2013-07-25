@@ -27,6 +27,7 @@
 #include "com/centreon/engine/deleter/commandsmember.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -506,6 +507,14 @@ void applier::contact::resolve_object(
     throw (engine_error()
            << "Error: Cannot resolve non-existing contact '"
            << obj->contact_name() << "'.");
+
+  // Remove contact group links.
+  for (objectlist_struct* m(it->second->contactgroups_ptr); m;) {
+    objectlist_struct* to_delete(m);
+    m = m->next;
+    deleter::objectlist(to_delete);
+  }
+  it->second->contactgroups_ptr = NULL;
 
   // Resolve contact.
   if (!check_contact(it->second.get(), NULL, NULL))
