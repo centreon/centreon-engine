@@ -506,7 +506,7 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
     current.first_notification(p.first->second->first_notification);
     current.last_notification(p.first->second->last_notification);
     current.notification_interval(
-              p.first->second->notification_interval);
+              static_cast<unsigned int>(p.first->second->notification_interval));
     current.escalation_period(p.first->second->escalation_period
                               ? p.first->second->escalation_period
                               : "");
@@ -762,7 +762,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
     current.first_notification(p.first->second->first_notification);
     current.last_notification(p.first->second->last_notification);
     current.notification_interval(
-              p.first->second->notification_interval);
+              static_cast<unsigned int>(p.first->second->notification_interval));
     current.escalation_period(p.first->second->escalation_period
                               ? p.first->second->escalation_period
                               : "");
