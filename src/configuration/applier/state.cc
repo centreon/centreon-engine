@@ -1337,6 +1337,7 @@ void applier::state::_processing(
   if (has_already_been_loaded) {
     _waiting = true;
     // Wait to stop engine before apply configuration.
+    _cv_lock.wake_one();
     _cv_lock.wait(&_lock);
     _waiting = false;
   }
