@@ -50,6 +50,56 @@ static std::string gl_config_path;
 
 /**************************************
 *                                     *
+*              Function               *
+*                                     *
+**************************************/
+
+template<class Key, class T, class Hash, class Pred, class Alloc>
+bool compare_with_true_contents(
+                umap<Key, T, Hash, Pred, Alloc> const& lhs,
+                umap<Key, T, Hash, Pred, Alloc> const& rhs) {
+  if (lhs.size() != rhs.size())
+    return (false);
+  for (typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+         it(lhs.begin()), end(lhs.end());
+       it != end;
+       ++it) {
+    typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+      it_find(rhs.find(it->first));
+    if (it_find == rhs.end() || *it_find->second != *it->second)
+      return (false);
+  }
+  return (true);
+}
+
+template<class Key, class T, class Hash, class Pred, class Alloc>
+bool compare_with_true_contents(
+       umultimap<Key, T, Hash, Pred, Alloc> const& lhs,
+       umultimap<Key, T, Hash, Pred, Alloc> const& rhs) {
+  if (lhs.size() != rhs.size())
+    return (false);
+  for (typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+         it(lhs.begin()), end(lhs.end());
+       it != end;
+       ++it) {
+    bool find(false);
+    for (typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+           it_find(rhs.find(it->first)), end(rhs.end());
+         it_find != end && it_find->first == it->first;
+         ++it_find) {
+      if (*it_find->second == *it->second) {
+        find = true;
+        break;
+      }
+    }
+    if (!find)
+      return (false);
+  }
+  return (true);
+}
+
+/**************************************
+*                                     *
 *               Class                 *
 *                                     *
 **************************************/
@@ -129,43 +179,43 @@ public:
     if (*_current_state != *::config)
       throw (engine_error() << "check modify configuration failed: "
              "state are not equal");
-    if (_obj_state.commands != app_state.commands())
+    if (!compare_with_true_contents(_obj_state.commands, app_state.commands()))
       throw (engine_error() << "check modify configuration failed: "
              "commands are not equal");
-    if (_obj_state.connectors != app_state.connectors())
+    if (!compare_with_true_contents(_obj_state.connectors, app_state.connectors()))
       throw (engine_error() << "check modify configuration failed: "
              "connectors are not equal");
-    if (_obj_state.contacts != app_state.contacts())
+    if (!compare_with_true_contents(_obj_state.contacts, app_state.contacts()))
       throw (engine_error() << "check modify configuration failed: "
              "contacts are not equal");
-    if (_obj_state.contactgroups != app_state.contactgroups())
+    if (!compare_with_true_contents(_obj_state.contactgroups, app_state.contactgroups()))
       throw (engine_error() << "check modify configuration failed: "
              "contactgroups are not equal");
-    if (_obj_state.hosts != app_state.hosts())
+    if (!compare_with_true_contents(_obj_state.hosts, app_state.hosts()))
       throw (engine_error() << "check modify configuration failed: "
              "hosts are not equal");
-    if (_obj_state.hostdependencies != app_state.hostdependencies())
+    if (!compare_with_true_contents(_obj_state.hostdependencies, app_state.hostdependencies()))
       throw (engine_error() << "check modify configuration failed: "
              "hostdependencies are not equal");
-    if (_obj_state.hostescalations != app_state.hostescalations())
+    if (!compare_with_true_contents(_obj_state.hostescalations, app_state.hostescalations()))
       throw (engine_error() << "check modify configuration failed: "
              "hostescalations are not equal");
-    if (_obj_state.hostgroups != app_state.hostgroups())
+    if (!compare_with_true_contents(_obj_state.hostgroups, app_state.hostgroups()))
       throw (engine_error() << "check modify configuration failed: "
              "hostgroups are not equal");
-    if (_obj_state.services != app_state.services())
+    if (!compare_with_true_contents(_obj_state.services, app_state.services()))
       throw (engine_error() << "check modify configuration failed: "
              "services are not equal");
-    if (_obj_state.servicedependencies != app_state.servicedependencies())
+    if (!compare_with_true_contents(_obj_state.servicedependencies, app_state.servicedependencies()))
       throw (engine_error() << "check modify configuration failed: "
              "servicedependencies are not equal");
-    if (_obj_state.serviceescalations != app_state.serviceescalations())
+    if (!compare_with_true_contents(_obj_state.serviceescalations, app_state.serviceescalations()))
       throw (engine_error() << "check modify configuration failed: "
              "serviceescalations are not equal");
-    if (_obj_state.servicegroups != app_state.servicegroups())
+    if (!compare_with_true_contents(_obj_state.servicegroups, app_state.servicegroups()))
       throw (engine_error() << "check modify configuration failed: "
              "servicegroups are not equal");
-    if (_obj_state.timeperiods != app_state.timeperiods())
+    if (!compare_with_true_contents(_obj_state.timeperiods, app_state.timeperiods()))
       throw (engine_error() << "check modify configuration failed: "
              "timeperiods are not equal");
   }
