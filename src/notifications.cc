@@ -167,7 +167,6 @@ int service_notification(
     return (OK);
   }
 
-  /* XXX: crazy indent */
   /* we have contacts to notify... */
   if (notification_list != NULL) {
 
@@ -1394,7 +1393,6 @@ int host_notification(
     return (OK);
   }
 
-  /* XXX: crazy indent */
   /* there are contacts to be notified... */
   if (notification_list != NULL) {
 

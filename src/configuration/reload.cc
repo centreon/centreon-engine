@@ -71,7 +71,7 @@ void reload::_run() {
     std::string path(::config->cfg_main());
     p.parse(path, config);
   }
-  configuration::applier::state::instance().apply(config);
+  configuration::applier::state::instance().apply(config, true);
   _set_is_finished(true);
 }
 

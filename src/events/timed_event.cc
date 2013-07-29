@@ -120,7 +120,8 @@ static void _exec_event_program_restart(timed_event* event) {
   logger(dbg_events, basic)
     << "** Program Restart Event";
 
-  // XXX todo: do the same think when receive SIGHUP.
+  // reload configuration.
+  sighup = true;
 
   // log the restart.
   logger(log_process_info, basic)

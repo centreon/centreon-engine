@@ -46,7 +46,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
-#include "com/centreon/engine/xpddefault.hh"
+ #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
 using namespace com::centreon;
@@ -60,12 +60,13 @@ static applier::state* _instance(NULL);
 /**
  *  Apply new configuration.
  *
- *  @param[in] new_cfg The new configuration.
+ *  @param[in] new_cfg        The new configuration.
+ *  @param[in] waiting_thread True to wait thread after calulate differencies.
  */
-void applier::state::apply(configuration::state& new_cfg) {
+void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
   configuration::state save(*config);
   try {
-    _processing(new_cfg);
+    _processing(new_cfg, waiting_thread);
   }
   catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
@@ -79,7 +80,7 @@ void applier::state::apply(configuration::state& new_cfg) {
       << e.what();
     logger(dbg_config, more)
       << "configuration: try to restore old configuration";
-    _processing(save);
+    _processing(save, waiting_thread);
   }
   return ;
 }
@@ -87,15 +88,17 @@ void applier::state::apply(configuration::state& new_cfg) {
 /**
  *  Apply new configuration.
  *
- *  @param[in] new_cfg The new configuration.
- *  @param[in] state   The retention to use.
+ *  @param[in] new_cfg        The new configuration.
+ *  @param[in] state          The retention to use.
+ *  @param[in] waiting_thread True to wait thread after calulate differencies.
  */
 void applier::state::apply(
        configuration::state& new_cfg,
-       retention::state& state) {
+       retention::state& state,
+       bool waiting_thread) {
   configuration::state save(*config);
   try {
-    _processing(new_cfg, &state);
+    _processing(new_cfg, waiting_thread, &state);
   }
   catch (std::exception const& e) {
     // If is the first time to load configuration, we don't
@@ -109,7 +112,7 @@ void applier::state::apply(
       << e.what();
     logger(dbg_config, more)
       << "configuration: try to restore old configuration";
-    _processing(save, &state);
+    _processing(save, waiting_thread, &state);
   }
   return ;
 }
@@ -890,12 +893,10 @@ umap<std::string, shared_ptr<timeperiod_struct> >::iterator applier::state::time
  *  Try to lock.
  */
 void applier::state::try_lock() {
-  if (has_already_been_loaded) {
-    concurrency::locker lock(&_lock);
-    if (_waiting) {
-      _cv_lock.wake_one();
-      _cv_lock.wait(&_lock);
-    }
+  concurrency::locker lock(&_lock);
+  if (_waiting) {
+    _cv_lock.wake_one();
+    _cv_lock.wait(&_lock);
   }
 }
 
@@ -1158,11 +1159,13 @@ void applier::state::_expand(
 /**
  *  Process new configuration and apply it.
  *
- *  @param[in] new_cfg The new configuration.
- *  @param[in] state   The retention to use.
+ *  @param[in] new_cfg        The new configuration.
+ *  @param[in] waiting_thread True to wait thread after calulate differencies.
+ *  @param[in] state          The retention to use.
  */
 void applier::state::_processing(
        configuration::state& new_cfg,
+       bool waiting_thread,
        retention::state* state) {
   // Call prelauch broker event the first time to run applier state.
   if (!has_already_been_loaded)
@@ -1332,12 +1335,10 @@ void applier::state::_processing(
     config->serviceescalations(),
     new_cfg.serviceescalations());
 
-  concurrency::locker lock(&_lock);
-  // Check if the engine is running.
-  if (has_already_been_loaded) {
+  if (waiting_thread) {
+    concurrency::locker lock(&_lock);
     _waiting = true;
     // Wait to stop engine before apply configuration.
-    _cv_lock.wake_one();
     _cv_lock.wait(&_lock);
     _waiting = false;
   }
@@ -1441,10 +1442,9 @@ void applier::state::_processing(
   // Apply new global on the current state.
   _apply(new_cfg);
 
-  if (has_already_been_loaded) {
-    // wake up waiting thread.
+  // wake up waiting thread.
+  if (waiting_thread)
     _cv_lock.wake_one();
-  }
 
   has_already_been_loaded = true;
 }

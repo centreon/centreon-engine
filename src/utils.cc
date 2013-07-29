@@ -211,7 +211,6 @@ int get_raw_command_line_r(
       = string::dup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
   }
 
-  /* XXX: Crazy indent */
   /* get the command arguments */
   if (cmd != NULL) {
     /* skip the command name (we're about to get the arguments)... */

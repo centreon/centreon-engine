@@ -34,7 +34,7 @@ using namespace com::centreon::engine::commands;
  *
  *  @return True if the command exist, false otherwise.
  */
-static bool command_exit(std::string const& name) {
+static bool command_exist(std::string const& name) {
   try {
     set::instance().get_command(name);
   }
@@ -57,33 +57,33 @@ int main_test(int argc, char** argv) {
   // Add commands.
   raw raw1("raw1", "raw1 argv1 argv2");
   cmd_set.add_command(raw1);
-  // com::centreon::shared_ptr<commands::command> pcmd2(raw1.clone());
-  // cmd_set.add_command(pcmd2);
-  // com::centreon::shared_ptr<commands::command>
-  //   pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
-  // cmd_set.add_command(pcmd3);
+  com::centreon::shared_ptr<commands::command> pcmd2(raw1.clone());
+  cmd_set.add_command(pcmd2);
+  com::centreon::shared_ptr<commands::command>
+    pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
+  cmd_set.add_command(pcmd3);
 
-  // // Get commands.
-  // if (!command_exit("raw1"))
-  //   throw (engine_error()
-  //          << "error: get_command failed, 'raw1' not found");
-  // if (!command_exit("pcmd3"))
-  //   throw (engine_error()
-  //          << "error: get_command failed, 'pcmd3' not found");
-  // if (command_exit("undef"))
-  //   throw (engine_error()
-  //          << "error: get_command failed, 'undef' found");
+  // Get commands.
+  if (!command_exist("raw1"))
+    throw (engine_error()
+           << "error: get_command failed, 'raw1' not found");
+  if (!command_exist("pcmd3"))
+    throw (engine_error()
+           << "error: get_command failed, 'pcmd3' not found");
+  if (command_exist("undef"))
+    throw (engine_error()
+           << "error: get_command failed, 'undef' found");
 
-  // // Remove commands.
-  // cmd_set.remove_command("pcmd3");
-  // if (command_exit("pcmd3"))
-  //   throw (engine_error()
-  //          << "error: remove_command failed, 'pcmd3' found");
-  // cmd_set.remove_command("raw1");
-  // if (command_exit("raw1"))
-  //   throw (engine_error()
-  //          << "error: remove_command failed, 'raw1' found");
-  // cmd_set.remove_command("undef");
+  // Remove commands.
+  cmd_set.remove_command("pcmd3");
+  if (command_exist("pcmd3"))
+    throw (engine_error()
+           << "error: remove_command failed, 'pcmd3' found");
+  cmd_set.remove_command("raw1");
+  if (command_exist("raw1"))
+    throw (engine_error()
+           << "error: remove_command failed, 'raw1' found");
+  cmd_set.remove_command("undef");
 
   return (0);
 }
@@ -92,6 +92,8 @@ int main_test(int argc, char** argv) {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
+  // XXX: fix unit test.
+  return (EXIT_FAILURE);
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
