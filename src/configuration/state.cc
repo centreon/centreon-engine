@@ -3488,7 +3488,7 @@ void state::user(std::string const& key, std::string const& value) {
   tmp.erase(pos - 1);
 
   unsigned int idx;
-  if (!string::to(tmp, idx) || !idx || idx >= MAX_USER_MACROS)
+  if (!string::to(tmp, idx) || !idx || idx > MAX_USER_MACROS)
     throw (engine_error()
            << "configuration: invalid user key '" << key << "'");
 
@@ -3503,7 +3503,7 @@ void state::user(std::string const& key, std::string const& value) {
  */
 void state::user(unsigned int key, std::string const& value) {
   if (key >= _users.size())
-    _users.resize(key + 10);
+    _users.resize(key + 1);
   _users[key] = value;
 }
 
