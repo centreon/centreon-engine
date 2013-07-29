@@ -322,6 +322,130 @@ set(
   "cfg_file=base_timeperiod_2.cfg")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
 
+# check modify_hostdependency
+set(TEST_NAME "check_modify_hostdependency")
+set(TEST_MAIN_CONFIG "chkmodify_hostdependency.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_hostdependency_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_host.cfg"
+  "cfg_file=base_hostdependency.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_host_2.cfg"
+  "cfg_file=base_hostdependency_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_hostescalation
+set(TEST_NAME "check_modify_hostescalation")
+set(TEST_MAIN_CONFIG "chkmodify_hostescalation.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_hostescalation_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_host.cfg"
+  "cfg_file=base_hostescalation.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_host_2.cfg"
+  "cfg_file=base_hostescalation_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_service
+set(TEST_NAME "check_modify_service")
+set(TEST_MAIN_CONFIG "chkmodify_service.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_service_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_host.cfg"
+  "cfg_file=base_service.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_host_2.cfg"
+  "cfg_file=base_service_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_servicedependency
+set(TEST_NAME "check_modify_servicedependency")
+set(TEST_MAIN_CONFIG "chkmodify_servicedependency.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_servicedependency_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_host.cfg"
+  "cfg_file=base_service.cfg"
+  "cfg_file=base_servicedependency.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_host_2.cfg"
+  "cfg_file=base_service_2.cfg"
+  "cfg_file=base_servicedependency_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_serviceescalation
+set(TEST_NAME "check_modify_serviceescalation")
+set(TEST_MAIN_CONFIG "chkmodify_serviceescalation.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_serviceescalation_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_host.cfg"
+  "cfg_file=base_service.cfg"
+  "cfg_file=base_serviceescalation.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_host_2.cfg"
+  "cfg_file=base_service_2.cfg"
+  "cfg_file=base_serviceescalation_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
 # check modify_timeperiod
 set(TEST_NAME "check_modify_timeperiod")
 set(TEST_MAIN_CONFIG "chkmodify_timeperiod.cfg")
