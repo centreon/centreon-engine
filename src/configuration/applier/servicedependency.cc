@@ -248,6 +248,10 @@ void applier::servicedependency::expand_object(
             !i
             ? configuration::servicedependency::execution_dependency
             : configuration::servicedependency::notification_dependency);
+          if (i)
+            sdep->execution_failure_options(0);
+          else
+            sdep->notification_failure_options(0);
 
           // Insert new service dependency. We do not need to expand it
           // because no expansion is made on 1->1 dependency.

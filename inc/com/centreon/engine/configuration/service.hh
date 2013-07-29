@@ -43,9 +43,8 @@ namespace                  configuration {
       warning = (1 << 1),
       unknown = (1 << 2),
       critical = (1 << 3),
-      recovery = (1 << 4),
-      flapping = (1 << 5),
-      downtime = (1 << 6)
+      flapping = (1 << 4),
+      downtime = (1 << 5)
     };
     typedef                std::pair<std::string, std::string>
                            key_type;

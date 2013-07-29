@@ -205,6 +205,10 @@ void applier::hostdependency::expand_object(
            !i
            ? configuration::hostdependency::execution_dependency
            : configuration::hostdependency::notification_dependency);
+          if (i)
+            hdep->execution_failure_options(0);
+          else
+            hdep->notification_failure_options(0);
 
           // Insert new host dependency. We do not need to expand it
           // because no expansion is made on 1->1 dependency.

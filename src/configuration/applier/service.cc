@@ -385,7 +385,7 @@ void applier::service::modify_object(
   modify_if_different(
     s->notify_on_recovery,
     static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::recovery)));
+      obj->notification_options() & configuration::service::ok)));
   modify_if_different(
     s->notify_on_flapping,
     static_cast<int>(static_cast<bool>(
@@ -635,6 +635,15 @@ void applier::service::resolve_object(
     deleter::objectlist(to_delete);
   }
   it->second->servicegroups_ptr = NULL;
+
+  // Find host and adjust its counters.
+  umap<std::string, shared_ptr<host_struct> >::iterator
+    hst(applier::state::instance().hosts_find(it->second->host_name));
+  if (hst != applier::state::instance().hosts().end()) {
+    ++hst->second->total_services;
+    hst->second->total_service_check_interval
+      += it->second->check_interval;
+  }
 
   // Resolve service.
   if (!check_service(it->second.get(), NULL, NULL))

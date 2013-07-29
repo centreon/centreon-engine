@@ -69,16 +69,16 @@ int main_test(int argc, char** argv) {
   std::string config_file(write_config_file(resource_file));
 
   try {
-    configuration::state config;
+    configuration::state cfg;
     configuration::parser p;
-    p.parse(config_file, config);
+    p.parse(config_file, cfg);
 
     // tricks to bypass create log file.
-    config.log_file("");
+    cfg.log_file("");
 
-    configuration::applier::state::instance().apply(config);
+    configuration::applier::state::instance().apply(cfg);
 
-    std::vector<std::string> const& users(config.user());
+    std::vector<std::string> const& users(cfg.user());
     for (unsigned int i(0); i < MAX_USER_MACROS - 1; ++i) {
       if (!macro_user[i] || macro_user[i] != users[i])
         throw (engine_error() << "apply configuration resources "

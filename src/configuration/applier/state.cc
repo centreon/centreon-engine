@@ -421,6 +421,7 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::st
   p = _hostdependencies.equal_range(k.dependent_hosts().front());
   while (p.first != p.second) {
     configuration::hostdependency current;
+    current.configuration::object::operator=(k);
     current.dependent_hosts().push_back(
                                 p.first->second->dependent_host_name);
     current.hosts().push_back(p.first->second->host_name);
@@ -502,6 +503,7 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
   p = _hostescalations.equal_range(k.hosts().front());
   while (p.first != p.second) {
     configuration::hostescalation current;
+    current.configuration::object::operator=(k);
     current.hosts().push_back(p.first->second->host_name);
     current.first_notification(p.first->second->first_notification);
     current.last_notification(p.first->second->last_notification);
@@ -668,6 +670,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
   p = _servicedependencies.equal_range(std::make_pair(k.dependent_hosts().front(), k.dependent_service_description().front()));
   while (p.first != p.second) {
     configuration::servicedependency current;
+    current.configuration::object::operator=(k);
     current.dependent_hosts().push_back(
                                 p.first->second->dependent_host_name);
     current.dependent_service_description().push_back(
@@ -756,6 +759,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
   p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
   while (p.first != p.second) {
     configuration::serviceescalation current;
+    current.configuration::object::operator=(k);
     current.hosts().push_back(p.first->second->host_name);
     current.service_description().push_back(
                                     p.first->second->description);
@@ -1344,85 +1348,74 @@ void applier::state::_processing(
   // Apply timeperiods.
   _apply<configuration::timeperiod, applier::timeperiod>(
     diff_timeperiods);
-  // _resolve<configuration::timeperiod, applier::timeperiod>(
-  //   config->timeperiods());
+  _resolve<configuration::timeperiod, applier::timeperiod>(
+    config->timeperiods());
 
   // Apply connectors.
   _apply<configuration::connector, applier::connector>(
     diff_connectors);
-  // _resolve<configuration::connector, applier::connector>(
-  //   config->connectors());
+  _resolve<configuration::connector, applier::connector>(
+    config->connectors());
 
   // Apply commands.
   _apply<configuration::command, applier::command>(
     diff_commands);
-  // _resolve<configuration::command, applier::command>(
-  //   config->commands());
+  _resolve<configuration::command, applier::command>(
+    config->commands());
 
   // Apply contacts and contactgroups.
   _apply<configuration::contact, applier::contact>(
     diff_contacts);
   _apply<configuration::contactgroup, applier::contactgroup>(
     diff_contactgroups);
-  // _resolve<configuration::contactgroup, applier::contactgroup>(
-  //   config->contactgroups());
-  // _resolve<configuration::contact, applier::contact>(
-  //   config->contacts());
+  _resolve<configuration::contactgroup, applier::contactgroup>(
+    config->contactgroups());
+  _resolve<configuration::contact, applier::contact>(
+    config->contacts());
 
   // Apply hosts and hostgroups.
   _apply<configuration::host, applier::host>(
     diff_hosts);
   _apply<configuration::hostgroup, applier::hostgroup>(
     diff_hostgroups);
-  // _resolve<configuration::hostgroup, applier::hostgroup>(
-  //   config->hostgroups());
-  // _resolve<configuration::host, applier::host>(
-  //   config->hosts());
+  _resolve<configuration::hostgroup, applier::hostgroup>(
+    config->hostgroups());
+  _resolve<configuration::host, applier::host>(
+    config->hosts());
 
   // Apply services and servicegroups.
   _apply<configuration::service, applier::service>(
     diff_services);
   _apply<configuration::servicegroup, applier::servicegroup>(
     diff_servicegroups);
-  // _resolve<configuration::servicegroup, applier::servicegroup>(
-  //   config->servicegroups());
-  // _resolve<configuration::service, applier::service>(
-  //   config->services());
+  _resolve<configuration::servicegroup, applier::servicegroup>(
+    config->servicegroups());
+  _resolve<configuration::service, applier::service>(
+    config->services());
 
   // Apply host dependencies.
   _apply<configuration::hostdependency, applier::hostdependency>(
     diff_hostdependencies);
-  // _resolve<configuration::hostdependency, applier::hostdependency>(
-  //   config->hostdependencies());
+  _resolve<configuration::hostdependency, applier::hostdependency>(
+    config->hostdependencies());
 
   // Apply service dependencies.
   _apply<configuration::servicedependency, applier::servicedependency>(
     diff_servicedependencies);
-  // _resolve<configuration::servicedependency, applier::servicedependency>(
-  //   config->servicedependencies());
+  _resolve<configuration::servicedependency, applier::servicedependency>(
+    config->servicedependencies());
 
   // Apply host escalations.
   _apply<configuration::hostescalation, applier::hostescalation>(
     diff_hostescalations);
-  // _resolve<configuration::hostescalation, applier::hostescalation>(
-  //   config->hostescalations());
+  _resolve<configuration::hostescalation, applier::hostescalation>(
+    config->hostescalations());
 
   // Apply service escalations.
   _apply<configuration::serviceescalation, applier::serviceescalation>(
     diff_serviceescalations);
-  // _resolve<configuration::serviceescalation, applier::serviceescalation>(
-  //   config->serviceescalations());
-
-  // Pre-flight check.
-  {
-    bool old_verify_config(verify_config);
-    verify_config = true;
-    bool ret(pre_flight_check() == OK);
-    verify_config = old_verify_config;
-    if (!ret)
-      throw (engine_error() << "Bailing out due to errors "
-             "encountered while running the pre-flight check.");
-  }
+  _resolve<configuration::serviceescalation, applier::serviceescalation>(
+    config->serviceescalations());
 
   // Call start broker event the first time to run applier state.
   if (!has_already_been_loaded)
