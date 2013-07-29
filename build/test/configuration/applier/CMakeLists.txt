@@ -258,12 +258,76 @@ add_library("mod_checkmodify" SHARED "${TEST_DIR}/mod_checkmodify.cc")
 set_target_properties("mod_checkmodify" PROPERTIES PREFIX "")
 get_property(MODULE_PATH TARGET "mod_checkmodify" PROPERTY LOCATION)
 
+# check modify_command
+set(TEST_NAME "check_modify_command")
+set(TEST_MAIN_CONFIG "chkmodify_command.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_command_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(CFG_FILES "cfg_file=base_command.cfg" "cfg_file=base_connector.cfg")
+string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(CFG_FILES "cfg_file=base_command_2.cfg" "cfg_file=base_connector_2.cfg")
+string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_connector
+set(TEST_NAME "check_modify_connector")
+set(TEST_MAIN_CONFIG "chkmodify_connector.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_connector_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(CFG_FILES "cfg_file=base_connector.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(CFG_FILES "cfg_file=base_connector_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_contact
+set(TEST_NAME "check_modify_contact")
+set(TEST_MAIN_CONFIG "chkmodify_contact.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_contact_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+# check modify_host
+set(TEST_NAME "check_modify_host")
+set(TEST_MAIN_CONFIG "chkmodify_host.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_host_2.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command.cfg"
+  "cfg_file=base_connector.cfg"
+  "cfg_file=base_contact.cfg"
+  "cfg_file=base_host.cfg"
+  "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(
+  CFG_FILES
+  "cfg_file=base_command_2.cfg"
+  "cfg_file=base_connector_2.cfg"
+  "cfg_file=base_contact_2.cfg"
+  "cfg_file=base_host_2.cfg"
+  "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
 # check modify_timeperiod
 set(TEST_NAME "check_modify_timeperiod")
 set(TEST_MAIN_CONFIG "chkmodify_timeperiod.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_timeperiod_2.cfg")
-set(TEST_BASE_CONFIG "base_timeperiod.cfg")
 add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-configure_file("${CONF_DIR}/${TEST_MAIN_CONFIG}.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(TEST_BASE_CONFIG "base_timeperiod_2.cfg")
-configure_file("${CONF_DIR}/${TEST_MAIN_CONFIG}.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+set(CFG_FILES "cfg_file=base_timeperiod.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(CFG_FILES "cfg_file=base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")

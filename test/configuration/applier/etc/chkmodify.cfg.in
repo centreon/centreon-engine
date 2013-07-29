@@ -17,7 +17,7 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-cfg_file=@TEST_BASE_CONFIG@
+@CFG_FILES@
 broker_module=@MODULE_PATH@ @CONF_DIR@/@TEST_MAIN_MODIFY_CONFIG@
 event_broker_options=-1
 log_file=/tmp/centengine-unittest.log
