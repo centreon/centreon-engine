@@ -1451,6 +1451,8 @@ void applier::state::_processing(
     // wake up waiting thread.
     _cv_lock.wake_one();
   }
+
+  has_already_been_loaded = true;
 }
 
 /**

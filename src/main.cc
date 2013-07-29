@@ -340,6 +340,16 @@ int main(int argc, char* argv[]) {
           <<  "LOG VERSION: " << LOG_VERSION_2;
 
         // Load broker modules.
+        for (std::list<std::string>::const_iterator
+               it(config.broker_module().begin()),
+               end(config.broker_module().end());
+             it != end;
+             ++it) {
+          std::string filename;
+          std::string args;
+          string::split(*it, filename, args, ' ');
+          broker::loader::instance().add_module(filename, args);
+        }
         neb_init_callback_list();
         neb_load_all_modules();
 

@@ -32,7 +32,7 @@ using namespace com::centreon::engine::configuration;
  *  Default constructor.
  */
 reload::reload()
-  : _is_finished(true) {
+  : _is_finished(false) {
 
 }
 
@@ -66,8 +66,11 @@ void reload::try_lock() {
 void reload::_run() {
   _set_is_finished(false);
   configuration::state config;
-  configuration::parser p;
-  p.parse(::config->cfg_main(), config);
+  {
+    configuration::parser p;
+    std::string path(::config->cfg_main());
+    p.parse(path, config);
+  }
   configuration::applier::state::instance().apply(config);
   _set_is_finished(true);
 }

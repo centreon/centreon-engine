@@ -252,3 +252,18 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 set(TEST_NAME "check_scheduler_configuration")
 set(TEST_CONF_FILE "main_scheduler.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+## check modify configuration.
+add_library("mod_checkmodify" SHARED "${TEST_DIR}/mod_checkmodify.cc")
+set_target_properties("mod_checkmodify" PROPERTIES PREFIX "")
+get_property(MODULE_PATH TARGET "mod_checkmodify" PROPERTY LOCATION)
+
+# check modify_timeperiod
+set(TEST_NAME "check_modify_timeperiod")
+set(TEST_MAIN_CONFIG "chkmodify_timeperiod.cfg")
+set(TEST_MAIN_MODIFY_CONFIG "chkmodify_timeperiod_2.cfg")
+set(TEST_BASE_CONFIG "base_timeperiod.cfg")
+add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+configure_file("${CONF_DIR}/${TEST_MAIN_CONFIG}.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+set(TEST_BASE_CONFIG "base_timeperiod_2.cfg")
+configure_file("${CONF_DIR}/${TEST_MAIN_CONFIG}.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
