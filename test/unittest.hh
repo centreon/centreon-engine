@@ -20,6 +20,7 @@
 #ifndef TEST_UNITTEST_HH
 #  define TEST_UNITTEST_HH
 
+#  include <cstdio>
 #  include <cstdlib>
 #  include <iostream>
 #  include "com/centreon/clib.hh"
@@ -94,7 +95,7 @@ private:
   class      nothing
     : public com::centreon::logging::backend {
   public:
-             nothing() {}
+             nothing(FILE* file = NULL) { (void)file; }
              nothing(nothing const& right)
       : com::centreon::logging::backend(right) { (void)right; }
              ~nothing() throw () {}
