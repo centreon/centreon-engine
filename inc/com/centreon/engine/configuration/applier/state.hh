@@ -182,6 +182,13 @@ namespace           configuration {
       void          try_lock();
 
     private:
+      enum          processing_state {
+        state_waiting,
+        state_apply,
+        state_error,
+        state_ready
+      };
+
                     state();
                     state(state const&);
                     ~state() throw ();
@@ -227,6 +234,7 @@ namespace           configuration {
                     _hostgroups;
       concurrency::mutex
                     _lock;
+      bool          _processing_state;
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >
                     _services;
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >
@@ -237,7 +245,6 @@ namespace           configuration {
                     _servicegroups;
       umap<std::string, shared_ptr<timeperiod_struct> >
                     _timeperiods;
-      bool          _waiting;
     };
   }
 }
