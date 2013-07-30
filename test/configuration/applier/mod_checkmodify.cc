@@ -30,13 +30,12 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/nebstructs.hh"
+#include "com/centreon/engine/objects.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::logging;
 
 /**************************************
 *                                     *
@@ -55,21 +54,55 @@ static std::string gl_config_path;
 **************************************/
 
 template<class Key, class T, class Hash, class Pred>
+void dump(umap<Key, T, Hash, Pred> const& hs) {
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
+         it(hs.begin()), end(hs.end());
+       it != end;
+       ++it)
+    std::cerr << *it->second << std::endl;
+}
+
+template<class Key, class T, class Hash, class Pred>
 bool compare_with_true_contents(
                 umap<Key, T, Hash, Pred> const& lhs,
                 umap<Key, T, Hash, Pred> const& rhs) {
-  if (lhs.size() != rhs.size())
-    return (false);
+  bool ret(true);
   for (typename umap<Key, T, Hash, Pred>::const_iterator
          it(lhs.begin()), end(lhs.end());
        it != end;
        ++it) {
     typename umap<Key, T, Hash, Pred>::const_iterator
       it_find(rhs.find(it->first));
-    if (it_find == rhs.end() || *it_find->second != *it->second)
-      return (false);
+    if (it_find == rhs.end()) {
+      std::cerr << "missing object" << std::endl
+                << "old " << *it->second << std::endl;
+      ret = false;
+    }
+    else if (*it_find->second != *it->second) {
+      std::cerr << "difference detected" << std::endl
+                << "old " << *it->second << std::endl
+                << "new " << *it_find->second << std::endl;
+    }
   }
-  return (true);
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
+         it(rhs.begin()), end(rhs.end());
+       it != end;
+       ++it) {
+    typename umap<Key, T, Hash, Pred>::const_iterator
+      it_find(lhs.find(it->first));
+    if (it_find == lhs.end()) {
+      std::cerr << "missing object" << std::endl
+                << "new " << *it->second << std::endl;
+      ret = false;
+    }
+  }
+  // if (!ret) {
+  //   std::cerr << "old configuration:" << std::endl;
+  //   dump(lhs);
+  //   std::cerr << "new configuration:" << std::endl;
+  //   dump(rhs);
+  // }
+  return (ret);
 }
 
 template<class Key, class T, class Hash, class Pred>
@@ -140,6 +173,18 @@ public:
                         ~checkmodify() throw () { delete _current_state; }
   void                  load_configuration() {
     ::config = NULL;
+    ::command_list = NULL;
+    ::contact_list = NULL;
+    ::contactgroup_list = NULL;
+    ::host_list = NULL;
+    ::hostdependency_list = NULL;
+    ::hostescalation_list = NULL;
+    ::hostgroup_list = NULL;
+    ::service_list = NULL;
+    ::servicedependency_list = NULL;
+    ::serviceescalation_list = NULL;
+    ::servicegroup_list = NULL;
+    ::timeperiod_list = NULL;
     configuration::applier::state::unload();
     configuration::applier::state::load();
     ::config->cfg_main(_cfg_path);
@@ -154,13 +199,6 @@ public:
         break;
       reload_configuration.try_lock();
     }
-    // configuration::state config;
-    // {
-    //   configuration::parser p;
-    //   std::string path(::config->cfg_main());
-    //   p.parse(path, config);
-    // }
-    // configuration::applier::state::instance().apply(config);
   }
   void                  save_current_configuration() {
     configuration::applier::state&
@@ -271,8 +309,7 @@ int callback_event_loop(int callback_type, void* neb_data) {
     }
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, most)
-      << "error: " << e.what();
+    std::cerr << "error: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }
   return (0);
@@ -365,8 +402,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
              "register callback failed");
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, most)
-      << "error: " << e.what();
+    std::cerr << "error: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }
   return (0);

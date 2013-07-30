@@ -123,4 +123,7 @@ namespace                commands {
 
 CCE_END()
 
+std::ostream& operator<<(std::ostream& os, com::centreon::engine::commands::connector const& obj);
+
+
 #endif // !CCE_COMMANDS_CONNECTOR_HH

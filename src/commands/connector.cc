@@ -886,3 +886,19 @@ void connector::restart::_run() {
   }
   return;
 }
+
+/**
+ *  Dump connector content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The connector to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, connector const& obj) {
+  os << "connector {\n"
+    "  name:         " << obj.get_name() << "\n"
+    "  command_line: " << obj.get_command_line() << "\n"
+    "}\n";
+  return (os);
+}

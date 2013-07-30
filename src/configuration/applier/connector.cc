@@ -173,8 +173,14 @@ void applier::connector::remove_object(
   logger(logging::dbg_config, logging::more)
     << "Removing connector '" << obj->connector_name() << "'.";
 
-  // Remove connector object.
-  commands::set::instance().remove_command(obj->connector_name());
+  // Find connector.
+  umap<std::string, shared_ptr<commands::connector> >::iterator
+    it(applier::state::instance().connectors_find(obj->key()));
+  if (it != applier::state::instance().connectors().end()) {
+    // Remove connector object.
+    commands::set::instance().remove_command(obj->connector_name());
+    state::instance().connectors().erase(it);
+  }
 
   // Remove connector from the global configuration set.
   config->connectors().erase(obj);
