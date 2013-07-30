@@ -23,6 +23,8 @@
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/contactsmember.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/shared.hh"
@@ -130,22 +132,60 @@ void applier::contactgroup::modify_object(
   logger(logging::dbg_config, logging::more)
     << "Modifying contactgroup '" << obj->contactgroup_name() << "'.";
 
-  // // Modify contact group.
-  // shared_ptr<contactgroup_struct>&
-  //   g(applier::state::instance().contactgroups()[obj->contactgroup_name()]);
-  // modify_if_different(g->alias, obj->alias().c_str());
-  // if (applier::members_has_change<contactsmember_struct, &contactsmember_struct::contact_name>(obj->members(), g->members))
-  //   applier::update_members(applier::state::instance().contacts(), obj->members(), g->members);
+  // Find old configuration.
+  set_contactgroup::iterator
+    it_cfg(config->contactgroups_find(obj->key()));
+  if (it_cfg == config->contactgroups().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "contact group '" << obj->contactgroup_name() << "'.");
 
-  // XXX: call broker.
-  // // Notify event broker.
-  // timeval tv(get_broker_timestamp(NULL));
-  // broker_group(
-  //   NEBTYPE_CONTACTGROUP_UPDATE,
-  //   NEBFLAG_NONE,
-  //   NEBATTR_NONE,
-  //   grp,
-  //   &tv);
+  // Find contact group object.
+  umap<std::string, shared_ptr<contactgroup_struct> >::iterator
+    it_obj(applier::state::instance().contactgroups_find(obj->key()));
+  if (it_obj == applier::state::instance().contactgroups().end())
+    throw (engine_error() << "Error: Could not modify non-existing "
+           << "contact group object '" << obj->contactgroup_name() << "'.");
+  contactgroup_struct* cg(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::contactgroup> old_cfg(*it_cfg);
+  config->contactgroups().insert(obj);
+  config->contactgroups().erase(it_cfg);
+
+  // Modify properties.
+  modify_if_different(
+    cg->alias,
+    NULL_IF_EMPTY(obj->alias()));
+
+  // Were members modified ?
+  if (obj->members() != old_cfg->members()) {
+    // Delete all old contact group members.
+    deleter::listmember(
+      (*it_obj).second->members,
+      &deleter::contactsmember);
+
+    // Create new contact group members.
+    for (set_string::const_iterator
+           it(obj->resolved_members().begin()),
+           end(obj->resolved_members().end());
+         it != end;
+         ++it)
+      if (!add_contact_to_contactgroup(
+             cg,
+             it->c_str()))
+        throw (engine_error() << "Error: Could not add contact member '"
+               << *it << "' to contact group '" << obj->contactgroup_name()
+               << "'.");
+  }
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_CONTACTGROUP_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    cg,
+    &tv);
 }
 
 /**

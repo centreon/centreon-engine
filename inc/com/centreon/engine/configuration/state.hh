@@ -175,6 +175,10 @@ namespace               configuration {
     set_contactgroup const&
                         contactgroups() const throw ();
     set_contactgroup&   contactgroups() throw ();
+    set_contactgroup::const_iterator
+                        contactgroups_find(contactgroup::key_type const& k) const;
+    set_contactgroup::iterator
+                        contactgroups_find(contactgroup::key_type const& k);
     date_type           date_format() const throw ();
     void                date_format(date_type value);
     std::string const&  debug_file() const throw ();
