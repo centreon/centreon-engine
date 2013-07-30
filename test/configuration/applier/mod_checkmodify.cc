@@ -54,17 +54,17 @@ static std::string gl_config_path;
 *                                     *
 **************************************/
 
-template<class Key, class T, class Hash, class Pred, class Alloc>
+template<class Key, class T, class Hash, class Pred>
 bool compare_with_true_contents(
-                umap<Key, T, Hash, Pred, Alloc> const& lhs,
-                umap<Key, T, Hash, Pred, Alloc> const& rhs) {
+                umap<Key, T, Hash, Pred> const& lhs,
+                umap<Key, T, Hash, Pred> const& rhs) {
   if (lhs.size() != rhs.size())
     return (false);
-  for (typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
          it(lhs.begin()), end(lhs.end());
        it != end;
        ++it) {
-    typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+    typename umap<Key, T, Hash, Pred>::const_iterator
       it_find(rhs.find(it->first));
     if (it_find == rhs.end() || *it_find->second != *it->second)
       return (false);
@@ -72,18 +72,18 @@ bool compare_with_true_contents(
   return (true);
 }
 
-template<class Key, class T, class Hash, class Pred, class Alloc>
+template<class Key, class T, class Hash, class Pred>
 bool compare_with_true_contents(
-       umultimap<Key, T, Hash, Pred, Alloc> const& lhs,
-       umultimap<Key, T, Hash, Pred, Alloc> const& rhs) {
+       umultimap<Key, T, Hash, Pred> const& lhs,
+       umultimap<Key, T, Hash, Pred> const& rhs) {
   if (lhs.size() != rhs.size())
     return (false);
-  for (typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
          it(lhs.begin()), end(lhs.end());
        it != end;
        ++it) {
     bool find(false);
-    for (typename umap<Key, T, Hash, Pred, Alloc>::const_iterator
+    for (typename umap<Key, T, Hash, Pred>::const_iterator
            it_find(rhs.find(it->first)), end(rhs.end());
          it_find != end && it_find->first == it->first;
          ++it_find) {
