@@ -66,6 +66,7 @@ static applier::state* _instance(NULL);
 void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
   configuration::state save(*config);
   try {
+    _processing_state = state_ready;
     _processing(new_cfg, waiting_thread);
   }
   catch (std::exception const& e) {
@@ -78,9 +79,19 @@ void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
     logger(log_config_error, basic)
       << "configuration: apply new configuration failed: "
       << e.what();
-    logger(dbg_config, more)
-      << "configuration: try to restore old configuration";
-    _processing(save, waiting_thread);
+
+    // Check if we need to restore old configuration.
+    if (_processing_state == state_error) {
+      logger(dbg_config, more)
+        << "configuration: try to restore old configuration";
+      _processing(save, waiting_thread);
+    }
+  }
+
+  // wake up waiting thread.
+  if (waiting_thread) {
+    concurrency::locker lock(&_lock);
+    _cv_lock.wake_one();
   }
   return ;
 }
@@ -98,6 +109,7 @@ void applier::state::apply(
        bool waiting_thread) {
   configuration::state save(*config);
   try {
+    _processing_state = state_ready;
     _processing(new_cfg, waiting_thread, &state);
   }
   catch (std::exception const& e) {
@@ -110,9 +122,19 @@ void applier::state::apply(
     logger(log_config_error, basic)
       << "configuration: apply new configuration failed: "
       << e.what();
-    logger(dbg_config, more)
-      << "configuration: try to restore old configuration";
-    _processing(save, waiting_thread, &state);
+
+    // Check if we need to restore old configuration.
+    if (_processing_state == state_error) {
+      logger(dbg_config, more)
+        << "configuration: try to restore old configuration";
+      _processing(save, waiting_thread, &state);
+    }
+  }
+
+  // wake up waiting thread.
+  if (waiting_thread) {
+    concurrency::locker lock(&_lock);
+    _cv_lock.wake_one();
   }
   return ;
 }
@@ -153,7 +175,7 @@ void applier::state::unload() {
  */
 applier::state::state()
   : _config(NULL),
-    _waiting(false) {
+    _processing_state(state_ready) {
   applier::logging::load();
   applier::globals::load();
   applier::macros::load();
@@ -894,7 +916,7 @@ umap<std::string, shared_ptr<timeperiod_struct> >::iterator applier::state::time
  */
 void applier::state::try_lock() {
   concurrency::locker lock(&_lock);
-  if (_waiting) {
+  if (_processing_state == state_waiting) {
     _cv_lock.wake_one();
     _cv_lock.wait(&_lock);
   }
@@ -1175,15 +1197,6 @@ void applier::state::_processing(
       NEBATTR_NONE,
       NULL);
 
-  // Apply logging configurations.
-  applier::logging::instance().apply(new_cfg);
-
-  // Apply globals configurations.
-  applier::globals::instance().apply(new_cfg);
-
-  // Apply macros configurations.
-  applier::macros::instance().apply(new_cfg);
-
   //
   // Expand all objects.
   //
@@ -1335,120 +1348,130 @@ void applier::state::_processing(
     config->serviceescalations(),
     new_cfg.serviceescalations());
 
-  if (waiting_thread) {
+  if (waiting_thread && _processing_state == state_ready) {
     concurrency::locker lock(&_lock);
-    _waiting = true;
+    _processing_state = state_waiting;
     // Wait to stop engine before apply configuration.
     _cv_lock.wait(&_lock);
-    _waiting = false;
+    _processing_state = state_apply;
   }
 
-  //
-  //  Apply and resolve all objects.
-  //
+  try {
+    // Apply logging configurations.
+    applier::logging::instance().apply(new_cfg);
 
-  // Apply timeperiods.
-  _apply<configuration::timeperiod, applier::timeperiod>(
-    diff_timeperiods);
-  _resolve<configuration::timeperiod, applier::timeperiod>(
-    config->timeperiods());
+    // Apply globals configurations.
+    applier::globals::instance().apply(new_cfg);
 
-  // Apply connectors.
-  _apply<configuration::connector, applier::connector>(
-    diff_connectors);
-  _resolve<configuration::connector, applier::connector>(
-    config->connectors());
+    // Apply macros configurations.
+    applier::macros::instance().apply(new_cfg);
 
-  // Apply commands.
-  _apply<configuration::command, applier::command>(
-    diff_commands);
-  _resolve<configuration::command, applier::command>(
-    config->commands());
+    //
+    //  Apply and resolve all objects.
+    //
 
-  // Apply contacts and contactgroups.
-  _apply<configuration::contact, applier::contact>(
-    diff_contacts);
-  _apply<configuration::contactgroup, applier::contactgroup>(
-    diff_contactgroups);
-  _resolve<configuration::contactgroup, applier::contactgroup>(
-    config->contactgroups());
-  _resolve<configuration::contact, applier::contact>(
-    config->contacts());
+    // Apply timeperiods.
+    _apply<configuration::timeperiod, applier::timeperiod>(
+      diff_timeperiods);
+    _resolve<configuration::timeperiod, applier::timeperiod>(
+      config->timeperiods());
 
-  // Apply hosts and hostgroups.
-  _apply<configuration::host, applier::host>(
-    diff_hosts);
-  _apply<configuration::hostgroup, applier::hostgroup>(
-    diff_hostgroups);
-  _resolve<configuration::hostgroup, applier::hostgroup>(
-    config->hostgroups());
-  _resolve<configuration::host, applier::host>(
-    config->hosts());
+    // Apply connectors.
+    _apply<configuration::connector, applier::connector>(
+      diff_connectors);
+    _resolve<configuration::connector, applier::connector>(
+      config->connectors());
 
-  // Apply services and servicegroups.
-  _apply<configuration::service, applier::service>(
-    diff_services);
-  _apply<configuration::servicegroup, applier::servicegroup>(
-    diff_servicegroups);
-  _resolve<configuration::servicegroup, applier::servicegroup>(
-    config->servicegroups());
-  _resolve<configuration::service, applier::service>(
-    config->services());
+    // Apply commands.
+    _apply<configuration::command, applier::command>(
+      diff_commands);
+    _resolve<configuration::command, applier::command>(
+      config->commands());
 
-  // Apply host dependencies.
-  _apply<configuration::hostdependency, applier::hostdependency>(
-    diff_hostdependencies);
-  _resolve<configuration::hostdependency, applier::hostdependency>(
-    config->hostdependencies());
+    // Apply contacts and contactgroups.
+    _apply<configuration::contact, applier::contact>(
+      diff_contacts);
+    _apply<configuration::contactgroup, applier::contactgroup>(
+      diff_contactgroups);
+    _resolve<configuration::contactgroup, applier::contactgroup>(
+      config->contactgroups());
+    _resolve<configuration::contact, applier::contact>(
+      config->contacts());
 
-  // Apply service dependencies.
-  _apply<configuration::servicedependency, applier::servicedependency>(
-    diff_servicedependencies);
-  _resolve<configuration::servicedependency, applier::servicedependency>(
-    config->servicedependencies());
+    // Apply hosts and hostgroups.
+    _apply<configuration::host, applier::host>(
+      diff_hosts);
+    _apply<configuration::hostgroup, applier::hostgroup>(
+      diff_hostgroups);
+    _resolve<configuration::hostgroup, applier::hostgroup>(
+      config->hostgroups());
+    _resolve<configuration::host, applier::host>(
+      config->hosts());
 
-  // Apply host escalations.
-  _apply<configuration::hostescalation, applier::hostescalation>(
-    diff_hostescalations);
-  _resolve<configuration::hostescalation, applier::hostescalation>(
-    config->hostescalations());
+    // Apply services and servicegroups.
+    _apply<configuration::service, applier::service>(
+      diff_services);
+    _apply<configuration::servicegroup, applier::servicegroup>(
+      diff_servicegroups);
+    _resolve<configuration::servicegroup, applier::servicegroup>(
+      config->servicegroups());
+    _resolve<configuration::service, applier::service>(
+      config->services());
 
-  // Apply service escalations.
-  _apply<configuration::serviceescalation, applier::serviceescalation>(
-    diff_serviceescalations);
-  _resolve<configuration::serviceescalation, applier::serviceescalation>(
-    config->serviceescalations());
+    // Apply host dependencies.
+    _apply<configuration::hostdependency, applier::hostdependency>(
+      diff_hostdependencies);
+    _resolve<configuration::hostdependency, applier::hostdependency>(
+      config->hostdependencies());
 
-  // Call start broker event the first time to run applier state.
-  if (!has_already_been_loaded)
-    broker_program_state(
-      NEBTYPE_PROCESS_START,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      NULL);
+    // Apply service dependencies.
+    _apply<configuration::servicedependency, applier::servicedependency>(
+      diff_servicedependencies);
+    _resolve<configuration::servicedependency, applier::servicedependency>(
+      config->servicedependencies());
 
-  // Load retention.
-  if (state) {
-    retention::applier::state app_state;
-    app_state.apply(new_cfg, *state);
+    // Apply host escalations.
+    _apply<configuration::hostescalation, applier::hostescalation>(
+      diff_hostescalations);
+    _resolve<configuration::hostescalation, applier::hostescalation>(
+      config->hostescalations());
+
+    // Apply service escalations.
+    _apply<configuration::serviceescalation, applier::serviceescalation>(
+      diff_serviceescalations);
+    _resolve<configuration::serviceescalation, applier::serviceescalation>(
+      config->serviceescalations());
+
+    // Call start broker event the first time to run applier state.
+    if (!has_already_been_loaded)
+      broker_program_state(
+        NEBTYPE_PROCESS_START,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        NULL);
+
+    // Load retention.
+    if (state) {
+      retention::applier::state app_state;
+      app_state.apply(new_cfg, *state);
+    }
+
+    // Schedule host and service checks.
+    applier::scheduler::instance().apply(
+      new_cfg,
+      diff_hosts,
+      diff_services);
+
+    // Apply new global on the current state.
+    _apply(new_cfg);
   }
-
-  // Schedule host and service checks.
-  applier::scheduler::instance().apply(
-    new_cfg,
-    diff_hosts,
-    diff_services);
-
-  // Apply new global on the current state.
-  _apply(new_cfg);
-
-  // wake up waiting thread.
-  if (waiting_thread) {
-    concurrency::locker lock(&_lock);
-    _cv_lock.wake_one();
+  catch (...) {
+    _processing_state = state_error;
+    throw;
   }
 
   has_already_been_loaded = true;
+  _processing_state = state_ready;
 }
 
 /**
