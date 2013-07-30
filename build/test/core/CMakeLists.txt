@@ -176,15 +176,15 @@ add_executable(
 target_link_libraries("${CENTENGINE_RUNNER}" "cce_core")
 
 # Help flag.
-add_test("running_engine_help" "centengine" "-h")
+add_test("running_engine_help" "${CENTENGINE_PATH}" "-h")
 
 # License flag.
-add_test("running_engine_license" "centengine" "-V")
+add_test("running_engine_license" "${CENTENGINE_PATH}" "-V")
 
 # Without any service.
 add_test(
   "running_engine_no_service"
-  "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/no_service.cfg"
 )
 set_tests_properties(
   "running_engine_no_service"
@@ -195,21 +195,21 @@ set_tests_properties(
 set(TEST_NAME "running_engine_empty_hostgroup")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup.cfg"
 )
 
 # Empty service group.
 set(TEST_NAME "running_engine_empty_servicegroup")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg"
 )
 
 # Empty host group assignment error.
 set(TEST_NAME "running_engine_empty_hostgroup_assignment_error")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_error.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_error.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -217,14 +217,14 @@ set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 set(TEST_NAME "running_engine_empty_hostgroup_assignment_success")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg"
 )
 
 # Invalid contactgroup on contact.
 set(TEST_NAME "invalid_contactgroup_on_contact")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/invalid_contactgroup_on_contact.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/invalid_contactgroup_on_contact.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -232,7 +232,7 @@ set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 set(TEST_NAME "running_engine_broker_module_without_args")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg"
 )
 
 # Check that all symbols required by modules are present.
@@ -282,7 +282,7 @@ configure_file(
 )
 add_test(
   "${TEST_NAME}"
-  "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg"
+  "${CENTENGINE_PATH}" "${TEST_DIR}/running/etc/modules_symbols.cfg"
 )
 # Check that the webservice module can be loaded.
 if (WITH_WEBSERVICE)
@@ -299,7 +299,7 @@ broker_module=${MODULE_PATH} ${MODULE_ARGS}"
     "${TEST_DIR}/running/etc/modules_webservice.cfg")
   add_test(
     "${TEST_NAME}"
-    "centengine" "${TEST_DIR}/running/etc/modules_webservice.cfg"
+    "${CENTENGINE_PATH}" "${TEST_DIR}/running/etc/modules_webservice.cfg"
   )
 endif ()
 
@@ -330,7 +330,7 @@ configure_file(
 set(TEST_NAME "running_service_check_with_no_check_cmd")
 add_test(
   "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg"
+  "${CENTENGINE_PATH}" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -350,7 +350,7 @@ configure_file(
 )
 add_test(
   "${TEST_NAME}"
-  "centengine" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
+  "${CENTENGINE_PATH}" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
 )
 
 # Precache file generation.

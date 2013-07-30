@@ -24,6 +24,7 @@
 # Set necessary settings.
 cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
+set(CENTENGINE_PATH "${PROJECT_BINARY_DIR}/centengine")
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
@@ -716,8 +717,7 @@ target_link_libraries("cce_core"
 )
 
 # centengine target.
-add_executable("centengine"
-  "${SRC_DIR}/main.cc")
+add_executable("centengine" "${SRC_DIR}/main.cc")
 if (CMAKE_COMPILER_IS_GNUCXX)
   if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries("centengine" "-all_load")
@@ -726,17 +726,13 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       "-Wl,-whole-archive -lcce_core -L. -Wl,-no-whole-archive")
   endif ()
 endif ()
-get_property(CENTENGINE_BINARY
-    TARGET "centengine"
-    PROPERTY LOCATION)
+get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
-target_link_libraries("centengine"
-  "cce_core")
+target_link_libraries("centengine" "cce_core")
 
 # centenginestats target.
-add_executable("centenginestats"
-  "${SRC_DIR}/centenginestats.cc")
+add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
 target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
 
 #
@@ -889,4 +885,5 @@ message(STATUS "")
 message(STATUS "  Libraries")
 message(STATUS "    - clib include directory      ${CLIB_INCLUDE_DIR}")
 message(STATUS "    - clib library directory      ${CLIB_LIBRARIES}")
+
 

@@ -154,6 +154,13 @@ public:
         break;
       reload_configuration.try_lock();
     }
+    // configuration::state config;
+    // {
+    //   configuration::parser p;
+    //   std::string path(::config->cfg_main());
+    //   p.parse(path, config);
+    // }
+    // configuration::applier::state::instance().apply(config);
   }
   void                  save_current_configuration() {
     configuration::applier::state&

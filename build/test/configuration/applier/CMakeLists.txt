@@ -262,7 +262,7 @@ get_property(MODULE_PATH TARGET "mod_checkmodify" PROPERTY LOCATION)
 set(TEST_NAME "check_modify_command")
 set(TEST_MAIN_CONFIG "chkmodify_command.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_command_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_command.cfg" "cfg_file=base_connector.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
@@ -274,7 +274,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_connector")
 set(TEST_MAIN_CONFIG "chkmodify_connector.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_connector_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_connector.cfg")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_connector_2.cfg")
@@ -284,7 +284,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_contact")
 set(TEST_MAIN_CONFIG "chkmodify_contact.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_contact_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -304,7 +304,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_host")
 set(TEST_MAIN_CONFIG "chkmodify_host.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_host_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -326,7 +326,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_hostdependency")
 set(TEST_MAIN_CONFIG "chkmodify_hostdependency.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_hostdependency_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -350,7 +350,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_hostescalation")
 set(TEST_MAIN_CONFIG "chkmodify_hostescalation.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_hostescalation_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -374,7 +374,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_service")
 set(TEST_MAIN_CONFIG "chkmodify_service.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_service_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -398,7 +398,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_servicedependency")
 set(TEST_MAIN_CONFIG "chkmodify_servicedependency.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_servicedependency_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -424,7 +424,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_serviceescalation")
 set(TEST_MAIN_CONFIG "chkmodify_serviceescalation.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_serviceescalation_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(
   CFG_FILES
   "cfg_file=base_command.cfg"
@@ -450,7 +450,7 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CO
 set(TEST_NAME "check_modify_timeperiod")
 set(TEST_MAIN_CONFIG "chkmodify_timeperiod.cfg")
 set(TEST_MAIN_MODIFY_CONFIG "chkmodify_timeperiod_2.cfg")
-add_test("${TEST_NAME}" "centengine" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
+add_test("${TEST_NAME}" "${CENTENGINE_PATH}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_timeperiod.cfg")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_timeperiod_2.cfg")
