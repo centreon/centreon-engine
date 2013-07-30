@@ -1443,8 +1443,10 @@ void applier::state::_processing(
   _apply(new_cfg);
 
   // wake up waiting thread.
-  if (waiting_thread)
+  if (waiting_thread) {
+    concurrency::locker lock(&_lock);
     _cv_lock.wake_one();
+  }
 
   has_already_been_loaded = true;
 }
