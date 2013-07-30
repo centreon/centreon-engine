@@ -92,6 +92,7 @@ void applier::connector::add_object(
                         obj->connector_name(),
                         processed_cmd,
                         &checks::checker::instance()));
+  state::instance().connectors()[obj->connector_name()] = cmd;
   commands::set::instance().add_command(cmd);
 
   return ;
