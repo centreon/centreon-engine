@@ -630,18 +630,13 @@ void connector::_recv_query_execute(char const* data) {
       res.exit_status = process::timeout;
       res.output = "(Process Timeout)";
     }
-    // If the check was not executed correctly.
-    else if (!is_executed) {
-      res.exit_status = process::crash;
-      res.output = std_err;
-    }
-    // If the check was executed correctly.
+    // The check result was properly returned.
     else {
-      if (exit_code < -1 || exit_code > 3)
+      if (exit_code < 0 || exit_code > 3)
         res.exit_code = STATE_UNKNOWN;
       else
         res.exit_code = exit_code;
-      res.output = std_out;
+      res.output = (is_executed ? std_out : std_err);
     }
 
     logger(dbg_commands, basic)
