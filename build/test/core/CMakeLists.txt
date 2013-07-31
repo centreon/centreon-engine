@@ -256,11 +256,6 @@ set_property(
   PROPERTY PREFIX ""
 )
 get_property(
-  EXTERNAL_COMMAND_PATH
-  TARGET "externalcmd"
-  PROPERTY LOCATION
-)
-get_property(
   MODULE_PATH
   TARGET "running_engine_broker_modules_symbols_checker"
   PROPERTY LOCATION
@@ -273,7 +268,7 @@ get_property(
 set(
   CFG_CONTENT
   "command_file=/tmp/running_engine_broker_modules_symbols.tmp
-broker_module=${EXTERNAL_COMMAND_PATH}
+broker_module=${EXTERNALCMD_MODULE}
 broker_module=${MODULE_PATH} ${MODULE_ARGS}"
 )
 configure_file(
@@ -291,7 +286,7 @@ if (WITH_WEBSERVICE)
   get_property(MODULE_ARGS TARGET "webservice" PROPERTY LOCATION)
   set(CFG_CONTENT
     "command_file=/tmp/running_engine_broker_modules_webservice.tmp
-broker_module=${EXTERNAL_COMMAND_PATH}
+broker_module=${EXTERNALCMD_MODULE}
 broker_module=${MODULE_PATH} ${MODULE_ARGS}"
 )
   configure_file(

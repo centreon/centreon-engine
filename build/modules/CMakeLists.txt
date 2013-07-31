@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2013 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -19,6 +19,7 @@
 
 # External commands module is required.
 add_subdirectory("external_commands")
+set(EXTERNALCMD_MODULE "${EXTERNALCMD_MODULE}" PARENT_SCOPE)
 
 # webservice module is optional.
 add_subdirectory("webservice")
