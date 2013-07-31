@@ -46,7 +46,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
- #include "com/centreon/engine/xpddefault.hh"
+#include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
 using namespace com::centreon;
@@ -1443,7 +1443,7 @@ void applier::state::_processing(
       config->serviceescalations());
 
     // Call start broker event the first time to run applier state.
-    if (!has_already_been_loaded)
+    if (!has_already_been_loaded) {
       neb_load_all_modules();
 
       broker_program_state(
@@ -1451,6 +1451,7 @@ void applier::state::_processing(
         NEBFLAG_NONE,
         NEBATTR_NONE,
         NULL);
+    }
 
     // Load retention.
     if (state) {

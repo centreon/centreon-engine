@@ -192,7 +192,6 @@ applier::globals::~globals() throw() {
 void applier::globals::_set_global(
        char*& property,
        std::string const& value) {
-  if (property && strcmp(property, value.c_str())) {
+  if (!property || strcmp(property, value.c_str()))
     property = string::dup(value);
-  }
 }
