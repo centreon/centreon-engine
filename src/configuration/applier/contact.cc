@@ -494,12 +494,9 @@ void applier::contact::resolve_object(
            << obj->contact_name() << "'.");
 
   // Remove contact group links.
-  for (objectlist_struct* m(it->second->contactgroups_ptr); m;) {
-    objectlist_struct* to_delete(m);
-    m = m->next;
-    deleter::objectlist(to_delete);
-  }
-  it->second->contactgroups_ptr = NULL;
+  deleter::listmember(
+    it->second->contactgroups_ptr,
+    &deleter::objectlist);
 
   // Resolve contact.
   if (!check_contact(it->second.get(), NULL, NULL))
