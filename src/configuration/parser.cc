@@ -52,16 +52,12 @@ parser::store parser::_store[] = {
  */
 parser::parser(unsigned int read_options)
   : _config(NULL),
-    _read_options(read_options) {
-
-}
+    _read_options(read_options) {}
 
 /**
  *  Destructor.
  */
-parser::~parser() throw () {
-
-}
+parser::~parser() throw () {}
 
 /**
  *  Parse configuration file.
@@ -432,6 +428,15 @@ void parser::_parse_object_definitions(std::string const& path) {
   object_ptr obj;
   std::string input;
   while (string::get_next_line(stream, input, _current_line)) {
+    // Multi-line.
+    while ('\\' == input[input.size() - 1]) {
+      input.resize(input.size() - 1);
+      std::string addendum;
+      if (!string::get_next_line(stream, addendum, _current_line))
+        break ;
+      input.append(addendum);
+    }
+
     // Check if is a valid object.
     if (obj.is_null()) {
       if (input.find("define") || !std::isspace(input[6]))
