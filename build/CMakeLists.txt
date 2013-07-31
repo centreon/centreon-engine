@@ -24,8 +24,6 @@
 # Set necessary settings.
 cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
-set(CENTENGINE_PATH "${PROJECT_BINARY_DIR}/centengine")
-set(CENTENGINESTATS_PATH "${PROJECT_BINARY_DIR}/centenginestats")
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
@@ -698,14 +696,6 @@ add_subdirectory("objects")
 add_subdirectory("retention")
 add_subdirectory("scripts")
 
-# Unit test.
-option(WITH_TESTING "Build unit tests." OFF)
-if (WITH_TESTING)
-  set(CTEST_TESTING_TIMEOUT 20)
-  include(CTest)
-  add_subdirectory("test")
-endif ()
-
 # Library engine target.
 add_library("cce_core" ${LIBRARY_TYPE} ${FILES})
 
@@ -735,6 +725,15 @@ target_link_libraries("centengine" "cce_core")
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
 target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
+get_property(CENTENGINESTATS_BINARY TARGET "centenginestats" PROPERTY LOCATION)
+
+# Unit test.
+option(WITH_TESTING "Build unit tests." OFF)
+if (WITH_TESTING)
+  set(CTEST_TESTING_TIMEOUT 20)
+  include(CTest)
+  add_subdirectory("test")
+endif ()
 
 #
 # Install stuff.
