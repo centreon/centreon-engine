@@ -152,7 +152,7 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "running_stats_no_config_file")
 add_test(
   "${TEST_NAME}"
-  "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg"
+  "${CENTENGINESTATS_PATH}" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -160,7 +160,7 @@ set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 set(TEST_NAME "running_stats_no_status_file")
 add_test(
   "${TEST_NAME}"
-  "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg"
+  "${CENTENGINESTATS_PATH}" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
