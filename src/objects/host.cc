@@ -563,6 +563,7 @@ host* add_host(
     obj->have_2d_coords = (have_2d_coords > 0);
     obj->have_3d_coords = (have_3d_coords > 0);
     obj->high_flap_threshold = high_flap_threshold;
+    obj->initial_state = initial_state;
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;
     obj->low_flap_threshold = low_flap_threshold;

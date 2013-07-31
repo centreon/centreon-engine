@@ -529,6 +529,7 @@ service* add_service(
     obj->flap_detection_on_warning = (flap_detection_on_warning > 0);
     obj->freshness_threshold = freshness_threshold;
     obj->high_flap_threshold = high_flap_threshold;
+    obj->initial_state = initial_state;
     obj->is_volatile = (is_volatile > 0);
     obj->last_hard_state = initial_state;
     obj->last_state = initial_state;

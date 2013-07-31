@@ -635,12 +635,9 @@ void applier::service::resolve_object(
            << obj->hosts().front() << "'.");
 
   // Remove service group links.
-  for (objectlist_struct* m(it->second->servicegroups_ptr); m;) {
-    objectlist_struct* to_delete(m);
-    m = m->next;
-    deleter::objectlist(to_delete);
-  }
-  it->second->servicegroups_ptr = NULL;
+  deleter::listmember(
+    it->second->servicegroups_ptr,
+    &deleter::objectlist);
 
   // Find host and adjust its counters.
   umap<std::string, shared_ptr<host_struct> >::iterator

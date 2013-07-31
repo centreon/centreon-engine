@@ -16,7 +16,7 @@
 ** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
-
+#include <iostream>
 #include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
@@ -84,6 +84,7 @@ void applier::host::add_object(
   // Add host to the global configuration set.
   config->hosts().insert(obj);
 
+  std::cout << "add >>>>> " << obj->host_name() << " - " << obj->initial_state() << std::endl;
   // Create host.
   host_struct*
     h(add_host(
@@ -563,28 +564,13 @@ void applier::host::resolve_object(
            << obj->host_name() << "'.");
 
   // Remove child backlinks.
-  for (hostsmember* m(it->second->child_hosts); m;) {
-    hostsmember* to_delete(m);
-    m = m->next;
-    deleter::hostsmember(to_delete);
-  }
-  it->second->child_hosts = NULL;
+  deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
 
   // Remove service backlinks.
-  for (servicesmember* m(it->second->services); m;) {
-    servicesmember* to_delete(m);
-    m = m->next;
-    deleter::servicesmember(to_delete);
-  }
-  it->second->services = NULL;
+  deleter::listmember(it->second->services, &deleter::servicesmember);
 
   // Remove host group links.
-  for (objectlist_struct* m(it->second->hostgroups_ptr); m;) {
-    objectlist_struct* to_delete(m);
-    m = m->next;
-    deleter::objectlist(to_delete);
-  }
-  it->second->hostgroups_ptr = NULL;
+  deleter::listmember(it->second->hostgroups_ptr, &deleter::objectlist);
 
   // Reset host counters.
   it->second->total_services = 0;
