@@ -40,10 +40,10 @@ namespace      configuration {
       T const& modified() const throw () { return (_modified); }
       void     parse(T const& old_data, T const& new_data) {
         parse(
-              old_data.begin(),
-              old_data.end(),
-              new_data.begin(),
-              new_data.end());
+          old_data.begin(),
+          old_data.end(),
+          new_data.begin(),
+          new_data.end());
       }
       void     parse(
                  typename T::const_iterator first1,
@@ -85,6 +85,9 @@ namespace      configuration {
             ++first1;
           }
         }
+
+        if (first2 != last2)
+          std::copy(first2, last2, add);
       }
 
     private:
