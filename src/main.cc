@@ -363,7 +363,6 @@ int main(int argc, char* argv[]) {
           broker::loader::instance().add_module(filename, args);
         }
         neb_init_callback_list();
-        neb_load_all_modules();
 
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
