@@ -27,8 +27,9 @@
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/misc/string.hh"
+#include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/string.hh"
 #include "test/unittest.hh"
 
 #ifndef __THROW
@@ -113,7 +114,7 @@ static void parse_file(char const* filename, options& opt) {
   while (stream.good()) {
     std::string line;
     std::getline(stream, line, '\n');
-    misc::trim(line);
+    string::trim(line);
     if (line.empty() || line[0] == '#')
       continue;
     size_t pos(line.find_first_of('='));
@@ -181,8 +182,8 @@ int main_test(int argc, char** argv) {
       std::string valid_str(ctime(&valid));
       throw (engine_error()
              << "get next valid time failed: "
-             << basename(argv[1]) << ": ref_time(" << misc::trim(ref_str)
-             << ") valid_time(" << misc::trim(valid_str) << ")");
+             << basename(argv[1]) << ": ref_time(" << string::trim(ref_str)
+             << ") valid_time(" << string::trim(valid_str) << ")");
     }
   }
   catch (...) {

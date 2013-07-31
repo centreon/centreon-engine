@@ -362,10 +362,12 @@ add_test(
   "${TEST_DIR}/running/etc/precache/objects.precache.expected"
 )
 
-# ## get_next_valid_time
-# set(TEST_BIN_NAME "get_next_valid_time")
-# add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/${TEST_BIN_NAME}.cc")
-# target_link_libraries("${TEST_BIN_NAME}" "cce_core")
+set(TEST_DIR "${TEST_DIR}/core")
+
+## get_next_valid_time
+set(TEST_BIN_NAME "get_next_valid_time")
+add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/${TEST_BIN_NAME}.cc")
+target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
 #
 # exception
