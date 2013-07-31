@@ -149,8 +149,8 @@ void applier::hostgroup::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::hostgroup> old_cfg(*it_cfg);
-  config->hostgroups().insert(obj);
   config->hostgroups().erase(it_cfg);
+  config->hostgroups().insert(obj);
 
   // Modify properties.
   modify_if_different(

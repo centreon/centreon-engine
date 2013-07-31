@@ -154,8 +154,8 @@ void applier::servicegroup::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::servicegroup> old_cfg(*it_cfg);
-  config->servicegroups().insert(obj);
   config->servicegroups().erase(it_cfg);
+  config->servicegroups().insert(obj);
 
   // Modify properties.
   modify_if_different(

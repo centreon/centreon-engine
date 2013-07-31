@@ -273,8 +273,8 @@ void applier::host::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::host> obj_old(*it_cfg);
-  config->hosts().insert(obj);
   config->hosts().erase(it_cfg);
+  config->hosts().insert(obj);
 
   // Modify properties.
   modify_if_different(

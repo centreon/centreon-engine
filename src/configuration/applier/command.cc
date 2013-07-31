@@ -138,8 +138,8 @@ void applier::command::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::command> old_cfg(*it_cfg);
-  config->commands().insert(obj);
   config->commands().erase(it_cfg);
+  config->commands().insert(obj);
 
   // Modify command.
   modify_if_different(c->command_line, obj->command_line().c_str());
