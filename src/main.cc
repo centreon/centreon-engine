@@ -275,7 +275,13 @@ int main(int argc, char* argv[]) {
         retention::state state;
         {
           retention::parser p;
-          p.parse(config.state_retention_file(), state);
+          try {
+            p.parse(config.state_retention_file(), state);
+          }
+          catch (std::exception const& e) {
+            logger(logging::log_config_error, logging::basic)
+              << e.what();
+          }
         }
 
         // Apply configuration.
@@ -309,7 +315,13 @@ int main(int argc, char* argv[]) {
         retention::state state;
         {
           retention::parser p;
-          p.parse(config.state_retention_file(), state);
+          try {
+            p.parse(config.state_retention_file(), state);
+          }
+          catch (std::exception const& e) {
+            logger(logging::log_config_error, logging::basic)
+              << e.what();
+          }
         }
 
         // Get program (re)start time and save as macro. Needs to be
