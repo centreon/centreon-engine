@@ -131,6 +131,16 @@ bool compare_with_true_contents(
   return (true);
 }
 
+template<typename T>
+void reset_next_check(T const& map) {
+  for (typename T::const_iterator it(map.begin()), end(map.end());
+       it != end;
+       ++it) {
+    it->second->next_check = 0;
+    it->second->should_be_scheduled = 1;
+  }
+}
+
 /**************************************
 *                                     *
 *               Class                 *
@@ -221,6 +231,12 @@ public:
   void                  verify() {
     configuration::applier::state&
       app_state(configuration::applier::state::instance());
+
+    reset_next_check(_obj_state.hosts);
+    reset_next_check(_obj_state.services);
+    reset_next_check(app_state.hosts());
+    reset_next_check(app_state.services());
+
     if (*_current_state != *::config)
       throw (engine_error() << "check modify configuration failed: "
              "state are not equal");
