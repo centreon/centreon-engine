@@ -149,8 +149,8 @@ void applier::contactgroup::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::contactgroup> old_cfg(*it_cfg);
-  config->contactgroups().insert(obj);
   config->contactgroups().erase(it_cfg);
+  config->contactgroups().insert(obj);
 
   // Modify properties.
   modify_if_different(

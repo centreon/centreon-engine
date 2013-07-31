@@ -142,8 +142,8 @@ void applier::connector::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::connector> old_cfg(*it_cfg);
-  config->connectors().insert(obj);
   config->connectors().erase(it_cfg);
+  config->connectors().insert(obj);
 
   // Expand command line.
   nagios_macros* macros(get_global_macros());

@@ -345,8 +345,8 @@ void applier::service::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::service> obj_old(*it_cfg);
-  config->services().insert(obj);
   config->services().erase(it_cfg);
+  config->services().insert(obj);
 
   // Modify properties.
   modify_if_different(

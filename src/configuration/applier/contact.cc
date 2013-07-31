@@ -270,8 +270,8 @@ void applier::contact::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::contact> old_cfg(*it_cfg);
-  config->contacts().insert(obj);
   config->contacts().erase(it_cfg);
+  config->contacts().insert(obj);
 
   // Modify contact.
   modify_if_different(c->alias, NULL_IF_EMPTY(obj->alias()));

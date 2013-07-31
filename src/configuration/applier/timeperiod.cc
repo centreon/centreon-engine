@@ -136,8 +136,8 @@ void applier::timeperiod::modify_object(
 
   // Update the global configuration set.
   shared_ptr<configuration::timeperiod> old_cfg(*it_cfg);
-  config->timeperiods().insert(obj);
   config->timeperiods().erase(it_cfg);
+  config->timeperiods().insert(obj);
 
   // Modify properties.
   modify_if_different(
