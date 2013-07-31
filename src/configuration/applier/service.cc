@@ -226,7 +226,6 @@ void applier::service::add_object(
  *
  *  @param[in]  obj      Object to expand.
  *  @param[in]  s        State being applied.
- *  @param[out] expanded Expanded services.
  */
 void applier::service::expand_object(
                          shared_ptr<configuration::service> obj,
@@ -270,6 +269,13 @@ void applier::service::expand_object(
       if (it2 == end2)
         throw (engine_error() << "Error: Could not find host group '"
                << *it << "' on which to apply service '"
+               << obj->service_description() << "'.");
+
+      // Check host group and user configuration.
+      if ((*it2)->resolved_members().empty()
+          && !s.allow_empty_hostgroup_assignment())
+        throw (engine_error() << "Error: Could not expand host group '"
+               << *it << "' specified in service '"
                << obj->service_description() << "'.");
 
       // Add host group members.
