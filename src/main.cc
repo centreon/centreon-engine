@@ -358,7 +358,8 @@ int main(int argc, char* argv[]) {
              ++it) {
           std::string filename;
           std::string args;
-          string::split(*it, filename, args, ' ');
+          if (!string::split(*it, filename, args, ' '))
+            filename = *it;
           broker::loader::instance().add_module(filename, args);
         }
         neb_init_callback_list();

@@ -46,7 +46,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
- #include "com/centreon/engine/xpddefault.hh"
+#include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
 using namespace com::centreon;
