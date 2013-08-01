@@ -291,6 +291,35 @@ static configuration::state deep_copy(configuration::state const& s) {
 }
 
 /**
+ *  Remove contact dependency for contact removal.
+ *
+ *  @param[in,out] cfg The configuration to update.
+ *  @param[in]     hst Contact that will be removed.
+ */
+static void remove_dependency_for_contact(
+              configuration::state& cfg,
+              configuration::contact const& cntct) {
+  for (configuration::set_contactgroup::iterator
+         it(cfg.contactgroups().begin()), end(cfg.contactgroups().end());
+       it != end;
+       ++it) {
+    list_string::const_iterator
+      m((*it)->members().begin()),
+      end((*it)->members().end());
+    while (m != end) {
+      if (cntct.contact_name() != *m)
+        ++m;
+      else {
+        (*it)->members().remove(cntct.contact_name());
+        m = (*it)->members().begin();
+      }
+    }
+  }
+  return ;
+}
+
+
+/**
  *  Remove contact dependency for remove contactgroup.
  *
  *  @param[in,out] config The configuration to update.
@@ -481,7 +510,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_contact,
       configuration::contact,
-      &configuration::state::contacts>(config, chk_contact);
+      &configuration::state::contacts>(config, chk_contact, remove_dependency_for_contact);
   }
   else if (type == "contactgroup") {
     chk_generic<
