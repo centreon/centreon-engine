@@ -234,7 +234,8 @@ namespace           configuration {
                     _hostgroups;
       concurrency::mutex
                     _lock;
-      bool          _processing_state;
+      processing_state
+                    _processing_state;
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >
                     _services;
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >

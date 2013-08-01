@@ -29,7 +29,6 @@
 #ifdef HAVE_GETOPT_H
 #  include <getopt.h>
 #endif // HAVE_GETOPT_H
-#include <iostream>
 #include <memory>
 #include <string>
 #include <sys/types.h>

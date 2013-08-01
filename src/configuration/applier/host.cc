@@ -16,7 +16,7 @@
 ** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
-#include <iostream>
+
 #include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/common.hh"
@@ -84,7 +84,6 @@ void applier::host::add_object(
   // Add host to the global configuration set.
   config->hosts().insert(obj);
 
-  std::cout << "add >>>>> " << obj->host_name() << " - " << obj->initial_state() << std::endl;
   // Create host.
   host_struct*
     h(add_host(

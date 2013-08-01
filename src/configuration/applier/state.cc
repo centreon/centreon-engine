@@ -1443,7 +1443,7 @@ void applier::state::_processing(
       config->serviceescalations());
 
     // Call start broker event the first time to run applier state.
-    if (!has_already_been_loaded)
+    if (!has_already_been_loaded) {
       neb_load_all_modules();
 
       broker_program_state(
@@ -1451,6 +1451,7 @@ void applier::state::_processing(
         NEBFLAG_NONE,
         NEBATTR_NONE,
         NULL);
+    }
 
     // Load retention.
     if (state) {

@@ -24,8 +24,10 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration;
 
 /**
@@ -65,13 +67,19 @@ void reload::try_lock() {
  */
 void reload::_run() {
   _set_is_finished(false);
-  configuration::state config;
-  {
-    configuration::parser p;
-    std::string path(::config->cfg_main());
-    p.parse(path, config);
+  try {
+    configuration::state config;
+    {
+      configuration::parser p;
+      std::string path(::config->cfg_main());
+      p.parse(path, config);
+    }
+    configuration::applier::state::instance().apply(config, true);
   }
-  configuration::applier::state::instance().apply(config, true);
+  catch (std::exception const& e) {
+    logger(log_config_error, most)
+      << "error: " << e.what();
+  }
   _set_is_finished(true);
 }
 

@@ -52,18 +52,10 @@ static std::string gl_config_path;
 *                                     *
 **************************************/
 
-class                   checkmodify {
+class                   checkinvalid {
 public:
-                        checkmodify(std::string const& cfg_path)
-    : _cfg_path(cfg_path) {}
-                        ~checkmodify() throw () {}
-  void                  load_configuration() {
-    backup::set_to_null();
-    configuration::applier::state::unload();
-    configuration::applier::state::load();
-    ::config->cfg_main(_cfg_path);
-    reload_configuration();
-  }
+                        checkinvalid() {}
+                        ~checkinvalid() throw () {}
   static void           reload_configuration() {
     configuration::reload reload_configuration;
     reload_configuration.exec();
@@ -85,7 +77,6 @@ public:
   }
 
 private:
-  std::string _cfg_path;
   backup      _backup;
 };
 
@@ -118,11 +109,9 @@ int callback_event_loop(int callback_type, void* neb_data) {
       sigshutdown = true;
     }
     else if (data.type == NEBTYPE_PROCESS_EVENTLOOPEND) {
-      checkmodify::reload_configuration();
-
-      checkmodify chkm(gl_config_path);
+      checkinvalid chkm;
       chkm.save_current_configuration();
-      chkm.load_configuration();
+      checkinvalid::reload_configuration();
       chkm.verify();
     }
   }
@@ -179,7 +168,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 
   try {
     if (!args)
-      throw (engine_error() << "can not load module checkmodify: "
+      throw (engine_error() << "can not load module checkinvalid: "
              "bad argument");
 
     gl_config_path = args;
@@ -188,7 +177,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     neb_set_module_info(
       handle,
       NEBMODULE_MODINFO_TITLE,
-      "Check modify configuration module");
+      "Check invalid configuration module");
     neb_set_module_info(
       handle,
       NEBMODULE_MODINFO_AUTHOR,
@@ -208,7 +197,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     neb_set_module_info(
       handle,
       NEBMODULE_MODINFO_DESC,
-      "Check modify configuration module.");
+      "Check invalid configuration module.");
 
     // Register callbacks event loop.
     if (neb_register_callback(
@@ -216,7 +205,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
           handle,
           0,
           callback_event_loop))
-      throw (engine_error() << "can not load module checkmodify: "
+      throw (engine_error() << "can not load module checkinvalid: "
              "register callback failed");
   }
   catch (std::exception const& e) {

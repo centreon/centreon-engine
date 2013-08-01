@@ -23,6 +23,85 @@
 #  include <iostream>
 
 /**
+ *  Check difference between to map of object.
+ *
+ *  @param[in] l1 The first map.
+ *  @param[in] l2 The second map.
+ *
+ *  @return True if all map is equal, otherwise false.
+ */
+template<class Key, class T, class Hash, class Pred>
+bool compare_with_true_contents(
+                umap<Key, T, Hash, Pred> const& lhs,
+                umap<Key, T, Hash, Pred> const& rhs) {
+  bool ret(true);
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
+         it(lhs.begin()), end(lhs.end());
+       it != end;
+       ++it) {
+    typename umap<Key, T, Hash, Pred>::const_iterator
+      it_find(rhs.find(it->first));
+    if (it_find == rhs.end()) {
+      std::cerr << "missing object" << std::endl
+                << "old " << *it->second << std::endl;
+      ret = false;
+    }
+    else if (*it_find->second != *it->second) {
+      std::cerr << "difference detected" << std::endl
+                << "old " << *it->second << std::endl
+                << "new " << *it_find->second << std::endl;
+    }
+  }
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
+         it(rhs.begin()), end(rhs.end());
+       it != end;
+       ++it) {
+    typename umap<Key, T, Hash, Pred>::const_iterator
+      it_find(lhs.find(it->first));
+    if (it_find == lhs.end()) {
+      std::cerr << "missing object" << std::endl
+                << "new " << *it->second << std::endl;
+      ret = false;
+    }
+  }
+  return (ret);
+}
+
+/**
+ *  Check difference between to multimap of object.
+ *
+ *  @param[in] l1 The first multimap.
+ *  @param[in] l2 The second multimap.
+ *
+ *  @return True if all multimap is equal, otherwise false.
+ */
+template<class Key, class T, class Hash, class Pred>
+bool compare_with_true_contents(
+       umultimap<Key, T, Hash, Pred> const& lhs,
+       umultimap<Key, T, Hash, Pred> const& rhs) {
+  if (lhs.size() != rhs.size())
+    return (false);
+  for (typename umap<Key, T, Hash, Pred>::const_iterator
+         it(lhs.begin()), end(lhs.end());
+       it != end;
+       ++it) {
+    bool find(false);
+    for (typename umap<Key, T, Hash, Pred>::const_iterator
+           it_find(rhs.find(it->first)), end(rhs.end());
+         it_find != end && it_find->first == it->first;
+         ++it_find) {
+      if (*it_find->second == *it->second) {
+        find = true;
+        break;
+      }
+    }
+    if (!find)
+      return (false);
+  }
+  return (true);
+}
+
+/**
  *  Check difference between to list of object.
  *
  *  @param[in] l1 The first list.
@@ -55,6 +134,16 @@ static bool chkdiff(T const* l1, T const* l2) {
     return (false);
   }
   return (true);
+}
+
+template<typename T>
+void reset_next_check(T const& map) {
+  for (typename T::const_iterator it(map.begin()), end(map.end());
+       it != end;
+       ++it) {
+    it->second->next_check = 0;
+    it->second->should_be_scheduled = 1;
+  }
 }
 
 #endif // !CCE_TEST_CONFIGURATION_APPLIER_CHKDIFF_HH
