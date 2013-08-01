@@ -56,7 +56,7 @@ namespace                 configuration {
                           scheduler(scheduler const&);
                           ~scheduler() throw ();
       scheduler&          operator=(scheduler const&);
-      void                _apply_misc_event(state const& config);
+      void                _apply_misc_event();
       void                _calculate_host_inter_check_delay(
                             configuration::state::inter_check_delay method);
       void                _calculate_host_scheduling_params(
@@ -102,6 +102,17 @@ namespace                 configuration {
                           _evt_service_check;
       timed_event_struct* _evt_service_perfdata;
       timed_event_struct* _evt_status_save;
+      unsigned int        _old_auto_rescheduling_interval;
+      unsigned int        _old_check_reaper_interval;
+      int                 _old_command_check_interval;
+      unsigned int        _old_host_freshness_check_interval;
+      std::string         _old_host_perfdata_file_processing_command;
+      unsigned int        _old_host_perfdata_file_processing_interval;
+      unsigned int        _old_retention_update_interval;
+      unsigned int        _old_service_freshness_check_interval;
+      std::string         _old_service_perfdata_file_processing_command;
+      unsigned int        _old_service_perfdata_file_processing_interval;
+      unsigned int        _old_status_update_interval;
     };
   }
 }

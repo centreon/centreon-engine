@@ -1442,17 +1442,6 @@ void applier::state::_processing(
     _resolve<configuration::serviceescalation, applier::serviceescalation>(
       config->serviceescalations());
 
-    // Call start broker event the first time to run applier state.
-    if (!has_already_been_loaded) {
-      neb_load_all_modules();
-
-      broker_program_state(
-        NEBTYPE_PROCESS_START,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        NULL);
-    }
-
     // Load retention.
     if (state) {
       retention::applier::state app_state;
@@ -1467,6 +1456,17 @@ void applier::state::_processing(
 
     // Apply new global on the current state.
     _apply(new_cfg);
+
+    // Call start broker event the first time to run applier state.
+    if (!has_already_been_loaded) {
+      neb_load_all_modules();
+
+      broker_program_state(
+        NEBTYPE_PROCESS_START,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        NULL);
+    }
   }
   catch (...) {
     _processing_state = state_error;

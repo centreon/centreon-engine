@@ -51,7 +51,7 @@ void applier::scheduler::apply(
        difference<set_host> const& diff_hosts,
        difference<set_service> const& diff_services) {
   // remove and create misc event.
-  _apply_misc_event(config);
+  _apply_misc_event();
 
   // remove deleted service check from the scheduler.
   if (!diff_services.deleted().empty())
@@ -132,125 +132,152 @@ applier::scheduler::scheduler()
     _evt_retention_save(NULL),
     _evt_sfreshness_check(NULL),
     _evt_service_perfdata(NULL),
-    _evt_status_save(NULL) {
+    _evt_status_save(NULL),
+    _old_auto_rescheduling_interval(0),
+    _old_check_reaper_interval(0),
+    _old_command_check_interval(0),
+    _old_host_freshness_check_interval(0),
+    _old_host_perfdata_file_processing_interval(0),
+    _old_retention_update_interval(0),
+    _old_service_freshness_check_interval(0),
+    _old_service_perfdata_file_processing_interval(0),
+    _old_status_update_interval(0) {
   memset(&scheduling_info, 0, sizeof(scheduling_info));
 }
 
 /**
  *  Default destructor.
  */
-applier::scheduler::~scheduler() throw() {
-
-}
+applier::scheduler::~scheduler() throw() {}
 
 /**
  *  Remove and create misc event if necessary.
- *
- *  @param[in] config The configuration to used.
  */
-void applier::scheduler::_apply_misc_event(configuration::state const& config) {
-  // get current time.
+void applier::scheduler::_apply_misc_event() {
+  // Get current time.
   time_t const now(time(NULL));
 
-  // remove and add check result reaper event.
+  // Remove and add check result reaper event.
   if (!_evt_check_reaper
-      || config.check_reaper_interval() != ::config->check_reaper_interval()) {
+      || (_old_check_reaper_interval
+          != config->check_reaper_interval())) {
     _remove_misc_event(_evt_check_reaper);
     _evt_check_reaper = _create_misc_event(
                           EVENT_CHECK_REAPER,
-                          now + config.check_reaper_interval(),
-                          config.check_reaper_interval());
+                          now + config->check_reaper_interval(),
+                          config->check_reaper_interval());
+    _old_check_reaper_interval = config->check_reaper_interval();
   }
 
-  // remove and add an external command check event.
-  if ((!_evt_command_check && config.check_external_commands())
-      || config.check_external_commands() != ::config->check_external_commands()
-      || config.command_check_interval() != ::config->command_check_interval()) {
+  // Remove and add an external command check event.
+  if ((!_evt_command_check && config->check_external_commands())
+      || (_evt_command_check && !config->check_external_commands())
+      || (_old_command_check_interval
+          != config->command_check_interval())) {
     _remove_misc_event(_evt_command_check);
-    if (config.check_external_commands()) {
+    if (config->check_external_commands()) {
       unsigned long interval(5);
-      if (config.command_check_interval() != -1)
-        interval = (unsigned long)config.command_check_interval();
+      if (config->command_check_interval() != -1)
+        interval = (unsigned long)config->command_check_interval();
       _evt_command_check = _create_misc_event(
                              EVENT_COMMAND_CHECK,
                              now + interval,
                              interval);
     }
+    _old_command_check_interval = config->command_check_interval();
   }
 
-  // remove and add a host result "freshness" check event.
-  if ((!_evt_hfreshness_check && config.check_host_freshness())
-      || config.check_host_freshness() != ::config->check_host_freshness()) {
+  // Remove and add a host result "freshness" check event.
+  if ((!_evt_hfreshness_check && config->check_host_freshness())
+      || (_evt_hfreshness_check && !config->check_host_freshness())
+      || (_old_host_freshness_check_interval
+          != config->host_freshness_check_interval())) {
     _remove_misc_event(_evt_hfreshness_check);
-    if (config.check_host_freshness()) {
-      _evt_hfreshness_check = _create_misc_event(
-                                EVENT_HFRESHNESS_CHECK,
-                                now + config.host_freshness_check_interval(),
-                                config.host_freshness_check_interval());
-    }
+    if (config->check_host_freshness())
+      _evt_hfreshness_check
+        = _create_misc_event(
+            EVENT_HFRESHNESS_CHECK,
+            now + config->host_freshness_check_interval(),
+            config->host_freshness_check_interval());
+    _old_host_freshness_check_interval
+      = config->host_freshness_check_interval();
   }
 
-  // remove and add an orphaned check event.
-  if ((!_evt_orphan_check && config.check_orphaned_services())
-      || config.check_orphaned_services() != ::config->check_orphaned_services()
-      || config.check_orphaned_hosts() != ::config->check_orphaned_hosts()) {
+  // Remove and add an orphaned check event.
+  if ((!_evt_orphan_check && config->check_orphaned_services())
+      || (!_evt_orphan_check && config->check_orphaned_hosts())
+      || (_evt_orphan_check
+          && !config->check_orphaned_services()
+          && !config->check_orphaned_hosts())) {
     _remove_misc_event(_evt_orphan_check);
-    if (config.check_orphaned_services() || config.check_orphaned_hosts()) {
+    if (config->check_orphaned_services()
+        || config->check_orphaned_hosts())
       _evt_orphan_check = _create_misc_event(
                             EVENT_ORPHAN_CHECK,
                             now + DEFAULT_ORPHAN_CHECK_INTERVAL,
                             DEFAULT_ORPHAN_CHECK_INTERVAL);
-    }
   }
 
-  // remove and add a host and service check rescheduling event.
-  if ((!_evt_reschedule_checks && config.auto_reschedule_checks())
-      || config.auto_reschedule_checks() != ::config->auto_reschedule_checks()
-      || config.auto_rescheduling_interval() != ::config->auto_rescheduling_interval()) {
+  // Remove and add a host and service check rescheduling event.
+  if ((!_evt_reschedule_checks && config->auto_reschedule_checks())
+      || (_evt_reschedule_checks && !config->auto_reschedule_checks())
+      || (_old_auto_rescheduling_interval
+          != ::config->auto_rescheduling_interval())) {
     _remove_misc_event(_evt_reschedule_checks);
-    if (config.auto_reschedule_checks()) {
-      _evt_reschedule_checks = _create_misc_event(
-                                 EVENT_RESCHEDULE_CHECKS,
-                                 now + config.auto_rescheduling_interval(),
-                                 config.auto_rescheduling_interval());
-    }
+    if (config->auto_reschedule_checks())
+      _evt_reschedule_checks
+        = _create_misc_event(
+            EVENT_RESCHEDULE_CHECKS,
+            now + config->auto_rescheduling_interval(),
+            config->auto_rescheduling_interval());
+    _old_auto_rescheduling_interval
+      = config->auto_rescheduling_interval();
   }
 
-  // remove and add a retention data save event if needed.
-  if ((!_evt_retention_save && config.retain_state_information())
-      || config.retain_state_information() != ::config->retain_state_information()
-      || config.retention_update_interval() != ::config->retention_update_interval()) {
+  // Remove and add a retention data save event if needed.
+  if ((!_evt_retention_save && config->retain_state_information())
+      || (_evt_retention_save && !config->retain_state_information())
+      || (_old_retention_update_interval
+          != config->retention_update_interval())) {
     _remove_misc_event(_evt_retention_save);
-    if (config.retain_state_information()
-        && config.retention_update_interval() > 0) {
-      unsigned long const interval(config.retention_update_interval() * 60);
+    if (config->retain_state_information()
+        && config->retention_update_interval() > 0) {
+      unsigned long interval(config->retention_update_interval() * 60);
       _evt_retention_save = _create_misc_event(
                               EVENT_RETENTION_SAVE,
                               now + interval,
                               interval);
     }
+    _old_retention_update_interval
+      = config->retention_update_interval();
   }
 
-  // remove add a service result "freshness" check event.
-  if ((!_evt_sfreshness_check && config.check_service_freshness())
-      || config.check_service_freshness() != ::config->check_service_freshness()) {
+  // Remove add a service result "freshness" check event.
+  if ((!_evt_sfreshness_check && config->check_service_freshness())
+      || (!_evt_sfreshness_check && !config->check_service_freshness())
+      || (_old_service_freshness_check_interval
+          != config->service_freshness_check_interval())) {
     _remove_misc_event(_evt_sfreshness_check);
-    if (config.check_service_freshness()) {
-      _evt_sfreshness_check = _create_misc_event(
-                                EVENT_SFRESHNESS_CHECK,
-                                now + config.service_freshness_check_interval(),
-                                config.service_freshness_check_interval());
-    }
+    if (config->check_service_freshness())
+      _evt_sfreshness_check
+        = _create_misc_event(
+            EVENT_SFRESHNESS_CHECK,
+            now + config->service_freshness_check_interval(),
+            config->service_freshness_check_interval());
+    _old_service_freshness_check_interval
+      = config->service_freshness_check_interval();
   }
 
-  // remove and add a status save event.
+  // Remove and add a status save event.
   if (!_evt_status_save
-      || config.status_update_interval() != ::config->status_update_interval()) {
+      || (_old_status_update_interval
+          != config->status_update_interval())) {
     _remove_misc_event(_evt_status_save);
     _evt_status_save = _create_misc_event(
                          EVENT_STATUS_SAVE,
-                         now + config.status_update_interval(),
-                         config.status_update_interval());
+                         now + config->status_update_interval(),
+                         config->status_update_interval());
+    _old_status_update_interval = config->status_update_interval();
   }
 
   union {
@@ -258,36 +285,50 @@ void applier::scheduler::_apply_misc_event(configuration::state const& config) {
     void* data;
   } type;
 
-  // remove and add process host perfdata file.
+  // Remove and add process host perfdata file.
   if (!_evt_host_perfdata
-      || config.host_perfdata_file_processing_interval() != ::config->host_perfdata_file_processing_interval()
-      || config.host_perfdata_file_processing_command() != ::config->host_perfdata_file_processing_command()) {
+      || (_old_host_perfdata_file_processing_interval
+          != config->host_perfdata_file_processing_interval())
+      || (_old_host_perfdata_file_processing_command
+          != config->host_perfdata_file_processing_command())) {
     _remove_misc_event(_evt_host_perfdata);
-    if (config.host_perfdata_file_processing_interval() > 0
-        && !config.host_perfdata_file_processing_command().empty()) {
+    if (config->host_perfdata_file_processing_interval() > 0
+        && !config->host_perfdata_file_processing_command().empty()) {
       type.func = &xpddefault_process_host_perfdata_file;
-      _evt_host_perfdata = _create_misc_event(
-                             EVENT_USER_FUNCTION,
-                             now + config.host_perfdata_file_processing_interval(),
-                             config.host_perfdata_file_processing_interval(),
-                             type.data);
+      _evt_host_perfdata
+        = _create_misc_event(
+            EVENT_USER_FUNCTION,
+            now + config->host_perfdata_file_processing_interval(),
+            config->host_perfdata_file_processing_interval(),
+            type.data);
     }
+    _old_host_perfdata_file_processing_interval
+      = config->host_perfdata_file_processing_interval();
+    _old_host_perfdata_file_processing_command
+      = config->host_perfdata_file_processing_command();
   }
 
-  // remove and add process service perfdata file.
+  // Remove and add process service perfdata file.
   if (!_evt_service_perfdata
-      || config.service_perfdata_file_processing_interval() != ::config->service_perfdata_file_processing_interval()
-      || config.service_perfdata_file_processing_command() != ::config->service_perfdata_file_processing_command()) {
+      || (_old_service_perfdata_file_processing_interval
+          != config->service_perfdata_file_processing_interval())
+      || (_old_service_perfdata_file_processing_command
+          != config->service_perfdata_file_processing_command())) {
     _remove_misc_event(_evt_service_perfdata);
-    if (config.service_perfdata_file_processing_interval() > 0
-        && !config.service_perfdata_file_processing_command().empty()) {
+    if (config->service_perfdata_file_processing_interval() > 0
+        && !config->service_perfdata_file_processing_command().empty()) {
       type.func = &xpddefault_process_service_perfdata_file;
-      _evt_service_perfdata = _create_misc_event(
-                                EVENT_USER_FUNCTION,
-                                now + config.service_perfdata_file_processing_interval(),
-                                config.service_perfdata_file_processing_interval(),
-                                type.data);
+      _evt_service_perfdata
+        = _create_misc_event(
+            EVENT_USER_FUNCTION,
+            now + config->service_perfdata_file_processing_interval(),
+            config->service_perfdata_file_processing_interval(),
+            type.data);
     }
+    _old_service_perfdata_file_processing_interval
+      = config->service_perfdata_file_processing_interval();
+    _old_service_perfdata_file_processing_command
+      = config->service_perfdata_file_processing_command();
   }
 }
 
