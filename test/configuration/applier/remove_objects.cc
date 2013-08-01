@@ -305,8 +305,8 @@ static void remove_dependency_for_contact(
        ++it) {
     list_string::const_iterator
       m((*it)->members().begin()),
-      end((*it)->members().end());
-    while (m != end) {
+      m_end((*it)->members().end());
+    while (m != m_end) {
       if (cntct.contact_name() != *m)
         ++m;
       else {
