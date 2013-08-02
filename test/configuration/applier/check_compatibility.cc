@@ -28,7 +28,9 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "compatibility/locations.h"
 #include "chkdiff.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
@@ -753,6 +755,14 @@ static bool oldparser_read_config(
             false);
   if (ret == OK)
     ret = pre_flight_check();
+  if (!check_result_path)
+    check_result_path = string::dup(DEFAULT_CHECK_RESULT_PATH);
+  if (!command_file)
+    command_file = string::dup(DEFAULT_COMMAND_FILE);
+  if (!debug_file)
+    debug_file = string::dup(DEFAULT_DEBUG_FILE);
+  if (!illegal_output_chars)
+    illegal_output_chars = string::dup("`~$&|'\"<>");
   if (ret == OK) {
     remove_duplicate_members_for_object(
       contactgroup_list,
