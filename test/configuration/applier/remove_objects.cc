@@ -287,6 +287,32 @@ static configuration::state deep_copy(configuration::state const& s) {
     s.timeperiods(),
     c.timeperiods());
 
+  // Clean groups.
+  for (configuration::set_contactgroup::iterator
+         it(c.contactgroups().begin()),
+         end(c.contactgroups().end());
+       it != end;
+       ++it) {
+    (*it)->set_resolved(false);
+    (*it)->resolved_members().clear();
+  }
+  for (configuration::set_hostgroup::iterator
+         it(c.hostgroups().begin()),
+         end(c.hostgroups().end());
+       it != end;
+       ++it) {
+    (*it)->set_resolved(false);
+    (*it)->resolved_members().clear();
+  }
+  for (configuration::set_servicegroup::iterator
+         it(c.servicegroups().begin()),
+         end(c.servicegroups().end());
+       it != end;
+       ++it) {
+    (*it)->set_resolved(false);
+    (*it)->resolved_members().clear();
+  }
+
   return (c);
 }
 
@@ -300,21 +326,11 @@ static void remove_dependency_for_contact(
               configuration::state& cfg,
               configuration::contact const& cntct) {
   for (configuration::set_contactgroup::iterator
-         it(cfg.contactgroups().begin()), end(cfg.contactgroups().end());
+         it(cfg.contactgroups().begin()),
+         end(cfg.contactgroups().end());
        it != end;
-       ++it) {
-    list_string::const_iterator
-      m((*it)->members().begin()),
-      m_end((*it)->members().end());
-    while (m != m_end) {
-      if (cntct.contact_name() != *m)
-        ++m;
-      else {
-        (*it)->members().remove(cntct.contact_name());
-        m = (*it)->members().begin();
-      }
-    }
-  }
+       ++it)
+    (*it)->members().remove(cntct.contact_name());
   return ;
 }
 
@@ -356,6 +372,12 @@ static void remove_dependency_for_host(
        it != end;
        ++it)
     (*it)->parents().remove(hst.host_name());
+  for (configuration::set_hostgroup::iterator
+         it(cfg.hostgroups().begin()),
+         end(cfg.hostgroups().end());
+       it != end;
+       ++it)
+    (*it)->members().remove(hst.host_name());
   return ;
 }
 
@@ -368,16 +390,49 @@ static void remove_dependency_for_host(
 static void remove_dependency_for_hostgroup(
               configuration::state& config,
               configuration::hostgroup const& grp) {
-  for (list_string::const_iterator
-         m(grp.members().begin()), end(grp.members().end());
-       m != end;
-       ++m)
-    for (configuration::set_host::iterator
-           it(config.hosts().begin()), end(config.hosts().end());
-         it != end;
-         ++it)
-      if ((*it)->host_name() == *m)
-        (*it)->hostgroups().remove(grp.hostgroup_name());
+  for (configuration::set_host::iterator
+         it(config.hosts().begin()), end(config.hosts().end());
+       it != end;
+       ++it)
+    (*it)->hostgroups().remove(grp.hostgroup_name());
+  return ;
+}
+
+/**
+ *  Remove service dependency for service removal.
+ *
+ *  @param[in,out] cfg The configuration to update.
+ *  @param[in]     svc Service that will be removed.
+ */
+static void remove_dependency_for_service(
+              configuration::state& cfg,
+              configuration::service const& svc) {
+  for (configuration::set_servicegroup::iterator
+         it(cfg.servicegroups().begin()),
+         end(cfg.servicegroups().end());
+       it != end;
+       ++it)
+    for (std::list<std::string>::iterator
+           it_m((*it)->members().begin()),
+           end_m((*it)->members().end());
+         it_m != end_m; ) {
+      std::list<std::string>::iterator
+        it_next(it_m);
+      ++it_next;
+      if (it_next == end_m)
+        throw (engine_error()
+               << "processing invalid service group member list");
+      if ((*it_m == svc.hosts().front())
+          && (*it_next == svc.service_description())) {
+        std::list<std::string>::iterator
+          to_delete(it_m);
+        ++(++it_m);
+        (*it)->members().erase(it_next);
+        (*it)->members().erase(to_delete);
+      }
+      else
+        ++(++it_m);
+    }
   return ;
 }
 
@@ -390,28 +445,12 @@ static void remove_dependency_for_hostgroup(
 static void remove_dependency_for_servicegroup(
               configuration::state& config,
               configuration::servicegroup const& grp) {
-  for (list_string::const_iterator
-         m(grp.members().begin()), end(grp.members().end());
-       m != end;
-       ++m) {
-    std::string const& host_name(*m++);
-    std::string const& service_description(*m);
-    for (configuration::set_service::iterator
-           it(config.services().begin()), end(config.services().end());
-         it != end;
-         ++it) {
-      for (list_string::const_iterator
-             h((*it)->hosts().begin()), end((*it)->hosts().end());
-           h != end;
-           ++h) {
-        if (*h == host_name
-            && (*it)->service_description() == service_description) {
-          config.services().erase(it);
-          break;
-        }
-      }
-    }
-  }
+  for (configuration::set_service::iterator
+         it(config.services().begin()), end(config.services().end());
+       it != end;
+       ++it)
+    (*it)->servicegroups().remove(grp.servicegroup_name());
+  return ;
 }
 
 /**
@@ -569,7 +608,7 @@ int main_test(int argc, char* argv[]) {
     check_remove_objects<
       configuration::set_service,
       configuration::service,
-      &configuration::state::services>(config, chk_service);
+      &configuration::state::services>(config, chk_service, remove_dependency_for_service);
   }
   else if (type == "servicegroup") {
     chk_generic<

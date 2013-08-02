@@ -45,9 +45,7 @@ servicegroup::setters servicegroup::_setters[] = {
 servicegroup::servicegroup(key_type const& key)
   : object(object::servicegroup),
     _resolved(false),
-    _servicegroup_name(key) {
-
-}
+    _servicegroup_name(key) {}
 
 /**
  *  Copy constructor.
@@ -101,6 +99,8 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
           && _members == right._members
           && _notes == right._notes
           && _notes_url == right._notes_url
+          && _resolved == right._resolved
+          && _resolved_members == right._resolved_members
           && _servicegroup_members == right._servicegroup_members
           && _servicegroup_name == right._servicegroup_name);
 }
@@ -134,7 +134,11 @@ bool servicegroup::operator<(servicegroup const& right) const throw () {
     return (_notes_url < right._notes_url);
   else if (_servicegroup_members != right._servicegroup_members)
     return (_servicegroup_members < right._servicegroup_members);
-  return (_members < right._members);
+  else if (_members != right._members)
+    return (_members < right._members);
+  else if (_resolved != right._resolved)
+    return (_resolved < right._resolved);
+  return (_resolved_members < right._resolved_members);
 }
 
 /**

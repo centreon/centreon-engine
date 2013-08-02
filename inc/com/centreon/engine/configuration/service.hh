@@ -115,6 +115,7 @@ namespace                  configuration {
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
+    list_string&           servicegroups() throw ();
     list_string const&     servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();

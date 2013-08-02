@@ -919,6 +919,15 @@ unsigned int service::retry_interval() const throw () {
 }
 
 /**
+ *  Get service groups.
+ *
+ *  @return The service groups.
+ */
+list_string& service::servicegroups() throw () {
+  return (*_servicegroups);
+}
+
+/**
  *  Get servicegroups.
  *
  *  @return The servicegroups.

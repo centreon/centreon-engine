@@ -41,9 +41,7 @@ contactgroup::setters contactgroup::_setters[] = {
 contactgroup::contactgroup(key_type const& key)
   : object(object::contactgroup),
     _contactgroup_name(key),
-    _resolved(false) {
-
-}
+    _resolved(false) {}
 
 /**
  *  Copy constructor.
@@ -92,7 +90,9 @@ bool contactgroup::operator==(contactgroup const& right) const throw () {
           && _alias == right._alias
           && _contactgroup_members == right._contactgroup_members
           && _contactgroup_name == right._contactgroup_name
-          && _members == right._members);
+          && _members == right._members
+          && _resolved == right._resolved
+          && _resolved_members == right._resolved_members);
 }
 
 /**
@@ -120,7 +120,11 @@ bool contactgroup::operator<(contactgroup const& right) const throw () {
     return (_alias < right._alias);
   else if (_contactgroup_members != right._contactgroup_members)
     return (_contactgroup_members < right._contactgroup_members);
-  return (_members < right._members);
+  else if (_members != right._members)
+    return (_members < right._members);
+  else if (_resolved != right._resolved)
+    return (_resolved < right._resolved);
+  return (_resolved_members < right._resolved_members);
 }
 
 /**

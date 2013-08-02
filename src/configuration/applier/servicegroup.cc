@@ -172,7 +172,7 @@ void applier::servicegroup::modify_object(
     NULL_IF_EMPTY(obj->notes_url()));
 
   // Were members modified ?
-  if (obj->members() != old_cfg->members()) {
+  if (obj->resolved_members() != old_cfg->resolved_members()) {
     // Delete all old service group members.
     deleter::listmember(
       (*it_obj).second->members,

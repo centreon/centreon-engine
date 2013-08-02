@@ -44,9 +44,7 @@ hostgroup::setters hostgroup::_setters[] = {
 hostgroup::hostgroup(key_type const& key)
   : object(object::hostgroup),
     _hostgroup_name(key),
-    _resolved(false) {
-
-}
+    _resolved(false) {}
 
 /**
  *  Copy constructor.
@@ -101,7 +99,9 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
           && _hostgroup_name == right._hostgroup_name
           && _members == right._members
           && _notes == right._notes
-          && _notes_url == right._notes_url);
+          && _notes_url == right._notes_url
+          && _resolved == right._resolved
+          && _resolved_members == right._resolved_members);
 }
 
 /**
@@ -135,7 +135,11 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
     return (_notes_url < right._notes_url);
   else if (_hostgroup_members != right._hostgroup_members)
     return (_hostgroup_members < right._hostgroup_members);
-  return (_members < right._members);
+  else if (_members != right._members)
+    return (_members < right._members);
+  else if (_resolved != right._resolved)
+    return (_resolved < right._resolved);
+  return (_resolved_members < right._resolved_members);
 }
 
 /**
