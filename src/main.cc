@@ -447,13 +447,16 @@ int main(int argc, char* argv[]) {
         retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {
+        // Log.
+        logger(logging::log_runtime_error, logging::basic)
+          << "Error: " << e.what();
+
         // Send program data to broker.
         broker_program_state(
           NEBTYPE_PROCESS_SHUTDOWN,
           NEBFLAG_PROCESS_INITIATED,
           NEBATTR_SHUTDOWN_ABNORMAL,
           NULL);
-
       }
     }
 
