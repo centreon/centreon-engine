@@ -37,33 +37,36 @@ static int check_process_file(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  char* tmp(io::file_stream::temp_path());
-  try {
-    if (!tmp)
-      throw (engine_error() << "bad_alloc");
-
-    std::ofstream file(tmp, std::ios_base::trunc | std::ios_base::out);
-    if (!file.is_open())
-      throw (engine_error() << "impossible to create temporary file.");
-    file << "[1317196300] ENABLE_NOTIFICATIONS" << std::endl;
-    file.close();
-
-    config->enable_notifications(false);
-    std::string cmd("[1317196300] PROCESS_FILE;");
-    cmd.append(tmp);
-    cmd.append(";0\n");
-    process_external_command(cmd.c_str());
-
-    io::file_stream::remove(tmp);
-    delete[] tmp;
-    tmp = NULL;
-    if (!config->enable_notifications())
-      throw (engine_error() << "process_file failed.");
+  // Generate temporary file name.
+  std::string tmp;
+  {
+    char* ptr(io::file_stream::temp_path());
+    if (!ptr)
+      throw (engine_error() << "cannot generate temporary name");
+    tmp = ptr;
   }
-  catch (...) {
-    delete[] tmp;
-    throw;
-  }
+
+  // Open file stream.
+  std::ofstream file(
+                  tmp.c_str(),
+                  std::ios_base::trunc | std::ios_base::out);
+  if (!file.is_open())
+    throw (engine_error() << "cannot create temporary file");
+  file << "[1317196300] ENABLE_NOTIFICATIONS" << std::endl;
+  file.close();
+
+  // Send external command.
+  config->enable_notifications(false);
+  std::string cmd("[1317196300] PROCESS_FILE;");
+  cmd.append(tmp);
+  cmd.append(";0\n");
+  process_external_command(cmd.c_str());
+
+  // Cleanup.
+  io::file_stream::remove(tmp);
+  if (!config->enable_notifications())
+    throw (engine_error() << "process_file failed");
+
   return (0);
 }
 

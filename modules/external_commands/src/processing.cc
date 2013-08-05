@@ -648,11 +648,19 @@ bool processing::execute(char const* cmd) const {
 }
 
 void processing::_wrapper_read_state_information() {
-  retention::state state;
-  retention::parser p;
-  p.parse(config->state_retention_file(), state);
-  retention::applier::state app_state;
-  app_state.apply(*config, state);
+  try {
+    retention::state state;
+    retention::parser p;
+    p.parse(config->state_retention_file(), state);
+    retention::applier::state app_state;
+    app_state.apply(*config, state);
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: could not load retention file: "
+      << e.what();
+  }
+  return ;
 }
 
 void processing::_wrapper_save_state_information() {
