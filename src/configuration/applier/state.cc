@@ -186,6 +186,7 @@ applier::state::state()
  *  Destructor.
  */
 applier::state::~state() throw() {
+  xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
   applier::globals::unload();
