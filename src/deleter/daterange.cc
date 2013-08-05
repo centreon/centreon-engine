@@ -18,7 +18,10 @@
 */
 
 #include "com/centreon/engine/deleter/daterange.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/timerange.hh"
 #include "com/centreon/engine/objects/daterange.hh"
+#include "com/centreon/engine/objects/timerange.hh"
 
 using namespace com::centreon::engine;
 
@@ -33,7 +36,7 @@ void deleter::daterange(void* ptr) throw () {
 
   daterange_struct* obj(static_cast<daterange_struct*>(ptr));
 
-  // XXX: release(obj->times);
+  listmember(obj->times, &timerange);
 
   delete obj;
 }
