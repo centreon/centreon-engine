@@ -650,6 +650,7 @@ int xodtemplate_process_config_file(char* filename, int options) {
   while (1) {
     /* free memory */
     delete[] input;
+    input = NULL;
 
     /* read the next line */
     if ((input = mmap_fgets_multiline(thefile)) == NULL)
@@ -810,6 +811,7 @@ int xodtemplate_process_config_file(char* filename, int options) {
 
   /* free memory and close file */
   delete[] input;
+  input = NULL;
   mmap_fclose(thefile);
 
   /* whoops - EOF while we were in the middle of an object definition... */

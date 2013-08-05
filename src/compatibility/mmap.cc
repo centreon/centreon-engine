@@ -203,6 +203,8 @@ char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
       break;
   }
 
-  // delete[] tempbuf;
+  delete[] tempbuf;
+  tempbuf = NULL;
+
   return (buf);
 }
