@@ -92,8 +92,6 @@ int main_test(int argc, char** argv) {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  // XXX: fix unit test.
-  return (EXIT_FAILURE);
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
