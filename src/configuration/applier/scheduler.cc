@@ -23,6 +23,8 @@
 #include "com/centreon/engine/configuration/applier/difference.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
+#include "com/centreon/engine/deleter/timedevent.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
@@ -148,7 +150,10 @@ applier::scheduler::scheduler()
 /**
  *  Default destructor.
  */
-applier::scheduler::~scheduler() throw() {}
+applier::scheduler::~scheduler() throw() {
+  deleter::listmember(event_list_low, &deleter::timedevent);
+  deleter::listmember(event_list_high, &deleter::timedevent);
+}
 
 /**
  *  Remove and create misc event if necessary.
