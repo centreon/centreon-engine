@@ -148,19 +148,20 @@ void loop::_dispatching() {
 
     // Start reload configuration.
     if (_need_reload && !_reload_running) {
-      _reload_configuration.exec();
       _reload_running = true;
       _need_reload = 0;
+      _reload_configuration.exec();
     }
     else if (_reload_running) {
       // Start locking engine to apply configuration.
       if (!_reload_configuration.is_finished())
         _reload_configuration.try_lock();
-      // Reaload configuration ending.
-      else
+      // Reload configuration ending.
+      else {
+        _reload_configuration.wait();
         _reload_running = false;
+      }
     }
-
 
     // Get the current time.
     time_t current_time;

@@ -730,7 +730,8 @@ void broker_custom_variable(
   ds.attr = attr;
   ds.timestamp = get_broker_timestamp(timestamp);
   ds.object_ptr = data;
-  ds.cv = cv;
+  ds.var_name = cv->variable_name;
+  ds.var_value = cv->variable_value;
 
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_CUSTOM_VARIABLE_DATA, &ds);

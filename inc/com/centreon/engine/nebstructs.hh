@@ -246,7 +246,9 @@ typedef struct           nebstruct_custom_variable_struct {
   int                    attr;
   struct timeval         timestamp;
 
-  customvariablesmember* cv;
+  char*                  var_name;
+  char*                  var_value;
+
   void*                  object_ptr;
 }                        nebstruct_custom_variable_data;
 
