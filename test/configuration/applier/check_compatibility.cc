@@ -744,6 +744,8 @@ static bool oldparser_read_config(
               global& g,
               std::string const& filename,
               unsigned int options) {
+  clear_volatile_macros_r(get_global_macros());
+  free_macrox_names();
   init_object_skiplists();
   init_macros();
   int ret(read_main_config_file(filename.c_str()));

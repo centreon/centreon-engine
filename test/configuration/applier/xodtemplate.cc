@@ -14005,6 +14005,7 @@ int xodtemplate_free_memory() {
     delete[] this_command->name;
     delete[] this_command->command_name;
     delete[] this_command->command_line;
+    delete[] this_command->connector_name;
     delete this_command;
   }
   xodtemplate_command_list = NULL;
@@ -14017,6 +14018,7 @@ int xodtemplate_free_memory() {
     next_connector = this_connector->next;
     delete[] this_connector->tmpl;
     delete[] this_connector->name;
+    delete[] this_connector->connector_name;
     delete[] this_connector->connector_line;
     delete this_connector;
   }
@@ -14167,6 +14169,7 @@ int xodtemplate_free_memory() {
     }
 
     next_host = this_host->next;
+    delete[] this_host->display_name;
     delete[] this_host->tmpl;
     delete[] this_host->name;
     delete[] this_host->host_name;
@@ -14209,6 +14212,7 @@ int xodtemplate_free_memory() {
     }
 
     next_service = this_service->next;
+    delete[] this_service->display_name;
     delete[] this_service->tmpl;
     delete[] this_service->name;
     delete[] this_service->hostgroup_name;
@@ -14317,7 +14321,7 @@ int xodtemplate_free_memory() {
 
   /* free skiplists */
   xodtemplate_free_xobject_skiplists();
-
+  delete[] log_file;
   return (OK);
 }
 
