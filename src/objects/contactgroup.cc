@@ -97,6 +97,16 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     return (NULL);
   }
 
+  // Check if the contact group already exist.
+  std::string id(name);
+  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
+    it(state::instance().contactgroups().find(id));
+  if (it != state::instance().contactgroups().end()) {
+    logger(log_config_error, basic)
+      << "Error: Contactgroup '" << name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory for a new contactgroup entry.
   shared_ptr<contactgroup> obj(new contactgroup, deleter::contactgroup);
   memset(obj.get(), 0, sizeof(*obj));
@@ -105,16 +115,6 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     // Duplicate vars.
     obj->group_name = string::dup(name);
     obj->alias = string::dup(!alias ? name : alias);
-
-    // Add new contact group to the monitoring engine.
-    std::string id(name);
-    umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
-      it(state::instance().contactgroups().find(id));
-    if (it != state::instance().contactgroups().end()) {
-      logger(log_config_error, basic)
-        << "Error: Contactgroup '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().contactgroups()[id] = obj;

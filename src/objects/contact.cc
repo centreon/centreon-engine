@@ -234,6 +234,14 @@ contact* add_contact(
     return (NULL);
   }
 
+  // Check if the contact already exist.
+  std::string id(name);
+  if (is_contact_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Contact '" << name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory for a new contact.
   shared_ptr<contact> obj(new contact, deleter::contact);
   memset(obj.get(), 0, sizeof(*obj));
@@ -276,14 +284,6 @@ contact* add_contact(
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->service_notifications_enabled = (service_notifications_enabled > 0);
-
-    // Add new contact to the monitoring engine.
-    std::string id(name);
-    if (is_contact_exist(id)) {
-      logger(log_config_error, basic)
-        << "Error: Contact '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().contacts()[id] = obj;

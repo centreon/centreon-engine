@@ -113,6 +113,14 @@ hostgroup* add_hostgroup(
     return (NULL);
   }
 
+  // Check if the host group already exist.
+  std::string id(name);
+  if (is_hostgroup_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Hostgroup '" << name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory.
   shared_ptr<hostgroup> obj(new hostgroup, deleter::hostgroup);
   memset(obj.get(), 0, sizeof(hostgroup));
@@ -127,14 +135,6 @@ hostgroup* add_hostgroup(
       obj->notes = string::dup(notes);
     if (notes_url)
       obj->notes_url = string::dup(notes_url);
-
-    // Add new hostgroup to the monitoring engine.
-    std::string id(name);
-    if (is_hostgroup_exist(id)) {
-      logger(log_config_error, basic)
-        << "Error: Hostgroup '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().hostgroups()[id] = obj;

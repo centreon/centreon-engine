@@ -481,6 +481,16 @@ service* add_service(
     return (NULL);
   }
 
+  // Check if the service is already exist.
+  std::pair<std::string, std::string>
+    id(std::make_pair(host_name, description));
+  if (is_service_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Service '" << description << "' on host '"
+      << host_name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory.
   shared_ptr<service> obj(new service, deleter::service);
   memset(obj.get(), 0, sizeof(*obj));
@@ -557,19 +567,12 @@ service* add_service(
     obj->stalk_on_warning = (stalk_on_warning > 0);
     obj->state_type = HARD_STATE;
 
-    for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
-      obj->state_history[x] = STATE_OK;
-
-    if (is_service_exist(host_name, description)) {
-      logger(log_config_error, basic)
-        << "Error: Service '" << description << "' on host '"
-        << host_name << "' has already been defined";
-      return (NULL);
-    }
+    // STATE_OK = 0, so we don't need to set state_history (memset
+    // is used before).
+    // for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
+    //   obj->state_history[x] = STATE_OK;
 
     // Add new items to the configuration state.
-    std::pair<std::string, std::string>
-      id(std::make_pair(host_name, description));
     state::instance().services()[id] = obj;
 
     // Add new items to the list.
@@ -699,16 +702,12 @@ service& engine::find_service(
 /**
  *  Get if service exist.
  *
- *  @param[in] host_name           The host name.
- *  @param[in] service_description The service_description.
+ *  @param[in] id The service id.
  *
  *  @return True if the service is found, otherwise false.
  */
 bool engine::is_service_exist(
-           std::string const& host_name,
-           std::string const& service_description) {
-  std::pair<std::string, std::string>
-    id(std::make_pair(host_name, service_description));
+       std::pair<std::string, std::string> const& id) {
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   return (it != state::instance().services().end());

@@ -96,6 +96,14 @@ command* add_command(char const* name, char const* value) {
     return (NULL);
   }
 
+  // Check if the command already exist.
+  std::string id(name);
+  if (is_command_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Command '" << name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory for the new command.
   shared_ptr<command> obj(new command, deleter::command);
   memset(obj.get(), 0, sizeof(*obj));
@@ -104,14 +112,6 @@ command* add_command(char const* name, char const* value) {
     // Duplicate vars.
     obj->name = string::dup(name);
     obj->command_line = string::dup(value);
-
-    // Add new command to the monitoring engine.
-    std::string id(name);
-    if (is_command_exist(id)) {
-      logger(log_config_error, basic)
-        << "Error: Command '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().commands()[id] = obj;

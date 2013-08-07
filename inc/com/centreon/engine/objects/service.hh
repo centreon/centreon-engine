@@ -234,8 +234,7 @@ service&      find_service(
                 std::string const& host_name,
                 std::string const& service_description);
 bool          is_service_exist(
-                std::string const& host_name,
-                std::string const& service_description);
+                std::pair<std::string, std::string> const& id);
 
 CCE_END()
 

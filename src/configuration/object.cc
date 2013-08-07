@@ -125,36 +125,36 @@ bool object::operator!=(object const& right) const throw () {
  */
 object_ptr object::create(std::string const& type_name) {
   object_ptr obj;
-  if (type_name == "command")
-    obj = object_ptr(new configuration::command());
-  else if (type_name == "connector")
-    obj = object_ptr(new configuration::connector());
-  else if (type_name == "contactgroup")
-    obj = object_ptr(new configuration::contactgroup());
-  else if (type_name == "contact")
-    obj = object_ptr(new configuration::contact());
-  else if (type_name == "hostdependency")
-    obj = object_ptr(new configuration::hostdependency());
-  else if (type_name == "hostescalation")
-    obj = object_ptr(new configuration::hostescalation());
-  else if (type_name == "hostextinfo")
-    obj = object_ptr(new configuration::hostextinfo());
-  else if (type_name == "hostgroup")
-    obj = object_ptr(new configuration::hostgroup());
+  if (type_name == "service")
+    obj = object_ptr(new configuration::service());
   else if (type_name == "host")
     obj = object_ptr(new configuration::host());
+  else if (type_name == "contact")
+    obj = object_ptr(new configuration::contact());
+  else if (type_name == "contactgroup")
+    obj = object_ptr(new configuration::contactgroup());
+  else if (type_name == "servicegroup")
+    obj = object_ptr(new configuration::servicegroup());
+  else if (type_name == "hostgroup")
+    obj = object_ptr(new configuration::hostgroup());
   else if (type_name == "servicedependency")
     obj = object_ptr(new configuration::servicedependency());
   else if (type_name == "serviceescalation")
     obj = object_ptr(new configuration::serviceescalation());
-  else if (type_name == "serviceextinfo")
-    obj = object_ptr(new configuration::serviceextinfo());
-  else if (type_name == "servicegroup")
-    obj = object_ptr(new configuration::servicegroup());
-  else if (type_name == "service")
-    obj = object_ptr(new configuration::service());
+  else if (type_name == "hostdependency")
+    obj = object_ptr(new configuration::hostdependency());
+  else if (type_name == "hostescalation")
+    obj = object_ptr(new configuration::hostescalation());
+  else if (type_name == "command")
+    obj = object_ptr(new configuration::command());
   else if (type_name == "timeperiod")
     obj = object_ptr(new configuration::timeperiod());
+  else if (type_name == "connector")
+    obj = object_ptr(new configuration::connector());
+  else if (type_name == "serviceextinfo")
+    obj = object_ptr(new configuration::serviceextinfo());
+  else if (type_name == "hostextinfo")
+    obj = object_ptr(new configuration::hostextinfo());
   return (obj);
 }
 
@@ -207,8 +207,8 @@ bool object::parse(std::string const& line) {
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
   string::trim(value);
-  if (!object::parse(key, value))
-    return (parse(key, value));
+  if (!parse(key, value))
+    return (object::parse(key, value));
   return (true);
 }
 

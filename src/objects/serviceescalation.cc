@@ -150,6 +150,18 @@ serviceescalation* add_service_escalation(
     return (NULL);
   }
 
+  // Check if the service escaltion already exist.
+  std::pair<std::string, std::string>
+    id(std::make_pair(host_name, description));
+  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::const_iterator
+    it(state::instance().serviceescalations().find(id));
+  if (it != state::instance().serviceescalations().end()) {
+    logger(log_config_error, basic)
+      << "Error: Serviceescalation '" << description << "' on host '"
+      << host_name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory for a new service escalation entry.
   shared_ptr<serviceescalation> obj(new serviceescalation, deleter::serviceescalation);
   memset(obj.get(), 0, sizeof(*obj));
@@ -168,18 +180,6 @@ serviceescalation* add_service_escalation(
     obj->first_notification = first_notification;
     obj->last_notification = last_notification;
     obj->notification_interval = (notification_interval <= 0) ? 0 : notification_interval;
-
-    // XXX: Add new serviceescalation to the monitoring engine.
-    std::pair<std::string, std::string>
-      id(std::make_pair(host_name, description));
-    umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::const_iterator
-      it(state::instance().serviceescalations().find(id));
-    if (it != state::instance().serviceescalations().end()) {
-      logger(log_config_error, basic)
-        << "Error: Serviceescalation '" << description << "' on host '"
-        << host_name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().serviceescalations()

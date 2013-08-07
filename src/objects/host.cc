@@ -507,6 +507,14 @@ host* add_host(
     return (NULL);
   }
 
+  // Check if the host is already exist.
+  std::string id(name);
+  if (is_host_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Host '" << name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory for a new host.
   shared_ptr<host> obj(new host, deleter::host);
   memset(obj.get(), 0, sizeof(*obj));
@@ -593,16 +601,10 @@ host* add_host(
     obj->y_3d = y_3d;
     obj->z_3d = z_3d;
 
-    for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
-      obj->state_history[x] = STATE_OK;
-
-    // Add new host to the monitoring engine.
-    std::string id(name);
-    if (is_host_exist(id)) {
-      logger(log_config_error, basic)
-        << "Error: Host '" << name << "' has already been defined";
-      return (NULL);
-    }
+    // STATE_OK = 0, so we don't need to set state_history (memset
+    // is used before).
+    // for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
+    //   obj->state_history[x] = STATE_OK;
 
     // Add new items to the configuration state.
     state::instance().hosts()[id] = obj;

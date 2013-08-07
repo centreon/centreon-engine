@@ -113,6 +113,14 @@ servicegroup* add_servicegroup(
     return (NULL);
   }
 
+  // Check if the service group already exist.
+  std::string id(name);
+  if (is_servicegroup_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Servicegroup '" << name << "' has already been defined";
+    return (NULL);
+  }
+
   // Allocate memory.
   shared_ptr<servicegroup> obj(new servicegroup, deleter::servicegroup);
   memset(obj.get(), 0, sizeof(*obj));
@@ -127,14 +135,6 @@ servicegroup* add_servicegroup(
       obj->notes = string::dup(notes);
     if (notes_url)
       obj->notes_url = string::dup(notes_url);
-
-    // Add new servicegroup to the monitoring engine.
-    std::string id(name);
-    if (is_servicegroup_exist(id)) {
-      logger(log_config_error, basic)
-        << "Error: Servicegroup '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().servicegroups()[name] = obj;

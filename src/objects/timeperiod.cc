@@ -121,6 +121,15 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     return (NULL);
   }
 
+  // Check if the timeperiod already exist.
+  std::string id(name);
+  if (is_timeperiod_exist(id)) {
+    logger(log_config_error, basic)
+      << "Error: Timeperiod '" << name << "' has already been defined";
+    return (NULL);
+  }
+
+
   // Allocate memory for the new timeperiod.
   shared_ptr<timeperiod> obj(new timeperiod, deleter::timeperiod);
   memset(obj.get(), 0, sizeof(*obj));
@@ -129,14 +138,6 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     // Copy string vars.
     obj->name = string::dup(name);
     obj->alias = string::dup(alias);
-
-    // Add new timeperiod to the monitoring engine.
-    std::string id(name);
-    if (is_timeperiod_exist(id)) {
-      logger(log_config_error, basic)
-        << "Error: Timeperiod '" << name << "' has already been defined";
-      return (NULL);
-    }
 
     // Add new items to the configuration state.
     state::instance().timeperiods()[id] = obj;
