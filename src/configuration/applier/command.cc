@@ -212,11 +212,8 @@ void applier::command::remove_object(
  */
 void applier::command::resolve_object(
                          shared_ptr<configuration::command> obj) {
-  // XXX : resolution should occur, command objects should check for
-  //       the validity of their connector (if any). However there is
-  //       currently no support code to do that in the commands::set
-  //       and other classes of the commands namespace.
-
+  if (!obj->connector().empty())
+    commands::set::instance().get_command(obj->connector());
   return ;
 }
 
