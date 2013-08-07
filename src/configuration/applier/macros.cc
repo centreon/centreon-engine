@@ -95,20 +95,24 @@ applier::macros::macros()
  *  Destructor.
  */
 applier::macros::~macros() throw() {
+  clear_volatile_macros_r(_mac);
+  free_macrox_names();
+
   delete[] _mac->x[MACRO_ADMINEMAIL];
   delete[] _mac->x[MACRO_ADMINPAGER];
   delete[] _mac->x[MACRO_COMMANDFILE];
+  delete[] _mac->x[MACRO_EVENTSTARTTIME];
+  delete[] _mac->x[MACRO_HOSTPERFDATAFILE];
   delete[] _mac->x[MACRO_LOGFILE];
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  delete[] _mac->x[MACRO_RESOURCEFILE];
-  delete[] _mac->x[MACRO_TEMPFILE];
-  delete[] _mac->x[MACRO_TEMPPATH];
-
   delete[] _mac->x[MACRO_OBJECTCACHEFILE];
   delete[] _mac->x[MACRO_PROCESSSTARTTIME];
-  delete[] _mac->x[MACRO_EVENTSTARTTIME];
+  delete[] _mac->x[MACRO_RESOURCEFILE];
   delete[] _mac->x[MACRO_RETENTIONDATAFILE];
+  delete[] _mac->x[MACRO_SERVICEPERFDATAFILE];
   delete[] _mac->x[MACRO_STATUSDATAFILE];
+  delete[] _mac->x[MACRO_TEMPFILE];
+  delete[] _mac->x[MACRO_TEMPPATH];
 
   for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
     delete[] macro_user[i];
