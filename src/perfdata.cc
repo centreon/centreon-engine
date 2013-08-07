@@ -23,22 +23,6 @@
 #include "com/centreon/engine/xpddefault.hh"
 
 /******************************************************************/
-/************** INITIALIZATION & CLEANUP FUNCTIONS ****************/
-/******************************************************************/
-
-/* initializes performance data */
-int initialize_performance_data() {
-  xpddefault_initialize_performance_data();
-  return (OK);
-}
-
-/* cleans up performance data */
-int cleanup_performance_data() {
-  xpddefault_cleanup_performance_data();
-  return (OK);
-}
-
-/******************************************************************/
 /****************** PERFORMANCE DATA FUNCTIONS ********************/
 /******************************************************************/
 

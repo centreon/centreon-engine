@@ -385,9 +385,6 @@ int main(int argc, char* argv[]) {
         // Initialize scheduled downtime data.
         initialize_downtime_data();
 
-        // Initialize performance data.
-        initialize_performance_data();
-
         // Initialize check statistics.
         init_check_stats();
 
@@ -432,9 +429,6 @@ int main(int argc, char* argv[]) {
 
         // Save service and host state information.
         retention::dump::save(::config->state_retention_file());
-
-        // Clean up performance data.
-        cleanup_performance_data();
 
         // Clean up the status data.
         cleanup_status_data(true);
