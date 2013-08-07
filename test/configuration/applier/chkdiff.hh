@@ -50,6 +50,7 @@ bool compare_with_true_contents(
       std::cerr << "difference detected" << std::endl
                 << "old " << *it->second << std::endl
                 << "new " << *it_find->second << std::endl;
+      ret = false;
     }
   }
   for (typename umap<Key, T, Hash, Pred>::const_iterator
