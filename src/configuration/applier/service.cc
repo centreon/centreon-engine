@@ -359,6 +359,9 @@ void applier::service::modify_object(
     s->event_handler,
     NULL_IF_EMPTY(obj->event_handler()));
   modify_if_different(
+    s->event_handler_enabled,
+    static_cast<int>(obj->event_handler_enabled()));
+  modify_if_different(
     s->initial_state,
     static_cast<int>(obj->initial_state()));
   modify_if_different(
@@ -484,6 +487,9 @@ void applier::service::modify_object(
   modify_if_different(
     s->icon_image_alt,
     NULL_IF_EMPTY(obj->icon_image_alt()));
+  modify_if_different(
+    s->is_volatile,
+    static_cast<int>(obj->is_volatile()));
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {
