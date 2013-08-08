@@ -172,7 +172,6 @@ void hostgroup::merge(object const& obj) {
   if (obj.type() != _type)
     throw (engine_error() << "merge failed: invalid object type");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
-
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_alias);
   MRG_INHERIT(_hostgroup_members);

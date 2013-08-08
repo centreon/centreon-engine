@@ -163,7 +163,7 @@ void applier::servicegroup::modify_object(
     NULL_IF_EMPTY(obj->action_url()));
   modify_if_different(
     sg->alias,
-    NULL_IF_EMPTY(obj->alias()));
+    (obj->alias().empty() ? obj->servicegroup_name() : obj->alias()).c_str());
   modify_if_different(
     sg->notes,
     NULL_IF_EMPTY(obj->notes()));

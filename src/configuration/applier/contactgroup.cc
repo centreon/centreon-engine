@@ -155,7 +155,7 @@ void applier::contactgroup::modify_object(
   // Modify properties.
   modify_if_different(
     cg->alias,
-    NULL_IF_EMPTY(obj->alias()));
+    (obj->alias().empty() ? obj->contactgroup_name() : obj->alias()).c_str());
 
   // Were members modified ?
   if (obj->resolved_members() != old_cfg->resolved_members()) {

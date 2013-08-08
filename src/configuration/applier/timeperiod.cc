@@ -142,7 +142,7 @@ void applier::timeperiod::modify_object(
   // Modify properties.
   modify_if_different(
     tp->alias,
-    NULL_IF_EMPTY(obj->alias()));
+    (obj->alias().empty() ? obj->timeperiod_name() : obj->alias()).c_str());
 
   // Time ranges modified ?
   if (obj->timeranges() != old_cfg->timeranges()) {

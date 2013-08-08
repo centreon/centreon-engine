@@ -274,7 +274,9 @@ void applier::contact::modify_object(
   config->contacts().insert(obj);
 
   // Modify contact.
-  modify_if_different(c->alias, NULL_IF_EMPTY(obj->alias()));
+  modify_if_different(
+    c->alias,
+    (obj->alias().empty() ? obj->contact_name() : obj->alias()).c_str());
   modify_if_different(c->email, NULL_IF_EMPTY(obj->email()));
   modify_if_different(c->pager, NULL_IF_EMPTY(obj->pager()));
   modify_if_different(

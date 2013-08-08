@@ -48,8 +48,12 @@ void applier::modify_if_different(
          end(t2.end());
        (it != end) && (i < size);
        ++it, ++i)
-    if (!t1[i] || strcmp(t1[i], it->c_str()))
-      string::setstr(t1[i], it->c_str());
+    if (!t1[i] || strcmp(t1[i], it->c_str())) {
+      delete[] t1[i];
+      t1[i] = NULL;
+      if (!it->empty())
+        t1[i] = string::dup(*it);
+    }
   while (i < size) {
     delete [] t1[i];
     t1[i] = NULL;

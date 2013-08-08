@@ -280,7 +280,9 @@ void applier::host::modify_object(
   modify_if_different(
     h->display_name,
     NULL_IF_EMPTY(obj->display_name()));
-  modify_if_different(h->alias, NULL_IF_EMPTY(obj->alias()));
+  modify_if_different(
+    h->alias,
+    (obj->alias().empty() ? obj->host_name() : obj-> alias()).c_str());
   modify_if_different(h->address, NULL_IF_EMPTY(obj->address()));
   modify_if_different(
     h->check_period,
@@ -341,6 +343,9 @@ void applier::host::modify_object(
   modify_if_different(
     h->event_handler,
     NULL_IF_EMPTY(obj->event_handler()));
+  modify_if_different(
+    h->event_handler_enabled,
+    static_cast<int>(obj->event_handler_enabled()));
   modify_if_different(
     h->flap_detection_enabled,
     static_cast<int>(obj->flap_detection_enabled()));

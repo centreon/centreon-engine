@@ -158,7 +158,7 @@ void applier::hostgroup::modify_object(
     NULL_IF_EMPTY(obj->action_url()));
   modify_if_different(
     hg->alias,
-    NULL_IF_EMPTY(obj->alias()));
+    (obj->alias().empty() ? obj->hostgroup_name() : obj->alias()).c_str());
   modify_if_different(
     hg->notes,
     NULL_IF_EMPTY(obj->notes()));
