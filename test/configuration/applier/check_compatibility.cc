@@ -250,15 +250,9 @@ static void remove_duplicates(
               T* l,
               void (*deleter)(void*)) {
   while (l) {
-    for (T* m(l->next); m;)
-      if (*l == *m) {
+    for (T* m(l->next); m; m = m->next)
+      if (*l == *m)
         l->next = m->next;
-        T* to_delete(m);
-        m = m->next;
-        deleter(to_delete);
-      }
-      else
-        m = m->next;
     l = l->next;
   }
   return ;
