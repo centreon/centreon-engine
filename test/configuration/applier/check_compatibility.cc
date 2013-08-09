@@ -246,19 +246,11 @@ static void sort_it(servicesmember*& l) {
  *  Remove duplicate members of a list.
  */
 template <typename T>
-static void remove_duplicates(
-              T* l,
-              void (*deleter)(void*)) {
+static void remove_duplicates(T* l) {
   while (l) {
-    for (T* m(l->next); m;)
-      if (*l == *m) {
+    for (T* m(l->next); m; m = m->next)
+      if (*l == *m)
         l->next = m->next;
-        T* to_delete(m);
-        m = m->next;
-        deleter(to_delete);
-      }
-      else
-        m = m->next;
     l = l->next;
   }
   return ;
@@ -390,9 +382,9 @@ bool chkdiff(global& g1, global& g2) {
   if (!chkdiff(g1.hosts, g2.hosts))
     ret = false;
   sort_it(g1.hostdependencies);
-  remove_duplicates(g1.hostdependencies, &deleter::hostdependency);
+  remove_duplicates(g1.hostdependencies);
   sort_it(g2.hostdependencies);
-  remove_duplicates(g2.hostdependencies, &deleter::hostdependency);
+  remove_duplicates(g2.hostdependencies);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
   for (hostescalation_struct* he1(g1.hostescalations);
@@ -402,7 +394,7 @@ bool chkdiff(global& g1, global& g2) {
     sort_it(he1->contact_groups);
   }
   sort_it(g1.hostescalations);
-  remove_duplicates(g1.hostescalations, &deleter::hostescalation);
+  remove_duplicates(g1.hostescalations);
   for (hostescalation_struct* he2(g2.hostescalations);
        he2;
        he2 = he2->next) {
@@ -410,7 +402,7 @@ bool chkdiff(global& g1, global& g2) {
     sort_it(he2->contact_groups);
   }
   sort_it(g2.hostescalations);
-  remove_duplicates(g2.hostescalations, &deleter::hostescalation);
+  remove_duplicates(g2.hostescalations);
   if (!chkdiff(g1.hostescalations, g2.hostescalations))
     ret = false;
   if (!chkdiff(g1.hostgroups, g2.hostgroups))
@@ -420,9 +412,9 @@ bool chkdiff(global& g1, global& g2) {
   if (!chkdiff(g1.services, g2.services))
     ret = false;
   sort_it(g1.servicedependencies);
-  remove_duplicates(g1.servicedependencies, &deleter::servicedependency);
+  remove_duplicates(g1.servicedependencies);
   sort_it(g2.servicedependencies);
-  remove_duplicates(g2.servicedependencies, &deleter::servicedependency);
+  remove_duplicates(g2.servicedependencies);
   if (!chkdiff(g1.servicedependencies, g2.servicedependencies))
     ret = false;
   for (serviceescalation_struct* se1(g1.serviceescalations);

@@ -955,6 +955,7 @@ void applier::scheduler::_unscheduling_host_checks(
       evt(_evt_host_check.find((*it)->host_name()));
     if (evt != _evt_host_check.end()) {
       remove_event(evt->second, &event_list_low, &event_list_low_tail);
+      delete evt->second;
       _evt_host_check.erase(evt);
     }
   }
@@ -978,6 +979,7 @@ void applier::scheduler::_unscheduling_service_checks(
       evt(_evt_service_check.find(id));
     if (evt != _evt_service_check.end()) {
       remove_event(evt->second, &event_list_low, &event_list_low_tail);
+      delete evt->second;
       _evt_service_check.erase(evt);
     }
   }

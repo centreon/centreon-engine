@@ -22,6 +22,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/string.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -47,12 +48,10 @@ int main_test(int argc, char** argv) {
   strcpy(macros.argv[0], CMD_ARG1);
 
   // add macros user1.
-  macro_user[0] = new char[strlen(CMD_USER1) + 1];
-  strcpy(macro_user[0], CMD_USER1);
+  string::setstr(macro_user[0], CMD_USER1);
 
   // add macros hostaddress.
-  macro_x_names[MACRO_HOSTADDRESS] = new char[strlen("HOSTADDRESS") + 1];
-  strcpy(macro_x_names[MACRO_HOSTADDRESS], "HOSTADDRESS");
+  string::setstr(macro_x_names[MACRO_HOSTADDRESS], "HOSTADDRESS");
 
   host hst = host();
   hst.address = new char[strlen(CMD_HOSTADDR) + 1];
@@ -65,10 +64,6 @@ int main_test(int argc, char** argv) {
 
   delete [] hst.address;
   hst.address = NULL;
-  delete [] macro_x_names[MACRO_HOSTADDRESS];
-  macro_x_names[MACRO_HOSTADDRESS] = NULL;
-  delete [] macro_user[0];
-  macro_user[0] = NULL;
   delete [] macros.argv[0];
   macros.argv[0] = NULL;
 

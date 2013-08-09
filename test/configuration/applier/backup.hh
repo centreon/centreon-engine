@@ -109,7 +109,6 @@ public:
       throw (engine_error() << "timeperiods are not equal");
   }
   static void  set_to_null() {
-    ::config = NULL;
     ::command_list = NULL;
     ::contact_list = NULL;
     ::contactgroup_list = NULL;
