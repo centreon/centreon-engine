@@ -1131,22 +1131,28 @@ int is_valid_escalation_for_service_notification(
   return (true);
 }
 
-/* checks to see whether a service notification should be escalation */
+/**
+ *  Checks to see whether a service notification should be escalated.
+ *
+ *  @param[in] svc Service.
+ *
+ *  @return true if service notification should be escalated, false if
+ *          it should not.
+ */
 int should_service_notification_be_escalated(service* svc) {
-
+  // Debug.
   logger(dbg_functions, basic)
     << "should_service_notification_be_escalated()";
 
-  std::pair<std::string, std::string>
-    id(std::make_pair(svc->host_name, svc->description));
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
-    escalations(state::instance().serviceescalations());
-  for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-       it != end && it->first == id;
-       ++it) {
-    serviceescalation* temp_se(&*it->second);
-    /* we found a matching entry, so escalate this notification! */
+  // Browse service escalations related to this service.
+  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > collection;
+  std::pair<collection::iterator, collection::iterator> p;
+  p = state::instance().serviceescalations().equal_range(
+        std::make_pair(svc->host_name, svc->description));
+  while (p.first != p.second) {
+    serviceescalation* temp_se(p.first->second.get());
+
+    // We found a matching entry, so escalate this notification!
     if (is_valid_escalation_for_service_notification(
           svc,
           temp_se,
@@ -1156,7 +1162,6 @@ int should_service_notification_be_escalated(service* svc) {
       return (true);
     }
   }
-
   logger(dbg_notifications, more)
     << "Service notification will NOT be escalated.";
   return (false);

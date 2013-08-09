@@ -97,16 +97,16 @@ void applier::serviceescalation::add_object(
          NULL_IF_EMPTY(obj->escalation_period()),
          static_cast<bool>(
            obj->escalation_options()
-           & configuration::serviceescalation::recovery),
-         static_cast<bool>(
-           obj->escalation_options()
            & configuration::serviceescalation::warning),
          static_cast<bool>(
            obj->escalation_options()
            & configuration::serviceescalation::unknown),
          static_cast<bool>(
            obj->escalation_options()
-           & configuration::serviceescalation::critical)));
+           & configuration::serviceescalation::critical),
+         static_cast<bool>(
+           obj->escalation_options()
+           & configuration::serviceescalation::recovery)));
   if (!se)
     throw (engine_error() << "Error: Could not create escalation on "
            << "service '" << obj->service_description().front()
@@ -285,6 +285,11 @@ void applier::serviceescalation::resolve_object(
   umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
     it(applier::state::instance().serviceescalations_find(obj->key()));
   if (applier::state::instance().serviceescalations().end() == it)
+    throw (engine_error()
+           << "Error: Cannot resolve service escalation.");
+
+  // Check service escalation.
+  if (!check_serviceescalation(it->second.get(), NULL, NULL))
     throw (engine_error()
            << "Error: Cannot resolve service escalation.");
 

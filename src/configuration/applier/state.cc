@@ -552,15 +552,15 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_ptr
-                                    ? m->contact_ptr->name
-                                    : m->contact_name);
+      current.contacts().push_back(m->contact_ptr
+                                   ? m->contact_ptr->name
+                                   : m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_ptr
-                                         ? m->group_ptr->group_name
-                                         : m->group_name);
+      current.contactgroups().push_back(m->group_ptr
+                                        ? m->group_ptr->group_name
+                                        : m->group_name);
     if (current == k)
       break ;
     ++p.first;
@@ -812,15 +812,15 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_ptr
-                                    ? m->contact_ptr->name
-                                    : m->contact_name);
+      current.contacts().push_back(m->contact_ptr
+                                   ? m->contact_ptr->name
+                                   : m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_ptr
-                                         ? m->group_ptr->group_name
-                                         : m->group_name);
+      current.contactgroups().push_back(m->group_ptr
+                                        ? m->group_ptr->group_name
+                                        : m->group_name);
     if (current == k)
       break ;
     ++p.first;
@@ -1404,16 +1404,18 @@ void applier::state::_processing(
       diff_hosts);
     _apply<configuration::hostgroup, applier::hostgroup>(
       diff_hostgroups);
-    _resolve<configuration::hostgroup, applier::hostgroup>(
-      config->hostgroups());
-    _resolve<configuration::host, applier::host>(
-      config->hosts());
 
     // Apply services and servicegroups.
     _apply<configuration::service, applier::service>(
       diff_services);
     _apply<configuration::servicegroup, applier::servicegroup>(
       diff_servicegroups);
+
+    // Resolve hosts, services, host groups and service groups.
+    _resolve<configuration::hostgroup, applier::hostgroup>(
+      config->hostgroups());
+    _resolve<configuration::host, applier::host>(
+      config->hosts());
     _resolve<configuration::servicegroup, applier::servicegroup>(
       config->servicegroups());
     _resolve<configuration::service, applier::service>(

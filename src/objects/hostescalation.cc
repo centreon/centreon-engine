@@ -190,16 +190,6 @@ hostescalation* add_host_escalation(
     return (NULL);
   }
 
-  // Check if the host escaltion alreay exist.
-  std::string id(host_name);
-  umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator
-    it(state::instance().hostescalations().find(id));
-  if (it != state::instance().hostescalations().end()) {
-    logger(log_config_error, basic)
-      << "Error: Hostescalation '" << host_name << "' has already been defined";
-    return (NULL);
-  }
-
   // Allocate memory for a new host escalation entry.
   shared_ptr<hostescalation> obj(new hostescalation, deleter::hostescalation);
   memset(obj.get(), 0, sizeof(*obj));
@@ -218,7 +208,7 @@ hostescalation* add_host_escalation(
 
     // Add new items to the configuration state.
     state::instance().hostescalations()
-      .insert(std::make_pair(id, obj));
+      .insert(std::make_pair(obj->host_name, obj));
 
     // Add new items to the list.
     obj->next = hostescalation_list;
