@@ -14322,6 +14322,7 @@ int xodtemplate_free_memory() {
   /* free skiplists */
   xodtemplate_free_xobject_skiplists();
   delete[] log_file;
+  log_file = NULL;
   return (OK);
 }
 

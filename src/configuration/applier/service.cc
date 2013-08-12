@@ -651,7 +651,7 @@ void applier::service::resolve_object(
   if (hst != applier::state::instance().hosts().end()) {
     ++hst->second->total_services;
     hst->second->total_service_check_interval
-      += it->second->check_interval;
+      += static_cast<unsigned long>(it->second->check_interval);
   }
 
   // Resolve service.
