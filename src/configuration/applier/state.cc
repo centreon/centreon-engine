@@ -523,7 +523,9 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator appli
  *  @return Iterator to the element if found, hostescalations().end()
  *          otherwise.
  */
+#include <iostream>
 umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
+  std::cout << ">>>>>>>>>>>>>>> find" << std::endl;
   typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _hostescalations.equal_range(k.hosts().front());
@@ -552,15 +554,16 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_back(m->contact_ptr
+      current.contacts().push_front(m->contact_ptr
                                    ? m->contact_ptr->name
                                    : m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_back(m->group_ptr
+      current.contactgroups().push_front(m->group_ptr
                                         ? m->group_ptr->group_name
                                         : m->group_name);
+
     if (current == k)
       break ;
     ++p.first;
@@ -812,13 +815,13 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_back(m->contact_ptr
+      current.contacts().push_front(m->contact_ptr
                                    ? m->contact_ptr->name
                                    : m->contact_name);
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_back(m->group_ptr
+      current.contactgroups().push_front(m->group_ptr
                                         ? m->group_ptr->group_name
                                         : m->group_name);
     if (current == k)

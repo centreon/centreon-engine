@@ -1680,7 +1680,6 @@ int check_hostescalation(hostescalation* he, int* w, int* e) {
   // Add errors.
   if (e)
     *e += errors;
-
   return (errors == 0);
 }
 
