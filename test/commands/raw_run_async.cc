@@ -21,6 +21,7 @@
 #include <cstring>
 #include <exception>
 #include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/process.hh"
@@ -38,13 +39,14 @@ using namespace com::centreon::engine::commands;
  */
 static bool run_without_timeout() {
   // Raw command object and its waiter.
-  raw cmd(__func__, "./bin_test_run --timeout=off");
-  wait_process wait_proc(&cmd);
+  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --timeout=off"));
+  wait_process wait_proc(cmd.get());
+  set::instance().add_command(cmd);
 
   // Run command and wait for it to exit.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
+  unsigned long id(cmd->run(cmd->get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
@@ -52,7 +54,7 @@ static bool run_without_timeout() {
   return (!((res.command_id != id)
             || (res.exit_code != STATE_OK)
             || (res.exit_status != process::normal)
-            || (res.output != cmd.get_command_line())));
+            || (res.output != cmd->get_command_line())));
 }
 
 /**
@@ -62,13 +64,14 @@ static bool run_without_timeout() {
  */
 static bool run_with_timeout() {
   // Raw command object and its waiter.
-  raw cmd(__func__, "./bin_test_run --timeout=on");
-  wait_process wait_proc(&cmd);
+  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --timeout=on"));
+  wait_process wait_proc(cmd.get());
+  set::instance().add_command(cmd);
 
   // Run command and wait for it to exit.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  unsigned long id(cmd.run(cmd.get_command_line(), mac, 1));
+  unsigned long id(cmd->run(cmd->get_command_line(), mac, 1));
   wait_proc.wait();
 
   // Check result.
@@ -96,11 +99,12 @@ static bool run_with_environment_macros() {
   strcpy(mac.argv[0], argv);
 
   // Raw command object and its waiter.
-  raw cmd(__func__, "./bin_test_run --check_macros");
-  wait_process wait_proc(&cmd);
+  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --check_macros"));
+  wait_process wait_proc(cmd.get());
+  set::instance().add_command(cmd);
 
   // Run command and wait for it to exit.
-  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
+  unsigned long id(cmd->run(cmd->get_command_line(), mac, 0));
   wait_proc.wait();
   delete [] mac.argv[0];
 
@@ -109,7 +113,7 @@ static bool run_with_environment_macros() {
   return (!((res.command_id != id)
             || (res.exit_code != STATE_OK)
             || (res.exit_status != process::normal)
-            || (res.output != cmd.get_command_line())));
+            || (res.output != cmd->get_command_line())));
 }
 
 /**
@@ -119,13 +123,14 @@ static bool run_with_environment_macros() {
  */
 static bool run_with_single_quotes() {
   // Raw command object and its waiter.
-  raw cmd(__func__, "'./bin_test_run' '--timeout'='off'");
-  wait_process wait_proc(&cmd);
+  shared_ptr<raw> cmd(new raw(__func__, "'./bin_test_run' '--timeout'='off'"));
+  wait_process wait_proc(cmd.get());
+  set::instance().add_command(cmd);
 
   // Run command and wait for it to exit.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
+  unsigned long id(cmd->run(cmd->get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
@@ -143,13 +148,14 @@ static bool run_with_single_quotes() {
  */
 static bool run_with_double_quotes() {
   // Raw command object and its waiter.
-  raw cmd(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\"");
-  wait_process wait_proc(&cmd);
+  shared_ptr<raw> cmd(new raw(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\""));
+  wait_process wait_proc(cmd.get());
+  set::instance().add_command(cmd);
 
   // Run command and wait for it to exit.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
+  unsigned long id(cmd->run(cmd->get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
