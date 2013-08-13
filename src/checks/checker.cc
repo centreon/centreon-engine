@@ -473,6 +473,7 @@ void checker::run(
     throw (engine_error() << "attempt to run active check on service '"
            << svc->description << "' on host '" << svc->host_ptr->name
            << "' with no check command");
+
   logger(dbg_checks, basic)
     << "** Running async check of service '" << svc->description
     << "' on host '" << svc->host_name << "'...";
