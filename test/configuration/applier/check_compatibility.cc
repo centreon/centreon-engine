@@ -28,12 +28,15 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
+#include "com/centreon/engine/retention/parser.hh"
+#include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "compatibility/locations.h"
 #include "chkdiff.hh"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
+#include "xrddefault.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -703,14 +706,26 @@ static bool newparser_read_config(
   bool ret(false);
   try {
     init_macros();
+    // Parse configuration.
     configuration::state config;
-    configuration::parser p(options);
-    p.parse(filename, config);
+    {
+      configuration::parser p(options);
+      p.parse(filename, config);
+    }
+
+    // Parse retention.
+    retention::state state;
+    try {
+      retention::parser p;
+      p.parse(config.state_retention_file(), state);
+    }
+    catch (...) {
+    }
 
     // tricks to bypass create log file.
     config.log_file("");
 
-    configuration::applier::state::instance().apply(config);
+    configuration::applier::state::instance().apply(config, state);
 
     g = get_globals();
     clear_volatile_macros_r(get_global_macros());
@@ -736,6 +751,7 @@ static bool oldparser_read_config(
               global& g,
               std::string const& filename,
               unsigned int options) {
+  xrddefault_initialize_retention_data(filename.c_str());
   clear_volatile_macros_r(get_global_macros());
   free_macrox_names();
   init_object_skiplists();
@@ -767,11 +783,14 @@ static bool oldparser_read_config(
     remove_duplicate_members_for_object(
       servicegroup_list,
       &deleter::servicesmember);
+
+    xrddefault_read_state_information();
     g = get_globals();
   }
   clear_volatile_macros_r(get_global_macros());
   free_macrox_names();
   free_object_skiplists();
+  xrddefault_cleanup_retention_data(filename.c_str());
   return (ret == OK);
 }
 

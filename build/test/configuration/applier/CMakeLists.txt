@@ -37,6 +37,7 @@ add_executable(
   "${TEST_BIN_NAME}"
   "${TEST_DIR}/check_compatibility.cc"
   "${TEST_DIR}/xodtemplate.cc"
+  "${TEST_DIR}/xrddefault.cc"
 )
 target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
@@ -60,9 +61,19 @@ set(TEST_NAME "parse_and_apply_configuration_contact")
 set(TEST_CONF_FILE "main_contact.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+# parse_and_apply_configuration_contact_retention
+set(TEST_NAME "parse_and_apply_configuration_contact_retention")
+set(TEST_CONF_FILE "main_contact_retention.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
 # parse_and_apply_configuration_contact_template
 set(TEST_NAME "parse_and_apply_configuration_contact_template")
 set(TEST_CONF_FILE "main_contact_template.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+# parse_and_apply_configuration_contact_template_retention
+set(TEST_NAME "parse_and_apply_configuration_contact_template_retention")
+set(TEST_CONF_FILE "main_contact_template_retention.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_apply_configuration_globals
@@ -75,9 +86,19 @@ set(TEST_NAME "parse_and_apply_configuration_host")
 set(TEST_CONF_FILE "main_host.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+# parse_and_apply_configuration_host_retention
+set(TEST_NAME "parse_and_apply_configuration_host_retention")
+set(TEST_CONF_FILE "main_host_retention.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
 # parse_and_apply_configuration_host_template
 set(TEST_NAME "parse_and_apply_configuration_host_template")
 set(TEST_CONF_FILE "main_host_template.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+# parse_and_apply_configuration_host_template_retention
+set(TEST_NAME "parse_and_apply_configuration_host_template_retention")
+set(TEST_CONF_FILE "main_host_template_retention.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_apply_configuration_hostdependency
@@ -110,9 +131,19 @@ set(TEST_NAME "parse_and_apply_configuration_service")
 set(TEST_CONF_FILE "main_service.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+# parse_and_apply_configuration_service_retention
+set(TEST_NAME "parse_and_apply_configuration_service_retention")
+set(TEST_CONF_FILE "main_service_retention.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
 # parse_and_apply_configuration_service_template
 set(TEST_NAME "parse_and_apply_configuration_service_template")
 set(TEST_CONF_FILE "main_service_template.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+# parse_and_apply_configuration_service_template_retention
+set(TEST_NAME "parse_and_apply_configuration_service_template_retention")
+set(TEST_CONF_FILE "main_service_template_retention.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_apply_configuration_servicedependency

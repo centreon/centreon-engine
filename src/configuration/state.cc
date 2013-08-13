@@ -3328,7 +3328,13 @@ std::string const& state::state_retention_file() const throw () {
  *  @param[in] value The new state_retention_file value.
  */
 void state::state_retention_file(std::string const& value) {
-  _state_retention_file = value;
+  if (value.empty() || value[0] == '/')
+    _state_retention_file = value;
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _state_retention_file = base_name + "/" + value;
+  }
 }
 
 /**
