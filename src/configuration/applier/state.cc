@@ -523,9 +523,7 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator appli
  *  @return Iterator to the element if found, hostescalations().end()
  *          otherwise.
  */
-#include <iostream>
 umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
-  std::cout << ">>>>>>>>>>>>>>> find" << std::endl;
   typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _hostescalations.equal_range(k.hosts().front());
