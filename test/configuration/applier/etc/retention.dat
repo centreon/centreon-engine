@@ -159,3 +159,53 @@ modified_service_attributes=0
 service_notification_period=tp_weekday
 service_notifications_enabled=1
 }
+hostcomment {
+host_name=central
+entry_type=1
+comment_id=4
+source=1
+persistent=1
+entry_time=1376401693
+expires=0
+expire_time=0
+author=root
+comment_data=host comment
+}
+servicecomment {
+host_name=central
+service_description=central_ping
+entry_type=1
+comment_id=3
+source=1
+persistent=1
+entry_time=1376401634
+expires=0
+expire_time=0
+author=root
+comment_data=service comment
+}
+hostdowntime {
+host_name=central
+downtime_id=1
+entry_time=1300000000
+start_time=1300000000
+end_time=6000000000
+triggered_by=0
+fixed=1
+duration=4700000000
+author=root
+comment=Downtime set by root
+}
+servicedowntime {
+host_name=central
+service_description=central_ping
+downtime_id=2
+entry_time=1300000000
+start_time=1300000000
+end_time=6000000000
+triggered_by=0
+fixed=1
+duration=4700000000
+author=root
+comment=Downtime set by root
+}
