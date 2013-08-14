@@ -28,6 +28,7 @@
 #  include "com/centreon/engine/deleter/contactsmember.hh"
 #  include "com/centreon/engine/deleter/customvariablesmember.hh"
 #  include "com/centreon/engine/deleter/daterange.hh"
+#  include "com/centreon/engine/deleter/downtime.hh"
 #  include "com/centreon/engine/deleter/hostdependency.hh"
 #  include "com/centreon/engine/deleter/hostescalation.hh"
 #  include "com/centreon/engine/deleter/hostgroup.hh"

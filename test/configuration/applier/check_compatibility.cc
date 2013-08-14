@@ -26,6 +26,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
 #include "com/centreon/engine/retention/parser.hh"
@@ -41,142 +42,143 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-struct               global {
-  command*           commands;
-  contact*           contacts;
-  contactgroup*      contactgroups;
-  host*              hosts;
-  hostdependency*    hostdependencies;
-  hostescalation*    hostescalations;
-  hostgroup*         hostgroups;
-  service*           services;
-  servicedependency* servicedependencies;
-  serviceescalation* serviceescalations;
-  servicegroup*      servicegroups;
-  timeperiod*        timeperiods;
+struct                global {
+  command*            commands;
+  contact*            contacts;
+  contactgroup*       contactgroups;
+  host*               hosts;
+  hostdependency*     hostdependencies;
+  hostescalation*     hostescalations;
+  hostgroup*          hostgroups;
+  service*            services;
+  servicedependency*  servicedependencies;
+  serviceescalation*  serviceescalations;
+  servicegroup*       servicegroups;
+  timeperiod*         timeperiods;
+  scheduled_downtime* downtimes;
 
   umap<std::string, shared_ptr<command> >
-                     save_commands;
+                      save_commands;
   umap<std::string, shared_ptr<commands::connector> >
-                     save_connectors;
+                      save_connectors;
   umap<std::string, shared_ptr<contact> >
-                     save_contacts;
+                      save_contacts;
   umap<std::string, shared_ptr<contactgroup> >
-                     save_contactgroups;
+                      save_contactgroups;
   umap<std::string, shared_ptr<host> >
-                     save_hosts;
+                      save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
-                     save_hostdependencies;
+                      save_hostdependencies;
   umultimap<std::string, shared_ptr<hostescalation> >
-                     save_hostescalations;
+                      save_hostescalations;
   umap<std::string, shared_ptr<hostgroup> >
-                     save_hostgroups;
+                      save_hostgroups;
   umap<std::pair<std::string, std::string>, shared_ptr<service> >
-                     save_services;
+                      save_services;
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
-                     save_servicedependencies;
+                      save_servicedependencies;
   umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >
-                     save_serviceescalations;
+                      save_serviceescalations;
   umap<std::string, shared_ptr<servicegroup> >
-                     save_servicegroups;
+                      save_servicegroups;
   umap<std::string, shared_ptr<timeperiod> >
-                     save_timeperiods;
+                      save_timeperiods;
 
-  bool               accept_passive_host_checks;
-  bool               accept_passive_service_checks;
-  int                additional_freshness_latency;
-  std::string        admin_email;
-  std::string        admin_pager;
-  bool               allow_empty_hostgroup_assignment;
-  bool               auto_reschedule_checks;
-  unsigned int       auto_rescheduling_interval;
-  unsigned int       auto_rescheduling_window;
-  unsigned long      cached_host_check_horizon;
-  unsigned long      cached_service_check_horizon;
-  bool               check_external_commands;
-  bool               check_host_freshness;
-  bool               check_orphaned_hosts;
-  bool               check_orphaned_services;
-  unsigned int       check_reaper_interval;
-  std::string        check_result_path;
-  bool               check_service_freshness;
-  int                command_check_interval;
-  std::string        command_file;
-  int                date_format;
-  std::string        debug_file;
-  unsigned long      debug_level;
-  unsigned int       debug_verbosity;
-  bool               enable_environment_macros;
-  bool               enable_event_handlers;
-  bool               enable_failure_prediction;
-  bool               enable_flap_detection;
-  bool               enable_notifications;
-  bool               enable_predictive_host_dependency_checks;
-  bool               enable_predictive_service_dependency_checks;
-  unsigned long      event_broker_options;
-  unsigned int       event_handler_timeout;
-  bool               execute_host_checks;
-  bool               execute_service_checks;
-  int                external_command_buffer_slots;
-  std::string        global_host_event_handler;
-  std::string        global_service_event_handler;
-  float              high_host_flap_threshold;
-  float              high_service_flap_threshold;
-  unsigned int       host_check_timeout;
-  unsigned int       host_freshness_check_interval;
-  int                host_inter_check_delay_method;
-  std::string        illegal_object_chars;
-  std::string        illegal_output_chars;
-  unsigned int       interval_length;
-  bool               log_event_handlers;
-  bool               log_external_commands;
-  //  std::string        log_file;
-  bool               log_host_retries;
-  bool               log_initial_states;
-  bool               log_notifications;
-  bool               log_passive_checks;
-  bool               log_service_retries;
-  float              low_host_flap_threshold;
-  float              low_service_flap_threshold;
-  unsigned int       max_check_reaper_time;
-  unsigned long      max_check_result_file_age;
-  unsigned long      max_debug_file_size;
-  unsigned int       max_host_check_spread;
-  unsigned int       max_parallel_service_checks;
-  unsigned int       max_service_check_spread;
-  unsigned int       notification_timeout;
-  bool               obsess_over_hosts;
-  bool               obsess_over_services;
-  std::string        ochp_command;
-  unsigned int       ochp_timeout;
-  std::string        ocsp_command;
-  unsigned int       ocsp_timeout;
-  bool               passive_host_checks_are_soft;
-  bool               process_performance_data;
-  unsigned long      retained_contact_host_attribute_mask;
-  unsigned long      retained_contact_service_attribute_mask;
-  unsigned long      retained_host_attribute_mask;
-  unsigned long      retained_process_host_attribute_mask;
-  bool               retain_state_information;
-  unsigned int       retention_scheduling_horizon;
-  unsigned int       retention_update_interval;
-  unsigned int       service_check_timeout;
-  unsigned int       service_freshness_check_interval;
-  int                service_inter_check_delay_method;
-  int                service_interleave_factor_method;
-  float              sleep_time;
-  bool               soft_state_dependencies;
-  unsigned int       status_update_interval;
-  unsigned int       time_change_threshold;
-  bool               translate_passive_host_checks;
-  bool               use_aggressive_host_checking;
-  bool               use_large_installation_tweaks;
-  bool               use_regexp_matches;
-  bool               use_retained_program_state;
-  bool               use_retained_scheduling_info;
-  bool               use_syslog;
-  std::string        use_timezone;
-  bool               use_true_regexp_matching;
+  bool                accept_passive_host_checks;
+  bool                accept_passive_service_checks;
+  int                 additional_freshness_latency;
+  std::string         admin_email;
+  std::string         admin_pager;
+  bool                allow_empty_hostgroup_assignment;
+  bool                auto_reschedule_checks;
+  unsigned int        auto_rescheduling_interval;
+  unsigned int        auto_rescheduling_window;
+  unsigned long       cached_host_check_horizon;
+  unsigned long       cached_service_check_horizon;
+  bool                check_external_commands;
+  bool                check_host_freshness;
+  bool                check_orphaned_hosts;
+  bool                check_orphaned_services;
+  unsigned int        check_reaper_interval;
+  std::string         check_result_path;
+  bool                check_service_freshness;
+  int                 command_check_interval;
+  std::string         command_file;
+  int                 date_format;
+  std::string         debug_file;
+  unsigned long       debug_level;
+  unsigned int        debug_verbosity;
+  bool                enable_environment_macros;
+  bool                enable_event_handlers;
+  bool                enable_failure_prediction;
+  bool                enable_flap_detection;
+  bool                enable_notifications;
+  bool                enable_predictive_host_dependency_checks;
+  bool                enable_predictive_service_dependency_checks;
+  unsigned long       event_broker_options;
+  unsigned int        event_handler_timeout;
+  bool                execute_host_checks;
+  bool                execute_service_checks;
+  int                 external_command_buffer_slots;
+  std::string         global_host_event_handler;
+  std::string         global_service_event_handler;
+  float               high_host_flap_threshold;
+  float               high_service_flap_threshold;
+  unsigned int        host_check_timeout;
+  unsigned int        host_freshness_check_interval;
+  int                 host_inter_check_delay_method;
+  std::string         illegal_object_chars;
+  std::string         illegal_output_chars;
+  unsigned int        interval_length;
+  bool                log_event_handlers;
+  bool                log_external_commands;
+  //  std::string         log_file;
+  bool                log_host_retries;
+  bool                log_initial_states;
+  bool                log_notifications;
+  bool                log_passive_checks;
+  bool                log_service_retries;
+  float               low_host_flap_threshold;
+  float               low_service_flap_threshold;
+  unsigned int        max_check_reaper_time;
+  unsigned long       max_check_result_file_age;
+  unsigned long       max_debug_file_size;
+  unsigned int        max_host_check_spread;
+  unsigned int        max_parallel_service_checks;
+  unsigned int        max_service_check_spread;
+  unsigned int        notification_timeout;
+  bool                obsess_over_hosts;
+  bool                obsess_over_services;
+  std::string         ochp_command;
+  unsigned int        ochp_timeout;
+  std::string         ocsp_command;
+  unsigned int        ocsp_timeout;
+  bool                passive_host_checks_are_soft;
+  bool                process_performance_data;
+  unsigned long       retained_contact_host_attribute_mask;
+  unsigned long       retained_contact_service_attribute_mask;
+  unsigned long       retained_host_attribute_mask;
+  unsigned long       retained_process_host_attribute_mask;
+  bool                retain_state_information;
+  unsigned int        retention_scheduling_horizon;
+  unsigned int        retention_update_interval;
+  unsigned int        service_check_timeout;
+  unsigned int        service_freshness_check_interval;
+  int                 service_inter_check_delay_method;
+  int                 service_interleave_factor_method;
+  float               sleep_time;
+  bool                soft_state_dependencies;
+  unsigned int        status_update_interval;
+  unsigned int        time_change_threshold;
+  bool                translate_passive_host_checks;
+  bool                use_aggressive_host_checking;
+  bool                use_large_installation_tweaks;
+  bool                use_regexp_matches;
+  bool                use_retained_program_state;
+  bool                use_retained_scheduling_info;
+  bool                use_syslog;
+  std::string         use_timezone;
+  bool                use_true_regexp_matching;
 };
 
 #define check_value(id) \
@@ -387,9 +389,14 @@ bool chkdiff(global& g1, global& g2) {
   check_value(use_timezone);
   check_value(use_true_regexp_matching);
 
+  for (scheduled_downtime* d(g1.downtimes); d; d = d->next)
+    d->comment_id = 0;
+  for (scheduled_downtime* d(g2.downtimes); d; d = d->next)
+    d->comment_id = 0;
+  if (!chkdiff(g1.downtimes, g2.downtimes))
+    ret = false;
   if (!chkdiff(g1.commands, g2.commands))
     ret = false;
-
   if (!chkdiff(g1.contacts, g2.contacts))
     ret = false;
   for (contactgroup_struct* cg1(g1.contactgroups);
@@ -504,6 +511,8 @@ static global get_globals() {
   servicegroup_list = NULL;
   g.timeperiods = timeperiod_list;
   timeperiod_list = NULL;
+  g.downtimes = scheduled_downtime_list;
+  scheduled_downtime_list = NULL;
 
   configuration::applier::state&
     app_state(configuration::applier::state::instance());
@@ -838,7 +847,8 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "new parser can't parse " << argv[1]);
 
   bool ret(chkdiff(oldcfg, newcfg));
-
+  deleter::listmember(oldcfg.downtimes, &deleter::downtime);
+  deleter::listmember(newcfg.downtimes, &deleter::downtime);
   return (!ret);
 }
 

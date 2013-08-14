@@ -21,10 +21,10 @@
 #include <iomanip>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comments.hh"
-#include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
 using namespace com::centreon::engine::logging;

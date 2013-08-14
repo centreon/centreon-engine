@@ -1,5 +1,4 @@
 /*
-** Copyright 2000-2008 Ethan Galstad
 ** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
@@ -18,19 +17,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_COMPATIBILITY_DOWNTIME_H
-#  define CCE_COMPATIBILITY_DOWNTIME_H
+#ifndef CCE_DELETER_DOWNTIME_HH
+#  define CCE_DELETER_DOWNTIME_HH
 
-#  include "com/centreon/engine/objects/downtime.hh"
-#  include "common.h"
-#  include "config.h"
-#  include "objects.h"
+#  include "com/centreon/engine/namespace.hh"
 
-/*
-** If you are going to be adding a lot of downtime in sequence,
-** set defer_downtime_sorting to 1 before you start and then
-** call sort_downtime afterwards. Things will go MUCH faster.
-*/
-extern int defer_downtime_sorting;
+CCE_BEGIN()
 
-#endif // !CCE_COMPATIBILITY_DOWNTIME_H
+namespace deleter {
+  void downtime(void* ptr) throw ();
+}
+
+CCE_END()
+
+#endif // !CCE_DELETER_DOWNTIME_HH

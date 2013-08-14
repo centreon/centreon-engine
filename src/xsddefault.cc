@@ -30,10 +30,10 @@
 #include <unistd.h>
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
 #include "skiplist.h"

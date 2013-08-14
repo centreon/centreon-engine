@@ -31,6 +31,7 @@
 #  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
+#  include "com/centreon/engine/objects/downtime.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/hostdependency.hh"
 #  include "com/centreon/engine/objects/hostescalation.hh"
