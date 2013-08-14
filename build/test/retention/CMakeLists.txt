@@ -23,3 +23,39 @@ set(TEST_DIR "${TEST_DIR}/retention")
 # Subdirectory.
 add_subdirectory("applier")
 
+## retention_dump.
+set(TEST_BIN_NAME "retention_dump")
+add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/dump.cc")
+target_link_libraries("${TEST_BIN_NAME}" "cce_core")
+
+# comment_dump
+set(TEST_NAME "comment_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "comment")
+
+# contact_dump
+set(TEST_NAME "contact_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact")
+
+# downtime_dump
+set(TEST_NAME "downtime_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "downtime")
+
+# header_dump
+set(TEST_NAME "header_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "header")
+
+# host_dump
+set(TEST_NAME "host_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host")
+
+# info_dump
+set(TEST_NAME "info_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "info")
+
+# program_dump
+set(TEST_NAME "program_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "program")
+
+# service_dump
+set(TEST_NAME "service_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "service")

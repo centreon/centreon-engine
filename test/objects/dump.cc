@@ -39,16 +39,12 @@ int main_test(int argc, char* argv[]) {
   std::ostringstream oss;
   std::string const type(argv[1]);
 
-// objectlist.hh
-
-
-
   if (type == "command") {
     command obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
-  if (type == "commandsmember") {
+  else if (type == "commandsmember") {
     commandsmember obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
