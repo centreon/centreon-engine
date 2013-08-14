@@ -23,6 +23,10 @@ event_broker_options=-1
 log_file=/tmp/centengine-unittest.log
 state_retention_file=
 
+debug_file=/tmp/centreon-engine-unitest.debug
+debug_level=2096895
+debug_verbosity=2
+
 accept_passive_host_checks=1
 accept_passive_service_checks=1
 aggregate_status_updates=1

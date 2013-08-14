@@ -272,7 +272,7 @@ int main(int argc, char* argv[]) {
 
         // Parse retention.
         retention::state state;
-        {
+        if (!config.state_retention_file().empty()) {
           retention::parser p;
           try {
             p.parse(config.state_retention_file(), state);
