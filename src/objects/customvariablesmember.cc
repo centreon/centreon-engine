@@ -44,10 +44,9 @@ bool operator==(
   if (is_equal(obj1.variable_name, obj2.variable_name)
       && is_equal(obj1.variable_value, obj2.variable_value)
       && obj1.has_been_modified == obj2.has_been_modified) {
-    if (!obj1.next && !obj2.next)
-      return (*obj1.next == *obj2.next);
-    if (obj1.next == obj2.next)
-      return (true);
+    if (!obj1.next || !obj2.next)
+      return (!obj1.next && !obj2.next);
+    return (*obj1.next == *obj2.next);
   }
   return (false);
 }
@@ -67,6 +66,27 @@ bool operator!=(
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] obj1 First object to compare.
+ *  @param[in] obj2 Second object to compare.
+ *
+ *  @return True if the first object is less than the second.
+ */
+bool operator<(
+       customvariablesmember const& obj1,
+       customvariablesmember const& obj2) throw () {
+  if (!obj1.variable_name || !obj2.variable_name)
+    return (obj1.variable_name < obj2.variable_name);
+  int ret(strcmp(obj1.variable_name, obj2.variable_name));
+  if (ret)
+    return (ret < 0);
+  if (!obj1.variable_value || !obj2.variable_value)
+    return (obj1.variable_value < obj2.variable_value);
+  return (strcmp(obj1.variable_value, obj2.variable_value) < 0);
+}
+
+/**
  *  Dump customvariablesmember content into the stream.
  *
  *  @param[out] os  The output stream.
@@ -76,7 +96,7 @@ bool operator!=(
  */
 std::ostream& operator<<(std::ostream& os, customvariablesmember const& obj) {
   for (customvariablesmember const* m(&obj); m; m = m->next)
-    os << "  " << chkstr(m->variable_name) << ": " << chkstr(m->variable_value) << "\n";
+    os << "  _" << chkstr(m->variable_name) << ": " << chkstr(m->variable_value) << "\n";
   return (os);
 }
 

@@ -18,7 +18,7 @@
 ** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
-#include <iostream>
+
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -971,7 +971,6 @@ int xrddefault_read_state_information() {
         continue;
       val[0] = '\x0';
       val++;
-      std::cout << ">>> " << var << "=" << val << std::endl;
       found_directive = TRUE;
 
       switch (data_type) {

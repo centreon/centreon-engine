@@ -266,7 +266,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  y_3d:                                 " << obj.y_3d << "\n"
     "  z_3d:                                 " << obj.z_3d << "\n"
     "  should_be_drawn:                      " << obj.should_be_drawn << "\n"
-    "  custom_variables:                     " << chkobj(obj.custom_variables) << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
     "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  check_type:                           " << obj.check_type << "\n"
@@ -330,7 +329,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
     "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
     "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n"
-    "}\n";
+    << chkobj(obj.custom_variables)
+    << "}\n";
   return (os);
 }
 

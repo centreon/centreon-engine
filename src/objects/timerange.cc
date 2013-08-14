@@ -43,8 +43,7 @@ bool operator==(
       && obj1.range_end == obj2.range_end) {
     if (!obj1.next || !obj2.next)
       return (!obj1.next && !obj2.next);
-    else
-      return (*obj1.next == *obj2.next);
+    return (*obj1.next == *obj2.next);
   }
   return (false);
 }

@@ -48,8 +48,7 @@ bool operator==(
   if (is_equal(obj1.contact_name, obj2.contact_name)) {
     if (!obj1.next || !obj2.next)
       return (!obj1.next && !obj2.next);
-    else
-      return (*obj1.next == *obj2.next);
+    return (*obj1.next == *obj2.next);
   }
   return (false);
 }

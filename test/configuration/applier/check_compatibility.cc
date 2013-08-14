@@ -220,6 +220,27 @@ static void sort_it(T*& l) {
 /**
  *  Sort a list.
  */
+template <typename T>
+static void sort_it_rev(T*& l) {
+  T* remaining(l);
+  T** new_root(&l);
+  *new_root = NULL;
+  while (remaining) {
+    T** min(&remaining);
+    for (T** cur(&((*min)->next)); *cur; cur = &((*cur)->next))
+      if (!(**cur < **min))
+        min = cur;
+    *new_root = *min;
+    *min = (*min)->next;
+    new_root = &((*new_root)->next);
+    *new_root = NULL;
+  }
+  return ;
+}
+
+/**
+ *  Sort a list.
+ */
 static void sort_it(servicesmember*& l) {
   servicesmember* remaining(l);
   servicesmember** new_root(&l);
@@ -368,6 +389,7 @@ bool chkdiff(global& g1, global& g2) {
 
   if (!chkdiff(g1.commands, g2.commands))
     ret = false;
+
   if (!chkdiff(g1.contacts, g2.contacts))
     ret = false;
   for (contactgroup_struct* cg1(g1.contactgroups);
@@ -412,6 +434,8 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   reset_next_check(g1.services);
   reset_next_check(g2.services);
+  for (service_struct* s(g1.services); s; s = s->next)
+    sort_it_rev(s->custom_variables);
   if (!chkdiff(g1.services, g2.services))
     ret = false;
   sort_it(g1.servicedependencies);
