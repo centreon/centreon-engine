@@ -207,12 +207,12 @@ int xrddefault_save_state_information() {
 
   /* what attributes should be masked out? */
   /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-  unsigned long process_host_attribute_mask = config->retained_process_host_attribute_mask();
-  unsigned long process_service_attribute_mask = config->retained_process_host_attribute_mask();
-  unsigned long host_attribute_mask = config->retained_host_attribute_mask();
-  unsigned long service_attribute_mask = config->retained_host_attribute_mask();
-  unsigned long contact_host_attribute_mask = config->retained_contact_host_attribute_mask();
-  unsigned long contact_service_attribute_mask = config->retained_contact_service_attribute_mask();
+  unsigned long process_host_attribute_mask = retained_process_host_attribute_mask;
+  unsigned long process_service_attribute_mask = retained_process_host_attribute_mask;
+  unsigned long host_attribute_mask = retained_host_attribute_mask;
+  unsigned long service_attribute_mask = retained_host_attribute_mask;
+  unsigned long contact_host_attribute_mask = retained_contact_host_attribute_mask;
+  unsigned long contact_service_attribute_mask = retained_contact_service_attribute_mask;
   unsigned long contact_attribute_mask = 0L;
 
   std::ostringstream stream;
@@ -238,21 +238,21 @@ int xrddefault_save_state_information() {
   stream << "program {\n"
          << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
          << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
-         << "enable_notifications=" << config->enable_notifications() << "\n"
-         << "active_service_checks_enabled=" << config->execute_service_checks() << "\n"
-         << "passive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
-         << "active_host_checks_enabled=" << config->execute_host_checks() << "\n"
-         << "passive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
-         << "enable_event_handlers=" << config->enable_event_handlers() << "\n"
-         << "obsess_over_services=" << config->obsess_over_services() << "\n"
-         << "obsess_over_hosts=" << config->obsess_over_hosts() << "\n"
-         << "check_service_freshness=" << config->check_service_freshness() << "\n"
-         << "check_host_freshness=" << config->check_host_freshness() << "\n"
-         << "enable_flap_detection=" << config->enable_flap_detection() << "\n"
-         << "enable_failure_prediction=" << config->enable_failure_prediction() << "\n"
-         << "process_performance_data=" << config->process_performance_data() << "\n"
-         << "global_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
-         << "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
+         << "enable_notifications=" << enable_notifications << "\n"
+         << "active_service_checks_enabled=" << execute_service_checks << "\n"
+         << "passive_service_checks_enabled=" << accept_passive_service_checks << "\n"
+         << "active_host_checks_enabled=" << execute_host_checks << "\n"
+         << "passive_host_checks_enabled=" << accept_passive_host_checks << "\n"
+         << "enable_event_handlers=" << enable_event_handlers << "\n"
+         << "obsess_over_services=" << obsess_over_services << "\n"
+         << "obsess_over_hosts=" << obsess_over_hosts << "\n"
+         << "check_service_freshness=" << check_service_freshness << "\n"
+         << "check_host_freshness=" << check_host_freshness << "\n"
+         << "enable_flap_detection=" << enable_flap_detection << "\n"
+         << "enable_failure_prediction=" << enable_failure_prediction << "\n"
+         << "process_performance_data=" << process_performance_data << "\n"
+         << "global_host_event_handler=" << global_host_event_handler << "\n"
+         << "global_service_event_handler=" << global_service_event_handler << "\n"
          << "next_comment_id=" << next_comment_id << "\n"
          << "next_downtime_id=" << next_downtime_id << "\n"
          << "next_event_id=" << next_event_id << "\n"
@@ -606,12 +606,12 @@ int xrddefault_read_state_information() {
 
   /* what attributes should be masked out? */
   /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-  process_host_attribute_mask = config->retained_process_host_attribute_mask();
-  process_service_attribute_mask = config->retained_process_host_attribute_mask();
-  host_attribute_mask = config->retained_host_attribute_mask();
-  service_attribute_mask = config->retained_host_attribute_mask();
-  contact_host_attribute_mask = config->retained_contact_host_attribute_mask();
-  contact_service_attribute_mask = config->retained_contact_service_attribute_mask();
+  process_host_attribute_mask = retained_process_host_attribute_mask;
+  process_service_attribute_mask = retained_process_host_attribute_mask;
+  host_attribute_mask = retained_host_attribute_mask;
+  service_attribute_mask = retained_host_attribute_mask;
+  contact_host_attribute_mask = retained_contact_host_attribute_mask;
+  contact_service_attribute_mask = retained_contact_service_attribute_mask;
 
   /* Big speedup when reading retention.dat in bulk */
   defer_downtime_sorting = 1;
@@ -658,7 +658,7 @@ int xrddefault_read_state_information() {
 
       case XRDDEFAULT_PROGRAMSTATUS_DATA:
         /* adjust modified attributes if necessary */
-        if (config->use_retained_program_state() == false) {
+        if (use_retained_program_state == false) {
           modified_host_process_attributes = MODATTR_NONE;
           modified_service_process_attributes = MODATTR_NONE;
         }
@@ -693,7 +693,7 @@ int xrddefault_read_state_information() {
             temp_host->current_attempt = temp_host->max_attempts;
 
           /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (config->use_large_installation_tweaks() == true)
+          if (use_large_installation_tweaks == true)
             temp_host->is_flapping = was_flapping;
           /* else use normal startup flap detection logic */
           else {
@@ -769,7 +769,7 @@ int xrddefault_read_state_information() {
 
 
           /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (config->use_large_installation_tweaks() == true)
+          if (use_large_installation_tweaks == true)
             temp_service->is_flapping = was_flapping;
           /* else use normal startup flap detection logic */
           else {
@@ -979,7 +979,7 @@ int xrddefault_read_state_information() {
           creation_time = strtoul(val, NULL, 10);
           time(&current_time);
           if ((current_time - creation_time)
-              < static_cast<time_t>(config->retention_scheduling_horizon()))
+              < static_cast<time_t>(retention_scheduling_horizon))
             scheduling_info_is_ok = TRUE;
           else
             scheduling_info_is_ok = FALSE;
@@ -1005,7 +1005,7 @@ int xrddefault_read_state_information() {
           /* mask out attributes we don't want to retain */
           modified_service_process_attributes &= ~process_service_attribute_mask;
         }
-        if (config->use_retained_program_state() == true) {
+        if (use_retained_program_state == true) {
           if (!strcmp(var, "enable_notifications")) {
             if (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
               config->enable_notifications((atoi(val) > 0) ? TRUE : FALSE);
@@ -1146,12 +1146,12 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "last_check"))
               temp_host->last_check = strtoul(val, NULL, 10);
             else if (!strcmp(var, "next_check")) {
-              if (config->use_retained_scheduling_info() == true
+              if (use_retained_scheduling_info == true
                   && scheduling_info_is_ok == TRUE)
                 temp_host->next_check = strtoul(val, NULL, 10);
             }
             else if (!strcmp(var, "check_options")) {
-              if (config->use_retained_scheduling_info() == true
+              if (use_retained_scheduling_info == true
                   && scheduling_info_is_ok == TRUE)
                 temp_host->check_options = atoi(val);
             }
@@ -1435,12 +1435,12 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "last_check"))
               temp_service->last_check = strtoul(val, NULL, 10);
             else if (!strcmp(var, "next_check")) {
-              if (config->use_retained_scheduling_info() == true
+              if (use_retained_scheduling_info == true
                   && scheduling_info_is_ok == TRUE)
                 temp_service->next_check = strtoul(val, NULL, 10);
             }
             else if (!strcmp(var, "check_options")) {
-              if (config->use_retained_scheduling_info() == true
+              if (use_retained_scheduling_info == true
                   && scheduling_info_is_ok == TRUE)
                 temp_service->check_options = atoi(val);
             }
