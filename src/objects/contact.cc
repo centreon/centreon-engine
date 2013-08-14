@@ -152,7 +152,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
     "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
     "  contactgroups_ptr:               " << chkstr(cntctgrp_str) << "\n"
-     << chkobj(obj.custom_variables)
+     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
      << "}\n";
   return (os);
 }

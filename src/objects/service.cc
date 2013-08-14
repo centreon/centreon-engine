@@ -311,7 +311,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
     "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
     "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n"
-    << chkobj(obj.custom_variables)
+    << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
     << "}\n";
   return (os);
 }
