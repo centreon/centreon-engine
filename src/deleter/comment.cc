@@ -1,5 +1,4 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
 ** Copyright 2011-2013 Merethis
 **
 ** This file is part of Centreon Engine.
@@ -18,19 +17,25 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_COMPATIBILITY_COMMENTS_H
-#  define CCE_COMPATIBILITY_COMMENTS_H
+#include "com/centreon/engine/deleter/comment.hh"
+#include "com/centreon/engine/objects/comment.hh"
 
-#  include "com/centreon/engine/objects/comment.hh"
-#  include "common.h"
-#  include "config.h"
-#  include "objects.h"
+using namespace com::centreon::engine;
 
-/*
-** If you are going to be adding a lot of comments in sequence,
-** set defer_comment_sorting to 1 before you start and then
-** call sort_comments afterwards. Things will go MUCH faster.
-*/
-extern int defer_comment_sorting;
+/**
+ *  Delete comments.
+ *
+ *  @param[in] ptr The comments to delete.
+ */
+void deleter::comment(void* ptr) throw () {
+  if (!ptr)
+    return;
 
-#endif // !CCE_COMPATIBILITY_COMMENTS_H
+  comment_struct* obj(static_cast<comment_struct*>(ptr));
+
+  delete[] obj->host_name;
+  delete[] obj->service_description;
+  delete[] obj->author;
+  delete[] obj->comment_data;
+  delete obj;
+}

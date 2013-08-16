@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/retention/applier/comment.hh"
 
 using namespace com::centreon::engine::retention;

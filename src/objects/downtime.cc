@@ -21,13 +21,13 @@
 #include <cstdlib>
 #include <cstring>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/deleter/downtime.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/statusdata.hh"

@@ -27,7 +27,6 @@
 #  include <stdio.h>
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
-#  include "com/centreon/engine/comments.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/hash_timed_event.hh"
 #  include "com/centreon/engine/events/sched_info.hh"

@@ -22,10 +22,8 @@
 #  define CCE_OBJECTS_DOWTIME_HH
 
 #  include <time.h>
-
-/* Forward declaration. */
-struct host_struct;
-struct service_struct;
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 typedef struct                      scheduled_downtime_struct {
   int                               type;

@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/deleter/timedevent.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/timed_event.hh"
 
 using namespace com::centreon::engine;
@@ -29,6 +30,9 @@ using namespace com::centreon::engine;
  */
 void deleter::timedevent(void* ptr) throw () {
   timed_event* obj(static_cast<timed_event*>(ptr));
+  if (obj->event_type == EVENT_SCHEDULED_DOWNTIME
+      || obj->event_type == EVENT_EXPIRE_COMMENT)
+    delete static_cast<unsigned long*>(obj->event_data);
   delete obj;
   return ;
 }

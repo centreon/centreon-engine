@@ -627,7 +627,6 @@ set(
   # Sources.
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
-  "${SRC_DIR}/comments.cc"
   "${SRC_DIR}/config.cc"
   "${SRC_DIR}/error.cc"
   "${SRC_DIR}/flapping.cc"
@@ -650,7 +649,6 @@ set(
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
   "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
-  "${INC_DIR}/com/centreon/engine/comments.hh"
   "${INC_DIR}/com/centreon/engine/common.hh"
   "${INC_DIR}/com/centreon/engine/config.hh"
   "${INC_DIR}/com/centreon/engine/error.hh"

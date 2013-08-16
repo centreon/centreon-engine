@@ -22,6 +22,7 @@
 
 #  include "com/centreon/engine/deleter/command.hh"
 #  include "com/centreon/engine/deleter/commandsmember.hh"
+#  include "com/centreon/engine/deleter/comment.hh"
 #  include "com/centreon/engine/deleter/contactgroup.hh"
 #  include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #  include "com/centreon/engine/deleter/contact.hh"

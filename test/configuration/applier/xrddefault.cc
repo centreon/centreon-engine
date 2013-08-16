@@ -29,7 +29,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -37,7 +36,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/io/file_entry.hh"

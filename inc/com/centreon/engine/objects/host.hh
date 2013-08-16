@@ -25,6 +25,7 @@
 
 /* Forward declaration. */
 struct command_struct;
+struct contact_struct;
 struct contactgroupsmember_struct;
 struct contactsmember_struct;
 struct customvariablesmember_struct;

@@ -26,6 +26,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
@@ -44,8 +45,10 @@ using namespace com::centreon::engine;
 
 struct                global {
   command*            commands;
+  comment*            comments;
   contact*            contacts;
   contactgroup*       contactgroups;
+  scheduled_downtime* downtimes;
   host*               hosts;
   hostdependency*     hostdependencies;
   hostescalation*     hostescalations;
@@ -55,7 +58,6 @@ struct                global {
   serviceescalation*  serviceescalations;
   servicegroup*       servicegroups;
   timeperiod*         timeperiods;
-  scheduled_downtime* downtimes;
 
   umap<std::string, shared_ptr<command> >
                       save_commands;
@@ -395,6 +397,14 @@ bool chkdiff(global& g1, global& g2) {
     d->comment_id = 0;
   if (!chkdiff(g1.downtimes, g2.downtimes))
     ret = false;
+
+  for (comment* d(g1.comments); d; d = d->next)
+    d->entry_time = 0;
+  for (comment* d(g2.comments); d; d = d->next)
+    d->entry_time = 0;
+  if (!chkdiff(g1.comments, g2.comments))
+    ret = false;
+
   if (!chkdiff(g1.commands, g2.commands))
     ret = false;
   if (!chkdiff(g1.contacts, g2.contacts))
@@ -489,10 +499,14 @@ static global get_globals() {
   global g;
   g.commands = command_list;
   command_list = NULL;
+  g.comments = comment_list;
+  comment_list = NULL;
   g.contacts = contact_list;
   contact_list = NULL;
   g.contactgroups = contactgroup_list;
   contactgroup_list = NULL;
+  g.downtimes = scheduled_downtime_list;
+  scheduled_downtime_list = NULL;
   g.hosts = host_list;
   host_list = NULL;
   g.hostdependencies = hostdependency_list;
@@ -511,8 +525,6 @@ static global get_globals() {
   servicegroup_list = NULL;
   g.timeperiods = timeperiod_list;
   timeperiod_list = NULL;
-  g.downtimes = scheduled_downtime_list;
-  scheduled_downtime_list = NULL;
 
   configuration::applier::state&
     app_state(configuration::applier::state::instance());
@@ -847,8 +859,14 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "new parser can't parse " << argv[1]);
 
   bool ret(chkdiff(oldcfg, newcfg));
+
+  // Delete downtimes.
   deleter::listmember(oldcfg.downtimes, &deleter::downtime);
   deleter::listmember(newcfg.downtimes, &deleter::downtime);
+
+  // Delete comments.
+  deleter::listmember(oldcfg.comments, &deleter::comment);
+  deleter::listmember(newcfg.comments, &deleter::comment);
   return (!ret);
 }
 

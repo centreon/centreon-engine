@@ -25,6 +25,7 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/commandsmember.hh"
+#  include "com/centreon/engine/objects/comment.hh"
 #  include "com/centreon/engine/objects/contact.hh"
 #  include "com/centreon/engine/objects/contactgroup.hh"
 #  include "com/centreon/engine/objects/contactgroupsmember.hh"

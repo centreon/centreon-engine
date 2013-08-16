@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/retention/comment.hh"
 #include "com/centreon/engine/string.hh"
 
