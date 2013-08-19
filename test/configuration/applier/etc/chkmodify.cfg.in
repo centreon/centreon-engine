@@ -20,9 +20,9 @@
 @CFG_FILES@
 broker_module=@MODULE_PATH@ @CONF_DIR@/@TEST_MAIN_MODIFY_CONFIG@
 event_broker_options=-1
-log_file=/tmp/centengine-unittest.log
 state_retention_file=
 
+log_file=/tmp/centreon-engine-unittest.log
 debug_file=/tmp/centreon-engine-unitest.debug
 debug_level=2096895
 debug_verbosity=2
