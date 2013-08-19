@@ -74,7 +74,7 @@ struct         global {
 /**
  *  Clear all global list.
  */
-void clear(global& g) {
+static void clear(global& g) {
   command_list = NULL;
   contact_list = NULL;
   contactgroup_list = NULL;
@@ -118,6 +118,12 @@ void clear(global& g) {
   app_state.timeperiods().clear();
 }
 
+static void lise_run_time(timed_event* lst, time_t ref) {
+  for (timed_event* evt(lst); evt; evt = evt->next)
+    if (evt->run_time != ref)
+      evt->run_time -= 1;
+}
+
 /**
  *  Check difference between global object.
  *
@@ -126,16 +132,31 @@ void clear(global& g) {
  *
  *  @return True if globals are equal, otherwise false.
  */
-bool chkdiff(global& g1, global& g2) {
+static bool chkdiff(global& g1, global& g2) {
   bool ret(true);
+  if (g1.scheduling_info.first_service_check != g2.scheduling_info.first_service_check)
+    g1.scheduling_info.first_service_check += 1;
+  if (g1.scheduling_info.last_service_check != g2.scheduling_info.last_service_check)
+    g1.scheduling_info.last_service_check += 1;
+  if (g1.scheduling_info.first_host_check != g2.scheduling_info.first_host_check)
+    g1.scheduling_info.first_host_check += 1;
+  if (g1.scheduling_info.last_host_check != g2.scheduling_info.last_host_check)
+    g1.scheduling_info.last_host_check += 1;
+
   if (memcmp(&g1.scheduling_info, &g2.scheduling_info, sizeof(sched_info))) {
     ret = false;
     std::cerr << "difference detected" << std::endl;
     std::cerr << "old " << g1.scheduling_info << std::endl;
     std::cerr << "new " << g2.scheduling_info << std::endl;
   }
+
+  lise_run_time(g1.events_high, g1.events_high->run_time);
+  lise_run_time(g2.events_high, g1.events_high->run_time);
   if (!chkdiff(g1.events_high, g2.events_high))
     ret = false;
+
+  lise_run_time(g1.events_low, g1.events_low->run_time);
+  lise_run_time(g2.events_low, g1.events_low->run_time);
   if (!chkdiff(g1.events_low, g2.events_low))
     ret = false;
   return (ret);
