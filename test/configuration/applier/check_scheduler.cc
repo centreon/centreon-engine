@@ -179,11 +179,12 @@ static bool newparser_read_config(
   try {
     init_macros();
     configuration::state config;
-    configuration::parser p(options);
-    p.parse(filename, config);
 
     // tricks to bypass create log file.
     config.log_file("");
+
+    configuration::parser p(options);
+    p.parse(filename, config);
 
     configuration::applier::state::instance().apply(config);
 

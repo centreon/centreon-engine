@@ -108,7 +108,7 @@ struct                global {
   std::string         command_file;
   int                 date_format;
   std::string         debug_file;
-  unsigned long       debug_level;
+  // unsigned long       debug_level;
   unsigned int        debug_verbosity;
   bool                enable_environment_macros;
   bool                enable_event_handlers;
@@ -317,7 +317,7 @@ bool chkdiff(global& g1, global& g2) {
   check_value(command_file);
   check_value(date_format);
   check_value(debug_file);
-  check_value(debug_level);
+  // check_value(debug_level);
   check_value(debug_verbosity);
   check_value(enable_environment_macros);
   check_value(enable_event_handlers);
@@ -577,7 +577,7 @@ static global get_globals() {
   g.command_file = to_str(command_file);
   g.date_format = date_format;
   g.debug_file = to_str(debug_file);
-  g.debug_level = debug_level;
+  // g.debug_level = debug_level;
   g.debug_verbosity = debug_verbosity;
   g.enable_environment_macros = enable_environment_macros;
   g.enable_event_handlers = enable_event_handlers;
@@ -753,6 +753,10 @@ static bool newparser_read_config(
     init_macros();
     // Parse configuration.
     configuration::state config;
+
+    // tricks to bypass create log file.
+    config.log_file("");
+
     {
       configuration::parser p(options);
       p.parse(filename, config);
@@ -766,9 +770,6 @@ static bool newparser_read_config(
     }
     catch (...) {
     }
-
-    // tricks to bypass create log file.
-    config.log_file("");
 
     configuration::applier::state::instance().apply(config, state);
 

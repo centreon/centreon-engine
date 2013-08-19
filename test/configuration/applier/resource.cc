@@ -70,11 +70,12 @@ int main_test(int argc, char** argv) {
 
   try {
     configuration::state cfg;
-    configuration::parser p;
-    p.parse(config_file, cfg);
 
     // tricks to bypass create log file.
     cfg.log_file("");
+
+    configuration::parser p;
+    p.parse(config_file, cfg);
 
     configuration::applier::state::instance().apply(cfg);
 
