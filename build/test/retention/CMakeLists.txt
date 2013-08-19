@@ -23,6 +23,48 @@ set(TEST_DIR "${TEST_DIR}/retention")
 # Subdirectory.
 add_subdirectory("applier")
 
+## comment.
+set(TEST_NAME "comment")
+add_executable("${TEST_NAME}" "${TEST_DIR}/comment.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+## contact.
+set(TEST_NAME "contact")
+add_executable("${TEST_NAME}" "${TEST_DIR}/contact.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+## downtime.
+set(TEST_NAME "downtime")
+add_executable("${TEST_NAME}" "${TEST_DIR}/downtime.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+## host.
+set(TEST_NAME "host")
+add_executable("${TEST_NAME}" "${TEST_DIR}/host.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+## info.
+set(TEST_NAME "info")
+add_executable("${TEST_NAME}" "${TEST_DIR}/info.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+## program.
+set(TEST_NAME "program")
+add_executable("${TEST_NAME}" "${TEST_DIR}/program.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+## service.
+set(TEST_NAME "service")
+add_executable("${TEST_NAME}" "${TEST_DIR}/service.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
 ## retention_dump.
 set(TEST_BIN_NAME "retention_dump")
 add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/dump.cc")

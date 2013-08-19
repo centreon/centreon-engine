@@ -33,6 +33,10 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "command")
 set(TEST_NAME "commandsmember_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "commandsmember")
 
+# comment_dump
+set(TEST_NAME "comment_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "comment")
+
 # contactgroup_dump
 set(TEST_NAME "contactgroup_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactgroup")
@@ -56,6 +60,10 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactsmember")
 # daterange_dump
 set(TEST_NAME "daterange_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "daterange")
+
+# downtime_dump
+set(TEST_NAME "downtime_dump")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "downtime")
 
 # hostdependency_dump
 set(TEST_NAME "hostdependency_dump")

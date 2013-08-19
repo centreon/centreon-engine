@@ -49,6 +49,11 @@ int main_test(int argc, char* argv[]) {
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
+  else if (type == "comment") {
+    comment obj;
+    memset(&obj, 0, sizeof(obj));
+    oss << obj;
+  }
   else if (type == "contactgroup") {
     contactgroup obj;
     memset(&obj, 0, sizeof(obj));
@@ -76,6 +81,11 @@ int main_test(int argc, char* argv[]) {
   }
   else if (type == "daterange") {
     daterange obj;
+    memset(&obj, 0, sizeof(obj));
+    oss << obj;
+  }
+  else if (type == "downtime") {
+    scheduled_downtime obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
