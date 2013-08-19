@@ -32,9 +32,14 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/downtime.hh"
-#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/retention/applier/state.hh"
+#include "com/centreon/engine/retention/dump.hh"
+#include "com/centreon/engine/retention/parser.hh"
+#include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/string.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules;
 using namespace com::centreon::engine::modules::webservice;
@@ -118,7 +123,11 @@ int centreonengine__stateInformationLoad(soap* s,
     webservice::sync::instance().wait_thread_safeness();
 
     logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
-    read_initial_state_information();
+    retention::state state;
+    retention::parser p;
+    p.parse(config->state_retention_file(), state);
+    retention::applier::state app_state;
+    app_state.apply(*config, state);
   }
   catch (...) {
     logger(dbg_commands, most)
@@ -147,9 +156,7 @@ int centreonengine__stateInformationSave(soap* s,
     webservice::sync::instance().wait_thread_safeness();
 
     logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
-    save_state_information(false);
-
-    webservice::sync::instance().worker_finish();
+    retention::dump::save(config->state_retention_file());
   }
   catch (...) {
     logger(dbg_commands, most)
@@ -157,6 +164,7 @@ int centreonengine__stateInformationSave(soap* s,
     webservice::sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
+  webservice::sync::instance().worker_finish();
   return (SOAP_OK);
 }
 

@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include <time.h>
+#include <cmath>
+#include <ctime>
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/schedule_object.hh"

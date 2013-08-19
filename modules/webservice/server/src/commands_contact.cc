@@ -26,9 +26,11 @@
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/string.hh"
 #include "com/centreon/unique_array_ptr.hh"
 #include "soapH.h"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules;
 using namespace com::centreon::engine::modules::webservice;
