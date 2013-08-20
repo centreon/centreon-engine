@@ -58,8 +58,10 @@ namespace              retention {
     template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
       static bool generic(T& obj, std::string const& value) {
+        static std::istringstream iss;
         U val;
-        std::istringstream iss(value);
+        iss.clear();
+        iss.str(value);
         if (!(iss >> val) || !iss.eof())
           return (false);
         return ((obj.*ptr)(val));
