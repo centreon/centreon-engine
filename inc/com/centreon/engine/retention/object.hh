@@ -58,7 +58,7 @@ namespace              retention {
     template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
       static bool generic(T& obj, std::string const& value) {
-        U val;
+        U val(0);
         if (!string::to(value, val))
           return (false);
         return ((obj.*ptr)(val));

@@ -469,8 +469,8 @@ namespace               configuration {
     struct              setter {
       static bool       generic(state& obj, std::string const& value) {
         try {
-          U val;
-          if (string::to(value, val))
+          U val(0);
+          if (!string::to(value, val))
             return (false);
           (obj.*ptr)(val);
         }
