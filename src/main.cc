@@ -45,6 +45,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/diagnostic.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/loop.hh"
@@ -94,6 +95,7 @@ int main(int argc, char* argv[]) {
 #ifdef HAVE_GETOPT_H
   int option_index = 0;
   static struct option const long_options[] = {
+    { "diagnose",              no_argument, NULL, 'D' },
     { "dont-verify-paths",     no_argument, NULL, 'x' },
     { "help",                  no_argument, NULL, 'h' },
     { "license",               no_argument, NULL, 'V' },
@@ -124,6 +126,7 @@ int main(int argc, char* argv[]) {
     bool display_help(false);
     bool display_license(false);
     bool error(false);
+    bool diagnose(false);
 
     // Process all command line arguments.
     int c;
@@ -131,11 +134,11 @@ int main(int argc, char* argv[]) {
     while ((c = getopt_long(
                   argc,
                   argv,
-                  "+hVvsxpu",
+                  "+hVvsxpuD",
                   long_options,
                   &option_index)) != -1) {
 #else
-    while ((c = getopt(argc, argv, "+hVvsxpu")) != -1) {
+    while ((c = getopt(argc, argv, "+hVvsxpuD")) != -1) {
 #endif // HAVE_GETOPT_H
 
       // Process flag.
@@ -147,20 +150,23 @@ int main(int argc, char* argv[]) {
       case 'V': // Version.
         display_license = true;
         break;
-      case 'v': // Verify config
+      case 'v': // Verify config.
         verify_config = true;
         break;
-      case 's': // Scheduling Check.
+      case 's': // Scheduling check.
         test_scheduling = true;
         break;
       case 'x': // Don't verify circular paths.
         verify_circular_paths = false;
         break;
-      case 'p': // Precache object config
+      case 'p': // Precache object config.
         precache_objects = true;
         break;
-      case 'u': // Use precached object config
+      case 'u': // Use precached object config.
         use_precached_objects = true;
+        break;
+      case 'D': // Diagnostic.
+        diagnose = true;
         break;
       default:
         error = true;
@@ -234,7 +240,8 @@ int main(int argc, char* argv[]) {
         << "                              USE WITH CAUTION !\n"
         << "  -p, --precache-objects      Precache object configuration - use with\n"
         << "                              -v or -s options.\n"
-        << "  -u, --use-precached-objects Use precached object config file.";
+        << "  -u, --use-precached-objects Use precached object config file.\n"
+        << "  -D, --diagnose              Generate a diagnostic file.";
       retval = (display_help ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     // We're just verifying the configuration.
@@ -299,6 +306,11 @@ int main(int argc, char* argv[]) {
         logger(logging::log_config_error, logging::basic)
           << e.what();
       }
+    }
+    // Diagnostic.
+    else if (diagnose) {
+      diagnostic diag;
+      diag.generate(config_file);
     }
     // Else start to monitor things.
     else {
