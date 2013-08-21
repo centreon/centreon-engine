@@ -21,16 +21,81 @@
 #include <cstdlib>
 #include <cstring>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/deleter/comment.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects/comment.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/xcddefault.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::string;
 
 static comment* comment_hashlist[COMMENT_HASHSLOTS];
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool operator==(comment const& obj1, comment const& obj2) throw () {
+  return (obj1.comment_type == obj2.comment_type
+          && obj1.entry_type == obj2.entry_type
+          && obj1.comment_id == obj2.comment_id
+          && obj1.source == obj2.source
+          && obj1.persistent == obj2.persistent
+          && obj1.entry_time == obj2.entry_time
+          && obj1.expires == obj2.expires
+          && obj1.expire_time == obj2.expire_time
+          && is_equal(obj1.host_name, obj2.host_name)
+          && is_equal(obj1.service_description, obj2.service_description)
+          && is_equal(obj1.author, obj2.author)
+          && is_equal(obj1.comment_data, obj2.comment_data));
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool operator!=(comment const& obj1, comment const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Dump downtime content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The downtime to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(std::ostream& os, comment const& obj) {
+  os << "comment {\n"
+    "  comment_type:        " << obj.comment_type << "\n"
+    "  entry_type:          " << obj.entry_type << "\n"
+    "  comment_id:          " << obj.comment_id << "\n"
+    "  source:              " << obj.source << "\n"
+    "  persistent:          " << obj.persistent << "\n"
+    "  entry_time:          " << obj.entry_time << "\n"
+    "  expires:             " << obj.expires << "\n"
+    "  expire_time:         " << obj.expire_time << "\n"
+    "  host_name:           " << chkstr(obj.host_name) << "\n"
+    "  service_description: " << chkstr(obj.service_description) << "\n"
+    "  author:              " << chkstr(obj.author) << "\n"
+    "  comment_data:        " << chkstr(obj.comment_data) << "\n"
+    "}\n";
+  return (os);
+}
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/
@@ -289,11 +354,7 @@ int delete_comment(unsigned int type, unsigned long comment_id) {
       last_comment->next = next_comment;
 
     /* free memory */
-    delete[] this_comment->host_name;
-    delete[] this_comment->service_description;
-    delete[] this_comment->author;
-    delete[] this_comment->comment_data;
-    delete this_comment;
+    deleter::comment(this_comment);
 
     result = OK;
   }
@@ -572,7 +633,6 @@ int add_comment(
     new_comment->service_description = string::dup(svc_description);
   new_comment->author = string::dup(author);
   new_comment->comment_data = string::dup(comment_data);
-
   new_comment->comment_type = comment_type;
   new_comment->entry_type = entry_type;
   new_comment->source = source;
@@ -647,6 +707,13 @@ static int comment_compar(void const* p1, void const* p2) {
   return (c1->comment_id - c2->comment_id);
 }
 
+/*
+** If you are going to be adding a lot of comments in sequence, set
+** defer_comment_sorting to 1 before you start and then call
+** sort_comments afterwards. Things will go MUCH faster.
+**
+** extern int defer_comment_sorting;
+*/
 int sort_comments() {
   comment** array;
   comment* temp_comment;
@@ -690,23 +757,7 @@ int sort_comments() {
 
 /* frees memory allocated for the comment data */
 void free_comment_data() {
-  comment* this_comment = NULL;
-  comment* next_comment = NULL;
-
-  /* free memory for the comment list */
-  for (this_comment = comment_list;
-       this_comment != NULL;
-       this_comment = next_comment) {
-    next_comment = this_comment->next;
-    delete[] this_comment->host_name;
-    delete[] this_comment->service_description;
-    delete[] this_comment->author;
-    delete[] this_comment->comment_data;
-    delete this_comment;
-  }
-
-  /* free hash list and reset list pointer */
-  comment_list = NULL;
+  deleter::listmember(comment_list, &deleter::comment);
   return;
 }
 

@@ -48,8 +48,7 @@ bool operator==(
       && is_equal(obj1.service_description, obj2.service_description)) {
     if (!obj1.next || !obj2.next)
       return (!obj1.next && !obj2.next);
-    else
-      return (*obj1.next == *obj2.next);
+    return (*obj1.next == *obj2.next);
   }
   return (false);
 }

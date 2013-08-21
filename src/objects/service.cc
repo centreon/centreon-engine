@@ -248,7 +248,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  action_url:                           " << chkstr(obj.action_url) << "\n"
     "  icon_image:                           " << chkstr(obj.icon_image) << "\n"
     "  icon_image_alt:                       " << chkstr(obj.icon_image_alt) << "\n"
-    "  custom_variables:                     " << chkobj(obj.custom_variables) << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
     "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
@@ -312,7 +311,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
     "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
     "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n"
-    "}\n";
+    << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
+    << "}\n";
   return (os);
 }
 

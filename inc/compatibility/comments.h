@@ -21,7 +21,7 @@
 #ifndef CCE_COMPATIBILITY_COMMENTS_H
 #  define CCE_COMPATIBILITY_COMMENTS_H
 
-#  include "com/centreon/engine/comments.hh"
+#  include "com/centreon/engine/objects/comment.hh"
 #  include "common.h"
 #  include "config.h"
 #  include "objects.h"

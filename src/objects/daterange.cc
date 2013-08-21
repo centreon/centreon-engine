@@ -54,8 +54,7 @@ bool operator==(
       && is_equal(obj1.times, obj2.times)) {
     if (!obj1.next || !obj2.next)
       return (!obj1.next && !obj2.next);
-    else
-      return (*obj1.next == *obj2.next);
+    return (*obj1.next == *obj2.next);
   }
   return (false);
 }

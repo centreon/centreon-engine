@@ -518,12 +518,13 @@ int main_test(int argc, char* argv[]) {
   std::string path(argv[2]);
 
   configuration::state config;
-  configuration::parser p;
-  p.parse(path, config);
 
   // tricks to bypass create log file.
   config.log_file("");
   ::config->log_file("");
+
+  configuration::parser p;
+  p.parse(path, config);
 
   if (type == "command") {
     chk_generic<

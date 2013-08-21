@@ -21,7 +21,7 @@
 #ifndef CCE_COMPATIBILITY_DOWNTIME_H
 #  define CCE_COMPATIBILITY_DOWNTIME_H
 
-#  include "com/centreon/engine/downtime.hh"
+#  include "com/centreon/engine/objects/downtime.hh"
 #  include "common.h"
 #  include "config.h"
 #  include "objects.h"

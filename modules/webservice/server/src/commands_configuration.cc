@@ -20,12 +20,14 @@
 #include <exception>
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/resource.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/objects.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/state.hh"
 #include "com/centreon/engine/modules/webservice/sync.hh"
+#include "com/centreon/engine/string.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;
@@ -67,7 +69,7 @@ int centreonengine__updateResourceUser(soap* s,
 
     unsigned int pos(resource_id->id - 1);
     delete[] macro_user[pos];
-    macro_user[pos] = string::dup(value.c_str());
+    macro_user[pos] = com::centreon::engine::string::dup(value.c_str());
     webservice::sync::instance().worker_finish();
   }
   catch (...) {

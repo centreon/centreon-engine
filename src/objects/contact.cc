@@ -144,7 +144,6 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  can_submit_commands:             " << obj.can_submit_commands << "\n"
     "  retain_status_information:       " << obj.retain_status_information << "\n"
     "  retain_nonstatus_information:    " << obj.retain_nonstatus_information << "\n"
-    "  custom_variables:                " << chkobj(obj.custom_variables) << "\n"
     "  last_host_notification:          " << string::ctime(obj.last_host_notification) << "\n"
     "  last_service_notification:       " << string::ctime(obj.last_service_notification) << "\n"
     "  modified_attributes:             " << obj.modified_attributes << "\n"
@@ -153,7 +152,8 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
     "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
     "  contactgroups_ptr:               " << chkstr(cntctgrp_str) << "\n"
-    "}\n";
+     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
+     << "}\n";
   return (os);
 }
 

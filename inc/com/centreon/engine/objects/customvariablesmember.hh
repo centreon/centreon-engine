@@ -66,6 +66,9 @@ bool          operator==(
 bool          operator!=(
                 customvariablesmember const& obj1,
                 customvariablesmember const& obj2) throw ();
+bool          operator<(
+                customvariablesmember const& obj1,
+                customvariablesmember const& obj2) throw ();
 std::ostream& operator<<(
                 std::ostream& os,
                 customvariablesmember const& obj);

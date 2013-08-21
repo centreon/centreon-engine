@@ -22,7 +22,6 @@
 
 #  include <list>
 #  include <set>
-#  include <sstream>
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/configuration/command.hh"
@@ -40,6 +39,7 @@
 #  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/string.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
@@ -469,9 +469,8 @@ namespace               configuration {
     struct              setter {
       static bool       generic(state& obj, std::string const& value) {
         try {
-          U val;
-          std::istringstream iss(value);
-          if (!(iss >> val) || !iss.eof())
+          U val(0);
+          if (!string::to(value, val))
             return (false);
           (obj.*ptr)(val);
         }

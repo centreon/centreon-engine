@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/applier/downtime.hh"
 
 using namespace com::centreon::engine;

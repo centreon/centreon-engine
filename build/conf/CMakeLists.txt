@@ -49,4 +49,23 @@ if (WITH_SAMPLE_CONFIG)
     DESTINATION "${PREFIX_CONF}"
     COMPONENT "runtime"
     FILES_MATCHING PATTERN "*.cfg")
+
+  install(CODE "
+  function(my_chown user group file)
+    if (APPLE OR (UNIX AND NOT CYGWIN))
+      execute_process(COMMAND \"chown\" \"\${user}:\${group}\" \"\${file}\")
+    endif ()
+  endfunction()
+
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/centengine.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/resource.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/commands.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/contacts.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/localhost.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/printer.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/switch.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/templates.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/timeperiods.cfg\")
+  my_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects/windows.cfg\")
+  ")
 endif ()

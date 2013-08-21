@@ -19,8 +19,8 @@
 */
 
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/xdddefault.hh"
 
 /******************************************************************/

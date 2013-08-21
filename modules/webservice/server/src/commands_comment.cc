@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/sync_lock.hh"
+#include "com/centreon/engine/objects/comment.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;

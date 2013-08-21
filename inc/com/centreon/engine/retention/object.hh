@@ -20,9 +20,9 @@
 #ifndef CCE_RETENTION_OBJECT_HH
 #  define CCE_RETENTION_OBJECT_HH
 
-#  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/string.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
@@ -58,9 +58,8 @@ namespace              retention {
     template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
       static bool generic(T& obj, std::string const& value) {
-        U val;
-        std::istringstream iss(value);
-        if (!(iss >> val) || !iss.eof())
+        U val(0);
+        if (!string::to(value, val))
           return (false);
         return ((obj.*ptr)(val));
       }

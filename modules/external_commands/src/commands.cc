@@ -25,8 +25,6 @@
 #include <sys/time.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
-#include "com/centreon/engine/comments.hh"
-#include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -35,6 +33,8 @@
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects/comment.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "mmap.h"

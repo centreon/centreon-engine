@@ -40,13 +40,11 @@
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/set.hh"
-#include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/diagnostic.hh"
-#include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
@@ -56,6 +54,8 @@
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects/comment.hh"
+#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
 
         // Parse retention.
         retention::state state;
-        {
+        if (!config.state_retention_file().empty()) {
           retention::parser p;
           try {
             p.parse(config.state_retention_file(), state);

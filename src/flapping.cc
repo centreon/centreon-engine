@@ -21,11 +21,11 @@
 #include <iomanip>
 #include <sstream>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine::logging;

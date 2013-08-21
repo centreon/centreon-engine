@@ -24,6 +24,7 @@
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/string.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine;

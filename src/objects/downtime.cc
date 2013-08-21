@@ -21,18 +21,97 @@
 #include <cstdlib>
 #include <cstring>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/comments.hh"
-#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/deleter/downtime.hh"
+#include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects/comment.hh"
+#include "com/centreon/engine/objects/downtime.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/xdddefault.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine::string;
+
+/**
+ *  Equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is the same object, otherwise false.
+ */
+bool operator==(
+       scheduled_downtime const& obj1,
+       scheduled_downtime const& obj2) throw () {
+  return (obj1.type == obj2.type
+          && is_equal(obj1.host_name, obj2.host_name)
+          && is_equal(obj1.service_description, obj2.service_description)
+          && obj1.entry_time == obj2.entry_time
+          && obj1.start_time == obj2.start_time
+          && obj1.end_time == obj2.end_time
+          && obj1.fixed == obj2.fixed
+          && obj1.triggered_by == obj2.triggered_by
+          && obj1.duration == obj2.duration
+          && obj1.downtime_id == obj2.downtime_id
+          && is_equal(obj1.author, obj2.author)
+          && is_equal(obj1.comment, obj2.comment)
+          && obj1.comment_id == obj2.comment_id
+          && obj1.is_in_effect == obj2.is_in_effect
+          && obj1.start_flex_downtime == obj2.start_flex_downtime
+          && obj1.incremented_pending_downtime == obj2.incremented_pending_downtime);
+}
+
+/**
+ *  Not equal operator.
+ *
+ *  @param[in] obj1 The first object to compare.
+ *  @param[in] obj2 The second object to compare.
+ *
+ *  @return True if is not the same object, otherwise false.
+ */
+bool operator!=(
+       scheduled_downtime const& obj1,
+       scheduled_downtime const& obj2) throw () {
+  return (!operator==(obj1, obj2));
+}
+
+/**
+ *  Dump downtime content into the stream.
+ *
+ *  @param[out] os  The output stream.
+ *  @param[in]  obj The downtime to dump.
+ *
+ *  @return The output stream.
+ */
+std::ostream& operator<<(
+                std::ostream& os,
+                scheduled_downtime const& obj) {
+  os << "downtime {\n"
+    "  type:                         " << obj.type << "\n"
+    "  host_name:                    " << chkstr(obj.host_name) << "\n"
+    "  service_description:          " << chkstr(obj.service_description) << "\n"
+    "  entry_time:                   " << obj.entry_time << "\n"
+    "  start_time:                   " << obj.start_time << "\n"
+    "  end_time:                     " << obj.end_time << "\n"
+    "  fixed:                        " << obj.fixed << "\n"
+    "  triggered_by:                 " << obj.triggered_by << "\n"
+    "  duration:                     " << obj.duration << "\n"
+    "  downtime_id:                  " << obj.downtime_id << "\n"
+    "  author:                       " << chkstr(obj.author) << "\n"
+    "  comment:                      " << chkstr(obj.comment) << "\n"
+    "  comment_id:                   " << obj.comment_id << "\n"
+    "  is_in_effect:                 " << obj.is_in_effect << "\n"
+    "  start_flex_downtime:          " << obj.start_flex_downtime << "\n"
+    "  incremented_pending_downtime: " << obj.incremented_pending_downtime << "\n"
+    "}\n";
+  return (os);
+}
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/
@@ -68,7 +147,7 @@ int schedule_downtime(
       unsigned long triggered_by,
       unsigned long duration,
       unsigned long* new_downtime_id) {
-  unsigned long downtime_id = 0L;
+  unsigned long downtime_id(0L);
 
   logger(dbg_functions, basic)
     << "schedule_downtime()";
@@ -96,19 +175,19 @@ int schedule_downtime(
   register_downtime(type, downtime_id);
 
   /* return downtime id */
-  if (new_downtime_id != NULL)
+  if (new_downtime_id)
     *new_downtime_id = downtime_id;
   return (OK);
 }
 
 /* unschedules a host or service downtime */
 int unschedule_downtime(int type, unsigned long downtime_id) {
-  scheduled_downtime* temp_downtime = NULL;
-  scheduled_downtime* next_downtime = NULL;
-  host* hst = NULL;
-  service* svc = NULL;
-  timed_event* temp_event = NULL;
-  int attr = 0;
+  scheduled_downtime* temp_downtime(NULL);
+  scheduled_downtime* next_downtime(NULL);
+  host* hst(NULL);
+  service* svc(NULL);
+  timed_event* temp_event(NULL);
+  int attr(0);
 
   logger(dbg_functions, basic)
     << "unschedule_downtime()";
@@ -242,14 +321,14 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
 int register_downtime(int type, unsigned long downtime_id) {
   char start_time_string[MAX_DATETIME_LENGTH] = "";
   char end_time_string[MAX_DATETIME_LENGTH] = "";
-  scheduled_downtime* temp_downtime = NULL;
-  host* hst = NULL;
-  service* svc = NULL;
-  char const* type_string = NULL;
-  int hours = 0;
-  int minutes = 0;
-  int seconds = 0;
-  unsigned long* new_downtime_id = NULL;
+  scheduled_downtime* temp_downtime(NULL);
+  host* hst(NULL);
+  service* svc(NULL);
+  char const* type_string(NULL);
+  int hours(0);
+  int minutes(0);
+  int seconds(0);
+  unsigned long* new_downtime_id(NULL);
 
   logger(dbg_functions, basic)
     << "register_downtime()";
@@ -386,7 +465,7 @@ int register_downtime(int type, unsigned long downtime_id) {
 
 /* handles scheduled downtime (id passed from timed event queue) */
 int handle_scheduled_downtime_by_id(unsigned long downtime_id) {
-  scheduled_downtime* temp_downtime = NULL;
+  scheduled_downtime* temp_downtime(NULL);
   /* find the downtime entry */
   if (!(temp_downtime = find_downtime(ANY_DOWNTIME, downtime_id)))
     return (ERROR);
@@ -396,12 +475,12 @@ int handle_scheduled_downtime_by_id(unsigned long downtime_id) {
 
 /* handles scheduled host or service downtime */
 int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
-  scheduled_downtime* this_downtime = NULL;
-  host* hst = NULL;
-  service* svc = NULL;
-  time_t event_time = 0L;
-  unsigned long* new_downtime_id = NULL;
-  int attr = 0;
+  scheduled_downtime* this_downtime(NULL);
+  host* hst(NULL);
+  service* svc(NULL);
+  time_t event_time(0L);
+  unsigned long* new_downtime_id(NULL);
+  int attr(0);
 
   logger(dbg_functions, basic)
     << "handle_scheduled_downtime()";
@@ -685,8 +764,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
 /* checks for flexible (non-fixed) host downtime that should start now */
 int check_pending_flex_host_downtime(host* hst) {
-  scheduled_downtime* temp_downtime = NULL;
-  time_t current_time = 0L;
+  scheduled_downtime* temp_downtime(NULL);
+  time_t current_time(0L);
 
   logger(dbg_functions, basic)
     << "check_pending_flex_host_downtime()";
@@ -730,8 +809,8 @@ int check_pending_flex_host_downtime(host* hst) {
 
 /* checks for flexible (non-fixed) service downtime that should start now */
 int check_pending_flex_service_downtime(service* svc) {
-  scheduled_downtime* temp_downtime = NULL;
-  time_t current_time = 0L;
+  scheduled_downtime* temp_downtime(NULL);
+  time_t current_time(0L);
 
   logger(dbg_functions, basic)
     << "check_pending_flex_service_downtime()";
@@ -778,9 +857,9 @@ int check_pending_flex_service_downtime(service* svc) {
 
 /* checks for (and removes) expired downtime entries */
 int check_for_expired_downtime() {
-  scheduled_downtime* temp_downtime = NULL;
-  scheduled_downtime* next_downtime = NULL;
-  time_t current_time = 0L;
+  scheduled_downtime* temp_downtime(NULL);
+  scheduled_downtime* next_downtime(NULL);
+  time_t current_time(0L);
 
   logger(dbg_functions, basic)
     << "check_for_expired_downtime()";
@@ -867,8 +946,8 @@ int add_new_host_downtime(
       unsigned long triggered_by,
       unsigned long duration,
       unsigned long* downtime_id) {
-  int result = OK;
-  unsigned long new_downtime_id = 0L;
+  int result(OK);
+  unsigned long new_downtime_id(0L);
 
   if (host_name == NULL)
     return (ERROR);
@@ -923,8 +1002,8 @@ int add_new_service_downtime(
       unsigned long triggered_by,
       unsigned long duration,
       unsigned long* downtime_id) {
-  int result = OK;
-  unsigned long new_downtime_id = 0L;
+  int result(OK);
+  unsigned long new_downtime_id(0L);
 
   if (host_name == NULL || service_description == NULL)
     return (ERROR);
@@ -973,9 +1052,9 @@ int add_new_service_downtime(
 
 /* deletes a scheduled host or service downtime entry from the list in memory */
 int delete_downtime(int type, unsigned long downtime_id) {
-  scheduled_downtime* this_downtime = NULL;
-  scheduled_downtime* last_downtime = NULL;
-  scheduled_downtime* next_downtime = NULL;
+  scheduled_downtime* this_downtime(NULL);
+  scheduled_downtime* last_downtime(NULL);
+  scheduled_downtime* next_downtime(NULL);
 
   /* find the downtime we should remove */
   for (this_downtime = scheduled_downtime_list,
@@ -1027,12 +1106,7 @@ int delete_downtime(int type, unsigned long downtime_id) {
     last_downtime->next = next_downtime;
 
   /* free memory */
-  delete[] this_downtime->host_name;
-  delete[] this_downtime->service_description;
-  delete[] this_downtime->author;
-  delete[] this_downtime->comment;
-  delete this_downtime;
-
+  deleter::downtime(this_downtime);
   return (OK);
 }
 
@@ -1275,6 +1349,13 @@ static int downtime_compar(void const* p1, void const* p2) {
           : (d1->start_time - d2->start_time));
 }
 
+/*
+** If you are going to be adding a lot of downtime in sequence, set
+** defer_downtime_sorting to 1 before you start and then call
+** sort_downtime afterwards. Things will go MUCH faster.
+**
+** extern int defer_downtime_sorting;
+*/
 int sort_downtime() {
   if (!defer_downtime_sorting)
     return (OK);
@@ -1316,7 +1397,7 @@ int sort_downtime() {
 
 /* finds a specific downtime entry */
 scheduled_downtime* find_downtime(int type, unsigned long downtime_id) {
-  scheduled_downtime* temp_downtime = NULL;
+  scheduled_downtime* temp_downtime(NULL);
 
   for (temp_downtime = scheduled_downtime_list;
        temp_downtime != NULL;
@@ -1345,22 +1426,6 @@ scheduled_downtime* find_service_downtime(unsigned long downtime_id) {
 
 /* frees memory allocated for the scheduled downtime data */
 void free_downtime_data() {
-  scheduled_downtime* this_downtime = NULL;
-  scheduled_downtime* next_downtime = NULL;
-
-  /* free memory for the scheduled_downtime list */
-  for (this_downtime = scheduled_downtime_list;
-       this_downtime != NULL;
-       this_downtime = next_downtime) {
-    next_downtime = this_downtime->next;
-    delete[] this_downtime->host_name;
-    delete[] this_downtime->service_description;
-    delete[] this_downtime->author;
-    delete[] this_downtime->comment;
-    delete this_downtime;
-  }
-
-  /* reset list pointer */
-  scheduled_downtime_list = NULL;
+  deleter::listmember(scheduled_downtime_list, &deleter::downtime);
   return;
 }
