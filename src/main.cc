@@ -359,18 +359,6 @@ int main(int argc, char* argv[]) {
         program_start = time(NULL);
         string::setstr(mac->x[MACRO_PROCESSSTARTTIME], program_start);
 
-        // This must be logged after we read config data,
-        // as user may have changed location of main log file.
-        logger(logging::log_process_info, logging::basic)
-          << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
-          << " starting ... (PID=" << getpid() << ")";
-
-        // Log the local time - may be different than clock
-        // time due to timezone offset.
-        logger(logging::log_process_info, logging::basic)
-          << "Local time is " << string::ctime(program_start) << "\n"
-          << "LOG VERSION: " << LOG_VERSION_2;
-
         // Load broker modules.
         for (std::list<std::string>::const_iterator
                it(config.broker_module().begin()),
@@ -393,6 +381,18 @@ int main(int argc, char* argv[]) {
           &backend_broker_log,
           logging::log_all,
           logging::basic);
+
+        // This must be logged after we read config data,
+        // as user may have changed location of main log file.
+        logger(logging::log_process_info, logging::basic)
+          << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
+          << " starting ... (PID=" << getpid() << ")";
+
+        // Log the local time - may be different than clock
+        // time due to timezone offset.
+        logger(logging::log_process_info, logging::basic)
+          << "Local time is " << string::ctime(program_start) << "\n"
+          << "LOG VERSION: " << LOG_VERSION_2;
 
         // Handle signals (interrupts).
         setup_sighandler();
