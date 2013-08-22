@@ -19,10 +19,15 @@
 
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
+
+extern int config_errors;
+extern int config_warnings;
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<servicedependency, type, &servicedependency::method>::generic
@@ -221,6 +226,17 @@ void servicedependency::check_validity() const {
            << "any dependent host or dependent host group (properties "
            << "'dependent_host_name' or 'dependent_hostgroup_name', "
            << "respectively)");
+
+  if (!_execution_failure_options && !_notification_failure_options) {
+    ++config_warnings;
+    logger(log_config_warning, basic)
+      << "configuration: warning: Ignoring lame service dependency of '"
+      << _dependent_service_description->front() << "' of host '"
+      << _dependent_hosts->front() << "' on service '"
+      << _service_description->front() << "' of host '"
+      << _hosts->front() << "'.";
+  }
+
   return ;
 }
 

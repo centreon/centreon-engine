@@ -19,6 +19,7 @@
 
 #include <syslog.h>
 #include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/logging/engine.hh"
 #include "com/centreon/shared_ptr.hh"
@@ -34,6 +35,9 @@ static applier::logging* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::logging::apply(state& config) {
+  if (verify_config)
+    return;
+
   // Syslog.
   if (config.use_syslog() == true && !_syslog)
     _add_syslog();

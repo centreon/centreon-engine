@@ -26,6 +26,7 @@
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -71,6 +72,14 @@ void applier::hostgroup::add_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new hostgroup '" << obj->hostgroup_name() << "'.";
+
+  if (obj->resolved_members().empty()) {
+    ++config_warnings;
+    logger(logging::log_config_warning, logging::basic)
+      << "configuration: warning: Specified hostgroup '"
+      << obj->hostgroup_name() << "' has no members";
+    return ;
+  }
 
   // Add host group to the global configuration state.
   config->hostgroups().insert(obj);

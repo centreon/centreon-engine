@@ -27,6 +27,7 @@
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/shared.hh"
 
 using namespace com::centreon::engine::configuration;
@@ -75,6 +76,14 @@ void applier::contactgroup::add_object(
   logger(logging::dbg_config, logging::more)
     << "Creating new contactgroup '"
     << obj->contactgroup_name() << "'.";
+
+  if (obj->resolved_members().empty()) {
+    ++config_warnings;
+    logger(logging::log_config_warning, logging::basic)
+      << "configuration: warning: Specified contactgroup '"
+      << obj->contactgroup_name() << "' has no members";
+    return ;
+  }
 
   // Add contact group to the global configuration set.
   config->contactgroups().insert(obj);

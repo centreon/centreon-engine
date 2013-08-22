@@ -58,7 +58,7 @@ state::setters state::_setters[] = {
   { "check_for_orphaned_services",                 SETTER(bool, check_orphaned_services) },
   { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
   { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
-  { "check_result_path",                           SETTER(std::string const&, check_result_path) },
+  { "check_result_path",                           SETTER(std::string const&, _set_check_result_path) },
   { "check_result_reaper_frequency",               SETTER(unsigned int, check_reaper_interval) },
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
   { "child_processes_fork_twice",                  SETTER(std::string const&, _set_child_processes_fork_twice) },
@@ -3818,6 +3818,15 @@ void state::_set_check_for_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: check_for_updates variable ignored";
+}
+
+/**
+ *  Set check_result_path value.
+ *
+ *  @param[in] value The new check_result_path value.
+ */
+void state::_set_check_result_path(std::string const& value) {
+  _check_result_path = value;
 }
 
 /**

@@ -388,6 +388,9 @@ void parser::_parse_directory_configuration(std::string const& path) {
  *  @param[in] path The configuration path.
  */
 void parser::_parse_global_configuration(std::string const& path) {
+  logger(logging::log_info_message, logging::most)
+    << "configuration: reading main configuration file '" << path << "'.";
+
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
     throw (engine_error() << "configuration: parse global "
@@ -416,6 +419,9 @@ void parser::_parse_global_configuration(std::string const& path) {
  *  @param[in] path The object definitions path.
  */
 void parser::_parse_object_definitions(std::string const& path) {
+  logger(logging::log_info_message, logging::most)
+    << "configuration: processing object config file '" << path << "'.";
+
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
     throw (engine_error() << "configuration: parse object "
@@ -490,6 +496,9 @@ void parser::_parse_object_definitions(std::string const& path) {
  *  @param[in] path The resource file path.
  */
 void parser::_parse_resource_file(std::string const& path) {
+  logger(logging::log_info_message, logging::most)
+    << "configuration: reading resource file '" << path << "'";
+
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
     throw (engine_error() << "configuration: parse resources "

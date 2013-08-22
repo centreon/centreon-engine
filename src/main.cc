@@ -240,17 +240,35 @@ int main(int argc, char* argv[]) {
     // We're just verifying the configuration.
     else if (verify_config) {
       try {
-        // Read main config file.
-        logger(logging::log_info_message, logging::basic)
-          << "reading main config file";
-
         // Read in the configuration files (main config file,
         // resource and object config files).
         configuration::state config;
         configuration::parser p;
         p.parse(config_file, config);
-        configuration::applier::state::instance().apply(config);
-        retval = EXIT_SUCCESS;
+
+        configuration::applier::state&
+          applier(configuration::applier::state::instance());
+        applier.apply(config);
+
+        logger(logging::log_info_message, logging::basic)
+          << "\n"
+          << "Checked " << applier.commands().size() << " commands.\n"
+          << "Checked " << applier.connectors().size() << " connectors.\n"
+          << "Checked " << applier.contacts().size() << " contacts.\n"
+          << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
+          << "Checked " << applier.hostescalations().size() << " host escalations.\n"
+          << "Checked " << applier.hostgroups().size() << " host groups.\n"
+          << "Checked " << applier.hosts().size() << " hosts.\n"
+          << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
+          << "Checked " << applier.serviceescalations().size() << " service escalations.\n"
+          << "Checked " << applier.servicegroups().size() << " service groups.\n"
+          << "Checked " << applier.services().size() << " services.\n"
+          << "Checked " << applier.timeperiods().size() << " time periods.\n"
+          << "\n"
+          << "Total Warnings: " << config_warnings << "\n"
+          << "Total Errors:   " << config_errors;
+
+        retval = (config_errors ? EXIT_FAILURE : EXIT_SUCCESS);
       }
       catch (std::exception const& e) {
         logger(logging::log_config_error, logging::basic)
@@ -337,18 +355,9 @@ int main(int argc, char* argv[]) {
 
         // Log the local time - may be different than clock
         // time due to timezone offset.
-        time_t const now(time(NULL));
-        struct tm tm;
-        localtime_r(&now, &tm);
-        char datestr[256];
-        strftime(
-          datestr,
-          sizeof(datestr),
-          "%a %b %d %H:%M:%S %Z %Y",
-          &tm);
         logger(logging::log_process_info, logging::basic)
-          << "Local time is " << datestr << "\n"
-          <<  "LOG VERSION: " << LOG_VERSION_2;
+          << "Local time is " << string::ctime(program_start) << "\n"
+          << "LOG VERSION: " << LOG_VERSION_2;
 
         // Load broker modules.
         for (std::list<std::string>::const_iterator
@@ -405,6 +414,9 @@ int main(int argc, char* argv[]) {
         // Get event start time and save as macro.
         event_start = time(NULL);
         string::setstr(mac->x[MACRO_EVENTSTARTTIME], event_start);
+
+        logger(logging::log_info_message, logging::basic)
+          << "Event loop start at " << string::ctime(event_start);
 
         // Start monitoring all services (doesn't return until a
         // restart or shutdown signal is encountered).

@@ -41,6 +41,10 @@
 extern "C" {
 #  endif /* C++ */
 
+
+extern int                       config_errors;
+extern int                       config_warnings;
+
 extern unsigned long             max_check_result_file_age;
 extern char*                     check_result_path;
 

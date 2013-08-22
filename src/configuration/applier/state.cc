@@ -998,7 +998,8 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->check_orphaned_hosts(new_cfg.check_orphaned_hosts());
   config->check_orphaned_services(new_cfg.check_orphaned_services());
   config->check_reaper_interval(new_cfg.check_reaper_interval());
-  config->check_result_path(new_cfg.check_result_path());
+  if (config->check_result_path() != new_cfg.check_result_path())
+    config->check_result_path(new_cfg.check_result_path());
   config->check_service_freshness(new_cfg.check_service_freshness());
   config->command_check_interval(new_cfg.command_check_interval());
   config->date_format(new_cfg.date_format());
@@ -1043,7 +1044,8 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->low_host_flap_threshold(new_cfg.low_host_flap_threshold());
   config->low_service_flap_threshold(new_cfg.low_service_flap_threshold());
   config->max_check_reaper_time(new_cfg.max_check_reaper_time());
-  config->max_check_result_file_age(new_cfg.max_check_result_file_age());
+  if (config->max_check_result_file_age() != new_cfg.max_check_result_file_age())
+    config->max_check_result_file_age(new_cfg.max_check_result_file_age());
   config->max_debug_file_size(new_cfg.max_debug_file_size());
   config->max_host_check_spread(new_cfg.max_host_check_spread());
   config->max_log_file_size(new_cfg.max_log_file_size());
@@ -1136,26 +1138,86 @@ void applier::state::_apply(
          it_delete(diff.deleted().begin()),
          end_delete(diff.deleted().end());
        it_delete != end_delete;
-       ++it_delete)
-    aplyr.remove_object(*it_delete);
+       ++it_delete) {
+    if (!verify_config)
+      aplyr.remove_object(*it_delete);
+    else {
+      try {
+        aplyr.remove_object(*it_delete);
+      }
+      catch (std::exception const& e) {
+        ++config_errors;
+        logger(log_info_message, basic)
+          << e.what();
+      }
+    }
+  }
 
   // Add objects.
   for (typename cfg_set::const_iterator
          it_create(diff.added().begin()),
          end_create(diff.added().end());
        it_create != end_create;
-       ++it_create)
-    aplyr.add_object(*it_create);
+       ++it_create) {
+    if (!verify_config)
+      aplyr.add_object(*it_create);
+    else {
+      try {
+        aplyr.add_object(*it_create);
+      }
+      catch (std::exception const& e) {
+        ++config_errors;
+        logger(log_info_message, basic)
+          << e.what();
+      }
+    }
+  }
 
   // Modify objects.
   for (typename cfg_set::const_iterator
          it_modify(diff.modified().begin()),
          end_modify(diff.modified().end());
        it_modify != end_modify;
-       ++it_modify)
-    aplyr.modify_object(*it_modify);
+       ++it_modify) {
+    if (!verify_config)
+      aplyr.modify_object(*it_modify);
+    else {
+      try {
+        aplyr.modify_object(*it_modify);
+      }
+      catch (std::exception const& e) {
+        ++config_errors;
+        logger(log_info_message, basic)
+          << e.what();
+      }
+    }
+  }
 
   return ;
+}
+
+/**
+ *  Apply retention.
+ *
+ *  @param[in] new_cfg New configuration set.
+ *  @param[in] state   The retention state to use.
+ */
+void applier::state::_apply(
+       configuration::state& new_cfg,
+       retention::state& state) {
+  retention::applier::state app_state;
+  if (!verify_config)
+    app_state.apply(new_cfg, state);
+  else {
+    try {
+      app_state.apply(new_cfg, state);
+    }
+    catch (std::exception const& e) {
+      ++config_errors;
+      logger(log_info_message, basic)
+        << e.what();
+    }
+  }
 }
 
 /**
@@ -1175,7 +1237,18 @@ void applier::state::_expand(
        it != end;) {
     typename std::set<shared_ptr<ConfigurationType> >::iterator
       to_expand(it++);
-    aplyr.expand_object(*to_expand, new_state);
+    if (!verify_config)
+      aplyr.expand_object(*to_expand, new_state);
+    else {
+      try {
+        aplyr.expand_object(*to_expand, new_state);
+      }
+      catch (std::exception const& e) {
+        ++config_errors;
+        logger(log_info_message, basic)
+          << e.what();
+      }
+    }
   }
   return ;
 }
@@ -1447,19 +1520,32 @@ void applier::state::_processing(
       config->serviceescalations());
 
     // Load retention.
-    if (state) {
-      retention::applier::state app_state;
-      app_state.apply(new_cfg, *state);
-    }
+    if (state)
+      _apply(new_cfg, *state);
 
-    // Schedule host and service checks.
-    applier::scheduler::instance().apply(
-      new_cfg,
-      diff_hosts,
-      diff_services);
+    // Apply scheduler.
+    if (!verify_config)
+      applier::scheduler::instance().apply(
+        new_cfg,
+        diff_hosts,
+        diff_services);
 
     // Apply new global on the current state.
-    _apply(new_cfg);
+    if (!verify_config)
+      _apply(new_cfg);
+    else {
+      try {
+        _apply(new_cfg);
+      }
+      catch (std::exception const& e) {
+        ++config_errors;
+        logger(log_info_message, basic)
+          << e.what();
+      }
+    }
+
+    // check for circular paths between hosts.
+    pre_flight_circular_check(&config_warnings, &config_errors);
 
     // Call start broker event the first time to run applier state.
     if (!has_already_been_loaded) {
@@ -1494,7 +1580,19 @@ void applier::state::_resolve(
          it(cfg.begin()),
          end(cfg.end());
        it != end;
-       ++it)
-    aplyr.resolve_object(*it);
+       ++it) {
+    if (!verify_config)
+      aplyr.resolve_object(*it);
+    else {
+      try {
+        aplyr.resolve_object(*it);
+      }
+      catch (std::exception const& e) {
+        ++config_errors;
+        logger(log_info_message, basic)
+          << e.what();
+      }
+    }
+  }
   return ;
 }

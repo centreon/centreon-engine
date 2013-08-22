@@ -197,6 +197,9 @@ namespace           configuration {
       template      <typename ConfigurationType, typename ApplierType>
       void          _apply(
                       difference<std::set<shared_ptr<ConfigurationType> > > const& diff);
+      void          _apply(
+                      configuration::state& new_cfg,
+                      retention::state& state);
       void          _expand(configuration::state& new_state);
       template      <typename ConfigurationType,
                      typename ApplierType>

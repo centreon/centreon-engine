@@ -88,6 +88,8 @@ int                 additional_freshness_latency(15);
 int                 allow_empty_hostgroup_assignment(false);
 int                 caught_signal(false);
 int                 command_check_interval(-1);
+int                 config_errors(0);
+int                 config_warnings(0);
 int                 defer_comment_sorting(0);
 int                 defer_downtime_sorting(0);
 int                 embedded_perl_initialized(false);

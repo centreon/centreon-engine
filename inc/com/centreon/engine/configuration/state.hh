@@ -438,6 +438,7 @@ namespace               configuration {
     void                _set_cfg_dir(std::string const& value);
     void                _set_cfg_file(std::string const& value);
     void                _set_check_for_updates(std::string const& value);
+    void                _set_check_result_path(std::string const& value);
     void                _set_child_processes_fork_twice(std::string const& value);
     void                _set_command_check_interval(std::string const& value);
     void                _set_comment_file(std::string const& value);

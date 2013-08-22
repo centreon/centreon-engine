@@ -26,6 +26,7 @@
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine::configuration;
 
@@ -72,6 +73,14 @@ void applier::servicegroup::add_object(
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
+
+  if (obj->resolved_members().empty()) {
+    ++config_warnings;
+    logger(logging::log_config_warning, logging::basic)
+      << "configuration: warning: Specified servicegroup '"
+      << obj->servicegroup_name() << "' has no members";
+    return ;
+  }
 
   // Add service group to the global configuration set.
   config->servicegroups().insert(obj);

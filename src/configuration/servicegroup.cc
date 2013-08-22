@@ -149,7 +149,7 @@ bool servicegroup::operator<(servicegroup const& right) const throw () {
 void servicegroup::check_validity() const {
   if (_servicegroup_name.empty())
     throw (engine_error() << "service group has no name "
-           << "(property 'servicegroup_name')");
+           "(property 'servicegroup_name')");
   return ;
 }
 

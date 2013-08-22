@@ -475,8 +475,6 @@ int pre_flight_circular_check(int* w, int* e) {
   /********************************************/
   /* check for circular paths between hosts   */
   /********************************************/
-  if (verify_config == true)
-    printf("Checking for circular paths between hosts...\n");
 
   /* check routes between all hosts */
   found = false;
@@ -509,8 +507,6 @@ int pre_flight_circular_check(int* w, int* e) {
   /********************************************/
   /* check for circular dependencies         */
   /********************************************/
-  if (verify_config == true)
-    printf("Checking for circular host and service dependencies...\n");
 
   /* check execution dependencies between all services */
   for (temp_sd = servicedependency_list;

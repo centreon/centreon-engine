@@ -149,8 +149,8 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
  */
 void hostgroup::check_validity() const {
   if (_hostgroup_name.empty())
-    throw (engine_error()
-           << "host group has no name (property 'hostgroup_name')");
+    throw (engine_error() << "host group has no name "
+           "(property 'hostgroup_name')");
   return ;
 }
 
