@@ -61,15 +61,29 @@ bool string::split(
        std::string& key,
        std::string& value,
        char delim) {
-  std::size_t pos(line.find(delim));
-  if (pos == std::string::npos)
+  std::size_t delim_pos(line.find_first_of(delim));
+  if (delim_pos == std::string::npos)
     return (false);
 
-  key = line.substr(0, pos);
-  string::trim(key);
+  std::size_t first_pos;
+  std::size_t last_pos;
 
-  value = line.substr(pos + 1);
-  string::trim(value);
+  last_pos = line.find_last_not_of(whitespaces, delim_pos - 1);
+  if (last_pos == std::string::npos)
+    key.clear();
+  else {
+    first_pos = line.find_first_not_of(whitespaces);
+    key.assign(line, first_pos, last_pos + 1 - first_pos);
+  }
+
+  first_pos = line.find_first_not_of(whitespaces, delim_pos + 1);
+  if (first_pos == std::string::npos)
+    value.clear();
+  else {
+    last_pos = line.find_last_not_of(whitespaces);
+    value.assign(line, first_pos, last_pos + 1 - first_pos);
+  }
+
   return (true);
 }
 
