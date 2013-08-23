@@ -160,35 +160,9 @@ servicesmember* add_service_to_servicegroup(
     obj->host_name = string::dup(host_name);
     obj->service_description = string::dup(svc_description);
 
-    // Add new member to member list, sorted by host name then
-    // service description.
-    servicesmember* last(grp->members);
-    servicesmember* temp;
-    for (temp = grp->members; temp; temp = temp->next) {
-      if (strcmp(obj->host_name, temp->host_name) < 0) {
-        obj->next = temp;
-        if (temp == grp->members)
-          grp->members = obj;
-        else
-          last->next = obj;
-        break;
-      }
-      else if (!strcmp(obj->host_name, temp->host_name)
-               && (strcmp(obj->service_description, temp->service_description) < 0)) {
-        obj->next = temp;
-        if (temp == grp->members)
-          grp->members = obj;
-        else
-          last->next = obj;
-        break;
-      }
-      else
-        last = temp;
-    }
-    if (!grp->members)
-      grp->members = obj;
-    else if (!temp)
-      last->next = obj;
+    // Add new member to member list.
+    obj->next = grp->members;
+    grp->members = obj;
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(NULL));
