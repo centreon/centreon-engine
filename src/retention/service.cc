@@ -264,22 +264,35 @@ bool service::operator!=(service const& right) const throw () {
  *  @param[in] key   The property to set.
  *  @param[in] value The new value.
  *
+ *  @warning This method is not thread safe.
+ *
  *  @return True on success, otherwise false.
  */
 bool service::set(
        std::string const& key,
        std::string const& value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (_setters[i].name == key)
-      return ((_setters[i].func)(*this, value));
+  static setters const*
+    first(_setters);
+  static setters const*
+    end(_setters + sizeof(_setters) / sizeof(*_setters));
+  setters const* it(first);
+  do {
+    if (it->name == key) {
+      first = it;
+      return ((it->func)(*this, value));
+    }
+    ++it;
+    if (it == end)
+      it = _setters;
+  } while (it != first);
+
   if (!key.empty() && key[0] == '_' && value.size() > 3) {
     char const* cv_name(key.c_str() + 1);
     char const* cv_value(value.c_str() + 2);
     _customvariables[cv_name] = cv_value;
     return (true);
   }
+
   return (false);
 }
 
