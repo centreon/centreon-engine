@@ -150,7 +150,7 @@ void loop::_dispatching() {
     if (_need_reload && !_reload_running) {
       _reload_running = true;
       _need_reload = 0;
-      _reload_configuration.exec();
+      _reload_configuration.start();
     }
     else if (_reload_running) {
       // Start locking engine to apply configuration.

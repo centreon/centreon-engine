@@ -58,7 +58,7 @@ public:
                         ~checkinvalid() throw () {}
   static void           reload_configuration() {
     configuration::reload reload_configuration;
-    reload_configuration.exec();
+    reload_configuration.start();
     while (true) {
       concurrency::thread::yield();
       if (reload_configuration.is_finished())

@@ -27,13 +27,22 @@
 CCE_BEGIN()
 
 namespace   configuration {
-  class     reload
-    : public concurrency::thread {
+  /**
+   *  @class reload reload.hh "com/centreon/engine/configuration/reload.hh"
+   *  @brief Reload a configuration state.
+   *
+   *  This class is used to reload a configuration state in a separate
+   *  thread which reduce the time required to load the configuration on
+   *  a multiprocessor machine.
+   */
+  class     reload : private concurrency::thread {
   public:
             reload();
             ~reload() throw ();
     bool    is_finished() const;
+    void    start();
     void    try_lock();
+    void    wait();
 
   private:
             reload(reload const&);

@@ -33,17 +33,12 @@ using namespace com::centreon::engine::configuration;
 /**
  *  Default constructor.
  */
-reload::reload()
-  : _is_finished(false) {
-
-}
+reload::reload() : _is_finished(true) {}
 
 /**
  *  Destructor.
  */
-reload::~reload() throw () {
-
-}
+reload::~reload() throw () {}
 
 /**
  *  Get if the reload finished.
@@ -56,10 +51,27 @@ bool reload::is_finished() const {
 }
 
 /**
+ *  Start the reload thread.
+ */
+void reload::start() {
+  _set_is_finished(false);
+  exec();
+  return ;
+}
+
+/**
  *  Try to lock engine if necessary.
  */
 void reload::try_lock() {
   configuration::applier::state::instance().try_lock();
+}
+
+/**
+ *  Wait for the reload thread termination.
+ */
+void reload::wait() {
+  concurrency::thread::wait();
+  return ;
 }
 
 /**
