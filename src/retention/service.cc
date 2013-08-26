@@ -88,27 +88,21 @@ service::setters service::_setters[] = {
 /**
  *  Constructor.
  */
-service::service()
-  : object(object::service) {
-
-}
+service::service() : object(object::service), _next_setter(_setters) {}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right Object to copy.
  */
-service::service(service const& right)
-  : object(right) {
+service::service(service const& right) : object(right) {
   operator=(right);
 }
 
 /**
  *  Destructor.
  */
-service::~service() throw () {
-
-}
+service::~service() throw () {}
 
 /**
  *  Copy operator.
@@ -159,6 +153,7 @@ service& service::operator=(service const& right) {
     _max_attempts = right._max_attempts;
     _modified_attributes = right._modified_attributes;
     _next_check = right._next_check;
+    _next_setter = right._next_setter;
     _normal_check_interval = right._normal_check_interval;
     _notification_period = right._notification_period;
     _notifications_enabled = right._notifications_enabled;
@@ -271,27 +266,36 @@ bool service::operator!=(service const& right) const throw () {
 bool service::set(
        std::string const& key,
        std::string const& value) {
-  static setters const*
-    first(_setters);
-  static setters const*
+  // The strategy in service retention loading is to keep the position
+  // at which the last entry was processed and to start from this
+  // position at the next entry. Therefore most of the time entry lookup
+  // will be the matter of one iteration, but the keep compatibility
+  // with modified retention files.
+  static setters const* const
     end(_setters + sizeof(_setters) / sizeof(*_setters));
-  setters const* it(first);
-  do {
-    if (it->name == key) {
-      first = it;
-      return ((it->func)(*this, value));
-    }
-    ++it;
-    if (it == end)
-      it = _setters;
-  } while (it != first);
 
+  // Custom variables.
   if (!key.empty() && key[0] == '_' && value.size() > 3) {
     char const* cv_name(key.c_str() + 1);
     char const* cv_value(value.c_str() + 2);
     _customvariables[cv_name] = cv_value;
     return (true);
   }
+
+  // Normal properties.
+  setters const* it(_next_setter);
+  do {
+    if (it->name == key) {
+      _next_setter = it;
+      ++_next_setter;
+      if (_next_setter == end)
+        _next_setter = _setters;
+      return ((it->func)(*this, value));
+    }
+    ++it;
+    if (it == end)
+      it = _setters;
+  } while (it != _next_setter);
 
   return (false);
 }

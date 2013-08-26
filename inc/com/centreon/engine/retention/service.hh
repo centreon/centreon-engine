@@ -203,6 +203,7 @@ namespace                         retention {
     opt<unsigned int>             _max_attempts;
     opt<unsigned long>            _modified_attributes;
     opt<time_t>                   _next_check;
+    setters const*                _next_setter;
     opt<unsigned int>             _normal_check_interval;
     opt<std::string>              _notification_period;
     opt<bool>                     _notifications_enabled;
