@@ -51,6 +51,48 @@ bool string::get_next_line(
 /**
  *  Get key and value from line.
  *
+ *  @param[in,out] line  The line to process.
+ *  @param[out]    key   The key pointer.
+ *  @param[out]    value The value pointer.
+ *  @param[in]     delim The delimiter.
+ */
+bool string::split(
+               std::string& line,
+               char const** key,
+               char const** value,
+               char delim) {
+  std::size_t delim_pos(line.find_first_of(delim));
+  if (delim_pos == std::string::npos)
+    return (false);
+
+  std::size_t first_pos;
+  std::size_t last_pos;
+  line.append("", 1);
+
+  last_pos = line.find_last_not_of(whitespaces, delim_pos - 1);
+  if (last_pos == std::string::npos)
+    *key = NULL;
+  else {
+    first_pos = line.find_first_not_of(whitespaces);
+    line[last_pos + 1] = '\0';
+    *key = line.data() + first_pos;
+  }
+
+  first_pos = line.find_first_not_of(whitespaces, delim_pos + 1);
+  if (first_pos == std::string::npos)
+    *value = NULL;
+  else {
+    last_pos = line.find_last_not_of(whitespaces);
+    line[last_pos + 1] = '\0';
+    *value = line.data() + first_pos;
+  }
+
+  return (true);
+}
+
+/**
+ *  Get key and value from line.
+ *
  *  @param[in]  line  The line to extract data.
  *  @param[out] key   The key to fill.
  *  @param[out] value The value to fill.
@@ -90,18 +132,16 @@ bool string::split(
 /**
  *  Split data into element.
  *
- *  @param[int] data  The data to split.
+ *  @param[in]  data  The data to split.
  *  @param[out] out   The list to fill.
  *  @param[in]  delim The delimiter.
- *
- *  @return The list of string split by delimiter.
  */
-std::list<std::string>& string::split(
-                          std::string const& data,
-                          std::list<std::string>& out,
-                          char delim) {
+void string::split(
+               std::string const& data,
+               std::list<std::string>& out,
+               char delim) {
   if (data.empty())
-    return (out);
+    return ;
 
   std::size_t last(0);
   std::size_t current(0);
@@ -112,7 +152,7 @@ std::list<std::string>& string::split(
   }
   std::string tmp(last ? data.substr(last) : data);
   out.push_back(trim(tmp));
-  return (out);
+  return ;
 }
 
 /**

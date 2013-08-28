@@ -29,8 +29,7 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    servicedependency
-    : public object {
+  class                    servicedependency : public object {
   public:
     enum                   action_on {
       none = 0,
@@ -62,9 +61,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     void                   dependency_period(std::string const& period);
     std::string const&     dependency_period() const throw ();
@@ -98,8 +95,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(servicedependency&, std::string const&);
+      char const*          name;
+      bool                 (*func)(servicedependency&, char const*);
     };
 
     bool                   _set_dependency_period(std::string const& value);
@@ -128,7 +125,7 @@ namespace                  configuration {
     opt<unsigned int>      _notification_failure_options;
     group                  _servicegroups;
     group                  _service_description;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<servicedependency>    servicedependency_ptr;

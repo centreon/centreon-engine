@@ -29,8 +29,7 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    hostescalation
-    : public object {
+  class                    hostescalation : public object {
   public:
     enum                   action_on {
       none = 0,
@@ -53,9 +52,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
@@ -83,8 +80,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(hostescalation&, std::string const&);
+      char const*          name;
+      bool                 (*func)(hostescalation&, char const*);
     };
 
     bool                   _set_contactgroups(std::string const& value);
@@ -106,7 +103,7 @@ namespace                  configuration {
     group                  _hosts;
     opt<unsigned int>      _last_notification;
     opt<unsigned int>      _notification_interval;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<hostescalation>   hostescalation_ptr;

@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostextinfo, type, &hostextinfo::method>::generic
 
-hostextinfo::setters hostextinfo::_setters[] = {
+hostextinfo::setters const hostextinfo::_setters[] = {
   { "host_name",       SETTER(std::string const&, _set_hosts) },
   { "hostgroup",       SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",  SETTER(std::string const&, _set_hostgroups) },
@@ -53,9 +53,7 @@ static point_3d const default_coords_3d(0.0, 0.0, 0.0);
 hostextinfo::hostextinfo()
   : object(object::hostextinfo),
     _coords_2d(default_coords_2d),
-    _coords_3d(default_coords_3d) {
-
-}
+    _coords_3d(default_coords_3d) {}
 
 /**
  *  Copy constructor.
@@ -70,9 +68,7 @@ hostextinfo::hostextinfo(hostextinfo const& right)
 /**
  *  Destructor.
  */
-hostextinfo::~hostextinfo() throw () {
-
-}
+hostextinfo::~hostextinfo() throw () {}
 
 /**
  *  Copy constructor.
@@ -176,13 +172,11 @@ void hostextinfo::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostextinfo::parse(
-       std::string const& key,
-       std::string const& value) {
+bool hostextinfo::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }
@@ -312,12 +306,12 @@ bool hostextinfo::_set_coords_2d(std::string const& value) {
     return (false);
 
   int x;
-  if (!string::to(string::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()).c_str(), x))
     return (false);
   coords.pop_front();
 
   int y;
-  if (!string::to(string::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()).c_str(), y))
     return (false);
 
   _coords_2d = point_2d(x, y);
@@ -338,17 +332,17 @@ bool hostextinfo::_set_coords_3d(std::string const& value) {
     return (false);
 
   double x;
-  if (!string::to(string::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()).c_str(), x))
     return (false);
   coords.pop_front();
 
   double y;
-  if (!string::to(string::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()).c_str(), y))
     return (false);
   coords.pop_front();
 
   double z;
-  if (!string::to(string::trim(coords.front()), z))
+  if (!string::to(string::trim(coords.front()).c_str(), z))
     return (false);
 
   _coords_3d = point_3d(x, y, z);

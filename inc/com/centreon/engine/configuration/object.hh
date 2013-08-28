@@ -70,9 +70,7 @@ namespace                  configuration {
     bool                   is_template() const throw ();
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
-    virtual bool           parse(
-                             std::string const& key,
-                             std::string const& value);
+    virtual bool           parse(char const* key, char const* value);
     virtual bool           parse(std::string const& line);
     void                   resolve_template(
                              umap<std::string, shared_ptr<object> >& templates);
@@ -81,13 +79,13 @@ namespace                  configuration {
 
   protected:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(object&, std::string const&);
+      char const*          name;
+      bool                 (*func)(object&, char const*);
     };
 
     template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
-      static bool generic(T& obj, std::string const& value) {
+      static bool generic(T& obj, char const* value) {
         U val(0);
         if (!string::to(value, val))
           return (false);
@@ -97,7 +95,7 @@ namespace                  configuration {
 
     template<typename T, bool (T::*ptr)(std::string const&)>
     struct              setter<T, std::string const&, ptr> {
-      static bool       generic(T& obj, std::string const& value) {
+      static bool       generic(T& obj, char const* value) {
         return ((obj.*ptr)(value));
       }
     };
@@ -109,7 +107,7 @@ namespace                  configuration {
     bool                   _is_resolve;
     bool                   _is_template;
     std::string            _name;
-    static setters         _setters[];
+    static setters const   _setters[];
     list_string            _templates;
     object_type            _type;
   };

@@ -27,7 +27,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<service, type, &service::method>::generic
 
-service::setters service::_setters[] = {
+service::setters const service::_setters[] = {
   { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
   { "check_command",                        SETTER(std::string const&, _set_check_command) },
@@ -263,9 +263,7 @@ bool service::operator!=(service const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool service::set(
-       std::string const& key,
-       std::string const& value) {
+bool service::set(char const* key, char const* value) {
   // The strategy in service retention loading is to keep the position
   // at which the last entry was processed and to start from this
   // position at the next entry. Therefore most of the time entry lookup
@@ -275,17 +273,15 @@ bool service::set(
     end(_setters + sizeof(_setters) / sizeof(*_setters));
 
   // Custom variables.
-  if (!key.empty() && key[0] == '_' && value.size() > 3) {
-    char const* cv_name(key.c_str() + 1);
-    char const* cv_value(value.c_str() + 2);
-    _customvariables[cv_name] = cv_value;
+  if ((key[0] == '_') && value[0] && value[1] && value[2]) {
+    _customvariables[key + 1] = value + 2;
     return (true);
   }
 
   // Normal properties.
   setters const* it(_next_setter);
   do {
-    if (it->name == key) {
+    if (!strcmp(it->name, key)) {
       _next_setter = it;
       ++_next_setter;
       if (_next_setter == end)
@@ -1343,20 +1339,20 @@ bool service::_set_service_description(std::string const& value) {
  *  @param[in] value The new state_history.
  */
 bool service::_set_state_history(std::string const& value) {
-  unsigned int x(0);
-  std::list<std::string> lst_history;
-  string::split(value, lst_history, ',');
   std::vector<int>& state_history(*_state_history);
-  for (std::list<std::string>::const_iterator
-         it(lst_history.begin()), end(lst_history.end());
-       it != end && x < MAX_STATE_HISTORY_ENTRIES;
-       ++it) {
-    int state(0);
-    if (!string::to(*it, state)) {
+  char const* ptr(value.c_str());
+  while (*ptr) {
+    char* endptr;
+    int state;
+    state = strtol(ptr, &endptr, 10);
+    if (*endptr && (*endptr != ',')) {
       _state_history.reset();
       return (false);
     }
     state_history.push_back(state);
+    ptr = endptr;
+    if (*ptr)
+      ++ptr;
   }
   _state_history.set(state_history);
   return (true);

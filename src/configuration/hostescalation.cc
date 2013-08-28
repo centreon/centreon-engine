@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostescalation, type, &hostescalation::method>::generic
 
-hostescalation::setters hostescalation::_setters[] = {
+hostescalation::setters const hostescalation::_setters[] = {
   { "hostgroup",             SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",            SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",        SETTER(std::string const&, _set_hostgroups) },
@@ -211,13 +211,11 @@ void hostescalation::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostescalation::parse(
-       std::string const& key,
-       std::string const& value) {
+bool hostescalation::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

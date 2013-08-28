@@ -31,7 +31,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<service, type, &service::method>::generic
 
-service::setters service::_setters[] = {
+service::setters const service::_setters[] = {
   { "host",                         SETTER(std::string const&, _set_hosts) },
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
@@ -487,16 +487,14 @@ void service::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool service::parse(
-       std::string const& key,
-       std::string const& value) {
+bool service::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (!key.empty() && key[0] == '_') {
-    _customvariables[key.substr(1)] = value;
+  if (key[0] == '_') {
+    _customvariables[key + 1] = value;
     return (true);
   }
   return (false);

@@ -387,7 +387,7 @@ namespace               configuration {
     void                status_file(std::string const& value);
     unsigned int        status_update_interval() const throw ();
     void                status_update_interval(unsigned int value);
-    bool                set(std::string const& key, std::string const& value);
+    bool                set(char const* key, char const* value);
     set_timeperiod const&
                         timeperiods() const throw ();
     set_timeperiod&     timeperiods() throw ();
@@ -427,8 +427,8 @@ namespace               configuration {
 
   private:
     struct              setters {
-      std::string const name;
-      bool              (*func)(state&, std::string const&);
+      char const*       name;
+      bool              (*func)(state&, char const*);
     };
 
     void                _set_aggregate_status_updates(std::string const& value);
@@ -468,7 +468,7 @@ namespace               configuration {
 
     template<typename U, void (state::*ptr)(U)>
     struct              setter {
-      static bool       generic(state& obj, std::string const& value) {
+      static bool       generic(state& obj, char const* value) {
         try {
           U val(0);
           if (!string::to(value, val))
@@ -486,7 +486,7 @@ namespace               configuration {
 
     template<void (state::*ptr)(std::string const&)>
     struct              setter<std::string const&, ptr> {
-      static bool       generic(state& obj, std::string const& value) {
+      static bool       generic(state& obj, char const* value) {
         try {
           (obj.*ptr)(value);
         }
@@ -622,7 +622,8 @@ namespace               configuration {
     std::string         _service_perfdata_file_processing_command;
     unsigned int        _service_perfdata_file_processing_interval;
     std::string         _service_perfdata_file_template;
-    static setters      _setters[];
+    static setters const
+                        _setters[];
     float               _sleep_time;
     bool                _soft_state_dependencies;
     std::string         _state_retention_file;

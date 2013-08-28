@@ -32,7 +32,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<servicedependency, type, &servicedependency::method>::generic
 
-servicedependency::setters servicedependency::_setters[] = {
+servicedependency::setters const servicedependency::_setters[] = {
   { "servicegroup",                  SETTER(std::string const&, _set_servicegroups) },
   { "servicegroups",                 SETTER(std::string const&, _set_servicegroups) },
   { "servicegroup_name",             SETTER(std::string const&, _set_servicegroups) },
@@ -78,9 +78,7 @@ servicedependency::servicedependency()
     _dependency_type(unknown_type),
     _execution_failure_options(default_execution_failure_options),
     _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {
-
-}
+    _notification_failure_options(default_notification_failure_options) {}
 
 /**
  *  Copy constructor.
@@ -281,13 +279,11 @@ void servicedependency::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool servicedependency::parse(
-       std::string const& key,
-       std::string const& value) {
+bool servicedependency::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

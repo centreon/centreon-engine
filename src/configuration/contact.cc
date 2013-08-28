@@ -30,7 +30,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<contact, type, &contact::method>::generic
 
-contact::setters contact::_setters[] = {
+contact::setters const contact::_setters[] = {
   { "contact_name",                  SETTER(std::string const&, _set_contact_name) },
   { "alias",                         SETTER(std::string const&, _set_alias) },
   { "contact_groups",                SETTER(std::string const&, _set_contactgroups) },
@@ -289,21 +289,17 @@ void contact::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool contact::parse(
-       std::string const& key,
-       std::string const& value) {
+bool contact::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (!key.empty()) {
-    if (key.find("address") == 0)
-      return (_set_address(key, value));
-    else if (key[0] == '_') {
-      _customvariables[key.substr(1)] = value;
-      return (true);
-    }
+  if (!strncmp(key, "address", sizeof("address") - 1))
+    return (_set_address(key, value));
+  else if (key[0] == '_') {
+    _customvariables[key + 1] = value;
+    return (true);
   }
   return (false);
 }
@@ -491,7 +487,7 @@ bool contact::_set_address(
        std::string const& key,
        std::string const& value) {
   unsigned int id;
-  if (!string::to(key, id) || id < 1 || id > MAX_ADDRESSES)
+  if (!string::to(key.c_str(), id) || id < 1 || id > MAX_ADDRESSES)
     return (false);
   _address[id] = value;
   return (true);

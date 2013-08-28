@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<hostgroup, type, &hostgroup::method>::generic
 
-hostgroup::setters hostgroup::_setters[] = {
+hostgroup::setters const hostgroup::_setters[] = {
   { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
   { "alias",             SETTER(std::string const&, _set_alias) },
   { "members",           SETTER(std::string const&, _set_members) },
@@ -189,13 +189,11 @@ void hostgroup::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool hostgroup::parse(
-       std::string const& key,
-       std::string const& value) {
+bool hostgroup::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

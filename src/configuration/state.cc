@@ -34,7 +34,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &state::setter<type, &state::method>::generic
 
-state::setters state::_setters[] = {
+state::setters const state::_setters[] = {
   { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
   { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
@@ -447,9 +447,7 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw () {
-
-}
+state::~state() throw () {}
 
 /**
  *  Copy operator.
@@ -3384,12 +3382,12 @@ void state::status_update_interval(unsigned int value) {
  *
  *  @return True on success, otherwise false.
  */
-bool state::set(std::string const& key, std::string const& value) {
+bool state::set(char const* key, char const* value) {
   try {
     for (unsigned int i(0);
          i < sizeof(_setters) / sizeof(_setters[0]);
          ++i)
-      if (_setters[i].name == key)
+      if (!strcmp(_setters[i].name, key))
         return ((_setters[i].func)(*this, value));
   }
   catch (std::exception const& e) {
@@ -3537,7 +3535,7 @@ void state::user(std::string const& key, std::string const& value) {
   tmp.erase(pos - 1);
 
   unsigned int idx;
-  if (!string::to(tmp, idx) || !idx || idx > MAX_USER_MACROS)
+  if (!string::to(tmp.c_str(), idx) || !idx || idx > MAX_USER_MACROS)
     throw (engine_error()
            << "configuration: invalid user key '" << key << "'");
 
@@ -3854,7 +3852,7 @@ void state::_set_command_check_interval(std::string const& value) {
     _command_check_interval_is_seconds = true;
     val.erase(val.begin() + pos);
   }
-  setter<int, &state::command_check_interval>::generic(*this, val);
+  setter<int, &state::command_check_interval>::generic(*this, val.c_str());
 }
 
 /**
@@ -3924,7 +3922,7 @@ void state::_set_enable_embedded_perl(std::string const& value) {
  */
 void state::_set_event_broker_options(std::string const& value) {
   if (value != "-1")
-    setter<unsigned long, &state::event_broker_options>::generic(*this, value);
+    setter<unsigned long, &state::event_broker_options>::generic(*this, value.c_str());
   else {
     _event_broker_options = BROKER_EVERYTHING;
     }
@@ -3955,7 +3953,7 @@ void state::_set_host_inter_check_delay_method(std::string const& value) {
     _host_inter_check_delay_method = icd_smart;
   else {
     _host_inter_check_delay_method = icd_user;
-    if (!string::to(value, scheduling_info.host_inter_check_delay)
+    if (!string::to(value.c_str(), scheduling_info.host_inter_check_delay)
         || scheduling_info.host_inter_check_delay <= 0.0)
       throw (engine_error()
                << "host_inter_check_delay_method: invalid value.");
@@ -4093,7 +4091,7 @@ void state::_set_service_inter_check_delay_method(std::string const& value) {
     _service_inter_check_delay_method = icd_smart;
   else {
     _service_inter_check_delay_method = icd_user;
-    if (!string::to(value, scheduling_info.service_inter_check_delay)
+    if (!string::to(value.c_str(), scheduling_info.service_inter_check_delay)
         || scheduling_info.service_inter_check_delay <= 0.0)
       throw (engine_error() << "service_inter_check_delay_method: invalid value.");
   }
@@ -4109,7 +4107,7 @@ void state::_set_service_interleave_factor_method(std::string const& value) {
     _service_interleave_factor_method = ilf_smart;
   else {
     _service_interleave_factor_method = ilf_user;
-    if (!string::to(value, scheduling_info.service_interleave_factor)
+    if (!string::to(value.c_str(), scheduling_info.service_interleave_factor)
         || scheduling_info.service_interleave_factor < 1)
       scheduling_info.service_interleave_factor = 1;
   }

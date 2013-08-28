@@ -71,9 +71,9 @@ void parser::parse(std::string const& path, state& retention) {
       obj = object::create(input.substr(0, pos));
     }
     else if (input != "}") {
-      std::string key;
-      std::string value;
-      if (string::split(input, key, value, '='))
+      char const* key;
+      char const* value;
+      if (string::split(input, &key, &value, '='))
         obj->set(key, value);
     }
     else {

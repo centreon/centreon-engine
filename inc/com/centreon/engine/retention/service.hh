@@ -32,8 +32,7 @@
 CCE_BEGIN()
 
 namespace                         retention {
-  class                           service
-    : public object {
+  class                           service : public object {
   public:
                                   service();
                                   service(service const& right);
@@ -41,9 +40,7 @@ namespace                         retention {
     service&                      operator=(service const& right);
     bool                          operator==(service const& right) const throw ();
     bool                          operator!=(service const& right) const throw ();
-    bool                          set(
-                                    std::string const& key,
-                                    std::string const& value);
+    bool                          set(char const* key, char const* value);
 
     opt<int> const&               acknowledgement_type() const throw ();
     opt<bool> const&              active_checks_enabled() const throw ();
@@ -104,8 +101,8 @@ namespace                         retention {
 
   private:
     struct                        setters {
-      std::string const           name;
-      bool                        (*func)(service&, std::string const&);
+      char const*                 name;
+      bool                        (*func)(service&, char const*);
     };
 
     bool                          _set_acknowledgement_type(int value);
@@ -219,7 +216,7 @@ namespace                         retention {
     opt<int>                      _process_performance_data;
     opt<unsigned int>             _retry_check_interval;
     std::string                   _service_description;
-    static setters                _setters[];
+    static setters const          _setters[];
     opt<std::vector<int> >        _state_history;
     opt<int>                      _state_type;
   };

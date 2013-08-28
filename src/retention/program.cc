@@ -25,7 +25,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<program, type, &program::method>::generic
 
-program::setters program::_setters[] = {
+program::setters const program::_setters[] = {
   { "active_host_checks_enabled",     SETTER(bool, _set_active_host_checks_enabled) },
   { "active_service_checks_enabled",  SETTER(bool, _set_active_service_checks_enabled) },
   { "check_host_freshness",           SETTER(bool, _set_check_host_freshness) },
@@ -53,10 +53,7 @@ program::setters program::_setters[] = {
 /**
  *  Constructor.
  */
-program::program()
-  : object(object::program) {
-
-}
+program::program() : object(object::program) {}
 
 /**
  *  Copy constructor.
@@ -71,9 +68,7 @@ program::program(program const& right)
 /**
  *  Destructor.
  */
-program::~program() throw () {
-
-}
+program::~program() throw () {}
 
 /**
  *  Copy operator.
@@ -163,13 +158,11 @@ bool program::operator!=(program const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool program::set(
-       std::string const& key,
-       std::string const& value) {
+bool program::set(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

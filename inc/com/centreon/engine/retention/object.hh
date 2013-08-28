@@ -48,16 +48,14 @@ namespace              retention {
     bool               operator!=(object const& right) const throw ();
     static shared_ptr<object>
                        create(std::string const& type_name);
-    virtual bool       set(
-                         std::string const& key,
-                         std::string const& value) = 0;
+    virtual bool       set(char const* key, char const* value) = 0;
     type_id            type() const throw ();
     std::string const& type_name() const throw ();
 
   protected:
     template<typename T, typename U, bool (T::*ptr)(U)>
     struct setter {
-      static bool generic(T& obj, std::string const& value) {
+      static bool generic(T& obj, char const* value) {
         U val(0);
         if (!string::to(value, val))
           return (false);
@@ -67,7 +65,7 @@ namespace              retention {
 
     template<typename T, bool (T::*ptr)(std::string const&)>
     struct              setter<T, std::string const&, ptr> {
-      static bool       generic(T& obj, std::string const& value) {
+      static bool       generic(T& obj, char const* value) {
         return ((obj.*ptr)(value));
       }
     };

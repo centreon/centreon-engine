@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<connector, type, &connector::method>::generic
 
-connector::setters connector::_setters[] = {
+connector::setters const connector::_setters[] = {
   { "connector_line", SETTER(std::string const&, _set_connector_line) },
   { "connector_name", SETTER(std::string const&, _set_connector_name) }
 };
@@ -39,9 +39,7 @@ connector::setters connector::_setters[] = {
  */
 connector::connector(key_type const& key)
   : object(object::connector),
-    _connector_name(key) {
-
-}
+    _connector_name(key) {}
 
 /**
  *  Copy constructor.
@@ -156,13 +154,11 @@ void connector::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool connector::parse(
-       std::string const& key,
-       std::string const& value) {
+bool connector::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

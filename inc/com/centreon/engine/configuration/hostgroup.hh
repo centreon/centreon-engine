@@ -29,8 +29,7 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    hostgroup
-    : public object {
+  class                    hostgroup : public object {
   public:
     typedef std::string    key_type;
 
@@ -47,9 +46,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     action_url() const throw ();
     std::string const&     alias() const throw ();
@@ -66,8 +63,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(hostgroup&, std::string const&);
+      char const*          name;
+      bool                 (*func)(hostgroup&, char const*);
     };
 
     bool                   _set_action_url(std::string const& value);
@@ -87,7 +84,7 @@ namespace                  configuration {
     std::string            _notes_url;
     mutable bool           _resolved;
     mutable set_string     _resolved_members;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<hostgroup>   hostgroup_ptr;

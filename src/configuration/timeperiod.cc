@@ -30,7 +30,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<timeperiod, type, &timeperiod::method>::generic
 
-timeperiod::setters timeperiod::_setters[] = {
+timeperiod::setters const timeperiod::_setters[] = {
   { "alias",           SETTER(std::string const&, _set_alias) },
   { "exclude",         SETTER(std::string const&, _set_exclude) },
   { "timeperiod_name", SETTER(std::string const&, _set_timeperiod_name) }
@@ -188,13 +188,11 @@ void timeperiod::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool timeperiod::parse(
-       std::string const& key,
-       std::string const& value) {
+bool timeperiod::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (_add_week_day(key, value));
 }
@@ -214,8 +212,8 @@ bool timeperiod::parse(std::string const& line) {
   std::string value(line.substr(pos + 1));
   string::trim(value);
 
-  if (object::parse(key, value)
-      || parse(key, string::trim(value))
+  if (object::parse(key.c_str(), value.c_str())
+      || parse(key.c_str(), string::trim(value).c_str())
       || _add_calendar_date(line)
       || _add_other_date(line))
     return (true);
@@ -314,10 +312,10 @@ bool timeperiod::_build_time_t(
   if (pos == std::string::npos)
     return (false);
   unsigned long hours;
-  if (!string::to(time_str.substr(0, pos), hours))
+  if (!string::to(time_str.substr(0, pos).c_str(), hours))
     return (false);
   unsigned long minutes;
-  if (!string::to(time_str.substr(pos + 1), minutes))
+  if (!string::to(time_str.substr(pos + 1).c_str(), minutes))
     return (false);
   ret = hours * 3600 + minutes * 60;
   return (true);

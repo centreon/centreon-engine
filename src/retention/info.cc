@@ -25,7 +25,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<info, type, &info::method>::generic
 
-info::setters info::_setters[] = {
+info::setters const info::_setters[] = {
   { "created",          SETTER(time_t, _set_created) },
   { "version",          SETTER(std::string const&, _set_unused) },
   { "update_available", SETTER(std::string const&, _set_unused) },
@@ -37,11 +37,7 @@ info::setters info::_setters[] = {
 /**
  *  Constructor.
  */
-info::info()
-  : object(object::info),
-    _created(0) {
-
-}
+info::info() : object(object::info), _created(0) {}
 
 /**
  *  Copy constructor.
@@ -56,9 +52,7 @@ info::info(info const& right)
 /**
  *  Destructor.
  */
-info::~info() throw () {
-
-}
+info::~info() throw () {}
 
 /**
  *  Copy operator.
@@ -106,13 +100,11 @@ bool info::operator!=(info const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool info::set(
-       std::string const& key,
-       std::string const& value) {
+bool info::set(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

@@ -46,17 +46,15 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     connector_line() const throw ();
     std::string const&     connector_name() const throw ();
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(connector&, std::string const&);
+      char const*          name;
+      bool                 (*func)(connector&, char const*);
     };
 
     bool                   _set_connector_line(std::string const& value);
@@ -64,7 +62,7 @@ namespace                  configuration {
 
     std::string            _connector_line;
     std::string            _connector_name;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<connector>   connector_ptr;

@@ -29,7 +29,7 @@ using namespace com::centreon::engine;
      type, \
      &retention::comment::method>::generic
 
-retention::comment::setters retention::comment::_setters[] = {
+retention::comment::setters const retention::comment::_setters[] = {
   { "author",              SETTER(std::string const&, _set_author) },
   { "comment_data",        SETTER(std::string const&, _set_comment_data) },
   { "comment_id",          SETTER(unsigned long, _set_comment_id) },
@@ -56,9 +56,7 @@ retention::comment::comment(type_id comment_type)
     _expire_time(0),
     _expires(false),
     _persistent(false),
-    _source(COMMENTSOURCE_INTERNAL) {
-
-}
+    _source(COMMENTSOURCE_INTERNAL) {}
 
 /**
  *  Copy constructor.
@@ -73,9 +71,7 @@ retention::comment::comment(comment const& right)
 /**
  *  Destructor.
  */
-retention::comment::~comment() throw () {
-
-}
+retention::comment::~comment() throw () {}
 
 /**
  *  Copy operator.
@@ -145,13 +141,11 @@ bool retention::comment::operator!=(comment const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool retention::comment::set(
-       std::string const& key,
-       std::string const& value) {
+bool retention::comment::set(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

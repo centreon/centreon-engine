@@ -26,7 +26,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<contact, type, &contact::method>::generic
 
-contact::setters contact::_setters[] = {
+contact::setters const contact::_setters[] = {
   { "contact_name",                  SETTER(std::string const&, _set_contact_name) },
   { "host_notification_period",      SETTER(std::string const&, _set_host_notification_period) },
   { "host_notifications_enabled",    SETTER(bool, _set_host_notifications_enabled) },
@@ -42,10 +42,7 @@ contact::setters contact::_setters[] = {
 /**
  *  Constructor.
  */
-contact::contact()
-  : object(object::contact) {
-
-}
+contact::contact() : object(object::contact) {}
 
 /**
  *  Copy constructor.
@@ -60,9 +57,7 @@ contact::contact(contact const& right)
 /**
  *  Destructor.
  */
-contact::~contact() throw () {
-
-}
+contact::~contact() throw () {}
 
 /**
  *  Copy operator.
@@ -130,18 +125,14 @@ bool contact::operator!=(contact const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool contact::set(
-       std::string const& key,
-       std::string const& value) {
+bool contact::set(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (!key.empty() && key[0] == '_' && value.size() > 3) {
-    char const* cv_name(key.c_str() + 1);
-    char const* cv_value(value.c_str() + 2);
-    _customvariables[cv_name] = cv_value;
+  if ((key[0] == '_') && (strlen(value) > 3)) {
+    _customvariables[key + 1] = value + 2;
     return (true);
   }
   return (false);

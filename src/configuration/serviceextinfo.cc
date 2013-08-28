@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<serviceextinfo, type, &serviceextinfo::method>::generic
 
-serviceextinfo::setters serviceextinfo::_setters[] = {
+serviceextinfo::setters const serviceextinfo::_setters[] = {
   { "host_name",           SETTER(std::string const&, _set_hosts) },
   { "hostgroup",           SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",      SETTER(std::string const&, _set_hostgroups) },
@@ -41,10 +41,7 @@ serviceextinfo::setters serviceextinfo::_setters[] = {
 /**
  *  Default constructor.
  */
-serviceextinfo::serviceextinfo()
-  : object(object::serviceextinfo) {
-
-}
+serviceextinfo::serviceextinfo() : object(object::serviceextinfo) {}
 
 /**
  *  Copy constructor.
@@ -59,9 +56,7 @@ serviceextinfo::serviceextinfo(serviceextinfo const& right)
 /**
  *  Destructor.
  */
-serviceextinfo::~serviceextinfo() throw () {
-
-}
+serviceextinfo::~serviceextinfo() throw () {}
 
 /**
  *  Copy constructor.
@@ -160,13 +155,11 @@ void serviceextinfo::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceextinfo::parse(
-       std::string const& key,
-       std::string const& value) {
+bool serviceextinfo::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

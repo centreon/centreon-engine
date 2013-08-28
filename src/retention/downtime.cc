@@ -29,7 +29,7 @@ using namespace com::centreon::engine;
      type, \
      &retention::downtime::method>::generic
 
-retention::downtime::setters retention::downtime::_setters[] = {
+retention::downtime::setters const retention::downtime::_setters[] = {
   { "author",              SETTER(std::string const&, _set_author) },
   { "comment",             SETTER(std::string const&, _set_comment_data) },
   { "downtime_id",         SETTER(unsigned long, _set_downtime_id) },
@@ -57,9 +57,7 @@ retention::downtime::downtime(type_id downtime_type)
     _entry_time(0),
     _fixed(false),
     _start_time(0),
-    _triggered_by(0) {
-
-}
+    _triggered_by(0) {}
 
 /**
  *  Copy constructor.
@@ -74,9 +72,7 @@ retention::downtime::downtime(downtime const& right)
 /**
  *  Destructor.
  */
-retention::downtime::~downtime() throw () {
-
-}
+retention::downtime::~downtime() throw () {}
 
 /**
  *  Copy operator.
@@ -146,13 +142,11 @@ bool retention::downtime::operator!=(downtime const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool retention::downtime::set(
-       std::string const& key,
-       std::string const& value) {
+bool retention::downtime::set(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

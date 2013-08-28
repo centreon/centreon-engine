@@ -24,9 +24,7 @@ using namespace com::centreon::engine::retention;
 /**
  *  Default constructor.
  */
-state::state() {
-
-}
+state::state() {}
 
 /**
  *  Copy constructor.
@@ -40,9 +38,7 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw () {
-
-}
+state::~state() throw () {}
 
 /**
  *  Copy operator.

@@ -27,7 +27,7 @@ using namespace com::centreon::engine::retention;
 #define SETTER(type, method) \
   &object::setter<host, type, &host::method>::generic
 
-host::setters host::_setters[] = {
+host::setters const host::_setters[] = {
   { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
   { "check_command",                        SETTER(std::string const&, _set_check_command) },
@@ -85,10 +85,7 @@ host::setters host::_setters[] = {
 /**
  *  Constructor.
  */
-host::host()
-  : object(object::host) {
-
-}
+host::host() : object(object::host) {}
 
 /**
  *  Copy constructor.
@@ -103,9 +100,7 @@ host::host(host const& right)
 /**
  *  Destructor.
  */
-host::~host() throw () {
-
-}
+host::~host() throw () {}
 
 /**
  *  Copy operator.
@@ -257,18 +252,14 @@ bool host::operator!=(host const& right) const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool host::set(
-       std::string const& key,
-       std::string const& value) {
-    for (unsigned int i(0);
+bool host::set(char const* key, char const* value) {
+  for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (!key.empty() && key[0] == '_' && value.size() > 3) {
-    char const* cv_name(key.c_str() + 1);
-    char const* cv_value(value.c_str() + 2);
-    _customvariables[cv_name] = cv_value;
+  if ((key[0] == '_') && (strlen(value) > 3)) {
+    _customvariables[key + 1] = value + 2;
     return (true);
   }
   return (false);
@@ -1269,7 +1260,7 @@ bool host::_set_state_history(std::string const& value) {
        it != end && x < MAX_STATE_HISTORY_ENTRIES;
        ++it) {
     int state(0);
-    if (!string::to(*it, state)) {
+    if (!string::to(it->c_str(), state)) {
       _state_history.reset();
       return (false);
     }

@@ -32,9 +32,9 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    host;
-  class                    hostextinfo
-    : public object {
+  class                    hostextinfo : public object {
     friend class host;
+
   public:
                            hostextinfo();
                            hostextinfo(hostextinfo const& right);
@@ -46,9 +46,7 @@ namespace                  configuration {
                              hostextinfo const& right) const throw ();
     void                   check_validity() const;
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     action_url() const throw ();
     point_2d const&        coords_2d() const throw ();
@@ -64,8 +62,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(hostextinfo&, std::string const&);
+      char const*          name;
+      bool                 (*func)(hostextinfo&, char const*);
     };
 
     bool                   _set_action_url(std::string const& value);
@@ -89,7 +87,7 @@ namespace                  configuration {
     std::string            _icon_image_alt;
     std::string            _notes;
     std::string            _notes_url;
-    static setters         _setters[];
+    static setters const   _setters[];
     std::string            _statusmap_image;
     std::string            _vrml_image;
   };

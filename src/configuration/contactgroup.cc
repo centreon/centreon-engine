@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<contactgroup, type, &contactgroup::method>::generic
 
-contactgroup::setters contactgroup::_setters[] = {
+contactgroup::setters const contactgroup::_setters[] = {
   { "contactgroup_name",    SETTER(std::string const&, _set_contactgroup_name) },
   { "alias",                SETTER(std::string const&, _set_alias) },
   { "members",              SETTER(std::string const&, _set_members) },
@@ -172,13 +172,11 @@ void contactgroup::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool contactgroup::parse(
-       std::string const& key,
-       std::string const& value) {
+bool contactgroup::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

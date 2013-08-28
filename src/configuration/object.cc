@@ -42,7 +42,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<object, type, &object::method>::generic
 
-object::setters object::_setters[] = {
+object::setters const object::_setters[] = {
   { "use",      SETTER(std::string const&, _set_templates) },
   { "name",     SETTER(std::string const&, _set_name) },
   { "register", SETTER(bool, _set_is_not_template) }
@@ -68,9 +68,7 @@ object::object(object const& right) {
 /**
  *  Destructor.
  */
-object::~object() throw () {
-
-}
+object::~object() throw () {}
 
 /**
  *  Copy constructor.
@@ -184,11 +182,11 @@ std::string const& object::name() const throw () {
  *
  *  @return True on success, otherwise false.
  */
-bool object::parse(std::string const& key, std::string const& value) {
+bool object::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }
@@ -207,8 +205,8 @@ bool object::parse(std::string const& line) {
   std::string key(line.substr(0, pos));
   std::string value(line.substr(pos + 1));
   string::trim(value);
-  if (!parse(key, value))
-    return (object::parse(key, value));
+  if (!parse(key.c_str(), value.c_str()))
+    return (object::parse(key.c_str(), value.c_str()));
   return (true);
 }
 

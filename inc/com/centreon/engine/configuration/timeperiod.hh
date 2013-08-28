@@ -50,9 +50,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
     bool                   parse(std::string const& line);
 
     std::string const&     alias() const throw ();
@@ -65,8 +63,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(timeperiod&, std::string const&);
+      char const*          name;
+      bool                 (*func)(timeperiod&, char const*);
     };
 
     bool                   _add_calendar_date(std::string const& line);
@@ -94,7 +92,7 @@ namespace                  configuration {
     bool                   _set_timeperiod_name(std::string const& value);
 
     std::string            _alias;
-    static setters         _setters[];
+    static setters const   _setters[];
     std::vector<std::list<daterange> >
                            _exceptions;
     group                  _exclude;

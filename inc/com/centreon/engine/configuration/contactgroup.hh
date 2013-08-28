@@ -46,9 +46,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     alias() const throw ();
     list_string const&     contactgroup_members() const throw ();
@@ -62,8 +60,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(contactgroup&, std::string const&);
+      char const*          name;
+      bool                 (*func)(contactgroup&, char const*);
     };
 
     bool                   _set_alias(std::string const& value);
@@ -77,7 +75,7 @@ namespace                  configuration {
     group                  _members;
     mutable bool           _resolved;
     mutable set_string     _resolved_members;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<contactgroup>   contactgroup_ptr;

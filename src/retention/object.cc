@@ -34,10 +34,7 @@ using namespace com::centreon::engine;
  *
  *  @param[in] type The object type.
  */
-retention::object::object(type_id type)
-  : _type(type) {
-
-}
+retention::object::object(type_id type) : _type(type) {}
 
 /**
  *  Copy constructor.
@@ -51,9 +48,7 @@ retention::object::object(object const& right) {
 /**
  *  Destructor.
  */
-retention::object::~object() throw () {
-
-}
+retention::object::~object() throw () {}
 
 /**
  *  Copy constructor.

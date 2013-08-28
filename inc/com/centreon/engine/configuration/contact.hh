@@ -51,9 +51,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     tab_string const&      address() const throw ();
     std::string const&     alias() const throw ();
@@ -77,8 +75,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(contact&, std::string const&);
+      char const*          name;
+      bool                 (*func)(contact&, char const*);
     };
 
     bool                   _set_address(
@@ -119,7 +117,7 @@ namespace                  configuration {
     opt<unsigned int>      _service_notification_options;
     std::string            _service_notification_period;
     opt<bool>              _service_notifications_enabled;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<contact>   contact_ptr;

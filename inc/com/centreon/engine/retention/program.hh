@@ -29,8 +29,7 @@
 CCE_BEGIN()
 
 namespace                     retention {
-  class                       program
-    : public object {
+  class                       program : public object {
   public:
                               program();
                               program(program const& right);
@@ -38,9 +37,7 @@ namespace                     retention {
     program&                  operator=(program const& right);
     bool                      operator==(program const& right) const throw ();
     bool                      operator!=(program const& right) const throw ();
-    bool                      set(
-                                std::string const& key,
-                                std::string const& value);
+    bool                      set(char const* key, char const* value);
 
     opt<bool> const&          active_host_checks_enabled() const throw ();
     opt<bool> const&          active_service_checks_enabled() const throw ();
@@ -67,8 +64,8 @@ namespace                     retention {
 
   private:
     struct                    setters {
-      std::string const       name;
-      bool                    (*func)(program&, std::string const&);
+      char const*             name;
+      bool                    (*func)(program&, char const*);
     };
 
     bool                      _set_active_host_checks_enabled(bool value);
@@ -116,7 +113,7 @@ namespace                     retention {
     opt<bool>                 _passive_host_checks_enabled;
     opt<bool>                 _passive_service_checks_enabled;
     opt<bool>                 _process_performance_data;
-    static setters            _setters[];
+    static setters const      _setters[];
   };
 
   typedef shared_ptr<program> program_ptr;

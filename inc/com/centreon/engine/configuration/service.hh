@@ -63,9 +63,7 @@ namespace                  configuration {
     key_type               key() const;
     void                   merge(configuration::serviceextinfo const& obj);
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     action_url() const throw ();
     bool                   checks_active() const throw ();
@@ -123,8 +121,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(service&, std::string const&);
+      char const*          name;
+      bool                 (*func)(service&, char const*);
     };
 
     bool                   _set_action_url(std::string const& value);
@@ -210,7 +208,7 @@ namespace                  configuration {
     opt<unsigned int>      _retry_interval;
     group                  _servicegroups;
     std::string            _service_description;
-    static setters         _setters[];
+    static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
  };
 

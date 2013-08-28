@@ -84,39 +84,44 @@ namespace                 string {
   }
 
   bool                    split(
+                            std::string& line,
+                            char const** key,
+                            char const** value,
+                            char delim);
+  bool                    split(
                             std::string const& line,
                             std::string& key,
                             std::string& value,
                             char delim);
-  std::list<std::string>& split(
+  void                    split(
                             std::string const& data,
                             std::list<std::string>& out,
                             char delim);
 
   template<typename T>
-  inline bool             to(std::string const& str, T& data) {
+  inline bool             to(char const* str, T& data) {
     std::istringstream iss(str);
     return ((iss >> data) && iss.eof());
   }
 
   template<>
-  inline bool             to(std::string const& str, long& data) {
+  inline bool             to(char const* str, long& data) {
     char* end(NULL);
     errno = 0;
-    data = strtol(str.c_str(), &end, 10);
+    data = strtol(str, &end, 10);
     return (!*end && !errno);
   }
 
   template<>
-  inline bool             to(std::string const& str, unsigned long& data) {
+  inline bool             to(char const* str, unsigned long& data) {
     char* end(NULL);
     errno = 0;
-    data = strtoul(str.c_str(), &end, 10);
+    data = strtoul(str, &end, 10);
     return (!*end && !errno);
   }
 
   template<>
-  inline bool             to(std::string const& str, bool& data) {
+  inline bool             to(char const* str, bool& data) {
     unsigned long tmp;
     if (!to(str, tmp))
       return (false);
@@ -125,23 +130,23 @@ namespace                 string {
   }
 
   template<>
-  inline bool             to(std::string const& str, double& data) {
+  inline bool             to(char const* str, double& data) {
     char* end(NULL);
     errno = 0;
-    data = strtod(str.c_str(), &end);
+    data = strtod(str, &end);
     return (!*end && !errno);
   }
 
   template<>
-  inline bool             to(std::string const& str, float& data) {
+  inline bool             to(char const* str, float& data) {
     char* end(NULL);
     errno = 0;
-    data = strtof(str.c_str(), &end);
+    data = strtof(str, &end);
     return (!*end && !errno);
   }
 
   template<>
-  inline bool             to(std::string const& str, int& data) {
+  inline bool             to(char const* str, int& data) {
     long tmp;
     if (!to(str, tmp)
         || tmp > std::numeric_limits<int>::max()
@@ -152,23 +157,23 @@ namespace                 string {
   }
 
   template<>
-  inline bool             to(std::string const& str, long double& data) {
+  inline bool             to(char const* str, long double& data) {
     char* end(NULL);
     errno = 0;
-    data = strtold(str.c_str(), &end);
+    data = strtold(str, &end);
     return (!*end && !errno);
   }
 
   template<>
-  inline bool             to(std::string const& str, long long& data) {
+  inline bool             to(char const* str, long long& data) {
     char* end(NULL);
     errno = 0;
-    data = strtoll(str.c_str(), &end, 10);
+    data = strtoll(str, &end, 10);
     return (!*end && !errno);
   }
 
   template<>
-  inline bool             to(std::string const& str, unsigned int& data) {
+  inline bool             to(char const* str, unsigned int& data) {
     unsigned long tmp;
     if (!to(str, tmp) || tmp > std::numeric_limits<unsigned int>::max())
       return (false);
@@ -177,15 +182,15 @@ namespace                 string {
   }
 
   template<>
-  inline bool             to(std::string const& str, unsigned long long& data) {
+  inline bool             to(char const* str, unsigned long long& data) {
     char* end(NULL);
     errno = 0;
-    data = strtoull(str.c_str(), &end, 10);
+    data = strtoull(str, &end, 10);
     return (!*end && !errno);
   }
 
   template<typename T, typename U>
-  inline bool             to(std::string const& str, U& data) {
+  inline bool             to(char const* str, U& data) {
     T tmp;
     if (!to(str, tmp))
       return (false);

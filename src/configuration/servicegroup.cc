@@ -26,7 +26,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<servicegroup, type, &servicegroup::method>::generic
 
-servicegroup::setters servicegroup::_setters[] = {
+servicegroup::setters const servicegroup::_setters[] = {
   { "servicegroup_name",    SETTER(std::string const&, _set_servicegroup_name) },
   { "alias",                SETTER(std::string const&, _set_alias) },
   { "members",              SETTER(std::string const&, _set_members) },
@@ -189,13 +189,11 @@ void servicegroup::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool servicegroup::parse(
-       std::string const& key,
-       std::string const& value) {
+bool servicegroup::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

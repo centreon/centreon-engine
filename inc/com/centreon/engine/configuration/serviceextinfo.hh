@@ -31,9 +31,9 @@ CCE_BEGIN()
 namespace                  configuration {
   class                    service;
 
-  class                    serviceextinfo
-    : public object {
+  class                    serviceextinfo : public object {
     friend class service;
+
   public:
                            serviceextinfo();
                            serviceextinfo(serviceextinfo const& right);
@@ -45,9 +45,7 @@ namespace                  configuration {
                              serviceextinfo const& right) const throw ();
     void                   check_validity() const;
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     action_url() const throw ();
     std::string const&     icon_image() const throw ();
@@ -60,8 +58,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(serviceextinfo&, std::string const&);
+      char const*          name;
+      bool                 (*func)(serviceextinfo&, char const*);
     };
 
     bool                   _set_action_url(std::string const& value);
@@ -81,7 +79,7 @@ namespace                  configuration {
     std::string            _notes;
     std::string            _notes_url;
     std::string            _service_description;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<serviceextinfo>    serviceextinfo_ptr;

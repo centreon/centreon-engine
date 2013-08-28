@@ -32,8 +32,7 @@
 CCE_BEGIN()
 
 namespace                     retention {
-  class                       contact
-    : public object {
+  class                       contact : public object {
   public:
                               contact();
                               contact(contact const& right);
@@ -41,9 +40,7 @@ namespace                     retention {
     contact&                  operator=(contact const& right);
     bool                      operator==(contact const& right) const throw ();
     bool                      operator!=(contact const& right) const throw ();
-    bool                      set(
-                                std::string const& key,
-                                std::string const& value);
+    bool                      set(char const* key, char const* value);
 
     std::string const&        contact_name() const throw ();
     map_customvar const&      customvariables() const throw ();
@@ -59,8 +56,8 @@ namespace                     retention {
 
   private:
     struct                    setters {
-      std::string const       name;
-      bool                    (*func)(contact&, std::string const&);
+      char const*             name;
+      bool                    (*func)(contact&, char const*);
     };
 
     bool                      _set_contact_name(std::string const& value);
@@ -85,7 +82,7 @@ namespace                     retention {
     opt<unsigned long>        _modified_service_attributes;
     opt<std::string>          _service_notification_period;
     opt<bool>                 _service_notifications_enabled;
-    static setters            _setters[];
+    static setters const      _setters[];
   };
 
   typedef shared_ptr<contact>    contact_ptr;

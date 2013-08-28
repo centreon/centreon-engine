@@ -27,7 +27,7 @@ using namespace com::centreon::engine::configuration;
 #define SETTER(type, method) \
   &object::setter<serviceescalation, type, &serviceescalation::method>::generic
 
-serviceescalation::setters serviceescalation::_setters[] = {
+serviceescalation::setters const serviceescalation::_setters[] = {
   { "host",                  SETTER(std::string const&, _set_hosts) },
   { "host_name",             SETTER(std::string const&, _set_hosts) },
   { "description",           SETTER(std::string const&, _set_service_description) },
@@ -61,9 +61,7 @@ serviceescalation::serviceescalation()
     _escalation_options(default_escalation_options),
     _first_notification(default_first_notification),
     _last_notification(default_last_notification),
-    _notification_interval(default_notification_interval) {
-
-}
+    _notification_interval(default_notification_interval) {}
 
 /**
  *  Copy constructor.
@@ -231,13 +229,11 @@ void serviceescalation::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool serviceescalation::parse(
-       std::string const& key,
-       std::string const& value) {
+bool serviceescalation::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
 }

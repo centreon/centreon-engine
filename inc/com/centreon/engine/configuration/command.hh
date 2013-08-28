@@ -45,9 +45,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     command_line() const throw ();
     std::string const&     command_name() const throw ();
@@ -55,8 +53,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(command&, std::string const&);
+      char const*          name;
+      bool                 (*func)(command&, char const*);
     };
     bool                   _set_command_line(std::string const& value);
     bool                   _set_command_name(std::string const& value);
@@ -65,7 +63,7 @@ namespace                  configuration {
     std::string            _command_line;
     std::string            _command_name;
     std::string            _connector;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<command>   command_ptr;

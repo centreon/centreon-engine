@@ -36,8 +36,7 @@ CCE_BEGIN()
 namespace                  configuration {
   class                    hostextinfo;
 
-  class                    host
-    : public object {
+  class                    host : public object {
   public:
     enum                   action_on {
       none = 0,
@@ -60,9 +59,7 @@ namespace                  configuration {
     key_type const&        key() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     std::string const&     action_url() const throw ();
     std::string const&     address() const throw ();
@@ -115,8 +112,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(host&, std::string const&);
+      char const*          name;
+      bool                 (*func)(host&, char const*);
     };
 
     bool                   _set_action_url(std::string const& value);
@@ -206,7 +203,7 @@ namespace                  configuration {
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
-    static setters         _setters[];
+    static setters const   _setters[];
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;
     std::string            _vrml_image;

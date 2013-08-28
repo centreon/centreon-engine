@@ -32,8 +32,7 @@
 CCE_BEGIN()
 
 namespace                         retention {
-  class                           host
-    : public object {
+  class                           host : public object {
   public:
                                   host();
                                   host(host const& right);
@@ -41,9 +40,7 @@ namespace                         retention {
     host&                         operator=(host const& right);
     bool                          operator==(host const& right) const throw ();
     bool                          operator!=(host const& right) const throw ();
-    bool                          set(
-                                    std::string const& key,
-                                    std::string const& value);
+    bool                          set(char const* key, char const* value);
 
     opt<int> const&               acknowledgement_type() const throw ();
     opt<bool> const&              active_checks_enabled() const throw ();
@@ -101,8 +98,8 @@ namespace                         retention {
 
   private:
     struct                        setters {
-      std::string const           name;
-      bool                        (*func)(host&, std::string const&);
+      char const*                 name;
+      bool                        (*func)(host&, char const*);
     };
 
     bool                          _set_acknowledgement_type(int value);
@@ -209,7 +206,7 @@ namespace                         retention {
     opt<bool>                     _problem_has_been_acknowledged;
     opt<int>                      _process_performance_data;
     opt<unsigned int>             _retry_check_interval;
-    static setters                _setters[];
+    static setters const          _setters[];
     opt<std::vector<int> >        _state_history;
     opt<int>                      _state_type;
   };

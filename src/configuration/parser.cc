@@ -403,9 +403,9 @@ void parser::_parse_global_configuration(std::string const& path) {
 
   std::string input;
   while (string::get_next_line(stream, input, _current_line)) {
-    std::string key;
-    std::string value;
-    if (!string::split(input, key, value, '=')
+    char const* key;
+    char const* value;
+    if (!string::split(input, &key, &value, '=')
         || !_config->set(key, value))
       throw (engine_error() << "configuration: parse global "
              "configuration failed in file '" << path << "' on line "

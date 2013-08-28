@@ -29,8 +29,7 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    hostdependency
-    : public object {
+  class                    hostdependency : public object {
   public:
     enum                   action_on {
       none = 0,
@@ -58,9 +57,7 @@ namespace                  configuration {
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
-    bool                   parse(
-                             std::string const& key,
-                             std::string const& value);
+    bool                   parse(char const* key, char const* value);
 
     void                   dependency_period(std::string const& period);
     std::string const&     dependency_period() const throw ();
@@ -86,8 +83,8 @@ namespace                  configuration {
 
   private:
     struct                 setters {
-      std::string const    name;
-      bool                 (*func)(hostdependency&, std::string const&);
+      char const*          name;
+      bool                 (*func)(hostdependency&, char const*);
     };
 
     bool                   _set_dependency_period(std::string const& value);
@@ -108,7 +105,7 @@ namespace                  configuration {
     group                  _hosts;
     opt<bool>              _inherits_parent;
     opt<unsigned int>      _notification_failure_options;
-    static setters         _setters[];
+    static setters const   _setters[];
   };
 
   typedef shared_ptr<hostdependency>    hostdependency_ptr;

@@ -31,7 +31,7 @@ using namespace com::centreon::engine::logging;
 #define SETTER(type, method) \
   &object::setter<host, type, &host::method>::generic
 
-host::setters host::_setters[] = {
+host::setters const host::_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_host_name) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "alias",                        SETTER(std::string const&, _set_alias) },
@@ -140,9 +140,7 @@ host::host(key_type const& key)
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {
-
-}
+    _stalking_options(default_stalking_options) {}
 
 /**
  *  Copy constructor.
@@ -490,16 +488,14 @@ void host::merge(object const& obj) {
  *
  *  @return True on success, otherwise false.
  */
-bool host::parse(
-       std::string const& key,
-       std::string const& value) {
+bool host::parse(char const* key, char const* value) {
   for (unsigned int i(0);
        i < sizeof(_setters) / sizeof(_setters[0]);
        ++i)
-    if (_setters[i].name == key)
+    if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (!key.empty() && key[0] == '_') {
-    _customvariables[key.substr(1)] = value;
+  if (key[0] == '_') {
+    _customvariables[key + 1] = value;
     return (true);
   }
   return (false);
@@ -1083,12 +1079,12 @@ bool host::_set_coords_2d(std::string const& value) {
     return (false);
 
   int x;
-  if (!string::to(string::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()).c_str(), x))
     return (false);
   coords.pop_front();
 
   int y;
-  if (!string::to(string::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()).c_str(), y))
     return (false);
 
   _coords_2d = point_2d(x, y);
@@ -1109,17 +1105,17 @@ bool host::_set_coords_3d(std::string const& value) {
     return (false);
 
   double x;
-  if (!string::to(string::trim(coords.front()), x))
+  if (!string::to(string::trim(coords.front()).c_str(), x))
     return (false);
   coords.pop_front();
 
   double y;
-  if (!string::to(string::trim(coords.front()), y))
+  if (!string::to(string::trim(coords.front()).c_str(), y))
     return (false);
   coords.pop_front();
 
   double z;
-  if (!string::to(string::trim(coords.front()), z))
+  if (!string::to(string::trim(coords.front()).c_str(), z))
     return (false);
 
   _coords_3d = point_3d(x, y, z);
