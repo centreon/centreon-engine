@@ -48,12 +48,12 @@ fi
 
 # Check arguments (only one parameter)
 if [ $# -ne 1 ]; then
-    if [ $# -lt 1 -o $command = "" ]; then
+    if [ $# -lt 1 -o "$command" = "" ]; then
 	log_failure_msg "$servicename: action not specified"
     else
 	log_failure_msg "$servicename: too many parameters"
     fi
-    log_warning_msg $usage
+    log_warning_msg "$usage"
     exit 2
 fi
 
