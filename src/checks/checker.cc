@@ -251,7 +251,8 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    return;
+    throw (engine_error() << "check of host '" << hst->name
+           << "' is not viable");
 
   // Don't execute a new host check if one is already running.
   if (hst->is_executing
@@ -259,7 +260,7 @@ void checker::run(
     logger(dbg_checks, basic)
       << "A check of this host (" << hst->name
       << ") is already being executed, so we'll pass for the moment...";
-    return;
+    return ;
   }
 
   // Send broker event.
@@ -484,7 +485,8 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    return;
+    throw (engine_error() << "check of service '" << svc->description
+           << "' on host '" << svc->host_name << "' is not viable");
 
   // Send broker event.
   timeval start_time;
