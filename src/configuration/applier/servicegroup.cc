@@ -183,6 +183,18 @@ void applier::servicegroup::modify_object(
   // Were members modified ?
   if (obj->resolved_members() != old_cfg->resolved_members()) {
     // Delete all old service group members.
+    for (servicesmember* m((*it_obj).second->members);
+         m;
+         m = m->next) {
+      timeval tv(get_broker_timestamp(NULL));
+      broker_group_member(
+        NEBTYPE_SERVICEGROUPMEMBER_DELETE,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        m,
+        sg,
+        &tv);
+    }
     deleter::listmember(
       (*it_obj).second->members,
       &deleter::servicesmember);
