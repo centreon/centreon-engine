@@ -38,16 +38,12 @@ parser::store parser::_store[] = {
 /**
  *  Default constructor.
  */
-parser::parser() {
-
-}
+parser::parser() {}
 
 /**
  *  Destructor.
  */
-parser::~parser() throw () {
-
-}
+parser::~parser() throw () {}
 
 /**
  *  Parse configuration file.
@@ -57,8 +53,8 @@ parser::~parser() throw () {
 void parser::parse(std::string const& path, state& retention) {
   std::ifstream stream(path.c_str());
   if (!stream.is_open())
-    throw (engine_error() << "retention: parse retention "
-           "failed: can't open file '" << path << "'");
+    throw (engine_error() << "Parsing of retention file failed: "
+           "Can't open file '" << path << "'");
 
   shared_ptr<object> obj;
   std::string input;

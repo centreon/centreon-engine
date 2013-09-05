@@ -73,15 +73,15 @@ void applier::hostdependency::add_object(
       || !obj->hostgroups().empty()
       || (obj->dependent_hosts().size() != 1)
       || !obj->dependent_hostgroups().empty())
-    throw (engine_error() << "Error: Could not create host dependency "
-           "with multiple (dependent) host / host groups.");
+    throw (engine_error() << "Could not create host dependency "
+           "with multiple (dependent) host / host groups");
   if ((obj->dependency_type()
        != configuration::hostdependency::execution_dependency)
       && (obj->dependency_type()
           != configuration::hostdependency::notification_dependency))
-    throw (engine_error() << "Error: Could not create unexpanded "
+    throw (engine_error() << "Could not create unexpanded "
            << "host dependency of '" << obj->dependent_hosts().front()
-           << "' on '" << obj->hosts().front() << "'.");
+           << "' on '" << obj->hosts().front() << "'");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -113,9 +113,9 @@ void applier::hostdependency::add_object(
              obj->execution_failure_options()
              & configuration::hostdependency::pending),
            NULL_IF_EMPTY(obj->dependency_period())))
-      throw (engine_error() << "Error: Could not create host execution "
+      throw (engine_error() << "Could not create host execution "
              << "dependency of '" << obj->dependent_hosts().front()
-             << "' on '" << obj->hosts().front() << "'.");
+             << "' on '" << obj->hosts().front() << "'");
   }
   // Create notification dependency.
   else
@@ -137,10 +137,10 @@ void applier::hostdependency::add_object(
              obj->notification_failure_options()
              & configuration::hostdependency::pending),
            NULL_IF_EMPTY(obj->dependency_period())))
-      throw (engine_error() << "Error: Could not create host "
+      throw (engine_error() << "Could not create host "
              << "notification dependency of '"
              << obj->dependent_hosts().front() << "' on '"
-             << obj->hosts().front() << "'.");
+             << obj->hosts().front() << "'");
 
   return ;
 }
@@ -230,8 +230,8 @@ void applier::hostdependency::expand_object(
 void applier::hostdependency::modify_object(
                                 shared_ptr<configuration::hostdependency> obj) {
   (void)obj;
-  throw (engine_error() << "Error: Could not modify a host dependency: "
-         << "host dependency objects can only be added or removed, "
+  throw (engine_error() << "Could not modify a host dependency: "
+         << "Host dependency objects can only be added or removed, "
          << "this is likely a software bug that you should report to "
          << "Centreon Engine developers");
   return ;
@@ -294,12 +294,12 @@ void applier::hostdependency::resolve_object(
   umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
     it(applier::state::instance().hostdependencies_find(obj->key()));
   if (applier::state::instance().hostdependencies().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing "
-           << "host dependency.");
+    throw (engine_error() << "Cannot resolve non-existing "
+           << "host dependency");
 
   // Resolve host dependency.
   if (!check_hostdependency(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve host dependency.");
+    throw (engine_error() << "Cannot resolve host dependency");
 
   return ;
 }
@@ -342,8 +342,8 @@ void applier::hostdependency::_expand_hosts(
     }
     if (it_group == end_group)
       throw (engine_error()
-             << "Error: Could not expand non-existing host group '"
-             << *it << "'.");
+             << "Could not expand non-existing host group '"
+             << *it << "'");
 
     // Add host group members.
     for (std::set<std::string>::const_iterator

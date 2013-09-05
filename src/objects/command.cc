@@ -148,7 +148,7 @@ command& engine::find_command(std::string const& name) {
   umap<std::string, shared_ptr<command_struct> >::const_iterator
     it(state::instance().commands().find(name));
   if (it == state::instance().commands().end())
-    throw (engine_error() << "command " << name << " not found");
+    throw (engine_error() << "Command '" << name << "' was not found");
   return (*it->second);
 }
 

@@ -447,18 +447,18 @@ service* add_service(
   // Make sure we have everything we need.
   if (!description || !description[0]) {
     logger(log_config_error, basic)
-      << "error: service description is not set";
+      << "Error: Service description is not set";
     return (NULL);
   }
   else if (!host_name || !host_name[0]) {
     logger(log_config_error, basic)
-      << "error: host name of service '"
+      << "Error: Host name of service '"
       << description << "' is not set";
     return (NULL);
   }
   else if (!check_command || !check_command[0]) {
     logger(log_config_error, basic)
-      << "error: check command of service '" << description
+      << "Error: Check command of service '" << description
       << "' on host '" << host_name << "' is not set";
     return (NULL);
   }
@@ -694,8 +694,8 @@ service& engine::find_service(
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
     it(state::instance().services().find(id));
   if (it == state::instance().services().end())
-    throw (engine_error() << "service " << host_name
-           << ", " << service_description << " not found");
+    throw (engine_error() << "Service '" << service_description
+           << "' on host '" << host_name << "' was not found");
   return (*it->second);
 }
 

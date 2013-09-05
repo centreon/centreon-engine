@@ -73,15 +73,15 @@ void applier::serviceescalation::add_object(
       || !obj->hostgroups().empty()
       || (obj->service_description().size() != 1)
       || !obj->servicegroups().empty())
-    throw (engine_error() << "Error: Could not create service "
+    throw (engine_error() << "Could not create service "
            << "escalation with multiple hosts / host groups / services "
-           << "/ service groups.");
+           << "/ service groups");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new escalation for service '"
     << obj->service_description().front() << "' of host '"
-    << obj->hosts().front() << "'.";
+    << obj->hosts().front() << "'";
 
   // Add escalation to the global configuration set.
   config->serviceescalations().insert(obj);
@@ -108,9 +108,9 @@ void applier::serviceescalation::add_object(
            obj->escalation_options()
            & configuration::serviceescalation::recovery)));
   if (!se)
-    throw (engine_error() << "Error: Could not create escalation on "
+    throw (engine_error() << "Could not create escalation on "
            << "service '" << obj->service_description().front()
-           << "' of host '" << obj->hosts().front() << "'.");
+           << "' of host '" << obj->hosts().front() << "'");
 
   // Unique contacts.
   std::set<std::string> contacts;
@@ -128,10 +128,10 @@ void applier::serviceescalation::add_object(
        it != end;
        ++it)
     if (!add_contact_to_serviceescalation(se, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact '"
-             << *it << "' to escalation of service '"
+      throw (engine_error() << "Could not add contact '" << *it
+             << "' to escalation of service '"
              << obj->service_description().front() << "' of host '"
-             << obj->hosts().front() << "'.");
+             << obj->hosts().front() << "'");
 
   // Unique contact groups.
   std::set<std::string> contact_groups;
@@ -149,10 +149,10 @@ void applier::serviceescalation::add_object(
        it != end;
        ++it)
     if (!add_contactgroup_to_serviceescalation(se, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact group '"
+      throw (engine_error() << "Could not add contact group '"
              << *it << "' to escalation of service '"
              << obj->service_description().front() << "' of host '"
-             << obj->hosts().front() << "'.");
+             << obj->hosts().front() << "'");
 
   return ;
 }
@@ -222,7 +222,7 @@ void applier::serviceescalation::expand_object(
 void applier::serviceescalation::modify_object(
                                    shared_ptr<configuration::serviceescalation> obj) {
   (void)obj;
-  throw (engine_error() << "Error: Could not modify a service "
+  throw (engine_error() << "Could not modify a service "
          << "escalation: service escalation objects can only be added "
          << "or removed, this is likely a software bug that you should "
          << "report to Centreon Engine developers");
@@ -285,13 +285,11 @@ void applier::serviceescalation::resolve_object(
   umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator
     it(applier::state::instance().serviceescalations_find(obj->key()));
   if (applier::state::instance().serviceescalations().end() == it)
-    throw (engine_error()
-           << "Error: Cannot resolve service escalation.");
+    throw (engine_error() << "Cannot resolve service escalation");
 
   // Check service escalation.
   if (!check_serviceescalation(it->second.get(), NULL, NULL))
-    throw (engine_error()
-           << "Error: Cannot resolve service escalation.");
+    throw (engine_error() << "Cannot resolve service escalation");
 
   return ;
 }
@@ -340,8 +338,8 @@ void applier::serviceescalation::_expand_services(
       ++it_group;
     }
     if (it_group == end_group)
-      throw (engine_error() << "Error: Could not resolve host group '"
-             << *it << "'.");
+      throw (engine_error() << "Could not resolve host group '"
+             << *it << "'");
 
     // Add host group members.
     for (std::set<std::string>::const_iterator
@@ -381,9 +379,8 @@ void applier::serviceescalation::_expand_services(
       ++it_group;
     }
     if (it_group == end_group)
-      throw (engine_error()
-             << "Error: Could not resolve service group '"
-             << *it << "'.");
+      throw (engine_error() << "Could not resolve service group '"
+             << *it << "'");
 
     // Add service group members.
     for (std::set<std::pair<std::string, std::string> >::const_iterator
@@ -427,10 +424,10 @@ void applier::serviceescalation::_inherits_special_vars(
       ++it;
     }
     if (it == end)
-      throw (engine_error() << "Error: Could not inherit special "
+      throw (engine_error() << "Could not inherit special "
              << "variables from service '"
              << obj->service_description().front() << "' of host '"
-             << obj->hosts().front() << "': service does not exist.");
+             << obj->hosts().front() << "': service does not exist");
 
     // Inherits variables.
     if (!obj->contacts_defined())

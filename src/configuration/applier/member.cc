@@ -47,9 +47,9 @@ void applier::add_member(
     it(contacts.find(name));
   if (it == contacts.end()) {
     logger(log_config_error, basic)
-      << "configuration: add contact into contactsmember failed: "
-      "contact name '" << name << "' not found";
-    return;
+      << "Error: Cannot add contact member: contact '"
+      << name << "' not found";
+    return ;
   }
 
   // Create and fill the new member.
@@ -77,8 +77,8 @@ void applier::add_member(
     it(commands.find(name));
   if (it == commands.end()) {
     logger(log_config_error, basic)
-      << "configuration: add command into commandsmember failed: "
-         "command '" << name << "' not found";
+      << "Error: Cannot add command member: command '"
+      << name << "' not found";
     return ;
   }
 

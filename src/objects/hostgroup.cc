@@ -193,7 +193,8 @@ hostgroup& engine::find_hostgroup(std::string const& name) {
   umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
     it(state::instance().hostgroups().find(name));
   if (it == state::instance().hostgroups().end())
-    throw (engine_error() << "hostgroup " << name << " not found");
+    throw (engine_error() << "Host group '"
+           << name << "' was not found");
   return (*it->second);
 }
 

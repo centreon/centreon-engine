@@ -180,7 +180,8 @@ contactgroup& engine::find_contactgroup(std::string const& name) {
   umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
     it(state::instance().contactgroups().find(name));
   if (it == state::instance().contactgroups().end())
-    throw (engine_error() << "contactgroup " << name << " not found");
+    throw (engine_error() << "Contact group '"
+           << name << "' was not found");
   return (*it->second);
 }
 

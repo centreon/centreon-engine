@@ -70,8 +70,8 @@ void applier::hostescalation::add_object(
                                 shared_ptr<configuration::hostescalation> obj) {
   // Check host escalation.
   if ((obj->hosts().size() != 1) || !obj->hostgroups().empty())
-    throw (engine_error() << "Error: Could not create host escalation "
-           << "with multiple hosts / host groups.");
+    throw (engine_error() << "Could not create host escalation "
+           << "with multiple hosts / host groups");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -99,8 +99,8 @@ void applier::hostescalation::add_object(
            obj->escalation_options()
            & configuration::hostescalation::recovery)));
   if (!he)
-    throw (engine_error() << "Error: Could not create escalation "
-           << "on host '" << obj->hosts().front() << "'.");
+    throw (engine_error() << "Could not create escalation "
+           << "on host '" << obj->hosts().front() << "'");
 
   // Unique contacts.
   std::set<std::string> contacts;
@@ -118,9 +118,9 @@ void applier::hostescalation::add_object(
        it != end;
        ++it)
     if (!add_contact_to_host_escalation(he, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact '"
-             << *it << "' on escalation of host '"
-             << obj->hosts().front() << "'.");
+      throw (engine_error() << "Could not add contact '" << *it
+             << "' on escalation of host '"
+             << obj->hosts().front() << "'");
 
   // Unique contact groups.
   std::set<std::string> contact_groups;
@@ -138,9 +138,9 @@ void applier::hostescalation::add_object(
        it != end;
        ++it)
     if (!add_contactgroup_to_host_escalation(he, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact group '"
+      throw (engine_error() << "Could not add contact group '"
              << *it << "' on escalation of host '"
-             << obj->hosts().front() << "'.");
+             << obj->hosts().front() << "'");
 
   return ;
 }
@@ -202,7 +202,7 @@ void applier::hostescalation::expand_object(
 void applier::hostescalation::modify_object(
                                 shared_ptr<configuration::hostescalation> obj) {
   (void)obj;
-  throw (engine_error() << "Error: Could not modify a host escalation: "
+  throw (engine_error() << "Could not modify a host escalation: "
          << "host escalation objects can only be added or removed, "
          << "this is likely a software bug that you should report to "
          << "Centreon Engine developers");
@@ -266,12 +266,12 @@ void applier::hostescalation::resolve_object(
   umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator
     it(applier::state::instance().hostescalations_find(obj->key()));
   if (applier::state::instance().hostescalations().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing "
-           << "host escalation.");
+    throw (engine_error() << "Cannot resolve non-existing "
+           << "host escalation");
 
   // Resolve host escalation.
   if (!check_hostescalation(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve host escalation.");
+    throw (engine_error() << "Cannot resolve host escalation");
 
   return ;
 }
@@ -314,8 +314,8 @@ void applier::hostescalation::_expand_hosts(
     }
     if (it_group == end_group)
       throw (engine_error()
-             << "Error: Could not expand non-existing host group '"
-             << *it << "'.");
+             << "Could not expand non-existing host group '"
+             << *it << "'");
 
     // Add host group members.
     for (std::set<std::string>::const_iterator
@@ -358,8 +358,8 @@ void applier::hostescalation::_inherits_special_vars(
     }
     if (it == end)
       throw (engine_error()
-             << "Error: Could not inherit special variables from host '"
-             << obj->hosts().front() << "': host does not exist.");
+             << "Could not inherit special variables from host '"
+             << obj->hosts().front() << "': host does not exist");
 
     // Inherits variables.
     if (!obj->contacts_defined())

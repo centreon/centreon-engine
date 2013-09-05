@@ -128,15 +128,15 @@ void applier::connector::modify_object(
   // Find old configuration.
   set_connector::iterator it_cfg(config->connectors_find(obj->key()));
   if (it_cfg == config->connectors().end())
-    throw (engine_error() << "Error: Cannot modify non-existing "
-           << "connector '" << obj->connector_name() << "'.");
+    throw (engine_error() << "Cannot modify non-existing connector '"
+           << obj->connector_name() << "'");
 
   // Find connector object.
   umap<std::string, shared_ptr<commands::connector> >::iterator
     it_obj(applier::state::instance().connectors_find(obj->key()));
   if (it_obj == applier::state::instance().connectors().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "connector object '" << obj->connector_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "connector object '" << obj->connector_name() << "'");
   commands::connector* c(it_obj->second.get());
 
   // Update the global configuration set.

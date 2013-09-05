@@ -151,8 +151,8 @@ void applier::contact::add_object(
         obj->retain_status_information(),
         obj->retain_nonstatus_information()));
   if (!c)
-    throw (engine_error() << "Error: Could not register contact '"
-           << obj->contact_name() << "'.");
+    throw (engine_error() << "Could not register contact '"
+           << obj->contact_name() << "'");
 
   // Add all the host notification commands.
   for (list_string::const_iterator
@@ -164,8 +164,8 @@ void applier::contact::add_object(
            c,
            it->c_str()))
       throw (engine_error()
-             << "Error: Could not add host notification command '"
-             << *it << "' to contact '" << obj->contact_name() << "'.");
+             << "Could not add host notification command '"
+             << *it << "' to contact '" << obj->contact_name() << "'");
 
   // Add all the service notification commands.
   for (list_string::const_iterator
@@ -177,8 +177,8 @@ void applier::contact::add_object(
            c,
 	   it->c_str()))
       throw (engine_error()
-	     << "Error: Could not add service notification command '"
-	     << *it << "' to contact '" << obj->contact_name() << "'.");
+	     << "Could not add service notification command '"
+	     << *it << "' to contact '" << obj->contact_name() << "'");
 
   // Add all custom variables.
   for (map_customvar::const_iterator
@@ -191,8 +191,8 @@ void applier::contact::add_object(
 	   it->first.c_str(),
 	   it->second.c_str()))
       throw (engine_error()
-	     << "Error: Could not add custom variable '" << it->first
-	     << "' to contact '" << obj->contact_name() << "'.");
+	     << "Could not add custom variable '" << it->first
+	     << "' to contact '" << obj->contact_name() << "'");
 
   return ;
 }
@@ -222,9 +222,9 @@ void applier::contact::expand_object(
                       s.contactgroups().end(),
                       contactgroup_name_comparator(*it)));
     if (it_group == s.contactgroups().end())
-      throw (engine_error() << "Error: Could not add contact '"
+      throw (engine_error() << "Could not add contact '"
              << obj->contact_name()
-             << "' to non-existing contact group '" << *it << "'.");
+             << "' to non-existing contact group '" << *it << "'");
 
     // Remove contact group from state.
     shared_ptr<configuration::contactgroup> backup(*it_group);
@@ -257,15 +257,15 @@ void applier::contact::modify_object(
   // Find old configuration.
   set_contact::iterator it_cfg(config->contacts_find(obj->key()));
   if (it_cfg == config->contacts().end())
-    throw (engine_error() << "Error: Cannot modify non-existing "
-           << "contact '" << obj->contact_name() << "'.");
+    throw (engine_error() << "Cannot modify non-existing contact '"
+           << obj->contact_name() << "'");
 
   // Find contact object.
   umap<std::string, shared_ptr<contact_struct> >::iterator
     it_obj(applier::state::instance().contacts_find(obj->key()));
   if (it_obj == applier::state::instance().contacts().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "contact object '" << obj->contact_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "contact object '" << obj->contact_name() << "'");
   contact_struct* c(it_obj->second.get());
 
   // Update the global configuration set.
@@ -365,9 +365,9 @@ void applier::contact::modify_object(
              c,
              it->c_str()))
         throw (engine_error()
-               << "Error: Could not add host notification command '"
+               << "Could not add host notification command '"
                << *it << "' to contact '" << obj->contact_name()
-               << "'.");
+               << "'");
   }
 
   // Service notification commands.
@@ -386,9 +386,9 @@ void applier::contact::modify_object(
              c,
              it->c_str()))
         throw (engine_error()
-               << "Error: Could not add service notification command '"
+               << "Could not add service notification command '"
                << *it << "' to contact '" << obj->contact_name()
-               << "'.");
+               << "'");
   }
 
   // Custom variables.
@@ -407,8 +407,8 @@ void applier::contact::modify_object(
              it->first.c_str(),
              it->second.c_str()))
         throw (engine_error()
-               << "Error: Could not add custom variable '" << it->first
-               << "' to contact '" << obj->contact_name() << "'.");
+               << "Could not add custom variable '" << it->first
+               << "' to contact '" << obj->contact_name() << "'");
   }
 
   // Notify event broker.
@@ -492,8 +492,8 @@ void applier::contact::resolve_object(
     it(applier::state::instance().contacts().find(obj->contact_name()));
   if (applier::state::instance().contacts().end() == it)
     throw (engine_error()
-           << "Error: Cannot resolve non-existing contact '"
-           << obj->contact_name() << "'.");
+           << "Cannot resolve non-existing contact '"
+           << obj->contact_name() << "'");
 
   // Remove contact group links.
   deleter::listmember(
@@ -502,8 +502,8 @@ void applier::contact::resolve_object(
 
   // Resolve contact.
   if (!check_contact(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve contact '"
-           << obj->contact_name() << "'.");
+    throw (engine_error() << "Cannot resolve contact '"
+           << obj->contact_name() << "'");
 
   return ;
 }

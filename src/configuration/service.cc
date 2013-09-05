@@ -23,6 +23,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
+extern int config_warnings;
+extern int config_errors;
+
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
@@ -389,14 +392,14 @@ bool service::operator<(service const& right) const throw () {
  */
 void service::check_validity() const {
   if (_service_description.empty())
-    throw (engine_error() << "service has no description (property "
+    throw (engine_error() << "Service has no description (property "
            << "'service_description')");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "service '" << _service_description
+    throw (engine_error() << "Service '" << _service_description
            << "' is not attached to any host or host group (properties "
            << "'host_name' or 'hostgroup_name', respectively)");
   if (_check_command.empty())
-    throw (engine_error() << "service '" << _service_description
+    throw (engine_error() << "Service '" << _service_description
            << "' has no check command (property 'check_command')");
   return ;
 }
@@ -434,7 +437,8 @@ void service::merge(configuration::serviceextinfo const& tmpl) {
  */
 void service::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge service with '"
+           << obj.type() << "'");
   service const& tmpl(static_cast<service const&>(obj));
 
   MRG_DEFAULT(_action_url);
@@ -1123,6 +1127,7 @@ bool service::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: service failure_prediction_enabled was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1137,6 +1142,7 @@ bool service::_set_failure_prediction_options(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: service failure_prediction_options was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1454,6 +1460,7 @@ bool service::_set_parallelize_check(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: service parallelize_check was ignored";
+  ++config_warnings;
   return (true);
 }
 

@@ -117,7 +117,7 @@ int neb_load_all_modules() {
   }
   catch (...) {
     logger(dbg_eventbroker, basic)
-      << "Counld not load all modules";
+      << "Could not load all modules";
     return (-1);
   }
   return (unloaded);
@@ -138,12 +138,12 @@ int neb_load_module(void* mod) {
     module->open();
     logger(log_info_message, basic)
       << "Event broker module '" << module->get_filename()
-      << "' initialized successfully.";
+      << "' initialized successfully";
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
       << "Error: Could not load module '"
-      << module->get_filename() << "' -> " << e.what();
+      << module->get_filename() << "': " << e.what();
     return (ERROR);
   }
   catch (...) {
@@ -183,12 +183,12 @@ int neb_unload_all_modules(int flags, int reason) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: module unloaded failed: " << e.what();
+      << "Error: Module unloading failed: " << e.what();
     retval = ERROR;
   }
   catch (...) {
     logger(dbg_eventbroker, basic)
-      << "error: load all modules failed.";
+      << "Error: unloading of all modules failed";
     retval = ERROR;
   }
   return (retval);
@@ -217,11 +217,11 @@ int neb_unload_module(void* mod, int flags, int reason) {
 
   logger(dbg_eventbroker, basic)
     << "Module '" << module->get_filename()
-    << "' unloaded successfully.";
+    << "' unloaded successfully";
 
   logger(log_info_message, basic)
     << "Event broker module '" << module->get_filename()
-    << "' deinitialized successfully.";
+    << "' deinitialized successfully";
 
   return (OK);
 }

@@ -840,7 +840,7 @@ host& engine::find_host(std::string const& name) {
   umap<std::string, shared_ptr<host_struct> >::const_iterator
     it(state::instance().hosts().find(name));
   if (it == state::instance().hosts().end())
-    throw (engine_error() << "host " << name << " not found");
+    throw (engine_error() << "Host '" << name << "' was not found");
   return (*it->second);
 }
 

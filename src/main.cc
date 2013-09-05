@@ -485,7 +485,7 @@ int main(int argc, char* argv[]) {
   }
   catch (std::exception const& e) {
     logger(logging::log_runtime_error, logging::basic)
-      << "error: " << e.what();
+      << "Error: " << e.what();
   }
 
   com::centreon::engine::events::loop::unload();

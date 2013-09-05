@@ -22,8 +22,8 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
-extern int config_errors;
 extern int config_warnings;
+extern int config_errors;
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -204,23 +204,23 @@ bool servicedependency::operator<(servicedependency const& right) const {
  */
 void servicedependency::check_validity() const {
   if (_service_description->empty() && _servicegroups->empty())
-    throw (engine_error() << "service dependency is not attached to "
+    throw (engine_error() << "Service dependency is not attached to "
            << "any service or service group (properties "
            << "'service_description' or 'servicegroup_name', "
            << "respectively)");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "service dependency is not attached to "
+    throw (engine_error() << "Service dependency is not attached to "
            << "any host or host group (properties 'host_name' or "
            << "'hostgroup_name', respectively)");
   if (_dependent_service_description->empty()
       && _dependent_servicegroups->empty())
-    throw (engine_error() << "service dependency is not attached to "
+    throw (engine_error() << "Service dependency is not attached to "
            << "any dependent service or dependent service group "
            << "(properties 'dependent_service_description' or "
            << "'dependent_servicegroup_name', respectively)");
   if (_dependent_hosts->empty()
       && _dependent_hostgroups->empty())
-    throw (engine_error() << "service dependency is not attached to "
+    throw (engine_error() << "Service dependency is not attached to "
            << "any dependent host or dependent host group (properties "
            << "'dependent_host_name' or 'dependent_hostgroup_name', "
            << "respectively)");
@@ -228,11 +228,11 @@ void servicedependency::check_validity() const {
   if (!_execution_failure_options && !_notification_failure_options) {
     ++config_warnings;
     logger(log_config_warning, basic)
-      << "configuration: warning: Ignoring lame service dependency of '"
+      << "Warning: Ignoring lame service dependency of '"
       << _dependent_service_description->front() << "' of host '"
       << _dependent_hosts->front() << "' on service '"
       << _service_description->front() << "' of host '"
-      << _hosts->front() << "'.";
+      << _hosts->front() << "'";
   }
 
   return ;
@@ -254,7 +254,8 @@ servicedependency::key_type const& servicedependency::key() const throw () {
  */
 void servicedependency::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge service dependency with '"
+           << obj.type() << "'");
   servicedependency const& tmpl(static_cast<servicedependency const&>(obj));
 
   MRG_DEFAULT(_dependency_period);

@@ -72,12 +72,12 @@ void applier::servicegroup::add_object(
                               shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new servicegroup '" << obj->servicegroup_name() << "'.";
+    << "Creating new servicegroup '" << obj->servicegroup_name() << "'";
 
   if (obj->resolved_members().empty()) {
     ++config_warnings;
     logger(logging::log_config_warning, logging::basic)
-      << "configuration: warning: Specified servicegroup '"
+      << "Warning: Specified service group '"
       << obj->servicegroup_name() << "' has no members";
     return ;
   }
@@ -93,8 +93,8 @@ void applier::servicegroup::add_object(
                             NULL_IF_EMPTY(obj->notes_url()),
                             NULL_IF_EMPTY(obj->action_url())));
   if (!sg)
-    throw (engine_error() << "Error: Could not register service group '"
-           << obj->servicegroup_name() << "'.");
+    throw (engine_error() << "Could not register service group '"
+           << obj->servicegroup_name() << "'");
 
   // Apply resolved services on servicegroup.
   for (set_pair_string::const_iterator
@@ -106,10 +106,10 @@ void applier::servicegroup::add_object(
            sg,
            it->first.c_str(),
            it->second.c_str()))
-      throw (engine_error() << "Error: Could not add service member '"
+      throw (engine_error() << "Could not add service member '"
              << it->second << "' of host '" << it->first
              << "' to service group '" << obj->servicegroup_name()
-             << "'.");
+             << "'");
 
   return ;
 }
@@ -143,22 +143,22 @@ void applier::servicegroup::modify_object(
                               shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying servicegroup '" << obj->servicegroup_name() << "'.";
+    << "Modifying servicegroup '" << obj->servicegroup_name() << "'";
 
   // Find old configuration.
   set_servicegroup::iterator
     it_cfg(config->servicegroups_find(obj->key()));
   if (it_cfg == config->servicegroups().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "service group '" << obj->servicegroup_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "service group '" << obj->servicegroup_name() << "'");
 
   // Find service group object.
   umap<std::string, shared_ptr<servicegroup_struct> >::iterator
     it_obj(applier::state::instance().servicegroups_find(obj->key()));
   if (it_obj == applier::state::instance().servicegroups().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
+    throw (engine_error() << "Could not modify non-existing "
            << "service group object '" << obj->servicegroup_name()
-           << "'.");
+           << "'");
   servicegroup_struct* sg(it_obj->second.get());
 
   // Update the global configuration set.
@@ -209,10 +209,10 @@ void applier::servicegroup::modify_object(
              sg,
              it->first.c_str(),
              it->second.c_str()))
-        throw (engine_error() << "Error: Could not add service member '"
+        throw (engine_error() << "Could not add service member '"
                << it->second << "' of host '" << it->first
                << "' to service group '" << obj->servicegroup_name()
-               << "'.");
+               << "'");
   }
 
   // Notify event broker.
@@ -236,7 +236,7 @@ void applier::servicegroup::remove_object(
                               shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing servicegroup '" << obj->servicegroup_name() << "'.";
+    << "Removing servicegroup '" << obj->servicegroup_name() << "'";
 
   // Find service group.
   umap<std::string, shared_ptr<servicegroup_struct> >::iterator
@@ -275,19 +275,19 @@ void applier::servicegroup::resolve_object(
                               shared_ptr<configuration::servicegroup> obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing service group '" << obj->servicegroup_name() << "'.";
+    << "Removing service group '" << obj->servicegroup_name() << "'";
 
   // Find service group.
   umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
     it(applier::state::instance().servicegroups_find(obj->key()));
   if (applier::state::instance().servicegroups().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing "
-           << "service group '" << obj->servicegroup_name() << "'.");
+    throw (engine_error() << "Cannot resolve non-existing "
+           << "service group '" << obj->servicegroup_name() << "'");
 
   // Resolve service group.
   if (!check_servicegroup(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve service group '"
-           << obj->servicegroup_name() << "'.");
+    throw (engine_error() << "Cannot resolve service group '"
+           << obj->servicegroup_name() << "'");
 
   return ;
 }
@@ -306,7 +306,7 @@ void applier::servicegroup::_resolve_members(
     // Logging.
     logger(logging::dbg_config, logging::more)
       << "Resolving members of service group '"
-      << obj->servicegroup_name() << "'.";
+      << obj->servicegroup_name() << "'";
 
     // Mark object as resolved.
     obj->set_resolved(true);
@@ -319,7 +319,7 @@ void applier::servicegroup::_resolve_members(
          ++it) {
       list_string::const_iterator it_prev(it++);
       if (it == end)
-        throw (engine_error() << "Error: members of service group '"
+        throw (engine_error() << "Members of service group '"
                << obj->servicegroup_name()
                << "' were not specified as a list of host-service pairs"
                << " (host1,service1,host2,service2,...)");
@@ -343,9 +343,9 @@ void applier::servicegroup::_resolve_members(
       }
       if (it2 == s.servicegroups().end())
         throw (engine_error()
-               << "Error: Could not add non-existing servicegroup member '"
-               << *it << "' to servicegroup '"
-               << obj->servicegroup_name() << "'.");
+               << "Could not add non-existing service group member '"
+               << *it << "' to service group '"
+               << obj->servicegroup_name() << "'");
 
       // Resolve servicegroup member.
       _resolve_members(*it2, s);

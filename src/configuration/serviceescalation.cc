@@ -174,16 +174,16 @@ bool serviceescalation::operator<(serviceescalation const& right) const {
  */
 void serviceescalation::check_validity() const {
   if (_service_description->empty() && _servicegroups->empty())
-    throw (engine_error() << "service escalation is not attached to "
+    throw (engine_error() << "Service escalation is not attached to "
            << "any service or service group (properties "
            << "'service_description' and 'servicegroup_name', "
            << "respectively)");
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "service escalation is not attached to "
+    throw (engine_error() << "Service escalation is not attached to "
            << "any host or host group (properties 'host_name' or "
            << "'hostgroup_name', respectively)");
   if (_contacts->empty() && _contactgroups->empty())
-    throw (engine_error() << "service escalation is not attached to "
+    throw (engine_error() << "Service escalation is not attached to "
            << "any contact or contact group (properties 'contacts' or "
            << "'contact_groups', respectively)");
   return ;
@@ -205,7 +205,8 @@ serviceescalation::key_type const& serviceescalation::key() const throw () {
  */
 void serviceescalation::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge service escalation with '"
+           << obj.type() << "'");
   serviceescalation const& tmpl(static_cast<serviceescalation const&>(obj));
 
   MRG_INHERIT(_contactgroups);

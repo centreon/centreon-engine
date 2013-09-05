@@ -241,8 +241,9 @@ void environment::_internal_copy(environment const& right) {
  */
 void environment::_realoc_buffer(unsigned int size) {
   if (_size_buffer >= size)
-    throw (engine_error() << "invalid buffer size: "
-           "old buffer is grater than the new buffer");
+    throw (engine_error()
+           << "Invalid size for command environment reallocation: "
+           << "Buffer size is greater than the requested size");
   char* new_buffer(new char[size]);
   if (_buffer)
     memcpy(new_buffer, _buffer, _pos_buffer);
@@ -260,8 +261,9 @@ void environment::_realoc_buffer(unsigned int size) {
  */
 void environment::_realoc_env(unsigned int size) {
   if (_size_env >= size)
-    throw (engine_error() << "invalid env size: "
-           "old env is grater than the new env");
+    throw (engine_error()
+           << "Invalid size for command environment reallocation: "
+           << "Environment size is greater than the requested size");
   char** new_env(new char*[size]);
   if (_env)
     memcpy(new_env, _env, sizeof(*new_env) * (_pos_env + 1));

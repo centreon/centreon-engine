@@ -65,7 +65,7 @@ int reap_check_results() {
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: " << e.what();
+      << "Error: " << e.what();
     return (ERROR);
   }
   return (OK);
@@ -200,7 +200,7 @@ int run_async_service_check(
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: " << e.what();
+      << "Error: " << e.what();
     return (ERROR);
   }
   return (OK);
@@ -2266,7 +2266,7 @@ int run_sync_host_check_3x(
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: " << e.what();
+      << "Error: " << e.what();
     return (ERROR);
   }
   return (OK);
@@ -2396,7 +2396,7 @@ int run_async_host_check_3x(
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: " << e.what();
+      << "Error: " << e.what();
     return (ERROR);
   }
   return (OK);

@@ -681,8 +681,8 @@ void applier::scheduler::_get_new_hosts(
     umap<std::string, shared_ptr<host_struct> >::const_iterator
       hst(hosts.find(host_name));
     if (hst == hosts.end())
-      throw (engine_error() << "configuration: apply scheduling "
-             "failed: host " << host_name << " not found.");
+      throw (engine_error() << "Could not schedule non-existing host '"
+             << host_name << "'");
     new_hosts.push_back(&*hst->second);
   }
 }
@@ -707,9 +707,9 @@ void applier::scheduler::_get_new_services(
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(host_name, service_description)));
     if (svc == services.end())
-      throw (engine_error() << "configuration: apply scheduling "
-             "failed: service " << service_description << " on host "
-             << host_name << " not found.");
+      throw (engine_error() << "Cannot schedule non-existing service '"
+             << service_description << "' on host '"
+             << host_name << "'");
     new_services.push_back(&*svc->second);
   }
 }

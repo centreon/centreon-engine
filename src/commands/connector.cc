@@ -61,7 +61,7 @@ connector::connector(
 
   if (config->enable_environment_macros())
     logger(log_runtime_warning, basic)
-      << "warning: Connector dosn't use enable environement macros!";
+      << "Warning: Connector does not enable environment macros";
 }
 
 /**
@@ -144,7 +144,8 @@ unsigned long connector::run(
       // Start connector if is not running.
       if (!_is_running) {
         if (!_try_to_restart)
-          throw (engine_error() << "restart failed");
+          throw (engine_error() << "Connector '" << _name
+                 << "' failed to restart");
         _queries[command_id] = info;
         try {
           if (_restart.wait(0))
@@ -213,7 +214,8 @@ void connector::run(
       // Start connector if is not running.
       if (!_is_running) {
         if (!_try_to_restart)
-          throw (engine_error() << "restart failed");
+          throw (engine_error() << "Connector '" << _name
+                 << "' failed to restart");
         lock.unlock();
         _connector_start();
         lock.relock();
@@ -245,7 +247,7 @@ void connector::run(
     if (it != _results.end()) {
       res = it->second;
       _results.erase(it);
-      break;
+      break ;
     }
     _cv_query.wait(&_lock);
   }
@@ -337,8 +339,8 @@ void connector::data_is_available(process& p) throw () {
           || id >= sizeof(tab_recv_query) / sizeof(*tab_recv_query)
           || !tab_recv_query[id])
         logger(log_runtime_warning, basic)
-          << "connector '" << _name << "' "
-          "receive bad request id: id=" << id;
+          << "Warning: Connector '" << _name << "' "
+             "received bad request ID: " << id;
       // Valid query, so execute it.
       else
         (this->*tab_recv_query[id])(endptr + 1);
@@ -346,7 +348,7 @@ void connector::data_is_available(process& p) throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "warning: connector '" << _name << "' error: " << e.what();
+      << "Warning: Connector '" << _name << "' error: " << e.what();
   }
   return;
 }
@@ -392,8 +394,8 @@ void connector::finished(process& p) throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: connector '" << _name
-      << "' connector finish failed: " << e.what();
+      << "Error: Connector '" << _name
+      << "' termination routine failed: " << e.what();
   }
   return;
 }
@@ -432,9 +434,8 @@ void connector::_connector_close() {
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
       logger(log_runtime_warning, basic)
-        << "warning: connector '" << _name
-        << "' connector close failed: "
-        << (is_timeout ? "timeout" : "bad query");
+        << "Warning: Cannot close connector '" << _name
+        << "': " << (is_timeout ? "Timeout" : "Bad query");
     }
   }
 
@@ -476,14 +477,16 @@ void connector::_connector_start() {
       _process.kill();
       _try_to_restart = false;
       if (is_timeout)
-        throw (engine_error() << "connector start failed: timeout");
-      throw (engine_error() << "connector start failed: bad version");
+        throw (engine_error() << "Cannot start connector '"
+               << _name << "': Timeout");
+      throw (engine_error() << "Cannot start connector '"
+             << _name << "': Bad protocol version");
     }
     _is_running = true;
   }
 
   logger(log_info_message, basic)
-    << "connector '" << _name << "' start";
+    << "Connector '" << _name << "' has started";
 
   {
     concurrency::locker lock(&_lock);
@@ -550,33 +553,31 @@ void connector::_recv_query_error(char const* data) {
     char* endptr(NULL);
     int code(strtol(data, &endptr, 10));
     if (data == endptr)
-      throw (engine_error() << "invalid query error: "
-             "invalid number of parameters");
+      throw (engine_error() << "Invalid query for connector '"
+             << _name << "': Bad number of arguments");
     char const* message(endptr + 1);
 
     switch (code) {
       // Information message.
     case 0:
       logger(log_info_message, basic)
-        << "info: connector '" << _name << "': " << message;
+        << "Info: Connector '" << _name << "': " << message;
       break;
-
       // Warning message.
     case 1:
       logger(log_runtime_warning, basic)
-        << "warning: connector '" << _name << "': " << message;
+        << "Warning: Connector '" << _name << "': " << message;
       break;
-
       // Error message.
     case 2:
       logger(log_runtime_error, basic)
-        << "error: connector '" << _name << "': " << message;
+        << "Error: Connector '" << _name << "': " << message;
       break;
     }
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "warning: connector '" << _name << "': " << e.what();
+      << "Warning: Connector '" << _name << "': " << e.what();
   }
   return;
 }
@@ -595,18 +596,18 @@ void connector::_recv_query_execute(char const* data) {
     char* endptr(NULL);
     unsigned long command_id(strtol(data, &endptr, 10));
     if (data == endptr)
-      throw (engine_error() << "invalid query execute: "
-             "invalid command_id");
+      throw (engine_error()
+             << "Invalid execution result: Invalid command ID");
     data = endptr + 1;
     bool is_executed(strtol(data, &endptr, 10));
     if (data == endptr)
-      throw (engine_error() << "invalid query execute: "
-             "invalid is_executed");
+      throw (engine_error()
+             << "Invalid execution result: Invalid executed flag");
     data = endptr + 1;
     int exit_code(strtol(data, &endptr, 10));
     if (data == endptr)
-      throw (engine_error() << "invalid query execute: "
-             "invalid exit_code");
+      throw (engine_error()
+             << "Invalid execution result: Invalid exit code");
     char const* std_err(endptr + 1);
     char const* std_out(std_err + strlen(std_err) + 1);
 
@@ -680,7 +681,7 @@ void connector::_recv_query_execute(char const* data) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "warning: connector '" << _name << "': " << e.what();
+      << "Warning: Connector '" << _name << "': " << e.what();
   }
   return;
 }
@@ -719,8 +720,8 @@ void connector::_recv_query_version(char const* data) {
     for (unsigned int i(0); i < 2; ++i) {
       version[i] = strtol(data, &endptr, 10);
       if (data == endptr)
-        throw (engine_error() << "invalid query version: "
-               "invalid number of parameters");
+        throw (engine_error()
+               << "Invalid version query: Bad format");
       data = endptr + 1;
     }
 
@@ -736,7 +737,7 @@ void connector::_recv_query_version(char const* data) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "warning: connector '" << _name << "': " << e.what();
+      << "Warning: Connector '" << _name << "': " << e.what();
   }
 
   concurrency::locker lock(&_lock);
@@ -805,17 +806,12 @@ void connector::_send_query_version() {
  *
  *  @param[in] c  The connector to restart.
  */
-connector::restart::restart(connector* c)
-  : _c(c) {
-
-}
+connector::restart::restart(connector* c) : _c(c) {}
 
 /**
  *  Destructor.
  */
-connector::restart::~restart() throw () {
-
-}
+connector::restart::~restart() throw () {}
 
 /**
  *  Execute restart.
@@ -830,7 +826,7 @@ void connector::restart::_run() {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "warning: connector '" << _c->_name << "': " << e.what();
+      << "Warning: Connector '" << _c->_name << "': " << e.what();
 
     umap<unsigned long, shared_ptr<query_info> > tmp_queries;
     {

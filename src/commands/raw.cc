@@ -48,20 +48,14 @@ raw::raw(
        std::string const& command_line,
        command_listener* listener)
   : command(name, command_line, listener),
-    process_listener() {
-
-}
+    process_listener() {}
 
 /**
  *  Copy constructor
  *
  *  @param[in] right Object to copy.
  */
-raw::raw(raw const& right)
-  : command(right),
-    process_listener(right) {
-
-}
+raw::raw(raw const& right) : command(right), process_listener(right) {}
 
 /**
  *  Destructor.
@@ -83,7 +77,7 @@ raw::~raw() throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "error: raw destructor failed: " << e.what();
+      << "Error: Raw command destructor failed: " << e.what();
   }
 }
 
@@ -279,9 +273,9 @@ void raw::finished(process& p) throw () {
         lock.unlock();
 
         logger(log_runtime_warning, basic)
-          << "invalid process pointer: "
-          "process not found into process busy list";
-        return;
+          << "Warning: Invalid process pointer: "
+             "process not found into process busy list";
+        return ;
       }
       // Get command_id and remove the process from the busy list.
       command_id = it->second;
@@ -334,7 +328,8 @@ void raw::finished(process& p) throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "error: process finish failed: " << e.what();
+      << "Warning: Raw process termination routine failed: "
+      << e.what();
 
     // Release process, put into the free list.
     concurrency::locker lock(&_lock);

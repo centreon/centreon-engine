@@ -887,8 +887,7 @@ unsigned int state::auto_rescheduling_interval() const throw () {
  */
 void state::auto_rescheduling_interval(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "auto_rescheduling_interval: invalid value");
+    throw (engine_error() << "auto_rescheduling_interval cannot be 0");
   _auto_rescheduling_interval = value;
 }
 
@@ -908,8 +907,7 @@ unsigned int state::auto_rescheduling_window() const throw () {
  */
 void state::auto_rescheduling_window(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "auto_rescheduling_window: invalid value");
+    throw (engine_error() << "auto_rescheduling_window cannot be 0");
   _auto_rescheduling_window = value;
 }
 
@@ -1116,7 +1114,7 @@ unsigned int state::check_reaper_interval() const throw () {
  */
 void state::check_reaper_interval(unsigned int value) {
   if (!value)
-    throw (engine_error() << "check_reaper_interval: invalid value");
+    throw (engine_error() << "check_reaper_interval cannot be 0");
   _check_reaper_interval = value;
 }
 
@@ -1138,6 +1136,7 @@ void state::check_result_path(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: check_result_path is deprecated";
   _check_result_path = value;
+  ++config_warnings;
 }
 
 /**
@@ -1236,7 +1235,9 @@ int state::command_check_interval() const throw () {
  */
 void state::command_check_interval(int value) {
   if (value < -1 || !value)
-    throw (engine_error() << "command_check_interval: invalid value");
+    throw (engine_error()
+           << "command_check_interval must be either positive or -1 ("
+           << value << " provided)");
 
   _command_check_interval = value;
 
@@ -1700,7 +1701,7 @@ unsigned int state::event_handler_timeout() const throw () {
 void state::event_handler_timeout(unsigned int value) {
   if (!value)
     throw (engine_error()
-           << "event_handler_timeout: invalid value");
+           << "event_handler_timeout cannot be 0");
   _event_handler_timeout = value;
 }
 
@@ -1812,8 +1813,8 @@ float state::high_host_flap_threshold() const throw () {
  */
 void state::high_host_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0)
-    throw (engine_error()
-             << "high_host_flap_threshold: invalid value.");
+    throw (engine_error() << "high_host_flap_threshold must "
+           << "be between 0.0 and 100.0, both excluded");
   _high_host_flap_threshold = value;
 }
 
@@ -1833,8 +1834,8 @@ float state::high_service_flap_threshold() const throw () {
  */
 void state::high_service_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0)
-    throw (engine_error()
-             << "high_service_flap_threshold: invalid value.");
+    throw (engine_error() << "high_service_flap_threshold "
+           << "must be between 0.0 and 100.0, both excluded");
   _high_service_flap_threshold = value;
 }
 
@@ -2007,8 +2008,7 @@ unsigned int state::host_check_timeout() const throw () {
  */
 void state::host_check_timeout(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "host_check_timeout: invalid value");
+    throw (engine_error() << "host_check_timeout cannot be 0");
   _host_check_timeout = value;
 }
 
@@ -2209,7 +2209,7 @@ unsigned int state::interval_length() const throw () {
  */
 void state::interval_length(unsigned int value) {
   if (!value)
-    throw (engine_error() << "interval_length: invalid value");
+    throw (engine_error() << "interval_length cannot be 0");
 
   if (!_command_check_interval_is_seconds
       && _command_check_interval != -1) {
@@ -2381,8 +2381,8 @@ float state::low_host_flap_threshold() const throw () {
  */
 void state::low_host_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0)
-    throw (engine_error()
-             << "low_host_flap_threshold: invalid value.");
+    throw (engine_error() << "low_host_flap_threshold "
+           << "must be between 0.0 and 100.0, both excluded");
   _low_host_flap_threshold = value;
 }
 
@@ -2402,8 +2402,8 @@ float state::low_service_flap_threshold() const throw () {
  */
 void state::low_service_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0)
-    throw (engine_error()
-             << "low_service_flap_threshold: invalid value.");
+    throw (engine_error() << "low_service_flap_threshold "
+           << "must be between 0.0 and 100.0, both excluded");
   _low_service_flap_threshold = value;
 }
 
@@ -2423,7 +2423,7 @@ unsigned int state::max_check_reaper_time() const throw () {
  */
 void state::max_check_reaper_time(unsigned int value) {
   if (!value)
-    throw (engine_error() << "max_check_reaper_time: invalid value");
+    throw (engine_error() << "max_check_reaper_time cannot be 0");
   _max_check_reaper_time = value;
 }
 
@@ -2445,6 +2445,7 @@ void state::max_check_result_file_age(unsigned long value) {
   logger(log_config_warning, basic)
     << "Warning: max_check_result_file_age is deprecated";
   _max_check_result_file_age = value;
+  ++config_warnings;
 }
 
 /**
@@ -2481,7 +2482,7 @@ unsigned int state::max_host_check_spread() const throw () {
  */
 void state::max_host_check_spread(unsigned int value) {
   if (!value)
-    throw (engine_error() << "max_host_check_spread: invalid value");
+    throw (engine_error() << "max_host_check_spread cannot be 0");
   _max_host_check_spread = value;
 }
 
@@ -2537,7 +2538,7 @@ unsigned int state::max_service_check_spread() const throw () {
  */
 void state::max_service_check_spread(unsigned int value) {
   if (!value)
-    throw (engine_error() << "max_service_check_spread: invalid value");
+    throw (engine_error() << "max_service_check_spread cannot be 0");
   _max_service_check_spread = value;
 }
 
@@ -2557,8 +2558,7 @@ unsigned int state::notification_timeout() const throw () {
  */
 void state::notification_timeout(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "notification_timeout: invalid value");
+    throw (engine_error() << "notification_timeout cannot be 0");
   _notification_timeout = value;
 }
 
@@ -2651,8 +2651,7 @@ unsigned int state::ochp_timeout() const throw () {
  */
 void state::ochp_timeout(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "ochp_timeout: invalid value");
+    throw (engine_error() << "ochp_timeout cannot be 0");
   _ochp_timeout = value;
 }
 
@@ -2690,8 +2689,7 @@ unsigned int state::ocsp_timeout() const throw () {
  */
 void state::ocsp_timeout(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "ocsp_timeout: invalid value");
+    throw (engine_error() << "ocsp_timeout cannot be 0");
   _ocsp_timeout = value;
 }
 
@@ -2892,7 +2890,7 @@ unsigned int state::retention_scheduling_horizon() const throw () {
 void state::retention_scheduling_horizon(unsigned int value) {
   if (!value)
     throw (engine_error()
-             << "retention_scheduling_horizon: invalid value");
+           << "retention_scheduling_horizon cannot be 0");
   _retention_scheduling_horizon = value;
 }
 
@@ -2912,8 +2910,7 @@ unsigned int state::retention_update_interval() const throw () {
  */
 void state::retention_update_interval(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "retention_update_interval: invalid value");
+    throw (engine_error() << "retention_update_interval cannot be 0");
   _retention_update_interval = value;
 }
 
@@ -3103,8 +3100,7 @@ unsigned int state::service_check_timeout() const throw () {
  */
 void state::service_check_timeout(unsigned int value) {
   if (!value)
-    throw (engine_error()
-             << "service_check_timeout: invalid value");
+    throw (engine_error() << "service_check_timeout cannot be 0");
   _service_check_timeout = value;
 }
 
@@ -3125,7 +3121,7 @@ unsigned int state::service_freshness_check_interval() const throw () {
 void state::service_freshness_check_interval(unsigned int value) {
   if (!value)
     throw (engine_error()
-             << "service_freshness_check_interval: invalid value");
+           << "service_freshness_check_interval cannot be 0");
   _service_freshness_check_interval = value;
 }
 
@@ -3289,7 +3285,8 @@ float state::sleep_time() const throw () {
  */
 void state::sleep_time(float value) {
   if (value <= 0.0)
-    throw (engine_error() << "sleep_time: invalid value.");
+    throw (engine_error() << "sleep_time cannot be less or equal to 0 ("
+           << value << " provided)");
   _sleep_time = value;
 }
 
@@ -3370,7 +3367,8 @@ unsigned int state::status_update_interval() const throw () {
 void state::status_update_interval(unsigned int value) {
   if (value < 2)
     throw (engine_error()
-           << "status_update_interval: invalid value");
+           << "status_update_interval cannot be less than 2 ("
+           << value << " provided)");
   _status_update_interval = value;
 }
 
@@ -3475,7 +3473,8 @@ unsigned int state::time_change_threshold() const throw () {
 void state::time_change_threshold(unsigned int value) {
   if (value < 6)
     throw (engine_error()
-             << "time_change_threshold: invalid value");
+           << "time_change_threshold cannot be less than 6 ("
+           << value << " provided)");
   _time_change_threshold = value;
 }
 
@@ -3524,20 +3523,17 @@ void state::user(std::vector<std::string> const& value) {
 void state::user(std::string const& key, std::string const& value) {
   std::size_t pos(key.find("$USER"));
   if (pos != 0)
-    throw (engine_error()
-           << "configuration: invalid user key '" << key << "'");
+    throw (engine_error() << "Invalid user key '" << key << "'");
   std::string tmp(key.substr(5));
 
   pos = tmp.size();
   if (!pos || tmp[pos - 1] != '$')
-    throw (engine_error()
-           << "configuration: invalid user key '" << key << "'");
+    throw (engine_error() << "Invalid user key '" << key << "'");
   tmp.erase(pos - 1);
 
   unsigned int idx;
   if (!string::to(tmp.c_str(), idx) || !idx || idx > MAX_USER_MACROS)
-    throw (engine_error()
-           << "configuration: invalid user key '" << key << "'");
+    throw (engine_error() << "Invalid user key '" << key << "'");
 
   user(idx - 1, value);
 }
@@ -3744,6 +3740,7 @@ void state::_set_aggregate_status_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: aggregate_status_updates variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3755,6 +3752,7 @@ void state::_set_auth_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: auth_file variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3766,6 +3764,7 @@ void state::_set_bare_update_check(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: bare_update_check variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3816,6 +3815,7 @@ void state::_set_check_for_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: check_for_updates variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3836,6 +3836,7 @@ void state::_set_child_processes_fork_twice(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: child_processes_fork_twice variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3864,6 +3865,7 @@ void state::_set_comment_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: comment_file variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3875,6 +3877,7 @@ void state::_set_daemon_dumps_core(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: daemon_dumps_core variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3902,6 +3905,7 @@ void state::_set_downtime_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: downtime_file variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3913,6 +3917,7 @@ void state::_set_enable_embedded_perl(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: enable_embedded_perl variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3937,6 +3942,7 @@ void state::_set_free_child_process_memory(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: free_child_process_memory variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3956,7 +3962,9 @@ void state::_set_host_inter_check_delay_method(std::string const& value) {
     if (!string::to(value.c_str(), scheduling_info.host_inter_check_delay)
         || scheduling_info.host_inter_check_delay <= 0.0)
       throw (engine_error()
-               << "host_inter_check_delay_method: invalid value.");
+             << "Invalid value for host_inter_check_delay_method, must "
+             << "be one of 'n' (none), 'd' (dumb), 's' (smart) or a "
+             << "stricly positive value (" << value << " provided)");
   }
 }
 
@@ -3983,6 +3991,7 @@ void state::_set_lock_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: lock_file variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -3994,6 +4003,7 @@ void state::_set_log_archive_path(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: log_archive_path variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4005,6 +4015,7 @@ void state::_set_log_rotation_method(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: log_rotation_method variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4016,6 +4027,7 @@ void state::_set_nagios_group(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: nagios_group variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4027,6 +4039,7 @@ void state::_set_nagios_user(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: nagios_user variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4038,6 +4051,7 @@ void state::_set_p1_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: p1_file variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4064,6 +4078,7 @@ void state::_set_retained_process_service_attribute_mask(std::string const& valu
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: retained_process_service_attribute_mask variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4075,6 +4090,7 @@ void state::_set_retained_service_attribute_mask(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: retained_service_attribute_mask variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4093,7 +4109,10 @@ void state::_set_service_inter_check_delay_method(std::string const& value) {
     _service_inter_check_delay_method = icd_user;
     if (!string::to(value.c_str(), scheduling_info.service_inter_check_delay)
         || scheduling_info.service_inter_check_delay <= 0.0)
-      throw (engine_error() << "service_inter_check_delay_method: invalid value.");
+      throw (engine_error()
+             << "Invalid value for service_inter_check_delay_method, "
+             << "must be one of 'n' (none), 'd' (dumb), 's' (smart) or "
+             << "a strictly positive value (" << value << " provided)");
   }
 }
 
@@ -4136,6 +4155,7 @@ void state::_set_temp_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: temp_file variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4147,6 +4167,7 @@ void state::_set_temp_path(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: temp_path variable ignored";
+  ++config_warnings;
 }
 
 /**
@@ -4158,4 +4179,5 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: use_embedded_perl_implicitly variable ignored";
+  ++config_warnings;
 }

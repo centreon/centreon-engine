@@ -218,7 +218,8 @@ servicegroup& engine::find_servicegroup(std::string const& name) {
   umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
     it(state::instance().servicegroups().find(name));
   if (it == state::instance().servicegroups().end())
-    throw (engine_error() << "servicegroup " << name << " not found");
+    throw (engine_error() << "Service group "
+           << name << "' was not found");
   return (*it->second);
 }
 

@@ -98,11 +98,11 @@ void diagnostic::generate(
 
   // Base information about the software.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: Centreon Engine " << CENTREON_ENGINE_VERSION_STRING;
+    << "Diagnostic: Centreon Engine " << CENTREON_ENGINE_VERSION_STRING;
 
   // df.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting disk usage";
+    << "Diagnostic: Getting disk usage";
   {
     std::string df_log_path;
     df_log_path = tmp_dir;
@@ -113,7 +113,7 @@ void diagnostic::generate(
 
   // lsb_release.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting LSB information";
+    << "Diagnostic: Getting LSB information";
   {
     std::string lsb_release_log_path;
     lsb_release_log_path = tmp_dir;
@@ -124,7 +124,7 @@ void diagnostic::generate(
 
   // uname.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting system name";
+    << "Diagnostic: Getting system name";
   {
     std::string uname_log_path;
     uname_log_path = tmp_dir;
@@ -135,7 +135,7 @@ void diagnostic::generate(
 
   // /proc/version
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting kernel information";
+    << "Diagnostic: Getting kernel information";
   {
     std::string proc_version_log_path;
     proc_version_log_path = tmp_dir;
@@ -146,7 +146,7 @@ void diagnostic::generate(
 
   // netstat.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting network connections information";
+    << "Diagnostic: Getting network connections information";
   {
     std::string netstat_log_path;
     netstat_log_path = tmp_dir;
@@ -159,7 +159,7 @@ void diagnostic::generate(
 
   // ps.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting processes information";
+    << "Diagnostic: Getting processes information";
   {
     std::string ps_log_path;
     ps_log_path = tmp_dir;
@@ -170,7 +170,7 @@ void diagnostic::generate(
 
   // rpm.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting packages information";
+    << "Diagnostic: Getting packages information";
   {
     std::string rpm_log_path;
     rpm_log_path = tmp_dir;
@@ -181,7 +181,7 @@ void diagnostic::generate(
 
   // sestatus.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: getting SELinux status";
+    << "Diagnostic: Getting SELinux status";
   {
     std::string sestatus_log_path;
     sestatus_log_path = tmp_dir;
@@ -192,7 +192,7 @@ void diagnostic::generate(
 
   // Parse configuration file.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: parsing configuration file '" << cfg_file << "'";
+    << "Diagnostic: Parsing configuration file '" << cfg_file << "'";
   configuration::state conf;
   {
     configuration::parser parsr;
@@ -212,7 +212,7 @@ void diagnostic::generate(
 
   // Copy base configuration file.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: copying configuration files";
+    << "Diagnostic: Copying configuration files";
   {
     std::string target_path;
     target_path = tmp_cfg_dir;
@@ -259,7 +259,7 @@ void diagnostic::generate(
 
   // Create tarball.
   logger(logging::log_info_message, logging::basic)
-    << "diagnostic: creating tarball '" << my_out_file << "'";
+    << "Diagnostic: Creating tarball '" << my_out_file << "'";
   {
     std::ostringstream cmdline;
     cmdline << "tar czf '" << my_out_file << "' '" << tmp_dir << "'";

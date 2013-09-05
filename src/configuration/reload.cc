@@ -90,7 +90,7 @@ void reload::_run() {
   }
   catch (std::exception const& e) {
     logger(log_config_error, most)
-      << "error: " << e.what();
+      << "Error: " << e.what();
   }
   _set_is_finished(true);
 }

@@ -85,8 +85,8 @@ void applier::command::add_object(
                       obj->command_name().c_str(),
                       obj->command_line().c_str()));
   if (!c)
-    throw (engine_error() << "Error: Could not register command '"
-           << obj->command_name() << "'.");
+    throw (engine_error() << "Could not register command '"
+           << obj->command_name() << "'");
 
   // Create real command object.
   _create_command(obj);
@@ -125,15 +125,15 @@ void applier::command::modify_object(
   // Find old configuration.
   set_command::iterator it_cfg(config->commands_find(obj->key()));
   if (it_cfg == config->commands().end())
-    throw (engine_error() << "Error: Cannot modify non-existing "
-           << "command '" << obj->command_name() << "'.");
+    throw (engine_error() << "Cannot modify non-existing "
+           << "command '" << obj->command_name() << "'");
 
   // Find command object.
   umap<std::string, shared_ptr<command_struct> >::iterator
     it_obj(applier::state::instance().commands_find(obj->key()));
   if (it_obj == applier::state::instance().commands().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "command object '" << obj->command_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "command object '" << obj->command_name() << "'");
   command_struct* c(it_obj->second.get());
 
   // Update the global configuration set.

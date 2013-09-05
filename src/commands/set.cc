@@ -71,7 +71,8 @@ shared_ptr<commands::command> set::get_command(
   umap<std::string, shared_ptr<command> >::iterator
     it(_list.find(cmd_name));
   if (it == _list.end())
-    throw (engine_error() << "command '" << cmd_name << "' not found");
+    throw (engine_error()
+           << "Command '" << cmd_name << "' was not found");
   return (it->second);
 }
 

@@ -237,9 +237,9 @@ void checker::run(
 
   // Preamble.
   if (!hst)
-    throw (engine_error() << "attempt to run check on NULL host");
+    throw (engine_error() << "Attempt to run check on invalid host");
   if (!hst->check_command_ptr)
-    throw (engine_error() << "attempt to run active check on host '"
+    throw (engine_error() << "Attempt to run active check on host '"
            << hst->name << "' with no check command");
 
   logger(dbg_checks, basic)
@@ -251,7 +251,7 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (engine_error() << "check of host '" << hst->name
+    throw (engine_error() << "Check of host '" << hst->name
            << "' is not viable");
 
   // Don't execute a new host check if one is already running.
@@ -292,10 +292,16 @@ void checker::run(
 
   // Host check was cancel by NEB module. Reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res)
-    throw (engine_error() << "broker callback cancel");
+    throw (engine_error()
+           << "Some broker module cancelled check of host '"
+           << hst->name << "'");
   // Host check was overriden by NEB module.
-  else if (NEBERROR_CALLBACKOVERRIDE == res)
-    return;
+  else if (NEBERROR_CALLBACKOVERRIDE == res) {
+    logger(dbg_functions, basic)
+           << "Some broker module overrode check of host '"
+           << hst->name << "' so we'll bail out";
+    return ;
+  }
 
   // Checking starts.
   logger(dbg_functions, basic)
@@ -428,7 +434,7 @@ void checker::run(
     _to_reap.push(check_result_info);
 
     logger(log_runtime_warning, basic)
-      << "error: execute command failed: " << e.what();
+      << "Error: Host check command execution failed: " << e.what();
   }
 
   // Cleanup.
@@ -466,12 +472,12 @@ void checker::run(
 
   // Preamble.
   if (!svc)
-    throw (engine_error() << "attempt to run check on NULL service");
+    throw (engine_error() << "Attempt to run check on invalid service");
   if (!svc->host_ptr)
     throw (engine_error()
-           << "attempt to run check on service with NULL host");
+           << "Attempt to run check on service with invalid host");
   if (!svc->check_command_ptr)
-    throw (engine_error() << "attempt to run active check on service '"
+    throw (engine_error() << "Attempt to run active check on service '"
            << svc->description << "' on host '" << svc->host_ptr->name
            << "' with no check command");
 
@@ -485,7 +491,7 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (engine_error() << "check of service '" << svc->description
+    throw (engine_error() << "Check of service '" << svc->description
            << "' on host '" << svc->host_name << "' is not viable");
 
   // Send broker event.
@@ -516,11 +522,18 @@ void checker::run(
       *preferred_time += static_cast<time_t>(
                            svc->check_interval
                            * config->interval_length());
-    throw (engine_error() << "broker callback cancel");
+    throw (engine_error()
+           << "Some broker module cancelled check of service '"
+           << svc->description << "' on host '" << svc->host_name);
   }
   // Service check was override by NEB module.
-  else if (NEBERROR_CALLBACKOVERRIDE == res)
-    return;
+  else if (NEBERROR_CALLBACKOVERRIDE == res) {
+    logger(dbg_functions, basic)
+      << "Some broker module overrode check of service '"
+      << svc->description << "' on host '" << svc->host_name
+      << "' so we'll bail out";
+    return ;
+  }
 
   // Checking starts.
   logger(dbg_checks, basic)
@@ -646,7 +659,7 @@ void checker::run(
     _to_reap.push(check_result_info);
 
     logger(log_runtime_warning, basic)
-      << "error: execute command failed: " << e.what();
+      << "Error: Service check command execution failed: " << e.what();
   }
 
   // Cleanup.
@@ -677,9 +690,11 @@ void checker::run_sync(
 
   // Preamble.
   if (!hst)
-    throw (engine_error() << "host pointer is NULL.");
+    throw (engine_error()
+           << "Attempt to run synchronous check on invalid host");
   if (!hst->check_command_ptr)
-    throw (engine_error() << "attempt to run active check on host '"
+    throw (engine_error()
+           << "Attempt to run synchronous active check on host '"
            << hst->name << "' with no check command");
 
   logger(dbg_checks, basic)
@@ -691,8 +706,8 @@ void checker::run_sync(
     if (check_result_code)
       *check_result_code = hst->current_state;
     logger(dbg_checks, basic)
-      << "Host check is not viable at this time.";
-    return;
+      << "Host check is not viable at this time";
+    return ;
   }
 
   // Time to start command.
@@ -933,9 +948,11 @@ int checker::_execute_sync(host* hst) {
 
   // Preamble.
   if (!hst)
-    throw (engine_error() << "host pointer is NULL.");
+    throw (engine_error()
+           << "Attempt to run synchronous check on invalid host");
   if (!hst->check_command_ptr)
-    throw (engine_error() << "attempt to run active check on host '"
+    throw (engine_error()
+           << "Attempt to run synchronous active check on host '"
            << hst->name << "' with no check command");
 
   logger(dbg_checks, basic)
@@ -1072,7 +1089,8 @@ int checker::_execute_sync(host* hst) {
     res.start_time = res.end_time;
 
     logger(log_runtime_warning, basic)
-      << "error: execute command failed: " << e.what();
+      << "Error: Synchronous host check command execution failed: "
+      << e.what();
   }
 
   // Get output.

@@ -130,7 +130,7 @@ void applier::macros::_set_macro(
        unsigned int type,
        std::string const& value) {
   if (type >= MACRO_X_COUNT)
-    throw (engine_error() << "applier: invalid type of global macro");
+    throw (engine_error() << "Invalid type of global macro: " << type);
   if (!_mac->x[type] || strcmp(_mac->x[type], value.c_str()))
     string::setstr(_mac->x[type], value);
 }
@@ -145,7 +145,7 @@ void applier::macros::_set_macros_user(
        unsigned int idx,
        std::string const& value) {
   if (idx >= MAX_USER_MACROS)
-    throw (engine_error() << "applier: invalid index of user macro");
+    throw (engine_error() << "Invalid index of user macro: " << idx);
   if (!macro_user[idx] || strcmp(macro_user[idx], value.c_str()))
     string::setstr(macro_user[idx], value);
 }

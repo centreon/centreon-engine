@@ -77,8 +77,7 @@ void applier::state::apply(configuration::state& new_cfg, bool waiting_thread) {
 
     // If is not the first time, we can restore the old one.
     logger(log_config_error, basic)
-      << "configuration: apply new configuration failed: "
-      << e.what();
+      << "Error: Could not apply new configuration: " << e.what();
 
     // Check if we need to restore old configuration.
     if (_processing_state == state_error) {
@@ -120,8 +119,7 @@ void applier::state::apply(
 
     // If is not the first time, we can restore the old one.
     logger(log_config_error, basic)
-      << "configuration: apply new configuration failed: "
-      << e.what();
+      << "Cannot apply new configuration: " << e.what();
 
     // Check if we need to restore old configuration.
     if (_processing_state == state_error) {
@@ -927,32 +925,38 @@ void applier::state::try_lock() {
 /*
  *  Update all new globals.
  *
- *  @param[in] new_cfg The new configuration state.
+ *  @param[in]  new_cfg The new configuration state.
  */
 void applier::state::_apply(configuration::state const& new_cfg) {
   // Check variables should not be change after the first execution.
   if (has_already_been_loaded) {
-    if (config->broker_module() != new_cfg.broker_module())
+    if (config->broker_module() != new_cfg.broker_module()) {
       logger(log_config_warning, basic)
-        << "configuration: warning: broker module can not be change";
-
-    if (config->broker_module_directory() != new_cfg.broker_module_directory())
+        << "Warning: Broker modules cannot be changed nor reloaded";
+      ++config_warnings;
+    }
+    if (config->broker_module_directory()
+        != new_cfg.broker_module_directory()) {
       logger(log_config_warning, basic)
-        << "configuration: warning: broker module directory "
-        "can not be change";
-
-    if (config->command_file() != new_cfg.command_file())
+        << "Warning: Broker module directory cannot be changed";
+      ++config_warnings;
+    }
+    if (config->command_file() != new_cfg.command_file()) {
       logger(log_config_warning, basic)
-        << "configuration: warning: command file can not be change";
-
-    if (config->external_command_buffer_slots() != new_cfg.external_command_buffer_slots())
+        << "Warning: Command file cannot be changed";
+      ++config_warnings;
+    }
+    if (config->external_command_buffer_slots()
+        != new_cfg.external_command_buffer_slots()) {
       logger(log_config_warning, basic)
-        << "configuration: warning: external command buffer slots "
-        "can not be change";
-
-    if (config->use_timezone() != new_cfg.use_timezone())
+        << "Warning: External command buffer slots cannot be changed";
+      ++config_warnings;
+    }
+    if (config->use_timezone() != new_cfg.use_timezone()) {
       logger(log_config_warning, basic)
-        << "configuration: warning: timezone can not be change";
+        << "Warning: Timezone can not be changed";
+      ++config_warnings;
+    }
   }
 
   // Initialize perfdata if necessary.
@@ -1106,6 +1110,78 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     config->command_file(new_cfg.command_file());
     config->external_command_buffer_slots(new_cfg.external_command_buffer_slots());
     config->use_timezone(new_cfg.use_timezone());
+  }
+
+  // Check global event handler commands...
+  if (verify_config)
+    logger(log_info_message, basic)
+      << "Checking global event handlers...";
+  if (!config->global_host_event_handler().empty()) {
+    // Check the event handler command.
+    std::string temp_command_name(config->global_host_event_handler().substr(
+                                    0,
+                                    config->global_host_event_handler().find_first_of('!')));
+    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    if (!temp_command) {
+      logger(log_verification_error, basic)
+        << "Error: Global host event handler command '"
+        << temp_command_name << "' is not defined anywhere!";
+      ++config_errors;
+    }
+
+    // Save the pointer to the command for later.
+    global_host_event_handler_ptr = temp_command;
+  }
+  if (!config->global_service_event_handler().empty()) {
+    // Check the event handler command.
+    std::string temp_command_name(config->global_service_event_handler().substr(
+                                    0,
+                                    config->global_service_event_handler().find_first_of('!')));
+    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    if (!temp_command) {
+      logger(log_verification_error, basic)
+        << "Error: Global service event handler command '"
+        << temp_command_name << "' is not defined anywhere!";
+      ++config_errors;
+    }
+
+    // Save the pointer to the command for later.
+    global_service_event_handler_ptr = temp_command;
+  }
+
+  // Check obsessive processor commands...
+  if (verify_config)
+    logger(log_info_message, basic)
+      << "Checking obsessive compulsive processor commands...";
+  if (!config->ocsp_command().empty()) {
+    std::string temp_command_name(config->ocsp_command().substr(
+                                    0,
+                                    config->ocsp_command().find_first_of('!')));
+    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    if (!temp_command) {
+      logger(log_verification_error, basic)
+        << "Error: Obsessive compulsive service processor command '"
+        << temp_command_name << "' is not defined anywhere!";
+      ++config_errors;
+    }
+
+    // Save the pointer to the command for later.
+    ocsp_command_ptr = temp_command;
+  }
+  if (!config->ochp_command().empty()) {
+    std::string temp_command_name(config->ochp_command().substr(
+                                    0,
+                                    config->ochp_command().find_first_of('!')));
+    command_struct* temp_command(::find_command(temp_command_name.c_str()));
+    if (!temp_command) {
+      logger(log_verification_error, basic)
+        << "Error: Obsessive compulsive host processor command '"
+        << temp_command_name << "' is not defined anywhere!";
+      ++config_errors;
+    }
+
+    // Save the pointer to the command for later.
+    ochp_command_ptr = temp_command;
   }
 }
 

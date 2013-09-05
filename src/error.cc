@@ -176,6 +176,18 @@ error& error::operator<<(unsigned long long ull) throw () {
 /**
  *  Insertion operator.
  *
+ *  @param[in] d Double to concatenate to error message.
+ *
+ *  @return This object.
+ */
+error& error::operator<<(double d) throw () {
+  _insert_with_snprintf(d, "%lf%n");
+  return (*this);
+}
+
+/**
+ *  Insertion operator.
+ *
  *  @param[in] str String to concatenate to error message.
  *
  *  @return This object.

@@ -327,7 +327,7 @@ contact& engine::find_contact(std::string const& name) {
   umap<std::string, shared_ptr<contact_struct> >::const_iterator
     it(state::instance().contacts().find(name));
   if (it == state::instance().contacts().end())
-    throw (engine_error() << "contact " << name << " not found");
+    throw (engine_error() << "Contact '" << name << "' was not found");
   return (*it->second);
 }
 

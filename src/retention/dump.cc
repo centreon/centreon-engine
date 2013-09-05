@@ -351,8 +351,8 @@ bool dump::save(std::string const& path) {
                     path.c_str(),
                     std::ios::out | std::ios::trunc);
     if (!stream.is_open())
-      throw (engine_error() << "retention: can't open file "
-             << config->state_retention_file());
+      throw (engine_error() << "Cannot open retention file '"
+             << config->state_retention_file() << "'");
     dump::header(stream);
     dump::info(stream);
     dump::program(stream);

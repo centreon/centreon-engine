@@ -134,7 +134,7 @@ bool contactgroup::operator<(contactgroup const& right) const throw () {
  */
 void contactgroup::check_validity() const {
   if (_contactgroup_name.empty())
-    throw (engine_error() << "contact group has no name "
+    throw (engine_error() << "Contact group has no name "
            "(property 'contactgroup_name')");
   return ;
 }
@@ -155,7 +155,8 @@ contactgroup::key_type const& contactgroup::key() const throw () {
  */
 void contactgroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge contact group with '"
+           << obj.type() << "'");
   contactgroup const& tmpl(static_cast<contactgroup const&>(obj));
 
   MRG_DEFAULT(_alias);

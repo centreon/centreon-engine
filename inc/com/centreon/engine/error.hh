@@ -51,6 +51,7 @@ public:
   error&       operator<<(long l) throw ();
   error&       operator<<(long long ll) throw ();
   error&       operator<<(unsigned long long ull) throw ();
+  error&       operator<<(double d) throw ();
   error&       operator<<(std::string const& str) throw ();
   char const*  what() const throw ();
 

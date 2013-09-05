@@ -226,7 +226,8 @@ void object::resolve_template(map_object& templates) {
        ++it) {
     map_object::iterator tmpl(templates.find(*it));
     if (tmpl == templates.end())
-      throw (engine_error() << "merge failed: invalid object type");
+      throw (engine_error() << "Cannot merge object of type '"
+             << *it << "'");
     tmpl->second->resolve_template(templates);
     merge(*tmpl->second);
   }

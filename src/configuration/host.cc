@@ -23,6 +23,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
+extern int config_warnings;
+extern int config_errors;
+
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
@@ -391,9 +394,9 @@ bool host::operator<(host const& right) const throw () {
  */
 void host::check_validity() const {
   if (_host_name.empty())
-    throw (engine_error() << "host has no name (property 'host_name')");
+    throw (engine_error() << "Host has no name (property 'host_name')");
   if (_address.empty())
-    throw (engine_error() << "host '" << _host_name
+    throw (engine_error() << "Host '" << _host_name
            << "' has no address (property 'address')");
   return ;
 }
@@ -431,7 +434,8 @@ void host::merge(configuration::hostextinfo const& tmpl) {
  */
 void host::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge host with '"
+           << obj.type() << "'");
   host const& tmpl(static_cast<host const&>(obj));
 
   MRG_DEFAULT(_action_url);
@@ -1169,6 +1173,7 @@ bool host::_set_failure_prediction_enabled(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: host failure_prediction_enabled was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1184,6 +1189,7 @@ bool host::_set_failure_prediction_options(
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: service failure_prediction_options was ignored";
+  ++config_warnings;
   return (true);
 }
 

@@ -135,7 +135,7 @@ bool hostextinfo::operator!=(hostextinfo const& right) const throw () {
  */
 void hostextinfo::check_validity() const {
   if (_hostgroups->empty() && _hosts->empty())
-    throw (engine_error() << "host extended information is not attached"
+    throw (engine_error() << "Host extended information is not attached"
            << " to any host or host group (properties 'host_name' or "
            << "'hostgroup_name', respectively)");
   return ;
@@ -148,7 +148,9 @@ void hostextinfo::check_validity() const {
  */
 void hostextinfo::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error()
+           << "Cannot merge host extended information with '"
+           << obj.type() << "'");
   hostextinfo const& tmpl(static_cast<hostextinfo const&>(obj));
 
   MRG_DEFAULT(_action_url);

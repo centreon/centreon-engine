@@ -80,19 +80,19 @@ void applier::servicedependency::add_object(
       || !obj->dependent_hostgroups().empty()
       || (obj->dependent_service_description().size() != 1)
       || !obj->dependent_servicegroups().empty())
-    throw (engine_error() << "Error: Could not create service "
+    throw (engine_error() << "Could not create service "
            << "dependency with multiple (dependent) hosts / host groups "
-           << "/ services / service groups.");
+           << "/ services / service groups");
   if ((obj->dependency_type()
        != configuration::servicedependency::execution_dependency)
       && (obj->dependency_type()
           != configuration::servicedependency::notification_dependency))
-    throw (engine_error() << "Error: Could not create unexpanded "
+    throw (engine_error() << "Could not create unexpanded "
            << "dependency of service '"
            << obj->dependent_service_description().front()
            << "' of host '" << obj->dependent_hosts().front()
            << "' on service '" << obj->service_description().front()
-           << "' of host '" << obj->hosts().front() << "'.");
+           << "' of host '" << obj->hosts().front() << "'");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -131,12 +131,12 @@ void applier::servicedependency::add_object(
              obj->execution_failure_options()
              & configuration::servicedependency::pending),
            NULL_IF_EMPTY(obj->dependency_period())))
-      throw (engine_error() << "Error: Could not create service "
+      throw (engine_error() << "Could not create service "
              << "execution dependency of service '"
              << obj->dependent_service_description().front()
              << "' of host '" << obj->dependent_hosts().front()
              << "' on service '" << obj->service_description().front()
-             << "' of host '" << obj->hosts().front() << "'.");
+             << "' of host '" << obj->hosts().front() << "'");
   }
   // Create notification dependency.
   else
@@ -163,12 +163,12 @@ void applier::servicedependency::add_object(
              obj->notification_failure_options()
              & configuration::servicedependency::pending),
            NULL_IF_EMPTY(obj->dependency_period())))
-      throw (engine_error() << "Error: Could not create service "
+      throw (engine_error() << "Could not create service "
              << "notification dependency of service '"
              << obj->dependent_service_description().front()
              << "' of host '" << obj->dependent_hosts().front()
              << "' on service '" << obj->service_description().front()
-             << "' of host '" << obj->hosts().front() << "'.");
+             << "' of host '" << obj->hosts().front() << "'");
 
   return ;
 }
@@ -274,7 +274,7 @@ void applier::servicedependency::expand_object(
 void applier::servicedependency::modify_object(
                                    shared_ptr<configuration::servicedependency> obj) {
   (void)obj;
-  throw (engine_error() << "Error: Could not modify a service "
+  throw (engine_error() << "Could not modify a service "
          << "dependency: service dependency objects can only be added "
          << "or removed, this is likely a software bug that you should "
          << "report to Centreon Engine developers");
@@ -338,13 +338,12 @@ void applier::servicedependency::resolve_object(
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
     it(applier::state::instance().servicedependencies_find(obj->key()));
   if (applier::state::instance().servicedependencies().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing "
-           << "service dependency.");
+    throw (engine_error() << "Cannot resolve non-existing "
+           << "service dependency");
 
   // Resolve service dependency.
   if (!check_servicedependency(it->second.get(), NULL, NULL))
-    throw (engine_error()
-           << "Error: Cannot resolve service dependency.");
+    throw (engine_error() << "Cannot resolve service dependency");
 
   return ;
 }
@@ -393,8 +392,8 @@ void applier::servicedependency::_expand_services(
       ++it_group;
     }
     if (it_group == end_group)
-      throw (engine_error() << "Error: Could not resolve host group '"
-             << *it << "'.");
+      throw (engine_error() << "Could not resolve host group '"
+             << *it << "'");
 
     // Add host group members.
     for (std::set<std::string>::const_iterator
@@ -434,9 +433,8 @@ void applier::servicedependency::_expand_services(
       ++it_group;
     }
     if (it_group == end_group)
-      throw (engine_error()
-             << "Error: Could not resolve service group '"
-             << *it << "'.");
+      throw (engine_error() << "Could not resolve service group '"
+             << *it << "'");
 
     // Add service group members.
     for (std::set<std::pair<std::string, std::string> >::const_iterator

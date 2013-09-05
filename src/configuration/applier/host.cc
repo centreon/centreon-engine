@@ -154,8 +154,8 @@ void applier::host::add_object(
         obj->retain_nonstatus_information(),
         obj->obsess_over_host()));
   if (!h)
-    throw (engine_error() << "Error: Could not register host '"
-           << obj->host_name() << "'.");
+    throw (engine_error() << "Could not register host '"
+           << obj->host_name() << "'");
 
   // Contacts.
   for (list_string::const_iterator
@@ -164,8 +164,8 @@ void applier::host::add_object(
        it != end;
        ++it)
     if (!add_contact_to_host(h, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact '"
-             << *it << "' to host '" << obj->host_name() << "'.");
+      throw (engine_error() << "Could not add contact '"
+             << *it << "' to host '" << obj->host_name() << "'");
 
   // Contact groups.
   for (list_string::const_iterator
@@ -174,8 +174,8 @@ void applier::host::add_object(
        it != end;
        ++it)
     if (!add_contactgroup_to_host(h, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact group '"
-             << *it << "' to host '" << obj->host_name() << "'.");
+      throw (engine_error() << "Could not add contact group '"
+             << *it << "' to host '" << obj->host_name() << "'");
 
   // Custom variables.
   for (map_customvar::const_iterator
@@ -187,8 +187,8 @@ void applier::host::add_object(
            h,
            it->first.c_str(),
            it->second.c_str()))
-      throw (engine_error() << "Error: Could not add custom variable '"
-             << it->first << "' to host '" << obj->host_name() << "'.");
+      throw (engine_error() << "Could not add custom variable '"
+             << it->first << "' to host '" << obj->host_name() << "'");
 
   // Parents.
   for (list_string::const_iterator
@@ -197,8 +197,8 @@ void applier::host::add_object(
        it != end;
        ++it)
     if (!add_parent_host_to_host(h, it->c_str()))
-      throw (engine_error() << "Error: Could not add parent '"
-             << *it << "' to host '" << obj->host_name() << "'.");
+      throw (engine_error() << "Could not add parent '"
+             << *it << "' to host '" << obj->host_name() << "'");
 
   return ;
 }
@@ -225,9 +225,9 @@ void applier::host::expand_object(
     std::set<shared_ptr<configuration::hostgroup> >::iterator
       it_group(s.hostgroups_find(*it));
     if (it_group == s.hostgroups().end())
-      throw (engine_error() << "Error: Could not add host '"
+      throw (engine_error() << "Could not add host '"
              << obj->host_name() << "' to non-existing host group '"
-             << *it << "'.");
+             << *it << "'");
 
     // Remove host group from state.
     shared_ptr<configuration::hostgroup> backup(*it_group);
@@ -260,15 +260,15 @@ void applier::host::modify_object(
   // Find the configuration object.
   set_host::iterator it_cfg(config->hosts_find(obj->key()));
   if (it_cfg == config->hosts().end())
-    throw (engine_error() << "Error: Cannot modify non-existing host '"
-           << obj->host_name() << "'.");
+    throw (engine_error() << "Cannot modify non-existing host '"
+           << obj->host_name() << "'");
 
   // Find host object.
   umap<std::string, shared_ptr<host_struct> >::iterator
     it_obj(applier::state::instance().hosts_find(obj->key()));
   if (it_obj == applier::state::instance().hosts().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "host object '" << obj->host_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "host object '" << obj->host_name() << "'");
   host_struct* h(it_obj->second.get());
 
   // Update the global configuration set.
@@ -432,8 +432,8 @@ void applier::host::modify_object(
          it != end;
          ++it)
       if (!add_contact_to_host(h, it->c_str()))
-        throw (engine_error() << "Error: Could not add contact '"
-               << *it << "' to host '" << obj->host_name() << "'.");
+        throw (engine_error() << "Could not add contact '"
+               << *it << "' to host '" << obj->host_name() << "'");
   }
 
   // Contact groups.
@@ -450,8 +450,8 @@ void applier::host::modify_object(
          it != end;
          ++it)
       if (!add_contactgroup_to_host(h, it->c_str()))
-        throw (engine_error() << "Error: Could not add contact group '"
-               << *it << "' to host '" << obj->host_name() << "'.");
+        throw (engine_error() << "Could not add contact group '"
+               << *it << "' to host '" << obj->host_name() << "'");
   }
 
   // Custom variables.
@@ -472,8 +472,8 @@ void applier::host::modify_object(
              it->first.c_str(),
              it->second.c_str()))
         throw (engine_error()
-               << "Error: Could not add custom variable '" << it->first
-               << "' to host '" << obj->host_name() << "'.");
+               << "Could not add custom variable '" << it->first
+               << "' to host '" << obj->host_name() << "'");
   }
 
   // Parents.
@@ -488,8 +488,8 @@ void applier::host::modify_object(
          it != end;
          ++it)
       if (!add_parent_host_to_host(h, it->c_str()))
-        throw (engine_error() << "Error: Could not add parent '"
-               << *it << "' to host '" << obj->host_name() << "'.");
+        throw (engine_error() << "Could not add parent '"
+               << *it << "' to host '" << obj->host_name() << "'");
   }
 
   // Notify event broker.
@@ -564,8 +564,8 @@ void applier::host::resolve_object(
   umap<std::string, shared_ptr<host_struct> >::iterator
     it(applier::state::instance().hosts_find(obj->key()));
   if (applier::state::instance().hosts().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing host '"
-           << obj->host_name() << "'.");
+    throw (engine_error() << "Cannot resolve non-existing host '"
+           << obj->host_name() << "'");
 
   // Remove child backlinks.
   deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
@@ -582,8 +582,8 @@ void applier::host::resolve_object(
 
   // Resolve host.
   if (!check_host(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve host '"
-           << obj->host_name() << "'.");
+    throw (engine_error() << "Cannot resolve host '"
+           << obj->host_name() << "'");
 
   return ;
 }

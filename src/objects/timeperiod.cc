@@ -175,7 +175,8 @@ timeperiod& engine::find_timperiod(std::string const& name) {
   umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
     it(state::instance().timeperiods().find(name));
   if (it == state::instance().timeperiods().end())
-    throw (engine_error() << "timeperiod " << name << " not found");
+    throw (engine_error() << "Time period '"
+           << name << " was not found");
   return (*it->second);
 }
 

@@ -149,7 +149,7 @@ bool hostgroup::operator<(hostgroup const& right) const throw () {
  */
 void hostgroup::check_validity() const {
   if (_hostgroup_name.empty())
-    throw (engine_error() << "host group has no name "
+    throw (engine_error() << "Host group has no name "
            "(property 'hostgroup_name')");
   return ;
 }
@@ -170,7 +170,8 @@ hostgroup::key_type const& hostgroup::key() const throw () {
  */
 void hostgroup::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge host group with '"
+           << obj.type() << "'");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_alias);

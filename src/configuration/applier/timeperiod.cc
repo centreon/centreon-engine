@@ -80,8 +80,8 @@ void applier::timeperiod::add_object(
                           obj->timeperiod_name().c_str(),
                           NULL_IF_EMPTY(obj->alias())));
   if (!tp)
-    throw (engine_error() << "Error: Could not register time period '"
-           << obj->timeperiod_name() << "'.");
+    throw (engine_error() << "Could not register time period '"
+           << obj->timeperiod_name() << "'");
 
   // Fill time period structure.
   _add_time_ranges(obj->timeranges(), tp);
@@ -123,15 +123,15 @@ void applier::timeperiod::modify_object(
   set_timeperiod::iterator
     it_cfg(config->timeperiods_find(obj->key()));
   if (it_cfg == config->timeperiods().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "time period '" << obj->timeperiod_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "time period '" << obj->timeperiod_name() << "'");
 
   // Find time period object.
   umap<std::string, shared_ptr<timeperiod_struct> >::iterator
     it_obj(applier::state::instance().timeperiods_find(obj->key()));
   if (it_obj == applier::state::instance().timeperiods().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
-           << "time period object '" << obj->timeperiod_name() << "'.");
+    throw (engine_error() << "Could not modify non-existing "
+           << "time period object '" << obj->timeperiod_name() << "'");
   timeperiod_struct* tp(it_obj->second.get());
 
   // Update the global configuration set.
@@ -245,13 +245,13 @@ void applier::timeperiod::resolve_object(
   umap<std::string, shared_ptr<timeperiod_struct> >::iterator
     it(applier::state::instance().timeperiods_find(obj->key()));
   if (applier::state::instance().timeperiods().end() == it)
-    throw (engine_error() << "Error: Cannot resolve non-existing "
-           << "time period '" << obj->timeperiod_name() << "'.");
+    throw (engine_error() << "Cannot resolve non-existing "
+           << "time period '" << obj->timeperiod_name() << "'");
 
   // Resolve time period.
   if (!check_timeperiod(it->second.get(), NULL, NULL))
-    throw (engine_error() << "Error: Cannot resolve time period '"
-           << obj->timeperiod_name() << "'.");
+    throw (engine_error() << "Cannot resolve time period '"
+           << obj->timeperiod_name() << "'");
 
   return ;
 }
@@ -273,8 +273,8 @@ void applier::timeperiod::_add_exclusions(
     if (!add_exclusion_to_timeperiod(
            tp,
            it->c_str()))
-      throw (engine_error() << "Error: Could not add exclusion '"
-             << *it << "' to time period '" << tp->name << "'.");
+      throw (engine_error() << "Could not add exclusion '"
+             << *it << "' to time period '" << tp->name << "'");
   return ;
 }
 
@@ -312,8 +312,8 @@ void applier::timeperiod::_add_exceptions(
              it2->week_day_end_offset(),
              it2->skip_interval()))
         throw (engine_error()
-               << "Error: Could not add exception to time period '"
-               << tp->name << "'.");
+               << "Could not add exception to time period '"
+               << tp->name << "'");
       for (std::list<timerange>::const_iterator
              it3(it2->timeranges().begin()),
              end3(it2->timeranges().end());
@@ -324,9 +324,9 @@ void applier::timeperiod::_add_exceptions(
                it3->start(),
                it3->end()))
           throw (engine_error()
-                 << "Error: Could not add time range to date range of "
+                 << "Could not add time range to date range of "
                  << "type " << it2->type() << " of time period '"
-                 << tp->name << "'.");
+                 << tp->name << "'");
     }
   return ;
 }
@@ -357,7 +357,7 @@ void applier::timeperiod::_add_time_ranges(
              it2->start(),
              it2->end()))
         throw (engine_error()
-               << "Error: Could not add time range to time period '"
-               << tp->name << "'.");
+               << "Could not add time range to time period '"
+               << tp->name << "'");
   return ;
 }

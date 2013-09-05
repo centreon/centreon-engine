@@ -22,8 +22,8 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
 
-extern int config_errors;
 extern int config_warnings;
+extern int config_errors;
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
@@ -173,11 +173,11 @@ bool hostdependency::operator<(hostdependency const& right) const {
  */
 void hostdependency::check_validity() const {
   if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "host dependency is not attached to any "
+    throw (engine_error() << "Host dependency is not attached to any "
            << "host or host group (properties 'host_name' or "
            << "'hostgroup_name', respectively)");
   if (_dependent_hosts->empty() && _dependent_hostgroups->empty())
-    throw (engine_error() << "host dependency is not attached to any "
+    throw (engine_error() << "Host dependency is not attached to any "
            << "dependent host or dependent host group (properties "
            << "'dependent_host_name' or 'dependent_hostgroup_name', "
            << "respectively)");
@@ -185,7 +185,7 @@ void hostdependency::check_validity() const {
   if (!_execution_failure_options && !_notification_failure_options) {
     ++config_warnings;
     logger(log_config_warning, basic)
-      << "configuration: warning: Ignoring lame host dependency of '"
+      << "Warning: Ignoring lame host dependency of '"
       << _dependent_hosts->front() << "' on host '"
       << _hosts->front() << "'.";
   }
@@ -209,7 +209,8 @@ hostdependency::key_type const& hostdependency::key() const throw () {
  */
 void hostdependency::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge host dependency with '"
+           << obj.type() << "'");
   hostdependency const& tmpl(static_cast<hostdependency const&>(obj));
 
   MRG_DEFAULT(_dependency_period);

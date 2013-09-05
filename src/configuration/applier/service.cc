@@ -94,13 +94,13 @@ void applier::service::add_object(
                          shared_ptr<configuration::service> obj) {
   // Check service.
   if (obj->hosts().size() != 1)
-    throw (engine_error() << "Error: Could not create service '"
+    throw (engine_error() << "Could not create service '"
            << obj->service_description()
-           << "' with multiple hosts defined.");
+           << "' with multiple hosts defined");
   else if (!obj->hostgroups().empty())
-    throw (engine_error() << "Error: Could not create service '"
+    throw (engine_error() << "Could not create service '"
            << obj->service_description()
-           << "' with multiple host groups defined.");
+           << "' with multiple host groups defined");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -176,9 +176,9 @@ void applier::service::add_object(
     obj->retain_nonstatus_information(),
     obj->obsess_over_service()));
   if (!svc)
-      throw (engine_error() << "Error: Could not register service '"
+      throw (engine_error() << "Could not register service '"
              << obj->service_description()
-             << "' of host '" << obj->hosts().front() << "'.");
+             << "' of host '" << obj->hosts().front() << "'");
 
   // Add contacts.
   for (list_string::const_iterator
@@ -187,9 +187,9 @@ void applier::service::add_object(
        it != end;
        ++it)
     if (!add_contact_to_service(svc, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact '"
+      throw (engine_error() << "Could not add contact '"
              << *it << "' to service '" << obj->service_description()
-             << "' of host '" << obj->hosts().front() << "'.");
+             << "' of host '" << obj->hosts().front() << "'");
 
   // Add contactgroups.
   for (list_string::const_iterator
@@ -198,9 +198,9 @@ void applier::service::add_object(
        it != end;
        ++it)
     if (!add_contactgroup_to_service(svc, it->c_str()))
-      throw (engine_error() << "Error: Could not add contact group '"
+      throw (engine_error() << "Could not add contact group '"
              << *it << "' to service '" << obj->service_description()
-             << "' of host '" << obj->hosts().front() << "'.");
+             << "' of host '" << obj->hosts().front() << "'");
 
   // Add custom variables.
   for (map_customvar::const_iterator
@@ -212,11 +212,10 @@ void applier::service::add_object(
            svc,
            it->first.c_str(),
            it->second.c_str()))
-      throw (engine_error()
-             << "Error: Could not add custom variable '"
+      throw (engine_error() << "Could not add custom variable '"
              << it->first << "' to service '"
              << obj->service_description() << "' of host '"
-             << obj->hosts().front() << "'.");
+             << obj->hosts().front() << "'");
 
   return ;
 }
@@ -267,16 +266,16 @@ void applier::service::expand_object(
         ++it2;
       }
       if (it2 == end2)
-        throw (engine_error() << "Error: Could not find host group '"
+        throw (engine_error() << "Could not find host group '"
                << *it << "' on which to apply service '"
-               << obj->service_description() << "'.");
+               << obj->service_description() << "'");
 
       // Check host group and user configuration.
       if ((*it2)->resolved_members().empty()
           && !s.allow_empty_hostgroup_assignment())
-        throw (engine_error() << "Error: Could not expand host group '"
+        throw (engine_error() << "Could not expand host group '"
                << *it << "' specified in service '"
-               << obj->service_description() << "'.");
+               << obj->service_description() << "'");
 
       // Add host group members.
       for (set_string::const_iterator
@@ -330,17 +329,17 @@ void applier::service::modify_object(
   // Find the configuration object.
   set_service::iterator it_cfg(config->services_find(obj->key()));
   if (it_cfg == config->services().end())
-    throw (engine_error() << "Error: Cannot modify non-existing "
+    throw (engine_error() << "Cannot modify non-existing "
            "service '" << service_description << "' of host '"
-           << host_name << "'.");
+           << host_name << "'");
 
   // Find service object.
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
     it_obj(applier::state::instance().services_find(obj->key()));
   if (it_obj == applier::state::instance().services().end())
-    throw (engine_error() << "Error: Could not modify non-existing "
+    throw (engine_error() << "Could not modify non-existing "
            << "service object '" << service_description
-           << "' of host '" << host_name << "'.");
+           << "' of host '" << host_name << "'");
   service_struct* s(it_obj->second.get());
 
   // Update the global configuration set.
@@ -503,9 +502,9 @@ void applier::service::modify_object(
          it != end;
          ++it)
       if (!add_contact_to_service(s, it->c_str()))
-        throw (engine_error() << "Error: Could not add contact '"
+        throw (engine_error() << "Could not add contact '"
                << *it << "' to service '" << service_description
-               << "' on host '" << host_name << "'.");
+               << "' on host '" << host_name << "'");
   }
 
   // Contact groups.
@@ -522,9 +521,9 @@ void applier::service::modify_object(
          it != end;
          ++it)
       if (!add_contactgroup_to_service(s, it->c_str()))
-        throw (engine_error() << "Error: Could not add contact group '"
+        throw (engine_error() << "Could not add contact group '"
                << *it << "' to service '" << service_description
-               << "' on host '" << host_name << "'.");
+               << "' on host '" << host_name << "'");
   }
 
   // Custom variables.
@@ -544,10 +543,9 @@ void applier::service::modify_object(
              s,
              it->first.c_str(),
              it->second.c_str()))
-        throw (engine_error()
-               << "Error: Could not add custom variable '" << it->first
-               << "' to service '" << service_description
-               << "' on host '" << host_name << "'.");
+        throw (engine_error() << "Could not add custom variable '"
+               << it->first << "' to service '" << service_description
+               << "' on host '" << host_name << "'");
   }
 
   // Notify event broker.
@@ -635,10 +633,9 @@ void applier::service::resolve_object(
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::iterator
     it(applier::state::instance().services_find(obj->key()));
   if (applier::state::instance().services().end() == it)
-    throw (engine_error()
-           << "Error: Cannot resolve non-existing service '"
+    throw (engine_error() << "Cannot resolve non-existing service '"
            << obj->service_description() << "' of host '"
-           << obj->hosts().front() << "'.");
+           << obj->hosts().front() << "'");
 
   // Remove service group links.
   deleter::listmember(
@@ -656,9 +653,9 @@ void applier::service::resolve_object(
 
   // Resolve service.
   if (!check_service(it->second.get(), NULL, NULL))
-      throw (engine_error() << "Error: Cannot resolve service '"
+      throw (engine_error() << "Cannot resolve service '"
              << obj->service_description() << "' of host '"
-             << obj->hosts().front() << "'.");
+             << obj->hosts().front() << "'");
 
   return ;
 }
@@ -685,10 +682,10 @@ void applier::service::_expand_service_memberships(
                       s.servicegroups().end(),
                       servicegroup_name_comparator(*it)));
     if (it_group == s.servicegroups().end())
-      throw (engine_error() << "Error: Could not add service '"
+      throw (engine_error() << "Could not add service '"
              << obj->service_description() << "' of host '"
              << obj->hosts().front()
-             << "' to non-existing service group '" << *it << "'.");
+             << "' to non-existing service group '" << *it << "'");
 
     // Remove service group from state.
     shared_ptr<configuration::servicegroup> backup(*it_group);
@@ -737,9 +734,9 @@ void applier::service::_inherits_special_vars(
     }
     if (it == end)
       throw (engine_error()
-             << "Error: Could not inherit special variables for service '"
+             << "Could not inherit special variables for service '"
              << obj->service_description() << "': host '"
-             << obj->hosts().front() << "' does not exist.");
+             << obj->hosts().front() << "' does not exist");
 
     // Inherits variables.
     if (!obj->contactgroups_defined())

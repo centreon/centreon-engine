@@ -138,7 +138,7 @@ bool timeperiod::operator<(timeperiod const& right) const throw () {
 void timeperiod::check_validity() const {
   if (_timeperiod_name.empty())
     throw (engine_error()
-           << "time period has no name (property 'timeperiod_name')");
+           << "Time period has no name (property 'timeperiod_name')");
   return ;
 }
 
@@ -158,7 +158,8 @@ timeperiod::key_type const& timeperiod::key() const throw () {
  */
 void timeperiod::merge(object const& obj) {
   if (obj.type() != _type)
-    throw (engine_error() << "merge failed: invalid object type");
+    throw (engine_error() << "Cannot merge time period with '"
+           << obj.type() << "'");
   timeperiod const& tmpl(static_cast<timeperiod const&>(obj));
 
   MRG_DEFAULT(_alias);
