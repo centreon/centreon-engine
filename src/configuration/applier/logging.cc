@@ -35,8 +35,8 @@ static applier::logging* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::logging::apply(state& config) {
-  if (verify_config)
-    return;
+  if (verify_config || test_scheduling)
+    return ;
 
   // Syslog.
   if (config.use_syslog() == true && !_syslog)

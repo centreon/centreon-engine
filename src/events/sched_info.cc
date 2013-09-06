@@ -208,129 +208,112 @@ void adjust_check_scheduling() {
  *  Displays service check scheduling information.
  */
 void display_scheduling_info() {
-  float max_reaper_interval(0.0);
-  float minimum_concurrent_checks(0.0);
-  float minimum_concurrent_checks1(0.0);
-  float minimum_concurrent_checks2(0.0);
+  // Notice.
+  logger(log_info_message, basic)
+    << "\nProjected scheduling information for host and service checks\n"
+    << "is listed below.  This information assumes that you are going\n"
+    << "to start running Centreon Engine with your current config files.\n\n";
+
+  // Host scheduling information.
+  logger(log_info_message, basic)
+    << "HOST SCHEDULING INFORMATION\n"
+    << "---------------------------\n"
+    << "Total hosts:                     " << scheduling_info.total_hosts << "\n"
+    << "Total scheduled hosts:           " << scheduling_info.total_scheduled_hosts << "\n";
+  if (config->host_inter_check_delay_method()
+      == configuration::state::icd_none)
+    logger(log_info_message, basic)
+      << "Host inter-check delay method:   NONE\n";
+  else if (config->host_inter_check_delay_method()
+           == configuration::state::icd_dumb)
+    logger(log_info_message, basic)
+      << "Host inter-check delay method:   DUMB\n";
+  else if (config->host_inter_check_delay_method()
+           == configuration::state::icd_smart)
+    logger(log_info_message, basic)
+      << "Host inter-check delay method:   SMART\n"
+      << "Average host check interval:     " << scheduling_info.average_host_check_interval << " sec\n";
+  else
+    logger(log_info_message, basic)
+      << "Host inter-check delay method:   USER-SUPPLIED VALUE\n";
+  logger(log_info_message, basic)
+    << "Host inter-check delay:          " << scheduling_info.host_inter_check_delay << " sec\n"
+    << "Max host check spread:           " << scheduling_info.max_host_check_spread << " min\n"
+    << "First scheduled check:           "
+    << ((scheduling_info.total_scheduled_hosts == 0)
+        ? "N/A\n"
+        : ctime(&scheduling_info.first_host_check))
+    << "Last scheduled check:            "
+    << ((scheduling_info.total_scheduled_hosts == 0)
+        ? "N/A\n"
+        : ctime(&scheduling_info.last_host_check))
+    << "\n";
+
+  // Service scheduling information.
+  logger(log_info_message, basic)
+    << "SERVICE SCHEDULING INFORMATION\n"
+    << "-------------------------------\n"
+    << "Total services:                     " << scheduling_info.total_services << "\n"
+    << "Total scheduled services:           " << scheduling_info.total_scheduled_services << "\n";
+  if (config->service_inter_check_delay_method()
+      == configuration::state::icd_none)
+    logger(log_info_message, basic)
+      << "Service inter-check delay method:   NONE\n";
+  else if (config->service_inter_check_delay_method()
+           == configuration::state::icd_dumb)
+    logger(log_info_message, basic)
+      << "Service inter-check delay method:   DUMB\n";
+  else if (config->service_inter_check_delay_method()
+           == configuration::state::icd_smart) {
+    logger(log_info_message, basic)
+      << "Service inter-check delay method:   SMART\n"
+      << "Average service check interval:     " << scheduling_info.average_service_check_interval << " sec\n";
+  }
+  else
+    logger(log_info_message, basic)
+      << "Service inter-check delay method:   USER-SUPPLIED VALUE\n";
+  logger(log_info_message, basic)
+    << "Inter-check delay:                  " << scheduling_info.service_inter_check_delay << " sec\n"
+    << "Interleave factor method:           "
+    << ((config->service_interleave_factor_method()
+         == configuration::state::ilf_user)
+        ? "USER-SUPPLIED VALUE"
+        : "SMART") << "\n";
+  if (config->service_interleave_factor_method()
+      == configuration::state::ilf_smart)
+    logger(log_info_message, basic)
+      << "Average services per host:          " << scheduling_info.average_services_per_host << "\n";
+  logger(log_info_message, basic)
+    << "Service interleave factor:          " << scheduling_info.service_interleave_factor << "\n"
+    << "Max service check spread:           " << scheduling_info.max_service_check_spread << " min\n"
+    << "First scheduled check:              " << ctime(&scheduling_info.first_service_check)
+    << "Last scheduled check:               " << ctime(&scheduling_info.last_service_check)
+    << "\n";
+
+  // Check processing information.
+  logger(log_info_message, basic)
+    << "CHECK PROCESSING INFORMATION\n"
+    << "----------------------------\n"
+    << "Check result reaper interval:       " << config->check_reaper_interval() << " sec\n";
+  if (config->max_parallel_service_checks() == 0)
+    logger(log_info_message, basic)
+      << "Max concurrent service checks:      Unlimited\n";
+  else
+    logger(log_info_message, basic)
+      << "Max concurrent service checks:      " << config->max_parallel_service_checks() << "\n";
+  logger(log_info_message, basic) << "\n";
+
+  // Performance suggestions.
+  logger(log_info_message, basic)
+    << "PERFORMANCE SUGGESTIONS\n"
+    << "-----------------------\n";
   int suggestions(0);
 
-  printf(
-    "Projected scheduling information for host and service "
-    "checks\n"
-    "is listed below.  This information assumes that you are "
-    "going\n"
-    "to start running Centreon Engine with your current config "
-    "files.\n\n");
-
-  printf(
-    "HOST SCHEDULING INFORMATION\n"
-    "---------------------------\n"
-    "Total hosts:                     %d\n",
-    scheduling_info.total_hosts);
-  printf(
-    "Total scheduled hosts:           %d\n",
-    scheduling_info.total_scheduled_hosts);
-
-  printf("Host inter-check delay method:   ");
-  if (config->host_inter_check_delay_method() == configuration::state::icd_none)
-    printf("NONE\n");
-  else if (config->host_inter_check_delay_method() == configuration::state::icd_dumb)
-    printf("DUMB\n");
-  else if (config->host_inter_check_delay_method() == configuration::state::icd_smart) {
-    printf("SMART\n");
-    printf(
-      "Average host check interval:     %.2f sec\n",
-      scheduling_info.average_host_check_interval);
-  }
-  else
-    printf("USER-SUPPLIED VALUE\n");
-  printf(
-    "Host inter-check delay:          %.2f sec\n",
-    scheduling_info.host_inter_check_delay);
-  printf(
-    "Max host check spread:           %d min\n",
-    scheduling_info.max_host_check_spread);
-  printf(
-    "First scheduled check:           %s",
-    (scheduling_info.total_scheduled_hosts == 0)
-    ? "N/A\n" : ctime(&scheduling_info.first_host_check));
-  printf(
-    "Last scheduled check:            %s",
-    (scheduling_info.total_scheduled_hosts == 0)
-    ? "N/A\n" : ctime(&scheduling_info.last_host_check));
-  printf("\n\n");
-
-  printf(
-    "SERVICE SCHEDULING INFORMATION\n"
-    "-------------------------------\n");
-  printf(
-    "Total services:                     %d\n",
-    scheduling_info.total_services);
-  printf(
-    "Total scheduled services:           %d\n",
-    scheduling_info.total_scheduled_services);
-
-  printf("Service inter-check delay method:   ");
-  if (config->service_inter_check_delay_method() == configuration::state::icd_none)
-    printf("NONE\n");
-  else if (config->service_inter_check_delay_method() == configuration::state::icd_dumb)
-    printf("DUMB\n");
-  else if (config->service_inter_check_delay_method() == configuration::state::icd_smart) {
-    printf("SMART\n");
-    printf(
-      "Average service check interval:     %.2f sec\n",
-      scheduling_info.average_service_check_interval);
-  }
-  else
-    printf("USER-SUPPLIED VALUE\n");
-  printf(
-    "Inter-check delay:                  %.2f sec\n",
-    scheduling_info.service_inter_check_delay);
-
-  printf(
-    "Interleave factor method:           %s\n",
-    (config->service_interleave_factor_method() == configuration::state::ilf_user)
-    ? "USER-SUPPLIED VALUE" : "SMART");
-  if (config->service_interleave_factor_method() == configuration::state::ilf_smart)
-    printf(
-      "Average services per host:          %.2f\n",
-      scheduling_info.average_services_per_host);
-  printf(
-    "Service interleave factor:          %d\n",
-    scheduling_info.service_interleave_factor);
-
-  printf(
-   "Max service check spread:           %d min\n",
-   scheduling_info.max_service_check_spread);
-  printf(
-    "First scheduled check:              %s",
-    ctime(&scheduling_info.first_service_check));
-  printf(
-    "Last scheduled check:               %s",
-    ctime(&scheduling_info.last_service_check));
-  printf("\n\n");
-
-  printf(
-    "CHECK PROCESSING INFORMATION\n"
-    "----------------------------\n");
-  printf(
-    "Check result reaper interval:       %d sec\n",
-    config->check_reaper_interval());
-  printf("Max concurrent service checks:      ");
-  if (config->max_parallel_service_checks() == 0)
-    printf("Unlimited\n");
-  else
-    printf("%d\n", config->max_parallel_service_checks());
-  printf("\n\n");
-
-  printf("PERFORMANCE SUGGESTIONS\n");
-  printf("-----------------------\n");
-
-  /***** MAX REAPER INTERVAL RECOMMENDATION *****/
-
-  // assume a 100% (2x) check burst for check reaper.
-  // assume we want a max of 2k files in the result queue
+  // MAX REAPER INTERVAL RECOMMENDATION.
+  // Assume a 100% (2x) check burst for check reaper.
+  // Assume we want a max of 2k files in the result queue
   // at any given time.
+  float max_reaper_interval(0.0);
   max_reaper_interval
     = floor(2000 * scheduling_info.service_inter_check_delay);
   if (max_reaper_interval < 2.0)
@@ -338,22 +321,23 @@ void display_scheduling_info() {
   if (max_reaper_interval > 30.0)
     max_reaper_interval = 30.0;
   if (max_reaper_interval < config->check_reaper_interval()) {
-    printf(
-      "* Value for 'check_result_reaper_frequency' should be <= %d "
-      "seconds\n", (int)max_reaper_interval);
-    suggestions++;
+    logger(log_info_message, basic)
+      << "* Value for 'check_result_reaper_frequency' should be <= "
+      << static_cast<int>(max_reaper_interval) << " seconds\n";
+    ++suggestions;
   }
   if (config->check_reaper_interval() < 2) {
-    printf(
-      "* Value for 'check_result_reaper_frequency' should be >= 2 "
-      "seconds\n");
-    suggestions++;
+    logger(log_info_message, basic)
+      << "* Value for 'check_result_reaper_frequency' should be >= 2 seconds\n";
+    ++suggestions;
   }
 
-  /***** MINIMUM CONCURRENT CHECKS RECOMMENDATION *****/
-
-  // first method (old) - assume a 100% (2x) service check
+  // MINIMUM CONCURRENT CHECKS RECOMMENDATION.
+  // First method (old) - assume a 100% (2x) service check
   // burst for max concurrent checks.
+  float minimum_concurrent_checks(0.0);
+  float minimum_concurrent_checks1(0.0);
+  float minimum_concurrent_checks2(0.0);
   if (scheduling_info.service_inter_check_delay == 0.0)
     minimum_concurrent_checks1
       = ceil(config->check_reaper_interval() * 2.0);
@@ -361,34 +345,31 @@ void display_scheduling_info() {
     minimum_concurrent_checks1
       = ceil((config->check_reaper_interval() * 2.0)
              / scheduling_info.service_inter_check_delay);
-
-  // second method (new) - assume a 25% (1.25x) service check
+  // Second method (new) - assume a 25% (1.25x) service check
   // burst for max concurrent checks.
   minimum_concurrent_checks2
     = ceil((((double)scheduling_info.total_scheduled_services)
             / scheduling_info.average_service_check_interval) * 1.25
            * config->check_reaper_interval()
            * scheduling_info.average_service_execution_time);
-
-  // use max of computed values.
+  // Use max of computed values.
   if (minimum_concurrent_checks1 > minimum_concurrent_checks2)
     minimum_concurrent_checks = minimum_concurrent_checks1;
   else
     minimum_concurrent_checks = minimum_concurrent_checks2;
-
-  // compare with configured value.
+  // Compare with configured value.
   if ((minimum_concurrent_checks > config->max_parallel_service_checks())
       && config->max_parallel_service_checks() != 0) {
-    printf(
-      "* Value for 'max_concurrent_checks' option should be >= %d\n",
-      (int)minimum_concurrent_checks);
-    suggestions++;
+    logger(log_info_message, basic)
+      << "* Value for 'max_concurrent_checks' option should be >= "
+      << static_cast<int>(minimum_concurrent_checks) << "\n";
+    ++suggestions;
   }
-
   if (suggestions == 0)
-    printf("I have no suggestions - things look okay.\n");
-  printf("\n");
-  return;
+    logger(log_info_message, basic)
+      << "I have no suggestions - things look okay.\n";
+
+  return ;
 }
 
 /**

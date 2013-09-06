@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
       }
       catch (std::exception const& e) {
         logger(logging::log_config_error, logging::basic)
-          << "error while processing a config file: " << e.what();
+          << "Error while processing a config file: " << e.what();
         logger(logging::log_config_error, logging::basic)
           << "One or more problems occurred while processing "
           "the config files.\n\n" ERROR_CONFIGURATION;
