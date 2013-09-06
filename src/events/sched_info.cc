@@ -218,32 +218,32 @@ void display_scheduling_info() {
   logger(log_info_message, basic)
     << "HOST SCHEDULING INFORMATION\n"
     << "---------------------------\n"
-    << "Total hosts:                     " << scheduling_info.total_hosts << "\n"
-    << "Total scheduled hosts:           " << scheduling_info.total_scheduled_hosts << "\n";
+    << "Total hosts:                        " << scheduling_info.total_hosts << "\n"
+    << "Total scheduled hosts:              " << scheduling_info.total_scheduled_hosts << "\n";
   if (config->host_inter_check_delay_method()
       == configuration::state::icd_none)
     logger(log_info_message, basic)
-      << "Host inter-check delay method:   NONE\n";
+      << "Host inter-check delay method:      NONE\n";
   else if (config->host_inter_check_delay_method()
            == configuration::state::icd_dumb)
     logger(log_info_message, basic)
-      << "Host inter-check delay method:   DUMB\n";
+      << "Host inter-check delay method:      DUMB\n";
   else if (config->host_inter_check_delay_method()
            == configuration::state::icd_smart)
     logger(log_info_message, basic)
-      << "Host inter-check delay method:   SMART\n"
-      << "Average host check interval:     " << scheduling_info.average_host_check_interval << " sec\n";
+      << "Host inter-check delay method:      SMART\n"
+      << "Average host check interval:        " << scheduling_info.average_host_check_interval << " sec\n";
   else
     logger(log_info_message, basic)
-      << "Host inter-check delay method:   USER-SUPPLIED VALUE\n";
+      << "Host inter-check delay method:      USER-SUPPLIED VALUE\n";
   logger(log_info_message, basic)
-    << "Host inter-check delay:          " << scheduling_info.host_inter_check_delay << " sec\n"
-    << "Max host check spread:           " << scheduling_info.max_host_check_spread << " min\n"
-    << "First scheduled check:           "
+    << "Host inter-check delay:             " << scheduling_info.host_inter_check_delay << " sec\n"
+    << "Max host check spread:              " << scheduling_info.max_host_check_spread << " min\n"
+    << "First scheduled check:              "
     << ((scheduling_info.total_scheduled_hosts == 0)
         ? "N/A\n"
         : ctime(&scheduling_info.first_host_check))
-    << "Last scheduled check:            "
+    << "Last scheduled check:               "
     << ((scheduling_info.total_scheduled_hosts == 0)
         ? "N/A\n"
         : ctime(&scheduling_info.last_host_check))

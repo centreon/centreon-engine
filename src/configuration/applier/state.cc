@@ -1340,6 +1340,9 @@ void applier::state::_processing(
        configuration::state& new_cfg,
        bool waiting_thread,
        retention::state* state) {
+  // Timing.
+  struct timeval tv[5];
+
   // Call prelauch broker event the first time to run applier state.
   if (!has_already_been_loaded)
     broker_program_state(
@@ -1351,6 +1354,7 @@ void applier::state::_processing(
   //
   // Expand all objects.
   //
+  gettimeofday(tv, NULL);
 
   // Expand timeperiods.
   _expand<configuration::timeperiod, applier::timeperiod>(
@@ -1499,6 +1503,9 @@ void applier::state::_processing(
     config->serviceescalations(),
     new_cfg.serviceescalations());
 
+  // Timing.
+  gettimeofday(tv + 1, NULL);
+
   if (waiting_thread && _processing_state == state_ready) {
     concurrency::locker lock(&_lock);
     _processing_state = state_waiting;
@@ -1516,6 +1523,9 @@ void applier::state::_processing(
 
     // Apply macros configurations.
     applier::macros::instance().apply(new_cfg);
+
+    // Timing.
+    gettimeofday(tv + 2, NULL);
 
     //
     //  Apply and resolve all objects.
@@ -1620,7 +1630,10 @@ void applier::state::_processing(
       }
     }
 
-    // check for circular paths between hosts.
+    // Timing.
+    gettimeofday(tv + 3, NULL);
+
+    // Check for circular paths between hosts.
     pre_flight_circular_check(&config_warnings, &config_errors);
 
     // Call start broker event the first time to run applier state.
@@ -1632,6 +1645,32 @@ void applier::state::_processing(
         NEBFLAG_NONE,
         NEBATTR_NONE,
         NULL);
+    }
+
+    // Timing.
+    gettimeofday(tv + 4, NULL);
+    if (test_scheduling) {
+      double runtimes[5];
+      runtimes[4] = 0.0;
+      for (unsigned int i(0);
+           i < (sizeof(runtimes) / sizeof(*runtimes) - 1);
+           ++i) {
+        runtimes[i] = tv[i + 1].tv_sec - tv[i].tv_sec
+          + (tv[i + 1].tv_usec - tv[i].tv_usec) / 1000000.0;
+        runtimes[4] += runtimes[i];
+      }
+      logger(log_info_message, basic)
+        << "\nTiming information on configuration verification is listed below.\n\n"
+        << "CONFIG VERIFICATION TIMES          (* = Potential for speedup with -x option)\n"
+        << "----------------------------------\n"
+        << "Template Resolutions: " << runtimes[0] << " sec\n"
+        << "Object Relationships: " << runtimes[2] << " sec\n"
+        << "Circular Paths:       " << runtimes[3] << " sec  *\n"
+        << "Misc:                 " << runtimes[1] << " sec\n"
+        << "                      ============\n"
+        << "TOTAL:                " << runtimes[4]
+        << " sec  * = " << runtimes[3] << " sec ("
+        << (runtimes[3] * 100.0 / runtimes[4]) << "%) estimated savings\n";
     }
   }
   catch (...) {
