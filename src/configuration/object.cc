@@ -200,10 +200,14 @@ bool object::parse(char const* key, char const* value) {
  */
 bool object::parse(std::string const& line) {
   std::size_t pos(line.find_first_of(" \t\r", 0));
+  std::string key;
+  std::string value;
   if (pos == std::string::npos)
-    return (false);
-  std::string key(line.substr(0, pos));
-  std::string value(line.substr(pos + 1));
+    key = line;
+  else {
+    key.assign(line, 0, pos);
+    value.assign(line, pos + 1, std::string::npos);
+  }
   string::trim(value);
   if (!parse(key.c_str(), value.c_str()))
     return (object::parse(key.c_str(), value.c_str()));
