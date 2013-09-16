@@ -51,6 +51,8 @@ get_property(
   TARGET "externalcmd"
   PROPERTY LOCATION)
 set(EXTERNALCMD_MODULE "${EXTERNALCMD_MODULE}" PARENT_SCOPE)
+# Link target with libraries.
+target_link_libraries("externalcmd" "${CLIB_LIBRARIES}")
 
 # Install rule.
 install(TARGETS "externalcmd"

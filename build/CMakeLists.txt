@@ -617,6 +617,11 @@ add_definitions(-DDEFAULT_CONFIG_FILE="${PREFIX_CONF}/centengine.cfg")
 add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${VAR_DIR}/objects.cache")
 add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 
+# Add specific linker flags for Mac OS to build correctly shared libraries.
+if (APPLE)
+  set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-undefined -Wl,dynamic_lookup")
+endif ()
+
 #
 # Targets.
 #
