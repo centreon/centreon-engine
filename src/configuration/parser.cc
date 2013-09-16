@@ -391,7 +391,7 @@ void parser::_parse_global_configuration(std::string const& path) {
   logger(logging::log_info_message, logging::most)
     << "Reading main configuration file '" << path << "'.";
 
-  std::ifstream stream(path.c_str());
+  std::ifstream stream(path.c_str(), std::ios::binary);
   if (!stream.is_open())
     throw (engine_error() << "Parsing of global "
            "configuration failed: Can't open file '" << path << "'");
@@ -422,7 +422,7 @@ void parser::_parse_object_definitions(std::string const& path) {
   logger(logging::log_info_message, logging::basic)
     << "Processing object config file '" << path << "'";
 
-  std::ifstream stream(path.c_str());
+  std::ifstream stream(path.c_str(), std::ios::binary);
   if (!stream.is_open())
     throw (engine_error() << "Parsing of object definition failed: "
            << "Can't open file '" << path << "'");
@@ -497,7 +497,7 @@ void parser::_parse_resource_file(std::string const& path) {
   logger(logging::log_info_message, logging::most)
     << "Reading resource file '" << path << "'";
 
-  std::ifstream stream(path.c_str());
+  std::ifstream stream(path.c_str(), std::ios::binary);
   if (!stream.is_open())
     throw (engine_error() << "Parsing of resource file failed: "
            << "can't open file '" << path << "'");

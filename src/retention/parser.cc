@@ -51,7 +51,7 @@ parser::~parser() throw () {}
  *  @param[in] path The configuration file path.
  */
 void parser::parse(std::string const& path, state& retention) {
-  std::ifstream stream(path.c_str());
+  std::ifstream stream(path.c_str(), std::ios::binary);
   if (!stream.is_open())
     throw (engine_error() << "Parsing of retention file failed: "
            "Can't open file '" << path << "'");
