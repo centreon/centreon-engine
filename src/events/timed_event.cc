@@ -370,7 +370,6 @@ void add_event(
 
   // else place the event according to next execution time.
   else {
-
     // start from the end of the list, as new events are likely to
     // be executed in the future, rather than now...
     for (timed_event* tmp(*event_list_tail); tmp; tmp = tmp->prev) {

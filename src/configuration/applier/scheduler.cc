@@ -801,6 +801,9 @@ void applier::scheduler::_scheduling_host_checks(
     ++mult_factor;
   }
 
+  // Need to optimize add_event insert.
+  std::multimap<time_t, host_struct*> hosts_to_schedule;
+
   // add scheduled host checks to event queue.
   for (unsigned int i(0); i < end; ++i) {
     host_struct& hst(*hosts[i]);
@@ -817,6 +820,15 @@ void applier::scheduler::_scheduling_host_checks(
             && (hst.check_options & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
     }
+    hosts_to_schedule.insert(std::make_pair(hst.next_check, &hst));
+  }
+
+  // Schedule events list.
+  for (std::multimap<time_t, host_struct*>::const_iterator
+         it(hosts_to_schedule.begin()), end(hosts_to_schedule.end());
+       it != end;
+       ++it) {
+    host_struct& hst(*it->second);
 
     // schedule a new host check event.
     timed_event* evt(events::schedule(
@@ -908,6 +920,9 @@ void applier::scheduler::_scheduling_service_checks(
     }
   }
 
+  // Need to optimize add_event insert.
+  std::multimap<time_t, service_struct*> services_to_schedule;
+
   // add scheduled service checks to event queue.
   for (unsigned int i(0); i < end; ++i) {
     service_struct& svc(*services[i]);
@@ -924,7 +939,16 @@ void applier::scheduler::_scheduling_service_checks(
             && (svc.check_options & CHECK_OPTION_FORCE_EXECUTION)))
         continue;
     }
+    services_to_schedule.insert(std::make_pair(svc.next_check, &svc));
+  }
 
+  // Schedule events list.
+  for (std::multimap<time_t, service_struct*>::const_iterator
+         it(services_to_schedule.begin()),
+         end(services_to_schedule.end());
+       it != end;
+       ++it) {
+    service_struct& svc(*it->second);
     // create a new service check event.
     timed_event* evt(events::schedule(
                        EVENT_SERVICE_CHECK,
