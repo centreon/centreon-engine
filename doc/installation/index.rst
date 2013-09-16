@@ -55,7 +55,7 @@ dependencies:
 
   * a C++ compilation environment.
   * CMake **(>= 2.8)**, a cross-platform build system.
-  * Centreon Clib, The centreon Core library.
+  * Centreon Clib **(>= 1.2)**, The centreon Core library.
 
 To build the optional web service module, you will need the following
 external dependencies:
@@ -104,7 +104,7 @@ Software                    Package Name        Description
 C++ compilation environment gcc gcc-c++ make    Mandatory tools to compile.
 CMake **(>= 2.8)**          cmake               Read the build script and
                                                 prepare sources for compilation.
-Centreon Clib               centreon-clib-devel Core library used by Centreon
+Centreon Clib  **(>= 1.2)** centreon-clib-devel Core library used by Centreon
 =========================== =================== ================================
 
 Optional packages was need for use web service module:
@@ -163,7 +163,7 @@ Software                    Package Name      Description
 C++ compilation environment build-essential   Mandatory tools to compile.
 CMake **(>= 2.8)**          cmake             Read the build script and
                                               prepare sources for compilation.
-Centreon Clib               centreon-clib-dev Core library used by Centreon
+Centreon Clib **(>= 1.2)**  centreon-clib-dev Core library used by Centreon
                                               Connector.
 =========================== ================= ================================
 
@@ -209,7 +209,7 @@ Software                    Package Name        Description
 C++ compilation environment gcc gcc-c++ make    Mandatory tools to compile.
 CMake **(>= 2.8)**          cmake               Read the build script and
                                                 prepare sources for compilation.
-Centreon Clib               centreon-clib-devel Core library used by Centreon
+Centreon Clib **(>= 1.2)**  centreon-clib-devel Core library used by Centreon
                                                 Connector.
 =========================== =================== ================================
 
