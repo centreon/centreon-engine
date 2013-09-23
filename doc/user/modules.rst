@@ -24,7 +24,7 @@ Centreon Engine has a web service module to receive order form other
 application. To use it, you need to add line on Centreon Engine
 configuration::
 
-    broker_module=/usr/lib/centreon-engine/webservice.so
+    broker_module=/usr/lib/centreon-engine/webservice.so /etc/centreon-engine/webservice.cfg
 
 Configuration
 -------------
