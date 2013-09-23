@@ -346,9 +346,9 @@ void add_event(
   event->next = NULL;
   event->prev = NULL;
 
-  if (*event_list == event_list_low)
+  if (event_list == &event_list_low)
     quick_timed_event.insert(hash_timed_event::low, event);
-  else if (*event_list == event_list_high)
+  else if (event_list == &event_list_high)
     quick_timed_event.insert(hash_timed_event::high, event);
 
   timed_event* first_event(*event_list);
