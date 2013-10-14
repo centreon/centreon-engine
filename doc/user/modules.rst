@@ -20,6 +20,10 @@ to add line on Centreon Engine configuration::
 Web Service
 ===========
 
+.. warning::
+   This module is in testing and has absolutely no warranty. And the
+   WSDL can change in the future.
+
 Centreon Engine has a web service module to receive order form other
 application. To use it, you need to add line on Centreon Engine
 configuration::
