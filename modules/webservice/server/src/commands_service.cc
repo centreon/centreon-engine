@@ -512,7 +512,7 @@ int centreonengine__serviceGetAcknowledgementType(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -549,7 +549,7 @@ int centreonengine__serviceGetCheckActiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -583,7 +583,7 @@ int centreonengine__serviceGetCheckCommand(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -614,7 +614,7 @@ int centreonengine__serviceGetCheckCurrentAttempt(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -645,7 +645,7 @@ int centreonengine__serviceGetCheckIntervalNormal(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -676,7 +676,7 @@ int centreonengine__serviceGetCheckIntervalRetry(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -693,7 +693,7 @@ int centreonengine__serviceGetCheckIntervalRetry(
 int centreonengine__serviceGetCheckLast(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -708,7 +708,7 @@ int centreonengine__serviceGetCheckLast(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -739,7 +739,7 @@ int centreonengine__serviceGetCheckMaxAttempts(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -756,7 +756,7 @@ int centreonengine__serviceGetCheckMaxAttempts(
 int centreonengine__serviceGetCheckNext(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -771,7 +771,7 @@ int centreonengine__serviceGetCheckNext(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -802,7 +802,7 @@ int centreonengine__serviceGetCheckOptions(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -833,7 +833,7 @@ int centreonengine__serviceGetCheckPassiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -867,7 +867,7 @@ int centreonengine__serviceGetCheckPeriod(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -898,7 +898,7 @@ int centreonengine__serviceGetCheckShouldBeScheduled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -929,7 +929,7 @@ int centreonengine__serviceGetCheckType(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -967,7 +967,7 @@ int centreonengine__serviceSetCheckActiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1024,7 +1024,7 @@ int centreonengine__serviceSetCheckCommand(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1062,7 +1062,7 @@ int centreonengine__serviceSetCheckIntervalNormal(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1100,7 +1100,7 @@ int centreonengine__serviceSetCheckIntervalRetry(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1145,7 +1145,7 @@ int centreonengine__serviceSetCheckMaxAttempts(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1183,7 +1183,7 @@ int centreonengine__serviceSetCheckPassiveEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1394,7 +1394,7 @@ int centreonengine__serviceGetDowntimeDepth(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1466,7 +1466,7 @@ int centreonengine__serviceGetEventHandler(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1497,7 +1497,7 @@ int centreonengine__serviceGetEventHandlerEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1554,7 +1554,7 @@ int centreonengine__serviceSetEventHandler(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1592,7 +1592,7 @@ int centreonengine__serviceSetEventHandlerEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1629,7 +1629,7 @@ int centreonengine__serviceGetFailurePredictionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1663,7 +1663,7 @@ int centreonengine__serviceGetFailurePredictionOptions(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1701,7 +1701,7 @@ int centreonengine__serviceSetFailurePredictionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1738,7 +1738,7 @@ int centreonengine__serviceGetFlapDetectionCommentID(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1769,7 +1769,7 @@ int centreonengine__serviceGetFlapDetectionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1800,7 +1800,7 @@ int centreonengine__serviceGetFlapDetectionIsFlapping(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1832,7 +1832,7 @@ int centreonengine__serviceGetFlapDetectionOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1864,7 +1864,7 @@ int centreonengine__serviceGetFlapDetectionOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1896,7 +1896,7 @@ int centreonengine__serviceGetFlapDetectionOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1928,7 +1928,7 @@ int centreonengine__serviceGetFlapDetectionOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1959,7 +1959,7 @@ int centreonengine__serviceGetFlapDetectionThresholdHigh(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -1990,7 +1990,7 @@ int centreonengine__serviceGetFlapDetectionThresholdLow(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2028,7 +2028,7 @@ int centreonengine__serviceSetFlapDetectionEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2066,7 +2066,7 @@ int centreonengine__serviceSetFlapDetectionOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2104,7 +2104,7 @@ int centreonengine__serviceSetFlapDetectionOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2142,7 +2142,7 @@ int centreonengine__serviceSetFlapDetectionOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2180,7 +2180,7 @@ int centreonengine__serviceSetFlapDetectionOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2218,7 +2218,7 @@ int centreonengine__serviceSetFlapDetectionThresholdHigh(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2256,7 +2256,7 @@ int centreonengine__serviceSetFlapDetectionThresholdLow(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2293,7 +2293,7 @@ int centreonengine__serviceGetFreshnessCheckEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2324,7 +2324,7 @@ int centreonengine__serviceGetFreshnessIsActive(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2355,7 +2355,7 @@ int centreonengine__serviceGetFreshnessThreshold(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2393,7 +2393,7 @@ int centreonengine__serviceSetFreshnessCheckEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2431,7 +2431,7 @@ int centreonengine__serviceSetFreshnessThreshold(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2468,7 +2468,7 @@ int centreonengine__serviceGetModifiedAttributes(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2508,7 +2508,7 @@ int centreonengine__serviceGetNameDisplay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2547,7 +2547,7 @@ int centreonengine__serviceSetNameDisplay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2562,7 +2562,7 @@ int centreonengine__serviceSetNameDisplay(
  *
  *  @param[in]  s          SOAP object.
  *  @param[in]  service_id Target service.
- *  @param[out] res        
+ *  @param[out] res
  *
  *  @return SOAP_OK on success.
  */
@@ -2584,7 +2584,7 @@ int centreonengine__serviceGetNotificationsCurrentID(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2615,7 +2615,7 @@ int centreonengine__serviceGetNotificationsCurrentNumber(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2646,7 +2646,7 @@ int centreonengine__serviceGetNotificationsEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2677,7 +2677,7 @@ int centreonengine__serviceGetNotificationsFirstDelay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2708,7 +2708,7 @@ int centreonengine__serviceGetNotificationsInterval(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2724,7 +2724,7 @@ int centreonengine__serviceGetNotificationsInterval(
 int centreonengine__serviceGetNotificationsLast(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -2739,7 +2739,7 @@ int centreonengine__serviceGetNotificationsLast(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2756,7 +2756,7 @@ int centreonengine__serviceGetNotificationsLast(
 int centreonengine__serviceGetNotificationsNext(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -2771,7 +2771,7 @@ int centreonengine__serviceGetNotificationsNext(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2803,7 +2803,7 @@ int centreonengine__serviceGetNotificationsOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2834,7 +2834,7 @@ int centreonengine__serviceGetNotificationsOnDowntime(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2866,7 +2866,7 @@ int centreonengine__serviceGetNotificationsOnFlapping(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2898,7 +2898,7 @@ int centreonengine__serviceGetNotificationsOnRecovery(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2930,7 +2930,7 @@ int centreonengine__serviceGetNotificationsOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2962,7 +2962,7 @@ int centreonengine__serviceGetNotificationsOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -2996,7 +2996,7 @@ int centreonengine__serviceGetNotificationsPeriod(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3034,7 +3034,7 @@ int centreonengine__serviceSetNotificationsEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3072,7 +3072,7 @@ int centreonengine__serviceSetNotificationsFirstDelay(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3110,7 +3110,7 @@ int centreonengine__serviceSetNotificationsInterval(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3148,7 +3148,7 @@ int centreonengine__serviceSetNotificationsOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3186,7 +3186,7 @@ int centreonengine__serviceSetNotificationsOnDowntime(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3224,7 +3224,7 @@ int centreonengine__serviceSetNotificationsOnFlapping(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3262,7 +3262,7 @@ int centreonengine__serviceSetNotificationsOnRecovery(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3300,7 +3300,7 @@ int centreonengine__serviceSetNotificationsOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3338,7 +3338,7 @@ int centreonengine__serviceSetNotificationsOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3435,7 +3435,7 @@ int centreonengine__serviceGetObsessOver(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3473,7 +3473,7 @@ int centreonengine__serviceSetObsessOver(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3510,7 +3510,7 @@ int centreonengine__serviceGetPerfdataProcessingEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3548,7 +3548,7 @@ int centreonengine__serviceSetPerfdataProcessingEnabled(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3585,7 +3585,7 @@ int centreonengine__serviceGetPluginExecutionTime(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3616,7 +3616,7 @@ int centreonengine__serviceGetPluginIsExecuting(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3647,7 +3647,7 @@ int centreonengine__serviceGetPluginLatency(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3681,7 +3681,7 @@ int centreonengine__serviceGetPluginOutput(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3715,7 +3715,7 @@ int centreonengine__serviceGetPluginPerfdata(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3752,7 +3752,7 @@ int centreonengine__serviceGetRetainStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3783,7 +3783,7 @@ int centreonengine__serviceGetRetainNonStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3821,7 +3821,7 @@ int centreonengine__serviceSetRetainStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3859,7 +3859,7 @@ int centreonengine__serviceSetRetainNonStatusInformation(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3897,7 +3897,7 @@ int centreonengine__serviceGetStalkOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3928,7 +3928,7 @@ int centreonengine__serviceGetStalkOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3960,7 +3960,7 @@ int centreonengine__serviceGetStalkOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -3992,7 +3992,7 @@ int centreonengine__serviceGetStalkOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4030,7 +4030,7 @@ int centreonengine__serviceSetStalkOnCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4068,7 +4068,7 @@ int centreonengine__serviceSetStalkOnOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4106,7 +4106,7 @@ int centreonengine__serviceSetStalkOnUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4144,7 +4144,7 @@ int centreonengine__serviceSetStalkOnWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4181,7 +4181,7 @@ int centreonengine__serviceGetStateCurrent(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4212,7 +4212,7 @@ int centreonengine__serviceGetStateInitial(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4243,7 +4243,7 @@ int centreonengine__serviceGetStateLast(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4259,7 +4259,7 @@ int centreonengine__serviceGetStateLast(
 int centreonengine__serviceGetStateLastChange(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4274,7 +4274,7 @@ int centreonengine__serviceGetStateLastChange(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4290,7 +4290,7 @@ int centreonengine__serviceGetStateLastChange(
 int centreonengine__serviceGetStateLastCritical(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4305,7 +4305,7 @@ int centreonengine__serviceGetStateLastCritical(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4321,7 +4321,7 @@ int centreonengine__serviceGetStateLastCritical(
 int centreonengine__serviceGetStateLastHard(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4336,7 +4336,7 @@ int centreonengine__serviceGetStateLastHard(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4352,7 +4352,7 @@ int centreonengine__serviceGetStateLastHard(
 int centreonengine__serviceGetStateLastHardChange(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4367,7 +4367,7 @@ int centreonengine__serviceGetStateLastHardChange(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4383,7 +4383,7 @@ int centreonengine__serviceGetStateLastHardChange(
 int centreonengine__serviceGetStateLastOk(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4398,7 +4398,7 @@ int centreonengine__serviceGetStateLastOk(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4414,7 +4414,7 @@ int centreonengine__serviceGetStateLastOk(
 int centreonengine__serviceGetStateLastUnknown(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4429,7 +4429,7 @@ int centreonengine__serviceGetStateLastUnknown(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4445,7 +4445,7 @@ int centreonengine__serviceGetStateLastUnknown(
 int centreonengine__serviceGetStateLastWarning(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4460,7 +4460,7 @@ int centreonengine__serviceGetStateLastWarning(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4491,7 +4491,7 @@ int centreonengine__serviceGetStatePercentChange(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }
 
@@ -4507,7 +4507,7 @@ int centreonengine__serviceGetStatePercentChange(
 int centreonengine__serviceGetStateType(
       soap* s,
       ns1__serviceIDType* service_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN("{" << service_id->host->name
                   << ", " << service_id->service << "}")
@@ -4522,6 +4522,6 @@ int centreonengine__serviceGetStateType(
 
   // Exception handling.
   COMMAND_END()
-  
+
   return (SOAP_OK);
 }

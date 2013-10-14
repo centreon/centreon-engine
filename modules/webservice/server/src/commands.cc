@@ -905,7 +905,7 @@ int centreonengine__downtimeGetDuration(soap* s,
  */
 int centreonengine__downtimeGetEnd(soap* s,
                                    ns1__downtimeIDType* downtime_id,
-                                   unsigned long& val) {
+                                   ULONG64& val) {
   try {
     webservice::sync::instance().wait_thread_safeness();
 
@@ -995,7 +995,7 @@ int centreonengine__downtimeGetFixed(soap* s,
  */
 int centreonengine__downtimeGetStart(soap* s,
                                      ns1__downtimeIDType* downtime_id,
-                                     unsigned long& val) {
+                                     ULONG64& val) {
   try {
     webservice::sync::instance().wait_thread_safeness();
 

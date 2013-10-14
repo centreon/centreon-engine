@@ -648,7 +648,7 @@ int centreonengine__contactGetNotificationsOnHostFlapping(
 int centreonengine__contactGetNotificationsOnHostLast(
       soap* s,
       ns1__contactIDType* contact_id,
-      unsigned long& last_time) {
+      ULONG64& last_time) {
   // Begin try block.
   COMMAND_BEGIN(contact_id->name)
 
@@ -877,7 +877,7 @@ int centreonengine__contactGetNotificationsOnServiceFlapping(
 int centreonengine__contactGetNotificationsOnServiceLast(
       soap* s,
       ns1__contactIDType* contact_id,
-      unsigned long& last_time) {
+      ULONG64& last_time) {
   // Begin try block.
   COMMAND_BEGIN(contact_id->name)
 

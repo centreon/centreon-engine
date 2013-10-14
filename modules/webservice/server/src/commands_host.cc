@@ -763,7 +763,7 @@ int centreonengine__hostGetCheckIntervalRetry(
 int centreonengine__hostGetCheckLast(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -819,7 +819,7 @@ int centreonengine__hostGetCheckMaxAttempts(
 int centreonengine__hostGetCheckNext(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -1936,7 +1936,7 @@ int centreonengine__hostGetFlapDetectionOnUp(
 int centreonengine__hostGetFlapDetectionStateHistoryLastUpdate(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -2711,7 +2711,7 @@ int centreonengine__hostGetNotificationsInterval(
 int centreonengine__hostGetNotificationsLast(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -2739,7 +2739,7 @@ int centreonengine__hostGetNotificationsLast(
 int centreonengine__hostGetNotificationsNext(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4117,7 +4117,7 @@ int centreonengine__hostGetStateLast(
 int centreonengine__hostGetStateLastChange(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4145,7 +4145,7 @@ int centreonengine__hostGetStateLastChange(
 int centreonengine__hostGetStateLastDown(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4173,7 +4173,7 @@ int centreonengine__hostGetStateLastDown(
 int centreonengine__hostGetStateLastHard(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4201,7 +4201,7 @@ int centreonengine__hostGetStateLastHard(
 int centreonengine__hostGetStateLastHardChange(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4229,7 +4229,7 @@ int centreonengine__hostGetStateLastHardChange(
 int centreonengine__hostGetStateLastUnreachable(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4257,7 +4257,7 @@ int centreonengine__hostGetStateLastUnreachable(
 int centreonengine__hostGetStateLastUp(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
@@ -4313,7 +4313,7 @@ int centreonengine__hostGetStatePercentChange(
 int centreonengine__hostGetStateType(
       soap* s,
       ns1__hostIDType* host_id,
-      unsigned long& res) {
+      ULONG64& res) {
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
