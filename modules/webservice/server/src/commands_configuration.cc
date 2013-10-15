@@ -2198,7 +2198,7 @@ int centreonengine__setDebugVerbosity(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setDebugLevel(soap* s,
-                                  unsigned long value,
+                                  ULONG64 value,
                                   centreonengine__setDebugLevelResponse& res) {
   (void)res;
 
