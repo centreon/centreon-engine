@@ -207,13 +207,10 @@ int log_service_event(service const* svc) {
   char const* state_type(tab_state_type[svc->state_type]);
   char const* output(svc->plugin_output ? svc->plugin_output : "");
 
-  std::ostringstream oss;
-  oss
+  logger(log_options, basic)
     << "SERVICE ALERT: " << svc->host_name << ";" << svc->description
     << ";" << state << ";" << state_type << ";" << svc->current_attempt
     << ";" << output;
-
-  logger(log_options, basic) << oss.str();
   return (OK);
 }
 
@@ -240,11 +237,10 @@ int log_host_event(host const* hst) {
   char const* state_type(tab_state_type[hst->state_type]);
   char const* output(hst->plugin_output ? hst->plugin_output : "");
 
-  std::ostringstream oss;
-  oss << "HOST ALERT: " << hst->name << ";" << state << ";"
-      << state_type << ";" << hst->current_attempt << ";" << output;
+  logger(log_options, basic)
+    << "HOST ALERT: " << hst->name << ";" << state << ";"
+    << state_type << ";" << hst->current_attempt << ";" << output;
 
-  logger(log_options, basic) << oss.str();
   return (OK);
 }
 
@@ -277,12 +273,10 @@ int log_host_states(unsigned int type, time_t* timestamp) {
     char const* state_type(tab_state_type[hst->state_type]);
     char const* output(hst->plugin_output ? hst->plugin_output : "");
 
-    std::ostringstream oss;
-    oss << type_str << " HOST STATE: " << hst->name << ";" << state
-        << ";" << state_type << ";" << hst->current_attempt << ";"
-        << output;
-
-    logger(log_info_message, basic) << oss.str();
+    logger(log_info_message, basic)
+      << type_str << " HOST STATE: " << hst->name << ";" << state
+      << ";" << state_type << ";" << hst->current_attempt << ";"
+      << output;
   }
   return (OK);
 }
@@ -316,12 +310,10 @@ int log_service_states(unsigned int type, time_t* timestamp) {
     char const* state_type(tab_state_type[svc->state_type]);
     char const* output(svc->plugin_output ? svc->plugin_output : "");
 
-    std::ostringstream oss;
-    oss << type_str << " SERVICE STATE: " << svc->host_name << ";"
-        << svc->description << ";" << state << ";" << state_type
-        << ";" << svc->current_attempt << ";" << output;
-
-    logger(log_info_message, basic) << oss.str();
+    logger(log_info_message, basic)
+      << type_str << " SERVICE STATE: " << svc->host_name << ";"
+      << svc->description << ";" << state << ";" << state_type
+      << ";" << svc->current_attempt << ";" << output;
   }
   return (OK);
 }
