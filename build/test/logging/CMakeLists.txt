@@ -25,9 +25,11 @@ add_library("dummymod" SHARED "${TEST_DIR}/dummymod.cc")
 set_target_properties("dummymod" PROPERTIES PREFIX "")
 add_executable("logging_broker_log" "${TEST_DIR}/broker_log.cc")
 target_link_libraries("logging_broker_log" "cce_core")
+set_property(TARGET "logging_broker_log" PROPERTY ENABLE_EXPORTS "1")
 add_test("logging_broker_log" "logging_broker_log")
 
 # Test broker show information.
 add_executable("logging_broker_show_info" "${TEST_DIR}/broker_show_info.cc")
 target_link_libraries("logging_broker_show_info" "cce_core")
+set_property(TARGET "logging_broker_show_info" PROPERTY ENABLE_EXPORTS "1")
 add_test("logging_broker_show_info" "logging_broker_show_info")
