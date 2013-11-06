@@ -720,6 +720,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       "-Wl,-whole-archive -lcce_core -L. -Wl,-no-whole-archive")
   endif ()
 endif ()
+set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
