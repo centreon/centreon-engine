@@ -94,8 +94,7 @@ void adjust_check_scheduling() {
     }
 
     else if (tmp->event_type == EVENT_SERVICE_CHECK) {
-
-      if (!((service*)tmp->event_data))
+      if (!(svc = (service*)tmp->event_data))
         continue;
 
       // ignore forced checks.
