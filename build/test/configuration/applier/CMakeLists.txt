@@ -40,6 +40,7 @@ add_executable(
   "${TEST_DIR}/xrddefault.cc"
 )
 target_link_libraries("${TEST_BIN_NAME}" "cce_core")
+set_property(TARGET "${TEST_BIN_NAME}" PROPERTY ENABLE_EXPORTS "1")
 
 # parse_and_apply_configuration_command
 set(TEST_NAME "parse_and_apply_configuration_command")
