@@ -43,9 +43,15 @@ public:
                 std::string const& out_file = "");
 
 private:
+  std::string _build_target_path(
+                std::string const& base,
+                std::string const& file);
   void        _exec_and_write_to_file(
                 std::string const& cmd,
                 std::string const& out_file);
+  void        _exec_cp(
+                std::string const& src,
+                std::string const& dst);
 };
 
 CCE_END()

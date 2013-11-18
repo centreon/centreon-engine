@@ -104,9 +104,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting disk usage";
   {
-    std::string df_log_path;
-    df_log_path = tmp_dir;
-    df_log_path.append("/df.log");
+    std::string df_log_path(tmp_dir + "/df.log");
     to_remove.push_back(df_log_path);
     _exec_and_write_to_file("df -P", df_log_path);
   }
@@ -115,9 +113,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting LSB information";
   {
-    std::string lsb_release_log_path;
-    lsb_release_log_path = tmp_dir;
-    lsb_release_log_path.append("/lsb_release.log");
+    std::string lsb_release_log_path(tmp_dir + "/lsb_release.log");
     to_remove.push_back(lsb_release_log_path);
     _exec_and_write_to_file("lsb_release -a", lsb_release_log_path);
   }
@@ -126,9 +122,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting system name";
   {
-    std::string uname_log_path;
-    uname_log_path = tmp_dir;
-    uname_log_path.append("/uname.log");
+    std::string uname_log_path(tmp_dir + "/uname.log");
     to_remove.push_back(uname_log_path);
     _exec_and_write_to_file("uname -a", uname_log_path);
   }
@@ -137,9 +131,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting kernel information";
   {
-    std::string proc_version_log_path;
-    proc_version_log_path = tmp_dir;
-    proc_version_log_path.append("/proc_version.log");
+    std::string proc_version_log_path(tmp_dir + "/proc_version.log");
     to_remove.push_back(proc_version_log_path);
     _exec_and_write_to_file("cat /proc/version", proc_version_log_path);
   }
@@ -148,9 +140,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting network connections information";
   {
-    std::string netstat_log_path;
-    netstat_log_path = tmp_dir;
-    netstat_log_path.append("/netstat.log");
+    std::string netstat_log_path(tmp_dir + "/netstat.log");
     to_remove.push_back(netstat_log_path);
     _exec_and_write_to_file(
       "netstat -ap --numeric-hosts",
@@ -161,9 +151,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting processes information";
   {
-    std::string ps_log_path;
-    ps_log_path = tmp_dir;
-    ps_log_path.append("/ps.log");
+    std::string ps_log_path(tmp_dir + "/ps.log");
     to_remove.push_back(ps_log_path);
     _exec_and_write_to_file("ps aux", ps_log_path);
   }
@@ -172,9 +160,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting packages information";
   {
-    std::string rpm_log_path;
-    rpm_log_path = tmp_dir;
-    rpm_log_path.append("/rpm.log");
+    std::string rpm_log_path(tmp_dir + "/rpm.log");
     to_remove.push_back(rpm_log_path);
     _exec_and_write_to_file("rpm -qa centreon*", rpm_log_path);
   }
@@ -183,9 +169,7 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Getting SELinux status";
   {
-    std::string sestatus_log_path;
-    sestatus_log_path = tmp_dir;
-    sestatus_log_path.append("/selinux.log");
+    std::string sestatus_log_path(tmp_dir + "/selinux.log");
     to_remove.push_back(sestatus_log_path);
     _exec_and_write_to_file("sestatus", sestatus_log_path);
   }
@@ -200,9 +184,7 @@ void diagnostic::generate(
   }
 
   // Create temporary configuration directory.
-  std::string tmp_cfg_dir;
-  tmp_cfg_dir = tmp_dir;
-  tmp_cfg_dir.append("/cfg/");
+  std::string tmp_cfg_dir(tmp_dir + "/cfg/");
   if (mkdir(tmp_cfg_dir.c_str(), S_IRWXU)) {
     char const* msg(strerror(errno));
     throw (engine_error()
@@ -214,19 +196,10 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Copying configuration files";
   {
-    std::string target_path;
-    target_path = tmp_cfg_dir;
-    size_t pos(cfg_file.find_last_of('/'));
-    if (pos != std::string::npos)
-      target_path.append(cfg_file.substr(pos + 1));
-    else
-      target_path.append(cfg_file);
+    std::string target_path(
+                  _build_target_path(tmp_cfg_dir, cfg_file));
     to_remove.push_back(target_path);
-    std::ostringstream oss;
-    oss << "cp '" << cfg_file << "' '" << target_path << "'";
-    process p;
-    p.exec(oss.str());
-    p.wait();
+    _exec_cp(cfg_file, target_path);
   }
 
   // Copy other configuration files.
@@ -235,19 +208,61 @@ void diagnostic::generate(
          end(conf.cfg_file().end());
        it != end;
        ++it) {
-    std::string target_path;
-    target_path = tmp_cfg_dir;
-    size_t pos(it->find_last_of('/'));
-    if (pos != std::string::npos)
-      target_path.append(it->substr(pos + 1));
-    else
-      target_path.append(*it);
+    std::string target_path(_build_target_path(tmp_cfg_dir, *it));
     to_remove.push_back(target_path);
-    std::ostringstream oss;
-    oss << "cp '" << *it << "' '" << target_path << "'";
-    process p;
-    p.exec(oss.str());
-    p.wait();
+    _exec_cp(*it, target_path);
+  }
+
+  // Create temporary log directory.
+  std::string tmp_log_dir(tmp_dir + "/log/");
+  if (mkdir(tmp_log_dir.c_str(), S_IRWXU)) {
+    char const* msg(strerror(errno));
+    throw (engine_error()
+           << "Cannot create temporary log directory '"
+           << tmp_log_dir << "': " << msg);
+  }
+
+  // Log file.
+  logger(logging::log_info_message, logging::basic)
+    << "Diagnostic: getting log file";
+  {
+    std::string target_path(
+                  _build_target_path(tmp_log_dir, conf.log_file()));
+    to_remove.push_back(target_path);
+    _exec_cp(conf.log_file(), target_path);
+  }
+
+  // Debug file.
+  logger(logging::log_info_message, logging::basic)
+    << "Diagnostic: getting debug file";
+  {
+    std::string target_path(_build_target_path(
+                              tmp_log_dir,
+                              conf.debug_file()));
+    to_remove.push_back(target_path);
+    _exec_cp(conf.debug_file(), target_path);
+  }
+
+  // Retention file.
+  logger(logging::log_info_message, logging::basic)
+    << "Diagnostic: getting retention file";
+  {
+    std::string target_path(_build_target_path(
+                              tmp_log_dir,
+                              conf.state_retention_file()));
+    to_remove.push_back(target_path);
+    _exec_cp(conf.state_retention_file(), target_path);
+  }
+
+  // Status file.
+  logger(logging::log_info_message, logging::basic)
+    << "Diagnostic: getting status file";
+  {
+    std::string target_path(_build_target_path(
+                              tmp_log_dir,
+                              conf.status_file()));
+    to_remove.push_back(target_path);
+    _exec_cp(conf.status_file(), target_path);
   }
 
   // Generate file name if not existing.
@@ -275,10 +290,32 @@ void diagnostic::generate(
        it != end;
        ++it)
     ::remove(it->c_str());
+  rmdir(tmp_log_dir.c_str());
   rmdir(tmp_cfg_dir.c_str());
   rmdir(tmp_dir.c_str());
 
   return ;
+}
+
+/**
+ *  Create path base on the temporary base path and the current file
+ *  path.
+ *
+ *  @param[in] base The base path.
+ *  @param[in] file The current file path.
+ *
+ *  @return The new path.
+ */
+std::string diagnostic::_build_target_path(
+                          std::string const& base,
+                          std::string const& file) {
+  std::string target_path(base);
+  size_t pos(file.find_last_of('/'));
+  if (pos != std::string::npos)
+    target_path.append(file.substr(pos + 1));
+  else
+    target_path.append(file);
+  return (target_path);
 }
 
 /**
@@ -304,4 +341,20 @@ void diagnostic::_exec_and_write_to_file(
     result.erase(0, wb);
   }
   return ;
+}
+
+/**
+ *  Execute cp command.
+ *
+ *  @param[in] src The source file to copy.
+ *  @param[in] dst The destination file to copy.
+ */
+void diagnostic::_exec_cp(
+                   std::string const& src,
+                   std::string const& dst) {
+  std::ostringstream oss;
+  oss << "cp '" << src << "' '" << dst << "'";
+  process p;
+  p.exec(oss.str());
+  p.wait();
 }
