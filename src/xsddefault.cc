@@ -51,10 +51,10 @@ int xsddefault_initialize_status_data() {
   if (config->status_file().empty())
     return (OK);
 
-  // delete the old status log (it might not exist).
-  unlink(config->status_file().c_str());
-
   if (xsddefault_status_log_fd == -1) {
+    // delete the old status log (it might not exist).
+    unlink(config->status_file().c_str());
+
     if ((xsddefault_status_log_fd = open(
                                       config->status_file().c_str(),
                                       O_WRONLY | O_CREAT,

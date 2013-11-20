@@ -960,6 +960,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   }
 
   // Initialize perfdata if necessary.
+  bool modify_perfdata(false);
   if (!has_already_been_loaded
       || config->host_perfdata_command() != new_cfg.host_perfdata_command()
       || config->host_perfdata_file() != new_cfg.host_perfdata_file()
@@ -972,17 +973,20 @@ void applier::state::_apply(configuration::state const& new_cfg) {
       || config->service_perfdata_file_mode() != new_cfg.service_perfdata_file_mode()
       || config->service_perfdata_file_processing_command() != new_cfg.service_perfdata_file_processing_command()
       || config->service_perfdata_file_processing_interval() != new_cfg.service_perfdata_file_processing_interval()
-      || config->service_perfdata_file_template() != new_cfg.service_perfdata_file_template()) {
-    xpddefault_cleanup_performance_data();
-    xpddefault_initialize_performance_data();
-  }
+      || config->service_perfdata_file_template() != new_cfg.service_perfdata_file_template())
+    modify_perfdata = true;
 
   // Initialize status file.
+  bool modify_status(false);
   if (!has_already_been_loaded
-      || config->status_file() != new_cfg.status_file()) {
+      || config->status_file() != new_cfg.status_file())
+    modify_status = true;
+
+  // Cleanup.
+  if (modify_perfdata)
+    xpddefault_cleanup_performance_data();
+  if (modify_status)
     xsddefault_cleanup_status_data(true);
-    xsddefault_initialize_status_data();
-  }
 
   // Set new values.
   config->accept_passive_host_checks(new_cfg.accept_passive_host_checks());
@@ -1111,6 +1115,12 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     config->external_command_buffer_slots(new_cfg.external_command_buffer_slots());
     config->use_timezone(new_cfg.use_timezone());
   }
+
+  // Initialize.
+  if (modify_status)
+    xsddefault_initialize_status_data();
+  if (modify_perfdata)
+    xpddefault_initialize_performance_data();
 
   // Check global event handler commands...
   if (verify_config)
