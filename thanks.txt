@@ -61,6 +61,7 @@ since 1999.  If I missed your name, let me know.
 * Justin Clarke
 * Perry Clarke
 * Nick Cleaton
+* Eric Coquard
 * Charlie Cook
 * Garry Cook
 * Jeff Cours
@@ -297,6 +298,6 @@ since 1999.  If I missed your name, let me know.
 * Armin Wolfermann
 * Greg Woods
 * Cliff Woolley
-* Mitch Wright 
+* Mitch Wright
 * Michal Zimen
 * Pawel Zuzelski
