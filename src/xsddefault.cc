@@ -48,7 +48,7 @@ static int xsddefault_status_log_fd(-1);
 
 /* initialize status data */
 int xsddefault_initialize_status_data() {
-  if (config->status_file().empty())
+  if (verify_config || config->status_file().empty())
     return (OK);
 
   if (xsddefault_status_log_fd == -1) {
@@ -71,6 +71,9 @@ int xsddefault_initialize_status_data() {
 
 // cleanup status data before terminating.
 int xsddefault_cleanup_status_data(int delete_status_data) {
+  if (verify_config)
+    return (OK);
+
   // delete the status log.
   if (delete_status_data && !config->status_file().empty()) {
     if (unlink(config->status_file().c_str()))

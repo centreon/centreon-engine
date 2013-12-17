@@ -75,7 +75,7 @@ check_configuration() {
 	exit 6
     fi
 
-    $binary -v $config_file > /dev/null 2>&1
+    su - $user -c "$binary -v $config_file > /dev/null 2>&1"
     if [ $? -ne 0 ]; then
     	log_failure_msg "$servicename $command: bad configuration."
     	exit 6
