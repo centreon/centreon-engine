@@ -413,10 +413,10 @@ void connector::_connector_close() {
                        config->get_service_check_timeout() * 1000));
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
-      logger(log_runtime_warning, basic)
-        << "warning: connector '" << _name
-        << "' connector close failed: "
-        << (is_timeout ? "timeout" : "bad query");
+      if (is_timeout)
+        logger(log_runtime_warning, basic)
+          << "warning: connector '" << _name
+          << "' connector close failed: timeout";
     }
   }
 
