@@ -8,3 +8,4 @@ Configuration
    basics/index
    advanced/index
    migrating
+   best_practice
