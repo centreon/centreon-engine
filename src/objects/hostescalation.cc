@@ -101,7 +101,7 @@ bool operator<(
   else if (obj1.escalate_on_recovery != obj2.escalate_on_recovery)
     return (obj1.escalate_on_recovery < obj2.escalate_on_recovery);
   else if (obj1.escalate_on_down != obj2.escalate_on_down)
-    return (obj2.escalate_on_down < obj2.escalate_on_down);
+    return (obj1.escalate_on_down < obj2.escalate_on_down);
   else if (obj1.escalate_on_unreachable
            != obj2.escalate_on_unreachable)
     return (obj1.escalate_on_unreachable
