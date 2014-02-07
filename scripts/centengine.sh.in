@@ -24,6 +24,7 @@ config_file=@PREFIX_CONF@/centengine.cfg
 status_file=$var_dir/status.dat
 retention_file=$var_dir/retention.dat
 command_file=$rw_dir/centengine.cmd
+remove_command_file=1
 lock_file=@LOCK_FILE@
 pid_file=@PID_FILE@
 user=@USER@
@@ -90,7 +91,9 @@ service_start() {
     fi
 
     if [ ! -f $pid_file ]; then
-	rm -f $command_file > /dev/null 2>&1
+	if [ $remove_command_file ] ; then
+		rm -f $command_file > /dev/null 2>&1
+	fi
 	su - $user -c "touch $var_dir/centengine.log $retention_file"
 
 	if [ $debug -eq 1 ]; then
@@ -135,7 +138,16 @@ service_stop() {
 	    kill -KILL $pid
 	fi
     fi
-    rm -f $lock_file $command_file $pid_file
+    rm -f $lock_file $pid_file
+    if [ $remove_command_file ] ; then
+	rm -f $command_file
+    fi
+}
+
+service_restart() {
+    remove_command_file=0
+    service_stop
+    service_start
 }
 
 service_reload() {
@@ -185,11 +197,7 @@ case $command in
 	;;
 
     restart)
-	pidofproc $binary > /dev/null 2>&1
-	if [ $? -eq 0 ]; then
-	    service_stop
-	fi
-	service_start
+	service_restart
 	;;
 
     try-restart)
