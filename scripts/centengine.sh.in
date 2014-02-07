@@ -91,7 +91,7 @@ service_start() {
     fi
 
     if [ ! -f $pid_file ]; then
-	if [ $remove_command_file ] ; then
+	if [ $remove_command_file -ne 0 ] ; then
 		rm -f $command_file > /dev/null 2>&1
 	fi
 	su - $user -c "touch $var_dir/centengine.log $retention_file"
@@ -139,7 +139,7 @@ service_stop() {
 	fi
     fi
     rm -f $lock_file $pid_file
-    if [ $remove_command_file ] ; then
+    if [ $remove_command_file -ne 0 ] ; then
 	rm -f $command_file
     fi
 }
