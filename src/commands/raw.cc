@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -46,10 +46,7 @@ raw::raw(
        std::string const& name,
        std::string const& command_line,
        command_listener* listener)
-  : command(name, command_line, listener),
-    process_listener() {
-
-}
+  : command(name, command_line, listener), process_listener() {}
 
 /**
  *  Copy constructor
@@ -57,10 +54,7 @@ raw::raw(
  *  @param[in] right Object to copy.
  */
 raw::raw(raw const& right)
-  : command(right),
-    process_listener(right) {
-
-}
+  : command(right), process_listener(right) {}
 
 /**
  *  Destructor.
@@ -599,6 +593,7 @@ process* raw::_get_free_process() {
   // If any process are available, create new one.
   if (_processes_free.empty()) {
     process* p(new process(this));
+    p->enable_stream(process::in, false);
     p->enable_stream(process::err, false);
     p->setpgid_on_exec(config->get_use_setpgid());
     return (p);
