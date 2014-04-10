@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,6 +24,7 @@
 #include <sstream>
 #include <sys/time.h>
 #include "com/centreon/concurrency/locker.hh"
+#include "com/centreon/exceptions/interruption.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -381,35 +382,44 @@ void checker::run(
     start_time.tv_sec);
   update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
 
-  try {
-    // Run command.
-    concurrency::locker lock(&_mut_id);
-    unsigned long id(cmd->run(
-                            processed_cmd,
-                            macros,
-                            config->get_host_check_timeout()));
-    if (id != 0)
-      _list_id[id] = check_result_info;
-  }
-  catch (std::exception const& e) {
-    timestamp now(timestamp::now());
+  // Run command.
+  bool retry;
+  do {
+    retry = false;
+    try {
+      // Run command.
+      concurrency::locker lock(&_mut_id);
+      unsigned long id(cmd->run(
+                              processed_cmd,
+                              macros,
+                              config->get_host_check_timeout()));
+      if (id != 0)
+        _list_id[id] = check_result_info;
+    }
+    catch (com::centreon::exceptions::interruption const& e) {
+      (void)e;
+      retry = true;
+    }
+    catch (std::exception const& e) {
+      timestamp now(timestamp::now());
 
-    // Update check result.
-    check_result_info.finish_time.tv_sec = now.to_seconds();
-    check_result_info.finish_time.tv_usec = now.to_useconds()
-      - check_result_info.finish_time.tv_sec * 1000000ull;
-    check_result_info.early_timeout = false;
-    check_result_info.return_code = STATE_UNKNOWN;
-    check_result_info.exited_ok = true;
-    check_result_info.output = my_strdup("(Execute command failed)");
+      // Update check result.
+      check_result_info.finish_time.tv_sec = now.to_seconds();
+      check_result_info.finish_time.tv_usec = now.to_useconds()
+        - check_result_info.finish_time.tv_sec * 1000000ull;
+      check_result_info.early_timeout = false;
+      check_result_info.return_code = STATE_UNKNOWN;
+      check_result_info.exited_ok = true;
+      check_result_info.output = my_strdup("(Execute command failed)");
 
-    // Queue check result.
-    concurrency::locker lock(&_mut_reap);
-    _to_reap.push(check_result_info);
+      // Queue check result.
+      concurrency::locker lock(&_mut_reap);
+      _to_reap.push(check_result_info);
 
-    logger(log_runtime_warning, basic)
-      << "error: execute command failed: " << e.what();
-  }
+      logger(log_runtime_warning, basic)
+        << "error: execute command failed: " << e.what();
+    }
+  } while (retry);
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
