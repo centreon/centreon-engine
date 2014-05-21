@@ -96,6 +96,41 @@ void checker::reap() {
   unsigned int reaped_checks(0);
   { // Scope to release mutex in all termination cases.
     concurrency::locker lock(&_mut_reap);
+
+    // Merge partial check results.
+    while (!_to_reap_partial.empty()) {
+      // Find the two parts.
+      umap<unsigned long, check_result>::iterator
+        it_partial(_to_reap_partial.begin());
+      umap<unsigned long, check_result>::iterator
+        it_id(_list_id.find(it_partial->first));
+      if (_list_id.end() == it_id) {
+        logger(log_runtime_warning, basic)
+          << "command ID '" << it_partial->first << "' not found";
+      }
+      else {
+        // Extract base part.
+        logger(dbg_checks, basic)
+          << "command ID (" << it_partial->first << ") executed";
+        check_result result;
+        result = it_id->second;
+        _list_id.erase(it_id);
+
+        // Merge check result.
+        result.finish_time.tv_sec = it_partial->second.finish_time.tv_sec;
+        result.finish_time.tv_usec = it_partial->second.finish_time.tv_usec;
+        result.early_timeout = it_partial->second.early_timeout;
+        result.return_code = it_partial->second.return_code;
+        result.exited_ok = it_partial->second.exited_ok;
+        result.output = it_partial->second.output;
+
+        // Push back in reap list.
+        _to_reap.push(result);
+      }
+      _to_reap_partial.erase(it_partial);
+    }
+
+    // Process check results.
     while (!_to_reap.empty()) {
       // Get result host or service check.
       logger(dbg_checks, basic)
@@ -388,7 +423,6 @@ void checker::run(
     retry = false;
     try {
       // Run command.
-      concurrency::locker lock(&_mut_id);
       unsigned long id(cmd->run(
                               processed_cmd,
                               macros,
@@ -417,7 +451,7 @@ void checker::run(
       _to_reap.push(check_result_info);
 
       logger(log_runtime_warning, basic)
-        << "error: execute command failed: " << e.what();
+        << "error: execution of command failed: " << e.what();
     }
   } while (retry);
 
@@ -609,35 +643,42 @@ void checker::run(
     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
     start_time.tv_sec);
 
-  try {
-    // Run command.
-    concurrency::locker lock(&_mut_id);
-    unsigned long id(cmd->run(
-                            processed_cmd,
-                            macros,
-                            config->get_service_check_timeout()));
-    if (id != 0)
-      _list_id[id] = check_result_info;
-  }
-  catch (std::exception const& e) {
-    timestamp now(timestamp::now());
+  bool retry;
+  do {
+    retry = false;
+    try {
+      // Run command.
+      unsigned long id(cmd->run(
+                              processed_cmd,
+                              macros,
+                              config->get_service_check_timeout()));
+      if (id != 0)
+        _list_id[id] = check_result_info;
+    }
+    catch (com::centreon::exceptions::interruption const& e) {
+      (void)e;
+      retry = true;
+    }
+    catch (std::exception const& e) {
+      timestamp now(timestamp::now());
 
-    // Update check result.
-    check_result_info.finish_time.tv_sec = now.to_seconds();
-    check_result_info.finish_time.tv_usec = now.to_useconds()
-      - check_result_info.finish_time.tv_sec * 1000000ull;
-    check_result_info.early_timeout = false;
-    check_result_info.return_code = STATE_UNKNOWN;
-    check_result_info.exited_ok = true;
-    check_result_info.output = my_strdup("(Execute command failed)");
+      // Update check result.
+      check_result_info.finish_time.tv_sec = now.to_seconds();
+      check_result_info.finish_time.tv_usec = now.to_useconds()
+        - check_result_info.finish_time.tv_sec * 1000000ull;
+      check_result_info.early_timeout = false;
+      check_result_info.return_code = STATE_UNKNOWN;
+      check_result_info.exited_ok = true;
+      check_result_info.output = my_strdup("(Execute command failed)");
 
-    // Queue check result.
-    concurrency::locker lock(&_mut_reap);
-    _to_reap.push(check_result_info);
+      // Queue check result.
+      concurrency::locker lock(&_mut_reap);
+      _to_reap.push(check_result_info);
 
-    logger(log_runtime_warning, basic)
-      << "error: execute command failed: " << e.what();
-  }
+      logger(log_runtime_warning, basic)
+        << "error: execution of command failed: " << e.what();
+    }
+  } while (retry);
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
@@ -899,23 +940,6 @@ void checker::finished(commands::result const& res) throw () {
 
   // Find check result.
   check_result result;
-  {
-    concurrency::locker lock(&_mut_id);
-    umap<unsigned long, check_result>::iterator
-      it(_list_id.find(res.command_id));
-    if (_list_id.end() == it) {
-      lock.unlock();
-      logger(log_runtime_warning, basic)
-        << "command ID '" << res.command_id << "' not found";
-      return;
-    }
-
-    // Check result was found.
-    result = it->second;
-    _list_id.erase(it);
-  }
-  logger(dbg_checks, basic)
-    << "command ID (" << res.command_id << ") executed";
 
   // Update check result.
   result.finish_time.tv_sec = res.end_time.to_seconds();
@@ -928,7 +952,7 @@ void checker::finished(commands::result const& res) throw () {
 
   // Queue check result.
   concurrency::locker lock(&_mut_reap);
-  _to_reap.push(result);
+  _to_reap_partial[res.command_id] = result;
   return;
 }
 
