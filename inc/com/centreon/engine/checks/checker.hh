@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -84,10 +84,11 @@ namespace                checks {
 
     umap<unsigned long, check_result>
                          _list_id;
-    concurrency::mutex   _mut_id;
     concurrency::mutex   _mut_reap;
     std::queue<check_result>
                          _to_reap;
+    umap<unsigned long, check_result>
+                         _to_reap_partial;
   };
 }
 
