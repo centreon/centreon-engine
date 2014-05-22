@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,6 +29,7 @@ using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
   &object::setter<contact, type, &contact::method>::generic
+#define ADDRESS_PROPERTY "address"
 
 contact::setters const contact::_setters[] = {
   { "contact_name",                  SETTER(std::string const&, _set_contact_name) },
@@ -296,8 +297,8 @@ bool contact::parse(char const* key, char const* value) {
        ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (!strncmp(key, "address", sizeof("address") - 1))
-    return (_set_address(key, value));
+  if (!strncmp(key, ADDRESS_PROPERTY, sizeof(ADDRESS_PROPERTY) - 1))
+    return (_set_address(key + sizeof(ADDRESS_PROPERTY) - 1, value));
   else if (key[0] == '_') {
     _customvariables[key + 1] = value;
     return (true);
