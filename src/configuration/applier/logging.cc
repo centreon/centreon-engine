@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,6 +20,7 @@
 #include <syslog.h>
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/debug_file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/logging/engine.hh"
 #include "com/centreon/shared_ptr.hh"
@@ -39,9 +40,9 @@ void applier::logging::apply(state& config) {
     return ;
 
   // Syslog.
-  if (config.use_syslog() == true && !_syslog)
+  if (config.use_syslog() && !_syslog)
     _add_syslog();
-  else if (config.use_syslog() == false && _syslog)
+  else if (!config.use_syslog() && _syslog)
     _del_syslog();
 
   // Standard log file.
@@ -60,11 +61,13 @@ void applier::logging::apply(state& config) {
     _del_debug();
     _debug_level = config.debug_level();
     _debug_verbosity = config.debug_verbosity();
+    _debug_max_size = config.max_debug_file_size();
   }
   else if (!_debug
            || config.debug_file() != _debug->filename()
            || config.debug_level() != _debug_level
-           || config.debug_verbosity() != _debug_verbosity)
+           || config.debug_verbosity() != _debug_verbosity
+           || config.max_debug_file_size() != _debug_max_size)
     _add_debug(config);
   return;
 }
@@ -102,6 +105,7 @@ void applier::logging::unload() {
 applier::logging::logging()
   : _debug(NULL),
     _debug_level(0),
+    _debug_max_size(0),
     _debug_verbosity(0),
     _log(NULL),
     _stderr(NULL),
@@ -119,6 +123,7 @@ applier::logging::logging()
 applier::logging::logging(state& config)
   : _debug(NULL),
     _debug_level(0),
+    _debug_max_size(0),
     _debug_verbosity(0),
     _log(NULL),
     _stderr(NULL),
@@ -223,11 +228,16 @@ void applier::logging::_add_log_file(state const& config) {
  */
 void applier::logging::_add_debug(state const& config) {
   _del_debug();
-  _debug = new com::centreon::logging::file(config.debug_file());
+  _debug_level = config.debug_level();
+  _debug_verbosity = config.debug_verbosity();
+  _debug_max_size = config.max_debug_file_size();
+  _debug = new com::centreon::engine::logging::debug_file(
+                                                 config.debug_file(),
+                                                 _debug_max_size);
   com::centreon::logging::engine::instance().add(
                                                _debug,
-                                               config.debug_level(),
-                                               config.debug_verbosity());
+                                               _debug_level,
+                                               _debug_verbosity);
   return;
 }
 
