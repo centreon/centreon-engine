@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -49,6 +49,8 @@ namespace                 configuration {
                             difference<set_service> const& diff_services);
       static scheduler&   instance();
       static void         load();
+      void                remove_host(configuration::host const& h);
+      void                remove_service(configuration::service const& s);
       static void         unload();
 
     private:
@@ -72,34 +74,32 @@ namespace                 configuration {
                             time_t start,
                             unsigned long interval,
                             void* data = NULL);
-      void                _get_new_hosts(
+      void                _get_hosts(
                             set_host const& hst_added,
-                            std::vector<host_struct*>& new_hosts);
-      void                _get_new_services(
+                            std::vector<host_struct*>& new_hosts,
+                            bool throw_if_not_found = true);
+      void                _get_services(
                             set_service const& svc_added,
-                            std::vector<service_struct*>& new_services);
+                            std::vector<service_struct*>& new_services,
+                            bool throw_if_not_found = true);
       void                _remove_misc_event(timed_event_struct*& evt);
-      void                _scheduling_host_checks(
+      void                _schedule_host_checks(
                             std::vector<host_struct*> const& hosts);
-      void                _scheduling_service_checks(
+      void                _schedule_service_checks(
                             std::vector<service_struct*> const& services);
-      void                _unscheduling_host_checks(
-                            set_host const& hosts);
-      void                _unscheduling_service_checks(
-                            set_service const& services);
+      void                _unschedule_host_checks(
+                            std::vector<host_struct*> const& hosts);
+      void                _unschedule_service_checks(
+                            std::vector<service_struct*> const& services);
 
       timed_event_struct* _evt_check_reaper;
       timed_event_struct* _evt_command_check;
       timed_event_struct* _evt_hfreshness_check;
-      umap<std::string, timed_event_struct*>
-                          _evt_host_check;
       timed_event_struct* _evt_host_perfdata;
       timed_event_struct* _evt_orphan_check;
       timed_event_struct* _evt_reschedule_checks;
       timed_event_struct* _evt_retention_save;
       timed_event_struct* _evt_sfreshness_check;
-      umap<std::pair<std::string, std::string>, timed_event_struct*>
-                          _evt_service_check;
       timed_event_struct* _evt_service_perfdata;
       timed_event_struct* _evt_status_save;
       unsigned int        _old_auto_rescheduling_interval;

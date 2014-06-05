@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,6 +24,7 @@
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/member.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
@@ -523,6 +524,9 @@ void applier::host::remove_object(
     it(applier::state::instance().hosts_find(obj->key()));
   if (it != applier::state::instance().hosts().end()) {
     host_struct* hst(it->second.get());
+
+    // Remove events related to this host.
+    applier::scheduler::instance().remove_host(*obj);
 
     // Remove host from its list.
     unregister_object<host_struct>(&host_list, hst);

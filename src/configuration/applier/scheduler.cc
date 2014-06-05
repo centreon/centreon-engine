@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,12 +27,14 @@
 #include "com/centreon/engine/deleter/timedevent.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/defines.hh"
+#include "com/centreon/engine/events/hash_timed_event.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/logging/logger.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::logging;
@@ -52,46 +54,110 @@ void applier::scheduler::apply(
        configuration::state& config,
        difference<set_host> const& diff_hosts,
        difference<set_service> const& diff_services) {
-  // remove and create misc event.
+  // Remove and create misc event.
   _apply_misc_event();
 
-  // remove deleted service check from the scheduler.
-  if (!diff_services.deleted().empty())
-    _unscheduling_service_checks(diff_services.deleted());
+  // Objects set.
+  set_host hst_to_unschedule;
+  set_service svc_to_unschedule;
+  set_host hst_to_schedule;
+  set_service svc_to_schedule;
+  hst_to_unschedule = diff_hosts.deleted();
+  svc_to_unschedule = diff_services.deleted();
+  hst_to_schedule = diff_hosts.added();
+  svc_to_schedule = diff_services.added();
+  for (set_host::iterator
+         it(diff_hosts.modified().begin()),
+         end(diff_hosts.modified().end());
+       it != end;
+       ++it) {
+    umap<std::string, shared_ptr<host_struct> > const&
+      hosts(applier::state::instance().hosts());
+    umap<std::string, shared_ptr<host_struct> >::const_iterator
+      hst(hosts.find((*it)->host_name()));
+    if (hst != hosts.end()) {
+      bool has_event(quick_timed_event.find(
+                                         events::hash_timed_event::low,
+                                         events::hash_timed_event::host_check,
+                                         hst->second.get()));
+      bool should_schedule((*it)->checks_active()
+                           && ((*it)->check_interval() > 0));
+      if (has_event && should_schedule) {
+        hst_to_unschedule.insert(*it);
+        hst_to_schedule.insert(*it);
+      }
+      else if (!has_event && should_schedule)
+        hst_to_schedule.insert(*it);
+      else if (has_event && !should_schedule)
+        hst_to_unschedule.insert(*it);
+      // Else it has no event and should not be scheduled, so do nothing.
+    }
+  }
+  for (set_service::iterator
+         it(diff_services.modified().begin()),
+         end(diff_services.modified().end());
+       it != end;
+       ++it) {
+    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
+      services(applier::state::instance().services());
+    umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+      svc(services.find(std::make_pair(
+                               (*it)->hosts().front(),
+                               (*it)->service_description())));
+    if (svc != services.end()) {
+      bool has_event(quick_timed_event.find(
+                                         events::hash_timed_event::low,
+                                         events::hash_timed_event::service_check,
+                                         svc->second.get()));
+      bool should_schedule((*it)->checks_active()
+                           && ((*it)->check_interval() > 0));
+      if (has_event && should_schedule) {
+        svc_to_unschedule.insert(*it);
+        svc_to_schedule.insert(*it);
+      }
+      else if (!has_event && should_schedule)
+        svc_to_schedule.insert(*it);
+      else if (has_event && !should_schedule)
+        svc_to_unschedule.insert(*it);
+      // Else it has no event and should not be scheduled, so do nothing.
+    }
+  }
 
-  // remove deleted host check from the scheduler.
-  if (!diff_hosts.deleted().empty())
-    _unscheduling_host_checks(diff_hosts.deleted());
+  // Remove deleted host check from the scheduler.
+  {
+    std::vector<host_struct*> old_hosts;
+    _get_hosts(hst_to_unschedule, old_hosts, false);
+    _unschedule_host_checks(old_hosts);
+  }
 
-  // check if we need to add new object into the engine scheduler.
-  bool rebuild_scheduling_info(false);
-  if (!diff_services.added().empty()
-      || !diff_services.deleted().empty())
-    rebuild_scheduling_info = true;
-  if (!diff_hosts.added().empty() || !diff_hosts.deleted().empty())
-    rebuild_scheduling_info = true;
+  // Remove deleted service check from the scheduler.
+  {
+    std::vector<service_struct*> old_services;
+    _get_services(svc_to_unschedule, old_services, false);
+    _unschedule_service_checks(old_services);
+  }
 
-  // check if we need to rebuild scheduled info.
-  if (rebuild_scheduling_info) {
-    // reset scheduling info.
+  // Check if we need to add or modify objects into the scheduler.
+  if (!hst_to_schedule.empty() || !svc_to_schedule.empty()) {
+    // Reset scheduling info.
     memset(&scheduling_info, 0, sizeof(scheduling_info));
 
-    // calculate scheduling params.
+    // Calculate scheduling parameters.
     _calculate_host_scheduling_params(config);
     _calculate_service_scheduling_params(config);
 
-    // get and schedule new hosts.
+    // Get and schedule new hosts.
     {
       std::vector<host_struct*> new_hosts;
-      _get_new_hosts(diff_hosts.added(), new_hosts);
-      _scheduling_host_checks(new_hosts);
+      _get_hosts(hst_to_schedule, new_hosts, true);
+      _schedule_host_checks(new_hosts);
     }
 
-    // get and schedule new services.
+    // Get and schedule new services.
     {
       std::vector<service_struct*> new_services;
-      _get_new_services(diff_services.added(), new_services);
-      _scheduling_service_checks(new_services);
+      _get_services(svc_to_schedule, new_services, true);
+      _schedule_service_checks(new_services);
     }
   }
 }
@@ -111,6 +177,45 @@ applier::scheduler& applier::scheduler::instance() {
 void applier::scheduler::load() {
   if (!_instance)
     _instance = new applier::scheduler;
+}
+
+/**
+ *  Remove some host from scheduling.
+ *
+ *  @param[in] h  Host configuration.
+ */
+void applier::scheduler::remove_host(configuration::host const& h) {
+  umap<std::string, shared_ptr<host_struct> > const&
+    hosts(applier::state::instance().hosts());
+  umap<std::string, shared_ptr<host_struct> >::const_iterator
+    hst(hosts.find(h.host_name()));
+  if (hst != hosts.end()) {
+    std::vector<host_struct*> hvec;
+    hvec.push_back(hst->second.get());
+    _unschedule_host_checks(hvec);
+  }
+  return ;
+}
+
+/**
+ *  Remove some service from scheduling.
+ *
+ *  @param[in] s  Service configuration.
+ */
+void applier::scheduler::remove_service(
+                           configuration::service const& s) {
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
+    services(applier::state::instance().services());
+  umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+    svc(services.find(std::make_pair(
+                             s.hosts().front(),
+                             s.service_description())));
+  if (svc != services.end()) {
+    std::vector<service_struct*> svec;
+    svec.push_back(svc->second.get());
+    _unschedule_service_checks(svec);
+  }
+  return ;
 }
 
 /**
@@ -150,7 +255,7 @@ applier::scheduler::scheduler()
 /**
  *  Default destructor.
  */
-applier::scheduler::~scheduler() throw() {
+applier::scheduler::~scheduler() throw () {
   deleter::listmember(event_list_low, &deleter::timedevent);
   deleter::listmember(event_list_high, &deleter::timedevent);
 }
@@ -665,53 +770,67 @@ timed_event* applier::scheduler::_create_misc_event(
 /**
  *  Get engine hosts struct with configuration hosts objects.
  *
- *  @param[in]  hst_added The list of configuration hosts objects.
- *  @param[out] new_hosts The list of engine hosts to fill.
+ *  @param[in]  hst_cfg             The list of configuration hosts objects.
+ *  @param[out] hst_obj             The list of engine hosts to fill.
+ *  @param[in]  throw_if_not_found  Flag to throw if an host is not
+ *                                  found.
  */
-void applier::scheduler::_get_new_hosts(
-       set_host const& hst_added,
-       std::vector<host_struct*>& new_hosts) {
+void applier::scheduler::_get_hosts(
+       set_host const& hst_cfg,
+       std::vector<host_struct*>& hst_obj,
+       bool throw_if_not_found) {
   umap<std::string, shared_ptr<host_struct> > const&
     hosts(applier::state::instance().hosts());
   for (set_host::const_reverse_iterator
-         it(hst_added.rbegin()), end(hst_added.rend());
+         it(hst_cfg.rbegin()), end(hst_cfg.rend());
        it != end;
        ++it) {
     std::string const& host_name((*it)->host_name());
     umap<std::string, shared_ptr<host_struct> >::const_iterator
       hst(hosts.find(host_name));
-    if (hst == hosts.end())
-      throw (engine_error() << "Could not schedule non-existing host '"
-             << host_name << "'");
-    new_hosts.push_back(&*hst->second);
+    if (hst == hosts.end()) {
+      if (throw_if_not_found)
+        throw (engine_error() << "Could not schedule non-existing host '"
+               << host_name << "'");
+    }
+    else
+      hst_obj.push_back(&*hst->second);
   }
+  return ;
 }
 
 /**
  *  Get engine services struct with configuration services objects.
  *
- *  @param[in]  svc_added    The list of configuration services objects.
- *  @param[out] new_services The list of engine services to fill.
+ *  @param[in]  svc_cfg             The list of configuration services objects.
+ *  @param[out] svc_obj             The list of engine services to fill.
+ *  @param[in]  throw_if_not_found  Flag to throw if an host is not
+ *                                  found.
  */
-void applier::scheduler::_get_new_services(
-       set_service const& svc_added,
-       std::vector<service_struct*>& new_services) {
+void applier::scheduler::_get_services(
+       set_service const& svc_cfg,
+       std::vector<service_struct*>& svc_obj,
+       bool throw_if_not_found) {
   umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
     services(applier::state::instance().services());
   for (set_service::const_reverse_iterator
-         it(svc_added.rbegin()), end(svc_added.rend());
+         it(svc_cfg.rbegin()), end(svc_cfg.rend());
        it != end;
        ++it) {
     std::string const& host_name((*it)->hosts().front());
     std::string const& service_description((*it)->service_description());
     umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
       svc(services.find(std::make_pair(host_name, service_description)));
-    if (svc == services.end())
-      throw (engine_error() << "Cannot schedule non-existing service '"
-             << service_description << "' on host '"
-             << host_name << "'");
-    new_services.push_back(&*svc->second);
+    if (svc == services.end()) {
+      if (throw_if_not_found)
+        throw (engine_error() << "Cannot schedule non-existing service '"
+               << service_description << "' on host '"
+               << host_name << "'");
+    }
+    else
+      svc_obj.push_back(&*svc->second);
   }
+  return ;
 }
 
 /**
@@ -732,7 +851,7 @@ void applier::scheduler::_remove_misc_event(timed_event*& evt) {
  *
  *  @param[in] hosts The list of hosts to schedule.
  */
-void applier::scheduler::_scheduling_host_checks(
+void applier::scheduler::_schedule_host_checks(
        std::vector<host_struct*> const& hosts) {
   logger(dbg_events, most)
     << "Scheduling host checks...";
@@ -830,20 +949,21 @@ void applier::scheduler::_scheduling_host_checks(
        ++it) {
     host_struct& hst(*it->second);
 
-    // schedule a new host check event.
-    timed_event* evt(events::schedule(
-                       EVENT_HOST_CHECK,
-                       false,
-                       hst.next_check,
-                       false,
-                       0,
-                       NULL,
-                       true,
-                       (void*)&hst,
-                       NULL,
-                       hst.check_options));
-    _evt_host_check[hst.name] = evt;
+    // Schedule a new host check event.
+    events::schedule(
+              EVENT_HOST_CHECK,
+              false,
+              hst.next_check,
+              false,
+              0,
+              NULL,
+              true,
+              (void*)&hst,
+              NULL,
+              hst.check_options);
   }
+
+  return ;
 }
 
 /**
@@ -851,7 +971,7 @@ void applier::scheduler::_scheduling_host_checks(
  *
  *  @param[in] services The list of services to schedule.
  */
-void applier::scheduler::_scheduling_service_checks(
+void applier::scheduler::_schedule_service_checks(
        std::vector<service_struct*> const& services) {
   logger(dbg_events, most)
     << "Scheduling service checks...";
@@ -949,20 +1069,21 @@ void applier::scheduler::_scheduling_service_checks(
        it != end;
        ++it) {
     service_struct& svc(*it->second);
-    // create a new service check event.
-    timed_event* evt(events::schedule(
-                       EVENT_SERVICE_CHECK,
-                       false,
-                       svc.next_check,
-                       false,
-                       0,
-                       NULL,
-                       true,
-                       (void*)&svc,
-                       NULL,
-                       svc.check_options));
-    _evt_service_check[std::make_pair(svc.host_name, svc.description)] = evt;
+    // Create a new service check event.
+    events::schedule(
+              EVENT_SERVICE_CHECK,
+              false,
+              svc.next_check,
+              false,
+              0,
+              NULL,
+              true,
+              (void*)&svc,
+              NULL,
+              svc.check_options);
   }
+
+  return ;
 }
 
 /**
@@ -970,19 +1091,27 @@ void applier::scheduler::_scheduling_service_checks(
  *
  *  @param[in] hosts The list of hosts to unschedule.
  */
-void applier::scheduler::_unscheduling_host_checks(
-       set_host const& hosts) {
-  for (set_host::const_iterator it(hosts.begin()), end(hosts.end());
+void applier::scheduler::_unschedule_host_checks(
+                           std::vector<host_struct*> const& hosts) {
+  for (std::vector<host_struct*>::const_iterator
+         it(hosts.begin()),
+         end(hosts.end());
        it != end;
        ++it) {
-    umap<std::string, timed_event_struct*>::iterator
-      evt(_evt_host_check.find((*it)->host_name()));
-    if (evt != _evt_host_check.end()) {
-      remove_event(evt->second, &event_list_low, &event_list_low_tail);
-      delete evt->second;
-      _evt_host_check.erase(evt);
+    timed_event* evt(quick_timed_event.find(
+                                         events::hash_timed_event::low,
+                                         events::hash_timed_event::host_check,
+                                         *it));
+    while (evt) {
+      remove_event(evt, &event_list_low, &event_list_low_tail);
+      delete evt;
+      evt = quick_timed_event.find(
+                                events::hash_timed_event::low,
+                                events::hash_timed_event::host_check,
+                                *it);
     }
   }
+  return ;
 }
 
 /**
@@ -990,21 +1119,25 @@ void applier::scheduler::_unscheduling_host_checks(
  *
  *  @param[in] services The list of services to schedule.
  */
-void applier::scheduler::_unscheduling_service_checks(
-       set_service const& services) {
-  for (set_service::const_iterator it(services.begin()), end(services.end());
+void applier::scheduler::_unschedule_service_checks(
+                           std::vector<service_struct*> const& services) {
+  for (std::vector<service_struct*>::const_iterator
+         it(services.begin()),
+         end(services.end());
        it != end;
        ++it) {
-    std::string const& host_name((*it)->hosts().front());
-    std::string const& service_description((*it)->service_description());
-    std::pair<std::string, std::string>
-      id(std::make_pair(host_name, service_description));
-    umap<std::pair<std::string, std::string>, timed_event_struct*>::iterator
-      evt(_evt_service_check.find(id));
-    if (evt != _evt_service_check.end()) {
-      remove_event(evt->second, &event_list_low, &event_list_low_tail);
-      delete evt->second;
-      _evt_service_check.erase(evt);
+    timed_event* evt(quick_timed_event.find(
+                                         events::hash_timed_event::low,
+                                         events::hash_timed_event::service_check,
+                                         *it));
+    while (evt) {
+      remove_event(evt, &event_list_low, &event_list_low_tail);
+      delete evt;
+      evt = quick_timed_event.find(
+                                events::hash_timed_event::low,
+                                events::hash_timed_event::service_check,
+                                *it);
     }
   }
+  return ;
 }

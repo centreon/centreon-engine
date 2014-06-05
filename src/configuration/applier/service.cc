@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,6 +22,7 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/object.hh"
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
@@ -584,6 +585,9 @@ void applier::service::remove_object(
     it(applier::state::instance().services_find(obj->key()));
   if (it != applier::state::instance().services().end()) {
     service_struct* svc(it->second.get());
+
+    // Remove events related to this service.
+    applier::scheduler::instance().remove_service(*obj);
 
     // Unregister service.
     for (service_struct** s(&service_list); *s; s = &(*s)->next)
