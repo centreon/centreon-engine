@@ -180,6 +180,9 @@ void applier::service::add_object(
       throw (engine_error() << "Could not register service '"
              << obj->service_description()
              << "' of host '" << obj->hosts().front() << "'");
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].initial_notif_time = 0;
 
   // Add contacts.
   for (list_string::const_iterator
@@ -612,6 +615,9 @@ void applier::service::remove_object(
       &tv);
 
     // Remove service object (will effectively delete the object).
+    service_other_props.erase(std::make_pair(
+                                     obj->hosts().front(),
+                                     obj->service_description()));
     applier::state::instance().services().erase(it);
   }
 

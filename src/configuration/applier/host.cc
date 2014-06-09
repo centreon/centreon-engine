@@ -157,6 +157,7 @@ void applier::host::add_object(
   if (!h)
     throw (engine_error() << "Could not register host '"
            << obj->host_name() << "'");
+  host_other_props[obj->host_name()].initial_notif_time = 0;
 
   // Contacts.
   for (list_string::const_iterator
@@ -544,6 +545,7 @@ void applier::host::remove_object(
       &tv);
 
     // Erase host object (will effectively delete the object).
+    host_other_props.erase(obj->host_name());
     applier::state::instance().hosts().erase(it);
   }
 
