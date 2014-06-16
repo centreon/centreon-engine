@@ -489,9 +489,9 @@ bool contact::_set_address(
        std::string const& key,
        std::string const& value) {
   unsigned int id;
-  if (!string::to(key.c_str(), id) || id < 1 || id > MAX_ADDRESSES)
+  if (!string::to(key.c_str(), id) || (id < 1) || (id > MAX_ADDRESSES))
     return (false);
-  _address[id] = value;
+  _address[id - 1] = value;
   return (true);
 }
 
