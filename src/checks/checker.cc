@@ -960,7 +960,8 @@ void checker::finished(commands::result const& res) throw () {
                                - result.finish_time.tv_sec * 1000000ull;
   result.early_timeout = (res.exit_status == process::timeout);
   result.return_code = res.exit_code;
-  result.exited_ok = (res.exit_status == process::normal);
+  result.exited_ok = ((res.exit_status == process::normal)
+                      || (res.exit_status == process::timeout));
   result.output = string::dup(res.output);
 
   // Queue check result.
