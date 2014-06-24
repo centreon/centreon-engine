@@ -876,16 +876,6 @@ void applier::scheduler::_schedule_host_checks(
       continue;
     }
 
-    // skip hosts that are already scheduled for the future (from
-    // retention data), but reschedule ones that were supposed to
-    // be checked before we started.
-    if (hst.next_check > now) {
-      logger(dbg_events, most)
-        << "Host is already scheduled to be checked in the future: "
-        << my_ctime(&hst.next_check);
-      continue;
-    }
-
     // calculate preferred host check time.
     hst.next_check
       = (time_t)(now
@@ -1003,12 +993,6 @@ void applier::scheduler::_schedule_service_checks(
 
       // skip this service if it shouldn't be scheduled.
       if (!svc.should_be_scheduled)
-        continue;
-
-      // skip services that are already scheduled for the future (from
-      // retention data), but reschedule ones that were supposed to
-      // happen while we weren't running...
-      if (svc.next_check > now)
         continue;
 
       int const mult_factor(
