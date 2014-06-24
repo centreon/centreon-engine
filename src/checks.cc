@@ -1221,104 +1221,112 @@ int handle_async_service_check_result(
   return (OK);
 }
 
-/* schedules an immediate or delayed service check */
+/**
+ *  Schedules an immediate or delayed service check.
+ *
+ *  @param[in] svc         Target service.
+ *  @param[in] check_time  Desired check time.
+ *  @param[in] options     Check options (FORCED, FRESHNESS, ...).
+ */
 void schedule_service_check(service* svc, time_t check_time, int options) {
   logger(dbg_functions, basic)
     << "schedule_service_check()";
 
-  if (svc == NULL)
-    return;
+  if (!svc)
+    return ;
 
-  logger(dbg_checks, basic)
-    << "Scheduling a " << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
+  logger(dbg_checks, basic) << "Scheduling a "
+    << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
     << ", active check of service '" << svc->description
     << "' on host '" << svc->host_name
     << "' @ " << my_ctime(&check_time);
 
-  /* don't schedule a check if active checks of this service are disabled */
-  if (svc->checks_enabled == false
+  // Don't schedule a check if active checks
+  // of this service are disabled.
+  if (!svc->checks_enabled
       && !(options & CHECK_OPTION_FORCE_EXECUTION)) {
     logger(dbg_checks, basic)
       << "Active checks of this service are disabled.";
-    return;
+    return ;
   }
-  /* default is to use the new event */
-  int use_original_event(false);
 
+  // Default is to use the new event.
+  bool use_original_event(false);
   timed_event* temp_event = quick_timed_event.find(
                               hash_timed_event::low,
                               hash_timed_event::service_check,
                               svc);
 
-  /* we found another service check event for this service in the queue - what should we do? */
-  if (temp_event != NULL) {
+  // We found another service check event for this service in
+  // the queue - what should we do?
+  if (temp_event) {
     logger(dbg_checks, most)
       << "Found another service check event for this service @ "
       << my_ctime(&temp_event->run_time);
 
-    /* use the originally scheduled check unless we decide otherwise */
+    // Use the originally scheduled check unless we decide otherwise.
     use_original_event = true;
 
-    /* the original event is a forced check... */
+    // The original event is a forced check...
     if ((temp_event->event_options & CHECK_OPTION_FORCE_EXECUTION)) {
-
-      /* the new event is also forced and its execution time is earlier than the original, so use it instead */
+      // The new event is also forced and its execution time is earlier
+      // than the original, so use it instead.
       if ((options & CHECK_OPTION_FORCE_EXECUTION)
           && (check_time < temp_event->run_time)) {
         use_original_event = false;
         logger(dbg_checks, most)
           << "New service check event is forced and occurs before the "
-          "existing event, so the new event will be used instead.";
+             "existing event, so the new event will be used instead.";
       }
     }
-    /* the original event is not a forced check... */
+    // The original event is not a forced check...
     else {
-      /* the new event is a forced check, so use it instead */
+      // The new event is a forced check, so use it instead.
       if ((options & CHECK_OPTION_FORCE_EXECUTION)) {
         use_original_event = false;
         logger(dbg_checks, most)
           << "New service check event is forced, so it will be used "
-          "instead of the existing event.";
+             "instead of the existing event.";
       }
-      /* the new event is not forced either and its execution time is earlier than the original, so use it instead */
+      // The new event is not forced either and its execution time is
+      // earlier than the original, so use it instead.
       else if (check_time < temp_event->run_time) {
         use_original_event = false;
         logger(dbg_checks, most)
           << "New service check event occurs before the existing "
-          "(older) event, so it will be used instead.";
+             "(older) event, so it will be used instead.";
       }
-
-      /* the new event is older, so override the existing one */
+      // The new event is older, so override the existing one.
       else {
         logger(dbg_checks, most)
           << "New service check event occurs after the existing event, "
-          "so we'll ignore it.";
+             "so we'll ignore it.";
       }
     }
   }
-  /* else we're using the new event, so remove the old one */
-  else {
-    remove_event(temp_event, &event_list_low, &event_list_low_tail);
-    delete temp_event;
-    temp_event = NULL;
-  }
 
-  /* save check options for retention purposes */
+  // Save check options for retention purposes.
   svc->check_options = options;
 
-  /* schedule a new event */
+  // Schedule a new event.
   if (use_original_event == false) {
-    logger(dbg_checks, most)
-      << "Scheduling new service check event.";
+    // We're using the new event, so remove the old one.
+    if (temp_event) {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+      temp_event = NULL;
+    }
 
-    /* allocate memory for a new event item */
+    logger(dbg_checks, most) << "Scheduling new service check event.";
+
+    // Allocate memory for a new event item.
     try {
       timed_event* new_event(new timed_event);
 
-      /* set the next service check time */
+      // Set the next service check time.
       svc->next_check = check_time;
 
-      /* place the new event in the event queue */
+      // Place the new event in the event queue.
       new_event->event_type = EVENT_SERVICE_CHECK;
       new_event->event_data = (void*)svc;
       new_event->event_args = (void*)NULL;
@@ -1331,23 +1339,24 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
       reschedule_event(new_event, &event_list_low, &event_list_low_tail);
     }
     catch (...) {
-      /* update the status log */
+      // Update the status log.
       update_service_status(svc, false);
-      throw;
+      throw ;
     }
   }
   else {
-    /* reset the next check time (it may be out of sync) */
-    if (temp_event != NULL)
+    // Reset the next check time (it may be out of sync).
+    if (temp_event)
       svc->next_check = temp_event->run_time;
 
     logger(dbg_checks, most)
       << "Keeping original service check event (ignoring the new one).";
   }
 
-  /* update the status log */
+  // Update the status log.
   update_service_status(svc, false);
-  return;
+
+  return ;
 }
 
 /* checks viability of performing a service check */
