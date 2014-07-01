@@ -19,7 +19,7 @@ Merethis provides RPM for its products through Centreon Entreprise
 Server (CES). Open source products are freely available from our
 repository.
 
-These packages have been successfully tested with CentOS 5 and RedHat 5.
+These packages are available for CentOS 5 and CentOS 6.
 
 .. _user_installation_packages_prerequisites:
 
@@ -27,12 +27,26 @@ Prerequisites
 =============
 
 In order to use RPM from the CES repository, you have to install the
-appropriate repo file. Run the following command as privileged user ::
+appropriate repository.
 
-  $ wget http://yum.centreon.com/standard/2.2/ces-standard.repo -O /etc/yum.repos.d/ces-standard.repo
+CentOS 5
+--------
 
-The repo file is now installed. Don't forget to cleanup ::
+Run the following command as privileged user ::
 
+  $ wget http://yum.centreon.com/standard/2.2/noarch/RPMS/ces-release-2.2-4.noarch.rpm                                                                                                                         
+  $ yum install --nogpgcheck ces-release-2.2-4.noarch.rpm                                                                                                                                                      
+  $ rm -f ces-release-2.2-4.noarch.rpm                                                                                                                                                                         
+  $ yum clean all 
+
+CentOS 6
+--------
+
+Run the following commands as privileged user ::
+
+  $ wget http://yum.centreon.com/standard/3.0/stable/noarch/RPMS/ces-release-3.0-1.noarch.rpm                                                                                                                  
+  $ yum install --nogpgcheck ces-release-3.0-1.noarch.rpm                                                                                                                                                      
+  $ rm -f ces-release-3.0-1.noarch.rpm                                                                                                                                                                         
   $ yum clean all
 
 Install
