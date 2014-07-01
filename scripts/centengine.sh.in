@@ -104,7 +104,7 @@ service_start() {
 	fi
 
 	sleep 2
-	kill 0 $pid > /dev/null 2>&1
+	kill -s 0 $pid > /dev/null 2>&1
         if [ $? -ne 0 ]; then
 	    log_failure_msg "$servicename $command: failed."
     	    exit 1
@@ -125,7 +125,7 @@ service_stop() {
 	kill -TERM $pid
 
 	for i in $(seq 1 $timeout); do
-	    kill 0 $pid > /dev/null 2>&1
+	    kill -s 0 $pid > /dev/null 2>&1
  	    if [ $? -ne 0 ]; then
  		break
  	    fi
@@ -133,7 +133,7 @@ service_stop() {
  	    sleep 1
 	done
 
-	kill 0 $pid > /dev/null 2>&1
+	kill -s 0 $pid > /dev/null 2>&1
 	if [ $? -eq 0 ]; then
 	    kill -KILL $pid
 	fi
@@ -173,7 +173,7 @@ service_force_reload() {
 
 service_status() {
     if [ -f "$pid_file" ]; then
-	kill 0 `cat "$pid_file"`
+	kill -s 0 `cat "$pid_file"`
 	if [ $? -eq 0 ]; then
     	    log_success_msg "$servicename $command: running"
     	    exit 0
