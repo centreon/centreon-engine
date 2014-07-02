@@ -27,6 +27,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/commands/command.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
@@ -287,7 +288,7 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (engine_error() << "Check of host '" << hst->name
+    throw (checks_viability_failure() << "Check of host '" << hst->name
            << "' is not viable");
 
   // Don't execute a new host check if one is already running.
@@ -535,8 +536,9 @@ void checker::run(
         check_options,
         time_is_valid,
         preferred_time) == ERROR)
-    throw (engine_error() << "Check of service '" << svc->description
-           << "' on host '" << svc->host_name << "' is not viable");
+    throw (checks_viability_failure() << "Check of service '"
+           << svc->description << "' on host '" << svc->host_name
+           << "' is not viable");
 
   // Send broker event.
   timeval start_time;

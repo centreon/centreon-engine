@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,6 +30,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/checks/viability_failure.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
@@ -197,6 +198,11 @@ int run_async_service_check(
                                   reschedule_check,
                                   time_is_valid,
                                   preferred_time);
+  }
+  catch (checks::viability_failure const& e) {
+    // Do not log viability failures.
+    (void)e;
+    return (ERROR);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -2273,6 +2279,11 @@ int run_sync_host_check_3x(
                                   use_cached_result,
                                   check_timestamp_horizon);
   }
+  catch (checks::viability_failure const& e) {
+    // Do not log viability failures.
+    (void)e;
+    return (ERROR);
+  }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
       << "Error: " << e.what();
@@ -2402,6 +2413,11 @@ int run_async_host_check_3x(
                                   reschedule_check,
                                   time_is_valid,
                                   preferred_time);
+  }
+  catch (checks::viability_failure const& e) {
+    // Do not log viability failures.
+    (void)e;
+    return (ERROR);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)

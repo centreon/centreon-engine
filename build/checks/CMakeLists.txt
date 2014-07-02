@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2014 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -29,10 +29,12 @@ set(
   # Sources.
   "${SRC_DIR}/checker.cc"
   "${SRC_DIR}/stats.cc"
+  "${SRC_DIR}/viability_failure.cc"
 
   # Headers.
   "${INC_DIR}/checker.hh"
   "${INC_DIR}/stats.hh"
+  "${INC_DIR}/viability_failure.hh"
 
   PARENT_SCOPE
 )
