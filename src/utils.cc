@@ -1392,9 +1392,10 @@ void _get_next_valid_time_per_timeperiod(
        ;
        ++weekday, ++days_into_the_future) {
 
-    // break out of the loop if we have checked an entire week already
-    if (has_looped && weekday >= ti.preftime.tm_wday)
-      break;
+    // Break out of the loop if we have checked an entire
+    // week already (8 days total).
+    if (has_looped && days_into_the_future > 7)
+      break ;
 
     if (weekday >= 7) {
       weekday -= 7;

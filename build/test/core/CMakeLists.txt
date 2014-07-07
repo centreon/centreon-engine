@@ -679,6 +679,11 @@ set(TEST_NAME "weekday_into_period")
 set(TEST_CONF_FILE "into_period.conf")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+# weekday_into_period_for_next_week
+set(TEST_NAME "weekday_into_period_for_next_week")
+set(TEST_CONF_FILE "into_period_for_next_week.conf")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
 # weekday_into_period_with_exclude_after
 set(TEST_NAME "weekday_into_period_with_exclude_after")
 set(TEST_CONF_FILE "into_period_with_exclude_after.conf")
@@ -693,4 +698,3 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 set(TEST_NAME "weekday_into_period_with_exclude_into")
 set(TEST_CONF_FILE "into_period_with_exclude_into.conf")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
