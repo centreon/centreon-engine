@@ -35,7 +35,7 @@ include_directories("${INC_DIR}/compatibility")
 # Version.
 set(CENTREON_ENGINE_MAJOR 1)
 set(CENTREON_ENGINE_MINOR 3)
-set(CENTREON_ENGINE_PATCH 8)
+set(CENTREON_ENGINE_PATCH 9)
 set(CENTREON_ENGINE_VERSION "${CENTREON_ENGINE_MAJOR}.${CENTREON_ENGINE_MINOR}.${CENTREON_ENGINE_PATCH}")
 message(STATUS "Generating version header (${CENTREON_ENGINE_VERSION}).")
 configure_file("${INC_DIR}/com/centreon/engine/version.hh.in"
@@ -1177,4 +1177,3 @@ message(STATUS "")
 message(STATUS "  Libraries")
 message(STATUS "    - clib include directory     ${CLIB_INCLUDE_DIR}")
 message(STATUS "    - clib library directory     ${CLIB_LIBRARIES}")
-
