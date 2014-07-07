@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1247,7 +1247,7 @@ static void _get_next_valid_time(
        ;
        weekday++, days_into_the_future++) {
     /* break out of the loop if we have checked an entire week already */
-    if (has_looped == TRUE && weekday >= pref_time_wday)
+    if (has_looped == TRUE && days_into_the_future > 7)
       break;
 
     if (weekday >= 7) {
