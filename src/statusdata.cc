@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -63,53 +63,67 @@ int cleanup_status_data(int delete_status_data) {
   return (xsddefault_cleanup_status_data(delete_status_data));
 }
 
-/* updates program status info */
-int update_program_status(int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_program_status(
-      NEBTYPE_PROGRAMSTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      NULL);
+/**
+ *  Updates program status info.
+ *
+ *  @return OK.
+ */
+int update_program_status() {
+  broker_program_status(
+    NEBTYPE_PROGRAMSTATUS_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
   return (OK);
 }
 
-/* updates host status info */
-int update_host_status(host* hst, int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_host_status(
-      NEBTYPE_HOSTSTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      hst,
-      NULL);
+/**
+ *  Updates host status info.
+ *
+ *  @param[in] hst  Host.
+ *
+ *  @return OK.
+ */
+int update_host_status(host* hst) {
+  broker_host_status(
+    NEBTYPE_HOSTSTATUS_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hst,
+    NULL);
   return (OK);
 }
 
-/* updates service status info */
-int update_service_status(service* svc, int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_service_status(
-      NEBTYPE_SERVICESTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      svc,
-      NULL);
+/**
+ *  Updates service status info.
+ *
+ *  @param[in] svc  Service.
+ *
+ *  @return OK.
+ */
+int update_service_status(service* svc) {
+  broker_service_status(
+    NEBTYPE_SERVICESTATUS_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc,
+    NULL);
   return (OK);
 }
 
-/* updates contact status info */
-int update_contact_status(contact* cntct, int aggregated_dump) {
-  /* send data to event broker (non-aggregated dumps only) */
-  if (aggregated_dump == false)
-    broker_contact_status(
-      NEBTYPE_CONTACTSTATUS_UPDATE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      cntct,
-      NULL);
+/**
+ *  Updates contact status info.
+ *
+ *  @param[in] cntct  Contact.
+ *
+ *  @return OK.
+ */
+int update_contact_status(contact* cntct) {
+  broker_contact_status(
+    NEBTYPE_CONTACTSTATUS_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    cntct,
+    NULL);
   return (OK);
 }

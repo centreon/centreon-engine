@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -323,6 +323,6 @@ void applier::service::_update(
   if (obj.last_hard_state_change)
     obj.last_hard_state_change = obj.last_state_change;
 
-  // update service status.
-  update_service_status(&obj, false);
+  // Update service status.
+  update_service_status(&obj);
 }

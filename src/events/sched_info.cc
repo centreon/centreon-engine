@@ -2,7 +2,7 @@
 ** Copyright 2007-2008 Ethan Galstad
 ** Copyright 2007,2010 Andreas Ericsson
 ** Copyright 2010      Max Schubert
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -185,12 +185,12 @@ void adjust_check_scheduling() {
     if (tmp->event_type == EVENT_HOST_CHECK) {
       tmp->run_time = new_run_time;
       hst->next_check = new_run_time;
-      update_host_status(hst, false);
+      update_host_status(hst);
     }
     else {
       tmp->run_time = new_run_time;
       svc->next_check = new_run_time;
-      update_service_status(svc, false);
+      update_service_status(svc);
     }
 
     current_icd_offset += inter_check_delay;

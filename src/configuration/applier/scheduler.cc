@@ -917,8 +917,8 @@ void applier::scheduler::_schedule_host_checks(
   for (unsigned int i(0); i < end; ++i) {
     host_struct& hst(*hosts[i]);
 
-    // update status of all hosts (scheduled or not).
-    update_host_status(&hst, false);
+    // Update status of all hosts (scheduled or not).
+    update_host_status(&hst);
 
     // skip most hosts that shouldn't be scheduled.
     if (!hst.should_be_scheduled) {
@@ -1031,8 +1031,8 @@ void applier::scheduler::_schedule_service_checks(
   for (unsigned int i(0); i < end; ++i) {
     service_struct& svc(*services[i]);
 
-    // update status of all services (scheduled or not).
-    update_service_status(&svc, false);
+    // Update status of all services (scheduled or not).
+    update_service_status(&svc);
 
     // skip most services that shouldn't be scheduled.
     if (!svc.should_be_scheduled) {

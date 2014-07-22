@@ -17404,14 +17404,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"aggregate_status_updates")){
-
-      /* DEPRECATED - ALL UPDATED ARE AGGREGATED AS OF NAGIOS 3.X */
-      /*aggregate_status_updates=(atoi(value)>0)?true:false;*/
-
-      logit(NSLOG_CONFIG_WARNING,true,"Warning: aggregate_status_updates directive ignored.  All status file updates are now aggregated.");
-    }
-
     else if(!strcmp(variable,"status_update_interval")){
 
       status_update_interval=atoi(value);

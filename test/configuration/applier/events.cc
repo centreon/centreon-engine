@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -419,9 +419,9 @@ void init_timing_loop() {
        temp_service != NULL;
        temp_service = temp_service->next) {
 
-    /* Nagios XI/NDOUtils MOD */
-    /* update status of all services (scheduled or not) */
-    update_service_status(temp_service, false);
+    // Nagios XI/NDOUtils MOD.
+    // Update status of all services (scheduled or not).
+    update_service_status(temp_service);
 
     /* skip most services that shouldn't be scheduled */
     if (temp_service->should_be_scheduled == false) {
@@ -602,9 +602,9 @@ void init_timing_loop() {
   for (temp_host = host_list;
        temp_host != NULL;
        temp_host = temp_host->next) {
-    /* Nagios XI/NDOUtils Mod */
-    /* update status of all hosts (scheduled or not) */
-    update_host_status(temp_host, false);
+    // Nagios XI/NDOUtils Mod.
+    // Update status of all hosts (scheduled or not).
+    update_host_status(temp_host);
 
     /* skip most hosts that shouldn't be scheduled */
     if (temp_host->should_be_scheduled == false) {

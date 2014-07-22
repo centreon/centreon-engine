@@ -2,7 +2,7 @@
 ** Copyright 2007-2008 Ethan Galstad
 ** Copyright 2007,2010 Andreas Ericsson
 ** Copyright 2010      Max Schubert
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -582,8 +582,8 @@ void compensate_for_system_time_change(
           svc,
           svc->last_notification);
 
-    // update the status data.
-    update_service_status(svc, false);
+    // Update the status data.
+    update_service_status(svc);
   }
 
   // adjust host timestamps.
@@ -625,8 +625,8 @@ void compensate_for_system_time_change(
           hst,
           hst->last_host_notification);
 
-    // update the status data.
-    update_host_status(hst, false);
+    // Update the status data.
+    update_host_status(hst);
   }
 
   // adjust program timestamps.
@@ -646,8 +646,8 @@ void compensate_for_system_time_change(
     time_difference,
     &last_command_check);
 
-  // update the status data.
-  update_program_status(false);
+  // Update the status data.
+  update_program_status();
   return;
 }
 

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -2422,7 +2422,7 @@ int centreonengine__setHostsEventHandler(soap* s,
                                  modified_service_process_attributes,
                                  NULL);
 
-    update_program_status(false);
+    update_program_status();
     webservice::sync::instance().worker_finish();
   }
   catch (...) {
@@ -2668,7 +2668,7 @@ int centreonengine__setServicesEventHandler(soap* s,
                                  modified_service_process_attributes,
                                  NULL);
 
-    update_program_status(false);
+    update_program_status();
     webservice::sync::instance().worker_finish();
   }
   catch (...) {

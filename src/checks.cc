@@ -173,8 +173,8 @@ int run_scheduled_service_check(
     if (svc->should_be_scheduled == true)
       schedule_service_check(svc, svc->next_check, check_options);
 
-    /* update the status log */
-    update_service_status(svc, false);
+    // Update the status log.
+    update_service_status(svc);
     return (ERROR);
   }
   return (OK);
@@ -1175,8 +1175,8 @@ int handle_async_service_check_result(
       || temp_service->checks_enabled == false) {
     /* set the checked flag */
     temp_service->has_been_checked = true;
-    /* update the current service status log */
-    update_service_status(temp_service, false);
+    // Update the current service status log.
+    update_service_status(temp_service);
   }
 
   /* check to see if the service and/or associate host is flapping */
@@ -1346,7 +1346,7 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
     }
     catch (...) {
       // Update the status log.
-      update_service_status(svc, false);
+      update_service_status(svc);
       throw ;
     }
   }
@@ -1360,7 +1360,7 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
   }
 
   // Update the status log.
-  update_service_status(svc, false);
+  update_service_status(svc);
 
   return ;
 }
@@ -1922,8 +1922,8 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
       << "Keeping original host check event (ignoring the new one).";
   }
 
-  /* update the status log */
-  update_host_status(hst, false);
+  // Update the status log.
+  update_host_status(hst);
   return;
 }
 
@@ -2381,8 +2381,8 @@ int run_scheduled_host_check_3x(
       }
     }
 
-    /* update the status log */
-    update_host_status(hst, false);
+    // Update the status log.
+    update_host_status(hst);
 
     /* reschedule the next host check - unless we couldn't find a valid next check time */
     /* 10/19/07 EG - keep original check options */
@@ -3250,8 +3250,9 @@ int process_host_check_result_3x(
     }
   }
 
-  /* update host status - for both active (scheduled) and passive (non-scheduled) hosts */
-  update_host_status(hst, false);
+  // Update host status - for both active (scheduled)
+  // and passive (non-scheduled) hosts.
+  update_host_status(hst);
 
   /* run async checks of all hosts we added above */
   /* don't run a check if one is already executing or we can get by with a cached state */

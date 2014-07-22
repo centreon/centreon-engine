@@ -193,7 +193,6 @@ static std::map<std::string, std::string> build_configuration(
   var["auto_reschedule_checks"] = obj2str(my_rand(0, 1));
   var["auto_rescheduling_interval"] = obj2str(my_rand(1));
   var["auto_rescheduling_window"] = obj2str(my_rand(1));
-  var["aggregate_status_updates"] = "DEPRECATED";
   var["status_update_interval"] = obj2str(my_rand(2));
   var["time_change_threshold"] = obj2str(my_rand(6));
   var["process_performance_data"] = obj2str(my_rand(0, 1));

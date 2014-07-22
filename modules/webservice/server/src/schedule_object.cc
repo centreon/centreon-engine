@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -203,8 +203,8 @@ void webservice::schedule_host(host* hst) {
   // update scheduling info.
   _update_host_schedule_info(hst);
 
-  // update status of all hosts.
-  update_host_status(hst, false);
+  // Update status of all hosts.
+  update_host_status(hst);
 
   // skip most host that shouldn't be scheduled.
   if (hst->should_be_scheduled == false
@@ -266,8 +266,8 @@ void webservice::schedule_service(service* svc) {
   // update scheduling info.
   _update_service_schedule_info(svc);
 
-  // update status of all services.
-  update_service_status(svc, false);
+  // Update status of all services.
+  update_service_status(svc);
 
   // skip most service to shouldn't be scheduled.
   if (svc->should_be_scheduled == false

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -687,8 +687,8 @@ void enable_flap_detection_routines() {
     modified_service_process_attributes,
     NULL);
 
-  /* update program status */
-  update_program_status(false);
+  // Update program status.
+  update_program_status();
 
   /* check for flapping */
   for (temp_host = host_list;
@@ -733,8 +733,8 @@ void disable_flap_detection_routines() {
     modified_service_process_attributes,
     NULL);
 
-  /* update program status */
-  update_program_status(false);
+  // Update program status.
+  update_program_status();
 
   /* handle the details... */
   for (temp_host = host_list;
@@ -785,8 +785,8 @@ void enable_host_flap_detection(host* hst) {
   /* check for flapping */
   check_for_host_flapping(hst, false, false, true);
 
-  /* update host status */
-  update_host_status(hst, false);
+  // Update host status.
+  update_host_status(hst);
   return;
 }
 
@@ -885,8 +885,8 @@ void handle_host_flap_detection_disabled(host* hst) {
     hst->check_flapping_recovery_notification = false;
   }
 
-  /* update host status */
-  update_host_status(hst, false);
+  // Update host status.
+  update_host_status(hst);
   return;
 }
 
@@ -928,8 +928,8 @@ void enable_service_flap_detection(service* svc) {
   /* check for flapping */
   check_for_service_flapping(svc, false, true);
 
-  /* update service status */
-  update_service_status(svc, false);
+  // Update service status.
+  update_service_status(svc);
   return;
 }
 
@@ -1030,7 +1030,7 @@ void handle_service_flap_detection_disabled(service* svc) {
     svc->check_flapping_recovery_notification = false;
   }
 
-  /* update service status */
-  update_service_status(svc, false);
+  // Update service status.
+  update_service_status(svc);
   return;
 }
