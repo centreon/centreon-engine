@@ -49,7 +49,6 @@ extern check_result check_result_info;
 extern check_result* check_result_list;
 
 // Embedded Perl.
-extern unsigned int enable_embedded_perl;
 extern unsigned int use_embedded_perl_implicitly;
 
 // Old path.

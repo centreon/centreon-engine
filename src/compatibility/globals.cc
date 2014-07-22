@@ -46,7 +46,6 @@ check_result check_result_info;
 check_result* check_result_list(NULL);
 
 // Embedded Perl.
-unsigned int enable_embedded_perl(false);
 unsigned int use_embedded_perl_implicitly(false);
 
 // Old path.

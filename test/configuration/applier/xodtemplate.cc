@@ -17549,16 +17549,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"free_child_process_memory")) {
       // free_child_process_memory=(atoi(value)>0)?true:false;
     }
-    else if(!strcmp(variable,"enable_embedded_perl")){
-
-      // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-      //   if (asprintf(&error_message,"Illegal value for enable_embedded_perl")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // enable_embedded_perl=(atoi(value)>0)?true:false;
-    }
 
     else if(!strcmp(variable,"use_embedded_perl_implicitly")){
 
