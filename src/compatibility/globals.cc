@@ -22,7 +22,6 @@
 
 // Features now handled by startup script.
 char const* nagios_user("");
-char const* nagios_group("");
 
 // Process options.
 int nagios_pid(0);

@@ -25,7 +25,6 @@
 
 // Features now handled by startup script.
 extern char const* nagios_user;
-extern char const* nagios_group;
 
 // Process options.
 extern int nagios_pid;
