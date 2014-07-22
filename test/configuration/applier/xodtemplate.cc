@@ -16802,11 +16802,6 @@ int read_main_config_file(char const* main_config_file) {
       ochp_command=(char *)string::dup(value);
     }
 
-    else if(!strcmp(variable,"nagios_user")){
-      // delete[] nagios_user;
-      // nagios_user=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"use_syslog")){
 
       if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){

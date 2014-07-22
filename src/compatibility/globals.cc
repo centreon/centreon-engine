@@ -20,9 +20,6 @@
 #include <cstddef>
 #include "globals.h"
 
-// Features now handled by startup script.
-char const* nagios_user("");
-
 // Process options.
 int nagios_pid(0);
 int verify_object_relationships(1);

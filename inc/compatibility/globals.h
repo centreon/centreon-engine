@@ -23,9 +23,6 @@
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
 
-// Features now handled by startup script.
-extern char const* nagios_user;
-
 // Process options.
 extern int nagios_pid;
 extern int verify_object_relationships;
