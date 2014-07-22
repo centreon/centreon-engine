@@ -38,13 +38,6 @@ char const* nagios_group("");
 int nagios_pid(0);
 int verify_object_relationships(1);
 
-// Update-related variables.
-int check_for_updates(0);
-int update_available(0);
-unsigned long update_uid(0);
-char const* last_program_version("");
-char const* new_program_version("");
-
 // Retention flags.
 unsigned long retained_process_service_attribute_mask(0);
 unsigned long retained_service_attribute_mask(0);

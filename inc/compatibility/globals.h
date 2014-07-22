@@ -40,13 +40,6 @@ extern char const* nagios_group;
 extern int nagios_pid;
 extern int verify_object_relationships;
 
-// Update-related variables.
-extern int check_for_updates;
-extern int update_available;
-extern unsigned long update_uid;
-extern char const* last_program_version;
-extern char const* new_program_version;
-
 // Retention flags.
 extern unsigned long retained_process_service_attribute_mask;
 extern unsigned long retained_service_attribute_mask;

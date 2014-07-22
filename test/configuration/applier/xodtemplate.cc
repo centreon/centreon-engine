@@ -17588,10 +17588,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"external_command_buffer_slots"))
       external_command_buffer_slots=atoi(value);
 
-    else if(!strcmp(variable,"check_for_updates")) {
-      // check_for_updates=(atoi(value)>0)?true:false;
-    }
-
     /* warn about old variables */
     else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file")){
       logit(NSLOG_CONFIG_WARNING,true,"Warning: comment_file variable ignored.  Comments are now stored in the status and retention files.");
