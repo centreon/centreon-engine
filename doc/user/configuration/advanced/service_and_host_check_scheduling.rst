@@ -327,9 +327,9 @@ It should be noted that service check scheduling and execution is done
 on a best effort basis. Individual service checks are considered to be
 low priority events in Centreon Engine, so they can get delayed if high
 priority events need to be executed. Examples of high priority events
-include log file rotations, external command checks, and check results
-reaper events. Additionally, host checks will slow down the execution
-and processing of service checks.
+include external command checks, and check results reaper events.
+Additionally, host checks will slow down the execution and processing
+of service checks.
 
 Scheduling Example
 ==================

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2014 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -40,7 +40,6 @@ set(
   "${SRC_DIR}/mmap.cc"
   "${SRC_DIR}/sighandlers.cc"
   "${SRC_DIR}/skiplist.cc"
-  "${SRC_DIR}/utils.cc"
 
   # Headers.
   "${INC_DIR}/broker.h"

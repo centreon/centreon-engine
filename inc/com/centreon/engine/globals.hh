@@ -64,7 +64,6 @@ extern com::centreon::engine::events::hash_timed_event quick_timed_event;
 
 extern time_t                    last_command_check;
 extern time_t                    last_command_status_update;
-extern time_t                    last_log_rotation;
 
 extern unsigned long             modified_host_process_attributes;
 extern unsigned long             modified_service_process_attributes;

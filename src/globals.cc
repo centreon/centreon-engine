@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -122,7 +122,6 @@ skiplist*           object_skiplists[NUM_OBJECT_SKIPLISTS];
 time_t              event_start(0L);
 time_t              last_command_check(0L);
 time_t              last_command_status_update(0L);
-time_t              last_log_rotation(0L);
 time_t              program_start(0L);
 timed_event*        event_list_high(NULL);
 timed_event*        event_list_high_tail(NULL);

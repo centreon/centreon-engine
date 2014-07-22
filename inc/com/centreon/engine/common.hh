@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2011 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -253,13 +253,6 @@
 /* Program modes. */
 #  define STANDBY_MODE 0
 #  define ACTIVE_MODE  1
-
-/* Log rotation modes. */
-#  define LOG_ROTATION_NONE    0
-#  define LOG_ROTATION_HOURLY  1
-#  define LOG_ROTATION_DAILY   2
-#  define LOG_ROTATION_WEEKLY  3
-#  define LOG_ROTATION_MONTHLY 4
 
 /* Log versions. */
 #  define LOG_VERSION_1 "1.0"

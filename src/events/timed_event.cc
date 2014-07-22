@@ -81,15 +81,6 @@ static void _exec_event_command_check(timed_event* event) {
   return;
 }
 
-/**
- *  Execute log rotation.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_log_rotation(timed_event* event) {
-  (void)event;
-  return;
-}
 
 /**
  *  Execute program shutdown.
@@ -663,7 +654,6 @@ int handle_timed_event(timed_event* event) {
   static exec_event tab_exec_event[] = {
     &_exec_event_service_check,
     &_exec_event_command_check,
-    &_exec_event_log_rotation,
     &_exec_event_program_shutdown,
     &_exec_event_program_restart,
     &_exec_event_check_reaper,
@@ -935,7 +925,6 @@ std::string const& events::name(timed_event const& evt) {
   static std::string const event_names[] = {
     "EVENT_SERVICE_CHECK",
     "EVENT_COMMAND_CHECK",
-    "EVENT_LOG_ROTATION",
     "EVENT_PROGRAM_SHUTDOWN",
     "EVENT_PROGRAM_RESTART",
     "EVENT_CHECK_REAPER",

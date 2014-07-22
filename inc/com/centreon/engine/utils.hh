@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -101,8 +101,6 @@ time_t calculate_time_from_weekday_of_month(
          int month,
          int weekday,
          int weekday_offset);
-// determine the next time to schedule a log rotation
-time_t get_next_log_rotation_time();
 // trap signals
 void setup_sighandler();
 // reset signals to default action

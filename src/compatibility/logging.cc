@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -319,19 +319,6 @@ int log_service_states(unsigned int type, time_t* timestamp) {
 }
 
 /**
- *  Archive logging files.
- *  This function has been DEPRECATED.
- *
- *  @param[in] rotation_time Unused.
- *
- *  @return Return true on success.
- */
-int rotate_log_file(time_t rotation_time) {
-  (void)rotation_time;
-  return (ERROR);
-}
-
-/**
  *  Write the log version into log objects.
  *  This function has been DEPRECATED.
  *
@@ -366,4 +353,3 @@ int open_debug_log() {
 int close_debug_log() {
   return (OK);
 }
-

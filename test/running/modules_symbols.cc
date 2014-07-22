@@ -76,7 +76,6 @@ extern "C" {
   extern hostgroup* hostgroup_list;
   extern int interval_length;
   extern time_t last_command_check;
-  extern time_t last_log_rotation;
   extern char* log_file;
   extern char* macro_user[MAX_USER_MACROS];
   extern int nagios_pid;

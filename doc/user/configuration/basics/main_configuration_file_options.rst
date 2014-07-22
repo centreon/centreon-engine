@@ -43,9 +43,8 @@ Log File
 This variable specifies where Centreon Engine should create its main log
 file. This should be the first variable that you define in your
 configuration file, as Centreon Engine will try to write errors that it
-finds in the rest of your configuration data to this file. If you have
-:ref:`log rotation <main_cfg_opt_log_rotation_method>` enabled, this
-file will automatically be rotated every hour, day, week, or month.
+finds in the rest of your configuration data to this file. Log rotation
+must be accomplished by an external program like *logrotate*.
 
 =========== ================================================
 **Format**  log_file=<file_name>
@@ -384,17 +383,6 @@ host or service event handlers.
 
     * 0 = Disable event handlers
     * 1 = Enable event handlers (default)
-
-.. _main_cfg_opt_log_rotation_method:
-
-Log Rotation Method
--------------------
-
-This is a deprecated and ignored variable. Use logrotate daemon.
-
-=========== ===============================
-**Format**  log_rotation_method=<n/h/d/w/m>
-=========== ===============================
 
 .. _main_cfg_opt_external_command_check:
 

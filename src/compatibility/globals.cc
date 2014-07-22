@@ -20,9 +20,6 @@
 #include <cstddef>
 #include "globals.h"
 
-// Log rotation.
-unsigned int log_rotation_method(0);
-
 // Features now handled by startup script.
 char const* nagios_user("");
 char const* nagios_group("");

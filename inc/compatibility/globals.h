@@ -23,9 +23,6 @@
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
 
-// Log rotation.
-extern unsigned int log_rotation_method;
-
 // Features now handled by startup script.
 extern char const* nagios_user;
 extern char const* nagios_group;

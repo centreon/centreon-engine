@@ -17110,24 +17110,6 @@ int read_main_config_file(char const* main_config_file) {
       soft_state_dependencies=(atoi(value)>0)?true:false;
     }
 
-    else if(!strcmp(variable,"log_rotation_method")){
-      // if(!strcmp(value,"n"))
-      //   log_rotation_method=LOG_ROTATION_NONE;
-      // else if(!strcmp(value,"h"))
-      //   log_rotation_method=LOG_ROTATION_HOURLY;
-      // else if(!strcmp(value,"d"))
-      //   log_rotation_method=LOG_ROTATION_DAILY;
-      // else if(!strcmp(value,"w"))
-      //   log_rotation_method=LOG_ROTATION_WEEKLY;
-      // else if(!strcmp(value,"m"))
-      //   log_rotation_method=LOG_ROTATION_MONTHLY;
-      // else{
-      //   if (asprintf(&error_message,"Illegal value for log_rotation_method")) {}
-      //   error=true;
-      //   break;
-      // }
-    }
-
     else if(!strcmp(variable,"enable_event_handlers"))
       enable_event_handlers=(atoi(value)>0)?true:false;
 
