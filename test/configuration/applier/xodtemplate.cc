@@ -17574,11 +17574,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"external_command_buffer_slots"))
       external_command_buffer_slots=atoi(value);
 
-    /* warn about old variables */
-    else if(!strcmp(variable,"downtime_file") || !strcmp(variable,"xdddefault_downtime_file")){
-      logit(NSLOG_CONFIG_WARNING,true,"Warning: downtime_file variable ignored.  Downtime entries are now stored in the status and retention files.");
-    }
-
     /* skip external data directives */
     else if(strstr(input,"x")==input)
       continue;

@@ -48,10 +48,6 @@
 #    define DEFAULT_DEBUG_FILE            "@VAR_DIR@/centengine.debug"
 #  endif // !DEFAULT_DEBUG_FILE
 
-#  ifndef DEFAULT_DOWNTIME_FILE
-#    define DEFAULT_DOWNTIME_FILE         "@VAR_DIR@/downtime.dat"
-#  endif // !DEFAULT_DOWNTIME_FILE
-
 #  ifndef DEFAULT_RETENTION_FILE
 #    define DEFAULT_RETENTION_FILE        "@VAR_DIR@/retention.dat"
 #  endif // !DEFAULT_RETENTION_FILE
