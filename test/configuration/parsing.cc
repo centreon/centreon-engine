@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -86,9 +86,6 @@ static void check_exist_file() {
 int main_test(int argc, char* argv[]) {
   (void)argc;
   (void)argv;
-
-  // Initialization.
-  config->log_archive_path(".");
 
   // Tests.
   check_directory();

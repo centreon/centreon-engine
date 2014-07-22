@@ -17128,18 +17128,6 @@ int read_main_config_file(char const* main_config_file) {
       // }
     }
 
-    else if(!strcmp(variable,"log_archive_path")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Log archive path too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] log_archive_path;
-      // log_archive_path=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"enable_event_handlers"))
       enable_event_handlers=(atoi(value)>0)?true:false;
 

@@ -24,7 +24,6 @@
 #  include "com/centreon/engine/circular_buffer.hh"
 
 // Log rotation.
-extern char const* log_archive_path;
 extern unsigned int log_rotation_method;
 
 // Features now handled by startup script.

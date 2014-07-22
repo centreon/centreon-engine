@@ -40,10 +40,6 @@
 #    define DEFAULT_LOG_FILE              "@VAR_DIR@/centengine.log"
 #  endif // !DEFAULT_LOG_FILE
 
-#  ifndef DEFAULT_LOG_ARCHIVE_PATH
-#    define DEFAULT_LOG_ARCHIVE_PATH      "."
-#  endif // !DEFAULT_LOG_ARCHIVE_PATH
-
 #  ifndef DEFAULT_DEBUG_FILE
 #    define DEFAULT_DEBUG_FILE            "@VAR_DIR@/centengine.debug"
 #  endif // !DEFAULT_DEBUG_FILE

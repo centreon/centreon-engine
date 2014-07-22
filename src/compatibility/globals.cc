@@ -21,7 +21,6 @@
 #include "globals.h"
 
 // Log rotation.
-char const* log_archive_path("");
 unsigned int log_rotation_method(0);
 
 // Features now handled by startup script.

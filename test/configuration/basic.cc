@@ -168,7 +168,6 @@ static std::map<std::string, std::string> build_configuration(
   var["cached_service_check_horizon"] = obj2str(my_rand(0));
   var["enable_predictive_service_dependency_checks"] = obj2str(my_rand(0, 1));
   var["soft_state_dependencies"] = obj2str(my_rand(0, 1));
-  var["log_archive_path"] = "./";
   var["enable_event_handlers"] = obj2str(my_rand(0, 1));
   var["enable_notifications"] = obj2str(my_rand(0, 1));
   var["execute_service_checks"] = obj2str(my_rand(0, 1));

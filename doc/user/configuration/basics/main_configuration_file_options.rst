@@ -396,15 +396,6 @@ This is a deprecated and ignored variable. Use logrotate daemon.
 **Format**  log_rotation_method=<n/h/d/w/m>
 =========== ===============================
 
-Log Archive Path
-----------------
-
-This is a deprecated and ignored variable.
-
-=========== =======================
-**Format**  log_archive_path=<path>
-=========== =======================
-
 .. _main_cfg_opt_external_command_check:
 
 External Command Check Option
