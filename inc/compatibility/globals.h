@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -41,7 +41,6 @@ extern int nagios_pid;
 extern int verify_object_relationships;
 
 // Update-related variables.
-extern int bare_update_checks;
 extern int check_for_updates;
 extern int update_available;
 extern unsigned long update_uid;

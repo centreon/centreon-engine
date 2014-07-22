@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,7 +39,6 @@ int nagios_pid(0);
 int verify_object_relationships(1);
 
 // Update-related variables.
-int bare_update_checks(0);
 int check_for_updates(0);
 int update_available(0);
 unsigned long update_uid(0);

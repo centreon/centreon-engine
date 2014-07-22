@@ -17591,9 +17591,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"check_for_updates")) {
       // check_for_updates=(atoi(value)>0)?true:false;
     }
-    else if(!strcmp(variable,"bare_update_check")) {
-      // bare_update_check=(atoi(value)>0)?true:false;
-    }
 
     /* warn about old variables */
     else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file")){
