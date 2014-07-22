@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -931,8 +931,6 @@ struct grab_value_redirection {
 
     // Static macros.
     static unsigned int const static_ids[] = {
-      MACRO_ADMINEMAIL,
-      MACRO_ADMINPAGER,
       MACRO_MAINCONFIGFILE,
       MACRO_STATUSDATAFILE,
       MACRO_RETENTIONDATAFILE,

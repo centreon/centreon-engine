@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -89,8 +89,6 @@ struct                global {
   bool                accept_passive_host_checks;
   bool                accept_passive_service_checks;
   int                 additional_freshness_latency;
-  std::string         admin_email;
-  std::string         admin_pager;
   bool                allow_empty_hostgroup_assignment;
   bool                auto_reschedule_checks;
   unsigned int        auto_rescheduling_interval;
@@ -298,8 +296,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(accept_passive_host_checks);
   check_value(accept_passive_service_checks);
   check_value(additional_freshness_latency);
-  check_value(admin_email);
-  check_value(admin_pager);
   check_value(allow_empty_hostgroup_assignment);
   check_value(auto_reschedule_checks);
   check_value(auto_rescheduling_interval);
@@ -558,8 +554,6 @@ static global get_globals() {
   g.accept_passive_host_checks = accept_passive_host_checks;
   g.accept_passive_service_checks = accept_passive_service_checks;
   g.additional_freshness_latency = additional_freshness_latency;
-  g.admin_email = to_str(macro_x[MACRO_ADMINEMAIL]);
-  g.admin_pager = to_str(macro_x[MACRO_ADMINPAGER]);
   g.allow_empty_hostgroup_assignment = allow_empty_hostgroup_assignment;
   g.auto_reschedule_checks = auto_reschedule_checks;
   g.auto_rescheduling_interval = auto_rescheduling_interval;

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -61,8 +61,6 @@
 # define MACRO_CONTACTALIAS                     21
 # define MACRO_CONTACTEMAIL                     22
 # define MACRO_CONTACTPAGER                     23
-# define MACRO_ADMINEMAIL                       24
-# define MACRO_ADMINPAGER                       25
 # define MACRO_HOSTSTATE                        26
 # define MACRO_HOSTSTATEID                      27
 # define MACRO_HOSTATTEMPT                      28

@@ -2205,37 +2205,6 @@ More information on how this works can be found
 **Example** use_true_regexp_matching=0
 =========== ==============================
 
-.. _main_cfg_opt_administrator_email_address:
-
-Administrator Email Address
----------------------------
-
-This is the email address for the administrator of the local machine
-(i.e. the one that Centreon Engine is running on).
-
-This value can be used in notification commands by using the
-$ADMINEMAIL$ :ref:`macro <understanding_macros>`.
-
-=========== ======================================
-**Format**  admin_email=<email_address>
-**Example** admin_email=root@localhost.localdomain
-=========== ======================================
-
-.. _main_cfg_opt_administrator_pager:
-
-Administrator Pager
--------------------
-
-This is the pager number (or pager email gateway) for the administrator
-of the local machine (i.e. the one that Centreon Engine is running
-on). The pager number/address can be used in notification commands by
-using the $ADMINPAGER$ :ref:`macro <understanding_macros>`.
-
-=========== =================================================
-**Format**  admin_pager=<pager_number_or_pager_email_gateway>
-**Example** admin_pager=pageroot@localhost.localdomain
-=========== =================================================
-
 Event Broker Options
 --------------------
 

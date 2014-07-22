@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1021,8 +1021,6 @@ int init_macrox_names() {
   add_macrox_name(CONTACTALIAS);
   add_macrox_name(CONTACTEMAIL);
   add_macrox_name(CONTACTPAGER);
-  add_macrox_name(ADMINEMAIL);
-  add_macrox_name(ADMINPAGER);
   add_macrox_name(HOSTSTATE);
   add_macrox_name(HOSTSTATEID);
   add_macrox_name(HOSTATTEMPT);
@@ -1192,8 +1190,6 @@ int clear_argv_macros() {
  */
 #define cp_macro(name) dest[MACRO_##name] = get_global_macros()->x[MACRO_##name]
 void copy_constant_macros(char** dest) {
-  cp_macro(ADMINEMAIL);
-  cp_macro(ADMINPAGER);
   cp_macro(MAINCONFIGFILE);
   cp_macro(STATUSDATAFILE);
   cp_macro(RETENTIONDATAFILE);
@@ -1220,8 +1216,6 @@ int clear_volatile_macros_r(nagios_macros* mac) {
   for (x = 0; x < MACRO_X_COUNT; x++) {
     switch (x) {
 
-    case MACRO_ADMINEMAIL:
-    case MACRO_ADMINPAGER:
     case MACRO_MAINCONFIGFILE:
     case MACRO_STATUSDATAFILE:
     case MACRO_RETENTIONDATAFILE:

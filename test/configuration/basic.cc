@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -131,8 +131,6 @@ static std::map<std::string, std::string> build_configuration(
   var["global_service_event_handler"] = "service-event-handler";
   var["ocsp_command"] = "ocsp-command";
   var["ochp_command"] = "ochp-command";
-  var["admin_email"] = "admin@localhost";
-  var["admin_pager"] = "pageadmin@localhost";
   var["use_syslog"] = obj2str(my_rand(0, 1));
   var["log_notifications"] = obj2str(my_rand(0, 1));
   var["log_service_retries"] = obj2str(my_rand(0, 1));
@@ -557,14 +555,6 @@ void test_configuration(
   }
 
   nagios_macros* mac = get_global_macros();
-  if (mac->x[MACRO_ADMINEMAIL] != NULL &&
-      my_conf["admin_email"] != mac->x[MACRO_ADMINEMAIL]) {
-    throw (engine_error() << "admin_email: init with '" << my_conf["admin_email"] << "'");
-  }
-  if (mac->x[MACRO_ADMINPAGER] &&
-      my_conf["admin_pager"] != mac->x[MACRO_ADMINPAGER]) {
-    throw (engine_error() << "admin_pager: init with '" << my_conf["admin_pager"] << "'");
-  }
 
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (macro_user[i] != "USER" + obj2str(i + 1)) {
@@ -620,4 +610,3 @@ int main(int argc, char** argv) {
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
-

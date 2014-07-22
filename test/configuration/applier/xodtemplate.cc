@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -16822,20 +16822,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"nagios_group")){
       // delete[] nagios_group;
       // nagios_group=(char *)string::dup(value);
-    }
-
-    else if(!strcmp(variable,"admin_email")){
-
-      /* save the macro */
-      delete[] macro_x[MACRO_ADMINEMAIL];
-      macro_x[MACRO_ADMINEMAIL]=(char *)string::dup(value);
-    }
-
-    else if(!strcmp(variable,"admin_pager")){
-
-      /* save the macro */
-      delete[] macro_x[MACRO_ADMINPAGER];
-      macro_x[MACRO_ADMINPAGER]=(char *)string::dup(value);
     }
 
     else if(!strcmp(variable,"use_syslog")){

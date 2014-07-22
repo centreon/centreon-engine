@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -117,10 +117,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.accept_passive_service_checks() << std::endl
     << "additional_freshness_latency="
     << obj.additional_freshness_latency() << std::endl
-    << "admin_email="
-    << obj.admin_email() << std::endl
-    << "admin_pager="
-    << obj.admin_pager() << std::endl
     << "allow_empty_hostgroup_assignment="
     << obj.allow_empty_hostgroup_assignment() << std::endl
     << "auto_reschedule_checks="

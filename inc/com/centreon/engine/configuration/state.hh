@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -107,10 +107,6 @@ namespace               configuration {
     void                accept_passive_service_checks(bool value);
     int                 additional_freshness_latency() const throw ();
     void                additional_freshness_latency(int value);
-    std::string const&  admin_email() const throw ();
-    void                admin_email(std::string const& value);
-    std::string const&  admin_pager() const throw ();
-    void                admin_pager(std::string const& value);
     bool                allow_empty_hostgroup_assignment() const throw ();
     void                allow_empty_hostgroup_assignment(bool value);
     bool                auto_reschedule_checks() const throw ();
@@ -431,6 +427,8 @@ namespace               configuration {
       bool              (*func)(state&, char const*);
     };
 
+    void                _set_admin_email(std::string const& value);
+    void                _set_admin_pager(std::string const& value);
     void                _set_aggregate_status_updates(std::string const& value);
     void                _set_auth_file(std::string const& value);
     void                _set_bare_update_check(std::string const& value);
@@ -502,8 +500,6 @@ namespace               configuration {
     bool                _accept_passive_host_checks;
     bool                _accept_passive_service_checks;
     int                 _additional_freshness_latency;
-    std::string         _admin_email;
-    std::string         _admin_pager;
     bool                _allow_empty_hostgroup_assignment;
     bool                _auto_reschedule_checks;
     unsigned int        _auto_rescheduling_interval;

@@ -38,8 +38,6 @@ state::setters const state::_setters[] = {
   { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
   { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
-  { "admin_email",                                 SETTER(std::string const&, admin_email) },
-  { "admin_pager",                                 SETTER(std::string const&, admin_pager) },
   { "allow_empty_hostgroup_assignment",            SETTER(bool, allow_empty_hostgroup_assignment) },
   { "auto_reschedule_checks",                      SETTER(bool, auto_reschedule_checks) },
   { "auto_rescheduling_interval",                  SETTER(unsigned int, auto_rescheduling_interval) },
@@ -159,6 +157,8 @@ state::setters const state::_setters[] = {
   { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) },
 
   // Deprecated.
+  { "admin_email",                                 SETTER(std::string const&, _set_admin_email) },
+  { "admin_pager",                                 SETTER(std::string const&, _set_admin_pager) },
   { "aggregate_status_updates",                    SETTER(std::string const&, _set_aggregate_status_updates) },
   { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
   { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
@@ -188,8 +188,6 @@ state::setters const state::_setters[] = {
 static bool const                      default_accept_passive_host_checks(true);
 static bool const                      default_accept_passive_service_checks(true);
 static int const                       default_additional_freshness_latency(15);
-static std::string const               default_admin_email("");
-static std::string const               default_admin_pager("");
 static bool const                      default_allow_empty_hostgroup_assignment(false);
 static bool const                      default_auto_reschedule_checks(false);
 static unsigned int const              default_auto_rescheduling_interval(30);
@@ -327,8 +325,6 @@ state::state()
   : _accept_passive_host_checks(default_accept_passive_host_checks),
     _accept_passive_service_checks(default_accept_passive_service_checks),
     _additional_freshness_latency(default_additional_freshness_latency),
-    _admin_email(default_admin_email),
-    _admin_pager(default_admin_pager),
     _allow_empty_hostgroup_assignment(default_allow_empty_hostgroup_assignment),
     _auto_reschedule_checks(default_auto_reschedule_checks),
     _auto_rescheduling_interval(default_auto_rescheduling_interval),
@@ -463,8 +459,6 @@ state& state::operator=(state const& right) {
     _accept_passive_host_checks = right._accept_passive_host_checks;
     _accept_passive_service_checks = right._accept_passive_service_checks;
     _additional_freshness_latency = right._additional_freshness_latency;
-    _admin_email = right._admin_email;
-    _admin_pager = right._admin_pager;
     _allow_empty_hostgroup_assignment = right._allow_empty_hostgroup_assignment;
     _auto_reschedule_checks = right._auto_reschedule_checks;
     _auto_rescheduling_interval = right._auto_rescheduling_interval;
@@ -606,8 +600,6 @@ bool state::operator==(state const& right) const throw () {
   return (_accept_passive_host_checks == right._accept_passive_host_checks
           && _accept_passive_service_checks == right._accept_passive_service_checks
           && _additional_freshness_latency == right._additional_freshness_latency
-          && _admin_email == right._admin_email
-          && _admin_pager == right._admin_pager
           && _allow_empty_hostgroup_assignment == right._allow_empty_hostgroup_assignment
           && _auto_reschedule_checks == right._auto_reschedule_checks
           && _auto_rescheduling_interval == right._auto_rescheduling_interval
@@ -799,42 +791,6 @@ int state::additional_freshness_latency() const throw () {
  */
 void state::additional_freshness_latency(int value) {
   _additional_freshness_latency = value;
-}
-
-/**
- *  Get admin_email value.
- *
- *  @return The admin_email value.
- */
-std::string const& state::admin_email() const throw () {
-  return (_admin_email);
-}
-
-/**
- *  Set admin_email value.
- *
- *  @param[in] value The new admin_email value.
- */
-void state::admin_email(std::string const& value) {
-  _admin_email = value;
-}
-
-/**
- *  Get admin_pager value.
- *
- *  @return The admin_pager value.
- */
-std::string const& state::admin_pager() const throw () {
-  return (_admin_pager);
-}
-
-/**
- *  Set admin_pager value.
- *
- *  @param[in] value The new admin_pager value.
- */
-void state::admin_pager(std::string const& value) {
-  _admin_pager = value;
 }
 
 /**
@@ -3731,6 +3687,32 @@ bool state::use_true_regexp_matching() const throw () {
  */
 void state::use_true_regexp_matching(bool value) {
   _use_true_regexp_matching = value;
+}
+
+/**
+ *  Variable admin_email is now deprecated.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_admin_email(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: admin_email variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Variable admin_pager is now deprecated.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_admin_pager(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: admin_pager variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
