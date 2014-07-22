@@ -68,7 +68,7 @@ void applier::downtime::_add_host_downtime(
 }
 
 /**
- *  Add serivce downtime.
+ *  Add service downtime.
  *
  *  @param[in] obj The downtime to add into the service.
  */
