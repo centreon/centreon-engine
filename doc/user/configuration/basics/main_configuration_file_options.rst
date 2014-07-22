@@ -1328,15 +1328,6 @@ For maximum performance, this option must be disable.
 **Example** use_setpgid=1
 =========== =================
 
-Child Process Memory Option
----------------------------
-
-This is a deprecated and ignored variable.
-
-=========== ===============================
-**Format**  free_child_process_memory=<0/1>
-=========== ===============================
-
 .. _main_cfg_opt_environment_macros:
 
 Environment Macros Option

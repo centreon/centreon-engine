@@ -27,9 +27,6 @@
 extern char const* log_archive_path;
 extern unsigned int log_rotation_method;
 
-// Free memory option.
-extern unsigned int free_child_process_memory;
-
 // Features now handled by startup script.
 extern char const* lock_file;
 extern char const* nagios_user;

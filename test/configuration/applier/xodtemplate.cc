@@ -17546,10 +17546,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"enable_environment_macros"))
       enable_environment_macros=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"free_child_process_memory")) {
-      // free_child_process_memory=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"use_embedded_perl_implicitly")){
 
       // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
@@ -17603,10 +17599,6 @@ int read_main_config_file(char const* main_config_file) {
   /* adjust command check interval */
   if(command_check_interval_is_seconds==false && command_check_interval!=-1)
     command_check_interval*=interval_length;
-
-  /* adjust tweaks */
-  // if(free_child_process_memory==-1)
-  //   free_child_process_memory=(use_large_installation_tweaks==true)?false:true;
 
   /* handle errors */
   if(error==true){
