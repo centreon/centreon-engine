@@ -17594,18 +17594,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"bare_update_check")) {
       // bare_update_check=(atoi(value)>0)?true:false;
     }
-    /*** AUTH_FILE VARIABLE USED BY EMBEDDED PERL INTERPRETER ***/
-    else if(!strcmp(variable,"auth_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Auth file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] auth_file;
-      // auth_file=(char *)string::dup(value);
-    }
 
     /* warn about old variables */
     else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file")){

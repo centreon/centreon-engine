@@ -217,7 +217,6 @@ static std::map<std::string, std::string> build_configuration(
   var["enable_embedded_perl"] = obj2str(my_rand(0, 1));
   var["use_embedded_perl_implicitly"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
-  var["auth_file"] = "auth_file.tmp";
   var["comment_file"] = "comment_file.tmp";
   var["xcddefault_comment_file"] = "comment_file.tmp";
   var["downtime_file"] = "downtime_file.tmp";

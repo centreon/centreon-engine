@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -258,7 +258,6 @@ extern unsigned int use_true_regexp_matching;
 extern unsigned int use_large_installation_tweaks;
 extern unsigned int enable_environment_macros;
 extern int external_command_buffer_slots;
-/* auth_file; */
 
 #  ifdef __cplusplus
 }
