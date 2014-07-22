@@ -28,7 +28,6 @@ unsigned int log_rotation_method(0);
 unsigned int free_child_process_memory(-1);
 
 // Features now handled by startup script.
-int daemon_dumps_core(0);
 char const* lock_file("");
 char const* nagios_user("");
 char const* nagios_group("");

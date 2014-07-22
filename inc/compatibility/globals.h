@@ -31,7 +31,6 @@ extern unsigned int log_rotation_method;
 extern unsigned int free_child_process_memory;
 
 // Features now handled by startup script.
-extern int daemon_dumps_core;
 extern char const* lock_file;
 extern char const* nagios_user;
 extern char const* nagios_group;

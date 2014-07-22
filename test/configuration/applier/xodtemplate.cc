@@ -17532,17 +17532,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"use_true_regexp_matching"))
       use_true_regexp_matching=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"daemon_dumps_core")){
-
-      // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-      //   if (asprintf(&error_message,"Illegal value for daemon_dumps_core")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // daemon_dumps_core=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"use_large_installation_tweaks")){
 
       if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
