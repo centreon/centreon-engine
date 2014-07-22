@@ -16782,18 +16782,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"max_check_result_file_age"))
       max_check_result_file_age=strtoul(value,NULL,0);
 
-    else if(!strcmp(variable,"lock_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Lock file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] lock_file;
-      // lock_file=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"global_host_event_handler")){
       delete[] global_host_event_handler;
       global_host_event_handler=(char *)string::dup(value);

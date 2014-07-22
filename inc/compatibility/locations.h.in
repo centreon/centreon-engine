@@ -60,10 +60,6 @@
 #    define DEFAULT_CONFIG_FILE           "@PREFIX_CONF@/centengine.cfg"
 #  endif // !DEFAULT_CONFIG_FILE
 
-#  ifndef DEFAULT_LOCK_FILE
-#    define DEFAULT_LOCK_FILE             "@LOCK_FILE@"
-#  endif // !DEFAULT_LOCK_FILE
-
 #  ifndef DEFAULT_OBJECT_CACHE_FILE
 #    define DEFAULT_OBJECT_CACHE_FILE     "@VAR_DIR@/objects.cache"
 #  endif // !DEFAULT_OBJECT_CACHE_FILE
