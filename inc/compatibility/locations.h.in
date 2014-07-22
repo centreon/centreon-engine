@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,10 +47,6 @@
 #  ifndef DEFAULT_DEBUG_FILE
 #    define DEFAULT_DEBUG_FILE            "@VAR_DIR@/centengine.debug"
 #  endif // !DEFAULT_DEBUG_FILE
-
-#  ifndef DEFAULT_COMMENT_FILE
-#    define DEFAULT_COMMENT_FILE          "@VAR_DIR@/comments.dat"
-#  endif // !DEFAULT_COMMENT_FILE
 
 #  ifndef DEFAULT_DOWNTIME_FILE
 #    define DEFAULT_DOWNTIME_FILE         "@VAR_DIR@/downtime.dat"
