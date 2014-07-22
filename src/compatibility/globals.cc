@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <climits>
 #include <cstddef>
 #include "globals.h"
 
@@ -46,7 +45,6 @@ unsigned long retained_service_attribute_mask(0);
 circular_buffer check_result_buffer;
 check_result check_result_info;
 check_result* check_result_list(NULL);
-unsigned int child_processes_fork_twice(UINT_MAX);
 
 // Embedded Perl.
 unsigned int enable_embedded_perl(false);

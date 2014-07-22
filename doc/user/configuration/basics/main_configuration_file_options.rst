@@ -1337,15 +1337,6 @@ This is a deprecated and ignored variable.
 **Format**  free_child_process_memory=<0/1>
 =========== ===============================
 
-Child Processes Fork Twice
---------------------------
-
-This is a deprecated and ignored variable.
-
-=========== ================================
-**Format**  child_processes_fork_twice=<0/1>
-=========== ================================
-
 .. _main_cfg_opt_environment_macros:
 
 Environment Macros Option
