@@ -270,7 +270,6 @@ Macro Name             Service Checks Service Notifications Host Checks Host Not
 `STATUSDATAFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RETENTIONDATAFILE`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `OBJECTCACHEFILE`_     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TEMPFILE`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TEMPPATH`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LOGFILE`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RESOURCEFILE`_        **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -654,7 +653,6 @@ _`MAINCONFIGFILE`      The location of the :ref:`main config file <main_cfg_opt>
 _`STATUSDATAFILE`      The location of the :ref:`status data file <main_cfg_opt_status_file>`.
 _`RETENTIONDATAFILE`   The location of the :ref:`retention data file <main_cfg_opt_state_retention_file>`.
 _`OBJECTCACHEFILE`     The location of the :ref:`object cache file <main_cfg_opt_object_cache_file>`.
-_`TEMPFILE`            The location of the :ref:`temp file <main_cfg_opt_temp_file>`.
 _`TEMPPATH`            The directory specified by the temp path variable.
 _`LOGFILE`             The location of the :ref:`log file <main_cfg_opt_log_file>`.
 _`RESOURCEFILE`        The location of the :ref:`resource file <main_cfg_opt_resource_file>`.

@@ -20,10 +20,6 @@
 #ifndef CCE_LOCATIONS_H
 #  define CCE_LOCATIONS_H
 
-#  ifndef DEFAULT_TEMP_FILE
-#    define DEFAULT_TEMP_FILE             "/tmp/centengine.tmp"
-#  endif // !DEFAULT_TEMP_FILE
-
 #  ifndef DEFAULT_TEMP_PATH
 #    define DEFAULT_TEMP_PATH             "/tmp"
 #  endif // !DEFAULT_TEMP_PATH

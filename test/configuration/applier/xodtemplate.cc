@@ -16711,22 +16711,6 @@ int read_main_config_file(char const* main_config_file) {
       macro_x[MACRO_COMMANDFILE]=(char *)string::dup(value);
     }
 
-    else if(!strcmp(variable,"temp_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Temp file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] temp_file;
-      // temp_file=(char *)string::dup(value);
-
-      // /* save the macro */
-      // delete[] macro_x[MACRO_TEMPFILE];
-      // macro_x[MACRO_TEMPFILE]=(char *)string::dup(temp_file);
-    }
-
     else if(!strcmp(variable,"temp_path")){
 
       // if(strlen(value)>MAX_FILENAME_LENGTH-1){

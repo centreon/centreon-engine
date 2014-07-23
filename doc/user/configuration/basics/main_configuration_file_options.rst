@@ -147,17 +147,6 @@ Engine distribution for an example of how to define $USERn$ macros.
 **Example** resource_file=/etc/centreon-engine/resource.cfg
 =========== ===============================================
 
-.. _main_cfg_opt_temp_file:
-
-Temp File
----------
-
-This is a deprecated and ignored variable.
-
-=========== =====================
-**Format**  temp_file=<file_name>
-=========== =====================
-
 .. _main_cfg_opt_status_file:
 
 Status File

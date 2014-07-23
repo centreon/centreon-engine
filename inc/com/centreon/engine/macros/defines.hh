@@ -103,7 +103,6 @@
 # define MACRO_SERVICEDISPLAYNAME               65
 # define MACRO_RETENTIONDATAFILE                66
 # define MACRO_OBJECTCACHEFILE                  67
-# define MACRO_TEMPFILE                         68
 # define MACRO_LOGFILE                          69
 # define MACRO_RESOURCEFILE                     70
 # define MACRO_COMMANDFILE                      71
