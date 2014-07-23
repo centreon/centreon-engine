@@ -35,6 +35,3 @@ check_result* check_result_list(NULL);
 
 // Embedded Perl.
 unsigned int use_embedded_perl_implicitly(false);
-
-// Old path.
-char const* temp_path("/tmp");

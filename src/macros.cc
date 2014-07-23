@@ -1096,7 +1096,6 @@ int init_macrox_names() {
   add_macrox_name(SERVICECHECKTYPE);
   add_macrox_name(LONGHOSTOUTPUT);
   add_macrox_name(LONGSERVICEOUTPUT);
-  add_macrox_name(TEMPPATH);
   add_macrox_name(HOSTNOTIFICATIONNUMBER);
   add_macrox_name(SERVICENOTIFICATIONNUMBER);
   add_macrox_name(HOSTNOTIFICATIONID);
@@ -1199,7 +1198,6 @@ void copy_constant_macros(char** dest) {
   cp_macro(HOSTPERFDATAFILE);
   cp_macro(SERVICEPERFDATAFILE);
   cp_macro(PROCESSSTARTTIME);
-  cp_macro(TEMPPATH);
   cp_macro(EVENTSTARTTIME);
   return;
 }
@@ -1224,7 +1222,6 @@ int clear_volatile_macros_r(nagios_macros* mac) {
     case MACRO_HOSTPERFDATAFILE:
     case MACRO_SERVICEPERFDATAFILE:
     case MACRO_PROCESSSTARTTIME:
-    case MACRO_TEMPPATH:
     case MACRO_EVENTSTARTTIME:
       /* these don't change during the course of monitoring, so no need to free them */
       break;

@@ -135,7 +135,6 @@
 # define MACRO_SERVICECHECKTYPE                 98
 # define MACRO_LONGHOSTOUTPUT                   99
 # define MACRO_LONGSERVICEOUTPUT                100
-# define MACRO_TEMPPATH                         101
 # define MACRO_HOSTNOTIFICATIONNUMBER           102
 # define MACRO_SERVICENOTIFICATIONNUMBER        103
 # define MACRO_HOSTNOTIFICATIONID               104

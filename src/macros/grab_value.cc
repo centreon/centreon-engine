@@ -941,7 +941,6 @@ struct grab_value_redirection {
       MACRO_HOSTPERFDATAFILE,
       MACRO_SERVICEPERFDATAFILE,
       MACRO_PROCESSSTARTTIME,
-      MACRO_TEMPPATH,
       MACRO_EVENTSTARTTIME
     };
     for (unsigned int i = 0;

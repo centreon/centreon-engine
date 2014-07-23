@@ -84,8 +84,6 @@ applier::macros::macros()
   memset(macro_user, 0, sizeof(*macro_user) * MAX_USER_MACROS);
 
   init_macros();
-
-  _set_macro(MACRO_TEMPPATH, "/tmp");
 }
 
 /**
@@ -106,7 +104,6 @@ applier::macros::~macros() throw() {
   delete[] _mac->x[MACRO_RETENTIONDATAFILE];
   delete[] _mac->x[MACRO_SERVICEPERFDATAFILE];
   delete[] _mac->x[MACRO_STATUSDATAFILE];
-  delete[] _mac->x[MACRO_TEMPPATH];
 
   for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
     delete[] macro_user[i];

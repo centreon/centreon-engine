@@ -16711,34 +16711,6 @@ int read_main_config_file(char const* main_config_file) {
       macro_x[MACRO_COMMANDFILE]=(char *)string::dup(value);
     }
 
-    else if(!strcmp(variable,"temp_path")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Temp path is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // if((tmpdir=opendir((char *)value))==NULL){
-      //   if (asprintf(&error_message,"Temp path is not a valid directory")) {}
-      //   error=true;
-      //   break;
-      // }
-      // closedir(tmpdir);
-
-      // delete[] temp_path;
-      // if((temp_path=(char *)string::dup(value))){
-      //   strip(temp_path);
-      //   /* make sure we don't have a trailing slash */
-      //   if(temp_path[strlen(temp_path)-1]=='/')
-      //     temp_path[strlen(temp_path)-1]='\x0';
-      // }
-
-      // /* save the macro */
-      // delete[] macro_x[MACRO_TEMPPATH];
-      // macro_x[MACRO_TEMPPATH]=(char *)string::dup(temp_path);
-    }
-
     else if(!strcmp(variable,"check_result_path")){
 
       if(strlen(value)>MAX_FILENAME_LENGTH-1){
