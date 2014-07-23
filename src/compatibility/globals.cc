@@ -32,6 +32,3 @@ unsigned long retained_service_attribute_mask(0);
 circular_buffer check_result_buffer;
 check_result check_result_info;
 check_result* check_result_list(NULL);
-
-// Embedded Perl.
-unsigned int use_embedded_perl_implicitly(false);

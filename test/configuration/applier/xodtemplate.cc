@@ -17438,17 +17438,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"enable_environment_macros"))
       enable_environment_macros=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"use_embedded_perl_implicitly")){
-
-      // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-      //   if (asprintf(&error_message,"Illegal value for use_embedded_perl_implicitly")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // use_embedded_perl_implicitly=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"external_command_buffer_slots"))
       external_command_buffer_slots=atoi(value);
 

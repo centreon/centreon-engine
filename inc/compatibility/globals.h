@@ -36,7 +36,4 @@ extern circular_buffer check_result_buffer;
 extern check_result check_result_info;
 extern check_result* check_result_list;
 
-// Embedded Perl.
-extern unsigned int use_embedded_perl_implicitly;
-
 #endif // !CCE_COMPATIBILITY_GLOBALS_H
