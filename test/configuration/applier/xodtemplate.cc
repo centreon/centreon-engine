@@ -17439,18 +17439,6 @@ int read_main_config_file(char const* main_config_file) {
       use_timezone=(char *)string::dup(value);
     }
 
-    else if(!strcmp(variable,"p1_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"P1 file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] p1_file;
-      // p1_file=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"event_broker_options")){
 
       if(!strcmp(value,"-1"))

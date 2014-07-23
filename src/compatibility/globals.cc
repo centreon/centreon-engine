@@ -37,5 +37,4 @@ check_result* check_result_list(NULL);
 unsigned int use_embedded_perl_implicitly(false);
 
 // Old path.
-char const* p1_file("");
 char const* temp_path("/tmp");

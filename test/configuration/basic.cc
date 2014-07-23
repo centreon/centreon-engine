@@ -203,7 +203,6 @@ static std::map<std::string, std::string> build_configuration(
   var["high_host_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
   var["date_format"] = date_format[my_rand(0, 3)];
   var["use_timezone"] = "US/Mountain";
-  var["p1_file"] = "p1_file.tmp";
   var["event_broker_options"] = obj2str(my_rand(1));
   var["illegal_object_name_chars"] = "`~!$%^&*|'\"<>?,()";
   var["illegal_macro_output_chars"] = "`~$&|'\"<>";

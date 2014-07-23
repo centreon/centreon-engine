@@ -40,7 +40,6 @@ extern check_result* check_result_list;
 extern unsigned int use_embedded_perl_implicitly;
 
 // Old path.
-extern char const* p1_file;
 extern char const* temp_path;
 
 #endif // !CCE_COMPATIBILITY_GLOBALS_H
