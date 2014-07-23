@@ -33,7 +33,6 @@ set(
   # Sources.
   "${SRC_DIR}/check_result.cc"
   "${SRC_DIR}/common.cc"
-  "${SRC_DIR}/embedded_perl.cc"
   "${SRC_DIR}/find.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
@@ -48,8 +47,6 @@ set(
   "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"
   "${INC_DIR}/downtime.h"
-  "${INC_DIR}/embedded_perl.h"
-  "${INC_DIR}/epn_nagios.h"
   "${INC_DIR}/events.h"
   "${INC_DIR}/find.hh"
   "${INC_DIR}/locations.h"

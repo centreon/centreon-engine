@@ -97,8 +97,6 @@ extern unsigned int              currently_running_host_checks;
 extern time_t                    program_start;
 extern time_t                    event_start;
 
-extern int                       embedded_perl_initialized;
-
 extern host*                     host_list;
 extern host*                     host_list_tail;
 extern std::map<std::string, host_other_properties> host_other_props;

@@ -92,7 +92,6 @@ int                 config_errors(0);
 int                 config_warnings(0);
 int                 defer_comment_sorting(0);
 int                 defer_downtime_sorting(0);
-int                 embedded_perl_initialized(false);
 int                 external_command_buffer_slots(4096);
 int                 log_host_retries(false);
 int                 precache_objects(false);
