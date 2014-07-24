@@ -1319,6 +1319,8 @@ int add_downtime(
   new_downtime->triggered_by = triggered_by;
   new_downtime->duration = duration;
   new_downtime->downtime_id = downtime_id;
+  new_downtime->recurring_interval = recurring_interval;
+  new_downtime->recurring_period = recurring_period;
 
   if (defer_downtime_sorting) {
     new_downtime->next = scheduled_downtime_list;
