@@ -21,6 +21,7 @@
 #ifndef CCE_NEBSTRUCTS_HH
 #  define CCE_NEBSTRUCTS_HH
 
+# include "com/centreon/engine/objects/timeperiod.hh"
 #  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/host.hh"
@@ -270,6 +271,8 @@ typedef struct   nebstruct_downtime_struct {
   int            fixed;
   unsigned long  duration;
   unsigned long  triggered_by;
+  unsigned long  recurring_interval;
+  timeperiod*    recurring_period;
   unsigned long  downtime_id;
 
   void*          object_ptr; /* not implemented yet */

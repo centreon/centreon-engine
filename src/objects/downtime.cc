@@ -243,6 +243,8 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
       temp_downtime->fixed,
       temp_downtime->triggered_by,
       temp_downtime->duration,
+      temp_downtime->recurring_interval,
+      temp_downtime->recurring_period,
       temp_downtime->downtime_id,
       NULL);
 
@@ -564,6 +566,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
       temp_downtime->fixed,
       temp_downtime->triggered_by,
       temp_downtime->duration,
+      temp_downtime->recurring_interval,
+      temp_downtime->recurring_period,
       temp_downtime->downtime_id,
       NULL);
 
@@ -678,6 +682,8 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
       temp_downtime->fixed,
       temp_downtime->triggered_by,
       temp_downtime->duration,
+      temp_downtime->recurring_interval,
+      temp_downtime->recurring_period,
       temp_downtime->downtime_id, NULL);
 
     if (temp_downtime->type == HOST_DOWNTIME
@@ -1002,6 +1008,8 @@ int add_new_host_downtime(
     fixed,
     triggered_by,
     duration,
+    recurring_interval,
+    recurring_period,
     new_downtime_id,
     NULL);
   return (result);
@@ -1063,6 +1071,8 @@ int add_new_service_downtime(
     fixed,
     triggered_by,
     duration,
+    recurring_interval,
+    recurring_period,
     new_downtime_id,
     NULL);
   return (result);
@@ -1119,6 +1129,8 @@ int delete_downtime(int type, unsigned long downtime_id) {
     this_downtime->fixed,
     this_downtime->triggered_by,
     this_downtime->duration,
+    this_downtime->recurring_interval,
+    this_downtime->recurring_period,
     downtime_id,
     NULL);
 
@@ -1371,6 +1383,8 @@ int add_downtime(
     fixed,
     triggered_by,
     duration,
+    recurring_interval,
+    recurring_period,
     downtime_id,
     NULL);
   return (OK);

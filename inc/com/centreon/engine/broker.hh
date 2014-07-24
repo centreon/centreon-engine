@@ -464,6 +464,8 @@ void           broker_downtime_data(
                  int fixed,
                  unsigned long triggered_by,
                  unsigned long duration,
+                 unsigned long recurring_interval,
+                 struct timeperiod_struct* recurring_period,
                  unsigned long downtime_id,
                  struct timeval const* timestamp);
 int            broker_event_handler(

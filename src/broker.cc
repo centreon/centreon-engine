@@ -777,6 +777,8 @@ void broker_downtime_data(
        int fixed,
        unsigned long triggered_by,
        unsigned long duration,
+       unsigned long recurring_interval,
+       struct timeperiod_struct* recurring_period,
        unsigned long downtime_id,
        struct timeval const* timestamp) {
   // Config check.
@@ -801,6 +803,8 @@ void broker_downtime_data(
   ds.fixed = fixed;
   ds.duration = duration;
   ds.triggered_by = triggered_by;
+  ds.recurring_interval = recurring_interval;
+  ds.recurring_period = recurring_period;
   ds.downtime_id = downtime_id;
 
   // Make callbacks.
