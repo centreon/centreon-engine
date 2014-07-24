@@ -1078,9 +1078,67 @@ int add_new_service_downtime(
   return (result);
 }
 
+int renew_downtime(int type, scheduled_downtime* downtime) {
+  unsigned long downtime_id;
+  time_t new_start_time = downtime->end_time + downtime->recurring_interval;
+  time_t new_end_time;
+
+  // If we aren't in the recurring period: start the next recurring period.
+  if (check_time_against_period(new_start_time, downtime->recurring_period) == ERROR)
+    get_next_valid_time(0, &new_start_time, downtime->recurring_period);
+
+  // Calculate a new correct end time from the new start time.
+  new_end_time = new_start_time + difftime(downtime->end_time, downtime->start_time);
+
+  // Create a new downtime.
+  return (add_new_downtime(type, downtime->host_name, downtime->service_description,
+                   downtime->entry_time, downtime->author, downtime->comment,
+                   new_start_time, new_end_time,
+                   downtime->fixed, downtime->triggered_by, downtime->duration,
+                   downtime->recurring_interval, downtime->recurring_period,
+                   &downtime_id));
+}
+
 /******************************************************************/
 /*********************** DELETION FUNCTIONS ***********************/
 /******************************************************************/
+
+/* deletes a scheduled host or service downtime.
+ * renew it by creating another downtime if it was a recurring downtime.
+ */
+int delete_or_renew_downtime(int type,
+                             unsigned long downtime_id) {
+  scheduled_downtime* this_downtime(NULL);
+  scheduled_downtime* last_downtime(NULL);
+  scheduled_downtime* next_downtime(NULL);
+
+  /* find the downtime we should remove */
+  for (this_downtime = scheduled_downtime_list,
+         last_downtime = scheduled_downtime_list;
+       this_downtime != NULL;
+       this_downtime = next_downtime) {
+    next_downtime = this_downtime->next;
+
+    /* we found the downtime we should delete */
+    if (this_downtime->downtime_id == downtime_id
+        && this_downtime->type == type)
+      break;
+
+    last_downtime = this_downtime;
+  }
+
+  if (this_downtime == NULL)
+    return (ERROR);
+
+  /* if a recurring downtime, reschedule it for another go */
+  if (this_downtime->recurring_period != NULL)
+    if (renew_downtime(type, this_downtime) == ERROR) {
+      delete_downtime(type, downtime_id);
+      return (ERROR);
+    }
+
+  return (delete_downtime(type, downtime_id));
+}
 
 /* deletes a scheduled host or service downtime entry from the list in memory */
 int delete_downtime(int type, unsigned long downtime_id) {
