@@ -130,6 +130,8 @@ int xdddefault_add_new_host_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id) {
   /* find the next valid downtime id */
   while (find_host_downtime(next_downtime_id) != NULL)
@@ -146,6 +148,8 @@ int xdddefault_add_new_host_downtime(
     fixed,
     triggered_by,
     duration,
+    recurring_interval,
+    recurring_period,
     next_downtime_id);
 
   /* update downtime file */
@@ -172,6 +176,8 @@ int xdddefault_add_new_service_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id) {
   /* find the next valid downtime id */
   while (find_service_downtime(next_downtime_id) != NULL)
@@ -189,6 +195,8 @@ int xdddefault_add_new_service_downtime(
     fixed,
     triggered_by,
     duration,
+    recurring_interval,
+    recurring_period,
     next_downtime_id);
 
   /* update downtime file */

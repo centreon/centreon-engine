@@ -40,7 +40,9 @@ retention::downtime::setters const retention::downtime::_setters[] = {
   { "host_name",           SETTER(std::string const&, _set_host_name) },
   { "service_description", SETTER(std::string const&, _set_service_description) },
   { "start_time",          SETTER(time_t, _set_start_time) },
-  { "triggered_by",        SETTER(unsigned long, _set_triggered_by) }
+  { "triggered_by",        SETTER(unsigned long, _set_triggered_by) },
+  { "recurring_interval",  SETTER(unsigned long, _set_recurring_interval) },
+  { "recurring_period",    SETTER(timeperiod*, _set_recurring_period) }
 };
 
 /**
@@ -57,7 +59,9 @@ retention::downtime::downtime(type_id downtime_type)
     _entry_time(0),
     _fixed(false),
     _start_time(0),
-    _triggered_by(0) {}
+    _triggered_by(0),
+    _recurring_interval(0),
+    _recurring_period(NULL) {}
 
 /**
  *  Copy constructor.
@@ -96,6 +100,8 @@ retention::downtime& retention::downtime::operator=(downtime const& right) {
     _service_description = right._service_description;
     _start_time = right._start_time;
     _triggered_by = right._triggered_by;
+    _recurring_interval = right._recurring_interval;
+    _recurring_period = right._recurring_period;
   }
   return (*this);
 }
@@ -120,7 +126,9 @@ bool retention::downtime::operator==(downtime const& right) const throw () {
           && _host_name == right._host_name
           && _service_description == right._service_description
           && _start_time == right._start_time
-          && _triggered_by == right._triggered_by);
+          && _triggered_by == right._triggered_by
+          && _recurring_interval == right._recurring_interval
+          && _recurring_period == right._recurring_period);
 }
 
 /**
@@ -259,6 +267,14 @@ unsigned long retention::downtime::triggered_by() const throw () {
  return (_triggered_by);
 }
 
+unsigned long retention::downtime::recurring_interval() const throw() {
+  return (_recurring_interval);
+}
+
+timeperiod* retention::downtime::recurring_period() const throw() {
+  return (_recurring_period);
+}
+
 /**
  *  Set author.
  *
@@ -366,5 +382,15 @@ bool retention::downtime::_set_start_time(time_t value) {
  */
 bool retention::downtime::_set_triggered_by(unsigned long value) {
   _triggered_by = value;
+  return (true);
+}
+
+bool retention::downtime::_set_recurring_interval(unsigned long value) {
+  _recurring_interval = value;
+  return (true);
+}
+
+bool retention::downtime::_set_recurring_period(timeperiod* value) {
+  _recurring_period = value;
   return (true);
 }

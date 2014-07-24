@@ -63,6 +63,8 @@ void applier::downtime::_add_host_downtime(
     obj.fixed(),
     obj.triggered_by(),
     obj.duration(),
+    obj.recurring_interval(),
+    obj.recurring_period(),
     obj.downtime_id());
   register_downtime(HOST_DOWNTIME, obj.downtime_id());
 }
@@ -85,6 +87,8 @@ void applier::downtime::_add_service_downtime(
     obj.fixed(),
     obj.triggered_by(),
     obj.duration(),
+    obj.recurring_interval(),
+    obj.recurring_period(),
     obj.downtime_id());
   register_downtime(SERVICE_DOWNTIME, obj.downtime_id());
 }

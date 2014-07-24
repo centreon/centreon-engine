@@ -22,6 +22,8 @@
 
 #  include <list>
 #  include <string>
+#  include "com/centreon/engine/configuration/applier/state.hh"
+#  include "com/centreon/engine/objects/timeperiod.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/object.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -56,6 +58,20 @@ namespace                retention {
     std::string          service_description() const throw ();
     time_t               start_time() const throw ();
     unsigned long        triggered_by() const throw ();
+    unsigned long        recurring_interval() const throw();
+    timeperiod*          recurring_period() const throw();
+
+  protected:
+    template<typename T, bool (T::*ptr)(timeperiod*)>
+    struct              setter<T, timeperiod*, ptr> {
+      static bool       generic(T& obj, char const* value) {
+        umap<std::string, shared_ptr<timeperiod_struct> >::iterator it =
+            configuration::applier::state::instance().timeperiods().find(value);
+        if (it == configuration::applier::state::instance().timeperiods().end())
+          return false;
+        else return ((obj.*ptr)(it->second.get()));
+      }
+    };
 
   private:
     struct               setters {
@@ -74,6 +90,8 @@ namespace                retention {
     bool                 _set_service_description(std::string const& value);
     bool                 _set_start_time(time_t value);
     bool                 _set_triggered_by(unsigned long value);
+    bool                 _set_recurring_interval(unsigned long value);
+    bool                 _set_recurring_period(timeperiod* value);
 
     std::string          _author;
     std::string          _comment_data;
@@ -88,6 +106,8 @@ namespace                retention {
     static setters const _setters[];
     time_t               _start_time;
     unsigned long        _triggered_by;
+    unsigned long        _recurring_interval;
+    timeperiod*          _recurring_period;
   };
 
   typedef shared_ptr<downtime> downtime_ptr;

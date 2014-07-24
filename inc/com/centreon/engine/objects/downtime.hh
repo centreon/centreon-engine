@@ -24,6 +24,7 @@
 #  include <time.h>
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/objects/timeperiod.hh"
 
 typedef struct                      scheduled_downtime_struct {
   int                               type;
@@ -42,6 +43,8 @@ typedef struct                      scheduled_downtime_struct {
   int                               is_in_effect;
   int                               start_flex_downtime;
   int                               incremented_pending_downtime;
+  unsigned long                     recurring_interval;
+  timeperiod*                       recurring_period;
   struct scheduled_downtime_struct* next;
 }                                   scheduled_downtime;
 
@@ -61,6 +64,8 @@ int                 add_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long downtime_id);
 int                 add_host_downtime(
                       char const* host_name,
@@ -72,6 +77,8 @@ int                 add_host_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long downtime_id);
 int                 add_new_downtime(
                       int type,
@@ -85,6 +92,8 @@ int                 add_new_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long* downtime_id);
 int                 add_new_host_downtime(
                       char const* host_name,
@@ -96,6 +105,8 @@ int                 add_new_host_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long* downtime_id);
 int                 add_new_service_downtime(
                       char const* host_name,
@@ -108,6 +119,8 @@ int                 add_new_service_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long* downtime_id);
 int                 add_service_downtime(
                       char const* host_name,
@@ -120,6 +133,8 @@ int                 add_service_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long downtime_id);
 int                 check_for_expired_downtime();
 int                 check_pending_flex_host_downtime(
@@ -163,6 +178,8 @@ int                 schedule_downtime(
                       int fixed,
                       unsigned long triggered_by,
                       unsigned long duration,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
                       unsigned long* new_downtime_id);
 int                 sort_downtime();
 int                 unschedule_downtime(

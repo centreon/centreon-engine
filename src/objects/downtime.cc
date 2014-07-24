@@ -64,7 +64,9 @@ bool operator==(
           && obj1.comment_id == obj2.comment_id
           && obj1.is_in_effect == obj2.is_in_effect
           && obj1.start_flex_downtime == obj2.start_flex_downtime
-          && obj1.incremented_pending_downtime == obj2.incremented_pending_downtime);
+          && obj1.incremented_pending_downtime == obj2.incremented_pending_downtime
+          && obj1.recurring_interval == obj2.recurring_interval
+          && obj1.recurring_period == obj2.recurring_period);
 }
 
 /**
@@ -109,6 +111,8 @@ std::ostream& operator<<(
     "  is_in_effect:                 " << obj.is_in_effect << "\n"
     "  start_flex_downtime:          " << obj.start_flex_downtime << "\n"
     "  incremented_pending_downtime: " << obj.incremented_pending_downtime << "\n"
+    "  recurring_interval:           " << obj.recurring_interval << "\n"
+    "  recurring_period:             " << obj.recurring_period << "\n"
     "}\n";
   return (os);
 }
@@ -146,6 +150,8 @@ int schedule_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long* new_downtime_id) {
   unsigned long downtime_id(0L);
 
@@ -169,6 +175,8 @@ int schedule_downtime(
     fixed,
     triggered_by,
     duration,
+    recurring_interval,
+    recurring_period,
     &downtime_id);
 
   /* register the scheduled downtime */
@@ -907,6 +915,8 @@ int add_new_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id) {
   if (type == HOST_DOWNTIME)
     return (add_new_host_downtime(
@@ -919,6 +929,8 @@ int add_new_downtime(
               fixed,
               triggered_by,
               duration,
+              recurring_interval,
+              recurring_period,
               downtime_id));
   return (add_new_service_downtime(
             host_name,
@@ -931,6 +943,8 @@ int add_new_downtime(
             fixed,
             triggered_by,
             duration,
+            recurring_interval,
+            recurring_period,
             downtime_id));
 }
 
@@ -945,6 +959,8 @@ int add_new_host_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id) {
   int result(OK);
   unsigned long new_downtime_id(0L);
@@ -962,6 +978,8 @@ int add_new_host_downtime(
              fixed,
              triggered_by,
              duration,
+             recurring_interval,
+             recurring_period,
              &new_downtime_id);
 
   /* save downtime id */
@@ -1001,6 +1019,8 @@ int add_new_service_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id) {
   int result(OK);
   unsigned long new_downtime_id(0L);
@@ -1019,6 +1039,8 @@ int add_new_service_downtime(
              fixed,
              triggered_by,
              duration,
+             recurring_interval,
+             recurring_period,
              &new_downtime_id);
 
   /* save downtime id */
@@ -1198,6 +1220,8 @@ int add_host_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long downtime_id) {
   return (add_downtime(
             HOST_DOWNTIME,
@@ -1211,6 +1235,8 @@ int add_host_downtime(
             fixed,
             triggered_by,
             duration,
+            recurring_interval,
+            recurring_period,
             downtime_id));
 }
 
@@ -1226,6 +1252,8 @@ int add_service_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long downtime_id) {
   return (add_downtime(
             SERVICE_DOWNTIME,
@@ -1238,6 +1266,8 @@ int add_service_downtime(
             fixed,
             triggered_by,
             duration,
+            recurring_interval,
+            recurring_period,
             downtime_id));
 }
 
@@ -1254,6 +1284,8 @@ int add_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long recurring_interval,
+      timeperiod* recurring_period,
       unsigned long downtime_id) {
 
   /* don't add triggered downtimes that don't have a valid parent */
@@ -1320,6 +1352,7 @@ int add_downtime(
     }
   }
 
+  // TODOO
   /* send data to event broker */
   broker_downtime_data(
     NEBTYPE_DOWNTIME_LOAD,
