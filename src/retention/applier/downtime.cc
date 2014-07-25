@@ -18,6 +18,7 @@
 */
 
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/applier/downtime.hh"
 
@@ -36,14 +37,67 @@ void applier::downtime::apply(list_downtime const& lst) {
   for (list_downtime::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
-    if ((*it)->downtime_type() == retention::downtime::host)
-      _add_host_downtime(**it);
+    // TRICKY STUFF: non recurring period are loaded entirely as they aren't in the conf.
+    // Recurring period are in the conf: they are only loaded if there is no matching periods
+    // already loaded somewhere in the engine.
+    if ((*it)->recurring_period() == NULL)
+      _add_downtime(**it);
     else
-      _add_service_downtime(**it);
+      _add_recurring_downtime(**it);
+
   }
 
   // Sort all downtimes.
   sort_downtime();
+}
+
+/**
+ *  Add a non recurring downtime.
+ *
+ *  @param[in] obj  The non recurring downtime to add.
+ */
+void  applier::downtime::_add_downtime(
+        retention::downtime const& obj) throw() {
+  if (obj.downtime_type() == retention::downtime::host)
+    _add_host_downtime(obj);
+  else
+    _add_service_downtime(obj);
+}
+
+/**
+ *  Add a recurring downtime.
+ *
+ *  @param[in] obj  The recurring downtime to add.
+ */
+
+void  applier::downtime::_add_recurring_downtime(
+        retention::downtime const& obj) throw() {
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator it =
+      configuration::applier::state::instance().timeperiods().begin();
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator end =
+      configuration::applier::state::instance().timeperiods().end();
+  for (; it != end; ++it) {
+    for (scheduled_downtime* downtime = scheduled_downtime_list;
+         downtime != NULL;
+         downtime = downtime->next) {
+      // Ids can change between recurring downtime: all the rest remain.
+      if (is_equal(downtime->host_name, obj.host_name().c_str())
+      && is_equal(downtime->service_description, obj.service_description().c_str())
+      && downtime->entry_time == obj.entry_time()
+      && downtime->start_time == obj.start_time()
+      && downtime->end_time == obj.end_time()
+      && downtime->fixed == obj.fixed()
+      && downtime->triggered_by == obj.triggered_by()
+      && downtime->duration == obj.duration()
+      && downtime->downtime_id == obj.downtime_id()
+      && is_equal(downtime->author, obj.author().c_str())
+      && is_equal(downtime->comment, obj.comment_data().c_str())
+      && downtime->recurring_interval == obj.recurring_interval()
+      && downtime->recurring_period == obj.recurring_period())
+        return ;
+    }
+  }
+  _add_downtime(obj);
 }
 
 /**
