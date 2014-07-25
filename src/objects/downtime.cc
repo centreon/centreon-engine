@@ -491,6 +491,7 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
   time_t event_time(0L);
   unsigned long* new_downtime_id(NULL);
   int attr(0);
+  unsigned long new_recurring_downtime_id;
 
   logger(dbg_functions, basic)
     << "handle_scheduled_downtime()";
@@ -509,8 +510,12 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     return (ERROR);
 
   /* Before anything, renew downtime if it is a recurring downtime. */
-  if (temp_downtime->recurring_period != NULL)
-    renew_downtime(temp_downtime);
+  if (temp_downtime->recurring_period != NULL) {
+    if (renew_downtime(temp_downtime, &new_recurring_downtime_id) == OK)
+      logger(dbg_downtime, basic)
+        << "Recurring downtime (id='" << temp_downtime->downtime_id <<
+           "): new downtime created (id=" << new_recurring_downtime_id << ").";
+  }
 
   /* if downtime if flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */
   /* start_flex_downtime variable is set to true by event handler functions */
@@ -1082,8 +1087,7 @@ int add_new_service_downtime(
   return (result);
 }
 
-int renew_downtime(scheduled_downtime* downtime) {
-  unsigned long downtime_id;
+int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id) {
   time_t new_start_time = downtime->start_time + downtime->recurring_interval;
   time_t new_end_time;
 
@@ -1102,7 +1106,7 @@ int renew_downtime(scheduled_downtime* downtime) {
                    new_start_time, new_end_time,
                    downtime->fixed, downtime->triggered_by, downtime->duration,
                    downtime->recurring_interval, downtime->recurring_period,
-                   &downtime_id));
+                   new_downtime_id));
 }
 
 /******************************************************************/

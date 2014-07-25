@@ -185,7 +185,8 @@ int                 sort_downtime();
 int                 unschedule_downtime(
                       int type,
                       unsigned long downtime_id);
-int                 renew_downtime(scheduled_downtime* downtime);
+int                 renew_downtime(scheduled_downtime* downtime,
+                                   unsigned long* new_downtime_id);
 #  ifdef __cplusplus
 }
 
