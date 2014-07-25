@@ -141,8 +141,6 @@ int                 check_pending_flex_host_downtime(
                       host_struct* hst);
 int                 check_pending_flex_service_downtime(
                       service_struct* svc);
-int                 delete_or_renew_downtime(int type,
-                                             unsigned long downtime_id);
 int                 delete_downtime(
                       int type,
                       unsigned long downtime_id);
@@ -187,8 +185,7 @@ int                 sort_downtime();
 int                 unschedule_downtime(
                       int type,
                       unsigned long downtime_id);
-int                 renew_downtime(int type,
-                                   scheduled_downtime* downtime);
+int                 renew_downtime(scheduled_downtime* downtime);
 #  ifdef __cplusplus
 }
 
