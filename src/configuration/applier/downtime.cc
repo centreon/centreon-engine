@@ -112,7 +112,7 @@ void applier::downtime::add_object(
 void applier::downtime::expand_object(
     shared_ptr<configuration::downtime> obj,
     configuration::state& s) {
-
+  s.downtimes().insert(obj);
 }
 
 void applier::downtime::modify_object(

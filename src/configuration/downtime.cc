@@ -42,7 +42,7 @@ configuration::downtime::setters const configuration::downtime::_setters[] = {
   { "start_time",          SETTER(time_t, _set_start_time) },
   { "triggered_by",        SETTER(unsigned long, _set_triggered_by) },
   { "recurring_interval",  SETTER(unsigned long, _set_recurring_interval) },
-  { "recurring_period",    SETTER(::timeperiod*, _set_recurring_period) }
+  { "recurring_period",    SETTER(std::string const&, _set_recurring_period_name) }
 };
 
 /**
@@ -435,5 +435,25 @@ bool configuration::downtime::_set_recurring_interval(unsigned long value) {
 
 bool configuration::downtime::_set_recurring_period(::timeperiod* value) {
   _recurring_period = value;
+  return (true);
+}
+
+bool configuration::downtime::_set_recurring_period_name(std::string const& value) {
+  _recurring_period_name = value;
+  return (true);
+}
+
+std::string configuration::downtime::recurring_period_name() const throw() {
+  return _recurring_period_name;
+}
+
+bool configuration::downtime::resolve_recurring_period() {
+  if (_recurring_period_name.empty())
+    return (true);
+  umap<std::string, shared_ptr<timeperiod_struct> >::iterator it =
+      configuration::applier::state::instance().timeperiods().find(_recurring_period_name);
+  if (it == configuration::applier::state::instance().timeperiods().end())
+    return (false);
+  _recurring_period = it->second.get();
   return (true);
 }

@@ -44,20 +44,10 @@ namespace                configuration {
     unsigned long        triggered_by() const throw ();
     unsigned long        recurring_interval() const throw();
     ::timeperiod*        recurring_period() const throw();
+    std::string          recurring_period_name() const throw();
+    bool                 resolve_recurring_period();
     void                 check_validity() const;
     void                 merge(object const& obj);
-
-  protected:
-    template<typename T, bool (T::*ptr)(::timeperiod*)>
-    struct              setter<T, ::timeperiod*, ptr> {
-      static bool       generic(T& obj, char const* value) {
-        umap<std::string, shared_ptr<timeperiod_struct> >::iterator it =
-            configuration::applier::state::instance().timeperiods().find(value);
-        if (it == configuration::applier::state::instance().timeperiods().end())
-          return false;
-        else return ((obj.*ptr)(it->second.get()));
-      }
-    };
 
   private:
     struct               setters {
@@ -78,6 +68,7 @@ namespace                configuration {
     bool                 _set_triggered_by(unsigned long value);
     bool                 _set_recurring_interval(unsigned long value);
     bool                 _set_recurring_period(::timeperiod* value);
+    bool                 _set_recurring_period_name(std::string const& value);
 
     std::string          _author;
     std::string          _comment_data;
@@ -93,7 +84,8 @@ namespace                configuration {
     time_t               _start_time;
     unsigned long        _triggered_by;
     unsigned long        _recurring_interval;
-    ::timeperiod*          _recurring_period;
+    ::timeperiod*        _recurring_period;
+    std::string          _recurring_period_name;
   };
 
   typedef shared_ptr<downtime> downtime_ptr;
