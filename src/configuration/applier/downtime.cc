@@ -136,7 +136,7 @@ void applier::downtime::modify_object(
   if (it_obj == applier::state::instance().downtimes().end())
     throw (engine_error() << "Could not modify non-existing "
            << "downtime object '" << (long)obj->downtime_id() << "'");
-  scheduled_downtime_struct* h(it_obj->second.get());
+  scheduled_downtime_struct* sd(it_obj->second.get());
 
   // Update the global configuration set.
   shared_ptr<configuration::downtime> obj_old(*it_cfg);
@@ -144,7 +144,17 @@ void applier::downtime::modify_object(
   config->downtimes().insert(obj);
 
   // Modify properties.
-  //modify_if_different();
+  modify_if_different(sd->author, obj->author().c_str());
+  modify_if_different(sd->comment, obj->comment_data().c_str());
+  modify_if_different(sd->type, (int)obj->downtime_id());
+  modify_if_different(sd->duration, obj->duration());
+  modify_if_different(sd->end_time, obj->end_time());
+  modify_if_different(sd->start_time, obj->start_time());
+  modify_if_different(sd->fixed, (int)obj->fixed());
+  modify_if_different(sd->host_name, obj->host_name().c_str());
+  modify_if_different(sd->service_description, obj->service_description().c_str());
+  modify_if_different(sd->triggered_by, obj->triggered_by());
+  modify_if_different(sd->recurring_interval, obj->recurring_interval());
   // Notify event broker.
   /*timeval tv(get_broker_timestamp(NULL));
   broker_adaptive_host_data(
