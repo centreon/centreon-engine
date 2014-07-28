@@ -30,21 +30,21 @@ namespace                configuration {
     key_type const&      key() const throw ();
     bool                 set(char const* key, char const* value);
 
-    std::string          author() const throw ();
-    std::string          comment_data() const throw ();
+    std::string const&   author() const throw ();
+    std::string const&   comment_data() const throw ();
     unsigned long        downtime_id() const throw ();
     type_id              downtime_type() const throw ();
     unsigned long        duration() const throw ();
     time_t               end_time() const throw ();
     time_t               entry_time() const throw ();
     bool                 fixed() const throw ();
-    std::string          host_name() const throw ();
-    std::string          service_description() const throw ();
+    std::string const&   host_name() const throw ();
+    std::string const&   service_description() const throw ();
     time_t               start_time() const throw ();
     unsigned long        triggered_by() const throw ();
     unsigned long        recurring_interval() const throw();
     ::timeperiod*        recurring_period() const throw();
-    std::string          recurring_period_name() const throw();
+    std::string const&   recurring_period_name() const throw();
     bool                 resolve_recurring_period();
     void                 check_validity() const;
     void                 merge(object const& obj);

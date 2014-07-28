@@ -164,7 +164,7 @@ bool retention::downtime::set(char const* key, char const* value) {
  *
  * @return The author.
  */
-std::string retention::downtime::author() const throw () {
+std::string const& retention::downtime::author() const throw () {
  return (_author);
 }
 
@@ -173,7 +173,7 @@ std::string retention::downtime::author() const throw () {
  *
  * @return The comment_data.
  */
-std::string retention::downtime::comment_data() const throw () {
+std::string const& retention::downtime::comment_data() const throw () {
  return (_comment_data);
 }
 
@@ -236,7 +236,7 @@ bool retention::downtime::fixed() const throw () {
  *
  * @return The host_name.
  */
-std::string retention::downtime::host_name() const throw () {
+std::string const& retention::downtime::host_name() const throw () {
  return (_host_name);
 }
 
@@ -245,7 +245,7 @@ std::string retention::downtime::host_name() const throw () {
  *
  * @return The service_description.
  */
-std::string retention::downtime::service_description() const throw () {
+std::string const& retention::downtime::service_description() const throw () {
  return (_service_description);
 }
 

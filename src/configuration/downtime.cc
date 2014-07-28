@@ -207,7 +207,7 @@ bool configuration::downtime::set(char const* key, char const* value) {
  *
  * @return The author.
  */
-std::string configuration::downtime::author() const throw () {
+std::string const& configuration::downtime::author() const throw () {
  return (_author);
 }
 
@@ -216,7 +216,7 @@ std::string configuration::downtime::author() const throw () {
  *
  * @return The comment_data.
  */
-std::string configuration::downtime::comment_data() const throw () {
+std::string const& configuration::downtime::comment_data() const throw () {
  return (_comment_data);
 }
 
@@ -279,7 +279,7 @@ bool configuration::downtime::fixed() const throw () {
  *
  * @return The host_name.
  */
-std::string configuration::downtime::host_name() const throw () {
+std::string const& configuration::downtime::host_name() const throw () {
  return (_host_name);
 }
 
@@ -288,7 +288,7 @@ std::string configuration::downtime::host_name() const throw () {
  *
  * @return The service_description.
  */
-std::string configuration::downtime::service_description() const throw () {
+std::string const& configuration::downtime::service_description() const throw () {
  return (_service_description);
 }
 
@@ -443,7 +443,7 @@ bool configuration::downtime::_set_recurring_period_name(std::string const& valu
   return (true);
 }
 
-std::string configuration::downtime::recurring_period_name() const throw() {
+std::string const& configuration::downtime::recurring_period_name() const throw() {
   return _recurring_period_name;
 }
 
