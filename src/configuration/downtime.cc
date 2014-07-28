@@ -181,6 +181,10 @@ void configuration::downtime::merge(object const& obj) {
   return ;
 }
 
+configuration::downtime::key_type const& configuration::downtime::key() const throw () {
+  return _downtime_id;
+}
+
 /**
  *  Set new value on specific property.
  *
