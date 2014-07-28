@@ -115,9 +115,49 @@ void applier::downtime::expand_object(
   s.downtimes().insert(obj);
 }
 
+/**
+ *  Modified downtime.
+ *
+ *  @param[in] obj The new downtime to modify into the monitoring engine.
+ */
 void applier::downtime::modify_object(
     shared_ptr<configuration::downtime> obj) {
+  logger(logging::dbg_config, logging::more)
+    << "Modifying downtime '" << obj->downtime_id() << "'.";
 
+  // Find the configuration object.
+  std::set<shared_ptr<configuration::downtime> >::iterator it_cfg(config->downtimes_find(obj->key()));
+  if (it_cfg == config->downtimes().end())
+    throw (engine_error() << "Cannot modify non-existing downtime '" << (long)obj->downtime_id() << "'");
+
+  // Find downtime object.
+  umap<unsigned long, shared_ptr<scheduled_downtime_struct> >::iterator
+    it_obj(applier::state::instance().downtimes_find(obj->key()));
+  if (it_obj == applier::state::instance().downtimes().end())
+    throw (engine_error() << "Could not modify non-existing "
+           << "downtime object '" << (long)obj->downtime_id() << "'");
+  scheduled_downtime_struct* h(it_obj->second.get());
+
+  // Update the global configuration set.
+  shared_ptr<configuration::downtime> obj_old(*it_cfg);
+  config->downtimes().erase(it_cfg);
+  config->downtimes().insert(obj);
+
+  // Modify properties.
+  //modify_if_different();
+  // Notify event broker.
+  /*timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_host_data(
+    NEBTYPE_HOST_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    h,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);*/
+
+  return ;
 }
 
 void applier::downtime::remove_object(
