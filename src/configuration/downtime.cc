@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/configuration/downtime.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;

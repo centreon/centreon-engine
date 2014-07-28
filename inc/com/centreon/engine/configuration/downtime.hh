@@ -3,7 +3,6 @@
 
 #  include <list>
 #  include <string>
-#  include "com/centreon/engine/configuration/applier/state.hh"
 #  include "com/centreon/engine/objects/timeperiod.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/configuration/object.hh"

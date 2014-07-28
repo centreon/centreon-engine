@@ -42,6 +42,7 @@ struct servicedependency_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
+struct scheduled_downtime_struct;
 
 CCE_BEGIN()
 
@@ -179,6 +180,11 @@ namespace           configuration {
                     timeperiods_find(configuration::timeperiod::key_type const& k) const;
       umap<std::string, shared_ptr<timeperiod_struct> >::iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k);
+      umap<unsigned long, shared_ptr<scheduled_downtime_struct> >::const_iterator
+                    downtimes_find(configuration::downtime::key_type const& k) const;
+      umap<unsigned long, shared_ptr<scheduled_downtime_struct> >::iterator
+                    downtimes_find(configuration::downtime::key_type const& k);
+      umap<unsigned long, shared_ptr<scheduled_downtime_struct> >& downtimes();
       void          try_lock();
 
     private:
@@ -249,6 +255,8 @@ namespace           configuration {
                     _servicegroups;
       umap<std::string, shared_ptr<timeperiod_struct> >
                     _timeperiods;
+      umap<unsigned long, shared_ptr<scheduled_downtime_struct> >
+                    _downtimes;
     };
   }
 }

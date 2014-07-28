@@ -122,10 +122,42 @@ void applier::downtime::modify_object(
 
 void applier::downtime::remove_object(
     shared_ptr<configuration::downtime> obj) {
+  // Logging.
+  logger(logging::dbg_config, logging::more)
+    << "Removing downtime '" << obj->downtime_id() << "'.";
 
+  // Find downtime.
+  umap<unsigned long, shared_ptr<scheduled_downtime> >::iterator
+    it(applier::state::instance().downtimes_find(obj->key()));
+  if (it != applier::state::instance().downtimes().end()) {
+    scheduled_downtime* sd(it->second.get());
+
+    // Remove downtime from its list.
+    //unregister_object<scheduled_downtime>(&downtime_list, sd);
+
+    // Notify event broker.
+    /*timeval tv(get_broker_timestamp(NULL));
+    broker_adaptive_host_data(
+      NEBTYPE_HOST_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      hst,
+      CMD_NONE,
+      MODATTR_ALL,
+      MODATTR_ALL,
+      &tv);*/
+
+    // Erase downtime object (will effectively delete the object).
+    applier::state::instance().downtimes().erase(it);
+  }
+
+  // Remove host from the global configuration set.
+  config->downtimes().erase(obj);
+
+  return ;
 }
 
 void applier::downtime::resolve_object(
     shared_ptr<configuration::downtime> obj) {
-
+  obj->resolve_recurring_period();
 }

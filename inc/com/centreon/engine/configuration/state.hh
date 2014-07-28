@@ -24,6 +24,7 @@
 #  include <set>
 #  include <string>
 #  include <vector>
+#  include "com/centreon/engine/configuration/downtime.hh"
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/configuration/connector.hh"
 #  include "com/centreon/engine/configuration/contact.hh"
