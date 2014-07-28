@@ -53,7 +53,8 @@ namespace                  configuration {
       serviceescalation = 11,
       serviceextinfo = 12,
       servicegroup = 13,
-      timeperiod = 14
+      timeperiod = 14,
+      downtime = 15
     };
 
                            object(object_type type);

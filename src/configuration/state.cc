@@ -4181,3 +4181,7 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
     << "Warning: use_embedded_perl_implicitly variable ignored";
   ++config_warnings;
 }
+
+std::set<shared_ptr<downtime> >& state::downtimes() throw() {
+   return _downtimes;
+}

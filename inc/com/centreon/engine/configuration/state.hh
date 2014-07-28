@@ -45,6 +45,7 @@
 CCE_BEGIN()
 
 namespace               configuration {
+  class downtime;
   /**
    *  @class state state.hh
    *  @brief Simple configuration state class.
@@ -425,6 +426,8 @@ namespace               configuration {
     bool                use_true_regexp_matching() const throw ();
     void                use_true_regexp_matching(bool value);
 
+    std::set<shared_ptr<downtime> >& downtimes() throw();
+
   private:
     struct              setters {
       char const*       name;
@@ -644,6 +647,7 @@ namespace               configuration {
     bool                _use_syslog;
     std::string         _use_timezone;
     bool                _use_true_regexp_matching;
+    std::set<shared_ptr<downtime> > _downtimes;
   };
 }
 
