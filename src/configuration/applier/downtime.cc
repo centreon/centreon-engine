@@ -87,22 +87,38 @@ void applier::downtime::add_object(
   // Add downtime to the global configuration set.
   config->downtimes().insert(obj);
 
-  //if ()
-
   // Create downtime.
-  if (add_host_downtime(
-    obj->host_name().c_str(),
-    obj->entry_time(),
-    obj->author().c_str(),
-    obj->comment_data().c_str(),
-    obj->start_time(),
-    obj->end_time(),
-    obj->fixed(),
-    obj->triggered_by(),
-    obj->duration(),
-    obj->recurring_interval(),
-    obj->recurring_period(),
-    obj->downtime_id()) == ERROR)
+  int ret = OK;
+  if (obj->downtime_type() == configuration::downtime::host)
+    ret = add_host_downtime(
+          obj->host_name().c_str(),
+          obj->entry_time(),
+          obj->author().c_str(),
+          obj->comment_data().c_str(),
+          obj->start_time(),
+          obj->end_time(),
+          obj->fixed(),
+          obj->triggered_by(),
+          obj->duration(),
+          obj->recurring_interval(),
+          obj->recurring_period(),
+          obj->downtime_id());
+  else if (obj->downtime_type() == configuration::downtime::service)
+    ret = add_service_downtime(
+          obj->host_name().c_str(),
+          obj->service_description().c_str(),
+          obj->entry_time(),
+          obj->author().c_str(),
+          obj->comment_data().c_str(),
+          obj->start_time(),
+          obj->end_time(),
+          obj->fixed(),
+          obj->triggered_by(),
+          obj->duration(),
+          obj->recurring_interval(),
+          obj->recurring_period(),
+          obj->downtime_id());
+  if (ret == ERROR)
     throw (engine_error() << "Could not register downtime '"
          << obj->host_name() << "'");
 
