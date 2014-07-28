@@ -188,6 +188,8 @@ namespace               configuration {
     void                debug_level(unsigned long value);
     unsigned int        debug_verbosity() const throw ();
     void                debug_verbosity(unsigned int value);
+    std::set<shared_ptr<downtime> >&
+                        downtimes() throw();
     bool                enable_environment_macros() const throw ();
     void                enable_environment_macros(bool value);
     bool                enable_event_handlers() const throw ();
@@ -426,8 +428,6 @@ namespace               configuration {
     bool                use_true_regexp_matching() const throw ();
     void                use_true_regexp_matching(bool value);
 
-    std::set<shared_ptr<downtime> >& downtimes() throw();
-
   private:
     struct              setters {
       char const*       name;
@@ -539,6 +539,8 @@ namespace               configuration {
     std::string         _debug_file;
     unsigned long       _debug_level;
     unsigned int        _debug_verbosity;
+    std::set<shared_ptr<downtime> >
+                        _downtimes;
     bool                _enable_environment_macros;
     bool                _enable_event_handlers;
     bool                _enable_failure_prediction;
@@ -647,7 +649,6 @@ namespace               configuration {
     bool                _use_syslog;
     std::string         _use_timezone;
     bool                _use_true_regexp_matching;
-    std::set<shared_ptr<downtime> > _downtimes;
   };
 }
 
