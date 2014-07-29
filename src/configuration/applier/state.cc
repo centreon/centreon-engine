@@ -1583,10 +1583,10 @@ void applier::state::_processing(
       config->contacts());
 
     // Apply downtimes
-    _apply<configuration::downtime, applier::downtime>(
-      diff_downtimes);
     _resolve<configuration::downtime, applier::downtime>(
       config->downtimes());
+    _apply<configuration::downtime, applier::downtime>(
+      diff_downtimes);
 
     // Apply hosts and hostgroups.
     _apply<configuration::host, applier::host>(
