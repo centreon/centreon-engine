@@ -1342,8 +1342,8 @@ static void _get_next_valid_time_per_timeperiod(
                  trange;
                  trange = trange->next) {
               // Get range limits.
-              time_t range_start(0);
-              time_t range_end(0);
+              time_t range_start((time_t)-1);
+              time_t range_end((time_t)-1);
               if (_timerange_to_time_t(
                     trange,
                     &midnight,
@@ -1373,8 +1373,59 @@ static void _get_next_valid_time_per_timeperiod(
       }
     }
 
-    // Check week day.
-    // XXX
+    /*
+    ** Find next available time from normal, weekly rotating schedule.
+    ** We do not need to check more than 8 days (today plus 7 days
+    ** ahead) because time ranges are recurring the same way every week.
+    */
+    bool got_earliest_time(false);
+    for (int weekday(ti.preftime.tm_wday), days_into_the_future(0);
+         (days_into_the_future <= 7) && !got_earliest_time;
+         ++weekday, ++days_into_the_future) {
+      if (weekday >= 7)
+        weekday -= 7;
+
+      // Calculate start of this future weekday.
+      time_t day_start(_add_round_days_to_midnight(
+                         ti.midnight,
+                         days_into_the_future * 24 * 60 * 60));
+      struct tm day_midnight;
+      localtime_r(&day_start, &day_midnight);
+
+      // Check all time ranges for this day of the week.
+      for (timerange* trange(tperiod->days[weekday]);
+           trange && !got_earliest_time;
+           trange = trange->next) {
+        // Get range limits.
+        time_t range_start((time_t)-1);
+        time_t range_end((time_t)-1);
+        if (_timerange_to_time_t(
+              trange,
+              &day_midnight,
+              range_start,
+              range_end)) {
+          time_t potential_time((time_t)-1);
+          // Range is out of bound.
+          if (preferred_time <= range_end) {
+            // Preferred time occurs before range start, so use
+            // range start time as earliest potential time.
+            if (range_start >= preferred_time)
+              potential_time = range_start;
+            // Preferred time occurs between range start/end, so
+            // use preferred time as earliest potential time.
+            else
+              potential_time = preferred_time;
+
+            // Is this the earliest time found thus far ?
+            if ((earliest_time == (time_t)-1)
+                || (potential_time < earliest_time)) {
+              earliest_time = potential_time;
+              got_earliest_time = true;
+            }
+          }
+        }
+      }
+    }
 
     // Check exclusions.
     // XXX : reset earliest time + move preferred time past exclusion
@@ -1394,52 +1445,6 @@ static void _get_next_valid_time_per_timeperiod(
     *valid_time = earliest_time;
 
   return ;
-
-//   // find next available time from normal, weekly
-//   // rotating schedule (in this timeperiod definition)
-
-//   // check a one week rotation of time
-//   bool has_looped(false);
-//   for (int weekday(ti.preftime.tm_wday), days_into_the_future(0);
-//        ;
-//        ++weekday, ++days_into_the_future) {
-
-//     // Break out of the loop if we have checked an entire
-//     // week already (8 days total).
-//     if (has_looped && days_into_the_future > 7)
-//       break ;
-
-//     if (weekday >= 7) {
-//       weekday -= 7;
-//       has_looped = true;
-//     }
-
-//     // calculate start of this future weekday
-//     time_t day_start((time_t)(ti.midnight + (days_into_the_future * 3600 * 24)));
-
-//     // we already found a time from a higher-precendence
-//     // date range exception
-//     if (day_start == earliest_day)
-//       continue;
-
-//     // check all time ranges for this day of the week
-//     for (timerange* trange(tperiod->days[weekday]);
-//          trange;
-//          trange = trange->next) {
-
-//       // calculate the time for the start of this time range
-//       time_t day_range_start(day_start + trange->range_start);
-
-//       if ((!have_earliest_time
-//            || day_range_start < earliest_time)
-//           && day_range_start >= preferred_time) {
-//         have_earliest_time = true;
-//         earliest_time = day_range_start;
-//         earliest_day = day_start;
-//       }
-//     }
-//   }
-
 }
 
 /**
