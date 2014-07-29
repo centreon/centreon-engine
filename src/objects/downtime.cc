@@ -1110,11 +1110,15 @@ void get_new_recurring_times(time_t start_time, time_t end_time,
                              timeperiod* recurring_period,
                              time_t* new_start_time, time_t* new_end_time) {
   *new_start_time = start_time + recurring_interval;
+  *new_end_time = start_time + difftime(end_time,
+                                        start_time);
+  time_t now(time(NULL));
 
   // If we aren't in the recurring period: start the next recurring period.
-  if (check_time_against_period(*new_start_time,
+  if ((*new_start_time < now && *new_end_time < now)
+      || check_time_against_period(*new_start_time,
                                 recurring_period) == ERROR)
-    get_next_valid_time(0, new_start_time, recurring_period);
+    get_next_valid_time(time(NULL), new_start_time, recurring_period);
 
   // Calculate a new correct end time from the new start time.
   *new_end_time = *new_start_time + difftime(end_time,
