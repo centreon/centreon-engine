@@ -99,7 +99,7 @@ void applier::downtime::add_object(
                           obj->recurring_interval(),
                           obj->recurring_period(),
                           &new_start_time, &new_end_time);
-  ret = add_new_downtime(obj->type(),
+  ret = add_new_downtime(obj->downtime_type(),
                          obj->host_name().c_str(),
                          obj->service_description().c_str(),
                          obj->entry_time(),
@@ -117,13 +117,13 @@ void applier::downtime::add_object(
     throw (engine_error() << "Could not register downtime '"
          << obj->host_name() << "'");
 
-  register_downtime(HOST_DOWNTIME, id);
+  register_downtime(obj->downtime_type(), id);
 }
 
 void applier::downtime::expand_object(
     shared_ptr<configuration::downtime> obj,
     configuration::state& s) {
-  /*s.downtimes().insert(obj);*/
+  s.downtimes().insert(obj);
 }
 
 /**
@@ -242,5 +242,7 @@ void applier::downtime::remove_object(
 
 void applier::downtime::resolve_object(
     shared_ptr<configuration::downtime> obj) {
-  obj->resolve_recurring_period();
+  if (obj->resolve_recurring_period() == false)
+    throw (engine_error() << "Could not register downtime '"
+         << obj->host_name() << "'");
 }
