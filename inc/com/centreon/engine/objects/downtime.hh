@@ -181,12 +181,17 @@ int                 schedule_downtime(
                       unsigned long recurring_interval,
                       timeperiod* recurring_period,
                       unsigned long* new_downtime_id);
+void                  get_new_recurring_times(time_t start_time, time_t end_time,
+                      unsigned long recurring_interval,
+                      timeperiod* recurring_period,
+                      time_t* new_start_time, time_t* new_end_time);
 int                 sort_downtime();
 int                 unschedule_downtime(
                       int type,
                       unsigned long downtime_id);
 int                 renew_downtime(scheduled_downtime* downtime,
                                    unsigned long* new_downtime_id);
+
 #  ifdef __cplusplus
 }
 

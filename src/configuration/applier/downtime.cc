@@ -80,6 +80,10 @@ applier::downtime& applier::downtime::operator=(applier::downtime const& right) 
  */
 void applier::downtime::add_object(
                shared_ptr<configuration::downtime> obj) {
+  // If no recurring period, do nothing.
+  if (obj->recurring_period())
+    return ;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new downtime.";
@@ -89,46 +93,37 @@ void applier::downtime::add_object(
 
   // Create downtime.
   int ret = OK;
-  if (obj->downtime_type() == configuration::downtime::host)
-    ret = add_host_downtime(
-          obj->host_name().c_str(),
-          obj->entry_time(),
-          obj->author().c_str(),
-          obj->comment_data().c_str(),
-          obj->start_time(),
-          obj->end_time(),
-          obj->fixed(),
-          obj->triggered_by(),
-          obj->duration(),
-          obj->recurring_interval(),
-          obj->recurring_period(),
-          obj->downtime_id());
-  else if (obj->downtime_type() == configuration::downtime::service)
-    ret = add_service_downtime(
-          obj->host_name().c_str(),
-          obj->service_description().c_str(),
-          obj->entry_time(),
-          obj->author().c_str(),
-          obj->comment_data().c_str(),
-          obj->start_time(),
-          obj->end_time(),
-          obj->fixed(),
-          obj->triggered_by(),
-          obj->duration(),
-          obj->recurring_interval(),
-          obj->recurring_period(),
-          obj->downtime_id());
+  unsigned long id;
+  time_t new_start_time, new_end_time;
+  get_new_recurring_times(obj->start_time(), obj->end_time(),
+                          obj->recurring_interval(),
+                          obj->recurring_period(),
+                          &new_start_time, &new_end_time);
+  ret = add_new_downtime(obj->type(),
+                         obj->host_name().c_str(),
+                         obj->service_description().c_str(),
+                         obj->entry_time(),
+                         obj->author().c_str(),
+                         obj->comment_data().c_str(),
+                         new_start_time,
+                         new_end_time,
+                         obj->fixed(),
+                         obj->triggered_by(),
+                         obj->duration(),
+                         obj->recurring_interval(),
+                         obj->recurring_period(),
+                         &id);
   if (ret == ERROR)
     throw (engine_error() << "Could not register downtime '"
          << obj->host_name() << "'");
 
-  register_downtime(HOST_DOWNTIME, obj->downtime_id());
+  register_downtime(HOST_DOWNTIME, id);
 }
 
 void applier::downtime::expand_object(
     shared_ptr<configuration::downtime> obj,
     configuration::state& s) {
-  s.downtimes().insert(obj);
+  /*s.downtimes().insert(obj);*/
 }
 
 /**
@@ -138,7 +133,7 @@ void applier::downtime::expand_object(
  */
 void applier::downtime::modify_object(
     shared_ptr<configuration::downtime> obj) {
-  logger(logging::dbg_config, logging::more)
+  /*logger(logging::dbg_config, logging::more)
     << "Modifying downtime '" << obj->downtime_id() << "'.";
 
   // Find the configuration object.
@@ -171,7 +166,29 @@ void applier::downtime::modify_object(
   modify_if_different(sd->service_description, obj->service_description().c_str());
   modify_if_different(sd->triggered_by, obj->triggered_by());
   modify_if_different(sd->recurring_interval, obj->recurring_interval());
+
   // Notify event broker.
+  /*
+    broker_downtime_data(
+    NEBTYPE_DOWNTIME_LOAD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    downtime_type,
+    host_name,
+    svc_description,
+    entry_time,
+    author,
+    comment_data,
+    start_time,
+    end_time,
+    fixed,
+    triggered_by,
+    duration,
+    recurring_interval,
+    recurring_period,
+    downtime_id,
+    NULL);
+   */
   /*timeval tv(get_broker_timestamp(NULL));
   broker_adaptive_host_data(
     NEBTYPE_HOST_UPDATE,

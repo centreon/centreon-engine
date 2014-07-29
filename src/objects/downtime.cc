@@ -1088,17 +1088,13 @@ int add_new_service_downtime(
 }
 
 int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id) {
-  time_t new_start_time = downtime->start_time + downtime->recurring_interval;
+  time_t new_start_time;
   time_t new_end_time;
 
-  // If we aren't in the recurring period: start the next recurring period.
-  if (check_time_against_period(new_start_time,
-                                downtime->recurring_period) == ERROR)
-    get_next_valid_time(0, &new_start_time, downtime->recurring_period);
-
-  // Calculate a new correct end time from the new start time.
-  new_end_time = new_start_time + difftime(downtime->end_time,
-                                           downtime->start_time);
+  get_new_recurring_times(downtime->start_time, downtime->end_time,
+                          downtime->recurring_interval,
+                          downtime->recurring_period,
+                          &new_start_time, &new_end_time);
 
   // Create a new downtime.
   return (add_new_downtime(downtime->type, downtime->host_name, downtime->service_description,
@@ -1107,6 +1103,23 @@ int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id)
                    downtime->fixed, downtime->triggered_by, downtime->duration,
                    downtime->recurring_interval, downtime->recurring_period,
                    new_downtime_id));
+}
+
+void get_new_recurring_times(time_t start_time, time_t end_time,
+                             unsigned long recurring_interval,
+                             timeperiod* recurring_period,
+                             time_t* new_start_time, time_t* new_end_time) {
+  *new_start_time = start_time + recurring_interval;
+
+  // If we aren't in the recurring period: start the next recurring period.
+  if (check_time_against_period(*new_start_time,
+                                recurring_period) == ERROR)
+    get_next_valid_time(0, new_start_time, recurring_period);
+
+  // Calculate a new correct end time from the new start time.
+  *new_end_time = *new_start_time + difftime(end_time,
+                                             start_time);
+
 }
 
 /******************************************************************/
