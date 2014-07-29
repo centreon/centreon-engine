@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -321,8 +321,10 @@ void applier::timeperiod::_add_exceptions(
            ++it3)
         if (!add_timerange_to_daterange(
                tp->exceptions[it2->type()],
-               it3->start(),
-               it3->end()))
+               it3->start() / (60 * 60),
+               (it3->start() / 60) % 60,
+               it3->end() / (60 * 60),
+               (it3->end() / 60) % 60))
           throw (engine_error()
                  << "Could not add time range to date range of "
                  << "type " << it2->type() << " of time period '"
@@ -354,8 +356,10 @@ void applier::timeperiod::_add_time_ranges(
       if (!add_timerange_to_timeperiod(
              tp,
              day,
-             it2->start(),
-             it2->end()))
+             it2->start() / (60 * 60),
+             (it2->start() / 60) % 60,
+             it2->end() / (60 * 60),
+             (it2->end() / 60) % 60))
         throw (engine_error()
                << "Could not add time range to time period '"
                << tp->name << "'");

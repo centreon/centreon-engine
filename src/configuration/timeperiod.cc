@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -416,9 +416,9 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
 
   if (ret) {
     if (fill_missing) {
-      year_end = year_start;
-      month_end = month_start;
-      month_day_end = month_day_start;
+      year_end = 0;
+      month_end = 0;
+      month_day_end = 0;
     }
 
     std::list<timerange> timeranges;

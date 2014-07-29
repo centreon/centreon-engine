@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -10090,8 +10090,10 @@ int xodtemplate_fill_timeperiod(
         /* add the new time range to the date range */
         new_timerange = add_timerange_to_daterange(
                           new_daterange,
-                          range_start_time,
-                          range_end_time);
+                          range_start_time / (60 * 60),
+                          (range_start_time / 60) % 60,
+                          range_end_time / (60 * 60),
+                          (range_end_time / 60) % 60);
         if (new_timerange == NULL) {
           logger(log_config_error, basic)
             << "Error: Could not add timerange #" << range
@@ -10139,8 +10141,10 @@ int xodtemplate_fill_timeperiod(
       new_timerange = add_timerange_to_timeperiod(
                         new_timeperiod,
                         day,
-                        range_start_time,
-                        range_end_time);
+                        range_start_time / (60 * 60),
+                        (range_start_time / 60) % 60,
+                        range_end_time / (60 * 60),
+                        (range_end_time / 60) % 60);
       if (new_timerange == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add timerange #" << range
