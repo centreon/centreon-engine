@@ -47,6 +47,23 @@ configuration::downtime::setters const configuration::downtime::_setters[] = {
 };
 
 /**
+ *  Parse and set the downtime property.
+ *
+ *  @param[in] key   The property name.
+ *  @param[in] value The property value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool configuration::downtime::parse(char const* key, char const* value) {
+  for (unsigned int i(0);
+       i < sizeof(_setters) / sizeof(_setters[0]);
+       ++i)
+    if (!strcmp(_setters[i].name, key))
+      return ((_setters[i].func)(*this, value));
+  return (false);
+}
+
+/**
  *  Constructor.
  *
  *  @param[in] type This is a host or service downtime.
@@ -184,23 +201,6 @@ void configuration::downtime::merge(object const& obj) {
 
 configuration::downtime::key_type const& configuration::downtime::key() const throw () {
   return _downtime_id;
-}
-
-/**
- *  Set new value on specific property.
- *
- *  @param[in] key   The property to set.
- *  @param[in] value The new value.
- *
- *  @return True on success, otherwise false.
- */
-bool configuration::downtime::set(char const* key, char const* value) {
-  for (unsigned int i(0);
-       i < sizeof(_setters) / sizeof(_setters[0]);
-       ++i)
-    if (!strcmp(_setters[i].name, key))
-      return ((_setters[i].func)(*this, value));
-  return (false);
 }
 
 /**

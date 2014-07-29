@@ -27,7 +27,7 @@ namespace                configuration {
     bool                 operator!=(downtime const& right) const throw ();
     bool                 operator<(downtime const& right) const throw ();
     key_type const&      key() const throw ();
-    bool                 set(char const* key, char const* value);
+    bool                 parse(char const* key, char const* value);
 
     std::string const&   author() const throw ();
     std::string const&   comment_data() const throw ();
