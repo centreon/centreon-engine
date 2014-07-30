@@ -373,6 +373,15 @@ int main(int argc, char* argv[]) {
         }
         neb_init_callback_list();
 
+        // Initialize status data.
+        initialize_status_data();
+
+        // Initialize comment data.
+        initialize_comment_data();
+
+        // Initialize scheduled downtime data.
+        initialize_downtime_data();
+
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
 
@@ -396,15 +405,6 @@ int main(int argc, char* argv[]) {
 
         // Handle signals (interrupts).
         setup_sighandler();
-
-        // Initialize status data.
-        initialize_status_data();
-
-        // Initialize comment data.
-        initialize_comment_data();
-
-        // Initialize scheduled downtime data.
-        initialize_downtime_data();
 
         // Initialize check statistics.
         init_check_stats();
