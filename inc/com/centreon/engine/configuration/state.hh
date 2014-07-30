@@ -191,8 +191,8 @@ namespace               configuration {
     void                debug_verbosity(unsigned int value);
     std::set<shared_ptr<downtime> >&
                         downtimes() throw();
-    std::set<shared_ptr<downtime> >::iterator
-                        downtimes_find(downtime::key_type const& key) throw();
+    /*std::set<shared_ptr<downtime> >::iterator
+                        downtimes_find(downtime::key_type const& key) throw();*/
     bool                enable_environment_macros() const throw ();
     void                enable_environment_macros(bool value);
     bool                enable_event_handlers() const throw ();

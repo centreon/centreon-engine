@@ -18,17 +18,9 @@ namespace                configuration {
       host = 2
     };
 
-    /*struct self_key_type {
-      self_key_type(downtime& downtime);
-      bool operator==();
-      bool operator==(downtime const& right) const throw ();
-      bool operator!=(downtime const& right) const throw ();
-      bool operator<(downtime const& right) const throw ();
-    private:
-      downtime* _downtime;
-    };*/
-
-    typedef unsigned long key_type;
+    // As a differing downtime is always a new downtime,
+    // the key of a downtime is itself.
+    typedef downtime key_type;
 
                          downtime(type_id type);
                          downtime(downtime const& right);

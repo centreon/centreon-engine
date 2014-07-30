@@ -1741,16 +1741,3 @@ void applier::state::_resolve(
   return ;
 }
 
-/*umap<unsigned long, shared_ptr<scheduled_downtime_struct> >::const_iterator
-              applier::state::downtimes_find(configuration::downtime::key_type const& k) const {
-  return _downtimes.find(k);
-}
-
-umap<unsigned long, shared_ptr<scheduled_downtime_struct> >::iterator
-              applier::state::downtimes_find(configuration::downtime::key_type const& k) {
-  return _downtimes.find(k);
-}
-
-umap<unsigned long, shared_ptr<scheduled_downtime_struct> >& applier::state::downtimes() {
-  return _downtimes;
-}*/

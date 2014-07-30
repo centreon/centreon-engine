@@ -4188,13 +4188,3 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
 std::set<shared_ptr<downtime> >& state::downtimes() throw() {
    return (_downtimes);
 }
-
-std::set<shared_ptr<downtime> >::iterator
-                    state::downtimes_find(downtime::key_type const& key) throw() {
-  for (std::set<shared_ptr<downtime> >::iterator it = _downtimes.begin(),
-       end = _downtimes.end(); it != end; ++it) {
-    if ((*it)->downtime_id() == key)
-      return (it);
-  }
-  return (_downtimes.end());
-}
