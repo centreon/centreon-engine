@@ -345,15 +345,8 @@ int register_downtime(int type, unsigned long downtime_id) {
 
   /* find the downtime entry in memory */
   temp_downtime = find_downtime(type, downtime_id);
-
-  logger(dbg_functions, basic)
-    << "register_downtime() 2";
-
   if (temp_downtime == NULL)
     return (ERROR);
-
-  logger(dbg_functions, basic)
-    << "register_downtime() 3";
 
   /* find the host or service associated with this downtime */
   if (temp_downtime->type == HOST_DOWNTIME) {
@@ -364,9 +357,6 @@ int register_downtime(int type, unsigned long downtime_id) {
                     temp_downtime->host_name,
                     temp_downtime->service_description)) == NULL)
     return (ERROR);
-
-  logger(dbg_functions, basic)
-    << "register_downtime() 4";
 
   /* create the comment */
   get_datetime_string(
