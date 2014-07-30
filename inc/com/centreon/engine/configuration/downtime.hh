@@ -14,8 +14,8 @@ namespace                configuration {
   class                  downtime : public object {
   public:
     enum                 type_id {
-      host = 0,
-      service = 1
+      service = 1,
+      host = 2
     };
     typedef unsigned long key_type;
 

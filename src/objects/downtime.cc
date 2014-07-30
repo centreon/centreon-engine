@@ -345,8 +345,15 @@ int register_downtime(int type, unsigned long downtime_id) {
 
   /* find the downtime entry in memory */
   temp_downtime = find_downtime(type, downtime_id);
+
+  logger(dbg_functions, basic)
+    << "register_downtime() 2";
+
   if (temp_downtime == NULL)
     return (ERROR);
+
+  logger(dbg_functions, basic)
+    << "register_downtime() 3";
 
   /* find the host or service associated with this downtime */
   if (temp_downtime->type == HOST_DOWNTIME) {
@@ -357,6 +364,9 @@ int register_downtime(int type, unsigned long downtime_id) {
                     temp_downtime->host_name,
                     temp_downtime->service_description)) == NULL)
     return (ERROR);
+
+  logger(dbg_functions, basic)
+    << "register_downtime() 4";
 
   /* create the comment */
   get_datetime_string(
@@ -510,12 +520,12 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     return (ERROR);
 
   /* Before anything, renew downtime if it is a recurring downtime. */
-  if (temp_downtime->recurring_period != NULL) {
+  /*if (temp_downtime->recurring_period != NULL) {
     if (renew_downtime(temp_downtime, &new_recurring_downtime_id) == OK)
       logger(dbg_downtime, basic)
         << "Recurring downtime (id='" << temp_downtime->downtime_id <<
            "): new downtime created (id=" << new_recurring_downtime_id << ").";
-  }
+  }*/
 
   /* if downtime if flexible and host/svc is in an ok state, don't do anything right now (wait for event handler to kick it off) */
   /* start_flex_downtime variable is set to true by event handler functions */

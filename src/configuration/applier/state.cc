@@ -1582,12 +1582,6 @@ void applier::state::_processing(
     _resolve<configuration::contact, applier::contact>(
       config->contacts());
 
-    // Apply downtimes
-    _resolve<configuration::downtime, applier::downtime>(
-      config->downtimes());
-    _apply<configuration::downtime, applier::downtime>(
-      diff_downtimes);
-
     // Apply hosts and hostgroups.
     _apply<configuration::host, applier::host>(
       diff_hosts);
@@ -1633,6 +1627,12 @@ void applier::state::_processing(
       diff_serviceescalations);
     _resolve<configuration::serviceescalation, applier::serviceescalation>(
       config->serviceescalations());
+
+    // Apply downtimes
+    _resolve<configuration::downtime, applier::downtime>(
+      config->downtimes());
+    _apply<configuration::downtime, applier::downtime>(
+      diff_downtimes);
 
     // Load retention.
     if (state)
