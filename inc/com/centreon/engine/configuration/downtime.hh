@@ -89,9 +89,6 @@ namespace                configuration {
     ::timeperiod*        _recurring_period;
     std::string          _recurring_period_name;
   };
-
-  /*typedef shared_ptr<downtime> downtime_ptr;
-  typedef std::list<downtime_ptr> list_downtime;*/
 }
 
 CCE_END()
