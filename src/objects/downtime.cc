@@ -1266,9 +1266,11 @@ int delete_downtime_by_hostname_service_description_start_time_comment(
   return (deleted);
 }
 
-int delete_downtimes_by_hostname_service_description_recurring_period_comment(
+int delete_downtimes_by_unique_recurring_period_informations(
                       char const* hostname,
                       char const* service_description,
+                      unsigned long duration,
+                      unsigned long recurring_interval,
                       timeperiod* recurring_period,
                       char const* comment) {
   scheduled_downtime* temp_downtime;

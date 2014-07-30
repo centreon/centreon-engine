@@ -161,8 +161,10 @@ void applier::downtime::remove_object(
       && !obj->service_description().empty())
     service_description = obj->service_description().c_str();
 
-  int num_deleted = delete_downtimes_by_hostname_service_description_recurring_period_comment(
+  int num_deleted = delete_downtimes_by_unique_recurring_period_informations(
         host_name, service_description,
+        obj->duration(),
+        obj->recurring_interval(),
         obj->recurring_period(),
         obj->comment_data().empty() ? NULL : obj->comment_data().c_str());
 
