@@ -149,6 +149,11 @@ int                 delete_downtime_by_hostname_service_description_start_time_c
                       char const*,
                       time_t,
                       char const*);
+int                 delete_downtimes_by_hostname_service_description_recurring_period_comment(
+                      char const* hostname,
+                      char const* service_description,
+                      timeperiod* recurring_period,
+                      char const* comment);
 int                 delete_host_downtime(unsigned long downtime_id);
 int                 delete_service_downtime(
                       unsigned long downtime_id);

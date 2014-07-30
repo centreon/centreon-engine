@@ -206,6 +206,11 @@ void applier::downtime::modify_object(
 
 void applier::downtime::remove_object(
     shared_ptr<configuration::downtime> obj) {
+  // If no recurring period, do nothing.
+  obj->resolve_recurring_period();
+  if (!obj->recurring_period())
+    return ;
+
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing downtime '" << obj->downtime_id() << "'.";
@@ -216,28 +221,17 @@ void applier::downtime::remove_object(
   if (it != applier::state::instance().downtimes().end()) {
     scheduled_downtime* sd(it->second.get());
 
+  delete_downtimes_by_hostname_service_description_recurring_period_comment(
+        obj->host_name().empty() ? NULL : obj->host_name().c_str(),
+        obj->service_description().empty() ? NULL : obj->service_description().c_str(),
+        obj->recurring_period(),
+        obj->comment_data().empty() ? NULL : obj->comment_data().c_str());
 
-
-    // Remove downtime from its list.
-    //unregister_object<scheduled_downtime>(&downtime_list, sd);
-
-    // Notify event broker.
-    /*timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_host_data(
-      NEBTYPE_HOST_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      hst,
-      CMD_NONE,
-      MODATTR_ALL,
-      MODATTR_ALL,
-      &tv);*/
-
-    // Erase downtime object (will effectively delete the object).
+    // Erase downtime object.
     applier::state::instance().downtimes().erase(it);
   }
 
-  // Remove host from the global configuration set.
+  // Remove downtime from the global configuration set.
   config->downtimes().erase(obj);
 
   return ;

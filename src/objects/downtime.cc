@@ -1266,6 +1266,60 @@ int delete_downtime_by_hostname_service_description_start_time_comment(
   return (deleted);
 }
 
+int delete_downtimes_by_hostname_service_description_recurring_period_comment(
+                      char const* hostname,
+                      char const* service_description,
+                      timeperiod* recurring_period,
+                      char const* comment) {
+  scheduled_downtime* temp_downtime;
+  scheduled_downtime* next_downtime;
+  int deleted(0);
+
+  /* Do not allow deletion of everything - must have at least 1 filter on. */
+  if ((NULL == hostname)
+      && (NULL == service_description)
+      && (NULL == recurring_period)
+      && (NULL == comment))
+    return (deleted);
+
+  for (temp_downtime = scheduled_downtime_list;
+       temp_downtime != NULL;
+       temp_downtime = next_downtime) {
+    next_downtime = temp_downtime->next;
+
+    if ((recurring_period != 0)
+        && (temp_downtime->recurring_period != recurring_period))
+      continue;
+    if ((comment != NULL)
+        && (strcmp(temp_downtime->comment, comment) != 0))
+      continue;
+    if (HOST_DOWNTIME == temp_downtime->type) {
+      /* If service is specified, then do not delete the host downtime. */
+      if (service_description != NULL)
+  continue;
+      if ((hostname != NULL)
+    && (strcmp(temp_downtime->host_name, hostname) != 0))
+  continue;
+    }
+    else if (SERVICE_DOWNTIME == temp_downtime->type) {
+      if ((hostname != NULL)
+          && (strcmp(temp_downtime->host_name, hostname) != 0))
+  continue;
+      if ((service_description != NULL)
+    && (strcmp(
+                temp_downtime->service_description,
+                service_description) != 0))
+  continue;
+    }
+
+    unschedule_downtime(
+      temp_downtime->type,
+      temp_downtime->downtime_id);
+    ++deleted;
+  }
+  return (deleted);
+}
+
 /******************************************************************/
 /******************** ADDITION FUNCTIONS **************************/
 /******************************************************************/
