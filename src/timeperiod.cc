@@ -221,25 +221,6 @@ static time_t calculate_time_from_weekday_of_month(
   return (midnight);
 }
 
-// tests if a date range covers just a single day
-int is_daterange_single_day(daterange const* dr) {
-  if (!dr)
-    return (false);
-
-  if (dr->syear != dr->eyear)
-    return (false);
-  if (dr->smon != dr->emon)
-    return (false);
-  if (dr->smday != dr->emday)
-    return (false);
-  if (dr->swday != dr->ewday)
-    return (false);
-  if (dr->swday_offset != dr->ewday_offset)
-    return (false);
-
-  return (true);
-}
-
 /**
  *  Internal struct time information.
  */
@@ -250,25 +231,6 @@ struct   time_info {
   time_t preferred_time;
   tm     preftime;
 };
-
-// Checks if the given time is in daylight time saving period.
-static int is_dst_time(time_t const* time) {
-  tm t;
-  localtime_r(time, &t);
-  return (t.tm_isdst);
-}
-
-// Returns the shift in seconds if the given times are across the
-// daylight time saving period change.
-static int get_dst_shift(time_t const* start, time_t const* end) {
-  int dst_start(is_dst_time(start));
-  int dst_end(is_dst_time(end));
-  if (dst_start < dst_end)
-    return (3600);
-  if (dst_start > dst_end)
-    return (-3600);
-  return (0);
-}
 
 /**
  *  Calculate start time and end time for date range calendar date.
@@ -742,336 +704,31 @@ static bool _timerange_to_time_t(
   return (true);
 }
 
-// see if the specified time falls into a valid time range in the
-// given time period
+/**
+ *  See if the specified time falls into a valid time range in the given
+ *  time period.
+ *
+ *  @param[in] test_time  Time to test.
+ *  @param[in] tperiod    Target time period.
+ *
+ *  @return OK on success, ERROR on failure.
+ */
 int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   logger(dbg_functions, basic)
     << "check_time_against_period()";
 
-  // if no period was specified, assume the time is good
+  // If no period was specified, assume the time is good.
   if (!tperiod)
     return (OK);
 
-  // test exclusions first - if exclusions match current time,
-  // bail out with an error
-  // clear exclusions list before recursing (and restore afterwards)
-  // to prevent endless loops...
-  timeperiodexclusion* first_exclusion(tperiod->exclusions);
-  tperiod->exclusions = NULL;
-  for (timeperiodexclusion* exclusion(first_exclusion);
-       exclusion;
-       exclusion = exclusion->next) {
-    if (!check_time_against_period(
-          test_time,
-          exclusion->timeperiod_ptr)) {
-      tperiod->exclusions = first_exclusion;
-      return (ERROR);
-    }
-  }
-  tperiod->exclusions = first_exclusion;
-
-  // save values for later
-  tm t;
-  localtime_r(&test_time, &t);
-  int test_time_year(t.tm_year);
-  int test_time_mon(t.tm_mon);
-  // int test_time_mday(t.tm_mday);
-  int test_time_wday(t.tm_wday);
-
-  // calculate the start of the day (midnight, 00:00 hours)
-  // when the specified test time occurs
-  t.tm_sec = 0;
-  t.tm_min = 0;
-  t.tm_hour = 0;
-  time_t midnight(mktime(&t));
-
-  bool found_match(false);
-
-  // check exceptions first
-  for (unsigned int daterange_type(0);
-       daterange_type < DATERANGE_TYPES;
-       ++daterange_type) {
-
-    for (daterange* drange(tperiod->exceptions[daterange_type]);
-         drange;
-         drange = drange->next) {
-
-#ifdef TEST_TIMEPERIODS_A
-      logger(dbg_events, most)
-        << "TYPE: " << daterange_type
-        << "\nTEST: " << test_time << " = " << ctime(&test_time)
-        << "MIDNIGHT: " << midnight << " = " << ctime(&midnight);
-#endif
-
-      time_t start_time(0);
-      time_t end_time(0);
-      int year(0);
-
-      // get the start time and end time.
-      switch (daterange_type) {
-      case DATERANGE_CALENDAR_DATE:
-        t.tm_sec = 0;
-        t.tm_min = 0;
-        t.tm_hour = 0;
-        t.tm_wday = 0;
-        t.tm_isdst = -1;
-
-        t.tm_mday = drange->smday;
-        t.tm_mon = drange->smon;
-        t.tm_year = drange->syear - 1900;
-        if (!(start_time = mktime(&t)))
-          continue;
-
-        t.tm_mday = drange->emday;
-        t.tm_mon = drange->emon;
-        t.tm_year = drange->eyear - 1900;
-        if (!(end_time = mktime(&t)))
-          continue;
-        break;
-
-      case DATERANGE_MONTH_DATE:
-        start_time = calculate_time_from_day_of_month(
-                       test_time_year,
-                       drange->smon,
-                       drange->smday);
-        if (!start_time)
-          continue;
-
-        year = test_time_year;
-        end_time = calculate_time_from_day_of_month(
-                     year,
-                     drange->emon,
-                     drange->emday);
-        // advance a year if necessary: august 2 - february 5
-        if (end_time < start_time)
-          end_time = calculate_time_from_day_of_month(
-                       ++year,
-                       drange->emon,
-                       drange->emday);
-
-        // end date was bad - see if we can handle the error
-        if (!end_time) {
-          // end date can't be helped, so skip it
-          if (drange->emday < 0)
-            continue;
-
-          // else end date slipped past end of month, so use
-          // last day of month as end date
-          // use same year calculated above
-          end_time = calculate_time_from_day_of_month(
-                       year,
-                       drange->emon,
-                       -1);
-        }
-        break;
-
-      case DATERANGE_MONTH_DAY:
-        start_time = calculate_time_from_day_of_month(
-                       test_time_year,
-                       test_time_mon,
-                       drange->smday);
-        if (!start_time)
-          continue;
-
-        end_time = calculate_time_from_day_of_month(
-                     test_time_year,
-                     test_time_mon,
-                     drange->emday);
-
-        // end date was bad - see if we can handle the error
-        if (!end_time) {
-          // end date can't be helped, so skip it
-          if (drange->emday < 0)
-            continue;
-
-          // else end date slipped past end of month, so use
-          // last day of month as end date
-          end_time = calculate_time_from_day_of_month(
-                       test_time_year,
-                       test_time_mon,
-                       -1);
-        }
-        break;
-
-      case DATERANGE_MONTH_WEEK_DAY:
-        start_time = calculate_time_from_weekday_of_month(
-                       test_time_year,
-                       drange->smon,
-                       drange->swday,
-                       drange->swday_offset);
-        if (!start_time)
-          continue;
-
-        year = test_time_year;
-        end_time = calculate_time_from_weekday_of_month(
-                     year,
-                     drange->emon,
-                     drange->ewday,
-                     drange->ewday_offset);
-        // advance a year if necessary:
-        // thursday 2 august - monday 3 february
-        if (end_time < start_time)
-          end_time = calculate_time_from_weekday_of_month(
-                       ++year,
-                       drange->emon,
-                       drange->ewday,
-                       drange->ewday_offset);
-
-        // end date was bad - see if we can handle the error
-        if (!end_time) {
-          // end date can't be helped, so skip it
-          if (drange->ewday_offset < 0)
-            continue;
-
-          // else end date slipped past end of month, so use
-          // last day of month as end date
-          // use same year calculated above
-          end_time = calculate_time_from_day_of_month(
-                       year,
-                       test_time_mon,
-                       -1);
-        }
-        break;
-
-      case DATERANGE_WEEK_DAY:
-        start_time = calculate_time_from_weekday_of_month(
-                       test_time_year,
-                       test_time_mon,
-                       drange->swday,
-                       drange->swday_offset);
-        if (!start_time)
-          continue;
-
-        end_time = calculate_time_from_weekday_of_month(
-                     test_time_year,
-                     test_time_mon,
-                     drange->ewday,
-                     drange->ewday_offset);
-
-        // end date was bad - see if we can handle the error
-        if (!end_time) {
-          // end date can't be helped, so skip it
-          if (drange->ewday_offset < 0)
-            continue;
-
-          // else end date slipped past end of month, so use
-          // last day of month as end date
-          end_time = calculate_time_from_day_of_month(
-                       test_time_year,
-                       test_time_mon,
-                       -1);
-        }
-        break;
-
-      default:
-        continue;
-      }
-
-#ifdef TEST_TIMEPERIODS_A
-      logger(dbg_events, most)
-        << "START: " << start_time << " = " << ctime(&start_time)
-        << "END: " << end_time << " = " << ctime(&end_time);
-#endif
-
-      // calculate skip date start (and end)
-      if (drange->skip_interval > 1) {
-        // skip start date must be before test time
-        if (start_time > test_time)
-          continue;
-
-        // check if interval is accress dlst change
-        // and gets the compensation.
-        int shift(get_dst_shift(&start_time, &midnight));
-
-        // how many days have passed between skip
-        // start date and test time?
-        unsigned long days((shift + (unsigned long)midnight
-                            - (unsigned long)start_time) / (3600 * 24));
-
-        // if test date doesn't fall on a skip
-        // interval day, bail out early
-        if ((days % drange->skip_interval))
-          continue;
-
-        // use midnight of test date as start time
-        start_time = midnight;
-
-        // if skipping range has no end, use test date as end
-        if (daterange_type == DATERANGE_CALENDAR_DATE
-            && is_daterange_single_day(drange))
-          end_time = midnight;
-      }
-
-#ifdef TEST_TIMEPERIODS_A
-      logger(dbg_events, most)
-        << "NEW START: " << start_time << " = " << ctime(&start_time)
-        << "NEW END: " << end_time << " = " << ctime(&end_time)
-        << days << " DAYS PASSED\n"
-        "DLST SHIFT: " << shift;
-#endif
-
-      // time falls into the range of days
-      if (midnight >= start_time && midnight <= end_time)
-        found_match = true;
-
-      // found a day match, so see if time ranges are good
-      if (found_match) {
-        for (timerange* trange(drange->times);
-             trange;
-             trange = trange->next) {
-
-//           // ranges with start/end of zero mean exlude this day
-//           if (!trange->range_start && !trange->range_end) {
-// #ifdef TEST_TIMEPERIODS_A
-//             logger(dbg_events, most)
-//               << "0 MINUTE RANGE EXCLUSION";
-// #endif
-//             continue;
-//           }
-
-          time_t day_range_start(midnight + trange->start_hour * 60 * 60 + trange->start_minute * 60);
-          time_t day_range_end(midnight + trange->end_hour * 60 * 60 + trange->end_minute * 60);
-
-#ifdef TEST_TIMEPERIODS_A
-          logger(dbg_events, most)
-            << "  RANGE START: " << trange->range_start
-            << " (" << day_range_start << ") = "
-            << ctime(&day_range_start)
-            << "  RANGE END: " << trange->range_end
-            << " (" << day_range_end << ") = "
-            << ctime(&day_range_end);
-#endif
-
-          // if the user-specified time falls in this range,
-          // return with a positive result
-          if (test_time >= day_range_start
-              && test_time <= day_range_end)
-            return (OK);
-        }
-
-        // no match, so bail with error
-        return (ERROR);
-      }
-    }
-  }
-
-  // check normal, weekly rotating schedule last
-
-  // check weekday time ranges
-  for (timerange* trange(tperiod->days[test_time_wday]);
-       trange;
-       trange = trange->next) {
-
-    time_t day_range_start(midnight + trange->start_hour * 60 * 60 + trange->start_minute * 60);
-    time_t day_range_end(midnight + trange->end_hour * 60 * 60 + trange->end_minute * 60);
-
-    // if the user-specified time falls in this range,
-    // return with a positive result
-    if (test_time >= day_range_start && test_time <= day_range_end)
-      return (OK);
-  }
-
-  return (ERROR);
+  // Faked next valid time must be tested time.
+  time_t next_valid_time((time_t)-1);
+  _get_next_valid_time_per_timeperiod(
+    test_time,
+    &next_valid_time,
+    test_time,
+    tperiod);
+  return ((next_valid_time == test_time) ? OK : ERROR);
 }
 
 /**
