@@ -130,11 +130,14 @@ void applier::downtime::expand_object(
 /**
  *  Modified downtime.
  *
+ *  A downtime can never be modified: as a downtime is its own key, two
+ *  non equal downtimes are always two new downtimes.
+ *
  *  @param[in] obj The new downtime to modify into the monitoring engine.
  */
 void applier::downtime::modify_object(
     shared_ptr<configuration::downtime> obj) {
-  throw (engine_error() << "A recurring downtime should ne be modified: id'"
+  throw (engine_error() << "A recurring downtime should never be modified: id'"
        << (int)obj->downtime_id() << "'");
   return ;
 }
