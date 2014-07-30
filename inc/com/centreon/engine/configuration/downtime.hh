@@ -17,6 +17,17 @@ namespace                configuration {
       service = 1,
       host = 2
     };
+
+    /*struct self_key_type {
+      self_key_type(downtime& downtime);
+      bool operator==();
+      bool operator==(downtime const& right) const throw ();
+      bool operator!=(downtime const& right) const throw ();
+      bool operator<(downtime const& right) const throw ();
+    private:
+      downtime* _downtime;
+    };*/
+
     typedef unsigned long key_type;
 
                          downtime(type_id type);
@@ -87,8 +98,8 @@ namespace                configuration {
     std::string          _recurring_period_name;
   };
 
-  typedef shared_ptr<downtime> downtime_ptr;
-  typedef std::list<downtime_ptr> list_downtime;
+  /*typedef shared_ptr<downtime> downtime_ptr;
+  typedef std::list<downtime_ptr> list_downtime;*/
 }
 
 CCE_END()

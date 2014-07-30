@@ -46,6 +46,11 @@ configuration::downtime::setters const configuration::downtime::_setters[] = {
   { "recurring_period",    SETTER(std::string const&, _set_recurring_period_name) }
 };
 
+/*configuration::downtime::self_key_type::self_key_type(configuration::downtime& downtime)
+  : _downtime(downtime) {}
+
+configuration::downtime::self_key_type::operator==*/
+
 /**
  *  Parse and set the downtime property.
  *

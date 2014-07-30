@@ -134,73 +134,8 @@ void applier::downtime::expand_object(
  */
 void applier::downtime::modify_object(
     shared_ptr<configuration::downtime> obj) {
-  /*logger(logging::dbg_config, logging::more)
-    << "Modifying downtime '" << obj->downtime_id() << "'.";
-
-  // Find the configuration object.
-  std::set<shared_ptr<configuration::downtime> >::iterator it_cfg(config->downtimes_find(obj->key()));
-  if (it_cfg == config->downtimes().end())
-    throw (engine_error() << "Cannot modify non-existing downtime '" << (long)obj->downtime_id() << "'");
-
-  // Find downtime object.
-  umap<unsigned long, shared_ptr<scheduled_downtime_struct> >::iterator
-    it_obj(applier::state::instance().downtimes_find(obj->key()));
-  if (it_obj == applier::state::instance().downtimes().end())
-    throw (engine_error() << "Could not modify non-existing "
-           << "downtime object '" << (long)obj->downtime_id() << "'");
-  scheduled_downtime_struct* sd(it_obj->second.get());
-
-  // Update the global configuration set.
-  shared_ptr<configuration::downtime> obj_old(*it_cfg);
-  config->downtimes().erase(it_cfg);
-  config->downtimes().insert(obj);
-
-  // Modify properties.
-  modify_if_different(sd->author, obj->author().c_str());
-  modify_if_different(sd->comment, obj->comment_data().c_str());
-  modify_if_different(sd->type, (int)obj->downtime_id());
-  modify_if_different(sd->duration, obj->duration());
-  modify_if_different(sd->end_time, obj->end_time());
-  modify_if_different(sd->start_time, obj->start_time());
-  modify_if_different(sd->fixed, (int)obj->fixed());
-  modify_if_different(sd->host_name, obj->host_name().c_str());
-  modify_if_different(sd->service_description, obj->service_description().c_str());
-  modify_if_different(sd->triggered_by, obj->triggered_by());
-  modify_if_different(sd->recurring_interval, obj->recurring_interval());
-
-  // Notify event broker.
-  /*
-    broker_downtime_data(
-    NEBTYPE_DOWNTIME_LOAD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    downtime_type,
-    host_name,
-    svc_description,
-    entry_time,
-    author,
-    comment_data,
-    start_time,
-    end_time,
-    fixed,
-    triggered_by,
-    duration,
-    recurring_interval,
-    recurring_period,
-    downtime_id,
-    NULL);
-   */
-  /*timeval tv(get_broker_timestamp(NULL));
-  broker_adaptive_host_data(
-    NEBTYPE_HOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    h,
-    CMD_NONE,
-    MODATTR_ALL,
-    MODATTR_ALL,
-    &tv);*/
-
+  throw (engine_error() << "A recurring downtime should ne be modified: id'"
+       << (int)obj->downtime_id() << "'");
   return ;
 }
 
@@ -213,23 +148,26 @@ void applier::downtime::remove_object(
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing downtime '" << obj->downtime_id() << "'.";
+    << "Removing recurring downtime '" << obj->downtime_id() << "'.";
 
-  // Find downtime.
-  umap<unsigned long, shared_ptr<scheduled_downtime> >::iterator
-    it(applier::state::instance().downtimes_find(obj->key()));
-  if (it != applier::state::instance().downtimes().end()) {
-    scheduled_downtime* sd(it->second.get());
+  // Delete all the recurring downtimes which can be uniquely attributed
+  // to this downtime.
+  char const* host_name = NULL;
+  char const* service_description = NULL;
+  if (obj->downtime_type() == configuration::downtime::host
+      && !obj->host_name().empty())
+    host_name = obj->host_name().c_str();
+  if (obj->downtime_type() == configuration::downtime::service
+      && !obj->service_description().empty())
+    service_description = obj->service_description().c_str();
 
-  delete_downtimes_by_hostname_service_description_recurring_period_comment(
-        obj->host_name().empty() ? NULL : obj->host_name().c_str(),
-        obj->service_description().empty() ? NULL : obj->service_description().c_str(),
+  int num_deleted = delete_downtimes_by_hostname_service_description_recurring_period_comment(
+        host_name, service_description,
         obj->recurring_period(),
         obj->comment_data().empty() ? NULL : obj->comment_data().c_str());
 
-    // Erase downtime object.
-    applier::state::instance().downtimes().erase(it);
-  }
+  logger(logging::dbg_config, logging::more)
+    << num_deleted << " recurring downtime removed.";
 
   // Remove downtime from the global configuration set.
   config->downtimes().erase(obj);
