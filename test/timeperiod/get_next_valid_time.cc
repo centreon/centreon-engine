@@ -85,6 +85,7 @@ static time_t string_to_time_t(std::string const& data) {
   memset(&t, 0, sizeof(t));
   if (!strptime(data.c_str(), "%Y-%m-%d %H:%M:%S", &t))
     throw (engine_error() << "invalid date format");
+  t.tm_isdst = -1; // Not set by strptime().
   return (mktime(&t));
 }
 

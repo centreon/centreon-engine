@@ -354,3 +354,22 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 set(TEST_NAME "timeperiod_week_day_into_period_with_exclude_into")
 set(TEST_CONF_FILE "into_period_with_exclude_into.conf")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+
+#
+# Timeperiod exclusions.
+#
+set(CONF_DIR "${TEST_DIR}/etc/exclusion")
+
+# timeperiod_exclusion_nested_after
+set(TEST_NAME "timeperiod_exclusion_nested_after")
+set(TEST_CONF_FILE "nested_after.conf")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+# timeperiod_exclusion_nested_before
+set(TEST_NAME "timeperiod_exclusion_nested_before")
+set(TEST_CONF_FILE "nested_before.conf")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+# timeperiod_exclusion_nested_into
+set(TEST_NAME "timeperiod_exclusion_nested_into")
+set(TEST_CONF_FILE "nested_into.conf")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")

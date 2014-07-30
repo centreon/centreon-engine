@@ -30,6 +30,13 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
+// Static declarations.
+static void _get_next_valid_time_per_timeperiod(
+              time_t preferred_time,
+              time_t* valid_time,
+              time_t current_time,
+              timeperiod* tperiod);
+
 /**
  *  Add a round number of days (expressed in seconds) to a date.
  *
@@ -645,25 +652,23 @@ static bool _daterange_to_time_t(
   if (!(*tabfunc[type])(*r, *ti, start, end))
     return (false);
 
-  // if skipping days...
+  // If skipping days...
   if (r->skip_interval > 1) {
-    // advance to the next possible skip date
+    // Advance to the next possible skip date
     if (start < ti->preferred_time) {
-      // check if interval is across dlst change and
-      // gets the compensation
-      int shift(get_dst_shift(&start, &ti->midnight));
+      // How many days have passed between skip start date
+      // and preferred time ?
+      unsigned long days((ti->midnight - (unsigned long)start)
+                         / (3600 * 24));
 
-      // how many days have passed between skip start date
-      // and preferred time?
-      unsigned long days((shift + ti->midnight
-                          - (unsigned long)start) / (3600 * 24));
-
-      // advance start date to next skip day
+      // Advance start date to next skip day
       if (!(days % r->skip_interval))
-        start += (days * 3600 * 24);
+        start = _add_round_days_to_midnight(start, days * 24 * 60 * 60);
       else
-        start += ((days - (days % r->skip_interval)
-                   + r->skip_interval) * 3600 * 24);
+        start = _add_round_days_to_midnight(
+                  start,
+                  ((days - (days % r->skip_interval) + r->skip_interval)
+                   * 24 * 60 * 60));
     }
   }
 
@@ -700,10 +705,8 @@ static time_t _earliest_midnight_in_daterange(
             && (preferred_time < next_day)))
       return (drange_start_time);
 
-    // Move to next day (if range is skipable).
-    if (!drange->skip_interval)
-      break ;
-    else if (drange->skip_interval == 1)
+    // Move to next day.
+    if (drange->skip_interval <= 1)
       drange_start_time = next_day;
     else
       drange_start_time = _add_round_days_to_midnight(
@@ -1072,192 +1075,190 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 }
 
 /**
- *  This function is for timeperiod exclusions,
- *  Icinga special from #459
+ *  Get the next invalid time within a time period (used to compute
+ *  exclusions).
  *
  *  @param[in]  preferred_time  The preferred time to check.
- *  @param[out] valid_time      Variable to fill.
+ *  @param[out] invalid_time    Variable to fill.
  *  @param[in]  current_time    The current time.
  *  @param[in]  tperiod         The time period to use.
  */
 static void _get_min_invalid_time_per_timeperiod(
        time_t preferred_time,
-       time_t* valid_time,
+       time_t* invalid_time,
        time_t current_time,
        timeperiod* tperiod) {
   logger(dbg_functions, basic)
     << "get_min_valid_time_per_timeperiod()";
 
-  // if no timeperiod, go with preferred time
+  // If no timeperiod, go with preferred time.
   if (!tperiod) {
-    *valid_time = preferred_time;
-    return;
+    *invalid_time = preferred_time;
+    return ;
   }
 
-  time_info ti;
-  ti.preferred_time = preferred_time;
-  ti.current_time = current_time;
-  localtime_r(&current_time, &ti.curtime);
+  // If no time can be found, the original preferred time will be set
+  // in invalid_time at the end of the loop.
+  time_t original_preferred_time(preferred_time);
 
-  // calculate the start of the day (midnight, 00:00 hours)
-  // of preferred time
-  localtime_r(&preferred_time, &ti.preftime);
-  ti.preftime.tm_sec = 0;
-  ti.preftime.tm_min = 0;
-  ti.preftime.tm_hour = 0;
-  ti.midnight = mktime(&ti.preftime);
+  // Do not compute more than one year ahead (we might compute forever).
+  time_t earliest_time(preferred_time);
+  time_t in_one_year(preferred_time + 366 * 24 * 60 * 60);
+  while ((earliest_time != (time_t)-1)
+         && (preferred_time < in_one_year)) {
+    preferred_time = earliest_time;
+    earliest_time = (time_t)-1;
 
-#ifdef TEST_TIMEPERIODS_B
-  logger(dbg_events, most)
-    << "PREF TIME: " << preferred_time
-    << " = " << ctime(&preferred_time)
-    << "CURRENT TIME: " << current_time
-    << " = " << ctime(&current_time)
-    << "PREF YEAR: " << ti.preftime.tm_year
-    << ", MON: " << ti.preftime.tm_mon
-    << ", MDAY: " << ti.preftime.tm_mday
-    << ", WDAY: " << ti.preftime.tm_wday
-    << "\nCURRENT YEAR: " << ti.curtime.tm_year
-    << ", MON: " << ti.curtime.tm_mon
-    << ", MDAY: " << ti.curtime.tm_mday
-    << ", WDAY: " << ti.curtime.tm_wday;
-#endif // TEST_TIMEPERIODS_B
+    // Compute time information.
+    time_info ti;
+    ti.preferred_time = preferred_time;
+    ti.current_time = current_time;
+    localtime_r(&current_time, &ti.curtime);
+    localtime_r(&preferred_time, &ti.preftime);
+    ti.preftime.tm_sec = 0;
+    ti.preftime.tm_min = 0;
+    ti.preftime.tm_hour = 0;
+    ti.midnight = mktime(&ti.preftime);
 
-  bool have_latest_time(false);
-  time_t latest_time(0);
-  time_t earliest_day(0);
+    // XXX: handle range end reached.
+    // Browse all date range.
+    for (unsigned int daterange_type(0);
+         (daterange_type < DATERANGE_TYPES) && ((time_t)-1 == earliest_time);
+         ++daterange_type) {
+      for (daterange* drange(tperiod->exceptions[daterange_type]);
+           drange && ((time_t)-1 == earliest_time);
+           drange = drange->next) {
+        // Get range limits.
+        time_t daterange_start_time((time_t)-1);
+        time_t daterange_end_time((time_t)-1);
+        if (_daterange_to_time_t(
+              drange,
+              daterange_type,
+              &ti,
+              daterange_start_time,
+              daterange_end_time)
+            && ((preferred_time < daterange_end_time)
+                || ((time_t)-1 == daterange_end_time))) {
+          // Check that date is within range.
+          time_t earliest_midnight(_earliest_midnight_in_daterange(
+                                     preferred_time,
+                                     drange,
+                                     daterange_start_time,
+                                     daterange_end_time));
+          if (earliest_midnight != (time_t)-1) {
+            // Midnight.
+            struct tm midnight;
+            localtime_r(&earliest_midnight, &midnight);
 
-  // check exceptions (in this timeperiod definition) first
-  for (unsigned int daterange_type(0);
-       daterange_type < DATERANGE_TYPES;
-       ++daterange_type) {
-
-#ifdef TEST_TIMEPERIODS_B
-    logger(dbg_events, most)
-      << "TYPE: " << daterange_type;
-#endif // TEST_TIMEPERIODS_B
-
-    for (daterange* drange(tperiod->exceptions[daterange_type]);
-         drange;
-         drange = drange->next) {
-
-      time_t start_time(0);
-      time_t end_time(0);
-      if (!_daterange_to_time_t(
-             drange,
-             daterange_type,
-             &ti,
-             start_time,
-             end_time))
-        continue;
-
-      // skip this date range its out of bounds with what we want
-      if (preferred_time > end_time)
-        continue;
-
-      // how many days at a time should we advance?
-      unsigned long advance_interval(1);
-      if (drange->skip_interval > 1)
-        advance_interval = drange->skip_interval;
-
-      // advance through the date range
-      for (time_t day_start(start_time);
-           day_start <= end_time;
-           day_start += advance_interval * 3600 * 24) {
-
-        // we already found a time from a higher-precendence
-        // date range exception
-        // here we use have_latest_time instead of have_earliest_time
-        if (day_start >= earliest_day && have_latest_time)
-          continue;
-
-        for (timerange* trange(drange->times);
-             trange;
-             trange = trange->next) {
-
-          // REMOVED
-          // ranges with start/end of zero mean exlude this day
-          // if (!trange->range_start && !trange->range_end)
-          //    continue;
-
-          time_t day_range_end(day_start + trange->end_hour * 60 * 60 + trange->end_minute * 60);
-#ifdef TEST_TIMEPERIODS_B
-          time_t day_range_start(day_start + trange->range_start);
-          logger(dbg_events, most)
-            << "  RANGE START: " << trange->range_start << " ("
-            << day_range_start << ") = " << ctime(&day_range_start)
-            << "  RANGE END: " << trange->range_end
-            << " (" << day_range_end << ") = "
-            << ctime(&day_range_end);
-#endif // TEST_TIMEPERIODS_B
-
-          // range is out of bounds
-          if (day_range_end < preferred_time)
-            continue;
-
-          // is this the earliest time found thus far?
-          if (!have_latest_time || day_range_end < latest_time) {
-            // save it as latest_time instead of earliest_time
-            have_latest_time = true;
-            latest_time = day_range_end;
-            earliest_day = day_start;
+            // Browse all time range of date range.
+            for (timerange* trange(drange->times);
+                 trange && ((time_t)-1 == earliest_time);
+                 trange = trange->next) {
+              // Get range limits.
+              time_t range_start((time_t)-1);
+              time_t range_end((time_t)-1);
+              if (_timerange_to_time_t(
+                    trange,
+                    &midnight,
+                    range_start,
+                    range_end)
+                  && (preferred_time >= range_start)
+                  && (preferred_time < range_end))
+                earliest_time = range_end;
+            }
           }
         }
       }
     }
-  }
 
-  // find next available time from normal, weekly rotating schedule
-  // (in this timeperiod definition)
+    /*
+    ** Find next available time from normal, weekly rotating schedule.
+    ** We do not need to check more than 8 days (today plus 7 days
+    ** ahead) because time ranges are recurring the same way every week.
+    */
+    for (int weekday(ti.preftime.tm_wday), days_into_the_future(0);
+         (days_into_the_future <= 7) && ((time_t)-1 == earliest_time);
+         ++weekday, ++days_into_the_future) {
+      if (weekday >= 7)
+        weekday -= 7;
 
-  // check a one week rotation of time
-  bool has_looped(false);
-  for (int weekday(ti.preftime.tm_wday), days_into_the_future(0);
-       ;
-       ++weekday, ++days_into_the_future) {
+      // Calculate start of this future weekday.
+      time_t day_start(_add_round_days_to_midnight(
+                         ti.midnight,
+                         days_into_the_future * 24 * 60 * 60));
+      struct tm day_midnight;
+      localtime_r(&day_start, &day_midnight);
 
-    // break out of the loop if we have checked an entire week already
-    if (has_looped && weekday >= ti.preftime.tm_wday)
-      break;
-
-    if (weekday >= 7) {
-      weekday -= 7;
-      has_looped = true;
-    }
-
-    // calculate start of this future weekday
-    time_t day_start((time_t)(ti.midnight + (days_into_the_future * 3600 * 24)));
-
-    // we already found a time from a higher-precendence
-    // date range exception
-    if (day_start == earliest_day)
-      continue;
-
-    // check all time ranges for this day of the week
-    for (timerange* trange(tperiod->days[weekday]);
-         trange;
-         trange = trange->next) {
-
-      // calculate day_range_end to assign to lastest_time again
-      time_t day_range_end((time_t)(day_start + trange->end_hour * 60 * 60 + trange->end_minute * 60));
-
-      if ((!have_latest_time
-           || day_range_end < latest_time)
-          && day_range_end >= preferred_time) {
-        have_latest_time = true;
-        latest_time = day_range_end;
-        earliest_day = day_start;
+      // Check all time ranges for this day of the week.
+      for (timerange* trange(tperiod->days[weekday]);
+           trange && ((time_t)-1 == earliest_time);
+           trange = trange->next) {
+        // Get range limits.
+        time_t range_start((time_t)-1);
+        time_t range_end((time_t)-1);
+        if (_timerange_to_time_t(
+              trange,
+              &day_midnight,
+              range_start,
+              range_end)
+            && (preferred_time >= range_start)
+            && (preferred_time < range_end))
+          earliest_time = range_end;
       }
     }
+
+    // Find next exclusion time.
+    time_t next_exclusion((time_t)-1);
+    timeperiodexclusion* first_exclusion(tperiod->exclusions);
+    tperiod->exclusions = NULL;
+    for (timeperiodexclusion* exclusion(first_exclusion);
+         exclusion;
+         exclusion = exclusion->next) {
+      time_t valid((time_t)-1);
+      _get_next_valid_time_per_timeperiod(
+        preferred_time,
+        &valid,
+        current_time,
+        exclusion->timeperiod_ptr);
+      if ((valid != (time_t)-1)
+          && (((time_t)-1 == next_exclusion)
+              || (valid < next_exclusion)))
+        next_exclusion = valid;
+    }
+    tperiod->exclusions = first_exclusion;
+
+    /*
+    ** If we got an earliest_time this means that current preferred time
+    ** is in a perfectly valid range. earliest_time holds the range end
+    ** which might still be valid thanks to another date/time range and
+    ** need to be checked. This is valid only if no exclusion occurs
+    ** before.
+    */
+
+    if ((next_exclusion != (time_t)-1)
+        && (next_exclusion < _add_round_days_to_midnight(
+                               ti.midnight,
+                               24 * 60 * 60))
+        && (((time_t)-1 == earliest_time)
+            || (next_exclusion <= earliest_time))) {
+      earliest_time = (time_t)-1;
+      preferred_time = next_exclusion;
+      break ; // We have our time, no need to search anymore.
+    }
+    if (earliest_time != (time_t)-1) {
+      preferred_time = earliest_time;
+      earliest_time = (time_t)-1;
+    }
   }
 
-  // if we couldn't find a time period there must be none defined
-  if (!have_latest_time || !latest_time)
-    *valid_time = preferred_time;
-  // else use the calculated time
+  // If we couldn't find a time period there must be none defined.
+  if (earliest_time != (time_t)-1)
+    *invalid_time = original_preferred_time;
+  // Else use the calculated time.
   else
-    *valid_time = latest_time;
-  return;
+    *invalid_time = preferred_time;
+
+  return ;
 }
 
 /**
@@ -1268,7 +1269,6 @@ static void _get_min_invalid_time_per_timeperiod(
  *  @param[in]  current_time    The current time.
  *  @param[in]  tperiod         The time period to use.
  */
-#include <iostream>
 static void _get_next_valid_time_per_timeperiod(
               time_t preferred_time,
               time_t* valid_time,
@@ -1292,7 +1292,6 @@ static void _get_next_valid_time_per_timeperiod(
   time_t in_one_year(preferred_time + 366 * 24 * 60 * 60);
   while ((earliest_time == (time_t)-1)
          && (preferred_time < in_one_year)) {
-    std::cout << "LOOP\n";
     // Compute time information.
     time_info ti;
     ti.preferred_time = preferred_time;
@@ -1313,8 +1312,8 @@ static void _get_next_valid_time_per_timeperiod(
            drange;
            drange = drange->next) {
         // Get range limits.
-        time_t daterange_start_time(0);
-        time_t daterange_end_time(0);
+        time_t daterange_start_time((time_t)-1);
+        time_t daterange_end_time((time_t)-1);
         if (_daterange_to_time_t(
               drange,
               daterange_type,
@@ -1322,17 +1321,14 @@ static void _get_next_valid_time_per_timeperiod(
               daterange_start_time,
               daterange_end_time)
             && ((preferred_time < daterange_end_time)
-                || (daterange_end_time == (time_t)-1))) {
-          std::cout << "DATERANGE IS " << ctime(&daterange_start_time);
-          std::cout << "-" << ctime(&daterange_end_time) << "\n";
-          // Check that date if within range.
+                || ((time_t)-1 == daterange_end_time))) {
+          // Check that date is within range.
           time_t earliest_midnight(_earliest_midnight_in_daterange(
                                      preferred_time,
                                      drange,
                                      daterange_start_time,
                                      daterange_end_time));
           if (earliest_midnight != (time_t)-1) {
-            std::cout << "GOT EARLIEST MIDNIGHT\n";
             // Midnight.
             struct tm midnight;
             localtime_r(&earliest_midnight, &midnight);
@@ -1428,10 +1424,33 @@ static void _get_next_valid_time_per_timeperiod(
     }
 
     // Check exclusions.
-    // XXX : reset earliest time + move preferred time past exclusion
-
-    // Increment preferred time.
-    if (earliest_time == (time_t)-1)
+    if (earliest_time != (time_t)-1) {
+      timeperiodexclusion* first_exclusion(tperiod->exclusions);
+      tperiod->exclusions = NULL;
+      time_t max_invalid((time_t)-1);
+      for (timeperiodexclusion* exclusion(first_exclusion);
+           exclusion;
+           exclusion = exclusion->next) {
+        time_t invalid((time_t)-1);
+        _get_min_invalid_time_per_timeperiod(
+          earliest_time,
+          &invalid,
+          current_time,
+          exclusion->timeperiod_ptr);
+        if ((invalid != (time_t)-1)
+            && (((time_t)-1 == max_invalid)
+                || (invalid > max_invalid)))
+          max_invalid = invalid;
+      }
+      tperiod->exclusions = first_exclusion;
+      if ((max_invalid != (time_t)-1)
+          && (max_invalid != earliest_time)) {
+        earliest_time = (time_t)-1;
+        preferred_time = max_invalid;
+      }
+    }
+    // Increment preferred time to next day.
+    else
       preferred_time = _add_round_days_to_midnight(
                          ti.midnight,
                          24 * 60 * 60);
@@ -1445,68 +1464,6 @@ static void _get_next_valid_time_per_timeperiod(
     *valid_time = earliest_time;
 
   return ;
-}
-
-/**
- *  Calculate the earliest time possible including checks
- *  for timepriod exclusion
- *
- *  @param[in]  preferred_time  The preferred time to check.
- *  @param[out] valid_time      Variable to fill.
- *  @param[in]  current_time    The current time.
- *  @param[in]  tperiod         The time period to use.
- *  @param[in]  level           The recursivity level.
- */
-static void get_earliest_time(
-              time_t preferred_time,
-              time_t* valid_time,
-              time_t current_time,
-              timeperiod* tperiod,
-              int level) {
-  time_t earliest_time(0);
-
-  /*
-   * function can get called recursivly, pushing alternating level
-   * see below in timeperiod exclusion loop
-   */
-  if (!(level % 2)) {
-    // initial hit here, and then alternating by 2 the timeperiod exclusions
-    _get_next_valid_time_per_timeperiod(
-      preferred_time,
-      &earliest_time,
-      current_time,
-      tperiod);
-    if (*valid_time == 0)
-      *valid_time = earliest_time;
-    else if (earliest_time < *valid_time)
-      *valid_time = earliest_time;
-  }
-  else {
-    // first timeperiod exclusion hits here, alternating by 2
-    _get_min_invalid_time_per_timeperiod(
-      preferred_time,
-      &earliest_time,
-      current_time,
-      tperiod);
-    if (*valid_time == 0)
-      *valid_time = earliest_time;
-    else if (earliest_time < *valid_time)
-      *valid_time = earliest_time + 1;
-  }
-
-  // loop through all available exclusions in this timeperiod and alternate level
-  timeperiodexclusion* first_exclusion(tperiod->exclusions);
-  tperiod->exclusions = NULL;
-  for (timeperiodexclusion* exclusion(first_exclusion);
-       exclusion;
-       exclusion = exclusion->next)
-    get_earliest_time(
-      preferred_time,
-      valid_time,
-      current_time,
-      exclusion->timeperiod_ptr,
-      level + 1);
-  tperiod->exclusions = first_exclusion;
 }
 
 /**
@@ -1536,12 +1493,11 @@ void get_next_valid_time(
   // before getting a valid_time.
   else {
     *valid_time = 0;
-    get_earliest_time(
+    _get_next_valid_time_per_timeperiod(
       preferred_time,
       valid_time,
       current_time,
-      tperiod,
-      0);
+      tperiod);
   }
 
   return ;
