@@ -1,5 +1,5 @@
 /*
-** Copyright 2013 Merethis
+** Copyright 2013-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -75,7 +75,7 @@ static void add_timeperiod(
          it(exclude.begin()), end(exclude.end());
        it != end;
        ++it)
-    obj->parse(*it);
+    obj->parse("exclude " + *it);
   configuration::applier::timeperiod app;
   app.add_object(obj);
 }
