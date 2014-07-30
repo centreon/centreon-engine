@@ -1629,10 +1629,10 @@ void applier::state::_processing(
       config->serviceescalations());
 
     // Apply downtimes
-    _resolve<configuration::downtime, applier::downtime>(
-      config->downtimes());
     _apply<configuration::downtime, applier::downtime>(
       diff_downtimes);
+    _resolve<configuration::downtime, applier::downtime>(
+      config->downtimes());
 
     // Load retention.
     if (state)

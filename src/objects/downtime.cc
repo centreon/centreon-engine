@@ -510,7 +510,7 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
     return (ERROR);
 
   /* Before anything, renew downtime if it is a recurring downtime. */
-  if (temp_downtime->recurring_period != NULL) {
+  if (!temp_downtime->is_in_effect && temp_downtime->recurring_period != NULL) {
     if (renew_downtime(temp_downtime, &new_recurring_downtime_id) == OK)
       logger(dbg_downtime, basic)
         << "Recurring downtime (id='" << temp_downtime->downtime_id <<
@@ -1097,7 +1097,8 @@ int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id)
                           &new_start_time, &new_end_time);
 
   // Create a new downtime.
-  return (add_new_downtime(downtime->type, downtime->host_name, downtime->service_description,
+  return (schedule_downtime(downtime->type,
+                   downtime->host_name, downtime->service_description,
                    downtime->entry_time, downtime->author, downtime->comment,
                    new_start_time, new_end_time,
                    downtime->fixed, downtime->triggered_by, downtime->duration,
@@ -1110,7 +1111,7 @@ void get_new_recurring_times(time_t start_time, time_t end_time,
                              timeperiod* recurring_period,
                              time_t* new_start_time, time_t* new_end_time) {
   *new_start_time = start_time + recurring_interval;
-  *new_end_time = start_time + difftime(end_time,
+  *new_end_time = *new_start_time + difftime(end_time,
                                         start_time);
   time_t now(time(NULL));
 

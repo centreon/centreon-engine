@@ -81,7 +81,8 @@ applier::downtime& applier::downtime::operator=(applier::downtime const& right) 
 void applier::downtime::add_object(
                shared_ptr<configuration::downtime> obj) {
   // If no recurring period, do nothing.
-  if (obj->recurring_period())
+  obj->resolve_recurring_period();
+  if (!obj->recurring_period())
     return ;
 
   // Logging.
@@ -215,6 +216,8 @@ void applier::downtime::remove_object(
   if (it != applier::state::instance().downtimes().end()) {
     scheduled_downtime* sd(it->second.get());
 
+
+
     // Remove downtime from its list.
     //unregister_object<scheduled_downtime>(&downtime_list, sd);
 
@@ -242,7 +245,4 @@ void applier::downtime::remove_object(
 
 void applier::downtime::resolve_object(
     shared_ptr<configuration::downtime> obj) {
-  if (obj->resolve_recurring_period() == false)
-    throw (engine_error() << "Could not register downtime '"
-         << obj->host_name() << "'");
 }
