@@ -215,9 +215,9 @@ void applier::downtime::resolve_object(
   // when rolling back after a configuration error (the timeperiod existed,
   // the configuration deleted it, the configuration was rolled back,
   // the timeperiod exists again with a new pointer). Fishy things are
-  // going on: Resolve all the timeperiods again.
+  // going on: replace the old period pointer by the new.
   if (old_period != NULL && old_period != obj->recurring_period())
-    resolve_recurring_periods();
+    replace_recurring_periods(old_period, obj->recurring_period());
 
   return ;
 }

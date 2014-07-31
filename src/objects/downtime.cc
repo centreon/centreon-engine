@@ -134,17 +134,15 @@ int cleanup_downtime_data() {
 }
 
 /*
- ** Resolve the recurring periods of all the downtimes from their names.
- ** You should never need to call that manually: the recurring periods
- ** are always valid.
- */
-void resolve_recurring_periods() {
+ **
+ **/
+void replace_recurring_periods(timeperiod* old_period,
+                               timeperiod* new_period) {
   for (scheduled_downtime* temp_downtime(scheduled_downtime_list);
        temp_downtime;
        temp_downtime = temp_downtime->next) {
-    if (temp_downtime->recurring_period_name != NULL)
-      temp_downtime->recurring_period =
-          find_timeperiod(temp_downtime->recurring_period_name);
+    if (temp_downtime->recurring_period == old_period)
+      temp_downtime->recurring_period = new_period;
   }
 }
 
