@@ -20,6 +20,7 @@
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/configuration/downtime.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
@@ -191,7 +192,15 @@ bool configuration::downtime::operator<(downtime const& right) const throw () {
     return false;
 }
 
+/**
+ *  Check if the object is valid.
+ *
+ *  If the object is not valid, an exception is thrown.
+ */
 void configuration::downtime::check_validity() const {
+  if (_recurring_period_name.empty())
+    throw (engine_error()
+          << "Downtime has no recurring period (propery 'recurring_period')");
   return ;
 }
 
