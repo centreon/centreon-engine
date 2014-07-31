@@ -134,7 +134,8 @@ int cleanup_downtime_data() {
 }
 
 /*
- **
+ **  Following a configuration roll back, we need to replace all
+ **  recurring period pointers from old value to new value.
  **/
 void replace_recurring_periods(timeperiod* old_period,
                                timeperiod* new_period) {
