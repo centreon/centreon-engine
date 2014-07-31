@@ -133,6 +133,20 @@ int cleanup_downtime_data() {
   return (OK);
 }
 
+/* Resolve the recurring periods of all the downtimes
+ * You should never need to call that: the recurring periods
+ * are always valid.
+ */
+void resolve_recurring_periods() {
+  for (scheduled_downtime* temp_downtime(scheduled_downtime_list);
+       temp_downtime;
+       temp_downtime = temp_downtime->next) {
+    if (temp_downtime->recurring_period_name != NULL)
+      temp_downtime->recurring_period =
+          find_timeperiod(temp_downtime->recurring_period_name);
+  }
+}
+
 /******************************************************************/
 /********************** SCHEDULING FUNCTIONS **********************/
 /******************************************************************/

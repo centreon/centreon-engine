@@ -1754,10 +1754,13 @@ int check_downtime(scheduled_downtime *dw, int* w, int* e) {
   (void)w;
   int errors(0);
 
+  logger(log_verification_error, basic)
+    << "check_downtime() '";
+
   // Check for the existence of the recurring time period.
   if (dw->recurring_period_name) {
     timeperiod* period = find_timeperiod(dw->recurring_period_name);
-    if (!period) {
+    if (period == NULL) {
       logger(log_verification_error, basic)
         << "Error: recurring time period '"
         << dw->recurring_period_name

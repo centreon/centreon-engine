@@ -180,6 +180,22 @@ void applier::downtime::remove_object(
   return ;
 }
 
+/* */
 void applier::downtime::resolve_object(
     shared_ptr<configuration::downtime> obj) {
+
+  // Check if the recurring period exists.
+  ::timeperiod* old_period = obj->recurring_period();
+  if (obj->resolve_recurring_period() == false) {
+    throw (engine_error() << "Cannot resolve downtime '"
+           << (int)obj->downtime_id() << "'");
+  }
+
+  // A timeperiod pointer has suddenly changed! It can only happen
+  // when rolling back after a configuration error (the timeperiod existed,
+  // the configuration deleted it, the configuration was rolled back,
+  // the timeperiod exists again with a new pointer). Fishy things are
+  // going on: Resolve all the timeperiods again.
+  if (old_period != NULL && old_period != obj->recurring_period())
+    resolve_recurring_periods();
 }
