@@ -121,6 +121,12 @@ void applier::downtime::add_object(
   register_downtime(obj->downtime_type(), id);
 }
 
+/**
+ *  Expand downtime.
+ *
+ *  @param  obj[in] the downtime to expand.
+ *  @param  s[out] the configuration state.
+ */
 void applier::downtime::expand_object(
     shared_ptr<configuration::downtime> obj,
     configuration::state& s) {
@@ -128,7 +134,7 @@ void applier::downtime::expand_object(
 }
 
 /**
- *  Modified downtime.
+ *  Modify downtime.
  *
  *  A downtime can never be modified: as a downtime is its own key, two
  *  non equal downtimes are always two new downtimes.

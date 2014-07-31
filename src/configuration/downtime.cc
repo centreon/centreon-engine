@@ -161,6 +161,13 @@ bool configuration::downtime::operator!=(downtime const& right) const throw () {
   return (!operator==(right));
 }
 
+/**
+ *  Comparison operator.
+ *
+ *  @param right  the downtime to compare.
+ *
+ *  @return True if this downtime is less than the other.
+ */
 bool configuration::downtime::operator<(downtime const& right) const throw () {
   if (_author != right._author)
     return _author < right._author;

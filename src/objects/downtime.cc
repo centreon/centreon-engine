@@ -133,9 +133,10 @@ int cleanup_downtime_data() {
   return (OK);
 }
 
-/* Resolve the recurring periods of all the downtimes
- * You should never need to call that: the recurring periods
- * are always valid.
+/*
+ ** Resolve the recurring periods of all the downtimes from their names.
+ ** You should never need to call that manually: the recurring periods
+ ** are always valid.
  */
 void resolve_recurring_periods() {
   for (scheduled_downtime* temp_downtime(scheduled_downtime_list);
@@ -1101,6 +1102,7 @@ int add_new_service_downtime(
   return (result);
 }
 
+/* If this downtime was a recurring downtime, renew it. */
 int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id) {
   time_t new_start_time;
   time_t new_end_time;
@@ -1120,6 +1122,7 @@ int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id)
                    new_downtime_id));
 }
 
+/* Get new times for a new recurring downtime. */
 void get_new_recurring_times(time_t start_time, time_t end_time,
                              unsigned long recurring_interval,
                              timeperiod* recurring_period,
@@ -1280,6 +1283,11 @@ int delete_downtime_by_hostname_service_description_start_time_comment(
   return (deleted);
 }
 
+/*
+ ** Delete all the downtimes that were spawned from same recurring downtime.
+ ** We can't use ids as each new downtime spawned from a recurring downtime
+ ** has a new id.
+ */
 int delete_downtimes_by_unique_recurring_period_informations(
                       char const* hostname,
                       char const* service_description,
