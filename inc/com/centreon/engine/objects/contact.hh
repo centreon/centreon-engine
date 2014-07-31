@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -63,6 +63,7 @@ typedef struct                  contact_struct {
   unsigned long                 modified_attributes;
   unsigned long                 modified_host_attributes;
   unsigned long                 modified_service_attributes;
+  char*                         timezone;
 
   timeperiod_struct*            host_notification_period_ptr;
   timeperiod_struct*            service_notification_period_ptr;
@@ -98,7 +99,8 @@ contact* add_contact(
            int service_notifications_enabled,
            int can_submit_commands,
            int retain_status_information,
-           int retain_nonstatus_information);
+           int retain_nonstatus_information,
+           char const* timezone);
 
 #  ifdef __cplusplus
 }
@@ -125,5 +127,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACT_HH
-
-

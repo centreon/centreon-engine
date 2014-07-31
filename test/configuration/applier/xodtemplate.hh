@@ -164,6 +164,7 @@ typedef struct xodtemplate_contact_struct{
   int          notify_on_host_downtime;
   char*        service_notification_period;
   char*        service_notification_commands;
+  char*        timezone;
   int          notify_on_service_unknown;
   int          notify_on_service_warning;
   int          notify_on_service_critical;
@@ -185,6 +186,7 @@ typedef struct xodtemplate_contact_struct{
   int          have_host_notification_commands;
   int          have_service_notification_period;
   int          have_service_notification_commands;
+  int          have_timezone;
 
   int          have_host_notification_options;
   int          have_service_notification_options;

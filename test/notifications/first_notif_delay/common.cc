@@ -184,7 +184,8 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     1,                                    // Service notifications enabled
     1,                                    // Can submit commands
     0,                                    // Retain status information
-    0));                                  // Retain non-status information
+    0,                                    // Retain non-status information
+    NULL));                               // System timezone
   retval |= (NULL == cntct);
   retval |= (NULL == add_contact_to_host(hst,
     const_cast<char*>("mycontact")));

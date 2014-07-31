@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -33,8 +33,9 @@ static int check_enable_contactgroup_host_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL,
+                               NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                               0, 0, 0, 0, NULL);
   if (!cntct)
     throw (engine_error() << "create contact failed.");
 

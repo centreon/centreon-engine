@@ -2130,6 +2130,11 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_contact->service_notification_commands = string::dup(value);
       temp_contact->have_service_notification_commands = true;
     }
+    else if (!strcmp(variable, "timezone")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->timezone = string::dup(value);
+      temp_contact->have_timezone = true;
+    }
     else if (!strcmp(variable, "host_notification_options")) {
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
@@ -7554,6 +7559,13 @@ int xodtemplate_resolve_contact(xodtemplate_contact* this_contact) {
       &this_contact->have_service_notification_commands,
       &this_contact->service_notification_commands);
 
+    if (this_contact->have_timezone == false
+        && template_contact->have_timezone == true) {
+      if (this_contact->timezone == NULL
+          && template_contact->timezone != NULL)
+        this_contact->timezone = string::dup(template_contact->timezone);
+      this_contact->have_timezone = true;
+    }
     if (this_contact->have_host_notification_period == false
         && template_contact->have_host_notification_period == true) {
       if (this_contact->host_notification_period == NULL
@@ -10751,7 +10763,8 @@ int xodtemplate_register_contact(xodtemplate_contact* this_contact) {
                   this_contact->service_notifications_enabled,
                   this_contact->can_submit_commands,
                   this_contact->retain_status_information,
-                  this_contact->retain_nonstatus_information);
+                  this_contact->retain_nonstatus_information,
+                  this_contact->timezone);
 
   /* return with an error if we couldn't add the contact */
   if (new_contact == NULL) {
@@ -12670,6 +12683,8 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (temp_contact->service_notification_commands)
       fprintf(fp, "\tservice_notification_commands\t%s\n",
 	      temp_contact->service_notification_commands);
+    if (temp_contact->timezone)
+      fprintf(fp, "\ttimezone\t%s\n", temp_contact->timezone);
     if (temp_contact->host_notification_commands)
       fprintf(
         fp,
@@ -14184,6 +14199,7 @@ int xodtemplate_free_memory() {
       delete[] this_contact->address[x];
     delete[] this_contact->service_notification_period;
     delete[] this_contact->service_notification_commands;
+    delete[] this_contact->timezone;
     delete[] this_contact->host_notification_period;
     delete[] this_contact->host_notification_commands;
     delete this_contact;

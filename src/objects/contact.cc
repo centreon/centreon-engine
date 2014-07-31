@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -78,7 +78,8 @@ bool operator==(
           && obj1.last_service_notification == obj2.last_service_notification
           && obj1.modified_attributes == obj2.modified_attributes
           && obj1.modified_host_attributes == obj2.modified_host_attributes
-          && obj1.modified_service_attributes == obj2.modified_service_attributes);
+          && obj1.modified_service_attributes == obj2.modified_service_attributes
+          && is_equal(obj1.timezone, obj2.timezone));
 }
 
 /**
@@ -152,6 +153,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  host_notification_period_ptr:    " << chkstr(hst_notif_str) << "\n"
     "  service_notification_period_ptr: " << chkstr(svc_notif_str) << "\n"
     "  contactgroups_ptr:               " << chkstr(cntctgrp_str) << "\n"
+    "  timezone:                        " << chkstr(obj.timezone) << "\n"
      << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
      << "}\n";
   return (os);
@@ -200,6 +202,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
  *                                           status info ?
  *  @param[in] retain_nonstatus_information  Shell Engine retain contact
  *                                           non-status info ?
+ *  @param[in] timezone                      Contact timezone.
  *
  *  @return New contact object.
  */
@@ -226,7 +229,8 @@ contact* add_contact(
            int service_notifications_enabled,
            int can_submit_commands,
            int retain_status_information,
-           int retain_nonstatus_information) {
+           int retain_nonstatus_information,
+           char const* timezone) {
   // Make sure we have the data we need.
   if (!name || !name[0]) {
     logger(log_config_error, basic)
@@ -258,6 +262,8 @@ contact* add_contact(
       obj->pager = string::dup(pager);
     if (svc_notification_period)
       obj->service_notification_period = string::dup(svc_notification_period);
+    if (timezone)
+      obj->timezone = string::dup(timezone);
     if (addresses) {
       for (unsigned int x(0); x < MAX_CONTACT_ADDRESSES; ++x)
         if (addresses[x])

@@ -176,7 +176,8 @@ void com::centreon::engine::test::minimal_setup() {
     1,                                    // Service notifications enabled
     1,                                    // Can submit commands
     0,                                    // Retain status information
-    0));                                  // Retain non-status information
+    0,                                    // Retain non-status information
+    NULL));                               // System timezone
   if (!cntct)
     throw (error() << "default contact creation failed");
   if (!add_contact_to_host(hst,
