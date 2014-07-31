@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -118,6 +118,9 @@ namespace                  configuration {
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
     unsigned short         stalking_options() const throw ();
+    void                   timezone(std::string const& tz);
+    std::string const&     timezone() const throw ();
+    bool                   timezone_defined() const throw ();
 
   private:
     struct                 setters {
@@ -167,6 +170,7 @@ namespace                  configuration {
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
     bool                   _set_stalking_options(std::string const& value);
+    bool                   _set_timezone(std::string const& value);
 
     std::string            _action_url;
     opt<bool>              _checks_active;
@@ -210,6 +214,7 @@ namespace                  configuration {
     std::string            _service_description;
     static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
+    opt<std::string>       _timezone;
  };
 
   typedef shared_ptr<service>    service_ptr;

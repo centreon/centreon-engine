@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -108,6 +108,7 @@ namespace                  configuration {
     unsigned int           retry_interval() const throw ();
     unsigned int           stalking_options() const throw ();
     std::string const&     statusmap_image() const throw ();
+    std::string const&     timezone() const throw ();
     std::string const&     vrml_image() const throw ();
 
   private:
@@ -160,6 +161,7 @@ namespace                  configuration {
     bool                   _set_retry_interval(unsigned int value);
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_statusmap_image(std::string const& value);
+    bool                   _set_timezone(std::string const& value);
     bool                   _set_vrml_image(std::string const& value);
 
     std::string            _action_url;
@@ -206,6 +208,7 @@ namespace                  configuration {
     static setters const   _setters[];
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;
+    opt<std::string>       _timezone;
     std::string            _vrml_image;
   };
 
@@ -217,4 +220,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOST_HH
-

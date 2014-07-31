@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -57,6 +57,7 @@ host::setters const host::_setters[] = {
   { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) },
   { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
   { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
+  { "timezone",                     SETTER(std::string const&, _set_timezone) },
   { "initial_state",                SETTER(std::string const&, _set_initial_state) },
   { "check_interval",               SETTER(unsigned int, _set_check_interval) },
   { "normal_check_interval",        SETTER(unsigned int, _set_check_interval) },
@@ -213,6 +214,7 @@ host& host::operator=(host const& right) {
     _retry_interval = right._retry_interval;
     _stalking_options = right._stalking_options;
     _statusmap_image = right._statusmap_image;
+    _timezone = right._timezone;
     _vrml_image = right._vrml_image;
   }
   return (*this);
@@ -270,6 +272,7 @@ bool host::operator==(host const& right) const throw () {
           && _retry_interval == right._retry_interval
           && _stalking_options == right._stalking_options
           && _statusmap_image == right._statusmap_image
+          && _timezone == right._timezone
           && _vrml_image == right._vrml_image);
 }
 
@@ -384,6 +387,8 @@ bool host::operator<(host const& right) const throw () {
     return (_stalking_options < right._stalking_options);
   else if (_statusmap_image != right._statusmap_image)
     return (_statusmap_image < right._statusmap_image);
+  else if (_timezone != right._timezone)
+    return (_timezone < right._timezone);
   return (_vrml_image < right._vrml_image);
 }
 
@@ -481,6 +486,7 @@ void host::merge(object const& obj) {
   MRG_OPTION(_retry_interval);
   MRG_OPTION(_stalking_options);
   MRG_DEFAULT(_statusmap_image);
+  MRG_OPTION(_timezone);
   MRG_DEFAULT(_vrml_image);
 }
 
@@ -926,6 +932,15 @@ unsigned int host::stalking_options() const throw () {
  */
 std::string const& host::statusmap_image() const throw () {
   return (_statusmap_image);
+}
+
+/**
+ *  Get host timezone.
+ *
+ *  @return Host timezone.
+ */
+std::string const& host::timezone() const throw () {
+  return (_timezone);
 }
 
 /**
@@ -1588,6 +1603,18 @@ bool host::_set_stalking_options(
 bool host::_set_statusmap_image(
        std::string const& value) {
   _statusmap_image = value;
+  return (true);
+}
+
+/**
+ *  Set timezone.
+ *
+ *  @param[in] timezone  The new host timezone.
+ *
+ *  @return True on success, false otherwise.
+ */
+bool host::_set_timezone(std::string const& value) {
+  _timezone = value;
   return (true);
 }
 

@@ -728,7 +728,8 @@ void applier::service::_inherits_special_vars(
   // Detect if any special variable has not been defined.
   if (!obj->contactgroups_defined()
       || !obj->notification_interval_defined()
-      || !obj->notification_period_defined()) {
+      || !obj->notification_period_defined()
+      || !obj->timezone_defined()) {
     // Remove service from state (it will be modified
     // and reinserted at the end of the method).
     s.services().erase(obj);
@@ -755,6 +756,8 @@ void applier::service::_inherits_special_vars(
       obj->notification_interval((*it)->notification_interval());
     if (!obj->notification_period_defined())
       obj->notification_period((*it)->notification_period());
+    if (!obj->timezone_defined())
+      obj->timezone((*it)->timezone());
 
     // Reinsert service.
     s.services().insert(obj);
