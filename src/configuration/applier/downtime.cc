@@ -180,7 +180,16 @@ void applier::downtime::remove_object(
   return ;
 }
 
-/* */
+/**
+ *  Resolve downtime.
+ *
+ *  Basically, check that the recurring period exists and throw an error
+ *  if it doesn't. This error will invalidate the whole configuration.
+ *
+ *  Also, handle sudden configuration rollbacks.
+ *
+ *  @param[in] obj The downtime to resolve.
+ */
 void applier::downtime::resolve_object(
     shared_ptr<configuration::downtime> obj) {
 
@@ -198,4 +207,6 @@ void applier::downtime::resolve_object(
   // going on: Resolve all the timeperiods again.
   if (old_period != NULL && old_period != obj->recurring_period())
     resolve_recurring_periods();
+
+  return ;
 }
