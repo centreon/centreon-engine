@@ -37,5 +37,6 @@ void deleter::downtime(void* ptr) throw () {
   delete[] obj->service_description;
   delete[] obj->author;
   delete[] obj->comment;
+  delete[] obj->recurring_period_name;
   delete obj;
 }

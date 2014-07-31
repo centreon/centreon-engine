@@ -45,6 +45,12 @@ typedef struct                      scheduled_downtime_struct {
   int                               incremented_pending_downtime;
   unsigned long                     recurring_interval;
   timeperiod*                       recurring_period;
+  /*  We keep a cache of the recurring period name for only one reason:
+   *  For checking that the time period still exists in the pre flight
+   *  configuration checks. For anything else, recurring_period is either set
+   *  if it exists, or NULL if it doesn't.
+   */
+  char*                             recurring_period_name;
   struct scheduled_downtime_struct* next;
 }                                   scheduled_downtime;
 
@@ -188,7 +194,7 @@ int                 schedule_downtime(
                       unsigned long recurring_interval,
                       timeperiod* recurring_period,
                       unsigned long* new_downtime_id);
-void                  get_new_recurring_times(time_t start_time, time_t end_time,
+void                get_new_recurring_times(time_t start_time, time_t end_time,
                       unsigned long recurring_interval,
                       timeperiod* recurring_period,
                       time_t* new_start_time, time_t* new_end_time);
