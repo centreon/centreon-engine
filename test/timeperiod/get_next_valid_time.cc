@@ -176,7 +176,8 @@ int main_test(int argc, char** argv) {
     get_next_valid_time(
       opt.preferred_time,
       &valid,
-      opt.period.back());
+      opt.period.back(),
+      NULL);
 
     if (valid != opt.ref_time) {
       std::string ref_str(ctime(&opt.ref_time));

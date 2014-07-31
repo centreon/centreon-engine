@@ -28,12 +28,12 @@ extern "C" {
 int  check_time_against_period(
        time_t test_time,
        timeperiod* tperiod,
-       char const* tz = NULL);
+       char const* tz);
 void get_next_valid_time(
        time_t pref_time,
        time_t* valid_time,
        timeperiod* tperiod,
-       char const* tz = NULL);
+       char const* tz);
 void initialize_timeperiods();
 void cleanup_timeperiods();
 

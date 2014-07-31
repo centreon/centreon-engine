@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -82,15 +82,17 @@ void init_timing_loop() {
     if (temp_service->checks_enabled == false)
       schedule_check = false;
 
-    /* are there any valid times this service can be checked? */
+    // Are there any valid times this service can be checked ?
     is_valid_time = check_time_against_period(
                       current_time,
-                      temp_service->check_period_ptr);
+                      temp_service->check_period_ptr,
+                      temp_service->timezone);
     if (is_valid_time == ERROR) {
       get_next_valid_time(
         current_time,
         &next_valid_time,
-        temp_service->check_period_ptr);
+        temp_service->check_period_ptr,
+        temp_service->timezone);
       if (current_time == next_valid_time)
         schedule_check = false;
     }
@@ -139,15 +141,17 @@ void init_timing_loop() {
     if (temp_host->checks_enabled == false)
       schedule_check = false;
 
-    /* are there any valid times this host can be checked? */
+    // Are there any valid times this host can be checked ?
     is_valid_time = check_time_against_period(
                       current_time,
-                      temp_host->check_period_ptr);
+                      temp_host->check_period_ptr,
+                      temp_host->timezone);
     if (is_valid_time == ERROR) {
       get_next_valid_time(
         current_time,
         &next_valid_time,
-        temp_host->check_period_ptr);
+        temp_host->check_period_ptr,
+        temp_host->timezone);
       if (current_time == next_valid_time)
         schedule_check = false;
     }
@@ -380,20 +384,21 @@ void init_timing_loop() {
         << "Preferred Check Time: " << temp_service->next_check
         << " --> " << my_ctime(&temp_service->next_check);
 
-      /* make sure the service can actually be scheduled when we want */
+      // Make sure the service can actually be scheduled when we want.
       is_valid_time = check_time_against_period(
                         temp_service->next_check,
-                        temp_service->check_period_ptr);
+                        temp_service->check_period_ptr,
+                        temp_service->timezone);
       if (is_valid_time == ERROR) {
         logger(dbg_events, most)
           << "Preferred Time is Invalid In Timeperiod '"
           << temp_service->check_period_ptr->name
           << "': " << temp_service->next_check
           << " --> " << my_ctime(&temp_service->next_check);
-
         get_next_valid_time(
           temp_service->next_check, &next_valid_time,
-          temp_service->check_period_ptr);
+          temp_service->check_period_ptr,
+          temp_service->timezone);
         temp_service->next_check = next_valid_time;
       }
 
@@ -570,15 +575,17 @@ void init_timing_loop() {
       << "Preferred Check Time: " << temp_host->next_check
       << " --> " << my_ctime(&temp_host->next_check);
 
-    /* make sure the host can actually be scheduled at this time */
+    // Make sure the host can actually be scheduled at this time.
     is_valid_time = check_time_against_period(
                       temp_host->next_check,
-                      temp_host->check_period_ptr);
+                      temp_host->check_period_ptr,
+                      temp_host->timezone);
     if (is_valid_time == ERROR) {
       get_next_valid_time(
         temp_host->next_check,
         &next_valid_time,
-        temp_host->check_period_ptr);
+        temp_host->check_period_ptr,
+        temp_host->timezone);
       temp_host->next_check = next_valid_time;
     }
 

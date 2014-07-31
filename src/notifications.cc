@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -410,12 +410,13 @@ int check_service_notification_viability(
   if (temp_period == NULL)
     temp_period = svc->host_ptr->notification_period_ptr;
 
-  /* see if the service can have notifications sent out at this time */
-  if (check_time_against_period(current_time, temp_period) == ERROR) {
-
-    logger(dbg_notifications, more)
-      << "This service shouldn't have notifications sent out "
-      "at this time.";
+  // See if the service can have notifications sent out at this time.
+  if (check_time_against_period(
+        current_time,
+        temp_period,
+        svc->timezone) == ERROR) {
+    logger(dbg_notifications, more) << "This service shouldn't have "
+         "notifications sent out at this time.";
 
     /* calculate the next acceptable notification time, once the next valid time range arrives... */
     if (type == NOTIFICATION_NORMAL) {
@@ -423,7 +424,8 @@ int check_service_notification_viability(
       get_next_valid_time(
         current_time,
         &timeperiod_start,
-        svc->notification_period_ptr);
+        svc->notification_period_ptr,
+        svc->timezone);
 
       /* looks like there are no valid notification times defined, so schedule the next one far into the future (one year)... */
       if (timeperiod_start == (time_t)0)
@@ -732,9 +734,11 @@ int check_contact_service_notification_viability(
     return (ERROR);
   }
 
-  /* see if the contact can be notified at this time */
-  if (check_time_against_period
-      (time(NULL), cntct->service_notification_period_ptr) == ERROR) {
+  // See if the contact can be notified at this time.
+  if (check_time_against_period(
+        time(NULL),
+        cntct->service_notification_period_ptr,
+        cntct->timezone) == ERROR) {
     logger(dbg_notifications, most)
       << "This contact shouldn't be notified at this time.";
     return (ERROR);
@@ -1107,11 +1111,13 @@ int is_valid_escalation_for_service_notification(
       && se->last_notification < notification_number)
     return (false);
 
-  /* skip this escalation if it has a timeperiod and the current time isn't valid */
+  // Skip this escalation if it has a timeperiod
+  // and the current time isn't valid.
   if (se->escalation_period != NULL
       && check_time_against_period(
            current_time,
-           se->escalation_period_ptr) == ERROR)
+           se->escalation_period_ptr,
+           svc->timezone) == ERROR)
     return (false);
 
   /* skip this escalation if the state options don't match */
@@ -1622,13 +1628,13 @@ int check_host_notification_viability(
     return (ERROR);
   }
 
-  /* see if the host can have notifications sent out at this time */
-  if (check_time_against_period
-      (current_time, hst->notification_period_ptr) == ERROR) {
-
-    logger(dbg_notifications, more)
-      << "This host shouldn't have notifications sent out at "
-      "this time.";
+  // See if the host can have notifications sent out at this time.
+  if (check_time_against_period(
+        current_time,
+        hst->notification_period_ptr,
+        hst->timezone) == ERROR) {
+    logger(dbg_notifications, more) << "This host shouldn't have "
+         "notifications sent out at this time.";
 
     /* if this is a normal notification, calculate the next acceptable notification time, once the next valid time range arrives... */
     if (type == NOTIFICATION_NORMAL) {
@@ -1636,7 +1642,8 @@ int check_host_notification_viability(
       get_next_valid_time(
         current_time,
         &timeperiod_start,
-        hst->notification_period_ptr);
+        hst->notification_period_ptr,
+        hst->timezone);
 
       /* it looks like there is no notification time defined, so schedule next one far into the future (one year)... */
       if (timeperiod_start == (time_t)0)
@@ -1904,10 +1911,11 @@ int check_contact_host_notification_viability(
     return (ERROR);
   }
 
-  /* see if the contact can be notified at this time */
+  // See if the contact can be notified at this time.
   if (check_time_against_period(
         time(NULL),
-        cntct->host_notification_period_ptr) == ERROR) {
+        cntct->host_notification_period_ptr,
+        cntct->timezone) == ERROR) {
     logger(dbg_notifications, most)
       << "This contact shouldn't be notified at this time.";
     return (ERROR);
@@ -2270,11 +2278,13 @@ int is_valid_escalation_for_host_notification(
       && he->last_notification < notification_number)
     return (false);
 
-  /* skip this escalation if it has a timeperiod and the current time isn't valid */
+  // Skip this escalation if it has a timeperiod
+  // and the current time isn't valid.
   if (he->escalation_period != NULL
       && check_time_against_period(
            current_time,
-           he->escalation_period_ptr) == ERROR)
+           he->escalation_period_ptr,
+           hst->timezone) == ERROR)
     return (false);
 
   /* skip this escalation if the state options don't match */
