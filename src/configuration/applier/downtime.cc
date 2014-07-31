@@ -148,6 +148,11 @@ void applier::downtime::modify_object(
   return ;
 }
 
+/**
+ *  Remove a downtime from the monitoring engine.
+ *
+ *  @param[in] obj  The downtime to remove from the monitoring engine.
+ */
 void applier::downtime::remove_object(
     shared_ptr<configuration::downtime> obj) {
   // If no recurring period, do nothing.
