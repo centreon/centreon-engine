@@ -1,6 +1,5 @@
 /*
-** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,27 +17,26 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_TIMEPERIOD_HH
-#  define CCE_TIMEPERIOD_HH
+#include "com/centreon/engine/timezone_locker.hh"
+#include "com/centreon/engine/timezone_manager.hh"
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif // C++
+using namespace com::centreon::engine;
 
-int  check_time_against_period(
-       time_t test_time,
-       timeperiod* tperiod,
-       char const* tz = NULL);
-void get_next_valid_time(
-       time_t pref_time,
-       time_t* valid_time,
-       timeperiod* tperiod,
-       char const* tz = NULL);
-void initialize_timeperiods();
-void cleanup_timeperiods();
-
-#  ifdef __cplusplus
+/**
+ *  Constructor.
+ *
+ *  @param[in] manager  Timezone manager.
+ *  @param[in] tz       Timezone to set during object lifetime.
+ */
+timezone_locker::timezone_locker(
+                   timezone_manager* manager,
+                   char const* tz) : _manager(manager) {
+  _manager->push_timezone(tz);
 }
-#  endif // C++
 
-#endif // !CCE_TIMEPERIOD_HH
+/**
+ *  Destructor.
+ */
+timezone_locker::~timezone_locker() {
+  _manager->pop_timezone();
+}

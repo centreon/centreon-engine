@@ -26,9 +26,14 @@
 #include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #include "com/centreon/engine/objects/timerange.hh"
 #include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/engine/timezone_locker.hh"
+#include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
+
+// Global timezone manager.
+static timezone_manager* gl_tz_manager(NULL);
 
 // Static declarations.
 static void _get_next_valid_time_per_timeperiod(
@@ -710,16 +715,23 @@ static bool _timerange_to_time_t(
  *
  *  @param[in] test_time  Time to test.
  *  @param[in] tperiod    Target time period.
+ *  @param[in] tz         Timezone.
  *
  *  @return OK on success, ERROR on failure.
  */
-int check_time_against_period(time_t test_time, timeperiod* tperiod) {
+int check_time_against_period(
+      time_t test_time,
+      timeperiod* tperiod,
+      char const* tz) {
   logger(dbg_functions, basic)
     << "check_time_against_period()";
 
   // If no period was specified, assume the time is good.
   if (!tperiod)
     return (OK);
+
+  // Set timezone.
+  timezone_locker tzlock(gl_tz_manager, tz);
 
   // Faked next valid time must be tested time.
   time_t next_valid_time((time_t)-1);
@@ -1130,11 +1142,13 @@ static void _get_next_valid_time_per_timeperiod(
  *  @param[in]  preferred_time  The preferred time to check.
  *  @param[out] valid_time      Variable to fill.
  *  @param[in]  tperiod         The time period to use.
+ *  @param[in]  tz              Timeperiod.
  */
 void get_next_valid_time(
        time_t pref_time,
        time_t* valid_time,
-       timeperiod* tperiod) {
+       timeperiod* tperiod,
+       char const* tz) {
   logger(dbg_functions, basic) << "get_next_valid_time()";
 
   // Preferred time must be now or in the future.
@@ -1149,6 +1163,7 @@ void get_next_valid_time(
   // First check for possible timeperiod exclusions
   // before getting a valid_time.
   else {
+    timezone_locker tzlock(gl_tz_manager, tz);
     *valid_time = 0;
     _get_next_valid_time_per_timeperiod(
       preferred_time,
@@ -1157,5 +1172,23 @@ void get_next_valid_time(
       tperiod);
   }
 
+  return ;
+}
+
+/**
+ *  Initialize timeperiods.
+ */
+void initialize_timeperiods() {
+  if (!gl_tz_manager)
+    gl_tz_manager = new timezone_manager;
+  return ;
+}
+
+/**
+ *  Cleanup timeperiods.
+ */
+void cleanup_timeperiods() {
+  delete gl_tz_manager;
+  gl_tz_manager = NULL;
   return ;
 }
