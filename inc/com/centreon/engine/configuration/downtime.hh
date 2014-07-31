@@ -69,7 +69,6 @@ namespace                configuration {
     bool                 _set_start_time(time_t value);
     bool                 _set_triggered_by(unsigned long value);
     bool                 _set_recurring_interval(unsigned long value);
-    bool                 _set_recurring_period(::timeperiod* value);
     bool                 _set_recurring_period_name(std::string const& value);
 
     std::string          _author;

@@ -204,10 +204,21 @@ void configuration::downtime::check_validity() const {
   return ;
 }
 
+/**
+ *  Merge with another object.
+ *
+ *  @param[in] The object to merge with.
+ */
 void configuration::downtime::merge(object const& obj) {
   return ;
 }
 
+/**
+ *  As two differing downtimes are always two new downtimes,
+ *  a downtime is its own key.
+ *
+ *  @return  This downtime.
+ */
 configuration::downtime::key_type const& configuration::downtime::key() const throw () {
   return *this;
 }
@@ -320,10 +331,20 @@ unsigned long configuration::downtime::triggered_by() const throw () {
  return (_triggered_by);
 }
 
+/**
+ *  Get the recurring interval.
+ *
+ *  @return The recurring interval.
+ */
 unsigned long configuration::downtime::recurring_interval() const throw() {
   return (_recurring_interval);
 }
 
+/**
+ *  Get the recurring period.
+ *
+ *  @return The recurring period.
+ */
 timeperiod* configuration::downtime::recurring_period() const throw() {
   return (_recurring_period);
 }
@@ -438,25 +459,42 @@ bool configuration::downtime::_set_triggered_by(unsigned long value) {
   return (true);
 }
 
+/**
+ *  Set recurring interval.
+ *
+ *  @param[in] value The new recurring interval.
+ */
 bool configuration::downtime::_set_recurring_interval(unsigned long value) {
   _recurring_interval = value;
   return (true);
 }
 
-bool configuration::downtime::_set_recurring_period(::timeperiod* value) {
-  _recurring_period = value;
-  return (true);
-}
-
-bool configuration::downtime::_set_recurring_period_name(std::string const& value) {
+/**
+ *  Set recurring period name. The recurring period will be
+ *  resolved later on.
+ *
+ *  @param[in] value The new recurring period name.
+ */
+bool configuration::downtime::_set_recurring_period_name(
+    std::string const& value) {
   _recurring_period_name = value;
   return (true);
 }
 
-std::string const& configuration::downtime::recurring_period_name() const throw() {
+/**
+ *  Get recurring period name.
+ *
+ *  @return The recurring period name.
+ */
+std::string const& configuration::downtime::recurring_period_name()const throw() {
   return _recurring_period_name;
 }
 
+/**
+ *  Resolve (get the corresponding recurring period) a recurring period name.
+ *
+ *  @return True if the recurring period name was successfully resolved.
+ */
 bool configuration::downtime::resolve_recurring_period() {
   if (_recurring_period_name.empty())
     return (true);
