@@ -1256,6 +1256,11 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_service->icon_image_alt = string::dup(value);
       temp_service->have_icon_image_alt = true;
     }
+    else if (!strcmp(variable, "timezone")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->timezone = string::dup(value);
+      temp_service->have_timezone = true;
+    }
     else if (!strcmp(variable, "initial_state")) {
       if (!strcmp(value, "o") || !strcmp(value, "ok"))
         temp_service->initial_state = STATE_OK;
@@ -1662,6 +1667,11 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_host->statusmap_image = string::dup(value);
       temp_host->have_statusmap_image = true;
+    }
+    else if (!strcmp(variable, "timezone")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_host->timezone = string::dup(value);
+      temp_host->have_timezone = true;
     }
     else if (!strcmp(variable, "initial_state")) {
       if (!strcmp(value, "o") || !strcmp(value, "up"))
@@ -5848,6 +5858,8 @@ int xodtemplate_duplicate_service(
   new_service->have_icon_image = temp_service->have_icon_image;
   new_service->icon_image_alt = NULL;
   new_service->have_icon_image_alt = temp_service->have_icon_image_alt;
+  new_service->timezone = NULL;
+  new_service->have_timezone = temp_service->have_timezone;
   new_service->custom_variables = NULL;
 
   /* make sure hostgroup member in new service definition is NULL */
@@ -5890,6 +5902,8 @@ int xodtemplate_duplicate_service(
     new_service->icon_image = string::dup(temp_service->icon_image);
   if (temp_service->icon_image_alt != NULL)
     new_service->icon_image_alt = string::dup(temp_service->icon_image_alt);
+  if (temp_service->timezone != NULL)
+    new_service->timezone = string::dup(temp_service->timezone);
 
   /* duplicate custom variables */
   for (temp_customvariablesmember = temp_service->custom_variables;
@@ -7816,6 +7830,13 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
           = string::dup(template_host->statusmap_image);
       this_host->have_statusmap_image = true;
     }
+    if (this_host->have_timezone == false
+        && template_host->have_timezone == true) {
+      if (this_host->timezone == NULL
+          && template_host->timezone != NULL)
+        this_host->timezone = string::dup(template_host->timezone);
+      this_host->have_timezone = true;
+    }
     if (this_host->have_initial_state == false
         && template_host->have_initial_state == true) {
       this_host->initial_state = template_host->initial_state;
@@ -8169,6 +8190,13 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
         this_service->icon_image_alt
           = string::dup(template_service->icon_image_alt);
       this_service->have_icon_image_alt = true;
+    }
+    if (this_service->have_timezone == false
+        && template_service->have_timezone == true) {
+      if (this_service->timezone == NULL
+          && template_service->timezone != NULL)
+        this_service->timezone = string::dup(template_service->timezone);
+      this_service->have_timezone = true;
     }
     if (this_service->have_initial_state == false
         && template_service->have_initial_state == true) {
@@ -10870,7 +10898,8 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                true,
                this_host->retain_status_information,
                this_host->retain_nonstatus_information,
-               this_host->obsess_over_host);
+               this_host->obsess_over_host,
+               this_host->timezone);
 
   /* return with an error if we couldn't add the host */
   if (new_host == NULL) {
@@ -11024,7 +11053,8 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->icon_image_alt,
                   this_service->retain_status_information,
                   this_service->retain_nonstatus_information,
-                  this_service->obsess_over_service);
+                  this_service->obsess_over_service,
+                  this_service->timezone);
 
   /* return with an error if we couldn't add the service */
   if (new_service == NULL) {
@@ -12793,6 +12823,8 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\tvrml_image\t%s\n", temp_host->vrml_image);
     if (temp_host->statusmap_image)
       fprintf(fp, "\tstatusmap_image\t%s\n", temp_host->statusmap_image);
+    if (temp_host->timezone)
+      fprintf(fp, "\ttimezone\t%s\n", temp_host->timezone);
     if (temp_host->have_2d_coords == true)
       fprintf(fp, "\t2d_coords\t%d,%d\n", temp_host->x_2d, temp_host->y_2d);
     if (temp_host->have_3d_coords == true)
@@ -12927,6 +12959,8 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\ticon_image\t%s\n", temp_service->icon_image);
     if (temp_service->icon_image_alt)
       fprintf(fp, "\ticon_image_alt\t%s\n", temp_service->icon_image_alt);
+    if (temp_service->timezone)
+      fprintf(fp, "\ttimezone\t%s\n", temp_service->timezone);
     if (temp_service->notes)
       fprintf(fp, "\tnotes\t%s\n", temp_service->notes);
     if (temp_service->notes_url)
@@ -14195,6 +14229,7 @@ int xodtemplate_free_memory() {
     delete[] this_host->icon_image_alt;
     delete[] this_host->vrml_image;
     delete[] this_host->statusmap_image;
+    delete[] this_host->timezone;
     delete this_host;
   }
   xodtemplate_host_list = NULL;
@@ -14235,6 +14270,7 @@ int xodtemplate_free_memory() {
     delete[] this_service->action_url;
     delete[] this_service->icon_image;
     delete[] this_service->icon_image_alt;
+    delete[] this_service->timezone;
     delete this_service;
   }
   xodtemplate_service_list = NULL;

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -164,7 +164,8 @@ bool operator==(
           && obj1.total_service_check_interval == obj2.total_service_check_interval
           && obj1.modified_attributes == obj2.modified_attributes
           && obj1.circular_path_checked == obj2.circular_path_checked
-          && obj1.contains_circular_path == obj2.contains_circular_path);
+          && obj1.contains_circular_path == obj2.contains_circular_path
+          && is_equal(obj1.timezone, obj2.timezone));
 }
 
 /**
@@ -305,7 +306,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  current_notification_id:              " << obj.current_notification_id << "\n"
     "  check_flapping_recovery_notification: " << obj.check_flapping_recovery_notification << "\n"
     "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n";
+    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
+    "  timezone:                             " << chkstr(obj.timezone) << "\n";
 
   os << "  state_history:                        ";
   for (unsigned int i(0), end(sizeof(obj.state_history) / sizeof(obj.state_history[0]));
@@ -411,6 +413,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *                                           this host ?
  *  @param[in] obsess_over_host              Should we obsess over this
  *                                           host ?
+ *  @param[in] timezone                      Host timezone.
  *
  *  @return New host.
  */
@@ -469,7 +472,8 @@ host* add_host(
         int should_be_drawn,
         int retain_status_information,
         int retain_nonstatus_information,
-        int obsess_over_host) {
+        int obsess_over_host,
+        char const* timezone) {
   // Make sure we have the data we need.
   if (!name || !name[0] || !address || !address[0]) {
     logger(log_config_error, basic)
@@ -549,6 +553,8 @@ host* add_host(
       obj->statusmap_image = string::dup(statusmap_image);
     if (vrml_image)
       obj->vrml_image = string::dup(vrml_image);
+    if (timezone)
+      obj->timezone = string::dup(timezone);
 
     // Duplicate non-string vars.
     obj->accept_passive_host_checks = (accept_passive_checks > 0);

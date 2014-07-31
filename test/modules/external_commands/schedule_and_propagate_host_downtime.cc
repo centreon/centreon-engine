@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,13 +47,13 @@ static int check_schedule_and_propagate_host_downtime(
                             0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
                             0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL,
                             NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0,
-                            0.0, 0.0, 0, 0, 0, 0, 0));
+                            0.0, 0.0, 0, 0, 0, 0, 0, NULL));
   host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0,
                            0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
                            0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0,
                            0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
                            NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                           0.0, 0, 0, 0, 0, 0));
+                           0.0, 0, 0, 0, 0, 0, NULL));
   if (!hst_parent || !hst_child)
     throw (engine_error() << "hosts creation failed");
   add_parent_host_to_host(hst_child, "parent");

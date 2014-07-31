@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -133,6 +133,7 @@ typedef struct                  service_struct {
   unsigned long                 flapping_comment_id;
   double                        percent_state_change;
   unsigned long                 modified_attributes;
+  char*                         timezone;
 
   host_struct*                  host_ptr;
   command_struct*               event_handler_ptr;
@@ -204,7 +205,8 @@ service* add_service(
            char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service);
+           int obsess_over_service,
+           char const* timezone);
 int      get_service_count();
 int      is_contact_for_service(
            service_struct* svc,
@@ -241,5 +243,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICE_HH
-
-

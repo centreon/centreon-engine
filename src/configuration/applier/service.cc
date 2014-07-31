@@ -175,7 +175,8 @@ void applier::service::add_object(
     NULL_IF_EMPTY(obj->icon_image_alt()),
     obj->retain_status_information(),
     obj->retain_nonstatus_information(),
-    obj->obsess_over_service()));
+    obj->obsess_over_service(),
+    NULL_IF_EMPTY(obj->timezone())));
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj->service_description()
@@ -493,6 +494,9 @@ void applier::service::modify_object(
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj->is_volatile()));
+  modify_if_different(
+    s->timezone,
+    NULL_IF_EMPTY(obj->timezone()));
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {
