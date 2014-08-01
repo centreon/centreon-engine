@@ -348,6 +348,13 @@ add_test(
   "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
 )
 
+# Recurring downtimes are correctly parsed.
+set (TEST_NAME "running_recurring_downtimes")
+add_test(
+  "${TEST_NAME}"
+  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/recurring_downtime.cfg"
+)
+
 # Precache file generation.
 set(TEST_NAME "running_precache_file_generation")
 add_executable(

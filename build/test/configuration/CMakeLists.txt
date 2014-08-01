@@ -102,3 +102,8 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 set(TEST_NAME "parse_and_copy_configuration_timeperiod")
 set(TEST_CONF_FILE "timeperiod.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
+# parse_and_copy_configuration_downtime
+set(TEST_NAME "parse_and_copy_configuration_downtime")
+set(TEST_CONF_FILE "downtime.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
