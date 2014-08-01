@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1161,7 +1161,7 @@ int should_service_notification_be_escalated(service* svc) {
         << "Service notification WILL be escalated.";
       return (true);
 
-      ++p->first;
+      ++p.first;
     }
   }
   logger(dbg_notifications, more)
