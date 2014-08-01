@@ -1160,6 +1160,8 @@ int should_service_notification_be_escalated(service* svc) {
       logger(dbg_notifications, more)
         << "Service notification WILL be escalated.";
       return (true);
+
+      ++p->first;
     }
   }
   logger(dbg_notifications, more)
