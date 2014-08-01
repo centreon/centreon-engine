@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <exception>
@@ -30,6 +31,7 @@
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timezone_locker.hh"
 #include "test/unittest.hh"
 
 #ifndef __THROW
@@ -55,6 +57,7 @@ struct                     options {
   std::vector<timeperiod*> period;
   time_t                   preferred_time;
   time_t                   ref_time;
+  std::string              timezone;
 };
 
 static void add_timeperiod(
@@ -83,9 +86,11 @@ static void add_timeperiod(
 static time_t string_to_time_t(std::string const& data) {
   tm t;
   memset(&t, 0, sizeof(t));
-  if (!strptime(data.c_str(), "%Y-%m-%d %H:%M:%S", &t))
+  char* ptr(strptime(data.c_str(), "%Y-%m-%d %H:%M:%S", &t));
+  if (!ptr)
     throw (engine_error() << "invalid date format");
   t.tm_isdst = -1; // Not set by strptime().
+  timezone_locker tzlock((*ptr == ' ') ? ptr + 1 : NULL);
   return (mktime(&t));
 }
 
@@ -134,6 +139,8 @@ static void parse_file(char const* filename, options& opt) {
       range.push_back(value);
     else if (key == "speday")
       range.push_back(value);
+    else if (key == "timezone")
+      opt.timezone = value;
     else if (key == "exclusion")
       exclude.push_back(value);
     else if (key == "timeperiod") {
@@ -177,7 +184,7 @@ int main_test(int argc, char** argv) {
       opt.preferred_time,
       &valid,
       opt.period.back(),
-      NULL);
+      opt.timezone.empty() ? NULL : opt.timezone.c_str());
 
     if (valid != opt.ref_time) {
       std::string ref_str(ctime(&opt.ref_time));
@@ -196,9 +203,17 @@ int main_test(int argc, char** argv) {
 }
 
 /**
- *  Init unit test.
+ *  @brief Init unit test.
+ *
+ *  The default timezone ":UTC" will be used.
+ *
+ *  @param[in] argc  Argument count.
+ *  @param[in] argv  Argument values.
+ *
+ *  @return 0 on success.
  */
 int main(int argc, char** argv) {
+  setenv("TZ", ":UTC", 1);
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
