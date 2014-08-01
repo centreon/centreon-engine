@@ -109,7 +109,7 @@ void applier::downtime::add_object(
                          new_start_time,
                          new_end_time,
                          obj->fixed(),
-                         obj->triggered_by(),
+                         0,
                          obj->duration(),
                          obj->recurring_interval(),
                          obj->recurring_period(),

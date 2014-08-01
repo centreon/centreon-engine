@@ -42,7 +42,6 @@ configuration::downtime::setters const configuration::downtime::_setters[] = {
   { "host_name",           SETTER(std::string const&, _set_host_name) },
   { "service_description", SETTER(std::string const&, _set_service_description) },
   { "start_time",          SETTER(time_t, _set_start_time) },
-  { "triggered_by",        SETTER(unsigned long, _set_triggered_by) },
   { "recurring_interval",  SETTER(unsigned long, _set_recurring_interval) },
   { "recurring_period",    SETTER(std::string const&, _set_recurring_period_name) }
 };
@@ -78,7 +77,6 @@ configuration::downtime::downtime(type_id downtime_type)
     _entry_time(0),
     _fixed(false),
     _start_time(0),
-    _triggered_by(0),
     _recurring_interval(0),
     _recurring_period(NULL) {}
 
@@ -118,7 +116,6 @@ configuration::downtime& configuration::downtime::operator=(downtime const& righ
     _host_name = right._host_name;
     _service_description = right._service_description;
     _start_time = right._start_time;
-    _triggered_by = right._triggered_by;
     _recurring_interval = right._recurring_interval;
     _recurring_period = right._recurring_period;
   }
@@ -145,7 +142,6 @@ bool configuration::downtime::operator==(downtime const& right) const throw () {
           && _host_name == right._host_name
           && _service_description == right._service_description
           && _start_time == right._start_time
-          && _triggered_by == right._triggered_by
           && _recurring_interval == right._recurring_interval
           && _recurring_period == right._recurring_period);
 }
@@ -189,8 +185,6 @@ bool configuration::downtime::operator<(downtime const& right) const throw () {
     return _service_description < right._service_description;
   else if (_start_time != right._start_time)
     return _start_time < right._start_time;
-  else if (_triggered_by != right._triggered_by)
-    return _triggered_by < right._triggered_by;
   else if (_recurring_interval != right._recurring_interval)
     return _recurring_interval < right._recurring_interval;
   else if (_recurring_period != right._recurring_period)
@@ -330,15 +324,6 @@ time_t configuration::downtime::start_time() const throw () {
 }
 
 /**
- * Get triggered_by.
- *
- * @return The triggered_by.
- */
-unsigned long configuration::downtime::triggered_by() const throw () {
- return (_triggered_by);
-}
-
-/**
  *  Get the recurring interval.
  *
  *  @return The recurring interval.
@@ -453,16 +438,6 @@ bool configuration::downtime::_set_service_description(std::string const& value)
  */
 bool configuration::downtime::_set_start_time(time_t value) {
   _start_time = value;
-  return (true);
-}
-
-/**
- *  Set triggered_by.
- *
- *  @param[in] value The new triggered_by.
- */
-bool configuration::downtime::_set_triggered_by(unsigned long value) {
-  _triggered_by = value;
   return (true);
 }
 

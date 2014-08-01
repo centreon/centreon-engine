@@ -43,7 +43,6 @@ namespace                configuration {
     std::string const&   host_name() const throw ();
     std::string const&   service_description() const throw ();
     time_t               start_time() const throw ();
-    unsigned long        triggered_by() const throw ();
     unsigned long        recurring_interval() const throw();
     ::timeperiod*        recurring_period() const throw();
     std::string const&   recurring_period_name() const throw();
@@ -67,7 +66,6 @@ namespace                configuration {
     bool                 _set_host_name(std::string const& value);
     bool                 _set_service_description(std::string const& value);
     bool                 _set_start_time(time_t value);
-    bool                 _set_triggered_by(unsigned long value);
     bool                 _set_recurring_interval(unsigned long value);
     bool                 _set_recurring_period_name(std::string const& value);
 
@@ -83,7 +81,6 @@ namespace                configuration {
     std::string          _service_description;
     static setters const _setters[];
     time_t               _start_time;
-    unsigned long        _triggered_by;
     unsigned long        _recurring_interval;
     ::timeperiod*        _recurring_period;
     std::string          _recurring_period_name;
