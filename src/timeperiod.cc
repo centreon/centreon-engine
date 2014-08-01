@@ -27,13 +27,9 @@
 #include "com/centreon/engine/objects/timerange.hh"
 #include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timezone_locker.hh"
-#include "com/centreon/engine/timezone_manager.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-// Global timezone manager.
-static timezone_manager* gl_tz_manager(NULL);
 
 // Static declarations.
 static void _get_next_valid_time_per_timeperiod(
@@ -731,7 +727,7 @@ int check_time_against_period(
     return (OK);
 
   // Set timezone.
-  timezone_locker tzlock(gl_tz_manager, tz);
+  timezone_locker tzlock(tz);
 
   // Faked next valid time must be tested time.
   time_t next_valid_time((time_t)-1);
@@ -1163,7 +1159,7 @@ void get_next_valid_time(
   // First check for possible timeperiod exclusions
   // before getting a valid_time.
   else {
-    timezone_locker tzlock(gl_tz_manager, tz);
+    timezone_locker tzlock(tz);
     *valid_time = 0;
     _get_next_valid_time_per_timeperiod(
       preferred_time,
@@ -1172,23 +1168,5 @@ void get_next_valid_time(
       tperiod);
   }
 
-  return ;
-}
-
-/**
- *  Initialize timeperiods.
- */
-void initialize_timeperiods() {
-  if (!gl_tz_manager)
-    gl_tz_manager = new timezone_manager;
-  return ;
-}
-
-/**
- *  Cleanup timeperiods.
- */
-void cleanup_timeperiods() {
-  delete gl_tz_manager;
-  gl_tz_manager = NULL;
   return ;
 }

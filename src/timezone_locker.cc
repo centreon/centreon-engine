@@ -25,18 +25,15 @@ using namespace com::centreon::engine;
 /**
  *  Constructor.
  *
- *  @param[in] manager  Timezone manager.
- *  @param[in] tz       Timezone to set during object lifetime.
+ *  @param[in] tz  Timezone to set during object lifetime.
  */
-timezone_locker::timezone_locker(
-                   timezone_manager* manager,
-                   char const* tz) : _manager(manager) {
-  _manager->push_timezone(tz);
+timezone_locker::timezone_locker(char const* tz) {
+  timezone_manager::instance().push_timezone(tz);
 }
 
 /**
  *  Destructor.
  */
 timezone_locker::~timezone_locker() {
-  _manager->pop_timezone();
+  timezone_manager::instance().pop_timezone();
 }

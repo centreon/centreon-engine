@@ -23,38 +23,16 @@
 
 using namespace com::centreon::engine;
 
-/**
- *  Default constructor.
- */
-timezone_manager::timezone_manager() {
-  _backup_timezone(&_base);
-}
+// Class instance.
+timezone_manager* timezone_manager::_instance(NULL);
 
 /**
- *  Copy constructor.
- *
- *  @param[in] other  Object to copy.
+ *  Load singleton.
  */
-timezone_manager::timezone_manager(timezone_manager const& other)
-  : _tz(other._tz) {}
-
-/**
- *  Destructor.
- */
-timezone_manager::~timezone_manager() {}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] other  Object to copy.
- *
- *  @return This object.
- */
-timezone_manager& timezone_manager::operator=(
-                                      timezone_manager const& other) {
-  if (this != &other)
-    _tz = other._tz;
-  return (*this);
+void timezone_manager::load() {
+  if (!_instance)
+    _instance = new timezone_manager;
+  return ;
 }
 
 /**
@@ -94,6 +72,49 @@ void timezone_manager::push_timezone(char const* tz) {
     _set_timezone(NULL);
 
   return ;
+}
+
+/**
+ *  Unload singleton.
+ */
+void timezone_manager::unload() {
+  delete _instance;
+  _instance = NULL;
+  return ;
+}
+
+/**
+ *  Default constructor.
+ */
+timezone_manager::timezone_manager() {
+  _backup_timezone(&_base);
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] other  Object to copy.
+ */
+timezone_manager::timezone_manager(timezone_manager const& other)
+  : _tz(other._tz) {}
+
+/**
+ *  Destructor.
+ */
+timezone_manager::~timezone_manager() {}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] other  Object to copy.
+ *
+ *  @return This object.
+ */
+timezone_manager& timezone_manager::operator=(
+                                      timezone_manager const& other) {
+  if (this != &other)
+    _tz = other._tz;
+  return (*this);
 }
 
 /**

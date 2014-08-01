@@ -33,26 +33,38 @@ CCE_BEGIN()
  *  This class handle timezone change. This can either be setting a new
  *  timezone or restoring a previous one.
  */
-class                 timezone_manager {
+class                      timezone_manager {
 public:
-                      timezone_manager();
-                      timezone_manager(timezone_manager const& other);
-                      ~timezone_manager();
-  timezone_manager&   operator=(timezone_manager const& other);
-  void                pop_timezone();
-  void                push_timezone(char const* tz);
+  static void              load();
+  void                     pop_timezone();
+  void                     push_timezone(char const* tz);
+  static void              unload();
+
+  /**
+   *  Get class instance.
+   *
+   *  @return Class instance.
+   */
+  static timezone_manager& instance() {
+    return (*_instance);
+  }
 
 private:
-  struct              tz_info {
-    bool              is_set;
-    std::string       tz_name;
+  struct                   tz_info {
+    bool                   is_set;
+    std::string            tz_name;
   };
 
-  void                _backup_timezone(tz_info* info);
-  void                _set_timezone(char const* tz);
+                           timezone_manager();
+                           timezone_manager(timezone_manager const& other);
+                           ~timezone_manager();
+  timezone_manager&        operator=(timezone_manager const& other);
+  void                     _backup_timezone(tz_info* info);
+  void                     _set_timezone(char const* tz);
 
-  tz_info             _base;
-  std::stack<tz_info> _tz;
+  tz_info                  _base;
+  static timezone_manager* _instance;
+  std::stack<tz_info>      _tz;
 };
 
 CCE_END()

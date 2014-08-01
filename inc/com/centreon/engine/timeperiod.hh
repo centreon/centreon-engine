@@ -34,8 +34,6 @@ void get_next_valid_time(
        time_t* valid_time,
        timeperiod* tperiod,
        char const* tz);
-void initialize_timeperiods();
-void cleanup_timeperiods();
 
 #  ifdef __cplusplus
 }

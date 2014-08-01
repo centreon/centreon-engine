@@ -24,9 +24,6 @@
 
 CCE_BEGIN()
 
-// Forward declaration.
-class timezone_manager;
-
 /**
  *  @class timezone_locker timezone_locker.hh "com/centreon/engine/timezone_locker.hh"
  *  @brief Handle timezone changes, even in case of exception.
@@ -36,16 +33,12 @@ class timezone_manager;
  */
 class                 timezone_locker {
 public:
-                      timezone_locker(
-                        timezone_manager* manager,
-                        char const* tz);
+                      timezone_locker(char const* tz);
                       ~timezone_locker();
 
 private:
                       timezone_locker(timezone_locker const& other);
   timezone_locker&    operator=(timezone_locker const& other);
-
-  timezone_manager*   _manager;
 };
 
 CCE_END()
