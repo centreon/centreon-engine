@@ -34,7 +34,6 @@ namespace                configuration {
 
     std::string const&   author() const throw ();
     std::string const&   comment_data() const throw ();
-    unsigned long        downtime_id() const throw ();
     type_id              downtime_type() const throw ();
     unsigned long        duration() const throw ();
     time_t               end_time() const throw ();
@@ -58,7 +57,6 @@ namespace                configuration {
 
     bool                 _set_author(std::string const& value);
     bool                 _set_comment_data(std::string const& value);
-    bool                 _set_downtime_id(unsigned long value);
     bool                 _set_duration(unsigned long value);
     bool                 _set_end_time(time_t value);
     bool                 _set_entry_time(time_t value);
@@ -71,7 +69,6 @@ namespace                configuration {
 
     std::string          _author;
     std::string          _comment_data;
-    unsigned long        _downtime_id;
     type_id              _downtime_type;
     unsigned long        _duration;
     time_t               _end_time;

@@ -34,7 +34,6 @@ using namespace com::centreon::engine;
 configuration::downtime::setters const configuration::downtime::_setters[] = {
   { "author",              SETTER(std::string const&, _set_author) },
   { "comment",             SETTER(std::string const&, _set_comment_data) },
-  { "downtime_id",         SETTER(unsigned long, _set_downtime_id) },
   { "duration",            SETTER(unsigned long, _set_duration) },
   { "end_time",            SETTER(time_t, _set_end_time) },
   { "entry_time",          SETTER(time_t, _set_entry_time) },
@@ -70,7 +69,6 @@ bool configuration::downtime::parse(char const* key, char const* value) {
  */
 configuration::downtime::downtime(type_id downtime_type)
   : object(object::downtime),
-    _downtime_id(0),
     _downtime_type(downtime_type),
     _duration(0),
     _end_time(0),
@@ -107,7 +105,6 @@ configuration::downtime& configuration::downtime::operator=(downtime const& righ
     object::operator=(right);
     _author = right._author;
     _comment_data = right._comment_data;
-    _downtime_id = right._downtime_id;
     _downtime_type = right._downtime_type;
     _duration = right._duration;
     _end_time = right._end_time;
@@ -133,7 +130,6 @@ bool configuration::downtime::operator==(downtime const& right) const throw () {
   return (object::operator==(right)
           && _author == right._author
           && _comment_data == right._comment_data
-          && _downtime_id == right._downtime_id
           && _downtime_type == right._downtime_type
           && _duration == right._duration
           && _end_time == right._end_time
@@ -169,8 +165,6 @@ bool configuration::downtime::operator<(downtime const& right) const throw () {
     return _author < right._author;
   else if (_comment_data != right._comment_data)
     return _comment_data < right._comment_data;
-  else if (_downtime_id != right._downtime_id)
-    return _downtime_id < right._downtime_id;
   else if (_duration != right._duration)
     return _duration < right._duration;
   else if (_end_time != right._end_time)
@@ -240,15 +234,6 @@ std::string const& configuration::downtime::author() const throw () {
  */
 std::string const& configuration::downtime::comment_data() const throw () {
  return (_comment_data);
-}
-
-/**
- * Get downtime_id.
- *
- * @return The downtime_id.
- */
-unsigned long configuration::downtime::downtime_id() const throw () {
- return (_downtime_id);
 }
 
 /**
@@ -358,16 +343,6 @@ bool configuration::downtime::_set_author(std::string const& value) {
  */
 bool configuration::downtime::_set_comment_data(std::string const& value) {
   _comment_data = value;
-  return (true);
-}
-
-/**
- *  Set downtime_id.
- *
- *  @param[in] value The new downtime_id.
- */
-bool configuration::downtime::_set_downtime_id(unsigned long value) {
-  _downtime_id = value;
   return (true);
 }
 

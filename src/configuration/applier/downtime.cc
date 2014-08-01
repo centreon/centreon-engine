@@ -143,8 +143,7 @@ void applier::downtime::expand_object(
  */
 void applier::downtime::modify_object(
     shared_ptr<configuration::downtime> obj) {
-  throw (engine_error() << "A recurring downtime should never be modified: id'"
-       << (int)obj->downtime_id() << "'");
+  throw (engine_error() << "A recurring downtime should never be modified.");
   return ;
 }
 
@@ -162,7 +161,7 @@ void applier::downtime::remove_object(
 
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing recurring downtime '" << obj->downtime_id() << "'.";
+    << "Removing recurring downtime.";
 
   // Delete all the recurring downtimes which can be uniquely attributed
   // to this downtime.
@@ -207,8 +206,7 @@ void applier::downtime::resolve_object(
   // Check if the recurring period exists.
   ::timeperiod* old_period = obj->recurring_period();
   if (obj->resolve_recurring_period() == false) {
-    throw (engine_error() << "Cannot resolve downtime '"
-           << (int)obj->downtime_id() << "'");
+    throw (engine_error() << "Cannot resolve downtime.");
   }
 
   // A timeperiod pointer has suddenly changed! It can only happen
