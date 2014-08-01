@@ -192,3 +192,21 @@ bool engine::is_timeperiod_exist(std::string const& name) throw () {
     it(state::instance().timeperiods().find(name));
   return (it != state::instance().timeperiods().end());
 }
+
+/**
+ *  Check if a given timeperiod exists.
+ *
+ *  @param[in] tentative_period The timeperiod to check.
+ *
+ *  @return True if the timeperiod exists.
+ */
+bool engine::timeperiod_exists(timeperiod* tentative_period) throw() {
+  umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+      it(state::instance().timeperiods().begin());
+  for (umap<std::string, shared_ptr<timeperiod_struct> >::const_iterator
+       end(state::instance().timeperiods().end()); it != end; ++it) {
+    if (it->second.get() == tentative_period)
+      return (true);
+  }
+  return (false);
+}

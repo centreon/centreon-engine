@@ -1758,13 +1758,11 @@ int check_downtime(scheduled_downtime *dw, int* w, int* e) {
     << "check_downtime() '";
 
   // Check for the existence of the recurring time period.
-  if (dw->recurring_period_name) {
-    timeperiod* period = find_timeperiod(dw->recurring_period_name);
-    if (period == NULL) {
+  if (dw->recurring_period) {
+    if (!timeperiod_exists(dw->recurring_period)) {
       logger(log_verification_error, basic)
-        << "Error: recurring time period '"
-        << dw->recurring_period_name
-        << "' specified in recurring downtime "
+        << "Error: recurring time period "
+        << "specified in recurring downtime "
         << "is not defined anywhere!";
       ++errors;
     }

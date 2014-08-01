@@ -62,6 +62,7 @@ CCE_BEGIN()
 
 timeperiod&   find_timperiod(std::string const& name);
 bool          is_timeperiod_exist(std::string const& name) throw ();
+bool          timeperiod_exists(timeperiod* tentative_period) throw();
 
 CCE_END()
 

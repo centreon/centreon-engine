@@ -1459,9 +1459,6 @@ int add_downtime(
   new_downtime->downtime_id = downtime_id;
   new_downtime->recurring_interval = recurring_interval;
   new_downtime->recurring_period = recurring_period;
-  new_downtime->recurring_period_name = recurring_period ?
-        string::dup(recurring_period->name) :
-        NULL;
 
   if (defer_downtime_sorting) {
     new_downtime->next = scheduled_downtime_list;
