@@ -40,6 +40,8 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
+class exception_success : public std::exception {};
+
 void check_downtimes_and_terminate() {
   unsigned int num_downtimes(0);
   for (scheduled_downtime* temp_downtime = scheduled_downtime_list;
@@ -54,9 +56,7 @@ void check_downtimes_and_terminate() {
   if (num_downtimes != 3)
     throw (engine_error() << "downtime not recurring: invalid number of "
                           << "downtimes (got " << num_downtimes << ").");
-
-  throw (engine_error() << "downtime not recurring.");
-  kill(getpid(), SIGTERM);
+  throw (exception_success());
 }
 
 /**
@@ -118,6 +118,9 @@ int main_test(int argc, char** argv) {
 
     com::centreon::engine::events::loop::instance().run();
 
+  }
+  catch (exception_success) {
+    return (0);
   }
   catch (...) {
     free_memory(get_global_macros());
