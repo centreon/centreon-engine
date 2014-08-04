@@ -50,6 +50,7 @@ void init_host_and_service(host*& hst, service*& svc) {
                              0, 0, 0);
   if (!svc)
     throw (engine_error() << "create service failed.");
+  svc->host_ptr = hst;
 
   timeperiod* tperiod = add_timeperiod("tperiod", "alias");
   if (!tperiod)
@@ -108,12 +109,12 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  /*host* hst;
+  host* hst;
   service* svc;
 
   init_host_and_service(hst, svc);
   check_host_escalation(hst);
-  check_service_escalation(svc);*/
+  check_service_escalation(svc);
 
   return (0);
 }
