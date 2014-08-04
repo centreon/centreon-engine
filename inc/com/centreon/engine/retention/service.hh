@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -93,7 +93,6 @@ namespace                         retention {
     opt<std::string> const&       performance_data() const throw ();
     opt<std::string> const&       plugin_output() const throw ();
     opt<bool> const&              problem_has_been_acknowledged() const throw ();
-    opt<int> const&               process_performance_data() const throw ();
     opt<unsigned int> const&      retry_check_interval() const throw ();
     std::string const&            service_description() const throw ();
     opt<std::vector<int> > const& state_history() const throw ();
@@ -213,7 +212,6 @@ namespace                         retention {
     opt<std::string>              _performance_data;
     opt<std::string>              _plugin_output;
     opt<bool>                     _problem_has_been_acknowledged;
-    opt<int>                      _process_performance_data;
     opt<unsigned int>             _retry_check_interval;
     std::string                   _service_description;
     static setters const          _setters[];
@@ -228,4 +226,3 @@ namespace                         retention {
 CCE_END()
 
 #endif // !CCE_RETENTION_SERVICE_HH
-

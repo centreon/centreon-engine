@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -60,7 +60,6 @@ namespace                     retention {
     opt<bool> const&          obsess_over_services() const throw ();
     opt<bool> const&          passive_host_checks_enabled() const throw ();
     opt<bool> const&          passive_service_checks_enabled() const throw ();
-    opt<bool> const&          process_performance_data() const throw ();
 
   private:
     struct                    setters {
@@ -112,7 +111,6 @@ namespace                     retention {
     opt<bool>                 _obsess_over_services;
     opt<bool>                 _passive_host_checks_enabled;
     opt<bool>                 _passive_service_checks_enabled;
-    opt<bool>                 _process_performance_data;
     static setters const      _setters[];
   };
 
@@ -122,4 +120,3 @@ namespace                     retention {
 CCE_END()
 
 #endif // !CCE_RETENTION_PROGRAM_HH
-

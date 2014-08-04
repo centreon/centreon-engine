@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -102,7 +102,6 @@ namespace                  configuration {
     bool                   obsess_over_host() const throw ();
     list_string&           parents() throw ();
     list_string const&     parents() const throw ();
-    bool                   process_perf_data() const throw ();
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
@@ -199,7 +198,6 @@ namespace                  configuration {
     std::string            _notification_period;
     opt<bool>              _obsess_over_host;
     group                  _parents;
-    opt<bool>              _process_perf_data;
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
@@ -217,4 +215,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOST_HH
-

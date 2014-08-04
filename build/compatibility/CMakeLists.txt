@@ -61,7 +61,6 @@ set(
   "${INC_DIR}/nebstructs.h"
   "${INC_DIR}/netutils.h"
   "${INC_DIR}/objects.h"
-  "${INC_DIR}/perfdata.h"
   "${INC_DIR}/shared.h"
   "${INC_DIR}/sighandlers.h"
   "${INC_DIR}/skiplist.h"
@@ -70,7 +69,6 @@ set(
   "${INC_DIR}/xcddefault.h"
   "${INC_DIR}/xdddefault.h"
   "${INC_DIR}/xodtemplate.h"
-  "${INC_DIR}/xpddefault.h"
   "${INC_DIR}/xrddefault.h"
   "${INC_DIR}/xsddefault.h"
 

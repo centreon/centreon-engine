@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -109,7 +109,6 @@ namespace                  configuration {
     std::string const&     notification_period() const throw ();
     bool                   notification_period_defined() const throw ();
     bool                   obsess_over_service() const throw ();
-    bool                   process_perf_data() const throw ();
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
@@ -202,7 +201,6 @@ namespace                  configuration {
     opt<unsigned short>    _notification_options;
     opt<std::string>       _notification_period;
     opt<bool>              _obsess_over_service;
-    opt<bool>              _process_perf_data;
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;

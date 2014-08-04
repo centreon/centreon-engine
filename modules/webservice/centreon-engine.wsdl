@@ -762,13 +762,6 @@
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- getPerfdataProcessingEnabled() -->
-    <operation name="getPerfdataProcessingEnabled">
-      <documentation>Check if performance data processing is enabled.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:booleanResponse"/>
-    </operation>
-
     <!-- getServicesChecksActiveEnabled() -->
     <operation name="getServicesChecksActiveEnabled">
       <documentation>Check if services active checks are enabled.</documentation>
@@ -863,13 +856,6 @@
     <!-- setNotificationsEnabled(enable) -->
     <operation name="setNotificationsEnabled">
       <documentation>Enable or disable notifications globally.</documentation>
-      <input message="tns:booleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setPerfdataProcessingEnabled(enable) -->
-    <operation name="setPerfdataProcessingEnabled">
-      <documentation>Enable or disable performance data processing globally.</documentation>
       <input message="tns:booleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -2029,24 +2015,6 @@
     </operation>
 
     <!--
-	 Perfdata.
-     -->
-
-    <!-- hostGetPerfdataProcessingEnabled(host) -->
-    <operation name="hostGetPerfdataProcessingEnabled">
-      <documentation>Check if perfdata processing is enabled on host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:booleanResponse"/>
-    </operation>
-
-    <!-- hostSetPerfdataProcessingEnabled(host, enable) -->
-    <operation name="hostSetPerfdataProcessingEnabled">
-      <documentation>Enable or disable perfdata processing.</documentation>
-      <input message="tns:hostBooleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
 	 Plugin.
      -->
 
@@ -2919,24 +2887,6 @@
     </operation>
 
     <!--
-	 Perfdata.
-     -->
-
-    <!-- serviceGetPerfdataProcessingEnabled(service) -->
-    <operation name="serviceGetPerfdataProcessingEnabled">
-      <documentation>Check if perfdata processing is enabled on service.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:booleanResponse"/>
-    </operation>
-
-    <!-- serviceSetPerfdataProcessingEnabled(service, enable) -->
-    <operation name="serviceSetPerfdataProcessingEnabled">
-      <documentation>Enable or disable perfdata processing.</documentation>
-      <input message="tns:serviceBooleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
 	 Plugin.
      -->
 
@@ -3669,12 +3619,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="getPerfdataProcessingEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="getServicesChecksActiveEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -3754,12 +3698,6 @@
     </operation>
 
     <operation name="setNotificationsEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setPerfdataProcessingEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4661,18 +4599,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetPerfdataProcessingEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostSetPerfdataProcessingEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="hostGetPluginExecutionTime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5353,18 +5279,6 @@
     </operation>
 
     <operation name="serviceSetObsessOver">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceGetPerfdataProcessingEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceSetPerfdataProcessingEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

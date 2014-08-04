@@ -131,7 +131,6 @@ void applier::host::add_object(
                           & configuration::host::down),
         static_cast<bool>(obj->stalking_options()
                           & configuration::host::unreachable),
-        obj->process_perf_data(),
         true, // failure_prediction_enabled, enabled by Nagios
         NULL, // failure_prediction_options
         obj->check_freshness(),
@@ -381,9 +380,6 @@ void applier::host::modify_object(
     h->stalk_on_unreachable,
     static_cast<int>(static_cast<bool>(
       obj->stalking_options() & configuration::host::unreachable)));
-  modify_if_different(
-    h->process_performance_data,
-    static_cast<int>(obj->process_perf_data()));
   modify_if_different(
     h->check_freshness,
     static_cast<int>(obj->check_freshness()));

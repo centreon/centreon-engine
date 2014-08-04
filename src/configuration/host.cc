@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -78,13 +78,15 @@ host::setters const host::_setters[] = {
   { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
   { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+
+  // Deprecated.
+  { "process_perf_data",            SETTER(bool, _set_process_perf_data) }
 };
 
 // XXX: check all default value from xodtemplate_inherit_object_properties !
@@ -108,7 +110,6 @@ static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
 static unsigned short const default_notification_options(host::up | host::down | host::unreachable | host::flapping | host::downtime);
 static bool const           default_obsess_over_host(true);
-static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
@@ -139,7 +140,6 @@ host::host(key_type const& key)
     _notification_interval(default_notification_interval),
     _notification_options(default_notification_options),
     _obsess_over_host(default_obsess_over_host),
-    _process_perf_data(default_process_perf_data),
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
@@ -207,7 +207,6 @@ host& host::operator=(host const& right) {
     _notification_period = right._notification_period;
     _obsess_over_host = right._obsess_over_host;
     _parents = right._parents;
-    _process_perf_data = right._process_perf_data;
     _retain_nonstatus_information = right._retain_nonstatus_information;
     _retain_status_information = right._retain_status_information;
     _retry_interval = right._retry_interval;
@@ -264,7 +263,6 @@ bool host::operator==(host const& right) const throw () {
           && _notification_period == right._notification_period
           && _obsess_over_host == right._obsess_over_host
           && _parents == right._parents
-          && _process_perf_data == right._process_perf_data
           && _retain_nonstatus_information == right._retain_nonstatus_information
           && _retain_status_information == right._retain_status_information
           && _retry_interval == right._retry_interval
@@ -368,8 +366,6 @@ bool host::operator<(host const& right) const throw () {
     return (_obsess_over_host < right._obsess_over_host);
   else if (_parents != right._parents)
     return (_parents < right._parents);
-  else if (_process_perf_data != right._process_perf_data)
-    return (_process_perf_data < right._process_perf_data);
   else if (_retain_nonstatus_information
            != right._retain_nonstatus_information)
     return (_retain_nonstatus_information
@@ -475,7 +471,6 @@ void host::merge(object const& obj) {
   MRG_DEFAULT(_notification_period);
   MRG_OPTION(_obsess_over_host);
   MRG_INHERIT(_parents);
-  MRG_OPTION(_process_perf_data);
   MRG_OPTION(_retain_nonstatus_information);
   MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
@@ -872,15 +867,6 @@ list_string& host::parents() throw () {
  */
 list_string const& host::parents() const throw () {
   return (*_parents);
-}
-
-/**
- *  Get process_perf_data.
- *
- *  @return The process_perf_data.
- */
-bool host::process_perf_data() const throw () {
-  return (_process_perf_data);
 }
 
 /**
@@ -1496,14 +1482,17 @@ bool host::_set_parents(std::string const& value) {
 }
 
 /**
- *  Set process_perf_data value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new process_perf_data value.
+ *  @param[in] value  Unused.
  *
  *  @return True on success, otherwise false.
  */
 bool host::_set_process_perf_data(bool value) {
-  _process_perf_data = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host process_perf_data was ignored";
+  ++config_warnings;
   return (true);
 }
 

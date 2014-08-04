@@ -82,7 +82,6 @@ extern "C" {
   extern nebmodule* neb_module_list;
   extern int obsess_over_hosts;
   extern int obsess_over_services;
-  extern int process_performance_data;
   extern time_t program_start;
   extern sched_info* scheduling_info;
   extern int service_check_timeout;
@@ -218,8 +217,8 @@ extern "C" {
       << (void (*)())neb_register_callback << "\n"
       << "neb_set_module_info: "
       << (void (*)())neb_set_module_info << "\n"
-      << "process_performance_data: "
-      << process_performance_data << "\n"
+      //<< "process_performance_data: "
+      //<< process_performance_data << "\n"
       << "schedule_new_event: "
       << (void (*)())schedule_new_event << "\n"
       << "strip: "
@@ -273,8 +272,8 @@ extern "C" {
       << (void (*)())neb_set_module_info << "\n"
       << "process_macros: "
       << (void (*)())process_macros << "\n"
-      << "process_performance_data: "
-      << process_performance_data << "\n"
+      //<< "process_performance_data: "
+      //<< process_performance_data << "\n"
       << "service_check_timeout: "
       << service_check_timeout << "\n"
       << "write_to_all_logs: "

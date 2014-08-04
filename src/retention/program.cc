@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,6 +47,8 @@ program::setters const program::_setters[] = {
   { "obsess_over_services",           SETTER(bool, _set_obsess_over_services) },
   { "passive_host_checks_enabled",    SETTER(bool, _set_passive_host_checks_enabled) },
   { "passive_service_checks_enabled", SETTER(bool, _set_passive_service_checks_enabled) },
+
+  // Deprecated.
   { "process_performance_data",       SETTER(bool, _set_process_performance_data) }
 };
 
@@ -101,7 +103,6 @@ program& program::operator=(program const& right) {
     _obsess_over_services = right._obsess_over_services;
     _passive_host_checks_enabled = right._passive_host_checks_enabled;
     _passive_service_checks_enabled = right._passive_service_checks_enabled;
-    _process_performance_data = right._process_performance_data;
   }
   return (*this);
 }
@@ -135,8 +136,7 @@ bool program::operator==(program const& right) const throw () {
           && _obsess_over_hosts == right._obsess_over_hosts
           && _obsess_over_services == right._obsess_over_services
           && _passive_host_checks_enabled == right._passive_host_checks_enabled
-          && _passive_service_checks_enabled == right._passive_service_checks_enabled
-          && _process_performance_data == right._process_performance_data);
+          && _passive_service_checks_enabled == right._passive_service_checks_enabled);
 }
 
 /**
@@ -357,15 +357,6 @@ opt<bool> const& program::passive_service_checks_enabled() const throw () {
 }
 
 /**
- *  Get process_performance_data.
- *
- *  @return The process_performance_data.
- */
-opt<bool> const& program::process_performance_data() const throw () {
-  return (_process_performance_data);
-}
-
-/**
  *  Set active_host_checks_enabled.
  *
  *  @param[in] value The new active_host_checks_enabled.
@@ -576,11 +567,11 @@ bool program::_set_passive_service_checks_enabled(bool value) {
 }
 
 /**
- *  Set process_performance_data.
+ *  Deprecated variable.
  *
- *  @param[in] value The new process_performance_data.
+ *  @param[in] value  Unused.
  */
 bool program::_set_process_performance_data(bool value) {
-  _process_performance_data = value;
+  (void)value;
   return (true);
 }

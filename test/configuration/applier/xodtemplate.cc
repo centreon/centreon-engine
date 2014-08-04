@@ -911,7 +911,6 @@ int xodtemplate_begin_object_definition(
     new_service->flap_detection_on_critical = true;
     new_service->notifications_enabled = true;
     new_service->notification_interval = 30.0;
-    new_service->process_perf_data = true;
     new_service->failure_prediction_enabled = true;
     new_service->retain_status_information = true;
     new_service->retain_nonstatus_information = true;
@@ -936,7 +935,6 @@ int xodtemplate_begin_object_definition(
     new_host->flap_detection_on_unreachable = true;
     new_host->notifications_enabled = true;
     new_host->notification_interval = 30.0;
-    new_host->process_perf_data = true;
     new_host->failure_prediction_enabled = true;
     new_host->x_2d = -1;
     new_host->y_2d = -1;
@@ -1457,10 +1455,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       }
       temp_service->have_stalking_options = true;
     }
-    else if (!strcmp(variable, "process_perf_data")) {
-      temp_service->process_perf_data = (atoi(value) > 0) ? true : false;
-      temp_service->have_process_perf_data = true;
-    }
     else if (!strcmp(variable, "failure_prediction_enabled")) {
       temp_service->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
       temp_service->have_failure_prediction_enabled = true;
@@ -1836,10 +1830,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
       temp_host->have_stalking_options = true;
-    }
-    else if (!strcmp(variable, "process_perf_data")) {
-      temp_host->process_perf_data = (atoi(value) > 0) ? true : false;
-      temp_host->have_process_perf_data = true;
     }
     else if (!strcmp(variable, "failure_prediction_enabled")) {
       temp_host->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
@@ -5953,8 +5943,6 @@ int xodtemplate_duplicate_service(
   new_service->stalk_on_warning = temp_service->stalk_on_warning;
   new_service->stalk_on_critical = temp_service->stalk_on_critical;
   new_service->have_stalking_options = temp_service->have_stalking_options;
-  new_service->process_perf_data = temp_service->process_perf_data;
-  new_service->have_process_perf_data = temp_service->have_process_perf_data;
   new_service->failure_prediction_enabled = temp_service->failure_prediction_enabled;
   new_service->have_failure_prediction_enabled = temp_service->have_failure_prediction_enabled;
   new_service->retain_status_information = temp_service->retain_status_information;
@@ -7934,11 +7922,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         = template_host->stalk_on_unreachable;
       this_host->have_stalking_options = true;
     }
-    if (this_host->have_process_perf_data == false
-        && template_host->have_process_perf_data == true) {
-      this_host->process_perf_data = template_host->process_perf_data;
-      this_host->have_process_perf_data = true;
-    }
     if (this_host->have_failure_prediction_enabled == false
         && template_host->have_failure_prediction_enabled == true) {
       this_host->failure_prediction_enabled
@@ -8313,12 +8296,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->stalk_on_critical
         = template_service->stalk_on_critical;
       this_service->have_stalking_options = true;
-    }
-    if (this_service->have_process_perf_data == false
-        && template_service->have_process_perf_data == true) {
-      this_service->process_perf_data
-        = template_service->process_perf_data;
-      this_service->have_process_perf_data = true;
     }
     if (this_service->have_failure_prediction_enabled == false
         && template_service->have_failure_prediction_enabled == true) {
@@ -10844,7 +10821,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->stalk_on_up,
                this_host->stalk_on_down,
                this_host->stalk_on_unreachable,
-               this_host->process_perf_data,
                this_host->failure_prediction_enabled,
                this_host->failure_prediction_options,
                this_host->check_freshness,
@@ -11008,7 +10984,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->stalk_on_warning,
                   this_service->stalk_on_unknown,
                   this_service->stalk_on_critical,
-                  this_service->process_perf_data,
                   this_service->failure_prediction_enabled,
                   this_service->failure_prediction_options,
                   this_service->check_freshness,
@@ -12779,7 +12754,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
-    fprintf(fp, "\tprocess_perf_data\t%d\n", temp_host->process_perf_data);
     fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_host->failure_prediction_enabled);
     if (temp_host->icon_image)
       fprintf(fp, "\ticon_image\t%s\n", temp_host->icon_image);
@@ -12917,7 +12891,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
-    fprintf(fp, "\tprocess_perf_data\t%d\n", temp_service->process_perf_data);
     fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_service->failure_prediction_enabled);
     if (temp_service->icon_image)
       fprintf(fp, "\ticon_image\t%s\n", temp_service->icon_image);
@@ -17328,9 +17301,6 @@ int read_main_config_file(char const* main_config_file) {
         break;
       }
     }
-
-    else if(!strcmp(variable,"process_performance_data"))
-      process_performance_data=(atoi(value)>0)?true:false;
 
     else if(!strcmp(variable,"enable_flap_detection"))
       enable_flap_detection=(atoi(value)>0)?true:false;

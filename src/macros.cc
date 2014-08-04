@@ -1067,8 +1067,6 @@ int init_macrox_names() {
   add_macrox_name(LOGFILE);
   add_macrox_name(RESOURCEFILE);
   add_macrox_name(COMMANDFILE);
-  add_macrox_name(HOSTPERFDATAFILE);
-  add_macrox_name(SERVICEPERFDATAFILE);
   add_macrox_name(HOSTACTIONURL);
   add_macrox_name(HOSTNOTESURL);
   add_macrox_name(HOSTNOTES);
@@ -1195,8 +1193,6 @@ void copy_constant_macros(char** dest) {
   cp_macro(LOGFILE);
   cp_macro(RESOURCEFILE);
   cp_macro(COMMANDFILE);
-  cp_macro(HOSTPERFDATAFILE);
-  cp_macro(SERVICEPERFDATAFILE);
   cp_macro(PROCESSSTARTTIME);
   cp_macro(EVENTSTARTTIME);
   return;
@@ -1219,8 +1215,6 @@ int clear_volatile_macros_r(nagios_macros* mac) {
     case MACRO_LOGFILE:
     case MACRO_RESOURCEFILE:
     case MACRO_COMMANDFILE:
-    case MACRO_HOSTPERFDATAFILE:
-    case MACRO_SERVICEPERFDATAFILE:
     case MACRO_PROCESSSTARTTIME:
     case MACRO_EVENTSTARTTIME:
       /* these don't change during the course of monitoring, so no need to free them */

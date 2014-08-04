@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -42,7 +42,7 @@ static int check_schedule_host_check(int argc, char** argv) {
   // Create target host.
   host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
                      42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
-                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL,
                      0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
                      0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
   if (!hst)

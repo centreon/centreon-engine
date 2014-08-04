@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -267,7 +267,6 @@ typedef struct xodtemplate_host_struct{
   int          stalk_on_up;
   int          stalk_on_down;
   int          stalk_on_unreachable;
-  int          process_perf_data;
   int          failure_prediction_enabled;
   char*        failure_prediction_options;
   char*        notes;
@@ -323,7 +322,6 @@ typedef struct xodtemplate_host_struct{
   int          have_notification_interval;
   int          have_first_notification_delay;
   int          have_stalking_options;
-  int          have_process_perf_data;
   int          have_failure_prediction_enabled;
   int          have_2d_coords;
   int          have_3d_coords;
@@ -413,7 +411,6 @@ typedef struct xodtemplate_service_struct{
   int          stalk_on_unknown;
   int          stalk_on_warning;
   int          stalk_on_critical;
-  int          process_perf_data;
   int          failure_prediction_enabled;
   char*        failure_prediction_options;
   char*        notes;
@@ -466,7 +463,6 @@ typedef struct xodtemplate_service_struct{
   int          have_notification_interval;
   int          have_first_notification_delay;
   int          have_stalking_options;
-  int          have_process_perf_data;
   int          have_failure_prediction_enabled;
   int          have_retain_status_information;
   int          have_retain_nonstatus_information;
@@ -1179,5 +1175,3 @@ int xodtemplate_skiplist_compare_serviceescalation(
 #  endif
 
 #endif // !CCE_XODTEMPLATE_HH
-
-

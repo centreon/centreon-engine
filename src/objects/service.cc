@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -84,7 +84,6 @@ bool operator==(
           && obj1.flap_detection_on_warning == obj2.flap_detection_on_warning
           && obj1.flap_detection_on_unknown == obj2.flap_detection_on_unknown
           && obj1.flap_detection_on_critical == obj2.flap_detection_on_critical
-          && obj1.process_performance_data == obj2.process_performance_data
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
           && obj1.accept_passive_service_checks == obj2.accept_passive_service_checks
@@ -231,7 +230,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  flap_detection_on_warning:            " << obj.flap_detection_on_warning << "\n"
     "  flap_detection_on_unknown:            " << obj.flap_detection_on_unknown << "\n"
     "  flap_detection_on_critical:           " << obj.flap_detection_on_critical << "\n"
-    "  process_performance_data:             " << obj.process_performance_data << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
     "  accept_passive_service_checks:        " << obj.accept_passive_service_checks << "\n"
@@ -372,9 +370,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] stalk_on_warning             Stalk on warning state ?
  *  @param[in] stalk_on_unknown             Stalk on unknown state ?
  *  @param[in] stalk_on_critical            Stalk on critical state ?
- *  @param[in] process_perfdata             Whether or not service
- *                                          performance data should be
- *                                          processed.
  *  @param[in] failure_prediction_enabled   Whether failure prediction
  *                                          should be enabled or not.
  *  @param[in] failure_prediction_options   Failure prediction options.
@@ -431,7 +426,6 @@ service* add_service(
            int stalk_on_warning,
            int stalk_on_unknown,
            int stalk_on_critical,
-           int process_perfdata,
            int failure_prediction_enabled,
            char const* failure_prediction_options,
            int check_freshness,
@@ -556,7 +550,6 @@ service* add_service(
     obj->notify_on_warning = (notify_warning > 0);
     obj->obsess_over_service = (obsess_over_service > 0);
     obj->parallelize = (parallelize > 0);
-    obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;

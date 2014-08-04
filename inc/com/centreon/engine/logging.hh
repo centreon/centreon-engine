@@ -71,7 +71,6 @@
 #  define DEBUGL_IPC                 16
 #  define DEBUGL_FLAPPING            16
 #  define DEBUGL_EVENTHANDLERS       16
-#  define DEBUGL_PERFDATA            16
 #  define DEBUGL_NOTIFICATIONS       32
 #  define DEBUGL_EVENTBROKER         64
 #  define DEBUGL_EXTERNALCOMMANDS    128

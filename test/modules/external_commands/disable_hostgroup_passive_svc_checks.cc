@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,7 +35,7 @@ static int check_disable_hostgroup_passive_svc_checks(int argc, char** argv) {
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
+                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
                        NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
                        0.0, 0, 0, 0, 0, 0);
   if (!hst)
@@ -44,7 +44,7 @@ static int check_disable_hostgroup_passive_svc_checks(int argc, char** argv) {
   service* svc = add_service("name", "description", NULL,
                              NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
                              0, 0, NULL, NULL, NULL, NULL, NULL,
                              0, 0, 0);
   if (!svc)

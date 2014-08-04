@@ -466,7 +466,6 @@ typedef struct   nebstruct_program_status_struct {
   int            event_handlers_enabled;
   int            flap_detection_enabled;
   int            failure_prediction_enabled;
-  int            process_performance_data;
   int            obsess_over_hosts;
   int            obsess_over_services;
   unsigned long  modified_host_attributes;

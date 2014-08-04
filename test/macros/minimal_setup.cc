@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -64,7 +64,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Stalk on ok
     0,                              // Stalk on down
     0,                              // Stalk on unreachable
-    0,                              // Process perfdata
     0,                              // Failure prediction enabled
     NULL,                           // Failure prediction options
     0,                              // Check freshness
@@ -131,7 +130,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Stalk on warning
     0,                              // Stalk on unknown
     0,                              // Stalk on critical
-    0,                              // Process perfdata
     0,                              // Failure prediction enabled
     NULL,                           // Failure prediction options
     0,                              // Check freshness

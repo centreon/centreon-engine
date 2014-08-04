@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -98,10 +98,6 @@ void applier::program::apply(
     if (obj.enable_failure_prediction().is_set()
         && (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED))
       enable_failure_prediction = *obj.enable_failure_prediction();
-
-    if (obj.process_performance_data().is_set()
-        && (modified_host_process_attributes & MODATTR_PERFORMANCE_DATA_ENABLED))
-      process_performance_data = *obj.process_performance_data();
 
     if (obj.global_host_event_handler().is_set()
         && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)

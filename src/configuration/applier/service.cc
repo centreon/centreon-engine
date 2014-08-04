@@ -163,7 +163,6 @@ void applier::service::add_object(
                       &configuration::service::unknown),
     static_cast<bool>(obj->stalking_options()
                       &configuration::service::critical),
-    obj->process_perf_data(),
     true, // failure_prediction_enabled, enabled by default in Nagios
     NULL, // failure_prediction_options
     obj->check_freshness(),
@@ -453,9 +452,6 @@ void applier::service::modify_object(
     s->flap_detection_on_critical,
     static_cast<int>(static_cast<bool>(
       obj->flap_detection_options() & configuration::service::critical)));
-  modify_if_different(
-    s->process_performance_data,
-    static_cast<int>(obj->process_perf_data()));
   modify_if_different(
     s->check_freshness,
     static_cast<int>(obj->check_freshness()));

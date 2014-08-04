@@ -174,7 +174,6 @@ unsigned int        obsess_over_services(false);
 unsigned int        ochp_timeout(15);
 unsigned int        ocsp_timeout(15);
 unsigned int        passive_host_checks_are_soft(false);
-unsigned int        process_performance_data(false);
 unsigned int        retain_state_information(false);
 unsigned int        retention_scheduling_horizon(900);
 unsigned int        retention_update_interval(60);

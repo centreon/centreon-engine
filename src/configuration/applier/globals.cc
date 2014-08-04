@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -102,7 +102,6 @@ void applier::globals::apply(state& config) {
   ::ochp_timeout = config.ochp_timeout();
   ::ocsp_timeout = config.ocsp_timeout();
   ::passive_host_checks_are_soft = config.passive_host_checks_are_soft();
-  ::process_performance_data = config.process_performance_data();
   ::retained_contact_host_attribute_mask = config.retained_contact_host_attribute_mask();
   ::retained_contact_service_attribute_mask = config.retained_contact_service_attribute_mask();
   ::retained_host_attribute_mask = config.retained_host_attribute_mask();

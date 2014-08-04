@@ -238,7 +238,6 @@ extern unsigned int auto_rescheduling_interval;
 extern unsigned int auto_rescheduling_window;
 extern unsigned int status_update_interval;
 extern unsigned int time_change_threshold;
-extern unsigned int process_performance_data;
 extern unsigned int enable_flap_detection;
 extern unsigned int enable_failure_prediction;
 extern float low_service_flap_threshold;

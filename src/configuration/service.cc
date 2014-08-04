@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -81,10 +81,12 @@ service::setters const service::_setters[] = {
   { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+
+  // Deprecated.
+  { "process_perf_data",            SETTER(bool, _set_process_perf_data) }
 };
 
 // Default values.
@@ -117,7 +119,6 @@ static unsigned short const default_notification_options(
                               | service::downtime);
 static std::string const    default_notification_period;
 static bool const           default_obsess_over_service(true);
-static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
@@ -147,7 +148,6 @@ service::service()
     _notification_interval(default_notification_interval),
     _notification_options(default_notification_options),
     _obsess_over_service(default_obsess_over_service),
-    _process_perf_data(default_process_perf_data),
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
@@ -212,7 +212,6 @@ service& service::operator=(service const& right) {
     _notification_options = right._notification_options;
     _notification_period = right._notification_period;
     _obsess_over_service = right._obsess_over_service;
-    _process_perf_data = right._process_perf_data;
     _retain_nonstatus_information = right._retain_nonstatus_information;
     _retain_status_information = right._retain_status_information;
     _retry_interval = right._retry_interval;
@@ -266,7 +265,6 @@ bool service::operator==(service const& right) const throw () {
           && _notification_options == right._notification_options
           && _notification_period == right._notification_period
           && _obsess_over_service == right._obsess_over_service
-          && _process_perf_data == right._process_perf_data
           && _retain_nonstatus_information == right._retain_nonstatus_information
           && _retain_status_information == right._retain_status_information
           && _retry_interval == right._retry_interval
@@ -368,8 +366,6 @@ bool service::operator<(service const& right) const throw () {
     return (_notification_period < right._notification_period);
   else if (_obsess_over_service != right._obsess_over_service)
     return (_obsess_over_service < right._obsess_over_service);
-  else if (_process_perf_data != right._process_perf_data)
-    return (_process_perf_data < right._process_perf_data);
   else if (_retain_nonstatus_information
            != right._retain_nonstatus_information)
     return (_retain_nonstatus_information
@@ -474,7 +470,6 @@ void service::merge(object const& obj) {
   MRG_OPTION(_notification_options);
   MRG_OPTION(_notification_period);
   MRG_OPTION(_obsess_over_service);
-  MRG_OPTION(_process_perf_data);
   MRG_OPTION(_retain_nonstatus_information);
   MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
@@ -882,15 +877,6 @@ bool service::notification_period_defined() const throw () {
  */
 bool service::obsess_over_service() const throw () {
   return (_obsess_over_service);
-}
-
-/**
- *  Get process_perf_data.
- *
- *  @return The process_perf_data.
- */
-bool service::process_perf_data() const throw () {
-  return (_process_perf_data);
 }
 
 /**
@@ -1465,14 +1451,17 @@ bool service::_set_parallelize_check(bool value) {
 }
 
 /**
- *  Set process_perf_data value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new process_perf_data value.
+ *  @param[in] value  Unused.
  *
  *  @return True on success, otherwise false.
  */
 bool service::_set_process_perf_data(bool value) {
-  _process_perf_data = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service process_perf_data was ignored";
+  ++config_warnings;
   return (true);
 }
 

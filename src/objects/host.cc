@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -89,7 +89,6 @@ bool operator==(
           && obj1.stalk_on_unreachable == obj2.stalk_on_unreachable
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
-          && obj1.process_performance_data == obj2.process_performance_data
           && obj1.checks_enabled == obj2.checks_enabled
           && obj1.accept_passive_host_checks == obj2.accept_passive_host_checks
           && obj1.event_handler_enabled == obj2.event_handler_enabled
@@ -242,7 +241,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  stalk_on_unreachable:                 " << obj.stalk_on_unreachable << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
-    "  process_performance_data:             " << obj.process_performance_data << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
     "  accept_passive_host_checks:           " << obj.accept_passive_host_checks << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
@@ -381,8 +379,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] stalk_on_up                   Stalk on up ?
  *  @param[in] stalk_on_down                 Stalk on down ?
  *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
- *  @param[in] process_perfdata              Should host perfdata be
- *                                           processed ?
  *  @param[in] failure_prediction_enabled    Whether or not failure
  *                                           prediction is enabled.
  *  @param[in] check_freshness               Whether or not freshness
@@ -447,7 +443,6 @@ host* add_host(
         int stalk_on_up,
         int stalk_on_down,
         int stalk_on_unreachable,
-        int process_perfdata,
         int failure_prediction_enabled,
         char const* failure_prediction_options,
         int check_freshness,
@@ -585,7 +580,6 @@ host* add_host(
     obj->notify_on_recovery = (notify_up > 0);
     obj->notify_on_unreachable = (notify_unreachable > 0);
     obj->obsess_over_host = (obsess_over_host > 0);
-    obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;

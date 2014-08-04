@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -251,7 +251,6 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "performance_data=" << (obj.perf_data ? obj.perf_data : "") << "\n"
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
     "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
-    "process_performance_data=" << obj.process_performance_data << "\n"
     "retry_check_interval=" << obj.check_interval << "\n"
     "state_type=" << obj.state_type << "\n";
 
@@ -322,7 +321,6 @@ std::ostream& dump::program(std::ostream& os) {
     "obsess_over_services=" << config->obsess_over_services() << "\n"
     "passive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
     "passive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
-    "process_performance_data=" << config->process_performance_data() << "\n"
     "}\n";
   return (os);
 }
@@ -439,7 +437,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "performance_data=" << (obj.perf_data ? obj.perf_data : "") << "\n"
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
     "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
-    "process_performance_data=" << obj.process_performance_data << "\n"
     "retry_check_interval=" << obj.retry_interval << "\n"
     "state_type=" << obj.state_type << "\n";
 

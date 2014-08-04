@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -67,7 +67,6 @@ typedef struct                  service_struct {
   int                           flap_detection_on_warning;
   int                           flap_detection_on_unknown;
   int                           flap_detection_on_critical;
-  int                           process_performance_data;
   int                           check_freshness;
   int                           freshness_threshold;
   int                           accept_passive_service_checks;
@@ -192,7 +191,6 @@ service* add_service(
            int stalk_on_warning,
            int stalk_on_unknown,
            int stalk_on_critical,
-           int process_perfdata,
            int failure_prediction_enabled,
            char const* failure_prediction_options,
            int check_freshness,
@@ -241,5 +239,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICE_HH
-
-

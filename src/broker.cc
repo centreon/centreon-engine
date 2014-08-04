@@ -1428,7 +1428,6 @@ void broker_program_status(
   ds.flap_detection_enabled = config->enable_flap_detection();
   ds.failure_prediction_enabled
     = config->enable_failure_prediction();
-  ds.process_performance_data = config->process_performance_data();
   ds.obsess_over_hosts = config->obsess_over_hosts();
   ds.obsess_over_services = config->obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;

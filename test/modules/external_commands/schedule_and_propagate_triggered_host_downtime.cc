@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,13 +45,13 @@ static int check_schedule_and_propagate_triggered_host_downtime(
   host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0,
                             0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
                             0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
-                            0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL,
+                            0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL,
                             NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0,
                             0.0, 0.0, 0, 0, 0, 0, 0));
   host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0,
                            0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
                            0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0,
-                           0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
+                           0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
                            NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
                            0.0, 0, 0, 0, 0, 0));
   if (!hst_parent || !hst_child)

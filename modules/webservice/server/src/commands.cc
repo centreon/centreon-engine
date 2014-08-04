@@ -2057,33 +2057,6 @@ int centreonengine__getNotificationsEnabled(soap* s, bool& val) {
 }
 
 /**
- *  Check if performance data processing is enabled.
- *
- *  @param[in]  s                 Unused.
- *  @param[out] val               Result of operation.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__getPerfdataProcessingEnabled(soap* s, bool& val) {
-  (void)s;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
-    val = process_performance_data;
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Check if services active checks are enabled.
  *
  *  @param[in]  s                 Unused.
@@ -2516,37 +2489,6 @@ int centreonengine__setNotificationsEnabled(soap* s,
 
     logger(dbg_functions, most) << "Webservice: " << __func__ << "(" << enable << ")";
     enable_notifications = enable;
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Enable or disable performance data processing globally.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  enable            true to enable, false to disable.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setPerfdataProcessingEnabled(soap* s,
-                                                 bool enable,
-                                                 centreonengine__setPerfdataProcessingEnabledResponse& res) {
-  (void)s;
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most) << "Webservice: " << __func__ << "(" << enable << ")";
-    process_performance_data = enable;
     webservice::sync::instance().worker_finish();
   }
   catch (...) {

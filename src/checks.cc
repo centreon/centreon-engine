@@ -41,7 +41,6 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
-#include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -1184,9 +1183,6 @@ int handle_async_service_check_result(
     check_for_service_flapping(temp_service, true, true);
     check_for_host_flapping(temp_host, true, false, true);
   }
-
-  /* update service performance info */
-  update_service_performance_data(temp_service);
 
   /* free allocated memory */
   delete[] old_plugin_output;

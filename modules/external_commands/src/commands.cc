@@ -3772,66 +3772,6 @@ void disable_all_failure_prediction(void) {
   update_program_status();
 }
 
-/* enable performance data on a program-wide basis */
-void enable_performance_data(void) {
-  unsigned long attr(MODATTR_PERFORMANCE_DATA_ENABLED);
-
-  /* bail out if we're already set... */
-  if (config->process_performance_data())
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-  modified_service_process_attributes |= attr;
-
-  config->process_performance_data(true);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  // Update the status log.
-  update_program_status();
-}
-
-/* disable performance data on a program-wide basis */
-void disable_performance_data(void) {
-  unsigned long attr(MODATTR_PERFORMANCE_DATA_ENABLED);
-
-  /* bail out if we're already set... */
-  if (config->process_performance_data() == false)
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-  modified_service_process_attributes |= attr;
-
-  config->process_performance_data(false);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  // Update the status log.
-  update_program_status();
-}
-
 /* start obsessing over a particular service */
 void start_obsessing_over_service(service* svc) {
   unsigned long attr(MODATTR_OBSESSIVE_HANDLER_ENABLED);

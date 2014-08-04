@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -70,7 +70,6 @@ typedef struct                  host_struct {
   int                           stalk_on_unreachable;
   int                           check_freshness;
   int                           freshness_threshold;
-  int                           process_performance_data;
   int                           checks_enabled;
   int                           accept_passive_host_checks;
   int                           event_handler_enabled;
@@ -204,7 +203,6 @@ host* add_host(
         int stalk_on_up,
         int stalk_on_down,
         int stalk_on_unreachable,
-        int process_perfdata,
         int failure_prediction_enabled,
         char const* failure_prediction_options,
         int check_freshness,
@@ -262,5 +260,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOST_HH
-
-

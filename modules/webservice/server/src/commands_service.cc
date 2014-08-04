@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -3085,81 +3085,6 @@ int centreonengine__serviceSetObsessOver(
 
   // Enable or disable obsession.
   svc->obsess_over_service = enable;
-
-  // Notify event broker.
-  notify_event_broker(svc);
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**************************************
-*                                     *
-*              Perfdata               *
-*                                     *
-**************************************/
-
-/**
- *  Check if perfdata processing is enabled on service.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  service_id Target service.
- *  @param[out] res        true if performance data are processed.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceGetPerfdataProcessingEnabled(
-      soap* s,
-      ns1__serviceIDType* service_id,
-      bool& res) {
-  // Begin try block.
-  COMMAND_BEGIN("{" << service_id->host->name
-                  << ", " << service_id->service << "}")
-
-  // Find target service.
-  service* svc(find_target_service(
-                 service_id->host->name.c_str(),
-		 service_id->service.c_str()));
-
-  // Get requested value.
-  res = svc->process_performance_data;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Enable or disable perfdata processing.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  service_id Target service.
- *  @param[in]  enable     true to enable, false to disable.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceSetPerfdataProcessingEnabled(
-      soap* s,
-      ns1__serviceIDType* service_id,
-      bool enable,
-      centreonengine__serviceSetPerfdataProcessingEnabledResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN("{" << service_id->host->name
-                  << ", " << service_id->service << "}")
-
-  // Find target service.
-  service* svc(find_target_service(
-                 service_id->host->name.c_str(),
-		 service_id->service.c_str()));
-
-  // Enable or disable perfdata processing.
-  svc->process_performance_data = enable;
 
   // Notify event broker.
   notify_event_broker(svc);

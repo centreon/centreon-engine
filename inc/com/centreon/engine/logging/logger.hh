@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -66,7 +66,6 @@ namespace logging {
     dbg_ipc                  = (16ull << 32),
     dbg_flapping             = (16ull << 32),
     dbg_eventhandlers        = (16ull << 32),
-    dbg_perfdata             = (16ull << 32),
     dbg_notifications        = (32ull << 32),
     dbg_eventbroker          = (64ull << 32),
     dbg_external_command     = (128ull << 32),

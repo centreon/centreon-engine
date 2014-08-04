@@ -85,16 +85,6 @@ namespace               configuration {
       ilf_smart         // smart interleave
     };
 
-    /**
-     *  @enum state::perdata_file_mode
-     *
-     */
-    enum                perfdata_file_mode {
-      mode_pipe = 0,
-      mode_file,
-      mode_file_append
-    };
-
                         state();
                         state(state const& right);
                         ~state() throw ();
@@ -239,18 +229,6 @@ namespace               configuration {
     void                host_freshness_check_interval(unsigned int value);
     inter_check_delay   host_inter_check_delay_method() const throw ();
     void                host_inter_check_delay_method(inter_check_delay value);
-    std::string const&  host_perfdata_command() const throw ();
-    void                host_perfdata_command(std::string const& value);
-    std::string const&  host_perfdata_file() const throw ();
-    void                host_perfdata_file(std::string const& value);
-    perfdata_file_mode  host_perfdata_file_mode() const throw ();
-    void                host_perfdata_file_mode(perfdata_file_mode value);
-    std::string const&  host_perfdata_file_processing_command() const throw ();
-    void                host_perfdata_file_processing_command(std::string const& value);
-    unsigned int        host_perfdata_file_processing_interval() const throw ();
-    void                host_perfdata_file_processing_interval(unsigned int value);
-    std::string const&  host_perfdata_file_template() const throw ();
-    void                host_perfdata_file_template(std::string const& value);
     std::string const&  illegal_object_chars() const throw ();
     void                illegal_object_chars(std::string const& value);
     std::string const&  illegal_output_chars() const throw ();
@@ -309,12 +287,8 @@ namespace               configuration {
     void                ocsp_timeout(unsigned int value);
     bool                passive_host_checks_are_soft() const throw ();
     void                passive_host_checks_are_soft(bool value);
-    int                 perfdata_timeout() const throw ();
-    void                perfdata_timeout(int value);
     std::string const&  precached_object_file() const throw ();
     void                precached_object_file(std::string const& value);
-    bool                process_performance_data() const throw ();
-    void                process_performance_data(bool value);
     std::list<std::string> const&
                         resource_file() const throw ();
     void                resource_file(std::list<std::string> const& value);
@@ -361,18 +335,6 @@ namespace               configuration {
     void                service_inter_check_delay_method(inter_check_delay value);
     interleave_factor   service_interleave_factor_method() const throw ();
     void                service_interleave_factor_method(interleave_factor value);
-    std::string const&  service_perfdata_command() const throw ();
-    void                service_perfdata_command(std::string const& value);
-    std::string const&  service_perfdata_file() const throw ();
-    void                service_perfdata_file(std::string const& value);
-    perfdata_file_mode  service_perfdata_file_mode() const throw ();
-    void                service_perfdata_file_mode(perfdata_file_mode value);
-    std::string const&  service_perfdata_file_processing_command() const throw ();
-    void                service_perfdata_file_processing_command(std::string const& value);
-    unsigned int        service_perfdata_file_processing_interval() const throw ();
-    void                service_perfdata_file_processing_interval(unsigned int value);
-    std::string const&  service_perfdata_file_template() const throw ();
-    void                service_perfdata_file_template(std::string const& value);
     float               sleep_time() const throw ();
     void                sleep_time(float value);
     bool                soft_state_dependencies() const throw ();
@@ -447,19 +409,31 @@ namespace               configuration {
     void                _set_event_broker_options(std::string const& value);
     void                _set_free_child_process_memory(std::string const& value);
     void                _set_host_inter_check_delay_method(std::string const& value);
+    void                _set_host_perfdata_command(std::string const& value);
+    void                _set_host_perfdata_file(std::string const& value);
     void                _set_host_perfdata_file_mode(std::string const& value);
+    void                _set_host_perfdata_file_processing_command(std::string const& value);
+    void                _set_host_perfdata_file_processing_interval(unsigned int value);
+    void                _set_host_perfdata_file_template(std::string const& value);
     void                _set_lock_file(std::string const& value);
     void                _set_log_archive_path(std::string const& value);
     void                _set_log_rotation_method(std::string const& value);
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
     void                _set_p1_file(std::string const& value);
+    void                _set_perfdata_timeout(int value);
+    void                _set_process_performance_data(bool value);
     void                _set_resource_file(std::string const& value);
     void                _set_retained_process_service_attribute_mask(std::string const& value);
     void                _set_retained_service_attribute_mask(std::string const& value);
     void                _set_service_inter_check_delay_method(std::string const& value);
     void                _set_service_interleave_factor_method(std::string const& value);
+    void                _set_service_perfdata_command(std::string const& value);
+    void                _set_service_perfdata_file(std::string const& value);
     void                _set_service_perfdata_file_mode(std::string const& value);
+    void                _set_service_perfdata_file_processing_command(std::string const& value);
+    void                _set_service_perfdata_file_processing_interval(unsigned int value);
+    void                _set_service_perfdata_file_template(std::string const& value);
     void                _set_temp_file(std::string const& value);
     void                _set_temp_path(std::string const& value);
     void                _set_use_embedded_perl_implicitly(std::string const& value);
@@ -555,12 +529,6 @@ namespace               configuration {
     unsigned int        _host_check_timeout;
     unsigned int        _host_freshness_check_interval;
     inter_check_delay   _host_inter_check_delay_method;
-    std::string         _host_perfdata_command;
-    std::string         _host_perfdata_file;
-    perfdata_file_mode  _host_perfdata_file_mode;
-    std::string         _host_perfdata_file_processing_command;
-    unsigned int        _host_perfdata_file_processing_interval;
-    std::string         _host_perfdata_file_template;
     std::string         _illegal_object_chars;
     std::string         _illegal_output_chars;
     unsigned int        _interval_length;
@@ -590,9 +558,7 @@ namespace               configuration {
     std::string         _ocsp_command;
     unsigned int        _ocsp_timeout;
     bool                _passive_host_checks_are_soft;
-    int                 _perfdata_timeout;
     std::string         _precached_object_file;
-    bool                _process_performance_data;
     std::list<std::string>
                         _resource_file;
     unsigned long       _retained_contact_host_attribute_mask;
@@ -612,12 +578,6 @@ namespace               configuration {
     unsigned int        _service_freshness_check_interval;
     inter_check_delay   _service_inter_check_delay_method;
     interleave_factor   _service_interleave_factor_method;
-    std::string         _service_perfdata_command;
-    std::string         _service_perfdata_file;
-    perfdata_file_mode  _service_perfdata_file_mode;
-    std::string         _service_perfdata_file_processing_command;
-    unsigned int        _service_perfdata_file_processing_interval;
-    std::string         _service_perfdata_file_template;
     static setters const
                         _setters[];
     float               _sleep_time;

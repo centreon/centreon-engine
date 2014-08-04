@@ -154,7 +154,6 @@ struct                global {
   std::string         ocsp_command;
   unsigned int        ocsp_timeout;
   bool                passive_host_checks_are_soft;
-  bool                process_performance_data;
   unsigned long       retained_contact_host_attribute_mask;
   unsigned long       retained_contact_service_attribute_mask;
   unsigned long       retained_host_attribute_mask;
@@ -361,7 +360,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(ocsp_command);
   check_value(ocsp_timeout);
   check_value(passive_host_checks_are_soft);
-  check_value(process_performance_data);
   check_value(retained_contact_host_attribute_mask);
   check_value(retained_contact_service_attribute_mask);
   check_value(retained_host_attribute_mask);
@@ -619,7 +617,6 @@ static global get_globals() {
   g.ocsp_command = to_str(ocsp_command);
   g.ocsp_timeout = ocsp_timeout;
   g.passive_host_checks_are_soft = passive_host_checks_are_soft;
-  g.process_performance_data = process_performance_data;
   g.retained_contact_host_attribute_mask = retained_contact_host_attribute_mask;
   g.retained_contact_service_attribute_mask = retained_contact_service_attribute_mask;
   g.retained_host_attribute_mask = retained_host_attribute_mask;

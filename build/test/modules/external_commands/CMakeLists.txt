@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2014 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -126,20 +126,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_failure_prediction")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_failure_prediction.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling enable_performance_data.
-set(TEST_NAME "modules_external_commands_enable_performance_data")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_performance_data.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_performance_data.
-set(TEST_NAME "modules_external_commands_disable_performance_data")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_performance_data.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
