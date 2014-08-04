@@ -949,16 +949,15 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     return (ERROR);
 
   /* get the recurring interval */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
-  recurring_interval = strtol(temp_ptr, NULL, 10);
+  if ((temp_ptr = my_strtok(NULL, ";")) != NULL)
+    recurring_interval = strtol(temp_ptr, NULL, 10);
 
   /* get the recurring period */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
-  if (strcmp(temp_ptr, "NULL") != 0) {
-    if ((recurring_period = find_timeperiod(temp_ptr)) == NULL)
-      return (ERROR);
+  if ((temp_ptr = my_strtok(NULL, ";")) != NULL) {
+    if (strcmp(temp_ptr, "NULL") != 0) {
+      if ((recurring_period = find_timeperiod(temp_ptr)) == NULL)
+        return (ERROR);
+    }
   }
 
   /* check if flexible downtime demanded and duration set to non-zero.
