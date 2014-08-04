@@ -108,12 +108,12 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst;
+  /*host* hst;
   service* svc;
 
   init_host_and_service(hst, svc);
   check_host_escalation(hst);
-  check_service_escalation(svc);
+  check_service_escalation(svc);*/
 
   return (0);
 }
