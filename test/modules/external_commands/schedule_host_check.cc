@@ -41,7 +41,7 @@ static int check_schedule_host_check(int argc, char** argv) {
 
   // Create target host.
   host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
-                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
+                     42, 0, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
                      NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
                      0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
                      0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));

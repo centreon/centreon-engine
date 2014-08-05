@@ -43,7 +43,7 @@ static int check_schedule_servicegroup_host_downtime(
 
   // Create target host.
   host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
-                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
+                     42, 0, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
                      NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
                      0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
                      0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
@@ -51,7 +51,7 @@ static int check_schedule_servicegroup_host_downtime(
     throw (engine_error() << "host creation failed");
 
   // Create target service.
-  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
+  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0, 0,
                            0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
                            0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,

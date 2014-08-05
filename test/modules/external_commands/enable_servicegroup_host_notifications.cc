@@ -34,7 +34,7 @@ static int check_enable_servicegroup_host_notifications(int argc, char** argv) {
   (void)argv;
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
+                       0, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
                        NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
                        0.0, 0, 0, 0, 0, 0);
@@ -42,7 +42,7 @@ static int check_enable_servicegroup_host_notifications(int argc, char** argv) {
     throw (engine_error() << "create host failed.");
 
   service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+                             NULL, 0, 42, 0, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
                              0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
                              0, 0, NULL, NULL, NULL, NULL, NULL,

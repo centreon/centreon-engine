@@ -897,6 +897,7 @@ int xodtemplate_begin_object_definition(
 
     new_service->initial_state = STATE_OK;
     new_service->max_check_attempts = -2;
+    new_host->check_timeout = 0;
     new_service->check_interval = 5.0;
     new_service->retry_interval = 1.0;
     new_service->active_checks_enabled = true;
@@ -929,6 +930,7 @@ int xodtemplate_begin_object_definition(
     new_host->passive_checks_enabled = true;
     new_host->obsess_over_host = true;
     new_host->max_check_attempts = -2;
+    new_host->check_timeout = 0;
     new_host->event_handler_enabled = true;
     new_host->flap_detection_enabled = true;
     new_host->flap_detection_on_up = true;
@@ -10821,6 +10823,7 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->check_interval,
                this_host->retry_interval,
                this_host->max_check_attempts,
+               this_host->check_timeout,
                this_host->notify_on_recovery,
                this_host->notify_on_down,
                this_host->notify_on_unreachable,
@@ -10978,6 +10981,7 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->check_period,
                   this_service->initial_state,
                   this_service->max_check_attempts,
+                  this_service->check_timeout,
                   this_service->parallelize_check,
                   this_service->passive_checks_enabled,
                   this_service->check_interval,

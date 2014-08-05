@@ -41,6 +41,7 @@ void com::centreon::engine::test::minimal_setup() {
     1.0,                            // Check interval
     1.0,                            // Retry interval
     1,                              // Max attempts
+    0,                              // Host check timeout
     0,                              // Notify up
     1,                              // Notify down
     1,                              // Notify unreachable
@@ -101,6 +102,7 @@ void com::centreon::engine::test::minimal_setup() {
     NULL,                           // Check period
     0,                              // Initial state
     1,                              // Max attempts
+    0,                              // Service check timeout
     1,                              // Parallelize
     1,                              // Accept passive checks
     1.0,                            // Check interval

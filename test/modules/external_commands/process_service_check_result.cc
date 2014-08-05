@@ -35,7 +35,7 @@ static int check_process_service_check_result(int argc, char** argv) {
   (void)argv;
 
   service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+                             NULL, 0, 42, 0, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
                              0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
                              0, 0, NULL, NULL, NULL, NULL, NULL,
@@ -44,7 +44,7 @@ static int check_process_service_check_result(int argc, char** argv) {
     throw (engine_error() << "create service failed.");
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
+                       0, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
                        NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
                        0.0, 0, 0, 0, 0, 0);

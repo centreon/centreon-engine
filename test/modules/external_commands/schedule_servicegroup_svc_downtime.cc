@@ -42,7 +42,7 @@ static int check_schedule_servicegroup_svc_downtime(
   (void)argv;
 
   // Create target service.
-  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
+  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0, 0,
                            0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
                            0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
