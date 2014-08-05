@@ -66,7 +66,7 @@ void init_host_and_service(host*& hst, service*& svc) {
  */
 void check_host_escalation(host* hst) {
   hostescalation* host_escalation = add_host_escalation("name",
-                                                        1,
+                                                        0,
                                                         1,
                                                         1,
                                                         "tperiod",
@@ -75,7 +75,8 @@ void check_host_escalation(host* hst) {
                                                         true);
   if (!host_escalation)
     throw (engine_error() << "cannot create host escalation.");
-  if (host_notification(hst, NOTIFICATION_NORMAL, NULL, NULL, 0) != OK)
+  if (host_notification(hst, NOTIFICATION_NORMAL, NULL, NULL,
+                        NOTIFICATION_OPTION_FORCED) != OK)
     throw (engine_error() << "host notification failed." );
 }
 
@@ -85,7 +86,7 @@ void check_host_escalation(host* hst) {
 void check_service_escalation(service* svc) {
   serviceescalation* service_escalation = add_service_escalation("name",
                                                                  "description",
-                                                                 1,
+                                                                 0,
                                                                  1,
                                                                  2,
                                                                  "tperiod",
@@ -96,7 +97,8 @@ void check_service_escalation(service* svc) {
 
   if (!service_escalation)
     throw (engine_error() << "cannot create service escalation");
-  if (service_notification(svc, NOTIFICATION_NORMAL, NULL, NULL, 0) != OK)
+  if (service_notification(svc, NOTIFICATION_NORMAL, NULL, NULL,
+                           NOTIFICATION_OPTION_FORCED) != OK)
     throw (engine_error() << "service notification failed.");
 }
 
