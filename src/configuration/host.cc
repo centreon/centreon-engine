@@ -44,6 +44,7 @@ host::setters const host::_setters[] = {
   { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
+  { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
@@ -179,6 +180,7 @@ host& host::operator=(host const& right) {
     _check_freshness = right._check_freshness;
     _check_interval = right._check_interval;
     _check_period = right._check_period;
+    _check_timeout = right._check_timeout;
     _contactgroups = right._contactgroups;
     _contacts = right._contacts;
     _coords_2d = right._coords_2d;
@@ -236,6 +238,7 @@ bool host::operator==(host const& right) const throw () {
           && _check_freshness == right._check_freshness
           && _check_interval == right._check_interval
           && _check_period == right._check_period
+          && _check_timeout == right._check_timeout
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
           && _coords_2d == right._coords_2d
@@ -312,6 +315,8 @@ bool host::operator<(host const& right) const throw () {
     return (_check_interval < right._check_interval);
   else if (_check_period != right._check_period)
     return (_check_period < right._check_period);
+  else if (_check_timeout != right._check_timeout)
+    return (_check_timeout < right._check_timeout);
   else if (_contactgroups != right._contactgroups)
     return (_contactgroups < right._contactgroups);
   else if (_contacts != right._contacts)
@@ -447,6 +452,7 @@ void host::merge(object const& obj) {
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
   MRG_DEFAULT(_check_period);
+  MRG_OPTION(_check_timeout);
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
   MRG_OPTION(_coords_2d);
@@ -584,6 +590,15 @@ unsigned int host::check_interval() const throw () {
  */
 std::string const& host::check_period() const throw () {
   return (_check_period);
+}
+
+/**
+ *  Get check_timeout.
+ *
+ *  @return The check_timeout.
+ */
+unsigned int host::check_timeout() const throw() {
+  return (_check_timeout);
 }
 
 /**
@@ -1043,6 +1058,18 @@ bool host::_set_check_interval(unsigned int value) {
 bool host::_set_check_period(std::string const& value) {
   _check_period = value;
   return (true);
+}
+
+/**
+ *  Set check_timeout value.
+ *
+ *  @param[in] value The new check_timeout value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_check_timeout(unsigned int value) {
+  _check_timeout = value;
+  return true;
 }
 
 /**

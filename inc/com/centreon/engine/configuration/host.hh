@@ -74,6 +74,7 @@ namespace                  configuration {
     list_string const&     contacts() const throw ();
     point_2d const&        coords_2d() const throw ();
     point_3d const&        coords_3d() const throw ();
+    unsigned int           check_timeout() const throw();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
@@ -125,6 +126,7 @@ namespace                  configuration {
     bool                   _set_check_freshness(bool value);
     bool                   _set_check_interval(unsigned int value);
     bool                   _set_check_period(std::string const& value);
+    bool                   _set_check_timeout(unsigned int value);
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
     bool                   _set_coords_2d(std::string const& value);
@@ -175,6 +177,7 @@ namespace                  configuration {
     group                  _contacts;
     opt<point_2d>          _coords_2d;
     opt<point_3d>          _coords_3d;
+    opt<unsigned int>      _check_timeout;
     map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
