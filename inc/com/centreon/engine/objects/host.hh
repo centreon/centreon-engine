@@ -59,6 +59,7 @@ typedef struct                  host_struct {
   int                           notify_on_downtime;
   char*                         notification_period;
   char*                         check_period;
+  unsigned int                  check_timeout;
   int                           flap_detection_enabled;
   double                        low_flap_threshold;
   double                        high_flap_threshold;
@@ -181,6 +182,7 @@ host* add_host(
         double check_interval,
         double retry_interval,
         int max_attempts,
+        unsigned int check_timeout,
         int notify_up,
         int notify_down,
         int notify_unreachable,

@@ -1071,6 +1071,13 @@ bool service::_set_check_period(std::string const& value) {
   return (true);
 }
 
+/**
+ *  Set check_timeout value.
+ *
+ *  @param[in] value The new check_timeout value.
+ *
+ *  @return True on success, otherwise false.
+ */
 bool service::_set_check_timeout(unsigned int value) {
   _check_timeout = value;
   return (true);
