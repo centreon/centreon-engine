@@ -282,6 +282,9 @@ void checker::run(
   logger(dbg_checks, basic)
     << "** Running async check of host '" << hst->name << "'...";
 
+  unsigned int timeout = hst->check_timeout ? hst->check_timeout :
+                                              config->host_check_timeout();
+
   // Check if the host is viable now.
   if (check_host_check_viability_3x(
         hst,
@@ -318,7 +321,7 @@ void checker::run(
             hst->host_check_command,
             hst->latency,
             0.0,
-            config->host_check_timeout(),
+            timeout,
             false,
             0,
             NULL,
@@ -422,7 +425,7 @@ void checker::run(
     hst->host_check_command,
     hst->latency,
     0.0,
-    config->host_check_timeout(),
+    timeout,
     false,
     0,
     processed_cmd_ptr,
@@ -453,7 +456,7 @@ void checker::run(
       unsigned long id(cmd->run(
                               processed_cmd,
                               macros,
-                              config->host_check_timeout()));
+                              timeout));
       if (id != 0)
         _list_id[id] = check_result_info;
     }
@@ -529,6 +532,9 @@ void checker::run(
   logger(dbg_checks, basic)
     << "** Running async check of service '" << svc->description
     << "' on host '" << svc->host_name << "'...";
+
+  unsigned int timeout = svc->check_timeout ? svc->check_timeout :
+                                              config->service_check_timeout();
 
   // Check if the service is viable now.
   if (check_service_check_viability(
@@ -655,7 +661,7 @@ void checker::run(
           svc->service_check_command,
           svc->latency,
           0.0,
-          config->service_check_timeout(),
+          timeout,
           false,
           0,
           processed_cmd_ptr,
@@ -686,7 +692,7 @@ void checker::run(
       unsigned long id(cmd->run(
                               processed_cmd,
                               macros,
-                              config->service_check_timeout()));
+                              timeout));
       if (id != 0)
         _list_id[id] = check_result_info;
     }
@@ -749,6 +755,9 @@ void checker::run_sync(
     throw (engine_error()
            << "Attempt to run synchronous active check on host '"
            << hst->name << "' with no check command");
+
+  unsigned int timeout = hst->check_timeout ? hst->check_timeout :
+                                              config->host_check_timeout();
 
   logger(dbg_checks, basic)
     << "** Run sync check of host '" << hst->name << "'...";
@@ -845,7 +854,7 @@ void checker::run_sync(
     hst->host_check_command,
     hst->latency,
     0.0,
-    config->host_check_timeout(),
+    timeout,
     false,
     0,
     NULL,
@@ -893,7 +902,7 @@ void checker::run_sync(
     hst->host_check_command,
     hst->latency,
     hst->execution_time,
-    config->host_check_timeout(),
+    timeout,
     false,
     hst->current_state,
     NULL,
@@ -992,6 +1001,9 @@ int checker::_execute_sync(host* hst) {
            << "Attempt to run synchronous active check on host '"
            << hst->name << "' with no check command");
 
+  unsigned int timeout = hst->check_timeout ? hst->check_timeout :
+                                              config->host_check_timeout();
+
   logger(dbg_checks, basic)
     << "** Executing sync check of host '" << hst->name << "'...";
 
@@ -1013,7 +1025,7 @@ int checker::_execute_sync(host* hst) {
             hst->host_check_command,
             hst->latency,
             0.0,
-            config->host_check_timeout(),
+            timeout,
             false,
             0,
             NULL,
@@ -1065,7 +1077,7 @@ int checker::_execute_sync(host* hst) {
     hst->host_check_command,
     0.0,
     0.0,
-    config->host_check_timeout(),
+    timeout,
     false,
     STATE_OK,
     tmp_processed_cmd,
@@ -1100,7 +1112,7 @@ int checker::_execute_sync(host* hst) {
     start_cmd,
     end_cmd,
     0,
-    config->host_check_timeout(),
+    timeout,
     false,
     0,
     tmp_processed_cmd,
@@ -1113,7 +1125,7 @@ int checker::_execute_sync(host* hst) {
     cmd->run(
            processed_cmd,
            macros,
-           config->host_check_timeout(),
+           timeout,
            res);
   }
   catch (std::exception const& e) {
@@ -1154,7 +1166,7 @@ int checker::_execute_sync(host* hst) {
     start_cmd,
     end_cmd,
     execution_time,
-    config->host_check_timeout(),
+    timeout,
     res.exit_status == process::timeout,
     res.exit_code,
     tmp_processed_cmd,
@@ -1169,13 +1181,13 @@ int checker::_execute_sync(host* hst) {
   if (res.exit_status == process::timeout) {
     std::ostringstream oss;
     oss << "Host check timed out after "
-        << config->host_check_timeout()
+        << timeout
         << "  seconds";
     res.output = oss.str();
     logger(log_runtime_warning, basic)
       << "Warning: Host check command '" << processed_cmd
       << "' for host '" << hst->name << "' timed out after "
-      << config->host_check_timeout() << " seconds";
+      << timeout << " seconds";
   }
 
   // Update values.
@@ -1244,7 +1256,7 @@ int checker::_execute_sync(host* hst) {
     hst->host_check_command,
     0.0,
     execution_time,
-    config->host_check_timeout(),
+    timeout,
     res.exit_status == process::timeout,
     res.exit_code,
     tmp_processed_cmd,
