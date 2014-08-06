@@ -74,6 +74,7 @@ namespace                  configuration {
     unsigned int           check_interval() const throw ();
     std::string const&     check_period() const throw ();
     unsigned int           check_timeout() const throw();
+    bool                   check_timeout_defined() const throw();
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();

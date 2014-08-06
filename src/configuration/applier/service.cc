@@ -119,7 +119,7 @@ void applier::service::add_object(
     NULL_IF_EMPTY(obj->check_period()),
     obj->initial_state(),
     obj->max_check_attempts(),
-    obj->check_timeout(),
+    obj->check_timeout_defined() ? obj->check_timeout() : 0,
     true, // parallelize, enabled by default in Nagios
     obj->checks_passive(),
     obj->check_interval(),

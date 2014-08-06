@@ -897,7 +897,7 @@ int xodtemplate_begin_object_definition(
 
     new_service->initial_state = STATE_OK;
     new_service->max_check_attempts = -2;
-    new_host->check_timeout = 0;
+    new_service->check_timeout = 0;
     new_service->check_interval = 5.0;
     new_service->retry_interval = 1.0;
     new_service->active_checks_enabled = true;
@@ -1278,6 +1278,10 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "max_check_attempts")) {
       temp_service->max_check_attempts = atoi(value);
       temp_service->have_max_check_attempts = true;
+    }
+    else if (!strcmp(variable, "check_timeout")) {
+      temp_service->check_timeout = atoi(value);
+      temp_service->have_check_timeout = true;
     }
     else if (!strcmp(variable, "check_interval")
              || !strcmp(variable, "normal_check_interval")) {
@@ -1693,6 +1697,10 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "max_check_attempts")) {
       temp_host->max_check_attempts = atoi(value);
       temp_host->have_max_check_attempts = true;
+    }
+    else if (!strcmp(variable, "check_timeout")) {
+        temp_host->check_timeout = atoi(value);
+        temp_host->have_check_timeout = true;
     }
     else if (!strcmp(variable, "checks_enabled")
              || !strcmp(variable, "active_checks_enabled")) {
@@ -5906,6 +5914,8 @@ int xodtemplate_duplicate_service(
   new_service->initial_state = temp_service->initial_state;
   new_service->max_check_attempts = temp_service->max_check_attempts;
   new_service->have_max_check_attempts = temp_service->have_max_check_attempts;
+  new_service->check_timeout = temp_service->check_timeout;
+  new_service->have_check_timeout = temp_service->have_check_timeout;
   new_service->check_interval = temp_service->check_interval;
   new_service->have_check_interval = temp_service->have_check_interval;
   new_service->retry_interval = temp_service->retry_interval;
@@ -7838,6 +7848,11 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
       this_host->max_check_attempts = template_host->max_check_attempts;
       this_host->have_max_check_attempts = true;
     }
+    if (this_host->have_check_timeout == false
+        && template_host->have_check_timeout == true) {
+      this_host->check_timeout = template_host->check_timeout;
+      this_host->have_check_timeout = true;
+    }
     if (this_host->have_active_checks_enabled == false
         && template_host->have_active_checks_enabled == true) {
       this_host->active_checks_enabled
@@ -8182,6 +8197,12 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->max_check_attempts
         = template_service->max_check_attempts;
       this_service->have_max_check_attempts = true;
+    }
+    if (this_service->have_check_timeout == false
+        && template_service->have_check_timeout == true) {
+      this_service->check_timeout
+        = template_service->check_timeout;
+      this_service->have_check_timeout = true;
     }
     if (this_service->have_check_interval == false
         && template_service->have_check_interval == true) {

@@ -75,6 +75,7 @@ namespace                  configuration {
     point_2d const&        coords_2d() const throw ();
     point_3d const&        coords_3d() const throw ();
     unsigned int           check_timeout() const throw();
+    bool                   check_timeout_defined() const throw();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();

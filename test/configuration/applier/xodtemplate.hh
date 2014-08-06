@@ -292,6 +292,7 @@ typedef struct xodtemplate_host_struct{
   int          have_host_groups;
   int          have_check_command;
   int          have_check_period;
+  int          have_check_timeout;
   int          have_event_handler;
   int          have_contact_groups;
   int          have_contacts;
@@ -435,6 +436,7 @@ typedef struct xodtemplate_service_struct{
   int          have_check_command;
   int          have_important_check_command;
   int          have_check_period;
+  int          have_check_timeout;
   int          have_event_handler;
   int          have_notification_period;
   int          have_contact_groups;

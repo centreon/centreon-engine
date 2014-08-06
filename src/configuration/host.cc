@@ -114,6 +114,7 @@ static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
 static unsigned short const default_stalking_options(host::none);
+static unsigned int const   default_check_timeout(0);
 
 /**
  *  Constructor.
@@ -126,6 +127,7 @@ host::host(key_type const& key)
     _checks_passive(default_checks_passive),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
+    _check_timeout(default_check_timeout),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
@@ -600,6 +602,16 @@ std::string const& host::check_period() const throw () {
 unsigned int host::check_timeout() const throw() {
   return (_check_timeout);
 }
+
+/**
+ *  Check if check timeout was defined.
+ *
+ *  @return True if the check_timeout was defined.
+ */
+bool host::check_timeout_defined() const throw() {
+  return (_check_timeout.is_set());
+}
+
 
 /**
  *  Get contactgroups.
