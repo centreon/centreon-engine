@@ -80,20 +80,13 @@ void  applier::downtime::_add_recurring_downtime(
     for (scheduled_downtime* downtime = scheduled_downtime_list;
          downtime != NULL;
          downtime = downtime->next) {
-      // Ids can change between recurring downtime: all the rest remain.
-      if (is_equal(downtime->host_name, obj.host_name().c_str())
-      && is_equal(downtime->service_description, obj.service_description().c_str())
-      && downtime->entry_time == obj.entry_time()
-      && downtime->start_time == obj.start_time()
-      && downtime->end_time == obj.end_time()
-      && downtime->fixed == obj.fixed()
-      && downtime->triggered_by == obj.triggered_by()
-      && downtime->duration == obj.duration()
-      && downtime->downtime_id == obj.downtime_id()
-      && is_equal(downtime->author, obj.author().c_str())
-      && is_equal(downtime->comment, obj.comment_data().c_str())
-      && downtime->recurring_interval == obj.recurring_interval()
-      && downtime->recurring_period == obj.recurring_period())
+      // Only add the recurrent downtime if a previous recurring downtime
+      // of same type, duration and period was not added.
+      if (downtime->recurring_period == obj.recurring_period()
+          && downtime->recurring_interval == obj.recurring_interval()
+          && is_equal(downtime->host_name, obj.host_name().c_str())
+          && is_equal(downtime->service_description, obj.service_description().c_str())
+          && downtime->duration == obj.duration())
         return ;
     }
   }
