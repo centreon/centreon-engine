@@ -1242,7 +1242,7 @@ void state::command_check_interval(int value) {
   _command_check_interval = value;
 
   // adjust command check interval
-  if (_command_check_interval_is_seconds
+  if (!_command_check_interval_is_seconds
       && _command_check_interval != -1)
     _command_check_interval *= _interval_length;
 }
