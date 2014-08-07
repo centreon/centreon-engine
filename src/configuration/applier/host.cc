@@ -586,22 +586,6 @@ void applier::host::resolve_object(
   it->second->total_services = 0;
   it->second->total_service_check_interval = 0;
 
-  // Add host groups in host structure.
-  for (list_string::const_iterator
-         it_hostgroups(obj->hostgroups().begin()),
-         end(obj->hostgroups().end());
-       it_hostgroups != end;
-       ++it_hostgroups) {
-    // Find host group.
-    umap<std::string, shared_ptr<hostgroup_struct> >::iterator
-      it_group(applier::state::instance().hostgroups_find(*it_hostgroups));
-    if (it_group == applier::state::instance().hostgroups().end())
-      throw (engine_error() << "Could not add host '"
-             << obj->host_name() << "' to non-existing host group '"
-             << *it_hostgroups << "'");
-    add_object_to_objectlist(&it->second.get()->hostgroups_ptr, &*it_group);
-  }
-
   // Resolve host.
   if (!check_host(it->second.get(), NULL, NULL))
     throw (engine_error() << "Cannot resolve host '"
