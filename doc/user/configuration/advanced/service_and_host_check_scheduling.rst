@@ -110,13 +110,14 @@ Service Interleaving
 ====================
 
 As discussed above, the inter-check delay helps to equalize the load
-that Icinga imposes on the local host. What about remote hosts? Is it
-necessary to equalize load on remote hosts? Why? Yes, it is important
-and yes, Centreon Engine can help out with this. If you monitor a large
-number of services on a remote host and the checks were not spread out,
-the remote host might think that it was the victim of a SYN attack if
-there were a lot of open connections on the same port. Plus, attempting
-to equalize the load on hosts is just a nice thing to do ...
+that Centreon Engine imposes on the local host. What about remote hosts?
+Is it necessary to equalize load on remote hosts? Why? Yes, it is
+important and yes, Centreon Engine can help out with this. If you
+monitor a large number of services on a remote host and the checks were
+not spread out, the remote host might think that it was the victim of a
+SYN attack if there were a lot of open connections on the same port.
+Plus, attempting to equalize the load on hosts is just a nice thing to
+do ...
 
 By giving a value to the
 :ref:`service_interleave_factor <main_cfg_opt_service_interleave_factor>`
