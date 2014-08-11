@@ -566,15 +566,23 @@ void applier::host::resolve_object(
   logger(logging::dbg_config, logging::more)
     << "Resolving host '" << obj->host_name() << "'.";
 
+  // If it is the very first host to be resolved,
+  // remove all the child backlinks of all the hosts.
+  // It is necessary to do it only once to prevent the removal
+  // of valid child backlinks.
+  if (obj == *config->hosts().begin()) {
+    for (umap<std::string, shared_ptr<host_struct> >::iterator
+         it(applier::state::instance().hosts().begin()),
+         end(applier::state::instance().hosts().end()); it != end; ++it)
+      deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
+  }
+
   // Find host.
   umap<std::string, shared_ptr<host_struct> >::iterator
     it(applier::state::instance().hosts_find(obj->key()));
   if (applier::state::instance().hosts().end() == it)
     throw (engine_error() << "Cannot resolve non-existing host '"
            << obj->host_name() << "'");
-
-  // Remove child backlinks.
-  deleter::listmember(it->second->child_hosts, &deleter::hostsmember);
 
   // Remove service backlinks.
   deleter::listmember(it->second->services, &deleter::servicesmember);
