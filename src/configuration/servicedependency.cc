@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -203,36 +203,60 @@ bool servicedependency::operator<(servicedependency const& right) const {
  *  If the object is not valid, an exception is thrown.
  */
 void servicedependency::check_validity() const {
-  if (_service_description->empty() && _servicegroups->empty())
-    throw (engine_error() << "Service dependency is not attached to "
-           << "any service or service group (properties "
-           << "'service_description' or 'servicegroup_name', "
-           << "respectively)");
-  if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "Service dependency is not attached to "
-           << "any host or host group (properties 'host_name' or "
-           << "'hostgroup_name', respectively)");
-  if (_dependent_service_description->empty()
-      && _dependent_servicegroups->empty())
-    throw (engine_error() << "Service dependency is not attached to "
-           << "any dependent service or dependent service group "
-           << "(properties 'dependent_service_description' or "
-           << "'dependent_servicegroup_name', respectively)");
-  if (_dependent_hosts->empty()
-      && _dependent_hostgroups->empty())
-    throw (engine_error() << "Service dependency is not attached to "
-           << "any dependent host or dependent host group (properties "
-           << "'dependent_host_name' or 'dependent_hostgroup_name', "
-           << "respectively)");
+  // Check base service(s).
+  if (_servicegroups->empty()) {
+    if (_service_description->empty())
+      throw (engine_error() << "Service dependency is not attached to "
+             << "any service or service group (properties "
+             << "'service_description' or 'servicegroup_name', "
+             << "respectively)");
+    else if (_hosts->empty() && _hostgroups->empty())
+      throw (engine_error() << "Service dependency is not attached to "
+             << "any host or host group (properties 'host_name' or "
+             << "'hostgroup_name', respectively)");
+  }
 
+  // Check dependent service(s).
+  if (_dependent_servicegroups->empty()) {
+    if (_dependent_service_description->empty())
+      throw (engine_error() << "Service dependency is not attached to "
+             << "any dependent service or dependent service group "
+             << "(properties 'dependent_service_description' or "
+             << "'dependent_servicegroup_name', respectively)");
+    else if (_dependent_hosts->empty()
+             && _dependent_hostgroups->empty())
+      throw (engine_error() << "Service dependency is not attached to "
+             << "any dependent host or dependent host group (properties "
+             << "'dependent_host_name' or 'dependent_hostgroup_name', "
+             << "respectively)");
+  }
+
+  // With no execution or failure options this dependency is useless.
   if (!_execution_failure_options && !_notification_failure_options) {
     ++config_warnings;
-    logger(log_config_warning, basic)
-      << "Warning: Ignoring lame service dependency of '"
-      << _dependent_service_description->front() << "' of host '"
-      << _dependent_hosts->front() << "' on service '"
-      << _service_description->front() << "' of host '"
-      << _hosts->front() << "'";
+    std::ostringstream msg;
+    msg << "Warning: Ignoring lame service dependency of ";
+    if (!_dependent_servicegroups->empty())
+      msg << "service group '" << _dependent_servicegroups->front()
+          << "'";
+    else {
+      msg << "service '" << _dependent_service_description->front() << "' of ";
+      if (!_dependent_hostgroups->empty())
+        msg << "host group '" << _dependent_hostgroups->front() << "'";
+      else
+        msg << "host '" << _dependent_hosts->front() << "'";
+    }
+    msg << " on ";
+    if (!_servicegroups->empty())
+      msg << "service group '" << _servicegroups->front() << "'";
+    else {
+      msg << "service '" << _service_description->front() << "' of ";
+      if (!_hostgroups->empty())
+        msg << "host group '" << _hostgroups->front() << "'";
+      else
+        msg << "host '" << _hosts->front() << "'";
+    }
+    logger(log_config_warning, basic) << msg.str();
   }
 
   return ;
