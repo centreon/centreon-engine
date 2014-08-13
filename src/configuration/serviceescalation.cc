@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -173,15 +173,17 @@ bool serviceescalation::operator<(serviceescalation const& right) const {
  *  If the object is not valid, an exception is thrown.
  */
 void serviceescalation::check_validity() const {
-  if (_service_description->empty() && _servicegroups->empty())
-    throw (engine_error() << "Service escalation is not attached to "
-           << "any service or service group (properties "
-           << "'service_description' and 'servicegroup_name', "
-           << "respectively)");
-  if (_hosts->empty() && _hostgroups->empty())
-    throw (engine_error() << "Service escalation is not attached to "
-           << "any host or host group (properties 'host_name' or "
-           << "'hostgroup_name', respectively)");
+  if (_servicegroups->empty()) {
+    if (_service_description->empty())
+      throw (engine_error() << "Service escalation is not attached to "
+             << "any service or service group (properties "
+             << "'service_description' and 'servicegroup_name', "
+             << "respectively)");
+    else if (_hosts->empty() && _hostgroups->empty())
+      throw (engine_error() << "Service escalation is not attached to "
+             << "any host or host group (properties 'host_name' or "
+             << "'hostgroup_name', respectively)");
+  }
   if (_contacts->empty() && _contactgroups->empty())
     throw (engine_error() << "Service escalation is not attached to "
            << "any contact or contact group (properties 'contacts' or "
