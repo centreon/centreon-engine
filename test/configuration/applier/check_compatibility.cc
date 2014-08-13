@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -467,12 +467,16 @@ bool chkdiff(global& g1, global& g2) {
     sort_it(se1->contacts);
     sort_it(se1->contact_groups);
   }
+  sort_it(g1.serviceescalations);
+  remove_duplicates(g1.serviceescalations);
   for (serviceescalation_struct* se2(g2.serviceescalations);
        se2;
        se2 = se2->next) {
     sort_it(se2->contacts);
     sort_it(se2->contact_groups);
   }
+  sort_it(g2.serviceescalations);
+  remove_duplicates(g2.serviceescalations);
   if (!chkdiff(g1.serviceescalations, g2.serviceescalations))
     ret = false;
   for (servicegroup_struct* sg1(g1.servicegroups);

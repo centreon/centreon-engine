@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -72,6 +72,9 @@ bool          operator==(
 bool          operator!=(
                 serviceescalation const& obj1,
                 serviceescalation const& obj2) throw ();
+bool          operator<(
+                serviceescalation const& obj1,
+                serviceescalation const& obj2) throw ();
 std::ostream& operator<<(
                 std::ostream& os,
                 serviceescalation const& obj);
@@ -79,5 +82,3 @@ std::ostream& operator<<(
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICEESCALATION_HH
-
-
