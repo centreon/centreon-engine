@@ -522,10 +522,18 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator appli
  *          otherwise.
  */
 umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
+  // Copy host escalation configuration to sort some
+  // members (used for comparison below).
+  configuration::hostescalation hesc(k);
+  hesc.contacts().sort();
+  hesc.contactgroups().sort();
+
+  // Browse escalations matching target host.
   typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _hostescalations.equal_range(k.hosts().front());
   while (p.first != p.second) {
+    // Create host escalation configuration from object.
     configuration::hostescalation current;
     current.configuration::object::operator=(k);
     current.hosts().push_back(p.first->second->host_name);
@@ -553,15 +561,20 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
       current.contacts().push_front(m->contact_ptr
                                    ? m->contact_ptr->name
                                    : m->contact_name);
+    current.contacts().sort();
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
       current.contactgroups().push_front(m->group_ptr
                                         ? m->group_ptr->group_name
                                         : m->group_name);
+    current.contactgroups().sort();
 
-    if (current == k)
+    // Found !
+    if (current == hesc)
       break ;
+
+    // Keep going.
     ++p.first;
   }
   return ((p.first == p.second) ? _hostescalations.end() : p.first);
@@ -779,10 +792,18 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
  *          otherwise.
  */
 umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
+  // Copy service escalation configuration to sort some
+  // members (used for comparison below).
+  configuration::serviceescalation sesc(k);
+  sesc.contacts().sort();
+  sesc.contactgroups().sort();
+
+  // Browse escalations matching target service.
   typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > collection;
   std::pair<collection::iterator, collection::iterator> p;
   p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
   while (p.first != p.second) {
+    // Create service escalation configuration from object.
     configuration::serviceescalation current;
     current.configuration::object::operator=(k);
     current.hosts().push_back(p.first->second->host_name);
@@ -814,14 +835,20 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
       current.contacts().push_front(m->contact_ptr
                                    ? m->contact_ptr->name
                                    : m->contact_name);
+    current.contacts().sort();
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
       current.contactgroups().push_front(m->group_ptr
                                         ? m->group_ptr->group_name
                                         : m->group_name);
-    if (current == k)
+    current.contactgroups().sort();
+
+    // Found !
+    if (current == sesc)
       break ;
+
+    // Keep going.
     ++p.first;
   }
   return ((p.first == p.second) ? _serviceescalations.end() : p.first);
