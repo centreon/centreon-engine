@@ -82,7 +82,6 @@ void applier::contactgroup::add_object(
     logger(logging::log_config_warning, logging::basic)
       << "Warning: Specified contact group '"
       << obj->contactgroup_name() << "' has no members";
-    return ;
   }
 
   // Add contact group to the global configuration set.
