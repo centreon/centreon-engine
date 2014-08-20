@@ -1259,6 +1259,15 @@ void state::command_check_interval(int value, bool is_second) {
 }
 
 /**
+ *  Return true is check interval is in seconds.
+ *
+ *  @return true if the check interval is in seconds.
+ */
+bool state::command_check_interval_is_seconds() const throw() {
+  return (_command_check_interval_is_seconds);
+}
+
+/**
  *  Get command_file value.
  *
  *  @return The command_file value.

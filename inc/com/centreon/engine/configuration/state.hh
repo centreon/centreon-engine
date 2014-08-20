@@ -157,6 +157,7 @@ namespace               configuration {
     int                 command_check_interval() const throw ();
     void                command_check_interval(int value);
     void                command_check_interval(int value, bool is_second);
+    bool                command_check_interval_is_seconds() const throw();
     std::string const&  command_file() const throw ();
     void                command_file(std::string const& value);
     set_connector const&
