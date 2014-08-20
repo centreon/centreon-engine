@@ -806,3 +806,23 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
+
+## Check that the effective state is the same as parsed.
+# check command interval length
+set(TEST_BIN_NAME "check_command_interval")
+add_executable(
+  "${TEST_BIN_NAME}"
+  "${TEST_DIR}/check_command_interval.cc"
+)
+target_link_libraries("${TEST_BIN_NAME}" "cce_core")
+set_property(TARGET "${TEST_BIN_NAME}" PROPERTY ENABLE_EXPORTS "1")
+
+set(TEST_NAME "check_command_interval_without_seconds")
+set(TEST_CONF_FILE "check_command_interval.cfg")
+set(TEST_EXPECTED_COMMAND_INTERVAL_VALUE 300)
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}" "${TEST_EXPECTED_COMMAND_INTERVAL_VALUE}")
+
+set(TEST_NAME "check_command_interval_with_seconds")
+set(TEST_CONF_FILE "check_command_interval_seconds.cfg")
+set(TEST_EXPECTED_COMMAND_INTERVAL_VALUE 5)
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}" "${TEST_EXPECTED_COMMAND_INTERVAL_VALUE}")
