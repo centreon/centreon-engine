@@ -87,7 +87,7 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "usage: " << argv[0] << " file.cfg" << " expected_value");
 
   unsigned int options(configuration::parser::read_all);
-  unsigned int expected_value = atoi(argv[2]);
+  int expected_value = atoi(argv[2]);
 
   if (!newparser_read_config(argv[1], options))
     throw (engine_error() << "new parser can't parse " << argv[1]);
