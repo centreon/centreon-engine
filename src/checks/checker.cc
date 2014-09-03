@@ -245,6 +245,51 @@ bool checker::reaper_is_empty() {
 }
 
 /**
+ *  Update the reschedule check flag of the current check of the host hst.
+ *  Note: this is extremely inefficient, but this is also very rarely called.
+ *
+ *  @param hst The host that is curently being checked.
+ *  @param reschedule the flag.
+ */
+void checker::_reschedule_check_flag(host* hst,
+                                     bool reschedule) {
+  if (reschedule == false)
+    return;
+
+  for (umap<unsigned long, check_result>::iterator it(_list_id.begin()), end(_list_id.end());
+       it != end; ++it)
+    if (strcmp(it->second.host_name, hst->name) == 0) {
+      it->second.reschedule_check = true;
+      return ;
+    }
+
+  for (umap<unsigned long, check_result>::iterator it(_to_reap_partial.begin()), end(_to_reap_partial.end());
+       it != end; ++it)
+    if (strcmp(it->second.host_name, hst->name) == 0) {
+      it->second.reschedule_check = true;
+      return ;
+    }
+
+  // Pretty clever (read: pretty horrible) queue plays to iterate over a queue.
+  // A better solution will obviously need to be implemented.
+  concurrency::locker lock(&_mut_reap);
+  std::queue<check_result> tmp;
+  while (_to_reap.size() != 0) {
+    check_result res = _to_reap.back();
+    _to_reap.pop();
+    tmp.push(res);
+    if (strcmp(res.host_name, hst->name) == 0) {
+      res.reschedule_check = true;
+      while (tmp.size() != 0) {
+        _to_reap.push(tmp.back());
+        tmp.pop();
+      }
+      return ;
+    }
+  }
+}
+
+/**
  *  Run an host check without waiting check result.
  *
  *  @param[in]  hst              Host to check.
@@ -290,15 +335,6 @@ void checker::run(
         preferred_time) == ERROR)
     throw (checks_viability_failure() << "Check of host '" << hst->name
            << "' is not viable");
-
-  // Don't execute a new host check if one is already running.
-  if (hst->is_executing
-      && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    logger(dbg_checks, basic)
-      << "A check of this host (" << hst->name
-      << ") is already being executed, so we'll pass for the moment...";
-    return ;
-  }
 
   // Send broker event.
   timeval start_time;
