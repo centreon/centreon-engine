@@ -291,15 +291,6 @@ void checker::run(
     throw (checks_viability_failure() << "Check of host '" << hst->name
            << "' is not viable");
 
-  // Don't execute a new host check if one is already running.
-  if (hst->is_executing
-      && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    logger(dbg_checks, basic)
-      << "A check of this host (" << hst->name
-      << ") is already being executed, so we'll pass for the moment...";
-    return ;
-  }
-
   // Send broker event.
   timeval start_time;
   timeval end_time;
