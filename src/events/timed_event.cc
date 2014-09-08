@@ -739,6 +739,8 @@ void remove_event(
     *event_list = event->next;
     if (!(*event_list))
       *event_list_tail = NULL;
+    else
+      (*event_list)->prev = NULL;
   }
 
   else {
