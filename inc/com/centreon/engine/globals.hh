@@ -179,7 +179,6 @@ extern unsigned int log_external_commands;
 extern unsigned int log_passive_checks;
 extern unsigned int log_initial_states;
 extern int log_host_retries;
-extern int allow_empty_hostgroup_assignment;
 extern unsigned int retain_state_information;
 extern unsigned int retention_update_interval;
 extern unsigned int use_retained_program_state;

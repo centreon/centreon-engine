@@ -85,7 +85,6 @@ hostgroup*          hostgroup_list(NULL);
 hostgroup*          hostgroup_list_tail(NULL);
 int                 __nagios_object_structure_version(CURRENT_OBJECT_STRUCTURE_VERSION);
 int                 additional_freshness_latency(15);
-int                 allow_empty_hostgroup_assignment(false);
 int                 caught_signal(false);
 int                 command_check_interval(-1);
 int                 config_errors(0);

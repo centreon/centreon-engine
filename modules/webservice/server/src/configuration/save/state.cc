@@ -117,8 +117,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.accept_passive_service_checks() << std::endl
     << "additional_freshness_latency="
     << obj.additional_freshness_latency() << std::endl
-    << "allow_empty_hostgroup_assignment="
-    << obj.allow_empty_hostgroup_assignment() << std::endl
     << "auto_reschedule_checks="
     << obj.auto_reschedule_checks() << std::endl
     << "auto_rescheduling_interval="

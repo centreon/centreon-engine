@@ -212,7 +212,6 @@ static std::map<std::string, std::string> build_configuration(
   var["use_large_installation_tweaks"] = obj2str(my_rand(0, 1));
   var["enable_environment_macros"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
-  var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
   std::ofstream ofs(mainconf.c_str());
   for (std::map<std::string, std::string>::const_iterator
@@ -485,9 +484,6 @@ void test_configuration(
   }
   if (my_conf["external_command_buffer_slots"] != obj2str(config->external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");
-  }
-  if (my_conf["allow_empty_hostgroup_assignment"] != obj2str(config->allow_empty_hostgroup_assignment())) {
-    throw (engine_error() << "allow_empty_hostgroup_assignment: init with '" << my_conf["allow_empty_hostgroup_assignment"] << "'");
   }
   if (my_conf["debug_file"] != config->debug_file()) {
     throw (engine_error() << "debug_file: init with '" << my_conf["debug_file"] << "'");

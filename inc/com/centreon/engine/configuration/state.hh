@@ -97,8 +97,6 @@ namespace               configuration {
     void                accept_passive_service_checks(bool value);
     int                 additional_freshness_latency() const throw ();
     void                additional_freshness_latency(int value);
-    bool                allow_empty_hostgroup_assignment() const throw ();
-    void                allow_empty_hostgroup_assignment(bool value);
     bool                auto_reschedule_checks() const throw ();
     void                auto_reschedule_checks(bool value);
     unsigned int        auto_rescheduling_interval() const throw ();
@@ -392,6 +390,7 @@ namespace               configuration {
     void                _set_admin_email(std::string const& value);
     void                _set_admin_pager(std::string const& value);
     void                _set_aggregate_status_updates(std::string const& value);
+    void                _set_allow_empty_hostgroup_assignment(bool value);
     void                _set_auth_file(std::string const& value);
     void                _set_bare_update_check(std::string const& value);
     void                _set_broker_module(std::string const& value);
@@ -474,7 +473,6 @@ namespace               configuration {
     bool                _accept_passive_host_checks;
     bool                _accept_passive_service_checks;
     int                 _additional_freshness_latency;
-    bool                _allow_empty_hostgroup_assignment;
     bool                _auto_reschedule_checks;
     unsigned int        _auto_rescheduling_interval;
     unsigned int        _auto_rescheduling_window;

@@ -38,7 +38,6 @@ state::setters const state::_setters[] = {
   { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
   { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
-  { "allow_empty_hostgroup_assignment",            SETTER(bool, allow_empty_hostgroup_assignment) },
   { "auto_reschedule_checks",                      SETTER(bool, auto_reschedule_checks) },
   { "auto_rescheduling_interval",                  SETTER(unsigned int, auto_rescheduling_interval) },
   { "auto_rescheduling_window",                    SETTER(unsigned int, auto_rescheduling_window) },
@@ -146,6 +145,7 @@ state::setters const state::_setters[] = {
   { "admin_email",                                 SETTER(std::string const&, _set_admin_email) },
   { "admin_pager",                                 SETTER(std::string const&, _set_admin_pager) },
   { "aggregate_status_updates",                    SETTER(std::string const&, _set_aggregate_status_updates) },
+  { "allow_empty_hostgroup_assignment",            SETTER(bool, _set_allow_empty_hostgroup_assignment) },
   { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
   { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
   { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
@@ -188,7 +188,6 @@ state::setters const state::_setters[] = {
 static bool const                      default_accept_passive_host_checks(true);
 static bool const                      default_accept_passive_service_checks(true);
 static int const                       default_additional_freshness_latency(15);
-static bool const                      default_allow_empty_hostgroup_assignment(false);
 static bool const                      default_auto_reschedule_checks(false);
 static unsigned int const              default_auto_rescheduling_interval(30);
 static unsigned int const              default_auto_rescheduling_window(180);
@@ -317,7 +316,6 @@ state::state()
   : _accept_passive_host_checks(default_accept_passive_host_checks),
     _accept_passive_service_checks(default_accept_passive_service_checks),
     _additional_freshness_latency(default_additional_freshness_latency),
-    _allow_empty_hostgroup_assignment(default_allow_empty_hostgroup_assignment),
     _auto_reschedule_checks(default_auto_reschedule_checks),
     _auto_rescheduling_interval(default_auto_rescheduling_interval),
     _auto_rescheduling_window(default_auto_rescheduling_window),
@@ -443,7 +441,6 @@ state& state::operator=(state const& right) {
     _accept_passive_host_checks = right._accept_passive_host_checks;
     _accept_passive_service_checks = right._accept_passive_service_checks;
     _additional_freshness_latency = right._additional_freshness_latency;
-    _allow_empty_hostgroup_assignment = right._allow_empty_hostgroup_assignment;
     _auto_reschedule_checks = right._auto_reschedule_checks;
     _auto_rescheduling_interval = right._auto_rescheduling_interval;
     _auto_rescheduling_window = right._auto_rescheduling_window;
@@ -570,7 +567,6 @@ bool state::operator==(state const& right) const throw () {
   return (_accept_passive_host_checks == right._accept_passive_host_checks
           && _accept_passive_service_checks == right._accept_passive_service_checks
           && _additional_freshness_latency == right._additional_freshness_latency
-          && _allow_empty_hostgroup_assignment == right._allow_empty_hostgroup_assignment
           && _auto_reschedule_checks == right._auto_reschedule_checks
           && _auto_rescheduling_interval == right._auto_rescheduling_interval
           && _auto_rescheduling_window == right._auto_rescheduling_window
@@ -747,24 +743,6 @@ int state::additional_freshness_latency() const throw () {
  */
 void state::additional_freshness_latency(int value) {
   _additional_freshness_latency = value;
-}
-
-/**
- *  Get allow_empty_hostgroup_assignment value.
- *
- *  @return The allow_empty_hostgroup_assignment value.
- */
-bool state::allow_empty_hostgroup_assignment() const throw () {
-  return (_allow_empty_hostgroup_assignment);
-}
-
-/**
- *  Set allow_empty_hostgroup_assignment value.
- *
- *  @param[in] value The new allow_empty_hostgroup_assignment value.
- */
-void state::allow_empty_hostgroup_assignment(bool value) {
-  _allow_empty_hostgroup_assignment = value;
 }
 
 /**
@@ -3429,6 +3407,19 @@ void state::_set_aggregate_status_updates(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: aggregate_status_updates variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable allow_empty_hostgroup_assignment.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_allow_empty_hostgroup_assignment(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: allow_empty_hostgroup_assignment variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

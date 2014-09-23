@@ -1,5 +1,5 @@
 ##
-## Copyright 2013 Merethis
+## Copyright 2013-2014 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -203,21 +203,6 @@ set(TEST_NAME "running_engine_empty_servicegroup")
 add_test(
   "${TEST_NAME}"
   "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg"
-)
-
-# Empty host group assignment error.
-set(TEST_NAME "running_engine_empty_hostgroup_assignment_error")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_error.cfg"
-)
-set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-
-# Empty host group assignment success.
-set(TEST_NAME "running_engine_empty_hostgroup_assignment_success")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg"
 )
 
 # Invalid contactgroup on contact.

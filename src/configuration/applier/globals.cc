@@ -47,7 +47,6 @@ void applier::globals::apply(state& config) {
   ::accept_passive_host_checks = config.accept_passive_host_checks();
   ::accept_passive_service_checks = config.accept_passive_service_checks();
   ::additional_freshness_latency = config.additional_freshness_latency();
-  ::allow_empty_hostgroup_assignment = config.allow_empty_hostgroup_assignment();
   ::auto_reschedule_checks = config.auto_reschedule_checks();
   ::auto_rescheduling_interval = config.auto_rescheduling_interval();
   ::auto_rescheduling_window = config.auto_rescheduling_window();

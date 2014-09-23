@@ -274,11 +274,11 @@ void applier::service::expand_object(
                << obj->service_description() << "'");
 
       // Check host group and user configuration.
-      if ((*it2)->resolved_members().empty()
-          && !s.allow_empty_hostgroup_assignment())
-        throw (engine_error() << "Could not expand host group '"
-               << *it << "' specified in service '"
-               << obj->service_description() << "'");
+      if ((*it2)->resolved_members().empty())
+        logger(logging::log_config_warning, logging::basic)
+          << "Could not expand host group '"
+          << *it << "' specified in service '"
+          << obj->service_description() << "'";
 
       // Add host group members.
       for (set_string::const_iterator

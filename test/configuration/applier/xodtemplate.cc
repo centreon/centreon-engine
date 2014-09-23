@@ -4484,8 +4484,6 @@ int xodtemplate_duplicate_services() {
         && temp_service->host_name == NULL)
       continue;
 
-    /* If hostgroup is not null and hostgroup has no members, check to see if */
-    /* allow_empty_hostgroup_assignment is set to 1 - if it is, continue without error  */
     if (temp_service->hostgroup_name != NULL) {
       if (xodtemplate_expand_hostgroups(
             &temp_memberlist,
@@ -4500,10 +4498,7 @@ int xodtemplate_duplicate_services() {
         if (temp_memberlist != NULL)
           xodtemplate_free_memberlist(&temp_memberlist);
         else {
-          /* User is ok with hostgroup -> service mappings with no hosts */
-          if (config->allow_empty_hostgroup_assignment() == 1) {
-            continue;
-          }
+          continue ;
         }
       }
     }

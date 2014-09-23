@@ -971,7 +971,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->accept_passive_host_checks(new_cfg.accept_passive_host_checks());
   config->accept_passive_service_checks(new_cfg.accept_passive_service_checks());
   config->additional_freshness_latency(new_cfg.additional_freshness_latency());
-  config->allow_empty_hostgroup_assignment(new_cfg.allow_empty_hostgroup_assignment());
   config->auto_reschedule_checks(new_cfg.auto_reschedule_checks());
   config->auto_rescheduling_interval(new_cfg.auto_rescheduling_interval());
   config->auto_rescheduling_window(new_cfg.auto_rescheduling_window());
