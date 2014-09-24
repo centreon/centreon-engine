@@ -54,7 +54,6 @@ typedef struct                  contact_struct {
   char*                         service_notification_period;
   int                           host_notifications_enabled;
   int                           service_notifications_enabled;
-  int                           can_submit_commands;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
   customvariablesmember_struct* custom_variables;
@@ -96,7 +95,6 @@ contact* add_contact(
            int notify_host_downtime,
            int host_notifications_enabled,
            int service_notifications_enabled,
-           int can_submit_commands,
            int retain_status_information,
            int retain_nonstatus_information);
 

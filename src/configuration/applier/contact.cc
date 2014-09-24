@@ -147,7 +147,6 @@ void applier::contact::add_object(
           obj->host_notification_options() & host::downtime),
         obj->host_notifications_enabled(),
         obj->service_notifications_enabled(),
-        obj->can_submit_commands(),
         obj->retain_status_information(),
         obj->retain_nonstatus_information()));
   if (!c)
@@ -339,9 +338,6 @@ void applier::contact::modify_object(
   modify_if_different(
     c->service_notifications_enabled,
     static_cast<int>(obj->service_notifications_enabled()));
-  modify_if_different(
-    c->can_submit_commands,
-    static_cast<int>(obj->can_submit_commands()));
   modify_if_different(
     c->retain_status_information,
     static_cast<int>(obj->retain_status_information()));

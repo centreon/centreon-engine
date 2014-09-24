@@ -34,7 +34,7 @@ static int check_change_contact_host_notification_timeperiod(int argc, char** ar
   (void)argv;
 
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
     throw (engine_error() << "create contact failed.");
 

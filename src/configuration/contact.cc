@@ -21,11 +21,16 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
+
+extern int config_warnings;
+extern int config_errors;
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<contact, type, &contact::method>::generic
@@ -46,13 +51,14 @@ contact::setters const contact::_setters[] = {
   { "service_notification_options",  SETTER(std::string const&, _set_service_notification_options) },
   { "host_notifications_enabled",    SETTER(bool, _set_host_notifications_enabled) },
   { "service_notifications_enabled", SETTER(bool, _set_service_notifications_enabled) },
-  { "can_submit_commands",           SETTER(bool, _set_can_submit_commands) },
   { "retain_status_information",     SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information",  SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information",  SETTER(bool, _set_retain_nonstatus_information) },
+
+  // Deprecated.
+  { "can_submit_commands",           SETTER(bool, _set_can_submit_commands) }
 };
 
 // Default values.
-static bool const           default_can_submit_commands(true);
 static bool const           default_host_notifications_enabled(true);
 static unsigned short const default_host_notification_options(host::none);
 static bool const           default_retain_nonstatus_information(true);
@@ -69,7 +75,6 @@ static unsigned int const   MAX_ADDRESSES(6);
  */
 contact::contact(key_type const& key)
   : object(object::contact),
-    _can_submit_commands(default_can_submit_commands),
     _contact_name(key),
     _host_notifications_enabled(default_host_notifications_enabled),
     _host_notification_options(default_host_notification_options),
@@ -107,7 +112,6 @@ contact& contact::operator=(contact const& right) {
     object::operator=(right);
     _address = right._address;
     _alias = right._alias;
-    _can_submit_commands = right._can_submit_commands;
     _contactgroups = right._contactgroups;
     _contact_name = right._contact_name;
     _customvariables = right._customvariables;
@@ -138,7 +142,6 @@ bool contact::operator==(contact const& right) const throw () {
   return (object::operator==(right)
           && _address == right._address
           && _alias == right._alias
-          && _can_submit_commands == right._can_submit_commands
           && _contactgroups == right._contactgroups
           && _contact_name == right._contact_name
           && std::operator==(_customvariables, right._customvariables)
@@ -181,8 +184,6 @@ bool contact::operator<(contact const& right) const throw () {
     return (_address < right._address);
   else if (_alias != right._alias)
     return (_alias < right._alias);
-  else if (_can_submit_commands != right._can_submit_commands)
-    return (_can_submit_commands < right._can_submit_commands);
   else if (_contactgroups != right._contactgroups)
     return (_contactgroups < right._contactgroups);
   else if (_customvariables != right._customvariables)
@@ -265,7 +266,6 @@ void contact::merge(object const& obj) {
 
   MRG_TAB(_address);
   MRG_DEFAULT(_alias);
-  MRG_OPTION(_can_submit_commands);
   MRG_INHERIT(_contactgroups);
   MRG_DEFAULT(_contact_name);
   MRG_MAP(_customvariables);
@@ -322,15 +322,6 @@ tab_string const& contact::address() const throw () {
  */
 std::string const& contact::alias() const throw () {
   return (_alias);
-}
-
-/**
- *  Get can_submit_commands.
- *
- *  @return The can_submit_commands.
- */
-bool contact::can_submit_commands() const throw () {
-  return (_can_submit_commands);
 }
 
 /**
@@ -508,14 +499,17 @@ bool contact::_set_alias(std::string const& value) {
 }
 
 /**
- *  Set can_submit_commands value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new can_submit_commands value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool contact::_set_can_submit_commands(bool value) {
-  _can_submit_commands = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: contact can_submit_commands was ignored";
+  ++config_warnings;
   return (true);
 }
 

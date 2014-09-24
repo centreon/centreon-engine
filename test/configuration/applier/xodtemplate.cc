@@ -10689,7 +10689,6 @@ int xodtemplate_register_contact(xodtemplate_contact* this_contact) {
                   this_contact->notify_on_host_downtime,
                   this_contact->host_notifications_enabled,
                   this_contact->service_notifications_enabled,
-                  this_contact->can_submit_commands,
                   this_contact->retain_status_information,
                   this_contact->retain_nonstatus_information);
 

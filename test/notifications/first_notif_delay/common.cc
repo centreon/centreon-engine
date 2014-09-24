@@ -159,7 +159,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                                    // Notify host downtime
     1,                                    // Host notifications enabled
     1,                                    // Service notifications enabled
-    1,                                    // Can submit commands
     0,                                    // Retain status information
     0));                                  // Retain non-status information
   retval |= (NULL == cntct);

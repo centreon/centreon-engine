@@ -34,7 +34,7 @@ static int check_enable_contactgroup_host_notifications(int argc, char** argv) {
   (void)argv;
 
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   if (!cntct)
     throw (engine_error() << "create contact failed.");
 
