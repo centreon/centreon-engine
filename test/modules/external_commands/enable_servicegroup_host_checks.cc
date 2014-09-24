@@ -40,12 +40,10 @@ static int check_enable_servicegroup_host_checks(int argc, char** argv) {
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
+                           0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
+                           0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
+                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0));
   if (!svc)
     throw (engine_error() << "create service failed.");
 

@@ -131,11 +131,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
-    NULL,                           // Notes
-    NULL,                           // Notes URL
-    NULL,                           // Action URL
-    NULL,                           // Icon image
-    NULL,                           // Icon image alt
     0,                              // Retain status information
     0,                              // Retain non-status information
     0));                            // Obsess over service

@@ -53,8 +53,7 @@ static int check_schedule_servicegroup_host_downtime(
   service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
                            0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
                            0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0));
+                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0));
   if (!svc)
     throw (engine_error() << "service creation failed");
 

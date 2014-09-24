@@ -10969,11 +10969,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->failure_prediction_options,
                   this_service->check_freshness,
                   this_service->freshness_threshold,
-                  this_service->notes,
-                  this_service->notes_url,
-                  this_service->action_url,
-                  this_service->icon_image,
-                  this_service->icon_image_alt,
                   this_service->retain_status_information,
                   this_service->retain_nonstatus_information,
                   this_service->obsess_over_service);

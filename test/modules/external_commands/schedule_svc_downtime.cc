@@ -51,8 +51,7 @@ static int check_schedule_svc_downtime(int argc, char** argv) {
   service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
                            0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
                            0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0));
+                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0));
   if (!svc)
     throw (engine_error() << "service creation failed");
 
