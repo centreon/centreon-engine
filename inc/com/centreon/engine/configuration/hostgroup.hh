@@ -48,14 +48,11 @@ namespace                  configuration {
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 
-    std::string const&     action_url() const throw ();
     std::string const&     alias() const throw ();
     list_string const&     hostgroup_members() const throw ();
     std::string const&     hostgroup_name() const throw ();
     list_string&           members() throw ();
     list_string const&     members() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
 
     bool                   is_resolved() const throw ();
     set_string&            resolved_members() const throw ();
@@ -75,13 +72,10 @@ namespace                  configuration {
     bool                   _set_notes(std::string const& value);
     bool                   _set_notes_url(std::string const& value);
 
-    std::string            _action_url;
     std::string            _alias;
     group                  _hostgroup_members;
     std::string            _hostgroup_name;
     group                  _members;
-    std::string            _notes;
-    std::string            _notes_url;
     mutable bool           _resolved;
     mutable set_string     _resolved_members;
     static setters const   _setters[];

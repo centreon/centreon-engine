@@ -87,10 +87,7 @@ void applier::hostgroup::add_object(
   // Create host group.
   hostgroup_struct* hg(add_hostgroup(
                          obj->hostgroup_name().c_str(),
-                         NULL_IF_EMPTY(obj->alias()),
-                         NULL_IF_EMPTY(obj->notes()),
-                         NULL_IF_EMPTY(obj->notes_url()),
-                         NULL_IF_EMPTY(obj->action_url())));
+                         NULL_IF_EMPTY(obj->alias())));
   if (!hg)
     throw (engine_error() << "Could not register host group '"
            << obj->hostgroup_name() << "'");
@@ -163,17 +160,8 @@ void applier::hostgroup::modify_object(
 
   // Modify properties.
   modify_if_different(
-    hg->action_url,
-    NULL_IF_EMPTY(obj->action_url()));
-  modify_if_different(
     hg->alias,
     (obj->alias().empty() ? obj->hostgroup_name() : obj->alias()).c_str());
-  modify_if_different(
-    hg->notes,
-    NULL_IF_EMPTY(obj->notes()));
-  modify_if_different(
-    hg->notes_url,
-    NULL_IF_EMPTY(obj->notes_url()));
 
   // Were members modified ?
   if (obj->resolved_members() != old_cfg->resolved_members()) {

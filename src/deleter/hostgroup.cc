@@ -42,12 +42,6 @@ void deleter::hostgroup(void* ptr) throw () {
   obj->group_name = NULL;
   delete[] obj->alias;
   obj->alias = NULL;
-  delete[] obj->notes;
-  obj->notes = NULL;
-  delete[] obj->notes_url;
-  obj->notes_url = NULL;
-  delete[] obj->action_url;
-  obj->action_url = NULL;
 
   delete obj;
 }

@@ -50,7 +50,7 @@ static int check_schedule_hostgroup_host_downtime(
     throw (engine_error() << "host creation failed");
 
   // Create target host group.
-  hostgroup* group(add_hostgroup("group", NULL, NULL, NULL, NULL));
+  hostgroup* group(add_hostgroup("group", NULL));
   if (!group)
     throw (engine_error() << "host group creation failed");
 

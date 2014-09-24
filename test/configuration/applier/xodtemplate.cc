@@ -10393,10 +10393,7 @@ int xodtemplate_register_hostgroup(
   hostgroup* new_hostgroup
     = add_hostgroup(
         this_hostgroup->hostgroup_name,
-        this_hostgroup->alias,
-        this_hostgroup->notes,
-        this_hostgroup->notes_url,
-        this_hostgroup->action_url);
+        this_hostgroup->alias);
 
   /* return with an error if we couldn't add the hostgroup */
   if (new_hostgroup == NULL) {

@@ -49,10 +49,7 @@ bool operator==(
        hostgroup const& obj2) throw () {
   return (is_equal(obj1.group_name, obj2.group_name)
           && is_equal(obj1.alias, obj2.alias)
-          && is_equal(obj1.members, obj2.members)
-          && is_equal(obj1.notes, obj2.notes)
-          && is_equal(obj1.notes_url, obj2.notes_url)
-          && is_equal(obj1.action_url, obj2.action_url));
+          && is_equal(obj1.members, obj2.members));
 }
 
 /**
@@ -82,9 +79,6 @@ std::ostream& operator<<(std::ostream& os, hostgroup const& obj) {
     "  group_name: " << chkstr(obj.group_name) << "\n"
     "  alias:      " << chkstr(obj.alias) << "\n"
     "  members:    " << chkobj(obj.members) << "\n"
-    "  notes:      " << chkstr(obj.notes) << "\n"
-    "  notes_url:  " << chkstr(obj.notes_url) << "\n"
-    "  action_url: " << chkstr(obj.action_url) << "\n"
     "}\n";
   return (os);
 }
@@ -102,10 +96,7 @@ std::ostream& operator<<(std::ostream& os, hostgroup const& obj) {
  */
 hostgroup* add_hostgroup(
              char const* name,
-             char const* alias,
-             char const* notes,
-             char const* notes_url,
-             char const* action_url) {
+             char const* alias) {
   // Make sure we have the data we need.
   if (!name || !name[0]) {
     logger(log_config_error, basic)
@@ -129,12 +120,6 @@ hostgroup* add_hostgroup(
     // Duplicate vars.
     obj->group_name = string::dup(name);
     obj->alias = string::dup(alias ? alias : name);
-    if (action_url)
-      obj->action_url = string::dup(action_url);
-    if (notes)
-      obj->notes = string::dup(notes);
-    if (notes_url)
-      obj->notes_url = string::dup(notes_url);
 
     // Add new items to the configuration state.
     state::instance().hostgroups()[id] = obj;

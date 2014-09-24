@@ -47,7 +47,7 @@ static int check_enable_hostgroup_svc_notifications(int argc, char** argv) {
   if (!svc)
     throw (engine_error() << "create service failed.");
 
-  hostgroup* group = add_hostgroup("group", NULL, NULL, NULL, NULL);
+  hostgroup* group = add_hostgroup("group", NULL);
   if (!group)
     throw (engine_error() << "create hostgroup failed.");
 

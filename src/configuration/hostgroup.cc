@@ -19,9 +19,14 @@
 
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
+
+extern int config_warnings;
+extern int config_errors;
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<hostgroup, type, &hostgroup::method>::generic
@@ -31,6 +36,8 @@ hostgroup::setters const hostgroup::_setters[] = {
   { "alias",             SETTER(std::string const&, _set_alias) },
   { "members",           SETTER(std::string const&, _set_members) },
   { "hostgroup_members", SETTER(std::string const&, _set_hostgroup_members) },
+
+  // Deprecated.
   { "notes",             SETTER(std::string const&, _set_notes) },
   { "notes_url",         SETTER(std::string const&, _set_notes_url) },
   { "action_url",        SETTER(std::string const&, _set_action_url) }
@@ -71,13 +78,10 @@ hostgroup::~hostgroup() throw () {}
 hostgroup& hostgroup::operator=(hostgroup const& right) {
   if (this != &right) {
     object::operator=(right);
-    _action_url = right._action_url;
     _alias = right._alias;
     _hostgroup_members = right._hostgroup_members;
     _hostgroup_name = right._hostgroup_name;
     _members = right._members;
-    _notes = right._notes;
-    _notes_url = right._notes_url;
     _resolved = right._resolved;
     _resolved_members = right._resolved_members;
   }
@@ -93,13 +97,10 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
  */
 bool hostgroup::operator==(hostgroup const& right) const throw () {
   return (object::operator==(right)
-          && _action_url == right._action_url
           && _alias == right._alias
           && _hostgroup_members == right._hostgroup_members
           && _hostgroup_name == right._hostgroup_name
           && _members == right._members
-          && _notes == right._notes
-          && _notes_url == right._notes_url
           && _resolved == right._resolved
           && _resolved_members == right._resolved_members);
 }
@@ -125,14 +126,8 @@ bool hostgroup::operator!=(hostgroup const& right) const throw () {
 bool hostgroup::operator<(hostgroup const& right) const throw () {
   if (_hostgroup_name != right._hostgroup_name)
     return (_hostgroup_name < right._hostgroup_name);
-  else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
   else if (_alias != right._alias)
     return (_alias < right._alias);
-  else if (_notes != right._notes)
-    return (_notes < right._notes);
-  else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
   else if (_hostgroup_members != right._hostgroup_members)
     return (_hostgroup_members < right._hostgroup_members);
   else if (_members != right._members)
@@ -173,13 +168,10 @@ void hostgroup::merge(object const& obj) {
     throw (engine_error() << "Cannot merge host group with '"
            << obj.type() << "'");
   hostgroup const& tmpl(static_cast<hostgroup const&>(obj));
-  MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_alias);
   MRG_INHERIT(_hostgroup_members);
   MRG_DEFAULT(_hostgroup_name);
   MRG_INHERIT(_members);
-  MRG_DEFAULT(_notes);
-  MRG_DEFAULT(_notes_url);
 }
 
 /**
@@ -197,15 +189,6 @@ bool hostgroup::parse(char const* key, char const* value) {
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
-}
-
-/**
- *  Get action_url.
- *
- *  @return The action_url.
- */
-std::string const& hostgroup::action_url() const throw () {
-  return (_action_url);
 }
 
 /**
@@ -254,24 +237,6 @@ list_string const& hostgroup::members() const throw () {
 }
 
 /**
- *  Get notes.
- *
- *  @return The notes.
- */
-std::string const& hostgroup::notes() const throw () {
-  return (_notes);
-}
-
-/**
- *  Get notes_url.
- *
- *  @return The notes_url.
- */
-std::string const& hostgroup::notes_url() const throw () {
-  return (_notes_url);
-}
-
-/**
  *  Check if hostgroup was resolved.
  *
  *  @return True if hostgroup was resolved, false otherwise.
@@ -301,14 +266,17 @@ void hostgroup::set_resolved(bool resolved) const throw () {
 }
 
 /**
- *  Set action_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new action_url value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool hostgroup::_set_action_url(std::string const& value) {
-  _action_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: hostgroup action_url was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -361,25 +329,31 @@ bool hostgroup::_set_members(std::string const& value) {
 }
 
 /**
- *  Set notes value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool hostgroup::_set_notes(std::string const& value) {
-  _notes = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: hostgroup notes was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notes_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes_url value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool hostgroup::_set_notes_url(std::string const& value) {
-  _notes_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: hostgroup notes_url was ignored";
+  ++config_warnings;
   return (true);
 }

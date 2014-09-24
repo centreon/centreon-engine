@@ -40,7 +40,7 @@ static int check_disable_hostgroup_host_checks(int argc, char** argv) {
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  hostgroup* group = add_hostgroup("group", NULL, NULL, NULL, NULL);
+  hostgroup* group = add_hostgroup("group", NULL);
   if (!group)
     throw (engine_error() << "create hostgroup failed.");
 
