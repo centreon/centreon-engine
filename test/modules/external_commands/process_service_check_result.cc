@@ -43,11 +43,10 @@ static int check_process_service_check_result(int argc, char** argv) {
   if (!svc)
     throw (engine_error() << "create service failed.");
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0,
+                     0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL,
+                     0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0,
+                     NULL, 0, 0, 0, 0, 0, 0));
   if (!hst)
     throw (engine_error() << "create host failed.");
 

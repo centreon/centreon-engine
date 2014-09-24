@@ -68,20 +68,6 @@ void com::centreon::engine::test::minimal_setup() {
     NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
-    NULL,                           // Notes
-    NULL,                           // Notes URL
-    NULL,                           // Action URL
-    NULL,                           // Icon image
-    NULL,                           // Icon image alt
-    NULL,                           // VRML image
-    NULL,                           // Statusmap image
-    0,                              // X2D
-    0,                              // Y2D
-    0,                              // Have 2D coords
-    0.0,                            // X3D
-    0.0,                            // Y3D
-    0.0,                            // Z3D
-    0,                              // Have 3D coords
     0,                              // Should be drawn
     0,                              // Retain status information
     0,                              // Retain non-status information

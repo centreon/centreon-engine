@@ -40,18 +40,14 @@ static int check_schedule_host_downtime(int argc, char** argv) {
   (void)argv;
 
   // Create target hosts.
-  host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0,
-                            0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
-                            0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
-                            0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL,
-                            NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0,
-                            0.0, 0.0, 0, 0, 0, 0, 0));
-  host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0,
-                           0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
-                           0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0,
-                           0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                           0.0, 0, 0, 0, 0, 0));
+  host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0,
+                            0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL,
+                            0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0,
+                            NULL, 0, 0, 0, 0, 0, 0));
+  host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0, 0.0,
+                           0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL,
+                           0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0,
+                           NULL, 0, 0, 0, 0, 0, 0));
   if (!hst_parent || !hst_child)
     throw (engine_error() << "hosts creation failed");
 

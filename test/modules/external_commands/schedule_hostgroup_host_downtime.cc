@@ -42,11 +42,10 @@ static int check_schedule_hostgroup_host_downtime(
   (void)argv;
 
   // Create target host.
-  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
-                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
-                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                     0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-                     0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0,
+                     0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL,
+                     0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0,
+                     NULL, 0, 0, 0, 0, 0, 0));
   if (!hst)
     throw (engine_error() << "host creation failed");
 

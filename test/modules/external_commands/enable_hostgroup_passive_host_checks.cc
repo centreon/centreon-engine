@@ -33,11 +33,10 @@ static int check_enable_hostgroup_passive_host_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0,
+                     0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL,
+                     0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0,
+                     NULL, 0, 0, 0, 0, 0, 0));
   if (!hst)
     throw (engine_error() << "create host failed.");
 
