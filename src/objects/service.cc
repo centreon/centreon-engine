@@ -95,11 +95,6 @@ bool operator==(
           && obj1.obsess_over_service == obj2.obsess_over_service
           && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
           && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
-          && is_equal(obj1.notes, obj2.notes)
-          && is_equal(obj1.notes_url, obj2.notes_url)
-          && is_equal(obj1.action_url, obj2.action_url)
-          && is_equal(obj1.icon_image, obj2.icon_image)
-          && is_equal(obj1.icon_image_alt, obj2.icon_image_alt)
           && is_equal(obj1.custom_variables, obj2.custom_variables)
           && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
           && obj1.acknowledgement_type == obj2.acknowledgement_type
@@ -241,11 +236,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
     "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
     "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
-    "  notes:                                " << chkstr(obj.notes) << "\n"
-    "  notes_url:                            " << chkstr(obj.notes_url) << "\n"
-    "  action_url:                           " << chkstr(obj.action_url) << "\n"
-    "  icon_image:                           " << chkstr(obj.icon_image) << "\n"
-    "  icon_image_alt:                       " << chkstr(obj.icon_image_alt) << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
     "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
@@ -375,11 +365,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] failure_prediction_options   Failure prediction options.
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
- *  @param[in] notes                        Notes.
- *  @param[in] notes_url                    URL.
- *  @param[in] action_url                   Action URL.
- *  @param[in] icon_image                   Icon image.
- *  @param[in] icon_image_alt               Alternative icon image.
  *  @param[in] retain_status_information    Should Engine retain service
  *                                          status information ?
  *  @param[in] retain_nonstatus_information Should Engine retain service
@@ -430,11 +415,6 @@ service* add_service(
            char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
-           char const* notes,
-           char const* notes_url,
-           char const* action_url,
-           char const* icon_image,
-           char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service) {
@@ -503,16 +483,6 @@ service* add_service(
       obj->check_period = string::dup(check_period);
     if (failure_prediction_options)
       obj->failure_prediction_options = string::dup(failure_prediction_options);
-    if (notes)
-      obj->notes = string::dup(notes);
-    if (notes_url)
-      obj->notes_url = string::dup(notes_url);
-    if (action_url)
-      obj->action_url = string::dup(action_url);
-    if (icon_image)
-      obj->icon_image = string::dup(icon_image);
-    if (icon_image_alt)
-      obj->icon_image_alt = string::dup(icon_image_alt);
 
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;

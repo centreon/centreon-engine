@@ -218,15 +218,6 @@ struct grab_service_redirection {
     // Last problem ID.
     routines[MACRO_LASTSERVICEPROBLEMID].first = &get_member_as_string<service, unsigned long, &service::last_problem_id>;
     routines[MACRO_LASTSERVICEPROBLEMID].second = true;
-    // Action URL.
-    routines[MACRO_SERVICEACTIONURL].first = &get_recursive<service, &service::action_url, URL_ENCODE_MACRO_CHARS>;
-    routines[MACRO_SERVICEACTIONURL].second = true;
-    // Notes URL.
-    routines[MACRO_SERVICENOTESURL].first = &get_recursive<service, &service::notes_url, URL_ENCODE_MACRO_CHARS>;
-    routines[MACRO_SERVICENOTESURL].second = true;
-    // Notes.
-    routines[MACRO_SERVICENOTES].first = &get_recursive<service, &service::notes, 0>;
-    routines[MACRO_SERVICENOTES].second = true;
     // Group names.
     routines[MACRO_SERVICEGROUPNAMES].first = &get_service_group_names;
     routines[MACRO_SERVICEGROUPNAMES].second = true;

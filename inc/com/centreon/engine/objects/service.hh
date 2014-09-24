@@ -78,11 +78,6 @@ typedef struct                  service_struct {
   int                           obsess_over_service;
   int                           failure_prediction_enabled;
   char*                         failure_prediction_options;
-  char*                         notes;
-  char*                         notes_url;
-  char*                         action_url;
-  char*                         icon_image;
-  char*                         icon_image_alt;
   customvariablesmember_struct* custom_variables;
   int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
@@ -195,11 +190,6 @@ service* add_service(
            char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
-           char const* notes,
-           char const* notes_url,
-           char const* action_url,
-           char const* icon_image,
-           char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service);

@@ -167,11 +167,6 @@ void applier::service::add_object(
     NULL, // failure_prediction_options
     obj->check_freshness(),
     obj->freshness_threshold(),
-    NULL_IF_EMPTY(obj->notes()),
-    NULL_IF_EMPTY(obj->notes_url()),
-    NULL_IF_EMPTY(obj->action_url()),
-    NULL_IF_EMPTY(obj->icon_image()),
-    NULL_IF_EMPTY(obj->icon_image_alt()),
     obj->retain_status_information(),
     obj->retain_nonstatus_information(),
     obj->obsess_over_service()));
@@ -479,13 +474,6 @@ void applier::service::modify_object(
   modify_if_different(
     s->obsess_over_service,
     static_cast<int>(obj->obsess_over_service()));
-  modify_if_different(s->notes, NULL_IF_EMPTY(obj->notes()));
-  modify_if_different(s->notes_url, NULL_IF_EMPTY(obj->notes_url()));
-  modify_if_different(s->action_url, NULL_IF_EMPTY(obj->action_url()));
-  modify_if_different(s->icon_image, NULL_IF_EMPTY(obj->icon_image()));
-  modify_if_different(
-    s->icon_image_alt,
-    NULL_IF_EMPTY(obj->icon_image_alt()));
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj->is_volatile()));
