@@ -49,14 +49,6 @@ host::setters const host::_setters[] = {
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
   { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
-  { "notes",                        SETTER(std::string const&, _set_notes) },
-  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
-  { "action_url",                   SETTER(std::string const&, _set_action_url) },
-  { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
-  { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
-  { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) },
-  { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
-  { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
   { "initial_state",                SETTER(std::string const&, _set_initial_state) },
   { "check_interval",               SETTER(unsigned int, _set_check_interval) },
   { "normal_check_interval",        SETTER(unsigned int, _set_check_interval) },
@@ -79,14 +71,22 @@ host::setters const host::_setters[] = {
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
-  { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
-  { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
 
   // Deprecated.
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) }
+  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
+  { "notes",                        SETTER(std::string const&, _set_notes) },
+  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
+  { "action_url",                   SETTER(std::string const&, _set_action_url) },
+  { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
+  { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
+  { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) },
+  { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
+  { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
+  { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
+  { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) }
 };
 
 // XXX: check all default value from xodtemplate_inherit_object_properties !
@@ -95,8 +95,6 @@ static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
 static unsigned int const   default_check_interval(5);
-static point_2d const       default_coords_2d;
-static point_3d const       default_coords_3d;
 static bool const           default_event_handler_enabled(true);
 static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
@@ -170,7 +168,6 @@ host::~host() throw () {}
 host& host::operator=(host const& right) {
   if (this != &right) {
     object::operator=(right);
-    _action_url = right._action_url;
     _address = right._address;
     _alias = right._alias;
     _checks_active = right._checks_active;
@@ -181,8 +178,6 @@ host& host::operator=(host const& right) {
     _check_period = right._check_period;
     _contactgroups = right._contactgroups;
     _contacts = right._contacts;
-    _coords_2d = right._coords_2d;
-    _coords_3d = right._coords_3d;
     _customvariables = right._customvariables;
     _display_name = right._display_name;
     _event_handler = right._event_handler;
@@ -194,13 +189,9 @@ host& host::operator=(host const& right) {
     _high_flap_threshold = right._high_flap_threshold;
     _hostgroups = right._hostgroups;
     _host_name = right._host_name;
-    _icon_image = right._icon_image;
-    _icon_image_alt = right._icon_image_alt;
     _initial_state = right._initial_state;
     _low_flap_threshold = right._low_flap_threshold;
     _max_check_attempts = right._max_check_attempts;
-    _notes = right._notes;
-    _notes_url = right._notes_url;
     _notifications_enabled = right._notifications_enabled;
     _notification_interval = right._notification_interval;
     _notification_options = right._notification_options;
@@ -211,8 +202,6 @@ host& host::operator=(host const& right) {
     _retain_status_information = right._retain_status_information;
     _retry_interval = right._retry_interval;
     _stalking_options = right._stalking_options;
-    _statusmap_image = right._statusmap_image;
-    _vrml_image = right._vrml_image;
   }
   return (*this);
 }
@@ -226,7 +215,6 @@ host& host::operator=(host const& right) {
  */
 bool host::operator==(host const& right) const throw () {
   return (object::operator==(right)
-          && _action_url == right._action_url
           && _address == right._address
           && _alias == right._alias
           && _checks_active == right._checks_active
@@ -237,8 +225,6 @@ bool host::operator==(host const& right) const throw () {
           && _check_period == right._check_period
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
-          && _coords_2d == right._coords_2d
-          && _coords_3d == right._coords_3d
           && std::operator==(_customvariables, right._customvariables)
           && _display_name == right._display_name
           && _event_handler == right._event_handler
@@ -250,13 +236,9 @@ bool host::operator==(host const& right) const throw () {
           && _high_flap_threshold == right._high_flap_threshold
           && _hostgroups == right._hostgroups
           && _host_name == right._host_name
-          && _icon_image == right._icon_image
-          && _icon_image_alt == right._icon_image_alt
           && _initial_state == right._initial_state
           && _low_flap_threshold == right._low_flap_threshold
           && _max_check_attempts == right._max_check_attempts
-          && _notes == right._notes
-          && _notes_url == right._notes_url
           && _notifications_enabled == right._notifications_enabled
           && _notification_interval == right._notification_interval
           && _notification_options == right._notification_options
@@ -266,9 +248,7 @@ bool host::operator==(host const& right) const throw () {
           && _retain_nonstatus_information == right._retain_nonstatus_information
           && _retain_status_information == right._retain_status_information
           && _retry_interval == right._retry_interval
-          && _stalking_options == right._stalking_options
-          && _statusmap_image == right._statusmap_image
-          && _vrml_image == right._vrml_image);
+          && _stalking_options == right._stalking_options);
 }
 
 /**
@@ -292,8 +272,6 @@ bool host::operator!=(host const& right) const throw () {
 bool host::operator<(host const& right) const throw () {
   if (_host_name != right._host_name)
     return (_host_name < right._host_name);
-  else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
   else if (_address != right._address)
     return (_address < right._address);
   else if (_alias != right._alias)
@@ -314,10 +292,6 @@ bool host::operator<(host const& right) const throw () {
     return (_contactgroups < right._contactgroups);
   else if (_contacts != right._contacts)
     return (_contacts < right._contacts);
-  else if (_coords_2d != right._coords_2d)
-    return (_coords_2d < right._coords_2d);
-  else if (_coords_3d != right._coords_3d)
-    return (_coords_3d < right._coords_3d);
   else if (_customvariables != right._customvariables)
     return (_customvariables < right._customvariables);
   else if (_display_name != right._display_name)
@@ -340,20 +314,12 @@ bool host::operator<(host const& right) const throw () {
     return (_high_flap_threshold < right._high_flap_threshold);
   else if (_hostgroups != right._hostgroups)
     return (_hostgroups < right._hostgroups);
-  else if (_icon_image != right._icon_image)
-    return (_icon_image < right._icon_image);
-  else if (_icon_image_alt != right._icon_image_alt)
-    return (_icon_image_alt < right._icon_image_alt);
   else if (_initial_state != right._initial_state)
     return (_initial_state < right._initial_state);
   else if (_low_flap_threshold != right._low_flap_threshold)
     return (_low_flap_threshold < right._low_flap_threshold);
   else if (_max_check_attempts != right._max_check_attempts)
     return (_max_check_attempts < right._max_check_attempts);
-  else if (_notes != right._notes)
-    return (_notes < right._notes);
-  else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
   else if (_notifications_enabled != right._notifications_enabled)
     return (_notifications_enabled < right._notifications_enabled);
   else if (_notification_interval != right._notification_interval)
@@ -376,12 +342,7 @@ bool host::operator<(host const& right) const throw () {
             < right._retain_status_information);
   else if (_retry_interval != right._retry_interval)
     return (_retry_interval < right._retry_interval);
-  else if (_stalking_options != right._stalking_options)
-    return (_stalking_options < right._stalking_options);
-  else if (_statusmap_image != right._statusmap_image)
-    return (_statusmap_image < right._statusmap_image);
-  return (_vrml_image < right._vrml_image);
-}
+  return (_stalking_options < right._stalking_options);}
 
 /**
  *  @brief Check if the object is valid.
@@ -412,15 +373,7 @@ host::key_type const& host::key() const throw () {
  *  @param[in] obj The object to merge.
  */
 void host::merge(configuration::hostextinfo const& tmpl) {
-  MRG_DEFAULT(_action_url);
-  MRG_OPTION(_coords_2d);
-  MRG_OPTION(_coords_3d);
-  MRG_DEFAULT(_icon_image);
-  MRG_DEFAULT(_icon_image_alt);
-  MRG_DEFAULT(_notes);
-  MRG_DEFAULT(_notes_url);
-  MRG_DEFAULT(_statusmap_image);
-  MRG_DEFAULT(_vrml_image);
+  (void) tmpl;
 }
 
 /**
@@ -434,7 +387,6 @@ void host::merge(object const& obj) {
            << obj.type() << "'");
   host const& tmpl(static_cast<host const&>(obj));
 
-  MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_address);
   MRG_DEFAULT(_alias);
   MRG_OPTION(_checks_active);
@@ -445,8 +397,6 @@ void host::merge(object const& obj) {
   MRG_DEFAULT(_check_period);
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
-  MRG_OPTION(_coords_2d);
-  MRG_OPTION(_coords_3d);
   MRG_MAP(_customvariables);
   MRG_DEFAULT(_display_name);
   MRG_DEFAULT(_event_handler);
@@ -458,13 +408,9 @@ void host::merge(object const& obj) {
   MRG_OPTION(_high_flap_threshold);
   MRG_INHERIT(_hostgroups);
   MRG_DEFAULT(_host_name);
-  MRG_DEFAULT(_icon_image);
-  MRG_DEFAULT(_icon_image_alt);
   MRG_OPTION(_initial_state);
   MRG_OPTION(_low_flap_threshold);
   MRG_OPTION(_max_check_attempts);
-  MRG_DEFAULT(_notes);
-  MRG_DEFAULT(_notes_url);
   MRG_OPTION(_notifications_enabled);
   MRG_OPTION(_notification_interval);
   MRG_OPTION(_notification_options);
@@ -474,10 +420,7 @@ void host::merge(object const& obj) {
   MRG_OPTION(_retain_nonstatus_information);
   MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
-  MRG_OPTION(_stalking_options);
-  MRG_DEFAULT(_statusmap_image);
-  MRG_DEFAULT(_vrml_image);
-}
+  MRG_OPTION(_stalking_options);}
 
 /**
  *  Parse and set the host property.
@@ -498,15 +441,6 @@ bool host::parse(char const* key, char const* value) {
     return (true);
   }
   return (false);
-}
-
-/**
- *  Get action_url.
- *
- *  @return The action_url.
- */
-std::string const& host::action_url() const throw () {
-  return (_action_url);
 }
 
 /**
@@ -600,24 +534,6 @@ list_string const& host::contacts() const throw () {
 }
 
 /**
- *  Get coords_2d.
- *
- *  @return The coords_2d.
- */
-point_2d const& host::coords_2d() const throw () {
-  return (_coords_2d.get());
-}
-
-/**
- *  Get coords_3d.
- *
- *  @return The coords_3d.
- */
-point_3d const& host::coords_3d() const throw () {
-  return (_coords_3d.get());
-}
-
-/**
  *  Get customvariables.
  *
  *  @return The customvariables.
@@ -690,24 +606,6 @@ unsigned int host::freshness_threshold() const throw () {
 }
 
 /**
- *  Get if host has coords 2d.
- *
- *  @return True if coords 2d exist, otherwise false.
- */
-bool host::have_coords_2d() const throw () {
-  return (_coords_2d.is_set());
-}
-
-/**
- *  Get if host has coords 3d.
- *
- *  @return True if coords 3d exist, otherwise false.
- */
-bool host::have_coords_3d() const throw () {
-  return (_coords_3d.is_set());
-}
-
-/**
  *  Get high_flap_threshold.
  *
  *  @return The high_flap_threshold.
@@ -744,24 +642,6 @@ std::string const& host::host_name() const throw () {
 }
 
 /**
- *  Get icon_image.
- *
- *  @return The icon_image.
- */
-std::string const& host::icon_image() const throw () {
-  return (_icon_image);
-}
-
-/**
- *  Get icon_image_alt.
- *
- *  @return The icon_image_alt.
- */
-std::string const& host::icon_image_alt() const throw () {
-  return (_icon_image_alt);
-}
-
-/**
  *  Get initial_state.
  *
  *  @return The initial_state.
@@ -786,24 +666,6 @@ unsigned int host::low_flap_threshold() const throw () {
  */
 unsigned int host::max_check_attempts() const throw () {
   return (_max_check_attempts);
-}
-
-/**
- *  Get notes.
- *
- *  @return The notes.
- */
-std::string const& host::notes() const throw () {
-  return (_notes);
-}
-
-/**
- *  Get notes_url.
- *
- *  @return The notes_url.
- */
-std::string const& host::notes_url() const throw () {
-  return (_notes_url);
 }
 
 /**
@@ -906,32 +768,17 @@ unsigned int host::stalking_options() const throw () {
 }
 
 /**
- *  Get statusmap_image.
+ *  Deprecated variable.
  *
- *  @return The statusmap_image.
- */
-std::string const& host::statusmap_image() const throw () {
-  return (_statusmap_image);
-}
-
-/**
- *  Get vrml_image.
+ *  @param[in] value Unused.
  *
- *  @return The vrml_image.
- */
-std::string const& host::vrml_image() const throw () {
-  return (_vrml_image);
-}
-
-/**
- *  Set action_url value.
- *
- *  @param[in] value The new action_url value.
- *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_action_url(std::string const& value) {
-  _action_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host action_url was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1056,59 +903,32 @@ bool host::_set_contacts(std::string const& value) {
 }
 
 /**
- *  Set coords_2d value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new coords_2d value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_coords_2d(std::string const& value) {
-  std::list<std::string> coords;
-  string::split(value, coords, ',');
-  if (coords.size() != 2)
-    return (false);
-
-  int x;
-  if (!string::to(string::trim(coords.front()).c_str(), x))
-    return (false);
-  coords.pop_front();
-
-  int y;
-  if (!string::to(string::trim(coords.front()).c_str(), y))
-    return (false);
-
-  _coords_2d = point_2d(x, y);
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host coords_2d was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set coords_3d value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new coords_3d value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_coords_3d(std::string const& value) {
-  std::list<std::string> coords;
-  string::split(value, coords, ',');
-  if (coords.size() != 3)
-    return (false);
-
-  double x;
-  if (!string::to(string::trim(coords.front()).c_str(), x))
-    return (false);
-  coords.pop_front();
-
-  double y;
-  if (!string::to(string::trim(coords.front()).c_str(), y))
-    return (false);
-  coords.pop_front();
-
-  double z;
-  if (!string::to(string::trim(coords.front()).c_str(), z))
-    return (false);
-
-  _coords_3d = point_3d(x, y, z);
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host coords_3d was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1287,26 +1107,32 @@ bool host::_set_hostgroups(std::string const& value) {
 }
 
 /**
- *  Set icon_image value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new icon_image value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_icon_image(std::string const& value) {
-  _icon_image = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host icon_image was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set icon_image_alt value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new icon_image_alt value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_icon_image_alt(std::string const& value) {
-  _icon_image_alt = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host icon_image_atl was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1358,26 +1184,32 @@ bool host::_set_max_check_attempts(unsigned int value) {
 }
 
 /**
- *  Set notes value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_notes(std::string const& value) {
-  _notes = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host notes was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notes_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes_url value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_notes_url(std::string const& value) {
-  _notes_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host notes_url was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1568,26 +1400,31 @@ bool host::_set_stalking_options(
 }
 
 /**
- *  Set statusmap_image value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new statusmap_image value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
-bool host::_set_statusmap_image(
-       std::string const& value) {
-  _statusmap_image = value;
+bool host::_set_statusmap_image(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host statusmap_image was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set vrml_image value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new vrml_image value.
+ *  @param[in] value Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return          True.
  */
 bool host::_set_vrml_image(std::string const& value) {
-  _vrml_image = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host vrml_image was ignored";
+  ++config_warnings;
   return (true);
 }

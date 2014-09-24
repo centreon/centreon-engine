@@ -282,15 +282,6 @@ struct grab_host_redirection {
     // Last problem ID.
     routines[MACRO_LASTHOSTPROBLEMID].first = &get_member_as_string<host, unsigned long, &host::last_problem_id>;
     routines[MACRO_LASTHOSTPROBLEMID].second = true;
-    // Action URL.
-    routines[MACRO_HOSTACTIONURL].first = &get_recursive<host, &host::action_url, URL_ENCODE_MACRO_CHARS>;
-    routines[MACRO_HOSTACTIONURL].second = true;
-    // Notes URL.
-    routines[MACRO_HOSTNOTESURL].first = &get_recursive<host, &host::notes_url, URL_ENCODE_MACRO_CHARS>;
-    routines[MACRO_HOSTNOTESURL].second = true;
-    // Notes.
-    routines[MACRO_HOSTNOTES].first = &get_recursive<host, &host::notes, 0>;
-    routines[MACRO_HOSTNOTES].second = true;
     // Group names.
     routines[MACRO_HOSTGROUPNAMES].first = &get_host_group_names;
     routines[MACRO_HOSTGROUPNAMES].second = true;
