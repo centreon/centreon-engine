@@ -29,9 +29,6 @@ typedef struct                servicegroup_struct {
   char*                       group_name;
   char*                       alias;
   servicesmember_struct*      members;
-  char*                       notes;
-  char*                       notes_url;
-  char*                       action_url;
   struct servicegroup_struct* next;
   struct servicegroup_struct* nexthash;
 }                             servicegroup;
@@ -42,10 +39,7 @@ extern "C" {
 
 servicegroup* add_servicegroup(
                 char const* name,
-                char const* alias,
-                char const* notes,
-                char const* notes_url,
-                char const* action_url);
+                char const* alias);
 int           is_host_member_of_servicegroup(
                 servicegroup_struct* group,
                 host_struct* hst);

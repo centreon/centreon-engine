@@ -10438,10 +10438,7 @@ int xodtemplate_register_servicegroup(
   servicegroup* new_servicegroup
     = add_servicegroup(
         this_servicegroup->servicegroup_name,
-        this_servicegroup->alias,
-        this_servicegroup->notes,
-        this_servicegroup->notes_url,
-        this_servicegroup->action_url);
+        this_servicegroup->alias);
 
   /* return with an error if we couldn't add the servicegroup */
   if (new_servicegroup == NULL) {

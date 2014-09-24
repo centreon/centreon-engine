@@ -40,7 +40,7 @@ static int check_enable_servicegroup_svc_checks(int argc, char** argv) {
   if (!svc)
     throw (engine_error() << "create service failed.");
 
-  servicegroup* group = add_servicegroup("group", NULL, NULL, NULL, NULL);
+  servicegroup* group = add_servicegroup("group", NULL);
   if (!group)
     throw (engine_error() << "create servicegroup failed.");
 

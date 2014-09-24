@@ -130,19 +130,10 @@ int main_test(int argc, char** argv) {
 
   // Add service groups and link them to service.
   servicegroup* sg1(add_servicegroup(const_cast<char*>(STR(GROUP1)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   servicegroup* sg2(add_servicegroup(const_cast<char*>(STR(GROUP2)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   servicegroup* sg3(add_servicegroup(const_cast<char*>(STR(GROUP3)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   add_service_to_servicegroup(sg1,
     service_list->host_ptr->name,

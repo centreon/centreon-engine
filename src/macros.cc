@@ -645,20 +645,6 @@ int grab_standard_servicegroup_macro_r(
                       temp_servicesmember->service_description);
     }
     break;
-  case MACRO_SERVICEGROUPACTIONURL:
-    if (temp_servicegroup->action_url)
-      *output = string::dup(temp_servicegroup->action_url);
-    break;
-
-  case MACRO_SERVICEGROUPNOTESURL:
-    if (temp_servicegroup->notes_url)
-      *output = string::dup(temp_servicegroup->notes_url);
-    break;
-
-  case MACRO_SERVICEGROUPNOTES:
-    if (temp_servicegroup->notes)
-      *output = string::dup(temp_servicegroup->notes);
-    break;
 
   default:
     logger(dbg_macros, basic)

@@ -59,7 +59,7 @@ static int check_schedule_servicegroup_host_downtime(
 
   // Create target service group.
   servicegroup*
-    group(add_servicegroup("group", NULL, NULL, NULL, NULL));
+    group(add_servicegroup("group", NULL));
   if (!group)
     throw (engine_error() << "service group creation failed");
 
