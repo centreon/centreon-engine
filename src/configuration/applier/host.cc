@@ -158,6 +158,7 @@ void applier::host::add_object(
     throw (engine_error() << "Could not register host '"
            << obj->host_name() << "'");
   host_other_props[obj->host_name()].initial_notif_time = 0;
+  host_other_props[obj->host_name()].should_reschedule_current_check = false;
 
   // Contacts.
   for (list_string::const_iterator

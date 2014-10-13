@@ -159,6 +159,7 @@ typedef struct                  host_struct {
 /* Other HOST structure. */
 struct                          host_other_properties {
   time_t                        initial_notif_time;
+  bool                          should_reschedule_current_check;
 };
 
 /* Hash structures. */

@@ -291,6 +291,23 @@ void checker::run(
     throw (checks_viability_failure() << "Check of host '" << hst->name
            << "' is not viable");
 
+
+  // If this check is a rescheduled check, propagate the rescheduled check flag
+  // to the host. This solves the problem when a new host check is
+  // bound to be rescheduled but would be discarded because a host check
+  // is already running.
+  if (reschedule_check)
+    host_other_props[hst->name].should_reschedule_current_check = true;
+
+  // Don't execute a new host check if one is already running.
+  if (hst->is_executing
+        && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
+    logger(dbg_checks, basic)
+      << "A check of this host (" << hst->name
+      << ") is already being executed, so we'll pass for the moment...";
+    return ;
+  }
+
   // Send broker event.
   timeval start_time;
   timeval end_time;

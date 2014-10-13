@@ -2471,6 +2471,8 @@ int handle_async_host_check_result_3x(
     << (queued_check_result->scheduled_check == true ? "Yes" : "No") << "\n"
     << "\tReschedule Check?:  "
     << (queued_check_result->reschedule_check == true ? "Yes" : "No") << "\n"
+    << "\tShould Reschedule Current Host Check?:"
+    << host_other_props[temp_host->name].should_reschedule_current_check
     << "\tExited OK?:         "
     << (queued_check_result->exited_ok == true ? "Yes" : "No") << "\n"
     << com::centreon::logging::setprecision(3)
@@ -2532,6 +2534,18 @@ int handle_async_host_check_result_3x(
 
   /* should we reschedule the next check of the host? NOTE: this might be overridden later... */
   reschedule_check = queued_check_result->reschedule_check;
+
+  // Inherit the should reschedule flag from the host. It is used when
+  // rescheduled checks were discarded because only one check can be executed
+  // on the same host at the same time. The flag is then set in the host
+  // and this check should be rescheduled regardless of what it was meant
+  // to initially.
+  if (host_other_props[temp_host->name].should_reschedule_current_check &&
+      !queued_check_result->reschedule_check)
+    reschedule_check = true;
+
+  // Clear the should reschedule flag.
+  host_other_props[temp_host->name].should_reschedule_current_check = false;
 
   /* check latency is passed to us for both active and passive checks */
   temp_host->latency = queued_check_result->latency;
@@ -2881,11 +2895,11 @@ int process_host_check_result_3x(
         if (hst->current_attempt == hst->max_attempts)
           hst->state_type = HARD_STATE;
         /* the host was in a hard problem state before, so it still is now */
-        else if (hst->current_attempt == 1)
-          hst->state_type = HARD_STATE;
+        /*else if (hst->current_attempt == 1)
+          hst->state_type = HARD_STATE;*/
         /* the host is in a soft state and the check will be retried */
-        else
-          hst->state_type = SOFT_STATE;
+        /*else
+          hst->state_type = SOFT_STATE;*/
       }
 
       /* make a determination of the host's state */
