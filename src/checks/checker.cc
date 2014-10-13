@@ -291,7 +291,6 @@ void checker::run(
     throw (checks_viability_failure() << "Check of host '" << hst->name
            << "' is not viable");
 
-
   // If this check is a rescheduled check, propagate the rescheduled check flag
   // to the host. This solves the problem when a new host check is
   // bound to be rescheduled but would be discarded because a host check

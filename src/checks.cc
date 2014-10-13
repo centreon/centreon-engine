@@ -2895,11 +2895,11 @@ int process_host_check_result_3x(
         if (hst->current_attempt == hst->max_attempts)
           hst->state_type = HARD_STATE;
         /* the host was in a hard problem state before, so it still is now */
-        /*else if (hst->current_attempt == 1)
-          hst->state_type = HARD_STATE;*/
+        else if (hst->current_attempt == 1)
+          hst->state_type = HARD_STATE;
         /* the host is in a soft state and the check will be retried */
-        /*else
-          hst->state_type = SOFT_STATE;*/
+        else
+          hst->state_type = SOFT_STATE;
       }
 
       /* make a determination of the host's state */
