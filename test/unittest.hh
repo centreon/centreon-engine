@@ -126,6 +126,7 @@ private:
            &_log,
            com::centreon::engine::logging::log_all,
            com::centreon::engine::logging::most);
+      config = new configuration::state;
       commands::set::load();
       configuration::applier::state::load();
       checks::checker::load();
@@ -154,6 +155,8 @@ private:
       checks::checker::unload();
       configuration::applier::state::unload();
       commands::set::unload();
+      delete config;
+      config = NULL;
       com::centreon::clib::unload();
     }
     catch (std::exception const& e) {
