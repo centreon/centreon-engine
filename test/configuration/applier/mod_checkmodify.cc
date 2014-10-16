@@ -60,6 +60,7 @@ public:
   void                  load_configuration() {
     backup::set_to_null();
     configuration::applier::state::unload();
+    delete config; config = new configuration::state;
     configuration::applier::state::load();
     ::config->cfg_main(_cfg_path);
     reload_configuration();
