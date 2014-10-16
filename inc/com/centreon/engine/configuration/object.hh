@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -67,13 +67,13 @@ namespace                  configuration {
     virtual void           check_validity() const = 0;
     static shared_ptr<object>
                            create(std::string const& type_name);
-    bool                   is_template() const throw ();
     virtual void           merge(object const& obj) = 0;
     std::string const&     name() const throw ();
     virtual bool           parse(char const* key, char const* value);
     virtual bool           parse(std::string const& line);
     void                   resolve_template(
                              umap<std::string, shared_ptr<object> >& templates);
+    bool                   should_register() const throw ();
     object_type            type() const throw ();
     std::string const&     type_name() const throw ();
 
@@ -100,14 +100,14 @@ namespace                  configuration {
       }
     };
 
-    bool                   _set_is_not_template(bool value);
     bool                   _set_name(std::string const& value);
+    bool                   _set_should_register(bool value);
     bool                   _set_templates(std::string const& value);
 
     bool                   _is_resolve;
-    bool                   _is_template;
     std::string            _name;
     static setters const   _setters[];
+    bool                   _should_register;
     list_string            _templates;
     object_type            _type;
   };
@@ -174,4 +174,3 @@ namespace std {
   } while (false)
 
 #endif // !CCE_CONFIGURATION_OBJECT_HH
-

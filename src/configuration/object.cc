@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,7 +45,7 @@ using namespace com::centreon::engine::configuration;
 object::setters const object::_setters[] = {
   { "use",      SETTER(std::string const&, _set_templates) },
   { "name",     SETTER(std::string const&, _set_name) },
-  { "register", SETTER(bool, _set_is_not_template) }
+  { "register", SETTER(bool, _set_should_register) }
 };
 
 /**
@@ -54,7 +54,7 @@ object::setters const object::_setters[] = {
  *  @param[in] type      The object type.
  */
 object::object(object::object_type type)
-  : _is_resolve(false), _is_template(false), _type(type) {}
+  : _is_resolve(false), _should_register(true), _type(type) {}
 
 /**
  *  Copy constructor.
@@ -80,8 +80,8 @@ object::~object() throw () {}
 object& object::operator=(object const& right) {
   if (this != &right) {
     _is_resolve = right._is_resolve;
-    _is_template = right._is_template;
     _name = right._name;
+    _should_register = right._should_register;
     _templates = right._templates;
     _type = right._type;
   }
@@ -99,7 +99,7 @@ bool object::operator==(object const& right) const throw () {
   return (_name == right._name
           && _type == right._type
           && _is_resolve == right._is_resolve
-          && _is_template == right._is_template
+          && _should_register == right._should_register
           && _templates == right._templates);
 }
 
@@ -154,15 +154,6 @@ object_ptr object::create(std::string const& type_name) {
   else if (type_name == "hostextinfo")
     obj = object_ptr(new configuration::hostextinfo());
   return (obj);
-}
-
-/**
- *  Get is this object is a template.
- *
- *  @return True if this object is tempalte.
- */
-bool object::is_template() const throw () {
-  return (_is_template);
 }
 
 /**
@@ -238,6 +229,15 @@ void object::resolve_template(map_object& templates) {
 }
 
 /**
+ *  Check if object should be registered.
+ *
+ *  @return True if object should be registered, false otherwise.
+ */
+bool object::should_register() const throw () {
+  return (_should_register);
+}
+
+/**
  *  Get the object type.
  *
  *  @return The object type.
@@ -273,18 +273,6 @@ std::string const& object::type_name() const throw () {
 }
 
 /**
- *  Set is template value.
- *
- *  @param[in] value The new is template value.
- *
- *  @return True on success, otherwise false.
- */
-bool object::_set_is_not_template(bool value) {
-  _is_template = !value;
-  return (true);
-}
-
-/**
  *  Set name value.
  *
  *  @param[in] value The new name value.
@@ -293,6 +281,18 @@ bool object::_set_is_not_template(bool value) {
  */
 bool object::_set_name(std::string const& value) {
   _name = value;
+  return (true);
+}
+
+/**
+ *  Set whether or not this object should be registered.
+ *
+ *  @param[in] value Registration flag.
+ *
+ *  @return True.
+ */
+bool object::_set_should_register(bool value) {
+  _should_register = value;
   return (true);
 }
 
