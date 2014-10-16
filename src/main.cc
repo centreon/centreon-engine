@@ -108,9 +108,10 @@ int main(int argc, char* argv[]) {
   };
 #endif // HAVE_GETOPT_H
 
-  // Load singletons.
+  // Load singletons and global variable.
   com::centreon::clib::load();
   com::centreon::logging::engine::load();
+  config = new configuration::state;
   com::centreon::engine::commands::set::load();
   com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::checks::checker::load();
@@ -488,12 +489,15 @@ int main(int argc, char* argv[]) {
       << "Error: " << e.what();
   }
 
+  // Unload singletons and global objects.
   com::centreon::engine::events::loop::unload();
   com::centreon::engine::checks::checker::unload();
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::state::unload();
   com::centreon::engine::commands::set::unload();
+  delete config;
+  config = NULL;
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 
