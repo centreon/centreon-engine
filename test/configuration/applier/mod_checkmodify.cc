@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -60,7 +60,8 @@ public:
   void                  load_configuration() {
     backup::set_to_null();
     configuration::applier::state::unload();
-    delete config; config = new configuration::state;
+    delete config;
+    config = new configuration::state;
     configuration::applier::state::load();
     ::config->cfg_main(_cfg_path);
     reload_configuration();
