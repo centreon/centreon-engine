@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -163,13 +163,33 @@ void string::split(
  *  @return The trimming stream.
  */
 std::string& string::trim(std::string& str) throw () {
+  // First, search backward for the last non-space character.
   size_t pos(str.find_last_not_of(whitespaces));
   if (pos == std::string::npos)
+    // Line is full of whitespaces, drop it.
     str.clear();
   else {
-    str.erase(pos + 1);
+    // Search for comments.
+    size_t comment(str.find_first_of(';'));
+    if (comment != 0)
+      while ((comment != std::string::npos)
+             && (str[comment - 1] == '\\'))
+        comment = str.find_first_of(';', comment + 1);
+
+    if (comment != std::string::npos)
+      // Comment was found, we can safely drop it as last non-whitespace
+      // character will obviously comes after it.
+      pos = comment;
+    else
+      // Otherwise drop from the last non-whitespace character.
+      ++pos;
+    str.erase(pos);
+
+    // Drop initial whitespaces.
     if ((pos = str.find_first_not_of(whitespaces)) != std::string::npos)
       str.erase(0, pos);
+    else
+      str.clear();
   }
   return (str);
 }
