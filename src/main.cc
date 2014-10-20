@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -251,8 +251,10 @@ int main(int argc, char* argv[]) {
         // Read in the configuration files (main config file,
         // resource and object config files).
         configuration::state config;
-        configuration::parser p;
-        p.parse(config_file, config);
+        {
+          configuration::parser p;
+          p.parse(config_file, config);
+        }
 
         configuration::applier::state&
           applier(configuration::applier::state::instance());

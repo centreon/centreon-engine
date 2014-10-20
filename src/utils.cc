@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2012 Icinga Development Team (http://www.icinga.org)
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -2041,19 +2041,25 @@ char* get_next_string_from_buf(
   return (sptr);
 }
 
-/* determines whether or not an object name (host, service, etc) contains illegal characters */
+/**
+ *  @brief Determines whether or not an object name (host, service, etc)
+ *  contains illegal characters.
+ *
+ *  This function uses the global illegal_object_chars variable. This is
+ *  caused by the configuration reload mechanism which does not set the
+ *  global configuration object itself until the end of the reload.
+ *  However during the configuration reload, objects are still checked
+ *  for invalid characters.
+ *
+ *  @param[in] name  Object name.
+ *
+ *  @return True if the object name contains an illegal character, false
+ *          otherwise.
+ */
 int contains_illegal_object_chars(char* name) {
-  if (name == NULL)
+  if (!name || !illegal_object_chars)
     return (false);
-
-  std::string tmp(name);
-  std::string const& illegal_object_chars
-    = config->illegal_object_chars();
-
-  if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
-    return (false);
-  }
-  return (true);
+  return (strpbrk(name, illegal_object_chars) ? TRUE : FALSE);
 }
 
 /* escapes newlines in a string */
