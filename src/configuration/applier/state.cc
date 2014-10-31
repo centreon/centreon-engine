@@ -1611,10 +1611,10 @@ void applier::state::_processing(
       config->hosts());
     _resolve<configuration::hostgroup, applier::hostgroup>(
       config->hostgroups());
-    _resolve<configuration::servicegroup, applier::servicegroup>(
-      config->servicegroups());
     _resolve<configuration::service, applier::service>(
       config->services());
+    _resolve<configuration::servicegroup, applier::servicegroup>(
+      config->servicegroups());
 
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(
