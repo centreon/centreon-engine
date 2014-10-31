@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,7 +25,6 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/commandsmember.hh"
-#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
@@ -393,9 +392,7 @@ void applier::contact::modify_object(
 
   // Custom variables.
   if (std::operator!=(obj->customvariables(), old_cfg->customvariables())) {
-    deleter::listmember(
-      c->custom_variables,
-      &deleter::customvariablesmember);
+    remove_all_custom_variables_from_contact(c);
 
     for (map_customvar::const_iterator
            it(obj->customvariables().begin()),

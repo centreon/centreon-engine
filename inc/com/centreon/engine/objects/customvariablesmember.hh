@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -52,6 +52,12 @@ customvariablesmember* add_custom_variable_to_service(
                          service_struct* svc,
                          char const* varname,
                          char const* varvalue);
+void                   remove_all_custom_variables_from_contact(
+                         contact_struct* cntct);
+void                   remove_all_custom_variables_from_host(
+                         host_struct* hst);
+void                   remove_all_custom_variables_from_service(
+                         service_struct* svc);
 
 #  ifdef __cplusplus
 }

@@ -26,7 +26,6 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
@@ -533,9 +532,7 @@ void applier::service::modify_object(
   // Custom variables.
   if (obj->customvariables() != obj_old->customvariables()) {
     // Delete old custom variables.
-    deleter::listmember(
-      s->custom_variables,
-      &deleter::customvariablesmember);
+    remove_all_custom_variables_from_service(s);
 
     // Add custom variables.
     for (map_customvar::const_iterator
