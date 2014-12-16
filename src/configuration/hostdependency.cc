@@ -184,10 +184,14 @@ void hostdependency::check_validity() const {
 
   if (!_execution_failure_options && !_notification_failure_options) {
     ++config_warnings;
+    std::string host_name = !_hosts->empty() ?
+                              _hosts->front() : _hostgroups->front();
+    std::string dependend_host_name = !_dependent_hosts->empty() ?
+                  _dependent_hosts->front() : _dependent_hostgroups->front();
     logger(log_config_warning, basic)
       << "Warning: Ignoring lame host dependency of '"
-      << _dependent_hosts->front() << "' on host '"
-      << _hosts->front() << "'.";
+      << dependend_host_name << "' on host/hostgroups '"
+      << host_name << "'.";
   }
 
   return ;
