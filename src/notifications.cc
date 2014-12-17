@@ -989,10 +989,19 @@ int notify_contact_of_service(
         break;
       }
 
+      std::string service_notification_state;
+      if (strcmp(notification_str, "NORMAL") == 0)
+        service_notification_state
+          .append("NORMAL (")
+          .append(service_state_str)
+          .append(")");
+      else
+        service_notification_state.append(service_state_str);
+
       logger(log_service_notification, basic)
         << "SERVICE NOTIFICATION: " << cntct->name << ';'
         << svc->host_name << ';' << svc->description << ';'
-        << notification_str << " (" << service_state_str << ");"
+        << service_notification_state << ";"
         << command_name_ptr << ';'
         << (svc->plugin_output ? svc->plugin_output : "")
         << info;
@@ -2154,10 +2163,19 @@ int notify_contact_of_host(
         break;
       }
 
+      std::string host_notification_state;
+      if (strcmp(notification_str, "NORMAL") == 0)
+        host_notification_state
+          .append("NORMAL (")
+          .append(host_state_str)
+          .append(")");
+      else
+        host_notification_state.append(host_state_str);
+
       logger(log_host_notification, basic)
         << "HOST NOTIFICATION: " << cntct->name
-        << ';' << hst->name << ';' << notification_str
-        << " (" << host_state_str << ");" << command_name_ptr
+        << ';' << hst->name << ';' << host_notification_state
+        << ";" << command_name_ptr
         << ';' << (hst->plugin_output ? hst->plugin_output : "")
         << info;
     }
