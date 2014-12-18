@@ -991,12 +991,13 @@ int notify_contact_of_service(
 
       std::string service_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
+        service_notification_state.append(service_state_str);
+      else
         service_notification_state
-          .append("NORMAL (")
+          .append(notification_str)
+          .append(" (")
           .append(service_state_str)
           .append(")");
-      else
-        service_notification_state.append(service_state_str);
 
       logger(log_service_notification, basic)
         << "SERVICE NOTIFICATION: " << cntct->name << ';'
@@ -2165,12 +2166,13 @@ int notify_contact_of_host(
 
       std::string host_notification_state;
       if (strcmp(notification_str, "NORMAL") == 0)
+        host_notification_state.append(host_state_str);
+      else
         host_notification_state
-          .append("NORMAL (")
+          .append(notification_str)
+          .append(" (")
           .append(host_state_str)
           .append(")");
-      else
-        host_notification_state.append(host_state_str);
 
       logger(log_host_notification, basic)
         << "HOST NOTIFICATION: " << cntct->name
