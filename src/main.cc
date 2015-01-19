@@ -35,7 +35,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "com/centreon/clib.hh"
-#include "com/centreon/process_manager.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
@@ -498,7 +497,6 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::state::unload();
-  com::centreon::process_manager::unload();
   com::centreon::engine::commands::set::unload();
   delete config;
   config = NULL;
