@@ -493,11 +493,11 @@ int main(int argc, char* argv[]) {
 
   // Unload singletons and global objects.
   com::centreon::engine::events::loop::unload();
-  com::centreon::engine::checks::checker::unload();
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::configuration::applier::state::unload();
   com::centreon::engine::commands::set::unload();
+  com::centreon::engine::checks::checker::unload();
   delete config;
   config = NULL;
   com::centreon::logging::engine::unload();
