@@ -152,7 +152,8 @@ void applier::host::add_object(
         true, // should_be_drawn, enabled by Nagios
         obj->retain_status_information(),
         obj->retain_nonstatus_information(),
-        obj->obsess_over_host()));
+        obj->obsess_over_host(),
+        NULL_IF_EMPTY(obj->timezone())));
   if (!h)
     throw (engine_error() << "Could not register host '"
            << obj->host_name() << "'");
@@ -421,6 +422,9 @@ void applier::host::modify_object(
   modify_if_different(
     h->obsess_over_host,
     static_cast<int>(obj->obsess_over_host()));
+  modify_if_different(
+    h->timezone,
+    NULL_IF_EMPTY(obj->timezone()));
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

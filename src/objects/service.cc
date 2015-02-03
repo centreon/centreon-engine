@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -151,7 +151,8 @@ bool operator==(
           && obj1.percent_state_change == obj2.percent_state_change
           && obj1.modified_attributes == obj2.modified_attributes
           && is_equal(obj1.event_handler_args, obj2.event_handler_args)
-          && is_equal(obj1.check_command_args, obj2.check_command_args));
+          && is_equal(obj1.check_command_args, obj2.check_command_args)
+          && is_equal(obj1.timezone, obj2.timezone));
 }
 
 /**
@@ -289,7 +290,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  is_executing:                         " << obj.is_executing << "\n"
     "  check_options:                        " << obj.check_options << "\n"
     "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n";
+    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
+    "  timezone:                             " << chkstr(obj.timezone) << "\n";
 
   os << "  state_history:                        ";
   for (unsigned int i(0), end(sizeof(obj.state_history) / sizeof(obj.state_history[0]));
@@ -391,6 +393,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *                                          non-status information ?
  *  @param[in] obsess_over_service          Should we obsess over
  *                                          service ?
+ *  @param[in] timezone                     Service timezone.
  *
  *  @return New service.
  */
@@ -443,7 +446,8 @@ service* add_service(
            char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
-           int obsess_over_service) {
+           int obsess_over_service,
+           char const* timezone) {
   // Make sure we have everything we need.
   if (!description || !description[0]) {
     logger(log_config_error, basic)
@@ -519,6 +523,8 @@ service* add_service(
       obj->icon_image = string::dup(icon_image);
     if (icon_image_alt)
       obj->icon_image_alt = string::dup(icon_image_alt);
+    if (timezone)
+      obj->timezone = string::dup(timezone);
 
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;

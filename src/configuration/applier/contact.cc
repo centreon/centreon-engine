@@ -148,7 +148,8 @@ void applier::contact::add_object(
         obj->service_notifications_enabled(),
         obj->can_submit_commands(),
         obj->retain_status_information(),
-        obj->retain_nonstatus_information()));
+        obj->retain_nonstatus_information(),
+        NULL_IF_EMPTY(obj->timezone())));
   if (!c)
     throw (engine_error() << "Could not register contact '"
            << obj->contact_name() << "'");

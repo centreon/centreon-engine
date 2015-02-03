@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -364,7 +364,6 @@ bool timeperiod::_has_similar_daterange(
 bool timeperiod::_add_calendar_date(std::string const& line) {
   int ret(0);
   int pos(0);
-  bool fill_missing(false);
   unsigned int month_start(0);
   unsigned int month_end(0);
   unsigned int month_day_start(0);
@@ -384,7 +383,7 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
                &month_day_end,
                &skip_interval,
                &pos)) == 7)
-    fill_missing = false;
+    ;
   else if ((ret = sscanf(
                     line.c_str(),
                     "%4u-%2u-%2u - %4u-%2u-%2u %n",
@@ -395,7 +394,7 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
                     &month_end,
                     &month_day_end,
                     &pos)) == 6)
-    fill_missing = false;
+    ;
   else if ((ret = sscanf(
                     line.c_str(),
                     "%4u-%2u-%2u / %u %n",
@@ -403,24 +402,24 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
                     &month_start,
                     &month_day_start,
                     &skip_interval,
-                    &pos)) == 4)
-    fill_missing = true;
+                    &pos)) == 4) {
+    year_end = 0;
+    month_end = 0;
+    month_day_end = 0;
+  }
   else if ((ret = sscanf(
                     line.c_str(),
                     "%4u-%2u-%2u %n",
                     &year_start,
                     &month_start,
                     &month_day_start,
-                    &pos)) == 3)
-    fill_missing = true;
+                    &pos)) == 3) {
+    year_end = year_start;
+    month_end = month_start;
+    month_day_end = month_day_start;
+  }
 
   if (ret) {
-    if (fill_missing) {
-      year_end = year_start;
-      month_end = month_start;
-      month_day_end = month_day_start;
-    }
-
     std::list<timerange> timeranges;
     if (!_build_timeranges(line.substr(pos), timeranges))
       return (false);

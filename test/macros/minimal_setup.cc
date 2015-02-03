@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -86,7 +86,8 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Should be drawn
     0,                              // Retain status information
     0,                              // Retain non-status information
-    0));                            // Obsess over
+    0,                              // Obsess over
+    NULL));                         // System timezone
   if (!hst)
     throw (error() << "default host creation failed");
   host_list->has_been_checked = 1;
@@ -143,7 +144,8 @@ void com::centreon::engine::test::minimal_setup() {
     NULL,                           // Icon image alt
     0,                              // Retain status information
     0,                              // Retain non-status information
-    0));                            // Obsess over service
+    0,                              // Obsess over service
+    NULL));                         // System timezone
   if (!svc)
     throw (error() << "default service creation failed");
   service_list->host_ptr = host_list;
@@ -174,7 +176,8 @@ void com::centreon::engine::test::minimal_setup() {
     1,                                    // Service notifications enabled
     1,                                    // Can submit commands
     0,                                    // Retain status information
-    0));                                  // Retain non-status information
+    0,                                    // Retain non-status information
+    NULL));                               // System timezone
   if (!cntct)
     throw (error() << "default contact creation failed");
   if (!add_contact_to_host(hst,

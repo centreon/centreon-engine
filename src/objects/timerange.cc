@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,8 +39,10 @@ using namespace com::centreon::engine::logging;
 bool operator==(
        timerange const& obj1,
        timerange const& obj2) throw () {
-  if (obj1.range_start == obj2.range_start
-      && obj1.range_end == obj2.range_end) {
+  if ((obj1.start_hour == obj2.start_hour)
+      && (obj1.start_minute == obj2.start_minute)
+      && (obj1.end_hour == obj2.end_hour)
+      && (obj1.end_minute == obj2.end_minute)) {
     if (!obj1.next || !obj2.next)
       return (!obj1.next && !obj2.next);
     return (*obj1.next == *obj2.next);
@@ -72,14 +74,10 @@ bool operator!=(
  */
 std::ostream& operator<<(std::ostream& os, timerange const& obj) {
   for (timerange const* r(&obj); r; r = r->next) {
-    unsigned int start_hours(r->range_start / 3600);
-    unsigned int start_minutes((r->range_start % 3600) / 60);
-    unsigned int end_hours(r->range_end / 3600);
-    unsigned int end_minutes((r->range_end % 3600) / 60);
-    os << std::setfill('0') << std::setw(2) << start_hours << ":"
-       << std::setfill('0') << std::setw(2) << start_minutes << "-"
-       << std::setfill('0') << std::setw(2) << end_hours << ":"
-       << std::setfill('0') << std::setw(2) << end_minutes
+    os << std::setfill('0') << std::setw(2) << obj.start_hour << ":"
+       << std::setfill('0') << std::setw(2) << obj.start_minute << "-"
+       << std::setfill('0') << std::setw(2) << obj.end_hour << ":"
+       << std::setfill('0') << std::setw(2) << obj.end_minute
        << (r->next ? ", " : "");
   }
   return (os);
@@ -88,29 +86,33 @@ std::ostream& operator<<(std::ostream& os, timerange const& obj) {
 /**
  *  Add a new timerange to a daterange.
  *
- *  @param[in,out] drange     Target date range.
- *  @param[in]     start_time Range start time.
- *  @param[in]     end_time   Range end time.
+ *  @param[in,out] drange        Target date range.
+ *  @param[in]     start_hour    Range start hour.
+ *  @param[in]     start_minute  Range start minute.
+ *  @param[in]     end_hour      Range end hour.
+ *  @param[in]     end_minute    Range end minute.
  *
  *  @return New timerange.
  */
 timerange* add_timerange_to_daterange(
              daterange* drange,
-             unsigned long start_time,
-             unsigned long end_time) {
+             int start_hour,
+             int start_minute,
+             int end_hour,
+             int end_minute) {
   // Make sure we have the data we need.
   if (!drange)
     return (NULL);
-  if (start_time > 86400) {
+  if (start_hour * 60 * 60 + start_minute * 60 > 24 * 60 * 60) {
     logger(log_config_error, basic)
-      << "Error: Start time " << start_time
+      << "Error: Start time " << start_hour << ":" << start_minute
       << " is not valid for timeperiod";
     return (NULL);
   }
-  if (end_time > 86400) {
+  if (end_hour * 60 * 60 + end_minute * 60 > 24 * 60 * 60) {
     logger(log_config_error, basic)
-      << "Error: End time " << end_time
-      << " is not value for timeperiod";
+      << "Error: End time " << end_hour << ":" << end_minute
+      << " is not valid for timeperiod";
     return (NULL);
   }
 
@@ -119,8 +121,10 @@ timerange* add_timerange_to_daterange(
   memset(obj, 0, sizeof(*obj));
 
   try {
-    obj->range_start = start_time;
-    obj->range_end = end_time;
+    obj->start_hour = start_hour;
+    obj->start_minute = start_minute;
+    obj->end_hour = end_hour;
+    obj->end_minute = end_minute;
 
     // Add the new time range to the head of the range
     // list for this date range.
@@ -138,37 +142,43 @@ timerange* add_timerange_to_daterange(
 /**
  *  Add a new timerange to a timeperiod.
  *
- *  @param[in,out] period     Target period.
- *  @param[in]     day        Day of the range ([0-6]).
- *  @param[in]     start_time Range start time.
- *  @param[in]     end_time   Range end time.
+ *  @param[in,out] period        Target period.
+ *  @param[in]     day           Day of the range ([0-6]).
+ *  @param[in]     start_hour    Range start hour.
+ *  @param[in]     start_minute  Range start minute.
+ *  @param[in]     end_hour      Range end hour.
+ *  @param[in]     end_minute    Range end minute.
  *
  *  @return New time range.
  */
 timerange* add_timerange_to_timeperiod(
              timeperiod* period,
              int day,
-             unsigned long start_time,
-             unsigned long end_time) {
+             int start_hour,
+             int start_minute,
+             int end_hour,
+             int end_minute) {
   // Make sure we have the data we need.
   if (!period)
     return (NULL);
-  if (day < 0 || day > 6) {
+  if ((day < 0) || (day > 6)) {
     logger(log_config_error, basic)
       << "Error: Day " << day
       << " is not valid for timeperiod '" << period->name << "'";
     return (NULL);
   }
-  if (start_time > 86400) {
+  if (start_hour * 60 * 60 + start_minute * 60 > 24 * 60 * 60) {
     logger(log_config_error, basic)
-      << "Error: Start time " << start_time << " on day " << day
-      << " is not valid for timeperiod '" << period->name << "'";
+      << "Error: Start time " << start_hour << ":" << start_minute
+      << " on day " << day << " is not valid for timeperiod '"
+      << period->name << "'";
     return (NULL);
   }
-  if (end_time > 86400) {
+  if (end_hour * 60 * 60 + end_minute * 60 > 24 * 60 * 60) {
     logger(log_config_error, basic)
-      << "Error: End time " << end_time << " on day " << day
-      << " is not value for timeperiod '" << period->name << "'";
+      << "Error: End time " << end_hour << ":" << end_minute
+      << " on day " << day << " is not value for timeperiod '"
+      << period->name << "'";
     return (NULL);
   }
 
@@ -177,8 +187,10 @@ timerange* add_timerange_to_timeperiod(
   memset(obj, 0, sizeof(*obj));
 
   try {
-    obj->range_start = start_time;
-    obj->range_end = end_time;
+    obj->start_hour = start_hour;
+    obj->start_minute = start_minute;
+    obj->end_hour = end_hour;
+    obj->end_minute = end_minute;
 
     // Add the new time range to the head of the range list for this day.
     obj->next = period->days[day];

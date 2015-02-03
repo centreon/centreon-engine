@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -146,6 +146,7 @@ typedef struct                  host_struct {
   unsigned long                 modified_attributes;
   int                           circular_path_checked;
   int                           contains_circular_path;
+  char*                         timezone;
 
   command_struct*               event_handler_ptr;
   command_struct*               check_command_ptr;
@@ -227,7 +228,8 @@ host* add_host(
         int should_be_drawn,
         int retain_status_information,
         int retain_nonstatus_information,
-        int obsess_over_host);
+        int obsess_over_host,
+        char const* timezone);
 int   get_host_count();
 int   is_contact_for_host(host* hst, contact_struct* cntct);
 int   is_escalated_contact_for_host(host* hst, contact_struct* cntct);
@@ -263,5 +265,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOST_HH
-
-

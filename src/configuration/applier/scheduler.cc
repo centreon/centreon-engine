@@ -536,12 +536,14 @@ void applier::scheduler::_calculate_host_scheduling_params(
     else {
       if (check_time_against_period(
             now,
-            hst.check_period_ptr) == ERROR) {
+            hst.check_period_ptr,
+            hst.timezone) == ERROR) {
         time_t next_valid_time(0);
         get_next_valid_time(
           now,
           &next_valid_time,
-          hst.check_period_ptr);
+          hst.check_period_ptr,
+          hst.timezone);
         if (now == next_valid_time)
           schedule_check = false;
       }
@@ -688,9 +690,16 @@ void applier::scheduler::_calculate_service_scheduling_params(
     if (!svc.check_interval || !svc.checks_enabled)
       schedule_check = false;
 
-    if (check_time_against_period(now, svc.check_period_ptr) == ERROR) {
+    if (check_time_against_period(
+          now,
+          svc.check_period_ptr,
+          svc.timezone) == ERROR) {
       time_t next_valid_time(0);
-      get_next_valid_time(now, &next_valid_time, svc.check_period_ptr);
+      get_next_valid_time(
+        now,
+        &next_valid_time,
+        svc.check_period_ptr,
+        svc.timezone);
       if (now == next_valid_time)
         schedule_check = false;
     }
@@ -885,15 +894,17 @@ void applier::scheduler::_schedule_host_checks(
       << "Preferred Check Time: " << hst.next_check
       << " --> " << my_ctime(&hst.next_check);
 
-    // make sure the host can actually be scheduled at this time.
+    // Make sure the host can actually be scheduled at this time.
     if (check_time_against_period(
           hst.next_check,
-          hst.check_period_ptr) == ERROR) {
+          hst.check_period_ptr,
+          hst.timezone) == ERROR) {
       time_t next_valid_time(0);
       get_next_valid_time(
         hst.next_check,
         &next_valid_time,
-        hst.check_period_ptr);
+        hst.check_period_ptr,
+        hst.timezone);
       hst.next_check = next_valid_time;
     }
 
@@ -1004,15 +1015,17 @@ void applier::scheduler::_schedule_service_checks(
         = (time_t)(now
              + mult_factor * scheduling_info.service_inter_check_delay);
 
-      // make sure the service can actually be scheduled when we want.
+      // Make sure the service can actually be scheduled when we want.
       if (check_time_against_period(
             svc.next_check,
-            svc.check_period_ptr) == ERROR) {
+            svc.check_period_ptr,
+            svc.timezone) == ERROR) {
         time_t next_valid_time(0);
         get_next_valid_time(
           svc.next_check,
           &next_valid_time,
-          svc.check_period_ptr);
+          svc.check_period_ptr,
+          svc.timezone);
         svc.next_check = next_valid_time;
       }
 

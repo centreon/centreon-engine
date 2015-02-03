@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -38,7 +38,7 @@ static int check_disable_servicegroup_svc_notifications(int argc, char** argv) {
                              0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
                              0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
                              0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+                             0, 0, 0, NULL);
   if (!svc)
     throw (engine_error() << "create service failed.");
 

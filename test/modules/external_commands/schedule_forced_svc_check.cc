@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -44,7 +44,7 @@ static int check_schedule_forced_svc_check(int argc, char** argv) {
                            0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
                            0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0));
+                           NULL, NULL, NULL, NULL, 0, 0, 0, NULL));
   if (!svc)
     throw (engine_error() << "service creation failed");
   svc->checks_enabled = true;

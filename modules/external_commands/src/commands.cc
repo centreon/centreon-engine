@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1467,11 +1467,13 @@ int cmd_change_object_int_var(int cmd, char* args) {
       time(&preferred_time);
       if (check_time_against_period(
             preferred_time,
-            temp_host->check_period_ptr) == ERROR) {
+            temp_host->check_period_ptr,
+            temp_host->timezone) == ERROR) {
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
-          temp_host->check_period_ptr);
+          temp_host->check_period_ptr,
+          temp_host->timezone);
         temp_host->next_check = next_valid_time;
       }
       else
@@ -1518,11 +1520,13 @@ int cmd_change_object_int_var(int cmd, char* args) {
       time(&preferred_time);
       if (check_time_against_period(
             preferred_time,
-            temp_service->check_period_ptr) == ERROR) {
+            temp_service->check_period_ptr,
+            temp_service->timezone) == ERROR) {
         get_next_valid_time(
           preferred_time,
           &next_valid_time,
-          temp_service->check_period_ptr);
+          temp_service->check_period_ptr,
+          temp_service->timezone);
         temp_service->next_check = next_valid_time;
       }
       else
@@ -2220,11 +2224,13 @@ void enable_service_checks(service* svc) {
   time(&preferred_time);
   if (check_time_against_period(
         preferred_time,
-        svc->check_period_ptr) == ERROR) {
+        svc->check_period_ptr,
+        svc->timezone) == ERROR) {
     get_next_valid_time(
       preferred_time,
       &next_valid_time,
-      svc->check_period_ptr);
+      svc->check_period_ptr,
+      svc->timezone);
     svc->next_check = next_valid_time;
   }
   else
@@ -3446,8 +3452,15 @@ void enable_host_checks(host* hst) {
 
   /* schedule a check for right now (or as soon as possible) */
   time(&preferred_time);
-  if (check_time_against_period(preferred_time, hst->check_period_ptr) == ERROR) {
-    get_next_valid_time(preferred_time, &next_valid_time, hst->check_period_ptr);
+  if (check_time_against_period(
+        preferred_time,
+        hst->check_period_ptr,
+        hst->timezone) == ERROR) {
+    get_next_valid_time(
+      preferred_time,
+      &next_valid_time,
+      hst->check_period_ptr,
+      hst->timezone);
     hst->next_check = next_valid_time;
   }
   else

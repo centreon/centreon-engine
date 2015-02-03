@@ -127,24 +127,21 @@ int run_scheduled_service_check(
       get_next_valid_time(
         preferred_time,
         &next_valid_time,
-        svc->check_period_ptr);
+        svc->check_period_ptr,
+        svc->timezone);
 
       // logit(NSLOG_RUNTIME_WARNING,true,"Warning: Service '%s' on host '%s' timeperiod check failed...\n",svc->description,svc->host_name);
       // logit(NSLOG_RUNTIME_WARNING,true,"Current time: %s",ctime(&current_time));
       // logit(NSLOG_RUNTIME_WARNING,true,"Preferred time: %s",ctime(&preferred_time));
       // logit(NSLOG_RUNTIME_WARNING,true,"Next valid time: %s",ctime(&next_valid_time));
 
-      /* the service could not be rescheduled properly - set the next check time for next week */
-      /*if(time_is_valid==false && next_valid_time==preferred_time){ */
-      /* UPDATED 08/12/09 EG to reflect proper timeperod check logic */
+      // The service could not be rescheduled properly
+      // so set the next check time for next week.
       if (time_is_valid == false
           && check_time_against_period(
                next_valid_time,
-               svc->check_period_ptr) == ERROR) {
-        /*
-	  svc->next_check=(time_t)(next_valid_time+(60*60*24*365));
-	  svc->should_be_scheduled=false;
-	*/
+               svc->check_period_ptr,
+               svc->timezone) == ERROR) {
         svc->next_check = (time_t)(next_valid_time + (60 * 60 * 24 * 7));
 
         logger(log_runtime_warning, basic)
@@ -1106,7 +1103,8 @@ int handle_async_service_check_result(
     get_next_valid_time(
       preferred_time,
       &next_valid_time,
-      temp_service->check_period_ptr);
+      temp_service->check_period_ptr,
+      temp_service->timezone);
     temp_service->next_check = next_valid_time;
 
     /* services with non-recurring intervals do not get rescheduled */
@@ -1406,10 +1404,11 @@ int check_service_check_viability(
       logger(dbg_checks, most)
         << "Active checks of the service are currently disabled.";
     }
-    /* make sure this is a valid time to check the service */
+    // Make sure this is a valid time to check the service.
     if (check_time_against_period(
-          (unsigned long)current_time,
-          svc->check_period_ptr) == ERROR) {
+          current_time,
+          svc->check_period_ptr,
+          svc->timezone) == ERROR) {
       preferred_time = current_time;
       if (time_is_valid)
         *time_is_valid = false;
@@ -1469,12 +1468,14 @@ unsigned int check_service_dependencies(
     if ((temp_service = temp_dependency->master_service_ptr) == NULL)
       continue;
 
-    /* skip this dependency if it has a timeperiod and the current time isn't valid */
+    // Skip this dependency if it has a timeperiod
+    // and the current time isn't valid.
     time(&current_time);
     if (temp_dependency->dependency_period != NULL
         && check_time_against_period(
              current_time,
-             temp_dependency->dependency_period_ptr) == ERROR)
+             temp_dependency->dependency_period_ptr,
+             svc->timezone) == ERROR)
       return (DEPENDENCIES_OK);
 
     /* get the status to use (use last hard state if its currently in a soft state) */
@@ -1612,11 +1613,12 @@ void check_service_result_freshness() {
     if (temp_service->is_being_freshened == true)
       continue;
 
-    /* see if the time is right... */
+    // See if the time is right...
     if (check_time_against_period(
           current_time,
-          temp_service->check_period_ptr) == ERROR)
-      continue;
+          temp_service->check_period_ptr,
+          temp_service->timezone) == ERROR)
+      continue ;
 
     /* EXCEPTION */
     /* don't check freshness of services without regular check intervals if we're using auto-freshness threshold */
@@ -1955,12 +1957,14 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
     if ((temp_host = temp_dependency->master_host_ptr) == NULL)
       continue;
 
-    /* skip this dependency if it has a timeperiod and the current time isn't valid */
+    // Skip this dependency if it has a timeperiod
+    // and the current time isn't valid.
     time(&current_time);
     if (temp_dependency->dependency_period != NULL
         && check_time_against_period(
              current_time,
-             temp_dependency->dependency_period_ptr) == ERROR)
+             temp_dependency->dependency_period_ptr,
+             hst->timezone) == ERROR)
       return (DEPENDENCIES_OK);
 
     /* get the status to use (use last hard state if its currently in a soft state) */
@@ -2096,11 +2100,12 @@ void check_host_result_freshness() {
     if (temp_host->is_being_freshened == true)
       continue;
 
-    /* see if the time is right... */
+    // See if the time is right...
     if (check_time_against_period(
           current_time,
-          temp_host->check_period_ptr) == ERROR)
-      continue;
+          temp_host->check_period_ptr,
+          temp_host->timezone) == ERROR)
+      continue ;
 
     /* the results for the last check of this host are stale */
     if (is_host_result_fresh(temp_host, current_time, true) == false) {
@@ -2351,7 +2356,8 @@ int run_scheduled_host_check_3x(
       get_next_valid_time(
         preferred_time,
         &next_valid_time,
-        hst->check_period_ptr);
+        hst->check_period_ptr,
+        hst->timezone);
 
       /* the host could not be rescheduled properly - set the next check time for next week */
       if (time_is_valid == false && next_valid_time == preferred_time) {
@@ -3245,7 +3251,8 @@ int process_host_check_result_3x(
     get_next_valid_time(
       preferred_time,
       &next_valid_time,
-      hst->check_period_ptr);
+      hst->check_period_ptr,
+      hst->timezone);
     hst->next_check = next_valid_time;
 
     /* hosts with non-recurring intervals do not get rescheduled if we're in a HARD or UP state */
@@ -3347,10 +3354,11 @@ int check_host_check_viability_3x(
       preferred_time = current_time + check_interval;
       perform_check = false;
     }
-    /* make sure this is a valid time to check the host */
+    // Make sure this is a valid time to check the host.
     if (check_time_against_period(
-          static_cast<unsigned long>(current_time),
-          hst->check_period_ptr) == ERROR) {
+          current_time,
+          hst->check_period_ptr,
+          hst->timezone) == ERROR) {
       preferred_time = current_time;
       if (time_is_valid)
 	*time_is_valid = false;

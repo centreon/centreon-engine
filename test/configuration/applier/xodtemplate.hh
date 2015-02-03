@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -164,6 +164,7 @@ typedef struct xodtemplate_contact_struct{
   int          notify_on_host_downtime;
   char*        service_notification_period;
   char*        service_notification_commands;
+  char*        timezone;
   int          notify_on_service_unknown;
   int          notify_on_service_warning;
   int          notify_on_service_critical;
@@ -185,6 +186,7 @@ typedef struct xodtemplate_contact_struct{
   int          have_host_notification_commands;
   int          have_service_notification_period;
   int          have_service_notification_commands;
+  int          have_timezone;
 
   int          have_host_notification_options;
   int          have_service_notification_options;
@@ -277,6 +279,7 @@ typedef struct xodtemplate_host_struct{
   char*        icon_image_alt;
   char*        vrml_image;
   char*        statusmap_image;
+  char*        timezone;
   int          x_2d;
   int          y_2d;
   double       x_3d;
@@ -303,6 +306,7 @@ typedef struct xodtemplate_host_struct{
   int          have_icon_image_alt;
   int          have_vrml_image;
   int          have_statusmap_image;
+  int          have_timezone;
 
   int          have_initial_state;
   int          have_check_interval;
@@ -421,6 +425,7 @@ typedef struct xodtemplate_service_struct{
   char*        action_url;
   char*        icon_image;
   char*        icon_image_alt;
+  char*        timezone;
   int          retain_status_information;
   int          retain_nonstatus_information;
   xodtemplate_customvariablesmember* custom_variables;
@@ -443,6 +448,7 @@ typedef struct xodtemplate_service_struct{
   int          have_action_url;
   int          have_icon_image;
   int          have_icon_image_alt;
+  int          have_timezone;
 
   int          have_initial_state;
   int          have_max_check_attempts;
@@ -1179,5 +1185,3 @@ int xodtemplate_skiplist_compare_serviceescalation(
 #  endif
 
 #endif // !CCE_XODTEMPLATE_HH
-
-

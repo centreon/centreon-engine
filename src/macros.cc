@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -372,7 +372,12 @@ int grab_datetime_macro_r(
     break;
   }
 
-  /* calculate the value */
+  /*
+  ** Calculate the value.
+  **
+  ** Default timezone is likely not valid but fetching it would require
+  ** a heavy API refactoring for what I believe to be very little gain.
+  */
   switch (macro_type) {
   case MACRO_LONGDATETIME:
     if (*output == NULL)
@@ -421,15 +426,20 @@ int grab_datetime_macro_r(
   case MACRO_ISVALIDTIME:
     string::setstr(
       *output,
-      !check_time_against_period(test_time, temp_timeperiod));
+      !check_time_against_period(test_time, temp_timeperiod, NULL));
     break;
 
   case MACRO_NEXTVALIDTIME:
-    get_next_valid_time(test_time, &next_valid_time, temp_timeperiod);
+    get_next_valid_time(
+      test_time,
+      &next_valid_time,
+      temp_timeperiod,
+      NULL);
     if (next_valid_time == test_time
         && check_time_against_period(
              test_time,
-             temp_timeperiod) == ERROR)
+             temp_timeperiod,
+             NULL) == ERROR)
       next_valid_time = (time_t)0L;
     string::setstr(*output, next_valid_time);
     break;

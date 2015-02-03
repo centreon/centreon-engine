@@ -174,7 +174,8 @@ void applier::service::add_object(
     NULL_IF_EMPTY(obj->icon_image_alt()),
     obj->retain_status_information(),
     obj->retain_nonstatus_information(),
-    obj->obsess_over_service()));
+    obj->obsess_over_service(),
+    NULL_IF_EMPTY(obj->timezone())));
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj->service_description()
@@ -492,6 +493,9 @@ void applier::service::modify_object(
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj->is_volatile()));
+  modify_if_different(
+    s->timezone,
+    NULL_IF_EMPTY(obj->timezone()));
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {
@@ -725,7 +729,8 @@ void applier::service::_inherits_special_vars(
   // Detect if any special variable has not been defined.
   if (!obj->contactgroups_defined()
       || !obj->notification_interval_defined()
-      || !obj->notification_period_defined()) {
+      || !obj->notification_period_defined()
+      || !obj->timezone_defined()) {
     // Remove service from state (it will be modified
     // and reinserted at the end of the method).
     s.services().erase(obj);
@@ -752,6 +757,8 @@ void applier::service::_inherits_special_vars(
       obj->notification_interval((*it)->notification_interval());
     if (!obj->notification_period_defined())
       obj->notification_period((*it)->notification_period());
+    if (!obj->timezone_defined())
+      obj->timezone((*it)->timezone());
 
     // Reinsert service.
     s.services().insert(obj);

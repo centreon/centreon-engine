@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -98,7 +98,8 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                              // Should be drawn
     0,                              // Retain status information
     0,                              // Retain non-status information
-    0));                            // Obsess over
+    0,                              // Obsess over
+    NULL));                         // System timezone
   retval |= (NULL == hst);
   host_list->has_been_checked = 1;
   host_list->last_check = time(NULL);
@@ -154,7 +155,8 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     NULL,                           // Icon image alt
     0,                              // Retain status information
     0,                              // Retain non-status information
-    0));                            // Obsess over service
+    0,                              // Obsess over service
+    NULL));                         // System timezone
   retval |= (NULL == svc);
   service_list->host_ptr = host_list;
 
@@ -182,7 +184,8 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     1,                                    // Service notifications enabled
     1,                                    // Can submit commands
     0,                                    // Retain status information
-    0));                                  // Retain non-status information
+    0,                                    // Retain non-status information
+    NULL));                               // System timezone
   retval |= (NULL == cntct);
   retval |= (NULL == add_contact_to_host(hst,
     const_cast<char*>("mycontact")));

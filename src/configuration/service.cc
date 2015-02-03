@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -84,7 +84,8 @@ service::setters const service::_setters[] = {
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+  { "timezone",                     SETTER(std::string const&, _set_timezone) }
 };
 
 // Default values.
@@ -219,6 +220,7 @@ service& service::operator=(service const& right) {
     _servicegroups = right._servicegroups;
     _service_description = right._service_description;
     _stalking_options = right._stalking_options;
+    _timezone = right._timezone;
   }
   return (*this);
 }
@@ -272,7 +274,8 @@ bool service::operator==(service const& right) const throw () {
           && _retry_interval == right._retry_interval
           && _servicegroups == right._servicegroups
           && _service_description == right._service_description
-          && _stalking_options == right._stalking_options);
+          && _stalking_options == right._stalking_options
+          && _timezone == right._timezone);
 }
 
 /**
@@ -382,6 +385,8 @@ bool service::operator<(service const& right) const throw () {
     return (_retry_interval < right._retry_interval);
   else if (_servicegroups != right._servicegroups)
     return (_servicegroups < right._servicegroups);
+  else if (_timezone != right._timezone)
+    return (_timezone < right._timezone);
   return (_stalking_options < right._stalking_options);
 }
 
@@ -481,6 +486,7 @@ void service::merge(object const& obj) {
   MRG_INHERIT(_servicegroups);
   MRG_DEFAULT(_service_description);
   MRG_OPTION(_stalking_options);
+  MRG_OPTION(_timezone);
 }
 
 /**
@@ -963,6 +969,34 @@ std::string const& service::service_description() const throw () {
  */
 unsigned short service::stalking_options() const throw () {
   return (_stalking_options);
+}
+
+/**
+ *  Set timezone.
+ *
+ *  @param[in] tz  New service timezone.
+ */
+void service::timezone(std::string const& tz) {
+  _timezone = tz;
+  return ;
+}
+
+/**
+ *  Get the service timezone.
+ *
+ *  @return Service timezone.
+ */
+std::string const& service::timezone() const throw () {
+  return (_timezone);
+}
+
+/**
+ *  Check if timezone was defined.
+ *
+ *  @return True if property was defined, false otherwise.
+ */
+bool service::timezone_defined() const throw () {
+  return (_timezone.is_set());
 }
 
 /**
@@ -1570,5 +1604,17 @@ bool service::_set_stalking_options(std::string const& value) {
       return (false);
   }
   _stalking_options = options;
+  return (true);
+}
+
+/**
+ *  Set timezone.
+ *
+ *  @param[in] value  Timezone.
+ *
+ *  @return True on success, false otherwise.
+ */
+bool service::_set_timezone(std::string const& value) {
+  _timezone = value;
   return (true);
 }

@@ -48,7 +48,8 @@ contact::setters const contact::_setters[] = {
   { "service_notifications_enabled", SETTER(bool, _set_service_notifications_enabled) },
   { "can_submit_commands",           SETTER(bool, _set_can_submit_commands) },
   { "retain_status_information",     SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information",  SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information",  SETTER(bool, _set_retain_nonstatus_information) },
+  { "timezone",                      SETTER(std::string const&, _set_timezone) }
 };
 
 // Default values.
@@ -123,6 +124,7 @@ contact& contact::operator=(contact const& right) {
     _service_notification_options = right._service_notification_options;
     _service_notification_period = right._service_notification_period;
     _service_notifications_enabled = right._service_notifications_enabled;
+    _timezone = right._timezone;
   }
   return (*this);
 }
@@ -153,7 +155,8 @@ bool contact::operator==(contact const& right) const throw () {
           && _service_notification_commands == right._service_notification_commands
           && _service_notification_options == right._service_notification_options
           && _service_notification_period == right._service_notification_period
-          && _service_notifications_enabled == right._service_notifications_enabled);
+          && _service_notifications_enabled == right._service_notifications_enabled
+          && _timezone == right._timezone);
 }
 
 /**
@@ -227,8 +230,11 @@ bool contact::operator<(contact const& right) const throw () {
            != right._service_notification_period)
     return (_service_notification_period
             < right._service_notification_period);
-  return (_service_notifications_enabled
-          < right._service_notifications_enabled);
+  else if (_service_notifications_enabled
+           != right._service_notifications_enabled)
+    return (_service_notifications_enabled
+            < right._service_notifications_enabled);
+  return (_timezone < right._timezone);
 }
 
 /**
@@ -281,6 +287,7 @@ void contact::merge(object const& obj) {
   MRG_OPTION(_service_notification_options);
   MRG_DEFAULT(_service_notification_period);
   MRG_OPTION(_service_notifications_enabled);
+  MRG_OPTION(_timezone);
 }
 
 /**
@@ -475,6 +482,15 @@ std::string const& contact::service_notification_period() const throw () {
  */
 bool contact::service_notifications_enabled() const throw () {
   return (_service_notifications_enabled);
+}
+
+/**
+ *  Get the contact timezone.
+ *
+ *  @return Contact timezone.
+ */
+std::string const& contact::timezone() const throw () {
+  return (_timezone);
 }
 
 /**
@@ -745,5 +761,17 @@ bool contact::_set_service_notification_period(std::string const& value) {
  */
 bool contact::_set_service_notifications_enabled(bool value) {
   _service_notifications_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set contact timezone.
+ *
+ *  @param[in] value  New contact timezone.
+ *
+ *  @return True on success, false otherwise.
+ */
+bool contact::_set_timezone(std::string const& value) {
+  _timezone = value;
   return (true);
 }

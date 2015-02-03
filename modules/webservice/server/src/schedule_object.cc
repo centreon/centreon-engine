@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -190,10 +190,17 @@ void webservice::schedule_host(host* hst) {
   logger(dbg_events, most)
     << "Preferred check time: " << hst->next_check << " --> " << ctime(&hst->next_check);
 
-  // check if the current time is ok.
-  if (check_time_against_period(hst->next_check, hst->check_period_ptr) == ERROR) {
+  // Check if the current time is ok.
+  if (check_time_against_period(
+        hst->next_check,
+        hst->check_period_ptr,
+        hst->timezone) == ERROR) {
     time_t valid_time = 0L;
-    get_next_valid_time(hst->next_check, &valid_time, hst->check_period_ptr);
+    get_next_valid_time(
+      hst->next_check,
+      &valid_time,
+      hst->check_period_ptr,
+      hst->timezone);
     hst->next_check = valid_time;
   }
 
@@ -253,10 +260,17 @@ void webservice::schedule_service(service* svc) {
   logger(dbg_events, most)
     << "Preferred Check Time: " << svc->next_check << " --> " << ctime(&svc->next_check);
 
-  // check if current time is ok.
-  if (check_time_against_period(svc->next_check, svc->check_period_ptr) == ERROR) {
+  // Check if current time is ok.
+  if (check_time_against_period(
+        svc->next_check,
+        svc->check_period_ptr,
+        svc->timezone) == ERROR) {
     time_t valid_time = 0L;
-    get_next_valid_time(svc->next_check, &valid_time, svc->check_period_ptr);
+    get_next_valid_time(
+      svc->next_check,
+      &valid_time,
+      svc->check_period_ptr,
+      svc->timezone);
     svc->next_check = valid_time;
   }
 
