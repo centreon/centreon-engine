@@ -96,10 +96,12 @@ void applier::downtime::add_object(
   int ret = OK;
   unsigned long id;
   time_t new_start_time, new_end_time;
+
   get_new_recurring_times(obj->start_time(), obj->end_time(),
                           obj->recurring_interval(),
                           obj->recurring_period(),
-                          &new_start_time, &new_end_time);
+                          &new_start_time, &new_end_time,
+                          NULL);
   ret = add_new_downtime(obj->downtime_type(),
                          obj->host_name().c_str(),
                          obj->service_description().c_str(),

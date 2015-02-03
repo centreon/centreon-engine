@@ -523,9 +523,11 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
                     temp_downtime->service_description)) == NULL)
     return (ERROR);
 
+  const char* tz = hst ? hst->timezone : svc->timezone;
+
   /* Before anything, renew downtime if it is a recurring downtime. */
   if (!temp_downtime->is_in_effect && temp_downtime->recurring_period != NULL) {
-    if (renew_downtime(temp_downtime, &new_recurring_downtime_id) == OK)
+    if (renew_downtime(temp_downtime, &new_recurring_downtime_id, tz) == OK)
       logger(dbg_downtime, basic)
         << "Recurring downtime (id='" << temp_downtime->downtime_id <<
            "): new downtime created (id=" << new_recurring_downtime_id << ").";
@@ -1102,14 +1104,17 @@ int add_new_service_downtime(
 }
 
 /* If this downtime was a recurring downtime, renew it. */
-int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id) {
+int renew_downtime(scheduled_downtime* downtime,
+                   unsigned long* new_downtime_id,
+                   const char* tz) {
   time_t new_start_time;
   time_t new_end_time;
 
   get_new_recurring_times(downtime->start_time, downtime->end_time,
                           downtime->recurring_interval,
                           downtime->recurring_period,
-                          &new_start_time, &new_end_time);
+                          &new_start_time, &new_end_time,
+                          tz);
 
   // Create a new downtime.
   return (schedule_downtime(downtime->type,
@@ -1125,7 +1130,8 @@ int renew_downtime(scheduled_downtime* downtime, unsigned long* new_downtime_id)
 void get_new_recurring_times(time_t start_time, time_t end_time,
                              unsigned long recurring_interval,
                              timeperiod* recurring_period,
-                             time_t* new_start_time, time_t* new_end_time) {
+                             time_t* new_start_time, time_t* new_end_time,
+                             const char* tz) {
   *new_start_time = start_time + recurring_interval;
   *new_end_time = *new_start_time + difftime(end_time,
                                         start_time);
@@ -1134,8 +1140,8 @@ void get_new_recurring_times(time_t start_time, time_t end_time,
   // If we aren't in the recurring period: start the next recurring period.
   if ((*new_start_time < now && *new_end_time < now)
       || check_time_against_period(*new_start_time,
-                                recurring_period) == ERROR)
-    get_next_valid_time(time(NULL), new_start_time, recurring_period);
+                                recurring_period, tz) == ERROR)
+    get_next_valid_time(time(NULL), new_start_time, recurring_period, tz);
 
   // Calculate a new correct end time from the new start time.
   *new_end_time = *new_start_time + difftime(end_time,

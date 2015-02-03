@@ -69,11 +69,11 @@ int main_test(int argc, char** argv) {
   (void) argv;
 
   try {
-    host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                         0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                         0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                         NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                         0.0, 0, 0, 0, 0, 0);
+    host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
+                       42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
+                       NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+                       0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
+                       0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, NULL));
     if (!hst)
       throw (engine_error() << "create host failed.");
 
@@ -82,7 +82,7 @@ int main_test(int argc, char** argv) {
       throw (engine_error() << "create timeperiod failed.");
 
     for (int i = 0; i < 7; ++i)
-      if (!add_timerange_to_timeperiod(tperiod, i, 0, 86400))
+      if (!add_timerange_to_timeperiod(tperiod, i, 0, 0, 24, 60))
         throw (engine_error() << "create timerange failed.");
 
     next_downtime_id = 1;
