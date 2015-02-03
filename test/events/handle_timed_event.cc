@@ -269,6 +269,8 @@ static void check_event_expire_downtime() {
                    0,
                    0,
                    0,
+                   0,
+                   NULL,
                    downtime_id) != OK || scheduled_downtime_list == NULL)
     throw (engine_error() << "add_new comment failed.");
 

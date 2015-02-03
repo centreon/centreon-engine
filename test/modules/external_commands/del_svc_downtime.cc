@@ -63,6 +63,8 @@ static int check_del_svc_downtime(int argc, char** argv) {
                                0,
                                0,
                                0,
+                               0,
+                               NULL,
                                &downtime_id) != OK)
     throw (engine_error() << "create downtime failed.");
 

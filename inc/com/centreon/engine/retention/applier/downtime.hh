@@ -32,6 +32,10 @@ namespace   retention {
       void  apply(list_downtime const& lst);
 
     private:
+      void  _add_downtime(
+              retention::downtime const& obj) throw();
+      void  _add_recurring_downtime(
+              retention::downtime const& obj) throw();
       void  _add_host_downtime(
               retention::downtime const& obj) throw ();
       void  _add_service_downtime(

@@ -46,6 +46,8 @@ int xdddefault_add_new_host_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long reccuring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id);
 int xdddefault_add_new_service_downtime(
       char const* host_name,
@@ -58,6 +60,8 @@ int xdddefault_add_new_service_downtime(
       int fixed,
       unsigned long triggered_by,
       unsigned long duration,
+      unsigned long reccuring_interval,
+      timeperiod* recurring_period,
       unsigned long* downtime_id);
 
 int xdddefault_delete_host_downtime(unsigned long downtime_id);

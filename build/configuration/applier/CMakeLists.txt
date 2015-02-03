@@ -47,6 +47,7 @@ set(
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/state.cc"
   "${SRC_DIR}/timeperiod.cc"
+  "${SRC_DIR}/downtime.cc"
 
   # Headers.
   "${INC_DIR}/command.hh"
@@ -70,6 +71,7 @@ set(
   "${INC_DIR}/servicegroup.hh"
   "${INC_DIR}/state.hh"
   "${INC_DIR}/timeperiod.hh"
+  "${INC_DIR}/downtime.hh"
 
   PARENT_SCOPE
 )

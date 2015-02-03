@@ -354,6 +354,19 @@ add_test(
   "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
 )
 
+# Recurring downtimes are correctly parsed and not crashing the engine.
+set (TEST_NAME "running_recurring_downtimes")
+add_test(
+  "${TEST_NAME}"
+  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/recurring_downtime.cfg"
+)
+
+# Recurring downtimes recure.
+set(TEST_NAME "downtimes_recur")
+add_executable("${TEST_NAME}" "${TEST_DIR}/running/downtimes_recur.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
 # Precache file generation.
 set(TEST_NAME "running_precache_file_generation")
 add_executable(

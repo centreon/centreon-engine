@@ -864,6 +864,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   unsigned long duration(0);
   char* author(NULL);
   char* comment_data(NULL);
+  unsigned long recurring_interval(0);
+  timeperiod* recurring_period(NULL);
   unsigned long downtime_id(0);
 
   if (cmd == CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME
@@ -946,6 +948,18 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   if ((comment_data = my_strtok(NULL, ";")) == NULL)
     return (ERROR);
 
+  /* get the recurring interval */
+  if ((temp_ptr = my_strtok(NULL, ";")) != NULL)
+    recurring_interval = strtol(temp_ptr, NULL, 10);
+
+  /* get the recurring period */
+  if ((temp_ptr = my_strtok(NULL, ";")) != NULL) {
+    if (strcmp(temp_ptr, "NULL") != 0) {
+      if ((recurring_period = find_timeperiod(temp_ptr)) == NULL)
+        return (ERROR);
+    }
+  }
+
   /* check if flexible downtime demanded and duration set to non-zero.
   ** according to the documentation, a flexible downtime is started
   ** between start and end time and will last for "duration" seconds.
@@ -975,6 +989,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       fixed,
       triggered_by,
       duration,
+      recurring_interval,
+      recurring_period,
       &downtime_id);
     break;
 
@@ -991,6 +1007,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       fixed,
       triggered_by,
       duration,
+      recurring_interval,
+      recurring_period,
       &downtime_id);
     break;
 
@@ -1012,6 +1030,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         fixed,
         triggered_by,
         duration,
+        recurring_interval,
+        recurring_period,
         &downtime_id);
     }
     break;
@@ -1032,6 +1052,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         fixed,
         triggered_by,
         duration,
+        recurring_interval,
+        recurring_period,
         &downtime_id);
     break;
 
@@ -1057,6 +1079,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
           fixed,
           triggered_by,
           duration,
+          recurring_interval,
+          recurring_period,
           &downtime_id);
       }
     }
@@ -1084,6 +1108,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         fixed,
         triggered_by,
         duration,
+        recurring_interval,
+        recurring_period,
         &downtime_id);
       last_host = temp_host;
     }
@@ -1104,6 +1130,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         fixed,
         triggered_by,
         duration,
+        recurring_interval,
+        recurring_period,
         &downtime_id);
     break;
 
@@ -1121,6 +1149,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       fixed,
       triggered_by,
       duration,
+      recurring_interval,
+      recurring_period,
       &downtime_id);
 
     /* schedule (non-triggered) downtime for all child hosts */
@@ -1133,7 +1163,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       end_time,
       fixed,
       0,
-      duration);
+      duration,
+      recurring_interval,
+      recurring_period);
     break;
 
   case CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME:
@@ -1150,6 +1182,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       fixed,
       triggered_by,
       duration,
+      recurring_interval,
+      recurring_period,
       &downtime_id);
 
     /* schedule triggered downtime for all child hosts */
@@ -1162,7 +1196,9 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       end_time,
       fixed,
       downtime_id,
-      duration);
+      duration,
+      recurring_interval,
+      recurring_period);
     break;
 
   default:
@@ -2676,7 +2712,9 @@ void schedule_and_propagate_downtime(
        time_t end_time,
        int fixed,
        unsigned long triggered_by,
-       unsigned long duration) {
+       unsigned long duration,
+       unsigned long recurring_interval,
+       timeperiod* recurring_period) {
   host* child_host(NULL);
   hostsmember* temp_hostsmember(NULL);
 
@@ -2698,7 +2736,9 @@ void schedule_and_propagate_downtime(
       end_time,
       fixed,
       triggered_by,
-      duration);
+      duration,
+      recurring_interval,
+      recurring_period);
 
     /* schedule downtime for this host */
     schedule_downtime(
@@ -2713,6 +2753,8 @@ void schedule_and_propagate_downtime(
       fixed,
       triggered_by,
       duration,
+      recurring_interval,
+      recurring_period,
       NULL);
   }
 }

@@ -913,6 +913,8 @@ int xrddefault_read_state_information() {
             fixed,
             triggered_by,
             duration,
+            0,
+            NULL,
             downtime_id);
         else
           add_service_downtime(
@@ -926,6 +928,8 @@ int xrddefault_read_state_information() {
             fixed,
             triggered_by,
             duration,
+            0,
+            NULL,
             downtime_id);
 
         /* must register the downtime with Centreon Engine so it can schedule it, add comments, etc. */

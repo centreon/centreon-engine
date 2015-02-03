@@ -42,6 +42,7 @@ struct servicedependency_struct;
 struct serviceescalation_struct;
 struct servicegroup_struct;
 struct timeperiod_struct;
+struct scheduled_downtime_struct;
 
 CCE_BEGIN()
 

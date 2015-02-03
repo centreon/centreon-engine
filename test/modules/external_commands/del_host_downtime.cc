@@ -53,6 +53,8 @@ static int check_del_host_downtime(int argc, char** argv) {
                             0,
                             0,
                             0,
+                            0,
+                            NULL,
                             &downtime_id) != OK)
     throw (engine_error() << "create downtime failed.");
 

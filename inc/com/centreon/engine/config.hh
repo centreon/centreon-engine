@@ -45,6 +45,7 @@ int check_hostdependency(hostdependency* hd, int* w, int* e);
 int check_serviceescalation(serviceescalation* se, int* w, int* e);
 int check_hostescalation(hostescalation* he, int* w, int* e);
 int check_timeperiod(timeperiod* tp, int* w, int* e);
+int check_downtime(scheduled_downtime *dw, int* w, int* e);
 
 #  ifdef __cplusplus
 }

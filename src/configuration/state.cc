@@ -25,6 +25,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/io/file_entry.hh"
+#include "com/centreon/engine/configuration/downtime.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -488,6 +489,7 @@ state& state::operator=(state const& right) {
     _debug_file = right._debug_file;
     _debug_level = right._debug_level;
     _debug_verbosity = right._debug_verbosity;
+    _downtimes = right._downtimes;
     _enable_environment_macros = right._enable_environment_macros;
     _enable_event_handlers = right._enable_event_handlers;
     _enable_failure_prediction = right._enable_failure_prediction;
@@ -631,6 +633,7 @@ bool state::operator==(state const& right) const throw () {
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
           && _debug_verbosity == right._debug_verbosity
+          && cmp_set_ptr(_downtimes, right._downtimes)
           && _enable_environment_macros == right._enable_environment_macros
           && _enable_event_handlers == right._enable_event_handlers
           && _enable_failure_prediction == right._enable_failure_prediction
@@ -4189,4 +4192,8 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: use_embedded_perl_implicitly variable ignored";
   ++config_warnings;
+}
+
+std::set<shared_ptr<downtime> >& state::downtimes() throw() {
+   return (_downtimes);
 }

@@ -62,6 +62,7 @@ namespace              configuration {
       read_serviceextinfo = (1 << 13),
       read_servicegroup = (1 << 14),
       read_timeperiod = (1 << 15),
+      read_downtime = (1 << 16),
       read_all = (~0)
     };
 
@@ -117,13 +118,13 @@ namespace              configuration {
     state*             _config;
     unsigned int       _current_line;
     std::string        _current_path;
-    list_object        _lst_objects[15];
-    map_object         _map_objects[15];
+    list_object        _lst_objects[16];
+    map_object         _map_objects[16];
     umap<object*, file_info>
                        _objects_info;
     unsigned int       _read_options;
     static store       _store[];
-    map_object         _templates[15];
+    map_object         _templates[16];
   };
 }
 

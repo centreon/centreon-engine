@@ -157,6 +157,8 @@ std::ostream& dump::downtime(std::ostream& os, scheduled_downtime_struct const& 
     "start_time=" << static_cast<unsigned long>(obj.start_time) << "\n"
     "triggered_by=" << obj.triggered_by << "\n"
     "downtime_id=" << obj.downtime_id << "\n"
+    "recurring_interval=" << obj.recurring_interval << "\n"
+    "recurring_period=" << obj.recurring_period->name << "\n"
     "}\n";
   return (os);
 }
