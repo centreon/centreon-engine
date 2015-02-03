@@ -38,16 +38,16 @@ void init_host_and_service(host*& hst, service*& svc) {
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
                        0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
                        NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+                       0.0, 0, 0, 0, 0, 0, NULL);
   if (!hst)
     throw (engine_error() << "create host failed.");
 
   svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+                           NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
+                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
+                           0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+                           0, 0, NULL, NULL, NULL, NULL, NULL,
+                           0, 0, 0, NULL);
   if (!svc)
     throw (engine_error() << "create service failed.");
   svc->host_ptr = hst;
@@ -57,7 +57,7 @@ void init_host_and_service(host*& hst, service*& svc) {
     throw (engine_error() << "create timeperiod failed.");
 
   for (int i = 0; i < 6; ++i)
-    if (!add_timerange_to_timeperiod(tperiod, i, 0, 86400))
+    if (!add_timerange_to_timeperiod(tperiod, i, 0, 0, 24, 60))
       throw (engine_error() << "create timerange failed.");
 }
 
