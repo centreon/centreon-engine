@@ -74,6 +74,36 @@ applier::downtime& applier::downtime::operator=(applier::downtime const& right) 
 }
 
 /**
+ *  @brief Get the timezone of a timeperiod.
+ *
+ *  It is the timezone of the concerned host or service.
+ *
+ *  @param[in] obj  The timezone.
+ *
+ *  @return  The timezone of the concerned timeperiod, or null if none found.
+ */
+static const char* get_timezone_for_timeperiod(
+                     shared_ptr<configuration::downtime> const& obj,
+                     configuration::state& config) {
+  if (obj->downtime_type() == configuration::downtime::host) {
+     set_host::iterator host_found = config.hosts_find(obj->host_name());
+    return (
+      host_found != config.hosts().end()
+        ? (*host_found)->timezone().c_str() : NULL);
+  }
+  else if (obj->downtime_type() == configuration::downtime::service) {
+    set_service::iterator service_found = config.services_find(
+                            std::make_pair(
+                                  obj->host_name(),
+                                  obj->service_description()));
+    return (
+      service_found != config.services().end()
+        ? (*service_found)->timezone().c_str() : NULL);
+  }
+  return (NULL);
+}
+
+/**
  *  Add new downtime.
  *
  *  @param[in] obj The new downtime to add into the monitoring engine.
@@ -97,11 +127,13 @@ void applier::downtime::add_object(
   unsigned long id;
   time_t new_start_time, new_end_time;
 
+  const char* tz = get_timezone_for_timeperiod(obj, *config);
+
   get_new_recurring_times(obj->start_time(), obj->end_time(),
                           obj->recurring_interval(),
                           obj->recurring_period(),
                           &new_start_time, &new_end_time,
-                          NULL);
+                          tz);
   ret = add_new_downtime(obj->downtime_type(),
                          obj->host_name().c_str(),
                          obj->service_description().c_str(),
