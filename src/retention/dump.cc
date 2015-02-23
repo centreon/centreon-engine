@@ -126,7 +126,7 @@ std::ostream& dump::customvariables(
        member = member->next)
     if (member->variable_name)
       os << "_" << member->variable_name << "="
-         << member->has_been_modified << ";"
+         << member->has_been_modified << ","
          << (member->variable_value ? member->variable_value : "")
          << "\n";
   return (os);
