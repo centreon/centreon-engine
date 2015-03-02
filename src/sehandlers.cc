@@ -104,14 +104,20 @@ int obsessive_compulsive_service_check_processor(service* svc) {
     "processor command line: " << processed_command;
 
   /* run the command */
-  my_system_r(
-    &mac,
-    processed_command,
-    config->ocsp_timeout(),
-    &early_timeout,
-    &exectime,
-    NULL,
-    0);
+  try {
+      my_system_r(
+      &mac,
+      processed_command,
+      config->ocsp_timeout(),
+      &early_timeout,
+      &exectime,
+      NULL,
+      0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute compulsive service processor command line '"
+      << processed_command << "' : " << e.what();
+  }
 
   clear_volatile_macros_r(&mac);
 
@@ -190,14 +196,20 @@ int obsessive_compulsive_host_check_processor(host* hst) {
     "command line: " << processed_command;
 
   /* run the command */
-  my_system_r(
-    &mac,
-    processed_command,
-    config->ochp_timeout(),
-    &early_timeout,
-    &exectime,
-    NULL,
-    0);
+  try {
+    my_system_r(
+      &mac,
+      processed_command,
+      config->ochp_timeout(),
+      &early_timeout,
+      &exectime,
+      NULL,
+      0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute compulsive host processor command line '"
+      << processed_command << "' : " << e.what();
+  }
   clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
@@ -390,14 +402,21 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   }
 
   /* run the command */
-  result = my_system_r(
-             mac,
-             processed_command,
-             config->event_handler_timeout(),
-             &early_timeout,
-             &exectime,
-             &command_output,
-             0);
+  try {
+    result = my_system_r(
+               mac,
+               processed_command,
+               config->event_handler_timeout(),
+               &early_timeout,
+               &exectime,
+               &command_output,
+               0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute global service event handler "
+         "command line '"
+      << processed_command << "' : " << e.what();
+  }
 
   /* check to see if the event handler timed out */
   if (early_timeout == true)
@@ -543,14 +562,20 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   }
 
   /* run the command */
-  result = my_system_r(
-             mac,
-             processed_command,
-             config->event_handler_timeout(),
-             &early_timeout,
-             &exectime,
-             &command_output,
-             0);
+  try {
+    result = my_system_r(
+               mac,
+               processed_command,
+               config->event_handler_timeout(),
+               &early_timeout,
+               &exectime,
+               &command_output,
+               0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute service event handler command line '"
+      << processed_command << "' : " << e.what();
+  }
 
   /* check to see if the event handler timed out */
   if (early_timeout == true)
@@ -754,14 +779,20 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   }
 
   /* run the command */
-  result = my_system_r(
-             mac,
-             processed_command,
-             config->event_handler_timeout(),
-             &early_timeout,
-             &exectime,
-             &command_output,
-             0);
+  try {
+    result = my_system_r(
+               mac,
+               processed_command,
+               config->event_handler_timeout(),
+               &early_timeout,
+               &exectime,
+               &command_output,
+               0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute global host event handler command line '"
+      << processed_command << "' : " << e.what();
+  }
 
   /* check for a timeout in the execution of the event handler command */
   if (early_timeout == true)
@@ -904,14 +935,20 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   }
 
   /* run the command */
-  result = my_system_r(
-             mac,
-             processed_command,
-             config->event_handler_timeout(),
-             &early_timeout,
-             &exectime,
-             &command_output,
-             0);
+  try {
+    result = my_system_r(
+               mac,
+               processed_command,
+               config->event_handler_timeout(),
+               &early_timeout,
+               &exectime,
+               &command_output,
+               0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute host event handler command line '"
+      << processed_command << "' : " << e.what();
+  }
 
   /* check to see if the event handler timed out */
   if (early_timeout == true)
