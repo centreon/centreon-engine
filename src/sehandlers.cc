@@ -269,18 +269,12 @@ int handle_service_event(service* svc) {
   grab_host_macros_r(&mac, temp_host);
   grab_service_macros_r(&mac, svc);
 
-  try {
-    /* run the global service event handler */
-    run_global_service_event_handler(&mac, svc);
+  /* run the global service event handler */
+  run_global_service_event_handler(&mac, svc);
 
-    /* run the event handler command if there is one */
-    if (svc->event_handler != NULL)
-      run_service_event_handler(&mac, svc);
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-      << "Could not execute service event handler: '" << e.what() << "'";
-  }
-
+  /* run the event handler command if there is one */
+  if (svc->event_handler != NULL)
+    run_service_event_handler(&mac, svc);
   clear_volatile_macros_r(&mac);
 
   /* send data to event broker */
