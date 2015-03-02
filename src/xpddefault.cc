@@ -314,14 +314,20 @@ int xpddefault_run_service_performance_data_command(
     "command line: " << processed_command_line;
 
   // run the command.
-  my_system_r(
-    mac,
-    processed_command_line,
-    config->perfdata_timeout(),
-    &early_timeout,
-    &exectime,
-    NULL,
-    0);
+  try {
+    my_system_r(
+      mac,
+      processed_command_line,
+      config->perfdata_timeout(),
+      &early_timeout,
+      &exectime,
+      NULL,
+      0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute service performance data command line '"
+      << processed_command_line << "' : " << e.what();
+  }
 
   // check to see if the command timed out.
   if (early_timeout == true)
@@ -385,14 +391,21 @@ int xpddefault_run_host_performance_data_command(
     << processed_command_line;
 
   // run the command.
-  my_system_r(
-    mac,
-    processed_command_line,
-    config->perfdata_timeout(),
-    &early_timeout,
-    &exectime,
-    NULL,
-    0);
+  try {
+    my_system_r(
+      mac,
+      processed_command_line,
+      config->perfdata_timeout(),
+      &early_timeout,
+      &exectime,
+      NULL,
+      0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute host performance data command line '"
+      << processed_command_line << "' : " << e.what();
+  }
+
   if (processed_command_line == NULL)
     return (ERROR);
 
@@ -686,14 +699,21 @@ int xpddefault_process_host_perfdata_file() {
   xpddefault_close_host_perfdata_file();
 
   // run the command.
-  my_system_r(
-    &mac,
-    processed_command_line,
-    config->perfdata_timeout(),
-    &early_timeout,
-    &exectime,
-    NULL,
-    0);
+  try {
+    my_system_r(
+      &mac,
+      processed_command_line,
+      config->perfdata_timeout(),
+      &early_timeout,
+      &exectime,
+      NULL,
+      0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute host performance data file processing command "
+         "line '"
+      << processed_command_line << "' : " << e.what();
+  }
   clear_volatile_macros_r(&mac);
 
   // re-open and unlock the performance data file.
@@ -770,14 +790,21 @@ int xpddefault_process_service_perfdata_file() {
   xpddefault_close_service_perfdata_file();
 
   // run the command.
-  my_system_r(
-    &mac,
-    processed_command_line,
-    config->perfdata_timeout(),
-    &early_timeout,
-    &exectime,
-    NULL,
-    0);
+  try {
+    my_system_r(
+      &mac,
+      processed_command_line,
+      config->perfdata_timeout(),
+      &early_timeout,
+      &exectime,
+      NULL,
+      0);
+  } catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: can't execute service performance data file processing "
+         "command line '"
+      << processed_command_line << "' : " << e.what();
+  }
 
   // re-open and unlock the performance data file.
   xpddefault_open_service_perfdata_file();

@@ -1013,14 +1013,20 @@ int notify_contact_of_service(
     }
 
     /* run the notification command */
-    my_system_r(
-      mac,
-      processed_command,
-      config->notification_timeout(),
-      &early_timeout,
-      &exectime,
-      NULL,
-      0);
+    try {
+      my_system_r(
+        mac,
+        processed_command,
+        config->notification_timeout(),
+        &early_timeout,
+        &exectime,
+        NULL,
+        0);
+    } catch (std::exception const& e) {
+      logger(log_runtime_error, basic)
+        << "Error: can't execute service notification '"
+        << cntct->name << "' : " << e.what();
+    }
 
     /* check to see if the notification command timed out */
     if (early_timeout == true) {
@@ -2191,14 +2197,20 @@ int notify_contact_of_host(
     }
 
     /* run the notification command */
-    my_system_r(
-      mac,
-      processed_command,
-      config->notification_timeout(),
-      &early_timeout,
-      &exectime,
-      NULL,
-      0);
+    try {
+      my_system_r(
+        mac,
+        processed_command,
+        config->notification_timeout(),
+        &early_timeout,
+        &exectime,
+        NULL,
+        0);
+    } catch (std::exception const& e) {
+      logger(log_runtime_error, basic)
+        << "Error: can't execute host notification '"
+        << cntct->name << "' : " << e.what();
+    }
 
     /* check to see if the notification timed out */
     if (early_timeout == true) {
