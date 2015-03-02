@@ -31,6 +31,7 @@
 CCE_BEGIN()
 
 namespace                retention {
+
   class                  downtime : public object {
   public:
     enum                 type_id {
@@ -60,18 +61,6 @@ namespace                retention {
     unsigned long        triggered_by() const throw ();
     unsigned long        recurring_interval() const throw();
     timeperiod*          recurring_period() const throw();
-
-  protected:
-    template<typename T, bool (T::*ptr)(timeperiod*)>
-    struct              setter<T, timeperiod*, ptr> {
-      static bool       generic(T& obj, char const* value) {
-        umap<std::string, shared_ptr<timeperiod_struct> >::iterator it =
-            configuration::applier::state::instance().timeperiods().find(value);
-        if (it == configuration::applier::state::instance().timeperiods().end())
-          return false;
-        else return ((obj.*ptr)(it->second.get()));
-      }
-    };
 
   private:
     struct               setters {
@@ -108,6 +97,17 @@ namespace                retention {
     unsigned long        _triggered_by;
     unsigned long        _recurring_interval;
     timeperiod*          _recurring_period;
+  };
+
+  template<typename T, bool (T::*ptr)(timeperiod*)>
+  struct              downtime::setter<T, timeperiod*, ptr> {
+    static bool       generic(T& obj, char const* value) {
+      umap<std::string, shared_ptr<timeperiod_struct> >::iterator it =
+          configuration::applier::state::instance().timeperiods().find(value);
+      if (it == configuration::applier::state::instance().timeperiods().end())
+        return false;
+      else return ((obj.*ptr)(it->second.get()));
+    }
   };
 
   typedef shared_ptr<downtime> downtime_ptr;
