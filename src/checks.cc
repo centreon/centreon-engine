@@ -691,17 +691,12 @@ int handle_async_service_check_result(
       flapping_check_done = true;
 
       /* notify contacts about the service recovery */
-      try {
-        service_notification(
-          temp_service,
-          NOTIFICATION_NORMAL,
-          NULL,
-          NULL,
-          NOTIFICATION_OPTION_NONE);
-      } catch (std::exception const& e) {
-        logger(log_runtime_error, basic)
-          << "Could not send service notification: '" << e.what() << "'";
-      }
+      service_notification(
+        temp_service,
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event(temp_service);
@@ -888,17 +883,12 @@ int handle_async_service_check_result(
 	  route_result = temp_host->current_state;
 
 	  /* possibly re-send host notifications... */
-    try {
-      host_notification(
-              temp_host,
-              NOTIFICATION_NORMAL,
-              NULL,
-              NULL,
-              NOTIFICATION_OPTION_NONE);
-    } catch (std::exception const& e) {
-      logger(log_runtime_error, basic)
-        << "Could not send host notification: '" << e.what() << "'";
-    }
+	  host_notification(
+            temp_host,
+            NOTIFICATION_NORMAL,
+            NULL,
+            NULL,
+            NOTIFICATION_OPTION_NONE);
 	}
     }
 
@@ -1065,17 +1055,12 @@ int handle_async_service_check_result(
       flapping_check_done = true;
 
       /* (re)send notifications out about this service problem if the host is up (and was at last check also) and the dependencies were okay... */
-      try {
-        service_notification(
-          temp_service,
-          NOTIFICATION_NORMAL,
-          NULL,
-          NULL,
-          NOTIFICATION_OPTION_NONE);
-      } catch (std::exception const& e) {
-        logger(log_runtime_error, basic)
-          << "Could not send service notification: '" << e.what() << "'";
-      }
+      service_notification(
+        temp_service,
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler if we changed state from the last hard state or if this service is flagged as being volatile */
       if (hard_state_change == true
