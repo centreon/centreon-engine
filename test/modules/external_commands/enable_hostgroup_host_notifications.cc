@@ -33,15 +33,11 @@ static int check_enable_hostgroup_host_notifications(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0, NULL);
+  host* hst = unittest::add_generic_host();
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  hostgroup* group = add_hostgroup("group", NULL, NULL, NULL, NULL);
+  hostgroup* group = add_hostgroup("group", NULL);
   if (!group)
     throw (engine_error() << "create hostgroup failed.");
 

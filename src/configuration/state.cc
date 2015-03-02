@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,15 +39,9 @@ state::setters const state::_setters[] = {
   { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
   { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
-  { "admin_email",                                 SETTER(std::string const&, admin_email) },
-  { "admin_pager",                                 SETTER(std::string const&, admin_pager) },
-  { "aggregate_status_updates",                    SETTER(std::string const&, _set_aggregate_status_updates) },
-  { "allow_empty_hostgroup_assignment",            SETTER(bool, allow_empty_hostgroup_assignment) },
-  { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
   { "auto_reschedule_checks",                      SETTER(bool, auto_reschedule_checks) },
   { "auto_rescheduling_interval",                  SETTER(unsigned int, auto_rescheduling_interval) },
   { "auto_rescheduling_window",                    SETTER(unsigned int, auto_rescheduling_window) },
-  { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
   { "broker_module_directory",                     SETTER(std::string const&, broker_module_directory) },
   { "broker_module",                               SETTER(std::string const&, _set_broker_module) },
   { "cached_host_check_horizon",                   SETTER(unsigned long, cached_host_check_horizon) },
@@ -57,22 +51,15 @@ state::setters const state::_setters[] = {
   { "check_external_commands",                     SETTER(bool, check_external_commands) },
   { "check_for_orphaned_hosts",                    SETTER(bool, check_orphaned_hosts) },
   { "check_for_orphaned_services",                 SETTER(bool, check_orphaned_services) },
-  { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
   { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
-  { "check_result_path",                           SETTER(std::string const&, _set_check_result_path) },
   { "check_result_reaper_frequency",               SETTER(unsigned int, check_reaper_interval) },
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
-  { "child_processes_fork_twice",                  SETTER(std::string const&, _set_child_processes_fork_twice) },
   { "command_check_interval",                      SETTER(std::string const&, _set_command_check_interval) },
   { "command_file",                                SETTER(std::string const&, command_file) },
-  { "comment_file",                                SETTER(std::string const&, _set_comment_file) },
-  { "daemon_dumps_core",                           SETTER(std::string const&, _set_daemon_dumps_core) },
   { "date_format",                                 SETTER(std::string const&, _set_date_format) },
   { "debug_file",                                  SETTER(std::string const&, debug_file) },
   { "debug_level",                                 SETTER(unsigned long, debug_level) },
   { "debug_verbosity",                             SETTER(unsigned int, debug_verbosity) },
-  { "downtime_file",                               SETTER(std::string const&, _set_downtime_file) },
-  { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
   { "enable_environment_macros",                   SETTER(bool, enable_environment_macros) },
   { "enable_event_handlers",                       SETTER(bool, enable_event_handlers) },
   { "enable_failure_prediction",                   SETTER(bool, enable_failure_prediction) },
@@ -85,7 +72,6 @@ state::setters const state::_setters[] = {
   { "execute_host_checks",                         SETTER(bool, execute_host_checks) },
   { "execute_service_checks",                      SETTER(bool, execute_service_checks) },
   { "external_command_buffer_slots",               SETTER(int, external_command_buffer_slots) },
-  { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
   { "global_host_event_handler",                   SETTER(std::string const&, global_host_event_handler) },
   { "global_service_event_handler",                SETTER(std::string const&, global_service_event_handler) },
   { "high_host_flap_threshold",                    SETTER(float, high_host_flap_threshold) },
@@ -93,17 +79,9 @@ state::setters const state::_setters[] = {
   { "host_check_timeout",                          SETTER(unsigned int, host_check_timeout) },
   { "host_freshness_check_interval",               SETTER(unsigned int, host_freshness_check_interval) },
   { "host_inter_check_delay_method",               SETTER(std::string const&, _set_host_inter_check_delay_method) },
-  { "host_perfdata_command",                       SETTER(std::string const&, host_perfdata_command) },
-  { "host_perfdata_file",                          SETTER(std::string const&, host_perfdata_file) },
-  { "host_perfdata_file_mode",                     SETTER(std::string const&, _set_host_perfdata_file_mode) },
-  { "host_perfdata_file_processing_command",       SETTER(std::string const&, host_perfdata_file_processing_command) },
-  { "host_perfdata_file_processing_interval",      SETTER(unsigned int, host_perfdata_file_processing_interval) },
-  { "host_perfdata_file_template",                 SETTER(std::string const&, host_perfdata_file_template) },
   { "illegal_macro_output_chars",                  SETTER(std::string const&, illegal_output_chars) },
   { "illegal_object_name_chars",                   SETTER(std::string const&, illegal_object_chars) },
   { "interval_length",                             SETTER(unsigned int, interval_length) },
-  { "lock_file",                                   SETTER(std::string const&, _set_lock_file) },
-  { "log_archive_path",                            SETTER(std::string const&, _set_log_archive_path) },
   { "log_event_handlers",                          SETTER(bool, log_event_handlers) },
   { "log_external_commands",                       SETTER(bool, log_external_commands) },
   { "log_file",                                    SETTER(std::string const&, log_file) },
@@ -111,19 +89,15 @@ state::setters const state::_setters[] = {
   { "log_initial_states",                          SETTER(bool, log_initial_states) },
   { "log_notifications",                           SETTER(bool, log_notifications) },
   { "log_passive_checks",                          SETTER(bool, log_passive_checks) },
-  { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
   { "log_service_retries",                         SETTER(bool, log_service_retries) },
   { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
   { "low_service_flap_threshold",                  SETTER(float, low_service_flap_threshold) },
-  { "max_check_result_file_age",                   SETTER(unsigned long, max_check_result_file_age) },
   { "max_check_result_reaper_time",                SETTER(unsigned int, max_check_reaper_time) },
   { "max_concurrent_checks",                       SETTER(unsigned int, max_parallel_service_checks) },
   { "max_debug_file_size",                         SETTER(unsigned long, max_debug_file_size) },
   { "max_host_check_spread",                       SETTER(unsigned int, max_host_check_spread) },
   { "max_log_file_size",                           SETTER(unsigned long, max_log_file_size) },
   { "max_service_check_spread",                    SETTER(unsigned int, max_service_check_spread) },
-  { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
-  { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
   { "notification_timeout",                        SETTER(unsigned int, notification_timeout) },
   { "object_cache_file",                           SETTER(std::string const&, object_cache_file) },
   { "obsess_over_hosts",                           SETTER(bool, obsess_over_hosts) },
@@ -132,18 +106,13 @@ state::setters const state::_setters[] = {
   { "ochp_timeout",                                SETTER(unsigned int, ochp_timeout) },
   { "ocsp_command",                                SETTER(std::string const&, ocsp_command) },
   { "ocsp_timeout",                                SETTER(unsigned int, ocsp_timeout) },
-  { "p1_file",                                     SETTER(std::string const&, _set_p1_file) },
   { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
-  { "perfdata_timeout",                            SETTER(int, perfdata_timeout) },
   { "precached_object_file",                       SETTER(std::string const&, precached_object_file) },
-  { "process_performance_data",                    SETTER(bool, process_performance_data) },
   { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
   { "retained_contact_host_attribute_mask",        SETTER(unsigned long, retained_contact_host_attribute_mask) },
   { "retained_contact_service_attribute_mask",     SETTER(unsigned long, retained_contact_service_attribute_mask) },
   { "retained_host_attribute_mask",                SETTER(unsigned long, retained_host_attribute_mask) },
   { "retained_process_host_attribute_mask",        SETTER(unsigned long, retained_process_host_attribute_mask) },
-  { "retained_process_service_attribute_mask",     SETTER(std::string const&, _set_retained_process_service_attribute_mask) },
-  { "retained_service_attribute_mask",             SETTER(std::string const&, _set_retained_service_attribute_mask) },
   { "retain_state_information",                    SETTER(bool, retain_state_information) },
   { "retention_scheduling_horizon",                SETTER(unsigned int, retention_scheduling_horizon) },
   { "retention_update_interval",                   SETTER(unsigned int, retention_update_interval) },
@@ -151,26 +120,17 @@ state::setters const state::_setters[] = {
   { "service_freshness_check_interval",            SETTER(unsigned int, service_freshness_check_interval) },
   { "service_inter_check_delay_method",            SETTER(std::string const&, _set_service_inter_check_delay_method) },
   { "service_interleave_factor",                   SETTER(std::string const&, _set_service_interleave_factor_method) },
-  { "service_perfdata_command",                    SETTER(std::string const&, service_perfdata_command) },
-  { "service_perfdata_file",                       SETTER(std::string const&, service_perfdata_file) },
-  { "service_perfdata_file_mode",                  SETTER(std::string const&, _set_service_perfdata_file_mode) },
-  { "service_perfdata_file_processing_command",    SETTER(std::string const&, service_perfdata_file_processing_command) },
-  { "service_perfdata_file_processing_interval",   SETTER(unsigned int, service_perfdata_file_processing_interval) },
-  { "service_perfdata_file_template",              SETTER(std::string const&, service_perfdata_file_template) },
   { "service_reaper_frequency",                    SETTER(unsigned int, check_reaper_interval) },
   { "sleep_time",                                  SETTER(float, sleep_time) },
   { "soft_state_dependencies",                     SETTER(bool, soft_state_dependencies) },
   { "state_retention_file",                        SETTER(std::string const&, state_retention_file) },
   { "status_file",                                 SETTER(std::string const&, status_file) },
   { "status_update_interval",                      SETTER(unsigned int, status_update_interval) },
-  { "temp_file",                                   SETTER(std::string const&, _set_temp_file) },
-  { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
   { "use_aggressive_host_checking",                SETTER(bool, use_aggressive_host_checking) },
   { "use_agressive_host_checking",                 SETTER(bool, use_aggressive_host_checking) },
   { "use_check_result_path",                       SETTER(bool, use_check_result_path) },
-  { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
   { "use_large_installation_tweaks",               SETTER(bool, use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, use_regexp_matches) },
   { "use_retained_program_state",                  SETTER(bool, use_retained_program_state) },
@@ -180,16 +140,55 @@ state::setters const state::_setters[] = {
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
   { "use_true_regexp_matching",                    SETTER(bool, use_true_regexp_matching) },
   { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
-  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) }
+  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) },
+
+  // Deprecated.
+  { "admin_email",                                 SETTER(std::string const&, _set_admin_email) },
+  { "admin_pager",                                 SETTER(std::string const&, _set_admin_pager) },
+  { "aggregate_status_updates",                    SETTER(std::string const&, _set_aggregate_status_updates) },
+  { "allow_empty_hostgroup_assignment",            SETTER(bool, _set_allow_empty_hostgroup_assignment) },
+  { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
+  { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
+  { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
+  { "check_result_path",                           SETTER(std::string const&, _set_check_result_path) },
+  { "child_processes_fork_twice",                  SETTER(std::string const&, _set_child_processes_fork_twice) },
+  { "comment_file",                                SETTER(std::string const&, _set_comment_file) },
+  { "daemon_dumps_core",                           SETTER(std::string const&, _set_daemon_dumps_core) },
+  { "downtime_file",                               SETTER(std::string const&, _set_downtime_file) },
+  { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
+  { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
+  { "host_perfdata_command",                       SETTER(std::string const&, _set_host_perfdata_command) },
+  { "host_perfdata_file",                          SETTER(std::string const&, _set_host_perfdata_file) },
+  { "host_perfdata_file_mode",                     SETTER(std::string const&, _set_host_perfdata_file_mode) },
+  { "host_perfdata_file_processing_command",       SETTER(std::string const&, _set_host_perfdata_file_processing_command) },
+  { "host_perfdata_file_processing_interval",      SETTER(unsigned int, _set_host_perfdata_file_processing_interval) },
+  { "host_perfdata_file_template",                 SETTER(std::string const&, _set_host_perfdata_file_template) },
+  { "lock_file",                                   SETTER(std::string const&, _set_lock_file) },
+  { "log_archive_path",                            SETTER(std::string const&, _set_log_archive_path) },
+  { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
+  { "max_check_result_file_age",                   SETTER(unsigned long, max_check_result_file_age) },
+  { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
+  { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
+  { "p1_file",                                     SETTER(std::string const&, _set_p1_file) },
+  { "perfdata_timeout",                            SETTER(int, _set_perfdata_timeout) },
+  { "process_performance_data",                    SETTER(bool, _set_process_performance_data) },
+  { "retained_process_service_attribute_mask",     SETTER(std::string const&, _set_retained_process_service_attribute_mask) },
+  { "retained_service_attribute_mask",             SETTER(std::string const&, _set_retained_service_attribute_mask) },
+  { "service_perfdata_command",                    SETTER(std::string const&, _set_service_perfdata_command) },
+  { "service_perfdata_file",                       SETTER(std::string const&, _set_service_perfdata_file) },
+  { "service_perfdata_file_mode",                  SETTER(std::string const&, _set_service_perfdata_file_mode) },
+  { "service_perfdata_file_processing_command",    SETTER(std::string const&, _set_service_perfdata_file_processing_command) },
+  { "service_perfdata_file_processing_interval",   SETTER(unsigned int, _set_service_perfdata_file_processing_interval) },
+  { "service_perfdata_file_template",              SETTER(std::string const&, _set_service_perfdata_file_template) },
+  { "temp_file",                                   SETTER(std::string const&, _set_temp_file) },
+  { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
+  { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) }
 };
 
 // Default values.
 static bool const                      default_accept_passive_host_checks(true);
 static bool const                      default_accept_passive_service_checks(true);
 static int const                       default_additional_freshness_latency(15);
-static std::string const               default_admin_email("");
-static std::string const               default_admin_pager("");
-static bool const                      default_allow_empty_hostgroup_assignment(false);
 static bool const                      default_auto_reschedule_checks(false);
 static unsigned int const              default_auto_rescheduling_interval(30);
 static unsigned int const              default_auto_rescheduling_window(180);
@@ -228,9 +227,6 @@ static float const                     default_high_service_flap_threshold(30.0)
 static unsigned int const              default_host_check_timeout(30);
 static unsigned int const              default_host_freshness_check_interval(60);
 static state::inter_check_delay const  default_host_inter_check_delay_method(state::icd_smart);
-static state::perfdata_file_mode const default_host_perfdata_file_mode(state::mode_pipe);
-static unsigned int const              default_host_perfdata_file_processing_interval(0);
-static std::string const               default_host_perfdata_file_template("[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$");
 static std::string const               default_illegal_object_chars("");
 static std::string const               default_illegal_output_chars("`~$&|'\"<>");
 static unsigned int const              default_interval_length(60);
@@ -260,9 +256,7 @@ static unsigned int const              default_ochp_timeout(15);
 static std::string const               default_ocsp_command("");
 static unsigned int const              default_ocsp_timeout(15);
 static bool const                      default_passive_host_checks_are_soft(false);
-static int const                       default_perfdata_timeout(5);
 static std::string const               default_precached_object_file(DEFAULT_PRECACHED_OBJECT_FILE);
-static bool const                      default_process_performance_data(false);
 static unsigned long const             default_retained_contact_host_attribute_mask(0L);
 static unsigned long const             default_retained_contact_service_attribute_mask(0L);
 static unsigned long const             default_retained_host_attribute_mask(0L);
@@ -274,9 +268,6 @@ static unsigned int const              default_service_check_timeout(60);
 static unsigned int const              default_service_freshness_check_interval(60);
 static state::inter_check_delay const  default_service_inter_check_delay_method(state::icd_smart);
 static state::interleave_factor const  default_service_interleave_factor_method(state::ilf_smart);
-static state::perfdata_file_mode const default_service_perfdata_file_mode(state::mode_pipe);
-static unsigned int const              default_service_perfdata_file_processing_interval(0);
-static std::string const               default_service_perfdata_file_template("[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$");
 static float const                     default_sleep_time(0.5);
 static bool const                      default_soft_state_dependencies(false);
 static std::string const               default_state_retention_file(DEFAULT_RETENTION_FILE);
@@ -326,9 +317,6 @@ state::state()
   : _accept_passive_host_checks(default_accept_passive_host_checks),
     _accept_passive_service_checks(default_accept_passive_service_checks),
     _additional_freshness_latency(default_additional_freshness_latency),
-    _admin_email(default_admin_email),
-    _admin_pager(default_admin_pager),
-    _allow_empty_hostgroup_assignment(default_allow_empty_hostgroup_assignment),
     _auto_reschedule_checks(default_auto_reschedule_checks),
     _auto_rescheduling_interval(default_auto_rescheduling_interval),
     _auto_rescheduling_window(default_auto_rescheduling_window),
@@ -367,9 +355,6 @@ state::state()
     _host_check_timeout(default_host_check_timeout),
     _host_freshness_check_interval(default_host_freshness_check_interval),
     _host_inter_check_delay_method(default_host_inter_check_delay_method),
-    _host_perfdata_file_mode(default_host_perfdata_file_mode),
-    _host_perfdata_file_processing_interval(default_host_perfdata_file_processing_interval),
-    _host_perfdata_file_template(default_host_perfdata_file_template),
     _illegal_object_chars(default_illegal_object_chars),
     _illegal_output_chars(default_illegal_output_chars),
     _interval_length(default_interval_length),
@@ -399,9 +384,7 @@ state::state()
     _ocsp_command(default_ocsp_command),
     _ocsp_timeout(default_ocsp_timeout),
     _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
-    _perfdata_timeout(default_perfdata_timeout),
     _precached_object_file(default_precached_object_file),
-    _process_performance_data(default_process_performance_data),
     _retained_contact_host_attribute_mask(default_retained_contact_host_attribute_mask),
     _retained_contact_service_attribute_mask(default_retained_contact_service_attribute_mask),
     _retained_host_attribute_mask(default_retained_host_attribute_mask),
@@ -413,9 +396,6 @@ state::state()
     _service_freshness_check_interval(default_service_freshness_check_interval),
     _service_inter_check_delay_method(default_service_inter_check_delay_method),
     _service_interleave_factor_method(default_service_interleave_factor_method),
-    _service_perfdata_file_mode(default_service_perfdata_file_mode),
-    _service_perfdata_file_processing_interval(default_service_perfdata_file_processing_interval),
-    _service_perfdata_file_template(default_service_perfdata_file_template),
     _sleep_time(default_sleep_time),
     _soft_state_dependencies(default_soft_state_dependencies),
     _state_retention_file(default_state_retention_file),
@@ -462,9 +442,6 @@ state& state::operator=(state const& right) {
     _accept_passive_host_checks = right._accept_passive_host_checks;
     _accept_passive_service_checks = right._accept_passive_service_checks;
     _additional_freshness_latency = right._additional_freshness_latency;
-    _admin_email = right._admin_email;
-    _admin_pager = right._admin_pager;
-    _allow_empty_hostgroup_assignment = right._allow_empty_hostgroup_assignment;
     _auto_reschedule_checks = right._auto_reschedule_checks;
     _auto_rescheduling_interval = right._auto_rescheduling_interval;
     _auto_rescheduling_window = right._auto_rescheduling_window;
@@ -513,12 +490,6 @@ state& state::operator=(state const& right) {
     _host_check_timeout = right._host_check_timeout;
     _host_freshness_check_interval = right._host_freshness_check_interval;
     _host_inter_check_delay_method = right._host_inter_check_delay_method;
-    _host_perfdata_command = right._host_perfdata_command;
-    _host_perfdata_file = right._host_perfdata_file;
-    _host_perfdata_file_mode = right._host_perfdata_file_mode;
-    _host_perfdata_file_processing_command = right._host_perfdata_file_processing_command;
-    _host_perfdata_file_processing_interval = right._host_perfdata_file_processing_interval;
-    _host_perfdata_file_template = right._host_perfdata_file_template;
     _illegal_object_chars = right._illegal_object_chars;
     _illegal_output_chars = right._illegal_output_chars;
     _interval_length = right._interval_length;
@@ -548,9 +519,7 @@ state& state::operator=(state const& right) {
     _ocsp_command = right._ocsp_command;
     _ocsp_timeout = right._ocsp_timeout;
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
-    _perfdata_timeout = right._perfdata_timeout;
     _precached_object_file = right._precached_object_file;
-    _process_performance_data = right._process_performance_data;
     _retained_contact_host_attribute_mask = right._retained_contact_host_attribute_mask;
     _retained_contact_service_attribute_mask = right._retained_contact_service_attribute_mask;
     _retained_host_attribute_mask = right._retained_host_attribute_mask;
@@ -566,12 +535,6 @@ state& state::operator=(state const& right) {
     _service_freshness_check_interval = right._service_freshness_check_interval;
     _service_inter_check_delay_method = right._service_inter_check_delay_method;
     _service_interleave_factor_method = right._service_interleave_factor_method;
-    _service_perfdata_command = right._service_perfdata_command;
-    _service_perfdata_file = right._service_perfdata_file;
-    _service_perfdata_file_mode = right._service_perfdata_file_mode;
-    _service_perfdata_file_processing_command = right._service_perfdata_file_processing_command;
-    _service_perfdata_file_processing_interval = right._service_perfdata_file_processing_interval;
-    _service_perfdata_file_template = right._service_perfdata_file_template;
     _sleep_time = right._sleep_time;
     _soft_state_dependencies = right._soft_state_dependencies;
     _state_retention_file = right._state_retention_file;
@@ -606,9 +569,6 @@ bool state::operator==(state const& right) const throw () {
   return (_accept_passive_host_checks == right._accept_passive_host_checks
           && _accept_passive_service_checks == right._accept_passive_service_checks
           && _additional_freshness_latency == right._additional_freshness_latency
-          && _admin_email == right._admin_email
-          && _admin_pager == right._admin_pager
-          && _allow_empty_hostgroup_assignment == right._allow_empty_hostgroup_assignment
           && _auto_reschedule_checks == right._auto_reschedule_checks
           && _auto_rescheduling_interval == right._auto_rescheduling_interval
           && _auto_rescheduling_window == right._auto_rescheduling_window
@@ -657,12 +617,6 @@ bool state::operator==(state const& right) const throw () {
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
           && _host_inter_check_delay_method == right._host_inter_check_delay_method
-          && _host_perfdata_command == right._host_perfdata_command
-          && _host_perfdata_file == right._host_perfdata_file
-          && _host_perfdata_file_mode == right._host_perfdata_file_mode
-          && _host_perfdata_file_processing_command == right._host_perfdata_file_processing_command
-          && _host_perfdata_file_processing_interval == right._host_perfdata_file_processing_interval
-          && _host_perfdata_file_template == right._host_perfdata_file_template
           && _illegal_object_chars == right._illegal_object_chars
           && _illegal_output_chars == right._illegal_output_chars
           && _interval_length == right._interval_length
@@ -692,9 +646,7 @@ bool state::operator==(state const& right) const throw () {
           && _ocsp_command == right._ocsp_command
           && _ocsp_timeout == right._ocsp_timeout
           && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
-          && _perfdata_timeout == right._perfdata_timeout
           && _precached_object_file == right._precached_object_file
-          && _process_performance_data == right._process_performance_data
           && _retained_contact_host_attribute_mask == right._retained_contact_host_attribute_mask
           && _retained_contact_service_attribute_mask == right._retained_contact_service_attribute_mask
           && _retained_host_attribute_mask == right._retained_host_attribute_mask
@@ -710,12 +662,6 @@ bool state::operator==(state const& right) const throw () {
           && _service_freshness_check_interval == right._service_freshness_check_interval
           && _service_inter_check_delay_method == right._service_inter_check_delay_method
           && _service_interleave_factor_method == right._service_interleave_factor_method
-          && _service_perfdata_command == right._service_perfdata_command
-          && _service_perfdata_file == right._service_perfdata_file
-          && _service_perfdata_file_mode == right._service_perfdata_file_mode
-          && _service_perfdata_file_processing_command == right._service_perfdata_file_processing_command
-          && _service_perfdata_file_processing_interval == right._service_perfdata_file_processing_interval
-          && _service_perfdata_file_template == right._service_perfdata_file_template
           && _sleep_time == right._sleep_time
           && _soft_state_dependencies == right._soft_state_dependencies
           && _state_retention_file == right._state_retention_file
@@ -800,60 +746,6 @@ int state::additional_freshness_latency() const throw () {
  */
 void state::additional_freshness_latency(int value) {
   _additional_freshness_latency = value;
-}
-
-/**
- *  Get admin_email value.
- *
- *  @return The admin_email value.
- */
-std::string const& state::admin_email() const throw () {
-  return (_admin_email);
-}
-
-/**
- *  Set admin_email value.
- *
- *  @param[in] value The new admin_email value.
- */
-void state::admin_email(std::string const& value) {
-  _admin_email = value;
-}
-
-/**
- *  Get admin_pager value.
- *
- *  @return The admin_pager value.
- */
-std::string const& state::admin_pager() const throw () {
-  return (_admin_pager);
-}
-
-/**
- *  Set admin_pager value.
- *
- *  @param[in] value The new admin_pager value.
- */
-void state::admin_pager(std::string const& value) {
-  _admin_pager = value;
-}
-
-/**
- *  Get allow_empty_hostgroup_assignment value.
- *
- *  @return The allow_empty_hostgroup_assignment value.
- */
-bool state::allow_empty_hostgroup_assignment() const throw () {
-  return (_allow_empty_hostgroup_assignment);
-}
-
-/**
- *  Set allow_empty_hostgroup_assignment value.
- *
- *  @param[in] value The new allow_empty_hostgroup_assignment value.
- */
-void state::allow_empty_hostgroup_assignment(bool value) {
-  _allow_empty_hostgroup_assignment = value;
 }
 
 /**
@@ -2061,114 +1953,6 @@ void state::host_inter_check_delay_method(inter_check_delay value) {
 }
 
 /**
- *  Get host_perfdata_command value.
- *
- *  @return The host_perfdata_command value.
- */
-std::string const& state::host_perfdata_command() const throw () {
-  return (_host_perfdata_command);
-}
-
-/**
- *  Set host_perfdata_command value.
- *
- *  @param[in] value The new host_perfdata_command value.
- */
-void state::host_perfdata_command(std::string const& value) {
-  _host_perfdata_command = value;
-}
-
-/**
- *  Get host_perfdata_file value.
- *
- *  @return The host_perfdata_file value.
- */
-std::string const& state::host_perfdata_file() const throw () {
-  return (_host_perfdata_file);
-}
-
-/**
- *  Set host_perfdata_file value.
- *
- *  @param[in] value The new host_perfdata_file value.
- */
-void state::host_perfdata_file(std::string const& value) {
-  _host_perfdata_file = value;
-}
-
-/**
- *  Get host_perfdata_file_mode value.
- *
- *  @return The host_perfdata_file_mode value.
- */
-state::perfdata_file_mode state::host_perfdata_file_mode() const throw () {
-  return (_host_perfdata_file_mode);
-}
-
-/**
- *  Set host_perfdata_file_mode value.
- *
- *  @param[in] value The new host_perfdata_file_mode value.
- */
-void state::host_perfdata_file_mode(perfdata_file_mode value) {
-  _host_perfdata_file_mode = value;
-}
-
-/**
- *  Get host_perfdata_file_processing_command value.
- *
- *  @return The host_perfdata_file_processing_command value.
- */
-std::string const& state::host_perfdata_file_processing_command() const throw () {
-  return (_host_perfdata_file_processing_command);
-}
-
-/**
- *  Set host_perfdata_file_processing_command value.
- *
- *  @param[in] value The new host_perfdata_file_processing_command value.
- */
-void state::host_perfdata_file_processing_command(std::string const& value) {
-  _host_perfdata_file_processing_command = value;
-}
-
-/**
- *  Get host_perfdata_file_processing_interval value.
- *
- *  @return The host_perfdata_file_processing_interval value.
- */
-unsigned int state::host_perfdata_file_processing_interval() const throw () {
-  return (_host_perfdata_file_processing_interval);
-}
-
-/**
- *  Set host_perfdata_file_processing_interval value.
- *
- *  @param[in] value The new host_perfdata_file_processing_interval value.
- */
-void state::host_perfdata_file_processing_interval(unsigned int value) {
-  _host_perfdata_file_processing_interval = value;
-}
-
-/**
- *  Get host_perfdata_file_template value.
- *
- *  @return The host_perfdata_file_template value.
- */
-std::string const& state::host_perfdata_file_template() const throw () {
-  return (_host_perfdata_file_template);
-}
-
-/**
- *  Set host_perfdata_file_template value.
- *
- *  @param[in] value The new host_perfdata_file_template value.
- */
-void state::host_perfdata_file_template(std::string const& value) {
-  _host_perfdata_file_template = value;
-}
-
-/**
  *  Get illegal_object_chars value.
  *
  *  @return The illegal_object_chars value.
@@ -2724,24 +2508,6 @@ void state::passive_host_checks_are_soft(bool value) {
 }
 
 /**
- *  Get perfdata_timeout value.
- *
- *  @return The perfdata_timeout value.
- */
-int state::perfdata_timeout() const throw () {
-  return (_perfdata_timeout);
-}
-
-/**
- *  Set perfdata_timeout value.
- *
- *  @param[in] value The new perfdata_timeout value.
- */
-void state::perfdata_timeout(int value) {
-  _perfdata_timeout = value;
-}
-
-/**
  *  Get precached_object_file value.
  *
  *  @return The precached_object_file value.
@@ -2757,24 +2523,6 @@ std::string const& state::precached_object_file() const throw () {
  */
 void state::precached_object_file(std::string const& value) {
   _precached_object_file = value;
-}
-
-/**
- *  Get process_performance_data value.
- *
- *  @return The process_performance_data value.
- */
-bool state::process_performance_data() const throw () {
-  return (_process_performance_data);
-}
-
-/**
- *  Set process_performance_data value.
- *
- *  @param[in] value The new process_performance_data value.
- */
-void state::process_performance_data(bool value) {
-  _process_performance_data = value;
 }
 
 /**
@@ -3171,114 +2919,6 @@ state::interleave_factor state::service_interleave_factor_method() const throw (
  */
 void state::service_interleave_factor_method(interleave_factor value) {
   _service_interleave_factor_method = value;
-}
-
-/**
- *  Get service_perfdata_command value.
- *
- *  @return The service_perfdata_command value.
- */
-std::string const& state::service_perfdata_command() const throw () {
-  return (_service_perfdata_command);
-}
-
-/**
- *  Set service_perfdata_command value.
- *
- *  @param[in] value The new service_perfdata_command value.
- */
-void state::service_perfdata_command(std::string const& value) {
-  _service_perfdata_command = value;
-}
-
-/**
- *  Get service_perfdata_file value.
- *
- *  @return The service_perfdata_file value.
- */
-std::string const& state::service_perfdata_file() const throw () {
-  return (_service_perfdata_file);
-}
-
-/**
- *  Set service_perfdata_file value.
- *
- *  @param[in] value The new service_perfdata_file value.
- */
-void state::service_perfdata_file(std::string const& value) {
-  _service_perfdata_file = value;
-}
-
-/**
- *  Get service_perfdata_file_mode value.
- *
- *  @return The service_perfdata_file_mode value.
- */
-state::perfdata_file_mode state::service_perfdata_file_mode() const throw () {
-  return (_service_perfdata_file_mode);
-}
-
-/**
- *  Set service_perfdata_file_mode value.
- *
- *  @param[in] value The new service_perfdata_file_mode value.
- */
-void state::service_perfdata_file_mode(perfdata_file_mode value) {
-  _service_perfdata_file_mode = value;
-}
-
-/**
- *  Get service_perfdata_file_processing_command value.
- *
- *  @return The service_perfdata_file_processing_command value.
- */
-std::string const& state::service_perfdata_file_processing_command() const throw () {
-  return (_service_perfdata_file_processing_command);
-}
-
-/**
- *  Set service_perfdata_file_processing_command value.
- *
- *  @param[in] value The new service_perfdata_file_processing_command value.
- */
-void state::service_perfdata_file_processing_command(std::string const& value) {
-  _service_perfdata_file_processing_command = value;
-}
-
-/**
- *  Get service_perfdata_file_processing_interval value.
- *
- *  @return The service_perfdata_file_processing_interval value.
- */
-unsigned int state::service_perfdata_file_processing_interval() const throw () {
-  return (_service_perfdata_file_processing_interval);
-}
-
-/**
- *  Set service_perfdata_file_processing_interval value.
- *
- *  @param[in] value The new service_perfdata_file_processing_interval value.
- */
-void state::service_perfdata_file_processing_interval(unsigned int value) {
-  _service_perfdata_file_processing_interval = value;
-}
-
-/**
- *  Get service_perfdata_file_template value.
- *
- *  @return The service_perfdata_file_template value.
- */
-std::string const& state::service_perfdata_file_template() const throw () {
-  return (_service_perfdata_file_template);
-}
-
-/**
- *  Set service_perfdata_file_template value.
- *
- *  @param[in] value The new service_perfdata_file_template value.
- */
-void state::service_perfdata_file_template(std::string const& value) {
-  _service_perfdata_file_template = value;
 }
 
 /**
@@ -3744,6 +3384,32 @@ void state::use_true_regexp_matching(bool value) {
 }
 
 /**
+ *  Variable admin_email is now deprecated.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_admin_email(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: admin_email variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Variable admin_pager is now deprecated.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_admin_pager(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: admin_pager variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Unused variable aggregate_status_updates.
  *
  *  @param[in] value Unused.
@@ -3753,6 +3419,19 @@ void state::_set_aggregate_status_updates(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: aggregate_status_updates variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable allow_empty_hostgroup_assignment.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_allow_empty_hostgroup_assignment(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: allow_empty_hostgroup_assignment variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
@@ -3981,17 +3660,83 @@ void state::_set_host_inter_check_delay_method(std::string const& value) {
 }
 
 /**
- *  Set host_perfdata_file_mode.
+ *  Deprecated variable.
  *
- *  @param[in] value The new host_inter_check_delay_method value.
+ *  @param[in] value  Unused.
+ */
+void state::_set_host_perfdata_command(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host_perfdata_command variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_host_perfdata_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host_perfdata_file variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
  */
 void state::_set_host_perfdata_file_mode(std::string const& value) {
-  if (value == "p")
-    _host_perfdata_file_mode = mode_pipe;
-  else if (value == "w")
-    _host_perfdata_file_mode = mode_file;
-  else
-    _host_perfdata_file_mode = mode_file_append;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host_perfdata_file_mode variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_host_perfdata_file_processing_command(
+              std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic) << "Warning: "
+    << "host_perfdata_file_processing_command variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_host_perfdata_file_processing_interval(
+              unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic) << "Warning: "
+    << "host_perfdata_file_processing_interval variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_host_perfdata_file_template(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host_perfdata_file_template variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
@@ -4067,6 +3812,32 @@ void state::_set_p1_file(std::string const& value) {
 }
 
 /**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_perfdata_timeout(int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: perfdata_timeout variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Unused variable process_performance_data.
+ *
+ *  @param[in] value The new process_performance_data value.
+ */
+void state::_set_process_performance_data(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: process_performance_data variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Set resource_file.
  *
  *  @param[in] value The new resource_file.
@@ -4129,33 +3900,105 @@ void state::_set_service_inter_check_delay_method(std::string const& value) {
 }
 
 /**
- *  Set service_interleave_factor_method
+ *  Set the service interleave factor method.
  *
- *  @param[in] value The new service_interleave_factor_method.
+ *  @param[in] value  Either the string "s" (smart calculation method)
+ *                    or a number of seconds (interleave interval).
  */
-void state::_set_service_interleave_factor_method(std::string const& value) {
+void state::_set_service_interleave_factor_method(
+              std::string const& value) {
   if (value == "s")
     _service_interleave_factor_method = ilf_smart;
   else {
     _service_interleave_factor_method = ilf_user;
-    if (!string::to(value.c_str(), scheduling_info.service_interleave_factor)
+    if (!string::to(
+                   value.c_str(),
+                   scheduling_info.service_interleave_factor)
         || scheduling_info.service_interleave_factor < 1)
       scheduling_info.service_interleave_factor = 1;
   }
+  return ;
 }
 
 /**
- *  Set service_perfdata_file_mode.
+ *  Deprecated variable.
  *
- *  @param[in] value The new service_inter_check_delay_method value.
+ *  @param[in] value  Unused.
+ */
+void state::_set_service_perfdata_command(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service_perfdata_command variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_service_perfdata_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service_perfdata_file variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
  */
 void state::_set_service_perfdata_file_mode(std::string const& value) {
-  if (value == "p")
-    _service_perfdata_file_mode = mode_pipe;
-  else if (value == "w")
-    _service_perfdata_file_mode = mode_file;
-  else
-    _service_perfdata_file_mode = mode_file_append;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service_perfdata_file_mode variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_service_perfdata_file_processing_command(
+              std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic) << "Warning: "
+    << "service_perfdata_file_processing_command variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_service_perfdata_file_processing_interval(
+              unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic) << "Warning: "
+    << "service_perfdata_file_processing_interval variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_service_perfdata_file_template(
+              std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service_perfdata_file_template variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

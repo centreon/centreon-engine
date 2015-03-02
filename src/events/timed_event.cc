@@ -2,7 +2,7 @@
 ** Copyright 2007-2008 Ethan Galstad
 ** Copyright 2007,2010 Andreas Ericsson
 ** Copyright 2010      Max Schubert
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -81,15 +81,6 @@ static void _exec_event_command_check(timed_event* event) {
   return;
 }
 
-/**
- *  Execute log rotation.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_log_rotation(timed_event* event) {
-  (void)event;
-  return;
-}
 
 /**
  *  Execute program shutdown.
@@ -582,8 +573,8 @@ void compensate_for_system_time_change(
           svc,
           svc->last_notification);
 
-    // update the status data.
-    update_service_status(svc, false);
+    // Update the status data.
+    update_service_status(svc);
   }
 
   // adjust host timestamps.
@@ -625,8 +616,8 @@ void compensate_for_system_time_change(
           hst,
           hst->last_host_notification);
 
-    // update the status data.
-    update_host_status(hst, false);
+    // Update the status data.
+    update_host_status(hst);
   }
 
   // adjust program timestamps.
@@ -646,8 +637,8 @@ void compensate_for_system_time_change(
     time_difference,
     &last_command_check);
 
-  // update the status data.
-  update_program_status(false);
+  // Update the status data.
+  update_program_status();
   return;
 }
 
@@ -663,7 +654,6 @@ int handle_timed_event(timed_event* event) {
   static exec_event tab_exec_event[] = {
     &_exec_event_service_check,
     &_exec_event_command_check,
-    &_exec_event_log_rotation,
     &_exec_event_program_shutdown,
     &_exec_event_program_restart,
     &_exec_event_check_reaper,
@@ -937,7 +927,6 @@ std::string const& events::name(timed_event const& evt) {
   static std::string const event_names[] = {
     "EVENT_SERVICE_CHECK",
     "EVENT_COMMAND_CHECK",
-    "EVENT_LOG_ROTATION",
     "EVENT_PROGRAM_SHUTDOWN",
     "EVENT_PROGRAM_RESTART",
     "EVENT_CHECK_REAPER",

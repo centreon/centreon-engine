@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -187,10 +187,6 @@ void applier::service::_update(
         && (obj.modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED))
       obj.failure_prediction_enabled = *state.failure_prediction_enabled();
 
-    if (state.process_performance_data().is_set()
-        && (obj.modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED))
-      obj.process_performance_data = *state.process_performance_data();
-
     if (state.obsess_over_service().is_set()
         && (obj.modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED))
       obj.obsess_over_service = *state.obsess_over_service();
@@ -323,6 +319,6 @@ void applier::service::_update(
   if (obj.last_hard_state_change)
     obj.last_hard_state_change = obj.last_state_change;
 
-  // update service status.
-  update_service_status(&obj, false);
+  // Update service status.
+  update_service_status(&obj);
 }

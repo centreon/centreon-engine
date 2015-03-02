@@ -61,7 +61,7 @@ int check_for_external_commands() {
   /* go easy on the frequency of this if we're checking often - only update program status every 10 seconds.... */
   if (last_command_check >= (last_command_status_update + 10)) {
     last_command_status_update = last_command_check;
-    update_program_status(false);
+    update_program_status();
   }
 
   /* process all commands found in the buffer */
@@ -1632,8 +1632,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
       temp_service->modified_attributes,
       NULL);
 
-    /* update the status log with the service info */
-    update_service_status(temp_service, false);
+    // Update the status log with the service info.
+    update_service_status(temp_service);
     break;
 
   case CMD_CHANGE_NORMAL_HOST_CHECK_INTERVAL:
@@ -1657,8 +1657,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
       temp_host->modified_attributes,
       NULL);
 
-    /* update the status log with the host info */
-    update_host_status(temp_host, false);
+    // Update the status log with the host info.
+    update_host_status(temp_host);
     break;
 
   case CMD_CHANGE_CONTACT_MODATTR:
@@ -1696,8 +1696,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
       temp_contact->modified_service_attributes,
       NULL);
 
-    /* update the status log with the contact info */
-    update_contact_status(temp_contact, false);
+    // Update the status log with the contact info.
+    update_contact_status(temp_contact);
     break;
 
   default:
@@ -1946,8 +1946,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
       MODATTR_NONE,
       modified_service_process_attributes,
       NULL);
-    /* update program status */
-    update_program_status(false);
+    // Update program status.
+    update_program_status();
     break;
 
   case CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER:
@@ -1966,8 +1966,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
       modified_service_process_attributes,
       NULL);
 
-    /* update program status */
-    update_program_status(false);
+    // Update program status.
+    update_program_status();
     break;
 
   case CMD_CHANGE_SVC_EVENT_HANDLER:
@@ -1989,8 +1989,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_service->modified_attributes,
       NULL);
 
-    /* update the status log with the service info */
-    update_service_status(temp_service, false);
+    // Update the status log with the service info.
+    update_service_status(temp_service);
     break;
 
   case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -2011,8 +2011,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_host->modified_attributes,
       NULL);
 
-    /* update the status log with the host info */
-    update_host_status(temp_host, false);
+    // Update the status log with the host info.
+    update_host_status(temp_host);
     break;
 
   case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
@@ -2036,8 +2036,8 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_contact->modified_service_attributes,
       NULL);
 
-    /* update the status log with the contact info */
-    update_contact_status(temp_contact, false);
+    // Update the status log with the contact info.
+    update_contact_status(temp_contact);
     break;
 
   default:
@@ -2149,17 +2149,17 @@ int cmd_change_object_custom_var(int cmd, char* args) {
 
   case CMD_CHANGE_CUSTOM_HOST_VAR:
     temp_host->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-    update_host_status(temp_host, false);
+    update_host_status(temp_host);
     break;
 
   case CMD_CHANGE_CUSTOM_SVC_VAR:
     temp_service->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-    update_service_status(temp_service, false);
+    update_service_status(temp_service);
     break;
 
   case CMD_CHANGE_CUSTOM_CONTACT_VAR:
     temp_contact->modified_attributes |= MODATTR_CUSTOM_VARIABLE;
-    update_contact_status(temp_contact, false);
+    update_contact_status(temp_contact);
     break;
 
   default:
@@ -2231,8 +2231,8 @@ void disable_service_checks(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  // Update the status log to reflect the new service state.
+  update_service_status(svc);
 }
 
 /* enables a service check */
@@ -2287,8 +2287,8 @@ void enable_service_checks(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  // Update the status log to reflect the new service state.
+  update_service_status(svc);
 }
 
 /* enable notifications on a program-wide basis */
@@ -2318,8 +2318,8 @@ void enable_all_notifications(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log */
-  update_program_status(false);
+  // Update the status log.
+  update_program_status();
 }
 
 /* disable notifications on a program-wide basis */
@@ -2349,8 +2349,8 @@ void disable_all_notifications(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log */
-  update_program_status(false);
+  // Update the status log.
+  update_program_status();
 }
 
 /* enables notifications for a service */
@@ -2378,8 +2378,8 @@ void enable_service_notifications(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  // Update the status log to reflect the new service state.
+  update_service_status(svc);
 }
 
 /* disables notifications for a service */
@@ -2407,8 +2407,8 @@ void disable_service_notifications(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log to reflect the new service state */
-  update_service_status(svc, false);
+  // Update the status log to reflect the new service state.
+  update_service_status(svc);
 }
 
 /* enables notifications for a host */
@@ -2436,8 +2436,8 @@ void enable_host_notifications(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log to reflect the new host state */
-  update_host_status(hst, false);
+  // Update the status log to reflect the new host state.
+  update_host_status(hst);
 }
 
 /* disables notifications for a host */
@@ -2465,8 +2465,8 @@ void disable_host_notifications(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log to reflect the new host state */
-  update_host_status(hst, false);
+  // Update the status log to reflect the new host state.
+  update_host_status(hst);
 }
 
 /* enables notifications for all hosts and services "beyond" a given host */
@@ -2599,8 +2599,8 @@ void enable_contact_host_notifications(contact* cntct) {
     cntct->modified_service_attributes,
     NULL);
 
-  /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  // Update the status log to reflect the new contact state.
+  update_contact_status(cntct);
 }
 
 /* disables host notifications for a contact */
@@ -2632,8 +2632,8 @@ void disable_contact_host_notifications(contact* cntct) {
     cntct->modified_service_attributes,
     NULL);
 
-  /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  // Update the status log to reflect the new contact state.
+  update_contact_status(cntct);
 }
 
 /* enables service notifications for a contact */
@@ -2665,8 +2665,8 @@ void enable_contact_service_notifications(contact* cntct) {
     cntct->modified_service_attributes,
     NULL);
 
-  /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  // Update the status log to reflect the new contact state.
+  update_contact_status(cntct);
 }
 
 /* disables service notifications for a contact */
@@ -2698,8 +2698,8 @@ void disable_contact_service_notifications(contact* cntct) {
     cntct->modified_service_attributes,
     NULL);
 
-  /* update the status log to reflect the new contact state */
-  update_contact_status(cntct, false);
+  // Update the status log to reflect the new contact state.
+  update_contact_status(cntct);
 }
 
 /* schedules downtime for all hosts "beyond" a given host */
@@ -2803,8 +2803,8 @@ void acknowledge_host_problem(
   hst->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
     ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 
   /* add a comment for the acknowledgement */
   time(&current_time);
@@ -2865,8 +2865,8 @@ void acknowledge_service_problem(
   svc->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
     ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 
   /* add a comment for the acknowledgement */
   time(&current_time);
@@ -2889,8 +2889,8 @@ void remove_host_acknowledgement(host* hst) {
   /* set the acknowledgement flag */
   hst->problem_has_been_acknowledged = false;
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 
   /* remove any non-persistant comments associated with the ack */
   delete_host_acknowledgement_comments(hst);
@@ -2901,8 +2901,8 @@ void remove_service_acknowledgement(service* svc) {
   /* set the acknowledgement flag */
   svc->problem_has_been_acknowledged = false;
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 
   /* remove any non-persistant comments associated with the ack */
   delete_service_acknowledgement_comments(svc);
@@ -2934,8 +2934,8 @@ void start_executing_service_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* stops executing service checks */
@@ -2964,8 +2964,8 @@ void stop_executing_service_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* starts accepting passive service checks */
@@ -2994,8 +2994,8 @@ void start_accepting_passive_service_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* stops accepting passive service checks */
@@ -3024,8 +3024,8 @@ void stop_accepting_passive_service_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* enables passive service checks for a particular service */
@@ -3053,8 +3053,8 @@ void enable_passive_service_checks(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }
 
 /* disables passive service checks for a particular service */
@@ -3082,8 +3082,8 @@ void disable_passive_service_checks(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }
 
 /* starts executing host checks */
@@ -3112,8 +3112,8 @@ void start_executing_host_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* stops executing host checks */
@@ -3142,8 +3142,8 @@ void stop_executing_host_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* starts accepting passive host checks */
@@ -3172,8 +3172,8 @@ void start_accepting_passive_host_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* stops accepting passive host checks */
@@ -3201,8 +3201,8 @@ void stop_accepting_passive_host_checks(void) {
     MODATTR_NONE,
     modified_service_process_attributes,
     NULL);
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* enables passive host checks for a particular host */
@@ -3230,8 +3230,8 @@ void enable_passive_host_checks(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* disables passive host checks for a particular host */
@@ -3259,8 +3259,8 @@ void disable_passive_host_checks(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* enables event handlers on a program-wide basis */
@@ -3290,8 +3290,8 @@ void start_using_event_handlers(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* disables event handlers on a program-wide basis */
@@ -3321,8 +3321,8 @@ void stop_using_event_handlers(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* enables the event handler for a particular service */
@@ -3350,8 +3350,8 @@ void enable_service_event_handler(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }
 
 /* disables the event handler for a particular service */
@@ -3379,8 +3379,8 @@ void disable_service_event_handler(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }
 
 /* enables the event handler for a particular host */
@@ -3408,8 +3408,8 @@ void enable_host_event_handler(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* disables the event handler for a particular host */
@@ -3437,8 +3437,8 @@ void disable_host_event_handler(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* disables checks of a particular host */
@@ -3467,8 +3467,8 @@ void disable_host_checks(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* enables checks of a particular host */
@@ -3523,8 +3523,8 @@ void enable_host_checks(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* start obsessing over service check results */
@@ -3553,8 +3553,8 @@ void start_obsessing_over_service_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* stop obsessing over service check results */
@@ -3583,8 +3583,8 @@ void stop_obsessing_over_service_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* start obsessing over host check results */
@@ -3613,8 +3613,8 @@ void start_obsessing_over_host_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* stop obsessing over host check results */
@@ -3643,8 +3643,8 @@ void stop_obsessing_over_host_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* enables service freshness checking */
@@ -3673,8 +3673,8 @@ void enable_service_freshness_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* disables service freshness checking */
@@ -3703,8 +3703,8 @@ void disable_service_freshness_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* enables host freshness checking */
@@ -3732,8 +3732,9 @@ void enable_host_freshness_checks(void) {
     MODATTR_NONE,
     modified_service_process_attributes,
     NULL);
-  /* update the status log with the program info */
-  update_program_status(false);
+
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* disables host freshness checking */
@@ -3762,8 +3763,8 @@ void disable_host_freshness_checks(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log with the program info */
-  update_program_status(false);
+  // Update the status log with the program info.
+  update_program_status();
 }
 
 /* enable failure prediction on a program-wide basis */
@@ -3792,8 +3793,8 @@ void enable_all_failure_prediction(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log */
-  update_program_status(false);
+  // Update the status log.
+  update_program_status();
 }
 
 /* disable failure prediction on a program-wide basis */
@@ -3822,68 +3823,8 @@ void disable_all_failure_prediction(void) {
     modified_service_process_attributes,
     NULL);
 
-  /* update the status log */
-  update_program_status(false);
-}
-
-/* enable performance data on a program-wide basis */
-void enable_performance_data(void) {
-  unsigned long attr(MODATTR_PERFORMANCE_DATA_ENABLED);
-
-  /* bail out if we're already set... */
-  if (config->process_performance_data())
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-  modified_service_process_attributes |= attr;
-
-  config->process_performance_data(true);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  /* update the status log */
-  update_program_status(false);
-}
-
-/* disable performance data on a program-wide basis */
-void disable_performance_data(void) {
-  unsigned long attr(MODATTR_PERFORMANCE_DATA_ENABLED);
-
-  /* bail out if we're already set... */
-  if (config->process_performance_data() == false)
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-  modified_service_process_attributes |= attr;
-
-  config->process_performance_data(false);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  /* update the status log */
-  update_program_status(false);
+  // Update the status log.
+  update_program_status();
 }
 
 /* start obsessing over a particular service */
@@ -3911,8 +3852,8 @@ void start_obsessing_over_service(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }
 
 /* stop obsessing over a particular service */
@@ -3940,8 +3881,8 @@ void stop_obsessing_over_service(service* svc) {
     svc->modified_attributes,
     NULL);
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }
 
 /* start obsessing over a particular host */
@@ -3969,8 +3910,8 @@ void start_obsessing_over_host(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* stop obsessing over a particular host */
@@ -3998,8 +3939,8 @@ void stop_obsessing_over_host(host* hst) {
     hst->modified_attributes,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* sets the current notification number for a specific host */
@@ -4007,8 +3948,8 @@ void set_host_notification_number(host* hst, int num) {
   /* set the notification number */
   hst->current_notification_number = num;
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 }
 
 /* sets the current notification number for a specific service */
@@ -4016,6 +3957,6 @@ void set_service_notification_number(service* svc, int num) {
   /* set the notification number */
   svc->current_notification_number = num;
 
-  /* update the status log with the service info */
-  update_service_status(svc, false);
+  // Update the status log with the service info.
+  update_service_status(svc);
 }

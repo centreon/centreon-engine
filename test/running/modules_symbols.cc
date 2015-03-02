@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -76,15 +76,12 @@ extern "C" {
   extern hostgroup* hostgroup_list;
   extern int interval_length;
   extern time_t last_command_check;
-  extern time_t last_log_rotation;
-  extern char* log_archive_path;
   extern char* log_file;
   extern char* macro_user[MAX_USER_MACROS];
   extern int nagios_pid;
   extern nebmodule* neb_module_list;
   extern int obsess_over_hosts;
   extern int obsess_over_services;
-  extern int process_performance_data;
   extern time_t program_start;
   extern sched_info* scheduling_info;
   extern int service_check_timeout;
@@ -205,111 +202,6 @@ extern "C" {
       << (void (*)())write_to_all_logs << "\n"
       << std::endl;
 
-    // mk-livestatus 1.1.12p6
-    std::cout
-      << "mk-livestatus 1.1.12p6\n"
-      << "accept_passive_host_checks: "
-      << accept_passive_host_checks << "\n"
-      << "accept_passive_service_checks: "
-      << accept_passive_service_checks << "\n"
-      << "check_external_commands: "
-      << check_external_commands << "\n"
-      << "check_host_freshness: "
-      << check_host_freshness << "\n"
-      << "check_service_freshness: "
-      << check_service_freshness << "\n"
-      << "check_time_against_period: "
-      << (void (*)())check_time_against_period << "\n"
-      << "command_list: "
-      << command_list << "\n"
-      << "contactgroup_list: "
-      << contactgroup_list << "\n"
-      << "contact_list: "
-      << contact_list << "\n"
-      << "enable_event_handlers: "
-      << enable_event_handlers << "\n"
-      << "enable_flap_detection: "
-      << enable_flap_detection << "\n"
-      << "enable_notifications: "
-      << enable_notifications << "\n"
-      << "event_broker_options: "
-      << event_broker_options << "\n"
-      << "execute_host_checks: "
-      << execute_host_checks << "\n"
-      << "execute_service_checks: "
-      << execute_service_checks << "\n"
-      << "external_command_buffer: "
-      << external_command_buffer.buffer << "\n"
-      << "external_command_buffer_slots: "
-      << external_command_buffer_slots << "\n"
-      << "find_command: "
-      << (void (*)())find_command << "\n"
-      << "find_contact: "
-      << (void (*)())find_contact << "\n"
-      << "find_contactgroup: "
-      << (void (*)())find_contactgroup << "\n"
-      << "find_host: "
-      << (void (*)())find_host << "\n"
-      << "find_hostgroup: "
-      << (void (*)())find_hostgroup << "\n"
-      << "find_service: "
-      << (void (*)())find_service << "\n"
-      << "find_servicegroup: "
-      << (void (*)())find_servicegroup << "\n"
-      << "get_program_version: "
-      << (void (*)())get_program_version << "\n"
-      << "hostgroup_list: "
-      << hostgroup_list << "\n"
-      << "host_list: "
-      << host_list << "\n"
-      << "interval_length: "
-      << interval_length << "\n"
-      << "is_contact_for_host: "
-      << (void (*)())is_contact_for_host << "\n"
-      << "is_contact_for_service: "
-      << (void (*)())is_contact_for_service << "\n"
-      << "is_escalated_contact_for_host: "
-      << (void (*)())is_escalated_contact_for_host << "\n"
-      << "is_escalated_contact_for_service: "
-      << (void (*)())is_escalated_contact_for_service << "\n"
-      << "last_command_check: "
-      << last_command_check << "\n"
-      << "last_log_rotation: "
-      << last_log_rotation << "\n"
-      << "log_archive_path: "
-      << log_archive_path << "\n"
-      << "log_file: "
-      << log_file << "\n"
-      << "macro_user: "
-      << macro_user << "\n"
-      << "nagios_pid: "
-      << nagios_pid << "\n"
-      << "neb_deregister_callback: "
-      << (void (*)())neb_deregister_callback << "\n"
-      << "neb_register_callback: "
-      << (void (*)())neb_register_callback << "\n"
-      << "obsess_over_hosts: "
-      << obsess_over_hosts << "\n"
-      << "obsess_over_services: "
-      << obsess_over_services << "\n"
-      << "process_performance_data: "
-      << process_performance_data << "\n"
-      << "program_start: "
-      << program_start << "\n"
-      << "rotate_log_file: "
-      << (void (*)())rotate_log_file << "\n"
-      << "servicegroup_list: "
-      << servicegroup_list << "\n"
-      << "service_list: "
-      << service_list << "\n"
-      << "submit_external_command: "
-      << (void (*)())submit_external_command << "\n"
-      << "timeperiod_list: "
-      << timeperiod_list << "\n"
-      << "write_to_all_logs: "
-      << (void (*)())write_to_all_logs << "\n"
-      << std::endl;
-
     // npcdmod 0.6.16
     std::cout
       << "npcdmod 0.6.16\n"
@@ -325,8 +217,8 @@ extern "C" {
       << (void (*)())neb_register_callback << "\n"
       << "neb_set_module_info: "
       << (void (*)())neb_set_module_info << "\n"
-      << "process_performance_data: "
-      << process_performance_data << "\n"
+      //<< "process_performance_data: "
+      //<< process_performance_data << "\n"
       << "schedule_new_event: "
       << (void (*)())schedule_new_event << "\n"
       << "strip: "
@@ -380,8 +272,8 @@ extern "C" {
       << (void (*)())neb_set_module_info << "\n"
       << "process_macros: "
       << (void (*)())process_macros << "\n"
-      << "process_performance_data: "
-      << process_performance_data << "\n"
+      //<< "process_performance_data: "
+      //<< process_performance_data << "\n"
       << "service_check_timeout: "
       << service_check_timeout << "\n"
       << "write_to_all_logs: "

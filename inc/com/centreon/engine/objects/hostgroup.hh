@@ -41,10 +41,7 @@ extern "C" {
 
 hostgroup* add_hostgroup(
              char const* name,
-             char const* alias,
-             char const* notes,
-             char const* notes_url,
-             char const* action_url);
+             char const* alias);
 int        is_host_member_of_hostgroup(
              hostgroup_struct* group,
              host_struct* hst);

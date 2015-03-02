@@ -1,7 +1,7 @@
 /*
 ** Copyright 2000-2009 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -139,7 +139,6 @@ int xsddefault_save_status_data() {
        "\tnagios_pid=" << static_cast<unsigned int>(getpid()) << "\n"
        "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
        "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
-       "\tlast_log_rotation=" << static_cast<unsigned long>(last_log_rotation) << "\n"
        "\tenable_notifications=" << config->enable_notifications() << "\n"
        "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
        "\tpassive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
@@ -152,7 +151,6 @@ int xsddefault_save_status_data() {
        "\tcheck_host_freshness=" << config->check_host_freshness() << "\n"
        "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
        "\tenable_failure_prediction=" << config->enable_failure_prediction() << "\n"
-       "\tprocess_performance_data=" << config->process_performance_data() << "\n"
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_comment_id=" << next_comment_id << "\n"
@@ -259,7 +257,6 @@ int xsddefault_save_status_data() {
          "\tevent_handler_enabled=" << hst->event_handler_enabled << "\n"
          "\tflap_detection_enabled=" << hst->flap_detection_enabled << "\n"
          "\tfailure_prediction_enabled=" << hst->failure_prediction_enabled << "\n"
-         "\tprocess_performance_data=" << hst->process_performance_data << "\n"
          "\tobsess_over_host=" << hst->obsess_over_host << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << hst->is_flapping << "\n"
@@ -327,7 +324,6 @@ int xsddefault_save_status_data() {
          "\tacknowledgement_type=" << svc->acknowledgement_type << "\n"
          "\tflap_detection_enabled=" << svc->flap_detection_enabled << "\n"
          "\tfailure_prediction_enabled=" << svc->failure_prediction_enabled << "\n"
-         "\tprocess_performance_data=" << svc->process_performance_data << "\n"
          "\tobsess_over_service=" << svc->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << svc->is_flapping << "\n"

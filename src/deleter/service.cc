@@ -63,16 +63,6 @@ void deleter::service(void* ptr) throw () {
   obj->check_period = NULL;
   delete[] obj->failure_prediction_options;
   obj->failure_prediction_options = NULL;
-  delete[] obj->notes;
-  obj->notes = NULL;
-  delete[] obj->notes_url;
-  obj->notes_url = NULL;
-  delete[] obj->action_url;
-  obj->action_url = NULL;
-  delete[] obj->icon_image;
-  obj->icon_image = NULL;
-  delete[] obj->icon_image_alt;
-  obj->icon_image_alt = NULL;
   delete[] obj->plugin_output;
   obj->plugin_output = NULL;
   delete[] obj->long_plugin_output;

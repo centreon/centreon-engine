@@ -61,7 +61,6 @@ namespace                  configuration {
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 
-    std::string const&     action_url() const throw ();
     std::string const&     address() const throw ();
     std::string const&     alias() const throw ();
     bool                   checks_active() const throw ();
@@ -72,8 +71,6 @@ namespace                  configuration {
     std::string const&     check_period() const throw ();
     list_string const&     contactgroups() const throw ();
     list_string const&     contacts() const throw ();
-    point_2d const&        coords_2d() const throw ();
-    point_3d const&        coords_3d() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
@@ -82,19 +79,13 @@ namespace                  configuration {
     bool                   flap_detection_enabled() const throw ();
     unsigned int           flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
-    bool                   have_coords_2d() const throw ();
-    bool                   have_coords_3d() const throw ();
     unsigned int           high_flap_threshold() const throw ();
     list_string&           hostgroups() throw ();
     list_string const&     hostgroups() const throw ();
     std::string const&     host_name() const throw ();
-    std::string const&     icon_image() const throw ();
-    std::string const&     icon_image_alt() const throw ();
     unsigned int           initial_state() const throw ();
     unsigned int           low_flap_threshold() const throw ();
     unsigned int           max_check_attempts() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
     bool                   notifications_enabled() const throw ();
     unsigned int           notification_interval() const throw ();
     unsigned int           notification_options() const throw ();
@@ -102,14 +93,11 @@ namespace                  configuration {
     bool                   obsess_over_host() const throw ();
     list_string&           parents() throw ();
     list_string const&     parents() const throw ();
-    bool                   process_perf_data() const throw ();
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
     unsigned int           stalking_options() const throw ();
-    std::string const&     statusmap_image() const throw ();
     std::string const&     timezone() const throw ();
-    std::string const&     vrml_image() const throw ();
 
   private:
     struct                 setters {
@@ -164,7 +152,6 @@ namespace                  configuration {
     bool                   _set_timezone(std::string const& value);
     bool                   _set_vrml_image(std::string const& value);
 
-    std::string            _action_url;
     std::string            _address;
     std::string            _alias;
     opt<bool>              _checks_active;
@@ -175,8 +162,6 @@ namespace                  configuration {
     std::string            _check_period;
     group                  _contactgroups;
     group                  _contacts;
-    opt<point_2d>          _coords_2d;
-    opt<point_3d>          _coords_3d;
     map_customvar          _customvariables;
     std::string            _display_name;
     std::string            _event_handler;
@@ -188,28 +173,21 @@ namespace                  configuration {
     opt<unsigned int>      _high_flap_threshold;
     group                  _hostgroups;
     std::string            _host_name;
-    std::string            _icon_image;
-    std::string            _icon_image_alt;
     opt<unsigned int>      _initial_state;
     opt<unsigned int>      _low_flap_threshold;
     opt<unsigned int>      _max_check_attempts;
-    std::string            _notes;
-    std::string            _notes_url;
     opt<bool>              _notifications_enabled;
     opt<unsigned int>      _notification_interval;
     opt<unsigned int>      _notification_options;
     std::string            _notification_period;
     opt<bool>              _obsess_over_host;
     group                  _parents;
-    opt<bool>              _process_perf_data;
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
     static setters const   _setters[];
     opt<unsigned int>      _stalking_options;
-    std::string            _statusmap_image;
     opt<std::string>       _timezone;
-    std::string            _vrml_image;
   };
 
   typedef shared_ptr<host>    host_ptr;

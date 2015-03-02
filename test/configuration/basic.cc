@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -131,8 +131,6 @@ static std::map<std::string, std::string> build_configuration(
   var["global_service_event_handler"] = "service-event-handler";
   var["ocsp_command"] = "ocsp-command";
   var["ochp_command"] = "ochp-command";
-  var["admin_email"] = "admin@localhost";
-  var["admin_pager"] = "pageadmin@localhost";
   var["use_syslog"] = obj2str(my_rand(0, 1));
   var["log_notifications"] = obj2str(my_rand(0, 1));
   var["log_service_retries"] = obj2str(my_rand(0, 1));
@@ -170,7 +168,6 @@ static std::map<std::string, std::string> build_configuration(
   var["cached_service_check_horizon"] = obj2str(my_rand(0));
   var["enable_predictive_service_dependency_checks"] = obj2str(my_rand(0, 1));
   var["soft_state_dependencies"] = obj2str(my_rand(0, 1));
-  var["log_archive_path"] = "./";
   var["enable_event_handlers"] = obj2str(my_rand(0, 1));
   var["enable_notifications"] = obj2str(my_rand(0, 1));
   var["execute_service_checks"] = obj2str(my_rand(0, 1));
@@ -195,7 +192,6 @@ static std::map<std::string, std::string> build_configuration(
   var["auto_reschedule_checks"] = obj2str(my_rand(0, 1));
   var["auto_rescheduling_interval"] = obj2str(my_rand(1));
   var["auto_rescheduling_window"] = obj2str(my_rand(1));
-  var["aggregate_status_updates"] = "DEPRECATED";
   var["status_update_interval"] = obj2str(my_rand(2));
   var["time_change_threshold"] = obj2str(my_rand(6));
   var["process_performance_data"] = obj2str(my_rand(0, 1));
@@ -207,7 +203,6 @@ static std::map<std::string, std::string> build_configuration(
   var["high_host_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
   var["date_format"] = date_format[my_rand(0, 3)];
   var["use_timezone"] = "US/Mountain";
-  var["p1_file"] = "p1_file.tmp";
   var["event_broker_options"] = obj2str(my_rand(1));
   var["illegal_object_name_chars"] = "`~!$%^&*|'\"<>?,()";
   var["illegal_macro_output_chars"] = "`~$&|'\"<>";
@@ -216,16 +211,7 @@ static std::map<std::string, std::string> build_configuration(
   var["use_true_regexp_matching"] = obj2str(my_rand(0, 1));
   var["use_large_installation_tweaks"] = obj2str(my_rand(0, 1));
   var["enable_environment_macros"] = obj2str(my_rand(0, 1));
-  var["child_processes_fork_twice"] = obj2str(my_rand(0, 1));
-  var["enable_embedded_perl"] = obj2str(my_rand(0, 1));
-  var["use_embedded_perl_implicitly"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
-  var["auth_file"] = "auth_file.tmp";
-  var["comment_file"] = "comment_file.tmp";
-  var["xcddefault_comment_file"] = "comment_file.tmp";
-  var["downtime_file"] = "downtime_file.tmp";
-  var["xdddefault_downtime_file"] = "downtime_file.tmp";
-  var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
   std::ofstream ofs(mainconf.c_str());
   for (std::map<std::string, std::string>::const_iterator
@@ -499,9 +485,6 @@ void test_configuration(
   if (my_conf["external_command_buffer_slots"] != obj2str(config->external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");
   }
-  if (my_conf["allow_empty_hostgroup_assignment"] != obj2str(config->allow_empty_hostgroup_assignment())) {
-    throw (engine_error() << "allow_empty_hostgroup_assignment: init with '" << my_conf["allow_empty_hostgroup_assignment"] << "'");
-  }
   if (my_conf["debug_file"] != config->debug_file()) {
     throw (engine_error() << "debug_file: init with '" << my_conf["debug_file"] << "'");
   }
@@ -557,14 +540,6 @@ void test_configuration(
   }
 
   nagios_macros* mac = get_global_macros();
-  if (mac->x[MACRO_ADMINEMAIL] != NULL &&
-      my_conf["admin_email"] != mac->x[MACRO_ADMINEMAIL]) {
-    throw (engine_error() << "admin_email: init with '" << my_conf["admin_email"] << "'");
-  }
-  if (mac->x[MACRO_ADMINPAGER] &&
-      my_conf["admin_pager"] != mac->x[MACRO_ADMINPAGER]) {
-    throw (engine_error() << "admin_pager: init with '" << my_conf["admin_pager"] << "'");
-  }
 
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (macro_user[i] != "USER" + obj2str(i + 1)) {
@@ -620,4 +595,3 @@ int main(int argc, char** argv) {
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
-

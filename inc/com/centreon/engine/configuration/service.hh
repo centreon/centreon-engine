@@ -65,7 +65,6 @@ namespace                  configuration {
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 
-    std::string const&     action_url() const throw ();
     bool                   checks_active() const throw ();
     bool                   checks_passive() const throw ();
     std::string const&     check_command() const throw ();
@@ -90,14 +89,10 @@ namespace                  configuration {
     list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
-    std::string const&     icon_image() const throw ();
-    std::string const&     icon_image_alt() const throw ();
     unsigned int           initial_state() const throw ();
     bool                   is_volatile() const throw ();
     unsigned int           low_flap_threshold() const throw ();
     unsigned int           max_check_attempts() const throw ();
-    std::string const&     notes() const throw ();
-    std::string const&     notes_url() const throw ();
     bool                   notifications_enabled() const throw ();
     void                   notification_interval(
                              unsigned int interval) throw ();
@@ -109,7 +104,6 @@ namespace                  configuration {
     std::string const&     notification_period() const throw ();
     bool                   notification_period_defined() const throw ();
     bool                   obsess_over_service() const throw ();
-    bool                   process_perf_data() const throw ();
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
@@ -172,7 +166,6 @@ namespace                  configuration {
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_timezone(std::string const& value);
 
-    std::string            _action_url;
     opt<bool>              _checks_active;
     opt<bool>              _checks_passive;
     std::string            _check_command;
@@ -193,20 +186,15 @@ namespace                  configuration {
     opt<unsigned int>      _high_flap_threshold;
     group                  _hostgroups;
     group                  _hosts;
-    std::string            _icon_image;
-    std::string            _icon_image_alt;
     opt<unsigned int>      _initial_state;
     opt<bool>              _is_volatile;
     opt<unsigned int>      _low_flap_threshold;
     opt<unsigned int>      _max_check_attempts;
-    std::string            _notes;
-    std::string            _notes_url;
     opt<bool>              _notifications_enabled;
     opt<unsigned int>      _notification_interval;
     opt<unsigned short>    _notification_options;
     opt<std::string>       _notification_period;
     opt<bool>              _obsess_over_service;
-    opt<bool>              _process_perf_data;
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;

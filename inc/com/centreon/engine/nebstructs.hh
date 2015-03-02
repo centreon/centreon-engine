@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2007 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -461,7 +461,6 @@ typedef struct   nebstruct_program_status_struct {
   int            pid;
   int            daemon_mode;
   time_t         last_command_check;
-  time_t         last_log_rotation;
   int            notifications_enabled;
   int            active_service_checks_enabled;
   int            passive_service_checks_enabled;
@@ -470,7 +469,6 @@ typedef struct   nebstruct_program_status_struct {
   int            event_handlers_enabled;
   int            flap_detection_enabled;
   int            failure_prediction_enabled;
-  int            process_performance_data;
   int            obsess_over_hosts;
   int            obsess_over_services;
   unsigned long  modified_host_attributes;

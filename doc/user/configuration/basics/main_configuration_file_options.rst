@@ -43,9 +43,8 @@ Log File
 This variable specifies where Centreon Engine should create its main log
 file. This should be the first variable that you define in your
 configuration file, as Centreon Engine will try to write errors that it
-finds in the rest of your configuration data to this file. If you have
-:ref:`log rotation <main_cfg_opt_log_rotation_method>` enabled, this
-file will automatically be rotated every hour, day, week, or month.
+finds in the rest of your configuration data to this file. Log rotation
+must be accomplished by an external program like *logrotate*.
 
 =========== ================================================
 **Format**  log_file=<file_name>
@@ -147,17 +146,6 @@ Engine distribution for an example of how to define $USERn$ macros.
 **Format**  resource_file=<file_name>
 **Example** resource_file=/etc/centreon-engine/resource.cfg
 =========== ===============================================
-
-.. _main_cfg_opt_temp_file:
-
-Temp File
----------
-
-This is a deprecated and ignored variable.
-
-=========== =====================
-**Format**  temp_file=<file_name>
-=========== =====================
 
 .. _main_cfg_opt_status_file:
 
@@ -384,26 +372,6 @@ host or service event handlers.
 
     * 0 = Disable event handlers
     * 1 = Enable event handlers (default)
-
-.. _main_cfg_opt_log_rotation_method:
-
-Log Rotation Method
--------------------
-
-This is a deprecated and ignored variable. Use logrotate daemon.
-
-=========== ===============================
-**Format**  log_rotation_method=<n/h/d/w/m>
-=========== ===============================
-
-Log Archive Path
-----------------
-
-This is a deprecated and ignored variable.
-
-=========== =======================
-**Format**  log_archive_path=<path>
-=========== =======================
 
 .. _main_cfg_opt_external_command_check:
 
@@ -1328,24 +1296,6 @@ For maximum performance, this option must be disable.
 **Example** use_setpgid=1
 =========== =================
 
-Child Process Memory Option
----------------------------
-
-This is a deprecated and ignored variable.
-
-=========== ===============================
-**Format**  free_child_process_memory=<0/1>
-=========== ===============================
-
-Child Processes Fork Twice
---------------------------
-
-This is a deprecated and ignored variable.
-
-=========== ================================
-**Format**  child_processes_fork_twice=<0/1>
-=========== ================================
-
 .. _main_cfg_opt_environment_macros:
 
 Environment Macros Option
@@ -2204,37 +2154,6 @@ More information on how this works can be found
 **Format**  use_true_regexp_matching=<0/1>
 **Example** use_true_regexp_matching=0
 =========== ==============================
-
-.. _main_cfg_opt_administrator_email_address:
-
-Administrator Email Address
----------------------------
-
-This is the email address for the administrator of the local machine
-(i.e. the one that Centreon Engine is running on).
-
-This value can be used in notification commands by using the
-$ADMINEMAIL$ :ref:`macro <understanding_macros>`.
-
-=========== ======================================
-**Format**  admin_email=<email_address>
-**Example** admin_email=root@localhost.localdomain
-=========== ======================================
-
-.. _main_cfg_opt_administrator_pager:
-
-Administrator Pager
--------------------
-
-This is the pager number (or pager email gateway) for the administrator
-of the local machine (i.e. the one that Centreon Engine is running
-on). The pager number/address can be used in notification commands by
-using the $ADMINPAGER$ :ref:`macro <understanding_macros>`.
-
-=========== =================================================
-**Format**  admin_pager=<pager_number_or_pager_email_gateway>
-**Example** admin_pager=pageroot@localhost.localdomain
-=========== =================================================
 
 Event Broker Options
 --------------------

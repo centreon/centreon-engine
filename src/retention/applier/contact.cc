@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -144,6 +144,6 @@ void applier::contact::_update(
       }
   }
 
-  // update contact status.
-  update_contact_status(&obj, false);
+  // Update contact status.
+  update_contact_status(&obj);
 }

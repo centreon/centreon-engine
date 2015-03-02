@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -86,7 +86,6 @@
 
 /* Logs. */
 #  define NEBTYPE_LOG_DATA                         300
-#  define NEBTYPE_LOG_ROTATION                     301
 
 /* System commands. */
 #  define NEBTYPE_SYSTEM_COMMAND_START             400

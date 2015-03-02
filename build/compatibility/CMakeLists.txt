@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2014 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -33,14 +33,12 @@ set(
   # Sources.
   "${SRC_DIR}/check_result.cc"
   "${SRC_DIR}/common.cc"
-  "${SRC_DIR}/embedded_perl.cc"
   "${SRC_DIR}/find.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/mmap.cc"
   "${SRC_DIR}/sighandlers.cc"
   "${SRC_DIR}/skiplist.cc"
-  "${SRC_DIR}/utils.cc"
 
   # Headers.
   "${INC_DIR}/broker.h"
@@ -49,8 +47,6 @@ set(
   "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"
   "${INC_DIR}/downtime.h"
-  "${INC_DIR}/embedded_perl.h"
-  "${INC_DIR}/epn_nagios.h"
   "${INC_DIR}/events.h"
   "${INC_DIR}/find.hh"
   "${INC_DIR}/locations.h"
@@ -65,7 +61,6 @@ set(
   "${INC_DIR}/nebstructs.h"
   "${INC_DIR}/netutils.h"
   "${INC_DIR}/objects.h"
-  "${INC_DIR}/perfdata.h"
   "${INC_DIR}/shared.h"
   "${INC_DIR}/sighandlers.h"
   "${INC_DIR}/skiplist.h"
@@ -74,7 +69,6 @@ set(
   "${INC_DIR}/xcddefault.h"
   "${INC_DIR}/xdddefault.h"
   "${INC_DIR}/xodtemplate.h"
-  "${INC_DIR}/xpddefault.h"
   "${INC_DIR}/xrddefault.h"
   "${INC_DIR}/xsddefault.h"
 

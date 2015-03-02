@@ -911,7 +911,6 @@ int xodtemplate_begin_object_definition(
     new_service->flap_detection_on_critical = true;
     new_service->notifications_enabled = true;
     new_service->notification_interval = 30.0;
-    new_service->process_perf_data = true;
     new_service->failure_prediction_enabled = true;
     new_service->retain_status_information = true;
     new_service->retain_nonstatus_information = true;
@@ -936,7 +935,6 @@ int xodtemplate_begin_object_definition(
     new_host->flap_detection_on_unreachable = true;
     new_host->notifications_enabled = true;
     new_host->notification_interval = 30.0;
-    new_host->process_perf_data = true;
     new_host->failure_prediction_enabled = true;
     new_host->x_2d = -1;
     new_host->y_2d = -1;
@@ -1462,10 +1460,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       }
       temp_service->have_stalking_options = true;
     }
-    else if (!strcmp(variable, "process_perf_data")) {
-      temp_service->process_perf_data = (atoi(value) > 0) ? true : false;
-      temp_service->have_process_perf_data = true;
-    }
     else if (!strcmp(variable, "failure_prediction_enabled")) {
       temp_service->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
       temp_service->have_failure_prediction_enabled = true;
@@ -1846,10 +1840,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
       temp_host->have_stalking_options = true;
-    }
-    else if (!strcmp(variable, "process_perf_data")) {
-      temp_host->process_perf_data = (atoi(value) > 0) ? true : false;
-      temp_host->have_process_perf_data = true;
     }
     else if (!strcmp(variable, "failure_prediction_enabled")) {
       temp_host->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
@@ -4509,8 +4499,6 @@ int xodtemplate_duplicate_services() {
         && temp_service->host_name == NULL)
       continue;
 
-    /* If hostgroup is not null and hostgroup has no members, check to see if */
-    /* allow_empty_hostgroup_assignment is set to 1 - if it is, continue without error  */
     if (temp_service->hostgroup_name != NULL) {
       if (xodtemplate_expand_hostgroups(
             &temp_memberlist,
@@ -4525,10 +4513,7 @@ int xodtemplate_duplicate_services() {
         if (temp_memberlist != NULL)
           xodtemplate_free_memberlist(&temp_memberlist);
         else {
-          /* User is ok with hostgroup -> service mappings with no hosts */
-          if (config->allow_empty_hostgroup_assignment() == 1) {
-            continue;
-          }
+          continue ;
         }
       }
     }
@@ -5972,8 +5957,6 @@ int xodtemplate_duplicate_service(
   new_service->stalk_on_warning = temp_service->stalk_on_warning;
   new_service->stalk_on_critical = temp_service->stalk_on_critical;
   new_service->have_stalking_options = temp_service->have_stalking_options;
-  new_service->process_perf_data = temp_service->process_perf_data;
-  new_service->have_process_perf_data = temp_service->have_process_perf_data;
   new_service->failure_prediction_enabled = temp_service->failure_prediction_enabled;
   new_service->have_failure_prediction_enabled = temp_service->have_failure_prediction_enabled;
   new_service->retain_status_information = temp_service->retain_status_information;
@@ -7967,11 +7950,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         = template_host->stalk_on_unreachable;
       this_host->have_stalking_options = true;
     }
-    if (this_host->have_process_perf_data == false
-        && template_host->have_process_perf_data == true) {
-      this_host->process_perf_data = template_host->process_perf_data;
-      this_host->have_process_perf_data = true;
-    }
     if (this_host->have_failure_prediction_enabled == false
         && template_host->have_failure_prediction_enabled == true) {
       this_host->failure_prediction_enabled
@@ -8353,12 +8331,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->stalk_on_critical
         = template_service->stalk_on_critical;
       this_service->have_stalking_options = true;
-    }
-    if (this_service->have_process_perf_data == false
-        && template_service->have_process_perf_data == true) {
-      this_service->process_perf_data
-        = template_service->process_perf_data;
-      this_service->have_process_perf_data = true;
     }
     if (this_service->have_failure_prediction_enabled == false
         && template_service->have_failure_prediction_enabled == true) {
@@ -10465,10 +10437,7 @@ int xodtemplate_register_hostgroup(
   hostgroup* new_hostgroup
     = add_hostgroup(
         this_hostgroup->hostgroup_name,
-        this_hostgroup->alias,
-        this_hostgroup->notes,
-        this_hostgroup->notes_url,
-        this_hostgroup->action_url);
+        this_hostgroup->alias);
 
   /* return with an error if we couldn't add the hostgroup */
   if (new_hostgroup == NULL) {
@@ -10513,10 +10482,7 @@ int xodtemplate_register_servicegroup(
   servicegroup* new_servicegroup
     = add_servicegroup(
         this_servicegroup->servicegroup_name,
-        this_servicegroup->alias,
-        this_servicegroup->notes,
-        this_servicegroup->notes_url,
-        this_servicegroup->action_url);
+        this_servicegroup->alias);
 
   /* return with an error if we couldn't add the servicegroup */
   if (new_servicegroup == NULL) {
@@ -10761,7 +10727,6 @@ int xodtemplate_register_contact(xodtemplate_contact* this_contact) {
                   this_contact->notify_on_host_downtime,
                   this_contact->host_notifications_enabled,
                   this_contact->service_notifications_enabled,
-                  this_contact->can_submit_commands,
                   this_contact->retain_status_information,
                   this_contact->retain_nonstatus_information,
                   this_contact->timezone);
@@ -10889,25 +10854,10 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->stalk_on_up,
                this_host->stalk_on_down,
                this_host->stalk_on_unreachable,
-               this_host->process_perf_data,
                this_host->failure_prediction_enabled,
                this_host->failure_prediction_options,
                this_host->check_freshness,
                this_host->freshness_threshold,
-               this_host->notes,
-               this_host->notes_url,
-               this_host->action_url,
-               this_host->icon_image,
-               this_host->icon_image_alt,
-               this_host->vrml_image,
-               this_host->statusmap_image,
-               this_host->x_2d,
-               this_host->y_2d,
-               this_host->have_2d_coords,
-               this_host->x_3d,
-               this_host->y_3d,
-               this_host->z_3d,
-               this_host->have_3d_coords,
                true,
                this_host->retain_status_information,
                this_host->retain_nonstatus_information,
@@ -11054,16 +11004,10 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->stalk_on_warning,
                   this_service->stalk_on_unknown,
                   this_service->stalk_on_critical,
-                  this_service->process_perf_data,
                   this_service->failure_prediction_enabled,
                   this_service->failure_prediction_options,
                   this_service->check_freshness,
                   this_service->freshness_threshold,
-                  this_service->notes,
-                  this_service->notes_url,
-                  this_service->action_url,
-                  this_service->icon_image,
-                  this_service->icon_image_alt,
                   this_service->retain_status_information,
                   this_service->retain_nonstatus_information,
                   this_service->obsess_over_service,
@@ -12828,7 +12772,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
-    fprintf(fp, "\tprocess_perf_data\t%d\n", temp_host->process_perf_data);
     fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_host->failure_prediction_enabled);
     if (temp_host->icon_image)
       fprintf(fp, "\ticon_image\t%s\n", temp_host->icon_image);
@@ -12968,7 +12911,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
-    fprintf(fp, "\tprocess_perf_data\t%d\n", temp_service->process_perf_data);
     fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_service->failure_prediction_enabled);
     if (temp_service->icon_image)
       fprintf(fp, "\ticon_image\t%s\n", temp_service->icon_image);
@@ -16767,50 +16709,6 @@ int read_main_config_file(char const* main_config_file) {
       macro_x[MACRO_COMMANDFILE]=(char *)string::dup(value);
     }
 
-    else if(!strcmp(variable,"temp_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Temp file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] temp_file;
-      // temp_file=(char *)string::dup(value);
-
-      // /* save the macro */
-      // delete[] macro_x[MACRO_TEMPFILE];
-      // macro_x[MACRO_TEMPFILE]=(char *)string::dup(temp_file);
-    }
-
-    else if(!strcmp(variable,"temp_path")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Temp path is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // if((tmpdir=opendir((char *)value))==NULL){
-      //   if (asprintf(&error_message,"Temp path is not a valid directory")) {}
-      //   error=true;
-      //   break;
-      // }
-      // closedir(tmpdir);
-
-      // delete[] temp_path;
-      // if((temp_path=(char *)string::dup(value))){
-      //   strip(temp_path);
-      //   /* make sure we don't have a trailing slash */
-      //   if(temp_path[strlen(temp_path)-1]=='/')
-      //     temp_path[strlen(temp_path)-1]='\x0';
-      // }
-
-      // /* save the macro */
-      // delete[] macro_x[MACRO_TEMPPATH];
-      // macro_x[MACRO_TEMPPATH]=(char *)string::dup(temp_path);
-    }
-
     else if(!strcmp(variable,"check_result_path")){
 
       if(strlen(value)>MAX_FILENAME_LENGTH-1){
@@ -16838,18 +16736,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"max_check_result_file_age"))
       max_check_result_file_age=strtoul(value,NULL,0);
 
-    else if(!strcmp(variable,"lock_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Lock file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] lock_file;
-      // lock_file=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"global_host_event_handler")){
       delete[] global_host_event_handler;
       global_host_event_handler=(char *)string::dup(value);
@@ -16868,30 +16754,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"ochp_command")){
       delete[] ochp_command;
       ochp_command=(char *)string::dup(value);
-    }
-
-    else if(!strcmp(variable,"nagios_user")){
-      // delete[] nagios_user;
-      // nagios_user=(char *)string::dup(value);
-    }
-
-    else if(!strcmp(variable,"nagios_group")){
-      // delete[] nagios_group;
-      // nagios_group=(char *)string::dup(value);
-    }
-
-    else if(!strcmp(variable,"admin_email")){
-
-      /* save the macro */
-      delete[] macro_x[MACRO_ADMINEMAIL];
-      macro_x[MACRO_ADMINEMAIL]=(char *)string::dup(value);
-    }
-
-    else if(!strcmp(variable,"admin_pager")){
-
-      /* save the macro */
-      delete[] macro_x[MACRO_ADMINPAGER];
-      macro_x[MACRO_ADMINPAGER]=(char *)string::dup(value);
     }
 
     else if(!strcmp(variable,"use_syslog")){
@@ -17192,36 +17054,6 @@ int read_main_config_file(char const* main_config_file) {
       soft_state_dependencies=(atoi(value)>0)?true:false;
     }
 
-    else if(!strcmp(variable,"log_rotation_method")){
-      // if(!strcmp(value,"n"))
-      //   log_rotation_method=LOG_ROTATION_NONE;
-      // else if(!strcmp(value,"h"))
-      //   log_rotation_method=LOG_ROTATION_HOURLY;
-      // else if(!strcmp(value,"d"))
-      //   log_rotation_method=LOG_ROTATION_DAILY;
-      // else if(!strcmp(value,"w"))
-      //   log_rotation_method=LOG_ROTATION_WEEKLY;
-      // else if(!strcmp(value,"m"))
-      //   log_rotation_method=LOG_ROTATION_MONTHLY;
-      // else{
-      //   if (asprintf(&error_message,"Illegal value for log_rotation_method")) {}
-      //   error=true;
-      //   break;
-      // }
-    }
-
-    else if(!strcmp(variable,"log_archive_path")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Log archive path too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] log_archive_path;
-      // log_archive_path=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"enable_event_handlers"))
       enable_event_handlers=(atoi(value)>0)?true:false;
 
@@ -17474,14 +17306,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"aggregate_status_updates")){
-
-      /* DEPRECATED - ALL UPDATED ARE AGGREGATED AS OF NAGIOS 3.X */
-      /*aggregate_status_updates=(atoi(value)>0)?true:false;*/
-
-      logit(NSLOG_CONFIG_WARNING,true,"Warning: aggregate_status_updates directive ignored.  All status file updates are now aggregated.");
-    }
-
     else if(!strcmp(variable,"status_update_interval")){
 
       status_update_interval=atoi(value);
@@ -17502,9 +17326,6 @@ int read_main_config_file(char const* main_config_file) {
         break;
       }
     }
-
-    else if(!strcmp(variable,"process_performance_data"))
-      process_performance_data=(atoi(value)>0)?true:false;
 
     else if(!strcmp(variable,"enable_flap_detection"))
       enable_flap_detection=(atoi(value)>0)?true:false;
@@ -17569,18 +17390,6 @@ int read_main_config_file(char const* main_config_file) {
       use_timezone=(char *)string::dup(value);
     }
 
-    else if(!strcmp(variable,"p1_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"P1 file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] p1_file;
-      // p1_file=(char *)string::dup(value);
-    }
-
     else if(!strcmp(variable,"event_broker_options")){
 
       if(!strcmp(value,"-1"))
@@ -17610,17 +17419,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"use_true_regexp_matching"))
       use_true_regexp_matching=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"daemon_dumps_core")){
-
-      // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-      //   if (asprintf(&error_message,"Illegal value for daemon_dumps_core")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // daemon_dumps_core=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"use_large_installation_tweaks")){
 
       if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
@@ -17635,63 +17433,8 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"enable_environment_macros"))
       enable_environment_macros=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"free_child_process_memory")) {
-      // free_child_process_memory=(atoi(value)>0)?true:false;
-    }
-    else if(!strcmp(variable,"child_processes_fork_twice")) {
-      // child_processes_fork_twice=(atoi(value)>0)?true:false;
-    }
-    else if(!strcmp(variable,"enable_embedded_perl")){
-
-      // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-      //   if (asprintf(&error_message,"Illegal value for enable_embedded_perl")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // enable_embedded_perl=(atoi(value)>0)?true:false;
-    }
-
-    else if(!strcmp(variable,"use_embedded_perl_implicitly")){
-
-      // if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-      //   if (asprintf(&error_message,"Illegal value for use_embedded_perl_implicitly")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // use_embedded_perl_implicitly=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"external_command_buffer_slots"))
       external_command_buffer_slots=atoi(value);
-
-    else if(!strcmp(variable,"check_for_updates")) {
-      // check_for_updates=(atoi(value)>0)?true:false;
-    }
-    else if(!strcmp(variable,"bare_update_check")) {
-      // bare_update_check=(atoi(value)>0)?true:false;
-    }
-    /*** AUTH_FILE VARIABLE USED BY EMBEDDED PERL INTERPRETER ***/
-    else if(!strcmp(variable,"auth_file")){
-
-      // if(strlen(value)>MAX_FILENAME_LENGTH-1){
-      //   if (asprintf(&error_message,"Auth file is too long")) {}
-      //   error=true;
-      //   break;
-      // }
-
-      // delete[] auth_file;
-      // auth_file=(char *)string::dup(value);
-    }
-
-    /* warn about old variables */
-    else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file")){
-      logit(NSLOG_CONFIG_WARNING,true,"Warning: comment_file variable ignored.  Comments are now stored in the status and retention files.");
-    }
-    else if(!strcmp(variable,"downtime_file") || !strcmp(variable,"xdddefault_downtime_file")){
-      logit(NSLOG_CONFIG_WARNING,true,"Warning: downtime_file variable ignored.  Downtime entries are now stored in the status and retention files.");
-    }
 
     /* skip external data directives */
     else if(strstr(input,"x")==input)
@@ -17732,13 +17475,6 @@ int read_main_config_file(char const* main_config_file) {
   /* adjust command check interval */
   if(command_check_interval_is_seconds==false && command_check_interval!=-1)
     command_check_interval*=interval_length;
-
-  /* adjust tweaks */
-  // if(free_child_process_memory==-1)
-  //   free_child_process_memory=(use_large_installation_tweaks==true)?false:true;
-  // if(child_processes_fork_twice==-1)
-  //   child_processes_fork_twice=(use_large_installation_tweaks==true)?false:true;
-
 
   /* handle errors */
   if(error==true){

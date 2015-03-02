@@ -33,11 +33,7 @@ static int check_change_max_host_check_attempts(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0, NULL);
+  host* hst = unittest::add_generic_host();
   if (!hst)
     throw (engine_error() << "create host failed.");
 

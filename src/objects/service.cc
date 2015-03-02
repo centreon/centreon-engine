@@ -84,7 +84,6 @@ bool operator==(
           && obj1.flap_detection_on_warning == obj2.flap_detection_on_warning
           && obj1.flap_detection_on_unknown == obj2.flap_detection_on_unknown
           && obj1.flap_detection_on_critical == obj2.flap_detection_on_critical
-          && obj1.process_performance_data == obj2.process_performance_data
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
           && obj1.accept_passive_service_checks == obj2.accept_passive_service_checks
@@ -96,11 +95,6 @@ bool operator==(
           && obj1.obsess_over_service == obj2.obsess_over_service
           && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
           && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
-          && is_equal(obj1.notes, obj2.notes)
-          && is_equal(obj1.notes_url, obj2.notes_url)
-          && is_equal(obj1.action_url, obj2.action_url)
-          && is_equal(obj1.icon_image, obj2.icon_image)
-          && is_equal(obj1.icon_image_alt, obj2.icon_image_alt)
           && is_equal(obj1.custom_variables, obj2.custom_variables)
           && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
           && obj1.acknowledgement_type == obj2.acknowledgement_type
@@ -232,7 +226,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  flap_detection_on_warning:            " << obj.flap_detection_on_warning << "\n"
     "  flap_detection_on_unknown:            " << obj.flap_detection_on_unknown << "\n"
     "  flap_detection_on_critical:           " << obj.flap_detection_on_critical << "\n"
-    "  process_performance_data:             " << obj.process_performance_data << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
     "  accept_passive_service_checks:        " << obj.accept_passive_service_checks << "\n"
@@ -244,11 +237,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
     "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
     "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
-    "  notes:                                " << chkstr(obj.notes) << "\n"
-    "  notes_url:                            " << chkstr(obj.notes_url) << "\n"
-    "  action_url:                           " << chkstr(obj.action_url) << "\n"
-    "  icon_image:                           " << chkstr(obj.icon_image) << "\n"
-    "  icon_image_alt:                       " << chkstr(obj.icon_image_alt) << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
     "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
@@ -374,19 +362,11 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] stalk_on_warning             Stalk on warning state ?
  *  @param[in] stalk_on_unknown             Stalk on unknown state ?
  *  @param[in] stalk_on_critical            Stalk on critical state ?
- *  @param[in] process_perfdata             Whether or not service
- *                                          performance data should be
- *                                          processed.
  *  @param[in] failure_prediction_enabled   Whether failure prediction
  *                                          should be enabled or not.
  *  @param[in] failure_prediction_options   Failure prediction options.
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
- *  @param[in] notes                        Notes.
- *  @param[in] notes_url                    URL.
- *  @param[in] action_url                   Action URL.
- *  @param[in] icon_image                   Icon image.
- *  @param[in] icon_image_alt               Alternative icon image.
  *  @param[in] retain_status_information    Should Engine retain service
  *                                          status information ?
  *  @param[in] retain_nonstatus_information Should Engine retain service
@@ -434,16 +414,10 @@ service* add_service(
            int stalk_on_warning,
            int stalk_on_unknown,
            int stalk_on_critical,
-           int process_perfdata,
            int failure_prediction_enabled,
            char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
-           char const* notes,
-           char const* notes_url,
-           char const* action_url,
-           char const* icon_image,
-           char const* icon_image_alt,
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service,
@@ -513,16 +487,6 @@ service* add_service(
       obj->check_period = string::dup(check_period);
     if (failure_prediction_options)
       obj->failure_prediction_options = string::dup(failure_prediction_options);
-    if (notes)
-      obj->notes = string::dup(notes);
-    if (notes_url)
-      obj->notes_url = string::dup(notes_url);
-    if (action_url)
-      obj->action_url = string::dup(action_url);
-    if (icon_image)
-      obj->icon_image = string::dup(icon_image);
-    if (icon_image_alt)
-      obj->icon_image_alt = string::dup(icon_image_alt);
     if (timezone)
       obj->timezone = string::dup(timezone);
 
@@ -562,7 +526,6 @@ service* add_service(
     obj->notify_on_warning = (notify_warning > 0);
     obj->obsess_over_service = (obsess_over_service > 0);
     obj->parallelize = (parallelize > 0);
-    obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;

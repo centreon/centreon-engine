@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -264,7 +264,7 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
 
     if (temp_downtime->type == HOST_DOWNTIME) {
       hst->scheduled_downtime_depth--;
-      update_host_status(hst, false);
+      update_host_status(hst);
 
       /* log a notice - this is parsed by the history CGI */
       if (hst->scheduled_downtime_depth == 0) {
@@ -284,7 +284,7 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
     }
     else {
       svc->scheduled_downtime_depth--;
-      update_service_status(svc, false);
+      update_service_status(svc);
 
       /* log a notice - this is parsed by the history CGI */
       if (svc->scheduled_downtime_depth == 0) {
@@ -650,9 +650,9 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
     /* update the status data */
     if (temp_downtime->type == HOST_DOWNTIME)
-      update_host_status(hst, false);
+      update_host_status(hst);
     else
-      update_service_status(svc, false);
+      update_service_status(svc);
 
     /* decrement pending flex downtime if necessary */
     if (temp_downtime->fixed == false
@@ -766,9 +766,9 @@ int handle_scheduled_downtime(scheduled_downtime*  temp_downtime) {
 
     /* update the status data */
     if (temp_downtime->type == HOST_DOWNTIME)
-      update_host_status(hst, false);
+      update_host_status(hst);
     else
-      update_service_status(svc, false);
+      update_service_status(svc);
 
     /* schedule an event */
     if (temp_downtime->fixed == false)

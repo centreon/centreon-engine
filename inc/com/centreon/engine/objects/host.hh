@@ -70,7 +70,6 @@ typedef struct                  host_struct {
   int                           stalk_on_unreachable;
   int                           check_freshness;
   int                           freshness_threshold;
-  int                           process_performance_data;
   int                           checks_enabled;
   int                           accept_passive_host_checks;
   int                           event_handler_enabled;
@@ -79,20 +78,6 @@ typedef struct                  host_struct {
   int                           failure_prediction_enabled;
   char*                         failure_prediction_options;
   int                           obsess_over_host;
-  char*                         notes;
-  char*                         notes_url;
-  char*                         action_url;
-  char*                         icon_image;
-  char*                         icon_image_alt;
-  char*                         vrml_image;
-  char*                         statusmap_image;
-  int                           have_2d_coords;
-  int                           x_2d;
-  int                           y_2d;
-  int                           have_3d_coords;
-  double                        x_3d;
-  double                        y_3d;
-  double                        z_3d;
   int                           should_be_drawn;
   customvariablesmember_struct* custom_variables;
   int                           problem_has_been_acknowledged;
@@ -206,25 +191,10 @@ host* add_host(
         int stalk_on_up,
         int stalk_on_down,
         int stalk_on_unreachable,
-        int process_perfdata,
         int failure_prediction_enabled,
         char const* failure_prediction_options,
         int check_freshness,
         int freshness_threshold,
-        char const* notes,
-        char const* notes_url,
-        char const* action_url,
-        char const* icon_image,
-        char const* icon_image_alt,
-        char const* vrml_image,
-        char const* statusmap_image,
-        int x_2d,
-        int y_2d,
-        int have_2d_coords,
-        double x_3d,
-        double y_3d,
-        double z_3d,
-        int have_3d_coords,
         int should_be_drawn,
         int retain_status_information,
         int retain_nonstatus_information,

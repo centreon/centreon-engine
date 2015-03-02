@@ -162,16 +162,10 @@ void applier::service::add_object(
                       &configuration::service::unknown),
     static_cast<bool>(obj->stalking_options()
                       &configuration::service::critical),
-    obj->process_perf_data(),
     true, // failure_prediction_enabled, enabled by default in Nagios
     NULL, // failure_prediction_options
     obj->check_freshness(),
     obj->freshness_threshold(),
-    NULL_IF_EMPTY(obj->notes()),
-    NULL_IF_EMPTY(obj->notes_url()),
-    NULL_IF_EMPTY(obj->action_url()),
-    NULL_IF_EMPTY(obj->icon_image()),
-    NULL_IF_EMPTY(obj->icon_image_alt()),
     obj->retain_status_information(),
     obj->retain_nonstatus_information(),
     obj->obsess_over_service(),
@@ -275,11 +269,11 @@ void applier::service::expand_object(
                << obj->service_description() << "'");
 
       // Check host group and user configuration.
-      if ((*it2)->resolved_members().empty()
-          && !s.allow_empty_hostgroup_assignment())
-        throw (engine_error() << "Could not expand host group '"
-               << *it << "' specified in service '"
-               << obj->service_description() << "'");
+      if ((*it2)->resolved_members().empty())
+        logger(logging::log_config_warning, logging::basic)
+          << "Could not expand host group '"
+          << *it << "' specified in service '"
+          << obj->service_description() << "'";
 
       // Add host group members.
       for (set_string::const_iterator
@@ -454,9 +448,6 @@ void applier::service::modify_object(
     static_cast<int>(static_cast<bool>(
       obj->flap_detection_options() & configuration::service::critical)));
   modify_if_different(
-    s->process_performance_data,
-    static_cast<int>(obj->process_perf_data()));
-  modify_if_different(
     s->check_freshness,
     static_cast<int>(obj->check_freshness()));
   modify_if_different(
@@ -483,13 +474,6 @@ void applier::service::modify_object(
   modify_if_different(
     s->obsess_over_service,
     static_cast<int>(obj->obsess_over_service()));
-  modify_if_different(s->notes, NULL_IF_EMPTY(obj->notes()));
-  modify_if_different(s->notes_url, NULL_IF_EMPTY(obj->notes_url()));
-  modify_if_different(s->action_url, NULL_IF_EMPTY(obj->action_url()));
-  modify_if_different(s->icon_image, NULL_IF_EMPTY(obj->icon_image()));
-  modify_if_different(
-    s->icon_image_alt,
-    NULL_IF_EMPTY(obj->icon_image_alt()));
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj->is_volatile()));

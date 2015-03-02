@@ -655,20 +655,6 @@ int grab_standard_servicegroup_macro_r(
                       temp_servicesmember->service_description);
     }
     break;
-  case MACRO_SERVICEGROUPACTIONURL:
-    if (temp_servicegroup->action_url)
-      *output = string::dup(temp_servicegroup->action_url);
-    break;
-
-  case MACRO_SERVICEGROUPNOTESURL:
-    if (temp_servicegroup->notes_url)
-      *output = string::dup(temp_servicegroup->notes_url);
-    break;
-
-  case MACRO_SERVICEGROUPNOTES:
-    if (temp_servicegroup->notes)
-      *output = string::dup(temp_servicegroup->notes);
-    break;
 
   default:
     logger(dbg_macros, basic)
@@ -1031,8 +1017,6 @@ int init_macrox_names() {
   add_macrox_name(CONTACTALIAS);
   add_macrox_name(CONTACTEMAIL);
   add_macrox_name(CONTACTPAGER);
-  add_macrox_name(ADMINEMAIL);
-  add_macrox_name(ADMINPAGER);
   add_macrox_name(HOSTSTATE);
   add_macrox_name(HOSTSTATEID);
   add_macrox_name(HOSTATTEMPT);
@@ -1076,12 +1060,9 @@ int init_macrox_names() {
   add_macrox_name(SERVICEDISPLAYNAME);
   add_macrox_name(RETENTIONDATAFILE);
   add_macrox_name(OBJECTCACHEFILE);
-  add_macrox_name(TEMPFILE);
   add_macrox_name(LOGFILE);
   add_macrox_name(RESOURCEFILE);
   add_macrox_name(COMMANDFILE);
-  add_macrox_name(HOSTPERFDATAFILE);
-  add_macrox_name(SERVICEPERFDATAFILE);
   add_macrox_name(HOSTACTIONURL);
   add_macrox_name(HOSTNOTESURL);
   add_macrox_name(HOSTNOTES);
@@ -1109,7 +1090,6 @@ int init_macrox_names() {
   add_macrox_name(SERVICECHECKTYPE);
   add_macrox_name(LONGHOSTOUTPUT);
   add_macrox_name(LONGSERVICEOUTPUT);
-  add_macrox_name(TEMPPATH);
   add_macrox_name(HOSTNOTIFICATIONNUMBER);
   add_macrox_name(SERVICENOTIFICATIONNUMBER);
   add_macrox_name(HOSTNOTIFICATIONID);
@@ -1202,20 +1182,14 @@ int clear_argv_macros() {
  */
 #define cp_macro(name) dest[MACRO_##name] = get_global_macros()->x[MACRO_##name]
 void copy_constant_macros(char** dest) {
-  cp_macro(ADMINEMAIL);
-  cp_macro(ADMINPAGER);
   cp_macro(MAINCONFIGFILE);
   cp_macro(STATUSDATAFILE);
   cp_macro(RETENTIONDATAFILE);
   cp_macro(OBJECTCACHEFILE);
-  cp_macro(TEMPFILE);
   cp_macro(LOGFILE);
   cp_macro(RESOURCEFILE);
   cp_macro(COMMANDFILE);
-  cp_macro(HOSTPERFDATAFILE);
-  cp_macro(SERVICEPERFDATAFILE);
   cp_macro(PROCESSSTARTTIME);
-  cp_macro(TEMPPATH);
   cp_macro(EVENTSTARTTIME);
   return;
 }
@@ -1230,20 +1204,14 @@ int clear_volatile_macros_r(nagios_macros* mac) {
   for (x = 0; x < MACRO_X_COUNT; x++) {
     switch (x) {
 
-    case MACRO_ADMINEMAIL:
-    case MACRO_ADMINPAGER:
     case MACRO_MAINCONFIGFILE:
     case MACRO_STATUSDATAFILE:
     case MACRO_RETENTIONDATAFILE:
     case MACRO_OBJECTCACHEFILE:
-    case MACRO_TEMPFILE:
     case MACRO_LOGFILE:
     case MACRO_RESOURCEFILE:
     case MACRO_COMMANDFILE:
-    case MACRO_HOSTPERFDATAFILE:
-    case MACRO_SERVICEPERFDATAFILE:
     case MACRO_PROCESSSTARTTIME:
-    case MACRO_TEMPPATH:
     case MACRO_EVENTSTARTTIME:
       /* these don't change during the course of monitoring, so no need to free them */
       break;

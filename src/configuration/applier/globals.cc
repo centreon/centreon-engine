@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,7 +47,6 @@ void applier::globals::apply(state& config) {
   ::accept_passive_host_checks = config.accept_passive_host_checks();
   ::accept_passive_service_checks = config.accept_passive_service_checks();
   ::additional_freshness_latency = config.additional_freshness_latency();
-  ::allow_empty_hostgroup_assignment = config.allow_empty_hostgroup_assignment();
   ::auto_reschedule_checks = config.auto_reschedule_checks();
   ::auto_rescheduling_interval = config.auto_rescheduling_interval();
   ::auto_rescheduling_window = config.auto_rescheduling_window();
@@ -102,7 +101,6 @@ void applier::globals::apply(state& config) {
   ::ochp_timeout = config.ochp_timeout();
   ::ocsp_timeout = config.ocsp_timeout();
   ::passive_host_checks_are_soft = config.passive_host_checks_are_soft();
-  ::process_performance_data = config.process_performance_data();
   ::retained_contact_host_attribute_mask = config.retained_contact_host_attribute_mask();
   ::retained_contact_service_attribute_mask = config.retained_contact_service_attribute_mask();
   ::retained_host_attribute_mask = config.retained_host_attribute_mask();

@@ -211,21 +211,6 @@ add_test(
   "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg"
 )
 
-# Empty host group assignment error.
-set(TEST_NAME "running_engine_empty_hostgroup_assignment_error")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_error.cfg"
-)
-set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-
-# Empty host group assignment success.
-set(TEST_NAME "running_engine_empty_hostgroup_assignment_success")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg"
-)
-
 # Invalid contactgroup on contact.
 set(TEST_NAME "invalid_contactgroup_on_contact")
 add_test(

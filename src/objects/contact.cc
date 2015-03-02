@@ -70,7 +70,6 @@ bool operator==(
           && is_equal(obj1.service_notification_period, obj2.service_notification_period)
           && obj1.host_notifications_enabled == obj2.host_notifications_enabled
           && obj1.service_notifications_enabled == obj2.service_notifications_enabled
-          && obj1.can_submit_commands == obj2.can_submit_commands
           && obj1.retain_status_information == obj2.retain_status_information
           && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
           && is_equal(obj1.custom_variables, obj2.custom_variables)
@@ -142,7 +141,6 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  service_notification_period:     " << chkstr(obj.service_notification_period) << "\n"
     "  host_notifications_enabled:      " << obj.host_notifications_enabled << "\n"
     "  service_notifications_enabled:   " << obj.service_notifications_enabled << "\n"
-    "  can_submit_commands:             " << obj.can_submit_commands << "\n"
     "  retain_status_information:       " << obj.retain_status_information << "\n"
     "  retain_nonstatus_information:    " << obj.retain_nonstatus_information << "\n"
     "  last_host_notification:          " << string::ctime(obj.last_host_notification) << "\n"
@@ -196,8 +194,6 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
  *                                           notifications enabled ?
  *  @param[in] service_notifications_enabled Are contact service
  *                                           notifications enabled ?
- *  @param[in] can_submit_commands           Can user submit external
- *                                           commands ?
  *  @param[in] retain_status_information     Shall Engine retain contact
  *                                           status info ?
  *  @param[in] retain_nonstatus_information  Shell Engine retain contact
@@ -227,7 +223,6 @@ contact* add_contact(
            int notify_host_downtime,
            int host_notifications_enabled,
            int service_notifications_enabled,
-           int can_submit_commands,
            int retain_status_information,
            int retain_nonstatus_information,
            char const* timezone) {
@@ -271,7 +266,6 @@ contact* add_contact(
     }
 
     // Set remaining contact properties.
-    obj->can_submit_commands = (can_submit_commands > 0);
     obj->host_notifications_enabled = (host_notifications_enabled > 0);
     obj->modified_attributes = MODATTR_NONE;
     obj->modified_host_attributes = MODATTR_NONE;

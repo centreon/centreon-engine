@@ -34,20 +34,11 @@ using namespace com::centreon::engine;
  *  Init host and service.
  */
 void init_host_and_service(host*& hst, service*& svc) {
-  hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0, NULL);
+  hst = unittest::add_generic_host();
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  svc = add_service("name", "description", NULL,
-                           NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                           0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                           0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                           0, 0, NULL, NULL, NULL, NULL, NULL,
-                           0, 0, 0, NULL);
+  svc = unittest::add_generic_service();
   if (!svc)
     throw (engine_error() << "create service failed.");
   svc->host_ptr = hst;

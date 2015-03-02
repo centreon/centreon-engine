@@ -102,19 +102,10 @@ int main_test(int argc, char** argv) {
 
   // Add host groups and link them to host.
   hostgroup* hg1(add_hostgroup(const_cast<char*>(STR(GROUP1)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   hostgroup* hg2(add_hostgroup(const_cast<char*>(STR(GROUP2)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   hostgroup* hg3(add_hostgroup(const_cast<char*>(STR(GROUP3)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   add_host_to_hostgroup(hg1, host_list->name);
   add_host_to_hostgroup(hg2, host_list->name);
@@ -161,12 +152,6 @@ int main_test(int argc, char** argv) {
   host_list->last_event_id = LAST_EVENT_ID;
   host_list->current_problem_id = PROBLEM_ID;
   host_list->last_problem_id = LAST_PROBLEM_ID;
-  delete [] host_list->action_url;
-  host_list->action_url = string::dup(STR(ACTION_URL));
-  delete [] host_list->notes_url;
-  host_list->notes_url = string::dup(STR(NOTES_URL));
-  delete [] host_list->notes;
-  host_list->notes = string::dup(STR(NOTES));
 
   // macro object.
   nagios_macros mac;

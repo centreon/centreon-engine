@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -78,11 +78,13 @@ service::setters const service::_setters[] = {
   { "performance_data",                     SETTER(std::string const&, _set_performance_data) },
   { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
   { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
-  { "process_performance_data",             SETTER(int, _set_process_performance_data) },
   { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
   { "service_description",                  SETTER(std::string const&, _set_service_description) },
   { "state_history",                        SETTER(std::string const&, _set_state_history) },
-  { "state_type",                           SETTER(int, _set_state_type) }
+  { "state_type",                           SETTER(int, _set_state_type) },
+
+  // Deprecated.
+  { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
 
 /**
@@ -166,7 +168,6 @@ service& service::operator=(service const& right) {
     _performance_data = right._performance_data;
     _plugin_output = right._plugin_output;
     _problem_has_been_acknowledged = right._problem_has_been_acknowledged;
-    _process_performance_data = right._process_performance_data;
     _retry_check_interval = right._retry_check_interval;
     _service_description = right._service_description;
     _state_history = right._state_history;
@@ -235,7 +236,6 @@ bool service::operator==(service const& right) const throw () {
           && _performance_data == right._performance_data
           && _plugin_output == right._plugin_output
           && _problem_has_been_acknowledged == right._problem_has_been_acknowledged
-          && _process_performance_data == right._process_performance_data
           && _retry_check_interval == right._retry_check_interval
           && _service_description == right._service_description
           && _state_history == right._state_history
@@ -753,15 +753,6 @@ opt<std::string> const& service::plugin_output() const throw () {
  */
 opt<bool> const& service::problem_has_been_acknowledged() const throw () {
   return (_problem_has_been_acknowledged);
-}
-
-/**
- *  Get process_performance_data.
- *
- *  @return The process_performance_data.
- */
-opt<int> const& service::process_performance_data() const throw () {
-  return (_process_performance_data);
 }
 
 /**
@@ -1304,12 +1295,12 @@ bool service::_set_problem_has_been_acknowledged(bool value) {
 }
 
 /**
- *  Set process_performance_data.
+ *  Deprecated variable.
  *
- *  @param[in] value The new process_performance_data.
+ *  @param[in] value  Unused.
  */
 bool service::_set_process_performance_data(int value) {
-  _process_performance_data = value;
+  (void)value;
   return (true);
 }
 
@@ -1367,4 +1358,3 @@ bool service::_set_state_type(int value) {
   _state_type = value;
   return (true);
 }
-

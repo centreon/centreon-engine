@@ -30,7 +30,6 @@ obsess_over_hosts=0
 obsess_over_services=0
 passive_host_checks_enabled=1
 passive_service_checks_enabled=1
-process_performance_data=0
 }
 host {
 host_name=central
@@ -81,7 +80,6 @@ percent_state_change=6.12
 performance_data=
 plugin_output=(Execute command failed)
 problem_has_been_acknowledged=0
-process_performance_data=1
 retry_check_interval=5.00
 state_type=0
 state_history=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
@@ -141,7 +139,6 @@ percent_state_change=0.00
 performance_data=
 plugin_output=(No output returned from plugin)
 problem_has_been_acknowledged=0
-process_performance_data=1
 retry_check_interval=3.00
 state_type=0
 state_history=0,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0

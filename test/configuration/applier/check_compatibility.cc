@@ -89,9 +89,6 @@ struct                global {
   bool                accept_passive_host_checks;
   bool                accept_passive_service_checks;
   int                 additional_freshness_latency;
-  std::string         admin_email;
-  std::string         admin_pager;
-  bool                allow_empty_hostgroup_assignment;
   bool                auto_reschedule_checks;
   unsigned int        auto_rescheduling_interval;
   unsigned int        auto_rescheduling_window;
@@ -156,7 +153,6 @@ struct                global {
   std::string         ocsp_command;
   unsigned int        ocsp_timeout;
   bool                passive_host_checks_are_soft;
-  bool                process_performance_data;
   unsigned long       retained_contact_host_attribute_mask;
   unsigned long       retained_contact_service_attribute_mask;
   unsigned long       retained_host_attribute_mask;
@@ -298,9 +294,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(accept_passive_host_checks);
   check_value(accept_passive_service_checks);
   check_value(additional_freshness_latency);
-  check_value(admin_email);
-  check_value(admin_pager);
-  check_value(allow_empty_hostgroup_assignment);
   check_value(auto_reschedule_checks);
   check_value(auto_rescheduling_interval);
   check_value(auto_rescheduling_window);
@@ -365,7 +358,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(ocsp_command);
   check_value(ocsp_timeout);
   check_value(passive_host_checks_are_soft);
-  check_value(process_performance_data);
   check_value(retained_contact_host_attribute_mask);
   check_value(retained_contact_service_attribute_mask);
   check_value(retained_host_attribute_mask);
@@ -562,9 +554,6 @@ static global get_globals() {
   g.accept_passive_host_checks = accept_passive_host_checks;
   g.accept_passive_service_checks = accept_passive_service_checks;
   g.additional_freshness_latency = additional_freshness_latency;
-  g.admin_email = to_str(macro_x[MACRO_ADMINEMAIL]);
-  g.admin_pager = to_str(macro_x[MACRO_ADMINPAGER]);
-  g.allow_empty_hostgroup_assignment = allow_empty_hostgroup_assignment;
   g.auto_reschedule_checks = auto_reschedule_checks;
   g.auto_rescheduling_interval = auto_rescheduling_interval;
   g.auto_rescheduling_window = auto_rescheduling_window;
@@ -629,7 +618,6 @@ static global get_globals() {
   g.ocsp_command = to_str(ocsp_command);
   g.ocsp_timeout = ocsp_timeout;
   g.passive_host_checks_are_soft = passive_host_checks_are_soft;
-  g.process_performance_data = process_performance_data;
   g.retained_contact_host_attribute_mask = retained_contact_host_attribute_mask;
   g.retained_contact_service_attribute_mask = retained_contact_service_attribute_mask;
   g.retained_host_attribute_mask = retained_host_attribute_mask;

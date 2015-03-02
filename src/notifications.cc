@@ -353,8 +353,8 @@ int service_notification(
     contacts_notified,
     NULL);
 
-  /* update the status log with the service information */
-  update_service_status(svc, false);
+  // Update the status log with the service information.
+  update_service_status(svc);
 
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);
@@ -1608,8 +1608,8 @@ int host_notification(
     contacts_notified,
     NULL);
 
-  /* update the status log with the host info */
-  update_host_status(hst, false);
+  // Update the status log with the host info.
+  update_host_status(hst);
 
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -2993,75 +2993,6 @@ int centreonengine__hostSetObsessOver(
 
   // Enable or disable obsession.
   hst->obsess_over_host = enable;
-
-  // Notify event broker.
-  notify_event_broker(hst);
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**************************************
-*                                     *
-*              Perfdata               *
-*                                     *
-**************************************/
-
-/**
- *  Check if perfdata processing is enabled on host.
- *
- *  @param[in]  s       SOAP object.
- *  @param[in]  host_id Target host.
- *  @param[out] res     true if perfdata processing is enabled on host.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__hostGetPerfdataProcessingEnabled(
-      soap* s,
-      ns1__hostIDType* host_id,
-      bool& res) {
-  // Begin try block.
-  COMMAND_BEGIN(host_id->name)
-
-  // Find target host.
-  host* hst(find_target_host(host_id->name.c_str()));
-
-  // Get requested value.
-  res = hst->process_performance_data;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Enable or disable perfdata processing.
- *
- *  @param[in]  s       SOAP object.
- *  @param[in]  host_id Target host.
- *  @param[in]  enable  true to enable, false to disable.
- *  @param[out] res     Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__hostSetPerfdataProcessingEnabled(
-      soap* s,
-      ns1__hostIDType* host_id,
-      bool enable,
-      centreonengine__hostSetPerfdataProcessingEnabledResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(host_id->name << ", " << enable)
-
-  // Find target host.
-  host* hst(find_target_host(host_id->name.c_str()));
-
-  // Enable or disable performance data processing.
-  hst->process_performance_data = enable;
 
   // Notify event broker.
   notify_event_broker(hst);

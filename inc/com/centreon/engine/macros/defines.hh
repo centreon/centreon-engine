@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -61,8 +61,6 @@
 # define MACRO_CONTACTALIAS                     21
 # define MACRO_CONTACTEMAIL                     22
 # define MACRO_CONTACTPAGER                     23
-# define MACRO_ADMINEMAIL                       24
-# define MACRO_ADMINPAGER                       25
 # define MACRO_HOSTSTATE                        26
 # define MACRO_HOSTSTATEID                      27
 # define MACRO_HOSTATTEMPT                      28
@@ -105,12 +103,9 @@
 # define MACRO_SERVICEDISPLAYNAME               65
 # define MACRO_RETENTIONDATAFILE                66
 # define MACRO_OBJECTCACHEFILE                  67
-# define MACRO_TEMPFILE                         68
 # define MACRO_LOGFILE                          69
 # define MACRO_RESOURCEFILE                     70
 # define MACRO_COMMANDFILE                      71
-# define MACRO_HOSTPERFDATAFILE                 72
-# define MACRO_SERVICEPERFDATAFILE              73
 # define MACRO_HOSTACTIONURL                    74
 # define MACRO_HOSTNOTESURL                     75
 # define MACRO_HOSTNOTES                        76
@@ -138,7 +133,6 @@
 # define MACRO_SERVICECHECKTYPE                 98
 # define MACRO_LONGHOSTOUTPUT                   99
 # define MACRO_LONGSERVICEOUTPUT                100
-# define MACRO_TEMPPATH                         101
 # define MACRO_HOSTNOTIFICATIONNUMBER           102
 # define MACRO_SERVICENOTIFICATIONNUMBER        103
 # define MACRO_HOSTNOTIFICATIONID               104

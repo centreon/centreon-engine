@@ -640,7 +640,6 @@ set(
   "${SRC_DIR}/macros.cc"
   "${SRC_DIR}/nebmods.cc"
   "${SRC_DIR}/notifications.cc"
-  "${SRC_DIR}/perfdata.cc"
   "${SRC_DIR}/sehandlers.cc"
   "${SRC_DIR}/shared.cc"
   "${SRC_DIR}/statusdata.cc"
@@ -651,7 +650,6 @@ set(
   "${SRC_DIR}/utils.cc"
   "${SRC_DIR}/xcddefault.cc"
   "${SRC_DIR}/xdddefault.cc"
-  "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
 
   # Headers.
@@ -673,7 +671,6 @@ set(
   "${INC_DIR}/com/centreon/engine/nebstructs.hh"
   "${INC_DIR}/com/centreon/engine/notifications.hh"
   "${INC_DIR}/com/centreon/engine/opt.hh"
-  "${INC_DIR}/com/centreon/engine/perfdata.hh"
   "${INC_DIR}/com/centreon/engine/sehandlers.hh"
   "${INC_DIR}/com/centreon/engine/shared.hh"
   "${INC_DIR}/com/centreon/engine/statusdata.hh"
@@ -685,7 +682,6 @@ set(
   "${INC_DIR}/com/centreon/engine/version.hh"
   "${INC_DIR}/com/centreon/engine/xcddefault.hh"
   "${INC_DIR}/com/centreon/engine/xdddefault.hh"
-  "${INC_DIR}/com/centreon/engine/xpddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
 

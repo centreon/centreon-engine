@@ -88,10 +88,7 @@ void applier::servicegroup::add_object(
   // Create servicegroup.
   servicegroup_struct* sg(add_servicegroup(
                             obj->servicegroup_name().c_str(),
-                            NULL_IF_EMPTY(obj->alias()),
-                            NULL_IF_EMPTY(obj->notes()),
-                            NULL_IF_EMPTY(obj->notes_url()),
-                            NULL_IF_EMPTY(obj->action_url())));
+                            NULL_IF_EMPTY(obj->alias())));
   if (!sg)
     throw (engine_error() << "Could not register service group '"
            << obj->servicegroup_name() << "'");
@@ -168,17 +165,8 @@ void applier::servicegroup::modify_object(
 
   // Modify properties.
   modify_if_different(
-    sg->action_url,
-    NULL_IF_EMPTY(obj->action_url()));
-  modify_if_different(
     sg->alias,
     (obj->alias().empty() ? obj->servicegroup_name() : obj->alias()).c_str());
-  modify_if_different(
-    sg->notes,
-    NULL_IF_EMPTY(obj->notes()));
-  modify_if_different(
-    sg->notes_url,
-    NULL_IF_EMPTY(obj->notes_url()));
 
   // Were members modified ?
   if (obj->resolved_members() != old_cfg->resolved_members()) {

@@ -33,24 +33,15 @@ static int check_enable_hostgroup_passive_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0, NULL);
+  host* hst = unittest::add_generic_host();
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0, NULL);
+  service* svc = unittest::add_generic_service();
   if (!svc)
     throw (engine_error() << "create service failed.");
 
-  hostgroup* group = add_hostgroup("group", NULL, NULL, NULL, NULL);
+  hostgroup* group = add_hostgroup("group", NULL);
   if (!group)
     throw (engine_error() << "create hostgroup failed.");
 

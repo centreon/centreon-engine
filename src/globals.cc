@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -85,14 +85,12 @@ hostgroup*          hostgroup_list(NULL);
 hostgroup*          hostgroup_list_tail(NULL);
 int                 __nagios_object_structure_version(CURRENT_OBJECT_STRUCTURE_VERSION);
 int                 additional_freshness_latency(15);
-int                 allow_empty_hostgroup_assignment(false);
 int                 caught_signal(false);
 int                 command_check_interval(-1);
 int                 config_errors(0);
 int                 config_warnings(0);
 int                 defer_comment_sorting(0);
 int                 defer_downtime_sorting(0);
-int                 embedded_perl_initialized(false);
 int                 external_command_buffer_slots(4096);
 int                 log_host_retries(false);
 int                 precache_objects(false);
@@ -122,7 +120,6 @@ skiplist*           object_skiplists[NUM_OBJECT_SKIPLISTS];
 time_t              event_start(0L);
 time_t              last_command_check(0L);
 time_t              last_command_status_update(0L);
-time_t              last_log_rotation(0L);
 time_t              program_start(0L);
 timed_event*        event_list_high(NULL);
 timed_event*        event_list_high_tail(NULL);
@@ -176,7 +173,6 @@ unsigned int        obsess_over_services(false);
 unsigned int        ochp_timeout(15);
 unsigned int        ocsp_timeout(15);
 unsigned int        passive_host_checks_are_soft(false);
-unsigned int        process_performance_data(false);
 unsigned int        retain_state_information(false);
 unsigned int        retention_scheduling_horizon(900);
 unsigned int        retention_update_interval(60);

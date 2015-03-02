@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2007 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,13 +36,13 @@ int update_all_status_data();
  // cleans up status data at program termination
 int cleanup_status_data(int delete_status_data);
 // updates program status data
-int update_program_status(int aggregated_dump);
+int update_program_status();
 // updates host status data
-int update_host_status(host* hst,int aggregated_dump);
+int update_host_status(host* hst);
 // updates service status data
-int update_service_status(service* svc,int aggregated_dump);
+int update_service_status(service* svc);
 // updates contact status data
-int update_contact_status(contact* cntct,int aggregated_dump);
+int update_contact_status(contact* cntct);
 
 #  ifdef __cplusplus
 }

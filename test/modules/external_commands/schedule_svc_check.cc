@@ -40,11 +40,7 @@ static int check_schedule_svc_check(int argc, char** argv) {
   (void)argv;
 
   // Create target service.
-  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
-                           0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
-                           0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                           NULL, NULL, NULL, NULL, 0, 0, 0, NULL));
+  service* svc(unittest::add_generic_service());
   if (!svc)
     throw (engine_error() << "service creation failed");
   svc->checks_enabled = true;

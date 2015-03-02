@@ -53,11 +53,6 @@ service::setters const service::_setters[] = {
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
   { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
-  { "notes",                        SETTER(std::string const&, _set_notes) },
-  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
-  { "action_url",                   SETTER(std::string const&, _set_action_url) },
-  { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
-  { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
   { "initial_state",                SETTER(std::string const&, _set_initial_state) },
   { "max_check_attempts",           SETTER(unsigned int, _set_max_check_attempts) },
   { "check_interval",               SETTER(unsigned int, _set_check_interval) },
@@ -81,11 +76,18 @@ service::setters const service::_setters[] = {
   { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
-  { "timezone",                     SETTER(std::string const&, _set_timezone) }
+  { "timezone",                     SETTER(std::string const&, _set_timezone) },
+
+  // Deprecated.
+  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
+  { "notes",                        SETTER(std::string const&, _set_notes) },
+  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
+  { "action_url",                   SETTER(std::string const&, _set_action_url) },
+  { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
+  { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) }
 };
 
 // Default values.
@@ -118,7 +120,6 @@ static unsigned short const default_notification_options(
                               | service::downtime);
 static std::string const    default_notification_period;
 static bool const           default_obsess_over_service(true);
-static bool const           default_process_perf_data(true);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
@@ -148,7 +149,6 @@ service::service()
     _notification_interval(default_notification_interval),
     _notification_options(default_notification_options),
     _obsess_over_service(default_obsess_over_service),
-    _process_perf_data(default_process_perf_data),
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
@@ -179,7 +179,6 @@ service::~service() throw () {}
 service& service::operator=(service const& right) {
   if (this != &right) {
     object::operator=(right);
-    _action_url = right._action_url;
     _checks_active = right._checks_active;
     _checks_passive = right._checks_passive;
     _check_command = right._check_command;
@@ -200,20 +199,15 @@ service& service::operator=(service const& right) {
     _high_flap_threshold = right._high_flap_threshold;
     _hostgroups = right._hostgroups;
     _hosts = right._hosts;
-    _icon_image = right._icon_image;
-    _icon_image_alt = right._icon_image_alt;
     _initial_state = right._initial_state;
     _is_volatile = right._is_volatile;
     _low_flap_threshold = right._low_flap_threshold;
     _max_check_attempts = right._max_check_attempts;
-    _notes = right._notes;
-    _notes_url = right._notes_url;
     _notifications_enabled = right._notifications_enabled;
     _notification_interval = right._notification_interval;
     _notification_options = right._notification_options;
     _notification_period = right._notification_period;
     _obsess_over_service = right._obsess_over_service;
-    _process_perf_data = right._process_perf_data;
     _retain_nonstatus_information = right._retain_nonstatus_information;
     _retain_status_information = right._retain_status_information;
     _retry_interval = right._retry_interval;
@@ -234,7 +228,6 @@ service& service::operator=(service const& right) {
  */
 bool service::operator==(service const& right) const throw () {
   return (object::operator==(right)
-          && _action_url == right._action_url
           && _checks_active == right._checks_active
           && _checks_passive == right._checks_passive
           && _check_command == right._check_command
@@ -255,20 +248,15 @@ bool service::operator==(service const& right) const throw () {
           && _high_flap_threshold == right._high_flap_threshold
           && _hostgroups == right._hostgroups
           && _hosts == right._hosts
-          && _icon_image == right._icon_image
-          && _icon_image_alt == right._icon_image_alt
           && _initial_state == right._initial_state
           && _is_volatile == right._is_volatile
           && _low_flap_threshold == right._low_flap_threshold
           && _max_check_attempts == right._max_check_attempts
-          && _notes == right._notes
-          && _notes_url == right._notes_url
           && _notifications_enabled == right._notifications_enabled
           && _notification_interval == right._notification_interval
           && _notification_options == right._notification_options
           && _notification_period == right._notification_period
           && _obsess_over_service == right._obsess_over_service
-          && _process_perf_data == right._process_perf_data
           && _retain_nonstatus_information == right._retain_nonstatus_information
           && _retain_status_information == right._retain_status_information
           && _retry_interval == right._retry_interval
@@ -301,8 +289,6 @@ bool service::operator<(service const& right) const throw () {
     return (_hosts < right._hosts);
   else if (_service_description != right._service_description)
     return (_service_description < right._service_description);
-  else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
   else if (_checks_active != right._checks_active)
     return (_checks_active < right._checks_active);
   else if (_checks_passive != right._checks_passive)
@@ -345,10 +331,6 @@ bool service::operator<(service const& right) const throw () {
     return (_high_flap_threshold < right._high_flap_threshold);
   else if (_hostgroups != right._hostgroups)
     return (_hostgroups < right._hostgroups);
-  else if (_icon_image != right._icon_image)
-    return (_icon_image < right._icon_image);
-  else if (_icon_image_alt != right._icon_image_alt)
-    return (_icon_image_alt < right._icon_image_alt);
   else if (_initial_state != right._initial_state)
     return (_initial_state < right._initial_state);
   else if (_is_volatile != right._is_volatile)
@@ -357,10 +339,6 @@ bool service::operator<(service const& right) const throw () {
     return (_low_flap_threshold < right._low_flap_threshold);
   else if (_max_check_attempts != right._max_check_attempts)
     return (_max_check_attempts < right._max_check_attempts);
-  else if (_notes != right._notes)
-    return (_notes < right._notes);
-  else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
   else if (_notifications_enabled != right._notifications_enabled)
     return (_notifications_enabled < right._notifications_enabled);
   else if (_notification_interval != right._notification_interval)
@@ -371,8 +349,6 @@ bool service::operator<(service const& right) const throw () {
     return (_notification_period < right._notification_period);
   else if (_obsess_over_service != right._obsess_over_service)
     return (_obsess_over_service < right._obsess_over_service);
-  else if (_process_perf_data != right._process_perf_data)
-    return (_process_perf_data < right._process_perf_data);
   else if (_retain_nonstatus_information
            != right._retain_nonstatus_information)
     return (_retain_nonstatus_information
@@ -428,11 +404,7 @@ service::key_type service::key() const {
  *  @param[in] obj The object to merge.
  */
 void service::merge(configuration::serviceextinfo const& tmpl) {
-  MRG_DEFAULT(_action_url);
-  MRG_DEFAULT(_icon_image);
-  MRG_DEFAULT(_icon_image_alt);
-  MRG_DEFAULT(_notes);
-  MRG_DEFAULT(_notes_url);
+  (void) tmpl;
 }
 
 /**
@@ -446,7 +418,6 @@ void service::merge(object const& obj) {
            << obj.type() << "'");
   service const& tmpl(static_cast<service const&>(obj));
 
-  MRG_DEFAULT(_action_url);
   MRG_IMPORTANT(_check_command);
   MRG_OPTION(_checks_active);
   MRG_OPTION(_checks_passive);
@@ -466,20 +437,15 @@ void service::merge(object const& obj) {
   MRG_OPTION(_high_flap_threshold);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
-  MRG_DEFAULT(_icon_image);
-  MRG_DEFAULT(_icon_image_alt);
   MRG_OPTION(_initial_state);
   MRG_OPTION(_is_volatile);
   MRG_OPTION(_low_flap_threshold);
   MRG_OPTION(_max_check_attempts);
-  MRG_DEFAULT(_notes);
-  MRG_DEFAULT(_notes_url);
   MRG_OPTION(_notifications_enabled);
   MRG_OPTION(_notification_interval);
   MRG_OPTION(_notification_options);
   MRG_OPTION(_notification_period);
   MRG_OPTION(_obsess_over_service);
-  MRG_OPTION(_process_perf_data);
   MRG_OPTION(_retain_nonstatus_information);
   MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
@@ -508,15 +474,6 @@ bool service::parse(char const* key, char const* value) {
     return (true);
   }
   return (false);
-}
-
-/**
- *  Get action_url.
- *
- *  @return The action_url.
- */
-std::string const& service::action_url() const throw () {
-  return (_action_url);
 }
 
 /**
@@ -736,24 +693,6 @@ list_string const& service::hosts() const throw () {
 }
 
 /**
- *  Get icon_image.
- *
- *  @return The icon_image.
- */
-std::string const& service::icon_image() const throw () {
-  return (_icon_image);
-}
-
-/**
- *  Get icon_image_alt.
- *
- *  @return The icon_image_alt.
- */
-std::string const& service::icon_image_alt() const throw () {
-  return (_icon_image_alt);
-}
-
-/**
  *  Get initial_state.
  *
  *  @return The initial_state.
@@ -787,24 +726,6 @@ unsigned int service::low_flap_threshold() const throw () {
  */
 unsigned int service::max_check_attempts() const throw () {
   return (_max_check_attempts);
-}
-
-/**
- *  Get notes.
- *
- *  @return The notes.
- */
-std::string const& service::notes() const throw () {
-  return (_notes);
-}
-
-/**
- *  Get notes_url.
- *
- *  @return The notes_url.
- */
-std::string const& service::notes_url() const throw () {
-  return (_notes_url);
 }
 
 /**
@@ -888,15 +809,6 @@ bool service::notification_period_defined() const throw () {
  */
 bool service::obsess_over_service() const throw () {
   return (_obsess_over_service);
-}
-
-/**
- *  Get process_perf_data.
- *
- *  @return The process_perf_data.
- */
-bool service::process_perf_data() const throw () {
-  return (_process_perf_data);
 }
 
 /**
@@ -1001,13 +913,17 @@ bool service::timezone_defined() const throw () {
 
 /**
  *  Set action_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new action_url value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool service::_set_action_url(std::string const& value) {
-  _action_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service _action_url was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1288,26 +1204,32 @@ bool service::_set_hosts(std::string const& value) {
 }
 
 /**
- *  Set icon_image value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new icon_image value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool service::_set_icon_image(std::string const& value) {
-  _icon_image = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service icon_image was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set icon_image_alt value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new icon_image_alt value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool service::_set_icon_image_alt(std::string const& value) {
-  _icon_image_alt = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service icon_image_alt was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1373,26 +1295,32 @@ bool service::_set_max_check_attempts(unsigned int value) {
 }
 
 /**
- *  Set notes value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool service::_set_notes(std::string const& value) {
-  _notes = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service notes was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notes_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes_url value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool service::_set_notes_url(std::string const& value) {
-  _notes_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service notes_url was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1499,14 +1427,17 @@ bool service::_set_parallelize_check(bool value) {
 }
 
 /**
- *  Set process_perf_data value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new process_perf_data value.
+ *  @param[in] value  Unused.
  *
  *  @return True on success, otherwise false.
  */
 bool service::_set_process_perf_data(bool value) {
-  _process_perf_data = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service process_perf_data was ignored";
+  ++config_warnings;
   return (true);
 }
 

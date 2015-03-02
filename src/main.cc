@@ -56,7 +56,6 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
-#include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"

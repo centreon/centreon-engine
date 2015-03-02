@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -209,7 +209,7 @@ void loop::_dispatching() {
     // NDOUtils DB to see if Engine is alive.
     if ((unsigned long)(current_time - _last_status_update) > 5) {
       _last_status_update = current_time;
-      update_program_status(false);
+      update_program_status();
     }
 
     // Handle high priority events.
@@ -322,7 +322,7 @@ void loop::_dispatching() {
           }
           temp_event->run_time = temp_service->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
-          update_service_status(temp_service, false);
+          update_service_status(temp_service);
           run_event = false;
         }
       }
@@ -370,7 +370,7 @@ void loop::_dispatching() {
                             * config->interval_length()));
           temp_event->run_time = temp_host->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
-          update_host_status(temp_host, false);
+          update_host_status(temp_host);
           run_event = false;
         }
       }

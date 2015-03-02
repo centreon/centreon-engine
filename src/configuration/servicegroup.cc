@@ -19,9 +19,14 @@
 
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
+
+extern int config_warnings;
+extern int config_errors;
 
 using namespace com::centreon;
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 #define SETTER(type, method) \
   &object::setter<servicegroup, type, &servicegroup::method>::generic
@@ -31,6 +36,8 @@ servicegroup::setters const servicegroup::_setters[] = {
   { "alias",                SETTER(std::string const&, _set_alias) },
   { "members",              SETTER(std::string const&, _set_members) },
   { "servicegroup_members", SETTER(std::string const&, _set_servicegroup_members) },
+
+  // Deprecated.
   { "notes",                SETTER(std::string const&, _set_notes) },
   { "notes_url",            SETTER(std::string const&, _set_notes_url) },
   { "action_url",           SETTER(std::string const&, _set_action_url) }
@@ -72,11 +79,8 @@ servicegroup::~servicegroup() throw () {}
 servicegroup& servicegroup::operator=(servicegroup const& right) {
   if (this != &right) {
     object::operator=(right);
-    _action_url = right._action_url;
     _alias = right._alias;
     _members = right._members;
-    _notes = right._notes;
-    _notes_url = right._notes_url;
     _resolved = right._resolved;
     _resolved_members = right._resolved_members;
     _servicegroup_members = right._servicegroup_members;
@@ -94,11 +98,8 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
  */
 bool servicegroup::operator==(servicegroup const& right) const throw () {
   return (object::operator==(right)
-          && _action_url == right._action_url
           && _alias == right._alias
           && _members == right._members
-          && _notes == right._notes
-          && _notes_url == right._notes_url
           && _resolved == right._resolved
           && _resolved_members == right._resolved_members
           && _servicegroup_members == right._servicegroup_members
@@ -126,12 +127,6 @@ bool servicegroup::operator!=(servicegroup const& right) const throw () {
 bool servicegroup::operator<(servicegroup const& right) const throw () {
   if (_servicegroup_name != right._servicegroup_name)
     return (_servicegroup_name < right._servicegroup_name);
-  else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
-  else if (_notes != right._notes)
-    return (_notes < right._notes);
-  else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
   else if (_servicegroup_members != right._servicegroup_members)
     return (_servicegroup_members < right._servicegroup_members);
   else if (_members != right._members)
@@ -173,11 +168,8 @@ void servicegroup::merge(object const& obj) {
            << obj.type() << "'");
   servicegroup const& tmpl(static_cast<servicegroup const&>(obj));
 
-  MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_alias);
   MRG_INHERIT(_members);
-  MRG_DEFAULT(_notes);
-  MRG_DEFAULT(_notes_url);
   MRG_INHERIT(_servicegroup_members);
   MRG_DEFAULT(_servicegroup_name);
 }
@@ -197,15 +189,6 @@ bool servicegroup::parse(char const* key, char const* value) {
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
   return (false);
-}
-
-/**
- *  Get action_url.
- *
- *  @return The action_url.
- */
-std::string const& servicegroup::action_url() const throw () {
-  return (_action_url);
 }
 
 /**
@@ -233,24 +216,6 @@ list_string& servicegroup::members() throw () {
  */
 list_string const& servicegroup::members() const throw () {
   return (*_members);
-}
-
-/**
- *  Get notes.
- *
- *  @return The notes.
- */
-std::string const& servicegroup::notes() const throw () {
-  return (_notes);
-}
-
-/**
- *  Get notes_url.
- *
- *  @return The notes_url.
- */
-std::string const& servicegroup::notes_url() const throw () {
-  return (_notes_url);
 }
 
 /**
@@ -301,14 +266,17 @@ void servicegroup::set_resolved(bool resolved) const throw () {
 }
 
 /**
- *  Set action_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new action_url value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool servicegroup::_set_action_url(std::string const& value) {
-  _action_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: hostgroup action_url was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -337,26 +305,32 @@ bool servicegroup::_set_members(std::string const& value) {
 }
 
 /**
- *  Set notes value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool servicegroup::_set_notes(std::string const& value) {
-  _notes = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: hostgroup notes was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notes_url value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notes_url value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return           True.
  */
 bool servicegroup::_set_notes_url(std::string const& value) {
-  _notes_url = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: hostgroup notes_url was ignored";
+  ++config_warnings;
   return (true);
 }
 

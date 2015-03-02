@@ -76,25 +76,10 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                              // Stalk on ok
     0,                              // Stalk on down
     0,                              // Stalk on unreachable
-    0,                              // Process perfdata
     0,                              // Failure prediction enabled
     NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
-    NULL,                           // Notes
-    NULL,                           // Notes URL
-    NULL,                           // Action URL
-    NULL,                           // Icon image
-    NULL,                           // Icon image alt
-    NULL,                           // VRML image
-    NULL,                           // Statusmap image
-    0,                              // X2D
-    0,                              // Y2D
-    0,                              // Have 2D coords
-    0.0,                            // X3D
-    0.0,                            // Y3D
-    0.0,                            // Z3D
-    0,                              // Have 3D coords
     0,                              // Should be drawn
     0,                              // Retain status information
     0,                              // Retain non-status information
@@ -143,16 +128,10 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                              // Stalk on warning
     0,                              // Stalk on unknown
     0,                              // Stalk on critical
-    0,                              // Process perfdata
     0,                              // Failure prediction enabled
     NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
-    NULL,                           // Notes
-    NULL,                           // Notes URL
-    NULL,                           // Action URL
-    NULL,                           // Icon image
-    NULL,                           // Icon image alt
     0,                              // Retain status information
     0,                              // Retain non-status information
     0,                              // Obsess over service
@@ -182,7 +161,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                                    // Notify host downtime
     1,                                    // Host notifications enabled
     1,                                    // Service notifications enabled
-    1,                                    // Can submit commands
     0,                                    // Retain status information
     0,                                    // Retain non-status information
     NULL));                               // System timezone

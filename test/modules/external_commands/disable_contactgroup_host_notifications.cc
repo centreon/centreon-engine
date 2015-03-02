@@ -33,9 +33,7 @@ static int check_disable_contactgroup_host_notifications(int argc, char** argv) 
   (void)argc;
   (void)argv;
 
-  contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL,
-                               NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, NULL);
+  contact* cntct = unittest::add_generic_contact();
   if (!cntct)
     throw (engine_error() << "create contact failed.");
 

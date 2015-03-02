@@ -31,7 +31,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
-#include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/logging/logger.hh"
 
 using namespace com::centreon::engine;
@@ -233,21 +232,17 @@ applier::scheduler::scheduler()
   : _evt_check_reaper(NULL),
     _evt_command_check(NULL),
     _evt_hfreshness_check(NULL),
-    _evt_host_perfdata(NULL),
     _evt_orphan_check(NULL),
     _evt_reschedule_checks(NULL),
     _evt_retention_save(NULL),
     _evt_sfreshness_check(NULL),
-    _evt_service_perfdata(NULL),
     _evt_status_save(NULL),
     _old_auto_rescheduling_interval(0),
     _old_check_reaper_interval(0),
     _old_command_check_interval(0),
     _old_host_freshness_check_interval(0),
-    _old_host_perfdata_file_processing_interval(0),
     _old_retention_update_interval(0),
     _old_service_freshness_check_interval(0),
-    _old_service_perfdata_file_processing_interval(0),
     _old_status_update_interval(0) {
   memset(&scheduling_info, 0, sizeof(scheduling_info));
 }
@@ -390,56 +385,7 @@ void applier::scheduler::_apply_misc_event() {
     _old_status_update_interval = config->status_update_interval();
   }
 
-  union {
-    int (*func)();
-    void* data;
-  } type;
-
-  // Remove and add process host perfdata file.
-  if (!_evt_host_perfdata
-      || (_old_host_perfdata_file_processing_interval
-          != config->host_perfdata_file_processing_interval())
-      || (_old_host_perfdata_file_processing_command
-          != config->host_perfdata_file_processing_command())) {
-    _remove_misc_event(_evt_host_perfdata);
-    if (config->host_perfdata_file_processing_interval() > 0
-        && !config->host_perfdata_file_processing_command().empty()) {
-      type.func = &xpddefault_process_host_perfdata_file;
-      _evt_host_perfdata
-        = _create_misc_event(
-            EVENT_USER_FUNCTION,
-            now + config->host_perfdata_file_processing_interval(),
-            config->host_perfdata_file_processing_interval(),
-            type.data);
-    }
-    _old_host_perfdata_file_processing_interval
-      = config->host_perfdata_file_processing_interval();
-    _old_host_perfdata_file_processing_command
-      = config->host_perfdata_file_processing_command();
-  }
-
-  // Remove and add process service perfdata file.
-  if (!_evt_service_perfdata
-      || (_old_service_perfdata_file_processing_interval
-          != config->service_perfdata_file_processing_interval())
-      || (_old_service_perfdata_file_processing_command
-          != config->service_perfdata_file_processing_command())) {
-    _remove_misc_event(_evt_service_perfdata);
-    if (config->service_perfdata_file_processing_interval() > 0
-        && !config->service_perfdata_file_processing_command().empty()) {
-      type.func = &xpddefault_process_service_perfdata_file;
-      _evt_service_perfdata
-        = _create_misc_event(
-            EVENT_USER_FUNCTION,
-            now + config->service_perfdata_file_processing_interval(),
-            config->service_perfdata_file_processing_interval(),
-            type.data);
-    }
-    _old_service_perfdata_file_processing_interval
-      = config->service_perfdata_file_processing_interval();
-    _old_service_perfdata_file_processing_command
-      = config->service_perfdata_file_processing_command();
-  }
+  return ;
 }
 
 /**
@@ -928,8 +874,8 @@ void applier::scheduler::_schedule_host_checks(
   for (unsigned int i(0); i < end; ++i) {
     host_struct& hst(*hosts[i]);
 
-    // update status of all hosts (scheduled or not).
-    update_host_status(&hst, false);
+    // Update status of all hosts (scheduled or not).
+    update_host_status(&hst);
 
     // skip most hosts that shouldn't be scheduled.
     if (!hst.should_be_scheduled) {
@@ -1044,8 +990,8 @@ void applier::scheduler::_schedule_service_checks(
   for (unsigned int i(0); i < end; ++i) {
     service_struct& svc(*services[i]);
 
-    // update status of all services (scheduled or not).
-    update_service_status(&svc, false);
+    // Update status of all services (scheduled or not).
+    update_service_status(&svc);
 
     // skip most services that shouldn't be scheduled.
     if (!svc.should_be_scheduled) {

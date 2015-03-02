@@ -130,25 +130,10 @@ void applier::host::add_object(
                           & configuration::host::down),
         static_cast<bool>(obj->stalking_options()
                           & configuration::host::unreachable),
-        obj->process_perf_data(),
         true, // failure_prediction_enabled, enabled by Nagios
         NULL, // failure_prediction_options
         obj->check_freshness(),
         obj->freshness_threshold(),
-        NULL_IF_EMPTY(obj->notes()),
-        NULL_IF_EMPTY(obj->notes_url()),
-        NULL_IF_EMPTY(obj->action_url()),
-        NULL_IF_EMPTY(obj->icon_image()),
-        NULL_IF_EMPTY(obj->icon_image_alt()),
-        NULL_IF_EMPTY(obj->vrml_image()),
-        NULL_IF_EMPTY(obj->statusmap_image()),
-        obj->coords_2d().x(),
-        obj->coords_2d().y(),
-        obj->have_coords_2d(),
-        obj->coords_3d().x(),
-        obj->coords_3d().y(),
-        obj->coords_3d().z(),
-        obj->have_coords_3d(),
         true, // should_be_drawn, enabled by Nagios
         obj->retain_status_information(),
         obj->retain_nonstatus_information(),
@@ -383,36 +368,11 @@ void applier::host::modify_object(
     static_cast<int>(static_cast<bool>(
       obj->stalking_options() & configuration::host::unreachable)));
   modify_if_different(
-    h->process_performance_data,
-    static_cast<int>(obj->process_perf_data()));
-  modify_if_different(
     h->check_freshness,
     static_cast<int>(obj->check_freshness()));
   modify_if_different(
     h->freshness_threshold,
     static_cast<int>(obj->freshness_threshold()));
-  modify_if_different(h->notes, NULL_IF_EMPTY(obj->notes()));
-  modify_if_different(h->notes_url, NULL_IF_EMPTY(obj->notes_url()));
-  modify_if_different(h->action_url, NULL_IF_EMPTY(obj->action_url()));
-  modify_if_different(h->icon_image, NULL_IF_EMPTY(obj->icon_image()));
-  modify_if_different(
-    h->icon_image_alt,
-    NULL_IF_EMPTY(obj->icon_image_alt()));
-  modify_if_different(h->vrml_image, NULL_IF_EMPTY(obj->vrml_image()));
-  modify_if_different(
-    h->statusmap_image,
-    NULL_IF_EMPTY(obj->statusmap_image()));
-  modify_if_different(h->x_2d, obj->coords_2d().x());
-  modify_if_different(h->y_2d, obj->coords_2d().y());
-  modify_if_different(
-    h->have_2d_coords,
-    static_cast<int>(obj->have_coords_2d()));
-  modify_if_different(h->x_3d, obj->coords_3d().x());
-  modify_if_different(h->y_3d, obj->coords_3d().y());
-  modify_if_different(h->z_3d, obj->coords_3d().z());
-  modify_if_different(
-    h->have_3d_coords,
-    static_cast<int>(obj->have_coords_3d()));
   modify_if_different(
     h->retain_status_information,
     static_cast<int>(obj->retain_status_information()));

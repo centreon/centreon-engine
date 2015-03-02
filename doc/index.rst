@@ -24,7 +24,6 @@ Some of the many features of Centreon Engine include:
     resolved (via email, page, or user-defined method).
   * ability to define event handlers to be run during service or host
     events for proactive problem resolution.
-  * automatic log file rotation.
   * support for implementing redundant monitoring hosts.
 
 System Requirements

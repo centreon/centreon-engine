@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -64,7 +64,6 @@ extern com::centreon::engine::events::hash_timed_event quick_timed_event;
 
 extern time_t                    last_command_check;
 extern time_t                    last_command_status_update;
-extern time_t                    last_log_rotation;
 
 extern unsigned long             modified_host_process_attributes;
 extern unsigned long             modified_service_process_attributes;
@@ -97,8 +96,6 @@ extern unsigned int              currently_running_host_checks;
 
 extern time_t                    program_start;
 extern time_t                    event_start;
-
-extern int                       embedded_perl_initialized;
 
 extern host*                     host_list;
 extern host*                     host_list_tail;
@@ -182,7 +179,6 @@ extern unsigned int log_external_commands;
 extern unsigned int log_passive_checks;
 extern unsigned int log_initial_states;
 extern int log_host_retries;
-extern int allow_empty_hostgroup_assignment;
 extern unsigned int retain_state_information;
 extern unsigned int retention_update_interval;
 extern unsigned int use_retained_program_state;
@@ -241,7 +237,6 @@ extern unsigned int auto_rescheduling_interval;
 extern unsigned int auto_rescheduling_window;
 extern unsigned int status_update_interval;
 extern unsigned int time_change_threshold;
-extern unsigned int process_performance_data;
 extern unsigned int enable_flap_detection;
 extern unsigned int enable_failure_prediction;
 extern float low_service_flap_threshold;
@@ -258,7 +253,6 @@ extern unsigned int use_true_regexp_matching;
 extern unsigned int use_large_installation_tweaks;
 extern unsigned int enable_environment_macros;
 extern int external_command_buffer_slots;
-/* auth_file; */
 
 #  ifdef __cplusplus
 }

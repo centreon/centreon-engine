@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2011 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -117,8 +117,6 @@
 #  define CMD_DEL_SVC_DOWNTIME                                79
 #  define CMD_ENABLE_FAILURE_PREDICTION                       80
 #  define CMD_DISABLE_FAILURE_PREDICTION                      81
-#  define CMD_ENABLE_PERFORMANCE_DATA                         82
-#  define CMD_DISABLE_PERFORMANCE_DATA                        83
 #  define CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME                84
 #  define CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME                 85
 #  define CMD_SCHEDULE_HOST_SVC_DOWNTIME                      86
@@ -254,13 +252,6 @@
 #  define STANDBY_MODE 0
 #  define ACTIVE_MODE  1
 
-/* Log rotation modes. */
-#  define LOG_ROTATION_NONE    0
-#  define LOG_ROTATION_HOURLY  1
-#  define LOG_ROTATION_DAILY   2
-#  define LOG_ROTATION_WEEKLY  3
-#  define LOG_ROTATION_MONTHLY 4
-
 /* Log versions. */
 #  define LOG_VERSION_1 "1.0"
 #  define LOG_VERSION_2 "2.0"
@@ -316,7 +307,6 @@
 #  define MODATTR_EVENT_HANDLER_ENABLED      (1 << 3)
 #  define MODATTR_FLAP_DETECTION_ENABLED     (1 << 4)
 #  define MODATTR_FAILURE_PREDICTION_ENABLED (1 << 5)
-#  define MODATTR_PERFORMANCE_DATA_ENABLED   (1 << 6)
 #  define MODATTR_OBSESSIVE_HANDLER_ENABLED  (1 << 7)
 #  define MODATTR_EVENT_HANDLER_COMMAND      (1 << 8)
 #  define MODATTR_CHECK_COMMAND              (1 << 9)

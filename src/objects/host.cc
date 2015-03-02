@@ -89,7 +89,6 @@ bool operator==(
           && obj1.stalk_on_unreachable == obj2.stalk_on_unreachable
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
-          && obj1.process_performance_data == obj2.process_performance_data
           && obj1.checks_enabled == obj2.checks_enabled
           && obj1.accept_passive_host_checks == obj2.accept_passive_host_checks
           && obj1.event_handler_enabled == obj2.event_handler_enabled
@@ -98,20 +97,6 @@ bool operator==(
           && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
           && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
           && obj1.obsess_over_host == obj2.obsess_over_host
-          && is_equal(obj1.notes, obj2.notes)
-          && is_equal(obj1.notes_url, obj2.notes_url)
-          && is_equal(obj1.action_url, obj2.action_url)
-          && is_equal(obj1.icon_image, obj2.icon_image)
-          && is_equal(obj1.icon_image_alt, obj2.icon_image_alt)
-          && is_equal(obj1.vrml_image, obj2.vrml_image)
-          && is_equal(obj1.statusmap_image, obj2.statusmap_image)
-          && obj1.have_2d_coords == obj2.have_2d_coords
-          && obj1.x_2d == obj2.x_2d
-          && obj1.y_2d == obj2.y_2d
-          && obj1.have_3d_coords == obj2.have_3d_coords
-          && obj1.x_3d == obj2.x_3d
-          && obj1.y_3d == obj2.y_3d
-          && obj1.z_3d == obj2.z_3d
           && obj1.should_be_drawn == obj2.should_be_drawn
           && is_equal(obj1.custom_variables, obj2.custom_variables)
           && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
@@ -243,7 +228,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  stalk_on_unreachable:                 " << obj.stalk_on_unreachable << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
-    "  process_performance_data:             " << obj.process_performance_data << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
     "  accept_passive_host_checks:           " << obj.accept_passive_host_checks << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
@@ -252,20 +236,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
     "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
     "  obsess_over_host:                     " << obj.obsess_over_host << "\n"
-    "  notes:                                " << chkstr(obj.notes) << "\n"
-    "  notes_url:                            " << chkstr(obj.notes_url) << "\n"
-    "  action_url:                           " << chkstr(obj.action_url) << "\n"
-    "  icon_image:                           " << chkstr(obj.icon_image) << "\n"
-    "  icon_image_alt:                       " << chkstr(obj.icon_image_alt) << "\n"
-    "  vrml_image:                           " << chkstr(obj.vrml_image) << "\n"
-    "  statusmap_image:                      " << chkstr(obj.statusmap_image) << "\n"
-    "  have_2d_coords:                       " << obj.have_2d_coords << "\n"
-    "  x_2d:                                 " << obj.x_2d << "\n"
-    "  y_2d:                                 " << obj.y_2d << "\n"
-    "  have_3d_coords:                       " << obj.have_3d_coords << "\n"
-    "  x_3d:                                 " << obj.x_3d << "\n"
-    "  y_3d:                                 " << obj.y_3d << "\n"
-    "  z_3d:                                 " << obj.z_3d << "\n"
     "  should_be_drawn:                      " << obj.should_be_drawn << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
     "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
@@ -383,27 +353,11 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] stalk_on_up                   Stalk on up ?
  *  @param[in] stalk_on_down                 Stalk on down ?
  *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
- *  @param[in] process_perfdata              Should host perfdata be
- *                                           processed ?
  *  @param[in] failure_prediction_enabled    Whether or not failure
  *                                           prediction is enabled.
  *  @param[in] check_freshness               Whether or not freshness
  *                                           check is enabled.
  *  @param[in] freshness_threshold           Freshness threshold.
- *  @param[in] notes                         Notes.
- *  @param[in] notes_url                     URL.
- *  @param[in] action_url                    Action URL.
- *  @param[in] icon_image                    Icon image.
- *  @param[in] icon_image_alt                Alternative icon image.
- *  @param[in] vrml_image                    VRML image.
- *  @param[in] statusmap_image               Status-map image.
- *  @param[in] x_2d                          2D x-coord.
- *  @param[in] y_2d                          2D y-coord.
- *  @param[in] have_2d_coords                Whether host has 2D coords.
- *  @param[in] x_3d                          3D x-coord.
- *  @param[in] y_3d                          3D y-coord.
- *  @param[in] z_3d                          3D z-coord.
- *  @param[in] have_3d_coords                Whether host has 3D coords.
  *  @param[in] should_be_drawn               Whether this host should be
  *                                           drawn.
  *  @param[in] retain_status_information     Should Engine retain status
@@ -450,25 +404,10 @@ host* add_host(
         int stalk_on_up,
         int stalk_on_down,
         int stalk_on_unreachable,
-        int process_perfdata,
         int failure_prediction_enabled,
         char const* failure_prediction_options,
         int check_freshness,
         int freshness_threshold,
-        char const* notes,
-        char const* notes_url,
-        char const* action_url,
-        char const* icon_image,
-        char const* icon_image_alt,
-        char const* vrml_image,
-        char const* statusmap_image,
-        int x_2d,
-        int y_2d,
-        int have_2d_coords,
-        double x_3d,
-        double y_3d,
-        double z_3d,
-        int have_3d_coords,
         int should_be_drawn,
         int retain_status_information,
         int retain_nonstatus_information,
@@ -529,8 +468,6 @@ host* add_host(
     obj->address = string::dup(address);
     obj->alias = string::dup(alias ? alias : name);
     obj->display_name = string::dup(display_name ? display_name : name);
-    if (action_url)
-      obj->action_url = string::dup(action_url);
     if (check_period)
       obj->check_period = string::dup(check_period);
     if (event_handler)
@@ -539,20 +476,8 @@ host* add_host(
       obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (check_command)
       obj->host_check_command = string::dup(check_command);
-    if (icon_image)
-      obj->icon_image = string::dup(icon_image);
-    if (icon_image_alt)
-      obj->icon_image_alt = string::dup(icon_image_alt);
-    if (notes)
-      obj->notes = string::dup(notes);
-    if (notes_url)
-      obj->notes_url = string::dup(notes_url);
     if (notification_period)
       obj->notification_period = string::dup(notification_period);
-    if (statusmap_image)
-      obj->statusmap_image = string::dup(statusmap_image);
-    if (vrml_image)
-      obj->vrml_image = string::dup(vrml_image);
     if (timezone)
       obj->timezone = string::dup(timezone);
 
@@ -574,8 +499,6 @@ host* add_host(
     obj->flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
     obj->flap_detection_on_up = (flap_detection_on_up > 0);
     obj->freshness_threshold = freshness_threshold;
-    obj->have_2d_coords = (have_2d_coords > 0);
-    obj->have_3d_coords = (have_3d_coords > 0);
     obj->high_flap_threshold = high_flap_threshold;
     obj->initial_state = initial_state;
     obj->last_hard_state = initial_state;
@@ -591,7 +514,6 @@ host* add_host(
     obj->notify_on_recovery = (notify_up > 0);
     obj->notify_on_unreachable = (notify_unreachable > 0);
     obj->obsess_over_host = (obsess_over_host > 0);
-    obj->process_performance_data = (process_perfdata > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;
@@ -601,11 +523,6 @@ host* add_host(
     obj->stalk_on_unreachable = (stalk_on_unreachable > 0);
     obj->stalk_on_up = (stalk_on_up > 0);
     obj->state_type = HARD_STATE;
-    obj->x_2d = x_2d;
-    obj->x_3d = x_3d;
-    obj->y_2d = y_2d;
-    obj->y_3d = y_3d;
-    obj->z_3d = z_3d;
 
     // STATE_OK = 0, so we don't need to set state_history (memset
     // is used before).

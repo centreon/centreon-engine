@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,7 +47,6 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
-#include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 #include "com/centreon/engine/configuration/downtime.hh"
 
@@ -183,7 +182,6 @@ applier::state::state()
  *  Destructor.
  */
 applier::state::~state() throw() {
-  xpddefault_cleanup_performance_data();
   applier::scheduler::unload();
   applier::macros::unload();
   applier::globals::unload();
@@ -985,23 +983,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     }
   }
 
-  // Initialize perfdata if necessary.
-  bool modify_perfdata(false);
-  if (!has_already_been_loaded
-      || config->host_perfdata_command() != new_cfg.host_perfdata_command()
-      || config->host_perfdata_file() != new_cfg.host_perfdata_file()
-      || config->host_perfdata_file_mode() != new_cfg.host_perfdata_file_mode()
-      || config->host_perfdata_file_processing_command() != new_cfg.host_perfdata_file_processing_command()
-      || config->host_perfdata_file_processing_interval() != new_cfg.host_perfdata_file_processing_interval()
-      || config->host_perfdata_file_template() != new_cfg.host_perfdata_file_template()
-      || config->service_perfdata_command() != new_cfg.service_perfdata_command()
-      || config->service_perfdata_file() != new_cfg.service_perfdata_file()
-      || config->service_perfdata_file_mode() != new_cfg.service_perfdata_file_mode()
-      || config->service_perfdata_file_processing_command() != new_cfg.service_perfdata_file_processing_command()
-      || config->service_perfdata_file_processing_interval() != new_cfg.service_perfdata_file_processing_interval()
-      || config->service_perfdata_file_template() != new_cfg.service_perfdata_file_template())
-    modify_perfdata = true;
-
   // Initialize status file.
   bool modify_status(false);
   if (!has_already_been_loaded
@@ -1009,8 +990,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     modify_status = true;
 
   // Cleanup.
-  if (modify_perfdata)
-    xpddefault_cleanup_performance_data();
   if (modify_status)
     xsddefault_cleanup_status_data(true);
 
@@ -1018,9 +997,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->accept_passive_host_checks(new_cfg.accept_passive_host_checks());
   config->accept_passive_service_checks(new_cfg.accept_passive_service_checks());
   config->additional_freshness_latency(new_cfg.additional_freshness_latency());
-  config->admin_email(new_cfg.admin_email());
-  config->admin_pager(new_cfg.admin_pager());
-  config->allow_empty_hostgroup_assignment(new_cfg.allow_empty_hostgroup_assignment());
   config->auto_reschedule_checks(new_cfg.auto_reschedule_checks());
   config->auto_rescheduling_interval(new_cfg.auto_rescheduling_interval());
   config->auto_rescheduling_window(new_cfg.auto_rescheduling_window());
@@ -1059,12 +1035,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->host_check_timeout(new_cfg.host_check_timeout());
   config->host_freshness_check_interval(new_cfg.host_freshness_check_interval());
   config->host_inter_check_delay_method(new_cfg.host_inter_check_delay_method());
-  config->host_perfdata_command(new_cfg.host_perfdata_command());
-  config->host_perfdata_file(new_cfg.host_perfdata_file());
-  config->host_perfdata_file_mode(new_cfg.host_perfdata_file_mode());
-  config->host_perfdata_file_processing_command(new_cfg.host_perfdata_file_processing_command());
-  config->host_perfdata_file_processing_interval(new_cfg.host_perfdata_file_processing_interval());
-  config->host_perfdata_file_template(new_cfg.host_perfdata_file_template());
   config->illegal_object_chars(new_cfg.illegal_object_chars());
   config->illegal_output_chars(new_cfg.illegal_output_chars());
   config->interval_length(new_cfg.interval_length());
@@ -1095,9 +1065,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->ocsp_command(new_cfg.ocsp_command());
   config->ocsp_timeout(new_cfg.ocsp_timeout());
   config->passive_host_checks_are_soft(new_cfg.passive_host_checks_are_soft());
-  config->perfdata_timeout(new_cfg.perfdata_timeout());
   config->precached_object_file(new_cfg.precached_object_file());
-  config->process_performance_data(new_cfg.process_performance_data());
   config->resource_file(new_cfg.resource_file());
   config->retain_state_information(new_cfg.retain_state_information());
   config->retained_contact_host_attribute_mask(new_cfg.retained_contact_host_attribute_mask());
@@ -1110,12 +1078,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->service_freshness_check_interval(new_cfg.service_freshness_check_interval());
   config->service_inter_check_delay_method(new_cfg.service_inter_check_delay_method());
   config->service_interleave_factor_method(new_cfg.service_interleave_factor_method());
-  config->service_perfdata_command(new_cfg.service_perfdata_command());
-  config->service_perfdata_file(new_cfg.service_perfdata_file());
-  config->service_perfdata_file_mode(new_cfg.service_perfdata_file_mode());
-  config->service_perfdata_file_processing_command(new_cfg.service_perfdata_file_processing_command());
-  config->service_perfdata_file_processing_interval(new_cfg.service_perfdata_file_processing_interval());
-  config->service_perfdata_file_template(new_cfg.service_perfdata_file_template());
   config->sleep_time(new_cfg.sleep_time());
   config->soft_state_dependencies(new_cfg.soft_state_dependencies());
   config->state_retention_file(new_cfg.state_retention_file());
@@ -1146,8 +1108,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   // Initialize.
   if (modify_status)
     xsddefault_initialize_status_data();
-  if (modify_perfdata)
-    xpddefault_initialize_performance_data();
 
   // Check global event handler commands...
   if (verify_config)

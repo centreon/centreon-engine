@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -28,7 +28,6 @@
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
-#include "com/centreon/engine/perfdata.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
 
@@ -1000,9 +999,6 @@ int handle_host_state(host* hst) {
 
   /* obsess over this host check */
   obsessive_compulsive_host_check_processor(hst);
-
-  /* update performance data */
-  update_host_performance_data(hst);
 
   /* record latest time for current state */
   switch (hst->current_state) {

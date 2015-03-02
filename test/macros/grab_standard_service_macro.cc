@@ -127,28 +127,13 @@ int main_test(int argc, char** argv) {
   service_list->last_event_id = LAST_EVENT_ID;
   service_list->current_problem_id = PROBLEM_ID;
   service_list->last_problem_id = LAST_PROBLEM_ID;
-  delete [] service_list->action_url;
-  service_list->action_url = string::dup(STR(ACTION_URL));
-  delete [] service_list->notes_url;
-  service_list->notes_url = string::dup(STR(NOTES_URL));
-  delete [] service_list->notes;
-  service_list->notes = string::dup(STR(NOTES));
 
   // Add service groups and link them to service.
   servicegroup* sg1(add_servicegroup(const_cast<char*>(STR(GROUP1)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   servicegroup* sg2(add_servicegroup(const_cast<char*>(STR(GROUP2)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   servicegroup* sg3(add_servicegroup(const_cast<char*>(STR(GROUP3)),
-    NULL,
-    NULL,
-    NULL,
     NULL));
   add_service_to_servicegroup(sg1,
     service_list->host_ptr->name,

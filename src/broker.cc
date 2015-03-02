@@ -1,7 +1,7 @@
 /*
 ** Copyright 2002-2010 Ethan Galstad
 ** Copyright 2010      Nagios Core Development Team
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2014 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1420,7 +1420,6 @@ void broker_program_status(
   ds.pid = getpid();
   ds.daemon_mode=0;
   ds.last_command_check = last_command_check;
-  ds.last_log_rotation = last_log_rotation;
   ds.notifications_enabled = config->enable_notifications();
   ds.active_service_checks_enabled
     = config->execute_service_checks();
@@ -1433,7 +1432,6 @@ void broker_program_status(
   ds.flap_detection_enabled = config->enable_flap_detection();
   ds.failure_prediction_enabled
     = config->enable_failure_prediction();
-  ds.process_performance_data = config->process_performance_data();
   ds.obsess_over_hosts = config->obsess_over_hosts();
   ds.obsess_over_services = config->obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;

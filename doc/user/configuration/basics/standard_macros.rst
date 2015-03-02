@@ -268,12 +268,8 @@ Macro Name             Service Checks Service Notifications Host Checks Host Not
 ====================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 `MAINCONFIGFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `STATUSDATAFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`COMMENTDATAFILE`_     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`DOWNTIMEDATAFILE`_    **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RETENTIONDATAFILE`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `OBJECTCACHEFILE`_     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TEMPFILE`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TEMPPATH`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LOGFILE`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RESOURCEFILE`_        **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `COMMANDFILE`_         **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -291,8 +287,6 @@ Macro Name          Service Checks Service Notifications Host Checks Host Notifi
 =================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 `PROCESSSTARTTIME`_ **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `EVENTSTARTTIME`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`ADMINEMAIL`_       **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`ADMINPAGER`_       **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `ARGn`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `USERn`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 =================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
@@ -656,12 +650,8 @@ File Macros
 ====================== ==================================================================================================================================
 _`MAINCONFIGFILE`      The location of the :ref:`main config file <main_cfg_opt>`.
 _`STATUSDATAFILE`      The location of the :ref:`status data file <main_cfg_opt_status_file>`.
-_`COMMENTDATAFILE`     The location of the comment data file.
-_`DOWNTIMEDATAFILE`    The location of the downtime data file.
 _`RETENTIONDATAFILE`   The location of the :ref:`retention data file <main_cfg_opt_state_retention_file>`.
 _`OBJECTCACHEFILE`     The location of the :ref:`object cache file <main_cfg_opt_object_cache_file>`.
-_`TEMPFILE`            The location of the :ref:`temp file <main_cfg_opt_temp_file>`.
-_`TEMPPATH`            The directory specified by the temp path variable.
 _`LOGFILE`             The location of the :ref:`log file <main_cfg_opt_log_file>`.
 _`RESOURCEFILE`        The location of the :ref:`resource file <main_cfg_opt_resource_file>`.
 _`COMMANDFILE`         The location of the :ref:`command file <main_cfg_opt_external_command_file>`.
@@ -679,10 +669,6 @@ _`PROCESSSTARTTIME` Time stamp in time_t format (seconds since the UNIX epoch) i
 _`EVENTSTARTTIME`   Time stamp in time_t format (seconds since the UNIX epoch) indicating when the Centreon Engine process starting process events
                     (checks, etc.). You can determine the number of seconds that it took for Centreon Engine to startup by subtracting $PROCESSSTARTTIME$
                     from $EVENTSTARTTIME$.
-_`ADMINEMAIL`       Global administrative email address. This value is taken from the :ref:`admin_email <main_cfg_opt_administrator_email_address>`.
-                    directive.
-_`ADMINPAGER`       Global administrative pager number/address. This value is taken from the :ref:`admin_pager <main_cfg_opt_administrator_pager>`
-                    directive.
 _`ARGn`             The nth argument passed to the command (notification, event handler, service check, etc.). Centreon Engine supports up to 32 argument
                     macros ($ARG1$ through $ARG32$).
 _`USERn`            The nth user-definable macro. User macros can be defined in one or more :ref:`resource files <main_cfg_opt_resource_file>`.
