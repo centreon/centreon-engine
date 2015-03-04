@@ -655,6 +655,22 @@ int check_service_notification_viability(
     return (ERROR);
   }
 
+  /* if this service is currently in a scheduled downtime period, don't send the notification */
+  if (svc->scheduled_downtime_depth > 0) {
+    logger(dbg_notifications, more)
+      << "This service is currently in a scheduled downtime, so "
+      "we won't send notifications.";
+    return (ERROR);
+  }
+
+  /* if this host is currently in a scheduled downtime period, don't send the notification */
+  if (temp_host->scheduled_downtime_depth > 0) {
+    logger(dbg_notifications, more)
+      << "The host this service is associated with is currently in "
+      "a scheduled downtime, so we won't send notifications.";
+    return (ERROR);
+  }
+
   /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
   if (svc->current_state == STATE_OK)
     return (OK);
@@ -683,22 +699,6 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "Next valid notification time: "
       << my_ctime(&svc->next_notification);
-    return (ERROR);
-  }
-
-  /* if this service is currently in a scheduled downtime period, don't send the notification */
-  if (svc->scheduled_downtime_depth > 0) {
-    logger(dbg_notifications, more)
-      << "This service is currently in a scheduled downtime, so "
-      "we won't send notifications.";
-    return (ERROR);
-  }
-
-  /* if this host is currently in a scheduled downtime period, don't send the notification */
-  if (temp_host->scheduled_downtime_depth > 0) {
-    logger(dbg_notifications, more)
-      << "The host this service is associated with is currently in "
-      "a scheduled downtime, so we won't send notifications.";
     return (ERROR);
   }
 
@@ -1869,10 +1869,6 @@ int check_host_notification_viability(
     return (ERROR);
   }
 
-  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
-  if (hst->current_state == HOST_UP)
-    return (OK);
-
   /* if this host is currently in a scheduled downtime period, don't send the notification */
   if (hst->scheduled_downtime_depth > 0) {
     logger(dbg_notifications, more)
@@ -1880,6 +1876,10 @@ int check_host_notification_viability(
       "so we won't send notifications.";
     return (ERROR);
   }
+
+  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
+  if (hst->current_state == HOST_UP)
+    return (OK);
 
   /* check if we shouldn't renotify contacts about the host problem */
   if (hst->no_more_notifications == true) {
