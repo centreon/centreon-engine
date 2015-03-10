@@ -42,6 +42,7 @@ typedef struct                  service_struct {
   double                        check_interval;
   double                        retry_interval;
   int                           max_attempts;
+  unsigned int                  check_timeout;
   int                           parallelize;
   contactgroupsmember_struct*   contact_groups;
   contactsmember_struct*        contacts;
@@ -157,6 +158,7 @@ service* add_service(
            char const* check_period,
            int initial_state,
            int max_attempts,
+           unsigned int check_timeout,
            int parallelize,
            int accept_passive_checks,
            double check_interval,

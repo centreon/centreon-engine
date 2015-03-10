@@ -1160,7 +1160,8 @@ int handle_async_service_check_result(
     NULL,
     temp_service->latency,
     temp_service->execution_time,
-    config->service_check_timeout(),
+    temp_service->check_timeout ? temp_service->check_timeout :
+                                  config->service_check_timeout(),
     queued_check_result->early_timeout,
     queued_check_result->return_code,
     NULL,
@@ -1532,7 +1533,8 @@ void check_for_orphaned_services() {
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
       = (time_t)(temp_service->next_check + temp_service->latency
-                 + config->service_check_timeout()
+                 + temp_service->check_timeout ? temp_service->check_timeout :
+                                                 config->service_check_timeout()
                  + config->check_reaper_interval() + 600);
 
     /* this service was supposed to have executed a while ago, but for some reason the results haven't come back in... */
@@ -2021,7 +2023,8 @@ void check_for_orphaned_hosts() {
     /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
     expected_time
       = (time_t)(temp_host->next_check + temp_host->latency
-                 + config->host_check_timeout()
+                 + temp_host->check_timeout ? temp_host->check_timeout :
+                                              config->host_check_timeout()
                  + config->check_reaper_interval() + 600);
 
     /* this host was supposed to have executed a while ago, but for some reason the results haven't come back in... */
@@ -2737,7 +2740,8 @@ int handle_async_host_check_result_3x(
     temp_host->host_check_command,
     temp_host->latency,
     temp_host->execution_time,
-    config->host_check_timeout(),
+    temp_host->check_timeout ? temp_host->check_timeout :
+                               config->host_check_timeout(),
     queued_check_result->early_timeout,
     queued_check_result->return_code,
     NULL,

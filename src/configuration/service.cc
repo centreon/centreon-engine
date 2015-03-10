@@ -48,6 +48,7 @@ service::setters const service::_setters[] = {
   { "servicegroups",                SETTER(std::string const&, _set_servicegroups) },
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
+  { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
@@ -124,6 +125,7 @@ static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
 static unsigned short const default_stalking_options(service::none);
+static unsigned int const   default_check_timeout(0);
 
 /**
  *  Default constructor.
@@ -135,6 +137,7 @@ service::service()
     _check_command_is_important(false),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
+    _check_timeout(default_check_timeout),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
@@ -186,6 +189,7 @@ service& service::operator=(service const& right) {
     _check_freshness = right._check_freshness;
     _check_interval = right._check_interval;
     _check_period = right._check_period;
+    _check_timeout = right._check_timeout;
     _contactgroups = right._contactgroups;
     _contacts = right._contacts;
     _customvariables = right._customvariables;
@@ -235,6 +239,7 @@ bool service::operator==(service const& right) const throw () {
           && _check_freshness == right._check_freshness
           && _check_interval == right._check_interval
           && _check_period == right._check_period
+          && _check_timeout == right._check_timeout
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
           && std::operator==(_customvariables, right._customvariables)
@@ -305,6 +310,8 @@ bool service::operator<(service const& right) const throw () {
     return (_check_interval < right._check_interval);
   else if (_check_period != right._check_period)
     return (_check_period < right._check_period);
+  else if (_check_timeout != right._check_timeout)
+    return (_check_timeout < right._check_timeout);
   else if (_contactgroups != right._contactgroups)
     return (_contactgroups < right._contactgroups);
   else if (_contacts != right._contacts)
@@ -423,6 +430,7 @@ void service::merge(object const& obj) {
   MRG_OPTION(_checks_passive);
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
+  MRG_OPTION(_check_timeout);
   MRG_DEFAULT(_check_period);
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
@@ -537,6 +545,24 @@ unsigned int service::check_interval() const throw () {
  */
 std::string const& service::check_period() const throw () {
   return (_check_period);
+}
+
+/**
+ *  Get check_timeout.
+ *
+ *  @return The check timeout.
+ */
+unsigned int service::check_timeout() const throw() {
+  return (_check_timeout);
+}
+
+/**
+ *  Check if check timeout was defined.
+ *
+ *  @return True if the check_timeout was defined.
+ */
+bool service::check_timeout_defined() const throw() {
+  return (_check_timeout.is_set());
 }
 
 /**
@@ -1003,6 +1029,18 @@ bool service::_set_check_interval(unsigned int value) {
  */
 bool service::_set_check_period(std::string const& value) {
   _check_period = value;
+  return (true);
+}
+
+/**
+ *  Set check_timeout value.
+ *
+ *  @param[in] value The new check_timeout value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_check_timeout(unsigned int value) {
+  _check_timeout = value;
   return (true);
 }
 

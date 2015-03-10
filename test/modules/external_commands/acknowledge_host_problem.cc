@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,7 +40,6 @@ static int check_acknowledge_host_problem(int argc, char** argv) {
   (void)argv;
 
   // Create target host.
-
   host* hst(unittest::add_generic_host());
   if (!hst)
     throw (engine_error() << "host creation failed");

@@ -59,6 +59,7 @@ bool operator==(
           && obj1.check_interval == obj2.check_interval
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
+          && obj1.check_timeout == obj2.check_timeout
           && obj1.parallelize == obj2.parallelize
           && is_equal(obj1.contact_groups, obj2.contact_groups)
           && is_equal(obj1.contacts, obj2.contacts)
@@ -201,6 +202,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  check_interval:                       " << obj.check_interval << "\n"
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
+    "  check_timeout:                        " << obj.check_timeout << "\n"
     "  parallelize:                          " << obj.parallelize << "\n"
     "  contact_groups:                       " << chkobj(obj.contact_groups) << "\n"
     "  contacts:                             " << chkobj(obj.contacts) << "\n"
@@ -316,6 +318,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
+ *  @param[in] check_timeout                Check timeout.
  *  @param[in] parallelize                  Can active checks be
  *                                          parallelized ?
  *  @param[in] accept_passive_checks        Does this service accept
@@ -384,6 +387,7 @@ service* add_service(
            char const* check_period,
            int initial_state,
            int max_attempts,
+           unsigned int check_timeout,
            int parallelize,
            int accept_passive_checks,
            double check_interval,
@@ -497,6 +501,7 @@ service* add_service(
     obj->check_options = CHECK_OPTION_NONE;
     obj->check_type = SERVICE_CHECK_ACTIVE;
     obj->checks_enabled = (checks_enabled > 0);
+    obj->check_timeout = check_timeout;
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);

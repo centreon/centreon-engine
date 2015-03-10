@@ -72,6 +72,8 @@ namespace                  configuration {
     bool                   check_freshness() const throw ();
     unsigned int           check_interval() const throw ();
     std::string const&     check_period() const throw ();
+    unsigned int           check_timeout() const throw();
+    bool                   check_timeout_defined() const throw();
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
@@ -129,6 +131,7 @@ namespace                  configuration {
     bool                   _set_check_freshness(bool value);
     bool                   _set_check_interval(unsigned int value);
     bool                   _set_check_period(std::string const& value);
+    bool                   _set_check_timeout(unsigned int value);
     bool                   _set_contactgroups(std::string const& value);
     bool                   _set_contacts(std::string const& value);
     bool                   _set_display_name(std::string const& value);
@@ -173,6 +176,7 @@ namespace                  configuration {
     opt<bool>              _check_freshness;
     opt<unsigned int>      _check_interval;
     std::string            _check_period;
+    opt<unsigned int>      _check_timeout;
     group                  _contactgroups;
     group                  _contacts;
     map_customvar          _customvariables;

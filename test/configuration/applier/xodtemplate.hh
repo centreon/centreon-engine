@@ -238,6 +238,7 @@ typedef struct xodtemplate_host_struct{
   char*        host_groups;
   char*        check_command;
   char*        check_period;
+  unsigned int check_timeout;
   int          initial_state;
   double       check_interval;
   double       retry_interval;
@@ -293,6 +294,7 @@ typedef struct xodtemplate_host_struct{
   int          have_host_groups;
   int          have_check_command;
   int          have_check_period;
+  int          have_check_timeout;
   int          have_event_handler;
   int          have_contact_groups;
   int          have_contacts;
@@ -383,6 +385,7 @@ typedef struct xodtemplate_service_struct{
   double       check_interval;
   double       retry_interval;
   char*        check_period;
+  unsigned int check_timeout;
   int          active_checks_enabled;
   int          passive_checks_enabled;
   int          parallelize_check;
@@ -435,6 +438,7 @@ typedef struct xodtemplate_service_struct{
   int          have_check_command;
   int          have_important_check_command;
   int          have_check_period;
+  int          have_check_timeout;
   int          have_event_handler;
   int          have_notification_period;
   int          have_contact_groups;

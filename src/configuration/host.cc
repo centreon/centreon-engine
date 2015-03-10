@@ -44,6 +44,7 @@ host::setters const host::_setters[] = {
   { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
+  { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
@@ -113,6 +114,7 @@ static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
 static unsigned short const default_stalking_options(host::none);
+static unsigned int const   default_check_timeout(0);
 
 /**
  *  Constructor.
@@ -125,6 +127,7 @@ host::host(key_type const& key)
     _checks_passive(default_checks_passive),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
+    _check_timeout(default_check_timeout),
     _event_handler_enabled(default_event_handler_enabled),
     _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
@@ -177,6 +180,7 @@ host& host::operator=(host const& right) {
     _check_freshness = right._check_freshness;
     _check_interval = right._check_interval;
     _check_period = right._check_period;
+    _check_timeout = right._check_timeout;
     _contactgroups = right._contactgroups;
     _contacts = right._contacts;
     _customvariables = right._customvariables;
@@ -224,6 +228,7 @@ bool host::operator==(host const& right) const throw () {
           && _check_freshness == right._check_freshness
           && _check_interval == right._check_interval
           && _check_period == right._check_period
+          && _check_timeout == right._check_timeout
           && _contactgroups == right._contactgroups
           && _contacts == right._contacts
           && std::operator==(_customvariables, right._customvariables)
@@ -290,6 +295,8 @@ bool host::operator<(host const& right) const throw () {
     return (_check_interval < right._check_interval);
   else if (_check_period != right._check_period)
     return (_check_period < right._check_period);
+  else if (_check_timeout != right._check_timeout)
+    return (_check_timeout < right._check_timeout);
   else if (_contactgroups != right._contactgroups)
     return (_contactgroups < right._contactgroups);
   else if (_contacts != right._contacts)
@@ -400,6 +407,7 @@ void host::merge(object const& obj) {
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
   MRG_DEFAULT(_check_period);
+  MRG_OPTION(_check_timeout);
   MRG_INHERIT(_contactgroups);
   MRG_INHERIT(_contacts);
   MRG_MAP(_customvariables);
@@ -521,6 +529,25 @@ unsigned int host::check_interval() const throw () {
 std::string const& host::check_period() const throw () {
   return (_check_period);
 }
+
+/**
+ *  Get check_timeout.
+ *
+ *  @return The check_timeout.
+ */
+unsigned int host::check_timeout() const throw() {
+  return (_check_timeout);
+}
+
+/**
+ *  Check if check timeout was defined.
+ *
+ *  @return True if the check_timeout was defined.
+ */
+bool host::check_timeout_defined() const throw() {
+  return (_check_timeout.is_set());
+}
+
 
 /**
  *  Get contactgroups.
@@ -891,6 +918,18 @@ bool host::_set_check_interval(unsigned int value) {
 bool host::_set_check_period(std::string const& value) {
   _check_period = value;
   return (true);
+}
+
+/**
+ *  Set check_timeout value.
+ *
+ *  @param[in] value The new check_timeout value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_check_timeout(unsigned int value) {
+  _check_timeout = value;
+  return true;
 }
 
 /**

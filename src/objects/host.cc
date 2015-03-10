@@ -66,6 +66,7 @@ bool operator==(
           && obj1.check_interval == obj2.check_interval
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
+          && obj1.check_timeout == obj2.check_timeout
           && is_equal(obj1.event_handler, obj2.event_handler)
           && is_equal(obj1.contact_groups, obj2.contact_groups)
           && is_equal(obj1.contacts, obj2.contacts)
@@ -205,6 +206,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  check_interval:                       " << obj.check_interval << "\n"
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
+    "  check_timeout                         " << obj.check_timeout << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  contact_groups:                       " << chkobj(obj.contact_groups) << "\n"
     "  contacts:                             " << chkobj(obj.contacts) << "\n"
@@ -318,6 +320,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] check_interval                Normal check interval.
  *  @param[in] retry_interval                Retry check interval.
  *  @param[in] max_attempts                  Max check attempts.
+ *  @param[in] check_timeout                 The check timeout.
  *  @param[in] notify_up                     Does this host notify when
  *                                           up ?
  *  @param[in] notify_down                   Does this host notify when
@@ -381,6 +384,7 @@ host* add_host(
         double check_interval,
         double retry_interval,
         int max_attempts,
+        unsigned int check_timeout,
         int notify_up,
         int notify_down,
         int notify_unreachable,
@@ -489,6 +493,7 @@ host* add_host(
     obj->check_options = CHECK_OPTION_NONE;
     obj->check_type = HOST_CHECK_ACTIVE;
     obj->checks_enabled = (checks_enabled > 0);
+    obj->check_timeout = check_timeout;
     obj->current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);

@@ -96,6 +96,7 @@ void applier::host::add_object(
         obj->check_interval(),
         obj->retry_interval(),
         obj->max_check_attempts(),
+        obj->check_timeout_defined() ? obj->check_timeout() : 0,
         static_cast<bool>(obj->notification_options()
                           & configuration::host::up),
         static_cast<bool>(obj->notification_options()
@@ -287,6 +288,9 @@ void applier::host::modify_object(
   modify_if_different(
     h->max_attempts,
     static_cast<int>(obj->max_check_attempts()));
+  modify_if_different(
+    h->check_timeout,
+    obj->check_timeout());
   modify_if_different(
     h->notify_on_recovery,
     static_cast<int>(static_cast<bool>(
