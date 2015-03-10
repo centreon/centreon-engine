@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -70,9 +70,6 @@ using namespace com::centreon::engine;
 #define LAST_EVENT_ID           1253887
 #define PROBLEM_ID              447786
 #define LAST_PROBLEM_ID         44597587
-#define ACTION_URL              http://www.merethis.com
-#define NOTES_URL               http://www.centreon.com
-#define NOTES                   Whatever I want
 #define GROUP_NAMES             STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
 #define TOTAL_SERVICES          1
 #define TOTAL_SERVICES_OK       1
@@ -198,9 +195,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTHOSTEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_HOSTPROBLEMID, STR(PROBLEM_ID), false },
     { MACRO_LASTHOSTPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_HOSTACTIONURL, STR(ACTION_URL), false },
-    { MACRO_HOSTNOTESURL, STR(NOTES_URL), false },
-    { MACRO_HOSTNOTES, STR(NOTES), false },
     { MACRO_HOSTGROUPNAMES, GROUP_NAMES, false },
     { MACRO_TOTALHOSTSERVICES, STR(TOTAL_SERVICES), false },
     { MACRO_TOTALHOSTSERVICESOK, STR(TOTAL_SERVICES_OK), false },
@@ -225,8 +219,11 @@ int main_test(int argc, char** argv) {
           host_list,
           &output,
           &free_macro)
-        != OK)
+        != OK) {
       retval |= 1;
+      std::cout << "failing macro: " << macro_values[i].macro_id
+                << std::endl;
+    }
     else {
       if (macro_values[i].is_double) {
         if (fabs(strtod(macro_values[i].expected_value, NULL)

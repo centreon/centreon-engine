@@ -1,5 +1,5 @@
 /*
-** Copyright 2013 Merethis
+** Copyright 2014-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -78,7 +78,7 @@ int main_test(int argc, char** argv) {
       throw (engine_error() << "create timeperiod failed.");
 
     for (int i = 0; i < 7; ++i)
-      if (!add_timerange_to_timeperiod(tperiod, i, 0, 0, 24, 60))
+      if (!add_timerange_to_timeperiod(tperiod, i, 0, 0, 24, 0))
         throw (engine_error() << "create timerange failed.");
 
     next_downtime_id = 1;

@@ -1,5 +1,5 @@
 ##
-## Copyright 2013-2014 Merethis
+## Copyright 2013-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -147,6 +147,16 @@ add_executable(
   "${TEST_NAME}"
   "${TEST_DIR}/notifications/escalations.cc"
 )
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+#
+# Downtimes tests.
+#
+
+# Recurring downtimes recur.
+set(TEST_NAME "downtimes_recurring")
+add_executable("${TEST_NAME}" "${TEST_DIR}/downtimes/recurring.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -345,12 +355,6 @@ add_test(
   "${TEST_NAME}"
   "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/recurring_downtime.cfg"
 )
-
-# Recurring downtimes recure.
-set(TEST_NAME "downtimes_recur")
-add_executable("${TEST_NAME}" "${TEST_DIR}/running/downtimes_recur.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
 
 # Precache file generation.
 set(TEST_NAME "running_precache_file_generation")

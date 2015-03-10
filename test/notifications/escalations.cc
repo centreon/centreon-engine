@@ -48,7 +48,7 @@ void init_host_and_service(host*& hst, service*& svc) {
     throw (engine_error() << "create timeperiod failed.");
 
   for (int i = 0; i < 6; ++i)
-    if (!add_timerange_to_timeperiod(tperiod, i, 0, 0, 24, 60))
+    if (!add_timerange_to_timeperiod(tperiod, i, 0, 0, 24, 0))
       throw (engine_error() << "create timerange failed.");
 }
 

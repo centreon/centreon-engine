@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -70,9 +70,6 @@ using namespace com::centreon::engine;
 #define LAST_EVENT_ID 21384723
 #define PROBLEM_ID 123900
 #define LAST_PROBLEM_ID 927834
-#define ACTION_URL http://www.merethis.com
-#define NOTES_URL http://www.centreon.com
-#define NOTES Centreon Engine is wonderful !
 #define GROUP_NAMES STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
 #define ACK_AUTHOR mkermagoret@merethis.com
 #define ACK_AUTHOR_NAME Matthieu Kermagoret
@@ -193,9 +190,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false },
     { MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_SERVICEACTIONURL, STR(ACTION_URL), false },
-    { MACRO_SERVICENOTESURL, STR(NOTES_URL), false },
-    { MACRO_SERVICENOTES, STR(NOTES), false },
     { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false },
     { MACRO_SERVICEACKAUTHOR, STR(ACK_AUTHOR), false },
     { MACRO_SERVICEACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
@@ -215,8 +209,11 @@ int main_test(int argc, char** argv) {
                                       service_list,
                                       &output,
                                       &free_macro)
-        != OK)
+        != OK) {
       retval |= 1;
+      std::cout << "failing macro: " << macro_values[i].macro_id
+                << std::endl;
+    }
     else {
       if (macro_values[i].is_double) {
         if (fabs(strtod(macro_values[i].expected_value, NULL)
