@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -58,8 +58,6 @@ int main_test(int argc, char* argv[]) {
   ref.set("obsess_over_services", "0");
   ref.set("passive_host_checks_enabled", "1");
   ref.set("passive_service_checks_enabled", "0");
-  ref.set("process_performance_data", "1");
-
 
   // Check copy constructor.
   {

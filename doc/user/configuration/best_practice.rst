@@ -31,15 +31,6 @@ Check the event broker options.
 
   * event_broker_options=-1
 
-Perfdata
-========
-
-With Centreon-Broker the perfdata processing need to disable
-beceause this options is not necessary for Centreon-Broker
-and make some latency.
-
-  * process_performance_data=0
-
 Tuning
 ======
 

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -194,7 +194,6 @@ static std::map<std::string, std::string> build_configuration(
   var["auto_rescheduling_window"] = obj2str(my_rand(1));
   var["status_update_interval"] = obj2str(my_rand(2));
   var["time_change_threshold"] = obj2str(my_rand(6));
-  var["process_performance_data"] = obj2str(my_rand(0, 1));
   var["enable_flap_detection"] = obj2str(my_rand(0, 1));
   var["enable_failure_prediction"] = obj2str(my_rand(0, 1));
   var["low_service_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
@@ -448,9 +447,6 @@ void test_configuration(
   }
   if (my_conf["time_change_threshold"] != obj2str(config->time_change_threshold())) {
     throw (engine_error() << "time_change_threshold: init with '" << my_conf["time_change_threshold"] << "'");
-  }
-  if (my_conf["process_performance_data"] != obj2str(config->process_performance_data())) {
-    throw (engine_error() << "process_performance_data: init with '" << my_conf["process_performance_data"] << "'");
   }
   if (my_conf["enable_flap_detection"] != obj2str(config->enable_flap_detection())) {
     throw (engine_error() << "enable_flap_detection: init with '" << my_conf["enable_flap_detection"] << "'");

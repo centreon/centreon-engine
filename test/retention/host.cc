@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -85,7 +85,6 @@ int main_test(int argc, char* argv[]) {
   ref.set("performance_data", "performance_data");
   ref.set("plugin_output", "plugin_output");
   ref.set("problem_has_been_acknowledged", "1");
-  ref.set("process_performance_data", "55");
   ref.set("retry_check_interval", "55");
   ref.set("state_history", "0,5,2,6,3,1");
   ref.set("state_type", "1");

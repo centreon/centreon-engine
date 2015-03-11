@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2014 Merethis
+** Copyright 2012-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -263,12 +263,8 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.ocsp_timeout() << std::endl
     << "passive_host_checks_are_soft="
     << obj.passive_host_checks_are_soft() << std::endl
-    << "perfdata_timeout="
-    << obj.perfdata_timeout() << std::endl
     << "precached_object_file="
     << obj.precached_object_file() << std::endl
-    << "process_performance_data="
-    << obj.process_performance_data() << std::endl
     << "retained_contact_host_attribute_mask="
     << obj.retained_contact_host_attribute_mask() << std::endl
     << "retained_contact_service_attribute_mask="

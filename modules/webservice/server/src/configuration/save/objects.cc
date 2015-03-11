@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -28,9 +28,7 @@ using namespace com::centreon::engine::modules::webservice::configuration::save;
 /**
  *  Default constructor.
  */
-objects::objects() {
-
-}
+objects::objects() {}
 
 /**
  *  Copy constructor.
@@ -44,9 +42,7 @@ objects::objects(objects const& right) {
 /**
  *  Destructor.
  */
-objects::~objects() throw () {
-
-}
+objects::~objects() throw () {}
 
 /**
  *  Assignment operator.
@@ -192,7 +188,6 @@ objects& objects::operator<<(host const& obj) {
   _add_line("high_flap_threshold", obj.high_flap_threshold);
   _add_line("flap_detection_enabled", obj.flap_detection_enabled);
   _add_string("flap_detection_options", flap_detection_options);
-  _add_line("process_perf_data", obj.process_performance_data);
   _add_line("retain_status_information", obj.retain_status_information);
   _add_line("retain_nonstatus_information", obj.retain_nonstatus_information);
   _add_contacts("contacts", obj.contacts);
@@ -347,7 +342,6 @@ objects& objects::operator<<(service const& obj) {
   _add_line("high_flap_threshold", obj.high_flap_threshold);
   _add_line("flap_detection_enabled", obj.flap_detection_enabled);
   _add_string("flap_detection_options", flap_detection_options);
-  _add_line("process_perf_data", obj.process_performance_data);
   _add_line("retain_status_information", obj.retain_status_information);
   _add_line("retain_nonstatus_information", obj.retain_nonstatus_information);
   _add_line("notification_interval", obj.notification_interval);
