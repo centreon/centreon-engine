@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17467,12 +17467,6 @@ int read_main_config_file(char const* main_config_file) {
 
     /* ignore external variables */
     else if(!strcmp(variable,"status_file"))
-      continue;
-    else if(!strcmp(variable,"perfdata_timeout"))
-      continue;
-    else if(strstr(variable,"host_perfdata")==variable)
-      continue;
-    else if(strstr(variable,"service_perfdata")==variable)
       continue;
     else if(strstr(input,"cfg_file=")==input || strstr(input,"cfg_dir=")==input)
       continue;
