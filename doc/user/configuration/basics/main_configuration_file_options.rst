@@ -2074,8 +2074,8 @@ have different local times associated with them. If not specified,
 Centreon Engine will use the system configured timezone.
 
 =========== ========================
-**Format**  use_timezone=<tz>
-**Example** use_timezone=US/Mountain
+**Format**  timezone=:<tz>
+**Example** timezone=:US/Mountain
 =========== ========================
 
 Illegal Object Name Characters

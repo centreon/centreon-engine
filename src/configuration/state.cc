@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -127,6 +127,7 @@ state::setters const state::_setters[] = {
   { "status_file",                                 SETTER(std::string const&, status_file) },
   { "status_update_interval",                      SETTER(unsigned int, status_update_interval) },
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
+  { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
   { "use_aggressive_host_checking",                SETTER(bool, use_aggressive_host_checking) },
   { "use_agressive_host_checking",                 SETTER(bool, use_aggressive_host_checking) },
