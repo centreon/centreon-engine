@@ -149,8 +149,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.debug_level() << std::endl
     << "debug_verbosity="
     << obj.debug_verbosity() << std::endl
-    << "enable_environment_macros="
-    << obj.enable_environment_macros() << std::endl
     << "enable_event_handlers="
     << obj.enable_event_handlers() << std::endl
     << "enable_flap_detection="

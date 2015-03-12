@@ -60,7 +60,6 @@ state::setters const state::_setters[] = {
   { "debug_file",                                  SETTER(std::string const&, debug_file) },
   { "debug_level",                                 SETTER(unsigned long, debug_level) },
   { "debug_verbosity",                             SETTER(unsigned int, debug_verbosity) },
-  { "enable_environment_macros",                   SETTER(bool, enable_environment_macros) },
   { "enable_event_handlers",                       SETTER(bool, enable_event_handlers) },
   { "enable_flap_detection",                       SETTER(bool, enable_flap_detection) },
   { "enable_notifications",                        SETTER(bool, enable_notifications) },
@@ -156,6 +155,7 @@ state::setters const state::_setters[] = {
   { "daemon_dumps_core",                           SETTER(std::string const&, _set_daemon_dumps_core) },
   { "downtime_file",                               SETTER(std::string const&, _set_downtime_file) },
   { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
+  { "enable_environment_macros",                   SETTER(bool, _set_enable_environment_macros) },
   { "enable_failure_prediction",                   SETTER(bool, _set_enable_failure_prediction) },
   { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
   { "host_perfdata_command",                       SETTER(std::string const&, _set_host_perfdata_command) },
@@ -209,7 +209,6 @@ static state::date_type const          default_date_format(state::us);
 static std::string const               default_debug_file(DEFAULT_DEBUG_FILE);
 static unsigned long const             default_debug_level(0);
 static unsigned int const              default_debug_verbosity(1);
-static bool const                      default_enable_environment_macros(false);
 static bool const                      default_enable_event_handlers(true);
 static bool const                      default_enable_flap_detection(false);
 static bool const                      default_enable_notifications(true);
@@ -336,7 +335,6 @@ state::state()
     _debug_file(default_debug_file),
     _debug_level(default_debug_level),
     _debug_verbosity(default_debug_verbosity),
-    _enable_environment_macros(default_enable_environment_macros),
     _enable_event_handlers(default_enable_event_handlers),
     _enable_flap_detection(default_enable_flap_detection),
     _enable_notifications(default_enable_notifications),
@@ -466,7 +464,6 @@ state& state::operator=(state const& right) {
     _debug_level = right._debug_level;
     _debug_verbosity = right._debug_verbosity;
     _downtimes = right._downtimes;
-    _enable_environment_macros = right._enable_environment_macros;
     _enable_event_handlers = right._enable_event_handlers;
     _enable_flap_detection = right._enable_flap_detection;
     _enable_notifications = right._enable_notifications;
@@ -592,7 +589,6 @@ bool state::operator==(state const& right) const throw () {
           && _debug_level == right._debug_level
           && _debug_verbosity == right._debug_verbosity
           && cmp_set_ptr(_downtimes, right._downtimes)
-          && _enable_environment_macros == right._enable_environment_macros
           && _enable_event_handlers == right._enable_event_handlers
           && _enable_flap_detection == right._enable_flap_detection
           && _enable_notifications == right._enable_notifications
@@ -1439,24 +1435,6 @@ void state::debug_verbosity(unsigned int value) {
     _debug_verbosity = static_cast<unsigned int>(most);
   else
     _debug_verbosity = value;
-}
-
-/**
- *  Get enable_environment_macros value.
- *
- *  @return The enable_environment_macros value.
- */
-bool state::enable_environment_macros() const throw () {
-  return (_enable_environment_macros);
-}
-
-/**
- *  Set enable_environment_macros value.
- *
- *  @param[in] value The new enable_environment_macros value.
- */
-void state::enable_environment_macros(bool value) {
-  _enable_environment_macros = value;
 }
 
 /**
@@ -3588,6 +3566,19 @@ void state::_set_enable_embedded_perl(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: enable_embedded_perl variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_enable_environment_macros(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: enable_environment_macros variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

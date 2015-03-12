@@ -19,16 +19,6 @@ Optimization Tips
     :ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
     option may provide you with better performance. Read more about what
     this option does :ref:`here <main_cfg_opt_large_installation_tweaks>`.
-  * Disable environment macros. Macros are normally made available to
-    check, notification, event handler, etc. commands as environment
-    variables. This can be a problem in a large Centreon Engine
-    installation, as it consumes some additional memory and (more
-    importantly) more CPU. If your scripts don't need to access the
-    macros as environment variables (e.g. you pass all necessary macros
-    on the command line), you don't need this feature. You can prevent
-    macros from being made available as environment variables by using
-    the :ref:`enable_environment_macros <main_cfg_opt_environment_macros>`
-    option.
   * Check Result Reaper Frequency. The
     :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
     variable determines how often Centreon Engine should check for host

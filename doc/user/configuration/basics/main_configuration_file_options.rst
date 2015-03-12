@@ -1296,27 +1296,6 @@ For maximum performance, this option must be disable.
 **Example** use_setpgid=1
 =========== =================
 
-.. _main_cfg_opt_environment_macros:
-
-Environment Macros Option
--------------------------
-
-This option determines whether or not the Centreon Engine daemon will
-make all standard :ref:`macros <standard_macros>` available as
-environment variables to your check, notification, event hander,
-etc. commands. In large Centreon Engine installations this can be
-problematic because it takes additional memory and (more importantly)
-CPU to compute the values of all macros and make them available to the
-environment.
-
-  * 0 = Don't make macros available as environment variables
-  * 1 = Make macros available as environment variables (default)
-
-=========== ===============================
-**Format**  enable_environment_macros=<0/1>
-**Example** enable_environment_macros=0
-=========== ===============================
-
 .. _main_cfg_opt_flap_detection:
 
 Flap Detection Option

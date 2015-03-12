@@ -1017,7 +1017,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->debug_file(new_cfg.debug_file());
   config->debug_level(new_cfg.debug_level());
   config->debug_verbosity(new_cfg.debug_verbosity());
-  config->enable_environment_macros(new_cfg.enable_environment_macros());
   config->enable_event_handlers(new_cfg.enable_event_handlers());
   config->enable_flap_detection(new_cfg.enable_flap_detection());
   config->enable_notifications(new_cfg.enable_notifications());

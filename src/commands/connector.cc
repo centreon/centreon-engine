@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -58,10 +58,6 @@ connector::connector(
   _process.enable_stream(process::err, false);
   // Set use setpgid.
   _process.setpgid_on_exec(config->use_setpgid());
-
-  if (config->enable_environment_macros())
-    logger(log_runtime_warning, basic)
-      << "Warning: Connector does not enable environment macros";
 }
 
 /**

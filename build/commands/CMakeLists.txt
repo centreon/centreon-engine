@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Scheduler.
 ##
@@ -29,7 +29,6 @@ set(
   # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/connector.cc"
-  "${SRC_DIR}/environment.cc"
   "${SRC_DIR}/forward.cc"
   "${SRC_DIR}/raw.cc"
   "${SRC_DIR}/result.cc"
@@ -39,7 +38,6 @@ set(
   "${INC_DIR}/command.hh"
   "${INC_DIR}/command_listener.hh"
   "${INC_DIR}/connector.hh"
-  "${INC_DIR}/environment.hh"
   "${INC_DIR}/forward.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/result.hh"

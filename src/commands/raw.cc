@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,7 +19,6 @@
 
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/commands/environment.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -130,13 +129,9 @@ unsigned long raw::run(
   logger(dbg_commands, basic)
     << "raw::run: id=" << command_id << ", process=" << p;
 
-  // Setup environement macros if is necessary.
-  environment env;
-  _build_environment_macros(macros, env);
-
   try {
     // Start process.
-    p->exec(processed_cmd.c_str(), env.data(), timeout);
+    p->exec(processed_cmd.c_str(), NULL, timeout);
     logger(dbg_commands, basic)
       << "raw::run: start process success: id=" << command_id;
   }
@@ -174,13 +169,9 @@ void raw::run(
   logger(dbg_commands, basic)
     << "raw::run: id=" << command_id << ", process=" << &p;
 
-  // Setup environement macros if is necessary.
-  environment env;
-  _build_environment_macros(macros, env);
-
   // Start process.
   try {
-    p.exec(processed_cmd.c_str(), env.data(), timeout);
+    p.exec(processed_cmd.c_str(), NULL, timeout);
     logger(dbg_commands, basic)
       << "raw::run: start process success: id=" << command_id;
   }
@@ -333,254 +324,6 @@ void raw::finished(process& p) throw () {
     // Release process, put into the free list.
     concurrency::locker lock(&_lock);
     _processes_free.push_back(&p);
-  }
-  return;
-}
-
-/**
- *  Build argv macro environment variables.
- *
- *  @param[in]  macros  The macros data struct.
- *  @param[out] env     The environment to fill.
- */
-void raw::_build_argv_macro_environment(
-            nagios_macros const& macros,
-            environment& env) {
-  for (unsigned int i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
-    char const* value(macros.argv[i] ? macros.argv[i] : "");
-    std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << value;
-    env.add(oss.str());
-  }
-  return;
-}
-
-/**
- *  Build contact address environment variables.
- *
- *  @param[in]  macros  The macros data struct.
- *  @param[out] env     The environment to fill.
- */
-void raw::_build_contact_address_environment(
-            nagios_macros const& macros,
-            environment& env) {
-  if (!macros.contact_ptr)
-    return;
-  for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i) {
-    char const* value(macros.contact_ptr->address[i]);
-    if (!value)
-      value = "";
-    std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << value;
-    env.add(oss.str());
-  }
-  return;
-}
-
-/**
- *  Build custom contact macro environment variables.
- *
- *  @param[in,out] macros  The macros data struct.
- *  @param[out]    env     The environment to fill.
- */
-void raw::_build_custom_contact_macro_environment(
-            nagios_macros& macros,
-            environment& env) {
-  // Build custom contact variable.
-  contact* hst(macros.contact_ptr);
-  if (hst) {
-    for (customvariablesmember* customvar(hst->custom_variables);
-         customvar;
-         customvar = customvar->next)
-      if (customvar->variable_name) {
-        char const* value(customvar->variable_value);
-        if (!value)
-          value = "";
-        std::string name("_CONTACT");
-        name.append(customvar->variable_name);
-        add_custom_variable_to_object(
-          &macros.custom_contact_vars,
-          name.c_str(),
-          value);
-      }
-  }
-  // Set custom contact variable into the environement
-  for (customvariablesmember* customvar(macros.custom_contact_vars);
-       customvar;
-       customvar = customvar->next)
-    if (customvar->variable_name) {
-      char const* value("");
-      if (customvar->variable_value)
-        value = clean_macro_chars(
-                  customvar->variable_value,
-                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(customvar->variable_name);
-      line.append("=");
-      line.append(value);
-      env.add(line);
-    }
-  return;
-}
-
-/**
- *  Build custom host macro environment variables.
- *
- *  @param[in,out] macros  The macros data struct.
- *  @param[out]    env     The environment to fill.
- */
-void raw::_build_custom_host_macro_environment(
-            nagios_macros& macros,
-            environment& env) {
-  // Build custom host variable.
-  host* hst(macros.host_ptr);
-  if (hst) {
-    for (customvariablesmember* customvar(hst->custom_variables);
-         customvar;
-         customvar = customvar->next)
-      if (customvar->variable_name) {
-        char const* value("");
-        if (customvar->variable_value)
-          value = customvar->variable_value;
-        std::string name("_HOST");
-        name.append(customvar->variable_name);
-        add_custom_variable_to_object(
-          &macros.custom_host_vars,
-          name.c_str(),
-          value);
-      }
-  }
-  // Set custom host variable into the environement
-  for (customvariablesmember* customvar(macros.custom_host_vars);
-       customvar;
-       customvar = customvar->next)
-    if (customvar->variable_name) {
-      char const* value("");
-      if (customvar->variable_value)
-        value = clean_macro_chars(
-                  customvar->variable_value,
-                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(customvar->variable_name);
-      line.append("=");
-      line.append(value);
-      env.add(line);
-    }
-  return;
-}
-
-/**
- *  Build custom service macro environment variables.
- *
- *  @param[in,out] macros  The macros data struct.
- *  @param[out]    env     The environment to fill.
- */
-void raw::_build_custom_service_macro_environment(
-            nagios_macros& macros,
-            environment& env) {
-  // Build custom service variable.
-  service* hst(macros.service_ptr);
-  if (hst) {
-    for (customvariablesmember* customvar(hst->custom_variables);
-         customvar;
-         customvar = customvar->next)
-      if (customvar->variable_name) {
-        char const* value(customvar->variable_value);
-        if (!value)
-          value = "";
-        std::string name("_SERVICE");
-        name.append(customvar->variable_name);
-        add_custom_variable_to_object(
-          &macros.custom_service_vars,
-          name.c_str(),
-          value);
-      }
-  }
-  // Set custom service variable into the environement
-  for (customvariablesmember* customvar(macros.custom_service_vars);
-       customvar;
-       customvar = customvar->next)
-    if (customvar->variable_name) {
-      char const* value("");
-      if (customvar->variable_value)
-        value = clean_macro_chars(
-                  customvar->variable_value,
-                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(customvar->variable_name);
-      line.append("=");
-      line.append(value);
-      env.add(line);
-    }
-  return;
-}
-
-/**
- *  Build all macro environemnt variable.
- *
- *  @param[in,out] macros  The macros data struct.
- *  @param[out]    env     The environment to fill.
- */
-void raw::_build_environment_macros(
-            nagios_macros& macros,
-            environment& env) {
-  if (config->enable_environment_macros()) {
-    _build_macrosx_environment(macros, env);
-    _build_argv_macro_environment(macros, env);
-    _build_custom_host_macro_environment(macros, env);
-    _build_custom_service_macro_environment(macros, env);
-    _build_custom_contact_macro_environment(macros, env);
-    _build_contact_address_environment(macros, env);
-  }
-  return;
-}
-
-/**
- *  Build macrox environment variables.
- *
- *  @param[in,out] macros  The macros data struct.
- *  @param[out]    env     The environment to fill.
- */
-void raw::_build_macrosx_environment(
-            nagios_macros& macros,
-            environment& env) {
-  for (unsigned int i(0); i < MACRO_X_COUNT; ++i) {
-    int release_memory(0);
-
-    // Need to grab macros?
-    if (!macros.x[i]) {
-      // Skip summary macro in lage instalation tweaks.
-      if ((i < MACRO_TOTALHOSTSUP
-           || i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
-          && !config->use_large_installation_tweaks()) {
-        grab_macrox_value_r(
-          &macros,
-          i,
-          NULL,
-          NULL,
-          &macros.x[i],
-          &release_memory);
-      }
-    }
-
-    // Add into the environment.
-    if (macro_x_names[i]) {
-      std::string line;
-      line.append(MACRO_ENV_VAR_PREFIX);
-      line.append(macro_x_names[i]);
-      line.append("=");
-      line.append(macros.x[i] ? macros.x[i] : "");
-      env.add(line);
-    }
-
-    // Release memory if necessary.
-    if (release_memory) {
-      delete[] macros.x[i];
-      macros.x[i] = NULL;
-    }
   }
   return;
 }

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Scheduler.
 ##
@@ -59,22 +59,6 @@ add_executable(
 )
 target_link_libraries("connector_restart" "cce_core")
 add_test("connector_restart" "connector_restart")
-
-# Test environment.
-add_executable("environment_add" "${TEST_DIR}/environment_add.cc")
-target_link_libraries("environment_add" "cce_core")
-add_test("environment_add" "environment_add")
-
-# Test environment.
-set(TEST_NAME "environment_compare")
-add_executable("${TEST_NAME}" "${TEST_DIR}/environment_compare.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test environment.
-add_executable("environment_ctor" "${TEST_DIR}/environment_ctor.cc")
-target_link_libraries("environment_ctor" "cce_core")
-add_test("environment_ctor" "environment_ctor")
 
 # Test result.
 add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")

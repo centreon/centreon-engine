@@ -143,7 +143,6 @@ unsigned int        currently_running_service_checks(0);
 unsigned int        date_format(DATE_FORMAT_US);
 unsigned int        debug_level(0);
 unsigned int        debug_verbosity(1);
-unsigned int        enable_environment_macros(false);
 unsigned int        enable_event_handlers(true);
 unsigned int        enable_flap_detection(false);
 unsigned int        enable_notifications(true);

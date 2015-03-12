@@ -176,8 +176,6 @@ namespace               configuration {
     void                debug_verbosity(unsigned int value);
     std::set<shared_ptr<downtime> >&
                         downtimes() throw();
-    bool                enable_environment_macros() const throw ();
-    void                enable_environment_macros(bool value);
     bool                enable_event_handlers() const throw ();
     void                enable_event_handlers(bool value);
     bool                enable_flap_detection() const throw ();
@@ -408,6 +406,7 @@ namespace               configuration {
     void                _set_date_format(std::string const& value);
     void                _set_downtime_file(std::string const& value);
     void                _set_enable_embedded_perl(std::string const& value);
+    void                _set_enable_environment_macros(bool value);
     void                _set_enable_failure_prediction(bool value);
     void                _set_event_broker_options(std::string const& value);
     void                _set_free_child_process_memory(std::string const& value);
@@ -510,7 +509,6 @@ namespace               configuration {
     unsigned int        _debug_verbosity;
     std::set<shared_ptr<downtime> >
                         _downtimes;
-    bool                _enable_environment_macros;
     bool                _enable_event_handlers;
     bool                _enable_flap_detection;
     bool                _enable_notifications;

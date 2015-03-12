@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -83,40 +83,6 @@ static bool run_with_timeout() {
 }
 
 /**
- *  Check if the command line result are ok with some macros arguments.
- *
- *  @return true if ok, false otherwise.
- */
-static bool run_with_environment_macros() {
-  // Enable environment macros in configuration.
-  config->enable_environment_macros(true);
-
-  // Get environment macros.
-  nagios_macros mac;
-  memset(&mac, 0, sizeof(mac));
-  char const* argv = "default_arg";
-  mac.argv[0] = new char[strlen(argv) + 1];
-  strcpy(mac.argv[0], argv);
-
-  // Raw command object and its waiter.
-  shared_ptr<raw> cmd(new raw(__func__, "./bin_test_run --check_macros"));
-  wait_process wait_proc(cmd.get());
-  set::instance().add_command(cmd);
-
-  // Run command and wait for it to exit.
-  unsigned long id(cmd->run(cmd->get_command_line(), mac, 0));
-  wait_proc.wait();
-  delete [] mac.argv[0];
-
-  // Check result.
-  result const& res = wait_proc.get_result();
-  return (!((res.command_id != id)
-            || (res.exit_code != STATE_OK)
-            || (res.exit_status != process::normal)
-            || (res.output != cmd->get_command_line())));
-}
-
-/**
  *  Check if single quotes are supported.
  *
  *  @return true if ok, false otherwise.
@@ -181,8 +147,6 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "raw::run without timeout failed");
   if (!run_with_timeout())
     throw (engine_error() << "raw::run with timeout failed");
-  if (!run_with_environment_macros())
-    throw (engine_error() << "raw::run with macros failed");
   if (!run_with_single_quotes())
     throw (engine_error() << "raw::run with single quotes failed");
   if (!run_with_double_quotes())

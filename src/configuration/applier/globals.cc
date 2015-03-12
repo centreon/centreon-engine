@@ -62,7 +62,6 @@ void applier::globals::apply(state& config) {
   ::date_format = config.date_format();
   ::debug_level = config.debug_level();
   ::debug_verbosity = config.debug_verbosity();
-  ::enable_environment_macros = config.enable_environment_macros();
   ::enable_event_handlers = config.enable_event_handlers();
   ::enable_flap_detection = config.enable_flap_detection();
   ::enable_notifications = config.enable_notifications();

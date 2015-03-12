@@ -107,7 +107,6 @@ struct                global {
   std::string         debug_file;
   // unsigned long       debug_level;
   unsigned int        debug_verbosity;
-  bool                enable_environment_macros;
   bool                enable_event_handlers;
   bool                enable_flap_detection;
   bool                enable_notifications;
@@ -311,7 +310,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(debug_file);
   // check_value(debug_level);
   check_value(debug_verbosity);
-  check_value(enable_environment_macros);
   check_value(enable_event_handlers);
   check_value(enable_flap_detection);
   check_value(enable_notifications);
@@ -570,7 +568,6 @@ static global get_globals() {
   g.debug_file = to_str(debug_file);
   // g.debug_level = debug_level;
   g.debug_verbosity = debug_verbosity;
-  g.enable_environment_macros = enable_environment_macros;
   g.enable_event_handlers = enable_event_handlers;
   g.enable_flap_detection = enable_flap_detection;
   g.enable_notifications = enable_notifications;

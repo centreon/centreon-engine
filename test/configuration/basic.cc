@@ -208,7 +208,6 @@ static std::map<std::string, std::string> build_configuration(
   var["use_regexp_matching"] = obj2str(my_rand(0, 1)) ;
   var["use_true_regexp_matching"] = obj2str(my_rand(0, 1));
   var["use_large_installation_tweaks"] = obj2str(my_rand(0, 1));
-  var["enable_environment_macros"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
 
   std::ofstream ofs(mainconf.c_str());
@@ -470,9 +469,6 @@ void test_configuration(
   }
   if (my_conf["use_large_installation_tweaks"] != obj2str(config->use_large_installation_tweaks())) {
     throw (engine_error() << "use_large_installation_tweaks: init with '" << my_conf["use_large_installation_tweaks"] << "'");
-  }
-  if (my_conf["enable_environment_macros"] != obj2str(config->enable_environment_macros())) {
-    throw (engine_error() << "enable_environment_macros: init with '" << my_conf["enable_environment_macros"] << "'");
   }
   if (my_conf["external_command_buffer_slots"] != obj2str(config->external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");

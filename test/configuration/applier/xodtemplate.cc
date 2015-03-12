@@ -15990,9 +15990,6 @@ int read_main_config_file(char const* main_config_file) {
       use_large_installation_tweaks=(atoi(value)>0)?true:false;
     }
 
-    else if(!strcmp(variable,"enable_environment_macros"))
-      enable_environment_macros=(atoi(value)>0)?true:false;
-
     else if(!strcmp(variable,"external_command_buffer_slots"))
       external_command_buffer_slots=atoi(value);
 
