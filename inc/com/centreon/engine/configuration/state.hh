@@ -124,10 +124,6 @@ namespace               configuration {
     void                check_external_commands(bool value);
     bool                check_host_freshness() const throw ();
     void                check_host_freshness(bool value);
-    bool                check_orphaned_hosts() const throw ();
-    void                check_orphaned_hosts(bool value);
-    void                check_orphaned_services(bool value);
-    bool                check_orphaned_services() const throw ();
     unsigned int        check_reaper_interval() const throw ();
     void                check_reaper_interval(unsigned int value);
     std::string const&  check_result_path() const throw ();
@@ -397,6 +393,8 @@ namespace               configuration {
     void                _set_broker_module(std::string const& value);
     void                _set_cfg_dir(std::string const& value);
     void                _set_cfg_file(std::string const& value);
+    void                _set_check_for_orphaned_hosts(bool value);
+    void                _set_check_for_orphaned_services(bool value);
     void                _set_check_for_updates(std::string const& value);
     void                _set_check_result_path(std::string const& value);
     void                _set_child_processes_fork_twice(std::string const& value);
@@ -491,8 +489,6 @@ namespace               configuration {
     std::string         _cfg_main;
     bool                _check_external_commands;
     bool                _check_host_freshness;
-    bool                _check_orphaned_hosts;
-    bool                _check_orphaned_services;
     unsigned int        _check_reaper_interval;
     std::string         _check_result_path;
     bool                _check_service_freshness;

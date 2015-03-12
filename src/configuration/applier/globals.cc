@@ -54,8 +54,6 @@ void applier::globals::apply(state& config) {
   ::cached_service_check_horizon = config.cached_service_check_horizon();
   ::check_external_commands = config.check_external_commands();
   ::check_host_freshness = config.check_host_freshness();
-  ::check_orphaned_hosts = config.check_orphaned_hosts();
-  ::check_orphaned_services = config.check_orphaned_services();
   ::check_reaper_interval = config.check_reaper_interval();
   ::check_service_freshness = config.check_service_freshness();
   ::command_check_interval = config.command_check_interval();

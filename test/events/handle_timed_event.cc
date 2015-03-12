@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -153,18 +153,6 @@ static void check_event_check_reaper() {
   timed_event event;
   memset(&event, 0, sizeof(event));
   event.event_type = EVENT_CHECK_REAPER;
-
-  handle_timed_event(&event);
-}
-
-/**
- *  Check the event orphan check.
- */
-static void check_event_orphan_check() {
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_ORPHAN_CHECK;
 
   handle_timed_event(&event);
 }
@@ -400,7 +388,6 @@ int main_test(int argc, char** argv) {
   check_event_program_shutdown();
   check_event_program_restart();
   check_event_check_reaper();
-  check_event_orphan_check();
   check_event_retention_save();
   check_event_status_save();
   check_event_scheduled_downtime();

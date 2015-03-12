@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -379,8 +379,7 @@ void checker::run(
   // Time to start command.
   gettimeofday(&start_time, NULL);
 
-  // Set check time for on-demand checks, so they're
-  // not incorrectly detected as being orphaned.
+  // Set check time for on-demand checks.
   if (!scheduled_check)
     hst->next_check = start_time.tv_sec;
 

@@ -49,8 +49,6 @@ state::setters const state::_setters[] = {
   { "cfg_dir",                                     SETTER(std::string const&, _set_cfg_dir) },
   { "cfg_file",                                    SETTER(std::string const&, _set_cfg_file) },
   { "check_external_commands",                     SETTER(bool, check_external_commands) },
-  { "check_for_orphaned_hosts",                    SETTER(bool, check_orphaned_hosts) },
-  { "check_for_orphaned_services",                 SETTER(bool, check_orphaned_services) },
   { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
   { "check_result_reaper_frequency",               SETTER(unsigned int, check_reaper_interval) },
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
@@ -148,6 +146,8 @@ state::setters const state::_setters[] = {
   { "allow_empty_hostgroup_assignment",            SETTER(bool, _set_allow_empty_hostgroup_assignment) },
   { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
   { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
+  { "check_for_orphaned_hosts",                    SETTER(bool, _set_check_for_orphaned_hosts) },
+  { "check_for_orphaned_services",                 SETTER(bool, _set_check_for_orphaned_services) },
   { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
   { "check_result_path",                           SETTER(std::string const&, _set_check_result_path) },
   { "child_processes_fork_twice",                  SETTER(std::string const&, _set_child_processes_fork_twice) },
@@ -198,8 +198,6 @@ static unsigned long const             default_cached_host_check_horizon(15);
 static unsigned long const             default_cached_service_check_horizon(15);
 static bool const                      default_check_external_commands(true);
 static bool const                      default_check_host_freshness(false);
-static bool const                      default_check_orphaned_hosts(true);
-static bool const                      default_check_orphaned_services(true);
 static unsigned int const              default_check_reaper_interval(10);
 static std::string const               default_check_result_path(DEFAULT_CHECK_RESULT_PATH);
 static bool const                      default_check_service_freshness(true);
@@ -323,8 +321,6 @@ state::state()
     _cached_service_check_horizon(default_cached_service_check_horizon),
     _check_external_commands(default_check_external_commands),
     _check_host_freshness(default_check_host_freshness),
-    _check_orphaned_hosts(default_check_orphaned_hosts),
-    _check_orphaned_services(default_check_orphaned_services),
     _check_reaper_interval(default_check_reaper_interval),
     _check_result_path(default_check_result_path),
     _check_service_freshness(default_check_service_freshness),
@@ -447,8 +443,6 @@ state& state::operator=(state const& right) {
     _cached_service_check_horizon = right._cached_service_check_horizon;
     _check_external_commands = right._check_external_commands;
     _check_host_freshness = right._check_host_freshness;
-    _check_orphaned_hosts = right._check_orphaned_hosts;
-    _check_orphaned_services = right._check_orphaned_services;
     _check_reaper_interval = right._check_reaper_interval;
     _check_result_path = right._check_result_path;
     _check_service_freshness = right._check_service_freshness;
@@ -572,8 +566,6 @@ bool state::operator==(state const& right) const throw () {
           && _cached_service_check_horizon == right._cached_service_check_horizon
           && _check_external_commands == right._check_external_commands
           && _check_host_freshness == right._check_host_freshness
-          && _check_orphaned_hosts == right._check_orphaned_hosts
-          && _check_orphaned_services == right._check_orphaned_services
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
@@ -948,42 +940,6 @@ bool state::check_host_freshness() const throw () {
  */
 void state::check_host_freshness(bool value) {
   _check_host_freshness = value;
-}
-
-/**
- *  Get check_orphaned_hosts value.
- *
- *  @return The check_orphaned_hosts value.
- */
-bool state::check_orphaned_hosts() const throw () {
-  return (_check_orphaned_hosts);
-}
-
-/**
- *  Set check_orphaned_hosts value.
- *
- *  @param[in] value The new check_orphaned_hosts value.
- */
-void state::check_orphaned_hosts(bool value) {
-  _check_orphaned_hosts = value;
-}
-
-/**
- *  Set check_orphaned_services value.
- *
- *  @param[in] value The new check_orphaned_services value.
- */
-void state::check_orphaned_services(bool value) {
-  _check_orphaned_services = value;
-}
-
-/**
- *  Get check_orphaned_services value.
- *
- *  @return The check_orphaned_services value.
- */
-bool state::check_orphaned_services() const throw () {
-  return (_check_orphaned_services);
 }
 
 /**
@@ -3452,6 +3408,32 @@ void state::_set_cfg_file(std::string const& value) {
     std::string base_name(fe.directory_name());
     _cfg_file.push_back(base_name + "/" + value);
   }
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_check_for_orphaned_hosts(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_for_orphaned_hosts variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_check_for_orphaned_services(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_for_orphaned_services variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

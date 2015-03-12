@@ -1627,56 +1627,6 @@ is enabled.
 **Example** ochp_command=obsessive_host_handler
 =========== ===================================
 
-Orphaned Service Check Option
------------------------------
-
-This option allows you to enable or disable checks for orphaned service
-checks. Orphaned service checks are checks which have been executed and
-have been removed from the event queue, but have not had any results
-reported in a long time. Since no results have come back in for the
-service, it is not rescheduled in the event queue. This can cause
-service checks to stop being executed. Normally it is very rare for this
-to happen - it might happen if an external user or process killed off
-the process that was being used to execute a service check. If this
-option is enabled and Centreon Engine finds that results for a
-particular service check have not come back, it will log an error
-message and reschedule the service check. If you start seeing service
-checks that never seem to get rescheduled, enable this option and see if
-you notice any log messages about orphaned services.
-
-  * 0 = Don't check for orphaned service checks
-  * 1 = Check for orphaned service checks (default)
-
-=========== =================================
-**Format**  check_for_orphaned_services=<0/1>
-**Example** check_for_orphaned_services=1
-=========== =================================
-
-Orphaned Host Check Option
---------------------------
-
-This option allows you to enable or disable checks for orphaned hoste
-checks. Orphaned host checks are checks which have been executed and
-have been removed from the event queue, but have not had any results
-reported in a long time. Since no results have come back in for the
-host, it is not rescheduled in the event queue. This can cause host
-checks to stop being executed. Normally it is very rare for this to
-happen - it might happen if an external user or process killed off the
-process that was being used to execute a host check. If this option is
-enabled and Centreon Engine finds that results for a particular host
-check have not come back, it will log an error message and reschedule
-the host check. If you start seeing host checks that never seem to get
-rescheduled, enable this option and see if you notice any log messages
-about orphaned hosts.
-
-  * 0 = Don't check for orphaned host checks
-  * 1 = Check for orphaned host checks (default)
-
-=========== ==============================
-**Format**  check_for_orphaned_hosts=<0/1>
-**Example** check_for_orphaned_hosts=1
-=========== ==============================
-
 .. _main_cfg_opt_service_freshness_checking:
 
 Service Freshness Checking Option

@@ -226,8 +226,6 @@ extern unsigned int interval_length;
 extern unsigned int check_external_commands;
 /* command_check_interval_is_seconds; */
 extern int command_check_interval;
-extern unsigned int check_orphaned_services;
-extern unsigned int check_orphaned_hosts;
 extern unsigned int check_service_freshness;
 extern unsigned int check_host_freshness;
 extern unsigned int service_freshness_check_interval;

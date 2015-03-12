@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2006      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -106,8 +106,6 @@ void schedule_host_check(
 unsigned int check_service_dependencies(
                service* svc,
                int dependency_type);
-// checks for orphaned services
-void check_for_orphaned_services();
 // checks the "freshness" of service check results
 void check_service_result_freshness();
 // determines if a service's check results are fresh
@@ -119,8 +117,6 @@ int is_service_result_fresh(
 unsigned int check_host_dependencies(
                host* hst,
                int dependency_type);
-// checks for orphaned hosts
-void check_for_orphaned_hosts();
 // checks the "freshness" of host check results
 void check_host_result_freshness();
 // determines if a host's check results are fresh

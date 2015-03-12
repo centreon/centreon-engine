@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1509,67 +1509,6 @@ unsigned int check_service_dependencies(
   return (DEPENDENCIES_OK);
 }
 
-/* check for services that never returned from a check... */
-void check_for_orphaned_services() {
-  service* temp_service = NULL;
-  time_t current_time = 0L;
-  time_t expected_time = 0L;
-
-  logger(dbg_functions, basic)
-    << "check_for_orphaned_services()";
-
-  /* get the current time */
-  time(&current_time);
-
-  /* check all services... */
-  for (temp_service = service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
-
-    /* skip services that are not currently executing */
-    if (temp_service->is_executing == false)
-      continue;
-
-    /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
-    expected_time
-      = (time_t)(temp_service->next_check + temp_service->latency
-                 + temp_service->check_timeout ? temp_service->check_timeout :
-                                                 config->service_check_timeout()
-                 + config->check_reaper_interval() + 600);
-
-    /* this service was supposed to have executed a while ago, but for some reason the results haven't come back in... */
-    if (expected_time < current_time) {
-
-      /* log a warning */
-      logger(log_runtime_warning, basic)
-        << "Warning: The check of service '"
-        << temp_service->description << "' on host '"
-        << temp_service->host_name << "' looks like it was orphaned "
-        "(results never came back).  I'm scheduling an immediate check "
-        "of the service...";
-
-      logger(dbg_checks, more)
-        << "Service '" << temp_service->description
-        << "' on host '" << temp_service->host_name
-        << "' was orphaned, so we're scheduling an immediate check...";
-
-      /* decrement the number of running service checks */
-      if (currently_running_service_checks > 0)
-        currently_running_service_checks--;
-
-      /* disable the executing flag */
-      temp_service->is_executing = false;
-
-      /* schedule an immediate check of the service */
-      schedule_service_check(
-        temp_service,
-        current_time,
-        CHECK_OPTION_ORPHAN_CHECK);
-    }
-  }
-  return;
-}
-
 /* check freshness of service results */
 void check_service_result_freshness() {
   service* temp_service = NULL;
@@ -1598,7 +1537,7 @@ void check_service_result_freshness() {
     if (temp_service->check_freshness == false)
       continue;
 
-    /* skip services that are currently executing (problems here will be caught by orphaned service check) */
+    /* skip services that are currently executing */
     if (temp_service->is_executing == true)
       continue;
 
@@ -1995,68 +1934,6 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
   return (DEPENDENCIES_OK);
 }
 
-/* check for hosts that never returned from a check... */
-void check_for_orphaned_hosts() {
-  host* temp_host = NULL;
-  time_t current_time = 0L;
-  time_t expected_time = 0L;
-
-  logger(dbg_functions, basic)
-    << "check_for_orphaned_hosts()";
-
-  /* get the current time */
-  time(&current_time);
-
-  /* check all hosts... */
-  for (temp_host = host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-
-    /* skip hosts that don't have a set check interval (on-demand checks are missed by the orphan logic) */
-    if (temp_host->next_check == (time_t)0L)
-      continue;
-
-    /* skip hosts that are not currently executing */
-    if (temp_host->is_executing == false)
-      continue;
-
-    /* determine the time at which the check results should have come in (allow 10 minutes slack time) */
-    expected_time
-      = (time_t)(temp_host->next_check + temp_host->latency
-                 + temp_host->check_timeout ? temp_host->check_timeout :
-                                              config->host_check_timeout()
-                 + config->check_reaper_interval() + 600);
-
-    /* this host was supposed to have executed a while ago, but for some reason the results haven't come back in... */
-    if (expected_time < current_time) {
-
-      /* log a warning */
-      logger(log_runtime_warning, basic)
-        << "Warning: The check of host '" << temp_host->name
-        << "' looks like it was orphaned (results never came back).  "
-        "I'm scheduling an immediate check of the host...";
-
-      logger(dbg_checks, more)
-        << "Host '" << temp_host->name
-        << "' was orphaned, so we're scheduling an immediate check...";
-
-      /* decrement the number of running host checks */
-      if (currently_running_host_checks > 0)
-        currently_running_host_checks--;
-
-      /* disable the executing flag */
-      temp_host->is_executing = false;
-
-      /* schedule an immediate check of the host */
-      schedule_host_check(
-        temp_host,
-        current_time,
-        CHECK_OPTION_ORPHAN_CHECK);
-    }
-  }
-  return;
-}
-
 /* check freshness of host results */
 void check_host_result_freshness() {
   host* temp_host = NULL;
@@ -2091,7 +1968,7 @@ void check_host_result_freshness() {
         && temp_host->accept_passive_host_checks == false)
       continue;
 
-    /* skip hosts that are currently executing (problems here will be caught by orphaned host check) */
+    /* skip hosts that are currently executing */
     if (temp_host->is_executing == true)
       continue;
 

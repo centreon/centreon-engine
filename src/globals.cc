@@ -134,8 +134,6 @@ unsigned int        auto_rescheduling_interval(30);
 unsigned int        auto_rescheduling_window(180);
 unsigned int        check_external_commands(true);
 unsigned int        check_host_freshness(false);
-unsigned int        check_orphaned_hosts(true);
-unsigned int        check_orphaned_services(true);
 unsigned int        check_reaper_interval(10);
 unsigned int        check_service_freshness(true);
 unsigned int        currently_running_host_checks(0);

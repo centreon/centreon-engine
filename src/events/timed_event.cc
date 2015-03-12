@@ -2,7 +2,7 @@
 ** Copyright 2007-2008 Ethan Galstad
 ** Copyright 2007,2010 Andreas Ericsson
 ** Copyright 2010      Max Schubert
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -132,24 +132,6 @@ static void _exec_event_check_reaper(timed_event* event) {
 
   // reap host and service check results.
   reap_check_results();
-  return;
-}
-
-/**
- *  Execute orphan check.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_orphan_check(timed_event* event) {
-  (void)event;
-  logger(dbg_events, basic)
-    << "** Orphaned Host and Service Check Event";
-
-  // check for orphaned hosts and services.
-  if (config->check_orphaned_hosts())
-    check_for_orphaned_hosts();
-  if (config->check_orphaned_services())
-    check_for_orphaned_services();
   return;
 }
 
@@ -657,7 +639,6 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_program_shutdown,
     &_exec_event_program_restart,
     &_exec_event_check_reaper,
-    &_exec_event_orphan_check,
     &_exec_event_retention_save,
     &_exec_event_status_save,
     &_exec_event_scheduled_downtime,
@@ -930,7 +911,6 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_PROGRAM_SHUTDOWN",
     "EVENT_PROGRAM_RESTART",
     "EVENT_CHECK_REAPER",
-    "EVENT_ORPHAN_CHECK",
     "EVENT_RETENTION_SAVE",
     "EVENT_STATUS_SAVE",
     "EVENT_SCHEDULED_DOWNTIME",

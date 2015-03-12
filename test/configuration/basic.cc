@@ -183,8 +183,6 @@ static std::map<std::string, std::string> build_configuration(
   var["sleep_time"] = obj2str(my_rand(0.1f, 10000.0f));
   var["interval_length"] = obj2str(my_rand(1, 10000));
   var["check_external_commands"] = obj2str(my_rand(0, 1));
-  var["check_for_orphaned_services"] = obj2str(my_rand(0, 1));
-  var["check_for_orphaned_hosts"] = obj2str(my_rand(0, 1));
   var["check_service_freshness"] = obj2str(my_rand(0, 1));
   var["check_host_freshness"] = obj2str(my_rand(0, 1));
   var["service_freshness_check_interval"] = obj2str(my_rand(1));
@@ -412,12 +410,6 @@ void test_configuration(
   }
   if (my_conf["check_external_commands"] != obj2str(config->check_external_commands())) {
     throw (engine_error() << "check_external_commands: init with '" << my_conf["check_external_commands"] << "'");
-  }
-  if (my_conf["check_for_orphaned_services"] != obj2str(config->check_orphaned_services())) {
-    throw (engine_error() << "check_for_orphaned_services: init with '" << my_conf["check_for_orphaned_services"] << "'");
-  }
-  if (my_conf["check_for_orphaned_hosts"] != obj2str(config->check_orphaned_hosts())) {
-    throw (engine_error() << "check_for_orphaned_hosts: init with '" << my_conf["check_for_orphaned_hosts"] << "'");
   }
   if (my_conf["check_service_freshness"] != obj2str(config->check_service_freshness())) {
     throw (engine_error() << "check_service_freshness: init with '" << my_conf["check_service_freshness"] << "'");

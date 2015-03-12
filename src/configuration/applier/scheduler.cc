@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -232,7 +232,6 @@ applier::scheduler::scheduler()
   : _evt_check_reaper(NULL),
     _evt_command_check(NULL),
     _evt_hfreshness_check(NULL),
-    _evt_orphan_check(NULL),
     _evt_reschedule_checks(NULL),
     _evt_retention_save(NULL),
     _evt_sfreshness_check(NULL),
@@ -306,21 +305,6 @@ void applier::scheduler::_apply_misc_event() {
             config->host_freshness_check_interval());
     _old_host_freshness_check_interval
       = config->host_freshness_check_interval();
-  }
-
-  // Remove and add an orphaned check event.
-  if ((!_evt_orphan_check && config->check_orphaned_services())
-      || (!_evt_orphan_check && config->check_orphaned_hosts())
-      || (_evt_orphan_check
-          && !config->check_orphaned_services()
-          && !config->check_orphaned_hosts())) {
-    _remove_misc_event(_evt_orphan_check);
-    if (config->check_orphaned_services()
-        || config->check_orphaned_hosts())
-      _evt_orphan_check = _create_misc_event(
-                            EVENT_ORPHAN_CHECK,
-                            now + DEFAULT_ORPHAN_CHECK_INTERVAL,
-                            DEFAULT_ORPHAN_CHECK_INTERVAL);
   }
 
   // Remove and add a host and service check rescheduling event.

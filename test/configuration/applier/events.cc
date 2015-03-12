@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -668,21 +668,6 @@ void init_timing_loop() {
     NULL,
     NULL,
     0);
-
-  /* add an orphaned check event */
-  if (config->check_orphaned_services() == true
-      || config->check_orphaned_hosts() == true)
-    schedule_new_event(
-      EVENT_ORPHAN_CHECK,
-      true,
-      current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
-      true,
-      DEFAULT_ORPHAN_CHECK_INTERVAL,
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
 
   /* add a service result "freshness" check event */
   if (config->check_service_freshness() == true)

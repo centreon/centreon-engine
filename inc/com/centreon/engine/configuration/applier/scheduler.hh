@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -95,7 +95,6 @@ namespace                 configuration {
       timed_event_struct* _evt_check_reaper;
       timed_event_struct* _evt_command_check;
       timed_event_struct* _evt_hfreshness_check;
-      timed_event_struct* _evt_orphan_check;
       timed_event_struct* _evt_reschedule_checks;
       timed_event_struct* _evt_retention_save;
       timed_event_struct* _evt_sfreshness_check;

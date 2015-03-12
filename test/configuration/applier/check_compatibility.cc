@@ -96,8 +96,6 @@ struct                global {
   unsigned long       cached_service_check_horizon;
   bool                check_external_commands;
   bool                check_host_freshness;
-  bool                check_orphaned_hosts;
-  bool                check_orphaned_services;
   unsigned int        check_reaper_interval;
   std::string         check_result_path;
   bool                check_service_freshness;
@@ -299,8 +297,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(cached_service_check_horizon);
   check_value(check_external_commands);
   check_value(check_host_freshness);
-  check_value(check_orphaned_hosts);
-  check_value(check_orphaned_services);
   check_value(check_reaper_interval);
   check_value(check_result_path);
   check_value(check_service_freshness);
@@ -557,8 +553,6 @@ static global get_globals() {
   g.cached_service_check_horizon = cached_service_check_horizon;
   g.check_external_commands = check_external_commands;
   g.check_host_freshness = check_host_freshness;
-  g.check_orphaned_hosts = check_orphaned_hosts;
-  g.check_orphaned_services = check_orphaned_services;
   g.check_reaper_interval = check_reaper_interval;
   g.check_result_path = to_str(check_result_path);
   g.check_service_freshness = check_service_freshness;
