@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1236,106 +1236,6 @@ int centreonengine__hostSetEventHandlerEnabled(
 
   // Set value.
   hst->event_handler_enabled = enable;
-
-  // Notify event broker.
-  notify_event_broker(hst);
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**************************************
-*                                     *
-*         Failure Prediction          *
-*                                     *
-**************************************/
-
-/**
- *  Check if failure prediction is enabled on host.
- *
- *  @param[in]  s       SOAP object.
- *  @param[in]  host_id Target host.
- *  @param[out] res     true if failure prediction is enabled.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__hostGetFailurePredictionEnabled(
-      soap* s,
-      ns1__hostIDType* host_id,
-      bool& res) {
-  // Begin try block.
-  COMMAND_BEGIN(host_id->name)
-
-  // Find target host.
-  host* hst(find_target_host(host_id->name.c_str()));
-
-  // Set requested value.
-  res = hst->failure_prediction_enabled;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Get host failure prediction options.
- *
- *  @param[in]  s       SOAP object.
- *  @param[in]  host_id Target host.
- *  @param[out] res     Failure prediction options.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__hostGetFailurePredictionOptions(
-      soap* s,
-      ns1__hostIDType* host_id,
-      std::string& res) {
-  // Begin try block.
-  COMMAND_BEGIN(host_id->name)
-
-  // Find target host.
-  host* hst(find_target_host(host_id->name.c_str()));
-
-  // Set requested value.
-  if (hst->failure_prediction_options)
-    res = hst->failure_prediction_options;
-  else
-    res.clear();
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Enable or disable failure prediction on host.
- *
- *  @param[in]  s       SOAP object.
- *  @param[in]  host_id Target host.
- *  @param[in]  enable  true to enable, false to disable.
- *  @param[out] res     Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__hostSetFailurePredictionEnabled(
-      soap* s,
-      ns1__hostIDType* host_id,
-      bool enable,
-      centreonengine__hostSetFailurePredictionEnabledResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(host_id->name << ", " << enable)
-
-  // Find target host.
-  host* hst(find_target_host(host_id->name.c_str()));
-
-  // Set property.
-  hst->failure_prediction_enabled = enable;
 
   // Notify event broker.
   notify_event_broker(hst);

@@ -706,13 +706,6 @@
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- getFailurePredictionEnabled() -->
-    <operation name="getFailurePredictionEnabled">
-      <documentation>Check if failure prediction is globally enabled.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:booleanResponse"/>
-    </operation>
-
     <!-- getFlapDetectionEnabled() -->
     <operation name="getFlapDetectionEnabled">
       <documentation>Check if flap detection is globally enabled.</documentation>
@@ -800,13 +793,6 @@
     <!-- setEventHandlersEnabled(enable) -->
     <operation name="setEventHandlersEnabled">
       <documentation>Enable or disable event handlers globally.</documentation>
-      <input message="tns:booleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setFailurePredictionEnabled(enable) -->
-    <operation name="setFailurePredictionEnabled">
-      <documentation>Enable or disable failure prediction globally.</documentation>
       <input message="tns:booleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -970,13 +956,6 @@
       <documentation>Get the contact alias.</documentation>
       <input message="tns:contactRequest"/>
       <output message="tns:stringResponse"/>
-    </operation>
-
-    <!-- contactGetCanSubmitCommands(contact) -->
-    <operation name="contactGetCanSubmitCommands">
-      <documentation>Check if the contact can submit external commands.</documentation>
-      <input message="tns:contactRequest"/>
-      <output message="tns:booleanResponse"/>
     </operation>
 
     <!-- contactGetCustomVariable(contact_id, variable_name) -->
@@ -1179,13 +1158,6 @@
     <operation name="contactSetAlias">
       <documentation>Set the contact alias.</documentation>
       <input message="tns:contactStringRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactSetCanSubmitCommands(contact, enable) -->
-    <operation name="contactSetCanSubmitCommands">
-      <documentation>Enable a contact to submit commands.</documentation>
-      <input message="tns:contactBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1598,31 +1570,6 @@
     <!-- hostSetEventHandlerEnabled(host, enable) -->
     <operation name="hostSetEventHandlerEnabled">
       <documentation>Enable or disable host event handler.</documentation>
-      <input message="tns:hostBooleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
-	 Failure Prediction.
-     -->
-
-    <!-- hostGetFailurePredictionEnabled(host) -->
-    <operation name="hostGetFailurePredictionEnabled">
-      <documentation>Check if failure prediction is enabled on host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:booleanResponse"/>
-    </operation>
-
-    <!-- hostGetFailurePredictionOptions(host) -->
-    <operation name="hostGetFailurePredictionOptions">
-      <documentation>Get host failure prediction options.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:stringResponse"/>
-    </operation>
-
-    <!-- hostSetFailurePredictionEnabled(host, enable) -->
-    <operation name="hostSetFailurePredictionEnabled">
-      <documentation>Enable or disable failure prediction on host.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -2477,31 +2424,6 @@
     <!-- serviceSetEventHandlerEnabled(service, enable) -->
     <operation name="serviceSetEventHandlerEnabled">
       <documentation>Enable or disable service event handler.</documentation>
-      <input message="tns:serviceBooleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!--
-	 Failure Prediction.
-     -->
-
-    <!-- serviceGetFailurePredictionEnabled(service) -->
-    <operation name="serviceGetFailurePredictionEnabled">
-      <documentation>Check if failure prediction is enabled on service.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:booleanResponse"/>
-    </operation>
-
-    <!-- serviceGetFailurePredictionOptions(service) -->
-    <operation name="serviceGetFailurePredictionOptions">
-      <documentation>Get service failure prediction options.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:stringResponse"/>
-    </operation>
-
-    <!-- serviceSetFailurePredictionEnabled(service, enable) -->
-    <operation name="serviceSetFailurePredictionEnabled">
-      <documentation>Enable or disable failure prediction on service.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -3571,12 +3493,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="getFailurePredictionEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="getFlapDetectionEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -3650,12 +3566,6 @@
     </operation>
 
     <operation name="setEventHandlersEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setFailurePredictionEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -3771,12 +3681,6 @@
      -->
 
     <operation name="contactGetAlias">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactGetCanSubmitCommands">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -3933,12 +3837,6 @@
     </operation>
 
     <operation name="contactSetAlias">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactSetCanSubmitCommands">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4270,24 +4168,6 @@
     </operation>
 
     <operation name="hostSetEventHandlerEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostGetFailurePredictionEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostGetFailurePredictionOptions">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="hostSetFailurePredictionEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4961,24 +4841,6 @@
     </operation>
 
     <operation name="serviceSetEventHandlerEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceGetFailurePredictionEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceGetFailurePredictionOptions">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="serviceSetFailurePredictionEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

@@ -42,7 +42,6 @@ int main_test(int argc, char* argv[]) {
   ref.set("check_host_freshness", "1");
   ref.set("check_service_freshness", "0");
   ref.set("enable_event_handlers", "1");
-  ref.set("enable_failure_prediction", "0");
   ref.set("enable_flap_detection", "1");
   ref.set("enable_notifications", "0");
   ref.set("global_host_event_handler", "global_host_event_handler");

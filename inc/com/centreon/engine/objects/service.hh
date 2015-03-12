@@ -76,8 +76,6 @@ typedef struct                  service_struct {
   int                           retain_nonstatus_information;
   int                           notifications_enabled;
   int                           obsess_over_service;
-  int                           failure_prediction_enabled;
-  char*                         failure_prediction_options;
   customvariablesmember_struct* custom_variables;
   int                           problem_has_been_acknowledged;
   int                           acknowledgement_type;
@@ -187,8 +185,6 @@ service* add_service(
            int stalk_on_warning,
            int stalk_on_unknown,
            int stalk_on_critical,
-           int failure_prediction_enabled,
-           char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
            int retain_status_information,

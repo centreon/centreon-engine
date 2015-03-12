@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -70,8 +70,6 @@ void deleter::host(void* ptr) throw () {
   obj->notification_period = NULL;
   delete[] obj->check_period;
   obj->check_period = NULL;
-  delete[] obj->failure_prediction_options;
-  obj->failure_prediction_options = NULL;
   delete[] obj->plugin_output;
   obj->plugin_output = NULL;
   delete[] obj->long_plugin_output;

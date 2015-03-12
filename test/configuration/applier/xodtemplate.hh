@@ -266,14 +266,7 @@ typedef struct xodtemplate_host_struct{
   int          stalk_on_up;
   int          stalk_on_down;
   int          stalk_on_unreachable;
-  int          failure_prediction_enabled;
-  char*        failure_prediction_options;
   char*        timezone;
-  int          x_2d;
-  int          y_2d;
-  double       x_3d;
-  double       y_3d;
-  double       z_3d;
   int          retain_status_information;
   int          retain_nonstatus_information;
   xodtemplate_customvariablesmember* custom_variables;
@@ -288,7 +281,6 @@ typedef struct xodtemplate_host_struct{
   int          have_contact_groups;
   int          have_contacts;
   int          have_notification_period;
-  int          have_failure_prediction_options;
   int          have_timezone;
 
   int          have_initial_state;
@@ -310,7 +302,6 @@ typedef struct xodtemplate_host_struct{
   int          have_notification_interval;
   int          have_first_notification_delay;
   int          have_stalking_options;
-  int          have_failure_prediction_enabled;
   int          have_retain_status_information;
   int          have_retain_nonstatus_information;
 
@@ -391,8 +382,6 @@ typedef struct xodtemplate_service_struct{
   int          stalk_on_unknown;
   int          stalk_on_warning;
   int          stalk_on_critical;
-  int          failure_prediction_enabled;
-  char*        failure_prediction_options;
   char*        timezone;
   int          retain_status_information;
   int          retain_nonstatus_information;
@@ -411,7 +400,6 @@ typedef struct xodtemplate_service_struct{
   int          have_notification_period;
   int          have_contact_groups;
   int          have_contacts;
-  int          have_failure_prediction_options;
   int          have_timezone;
 
   int          have_initial_state;
@@ -435,7 +423,6 @@ typedef struct xodtemplate_service_struct{
   int          have_notification_interval;
   int          have_first_notification_delay;
   int          have_stalking_options;
-  int          have_failure_prediction_enabled;
   int          have_retain_status_information;
   int          have_retain_nonstatus_information;
 

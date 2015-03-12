@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -95,8 +95,6 @@ bool operator==(
           && obj1.event_handler_enabled == obj2.event_handler_enabled
           && obj1.retain_status_information == obj2.retain_status_information
           && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
-          && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
-          && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
           && obj1.obsess_over_host == obj2.obsess_over_host
           && obj1.should_be_drawn == obj2.should_be_drawn
           && is_equal(obj1.custom_variables, obj2.custom_variables)
@@ -235,8 +233,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
     "  retain_status_information:            " << obj.retain_status_information << "\n"
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
-    "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
-    "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
     "  obsess_over_host:                     " << obj.obsess_over_host << "\n"
     "  should_be_drawn:                      " << obj.should_be_drawn << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
@@ -356,8 +352,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] stalk_on_up                   Stalk on up ?
  *  @param[in] stalk_on_down                 Stalk on down ?
  *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
- *  @param[in] failure_prediction_enabled    Whether or not failure
- *                                           prediction is enabled.
  *  @param[in] check_freshness               Whether or not freshness
  *                                           check is enabled.
  *  @param[in] freshness_threshold           Freshness threshold.
@@ -408,8 +402,6 @@ host* add_host(
         int stalk_on_up,
         int stalk_on_down,
         int stalk_on_unreachable,
-        int failure_prediction_enabled,
-        char const* failure_prediction_options,
         int check_freshness,
         int freshness_threshold,
         int should_be_drawn,
@@ -476,8 +468,6 @@ host* add_host(
       obj->check_period = string::dup(check_period);
     if (event_handler)
       obj->event_handler = string::dup(event_handler);
-    if (failure_prediction_options)
-      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (check_command)
       obj->host_check_command = string::dup(check_command);
     if (notification_period)
@@ -497,7 +487,6 @@ host* add_host(
     obj->current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->failure_prediction_enabled = (failure_prediction_enabled > 0);
     obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_down = (flap_detection_on_down > 0);

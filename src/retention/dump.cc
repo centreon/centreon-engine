@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -223,7 +223,6 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "current_state=" << obj.current_state << "\n"
     "event_handler=" << (obj.event_handler ? obj.event_handler : "") << "\n"
     "event_handler_enabled=" << obj.event_handler_enabled << "\n"
-    "failure_prediction_enabled=" << obj.failure_prediction_enabled << "\n"
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
@@ -307,7 +306,6 @@ std::ostream& dump::program(std::ostream& os) {
     "check_host_freshness=" << config->check_host_freshness() << "\n"
     "check_service_freshness=" << config->check_service_freshness() << "\n"
     "enable_event_handlers=" << config->enable_event_handlers() << "\n"
-    "enable_failure_prediction=" << config->enable_failure_prediction() << "\n"
     "enable_flap_detection=" << config->enable_flap_detection() << "\n"
     "enable_notifications=" << config->enable_notifications() << "\n"
     "global_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
@@ -407,7 +405,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "current_state=" << obj.current_state << "\n"
     "event_handler=" << (obj.event_handler ? obj.event_handler : "") << "\n"
     "event_handler_enabled=" << obj.event_handler_enabled << "\n"
-    "failure_prediction_enabled=" << obj.failure_prediction_enabled << "\n"
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"

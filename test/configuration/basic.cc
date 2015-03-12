@@ -195,7 +195,6 @@ static std::map<std::string, std::string> build_configuration(
   var["status_update_interval"] = obj2str(my_rand(2));
   var["time_change_threshold"] = obj2str(my_rand(6));
   var["enable_flap_detection"] = obj2str(my_rand(0, 1));
-  var["enable_failure_prediction"] = obj2str(my_rand(0, 1));
   var["low_service_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
   var["high_service_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
   var["low_host_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
@@ -450,9 +449,6 @@ void test_configuration(
   }
   if (my_conf["enable_flap_detection"] != obj2str(config->enable_flap_detection())) {
     throw (engine_error() << "enable_flap_detection: init with '" << my_conf["enable_flap_detection"] << "'");
-  }
-  if (my_conf["enable_failure_prediction"] != obj2str(config->enable_failure_prediction())) {
-    throw (engine_error() << "enable_failure_prediction: init with '" << my_conf["enable_failure_prediction"] << "'");
   }
   if (my_conf["low_service_flap_threshold"] != obj2str(config->low_service_flap_threshold())) {
     throw (engine_error() << "low_service_flap_threshold: init with '" << my_conf["low_service_flap_threshold"] << "'");

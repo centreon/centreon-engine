@@ -54,7 +54,6 @@ int main_test(int argc, char* argv[]) {
   ref.set("current_state", "1");
   ref.set("event_handler", "event_handler");
   ref.set("event_handler_enabled", "1");
-  ref.set("failure_prediction_enabled", "1");
   ref.set("flap_detection_enabled", "1");
   ref.set("has_been_checked", "1");
   ref.set("host_name", "host_name");

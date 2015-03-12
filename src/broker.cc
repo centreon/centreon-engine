@@ -1,7 +1,7 @@
 /*
 ** Copyright 2002-2010 Ethan Galstad
 ** Copyright 2010      Nagios Core Development Team
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1430,8 +1430,6 @@ void broker_program_status(
     = config->accept_passive_host_checks();
   ds.event_handlers_enabled = config->enable_event_handlers();
   ds.flap_detection_enabled = config->enable_flap_detection();
-  ds.failure_prediction_enabled
-    = config->enable_failure_prediction();
   ds.obsess_over_hosts = config->obsess_over_hosts();
   ds.obsess_over_services = config->obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;

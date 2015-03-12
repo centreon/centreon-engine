@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -131,8 +131,6 @@ void applier::host::add_object(
                           & configuration::host::down),
         static_cast<bool>(obj->stalking_options()
                           & configuration::host::unreachable),
-        true, // failure_prediction_enabled, enabled by Nagios
-        NULL, // failure_prediction_options
         obj->check_freshness(),
         obj->freshness_threshold(),
         true, // should_be_drawn, enabled by Nagios

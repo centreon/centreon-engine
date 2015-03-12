@@ -897,7 +897,6 @@ int xodtemplate_begin_object_definition(
     new_service->flap_detection_on_critical = true;
     new_service->notifications_enabled = true;
     new_service->notification_interval = 30.0;
-    new_service->failure_prediction_enabled = true;
     new_service->retain_status_information = true;
     new_service->retain_nonstatus_information = true;
 
@@ -922,9 +921,6 @@ int xodtemplate_begin_object_definition(
     new_host->flap_detection_on_unreachable = true;
     new_host->notifications_enabled = true;
     new_host->notification_interval = 30.0;
-    new_host->failure_prediction_enabled = true;
-    new_host->x_2d = -1;
-    new_host->y_2d = -1;
     new_host->retain_status_information = true;
     new_host->retain_nonstatus_information = true;
   }
@@ -1198,11 +1194,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_service->contacts = string::dup(value);
       temp_service->have_contacts = true;
     }
-    else if (!strcmp(variable, "failure_prediction_options")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->failure_prediction_options = string::dup(value);
-      temp_service->have_failure_prediction_options = true;
-    }
     else if (!strcmp(variable, "timezone")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->timezone = string::dup(value);
@@ -1409,10 +1400,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       }
       temp_service->have_stalking_options = true;
     }
-    else if (!strcmp(variable, "failure_prediction_enabled")) {
-      temp_service->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
-      temp_service->have_failure_prediction_enabled = true;
-    }
     else if (!strcmp(variable, "retain_status_information")) {
       temp_service->retain_status_information = (atoi(value) > 0) ? true : false;
       temp_service->have_retain_status_information = true;
@@ -1569,11 +1556,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_host->event_handler = string::dup(value);
       temp_host->have_event_handler = true;
-    }
-    else if (!strcmp(variable, "failure_prediction_options")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->failure_prediction_options = string::dup(value);
-      temp_host->have_failure_prediction_options = true;
     }
     else if (!strcmp(variable, "timezone")) {
       if (strcmp(value, XODTEMPLATE_NULL))
@@ -1757,10 +1739,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
       temp_host->have_stalking_options = true;
-    }
-    else if (!strcmp(variable, "failure_prediction_enabled")) {
-      temp_host->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
-      temp_host->have_failure_prediction_enabled = true;
     }
     else if (!strcmp(variable, "obsess_over_host")) {
       temp_host->obsess_over_host = (atoi(value) > 0) ? true : false;
@@ -5341,8 +5319,6 @@ int xodtemplate_duplicate_service(
   new_service->have_contact_groups = temp_service->have_contact_groups;
   new_service->contacts = NULL;
   new_service->have_contacts = temp_service->have_contacts;
-  new_service->failure_prediction_options = NULL;
-  new_service->have_failure_prediction_options = temp_service->have_failure_prediction_options;
   new_service->timezone = NULL;
   new_service->have_timezone = temp_service->have_timezone;
   new_service->custom_variables = NULL;
@@ -5375,8 +5351,6 @@ int xodtemplate_duplicate_service(
     new_service->contact_groups = string::dup(temp_service->contact_groups);
   if (temp_service->contacts != NULL)
     new_service->contacts = string::dup(temp_service->contacts);
-  if (temp_service->failure_prediction_options != NULL)
-    new_service->failure_prediction_options = string::dup(temp_service->failure_prediction_options);
   if (temp_service->timezone != NULL)
     new_service->timezone = string::dup(temp_service->timezone);
 
@@ -5442,8 +5416,6 @@ int xodtemplate_duplicate_service(
   new_service->stalk_on_warning = temp_service->stalk_on_warning;
   new_service->stalk_on_critical = temp_service->stalk_on_critical;
   new_service->have_stalking_options = temp_service->have_stalking_options;
-  new_service->failure_prediction_enabled = temp_service->failure_prediction_enabled;
-  new_service->have_failure_prediction_enabled = temp_service->have_failure_prediction_enabled;
   new_service->retain_status_information = temp_service->retain_status_information;
   new_service->have_retain_status_information = temp_service->have_retain_status_information;
   new_service->retain_nonstatus_information = temp_service->retain_nonstatus_information;
@@ -7050,14 +7022,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
           = string::dup(template_host->notification_period);
       this_host->have_notification_period = true;
     }
-    if (this_host->have_failure_prediction_options == false
-        && template_host->have_failure_prediction_options == true) {
-      if (this_host->failure_prediction_options == NULL
-          && template_host->failure_prediction_options != NULL)
-        this_host->failure_prediction_options
-          = string::dup(template_host->failure_prediction_options);
-      this_host->have_failure_prediction_options = true;
-    }
     if (this_host->have_timezone == false
         && template_host->have_timezone == true) {
       if (this_host->timezone == NULL
@@ -7187,12 +7151,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
       this_host->stalk_on_unreachable
         = template_host->stalk_on_unreachable;
       this_host->have_stalking_options = true;
-    }
-    if (this_host->have_failure_prediction_enabled == false
-        && template_host->have_failure_prediction_enabled == true) {
-      this_host->failure_prediction_enabled
-        = template_host->failure_prediction_enabled;
-      this_host->have_failure_prediction_enabled = true;
     }
     if (this_host->have_retain_status_information == false
         && template_host->have_retain_status_information == true) {
@@ -7359,14 +7317,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
           = string::dup(template_service->notification_period);
       this_service->have_notification_period = true;
     }
-    if (this_service->have_failure_prediction_options == false
-        && template_service->have_failure_prediction_options == true) {
-      if (this_service->failure_prediction_options == NULL
-          && template_service->failure_prediction_options != NULL)
-        this_service->failure_prediction_options
-          = string::dup(template_service->failure_prediction_options);
-      this_service->have_failure_prediction_options = true;
-    }
     if (this_service->have_timezone == false
         && template_service->have_timezone == true) {
       if (this_service->timezone == NULL
@@ -7517,12 +7467,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->stalk_on_critical
         = template_service->stalk_on_critical;
       this_service->have_stalking_options = true;
-    }
-    if (this_service->have_failure_prediction_enabled == false
-        && template_service->have_failure_prediction_enabled == true) {
-      this_service->failure_prediction_enabled
-        = template_service->failure_prediction_enabled;
-      this_service->have_failure_prediction_enabled = true;
     }
     if (this_service->have_retain_status_information == false
         && template_service->have_retain_status_information == true) {
@@ -9766,8 +9710,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->stalk_on_up,
                this_host->stalk_on_down,
                this_host->stalk_on_unreachable,
-               this_host->failure_prediction_enabled,
-               this_host->failure_prediction_options,
                this_host->check_freshness,
                this_host->freshness_threshold,
                true,
@@ -9916,8 +9858,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->stalk_on_warning,
                   this_service->stalk_on_unknown,
                   this_service->stalk_on_critical,
-                  this_service->failure_prediction_enabled,
-                  this_service->failure_prediction_options,
                   this_service->check_freshness,
                   this_service->freshness_threshold,
                   this_service->retain_status_information,
@@ -11484,8 +11424,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\tcontact_groups\t%s\n", temp_host->contact_groups);
     if (temp_host->notification_period)
       fprintf(fp, "\tnotification_period\t%s\n", temp_host->notification_period);
-    if (temp_host->failure_prediction_options)
-      fprintf(fp, "\tfailure_prediction_options\t%s\n", temp_host->failure_prediction_options);
     fprintf(fp, "\tinitial_state\t");
     if (temp_host->initial_state == HOST_DOWN)
       fprintf(fp, "d\n");
@@ -11545,7 +11483,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
-    fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_host->failure_prediction_enabled);
     if (temp_host->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_host->timezone);
     fprintf(fp, "\tretain_status_information\t%d\n", temp_host->retain_status_information);
@@ -11595,8 +11532,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\tcontact_groups\t%s\n", temp_service->contact_groups);
     if (temp_service->notification_period)
       fprintf(fp, "\tnotification_period\t%s\n", temp_service->notification_period);
-    if (temp_service->failure_prediction_options)
-      fprintf(fp, "\tfailure_prediction_options\t%s\n", temp_service->failure_prediction_options);
     fprintf(fp, "\tinitial_state\t");
     if (temp_service->initial_state == STATE_WARNING)
       fprintf(fp, "w\n");
@@ -11665,7 +11600,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
-    fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_service->failure_prediction_enabled);
     if (temp_service->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_service->timezone);
     fprintf(fp, "\tretain_status_information\t%d\n", temp_service->retain_status_information);
@@ -12862,7 +12796,6 @@ int xodtemplate_free_memory() {
     delete[] this_host->contact_groups;
     delete[] this_host->contacts;
     delete[] this_host->notification_period;
-    delete[] this_host->failure_prediction_options;
     delete[] this_host->timezone;
     delete this_host;
   }
@@ -12898,7 +12831,6 @@ int xodtemplate_free_memory() {
     delete[] this_service->notification_period;
     delete[] this_service->contact_groups;
     delete[] this_service->contacts;
-    delete[] this_service->failure_prediction_options;
     delete[] this_service->timezone;
     delete this_service;
   }
@@ -15960,9 +15892,6 @@ int read_main_config_file(char const* main_config_file) {
 
     else if(!strcmp(variable,"enable_flap_detection"))
       enable_flap_detection=(atoi(value)>0)?true:false;
-
-    else if(!strcmp(variable,"enable_failure_prediction"))
-      enable_failure_prediction=(atoi(value)>0)?true:false;
 
     else if(!strcmp(variable,"low_service_flap_threshold")){
 

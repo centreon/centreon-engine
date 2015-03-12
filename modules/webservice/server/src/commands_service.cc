@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1204,115 +1204,6 @@ int centreonengine__serviceSetEventHandlerEnabled(
 
   // Enable or disable event handler.
   svc->event_handler_enabled = enable;
-
-  // Notify event broker.
-  notify_event_broker(svc);
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**************************************
-*                                     *
-*         Failure Prediction          *
-*                                     *
-**************************************/
-
-/**
- *  Check if failure prediction is enabled on service.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  service_id Target service.
- *  @param[out] res        true if failure prediction is enabled.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceGetFailurePredictionEnabled(
-      soap* s,
-      ns1__serviceIDType* service_id,
-      bool& res) {
-  // Begin try block.
-  COMMAND_BEGIN("{" << service_id->host->name
-                  << ", " << service_id->service << "}")
-
-  // Find target service.
-  service* svc(find_target_service(
-                 service_id->host->name.c_str(),
-		 service_id->service.c_str()));
-
-  // Get requested value.
-  res = svc->failure_prediction_enabled;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Get service failure prediction options.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  service_id Target service.
- *  @param[out] res        Failure prediction options.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceGetFailurePredictionOptions(
-      soap* s,
-      ns1__serviceIDType* service_id,
-      std::string& res) {
-  // Begin try block.
-  COMMAND_BEGIN("{" << service_id->host->name
-                  << ", " << service_id->service << "}")
-
-  // Find target service.
-  service* svc(find_target_service(
-                 service_id->host->name.c_str(),
-		 service_id->service.c_str()));
-
-  // Get requested value.
-  if (svc->failure_prediction_options)
-    res = svc->failure_prediction_options;
-  else
-    res.clear();
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Enable or disable failure prediction on service.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  service_id Target service.
- *  @param[in]  enable     true to enable, false to disable.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__serviceSetFailurePredictionEnabled(
-      soap* s,
-      ns1__serviceIDType* service_id,
-      bool enable,
-      centreonengine__serviceSetFailurePredictionEnabledResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN("{" << service_id->host->name
-                  << ", " << service_id->service << "}")
-
-  // Find target service.
-  service* svc(find_target_service(
-                 service_id->host->name.c_str(),
-		 service_id->service.c_str()));
-
-  // Enable or disable failure prediction.
-  svc->failure_prediction_enabled = enable;
 
   // Notify event broker.
   notify_event_broker(svc);

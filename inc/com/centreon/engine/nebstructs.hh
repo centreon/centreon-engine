@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2007 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -468,7 +468,6 @@ typedef struct   nebstruct_program_status_struct {
   int            passive_host_checks_enabled;
   int            event_handlers_enabled;
   int            flap_detection_enabled;
-  int            failure_prediction_enabled;
   int            obsess_over_hosts;
   int            obsess_over_services;
   unsigned long  modified_host_attributes;

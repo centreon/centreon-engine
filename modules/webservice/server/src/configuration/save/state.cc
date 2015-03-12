@@ -28,9 +28,7 @@ using namespace com::centreon::engine::modules::webservice::configuration::save;
 /**
  *  Default constructor.
  */
-state::state() {
-
-}
+state::state() {}
 
 /**
  *  Copy constructor.
@@ -44,9 +42,7 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw () {
-
-}
+state::~state() throw () {}
 
 /**
  *  Assignment operator.
@@ -157,8 +153,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.enable_environment_macros() << std::endl
     << "enable_event_handlers="
     << obj.enable_event_handlers() << std::endl
-    << "enable_failure_prediction="
-    << obj.enable_failure_prediction() << std::endl
     << "enable_flap_detection="
     << obj.enable_flap_detection() << std::endl
     << "enable_notifications="

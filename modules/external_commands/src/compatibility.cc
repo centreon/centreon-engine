@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -103,11 +103,6 @@ int process_external_command1(char* cmd) {
 
   else if (!strcmp(command_id, "FLUSH_PENDING_COMMANDS"))
     command_type = CMD_FLUSH_PENDING_COMMANDS;
-
-  else if (!strcmp(command_id, "ENABLE_FAILURE_PREDICTION"))
-    command_type = CMD_ENABLE_FAILURE_PREDICTION;
-  else if (!strcmp(command_id, "DISABLE_FAILURE_PREDICTION"))
-    command_type = CMD_DISABLE_FAILURE_PREDICTION;
 
   else if (!strcmp(command_id, "START_EXECUTING_HOST_CHECKS"))
     command_type = CMD_START_EXECUTING_HOST_CHECKS;
@@ -703,14 +698,6 @@ int process_external_command2(int cmd,
 
   case CMD_DISABLE_HOST_FRESHNESS_CHECKS:
     disable_host_freshness_checks();
-    break;
-
-  case CMD_ENABLE_FAILURE_PREDICTION:
-    enable_all_failure_prediction();
-    break;
-
-  case CMD_DISABLE_FAILURE_PREDICTION:
-    disable_all_failure_prediction();
     break;
 
     /***************************/

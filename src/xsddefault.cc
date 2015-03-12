@@ -1,7 +1,7 @@
 /*
 ** Copyright 2000-2009 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -150,7 +150,6 @@ int xsddefault_save_status_data() {
        "\tcheck_service_freshness=" << config->check_service_freshness() << "\n"
        "\tcheck_host_freshness=" << config->check_host_freshness() << "\n"
        "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
-       "\tenable_failure_prediction=" << config->enable_failure_prediction() << "\n"
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_comment_id=" << next_comment_id << "\n"
@@ -256,7 +255,6 @@ int xsddefault_save_status_data() {
          "\tpassive_checks_enabled=" << hst->accept_passive_host_checks << "\n"
          "\tevent_handler_enabled=" << hst->event_handler_enabled << "\n"
          "\tflap_detection_enabled=" << hst->flap_detection_enabled << "\n"
-         "\tfailure_prediction_enabled=" << hst->failure_prediction_enabled << "\n"
          "\tobsess_over_host=" << hst->obsess_over_host << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << hst->is_flapping << "\n"
@@ -323,7 +321,6 @@ int xsddefault_save_status_data() {
          "\tproblem_has_been_acknowledged=" << svc->problem_has_been_acknowledged << "\n"
          "\tacknowledgement_type=" << svc->acknowledgement_type << "\n"
          "\tflap_detection_enabled=" << svc->flap_detection_enabled << "\n"
-         "\tfailure_prediction_enabled=" << svc->failure_prediction_enabled << "\n"
          "\tobsess_over_service=" << svc->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << svc->is_flapping << "\n"

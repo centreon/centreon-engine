@@ -162,8 +162,6 @@ void applier::service::add_object(
                       &configuration::service::unknown),
     static_cast<bool>(obj->stalking_options()
                       &configuration::service::critical),
-    true, // failure_prediction_enabled, enabled by default in Nagios
-    NULL, // failure_prediction_options
     obj->check_freshness(),
     obj->freshness_threshold(),
     obj->retain_status_information(),

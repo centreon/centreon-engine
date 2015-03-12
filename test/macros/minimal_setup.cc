@@ -65,8 +65,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Stalk on ok
     0,                              // Stalk on down
     0,                              // Stalk on unreachable
-    0,                              // Failure prediction enabled
-    NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Should be drawn
@@ -118,8 +116,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Stalk on warning
     0,                              // Stalk on unknown
     0,                              // Stalk on critical
-    0,                              // Failure prediction enabled
-    NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Retain status information

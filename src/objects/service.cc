@@ -93,8 +93,6 @@ bool operator==(
           && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
           && obj1.notifications_enabled == obj2.notifications_enabled
           && obj1.obsess_over_service == obj2.obsess_over_service
-          && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
-          && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
           && is_equal(obj1.custom_variables, obj2.custom_variables)
           && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
           && obj1.acknowledgement_type == obj2.acknowledgement_type
@@ -235,8 +233,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
     "  notifications_enabled:                " << obj.notifications_enabled << "\n"
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
-    "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
-    "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
     "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
     "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
@@ -361,9 +357,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] stalk_on_warning             Stalk on warning state ?
  *  @param[in] stalk_on_unknown             Stalk on unknown state ?
  *  @param[in] stalk_on_critical            Stalk on critical state ?
- *  @param[in] failure_prediction_enabled   Whether failure prediction
- *                                          should be enabled or not.
- *  @param[in] failure_prediction_options   Failure prediction options.
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
  *  @param[in] retain_status_information    Should Engine retain service
@@ -413,8 +406,6 @@ service* add_service(
            int stalk_on_warning,
            int stalk_on_unknown,
            int stalk_on_critical,
-           int failure_prediction_enabled,
-           char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
            int retain_status_information,
@@ -484,8 +475,6 @@ service* add_service(
       obj->notification_period = string::dup(notification_period);
     if (check_period)
       obj->check_period = string::dup(check_period);
-    if (failure_prediction_options)
-      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (timezone)
       obj->timezone = string::dup(timezone);
 
@@ -500,7 +489,6 @@ service* add_service(
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->failure_prediction_enabled = (failure_prediction_enabled > 0);
     obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);

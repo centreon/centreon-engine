@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -238,7 +238,6 @@ extern unsigned int auto_rescheduling_window;
 extern unsigned int status_update_interval;
 extern unsigned int time_change_threshold;
 extern unsigned int enable_flap_detection;
-extern unsigned int enable_failure_prediction;
 extern float low_service_flap_threshold;
 extern float high_service_flap_threshold;
 extern float low_host_flap_threshold;

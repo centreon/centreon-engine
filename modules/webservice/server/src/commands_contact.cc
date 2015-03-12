@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -73,34 +73,6 @@ int centreonengine__contactGetAlias(
     alias = cntct->alias;
   else
     alias.clear();
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Check if the contact can submit external commands.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[out] can_submit Boolean value.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactGetCanSubmitCommands(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      bool& can_submit) {
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Set value.
-  can_submit = cntct->can_submit_commands;
 
   // Exception handling.
   COMMAND_END()
@@ -857,38 +829,6 @@ int centreonengine__contactSetAlias(
   // Set new alias.
   delete [] cntct->alias;
   cntct->alias = string::dup(alias.c_str());
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Enable a contact to submit commands.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  enable     true to enable, false to disable.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactSetCanSubmitCommands(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      bool enable,
-      centreonengine__contactSetCanSubmitCommandsResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << enable)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Set boolean value.
-  cntct->can_submit_commands = enable;
 
   // Exception handling.
   COMMAND_END()

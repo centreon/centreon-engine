@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -31,7 +31,6 @@ program::setters const program::_setters[] = {
   { "check_host_freshness",           SETTER(bool, _set_check_host_freshness) },
   { "check_service_freshness",        SETTER(bool, _set_check_service_freshness) },
   { "enable_event_handlers",          SETTER(bool, _set_enable_event_handlers) },
-  { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
   { "enable_flap_detection",          SETTER(bool, _set_enable_flap_detection) },
   { "enable_notifications",           SETTER(bool, _set_enable_notifications) },
   { "global_host_event_handler",      SETTER(std::string const&, _set_global_host_event_handler) },
@@ -49,6 +48,7 @@ program::setters const program::_setters[] = {
   { "passive_service_checks_enabled", SETTER(bool, _set_passive_service_checks_enabled) },
 
   // Deprecated.
+  { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
   { "process_performance_data",       SETTER(bool, _set_process_performance_data) }
 };
 
@@ -87,7 +87,6 @@ program& program::operator=(program const& right) {
     _check_host_freshness = right._check_host_freshness;
     _check_service_freshness = right._check_service_freshness;
     _enable_event_handlers = right._enable_event_handlers;
-    _enable_failure_prediction = right._enable_failure_prediction;
     _enable_flap_detection = right._enable_flap_detection;
     _enable_notifications = right._enable_notifications;
     _global_host_event_handler = right._global_host_event_handler;
@@ -121,7 +120,6 @@ bool program::operator==(program const& right) const throw () {
           && _check_host_freshness == right._check_host_freshness
           && _check_service_freshness == right._check_service_freshness
           && _enable_event_handlers == right._enable_event_handlers
-          && _enable_failure_prediction == right._enable_failure_prediction
           && _enable_flap_detection == right._enable_flap_detection
           && _enable_notifications == right._enable_notifications
           && _global_host_event_handler == right._global_host_event_handler
@@ -210,15 +208,6 @@ opt<bool> const& program::check_service_freshness() const throw () {
  */
 opt<bool> const& program::enable_event_handlers() const throw () {
   return (_enable_event_handlers);
-}
-
-/**
- *  Get enable_failure_prediction.
- *
- *  @return The enable_failure_prediction.
- */
-opt<bool> const& program::enable_failure_prediction() const throw () {
-  return (_enable_failure_prediction);
 }
 
 /**
@@ -407,12 +396,12 @@ bool program::_set_enable_event_handlers(bool value) {
 }
 
 /**
- *  Set enable_failure_prediction.
+ *  Deprecated variable.
  *
- *  @param[in] value The new enable_failure_prediction.
+ *  @param[in] value  Unused.
  */
 bool program::_set_enable_failure_prediction(bool value) {
-  _enable_failure_prediction = value;
+  (void)value;
   return (true);
 }
 

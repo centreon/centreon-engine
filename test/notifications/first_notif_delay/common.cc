@@ -77,8 +77,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                              // Stalk on ok
     0,                              // Stalk on down
     0,                              // Stalk on unreachable
-    0,                              // Failure prediction enabled
-    NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Should be drawn
@@ -129,8 +127,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     0,                              // Stalk on warning
     0,                              // Stalk on unknown
     0,                              // Stalk on critical
-    0,                              // Failure prediction enabled
-    NULL,                           // Failure prediction options
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Retain status information

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,7 +45,6 @@ host::setters const host::_setters[] = {
   { "current_state",                        SETTER(int, _set_current_state) },
   { "event_handler",                        SETTER(std::string const&, _set_event_handler) },
   { "event_handler_enabled",                SETTER(bool, _set_event_handler_enabled) },
-  { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
   { "flap_detection_enabled",               SETTER(bool, _set_flap_detection_enabled) },
   { "has_been_checked",                     SETTER(bool, _set_has_been_checked) },
   { "host_name",                            SETTER(std::string const&, _set_host_name) },
@@ -81,6 +80,7 @@ host::setters const host::_setters[] = {
   { "state_type",                           SETTER(int, _set_state_type) },
 
   // Deprecated.
+  { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
 
@@ -132,7 +132,6 @@ host& host::operator=(host const& right) {
     _customvariables = right._customvariables;
     _event_handler = right._event_handler;
     _event_handler_enabled = right._event_handler_enabled;
-    _failure_prediction_enabled = right._failure_prediction_enabled;
     _flap_detection_enabled = right._flap_detection_enabled;
     _has_been_checked = right._has_been_checked;
     _host_name = right._host_name;
@@ -197,7 +196,6 @@ bool host::operator==(host const& right) const throw () {
           && std::operator==(_customvariables, right._customvariables)
           && _event_handler == right._event_handler
           && _event_handler_enabled == right._event_handler_enabled
-          && _failure_prediction_enabled == right._failure_prediction_enabled
           && _flap_detection_enabled == right._flap_detection_enabled
           && _has_been_checked == right._has_been_checked
           && _host_name == right._host_name
@@ -425,15 +423,6 @@ opt<std::string> const& host::event_handler() const throw () {
  */
 opt<bool> const& host::event_handler_enabled() const throw () {
   return (_event_handler_enabled);
-}
-
-/**
- *  Get failure_prediction_enabled.
- *
- *  @return The failure_prediction_enabled.
- */
-opt<bool> const& host::failure_prediction_enabled() const throw () {
-  return (_failure_prediction_enabled);
 }
 
 /**
@@ -904,12 +893,12 @@ bool host::_set_event_handler_enabled(bool value) {
 }
 
 /**
- *  Set failure_prediction_enabled.
+ *  Unused variable.
  *
- *  @param[in] value The new failure_prediction_enabled.
+ *  @param[in] value  Unused.
  */
 bool host::_set_failure_prediction_enabled(bool value) {
-  _failure_prediction_enabled = value;
+  (void)value;
   return (true);
 }
 

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -109,7 +109,6 @@ struct                global {
   unsigned int        debug_verbosity;
   bool                enable_environment_macros;
   bool                enable_event_handlers;
-  bool                enable_failure_prediction;
   bool                enable_flap_detection;
   bool                enable_notifications;
   bool                enable_predictive_host_dependency_checks;
@@ -314,7 +313,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(debug_verbosity);
   check_value(enable_environment_macros);
   check_value(enable_event_handlers);
-  check_value(enable_failure_prediction);
   check_value(enable_flap_detection);
   check_value(enable_notifications);
   check_value(enable_predictive_host_dependency_checks);
@@ -574,7 +572,6 @@ static global get_globals() {
   g.debug_verbosity = debug_verbosity;
   g.enable_environment_macros = enable_environment_macros;
   g.enable_event_handlers = enable_event_handlers;
-  g.enable_failure_prediction = enable_failure_prediction;
   g.enable_flap_detection = enable_flap_detection;
   g.enable_notifications = enable_notifications;
   g.enable_predictive_host_dependency_checks = enable_predictive_host_dependency_checks;

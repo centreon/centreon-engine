@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -247,7 +247,6 @@ int xrddefault_save_state_information() {
          << "check_service_freshness=" << check_service_freshness << "\n"
          << "check_host_freshness=" << check_host_freshness << "\n"
          << "enable_flap_detection=" << enable_flap_detection << "\n"
-         << "enable_failure_prediction=" << enable_failure_prediction << "\n"
          << "global_host_event_handler=" << global_host_event_handler << "\n"
          << "global_service_event_handler=" << global_service_event_handler << "\n"
          << "next_comment_id=" << next_comment_id << "\n"
@@ -308,7 +307,6 @@ int xrddefault_save_state_information() {
            << "passive_checks_enabled=" << temp_host->accept_passive_host_checks << "\n"
            << "event_handler_enabled=" << temp_host->event_handler_enabled << "\n"
            << "flap_detection_enabled=" << temp_host->flap_detection_enabled << "\n"
-           << "failure_prediction_enabled=" << temp_host->failure_prediction_enabled << "\n"
            << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
            << "is_flapping=" << temp_host->is_flapping << "\n"
            << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_host->percent_state_change << std::setprecision(ss) << "\n"
@@ -386,7 +384,6 @@ int xrddefault_save_state_information() {
            << "problem_has_been_acknowledged=" << temp_service->problem_has_been_acknowledged << "\n"
            << "acknowledgement_type=" << temp_service->acknowledgement_type << "\n"
            << "flap_detection_enabled=" << temp_service->flap_detection_enabled << "\n"
-           << "failure_prediction_enabled=" << temp_service->failure_prediction_enabled << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "is_flapping=" << temp_service->is_flapping << "\n"
            << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_service->percent_state_change << std::setprecision(ss) << "\n"
@@ -1049,10 +1046,6 @@ int xrddefault_read_state_information() {
             if (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
               config->enable_flap_detection((atoi(val) > 0) ? TRUE : FALSE);
           }
-          else if (!strcmp(var, "enable_failure_prediction")) {
-            if (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-              config->enable_failure_prediction((atoi(val) > 0) ? TRUE : FALSE);
-          }
           else if (!strcmp(var, "global_host_event_handler")) {
             if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
               /* make sure the check command still exists... */
@@ -1229,10 +1222,6 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "flap_detection_enabled")) {
               if (temp_host->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
                 temp_host->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "failure_prediction_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-                temp_host->failure_prediction_enabled = (atoi(val) > 0) ? TRUE : FALSE;
             }
             else if (!strcmp(var, "obsess_over_host")) {
               if (temp_host->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
@@ -1494,10 +1483,6 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "flap_detection_enabled")) {
               if (temp_service->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
                 temp_service->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "failure_prediction_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-                temp_service->failure_prediction_enabled = (atoi(val) > 0) ? TRUE : FALSE;
             }
             else if (!strcmp(var, "obsess_over_service")) {
               if (temp_service->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)

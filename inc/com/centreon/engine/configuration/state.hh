@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -180,8 +180,6 @@ namespace               configuration {
     void                enable_environment_macros(bool value);
     bool                enable_event_handlers() const throw ();
     void                enable_event_handlers(bool value);
-    bool                enable_failure_prediction() const throw ();
-    void                enable_failure_prediction(bool value);
     bool                enable_flap_detection() const throw ();
     void                enable_flap_detection(bool value);
     bool                enable_notifications() const throw ();
@@ -410,6 +408,7 @@ namespace               configuration {
     void                _set_date_format(std::string const& value);
     void                _set_downtime_file(std::string const& value);
     void                _set_enable_embedded_perl(std::string const& value);
+    void                _set_enable_failure_prediction(bool value);
     void                _set_event_broker_options(std::string const& value);
     void                _set_free_child_process_memory(std::string const& value);
     void                _set_host_inter_check_delay_method(std::string const& value);
@@ -513,7 +512,6 @@ namespace               configuration {
                         _downtimes;
     bool                _enable_environment_macros;
     bool                _enable_event_handlers;
-    bool                _enable_failure_prediction;
     bool                _enable_flap_detection;
     bool                _enable_notifications;
     bool                _enable_predictive_host_dependency_checks;

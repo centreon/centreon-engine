@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -74,12 +74,6 @@ processing::processing() {
   // _lst_command["FLUSH_PENDING_COMMANDS"] =
   //   command_info(CMD_FLUSH_PENDING_COMMANDS,
   //                &_redirector<&>);
-  _lst_command["ENABLE_FAILURE_PREDICTION"] =
-    command_info(CMD_ENABLE_FAILURE_PREDICTION,
-                 &_redirector<&enable_all_failure_prediction>);
-  _lst_command["DISABLE_FAILURE_PREDICTION"] =
-    command_info(CMD_DISABLE_FAILURE_PREDICTION,
-                 &_redirector<&disable_all_failure_prediction>);
   _lst_command["START_EXECUTING_HOST_CHECKS"] =
     command_info(CMD_START_EXECUTING_HOST_CHECKS,
                  &_redirector<&start_executing_host_checks>);

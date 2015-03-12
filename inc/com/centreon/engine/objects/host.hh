@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -76,8 +76,6 @@ typedef struct                  host_struct {
   int                           event_handler_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
-  int                           failure_prediction_enabled;
-  char*                         failure_prediction_options;
   int                           obsess_over_host;
   int                           should_be_drawn;
   customvariablesmember_struct* custom_variables;
@@ -193,8 +191,6 @@ host* add_host(
         int stalk_on_up,
         int stalk_on_down,
         int stalk_on_unreachable,
-        int failure_prediction_enabled,
-        char const* failure_prediction_options,
         int check_freshness,
         int freshness_threshold,
         int should_be_drawn,

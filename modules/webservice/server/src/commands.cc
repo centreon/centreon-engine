@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1123,18 +1123,21 @@ int centreonengine__downtimeAddToHost(soap* s,
     char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
-    if (schedule_downtime(HOST_DOWNTIME,
-                          host->name,
-                          NULL,
-                          time(NULL),
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          static_cast<unsigned long>(downtime_type->duration),
-                          &downtime_id) == ERROR) {
+    if (schedule_downtime(
+          HOST_DOWNTIME,
+          host->name,
+          NULL,
+          time(NULL),
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          0,
+          NULL,
+          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
@@ -1207,18 +1210,21 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
     char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
-    if (schedule_downtime(HOST_DOWNTIME,
-                          host->name,
-                          NULL,
-                          entry_time,
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          static_cast<unsigned long>(downtime_type->duration),
-                          &downtime_id) == ERROR) {
+    if (schedule_downtime(
+          HOST_DOWNTIME,
+          host->name,
+          NULL,
+          entry_time,
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          0,
+          NULL,
+          &downtime_id) == ERROR) {
 
       delete[] author;
       delete[] comment;
@@ -1234,15 +1240,18 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
     res.downtimeid = soap_new_ns1__downtimeIDType(s, 1);
     res.downtimeid->downtime = downtime_id;
 
-    schedule_and_propagate_downtime(host,
-                                    entry_time,
-                                    author,
-                                    comment,
-                                    downtime_type->starttime,
-                                    downtime_type->endtime,
-                                    downtime_type->fixed,
-                                    0,
-                                    static_cast<unsigned long>(downtime_type->duration));
+    schedule_and_propagate_downtime(
+      host,
+      entry_time,
+      author,
+      comment,
+      downtime_type->starttime,
+      downtime_type->endtime,
+      downtime_type->fixed,
+      0,
+      static_cast<unsigned long>(downtime_type->duration),
+      0,
+      NULL);
 
     delete[] author;
     delete[] comment;
@@ -1302,18 +1311,21 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
     char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
-    if (schedule_downtime(HOST_DOWNTIME,
-                          host->name,
-                          NULL,
-                          entry_time,
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          static_cast<unsigned long>(downtime_type->duration),
-                          &downtime_id) == ERROR) {
+    if (schedule_downtime(
+          HOST_DOWNTIME,
+          host->name,
+          NULL,
+          entry_time,
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          0,
+          NULL,
+          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
 
@@ -1329,15 +1341,18 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
     res.downtimeid = soap_new_ns1__downtimeIDType(s, 1);
     res.downtimeid->downtime = downtime_id;
 
-    schedule_and_propagate_downtime(host,
-                                    entry_time,
-                                    author,
-                                    comment,
-                                    downtime_type->starttime,
-                                    downtime_type->endtime,
-                                    downtime_type->fixed,
-                                    res.downtimeid->downtime,
-                                    static_cast<unsigned long>(downtime_type->duration));
+    schedule_and_propagate_downtime(
+      host,
+      entry_time,
+      author,
+      comment,
+      downtime_type->starttime,
+      downtime_type->endtime,
+      downtime_type->fixed,
+      res.downtimeid->downtime,
+      static_cast<unsigned long>(downtime_type->duration),
+      0,
+      NULL);
 
     delete[] author;
     delete[] comment;
@@ -1402,18 +1417,21 @@ int centreonengine__downtimeAddToHostServices(soap* s,
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr !=NULL) {
-        if (schedule_downtime(SERVICE_DOWNTIME,
-                              host->name,
-                              tmp->service_ptr->description,
-                              entry_time,
-                              author,
-                              comment,
-                              downtime_type->starttime,
-                              downtime_type->endtime,
-                              downtime_type->fixed,
-                              downtime_type->triggerid->downtime,
-                              static_cast<unsigned long>(downtime_type->duration),
-                              NULL) == ERROR) {
+        if (schedule_downtime(
+              SERVICE_DOWNTIME,
+              host->name,
+              tmp->service_ptr->description,
+              entry_time,
+              author,
+              comment,
+              downtime_type->starttime,
+              downtime_type->endtime,
+              downtime_type->fixed,
+              downtime_type->triggerid->downtime,
+              static_cast<unsigned long>(downtime_type->duration),
+              0,
+              NULL,
+              NULL) == ERROR) {
           is_error = true;
         }
       }
@@ -1488,18 +1506,21 @@ int centreonengine__downtimeAddToService(soap* s,
     char* comment = string::dup(downtime_type->comment.c_str());
 
     unsigned long downtime_id;
-    if (schedule_downtime(SERVICE_DOWNTIME,
-                          service->host_name,
-                          service->description,
-                          time(NULL),
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          static_cast<unsigned long>(downtime_type->duration),
-                          &downtime_id) == ERROR) {
+    if (schedule_downtime(
+          SERVICE_DOWNTIME,
+          service->host_name,
+          service->description,
+          time(NULL),
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          0,
+          NULL,
+          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
@@ -1827,33 +1848,6 @@ int centreonengine__getEventHandlersEnabled(soap* s, bool& val) {
 
     logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
     val = enable_event_handlers;
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Check if failure prediction is globally enabled.
- *
- *  @param[in]  s                 Unused.
- *  @param[out] val               Result of operation.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__getFailurePredictionEnabled(soap* s, bool& val) {
-  (void)s;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
-    val = enable_failure_prediction;
     webservice::sync::instance().worker_finish();
   }
   catch (...) {
@@ -2213,37 +2207,6 @@ int centreonengine__setEventHandlersEnabled(soap* s,
 
     logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
     enable_event_handlers = enable;
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Enable or disable failure prediction globally.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  enable            true to enable, false to disable.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setFailurePredictionEnabled(soap* s,
-                                                bool enable,
-                                                centreonengine__setFailurePredictionEnabledResponse& res) {
-  (void)s;
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most) << "Webservice: " << __func__ << "(" << enable << ")";
-    enable_failure_prediction = enable;
     webservice::sync::instance().worker_finish();
   }
   catch (...) {
