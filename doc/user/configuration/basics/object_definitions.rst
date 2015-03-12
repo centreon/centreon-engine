@@ -118,7 +118,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,d,u]
-    # process_perf_data            [0/1]
     # retain_status_information    [0/1]
     # retain_nonstatus_information [0/1]
     contacts                       contacts
@@ -146,7 +145,6 @@ Example Definition
     retry_interval               1
     max_check_attempts           5
     check_period                 24x7
-    process_perf_data            0
     retain_nonstatus_information 0
     contact_groups               router-admins
     notification_interval        30
@@ -256,9 +254,6 @@ flap_detection_enabled       :ref:`* <obj_def_retentionnotes>` This directive is
 flap_detection_options       This directive is used to determine what host states the
                              :ref:`flap detection logic <flapping_detection>` will use for this host. Valid options are
                              a combination of one or more of the following: o = UP states, d = DOWN states, u = UNREACHABLE states.
-process_perf_data            :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
-                             processing of performance data is enabled for this host. Values: 0 = disable performance data processing, 1 = enable
-                             performance data processing.
 retain_status_information    This directive is used to determine whether or not status-related information about the host is retained across program
                              restarts. This is only useful if you have enabled state retention using the
                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
@@ -402,7 +397,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,w,c,u]
-    # process_perf_data            [0/1]
     # retain_status_information    [0/1]
     # retain_nonstatus_information [0/1]
     notification_interval          #
@@ -516,9 +510,6 @@ flap_detection_options       This directive is used to determine what service st
                              :ref:`flap detection logic <flapping_detection>` will use for this service. Valid options
                              are a combination of one or more of the following: o = OK states, w = WARNING states, c = CRITICAL states,
                              u = UNKNOWN states.
-process_perf_data            :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
-                             processing of performance data is enabled for this service. Values: 0 = disable performance data processing,
-                             1 = enable performance data processing.
 retain_status_information    This directive is used to determine whether or not status-related information about the service is retained across
                              program restarts. This is only useful if you have enabled state retention using the
                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
