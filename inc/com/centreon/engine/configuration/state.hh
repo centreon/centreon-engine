@@ -355,8 +355,6 @@ namespace               configuration {
     void                user(std::vector<std::string> const& value);
     void                user(std::string const& key, std::string const& value);
     void                user(unsigned int key, std::string const& value);
-    bool                use_aggressive_host_checking() const throw ();
-    void                use_aggressive_host_checking(bool value);
     bool                use_check_result_path() const throw ();
     void                use_check_result_path(bool value);
     bool                use_large_installation_tweaks() const throw ();
@@ -435,6 +433,7 @@ namespace               configuration {
     void                _set_service_perfdata_file_template(std::string const& value);
     void                _set_temp_file(std::string const& value);
     void                _set_temp_path(std::string const& value);
+    void                _set_use_aggressive_host_checking(bool value);
     void                _set_use_embedded_perl_implicitly(std::string const& value);
 
     template<typename U, void (state::*ptr)(U)>
@@ -585,7 +584,6 @@ namespace               configuration {
     bool                _translate_passive_host_checks;
     std::vector<std::string>
                         _users;
-    bool                _use_aggressive_host_checking;
     bool                _use_check_result_path;
     bool                _use_large_installation_tweaks;
     bool                _use_regexp_matches;

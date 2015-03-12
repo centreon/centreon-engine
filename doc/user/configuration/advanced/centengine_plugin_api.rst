@@ -38,18 +38,10 @@ return codes, along with their corresponding service or host states.
 Plugin Return Code Service State Host State
 ================== ============= ======================
 0                  OK            UP
-1                  WARNING       UP or DOWN/UNREACHABLE
+1                  WARNING       UP
 2                  CRITICAL      DOWN/UNREACHABLE
 3                  UNKNOWN       DOWN/UNREACHABLE
 ================== ============= ======================
-
-.. note::
-   If the :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
-   option is enabled, return codes of 1 will result in a host state of
-   DOWN or UNREACHABLE. Otherwise return codes of 1 will result in a
-   host state of UP. The process by which Centreon Engine determines
-   whether or not a host is DOWN or UNREACHABLE is discussed
-   :ref:`here toto <status_and_reachability_network>` .
 
 Plugin Output Spec
 ==================
@@ -158,4 +150,3 @@ that you download the official Centreon Engine plugins and look through
 the code for various C, Perl, and shell script plugins. Information on
 obtaining the official Centreon Engine plugins can be found
 :ref:`here <exploit_plugins>`.
-

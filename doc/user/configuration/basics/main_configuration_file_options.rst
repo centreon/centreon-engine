@@ -1094,27 +1094,6 @@ option is enabled. Default is 180 seconds (3 minutes).
    versions. Enabling the auto-rescheduling option can degrade
    performance - rather than increase it - if used improperly!
 
-.. _main_cfg_opt_aggressive_host_checking:
-
-Aggressive Host Checking Option
--------------------------------
-
-Centreon Engine tries to be smart about how and when it checks the
-status of hosts. In general, disabling this option will allow Centreon
-Engine to make some smarter decisions and check hosts a bit
-faster. Enabling this option will increase the amount of time required
-to check hosts, but may improve reliability a bit. Unless you have
-problems with Centreon Engine not recognizing that a host recovered, I
-would suggest not enabling this option.
-
-  * 0 = Don't use aggressive host checking (default)
-  * 1 = Use aggressive host checking
-
-=========== ==================================
-**Format**  use_aggressive_host_checking=<0/1>
-**Example** use_aggressive_host_checking=0
-=========== ==================================
-
 .. _main_cfg_opt_translate_passive_host_checks:
 
 Translate Passive Host Checks Option

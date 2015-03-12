@@ -201,7 +201,6 @@ extern unsigned int event_handler_timeout;
 extern unsigned int notification_timeout;
 extern unsigned int ocsp_timeout;
 extern unsigned int ochp_timeout;
-extern unsigned int use_aggressive_host_checking;
 extern unsigned long cached_host_check_horizon;
 extern unsigned int enable_predictive_host_dependency_checks;
 extern unsigned long cached_service_check_horizon;

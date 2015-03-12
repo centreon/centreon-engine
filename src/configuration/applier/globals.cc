@@ -112,7 +112,6 @@ void applier::globals::apply(state& config) {
   ::status_update_interval = config.status_update_interval();
   ::time_change_threshold = config.time_change_threshold();
   ::translate_passive_host_checks = config.translate_passive_host_checks();
-  ::use_aggressive_host_checking = config.use_aggressive_host_checking();
   ::use_large_installation_tweaks = config.use_large_installation_tweaks();
   ::use_regexp_matches = config.use_regexp_matches();
   ::use_retained_program_state = config.use_retained_program_state();

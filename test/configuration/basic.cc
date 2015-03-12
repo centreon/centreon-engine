@@ -161,8 +161,6 @@ static std::map<std::string, std::string> build_configuration(
   var["notification_timeout"] = obj2str(my_rand(1));
   var["ocsp_timeout"] = obj2str(my_rand(1));
   var["ochp_timeout"] = obj2str(my_rand(1));
-  var["use_agressive_host_checking"] = obj2str(my_rand(0, 1));
-  var["use_aggressive_host_checking"] = var["use_agressive_host_checking"];
   var["cached_host_check_horizon"] = obj2str(my_rand(0));
   var["enable_predictive_host_dependency_checks"] = obj2str(my_rand(0, 1));
   var["cached_service_check_horizon"] = obj2str(my_rand(0));
@@ -343,12 +341,6 @@ void test_configuration(
   }
   if (my_conf["ochp_timeout"] != obj2str(config->ochp_timeout())) {
     throw (engine_error() << "ochp_timeout: init with '" << my_conf["ochp_timeout"] << "'");
-  }
-  if (my_conf["use_agressive_host_checking"] != obj2str(config->use_aggressive_host_checking())) {
-    throw (engine_error() << "use_agressive_host_checking: init with '" << my_conf["use_agressive_host_checking"] << "'");
-  }
-  if (my_conf["use_aggressive_host_checking"] != obj2str(config->use_aggressive_host_checking())) {
-    throw (engine_error() << "use_aggressive_host_checking: init with '" << my_conf["use_aggressive_host_checking"] << "'");
   }
   if (my_conf["cached_host_check_horizon"] != obj2str(config->cached_host_check_horizon())) {
     throw (engine_error() << "cached_host_check_horizon: init with '" << my_conf["cached_host_check_horizon"] << "'");

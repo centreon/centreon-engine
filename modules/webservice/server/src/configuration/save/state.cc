@@ -303,8 +303,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.time_change_threshold() << std::endl
     << "translate_passive_host_checks="
     << obj.translate_passive_host_checks() << std::endl
-    << "use_aggressive_host_checking="
-    << obj.use_aggressive_host_checking() << std::endl
     << "use_large_installation_tweaks="
     << obj.use_large_installation_tweaks() << std::endl
     << "use_regexp_matching="

@@ -800,39 +800,6 @@ int centreonengine__setCommandCheckInterval(soap* s,
 }
 
 /**
- *  Set global variable use_aggressive_host_checking.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable use_aggressive_host_checking.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setUseAggressiveHostChecking(soap* s,
-                                                 bool value,
-                                                 centreonengine__setUseAggressiveHostCheckingResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config->use_aggressive_host_checking(value);
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Set global variable global_host_event_handler.
  *
  *  @param[in]  s           Unused.

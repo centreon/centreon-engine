@@ -110,19 +110,6 @@ Optimization Tips
     need to schedule regular checks of your hosts (see above). More
     information on cached checks can be found
     :ref:`here <cached_checks>`.
-  * Don't use agressive host checking. Unless you're having problems
-    with Centreon Engine recognizing host recoveries, I would recommend
-    not enabling the
-    :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
-    option. With this option turned off host checks will execute much
-    faster, resulting in speedier processing of service check
-    results. However, host recoveries can be missed under certain
-    circumstances when this it turned off. For example, if a host
-    recovers and all of the services associated with that host stay in
-    non-OK states (and don't "wobble" between different non-OK states),
-    Centreon Engine may miss the fact that the host has recovered. A few
-    people may need to enable this option, but the majority don't and I
-    would recommendnot using it unless you find it necessary...
   * External command optimizations. If you're processing a lot of
     external commands (i.e. passive checks in a
     :ref:`distributed setup <distributed_monitoring>`, you'll probably

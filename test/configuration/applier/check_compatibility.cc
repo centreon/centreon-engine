@@ -164,7 +164,6 @@ struct                global {
   unsigned int        status_update_interval;
   unsigned int        time_change_threshold;
   bool                translate_passive_host_checks;
-  bool                use_aggressive_host_checking;
   bool                use_large_installation_tweaks;
   bool                use_regexp_matches;
   bool                use_retained_program_state;
@@ -364,7 +363,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(status_update_interval);
   check_value(time_change_threshold);
   check_value(translate_passive_host_checks);
-  check_value(use_aggressive_host_checking);
   check_value(use_large_installation_tweaks);
   check_value(use_regexp_matches);
   check_value(use_retained_program_state);
@@ -619,7 +617,6 @@ static global get_globals() {
   g.status_update_interval = status_update_interval;
   g.time_change_threshold = time_change_threshold;
   g.translate_passive_host_checks = translate_passive_host_checks;
-  g.use_aggressive_host_checking = use_aggressive_host_checking;
   g.use_large_installation_tweaks = use_large_installation_tweaks;
   g.use_regexp_matches = use_regexp_matches;
   g.use_retained_program_state = use_retained_program_state;

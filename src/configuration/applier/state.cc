@@ -1080,7 +1080,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->status_update_interval(new_cfg.status_update_interval());
   config->time_change_threshold(new_cfg.time_change_threshold());
   config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
-  config->use_aggressive_host_checking(new_cfg.use_aggressive_host_checking());
   config->use_check_result_path(new_cfg.use_check_result_path());
   config->use_large_installation_tweaks(new_cfg.use_large_installation_tweaks());
   config->use_regexp_matches(new_cfg.use_regexp_matches());

@@ -134,16 +134,10 @@ is done which may then alter the final host state.
 Plugin Result Preliminary Host State
 ============= ======================
 OK            UP
-WARNING       UP or DOWN
+WARNING       UP
 UNKNOWN       DOWN
 CRITICAL      DOWN
 ============= ======================
-
-.. note::
-   WARNING results usually means the host is UP. However, WARNING
-   results are interpreted to mean the host is DOWN if the
-   :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
-   option is enabled.
 
 If the preliminary host state is DOWN, Centreon Engine will attempt to
 see if the host is really DOWN or if it is UNREACHABLE. The distinction

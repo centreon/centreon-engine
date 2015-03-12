@@ -124,8 +124,6 @@ state::setters const state::_setters[] = {
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
-  { "use_aggressive_host_checking",                SETTER(bool, use_aggressive_host_checking) },
-  { "use_agressive_host_checking",                 SETTER(bool, use_aggressive_host_checking) },
   { "use_check_result_path",                       SETTER(bool, use_check_result_path) },
   { "use_large_installation_tweaks",               SETTER(bool, use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, use_regexp_matches) },
@@ -183,6 +181,8 @@ state::setters const state::_setters[] = {
   { "service_perfdata_file_template",              SETTER(std::string const&, _set_service_perfdata_file_template) },
   { "temp_file",                                   SETTER(std::string const&, _set_temp_file) },
   { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
+  { "use_aggressive_host_checking",                SETTER(bool, _set_use_aggressive_host_checking) },
+  { "use_agressive_host_checking",                 SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) }
 };
 
@@ -271,7 +271,6 @@ static std::string const               default_status_file(DEFAULT_STATUS_FILE);
 static unsigned int const              default_status_update_interval(60);
 static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
-static bool const                      default_use_aggressive_host_checking(false);
 static bool const                      default_use_check_result_path(false);
 static bool const                      default_use_large_installation_tweaks(false);
 static bool const                      default_use_regexp_matches(false);
@@ -394,7 +393,6 @@ state::state()
     _status_update_interval(default_status_update_interval),
     _time_change_threshold(default_time_change_threshold),
     _translate_passive_host_checks(default_translate_passive_host_checks),
-    _use_aggressive_host_checking(default_use_aggressive_host_checking),
     _use_check_result_path(default_use_check_result_path),
     _use_large_installation_tweaks(default_use_large_installation_tweaks),
     _use_regexp_matches(default_use_regexp_matches),
@@ -530,7 +528,6 @@ state& state::operator=(state const& right) {
     _time_change_threshold = right._time_change_threshold;
     _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
-    _use_aggressive_host_checking = right._use_aggressive_host_checking;
     _use_check_result_path = right._use_check_result_path;
     _use_large_installation_tweaks = right._use_large_installation_tweaks;
     _use_regexp_matches = right._use_regexp_matches;
@@ -652,7 +649,6 @@ bool state::operator==(state const& right) const throw () {
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
-          && _use_aggressive_host_checking == right._use_aggressive_host_checking
           && _use_check_result_path == right._use_check_result_path
           && _use_large_installation_tweaks == right._use_large_installation_tweaks
           && _use_regexp_matches == right._use_regexp_matches
@@ -3094,24 +3090,6 @@ void state::user(unsigned int key, std::string const& value) {
 }
 
 /**
- *  Get use_aggressive_host_checking value.
- *
- *  @return The use_aggressive_host_checking value.
- */
-bool state::use_aggressive_host_checking() const throw () {
-  return (_use_aggressive_host_checking);
-}
-
-/**
- *  Set use_aggressive_host_checking value.
- *
- *  @param[in] value The new use_aggressive_host_checking value.
- */
-void state::use_aggressive_host_checking(bool value) {
-  _use_aggressive_host_checking = value;
-}
-
-/**
  *  Get use_check_result_path value.
  *
  *  @return The use_check_result_path value.
@@ -3979,6 +3957,19 @@ void state::_set_temp_path(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: temp_path variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_aggressive_host_checking(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_aggressive_host_checking variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

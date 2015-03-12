@@ -1233,15 +1233,9 @@ int checker::_execute_sync(host* hst) {
     for (char* ptr = hst->plugin_output; (ptr = strchr(ptr, ';')); *ptr = ':')
       ;
 
-  // If we're not doing aggressive host checking, let WARNING
-  // states indicate the host is up (fake the result to be STATE_OK).
-  if (!config->use_aggressive_host_checking()
-      && (res.exit_code == STATE_WARNING))
-    res.exit_code = STATE_OK;
-
   // Get host state from plugin exit code.
   int return_result(
-        (res.exit_code == STATE_OK)
+        ((res.exit_code == STATE_OK) || (res.exit_code == STATE_WARNING))
         ? HOST_UP
         : HOST_DOWN);
 

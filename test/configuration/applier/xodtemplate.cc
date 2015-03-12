@@ -15584,17 +15584,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"use_agressive_host_checking") || !strcmp(variable,"use_aggressive_host_checking")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for use_aggressive_host_checking")) {}
-        error=true;
-        break;
-      }
-
-      use_aggressive_host_checking=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"cached_host_check_horizon"))
       cached_host_check_horizon=strtoul(value,NULL,0);
 
