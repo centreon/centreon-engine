@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -60,7 +60,6 @@ bool operator==(
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
           && obj1.check_timeout == obj2.check_timeout
-          && obj1.parallelize == obj2.parallelize
           && is_equal(obj1.contact_groups, obj2.contact_groups)
           && is_equal(obj1.contacts, obj2.contacts)
           && obj1.notification_interval == obj2.notification_interval
@@ -203,7 +202,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  check_timeout:                        " << obj.check_timeout << "\n"
-    "  parallelize:                          " << obj.parallelize << "\n"
     "  contact_groups:                       " << chkobj(obj.contact_groups) << "\n"
     "  contacts:                             " << chkobj(obj.contacts) << "\n"
     "  notification_interval:                " << obj.notification_interval << "\n"
@@ -319,8 +317,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
  *  @param[in] check_timeout                Check timeout.
- *  @param[in] parallelize                  Can active checks be
- *                                          parallelized ?
  *  @param[in] accept_passive_checks        Does this service accept
  *                                          check result submission ?
  *  @param[in] check_interval               Normal check interval.
@@ -388,7 +384,6 @@ service* add_service(
            int initial_state,
            int max_attempts,
            unsigned int check_timeout,
-           int parallelize,
            int accept_passive_checks,
            double check_interval,
            double retry_interval,
@@ -530,7 +525,6 @@ service* add_service(
     obj->notify_on_unknown = (notify_unknown > 0);
     obj->notify_on_warning = (notify_warning > 0);
     obj->obsess_over_service = (obsess_over_service > 0);
-    obj->parallelize = (parallelize > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -89,7 +89,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Initial state
     1,                              // Max attempts
     0,                              // Service check timeout
-    1,                              // Parallelize
     1,                              // Accept passive checks
     1.0,                            // Check interval
     1.0,                            // Retry interval

@@ -100,7 +100,7 @@ public:
   }
 
   static service* add_generic_service() {
-    return (add_service("name", "description", NULL, NULL, 0, 42, 0, 0,
+    return (add_service("name", "description", NULL, NULL, 0, 42, 0,
                         0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
                         0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, NULL));

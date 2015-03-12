@@ -888,7 +888,6 @@ int xodtemplate_begin_object_definition(
     new_service->retry_interval = 1.0;
     new_service->active_checks_enabled = true;
     new_service->passive_checks_enabled = true;
-    new_service->parallelize_check = true;
     new_service->obsess_over_service = true;
     new_service->event_handler_enabled = true;
     new_service->flap_detection_enabled = true;
@@ -1251,10 +1250,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "passive_checks_enabled")) {
       temp_service->passive_checks_enabled = (atoi(value) > 0) ? true : false;
       temp_service->have_passive_checks_enabled = true;
-    }
-    else if (!strcmp(variable, "parallelize_check")) {
-      temp_service->parallelize_check = atoi(value);
-      temp_service->have_parallelize_check = true;
     }
     else if (!strcmp(variable, "is_volatile")) {
       temp_service->is_volatile = (atoi(value) > 0) ? true : false;
@@ -5408,8 +5403,6 @@ int xodtemplate_duplicate_service(
   new_service->have_active_checks_enabled = temp_service->have_active_checks_enabled;
   new_service->passive_checks_enabled = temp_service->passive_checks_enabled;
   new_service->have_passive_checks_enabled = temp_service->have_passive_checks_enabled;
-  new_service->parallelize_check = temp_service->parallelize_check;
-  new_service->have_parallelize_check = temp_service->have_parallelize_check;
   new_service->is_volatile = temp_service->is_volatile;
   new_service->have_is_volatile = temp_service->have_is_volatile;
   new_service->obsess_over_service = temp_service->obsess_over_service;
@@ -7420,12 +7413,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->passive_checks_enabled
         = template_service->passive_checks_enabled;
       this_service->have_passive_checks_enabled = true;
-    }
-    if (this_service->have_parallelize_check == false
-        && template_service->have_parallelize_check == true) {
-      this_service->parallelize_check
-        = template_service->parallelize_check;
-      this_service->have_parallelize_check = true;
     }
     if (this_service->have_is_volatile == false
         && template_service->have_is_volatile == true) {
@@ -9900,7 +9887,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->initial_state,
                   this_service->max_check_attempts,
                   this_service->check_timeout,
-                  this_service->parallelize_check,
                   this_service->passive_checks_enabled,
                   this_service->check_interval,
                   this_service->retry_interval,
@@ -11624,7 +11610,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\tretry_interval\t%f\n", temp_service->retry_interval);
     fprintf(fp, "\tmax_check_attempts\t%d\n", temp_service->max_check_attempts);
     fprintf(fp, "\tis_volatile\t%d\n", temp_service->is_volatile);
-    fprintf(fp, "\tparallelize_check\t%d\n", temp_service->parallelize_check);
     fprintf(fp, "\tactive_checks_enabled\t%d\n", temp_service->active_checks_enabled);
     fprintf(fp, "\tpassive_checks_enabled\t%d\n", temp_service->passive_checks_enabled);
     fprintf(fp, "\tobsess_over_service\t%d\n", temp_service->obsess_over_service);

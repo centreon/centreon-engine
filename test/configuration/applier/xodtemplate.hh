@@ -362,7 +362,6 @@ typedef struct xodtemplate_service_struct{
   unsigned int check_timeout;
   int          active_checks_enabled;
   int          passive_checks_enabled;
-  int          parallelize_check;
   int          is_volatile;
   int          obsess_over_service;
   char*        event_handler;
@@ -421,7 +420,6 @@ typedef struct xodtemplate_service_struct{
   int          have_retry_interval;
   int          have_active_checks_enabled;
   int          have_passive_checks_enabled;
-  int          have_parallelize_check;
   int          have_is_volatile;
   int          have_obsess_over_service;
   int          have_event_handler_enabled;

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -119,7 +119,6 @@ void applier::service::add_object(
     obj->initial_state(),
     obj->max_check_attempts(),
     obj->check_timeout_defined() ? obj->check_timeout() : 0,
-    true, // parallelize, enabled by default in Nagios
     obj->checks_passive(),
     obj->check_interval(),
     obj->retry_interval(),
