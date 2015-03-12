@@ -30,6 +30,5 @@ Advanced
    determining_status_and_reachability_of_network_hosts
    fast_startup_options
    known_issues
-   large_installation_tweaks
    security_considerations
    centengine_plugin_api

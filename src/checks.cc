@@ -1711,11 +1711,6 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
   /* default is to use the new event */
   use_original_event = false;
 
-#ifdef PERFORMANCE_INCREASE_BUT_VERY_BAD_IDEA_INDEED
-  /* WARNING! 1/19/07 on-demand async host checks will end up causing mutliple scheduled checks of a host to appear in the queue if the code below is skipped */
-  /* if(use_large_installation_tweaks==false)... skip code below */
-#endif
-
   /* see if there are any other scheduled checks of this host in the queue */
   temp_event = quick_timed_event.find(
                                    hash_timed_event::low,

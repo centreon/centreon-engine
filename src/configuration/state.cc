@@ -125,7 +125,6 @@ state::setters const state::_setters[] = {
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
   { "use_check_result_path",                       SETTER(bool, use_check_result_path) },
-  { "use_large_installation_tweaks",               SETTER(bool, use_large_installation_tweaks) },
   { "use_retained_program_state",                  SETTER(bool, use_retained_program_state) },
   { "use_retained_scheduling_info",                SETTER(bool, use_retained_scheduling_info) },
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
@@ -182,6 +181,7 @@ state::setters const state::_setters[] = {
   { "use_aggressive_host_checking",                SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_agressive_host_checking",                 SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
+  { "use_large_installation_tweaks",               SETTER(bool, _set_use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, _set_use_regexp_matching) },
   { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) }
 };
@@ -272,7 +272,6 @@ static unsigned int const              default_status_update_interval(60);
 static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
 static bool const                      default_use_check_result_path(false);
-static bool const                      default_use_large_installation_tweaks(false);
 static bool const                      default_use_retained_program_state(true);
 static bool const                      default_use_retained_scheduling_info(false);
 static bool const                      default_use_setpgid(true);
@@ -392,7 +391,6 @@ state::state()
     _time_change_threshold(default_time_change_threshold),
     _translate_passive_host_checks(default_translate_passive_host_checks),
     _use_check_result_path(default_use_check_result_path),
-    _use_large_installation_tweaks(default_use_large_installation_tweaks),
     _use_retained_program_state(default_use_retained_program_state),
     _use_retained_scheduling_info(default_use_retained_scheduling_info),
     _use_setpgid(default_use_setpgid),
@@ -525,7 +523,6 @@ state& state::operator=(state const& right) {
     _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
     _use_check_result_path = right._use_check_result_path;
-    _use_large_installation_tweaks = right._use_large_installation_tweaks;
     _use_retained_program_state = right._use_retained_program_state;
     _use_retained_scheduling_info = right._use_retained_scheduling_info;
     _use_setpgid = right._use_setpgid;
@@ -644,7 +641,6 @@ bool state::operator==(state const& right) const throw () {
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
           && _use_check_result_path == right._use_check_result_path
-          && _use_large_installation_tweaks == right._use_large_installation_tweaks
           && _use_retained_program_state == right._use_retained_program_state
           && _use_retained_scheduling_info == right._use_retained_scheduling_info
           && _use_setpgid == right._use_setpgid
@@ -3109,24 +3105,6 @@ void state::use_check_result_path(bool value) {
 }
 
 /**
- *  Get use_large_installation_tweaks value.
- *
- *  @return The use_large_installation_tweaks value.
- */
-bool state::use_large_installation_tweaks() const throw () {
-  return (_use_large_installation_tweaks);
-}
-
-/**
- *  Set use_large_installation_tweaks value.
- *
- *  @param[in] value The new use_large_installation_tweaks value.
- */
-void state::use_large_installation_tweaks(bool value) {
-  _use_large_installation_tweaks = value;
-}
-
-/**
  *  Get use_retained_program_state value.
  *
  *  @return The use_retained_program_state value.
@@ -3947,6 +3925,19 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: use_embedded_perl_implicitly variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_large_installation_tweaks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_large_installation_tweaks variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

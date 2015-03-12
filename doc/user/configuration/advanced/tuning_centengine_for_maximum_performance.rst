@@ -15,10 +15,6 @@ optimizing Centreon Engine...
 Optimization Tips
 =================
 
-  * Use large installation tweaks. Enabling the
-    :ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
-    option may provide you with better performance. Read more about what
-    this option does :ref:`here <main_cfg_opt_large_installation_tweaks>`.
   * Check Result Reaper Frequency. The
     :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
     variable determines how often Centreon Engine should check for host

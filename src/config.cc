@@ -845,30 +845,6 @@ int check_host(host* hst, int* w, int* e) {
   int warnings(0);
   int errors(0);
 
-  /* make sure each host has at least one service associated with it */
-  /* 02/21/08 NOTE: this is extremely inefficient */
-  if (use_precached_objects == false
-      && config->use_large_installation_tweaks() == false) {
-
-    bool found = false;
-    for (service* temp_service = service_list;
-	 temp_service != NULL;
-	 temp_service = temp_service->next) {
-      if (!strcmp(temp_service->host_name, hst->name)) {
-	found = true;
-	break;
-      }
-    }
-
-    /* we couldn't find a service associated with this host! */
-    if (found == false) {
-      logger(log_verification_error, basic)
-        << "Warning: Host '" << hst->name
-        << "' has no services associated with it!";
-      warnings++;
-    }
-  }
-
   /* check the event handler command */
   if (hst->event_handler != NULL) {
 

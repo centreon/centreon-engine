@@ -277,28 +277,8 @@ void applier::host::_update(
   if (obj.current_state != HOST_UP && obj.state_type == HARD_STATE)
     obj.current_attempt = obj.max_attempts;
 
-  // ADDED 02/20/08 assume same flapping state if large install
-  // tweaks enabled.
-  if (config.use_large_installation_tweaks())
-    obj.is_flapping = state.is_flapping();
-  // else use normal startup flap detection logic.
-  else {
-    // host was flapping before program started.
-    // 11/10/07 don't allow flapping notifications to go out.
-    allow_flapstart_notification = !state.is_flapping();
-
-    // check for flapping.
-    check_for_host_flapping(
-      &obj,
-      false,
-      false,
-      allow_flapstart_notification);
-
-    // host was flapping before and isn't now, so clear recovery
-    // check variable if host isn't flapping now.
-    if (state.is_flapping() && !obj.is_flapping)
-      obj.check_flapping_recovery_notification = false;
-  }
+  // Assume same flapping state.
+  obj.is_flapping = state.is_flapping();
 
   // handle new vars added in 2.x.
   if (!obj.last_hard_state_change)

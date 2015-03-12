@@ -42,10 +42,6 @@ Enable cached check to incresed performance.
 Optimization
 ============
 
-Large installation enable some optimization enable it.
-
-  * use_large_installation_tweaks=1
-
 Centreon-Engine allow to improve performance without
 using setpgid (see the documentation!).
 

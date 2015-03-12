@@ -684,27 +684,8 @@ int xrddefault_read_state_information() {
               && temp_host->state_type == HARD_STATE)
             temp_host->current_attempt = temp_host->max_attempts;
 
-          /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (use_large_installation_tweaks == true)
-            temp_host->is_flapping = was_flapping;
-          /* else use normal startup flap detection logic */
-          else {
-            /* host was flapping before program started */
-            /* 11/10/07 don't allow flapping notifications to go out */
-            if (was_flapping == TRUE)
-              allow_flapstart_notification = FALSE;
-            else
-              /* flapstart notifications are okay */
-              allow_flapstart_notification = TRUE;
-
-            /* check for flapping */
-            check_for_host_flapping(temp_host, FALSE, FALSE,
-				    allow_flapstart_notification);
-
-            /* host was flapping before and isn't now, so clear recovery check variable if host isn't flapping now */
-            if (was_flapping == TRUE && temp_host->is_flapping == FALSE)
-              temp_host->check_flapping_recovery_notification = FALSE;
-          }
+          // Assume same flapping state.
+          temp_host->is_flapping = was_flapping;
 
           /* handle new vars added in 2.x */
           if (temp_host->last_hard_state_change == (time_t)0)
@@ -760,28 +741,8 @@ int xrddefault_read_state_information() {
             temp_service->current_attempt = temp_service->max_attempts;
 
 
-          /* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-          if (use_large_installation_tweaks == true)
-            temp_service->is_flapping = was_flapping;
-          /* else use normal startup flap detection logic */
-          else {
-            /* service was flapping before program started */
-            /* 11/10/07 don't allow flapping notifications to go out */
-            if (was_flapping == TRUE)
-              allow_flapstart_notification = FALSE;
-            else
-              /* flapstart notifications are okay */
-              allow_flapstart_notification = TRUE;
-
-            /* check for flapping */
-            check_for_service_flapping(temp_service, FALSE,
-				       allow_flapstart_notification);
-
-            /* service was flapping before and isn't now, so clear recovery check variable if service isn't flapping now */
-            if (was_flapping == TRUE
-                && temp_service->is_flapping == FALSE)
-              temp_service->check_flapping_recovery_notification = FALSE;
-          }
+          // Assume same flapping state if large install tweaks enabled.
+          temp_service->is_flapping = was_flapping;
 
           /* handle new vars added in 2.x */
           if (temp_service->last_hard_state_change == (time_t)0)

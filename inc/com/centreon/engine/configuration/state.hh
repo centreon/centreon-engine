@@ -357,8 +357,6 @@ namespace               configuration {
     void                user(unsigned int key, std::string const& value);
     bool                use_check_result_path() const throw ();
     void                use_check_result_path(bool value);
-    bool                use_large_installation_tweaks() const throw ();
-    void                use_large_installation_tweaks(bool value);
     bool                use_retained_program_state() const throw ();
     void                use_retained_program_state(bool value);
     bool                use_retained_scheduling_info() const throw ();
@@ -431,6 +429,7 @@ namespace               configuration {
     void                _set_temp_path(std::string const& value);
     void                _set_use_aggressive_host_checking(bool value);
     void                _set_use_embedded_perl_implicitly(std::string const& value);
+    void                _set_use_large_installation_tweaks(bool value);
     void                _set_use_regexp_matching(bool value);
     void                _set_use_true_regexp_matching(bool value);
 
@@ -583,7 +582,6 @@ namespace               configuration {
     std::vector<std::string>
                         _users;
     bool                _use_check_result_path;
-    bool                _use_large_installation_tweaks;
     bool                _use_retained_program_state;
     bool                _use_retained_scheduling_info;
     bool                _use_setpgid;

@@ -1081,7 +1081,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->time_change_threshold(new_cfg.time_change_threshold());
   config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
   config->use_check_result_path(new_cfg.use_check_result_path());
-  config->use_large_installation_tweaks(new_cfg.use_large_installation_tweaks());
   config->use_retained_program_state(new_cfg.use_retained_program_state());
   config->use_retained_scheduling_info(new_cfg.use_retained_scheduling_info());
   config->use_setpgid(new_cfg.use_setpgid());

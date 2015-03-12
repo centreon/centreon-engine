@@ -680,7 +680,3 @@ Notes
   * :sup:`9` These macro are only available as on-demand macros -
     e.g. you must supply an additional argument with them in order to
     use them. These macros are not available as environment variables.
-  * :sup:`10` Summary macros are not available as environment
-    variables if the
-    :ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
-    option is enabled, as they are quite CPU-intensive to calculate.

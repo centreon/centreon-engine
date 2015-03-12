@@ -1215,24 +1215,6 @@ service check caching. More information on cached checks can be found
 **Example** cached_service_check_horizon=15
 =========== ======================================
 
-.. _main_cfg_opt_large_installation_tweaks:
-
-Large Installation Tweaks Option
---------------------------------
-
-This option determines whether or not the Centreon Engine daemon will
-take several shortcuts to improve performance. These shortcuts result in
-the loss of a few features, but larger installations will likely see a
-lot of benefit from doing so.
-
-  * 0 = Don't use tweaks (default)
-  * 1 = Use tweaks
-
-=========== ===================================
-**Format**  use_large_installation_tweaks=<0/1>
-**Example** use_large_installation_tweaks=0
-=========== ===================================
-
 .. _main_cfg_opt_use_setpgid:
 
 Use Setpgid

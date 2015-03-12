@@ -289,27 +289,8 @@ void applier::service::_update(
     obj.current_attempt = obj.max_attempts;
 
 
-  // ADDED 02/20/08 assume same flapping state if large
-  // install tweaks enabled.
-  if (config.use_large_installation_tweaks())
-    obj.is_flapping = state.is_flapping();
-  // else use normal startup flap detection logic.
-  else {
-    // service was flapping before program started.
-    // 11/10/07 don't allow flapping notifications to go out.
-    allow_flapstart_notification = !state.is_flapping();
-
-    // check for flapping.
-    check_for_service_flapping(
-      &obj,
-      false,
-      allow_flapstart_notification);
-
-    // service was flapping before and isn't now, so clear
-    // recovery check variable if service isn't flapping now.
-    if (state.is_flapping() && !obj.is_flapping)
-      obj.check_flapping_recovery_notification = false;
-  }
+  // Assume same flapping state.
+  obj.is_flapping = state.is_flapping();
 
   // handle new vars added in 2.x.
   if (obj.last_hard_state_change)

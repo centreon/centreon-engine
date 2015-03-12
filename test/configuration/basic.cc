@@ -200,7 +200,6 @@ static std::map<std::string, std::string> build_configuration(
   var["illegal_object_name_chars"] = "`~!$%^&*|'\"<>?,()";
   var["illegal_macro_output_chars"] = "`~$&|'\"<>";
   var["broker_module"] = "module argument";
-  var["use_large_installation_tweaks"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
 
   std::ofstream ofs(mainconf.c_str());
@@ -441,9 +440,6 @@ void test_configuration(
   }
   if (my_conf["event_broker_options"] != obj2str(config->event_broker_options())) {
     throw (engine_error() << "event_broker_options: init with '" << my_conf["event_broker_options"] << "'");
-  }
-  if (my_conf["use_large_installation_tweaks"] != obj2str(config->use_large_installation_tweaks())) {
-    throw (engine_error() << "use_large_installation_tweaks: init with '" << my_conf["use_large_installation_tweaks"] << "'");
   }
   if (my_conf["external_command_buffer_slots"] != obj2str(config->external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");

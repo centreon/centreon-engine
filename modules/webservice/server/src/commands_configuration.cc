@@ -2046,39 +2046,6 @@ int centreonengine__setCheckResultReaperFrequency(soap* s,
 }
 
 /**
- *  Set global variable use_lage_installation_tweaks.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable use_lage_installation_tweaks.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setUseLargeInstallationTweaks(soap* s,
-                                                  bool value,
-                                                  centreonengine__setUseLargeInstallationTweaksResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config->use_large_installation_tweaks(value);
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Set global variable debug_verbosity.
  *
  *  @param[in]  s           Unused.

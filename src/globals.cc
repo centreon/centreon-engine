@@ -179,7 +179,6 @@ unsigned int        soft_state_dependencies(false);
 unsigned int        status_update_interval(60);
 unsigned int        time_change_threshold(900);
 unsigned int        translate_passive_host_checks(false);
-unsigned int        use_large_installation_tweaks(false);
 unsigned int        use_retained_program_state(true);
 unsigned int        use_retained_scheduling_info(false);
 unsigned int        use_syslog(true);

@@ -15393,17 +15393,6 @@ int read_main_config_file(char const* main_config_file) {
 #endif
     }
 
-    else if(!strcmp(variable,"use_large_installation_tweaks")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for use_large_installation_tweaks ")) {}
-        error=true;
-        break;
-      }
-
-      use_large_installation_tweaks=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"external_command_buffer_slots"))
       external_command_buffer_slots=atoi(value);
 

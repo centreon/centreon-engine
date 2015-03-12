@@ -303,8 +303,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.time_change_threshold() << std::endl
     << "translate_passive_host_checks="
     << obj.translate_passive_host_checks() << std::endl
-    << "use_large_installation_tweaks="
-    << obj.use_large_installation_tweaks() << std::endl
     << "use_retained_program_state="
     << obj.use_retained_program_state() << std::endl
     << "use_retained_scheduling_info="
