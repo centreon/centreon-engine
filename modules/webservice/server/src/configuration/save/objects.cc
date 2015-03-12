@@ -198,17 +198,6 @@ objects& objects::operator<<(host const& obj) {
   _add_string("notification_options", notification_options);
   _add_line("notifications_enabled", obj.notifications_enabled);
   _add_string("stalking_options", stalking_options);
-  _add_string("notes", obj.notes);
-  _add_string("notes_url", obj.notes_url);
-  _add_string("action_url", obj.action_url);
-  _add_string("icon_image", obj.icon_image);
-  _add_string("icon_image_alt", obj.icon_image_alt);
-  _add_string("vrml_image", obj.vrml_image);
-  _add_string("statusmap_image", obj.statusmap_image);
-  if (obj.have_2d_coords)
-    _stream << "  2d_coords " << obj.x_2d << "," << obj.y_2d << "\n";
-  if (obj.have_3d_coords)
-    _stream << "  3d_coords " << obj.x_3d << "," << obj.y_3d << "," << obj.z_3d << "\n";
   _add_customvariables(obj.custom_variables);
   _stream << "}\n";
   return (*this);
@@ -279,9 +268,6 @@ objects& objects::operator<<(hostgroup const& obj) {
   _add_string("hostgroup_name", obj.group_name);
   _add_string("alias", obj.alias);
   _add_hosts("members", obj.members);
-  _add_string("notes", obj.notes);
-  _add_string("notes_url", obj.notes_url);
-  _add_string("action_url", obj.action_url);
   _stream << "}\n";
   return (*this);
 }
@@ -352,11 +338,6 @@ objects& objects::operator<<(service const& obj) {
   _add_contacts("contacts", obj.contacts);
   _add_contactgroups("contact_groups", obj.contact_groups);
   _add_string("stalking_options", stalking_options);
-  _add_string("notes", obj.notes);
-  _add_string("notes_url", obj.notes_url);
-  _add_string("action_url", obj.action_url);
-  _add_string("icon_image", obj.icon_image);
-  _add_string("icon_image_alt", obj.icon_image_alt);
   _add_customvariables(obj.custom_variables);
   _stream << "}\n";
   return (*this);
@@ -432,9 +413,6 @@ objects& objects::operator<<(servicegroup const& obj) {
   _add_string("servicegroup_name", obj.group_name);
   _add_string("alias", obj.alias);
   _add_services("members", obj.members);
-  _add_string("notes", obj.notes);
-  _add_string("notes_url", obj.notes_url);
-  _add_string("action_url", obj.action_url);
   _stream << "}\n";
   return (*this);
 }

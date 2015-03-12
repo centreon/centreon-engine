@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2008 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,10 +40,8 @@
 #  define XODTEMPLATE_SERVICEESCALATION     10
 #  define XODTEMPLATE_HOSTESCALATION        11
 #  define XODTEMPLATE_HOSTDEPENDENCY        12
-#  define XODTEMPLATE_HOSTEXTINFO           13
-#  define XODTEMPLATE_SERVICEEXTINFO        14
-#  define XODTEMPLATE_SERVICEGROUP          15
-#  define XODTEMPLATE_CONNECTOR             16
+#  define XODTEMPLATE_SERVICEGROUP          13
+#  define XODTEMPLATE_CONNECTOR             14
 
 // Skip lists.
 #  define X_HOST_SKIPLIST                   1
@@ -58,10 +56,8 @@
 #  define X_SERVICEDEPENDENCY_SKIPLIST      10
 #  define X_HOSTESCALATION_SKIPLIST         11
 #  define X_SERVICEESCALATION_SKIPLIST      12
-#  define X_HOSTEXTINFO_SKIPLIST            13
-#  define X_SERVICEEXTINFO_SKIPLIST         14
-#  define X_CONNECTOR_SKIPLIST              15
-#  define NUM_XOBJECT_SKIPLISTS             16
+#  define X_CONNECTOR_SKIPLIST              13
+#  define NUM_XOBJECT_SKIPLISTS             14
 
 
 /* CUSTOMVARIABLESMEMBER structure */
@@ -272,13 +268,6 @@ typedef struct xodtemplate_host_struct{
   int          stalk_on_unreachable;
   int          failure_prediction_enabled;
   char*        failure_prediction_options;
-  char*        notes;
-  char*        notes_url;
-  char*        action_url;
-  char*        icon_image;
-  char*        icon_image_alt;
-  char*        vrml_image;
-  char*        statusmap_image;
   char*        timezone;
   int          x_2d;
   int          y_2d;
@@ -300,13 +289,6 @@ typedef struct xodtemplate_host_struct{
   int          have_contacts;
   int          have_notification_period;
   int          have_failure_prediction_options;
-  int          have_notes;
-  int          have_notes_url;
-  int          have_action_url;
-  int          have_icon_image;
-  int          have_icon_image_alt;
-  int          have_vrml_image;
-  int          have_statusmap_image;
   int          have_timezone;
 
   int          have_initial_state;
@@ -329,8 +311,6 @@ typedef struct xodtemplate_host_struct{
   int          have_first_notification_delay;
   int          have_stalking_options;
   int          have_failure_prediction_enabled;
-  int          have_2d_coords;
-  int          have_3d_coords;
   int          have_retain_status_information;
   int          have_retain_nonstatus_information;
 
@@ -351,15 +331,9 @@ typedef struct xodtemplate_hostgroup_struct{
   char*        alias;
   char*        members;
   char*        hostgroup_members;
-  char*        notes;
-  char*        notes_url;
-  char*        action_url;
 
   int          have_members;
   int          have_hostgroup_members;
-  int          have_notes;
-  int          have_notes_url;
-  int          have_action_url;
 
   int          has_been_resolved;
   int          register_object;
@@ -420,11 +394,6 @@ typedef struct xodtemplate_service_struct{
   int          stalk_on_critical;
   int          failure_prediction_enabled;
   char*        failure_prediction_options;
-  char*        notes;
-  char*        notes_url;
-  char*        action_url;
-  char*        icon_image;
-  char*        icon_image_alt;
   char*        timezone;
   int          retain_status_information;
   int          retain_nonstatus_information;
@@ -444,11 +413,6 @@ typedef struct xodtemplate_service_struct{
   int          have_contact_groups;
   int          have_contacts;
   int          have_failure_prediction_options;
-  int          have_notes;
-  int          have_notes_url;
-  int          have_action_url;
-  int          have_icon_image;
-  int          have_icon_image_alt;
   int          have_timezone;
 
   int          have_initial_state;
@@ -494,15 +458,9 @@ typedef struct xodtemplate_servicegroup_struct{
   char*        alias;
   char*        members;
   char*        servicegroup_members;
-  char*        notes;
-  char*        notes_url;
-  char*        action_url;
 
   int          have_members;
   int          have_servicegroup_members;
-  int          have_notes;
-  int          have_notes_url;
-  int          have_action_url;
 
   int          has_been_resolved;
   int          register_object;
@@ -672,77 +630,6 @@ typedef struct xodtemplate_hostescalation_struct{
   struct xodtemplate_hostescalation_struct* next;
 }              xodtemplate_hostescalation;
 
-
-/* HOSTEXTINFO TEMPLATE STRUCTURE */
-typedef struct xodtemplate_hostextinfo_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        host_name;
-  char*        hostgroup_name;
-  char*        notes;
-  char*        notes_url;
-  char*        action_url;
-  char*        icon_image;
-  char*        icon_image_alt;
-  char*        vrml_image;
-  char*        statusmap_image;
-  int          x_2d;
-  int          y_2d;
-  double       x_3d;
-  double       y_3d;
-  double       z_3d;
-
-  int          have_host_name;
-  int          have_hostgroup_name;
-  int          have_notes;
-  int          have_notes_url;
-  int          have_action_url;
-  int          have_icon_image;
-  int          have_icon_image_alt;
-  int          have_vrml_image;
-  int          have_statusmap_image;
-
-  int          have_2d_coords;
-  int          have_3d_coords;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_hostextinfo_struct* next;
-}              xodtemplate_hostextinfo;
-
-
-/* SERVICEEXTINFO TEMPLATE STRUCTURE */
-typedef struct xodtemplate_serviceextinfo_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        host_name;
-  char*        hostgroup_name;
-  char*        service_description;
-  char*        notes;
-  char*        notes_url;
-  char*        action_url;
-  char*        icon_image;
-  char*        icon_image_alt;
-
-  int          have_host_name;
-  int          have_hostgroup_name;
-  int          have_service_description;
-  int          have_notes;
-  int          have_notes_url;
-  int          have_action_url;
-  int          have_icon_image;
-  int          have_icon_image_alt;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_serviceextinfo_struct* next;
-}              xodtemplate_serviceextinfo;
 
 /* CONTACT LIST STRUCTURE */
 typedef struct xodtemplate_contactlist_struct{
@@ -985,10 +872,6 @@ int xodtemplate_duplicate_servicedependency(
       char*,
       char*,
       char*);
-int xodtemplate_duplicate_hostextinfo(xodtemplate_hostextinfo*, char*);
-int xodtemplate_duplicate_serviceextinfo(
-      xodtemplate_serviceextinfo*,
-      char*);
 
 int xodtemplate_recombobulate_contactgroups();
 int xodtemplate_recombobulate_contactgroup_subgroups(
@@ -1016,8 +899,6 @@ int xodtemplate_resolve_host(xodtemplate_host*);
 int xodtemplate_resolve_service(xodtemplate_service*);
 int xodtemplate_resolve_hostdependency(xodtemplate_hostdependency*);
 int xodtemplate_resolve_hostescalation(xodtemplate_hostescalation*);
-int xodtemplate_resolve_hostextinfo(xodtemplate_hostextinfo*);
-int xodtemplate_resolve_serviceextinfo(xodtemplate_serviceextinfo*);
 
 int xodtemplate_sort_timeperiods();
 int xodtemplate_sort_commands();
@@ -1032,14 +913,6 @@ int xodtemplate_sort_servicedependencies();
 int xodtemplate_sort_serviceescalations();
 int xodtemplate_sort_hostdependencies();
 int xodtemplate_sort_hostescalations();
-
-int xodtemplate_merge_extinfo_ojects();
-int xodtemplate_merge_host_extinfo_object(
-      xodtemplate_host*,
-      xodtemplate_hostextinfo*);
-int xodtemplate_merge_service_extinfo_object(
-      xodtemplate_service*,
-      xodtemplate_serviceextinfo*);
 
 xodtemplate_timeperiod* xodtemplate_find_timeperiod(char*);
 xodtemplate_command* xodtemplate_find_command(char*);
@@ -1060,8 +933,6 @@ xodtemplate_service* xodtemplate_find_service(char*);
 xodtemplate_service* xodtemplate_find_real_service(char*,char*);
 xodtemplate_hostdependency* xodtemplate_find_hostdependency(char*);
 xodtemplate_hostescalation* xodtemplate_find_hostescalation(char*);
-xodtemplate_hostextinfo* xodtemplate_find_hostextinfo(char*);
-xodtemplate_serviceextinfo* xodtemplate_find_serviceextinfo(char*);
 
 int xodtemplate_get_inherited_string(int*, char**, int*, char **);
 int xodtemplate_clean_additive_string(char **);
@@ -1131,12 +1002,6 @@ int xodtemplate_skiplist_compare_hostescalation_template(
       void const* a,
       void const* b);
 int xodtemplate_skiplist_compare_serviceescalation_template(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_hostextinfo_template(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_serviceextinfo_template(
       void const* a,
       void const* b);
 

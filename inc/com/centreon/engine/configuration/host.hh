@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,8 +25,6 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/configuration/group.hh"
 #  include "com/centreon/engine/configuration/object.hh"
-#  include "com/centreon/engine/configuration/point_2d.hh"
-#  include "com/centreon/engine/configuration/point_3d.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects/customvariable.hh"
 #  include "com/centreon/engine/opt.hh"
@@ -34,8 +32,6 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    hostextinfo;
-
   class                    host : public object {
   public:
     enum                   action_on {
@@ -57,7 +53,6 @@ namespace                  configuration {
     bool                   operator<(host const& right) const throw ();
     void                   check_validity() const;
     key_type const&        key() const throw ();
-    void                   merge(configuration::hostextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 

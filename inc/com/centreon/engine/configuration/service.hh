@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -33,8 +33,6 @@
 CCE_BEGIN()
 
 namespace                  configuration {
-  class                    serviceextinfo;
-
   class                    service : public object {
   public:
     enum                   action_on {
@@ -61,7 +59,6 @@ namespace                  configuration {
                              service const& right) const throw ();
     void                   check_validity() const;
     key_type               key() const;
-    void                   merge(configuration::serviceextinfo const& obj);
     void                   merge(object const& obj);
     bool                   parse(char const* key, char const* value);
 

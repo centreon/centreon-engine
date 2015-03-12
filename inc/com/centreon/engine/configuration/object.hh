@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,21 +40,19 @@ namespace                  configuration {
   public:
     enum                   object_type {
       command = 0,
-      connector = 1,
-      contact = 2,
-      contactgroup = 3,
-      host = 4,
-      hostdependency = 5,
-      hostescalation = 6,
-      hostextinfo = 7,
-      hostgroup = 8,
-      service = 9,
-      servicedependency = 10,
-      serviceescalation = 11,
-      serviceextinfo = 12,
-      servicegroup = 13,
-      timeperiod = 14,
-      downtime = 15
+      connector,
+      contact,
+      contactgroup,
+      host,
+      hostdependency,
+      hostescalation,
+      hostgroup,
+      service,
+      servicedependency,
+      serviceescalation,
+      servicegroup,
+      timeperiod,
+      downtime
     };
 
                            object(object_type type);

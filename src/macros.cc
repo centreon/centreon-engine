@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -522,49 +522,10 @@ int grab_standard_hostgroup_macro_r(
     }
     break;
 
-  case MACRO_HOSTGROUPACTIONURL:
-    if (temp_hostgroup->action_url)
-      *output = string::dup(temp_hostgroup->action_url);
-    break;
-
-  case MACRO_HOSTGROUPNOTESURL:
-    if (temp_hostgroup->notes_url)
-      *output = string::dup(temp_hostgroup->notes_url);
-    break;
-
-  case MACRO_HOSTGROUPNOTES:
-    if (temp_hostgroup->notes)
-      *output = string::dup(temp_hostgroup->notes);
-    break;
-
   default:
     logger(dbg_macros, basic)
       << "UNHANDLED HOSTGROUP MACRO #" << macro_type << "! THIS IS A BUG!";
     return (ERROR);
-  }
-
-  /* post-processing */
-  /* notes, notes URL and action URL macros may themselves contain macros, so process them... */
-  switch (macro_type) {
-  case MACRO_HOSTGROUPACTIONURL:
-  case MACRO_HOSTGROUPNOTESURL:
-    process_macros_r(
-      mac,
-      *output,
-      &temp_buffer,
-      URL_ENCODE_MACRO_CHARS);
-    delete[] *output;
-    *output = temp_buffer;
-    break;
-
-  case MACRO_HOSTGROUPNOTES:
-    process_macros_r(mac, *output, &temp_buffer, 0);
-    delete[] *output;
-    *output = temp_buffer;
-    break;
-
-  default:
-    break;
   }
 
   return (OK);
@@ -663,29 +624,6 @@ int grab_standard_servicegroup_macro_r(
     return (ERROR);
   }
 
-  /* post-processing */
-  /* notes, notes URL and action URL macros may themselves contain macros, so process them... */
-  switch (macro_type) {
-  case MACRO_SERVICEGROUPACTIONURL:
-  case MACRO_SERVICEGROUPNOTESURL:
-    process_macros_r(
-      mac,
-      *output,
-      &temp_buffer,
-      URL_ENCODE_MACRO_CHARS);
-    delete[] *output;
-    *output = temp_buffer;
-    break;
-
-  case MACRO_SERVICEGROUPNOTES:
-    process_macros_r(mac, *output, &temp_buffer, 0);
-    delete[] *output;
-    *output = temp_buffer;
-    break;
-
-  default:
-    break;
-  }
   return (OK);
 }
 
@@ -1063,12 +1001,6 @@ int init_macrox_names() {
   add_macrox_name(LOGFILE);
   add_macrox_name(RESOURCEFILE);
   add_macrox_name(COMMANDFILE);
-  add_macrox_name(HOSTACTIONURL);
-  add_macrox_name(HOSTNOTESURL);
-  add_macrox_name(HOSTNOTES);
-  add_macrox_name(SERVICEACTIONURL);
-  add_macrox_name(SERVICENOTESURL);
-  add_macrox_name(SERVICENOTES);
   add_macrox_name(TOTALHOSTSUP);
   add_macrox_name(TOTALHOSTSDOWN);
   add_macrox_name(TOTALHOSTSUNREACHABLE);
@@ -1111,12 +1043,6 @@ int init_macrox_names() {
   add_macrox_name(TOTALHOSTSERVICESWARNING);
   add_macrox_name(TOTALHOSTSERVICESUNKNOWN);
   add_macrox_name(TOTALHOSTSERVICESCRITICAL);
-  add_macrox_name(HOSTGROUPNOTES);
-  add_macrox_name(HOSTGROUPNOTESURL);
-  add_macrox_name(HOSTGROUPACTIONURL);
-  add_macrox_name(SERVICEGROUPNOTES);
-  add_macrox_name(SERVICEGROUPNOTESURL);
-  add_macrox_name(SERVICEGROUPACTIONURL);
   add_macrox_name(HOSTGROUPMEMBERS);
   add_macrox_name(SERVICEGROUPMEMBERS);
   add_macrox_name(CONTACTGROUPNAME);

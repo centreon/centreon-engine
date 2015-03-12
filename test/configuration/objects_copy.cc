@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,13 +23,11 @@
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
-#include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/configuration/serviceescalation.hh"
-#include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
@@ -111,12 +109,6 @@ int main_test(int argc, char* argv[]) {
       configuration::set_hostescalation,
       &configuration::state::hostescalations>(fe.path());
   }
-  // else if (type == "hostextinfo") {
-  //   check_objects<
-  //     configuration::hostextinfo,
-  //     configuration::set_hostextinfo,
-  //     &configuration::state::hostextinfos>(fe.path());
-  // }
   else if (type == "hostgroup") {
     check_objects<
       configuration::hostgroup,
@@ -141,12 +133,6 @@ int main_test(int argc, char* argv[]) {
       configuration::set_serviceescalation,
       &configuration::state::serviceescalations>(fe.path());
   }
-  // else if (type == "serviceextinfo") {
-  //   check_objects<
-  //     configuration::serviceextinfo,
-  //     configuration::set_serviceextinfo,
-  //     &configuration::state::serviceextinfos>(fe.path());
-  // }
   else if (type == "servicegroup") {
     check_objects<
       configuration::servicegroup,

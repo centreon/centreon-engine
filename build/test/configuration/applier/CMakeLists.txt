@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -122,11 +122,6 @@ set(TEST_NAME "parse_and_apply_configuration_hostescalation_template")
 set(TEST_CONF_FILE "main_hostescalation_template.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_apply_configuration_hostextinfo
-set(TEST_NAME "parse_and_apply_configuration_hostextinfo")
-set(TEST_CONF_FILE "main_hostextinfo.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_apply_configuration_service
 set(TEST_NAME "parse_and_apply_configuration_service")
 set(TEST_CONF_FILE "main_service.cfg")
@@ -165,11 +160,6 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 # parse_and_apply_configuration_serviceescalation_template
 set(TEST_NAME "parse_and_apply_configuration_serviceescalation_template")
 set(TEST_CONF_FILE "main_serviceescalation_template.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_apply_configuration_serviceextinfo
-set(TEST_NAME "parse_and_apply_configuration_serviceextinfo")
-set(TEST_CONF_FILE "main_serviceextinfo.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_apply_configuration_timeperiod

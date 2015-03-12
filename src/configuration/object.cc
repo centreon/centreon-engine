@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,13 +24,11 @@
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/configuration/hostescalation.hh"
-#include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
 #include "com/centreon/engine/configuration/serviceescalation.hh"
-#include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
@@ -150,10 +148,6 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::timeperiod());
   else if (type_name == "connector")
     obj = object_ptr(new configuration::connector());
-  else if (type_name == "serviceextinfo")
-    obj = object_ptr(new configuration::serviceextinfo());
-  else if (type_name == "hostextinfo")
-    obj = object_ptr(new configuration::hostextinfo());
   else if (type_name == "hostdowntime")
     obj = object_ptr(new configuration::downtime(configuration::downtime::host));
   else if (type_name == "servicedowntime")
@@ -265,12 +259,10 @@ std::string const& object::type_name() const throw () {
     "host",
     "hostdependency",
     "hostescalation",
-    "hostextinfo",
     "hostgroup",
     "service",
     "servicedependency",
     "serviceescalation",
-    "serviceextinfo",
     "servicegroup",
     "timeperiod",
     "downtime"

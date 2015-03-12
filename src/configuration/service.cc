@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/service.hh"
-#include "com/centreon/engine/configuration/serviceextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
@@ -403,15 +402,6 @@ service::key_type service::key() const {
     k.first = _hosts->front();
   k.second = _service_description;
   return (k);
-}
-
-/**
- *  Merge object.
- *
- *  @param[in] obj The object to merge.
- */
-void service::merge(configuration::serviceextinfo const& tmpl) {
-  (void) tmpl;
 }
 
 /**

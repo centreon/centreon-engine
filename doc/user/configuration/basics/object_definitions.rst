@@ -74,8 +74,6 @@ Object Types
   * :ref:`Service escalation definitions <obj_def_service_escalation>`
   * :ref:`Host dependency definitions <obj_def_host_dependency>`
   * :ref:`Host escalation definitions <obj_def_host_escalation>`
-  * :ref:`Extended host information definitions <obj_def_extended_host_information>`
-  * :ref:`Extended service information definitions <obj_def_extended_service_information>`
 
 .. _obj_def_host:
 
@@ -131,15 +129,6 @@ Definition Format
     # notification_options         [d,u,r,f,s]
     # notifications_enabled        [0/1]
     # stalking_options             [o,d,u]
-    # notes                        note_string
-    # notes_url                    url
-    # action_url                   url
-    # icon_image                   image_file
-    # icon_image_alt               alt_string
-    # vrml_image                   image_file
-    # statusmap_image              image_file
-    # 2d_coords                    x_coord,y_coord
-    # 3d_coords                    x_coord,y_coord,z_coord
   }
 
 Example Definition
@@ -313,38 +302,6 @@ notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is
 stalking_options             This directive determines which host states "stalking" is enabled for. Valid options are a combination of one or more of
                              the following: o = stalk on UP states, d = stalk on DOWN states, and u = stalk on UNREACHABLE states. More information
                              on state stalking can be found :ref:`here <state_stalking>`.
-notes                        This directive is used to define an optional string of notes pertaining to the host.
-notes_url                    This variable is used to define an optional URL that can be used to provide more information about the host. Any valid
-URL can be used. This can be very useful if you want to make detailed information on the host, emergency contact methods, etc. available to other
-                             support staff.
-action_url                   This directive is used to define an optional URL that can be used to provide more actions to be performed on the host.
-                             Any valid URL can be used.
-icon_image                   This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. The image
-                             will look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/`` subdirectory in your
-                             HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
-icon_image_alt               This variable is used to define an optional string that is used in the ALT tag of the image specified by the <icon_image>
-                             argument.
-vrml_image                   This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. This image
-                             will be used as the texture map for the specified host. Unlike the image you use for the <icon_image> variable, this one
-                             should probably not have any transparency. If it does, the host object will look a bit wierd. Images for hosts are
-                             assumed to be in the ``logos/`` subdirectory in your HTML images directory (i.e.
-                             ``/usr/local/centengine/share/images/logos``).
-statusmap_image              This variable is used to define the name of an image that should be associated with this host. You can specify a JPEG,
-                             PNG, and GIF image if you want, although I would strongly suggest using a GD2 format image, as other image formats will
-                             result in a lot of wasted CPU time when the statusmap image is generated. GD2 images can be created from PNG images by
-                             using the pngtogd2 utility supplied with Thomas Boutell's `gd library <http://www.boutell.com/gd/>`_. The GD2 images
-                             should be created in uncompressed format in order to minimize CPU load. Images for hosts are assumed to be in the
-                             ``logos/`` subdirectory in your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
-2d_coords                    This variable is used to define coordinates to use when drawing the host. Coordinates should be given in positive
-                             integers, as they correspond to physical pixels in the generated image. The origin for drawing (0,0) is in the upper
-                             left hand corner of the image and extends in the positive x direction (to the right) along the top of the image and
-                             in the positive y direction (down) along the left hand side of the image. For reference, the size of the icons drawn is
-                             usually about 40x40 pixels (text takes a little extra space). The coordinates you specify here are for the upper left
-                             hand corner of the host icon that is drawn. Note: Don't worry about what the maximum x and y coordinates that you can
-                             use are.
-3d_coords                    This variable is used to define coordinates to use when drawing the host. Coordinates can be positive or negative real
-                             numbers. The origin for drawing is (0.0,0.0,0.0). For reference, the size of the host cubes drawn is 0.5 units on each
-                             side (text takes a little more space). The coordinates you specify here are used as the center of the host cube.
 ============================ =========================================================================================================================
 
 .. _obj_def_hostgroup:
@@ -371,9 +328,6 @@ Definition Format
     alias               alias
     # members           hosts
     # hostgroup_members hostgroups
-    # notes             note_string
-    # notes_url         url
-    # action_url        url
   }
 
 Example Definition
@@ -399,13 +353,6 @@ members           This is a list of the short names of :ref:`hosts <obj_def_host
                   :ref:`host definitions <obj_def_host>`.
 hostgroup_members This optional directive can be used to include hosts from other "sub" host groups in this host group. Specify a comma-delimited list
                   of short names of other host groups whose members should be included in this group.
-notes             This directive is used to define an optional string of notes pertaining to the host. If you specify a note here, you will see the
-                  it.
-notes_url         This variable is used to define an optional URL that can be used to provide more information about the host group. Any valid URL
-                  can be used. This can be very useful if you want to make detailed information on the host group, emergency contact methods, etc.
-                  available to other support staff.
-action_url        This directive is used to define an optional URL that can be used to provide more actions to be performed on the host group. Any
-                  valid URL can be used.
 ================= ====================================================================================================================================
 
 .. _obj_def_service:
@@ -466,11 +413,6 @@ Definition Format
     contacts                       contacts
     contact_groups                 contact_groups
     # stalking_options             [o,w,u,c]
-    # notes                        note_string
-    # notes_url                    url
-    # action_url                   url
-    # icon_image                   image_file
-    # icon_image_alt               alt_string
   }
 
 Example Definition
@@ -621,17 +563,6 @@ contact_groups               This is a list of the short names of the :ref:`cont
 stalking_options             This directive determines which service states "stalking" is enabled for. Valid options are a combination of one or more
                              of the following: o = stalk on OK states, w = stalk on WARNING states, u = stalk on UNKNOWN states, and c = stalk on
                              CRITICAL states. More information on state stalking can be found :ref:`here <state_stalking>`.
-notes                        This directive is used to define an optional string of notes pertaining to the service.
-notes_url                    This directive is used to define an optional URL that can be used to provide more information about the service. Any
-                             valid URL can be used. This can be very useful if you want to make detailed information on the service, emergency
-                             contact methods, etc. available to other support staff.
-action_url                   This directive is used to define an optional URL that can be used to provide more actions to be performed on the
-                             service. Any valid URL can be used.
-icon_image                   This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this service. The
-                             image will look best if it is 40x40 pixels in size. Images for services are assumed to be in the ``logos/`` subdirectory
-                             in your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
-icon_image_alt               This variable is used to define an optional string that is used in the ALT tag of the image specified by the
-                             <icon_image> argument.
 ============================ =========================================================================================================================
 
 .. _obj_def_servicegroup:
@@ -659,9 +590,6 @@ Definition Format
     alias                  alias
     # members              services
     # servicegroup_members servicegroups
-    # notes                note_string
-    # notes_url            url
-    # action_url           url
   }
 
 Example Definition
@@ -689,12 +617,6 @@ members              This is a list of the descriptions of :ref:`services <obj_d
                      name/description):members=<host1>,<service1>,<host2>,<service2>,...,<hostn>,<servicen>
 servicegroup_members This optional directive can be used to include services from other "sub" service groups in this service group. Specify a
                      comma-delimited list of short names of other service groups whose members should be included in this group.
-notes                This directive is used to define an optional string of notes pertaining to the service group.
-notes_url            This directive is used to define an optional URL that can be used to provide more information about the service group. Any valid
-                     URL can be used. This can be very useful if you want to make detailed information on the service group, emergency contact
-                     methods, etc. available to other support staff.
-action_url           This directive is used to define an optional URL that can be used to provide more actions to be performed on the service group.
-                     Any valid URL can be used.
 ==================== =================================================================================================================================
 
 .. _obj_def_contact:
@@ -1468,172 +1390,3 @@ escalation_options    This directive is used to define the criteria that determi
                       r = escalate on an UP (recovery) state, d = escalate on a DOWN state, and u = escalate on an UNREACHABLE state. Example: If you
                       specify d in this field, the escalation will only be used if the host is in a DOWN state.
 ===================== ================================================================================================================================
-
-.. _obj_def_extended_host_information:
-
-Extended Host Information Definition
-------------------------------------
-
-Description
-^^^^^^^^^^^
-
-Extended host information entries are basically used to make the
-output. They have no effect on monitoring and are completely optional.
-
-.. note::
-   As of Centreon Engine 1.x, all directives contained in extended host
-   information definitions are also available in
-   :ref:`host definitions <obj_def_host>`.  Thus, you can choose to
-   define the directives below in your host definitions if it makes your
-   configuration simpler. Separate extended host information definitions
-   will continue to be supported for backward compatability.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #). However, you
-   need to supply at least one optional variable in each definition for
-   it to be of much use.
-
-::
-
-  define hostextinfo{
-    host_name         host_name
-    # notes           note_string
-    # notes_url       url
-    # action_url      url
-    # icon_image      image_file
-    # icon_image_alt  alt_string
-    # vrml_image      image_file
-    # statusmap_image image_file
-    # 2d_coords       x_coord,y_coord
-    # 3d_coords       x_coord,y_coord,z_coord
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define hostextinfo{
-    host_name       netware1
-    notes           This is the primary Netware file server
-    notes_url       http://webserver.localhost.localdomain/hostinfo.pl?host=netware1
-    icon_image      novell40.png
-    icon_image_alt  IntranetWare 4.11
-    vrml_image      novell40.png
-    statusmap_image novell40.gd2
-    2d_coords       100,250
-    3d_coords       100.0,50.0,75.0
-  }
-
-Variable Descriptions
-^^^^^^^^^^^^^^^^^^^^^
-
-=============== ======================================================================================================================================
-host_name       This variable is used to identify the short name of the :ref:`host <obj_def_host>` which the data is
-                associated with.
-notes           This directive is used to define an optional string of notes pertaining to the host.
-notes_url       This variable is used to define an optional URL that can be used to provide more information about the host. Any valid URL can be
-                used. This can be very useful if you want to make detailed information on the host, emergency contact methods, etc. available to other
-                support staff.
-action_url      This directive is used to define an optional URL that can be used to provide more actions to be performed on the host. Any valid URL
-                can be used.
-icon_image      This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. The image will look
-                best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/`` subdirectory in your HTML images directory
-                (i.e. ``/usr/local/centengine/share/images/logos``).
-icon_image_alt  This variable is used to define an optional string that is used in the ALT tag of the image specified by the <icon_image> argument.
-vrml_image      This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. This image will be used
-                as the texture map for the specified host. Unlike the image you use for the <icon_image> variable, this one should probably not have
-                any transparency. If it does, the host object will look a bit wierd. Images for hosts are assumed to be in the ``logos/`` subdirectory in
-                your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
-statusmap_image This variable is used to define the name of an image that should be associated with this host. You can specify a JPEG, PNG, and GIF
-                image if you want, although I would strongly suggest using a GD2 format image, as other image formats will result in a lot of wasted
-                CPU time when the statusmap image is generated. GD2 images can be created from PNG images by using the pngtogd2 utility supplied with
-                Thomas Boutell's `gd library <http://www.boutell.com/gd/>`_. The GD2 images should be created in uncompressed format in order to
-                minimize CPU load. The image will look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/``
-                subdirectory in your HTML images directory (i.e. ``/usr/local/centengine/share/images/logos``).
-2d_coords       This variable is used to define coordinates to use when drawing the host. Coordinates should be given in positive integers, as they
-                correspond to physical pixels in the generated image. The origin for drawing (0,0) is in the upper left hand corner of the image and
-                extends in the positive x direction (to the right) along the top of the image and in the positive y direction (down) along the left
-                hand side of the image. For reference, the size of the icons drawn is usually about 40x40 pixels (text takes a little extra space).
-                The coordinates you specify here are for the upper left hand corner of the host icon that is drawn. Note: Don't worry about what the
-                maximum x and y coordinates that you can use are.
-3d_coords       This variable is used to define coordinates to use when drawing the host. Coordinates can be positive or negative real numbers. The
-                origin for drawing is (0.0,0.0,0.0). For reference, the size of the host cubes drawn is 0.5 units on each side (text takes a little
-                more space). The coordinates you specify here are used as the center of the host cube.
-=============== ======================================================================================================================================
-
-.. _obj_def_extended_service_information:
-
-Extended Service Information Definition
----------------------------------------
-
-Description
-^^^^^^^^^^^
-
-Extended service information entries are basically used to make the
-output. They have no effect on monitoring and are completely optional.
-
-.. note::
-   As of Centreon Engine 3.x, all directives contained in
-   extended service information definitions are also available in
-   :ref:`service definitions <obj_def_service>`.
-   Thus, you can choose to define the directives below in your service
-   definitions if it makes your configuration simpler. Separate extended
-   service information definitions will continue to be supported for
-   backward compatability.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #). However, you
-   need to supply at least one optional variable in each definition for
-   it to be of much use.
-
-::
-
-  define serviceextinfo{
-    host_name                host_name
-    service_description      service_description
-    # notes                  note_string
-    # notes_url              url
-    # action_url             url
-    # icon_image             image_file
-    # icon_image_alt         alt_string
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define serviceextinfo{
-    host_name              linux2
-    service_description    Log Anomalies
-    notes Security-related log anomalies on secondary Linux server
-    notes_url              http://webserver.localhost.localdomain/serviceinfo.pl?host=linux2&service=Log+Anomalies
-    icon_image             security.png
-    icon_image_alt         Security-Related Alerts
-  }
-
-Variable Descriptions
-^^^^^^^^^^^^^^^^^^^^^
-
-=================== ==================================================================================================================================
-host_name           This directive is used to identify the short name of the host that the :ref:`service <obj_def_service>` is associated with.
-service_description This directive is description of the :ref:`service <obj_def_service>` which the data is associated with.
-notes               This directive is used to define an optional string of notes pertaining to the service.
-notes_url           This directive is used to define an optional URL that can be used to provide more information about the service. Any valid URL can
-                    be used. This can be very useful if you want to make detailed information on the service, emergency contact methods, etc.
-                    available to other support staff.
-action_url          This directive is used to define an optional URL that can be used to provide more actions to be performed on the service. Any
-                    valid URL can be used.
-icon_image          This variable is used to define the name of a GIF, PNG, or JPG image that should be associated with this host. The image will
-                    look best if it is 40x40 pixels in size. Images for hosts are assumed to be in the ``logos/`` subdirectory in your HTML images
-                    directory (i.e. ``/usr/local/centengine/share/images/logos``).
-icon_image_alt      This variable is used to define an optional string that is used in the ALT tag of the image specified by the <icon_image>
-                    argument.
-=================== ==================================================================================================================================

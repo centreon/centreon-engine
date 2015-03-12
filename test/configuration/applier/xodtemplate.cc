@@ -63,8 +63,6 @@ static xodtemplate_host*              xodtemplate_host_list = NULL;
 static xodtemplate_service*           xodtemplate_service_list = NULL;
 static xodtemplate_hostdependency*    xodtemplate_hostdependency_list = NULL;
 static xodtemplate_hostescalation*    xodtemplate_hostescalation_list = NULL;
-static xodtemplate_hostextinfo*       xodtemplate_hostextinfo_list = NULL;
-static xodtemplate_serviceextinfo*    xodtemplate_serviceextinfo_list = NULL;
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list_tail = NULL;
 static xodtemplate_command*           xodtemplate_command_list_tail = NULL;
@@ -79,8 +77,6 @@ static xodtemplate_host*              xodtemplate_host_list_tail = NULL;
 static xodtemplate_service*           xodtemplate_service_list_tail = NULL;
 static xodtemplate_hostdependency*    xodtemplate_hostdependency_list_tail = NULL;
 static xodtemplate_hostescalation*    xodtemplate_hostescalation_list_tail = NULL;
-static xodtemplate_hostextinfo*       xodtemplate_hostextinfo_list_tail = NULL;
-static xodtemplate_serviceextinfo*    xodtemplate_serviceextinfo_list_tail = NULL;
 
 static skiplist*                      xobject_template_skiplists[NUM_XOBJECT_SKIPLISTS];
 static skiplist*                      xobject_skiplists[NUM_XOBJECT_SKIPLISTS];
@@ -150,8 +146,6 @@ int xodtemplate_read_config_data(
   xodtemplate_service_list = NULL;
   xodtemplate_hostdependency_list = NULL;
   xodtemplate_hostescalation_list = NULL;
-  xodtemplate_hostextinfo_list = NULL;
-  xodtemplate_serviceextinfo_list = NULL;
 
   /* initialize skiplists */
   xodtemplate_init_xobject_skiplists();
@@ -335,10 +329,6 @@ int xodtemplate_read_config_data(
   }
 
   if (result == OK) {
-    /* merge host/service extinfo definitions with host/service definitions */
-    /* this will be removed in next major release */
-    xodtemplate_merge_extinfo_ojects();
-
     /* cache object definitions for the CGIs and external apps */
     if (cache == true)
       xodtemplate_cache_objects(xodtemplate_cache_file);
@@ -713,8 +703,6 @@ int xodtemplate_process_config_file(char* filename, int options) {
           && strcmp(input, "hostgroupescalation")
           && strcmp(input, "hostdependency")
           && strcmp(input, "hostescalation")
-          && strcmp(input, "hostextinfo")
-          && strcmp(input, "serviceextinfo")
 	  && strcmp(input, "connector")) {
         logger(log_config_error, basic)
           << "Error: Invalid object definition type '" << input
@@ -888,8 +876,6 @@ int xodtemplate_begin_object_definition(
   xodtemplate_service* new_service = NULL;
   xodtemplate_hostdependency* new_hostdependency = NULL;
   xodtemplate_hostescalation* new_hostescalation = NULL;
-  xodtemplate_hostextinfo* new_hostextinfo = NULL;
-  xodtemplate_serviceextinfo* new_serviceextinfo = NULL;
 
   if (!strcmp(input, "service")) {
     xodtemplate_current_object_type = XODTEMPLATE_SERVICE;
@@ -995,17 +981,6 @@ int xodtemplate_begin_object_definition(
     new_hostescalation->first_notification = -2;
     new_hostescalation->last_notification = -2;
   }
-  else if (!strcmp(input, "serviceextinfo")) {
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEEXTINFO;
-    xod_begin_def(serviceextinfo);
-  }
-  else if (!strcmp(input, "hostextinfo")) {
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTEXTINFO;
-    xod_begin_def(hostextinfo);
-
-    new_hostextinfo->x_2d = -1;
-    new_hostextinfo->y_2d = -1;
-  }
   else if (!strcmp(input, "connector")) {
     xodtemplate_current_object_type = XODTEMPLATE_CONNECTOR;
     xod_begin_def(connector);
@@ -1041,8 +1016,6 @@ int xodtemplate_add_object_property(char* input, int options) {
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
   xodtemplate_hostescalation* temp_hostescalation = NULL;
-  xodtemplate_hostextinfo* temp_hostextinfo = NULL;
-  xodtemplate_serviceextinfo* temp_serviceextinfo = NULL;
   int x = 0;
   int y = 0;
   int force_skiplists = false;
@@ -1230,31 +1203,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->failure_prediction_options = string::dup(value);
       temp_service->have_failure_prediction_options = true;
-    }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->notes = string::dup(value);
-      temp_service->have_notes = true;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->notes_url = string::dup(value);
-      temp_service->have_notes_url = true;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->action_url = string::dup(value);
-      temp_service->have_action_url = true;
-    }
-    else if (!strcmp(variable, "icon_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->icon_image = string::dup(value);
-      temp_service->have_icon_image = true;
-    }
-    else if (!strcmp(variable, "icon_image_alt")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->icon_image_alt = string::dup(value);
-      temp_service->have_icon_image_alt = true;
     }
     else if (!strcmp(variable, "timezone")) {
       if (strcmp(value, XODTEMPLATE_NULL))
@@ -1632,42 +1580,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_host->failure_prediction_options = string::dup(value);
       temp_host->have_failure_prediction_options = true;
     }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->notes = string::dup(value);
-      temp_host->have_notes = true;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->notes_url = string::dup(value);
-      temp_host->have_notes_url = true;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->action_url = string::dup(value);
-      temp_host->have_action_url = true;
-    }
-    else if (!strcmp(variable, "icon_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->icon_image = string::dup(value);
-      temp_host->have_icon_image = true;
-    }
-    else if (!strcmp(variable, "icon_image_alt")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->icon_image_alt = string::dup(value);
-      temp_host->have_icon_image_alt = true;
-    }
-    else if (!strcmp(variable, "vrml_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->vrml_image = string::dup(value);
-      temp_host->have_vrml_image = true;
-    }
-    else if (!strcmp(variable, "gd2_image")
-             || !strcmp(variable, "statusmap_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->statusmap_image = string::dup(value);
-      temp_host->have_statusmap_image = true;
-    }
     else if (!strcmp(variable, "timezone")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_host->timezone = string::dup(value);
@@ -1854,47 +1766,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "failure_prediction_enabled")) {
       temp_host->failure_prediction_enabled = (atoi(value) > 0) ? true : false;
       temp_host->have_failure_prediction_enabled = true;
-    }
-    else if (!strcmp(variable, "2d_coords")) {
-      if ((temp_ptr = strtok(value, ", ")) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 2d_coords value '" << temp_ptr
-          << "' in host definition.";
-        return (ERROR);
-      }
-      temp_host->x_2d = atoi(temp_ptr);
-      if ((temp_ptr = strtok(NULL, ", ")) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 2d_coords value '" << temp_ptr
-          << "' in host definition.";
-        return (ERROR);
-      }
-      temp_host->y_2d = atoi(temp_ptr);
-      temp_host->have_2d_coords = true;
-    }
-    else if (!strcmp(variable, "3d_coords")) {
-      if ((temp_ptr = strtok(value, ", ")) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 3d_coords value '" << temp_ptr
-          << "' in host definition.";
-        return (ERROR);
-      }
-      temp_host->x_3d = strtod(temp_ptr, NULL);
-      if ((temp_ptr = strtok(NULL, ", ")) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 3d_coords value '" << temp_ptr
-          << "' in host definition.";
-        return (ERROR);
-      }
-      temp_host->y_3d = strtod(temp_ptr, NULL);
-      if ((temp_ptr = strtok(NULL, ", ")) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 3d_coords value '" << temp_ptr
-          << "' in host definition.";
-        return (ERROR);
-      }
-      temp_host->z_3d = strtod(temp_ptr, NULL);
-      temp_host->have_3d_coords = true;
     }
     else if (!strcmp(variable, "obsess_over_host")) {
       temp_host->obsess_over_host = (atoi(value) > 0) ? true : false;
@@ -2583,21 +2454,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       }
       temp_hostgroup->have_hostgroup_members = true;
     }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostgroup->notes = string::dup(value);
-      temp_hostgroup->have_notes = true;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostgroup->notes_url = string::dup(value);
-      temp_hostgroup->have_notes_url = true;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostgroup->action_url = string::dup(value);
-      temp_hostgroup->have_action_url = true;
-    }
     else if (!strcmp(variable, "register"))
       temp_hostgroup->register_object = (atoi(value) > 0) ? true : false;
     else {
@@ -2700,21 +2556,6 @@ int xodtemplate_add_object_property(char* input, int options) {
           result = ERROR;
       }
       temp_servicegroup->have_servicegroup_members = true;
-    }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicegroup->notes = string::dup(value);
-      temp_servicegroup->have_notes = true;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicegroup->notes_url = string::dup(value);
-      temp_servicegroup->have_notes_url = true;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicegroup->action_url = string::dup(value);
-      temp_servicegroup->have_action_url = true;
     }
     else if (!strcmp(variable, "register"))
       temp_servicegroup->register_object = (atoi(value) > 0) ? true : false;
@@ -3401,222 +3242,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else {
       logger(log_config_error, basic)
         << "Error: Invalid hostescalation object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_HOSTEXTINFO:
-    temp_hostextinfo = xodtemplate_hostextinfo_list;
-
-    if (!strcmp(variable, "use"))
-      temp_hostextinfo->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_hostextinfo->name = string::dup(value);
-
-      /* add to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_HOSTEXTINFO_SKIPLIST],
-                 (void*)temp_hostextinfo);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for extended host info '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_hostextinfo->_config_file)
-          << "', starting on line " << temp_hostextinfo->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "host_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->host_name = string::dup(value);
-      temp_hostextinfo->have_host_name = true;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->hostgroup_name = string::dup(value);
-      temp_hostextinfo->have_hostgroup_name = true;
-    }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->notes = string::dup(value);
-      temp_hostextinfo->have_notes = true;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->notes_url = string::dup(value);
-      temp_hostextinfo->have_notes_url = true;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->action_url = string::dup(value);
-      temp_hostextinfo->have_action_url = true;
-    }
-    else if (!strcmp(variable, "icon_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->icon_image = string::dup(value);
-      temp_hostextinfo->have_icon_image = true;
-    }
-    else if (!strcmp(variable, "icon_image_alt")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->icon_image_alt = string::dup(value);
-      temp_hostextinfo->have_icon_image_alt = true;
-    }
-    else if (!strcmp(variable, "vrml_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->vrml_image = string::dup(value);
-      temp_hostextinfo->have_vrml_image = true;
-    }
-    else if (!strcmp(variable, "gd2_image")
-	     || !strcmp(variable, "statusmap_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostextinfo->statusmap_image = string::dup(value);
-      temp_hostextinfo->have_statusmap_image = true;
-    }
-    else if (!strcmp(variable, "2d_coords")) {
-      temp_ptr = strtok(value, ", ");
-      if (temp_ptr == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 2d_coords value '" << temp_ptr
-          << "' in extended host info definition.";
-        return (ERROR);
-      }
-      temp_hostextinfo->x_2d = atoi(temp_ptr);
-      temp_ptr = strtok(NULL, ", ");
-      if (temp_ptr == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 2d_coords value '" << temp_ptr
-          << "' in extended host info definition.";
-        return (ERROR);
-      }
-      temp_hostextinfo->y_2d = atoi(temp_ptr);
-      temp_hostextinfo->have_2d_coords = true;
-    }
-    else if (!strcmp(variable, "3d_coords")) {
-      temp_ptr = strtok(value, ", ");
-      if (temp_ptr == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 3d_coords value '" << temp_ptr
-          << "' in extended host info definition.";
-        return (ERROR);
-      }
-      temp_hostextinfo->x_3d = strtod(temp_ptr, NULL);
-      temp_ptr = strtok(NULL, ", ");
-      if (temp_ptr == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 3d_coords value '" << temp_ptr
-          << "' in extended host info definition.";
-        return (ERROR);
-      }
-      temp_hostextinfo->y_3d = strtod(temp_ptr, NULL);
-      temp_ptr = strtok(NULL, ", ");
-      if (temp_ptr == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Invalid 3d_coords value '" << temp_ptr
-          << "' in extended host info definition.";
-        return (ERROR);
-      }
-      temp_hostextinfo->z_3d = strtod(temp_ptr, NULL);
-      temp_hostextinfo->have_3d_coords = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_hostextinfo->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid hostextinfo object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_SERVICEEXTINFO:
-    temp_serviceextinfo = xodtemplate_serviceextinfo_list;
-
-    if (!strcmp(variable, "use"))
-      temp_serviceextinfo->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_serviceextinfo->name = string::dup(value);
-
-      /* add to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_SERVICEEXTINFO_SKIPLIST],
-                 (void*)temp_serviceextinfo);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for extended service info '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_serviceextinfo->_config_file)
-          << "', starting on line " << temp_serviceextinfo->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "host_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->host_name = string::dup(value);
-      temp_serviceextinfo->have_host_name = true;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->hostgroup_name = string::dup(value);
-      temp_serviceextinfo->have_hostgroup_name = true;
-    }
-    else if (!strcmp(variable, "service_description")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->service_description = string::dup(value);
-      temp_serviceextinfo->have_service_description = true;
-    }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->notes = string::dup(value);
-      temp_serviceextinfo->have_notes = true;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->notes_url = string::dup(value);
-      temp_serviceextinfo->have_notes_url = true;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->action_url = string::dup(value);
-      temp_serviceextinfo->have_action_url = true;
-    }
-    else if (!strcmp(variable, "icon_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->icon_image = string::dup(value);
-      temp_serviceextinfo->have_icon_image = true;
-    }
-    else if (!strcmp(variable, "icon_image_alt")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceextinfo->icon_image_alt = string::dup(value);
-      temp_serviceextinfo->have_icon_image_alt = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_serviceextinfo->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid serviceextinfo object directive '"
         << variable << "'.";
       return (ERROR);
     }
@@ -4680,8 +4305,6 @@ int xodtemplate_duplicate_objects() {
   xodtemplate_serviceescalation* temp_serviceescalation = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_hostextinfo* temp_hostextinfo = NULL;
-  xodtemplate_serviceextinfo* temp_serviceextinfo = NULL;
   xodtemplate_memberlist* master_hostlist = NULL;
   xodtemplate_memberlist* dependent_hostlist = NULL;
   xodtemplate_memberlist* master_servicelist = NULL;
@@ -5563,123 +5186,6 @@ int xodtemplate_duplicate_objects() {
 #endif
 
 
-  /****** DUPLICATE HOSTEXTINFO DEFINITIONS WITH ONE OR MORE HOSTGROUP AND/OR HOST NAMES ******/
-  for (temp_hostextinfo = xodtemplate_hostextinfo_list;
-       temp_hostextinfo != NULL;
-       temp_hostextinfo = temp_hostextinfo->next) {
-
-    /* skip definitions without enough data */
-    if (temp_hostextinfo->hostgroup_name == NULL
-        && temp_hostextinfo->host_name == NULL)
-      continue;
-
-    /* get list of hosts */
-    master_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                        temp_hostextinfo->hostgroup_name,
-                        temp_hostextinfo->host_name,
-                        temp_hostextinfo->_config_file,
-                        temp_hostextinfo->_start_line);
-    if (master_hostlist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand hostgroups and/or hosts "
-        "specified in extended host info (config file '"
-        << xodtemplate_config_file_name(temp_hostextinfo->_config_file)
-        << "', starting on line " << temp_hostextinfo->_start_line
-        << ")";
-      return (ERROR);
-    }
-
-    /* add a copy of the definition for every host in the hostgroup/host name list */
-    first_item = true;
-    for (temp_masterhost = master_hostlist;
-	 temp_masterhost != NULL;
-         temp_masterhost = temp_masterhost->next) {
-
-      /* if this is the first duplication, use the existing entry */
-      if (first_item == true) {
-
-        delete[] temp_hostextinfo->host_name;
-        temp_hostextinfo->host_name = string::dup(temp_masterhost->name1);
-
-        first_item = false;
-        continue;
-      }
-
-      /* duplicate hostextinfo definition */
-      result = xodtemplate_duplicate_hostextinfo(
-                 temp_hostextinfo,
-                 temp_masterhost->name1);
-
-      /* exit on error */
-      if (result == ERROR) {
-        xodtemplate_free_memberlist(&master_hostlist);
-        return (ERROR);
-      }
-    }
-
-    /* free memory we used for host list */
-    xodtemplate_free_memberlist(&master_hostlist);
-  }
-
-
-  /****** DUPLICATE SERVICEEXTINFO DEFINITIONS WITH ONE OR MORE HOSTGROUP AND/OR HOST NAMES ******/
-  for (temp_serviceextinfo = xodtemplate_serviceextinfo_list;
-       temp_serviceextinfo != NULL;
-       temp_serviceextinfo = temp_serviceextinfo->next) {
-
-    /* skip definitions without enough data */
-    if (temp_serviceextinfo->hostgroup_name == NULL
-        && temp_serviceextinfo->host_name == NULL)
-      continue;
-
-    /* get list of hosts */
-    master_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                        temp_serviceextinfo->hostgroup_name,
-                        temp_serviceextinfo->host_name,
-                        temp_serviceextinfo->_config_file,
-                        temp_serviceextinfo->_start_line);
-    if (master_hostlist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand hostgroups and/or hosts "
-        "specified in extended service info (config file '"
-        << xodtemplate_config_file_name(temp_serviceextinfo->_config_file)
-        << "', starting on line "
-        << temp_serviceextinfo->_start_line << ")";
-      return (ERROR);
-    }
-
-    /* add a copy of the definition for every host in the hostgroup/host name list */
-    first_item = true;
-    for (temp_masterhost = master_hostlist;
-	 temp_masterhost != NULL;
-         temp_masterhost = temp_masterhost->next) {
-
-      /* existing definition gets first host name */
-      if (first_item == true) {
-        delete[] temp_serviceextinfo->host_name;
-        temp_serviceextinfo->host_name = string::dup(temp_masterhost->name1);
-
-        first_item = false;
-        continue;
-      }
-
-      /* duplicate serviceextinfo definition */
-      result = xodtemplate_duplicate_serviceextinfo(
-                 temp_serviceextinfo,
-                 temp_masterhost->name1);
-
-      /* exit on error */
-      if (result == ERROR) {
-        xodtemplate_free_memberlist(&master_hostlist);
-        return (ERROR);
-      }
-    }
-
-    /* free memory we used for host list */
-    xodtemplate_free_memberlist(&master_hostlist);
-  }
-
-
   /***************************************/
   /* SKIPLIST STUFF FOR FAST SORT/SEARCH */
   /***************************************/
@@ -5794,12 +5300,6 @@ int xodtemplate_duplicate_objects() {
     }
   }
 
-  /* host extinfo */
-  /* NOT NEEDED */
-
-  /* service extinfo */
-  /* NOT NEEDED */
-
   return (OK);
 }
 
@@ -5848,16 +5348,6 @@ int xodtemplate_duplicate_service(
   new_service->have_contacts = temp_service->have_contacts;
   new_service->failure_prediction_options = NULL;
   new_service->have_failure_prediction_options = temp_service->have_failure_prediction_options;
-  new_service->notes = NULL;
-  new_service->have_notes = temp_service->have_notes;
-  new_service->notes_url = NULL;
-  new_service->have_notes_url = temp_service->have_notes_url;
-  new_service->action_url = NULL;
-  new_service->have_action_url = temp_service->have_action_url;
-  new_service->icon_image = NULL;
-  new_service->have_icon_image = temp_service->have_icon_image;
-  new_service->icon_image_alt = NULL;
-  new_service->have_icon_image_alt = temp_service->have_icon_image_alt;
   new_service->timezone = NULL;
   new_service->have_timezone = temp_service->have_timezone;
   new_service->custom_variables = NULL;
@@ -5892,16 +5382,6 @@ int xodtemplate_duplicate_service(
     new_service->contacts = string::dup(temp_service->contacts);
   if (temp_service->failure_prediction_options != NULL)
     new_service->failure_prediction_options = string::dup(temp_service->failure_prediction_options);
-  if (temp_service->notes != NULL)
-    new_service->notes = string::dup(temp_service->notes);
-  if (temp_service->notes_url != NULL)
-    new_service->notes_url = string::dup(temp_service->notes_url);
-  if (temp_service->action_url != NULL)
-    new_service->action_url = string::dup(temp_service->action_url);
-  if (temp_service->icon_image != NULL)
-    new_service->icon_image = string::dup(temp_service->icon_image);
-  if (temp_service->icon_image_alt != NULL)
-    new_service->icon_image_alt = string::dup(temp_service->icon_image_alt);
   if (temp_service->timezone != NULL)
     new_service->timezone = string::dup(temp_service->timezone);
 
@@ -6276,141 +5756,6 @@ int xodtemplate_duplicate_servicedependency(
   return (OK);
 }
 
-/* duplicates a hostextinfo object definition */
-int xodtemplate_duplicate_hostextinfo(
-      xodtemplate_hostextinfo* this_hostextinfo,
-      char* host_name) {
-  xodtemplate_hostextinfo* new_hostextinfo = NULL;
-
-  new_hostextinfo = new xodtemplate_hostextinfo;
-
-  /* standard items */
-  new_hostextinfo->tmpl = NULL;
-  new_hostextinfo->name = NULL;
-  new_hostextinfo->has_been_resolved = this_hostextinfo->has_been_resolved;
-  new_hostextinfo->register_object = this_hostextinfo->register_object;
-  new_hostextinfo->_config_file = this_hostextinfo->_config_file;
-  new_hostextinfo->_start_line = this_hostextinfo->_start_line;
-
-  /* string defaults */
-  new_hostextinfo->host_name = NULL;
-  new_hostextinfo->have_host_name = this_hostextinfo->have_host_name;
-  new_hostextinfo->hostgroup_name = NULL;
-  new_hostextinfo->have_hostgroup_name = this_hostextinfo->have_hostgroup_name;
-  new_hostextinfo->notes = NULL;
-  new_hostextinfo->have_notes = this_hostextinfo->have_notes;
-  new_hostextinfo->notes_url = NULL;
-  new_hostextinfo->have_notes_url = this_hostextinfo->have_notes_url;
-  new_hostextinfo->action_url = NULL;
-  new_hostextinfo->have_action_url = this_hostextinfo->have_action_url;
-  new_hostextinfo->icon_image = NULL;
-  new_hostextinfo->have_icon_image = this_hostextinfo->have_icon_image;
-  new_hostextinfo->icon_image_alt = NULL;
-  new_hostextinfo->have_icon_image_alt = this_hostextinfo->have_icon_image_alt;
-  new_hostextinfo->vrml_image = NULL;
-  new_hostextinfo->have_vrml_image = this_hostextinfo->have_vrml_image;
-  new_hostextinfo->statusmap_image = NULL;
-  new_hostextinfo->have_statusmap_image = this_hostextinfo->have_statusmap_image;
-
-  /* duplicate strings (host_name member is passed in) */
-  if (host_name != NULL)
-    new_hostextinfo->host_name = string::dup(host_name);
-  if (this_hostextinfo->tmpl != NULL)
-    new_hostextinfo->tmpl = string::dup(this_hostextinfo->tmpl);
-  if (this_hostextinfo->name != NULL)
-    new_hostextinfo->name = string::dup(this_hostextinfo->name);
-  if (this_hostextinfo->notes != NULL)
-    new_hostextinfo->notes = string::dup(this_hostextinfo->notes);
-  if (this_hostextinfo->notes_url != NULL)
-    new_hostextinfo->notes_url = string::dup(this_hostextinfo->notes_url);
-  if (this_hostextinfo->action_url != NULL)
-    new_hostextinfo->action_url = string::dup(this_hostextinfo->action_url);
-  if (this_hostextinfo->icon_image != NULL)
-    new_hostextinfo->icon_image = string::dup(this_hostextinfo->icon_image);
-  if (this_hostextinfo->icon_image_alt != NULL)
-    new_hostextinfo->icon_image_alt = string::dup(this_hostextinfo->icon_image_alt);
-  if (this_hostextinfo->vrml_image != NULL)
-    new_hostextinfo->vrml_image = string::dup(this_hostextinfo->vrml_image);
-  if (this_hostextinfo->statusmap_image != NULL)
-    new_hostextinfo->statusmap_image = string::dup(this_hostextinfo->statusmap_image);
-
-  /* duplicate non-string members */
-  new_hostextinfo->x_2d = this_hostextinfo->x_2d;
-  new_hostextinfo->y_2d = this_hostextinfo->y_2d;
-  new_hostextinfo->have_2d_coords = this_hostextinfo->have_2d_coords;
-  new_hostextinfo->x_3d = this_hostextinfo->x_3d;
-  new_hostextinfo->y_3d = this_hostextinfo->y_3d;
-  new_hostextinfo->z_3d = this_hostextinfo->z_3d;
-  new_hostextinfo->have_3d_coords = this_hostextinfo->have_3d_coords;
-
-  /* add new object to head of list */
-  new_hostextinfo->next = xodtemplate_hostextinfo_list;
-  xodtemplate_hostextinfo_list = new_hostextinfo;
-
-  return (OK);
-}
-
-/* duplicates a serviceextinfo object definition */
-int xodtemplate_duplicate_serviceextinfo(
-      xodtemplate_serviceextinfo* this_serviceextinfo,
-      char* host_name) {
-  xodtemplate_serviceextinfo* new_serviceextinfo = NULL;
-
-  new_serviceextinfo = new xodtemplate_serviceextinfo;
-
-  /* standard items */
-  new_serviceextinfo->tmpl = NULL;
-  new_serviceextinfo->name = NULL;
-  new_serviceextinfo->has_been_resolved = this_serviceextinfo->has_been_resolved;
-  new_serviceextinfo->register_object = this_serviceextinfo->register_object;
-  new_serviceextinfo->_config_file = this_serviceextinfo->_config_file;
-  new_serviceextinfo->_start_line = this_serviceextinfo->_start_line;
-
-  /* string defaults */
-  new_serviceextinfo->host_name = NULL;
-  new_serviceextinfo->have_host_name = this_serviceextinfo->have_host_name;
-  new_serviceextinfo->service_description = NULL;
-  new_serviceextinfo->have_service_description = this_serviceextinfo->have_service_description;
-  new_serviceextinfo->hostgroup_name = NULL;
-  new_serviceextinfo->have_hostgroup_name = this_serviceextinfo->have_hostgroup_name;
-  new_serviceextinfo->notes = NULL;
-  new_serviceextinfo->have_notes = this_serviceextinfo->have_notes;
-  new_serviceextinfo->notes_url = NULL;
-  new_serviceextinfo->have_notes_url = this_serviceextinfo->have_notes_url;
-  new_serviceextinfo->action_url = NULL;
-  new_serviceextinfo->have_action_url = this_serviceextinfo->have_action_url;
-  new_serviceextinfo->icon_image = NULL;
-  new_serviceextinfo->have_icon_image = this_serviceextinfo->have_icon_image;
-  new_serviceextinfo->icon_image_alt = NULL;
-  new_serviceextinfo->have_icon_image_alt = this_serviceextinfo->have_icon_image_alt;
-
-  /* duplicate strings (host_name member is passed in) */
-  if (host_name != NULL)
-    new_serviceextinfo->host_name = string::dup(host_name);
-  if (this_serviceextinfo->tmpl != NULL)
-    new_serviceextinfo->tmpl = string::dup(this_serviceextinfo->tmpl);
-  if (this_serviceextinfo->name != NULL)
-    new_serviceextinfo->name = string::dup(this_serviceextinfo->name);
-  if (this_serviceextinfo->service_description != NULL)
-    new_serviceextinfo->service_description = string::dup(this_serviceextinfo->service_description);
-  if (this_serviceextinfo->notes != NULL)
-    new_serviceextinfo->notes = string::dup(this_serviceextinfo->notes);
-  if (this_serviceextinfo->notes_url != NULL)
-    new_serviceextinfo->notes_url = string::dup(this_serviceextinfo->notes_url);
-  if (this_serviceextinfo->action_url != NULL)
-    new_serviceextinfo->action_url = string::dup(this_serviceextinfo->action_url);
-  if (this_serviceextinfo->icon_image != NULL)
-    new_serviceextinfo->icon_image = string::dup(this_serviceextinfo->icon_image);
-  if (this_serviceextinfo->icon_image_alt != NULL)
-    new_serviceextinfo->icon_image_alt = string::dup(this_serviceextinfo->icon_image_alt);
-
-  /* add new object to head of list */
-  new_serviceextinfo->next = xodtemplate_serviceextinfo_list;
-  xodtemplate_serviceextinfo_list = new_serviceextinfo;
-
-  return (OK);
-}
-
 /******************************************************************/
 /***************** OBJECT RESOLUTION FUNCTIONS ********************/
 /******************************************************************/
@@ -6657,8 +6002,6 @@ int xodtemplate_resolve_objects() {
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
   xodtemplate_hostescalation* temp_hostescalation = NULL;
-  xodtemplate_hostextinfo* temp_hostextinfo = NULL;
-  xodtemplate_serviceextinfo* temp_serviceextinfo = NULL;
 
   /* resolve all timeperiod objects */
   for (temp_timeperiod = xodtemplate_timeperiod_list;
@@ -6753,22 +6096,6 @@ int xodtemplate_resolve_objects() {
        temp_hostescalation != NULL;
        temp_hostescalation = temp_hostescalation->next) {
     if (xodtemplate_resolve_hostescalation(temp_hostescalation) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all hostextinfo objects */
-  for (temp_hostextinfo = xodtemplate_hostextinfo_list;
-       temp_hostextinfo != NULL;
-       temp_hostextinfo = temp_hostextinfo->next) {
-    if (xodtemplate_resolve_hostextinfo(temp_hostextinfo) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all serviceextinfo objects */
-  for (temp_serviceextinfo = xodtemplate_serviceextinfo_list;
-       temp_serviceextinfo != NULL;
-       temp_serviceextinfo = temp_serviceextinfo->next) {
-    if (xodtemplate_resolve_serviceextinfo(temp_serviceextinfo) == ERROR)
       return (ERROR);
   }
 
@@ -7084,30 +6411,6 @@ int xodtemplate_resolve_hostgroup(
       &template_hostgroup->hostgroup_members,
       &this_hostgroup->have_hostgroup_members,
       &this_hostgroup->hostgroup_members);
-
-    if (this_hostgroup->have_notes == false
-        && template_hostgroup->have_notes == true) {
-      if (this_hostgroup->notes == NULL
-          && template_hostgroup->notes != NULL)
-        this_hostgroup->notes = string::dup(template_hostgroup->notes);
-      this_hostgroup->have_notes = true;
-    }
-    if (this_hostgroup->have_notes_url == false
-        && template_hostgroup->have_notes_url == true) {
-      if (this_hostgroup->notes_url == NULL
-          && template_hostgroup->notes_url != NULL)
-        this_hostgroup->notes_url
-          = string::dup(template_hostgroup->notes_url);
-      this_hostgroup->have_notes_url = true;
-    }
-    if (this_hostgroup->have_action_url == false
-        && template_hostgroup->have_action_url == true) {
-      if (this_hostgroup->action_url == NULL
-          && template_hostgroup->action_url != NULL)
-        this_hostgroup->action_url
-          = string::dup(template_hostgroup->action_url);
-      this_hostgroup->have_action_url = true;
-    }
   }
 
   delete[] template_names;
@@ -7176,31 +6479,6 @@ int xodtemplate_resolve_servicegroup(
       &template_servicegroup->servicegroup_members,
       &this_servicegroup->have_servicegroup_members,
       &this_servicegroup->servicegroup_members);
-
-    if (this_servicegroup->have_notes == false
-        && template_servicegroup->have_notes == true) {
-      if (this_servicegroup->notes == NULL
-          && template_servicegroup->notes != NULL)
-        this_servicegroup->notes
-          = string::dup(template_servicegroup->notes);
-      this_servicegroup->have_notes = true;
-    }
-    if (this_servicegroup->have_notes_url == false
-        && template_servicegroup->have_notes_url == true) {
-      if (this_servicegroup->notes_url == NULL
-          && template_servicegroup->notes_url != NULL)
-        this_servicegroup->notes_url
-          = string::dup(template_servicegroup->notes_url);
-      this_servicegroup->have_notes_url = true;
-    }
-    if (this_servicegroup->have_action_url == false
-        && template_servicegroup->have_action_url == true) {
-      if (this_servicegroup->action_url == NULL
-          && template_servicegroup->action_url != NULL)
-        this_servicegroup->action_url
-          = string::dup(template_servicegroup->action_url);
-      this_servicegroup->have_action_url = true;
-    }
   }
 
   delete[] template_names;
@@ -7787,56 +7065,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
           = string::dup(template_host->failure_prediction_options);
       this_host->have_failure_prediction_options = true;
     }
-    if (this_host->have_notes == false
-        && template_host->have_notes == true) {
-      if (this_host->notes == NULL && template_host->notes != NULL)
-        this_host->notes = string::dup(template_host->notes);
-      this_host->have_notes = true;
-    }
-    if (this_host->have_notes_url == false
-        && template_host->have_notes_url == true) {
-      if (this_host->notes_url == NULL
-          && template_host->notes_url != NULL)
-        this_host->notes_url = string::dup(template_host->notes_url);
-      this_host->have_notes_url = true;
-    }
-    if (this_host->have_action_url == false
-        && template_host->have_action_url == true) {
-      if (this_host->action_url == NULL
-          && template_host->action_url != NULL)
-        this_host->action_url = string::dup(template_host->action_url);
-      this_host->have_action_url = true;
-    }
-    if (this_host->have_icon_image == false
-        && template_host->have_icon_image == true) {
-      if (this_host->icon_image == NULL
-          && template_host->icon_image != NULL)
-        this_host->icon_image = string::dup(template_host->icon_image);
-      this_host->have_icon_image = true;
-    }
-    if (this_host->have_icon_image_alt == false
-        && template_host->have_icon_image_alt == true) {
-      if (this_host->icon_image_alt == NULL
-          && template_host->icon_image_alt != NULL)
-        this_host->icon_image_alt
-          = string::dup(template_host->icon_image_alt);
-      this_host->have_icon_image_alt = true;
-    }
-    if (this_host->have_vrml_image == false
-        && template_host->have_vrml_image == true) {
-      if (this_host->vrml_image == NULL
-          && template_host->vrml_image != NULL)
-        this_host->vrml_image = string::dup(template_host->vrml_image);
-      this_host->have_vrml_image = true;
-    }
-    if (this_host->have_statusmap_image == false
-        && template_host->have_statusmap_image == true) {
-      if (this_host->statusmap_image == NULL
-          && template_host->statusmap_image != NULL)
-        this_host->statusmap_image
-          = string::dup(template_host->statusmap_image);
-      this_host->have_statusmap_image = true;
-    }
     if (this_host->have_timezone == false
         && template_host->have_timezone == true) {
       if (this_host->timezone == NULL
@@ -7972,19 +7200,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
       this_host->failure_prediction_enabled
         = template_host->failure_prediction_enabled;
       this_host->have_failure_prediction_enabled = true;
-    }
-    if (this_host->have_2d_coords == false
-        && template_host->have_2d_coords == true) {
-      this_host->x_2d = template_host->x_2d;
-      this_host->y_2d = template_host->y_2d;
-      this_host->have_2d_coords = true;
-    }
-    if (this_host->have_3d_coords == false
-        && template_host->have_3d_coords == true) {
-      this_host->x_3d = template_host->x_3d;
-      this_host->y_3d = template_host->y_3d;
-      this_host->z_3d = template_host->z_3d;
-      this_host->have_3d_coords = true;
     }
     if (this_host->have_retain_status_information == false
         && template_host->have_retain_status_information == true) {
@@ -8158,45 +7373,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
         this_service->failure_prediction_options
           = string::dup(template_service->failure_prediction_options);
       this_service->have_failure_prediction_options = true;
-    }
-    if (this_service->have_notes == false
-        && template_service->have_notes == true) {
-      if (this_service->notes == NULL
-          && template_service->notes != NULL)
-        this_service->notes = string::dup(template_service->notes);
-      this_service->have_notes = true;
-    }
-    if (this_service->have_notes_url == false
-        && template_service->have_notes_url == true) {
-      if (this_service->notes_url == NULL
-          && template_service->notes_url != NULL)
-        this_service->notes_url
-          = string::dup(template_service->notes_url);
-      this_service->have_notes_url = true;
-    }
-    if (this_service->have_action_url == false
-        && template_service->have_action_url == true) {
-      if (this_service->action_url == NULL
-          && template_service->action_url != NULL)
-        this_service->action_url
-          = string::dup(template_service->action_url);
-      this_service->have_action_url = true;
-    }
-    if (this_service->have_icon_image == false
-        && template_service->have_icon_image == true) {
-      if (this_service->icon_image == NULL
-          && template_service->icon_image != NULL)
-        this_service->icon_image
-          = string::dup(template_service->icon_image);
-      this_service->have_icon_image = true;
-    }
-    if (this_service->have_icon_image_alt == false
-        && template_service->have_icon_image_alt == true) {
-      if (this_service->icon_image_alt == NULL
-          && template_service->icon_image_alt != NULL)
-        this_service->icon_image_alt
-          = string::dup(template_service->icon_image_alt);
-      this_service->have_icon_image_alt = true;
     }
     if (this_service->have_timezone == false
         && template_service->have_timezone == true) {
@@ -8611,255 +7787,6 @@ int xodtemplate_resolve_hostescalation(
       this_hostescalation->escalate_on_recovery
         = template_hostescalation->escalate_on_recovery;
       this_hostescalation->have_escalation_options = true;
-    }
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
-/* resolves a hostextinfo object */
-int xodtemplate_resolve_hostextinfo(
-      xodtemplate_hostextinfo* this_hostextinfo) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_hostextinfo* template_hostextinfo = NULL;
-
-  /* return if this object has already been resolved */
-  if (this_hostextinfo->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_hostextinfo->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_hostextinfo->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_hostextinfo->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_hostextinfo = xodtemplate_find_hostextinfo(temp_ptr);
-    if (template_hostextinfo == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in extended "
-        "host info definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_hostextinfo->_config_file)
-        << "', starting on line " << this_hostextinfo->_start_line
-        << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template hostextinfo... */
-    xodtemplate_resolve_hostextinfo(template_hostextinfo);
-
-    /* apply missing properties from template hostextinfo... */
-    if (this_hostextinfo->have_host_name == false
-        && template_hostextinfo->have_host_name == true) {
-      if (this_hostextinfo->host_name == NULL
-          && template_hostextinfo->host_name != NULL)
-        this_hostextinfo->host_name
-          = string::dup(template_hostextinfo->host_name);
-      this_hostextinfo->have_host_name = true;
-    }
-    if (this_hostextinfo->have_hostgroup_name == false
-        && template_hostextinfo->have_hostgroup_name == true) {
-      if (this_hostextinfo->hostgroup_name == NULL
-          && template_hostextinfo->hostgroup_name != NULL)
-        this_hostextinfo->hostgroup_name
-          = string::dup(template_hostextinfo->hostgroup_name);
-      this_hostextinfo->have_hostgroup_name = true;
-    }
-    if (this_hostextinfo->have_notes == false
-        && template_hostextinfo->have_notes == true) {
-      if (this_hostextinfo->notes == NULL
-          && template_hostextinfo->notes != NULL)
-        this_hostextinfo->notes
-          = string::dup(template_hostextinfo->notes);
-      this_hostextinfo->have_notes = true;
-    }
-    if (this_hostextinfo->have_notes_url == false
-        && template_hostextinfo->have_notes_url == true) {
-      if (this_hostextinfo->notes_url == NULL
-          && template_hostextinfo->notes_url != NULL)
-        this_hostextinfo->notes_url
-          = string::dup(template_hostextinfo->notes_url);
-      this_hostextinfo->have_notes_url = true;
-    }
-    if (this_hostextinfo->have_action_url == false
-        && template_hostextinfo->have_action_url == true) {
-      if (this_hostextinfo->action_url == NULL
-          && template_hostextinfo->action_url != NULL)
-        this_hostextinfo->action_url
-          = string::dup(template_hostextinfo->action_url);
-      this_hostextinfo->have_action_url = true;
-    }
-    if (this_hostextinfo->have_icon_image == false
-        && template_hostextinfo->have_icon_image == true) {
-      if (this_hostextinfo->icon_image == NULL
-          && template_hostextinfo->icon_image != NULL)
-        this_hostextinfo->icon_image
-          = string::dup(template_hostextinfo->icon_image);
-      this_hostextinfo->have_icon_image = true;
-    }
-    if (this_hostextinfo->have_icon_image_alt == false
-        && template_hostextinfo->have_icon_image_alt == true) {
-      if (this_hostextinfo->icon_image_alt == NULL
-          && template_hostextinfo->icon_image_alt != NULL)
-        this_hostextinfo->icon_image_alt
-          = string::dup(template_hostextinfo->icon_image_alt);
-      this_hostextinfo->have_icon_image_alt = true;
-    }
-    if (this_hostextinfo->have_vrml_image == false
-        && template_hostextinfo->have_vrml_image == true) {
-      if (this_hostextinfo->vrml_image == NULL
-          && template_hostextinfo->vrml_image != NULL)
-        this_hostextinfo->vrml_image
-          = string::dup(template_hostextinfo->vrml_image);
-      this_hostextinfo->have_vrml_image = true;
-    }
-    if (this_hostextinfo->have_statusmap_image == false
-        && template_hostextinfo->have_statusmap_image == true) {
-      if (this_hostextinfo->statusmap_image == NULL
-          && template_hostextinfo->statusmap_image != NULL)
-        this_hostextinfo->statusmap_image
-          = string::dup(template_hostextinfo->statusmap_image);
-      this_hostextinfo->have_statusmap_image = true;
-    }
-    if (this_hostextinfo->have_2d_coords == false
-        && template_hostextinfo->have_2d_coords == true) {
-      this_hostextinfo->x_2d = template_hostextinfo->x_2d;
-      this_hostextinfo->y_2d = template_hostextinfo->y_2d;
-      this_hostextinfo->have_2d_coords = true;
-    }
-    if (this_hostextinfo->have_3d_coords == false
-        && template_hostextinfo->have_3d_coords == true) {
-      this_hostextinfo->x_3d = template_hostextinfo->x_3d;
-      this_hostextinfo->y_3d = template_hostextinfo->y_3d;
-      this_hostextinfo->z_3d = template_hostextinfo->z_3d;
-      this_hostextinfo->have_3d_coords = true;
-    }
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
-/* resolves a serviceextinfo object */
-int xodtemplate_resolve_serviceextinfo(
-      xodtemplate_serviceextinfo* this_serviceextinfo) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_serviceextinfo* template_serviceextinfo = NULL;
-
-  /* return if this object has already been resolved */
-  if (this_serviceextinfo->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_serviceextinfo->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_serviceextinfo->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_serviceextinfo->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_serviceextinfo = xodtemplate_find_serviceextinfo(temp_ptr);
-    if (template_serviceextinfo == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in extended "
-        "service info definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_serviceextinfo->_config_file)
-        << "', starting on line " << this_serviceextinfo->_start_line
-        << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template serviceextinfo... */
-    xodtemplate_resolve_serviceextinfo(template_serviceextinfo);
-
-    /* apply missing properties from template serviceextinfo... */
-    if (this_serviceextinfo->have_host_name == false
-        && template_serviceextinfo->have_host_name == true) {
-      if (this_serviceextinfo->host_name == NULL
-          && template_serviceextinfo->host_name != NULL)
-        this_serviceextinfo->host_name
-          = string::dup(template_serviceextinfo->host_name);
-      this_serviceextinfo->have_host_name = true;
-    }
-    if (this_serviceextinfo->have_hostgroup_name == false
-        && template_serviceextinfo->have_hostgroup_name == true) {
-      if (this_serviceextinfo->hostgroup_name == NULL
-          && template_serviceextinfo->hostgroup_name != NULL)
-        this_serviceextinfo->hostgroup_name
-          = string::dup(template_serviceextinfo->hostgroup_name);
-      this_serviceextinfo->have_hostgroup_name = true;
-    }
-    if (this_serviceextinfo->have_service_description == false
-        && template_serviceextinfo->have_service_description == true) {
-      if (this_serviceextinfo->service_description == NULL
-          && template_serviceextinfo->service_description != NULL)
-        this_serviceextinfo->service_description
-          = string::dup(template_serviceextinfo->service_description);
-      this_serviceextinfo->have_service_description = true;
-    }
-    if (this_serviceextinfo->have_notes == false
-        && template_serviceextinfo->have_notes == true) {
-      if (this_serviceextinfo->notes == NULL
-          && template_serviceextinfo->notes != NULL)
-        this_serviceextinfo->notes
-          = string::dup(template_serviceextinfo->notes);
-      this_serviceextinfo->have_notes = true;
-    }
-    if (this_serviceextinfo->have_notes_url == false
-        && template_serviceextinfo->have_notes_url == true) {
-      if (this_serviceextinfo->notes_url == NULL
-          && template_serviceextinfo->notes_url != NULL)
-        this_serviceextinfo->notes_url
-          = string::dup(template_serviceextinfo->notes_url);
-      this_serviceextinfo->have_notes_url = true;
-    }
-    if (this_serviceextinfo->have_action_url == false
-        && template_serviceextinfo->have_action_url == true) {
-      if (this_serviceextinfo->action_url == NULL
-          && template_serviceextinfo->action_url != NULL)
-        this_serviceextinfo->action_url
-          = string::dup(template_serviceextinfo->action_url);
-      this_serviceextinfo->have_action_url = true;
-    }
-    if (this_serviceextinfo->have_icon_image == false
-        && template_serviceextinfo->have_icon_image == true) {
-      if (this_serviceextinfo->icon_image == NULL
-          && template_serviceextinfo->icon_image != NULL)
-        this_serviceextinfo->icon_image
-          = string::dup(template_serviceextinfo->icon_image);
-      this_serviceextinfo->have_icon_image = true;
-    }
-    if (this_serviceextinfo->have_icon_image_alt == false
-        && template_serviceextinfo->have_icon_image_alt == true) {
-      if (this_serviceextinfo->icon_image_alt == NULL
-          && template_serviceextinfo->icon_image_alt != NULL)
-        this_serviceextinfo->icon_image_alt
-          = string::dup(template_serviceextinfo->icon_image_alt);
-      this_serviceextinfo->have_icon_image_alt = true;
     }
   }
 
@@ -9833,32 +8760,6 @@ xodtemplate_hostescalation* xodtemplate_find_hostescalation(char* name) {
                                          NULL));
 }
 
-
-/* finds a specific hostextinfo object */
-xodtemplate_hostextinfo* xodtemplate_find_hostextinfo(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_hostextinfo temp_hostextinfo;
-  temp_hostextinfo.name = name;
-  return ((xodtemplate_hostextinfo*)skiplist_find_first(
-                                      xobject_template_skiplists[X_HOSTEXTINFO_SKIPLIST],
-                                      &temp_hostextinfo,
-                                      NULL));
-}
-
-/* finds a specific serviceextinfo object */
-xodtemplate_serviceextinfo* xodtemplate_find_serviceextinfo(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_serviceextinfo temp_serviceextinfo;
-  temp_serviceextinfo.name = name;
-  return ((xodtemplate_serviceextinfo*)skiplist_find_first(
-                                         xobject_template_skiplists[X_SERVICEEXTINFO_SKIPLIST],
-                                         &temp_serviceextinfo,
-                                         NULL));
-}
 
 /* finds a specific service object */
 xodtemplate_service* xodtemplate_find_service(char* name) {
@@ -12162,133 +11063,6 @@ int xodtemplate_sort_hostdependencies() {
 }
 
 /******************************************************************/
-/*********************** MERGE FUNCTIONS **************************/
-/******************************************************************/
-
-/* merge extinfo definitions */
-int xodtemplate_merge_extinfo_ojects() {
-  xodtemplate_hostextinfo* temp_hostextinfo = NULL;
-  xodtemplate_serviceextinfo* temp_serviceextinfo = NULL;
-  xodtemplate_host* temp_host = NULL;
-  xodtemplate_service* temp_service = NULL;
-
-  /* merge service extinfo definitions */
-  for (temp_serviceextinfo = xodtemplate_serviceextinfo_list;
-       temp_serviceextinfo != NULL;
-       temp_serviceextinfo = temp_serviceextinfo->next) {
-
-    /* make sure we have everything */
-    if (temp_serviceextinfo->host_name == NULL
-        || temp_serviceextinfo->service_description == NULL)
-      continue;
-
-    /* find the service */
-    if ((temp_service = xodtemplate_find_real_service(
-                          temp_serviceextinfo->host_name,
-                          temp_serviceextinfo->service_description)) == NULL)
-      continue;
-
-    /* merge the definitions */
-    xodtemplate_merge_service_extinfo_object(
-      temp_service,
-      temp_serviceextinfo);
-  }
-
-  /* merge host extinfo definitions */
-  for (temp_hostextinfo = xodtemplate_hostextinfo_list;
-       temp_hostextinfo != NULL;
-       temp_hostextinfo = temp_hostextinfo->next) {
-
-    /* make sure we have everything */
-    if (temp_hostextinfo->host_name == NULL)
-      continue;
-
-    /* find the host */
-    if ((temp_host = xodtemplate_find_real_host(
-                       temp_hostextinfo->host_name)) == NULL)
-      continue;
-
-    /* merge the definitions */
-    xodtemplate_merge_host_extinfo_object(temp_host, temp_hostextinfo);
-  }
-
-  return (OK);
-}
-
-/* merges a service extinfo definition */
-int xodtemplate_merge_service_extinfo_object(
-      xodtemplate_service* this_service,
-      xodtemplate_serviceextinfo* this_serviceextinfo) {
-
-  if (this_service == NULL || this_serviceextinfo == NULL)
-    return (ERROR);
-
-  if (this_service->notes == NULL && this_serviceextinfo->notes != NULL)
-    this_service->notes = string::dup(this_serviceextinfo->notes);
-  if (this_service->notes_url == NULL
-      && this_serviceextinfo->notes_url != NULL)
-    this_service->notes_url = string::dup(this_serviceextinfo->notes_url);
-  if (this_service->action_url == NULL
-      && this_serviceextinfo->action_url != NULL)
-    this_service->action_url = string::dup(this_serviceextinfo->action_url);
-  if (this_service->icon_image == NULL
-      && this_serviceextinfo->icon_image != NULL)
-    this_service->icon_image = string::dup(this_serviceextinfo->icon_image);
-  if (this_service->icon_image_alt == NULL
-      && this_serviceextinfo->icon_image_alt != NULL)
-    this_service->icon_image_alt
-      = string::dup(this_serviceextinfo->icon_image_alt);
-
-  return (OK);
-}
-
-/* merges a host extinfo definition */
-int xodtemplate_merge_host_extinfo_object(
-      xodtemplate_host* this_host,
-      xodtemplate_hostextinfo* this_hostextinfo) {
-
-  if (this_host == NULL || this_hostextinfo == NULL)
-    return (ERROR);
-
-  if (this_host->notes == NULL && this_hostextinfo->notes != NULL)
-    this_host->notes = string::dup(this_hostextinfo->notes);
-  if (this_host->notes_url == NULL
-      && this_hostextinfo->notes_url != NULL)
-    this_host->notes_url = string::dup(this_hostextinfo->notes_url);
-  if (this_host->action_url == NULL
-      && this_hostextinfo->action_url != NULL)
-    this_host->action_url = string::dup(this_hostextinfo->action_url);
-  if (this_host->icon_image == NULL
-      && this_hostextinfo->icon_image != NULL)
-    this_host->icon_image = string::dup(this_hostextinfo->icon_image);
-  if (this_host->icon_image_alt == NULL
-      && this_hostextinfo->icon_image_alt != NULL)
-    this_host->icon_image_alt = string::dup(this_hostextinfo->icon_image_alt);
-  if (this_host->vrml_image == NULL
-      && this_hostextinfo->vrml_image != NULL)
-    this_host->vrml_image = string::dup(this_hostextinfo->vrml_image);
-  if (this_host->statusmap_image == NULL
-      && this_hostextinfo->statusmap_image != NULL)
-    this_host->statusmap_image = string::dup(this_hostextinfo->statusmap_image);
-
-  if (this_host->have_2d_coords == false
-      && this_hostextinfo->have_2d_coords == true) {
-    this_host->x_2d = this_hostextinfo->x_2d;
-    this_host->y_2d = this_hostextinfo->y_2d;
-    this_host->have_2d_coords = true;
-  }
-  if (this_host->have_3d_coords == false
-      && this_hostextinfo->have_3d_coords == true) {
-    this_host->x_3d = this_hostextinfo->x_3d;
-    this_host->y_3d = this_hostextinfo->y_3d;
-    this_host->z_3d = this_hostextinfo->z_3d;
-    this_host->have_3d_coords = true;
-  }
-
-  return (OK);
-}
-
-/******************************************************************/
 /*********************** CACHE FUNCTIONS **************************/
 /******************************************************************/
 
@@ -12558,12 +11332,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\talias\t%s\n", temp_hostgroup->alias);
     if (temp_hostgroup->members)
       fprintf(fp, "\tmembers\t%s\n", temp_hostgroup->members);
-    if (temp_hostgroup->notes)
-      fprintf(fp, "\tnotes\t%s\n", temp_hostgroup->notes);
-    if (temp_hostgroup->notes_url)
-      fprintf(fp, "\tnotes_url\t%s\n", temp_hostgroup->notes_url);
-    if (temp_hostgroup->action_url)
-      fprintf(fp, "\taction_url\t%s\n", temp_hostgroup->action_url);
     fprintf(fp, "\t}\n\n");
   }
 
@@ -12585,12 +11353,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\talias\t%s\n", temp_servicegroup->alias);
     if (temp_servicegroup->members)
       fprintf(fp, "\tmembers\t%s\n", temp_servicegroup->members);
-    if (temp_servicegroup->notes)
-      fprintf(fp, "\tnotes\t%s\n", temp_servicegroup->notes);
-    if (temp_servicegroup->notes_url)
-      fprintf(fp, "\tnotes_url\t%s\n", temp_servicegroup->notes_url);
-    if (temp_servicegroup->action_url)
-      fprintf(fp, "\taction_url\t%s\n", temp_servicegroup->action_url);
     fprintf(fp, "\t}\n\n");
   }
 
@@ -12798,26 +11560,8 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "n");
     fprintf(fp, "\n");
     fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_host->failure_prediction_enabled);
-    if (temp_host->icon_image)
-      fprintf(fp, "\ticon_image\t%s\n", temp_host->icon_image);
-    if (temp_host->icon_image_alt)
-      fprintf(fp, "\ticon_image_alt\t%s\n", temp_host->icon_image_alt);
-    if (temp_host->vrml_image)
-      fprintf(fp, "\tvrml_image\t%s\n", temp_host->vrml_image);
-    if (temp_host->statusmap_image)
-      fprintf(fp, "\tstatusmap_image\t%s\n", temp_host->statusmap_image);
     if (temp_host->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_host->timezone);
-    if (temp_host->have_2d_coords == true)
-      fprintf(fp, "\t2d_coords\t%d,%d\n", temp_host->x_2d, temp_host->y_2d);
-    if (temp_host->have_3d_coords == true)
-      fprintf(fp, "\t3d_coords\t%f,%f,%f\n", temp_host->x_3d, temp_host->y_3d, temp_host->z_3d);
-    if (temp_host->notes)
-      fprintf(fp, "\tnotes\t%s\n", temp_host->notes);
-    if (temp_host->notes_url)
-      fprintf(fp, "\tnotes_url\t%s\n", temp_host->notes_url);
-    if (temp_host->action_url)
-      fprintf(fp, "\taction_url\t%s\n", temp_host->action_url);
     fprintf(fp, "\tretain_status_information\t%d\n", temp_host->retain_status_information);
     fprintf(fp, "\tretain_nonstatus_information\t%d\n", temp_host->retain_nonstatus_information);
 
@@ -12937,18 +11681,8 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "n");
     fprintf(fp, "\n");
     fprintf(fp, "\tfailure_prediction_enabled\t%d\n", temp_service->failure_prediction_enabled);
-    if (temp_service->icon_image)
-      fprintf(fp, "\ticon_image\t%s\n", temp_service->icon_image);
-    if (temp_service->icon_image_alt)
-      fprintf(fp, "\ticon_image_alt\t%s\n", temp_service->icon_image_alt);
     if (temp_service->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_service->timezone);
-    if (temp_service->notes)
-      fprintf(fp, "\tnotes\t%s\n", temp_service->notes);
-    if (temp_service->notes_url)
-      fprintf(fp, "\tnotes_url\t%s\n", temp_service->notes_url);
-    if (temp_service->action_url)
-      fprintf(fp, "\taction_url\t%s\n", temp_service->action_url);
     fprintf(fp, "\tretain_status_information\t%d\n", temp_service->retain_status_information);
     fprintf(fp, "\tretain_nonstatus_information\t%d\n", temp_service->retain_nonstatus_information);
 
@@ -13255,20 +11989,6 @@ int xodtemplate_init_xobject_skiplists() {
         false,
         false,
         xodtemplate_skiplist_compare_serviceescalation_template);
-  xobject_template_skiplists[X_HOSTEXTINFO_SKIPLIST]
-    = skiplist_new(
-        16,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_hostextinfo_template);
-  xobject_template_skiplists[X_SERVICEEXTINFO_SKIPLIST]
-    = skiplist_new(
-        16,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_serviceextinfo_template);
   xobject_skiplists[X_HOST_SKIPLIST]
     = skiplist_new(
         16,
@@ -13361,7 +12081,6 @@ int xodtemplate_init_xobject_skiplists() {
         true,
         false,
         xodtemplate_skiplist_compare_serviceescalation);
-  /* host and service extinfo entries don't need to be added to a list... */
 
   return (OK);
 }
@@ -13908,42 +12627,6 @@ int xodtemplate_skiplist_compare_serviceescalation(
             ob->service_description));
 }
 
-int xodtemplate_skiplist_compare_hostextinfo_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_hostextinfo const* oa
-    = static_cast<xodtemplate_hostextinfo const*>(a);
-  xodtemplate_hostextinfo const* ob
-    = static_cast<xodtemplate_hostextinfo const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_serviceextinfo_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_serviceextinfo const* oa
-    = static_cast<xodtemplate_serviceextinfo const*>(a);
-  xodtemplate_serviceextinfo const* ob
-    = static_cast<xodtemplate_serviceextinfo const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
 /******************************************************************/
 /********************** CLEANUP FUNCTIONS *************************/
 /******************************************************************/
@@ -13998,10 +12681,6 @@ int xodtemplate_free_memory() {
   xodtemplate_hostdependency* next_hostdependency = NULL;
   xodtemplate_hostescalation* this_hostescalation = NULL;
   xodtemplate_hostescalation* next_hostescalation = NULL;
-  xodtemplate_hostextinfo* this_hostextinfo = NULL;
-  xodtemplate_hostextinfo* next_hostextinfo = NULL;
-  xodtemplate_serviceextinfo* this_serviceextinfo = NULL;
-  xodtemplate_serviceextinfo* next_serviceextinfo = NULL;
   xodtemplate_customvariablesmember* this_customvariablesmember = NULL;
   xodtemplate_customvariablesmember* next_customvariablesmember = NULL;
   int x = 0;
@@ -14072,9 +12751,6 @@ int xodtemplate_free_memory() {
     delete[] this_hostgroup->alias;
     delete[] this_hostgroup->members;
     delete[] this_hostgroup->hostgroup_members;
-    delete[] this_hostgroup->notes;
-    delete[] this_hostgroup->notes_url;
-    delete[] this_hostgroup->action_url;
     delete this_hostgroup;
   }
   xodtemplate_hostgroup_list = NULL;
@@ -14091,9 +12767,6 @@ int xodtemplate_free_memory() {
     delete[] this_servicegroup->alias;
     delete[] this_servicegroup->members;
     delete[] this_servicegroup->servicegroup_members;
-    delete[] this_servicegroup->notes;
-    delete[] this_servicegroup->notes_url;
-    delete[] this_servicegroup->action_url;
     delete this_servicegroup;
   }
   xodtemplate_servicegroup_list = NULL;
@@ -14205,13 +12878,6 @@ int xodtemplate_free_memory() {
     delete[] this_host->contacts;
     delete[] this_host->notification_period;
     delete[] this_host->failure_prediction_options;
-    delete[] this_host->notes;
-    delete[] this_host->notes_url;
-    delete[] this_host->action_url;
-    delete[] this_host->icon_image;
-    delete[] this_host->icon_image_alt;
-    delete[] this_host->vrml_image;
-    delete[] this_host->statusmap_image;
     delete[] this_host->timezone;
     delete this_host;
   }
@@ -14248,11 +12914,6 @@ int xodtemplate_free_memory() {
     delete[] this_service->contact_groups;
     delete[] this_service->contacts;
     delete[] this_service->failure_prediction_options;
-    delete[] this_service->notes;
-    delete[] this_service->notes_url;
-    delete[] this_service->action_url;
-    delete[] this_service->icon_image;
-    delete[] this_service->icon_image_alt;
     delete[] this_service->timezone;
     delete this_service;
   }
@@ -14292,46 +12953,6 @@ int xodtemplate_free_memory() {
   }
   xodtemplate_hostescalation_list = NULL;
   xodtemplate_hostescalation_list_tail = NULL;
-
-  /* free memory allocated to hostextinfo list */
-  for (this_hostextinfo = xodtemplate_hostextinfo_list;
-       this_hostextinfo != NULL; this_hostextinfo = next_hostextinfo) {
-    next_hostextinfo = this_hostextinfo->next;
-    delete[] this_hostextinfo->tmpl;
-    delete[] this_hostextinfo->name;
-    delete[] this_hostextinfo->host_name;
-    delete[] this_hostextinfo->hostgroup_name;
-    delete[] this_hostextinfo->notes;
-    delete[] this_hostextinfo->notes_url;
-    delete[] this_hostextinfo->action_url;
-    delete[] this_hostextinfo->icon_image;
-    delete[] this_hostextinfo->icon_image_alt;
-    delete[] this_hostextinfo->vrml_image;
-    delete[] this_hostextinfo->statusmap_image;
-    delete this_hostextinfo;
-  }
-  xodtemplate_hostextinfo_list = NULL;
-  xodtemplate_hostextinfo_list_tail = NULL;
-
-  /* free memory allocated to serviceextinfo list */
-  for (this_serviceextinfo = xodtemplate_serviceextinfo_list;
-       this_serviceextinfo != NULL;
-       this_serviceextinfo = next_serviceextinfo) {
-    next_serviceextinfo = this_serviceextinfo->next;
-    delete[] this_serviceextinfo->tmpl;
-    delete[] this_serviceextinfo->name;
-    delete[] this_serviceextinfo->host_name;
-    delete[] this_serviceextinfo->hostgroup_name;
-    delete[] this_serviceextinfo->service_description;
-    delete[] this_serviceextinfo->notes;
-    delete[] this_serviceextinfo->notes_url;
-    delete[] this_serviceextinfo->action_url;
-    delete[] this_serviceextinfo->icon_image;
-    delete[] this_serviceextinfo->icon_image_alt;
-    delete this_serviceextinfo;
-  }
-  xodtemplate_serviceextinfo_list = NULL;
-  xodtemplate_serviceextinfo_list_tail = NULL;
 
   /* free memory for the config file names */
   for (x = 0; x < xodtemplate_current_config_file; x++) {

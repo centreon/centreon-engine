@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -28,9 +28,6 @@ typedef struct             hostgroup_struct {
   char*                    group_name;
   char*                    alias;
   hostsmember_struct*      members;
-  char*                    notes;
-  char*                    notes_url;
-  char*                    action_url;
   struct hostgroup_struct* next;
   struct hostgroup_struct* nexthash;
 }                          hostgroup;
@@ -71,5 +68,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTGROUP_HH
-
-

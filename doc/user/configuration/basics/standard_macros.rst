@@ -90,9 +90,6 @@ Macro Name                     Service Checks Service Notifications Host Checks 
 `HOSTACKAUTHORNAME`_ :sup:`8`  No             No                    No               **Yes**            No                              No                           No                No
 `HOSTACKAUTHORALIAS`_ :sup:`8` No             No                    No               **Yes**            No                              No                           No                No
 `HOSTACKCOMMENT`_ :sup:`8`     No             No                    No               **Yes**            No                              No                           No                No
-`HOSTACTIONURL`_               **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTNOTESURL`_                **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTNOTES`_                   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TOTALHOSTSERVICES`_           **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TOTALHOSTSERVICESOK`_         **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TOTALHOSTSERVICESWARNING`_    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -108,9 +105,6 @@ Macro Name                     Service Checks Service Notifications Host Checks 
 ============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 `HOSTGROUPALIAS`_ :sup:`5`     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTGROUPMEMBERS`_ :sup:`5`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTGROUPNOTES`_ :sup:`5`     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTGROUPNOTESURL`_ :sup:`5`  **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTGROUPACTIONURL`_ :sup:`5` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 .. _user_configuration_macros_service:
@@ -157,9 +151,6 @@ Macro Name                        Service Checks Service Notifications Host Chec
 `SERVICEACKAUTHORNAME`_ :sup:`8`  No             **Yes**               No          No                 No                              No                           No                No
 `SERVICEACKAUTHORALIAS`_ :sup:`8` No             **Yes**               No          No                 No                              No                           No                No
 `SERVICEACKCOMMENT`_ :sup:`8`     No             **Yes**               No          No                 No                              No                           No                No
-`SERVICEACTIONURL`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICENOTESURL`_                **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICENOTES`_                   **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 Service Group Macros
@@ -170,9 +161,6 @@ Macro Name                        Service Checks Service Notifications Host Chec
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 `SERVICEGROUPALIAS`_ :sup:`6`     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `SERVICEGROUPMEMBERS`_ :sup:`6`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SERVICEGROUPNOTES`_ :sup:`6`     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SERVICEGROUPNOTESURL`_ :sup:`6`  **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SERVICEGROUPACTIONURL`_ :sup:`6` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 Contact Macros
@@ -369,12 +357,6 @@ _`HOSTACKAUTHORALIAS` :sup:`8` A string containing the alias of the contact (if 
                                in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
 _`HOSTACKCOMMENT` :sup:`8`     A string containing the acknowledgement comment that was entered by the user who acknowledged the host problem. This
                                macro is only valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`HOSTACTIONURL`               Action URL for the host. This macro may contain other macros (e.g. $HOSTNAME$), which can be useful when you want to pass
-                               the host name to a web page.
-_`HOSTNOTESURL`                Notes URL for the host. This macro may contain other macros (e.g. $HOSTNAME$), which can be useful when you want to pass
-                               the host name to a web page.
-_`HOSTNOTES`                   Notes for the host. This macro may contain other macros (e.g. $HOSTNAME$), which can be useful when you want to
-                               host-specific status information, etc. in the description.
 _`TOTALHOSTSERVICES`           The total number of services associated with the host.
 _`TOTALHOSTSERVICESOK`         The total number of services associated with the host that are in an OK state.
 _`TOTALHOSTSERVICESWARNING`    The total number of services associated with the host that are in a WARNING state.
@@ -391,15 +373,6 @@ _`HOSTGROUPALIAS` :sup:`5`     The long name / alias of either 1) the hostgroup 
                                directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
 _`HOSTGROUPMEMBERS` :sup:`5`   A comma-separated list of all hosts that belong to either 1) the hostgroup name passed as an on-demand macro argument or
                                2) the primary hostgroup associated with the current host (if not used in the context of an on-demand macro).
-_`HOSTGROUPNOTES` :sup:`5`     The notes associated with either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary hostgroup
-                               associated with the current host (if not used in the context of an on-demand macro). This value is taken from the notes
-                               directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
-_`HOSTGROUPNOTESURL` :sup:`5`  The notes URL associated with either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary
-                               hostgroup associated with the current host (if not used in the context of an on-demand macro). This value is taken from
-                               the notes_url directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
-_`HOSTGROUPACTIONURL` :sup:`5` The action URL associated with either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary
-                               hostgroup associated with the current host (if not used in the context of an on-demand macro). This value is taken from
-                               the action_url directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
 ============================== =========================================================================================================================
 
 Service Macros
@@ -478,12 +451,6 @@ _`SERVICEACKAUTHORALIAS` :sup:`8` A string containing the alias of the contact (
                                   valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
 _`SERVICEACKCOMMENT` :sup:`8`     A string containing the acknowledgement comment that was entered by the user who acknowledged the service problem.
                                   This macro is only valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`SERVICEACTIONURL`               Action URL for the service. This macro may contain other macros (e.g. $HOSTNAME$ or $SERVICEDESC$), which can be
-                                  useful when you want to pass the service name to a web page.
-_`SERVICENOTESURL`                Notes URL for the service. This macro may contain other macros (e.g. $HOSTNAME$ or $SERVICEDESC$), which can be
-                                  useful when you want to pass the service name to a web page.
-_`SERVICENOTES`                   Notes for the service. This macro may contain other macros (e.g. $HOSTNAME$ or $SERVICESTATE$), which can be useful
-                                  when you want to service-specific status information, etc. in the description
 ================================= ======================================================================================================================
 
 Service Group Macros
@@ -496,15 +463,6 @@ _`SERVICEGROUPALIAS` :sup:`6`     The long name / alias of either 1) the service
 _`SERVICEGROUPMEMBERS` :sup:`6`   A comma-separated list of all services that belong to either 1) the servicegroup name passed as an on-demand macro
                                   argument or 2) the primary servicegroup associated with the current service (if not used in the context of an
                                   on-demand macro).
-_`SERVICEGROUPNOTES` :sup:`6`     The notes associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                  taken from the notes directive in the :ref:`servicegroup definition <obj_def_servicegroup>`.
-_`SERVICEGROUPNOTESURL` :sup:`6`  The notes URL associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                  taken from the notes_url directive in the :ref:`servicegroup definition <obj_def_servicegroup>`.
-_`SERVICEGROUPACTIONURL` :sup:`6` The action URL associated with either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                  taken from the action_url directive in the :ref:`servicegroup definition <obj_def_servicegroup>`..
 ================================= ======================================================================================================================
 
 Contact Macros

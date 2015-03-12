@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -88,9 +88,6 @@ std::ostream& operator<<(std::ostream& os, hostgroup const& obj) {
  *
  *  @param[in] name       Host group name.
  *  @param[in] alias      Host group alias.
- *  @param[in] notes      Notes.
- *  @param[in] notes_url  URL.
- *  @param[in] action_url Action URL.
  *
  *  @return New host group.
  */

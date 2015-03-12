@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -28,12 +28,10 @@
 #  include "com/centreon/engine/configuration/file_info.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
 #  include "com/centreon/engine/configuration/hostescalation.hh"
-#  include "com/centreon/engine/configuration/hostextinfo.hh"
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/servicedependency.hh"
 #  include "com/centreon/engine/configuration/serviceescalation.hh"
-#  include "com/centreon/engine/configuration/serviceextinfo.hh"
 #  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
@@ -53,16 +51,14 @@ namespace              configuration {
       read_host = (1 << 4),
       read_hostdependency = (1 << 5),
       read_hostescalation = (1 << 6),
-      read_hostextinfo = (1 << 7),
-      read_hostgroup = (1 << 8),
-      read_hostgroupescalation = (1 << 9),
-      read_service = (1 << 10),
-      read_servicedependency = (1 << 11),
-      read_serviceescalation = (1 << 12),
-      read_serviceextinfo = (1 << 13),
-      read_servicegroup = (1 << 14),
-      read_timeperiod = (1 << 15),
-      read_downtime = (1 << 16),
+      read_hostgroup = (1 << 7),
+      read_hostgroupescalation = (1 << 8),
+      read_service = (1 << 9),
+      read_servicedependency = (1 << 10),
+      read_serviceescalation = (1 << 11),
+      read_servicegroup = (1 << 12),
+      read_timeperiod = (1 << 13),
+      read_downtime = (1 << 14),
       read_all = (~0)
     };
 
@@ -80,8 +76,6 @@ namespace              configuration {
     void               _apply(
                          std::list<std::string> const& lst,
                          void (parser::*pfunc)(std::string const&));
-    void               _apply_hostextinfo();
-    void               _apply_serviceextinfo();
     file_info const&   _get_file_info(object* obj) const;
     void               _get_hosts_by_hostgroups(
                          hostgroup_ptr const& hostgroups,

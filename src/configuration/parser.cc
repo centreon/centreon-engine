@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,9 +35,7 @@ parser::store parser::_store[] = {
   &parser::_store_into_map<host, &host::host_name>,
   &parser::_store_into_list,
   &parser::_store_into_list,
-  &parser::_store_into_list,
   &parser::_store_into_map<hostgroup, &hostgroup::hostgroup_name>,
-  &parser::_store_into_list,
   &parser::_store_into_list,
   &parser::_store_into_list,
   &parser::_store_into_list,
@@ -83,10 +81,6 @@ void parser::parse(std::string const& path, state& config) {
 
   // Apply template.
   _resolve_template();
-
-  // Apply extended info.
-  _apply_hostextinfo();
-  _apply_serviceextinfo();
 
   // Fill state.
   _insert(_map_objects[object::command], config.commands());
@@ -161,87 +155,6 @@ void parser::_apply(
        it != end;
        ++it)
     (this->*pfunc)(*it);
-}
-
-/**
- *  Apply the host extended info.
- *
- *  @warning This function is for compatibility and has very
- *           poor performance. Didn't use extended info. If you
- *           want to use the generic template system.
- */
-void parser::_apply_hostextinfo() {
-  map_object& gl_hosts(_map_objects[object::host]);
-  list_object const& hostextinfos(_lst_objects[object::hostextinfo]);
-  for (list_object::const_iterator
-         it(hostextinfos.begin()), end(hostextinfos.end());
-       it != end;
-       ++it) {
-    // Get the current hostextinfo to check.
-    hostextinfo_ptr obj(*it);
-
-    list_host hosts;
-    _get_objects_by_list_name(obj->hosts(), gl_hosts, hosts);
-    _get_hosts_by_hostgroups_name(obj->hostgroups(), hosts);
-
-    for (list_host::const_iterator it(hosts.begin()), end(hosts.end());
-         it != end;
-         ++it)
-      (*it)->merge(*obj);
-  }
-}
-
-/**
- *  Apply the service extended info.
- *
- *  @warning This function is for compatibility and has very
- *           poor performance. Didn't use extended info. If you
- *           want to use the generic template system.
- */
-void parser::_apply_serviceextinfo() {
-  map_object& gl_hosts(_map_objects[object::host]);
-  list_object& gl_services(_lst_objects[object::service]);
-  list_object const& serviceextinfos(_lst_objects[object::serviceextinfo]);
-  for (list_object::const_iterator
-         it(serviceextinfos.begin()), end(serviceextinfos.end());
-       it != end;
-       ++it) {
-    // Get the current serviceextinfo to check.
-    serviceextinfo_ptr obj(*it);
-
-    list_host hosts;
-    _get_objects_by_list_name(obj->hosts(), gl_hosts, hosts);
-    _get_hosts_by_hostgroups_name(obj->hostgroups(), hosts);
-
-    for (list_object::iterator
-           it(gl_services.begin()), end(gl_services.end());
-         it != end;
-         ++it) {
-      service_ptr svc(*it);
-      if (svc->service_description() != obj->service_description())
-        continue;
-
-      list_host svc_hosts;
-      _get_objects_by_list_name(svc->hosts(), gl_hosts, svc_hosts);
-      _get_hosts_by_hostgroups_name(svc->hostgroups(), svc_hosts);
-
-      bool found(false);
-      for (list_host::const_iterator
-             it_host(hosts.begin()), end(hosts.end());
-           !found && it_host != end;
-           ++it_host) {
-        for (list_host::const_iterator
-               it_svc_host(svc_hosts.begin()), end(svc_hosts.end());
-             it_svc_host != end;
-             ++it_svc_host) {
-          if ((*it_host)->host_name() == (*it_svc_host)->host_name()) {
-            svc->merge(*obj);
-            found = true;
-          }
-        }
-      }
-    }
-  }
 }
 
 /**
@@ -459,13 +372,22 @@ void parser::_parse_object_definitions(std::string const& path) {
                << _current_line << ": Unexpected start definition");
       std::string const& type(string::trim_right(input.erase(last)));
       obj = object::create(type);
-      if (obj.is_null())
-        throw (engine_error() << "Parsing of object definition failed "
-               << "in file '" << _current_path << "' on line "
-               << _current_line << ": Unknown object type name '"
-               << type << "'");
-      parse_object = (_read_options & (1 << obj->type()));
-      _objects_info[obj.get()] = file_info(path, _current_line);
+      if (obj.is_null()) {
+        if ((type == "hostextinfo") || (type == "serviceextinfo")) {
+          logger(logging::log_config_warning, logging::basic)
+            << "Warning: " << type << " object is ignored";
+          parse_object = false;
+        }
+        else
+          throw (engine_error() << "Parsing of object definition failed"
+                 << " in file '" << _current_path << "' on line "
+                 << _current_line << ": Unknown object type name '"
+                 << type << "'");
+      }
+      else {
+        parse_object = (_read_options & (1 << obj->type()));
+        _objects_info[obj.get()] = file_info(path, _current_line);
+      }
     }
     // Check if is the not the end of the current object.
     else if (input != "}") {

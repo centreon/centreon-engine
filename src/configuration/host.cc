@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/host.hh"
-#include "com/centreon/engine/configuration/hostextinfo.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/string.hh"
@@ -377,15 +376,6 @@ void host::check_validity() const {
  */
 host::key_type const& host::key() const throw () {
   return (_host_name);
-}
-
-/**
- *  Merge object.
- *
- *  @param[in] obj The object to merge.
- */
-void host::merge(configuration::hostextinfo const& tmpl) {
-  (void) tmpl;
 }
 
 /**
