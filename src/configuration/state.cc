@@ -126,13 +126,11 @@ state::setters const state::_setters[] = {
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
   { "use_check_result_path",                       SETTER(bool, use_check_result_path) },
   { "use_large_installation_tweaks",               SETTER(bool, use_large_installation_tweaks) },
-  { "use_regexp_matching",                         SETTER(bool, use_regexp_matches) },
   { "use_retained_program_state",                  SETTER(bool, use_retained_program_state) },
   { "use_retained_scheduling_info",                SETTER(bool, use_retained_scheduling_info) },
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
   { "use_syslog",                                  SETTER(bool, use_syslog) },
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
-  { "use_true_regexp_matching",                    SETTER(bool, use_true_regexp_matching) },
   { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
   { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) },
 
@@ -183,7 +181,9 @@ state::setters const state::_setters[] = {
   { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
   { "use_aggressive_host_checking",                SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_agressive_host_checking",                 SETTER(bool, _set_use_aggressive_host_checking) },
-  { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) }
+  { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
+  { "use_regexp_matching",                         SETTER(bool, _set_use_regexp_matching) },
+  { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) }
 };
 
 // Default values.
@@ -273,13 +273,11 @@ static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
 static bool const                      default_use_check_result_path(false);
 static bool const                      default_use_large_installation_tweaks(false);
-static bool const                      default_use_regexp_matches(false);
 static bool const                      default_use_retained_program_state(true);
 static bool const                      default_use_retained_scheduling_info(false);
 static bool const                      default_use_setpgid(true);
 static bool const                      default_use_syslog(true);
 static std::string const               default_use_timezone("");
-static bool const                      default_use_true_regexp_matching(false);
 
 /**
  *  Compare sets with the pointer content.
@@ -395,13 +393,11 @@ state::state()
     _translate_passive_host_checks(default_translate_passive_host_checks),
     _use_check_result_path(default_use_check_result_path),
     _use_large_installation_tweaks(default_use_large_installation_tweaks),
-    _use_regexp_matches(default_use_regexp_matches),
     _use_retained_program_state(default_use_retained_program_state),
     _use_retained_scheduling_info(default_use_retained_scheduling_info),
     _use_setpgid(default_use_setpgid),
     _use_syslog(default_use_syslog),
     _use_timezone(default_use_timezone),
-    _use_true_regexp_matching(default_use_true_regexp_matching) {
   _users.resize(10);
 }
 
@@ -530,13 +526,11 @@ state& state::operator=(state const& right) {
     _users = right._users;
     _use_check_result_path = right._use_check_result_path;
     _use_large_installation_tweaks = right._use_large_installation_tweaks;
-    _use_regexp_matches = right._use_regexp_matches;
     _use_retained_program_state = right._use_retained_program_state;
     _use_retained_scheduling_info = right._use_retained_scheduling_info;
     _use_setpgid = right._use_setpgid;
     _use_syslog = right._use_syslog;
     _use_timezone = right._use_timezone;
-    _use_true_regexp_matching = right._use_true_regexp_matching;
   }
   return (*this);
 }
@@ -651,13 +645,11 @@ bool state::operator==(state const& right) const throw () {
           && _users == right._users
           && _use_check_result_path == right._use_check_result_path
           && _use_large_installation_tweaks == right._use_large_installation_tweaks
-          && _use_regexp_matches == right._use_regexp_matches
           && _use_retained_program_state == right._use_retained_program_state
           && _use_retained_scheduling_info == right._use_retained_scheduling_info
           && _use_setpgid == right._use_setpgid
           && _use_syslog == right._use_syslog
-          && _use_timezone == right._use_timezone
-          && _use_true_regexp_matching == right._use_true_regexp_matching);
+          && _use_timezone == right._use_timezone);
 }
 
 /**
@@ -1365,6 +1357,15 @@ void state::debug_verbosity(unsigned int value) {
     _debug_verbosity = static_cast<unsigned int>(most);
   else
     _debug_verbosity = value;
+}
+
+/**
+ *  Get the downtime set.
+ *
+ *  @return Downtime set.
+ */
+std::set<shared_ptr<downtime> >& state::downtimes() throw() {
+   return (_downtimes);
 }
 
 /**
@@ -3126,24 +3127,6 @@ void state::use_large_installation_tweaks(bool value) {
 }
 
 /**
- *  Get use_regexp_matches value.
- *
- *  @return The use_regexp_matches value.
- */
-bool state::use_regexp_matches() const throw () {
-  return (_use_regexp_matches);
-}
-
-/**
- *  Set use_regexp_matches value.
- *
- *  @param[in] value The new use_regexp_matches value.
- */
-void state::use_regexp_matches(bool value) {
-  _use_regexp_matches = value;
-}
-
-/**
  *  Get use_retained_program_state value.
  *
  *  @return The use_retained_program_state value.
@@ -3232,24 +3215,6 @@ std::string const& state::use_timezone() const throw () {
 void state::use_timezone(std::string const& value) {
   _use_timezone = value;
 
-}
-
-/**
- *  Get use_true_regexp_matching value.
- *
- *  @return The use_true_regexp_matching value.
- */
-bool state::use_true_regexp_matching() const throw () {
-  return (_use_true_regexp_matching);
-}
-
-/**
- *  Set use_true_regexp_matching value.
- *
- *  @param[in] value The new use_true_regexp_matching value.
- */
-void state::use_true_regexp_matching(bool value) {
-  _use_true_regexp_matching = value;
 }
 
 /**
@@ -3984,6 +3949,28 @@ void state::_set_use_embedded_perl_implicitly(std::string const& value) {
   ++config_warnings;
 }
 
-std::set<shared_ptr<downtime> >& state::downtimes() throw() {
-   return (_downtimes);
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_regexp_matching(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_regexp_matching variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_true_regexp_matching(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_true_regexp_matching variable ignored";
+  ++config_warnings;
+  return ;
 }

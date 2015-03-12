@@ -359,8 +359,6 @@ namespace               configuration {
     void                use_check_result_path(bool value);
     bool                use_large_installation_tweaks() const throw ();
     void                use_large_installation_tweaks(bool value);
-    bool                use_regexp_matches() const throw ();
-    void                use_regexp_matches(bool value);
     bool                use_retained_program_state() const throw ();
     void                use_retained_program_state(bool value);
     bool                use_retained_scheduling_info() const throw ();
@@ -371,8 +369,6 @@ namespace               configuration {
     void                use_syslog(bool value);
     std::string const&  use_timezone() const throw ();
     void                use_timezone(std::string const& value);
-    bool                use_true_regexp_matching() const throw ();
-    void                use_true_regexp_matching(bool value);
 
   private:
     struct              setters {
@@ -435,6 +431,8 @@ namespace               configuration {
     void                _set_temp_path(std::string const& value);
     void                _set_use_aggressive_host_checking(bool value);
     void                _set_use_embedded_perl_implicitly(std::string const& value);
+    void                _set_use_regexp_matching(bool value);
+    void                _set_use_true_regexp_matching(bool value);
 
     template<typename U, void (state::*ptr)(U)>
     struct              setter {
@@ -586,13 +584,11 @@ namespace               configuration {
                         _users;
     bool                _use_check_result_path;
     bool                _use_large_installation_tweaks;
-    bool                _use_regexp_matches;
     bool                _use_retained_program_state;
     bool                _use_retained_scheduling_info;
     bool                _use_setpgid;
     bool                _use_syslog;
     std::string         _use_timezone;
-    bool                _use_true_regexp_matching;
   };
 }
 

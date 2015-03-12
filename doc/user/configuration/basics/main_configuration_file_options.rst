@@ -1749,47 +1749,6 @@ macros are stripped of the characters you specify::
 **Example** illegal_macro_output_chars=`~$^&"\|'<>
 =========== ======================================
 
-.. _main_cfg_opt_regular_expression_matching:
-
-Regular Expression Matching Option
-----------------------------------
-
-This option determines whether or not various directives in your
-:ref:`object definitions <object_configuration_overview>` will be
-processed as regular expressions. More information on how this works can
-be found :ref:`here <obj_def_tricks>`.
-
-  * 0 = Don't use regular expression matching (default)
-  * 1 = Use regular expression matching
-
-=========== =========================
-**Format**  use_regexp_matching=<0/1>
-**Example** use_regexp_matching=0
-=========== =========================
-
-.. _main_cfg_opt_true_regular_expression_matching:
-
-True Regular Expression Matching Option
----------------------------------------
-
-If you've enabled regular expression matching of various object
-directives using the :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
-option, this option will determine when object directives are treated as
-regular expressions. If this option is disabled (the default),
-directives will only be treated as regular expressions if they contain
-\*, ?, +, or \\.. If this option is enabled, all appropriate directives
-will be treated as regular expression - be careful when enabling this!
-More information on how this works can be found
-:ref:`here <obj_def_tricks>`.
-
-  * 0 = Don't use true regular expression matching (default)
-  * 1 = Use true regular expression matching
-
-=========== ==============================
-**Format**  use_true_regexp_matching=<0/1>
-**Example** use_true_regexp_matching=0
-=========== ==============================
-
 Event Broker Options
 --------------------
 

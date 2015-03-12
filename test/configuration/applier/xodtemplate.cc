@@ -25,7 +25,6 @@
 #include <cstring>
 #include <dirent.h>
 #include <libgen.h>
-#include <regex.h>
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -13061,10 +13060,8 @@ int xodtemplate_expand_contactgroups(
   char* contactgroup_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_contactgroup* temp_contactgroup = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || contactgroups == NULL)
     return (ERROR);
@@ -13082,95 +13079,46 @@ int xodtemplate_expand_contactgroups(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
-    else
-      use_regexp = false;
+    /* return a list of all contactgroups */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] contactgroup_names;
-        return (ERROR);
-      }
+      found_match = true;
 
-      /* test match against all contactgroup names */
       for (temp_contactgroup = xodtemplate_contactgroup_list;
            temp_contactgroup != NULL;
            temp_contactgroup = temp_contactgroup->next) {
-
-        if (temp_contactgroup->contactgroup_name == NULL)
-          continue;
-
-        /* skip this contactgroup if it did not match the expression */
-        if (regexec(&preg, temp_contactgroup->contactgroup_name, 0, NULL, 0))
-          continue;
-
-        found_match = true;
 
         /* dont' add contactgroups that shouldn't be registered */
         if (temp_contactgroup->register_object == false)
           continue;
 
-        /* add contactgroup members to list */
+        /* add contactgroup to list */
         xodtemplate_add_contactgroup_members_to_memberlist(
           list,
           temp_contactgroup,
           _config_file,
           _start_line);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
-    /* use standard matching... */
+    /* else this is just a single contactgroup... */
     else {
-      /* return a list of all contactgroups */
-      if (!strcmp(temp_ptr, "*")) {
+      /* this contactgroup should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
+      }
 
+      /* find the contactgroup */
+      temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
+      if (temp_contactgroup != NULL) {
         found_match = true;
 
-        for (temp_contactgroup = xodtemplate_contactgroup_list;
-             temp_contactgroup != NULL;
-             temp_contactgroup = temp_contactgroup->next) {
-
-          /* dont' add contactgroups that shouldn't be registered */
-          if (temp_contactgroup->register_object == false)
-            continue;
-
-          /* add contactgroup to list */
-          xodtemplate_add_contactgroup_members_to_memberlist(
-            list,
-            temp_contactgroup,
-            _config_file,
-            _start_line);
-        }
-      }
-      /* else this is just a single contactgroup... */
-      else {
-        /* this contactgroup should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the contactgroup */
-        temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
-        if (temp_contactgroup != NULL) {
-          found_match = true;
-
-          /* add contactgroup members to proper list */
-          xodtemplate_add_contactgroup_members_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_contactgroup,
-            _config_file,
-            _start_line);
-        }
+        /* add contactgroup members to proper list */
+        xodtemplate_add_contactgroup_members_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_contactgroup,
+          _config_file,
+          _start_line);
       }
     }
 
@@ -13203,10 +13151,8 @@ int xodtemplate_expand_contacts(
   char* contact_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_contact* temp_contact = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || contacts == NULL)
     return (ERROR);
@@ -13224,35 +13170,17 @@ int xodtemplate_expand_contacts(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
+    /* return a list of all contacts */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
+      found_match = true;
 
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] contact_names;
-        return (ERROR);
-      }
-
-      /* test match against all contacts */
       for (temp_contact = xodtemplate_contact_list;
            temp_contact != NULL;
-	   temp_contact = temp_contact->next) {
+           temp_contact = temp_contact->next) {
 
         if (temp_contact->contact_name == NULL)
           continue;
-
-        /* skip this contact if it did not match the expression */
-        if (regexec(&preg, temp_contact->contact_name, 0, NULL, 0))
-          continue;
-
-        found_match = true;
 
         /* dont' add contacts that shouldn't be registered */
         if (temp_contact->register_object == false)
@@ -13264,58 +13192,27 @@ int xodtemplate_expand_contacts(
           temp_contact->contact_name,
           NULL);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single contact... */
     else {
 
-      /* return a list of all contacts */
-      if (!strcmp(temp_ptr, "*")) {
-
-        found_match = true;
-
-        for (temp_contact = xodtemplate_contact_list;
-             temp_contact != NULL;
-	     temp_contact = temp_contact->next) {
-
-          if (temp_contact->contact_name == NULL)
-            continue;
-
-          /* dont' add contacts that shouldn't be registered */
-          if (temp_contact->register_object == false)
-            continue;
-
-          /* add contact to list */
-          xodtemplate_add_member_to_memberlist(
-            list,
-            temp_contact->contact_name,
-            NULL);
-        }
+      /* this contact should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
       }
 
-      /* else this is just a single contact... */
-      else {
+      /* find the contact */
+      temp_contact = xodtemplate_find_real_contact(temp_ptr);
+      if (temp_contact != NULL) {
+        found_match = true;
 
-        /* this contact should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the contact */
-        temp_contact = xodtemplate_find_real_contact(temp_ptr);
-        if (temp_contact != NULL) {
-          found_match = true;
-
-          /* add contact to list */
-          xodtemplate_add_member_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_ptr,
-            NULL);
-        }
+        /* add contact to list */
+        xodtemplate_add_member_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_ptr,
+          NULL);
       }
     }
 
@@ -13468,10 +13365,8 @@ int xodtemplate_expand_hostgroups(
   char* hostgroup_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || hostgroups == NULL)
     return (ERROR);
@@ -13488,95 +13383,45 @@ int xodtemplate_expand_hostgroups(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
-    else
-      use_regexp = false;
+    /* return a list of all hostgroups */
+    if (!strcmp(temp_ptr, "*")) {
+      found_match = true;
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
-
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] hostgroup_names;
-        return (ERROR);
-      }
-
-      /* test match against all hostgroup names */
       for (temp_hostgroup = xodtemplate_hostgroup_list;
            temp_hostgroup != NULL;
            temp_hostgroup = temp_hostgroup->next) {
-
-        if (temp_hostgroup->hostgroup_name == NULL)
-          continue;
-
-        /* skip this hostgroup if it did not match the expression */
-        if (regexec(&preg, temp_hostgroup->hostgroup_name, 0, NULL, 0))
-          continue;
-
-        found_match = true;
 
         /* dont' add hostgroups that shouldn't be registered */
         if (temp_hostgroup->register_object == false)
           continue;
 
-        /* add hostgroup members to list */
+        /* add hostgroup to list */
         xodtemplate_add_hostgroup_members_to_memberlist(
           list,
           temp_hostgroup,
           _config_file,
           _start_line);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
-    /* use standard matching... */
+    /* else this is just a single hostgroup... */
     else {
-      /* return a list of all hostgroups */
-      if (!strcmp(temp_ptr, "*")) {
+      /* this hostgroup should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
+      }
+
+      /* find the hostgroup */
+      temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
+      if (temp_hostgroup != NULL) {
         found_match = true;
 
-        for (temp_hostgroup = xodtemplate_hostgroup_list;
-             temp_hostgroup != NULL;
-             temp_hostgroup = temp_hostgroup->next) {
-
-          /* dont' add hostgroups that shouldn't be registered */
-          if (temp_hostgroup->register_object == false)
-            continue;
-
-          /* add hostgroup to list */
-          xodtemplate_add_hostgroup_members_to_memberlist(
-            list,
-            temp_hostgroup,
-            _config_file,
-            _start_line);
-        }
-      }
-      /* else this is just a single hostgroup... */
-      else {
-        /* this hostgroup should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the hostgroup */
-        temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
-        if (temp_hostgroup != NULL) {
-          found_match = true;
-
-          /* add hostgroup members to proper list */
-          xodtemplate_add_hostgroup_members_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_hostgroup,
-            _config_file,
-            _start_line);
-        }
+        /* add hostgroup members to proper list */
+        xodtemplate_add_hostgroup_members_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_hostgroup,
+          _config_file,
+          _start_line);
       }
     }
 
@@ -13609,10 +13454,8 @@ int xodtemplate_expand_hosts(
   char* host_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_host* temp_host = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || hosts == NULL)
     return (ERROR);
@@ -13629,35 +13472,15 @@ int xodtemplate_expand_hosts(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
+    /* return a list of all hosts */
+    if (!strcmp(temp_ptr, "*")) {
+      found_match = true;
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
-
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] host_names;
-        return (ERROR);
-      }
-
-      /* test match against all hosts */
       for (temp_host = xodtemplate_host_list;
            temp_host != NULL;
            temp_host = temp_host->next) {
-
         if (temp_host->host_name == NULL)
           continue;
-
-        /* skip this host if it did not match the expression */
-        if (regexec(&preg, temp_host->host_name, 0, NULL, 0))
-          continue;
-
-        found_match = true;
 
         /* dont' add hosts that shouldn't be registered */
         if (temp_host->register_object == false)
@@ -13669,55 +13492,27 @@ int xodtemplate_expand_hosts(
           temp_host->host_name,
           NULL);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single host... */
     else {
-      /* return a list of all hosts */
-      if (!strcmp(temp_ptr, "*")) {
-        found_match = true;
 
-        for (temp_host = xodtemplate_host_list;
-             temp_host != NULL;
-             temp_host = temp_host->next) {
-          if (temp_host->host_name == NULL)
-            continue;
-
-          /* dont' add hosts that shouldn't be registered */
-          if (temp_host->register_object == false)
-            continue;
-
-          /* add host to list */
-          xodtemplate_add_member_to_memberlist(
-            list,
-            temp_host->host_name,
-            NULL);
-        }
+      /* this host should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
       }
 
-      /* else this is just a single host... */
-      else {
+      /* find the host */
+      temp_host = xodtemplate_find_real_host(temp_ptr);
+      if (temp_host != NULL) {
+        found_match = true;
 
-        /* this host should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the host */
-        temp_host = xodtemplate_find_real_host(temp_ptr);
-        if (temp_host != NULL) {
-          found_match = true;
-
-          /* add host to list */
-          xodtemplate_add_member_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_ptr,
-            NULL);
-        }
+        /* add host to list */
+        xodtemplate_add_member_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_ptr,
+          NULL);
       }
     }
 
@@ -13860,12 +13655,10 @@ int xodtemplate_expand_servicegroups(
       int _config_file,
       int _start_line) {
   xodtemplate_servicegroup* temp_servicegroup = NULL;
-  regex_t preg;
   char* servicegroup_names = NULL;
   char* temp_ptr = NULL;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL)
     return (ERROR);
@@ -13886,105 +13679,48 @@ int xodtemplate_expand_servicegroups(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
-    else
-      use_regexp = false;
+    /* return a list of all servicegroups */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
+      found_match = true;
 
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] servicegroup_names;
-        return (ERROR);
-      }
-
-      /* test match against all servicegroup names */
       for (temp_servicegroup = xodtemplate_servicegroup_list;
            temp_servicegroup != NULL;
            temp_servicegroup = temp_servicegroup->next) {
-
-        if (temp_servicegroup->servicegroup_name == NULL)
-          continue;
-
-        /* skip this servicegroup if it did not match the expression */
-        if (regexec(
-              &preg,
-              temp_servicegroup->servicegroup_name,
-              0,
-              NULL,
-              0))
-          continue;
-
-        found_match = true;
 
         /* dont' add servicegroups that shouldn't be registered */
         if (temp_servicegroup->register_object == false)
           continue;
 
-        /* add servicegroup members to list */
+        /* add servicegroup to list */
         xodtemplate_add_servicegroup_members_to_memberlist(
           list,
           temp_servicegroup,
           _config_file,
           _start_line);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single servicegroup... */
     else {
 
-      /* return a list of all servicegroups */
-      if (!strcmp(temp_ptr, "*")) {
+      /* this servicegroup should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
+      }
+
+      /* find the servicegroup */
+      if ((temp_servicegroup = xodtemplate_find_real_servicegroup(temp_ptr)) != NULL) {
 
         found_match = true;
 
-        for (temp_servicegroup = xodtemplate_servicegroup_list;
-             temp_servicegroup != NULL;
-             temp_servicegroup = temp_servicegroup->next) {
-
-          /* dont' add servicegroups that shouldn't be registered */
-          if (temp_servicegroup->register_object == false)
-            continue;
-
-          /* add servicegroup to list */
-          xodtemplate_add_servicegroup_members_to_memberlist(
-            list,
-            temp_servicegroup,
-            _config_file,
-            _start_line);
-        }
-      }
-
-      /* else this is just a single servicegroup... */
-      else {
-
-        /* this servicegroup should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the servicegroup */
-        if ((temp_servicegroup = xodtemplate_find_real_servicegroup(temp_ptr)) != NULL) {
-
-          found_match = true;
-
-          /* add servicegroup members to list */
-          xodtemplate_add_servicegroup_members_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_servicegroup,
-            _config_file,
-            _start_line);
-        }
+        /* add servicegroup members to list */
+        xodtemplate_add_servicegroup_members_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_servicegroup,
+          _config_file,
+          _start_line);
       }
     }
 
@@ -14019,36 +13755,16 @@ int xodtemplate_expand_services(
   char* service_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_service* temp_service = NULL;
-  regex_t preg;
-  regex_t preg2;
   int found_match = true;
   int reject_item = false;
-  int use_regexp_host = false;
-  int use_regexp_service = false;
 
   if (list == NULL)
     return (ERROR);
   if (host_name == NULL || services == NULL)
     return (OK);
 
-  /* should we use regular expression matching for the host name? */
-  if (config->use_regexp_matches() == true
-      && (config->use_true_regexp_matching() == true
-          || strstr(host_name, "*") || strstr(host_name, "?")
-          || strstr(host_name, "+") || strstr(host_name, "\\.")))
-    use_regexp_host = true;
-
-  /* compile regular expression for host name */
-  if (use_regexp_host == true) {
-    if (regcomp(&preg2, host_name, REG_EXTENDED))
-      return (ERROR);
-  }
-
-  if ((service_names = string::dup(services)) == NULL) {
-    if (use_regexp_host == true)
-      regfree(&preg2);
+  if ((service_names = string::dup(services)) == NULL)
     return (ERROR);
-  }
 
   /* expand each service description */
   for (temp_ptr = strtok(service_names, ",");
@@ -14061,63 +13777,21 @@ int xodtemplate_expand_services(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching for the service description? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp_service = true;
-    else
-      use_regexp_service = false;
+    /* return a list of all services on the host */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* compile regular expression for service description */
-    if (use_regexp_service == true) {
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        if (use_regexp_host == true)
-          regfree(&preg2);
-        delete[] service_names;
-        return (ERROR);
-      }
-    }
+      found_match = true;
 
-    /* use regular expression matching */
-    if (use_regexp_host == true || use_regexp_service == true) {
-
-      /* test match against all services */
       for (temp_service = xodtemplate_service_list;
            temp_service != NULL;
-	   temp_service = temp_service->next) {
+           temp_service = temp_service->next) {
 
         if (temp_service->host_name == NULL
             || temp_service->service_description == NULL)
           continue;
 
-        /* skip this service if it doesn't match the host name expression */
-        if (use_regexp_host == true) {
-          if (regexec(&preg2, temp_service->host_name, 0, NULL, 0))
-            continue;
-        }
-        else {
-          if (strcmp(temp_service->host_name, host_name))
-            continue;
-        }
-
-        /* skip this service if it doesn't match the service description expression */
-        if (use_regexp_service == true) {
-          if (regexec(
-                &preg,
-                temp_service->service_description,
-                0,
-                NULL,
-                0))
-            continue;
-        }
-        else {
-          if (strcmp(temp_service->service_description, temp_ptr))
-            continue;
-        }
-
-        found_match = true;
+        if (strcmp(temp_service->host_name, host_name))
+          continue;
 
         /* dont' add services that shouldn't be registered */
         if (temp_service->register_object == false)
@@ -14129,65 +13803,29 @@ int xodtemplate_expand_services(
           host_name,
           temp_service->service_description);
       }
-
-      /* free memory allocated to compiled regexp */
-      if (use_regexp_service == true)
-        regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single service... */
     else {
 
-      /* return a list of all services on the host */
-      if (!strcmp(temp_ptr, "*")) {
+      /* this service should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
+      }
+
+      /* find the service */
+      if ((temp_service = xodtemplate_find_real_service(
+                            host_name,
+                            temp_ptr)) != NULL) {
 
         found_match = true;
 
-        for (temp_service = xodtemplate_service_list;
-             temp_service != NULL;
-	     temp_service = temp_service->next) {
-
-          if (temp_service->host_name == NULL
-              || temp_service->service_description == NULL)
-            continue;
-
-          if (strcmp(temp_service->host_name, host_name))
-            continue;
-
-          /* dont' add services that shouldn't be registered */
-          if (temp_service->register_object == false)
-            continue;
-
-          /* add service to the list */
-          xodtemplate_add_member_to_memberlist(
-            list,
-            host_name,
-            temp_service->service_description);
-        }
-      }
-
-      /* else this is just a single service... */
-      else {
-
-        /* this service should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the service */
-        if ((temp_service = xodtemplate_find_real_service(
-                              host_name,
-                              temp_ptr)) != NULL) {
-
-          found_match = true;
-
-          /* add service to the list */
-          xodtemplate_add_member_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            host_name,
-            temp_service->service_description);
-        }
+        /* add service to the list */
+        xodtemplate_add_member_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          host_name,
+          temp_service->service_description);
       }
     }
 
@@ -14202,10 +13840,6 @@ int xodtemplate_expand_services(
       break;
     }
   }
-
-  if (use_regexp_host == true)
-    regfree(&preg2);
-  delete[] service_names;
 
   if (found_match == false && reject_item == false)
     return (ERROR);
@@ -14351,10 +13985,8 @@ int xodtemplate_get_hostgroup_names(
   char* hostgroup_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || hostgroups == NULL)
     return (ERROR);
@@ -14371,37 +14003,14 @@ int xodtemplate_get_hostgroup_names(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
-    else
-      use_regexp = false;
+    /* return a list of all hostgroups */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
+      found_match = true;
 
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] hostgroup_names;
-        return (ERROR);
-      }
-
-      /* test match against all hostgroup names */
       for (temp_hostgroup = xodtemplate_hostgroup_list;
            temp_hostgroup != NULL;
            temp_hostgroup = temp_hostgroup->next) {
-
-        if (temp_hostgroup->hostgroup_name == NULL)
-          continue;
-
-        /* skip this hostgroup if it did not match the expression */
-        if (regexec(&preg, temp_hostgroup->hostgroup_name, 0, NULL, 0))
-          continue;
-
-        found_match = true;
 
         /* dont' add hostgroups that shouldn't be registered */
         if (temp_hostgroup->register_object == false)
@@ -14413,55 +14022,27 @@ int xodtemplate_get_hostgroup_names(
           temp_hostgroup->hostgroup_name,
           NULL);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single hostgroup... */
     else {
 
-      /* return a list of all hostgroups */
-      if (!strcmp(temp_ptr, "*")) {
-
-        found_match = true;
-
-        for (temp_hostgroup = xodtemplate_hostgroup_list;
-             temp_hostgroup != NULL;
-             temp_hostgroup = temp_hostgroup->next) {
-
-          /* dont' add hostgroups that shouldn't be registered */
-          if (temp_hostgroup->register_object == false)
-            continue;
-
-          /* add hostgroup to list */
-          xodtemplate_add_member_to_memberlist(
-            list,
-            temp_hostgroup->hostgroup_name,
-            NULL);
-        }
+      /* this hostgroup should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
       }
 
-      /* else this is just a single hostgroup... */
-      else {
+      /* find the hostgroup */
+      temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
+      if (temp_hostgroup != NULL) {
+        found_match = true;
 
-        /* this hostgroup should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the hostgroup */
-        temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
-        if (temp_hostgroup != NULL) {
-          found_match = true;
-
-          /* add hostgroup members to proper list */
-          xodtemplate_add_member_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_hostgroup->hostgroup_name,
-            NULL);
-        }
+        /* add hostgroup members to proper list */
+        xodtemplate_add_member_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_hostgroup->hostgroup_name,
+          NULL);
       }
     }
 
@@ -14563,10 +14144,8 @@ int xodtemplate_get_contactgroup_names(
   char* contactgroup_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_contactgroup* temp_contactgroup = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || contactgroups == NULL)
     return (ERROR);
@@ -14583,42 +14162,14 @@ int xodtemplate_get_contactgroup_names(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
-    else
-      use_regexp = false;
+    /* return a list of all contactgroups */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
+      found_match = true;
 
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] contactgroup_names;
-        return (ERROR);
-      }
-
-      /* test match against all contactgroup names */
       for (temp_contactgroup = xodtemplate_contactgroup_list;
            temp_contactgroup != NULL;
            temp_contactgroup = temp_contactgroup->next) {
-
-        if (temp_contactgroup->contactgroup_name == NULL)
-          continue;
-
-        /* skip this contactgroup if it did not match the expression */
-        if (regexec(
-              &preg,
-              temp_contactgroup->contactgroup_name,
-              0,
-              NULL,
-              0))
-          continue;
-
-        found_match = true;
 
         /* dont' add contactgroups that shouldn't be registered */
         if (temp_contactgroup->register_object == false)
@@ -14630,56 +14181,28 @@ int xodtemplate_get_contactgroup_names(
           temp_contactgroup->contactgroup_name,
           NULL);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single contactgroup... */
     else {
 
-      /* return a list of all contactgroups */
-      if (!strcmp(temp_ptr, "*")) {
+      /* this contactgroup should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
+      }
+
+      /* find the contactgroup */
+      temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
+      if (temp_contactgroup != NULL) {
 
         found_match = true;
 
-        for (temp_contactgroup = xodtemplate_contactgroup_list;
-             temp_contactgroup != NULL;
-             temp_contactgroup = temp_contactgroup->next) {
-
-          /* dont' add contactgroups that shouldn't be registered */
-          if (temp_contactgroup->register_object == false)
-            continue;
-
-          /* add contactgroup to list */
-          xodtemplate_add_member_to_memberlist(
-            list,
-            temp_contactgroup->contactgroup_name,
-            NULL);
-        }
-      }
-
-      /* else this is just a single contactgroup... */
-      else {
-
-        /* this contactgroup should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the contactgroup */
-        temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
-        if (temp_contactgroup != NULL) {
-
-          found_match = true;
-
-          /* add contactgroup members to proper list */
-          xodtemplate_add_member_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_contactgroup->contactgroup_name,
-            NULL);
-        }
+        /* add contactgroup members to proper list */
+        xodtemplate_add_member_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_contactgroup->contactgroup_name,
+          NULL);
       }
     }
 
@@ -14781,10 +14304,8 @@ int xodtemplate_get_servicegroup_names(
   char* servicegroup_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
-  regex_t preg;
   int found_match = true;
   int reject_item = false;
-  int use_regexp = false;
 
   if (list == NULL || servicegroups == NULL)
     return (ERROR);
@@ -14802,42 +14323,14 @@ int xodtemplate_get_servicegroup_names(
     /* strip trailing spaces */
     strip(temp_ptr);
 
-    /* should we use regular expression matching? */
-    if (config->use_regexp_matches() == true
-        && (config->use_true_regexp_matching() == true
-            || strstr(temp_ptr, "*") || strstr(temp_ptr, "?")
-            || strstr(temp_ptr, "+") || strstr(temp_ptr, "\\.")))
-      use_regexp = true;
-    else
-      use_regexp = false;
+    /* return a list of all servicegroups */
+    if (!strcmp(temp_ptr, "*")) {
 
-    /* use regular expression matching */
-    if (use_regexp == true) {
+      found_match = true;
 
-      /* compile regular expression */
-      if (regcomp(&preg, temp_ptr, REG_EXTENDED)) {
-        delete[] servicegroup_names;
-        return (ERROR);
-      }
-
-      /* test match against all servicegroup names */
       for (temp_servicegroup = xodtemplate_servicegroup_list;
            temp_servicegroup != NULL;
            temp_servicegroup = temp_servicegroup->next) {
-
-        if (temp_servicegroup->servicegroup_name == NULL)
-          continue;
-
-        /* skip this servicegroup if it did not match the expression */
-        if (regexec(
-              &preg,
-              temp_servicegroup->servicegroup_name,
-              0,
-              NULL,
-              0))
-          continue;
-
-        found_match = true;
 
         /* dont' add servicegroups that shouldn't be registered */
         if (temp_servicegroup->register_object == false)
@@ -14849,57 +14342,28 @@ int xodtemplate_get_servicegroup_names(
           temp_servicegroup->servicegroup_name,
           NULL);
       }
-
-      /* free memory allocated to compiled regexp */
-      regfree(&preg);
     }
 
-    /* use standard matching... */
+    /* else this is just a single servicegroup... */
     else {
 
-      /* return a list of all servicegroups */
-      if (!strcmp(temp_ptr, "*")) {
+      /* this servicegroup should be excluded (rejected) */
+      if (temp_ptr[0] == '!') {
+        reject_item = true;
+        temp_ptr++;
+      }
+
+      /* find the servicegroup */
+      temp_servicegroup = xodtemplate_find_real_servicegroup(temp_ptr);
+      if (temp_servicegroup != NULL) {
 
         found_match = true;
 
-        for (temp_servicegroup = xodtemplate_servicegroup_list;
-             temp_servicegroup != NULL;
-             temp_servicegroup = temp_servicegroup->next) {
-
-          /* dont' add servicegroups that shouldn't be registered */
-          if (temp_servicegroup->register_object == false)
-            continue;
-
-          /* add servicegroup to list */
-          xodtemplate_add_member_to_memberlist(
-            list,
-            temp_servicegroup->servicegroup_name,
-            NULL);
-        }
-      }
-
-      /* else this is just a single servicegroup... */
-      else {
-
-        /* this servicegroup should be excluded (rejected) */
-        if (temp_ptr[0] == '!') {
-          reject_item = true;
-          temp_ptr++;
-        }
-
-        /* find the servicegroup */
-        temp_servicegroup
-          = xodtemplate_find_real_servicegroup(temp_ptr);
-        if (temp_servicegroup != NULL) {
-
-          found_match = true;
-
-          /* add servicegroup members to proper list */
-          xodtemplate_add_member_to_memberlist(
-            (reject_item == true ? reject_list : list),
-            temp_servicegroup->servicegroup_name,
-            NULL);
-        }
+        /* add servicegroup members to proper list */
+        xodtemplate_add_member_to_memberlist(
+          (reject_item == true ? reject_list : list),
+          temp_servicegroup->servicegroup_name,
+          NULL);
       }
     }
 
@@ -15928,12 +15392,6 @@ int read_main_config_file(char const* main_config_file) {
       neb_add_module(modptr,argptr,true);
 #endif
     }
-
-    else if(!strcmp(variable,"use_regexp_matching"))
-      use_regexp_matches=(atoi(value)>0)?true:false;
-
-    else if(!strcmp(variable,"use_true_regexp_matching"))
-      use_true_regexp_matching=(atoi(value)>0)?true:false;
 
     else if(!strcmp(variable,"use_large_installation_tweaks")){
 

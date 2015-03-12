@@ -26,29 +26,6 @@ time-saving feature are as follows:
 Object types that are not listed above (i.e. timeperiods, commands,
 etc.) do not support the features I'm about to describe.
 
-Regular Expression Matching
-===========================
-
-The examples I give below use "standard" matching of object names and
-*require* :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
-to be *disabled*.
-
-If you wish, you can enable regular expression matching for object names
-by using the :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
-config option. By default, regular expression matching will only be used
-in object names that contain -, ?, +, or \.. If you want regular
-expression matching to be used on all object names, enable the
-:ref:`use_true_regexp_matching <main_cfg_opt_true_regular_expression_matching>`
-config option. Regular expressions can be used in any of the fields used
-in the examples below (host names, hostgroup names, service names, and
-servicegroup names).
-
-.. note::
-   Be careful when enabling regular expression matching - you may have
-   to change your config file, since some directives that you might not
-   want to be interpreted as a regular expression just might be! Any
-   problems should become evident once you verify your configuration.
-
 .. _obj_def_tricks_service:
 
 Service Definitions

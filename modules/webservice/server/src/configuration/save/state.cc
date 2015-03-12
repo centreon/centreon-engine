@@ -305,8 +305,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.translate_passive_host_checks() << std::endl
     << "use_large_installation_tweaks="
     << obj.use_large_installation_tweaks() << std::endl
-    << "use_regexp_matching="
-    << obj.use_regexp_matches() << std::endl
     << "use_retained_program_state="
     << obj.use_retained_program_state() << std::endl
     << "use_retained_scheduling_info="
@@ -315,8 +313,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.use_syslog() << std::endl
     << "use_timezone="
     << obj.use_timezone() << std::endl
-    << "use_true_regexp_matching="
-    << obj.use_true_regexp_matching() << std::endl;
   return (*this);
 }
 

@@ -243,8 +243,6 @@ extern char* use_timezone;
 extern unsigned long event_broker_options;
 extern char* illegal_object_chars;
 extern char* illegal_output_chars;
-extern unsigned int use_regexp_matches;
-extern unsigned int use_true_regexp_matching;
 extern unsigned int use_large_installation_tweaks;
 extern int external_command_buffer_slots;
 

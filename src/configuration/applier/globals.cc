@@ -113,11 +113,9 @@ void applier::globals::apply(state& config) {
   ::time_change_threshold = config.time_change_threshold();
   ::translate_passive_host_checks = config.translate_passive_host_checks();
   ::use_large_installation_tweaks = config.use_large_installation_tweaks();
-  ::use_regexp_matches = config.use_regexp_matches();
   ::use_retained_program_state = config.use_retained_program_state();
   ::use_retained_scheduling_info = config.use_retained_scheduling_info();
   ::use_syslog = config.use_syslog();
-  ::use_true_regexp_matching = config.use_true_regexp_matching();
 }
 
 /**

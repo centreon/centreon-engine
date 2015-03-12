@@ -1082,12 +1082,10 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
   config->use_check_result_path(new_cfg.use_check_result_path());
   config->use_large_installation_tweaks(new_cfg.use_large_installation_tweaks());
-  config->use_regexp_matches(new_cfg.use_regexp_matches());
   config->use_retained_program_state(new_cfg.use_retained_program_state());
   config->use_retained_scheduling_info(new_cfg.use_retained_scheduling_info());
   config->use_setpgid(new_cfg.use_setpgid());
   config->use_syslog(new_cfg.use_syslog());
-  config->use_true_regexp_matching(new_cfg.use_true_regexp_matching());
   config->user(new_cfg.user());
 
   // Set this variable just the first time.

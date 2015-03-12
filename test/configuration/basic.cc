@@ -200,8 +200,6 @@ static std::map<std::string, std::string> build_configuration(
   var["illegal_object_name_chars"] = "`~!$%^&*|'\"<>?,()";
   var["illegal_macro_output_chars"] = "`~$&|'\"<>";
   var["broker_module"] = "module argument";
-  var["use_regexp_matching"] = obj2str(my_rand(0, 1)) ;
-  var["use_true_regexp_matching"] = obj2str(my_rand(0, 1));
   var["use_large_installation_tweaks"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
 
@@ -444,9 +442,6 @@ void test_configuration(
   if (my_conf["event_broker_options"] != obj2str(config->event_broker_options())) {
     throw (engine_error() << "event_broker_options: init with '" << my_conf["event_broker_options"] << "'");
   }
-  if (my_conf["use_true_regexp_matching"] != obj2str(config->use_true_regexp_matching())) {
-    throw (engine_error() << "use_true_regexp_matching: init with '" << my_conf["use_true_regexp_matching"] << "'");
-  }
   if (my_conf["use_large_installation_tweaks"] != obj2str(config->use_large_installation_tweaks())) {
     throw (engine_error() << "use_large_installation_tweaks: init with '" << my_conf["use_large_installation_tweaks"] << "'");
   }
@@ -479,9 +474,6 @@ void test_configuration(
   }
   if (my_conf["illegal_macro_output_chars"] != config->illegal_output_chars()) {
     throw (engine_error() << "illegal_macro_output_chars: init with '" << my_conf["illegal_macro_output_chars"] << "'");
-  }
-  if (my_conf["use_regexp_matching"] != obj2str(config->use_regexp_matches())) {
-    throw (engine_error() << "use_regexp_matching: init with '" << my_conf["use_regexp_matching"] << "'");
   }
   if (my_conf["command_check_interval"] != obj2str(config->command_check_interval() / config->interval_length()) &&
       my_conf["command_check_interval"] != obj2str(config->command_check_interval()) + "s") {
