@@ -9,6 +9,8 @@ callback routines which have to be served by the modules. These routines
 are executed when special events occur in the Centreon Engine server
 process.
 
+.. _modules_external_commands:
+
 External Command
 ================
 
@@ -81,4 +83,3 @@ Example
         <password>password</password>
       </ssl>
     </webservice>
-

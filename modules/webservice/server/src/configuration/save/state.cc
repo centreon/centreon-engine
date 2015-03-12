@@ -125,8 +125,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << obj.cached_host_check_horizon() << std::endl
     << "cached_service_check_horizon="
     << obj.cached_service_check_horizon() << std::endl
-    << "check_external_commands="
-    << obj.check_external_commands() << std::endl
     << "check_host_freshness="
     << obj.check_host_freshness() << std::endl
     << "check_result_reaper_frequency="

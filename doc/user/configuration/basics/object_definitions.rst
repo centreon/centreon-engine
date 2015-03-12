@@ -42,7 +42,7 @@ values found in the config files, assuming you have
 :ref:`state retention <main_cfg_opt_state_retention>` enabled on a
 program-wide basis and the value of the directive is changed during
 runtime with an
-:ref:`external command <main_cfg_opt_external_command_check>`.  One way
+:ref:`external command <external_commands>`.  One way
 to get around this problem is to disable the retention of non-status
 information using the retain_nonstatus_information directive in the
 host, service, and contact definitions. Disabling this directive will

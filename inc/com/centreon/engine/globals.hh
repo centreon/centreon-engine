@@ -223,7 +223,6 @@ extern unsigned int check_reaper_interval;
 extern unsigned int max_check_reaper_time;
 extern float sleep_time;
 extern unsigned int interval_length;
-extern unsigned int check_external_commands;
 /* command_check_interval_is_seconds; */
 extern int command_check_interval;
 extern unsigned int check_service_freshness;

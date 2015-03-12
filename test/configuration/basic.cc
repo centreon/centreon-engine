@@ -182,7 +182,6 @@ static std::map<std::string, std::string> build_configuration(
   var["max_check_result_reaper_time"] = obj2str(my_rand(1));
   var["sleep_time"] = obj2str(my_rand(0.1f, 10000.0f));
   var["interval_length"] = obj2str(my_rand(1, 10000));
-  var["check_external_commands"] = obj2str(my_rand(0, 1));
   var["check_service_freshness"] = obj2str(my_rand(0, 1));
   var["check_host_freshness"] = obj2str(my_rand(0, 1));
   var["service_freshness_check_interval"] = obj2str(my_rand(1));
@@ -407,9 +406,6 @@ void test_configuration(
   }
   if (my_conf["interval_length"] != obj2str(config->interval_length())) {
     throw (engine_error() << "interval_length: init with '" << my_conf["interval_length"] << "'");
-  }
-  if (my_conf["check_external_commands"] != obj2str(config->check_external_commands())) {
-    throw (engine_error() << "check_external_commands: init with '" << my_conf["check_external_commands"] << "'");
   }
   if (my_conf["check_service_freshness"] != obj2str(config->check_service_freshness())) {
     throw (engine_error() << "check_service_freshness: init with '" << my_conf["check_service_freshness"] << "'");

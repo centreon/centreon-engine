@@ -1003,7 +1003,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->cached_host_check_horizon(new_cfg.cached_host_check_horizon());
   config->cached_service_check_horizon(new_cfg.cached_service_check_horizon());
   config->cfg_main(new_cfg.cfg_main());
-  config->check_external_commands(new_cfg.check_external_commands());
   config->check_host_freshness(new_cfg.check_host_freshness());
   config->check_reaper_interval(new_cfg.check_reaper_interval());
   if (config->check_result_path() != new_cfg.check_result_path())

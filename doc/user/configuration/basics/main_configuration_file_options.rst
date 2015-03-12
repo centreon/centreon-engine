@@ -373,24 +373,6 @@ host or service event handlers.
     * 0 = Disable event handlers
     * 1 = Enable event handlers (default)
 
-.. _main_cfg_opt_external_command_check:
-
-External Command Check Option
------------------------------
-
-This option determines whether or not Centreon Engine will check the
-:ref:`command file <main_cfg_opt_external_command_file>`
-for commands that should be executed. More information on external
-commands can be found :ref:`here <external_commands>`.
-
-  * 0 = Don't check external commands
-  * 1 = Check external commands (default)
-
-=========== =============================
-**Format**  check_external_commands=<0/1>
-**Example** check_external_commands=1
-=========== =============================
-
 .. _main_cfg_opt_external_command_check_interval:
 
 External Command Check Interval

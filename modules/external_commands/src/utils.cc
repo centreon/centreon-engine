@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -46,10 +46,6 @@ static FILE* command_file_fp = NULL;
 int open_command_file(void) {
   struct stat st;
   int result = 0;
-
-  /* if we're not checking external commands, don't do anything */
-  if (config->check_external_commands() == false)
-    return (OK);
 
   /* the command file was already created */
   if (command_file_created)
@@ -133,10 +129,6 @@ int open_command_file(void) {
 
 /* closes the external command file FIFO and deletes it */
 int close_command_file(void) {
-  /* if we're not checking external commands, don't do anything */
-  if (config->check_external_commands() == false)
-    return (OK);
-
   /* the command file wasn't created or was already cleaned up */
   if (command_file_created == false)
     return (OK);

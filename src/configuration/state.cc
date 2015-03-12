@@ -48,7 +48,6 @@ state::setters const state::_setters[] = {
   { "cached_service_check_horizon",                SETTER(unsigned long, cached_service_check_horizon) },
   { "cfg_dir",                                     SETTER(std::string const&, _set_cfg_dir) },
   { "cfg_file",                                    SETTER(std::string const&, _set_cfg_file) },
-  { "check_external_commands",                     SETTER(bool, check_external_commands) },
   { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
   { "check_result_reaper_frequency",               SETTER(unsigned int, check_reaper_interval) },
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
@@ -146,6 +145,7 @@ state::setters const state::_setters[] = {
   { "allow_empty_hostgroup_assignment",            SETTER(bool, _set_allow_empty_hostgroup_assignment) },
   { "auth_file",                                   SETTER(std::string const&, _set_auth_file) },
   { "bare_update_check",                           SETTER(std::string const&, _set_bare_update_check) },
+  { "check_external_commands",                     SETTER(bool, _set_check_external_commands) },
   { "check_for_orphaned_hosts",                    SETTER(bool, _set_check_for_orphaned_hosts) },
   { "check_for_orphaned_services",                 SETTER(bool, _set_check_for_orphaned_services) },
   { "check_for_updates",                           SETTER(std::string const&, _set_check_for_updates) },
@@ -196,7 +196,6 @@ static unsigned int const              default_auto_rescheduling_window(180);
 static std::string const               default_broker_module_directory("");
 static unsigned long const             default_cached_host_check_horizon(15);
 static unsigned long const             default_cached_service_check_horizon(15);
-static bool const                      default_check_external_commands(true);
 static bool const                      default_check_host_freshness(false);
 static unsigned int const              default_check_reaper_interval(10);
 static std::string const               default_check_result_path(DEFAULT_CHECK_RESULT_PATH);
@@ -319,7 +318,6 @@ state::state()
     _auto_rescheduling_window(default_auto_rescheduling_window),
     _cached_host_check_horizon(default_cached_host_check_horizon),
     _cached_service_check_horizon(default_cached_service_check_horizon),
-    _check_external_commands(default_check_external_commands),
     _check_host_freshness(default_check_host_freshness),
     _check_reaper_interval(default_check_reaper_interval),
     _check_result_path(default_check_result_path),
@@ -441,7 +439,6 @@ state& state::operator=(state const& right) {
     _broker_module_directory = right._broker_module_directory;
     _cached_host_check_horizon = right._cached_host_check_horizon;
     _cached_service_check_horizon = right._cached_service_check_horizon;
-    _check_external_commands = right._check_external_commands;
     _check_host_freshness = right._check_host_freshness;
     _check_reaper_interval = right._check_reaper_interval;
     _check_result_path = right._check_result_path;
@@ -564,7 +561,6 @@ bool state::operator==(state const& right) const throw () {
           && _broker_module_directory == right._broker_module_directory
           && _cached_host_check_horizon == right._cached_host_check_horizon
           && _cached_service_check_horizon == right._cached_service_check_horizon
-          && _check_external_commands == right._check_external_commands
           && _check_host_freshness == right._check_host_freshness
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
@@ -889,15 +885,6 @@ std::list<std::string> const& state::cfg_file() const throw () {
 }
 
 /**
- *  Get check_external_commands value.
- *
- *  @return The check_external_commands value.
- */
-bool state::check_external_commands() const throw () {
-  return (_check_external_commands);
-}
-
-/**
  *  Set cfg_main value.
  *
  *  @param[in] value The new cfg_main value.
@@ -913,15 +900,6 @@ void state::cfg_main(std::string const& value) {
  */
 std::string const& state::cfg_main() const throw () {
   return (_cfg_main);
-}
-
-/**
- *  Set check_external_commands value.
- *
- *  @param[in] value The new check_external_commands value.
- */
-void state::check_external_commands(bool value) {
-  _check_external_commands = value;
 }
 
 /**
@@ -3408,6 +3386,19 @@ void state::_set_cfg_file(std::string const& value) {
     std::string base_name(fe.directory_name());
     _cfg_file.push_back(base_name + "/" + value);
   }
+}
+
+/**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_check_external_commands(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_external_commands variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

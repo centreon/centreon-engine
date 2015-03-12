@@ -50,10 +50,6 @@ using namespace com::centreon::engine::logging;
 int check_for_external_commands() {
   logger(dbg_functions, basic) << "check_for_external_commands()";
 
-  /* bail out if we shouldn't be checking for external commands */
-  if (!config->check_external_commands())
-    return (ERROR);
-
   /* update last command check time */
   last_command_check = time(NULL);
 

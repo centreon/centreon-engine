@@ -52,7 +52,6 @@ void applier::globals::apply(state& config) {
   ::auto_rescheduling_window = config.auto_rescheduling_window();
   ::cached_host_check_horizon = config.cached_host_check_horizon();
   ::cached_service_check_horizon = config.cached_service_check_horizon();
-  ::check_external_commands = config.check_external_commands();
   ::check_host_freshness = config.check_host_freshness();
   ::check_reaper_interval = config.check_reaper_interval();
   ::check_service_freshness = config.check_service_freshness();

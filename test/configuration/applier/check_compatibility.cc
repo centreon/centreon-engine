@@ -94,7 +94,6 @@ struct                global {
   unsigned int        auto_rescheduling_window;
   unsigned long       cached_host_check_horizon;
   unsigned long       cached_service_check_horizon;
-  bool                check_external_commands;
   bool                check_host_freshness;
   unsigned int        check_reaper_interval;
   std::string         check_result_path;
@@ -295,7 +294,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(auto_rescheduling_window);
   check_value(cached_host_check_horizon);
   check_value(cached_service_check_horizon);
-  check_value(check_external_commands);
   check_value(check_host_freshness);
   check_value(check_reaper_interval);
   check_value(check_result_path);
@@ -551,7 +549,6 @@ static global get_globals() {
   g.auto_rescheduling_window = auto_rescheduling_window;
   g.cached_host_check_horizon = cached_host_check_horizon;
   g.cached_service_check_horizon = cached_service_check_horizon;
-  g.check_external_commands = check_external_commands;
   g.check_host_freshness = check_host_freshness;
   g.check_reaper_interval = check_reaper_interval;
   g.check_result_path = to_str(check_result_path);

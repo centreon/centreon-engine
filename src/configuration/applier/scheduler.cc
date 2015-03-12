@@ -274,20 +274,17 @@ void applier::scheduler::_apply_misc_event() {
   }
 
   // Remove and add an external command check event.
-  if ((!_evt_command_check && config->check_external_commands())
-      || (_evt_command_check && !config->check_external_commands())
-      || (_old_command_check_interval
-          != config->command_check_interval())) {
+  if (_old_command_check_interval != config->command_check_interval()) {
     _remove_misc_event(_evt_command_check);
-    if (config->check_external_commands()) {
-      unsigned long interval(5);
-      if (config->command_check_interval() != -1)
-        interval = (unsigned long)config->command_check_interval();
-      _evt_command_check = _create_misc_event(
-                             EVENT_COMMAND_CHECK,
-                             now + interval,
-                             interval);
-    }
+    unsigned long interval;
+    if (config->command_check_interval() != -1)
+      interval = (unsigned long)config->command_check_interval();
+    else
+      interval = 5;
+    _evt_command_check = _create_misc_event(
+                           EVENT_COMMAND_CHECK,
+                           now + interval,
+                           interval);
     _old_command_check_interval = config->command_check_interval();
   }
 

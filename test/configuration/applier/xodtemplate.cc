@@ -15753,17 +15753,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"check_external_commands")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for check_external_commands")) {}
-        error=true;
-        break;
-      }
-
-      check_external_commands=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"command_check_interval")){
 
       command_check_interval_is_seconds=(strstr(value,"s"))?true:false;

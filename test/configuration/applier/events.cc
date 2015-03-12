@@ -711,23 +711,21 @@ void init_timing_loop() {
     0);
 
   /* add an external command check event if needed */
-  if (config->check_external_commands() == true) {
-    if (config->command_check_interval() == -1)
-      interval_to_use = (unsigned long)5;
-    else
-      interval_to_use = (unsigned long)config->command_check_interval();
-    schedule_new_event(
-      EVENT_COMMAND_CHECK,
-      true,
-      current_time + interval_to_use,
-      true,
-      interval_to_use,
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
-  }
+  if (config->command_check_interval() == -1)
+    interval_to_use = (unsigned long)5;
+  else
+    interval_to_use = (unsigned long)config->command_check_interval();
+  schedule_new_event(
+    EVENT_COMMAND_CHECK,
+    true,
+    current_time + interval_to_use,
+    true,
+    interval_to_use,
+    NULL,
+    true,
+    NULL,
+    NULL,
+    0);
 
   /* add a retention data save event if needed */
   if (config->retain_state_information() == true

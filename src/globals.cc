@@ -132,7 +132,6 @@ unsigned int        accept_passive_service_checks(true);
 unsigned int        auto_reschedule_checks(false);
 unsigned int        auto_rescheduling_interval(30);
 unsigned int        auto_rescheduling_window(180);
-unsigned int        check_external_commands(true);
 unsigned int        check_host_freshness(false);
 unsigned int        check_reaper_interval(10);
 unsigned int        check_service_freshness(true);

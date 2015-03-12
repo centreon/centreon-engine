@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -787,39 +787,6 @@ int centreonengine__setCommandCheckInterval(soap* s,
       webservice::sync::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
-
-    webservice::sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    webservice::sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Set global variable check_external_commands.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable check_external_commands.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setCheckExternalCommands(soap* s,
-                                             bool value,
-                                             centreonengine__setCheckExternalCommandsResponse& res) {
-  (void)res;
-
-  try {
-    webservice::sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config->check_external_commands(value);
 
     webservice::sync::instance().worker_finish();
   }
