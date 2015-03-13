@@ -395,7 +395,7 @@ state::state()
     _use_retained_scheduling_info(default_use_retained_scheduling_info),
     _use_setpgid(default_use_setpgid),
     _use_syslog(default_use_syslog),
-    _use_timezone(default_use_timezone),
+    _use_timezone(default_use_timezone) {
   _users.resize(10);
 }
 
