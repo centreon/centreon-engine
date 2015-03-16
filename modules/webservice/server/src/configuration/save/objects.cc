@@ -113,7 +113,6 @@ objects& objects::operator<<(contact const& obj) {
   for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i)
     if (obj.address[i])
       _stream << "  address" << (i + 1) << " " << obj.address[i] << "\n";
-  _add_line("can_submit_commands", obj.can_submit_commands);
   _add_line("retain_status_information", obj.retain_status_information);
   _add_line("retain_nonstatus_information", obj.retain_nonstatus_information);
   _add_customvariables(obj.custom_variables);

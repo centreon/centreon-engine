@@ -150,7 +150,6 @@ define contact {
 	host_notification_commands	notify-none
 	host_notifications_enabled	0
 	service_notifications_enabled	0
-	can_submit_commands	1
 	retain_status_information	1
 	retain_nonstatus_information	1
 	}
@@ -165,7 +164,6 @@ define contact {
 	host_notification_commands	notify-none
 	host_notifications_enabled	0
 	service_notifications_enabled	0
-	can_submit_commands	1
 	retain_status_information	1
 	retain_nonstatus_information	1
 	}

@@ -169,7 +169,6 @@ typedef struct xodtemplate_contact_struct{
   int          notify_on_service_downtime;
   int          host_notifications_enabled;
   int          service_notifications_enabled;
-  int          can_submit_commands;
   int          retain_status_information;
   int          retain_nonstatus_information;
   xodtemplate_customvariablesmember* custom_variables;
@@ -188,7 +187,6 @@ typedef struct xodtemplate_contact_struct{
   int          have_service_notification_options;
   int          have_host_notifications_enabled;
   int          have_service_notifications_enabled;
-  int          have_can_submit_commands;
   int          have_retain_status_information;
   int          have_retain_nonstatus_information;
 

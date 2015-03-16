@@ -663,7 +663,6 @@ Definition Format
     # email                            email_address
     # pager                            pager_number or pager_email_gateway
     # addressx                         additional_contact_address
-    # can_submit_commands              [0/1]
     # retain_status_information        [0/1]
     # retain_nonstatus_information     [0/1]
   }
@@ -688,7 +687,6 @@ Example Definition
     pager                         555-5555@pagergateway.localhost.localdomain
     address1                      xxxxx.xyyy@icq.com
     address2                      555-555-5555
-    can_submit_commands           1
   }
 
 Directive Descriptions
@@ -753,9 +751,6 @@ addressx                      Address directives are used to define additional "
                               phone numbers, instant messaging addresses, etc. Depending on how you configure your notification commands, they can be
                               used to send out an alert to the contact. Up to six addresses can be defined using these directives (address1 through
                               address6). The $CONTACTADDRESSx$ :ref:`macro <understanding_macros>` will contain this value.
-can_submit_commands           This directive is used to determine whether or not the contact can submit
-                              :ref:`external commands <external_commands>` to Centreon Engine. Values: 0 = don't allow contact to submit
-                              commands, 1 = allow contact to submit commands.
 retain_status_information     This directive is used to determine whether or not status-related information about the contact is retained across
                               program restarts. This is only useful if you have enabled state retention using the
                               :ref:`retain_state_information <main_cfg_opt_state_retention>`

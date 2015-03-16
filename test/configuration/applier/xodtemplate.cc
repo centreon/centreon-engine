@@ -933,7 +933,6 @@ int xodtemplate_begin_object_definition(
 
     new_contact->host_notifications_enabled = true;
     new_contact->service_notifications_enabled = true;
-    new_contact->can_submit_commands = true;
     new_contact->retain_status_information = true;
     new_contact->retain_nonstatus_information = true;
   }
@@ -2063,10 +2062,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "service_notifications_enabled")) {
       temp_contact->service_notifications_enabled = (atoi(value) > 0) ? true : false;
       temp_contact->have_service_notifications_enabled = true;
-    }
-    else if (!strcmp(variable, "can_submit_commands")) {
-      temp_contact->can_submit_commands = (atoi(value) > 0) ? true : false;
-      temp_contact->have_can_submit_commands = true;
     }
     else if (!strcmp(variable, "retain_status_information")) {
       temp_contact->retain_status_information = (atoi(value) > 0) ? true : false;
@@ -6861,12 +6856,6 @@ int xodtemplate_resolve_contact(xodtemplate_contact* this_contact) {
         = template_contact->service_notifications_enabled;
       this_contact->have_service_notifications_enabled = true;
     }
-    if (this_contact->have_can_submit_commands == false
-        && template_contact->have_can_submit_commands == true) {
-      this_contact->can_submit_commands
-        = template_contact->can_submit_commands;
-      this_contact->have_can_submit_commands = true;
-    }
     if (this_contact->have_retain_status_information == false
         && template_contact->have_retain_status_information == true) {
       this_contact->retain_status_information
@@ -11362,10 +11351,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fp,
       "\tservice_notifications_enabled\t%d\n",
       temp_contact->service_notifications_enabled);
-    fprintf(
-      fp,
-      "\tcan_submit_commands\t%d\n",
-      temp_contact->can_submit_commands);
     fprintf(
       fp,
       "\tretain_status_information\t%d\n",
