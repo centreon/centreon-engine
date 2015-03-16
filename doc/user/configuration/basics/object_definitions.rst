@@ -192,8 +192,14 @@ check_command                This directive is used to specify the short name of
                              argument blank, the host will not be actively checked. Thus, Centreon Engine will likely always assume the host is up (it
                              may show up as being in a "PENDING" state in the web interface). This is useful if you are monitoring printers or other
                              devices that are frequently turned off. The maximum amount of time that the notification command can run is controlled by
-                             the :ref:`host_check_timeout <main_cfg_opt_host_check_timeout>`
+                             either the host's check_timeout option or the global :ref:`host_check_timeout <main_cfg_opt_host_check_timeout>`
                              option.
+check_timeout                This is the maximum number of seconds that Centreon Engine will allow host checks to run. If checks exceed this limit,
+                             they are killed and a DOWN state is returned. A timeout error will also be logged. There is often widespread confusion as
+                             to what this option really does. It is meant to be used as a last ditch mechanism to kill off plugins which are
+                             misbehaving and not exiting in a timely manner. It should be set to something reasonable (like 10 seconds), so that each
+                             host check normally finishes executing within this time limit. If a host check runs longer than this limit, Centreon
+                             Engine will kill it off thinking it is a runaway processes.
 initial_state                By default Centreon Engine will assume that all hosts are in UP states when it starts. You can override the initial state
                              for a host by using this directive. Valid options are: o = UP, d = DOWN, and u = UNREACHABLE.
 max_check_attempts           This directive is used to define the number of times that Centreon Engine will retry the host check command if it returns
@@ -452,7 +458,14 @@ is_volatile                  This directive is used to denote whether the servic
                              Value: 0 = service is not volatile, 1 = service is volatile.
 check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>` that Centreon Engine will run in
                              order to check the status of the service. The maximum amount of time that the service check command can run is controlled
-                             by the :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>` option.
+                             by either the service's check_timeout option or the global :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>`
+                             option.
+check_timeout                This is the maximum number of seconds that Centreon Engine will allow service checks to run. If checks exceed this limit,
+                             they are killed and a CRITICAL state is returned. A timeout error will also be logged. There is often widespread confusion
+                             as to what this option really does. It is meant to be used as a last ditch mechanism to kill off plugins which are
+                             misbehaving and not exiting in a timely manner. It should be set to something reasonably (like 10 seconds), so that each
+                             service check normally finishes executing within this time limit. If a service check runs longer than this limit, Centreon
+                             Engine will kill it off thinking it is a runaway processes.
 initial_state                By default Centreon Engine will assume that all services are in OK states when it starts. You can override the initial
                              state for a service by using this directive. Valid options are: o = OK, w = WARNING, u = UNKNOWN, and c = CRITICAL.
 max_check_attempts           This directive is used to define the number of times that Centreon Engine will retry the service check command if it
