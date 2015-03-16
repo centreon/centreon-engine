@@ -303,6 +303,7 @@ notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is
 stalking_options             This directive determines which host states "stalking" is enabled for. Valid options are a combination of one or more of
                              the following: o = stalk on UP states, d = stalk on DOWN states, and u = stalk on UNREACHABLE states. More information
                              on state stalking can be found :ref:`here <state_stalking>`.
+timezone                     Time zone of this host. All times applied to this host (time periods, downtimes, ...) will be affected by this option.
 ============================ =========================================================================================================================
 
 .. _obj_def_hostgroup:
@@ -440,7 +441,8 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================ =========================================================================================================================
-host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is                                   associated with. Multiple hosts should be separated by commas.
+host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is
+                             associated with. Multiple hosts should be separated by commas.
 hostgroup_name               This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>` that the service
                              "runs" on or is associated with.
                              Multiple hostgroups should be separated by commas. The hostgroup_name may be used instead of, or in addition to, the
@@ -567,6 +569,8 @@ contact_groups               This is a list of the short names of the :ref:`cont
 stalking_options             This directive determines which service states "stalking" is enabled for. Valid options are a combination of one or more
                              of the following: o = stalk on OK states, w = stalk on WARNING states, u = stalk on UNKNOWN states, and c = stalk on
                              CRITICAL states. More information on state stalking can be found :ref:`here <state_stalking>`.
+timezone                     Time zone of this service. All times applied to this service (time periods, downtimes, ...) will be affected by this
+                             option.
 ============================ =========================================================================================================================
 
 .. _obj_def_servicegroup:
@@ -760,6 +764,7 @@ retain_nonstatus_information  This directive is used to determine whether or not
                               restarts. This is only useful if you have enabled state retention using the
                               :ref:`retain_state_information <main_cfg_opt_state_retention>`
                               directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
+timezone                      Time zone of this contact. All times applied to this host (time periods) will be affected by this option.
 ============================= ========================================================================================================================
 
 .. _obj_def_contactgroup:
