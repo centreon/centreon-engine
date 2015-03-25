@@ -76,9 +76,6 @@ using namespace com::centreon::engine;
 #define TOTAL_SERVICES_WARNING  0
 #define TOTAL_SERVICES_UNKNOWN  0
 #define TOTAL_SERVICES_CRITICAL 0
-#define ACK_AUTHOR              mkermagoret
-#define ACK_AUTHOR_NAME         Matthieu Kermagoret
-#define ACK_AUTHOR_ALIAS        mk
 
 /**
  *  Check that the grab_standard_host_macro function works properly.
@@ -152,9 +149,6 @@ int main_test(int argc, char** argv) {
   // macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  mac.x[MACRO_HOSTACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
-  mac.x[MACRO_HOSTACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
-  mac.x[MACRO_HOSTACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
 
   // Macro values table.
   struct {
@@ -198,10 +192,7 @@ int main_test(int argc, char** argv) {
     { MACRO_TOTALHOSTSERVICESOK, STR(TOTAL_SERVICES_OK), false },
     { MACRO_TOTALHOSTSERVICESWARNING, STR(TOTAL_SERVICES_WARNING), false },
     { MACRO_TOTALHOSTSERVICESUNKNOWN, STR(TOTAL_SERVICES_UNKNOWN), false },
-    { MACRO_TOTALHOSTSERVICESCRITICAL, STR(TOTAL_SERVICES_CRITICAL), false },
-    { MACRO_HOSTACKAUTHOR, STR(ACK_AUTHOR), false },
-    { MACRO_HOSTACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
-    { MACRO_HOSTACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false }
+    { MACRO_TOTALHOSTSERVICESCRITICAL, STR(TOTAL_SERVICES_CRITICAL), false }
   };
 
   // Compare macros with expected values.
@@ -248,10 +239,6 @@ int main_test(int argc, char** argv) {
   delete [] mac.x[MACRO_TOTALHOSTSERVICESWARNING];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESUNKNOWN];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESCRITICAL];
-
-  delete [] mac.x[MACRO_HOSTACKAUTHOR];
-  delete [] mac.x[MACRO_HOSTACKAUTHORNAME];
-  delete [] mac.x[MACRO_HOSTACKAUTHORALIAS];
 
   return (retval);
 }

@@ -181,12 +181,6 @@ processing::processing() {
   _lst_command["SCHEDULE_FORCED_HOST_SVC_CHECKS"] =
     command_info(CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS,
                  &_redirector<&cmd_schedule_check>);
-  _lst_command["ACKNOWLEDGE_HOST_PROBLEM"] =
-    command_info(CMD_ACKNOWLEDGE_HOST_PROBLEM,
-                 &_redirector<&cmd_acknowledge_problem>);
-  _lst_command["REMOVE_HOST_ACKNOWLEDGEMENT"] =
-    command_info(CMD_REMOVE_HOST_ACKNOWLEDGEMENT,
-                 &_redirector<&cmd_remove_acknowledgement>);
   _lst_command["ENABLE_HOST_EVENT_HANDLER"] =
     command_info(CMD_ENABLE_HOST_EVENT_HANDLER,
                  &_redirector_host<&enable_host_event_handler>);
@@ -368,12 +362,6 @@ processing::processing() {
   _lst_command["DEL_SVC_DOWNTIME"] =
     command_info(CMD_DEL_SVC_DOWNTIME,
                  &_redirector<&cmd_delete_downtime>);
-  _lst_command["ACKNOWLEDGE_SVC_PROBLEM"] =
-    command_info(CMD_ACKNOWLEDGE_SVC_PROBLEM,
-                 &_redirector<&cmd_acknowledge_problem>);
-  _lst_command["REMOVE_SVC_ACKNOWLEDGEMENT"] =
-    command_info(CMD_REMOVE_SVC_ACKNOWLEDGEMENT,
-                 &_redirector<&cmd_remove_acknowledgement>);
   _lst_command["START_OBSESSING_OVER_SVC"] =
     command_info(CMD_START_OBSESSING_OVER_SVC,
                  &_redirector_service<&start_obsessing_over_service>);

@@ -28,7 +28,6 @@ using namespace com::centreon::engine::retention;
   &object::setter<service, type, &service::method>::generic
 
 service::setters const service::_setters[] = {
-  { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
   { "check_command",                        SETTER(std::string const&, _set_check_command) },
   { "check_execution_time",                 SETTER(double, _set_check_execution_time) },
@@ -76,14 +75,15 @@ service::setters const service::_setters[] = {
   { "percent_state_change",                 SETTER(double, _set_percent_state_change) },
   { "performance_data",                     SETTER(std::string const&, _set_performance_data) },
   { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
-  { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
   { "service_description",                  SETTER(std::string const&, _set_service_description) },
   { "state_history",                        SETTER(std::string const&, _set_state_history) },
   { "state_type",                           SETTER(int, _set_state_type) },
 
   // Deprecated.
+  { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
+  { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
 
@@ -116,7 +116,6 @@ service::~service() throw () {}
 service& service::operator=(service const& right) {
   if (this != &right) {
     object::operator=(right);
-    _acknowledgement_type = right._acknowledgement_type;
     _active_checks_enabled = right._active_checks_enabled;
     _check_command = right._check_command;
     _check_execution_time = right._check_execution_time;
@@ -166,7 +165,6 @@ service& service::operator=(service const& right) {
     _percent_state_change = right._percent_state_change;
     _performance_data = right._performance_data;
     _plugin_output = right._plugin_output;
-    _problem_has_been_acknowledged = right._problem_has_been_acknowledged;
     _retry_check_interval = right._retry_check_interval;
     _service_description = right._service_description;
     _state_history = right._state_history;
@@ -184,7 +182,6 @@ service& service::operator=(service const& right) {
  */
 bool service::operator==(service const& right) const throw () {
   return (object::operator==(right)
-          && _acknowledgement_type == right._acknowledgement_type
           && _active_checks_enabled == right._active_checks_enabled
           && _check_command == right._check_command
           && _check_execution_time == right._check_execution_time
@@ -233,7 +230,6 @@ bool service::operator==(service const& right) const throw () {
           && _percent_state_change == right._percent_state_change
           && _performance_data == right._performance_data
           && _plugin_output == right._plugin_output
-          && _problem_has_been_acknowledged == right._problem_has_been_acknowledged
           && _retry_check_interval == right._retry_check_interval
           && _service_description == right._service_description
           && _state_history == right._state_history
@@ -292,15 +288,6 @@ bool service::set(char const* key, char const* value) {
   } while (it != _next_setter);
 
   return (false);
-}
-
-/**
- *  Get acknowledgement_type.
- *
- *  @return The acknowledgement_type.
- */
-opt<int> const& service::acknowledgement_type() const throw () {
-  return (_acknowledgement_type);
 }
 
 /**
@@ -736,15 +723,6 @@ opt<std::string> const& service::plugin_output() const throw () {
 }
 
 /**
- *  Get problem_has_been_acknowledged.
- *
- *  @return The problem_has_been_acknowledged.
- */
-opt<bool> const& service::problem_has_been_acknowledged() const throw () {
-  return (_problem_has_been_acknowledged);
-}
-
-/**
  *  Get retry_check_interval.
  *
  *  @return The retry_check_interval.
@@ -781,12 +759,14 @@ opt<int> const& service::state_type() const throw () {
 }
 
 /**
- *  Set acknowledgement_type.
+ *  Deprecated variable.
  *
- *  @param[in] value The new acknowledgement_type.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_acknowledgement_type(int value) {
-  _acknowledgement_type = value;
+  (void)value;
   return (true);
 }
 
@@ -1274,12 +1254,14 @@ bool service::_set_plugin_output(std::string const& value) {
 }
 
 /**
- *  Set problem_has_been_acknowledged.
+ *  Deprecated variable.
  *
- *  @param[in] value The new problem_has_been_acknowledged.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_problem_has_been_acknowledged(bool value) {
-  _problem_has_been_acknowledged = value;
+  (void)value;
   return (true);
 }
 

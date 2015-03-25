@@ -34,69 +34,6 @@ using namespace com::centreon::engine;
 extern "C" {
 
 /**
- *  Send acknowledgement data to broker.
- *
- *  @param[in] type                 Type.
- *  @param[in] flags                Flags.
- *  @param[in] attr                 Attributes.
- *  @param[in] acknowledgement_type Type (sticky or not).
- *  @param[in] data                 Data.
- *  @param[in] ack_author           Author.
- *  @param[in] ack_data             Acknowledgement text.
- *  @param[in] subtype              Subtype.
- *  @param[in] notify_contacts      Should we notify contacts.
- *  @param[in] timestamp            Timestamp.
- */
-void broker_acknowledgement_data(
-       int type,
-       int flags,
-       int attr,
-       int acknowledgement_type,
-       void* data,
-       char* ack_author,
-       char* ack_data,
-       int subtype,
-       int notify_contacts,
-       int persistent_comment,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_ACKNOWLEDGEMENT_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  host* temp_host(NULL);
-  service* temp_service(NULL);
-  nebstruct_acknowledgement_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.acknowledgement_type = acknowledgement_type;
-  if (acknowledgement_type == SERVICE_ACKNOWLEDGEMENT) {
-    temp_service = (service*)data;
-    ds.host_name = temp_service->host_name;
-    ds.service_description = temp_service->description;
-    ds.state = temp_service->current_state;
-  }
-  else {
-    temp_host = (host*)data;
-    ds.host_name = temp_host->name;
-    ds.service_description = NULL;
-    ds.state = temp_host->current_state;
-  }
-  ds.object_ptr = data;
-  ds.author_name = ack_author;
-  ds.comment_data = ack_data;
-  ds.is_sticky = (subtype == ACKNOWLEDGEMENT_STICKY) ? true : false;
-  ds.notify_contacts = notify_contacts;
-  ds.persistent_comment = persistent_comment;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_ACKNOWLEDGEMENT_DATA, &ds);
-  return;
-}
-
-/**
  *  Sends adaptive contact updates to broker.
  *
  *  @param[in] type         Type.
@@ -416,8 +353,6 @@ void broker_command_data(
  *  @param[in] end_time          End time.
  *  @param[in] data              Data.
  *  @param[in] cntct             Target contact.
- *  @param[in] ack_author        Author.
- *  @param[in] ack_data          Data.
  *  @param[in] escalated         Escalated ?
  *  @param[in] timestamp         Timestamp.
  */
@@ -431,8 +366,6 @@ int broker_contact_notification_data(
       struct timeval end_time,
       void* data,
       contact* cntct,
-      char* ack_author,
-      char* ack_data,
       int escalated,
       struct timeval const* timestamp) {
   // Config check.
@@ -468,8 +401,6 @@ int broker_contact_notification_data(
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
-  ds.ack_author = ack_author;
-  ds.ack_data = ack_data;
   ds.escalated = escalated;
 
   // Make callbacks.
@@ -491,8 +422,6 @@ int broker_contact_notification_data(
  *  @param[in] data              Data.
  *  @param[in] cntct             Target contact.
  *  @param[in] cmd               Notification command.
- *  @param[in] ack_author        Author.
- *  @param[in] ack_data          Data.
  *  @param[in] escalated         Escalated ?
  *  @param[in] timestamp         Timestamp.
  *
@@ -509,8 +438,6 @@ int broker_contact_notification_method_data(
       void* data,
       contact* cntct,
       char const* cmd,
-      char* ack_author,
-      char* ack_data,
       int escalated,
       struct timeval const* timestamp) {
   // Config check.
@@ -558,8 +485,6 @@ int broker_contact_notification_method_data(
   }
   ds.object_ptr = data;
   ds.contact_ptr = cntct;
-  ds.ack_author = ack_author;
-  ds.ack_data = ack_data;
   ds.escalated = escalated;
 
   // Make callbacks.
@@ -1203,8 +1128,6 @@ void broker_module_data(
  *  @param[in] start_time        Start time.
  *  @param[in] end_time          End time.
  *  @param[in] data              Data.
- *  @param[in] ack_author        Acknowledgement author.
- *  @param[in] ack_data          Acknowledgement data.
  *  @param[in] escalated         Is notification escalated ?
  *  @param[in] contacts_notified Are contacts notified ?
  *  @param[in] timestamp         Timestamp.
@@ -1220,8 +1143,6 @@ int broker_notification_data(
       struct timeval start_time,
       struct timeval end_time,
       void* data,
-      char* ack_author,
-      char* ack_data,
       int escalated,
       int contacts_notified,
       struct timeval const* timestamp) {
@@ -1256,8 +1177,6 @@ int broker_notification_data(
     ds.output = temp_host->plugin_output;
   }
   ds.object_ptr = data;
-  ds.ack_author = ack_author;
-  ds.ack_data = ack_data;
   ds.escalated = escalated;
   ds.contacts_notified = contacts_notified;
 

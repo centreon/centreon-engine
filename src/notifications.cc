@@ -38,7 +38,6 @@ using namespace com::centreon::engine::logging;
 
 static char const* tab_notification_str[] = {
   "NORMAL",
-  "ACKNOWLEDGEMENT",
   "FLAPPINGSTART",
   "FLAPPINGSTOP",
   "FLAPPINGDISABLED",
@@ -153,8 +152,6 @@ int service_notification(
     start_time,
     end_time,
     (void*)svc,
-    not_author,
-    not_data,
     escalated,
     0,
     NULL);
@@ -199,24 +196,8 @@ int service_notification(
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
     }
 
-    /* NOTE: these macros are deprecated and will likely disappear in next major release */
-    /* if this is an acknowledgement, get author macros */
-    if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-      string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
-      if (temp_contact) {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
-      }
-      else {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS]);
-      }
-    }
-
     /* set the notification type macro */
-    if (type == NOTIFICATION_ACKNOWLEDGEMENT)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
-    else if (type == NOTIFICATION_FLAPPINGSTART)
+    if (type == NOTIFICATION_FLAPPINGSTART)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
     else if (type == NOTIFICATION_FLAPPINGSTOP)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
@@ -345,8 +326,6 @@ int service_notification(
     start_time,
     end_time,
     (void*)svc,
-    not_author,
-    not_data,
     escalated,
     contacts_notified,
     NULL);
@@ -467,26 +446,6 @@ int check_service_notification_viability(
   }
 
   /****************************************/
-  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
-  /****************************************/
-
-  /* acknowledgements only have to pass three general filters, although they have another test of their own... */
-  if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-
-    /* don't send an acknowledgement if there isn't a problem... */
-    if (svc->current_state == STATE_OK) {
-      logger(dbg_notifications, more)
-        << "The service is currently OK, so we won't send an "
-        "acknowledgement.";
-      return (ERROR);
-    }
-
-    /* acknowledgement viability test passed, so the notification can be sent out */
-    return (OK);
-  }
-
-
-  /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /****************************************/
 
@@ -554,14 +513,6 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "This service is in a soft state, so we won't send a "
       "notification out.";
-    return (ERROR);
-  }
-
-  /* has this problem already been acknowledged? */
-  if (svc->problem_has_been_acknowledged == true) {
-    logger(dbg_notifications, more)
-      << "This service problem has already been acknowledged, "
-      "so we won't send a notification out.";
     return (ERROR);
   }
 
@@ -766,9 +717,9 @@ int check_contact_service_notification_viability(
     return (OK);
   }
 
-  /*************************************/
-  /*** ACKS AND NORMAL NOTIFICATIONS ***/
-  /*************************************/
+  /****************************/
+  /*** NORMAL NOTIFICATIONS ***/
+  /****************************/
 
   /* see if we should notify about problems with this service */
   if (svc->current_state == STATE_UNKNOWN
@@ -851,7 +802,6 @@ int notify_contact_of_service(
     << "** Attempting to notifying contact '" << cntct->name << "'...";
 
   /* check viability of notifying this user */
-  /* acknowledgements are no longer excluded from this test - added 8/19/02 Tom Bertelson */
   if (check_contact_service_notification_viability(
         cntct,
         svc,
@@ -878,8 +828,6 @@ int notify_contact_of_service(
                  end_time,
                  (void*)svc,
                  cntct,
-                 not_author,
-                 not_data,
                  escalated,
                  NULL);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
@@ -909,8 +857,6 @@ int notify_contact_of_service(
                    (void*)svc,
                    cntct,
                    temp_commandsmember->cmd,
-                   not_author,
-                   not_data,
                    escalated,
                    NULL);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
@@ -963,12 +909,6 @@ int notify_contact_of_service(
       switch (type) {
       case NOTIFICATION_CUSTOM:
         notification_str = "CUSTOM";
-
-      case NOTIFICATION_ACKNOWLEDGEMENT:
-        info
-          .append(";").append(not_author ? not_author : "")
-          .append(";").append(not_data ? not_data : "");
-        break;
       }
 
       std::string service_notification_state;
@@ -1035,8 +975,6 @@ int notify_contact_of_service(
       (void*)svc,
       cntct,
       temp_commandsmember->cmd,
-      not_author,
-      not_data,
       escalated,
       NULL);
   }
@@ -1058,8 +996,6 @@ int notify_contact_of_service(
     end_time,
     (void*)svc,
     cntct,
-    not_author,
-    not_data,
     escalated,
     NULL);
   return (OK);
@@ -1202,8 +1138,6 @@ int host_notification(
     start_time,
     end_time,
     (void*)hst,
-    not_author,
-    not_data,
     escalated,
     0,
     NULL);
@@ -1248,24 +1182,8 @@ int host_notification(
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS]);
     }
 
-    /* NOTE: these macros are deprecated and will likely disappear in next major release */
-    /* if this is an acknowledgement, get author macros */
-    if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-      string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
-      if (temp_contact) {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
-      }
-      else {
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME]);
-        string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS]);
-      }
-    }
-
     /* set the notification type macro */
-    if (type == NOTIFICATION_ACKNOWLEDGEMENT)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "ACKNOWLEDGEMENT");
-    else if (type == NOTIFICATION_FLAPPINGSTART)
+    if (type == NOTIFICATION_FLAPPINGSTART)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTART");
     else if (type == NOTIFICATION_FLAPPINGSTOP)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
@@ -1394,8 +1312,6 @@ int host_notification(
     start_time,
     end_time,
     (void*)hst,
-    not_author,
-    not_data,
     escalated,
     contacts_notified,
     NULL);
@@ -1495,25 +1411,6 @@ int check_host_notification_viability(
     return (OK);
   }
 
-  /****************************************/
-  /*** SPECIAL CASE FOR ACKNOWLEGEMENTS ***/
-  /****************************************/
-
-  /* acknowledgements only have to pass three general filters, although they have another test of their own... */
-  if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
-
-    /* don't send an acknowledgement if there isn't a problem... */
-    if (hst->current_state == HOST_UP) {
-      logger(dbg_notifications, more)
-        << "The host is currently UP, so we won't send "
-        "an acknowledgement.";
-      return (ERROR);
-    }
-
-    /* acknowledgement viability test passed, so the notification can be sent out */
-    return (OK);
-  }
-
   /*****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /*****************************************/
@@ -1579,14 +1476,6 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "This host is in a soft state, so we won't send "
       "a notification out.";
-    return (ERROR);
-  }
-
-  /* has this problem already been acknowledged? */
-  if (hst->problem_has_been_acknowledged == true) {
-    logger(dbg_notifications, more)
-      << "This host problem has already been acknowledged, "
-      "so we won't send a notification out!";
     return (ERROR);
   }
 
@@ -1765,9 +1654,9 @@ int check_contact_host_notification_viability(
     return (OK);
   }
 
-  /*************************************/
-  /*** ACKS AND NORMAL NOTIFICATIONS ***/
-  /*************************************/
+  /****************************/
+  /*** NORMAL NOTIFICATIONS ***/
+  /****************************/
 
   /* see if we should notify about problems with this host */
   if (hst->current_state == HOST_DOWN
@@ -1840,7 +1729,6 @@ int notify_contact_of_host(
     << "** Attempting to notifying contact '" << cntct->name << "'...";
 
   /* check viability of notifying this user about the host */
-  /* acknowledgements are no longer excluded from this test - added 8/19/02 Tom Bertelson */
   if (check_contact_host_notification_viability(
         cntct,
         hst,
@@ -1867,8 +1755,6 @@ int notify_contact_of_host(
                  end_time,
                  (void*)hst,
                  cntct,
-                 not_author,
-                 not_data,
                  escalated,
                  NULL);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
@@ -1898,8 +1784,6 @@ int notify_contact_of_host(
                    (void*)hst,
                    cntct,
                    temp_commandsmember->cmd,
-                   not_author,
-                   not_data,
                    escalated,
                    NULL);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
@@ -1952,12 +1836,6 @@ int notify_contact_of_host(
       switch (type) {
       case NOTIFICATION_CUSTOM:
         notification_str = "CUSTOM";
-
-      case NOTIFICATION_ACKNOWLEDGEMENT:
-        info
-          .append(";").append(not_author ? not_author : "")
-          .append(";").append(not_data ? not_data : "");
-        break;
       }
 
       std::string host_notification_state;
@@ -2023,8 +1901,6 @@ int notify_contact_of_host(
       (void*)hst,
       cntct,
       temp_commandsmember->cmd,
-      not_author,
-      not_data,
       escalated,
       NULL);
   }
@@ -2046,8 +1922,6 @@ int notify_contact_of_host(
     end_time,
     (void*)hst,
     cntct,
-    not_author,
-    not_data,
     escalated,
     NULL);
 

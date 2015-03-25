@@ -596,8 +596,6 @@ static int handle_summary_macro(
         else if (temp_host->current_state == HOST_DOWN) {
           if (temp_host->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_host->problem_has_been_acknowledged == true)
-            problem = false;
           if (temp_host->checks_enabled == false)
             problem = false;
           if (problem)
@@ -606,8 +604,6 @@ static int handle_summary_macro(
         }
         else if (temp_host->current_state == HOST_UNREACHABLE) {
           if (temp_host->scheduled_downtime_depth > 0)
-            problem = false;
-          if (temp_host->problem_has_been_acknowledged == true)
             problem = false;
           if (temp_host->checks_enabled == false)
             problem = false;
@@ -654,8 +650,6 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == true)
-            problem = false;
           if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
@@ -670,8 +664,6 @@ static int handle_summary_macro(
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
-          if (temp_service->problem_has_been_acknowledged == true)
-            problem = false;
           if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
@@ -685,8 +677,6 @@ static int handle_summary_macro(
                   || temp_host->current_state == HOST_UNREACHABLE))
             problem = false;
           if (temp_service->scheduled_downtime_depth > 0)
-            problem = false;
-          if (temp_service->problem_has_been_acknowledged == true)
             problem = false;
           if (temp_service->checks_enabled == false)
             problem = false;
@@ -762,7 +752,6 @@ struct grab_value_redirection {
       MACRO_HOSTDOWNTIME,
       MACRO_HOSTSTATETYPE,
       MACRO_HOSTPERCENTCHANGE,
-      MACRO_HOSTACKAUTHOR,
       MACRO_LASTHOSTUP,
       MACRO_LASTHOSTDOWN,
       MACRO_LASTHOSTUNREACHABLE,
@@ -778,8 +767,6 @@ struct grab_value_redirection {
       MACRO_HOSTEVENTID,
       MACRO_LASTHOSTEVENTID,
       MACRO_HOSTGROUPNAMES,
-      MACRO_HOSTACKAUTHORNAME,
-      MACRO_HOSTACKAUTHORALIAS,
       MACRO_MAXHOSTATTEMPTS,
       MACRO_TOTALHOSTSERVICES,
       MACRO_TOTALHOSTSERVICESOK,
@@ -827,7 +814,6 @@ struct grab_value_redirection {
       MACRO_SERVICEDOWNTIME,
       MACRO_SERVICESTATETYPE,
       MACRO_SERVICEPERCENTCHANGE,
-      MACRO_SERVICEACKAUTHOR,
       MACRO_LASTSERVICEOK,
       MACRO_LASTSERVICEWARNING,
       MACRO_LASTSERVICEUNKNOWN,
@@ -844,8 +830,6 @@ struct grab_value_redirection {
       MACRO_SERVICEEVENTID,
       MACRO_LASTSERVICEEVENTID,
       MACRO_SERVICEGROUPNAMES,
-      MACRO_SERVICEACKAUTHORNAME,
-      MACRO_SERVICEACKAUTHORALIAS,
       MACRO_MAXSERVICEATTEMPTS,
       MACRO_SERVICEISVOLATILE,
       MACRO_SERVICEPROBLEMID,

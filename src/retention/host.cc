@@ -28,7 +28,6 @@ using namespace com::centreon::engine::retention;
   &object::setter<host, type, &host::method>::generic
 
 host::setters const host::_setters[] = {
-  { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
   { "check_command",                        SETTER(std::string const&, _set_check_command) },
   { "check_execution_time",                 SETTER(double, _set_check_execution_time) },
@@ -74,13 +73,14 @@ host::setters const host::_setters[] = {
   { "percent_state_change",                 SETTER(double, _set_percent_state_change) },
   { "performance_data",                     SETTER(std::string const&, _set_performance_data) },
   { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
-  { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "retry_check_interval",                 SETTER(unsigned int, _set_retry_check_interval) },
   { "state_history",                        SETTER(std::string const&, _set_state_history) },
   { "state_type",                           SETTER(int, _set_state_type) },
 
   // Deprecated.
+  { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
   { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
+  { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
 
@@ -114,7 +114,6 @@ host::~host() throw () {}
 host& host::operator=(host const& right) {
   if (this != &right) {
     object::operator=(right);
-    _acknowledgement_type = right._acknowledgement_type;
     _active_checks_enabled = right._active_checks_enabled;
     _check_command = right._check_command;
     _check_execution_time = right._check_execution_time;
@@ -161,7 +160,6 @@ host& host::operator=(host const& right) {
     _percent_state_change = right._percent_state_change;
     _performance_data = right._performance_data;
     _plugin_output = right._plugin_output;
-    _problem_has_been_acknowledged = right._problem_has_been_acknowledged;
     _retry_check_interval = right._retry_check_interval;
     _state_history = right._state_history;
     _state_type = right._state_type;
@@ -178,7 +176,6 @@ host& host::operator=(host const& right) {
  */
 bool host::operator==(host const& right) const throw () {
   return (object::operator==(right)
-          && _acknowledgement_type == right._acknowledgement_type
           && _active_checks_enabled == right._active_checks_enabled
           && _check_command == right._check_command
           && _check_execution_time == right._check_execution_time
@@ -225,7 +222,6 @@ bool host::operator==(host const& right) const throw () {
           && _percent_state_change == right._percent_state_change
           && _performance_data == right._performance_data
           && _plugin_output == right._plugin_output
-          && _problem_has_been_acknowledged == right._problem_has_been_acknowledged
           && _retry_check_interval == right._retry_check_interval
           && _state_history == right._state_history
           && _state_type == right._state_type);
@@ -261,15 +257,6 @@ bool host::set(char const* key, char const* value) {
     return (true);
   }
   return (false);
-}
-
-/**
- *  Get acknowledgement_type.
- *
- *  @return The acknowledgement_type.
- */
-opt<int> const& host::acknowledgement_type() const throw () {
-  return (_acknowledgement_type);
 }
 
 /**
@@ -687,15 +674,6 @@ opt<std::string> const& host::plugin_output() const throw () {
 }
 
 /**
- *  Get problem_has_been_acknowledged.
- *
- *  @return The problem_has_been_acknowledged.
- */
-opt<bool> const& host::problem_has_been_acknowledged() const throw () {
-  return (_problem_has_been_acknowledged);
-}
-
-/**
  *  Get retry_check_interval.
  *
  *  @return The retry_check_interval.
@@ -723,12 +701,14 @@ opt<int> const& host::state_type() const throw () {
 }
 
 /**
- *  Set acknowledgement_type.
+ *  Deprecated variable.
  *
- *  @param[in] value The new acknowledgement_type.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool host::_set_acknowledgement_type(int value) {
-  _acknowledgement_type = value;
+  (void)value;
   return (true);
 }
 
@@ -1196,12 +1176,14 @@ bool host::_set_plugin_output(std::string const& value) {
 }
 
 /**
- *  Set problem_has_been_acknowledged.
+ *  Deprecated variable.
  *
- *  @param[in] value The new problem_has_been_acknowledged.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool host::_set_problem_has_been_acknowledged(bool value) {
-  _problem_has_been_acknowledged = value;
+  (void)value;
   return (true);
 }
 

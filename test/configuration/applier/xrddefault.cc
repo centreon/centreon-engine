@@ -300,8 +300,6 @@ int xrddefault_save_state_information() {
            << "current_notification_number=" << temp_host->current_notification_number << "\n"
            << "current_notification_id=" << temp_host->current_notification_id << "\n"
            << "notifications_enabled=" << temp_host->notifications_enabled << "\n"
-           << "problem_has_been_acknowledged=" << temp_host->problem_has_been_acknowledged << "\n"
-           << "acknowledgement_type=" << temp_host->acknowledgement_type << "\n"
            << "active_checks_enabled=" << temp_host->checks_enabled << "\n"
            << "passive_checks_enabled=" << temp_host->accept_passive_host_checks << "\n"
            << "event_handler_enabled=" << temp_host->event_handler_enabled << "\n"
@@ -380,8 +378,6 @@ int xrddefault_save_state_information() {
            << "active_checks_enabled=" << temp_service->checks_enabled << "\n"
            << "passive_checks_enabled=" << temp_service->accept_passive_service_checks << "\n"
            << "event_handler_enabled=" << temp_service->event_handler_enabled << "\n"
-           << "problem_has_been_acknowledged=" << temp_service->problem_has_been_acknowledged << "\n"
-           << "acknowledgement_type=" << temp_service->acknowledgement_type << "\n"
            << "flap_detection_enabled=" << temp_service->flap_detection_enabled << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "is_flapping=" << temp_service->is_flapping << "\n"
@@ -543,7 +539,6 @@ int xrddefault_read_state_information() {
   unsigned long contact_service_attribute_mask = 0L;
   unsigned long process_host_attribute_mask = 0L;
   unsigned long process_service_attribute_mask = 0L;
-  int ack = FALSE;
   int was_flapping = FALSE;
   int allow_flapstart_notification = TRUE;
   struct timeval tv[2];
@@ -1060,10 +1055,6 @@ int xrddefault_read_state_information() {
             /* null-op speeds up logic */
             if (found_directive == TRUE);
 
-            else if (!strcmp(var, "problem_has_been_acknowledged"))
-              temp_host->problem_has_been_acknowledged = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "acknowledgement_type"))
-              temp_host->acknowledgement_type = atoi(val);
             else if (!strcmp(var, "notifications_enabled")) {
               if (temp_host->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
                 temp_host->notifications_enabled = (atoi(val) > 0) ? TRUE : FALSE;
@@ -1321,10 +1312,6 @@ int xrddefault_read_state_information() {
             /* null-op speeds up logic */
             if (found_directive == TRUE);
 
-            else if (!strcmp(var, "problem_has_been_acknowledged"))
-              temp_service->problem_has_been_acknowledged = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "acknowledgement_type"))
-              temp_service->acknowledgement_type = atoi(val);
             else if (!strcmp(var, "notifications_enabled")) {
               if (temp_service->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
                 temp_service->notifications_enabled = (atoi(val) > 0) ? TRUE : FALSE;

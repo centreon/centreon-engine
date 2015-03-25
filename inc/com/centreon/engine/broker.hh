@@ -43,7 +43,6 @@
 #  define BROKER_ADAPTIVE_DATA                     (1 << 13)
 #  define BROKER_EXTERNALCOMMAND_DATA              (1 << 14)
 #  define BROKER_RETENTION_DATA                    (1 << 15)
-#  define BROKER_ACKNOWLEDGEMENT_DATA              (1 << 16)
 #  define BROKER_STATECHANGE_DATA                  (1 << 17)
 #  define BROKER_RESERVED18                        (1 << 18)
 #  define BROKER_RESERVED19                        (1 << 19)
@@ -155,13 +154,6 @@
 #  define NEBTYPE_RETENTIONDATA_ENDLOAD            1601
 #  define NEBTYPE_RETENTIONDATA_STARTSAVE          1602
 #  define NEBTYPE_RETENTIONDATA_ENDSAVE            1603
-
-/* Acknowledgement. */
-#  define NEBTYPE_ACKNOWLEDGEMENT_ADD              1700
-#  define NEBTYPE_ACKNOWLEDGEMENT_DELETE           1701
-#  define NEBTYPE_ACKNOWLEDGEMENT_REMOVE           NEBTYPE_ACKNOWLEDGEMENT_DELETE
-#  define NEBTYPE_ACKNOWLEDGEMENT_LOAD             1702    /* NOT IMPLEMENTED. */
-#  define NEBTYPE_ACKNOWLEDGEMENT_UPDATE           1703
 
 /* State change. */
 #  define NEBTYPE_STATECHANGE_START                1800    /* NOT IMPLEMENTED. */
@@ -288,18 +280,6 @@ struct timeperiod_struct;
 extern "C" {
 #  endif /* C++ */
 
-void           broker_acknowledgement_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 int acknowledgement_type,
-                 void* data,
-                 char* ack_author,
-                 char* ack_data,
-                 int subtype,
-                 int notify_contacts,
-                 int persistent_comment,
-                 struct timeval const* timestamp);
 void           broker_adaptive_contact_data(
                  int type,
                  int flags,
@@ -375,8 +355,6 @@ int            broker_contact_notification_data(
                  struct timeval end_time,
                  void* data,
                  contact* cntct,
-                 char* ack_author,
-                 char* ack_data,
                  int escalated,
                  struct timeval const* timestamp);
 int            broker_contact_notification_method_data(
@@ -390,8 +368,6 @@ int            broker_contact_notification_method_data(
                  void* data,
                  contact* cntct,
                  char const* cmd,
-                 char* ack_author,
-                 char* ack_data,
                  int escalated,
                  struct timeval const* timestamp);
 void           broker_contact_status(
@@ -528,8 +504,6 @@ int            broker_notification_data(
                  struct timeval start_time,
                  struct timeval end_time,
                  void* data,
-                 char* ack_author,
-                 char* ack_data,
                  int escalated,
                  int contacts_notified,
                  struct timeval const* timestamp);

@@ -1051,19 +1051,6 @@ int handle_host_state(host* hst) {
       hst->current_problem_id = 0L;
     }
 
-    /* reset the acknowledgement flag if necessary */
-    if (hst->acknowledgement_type == ACKNOWLEDGEMENT_NORMAL) {
-
-      hst->problem_has_been_acknowledged = false;
-      hst->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    }
-    else if (hst->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
-             && hst->current_state == HOST_UP) {
-
-      hst->problem_has_been_acknowledged = false;
-      hst->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    }
-
     /* reset the next and last notification times */
     hst->last_host_notification = (time_t)0;
     hst->next_host_notification = (time_t)0;

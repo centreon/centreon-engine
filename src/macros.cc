@@ -978,8 +978,6 @@ int init_macrox_names() {
   add_macrox_name(HOSTGROUPALIAS);
   add_macrox_name(SERVICEGROUPNAME);
   add_macrox_name(SERVICEGROUPALIAS);
-  add_macrox_name(HOSTACKAUTHOR);
-  add_macrox_name(SERVICEACKAUTHOR);
   add_macrox_name(LASTSERVICEOK);
   add_macrox_name(LASTSERVICEWARNING);
   add_macrox_name(LASTSERVICEUNKNOWN);
@@ -1029,10 +1027,6 @@ int init_macrox_names() {
   add_macrox_name(LASTSERVICEEVENTID);
   add_macrox_name(HOSTGROUPNAMES);
   add_macrox_name(SERVICEGROUPNAMES);
-  add_macrox_name(HOSTACKAUTHORNAME);
-  add_macrox_name(HOSTACKAUTHORALIAS);
-  add_macrox_name(SERVICEACKAUTHORNAME);
-  add_macrox_name(SERVICEACKAUTHORALIAS);
   add_macrox_name(MAXHOSTATTEMPTS);
   add_macrox_name(MAXSERVICEATTEMPTS);
   add_macrox_name(TOTALHOSTSERVICES);

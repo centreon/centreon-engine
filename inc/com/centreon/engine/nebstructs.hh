@@ -27,26 +27,6 @@
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
-/* Acknowledgement structure. */
-typedef struct   nebstruct_acknowledgement_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  int            acknowledgement_type;
-  char*          host_name;
-  char*          service_description;
-  int            state;
-  char*          author_name;
-  char*          comment_data;
-  int            is_sticky;
-  int            persistent_comment;
-  int            notify_contacts;
-
-  void*          object_ptr;
-}                nebstruct_acknowledgement_data;
-
 /* Adaptive contact data structure. */
 typedef struct   nebstruct_adaptive_contact_data_struct {
   int            type;
@@ -186,8 +166,6 @@ typedef struct   nebstruct_contact_notification_struct {
   int            reason_type;
   int            state;
   char*          output;
-  char*          ack_author;
-  char*          ack_data;
   int            escalated;
 
   void*          object_ptr;
@@ -212,8 +190,6 @@ typedef struct   nebstruct_contact_notification_method_struct {
   int            reason_type;
   int            state;
   char*          output;
-  char*          ack_author;
-  char*          ack_data;
   int            escalated;
 
   void*          object_ptr;
@@ -424,8 +400,6 @@ typedef struct   nebstruct_notification_struct {
   int            reason_type;
   int            state;
   char*          output;
-  char*          ack_author;
-  char*          ack_data;
   int            escalated;
   int            contacts_notified;
 

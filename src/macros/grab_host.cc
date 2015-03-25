@@ -300,15 +300,6 @@ struct grab_host_redirection {
     // Total services critical.
     routines[MACRO_TOTALHOSTSERVICESCRITICAL].first = &get_host_total_services<MACRO_TOTALHOSTSERVICESCRITICAL>;
     routines[MACRO_TOTALHOSTSERVICESCRITICAL].second = false;
-    // Acknowledgement author.
-    routines[MACRO_HOSTACKAUTHOR].first = &get_macro_copy<host, MACRO_HOSTACKAUTHOR>;
-    routines[MACRO_HOSTACKAUTHOR].second = true;
-    // Acknowledgement author name.
-    routines[MACRO_HOSTACKAUTHORNAME].first = &get_macro_copy<host, MACRO_HOSTACKAUTHORNAME>;
-    routines[MACRO_HOSTACKAUTHORNAME].second = true;
-    // Acknowledgement author alias.
-    routines[MACRO_HOSTACKAUTHORALIAS].first = &get_macro_copy<host, MACRO_HOSTACKAUTHORALIAS>;
-    routines[MACRO_HOSTACKAUTHORALIAS].second = true;
   }
 } static const redirector;
 

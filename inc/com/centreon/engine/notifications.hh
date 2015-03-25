@@ -34,7 +34,6 @@
 
 // Notification Reason Types
 #  define NOTIFICATION_NORMAL             0
-#  define NOTIFICATION_ACKNOWLEDGEMENT    1
 #  define NOTIFICATION_FLAPPINGSTART      2
 #  define NOTIFICATION_FLAPPINGSTOP       3
 #  define NOTIFICATION_FLAPPINGDISABLED   4

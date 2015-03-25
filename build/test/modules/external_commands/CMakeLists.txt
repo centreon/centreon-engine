@@ -360,20 +360,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling acknowledge_host_problem.
-set(TEST_NAME "modules_external_commands_acknowledge_host_problem")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/acknowledge_host_problem.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling remove_host_acknowledgement.
-set(TEST_NAME "modules_external_commands_remove_host_acknowledgement")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/remove_host_acknowledgement.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling enable_host_event_handler.
 set(TEST_NAME "modules_external_commands_enable_host_event_handler")
 add_executable("${TEST_NAME}"
@@ -784,20 +770,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_del_svc_downtime")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/del_svc_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling acknowledge_svc_problem.
-set(TEST_NAME "modules_external_commands_acknowledge_svc_problem")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/acknowledge_svc_problem.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling remove_svc_acknowledgement.
-set(TEST_NAME "modules_external_commands_remove_svc_acknowledgement")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/remove_svc_acknowledgement.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 

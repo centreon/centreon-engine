@@ -221,15 +221,6 @@ struct grab_service_redirection {
     // Group names.
     routines[MACRO_SERVICEGROUPNAMES].first = &get_service_group_names;
     routines[MACRO_SERVICEGROUPNAMES].second = true;
-    // Acknowledgement author.
-    routines[MACRO_SERVICEACKAUTHOR].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHOR>;
-    routines[MACRO_SERVICEACKAUTHOR].second = true;
-    // Acknowledgement author name.
-    routines[MACRO_SERVICEACKAUTHORNAME].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORNAME>;
-    routines[MACRO_SERVICEACKAUTHORNAME].second = true;
-    // Acknowledgement author alias.
-    routines[MACRO_SERVICEACKAUTHORALIAS].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORALIAS>;
-    routines[MACRO_SERVICEACKAUTHORALIAS].second = true;
   }
 } static const redirector;
 

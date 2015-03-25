@@ -79,8 +79,6 @@ typedef struct                  host_struct {
   int                           obsess_over_host;
   int                           should_be_drawn;
   customvariablesmember_struct* custom_variables;
-  int                           problem_has_been_acknowledged;
-  int                           acknowledgement_type;
   int                           check_type;
   int                           current_state;
   int                           last_state;

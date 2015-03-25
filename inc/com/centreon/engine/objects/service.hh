@@ -77,8 +77,6 @@ typedef struct                  service_struct {
   int                           notifications_enabled;
   int                           obsess_over_service;
   customvariablesmember_struct* custom_variables;
-  int                           problem_has_been_acknowledged;
-  int                           acknowledgement_type;
   int                           host_problem_at_last_check;
   int                           check_type;
   int                           current_state;

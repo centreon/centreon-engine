@@ -196,11 +196,6 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "SCHEDULE_FORCED_HOST_SVC_CHECKS"))
     command_type = CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS;
 
-  else if (!strcmp(command_id, "ACKNOWLEDGE_HOST_PROBLEM"))
-    command_type = CMD_ACKNOWLEDGE_HOST_PROBLEM;
-  else if (!strcmp(command_id, "REMOVE_HOST_ACKNOWLEDGEMENT"))
-    command_type = CMD_REMOVE_HOST_ACKNOWLEDGEMENT;
-
   else if (!strcmp(command_id, "ENABLE_HOST_EVENT_HANDLER"))
     command_type = CMD_ENABLE_HOST_EVENT_HANDLER;
   else if (!strcmp(command_id, "DISABLE_HOST_EVENT_HANDLER"))
@@ -358,11 +353,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_SCHEDULE_SVC_DOWNTIME;
   else if (!strcmp(command_id, "DEL_SVC_DOWNTIME"))
     command_type = CMD_DEL_SVC_DOWNTIME;
-
-  else if (!strcmp(command_id, "ACKNOWLEDGE_SVC_PROBLEM"))
-    command_type = CMD_ACKNOWLEDGE_SVC_PROBLEM;
-  else if (!strcmp(command_id, "REMOVE_SVC_ACKNOWLEDGEMENT"))
-    command_type = CMD_REMOVE_SVC_ACKNOWLEDGEMENT;
 
   else if (!strcmp(command_id, "START_OBSESSING_OVER_SVC"))
     command_type = CMD_START_OBSESSING_OVER_SVC;
@@ -819,16 +809,6 @@ int process_external_command2(int cmd,
 
   case CMD_PROCESS_HOST_CHECK_RESULT:
     cmd_process_host_check_result(cmd, entry_time, args);
-    break;
-
-  case CMD_ACKNOWLEDGE_HOST_PROBLEM:
-  case CMD_ACKNOWLEDGE_SVC_PROBLEM:
-    cmd_acknowledge_problem(cmd, args);
-    break;
-
-  case CMD_REMOVE_HOST_ACKNOWLEDGEMENT:
-  case CMD_REMOVE_SVC_ACKNOWLEDGEMENT:
-    cmd_remove_acknowledgement(cmd, args);
     break;
 
   case CMD_SCHEDULE_HOST_DOWNTIME:

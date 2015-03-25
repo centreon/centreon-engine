@@ -62,8 +62,6 @@
 #  define CMD_PROCESS_SERVICE_CHECK_RESULT                    30
 #  define CMD_SAVE_STATE_INFORMATION                          31
 #  define CMD_READ_STATE_INFORMATION                          32
-#  define CMD_ACKNOWLEDGE_HOST_PROBLEM                        33
-#  define CMD_ACKNOWLEDGE_SVC_PROBLEM                         34
 #  define CMD_START_EXECUTING_SVC_CHECKS                      35
 #  define CMD_STOP_EXECUTING_SVC_CHECKS                       36
 #  define CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS              37
@@ -80,8 +78,6 @@
 #  define CMD_DISABLE_HOST_CHECK                              48
 #  define CMD_START_OBSESSING_OVER_SVC_CHECKS                 49
 #  define CMD_STOP_OBSESSING_OVER_SVC_CHECKS                  50
-#  define CMD_REMOVE_HOST_ACKNOWLEDGEMENT                     51
-#  define CMD_REMOVE_SVC_ACKNOWLEDGEMENT                      52
 #  define CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS                 53
 #  define CMD_SCHEDULE_FORCED_SVC_CHECK                       54
 #  define CMD_SCHEDULE_HOST_DOWNTIME                          55
@@ -220,14 +216,6 @@
 #  define NOTIFICATION_OPTION_BROADCAST 1
 #  define NOTIFICATION_OPTION_FORCED    2
 #  define NOTIFICATION_OPTION_INCREMENT 4
-
-/* Acknowledgement types. */
-#  define HOST_ACKNOWLEDGEMENT    0
-#  define SERVICE_ACKNOWLEDGEMENT 1
-
-#  define ACKNOWLEDGEMENT_NONE    0
-#  define ACKNOWLEDGEMENT_NORMAL  1
-#  define ACKNOWLEDGEMENT_STICKY  2
 
 /* Host/service check options. */
 #  define CHECK_OPTION_NONE            0 /* No check options. */

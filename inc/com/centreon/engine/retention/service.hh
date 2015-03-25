@@ -42,7 +42,6 @@ namespace                         retention {
     bool                          operator!=(service const& right) const throw ();
     bool                          set(char const* key, char const* value);
 
-    opt<int> const&               acknowledgement_type() const throw ();
     opt<bool> const&              active_checks_enabled() const throw ();
     opt<std::string> const&       check_command() const throw ();
     opt<double> const&            check_execution_time() const throw ();
@@ -91,7 +90,6 @@ namespace                         retention {
     opt<double> const&            percent_state_change() const throw ();
     opt<std::string> const&       performance_data() const throw ();
     opt<std::string> const&       plugin_output() const throw ();
-    opt<bool> const&              problem_has_been_acknowledged() const throw ();
     opt<unsigned int> const&      retry_check_interval() const throw ();
     std::string const&            service_description() const throw ();
     opt<std::vector<int> > const& state_history() const throw ();
@@ -159,7 +157,6 @@ namespace                         retention {
     bool                          _set_state_history(std::string const& value);
     bool                          _set_state_type(int value);
 
-    opt<int>                      _acknowledgement_type;
     opt<bool>                     _active_checks_enabled;
     opt<std::string>              _check_command;
     opt<double>                   _check_execution_time;
@@ -209,7 +206,6 @@ namespace                         retention {
     opt<double>                   _percent_state_change;
     opt<std::string>              _performance_data;
     opt<std::string>              _plugin_output;
-    opt<bool>                     _problem_has_been_acknowledged;
     opt<unsigned int>             _retry_check_interval;
     std::string                   _service_description;
     static setters const          _setters[];

@@ -94,8 +94,6 @@ bool operator==(
           && obj1.notifications_enabled == obj2.notifications_enabled
           && obj1.obsess_over_service == obj2.obsess_over_service
           && is_equal(obj1.custom_variables, obj2.custom_variables)
-          && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
-          && obj1.acknowledgement_type == obj2.acknowledgement_type
           && obj1.host_problem_at_last_check == obj2.host_problem_at_last_check
           && obj1.check_type == obj2.check_type
           && obj1.current_state == obj2.current_state
@@ -232,8 +230,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
     "  notifications_enabled:                " << obj.notifications_enabled << "\n"
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
-    "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
-    "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
     "  check_type:                           " << obj.check_type << "\n"
     "  current_state:                        " << obj.current_state << "\n"
@@ -477,7 +473,6 @@ service* add_service(
       obj->timezone = string::dup(timezone);
 
     obj->accept_passive_service_checks = (accept_passive_checks > 0);
-    obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_freshness = (check_freshness > 0);
     obj->check_interval = check_interval;
     obj->check_options = CHECK_OPTION_NONE;

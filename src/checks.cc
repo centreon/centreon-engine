@@ -525,7 +525,7 @@ int handle_async_service_check_result(
   }
 
   /* a state change occurred... */
-  /* reset last and next notification times and acknowledgement flag if necessary, misc other stuff */
+  /* reset last and next notification times, misc other stuff */
   if (state_change == true || hard_state_change == true) {
 
     /* reschedule the service check */
@@ -537,18 +537,6 @@ int handle_async_service_check_result(
 
     /* reset notification suppression option */
     temp_service->no_more_notifications = false;
-
-    if ((ACKNOWLEDGEMENT_NORMAL == temp_service->acknowledgement_type)
-	&& ((true == state_change) || (false == hard_state_change))) {
-
-      temp_service->problem_has_been_acknowledged = false;
-      temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    }
-    else if (temp_service->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
-             && temp_service->current_state == STATE_OK) {
-      temp_service->problem_has_been_acknowledged = false;
-      temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    }
 
     /* do NOT reset current notification number!!! */
     /* hard changes between non-OK states should continue to be escalated, so don't reset current notification number */
@@ -603,10 +591,6 @@ int handle_async_service_check_result(
 
     logger(dbg_checks, more)
       << "Service is OK.";
-
-    /* reset the acknowledgement flag (this should already have been done, but just in case...) */
-    temp_service->problem_has_been_acknowledged = false;
-    temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
     /* verify the route to the host and send out host recovery notifications */
     if (temp_host->current_state != HOST_UP) {
@@ -708,8 +692,6 @@ int handle_async_service_check_result(
     temp_service->last_notification = (time_t)0;
     temp_service->next_notification = (time_t)0;
     temp_service->current_notification_number = 0;
-    temp_service->problem_has_been_acknowledged = false;
-    temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     temp_service->notified_on_unknown = false;
     temp_service->notified_on_warning = false;
     temp_service->notified_on_critical = false;

@@ -71,9 +71,6 @@ using namespace com::centreon::engine;
 #define PROBLEM_ID 123900
 #define LAST_PROBLEM_ID 927834
 #define GROUP_NAMES STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
-#define ACK_AUTHOR mkermagoret@merethis.com
-#define ACK_AUTHOR_NAME Matthieu Kermagoret
-#define ACK_AUTHOR_ALIAS mk
 
 /**
  *  Check that the grab_standard_service_macro function works properly.
@@ -147,9 +144,6 @@ int main_test(int argc, char** argv) {
   // Macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  mac.x[MACRO_SERVICEACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
-  mac.x[MACRO_SERVICEACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
-  mac.x[MACRO_SERVICEACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
 
   // Macro values table.
   struct {
@@ -188,10 +182,7 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false },
     { MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false },
-    { MACRO_SERVICEACKAUTHOR, STR(ACK_AUTHOR), false },
-    { MACRO_SERVICEACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
-    { MACRO_SERVICEACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false },
+    { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false }
   };
 
   // Compare macros with expected values.
@@ -234,10 +225,6 @@ int main_test(int argc, char** argv) {
         std::cout << macro_values[i].macro_id << std::endl;
     }
   }
-
-  delete [] mac.x[MACRO_SERVICEACKAUTHOR];
-  delete [] mac.x[MACRO_SERVICEACKAUTHORNAME];
-  delete [] mac.x[MACRO_SERVICEACKAUTHORALIAS];
 
   return (retval);
 }

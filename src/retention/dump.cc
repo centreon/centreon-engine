@@ -163,7 +163,6 @@ std::ostream& dump::header(std::ostream& os) {
 std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
   os << "host {\n"
     "host_name=" << obj.name << "\n"
-    "acknowledgement_type=" << obj.acknowledgement_type << "\n"
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.host_check_command ? obj.host_check_command : "") << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.execution_time << "\n"
@@ -208,7 +207,6 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"
     "performance_data=" << (obj.perf_data ? obj.perf_data : "") << "\n"
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
-    "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
     "retry_check_interval=" << obj.check_interval << "\n"
     "state_type=" << obj.state_type << "\n";
 
@@ -343,7 +341,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
   os << "service {\n"
     "host_name=" << obj.host_name << "\n"
     "service_description=" << obj.description << "\n"
-    "acknowledgement_type=" << obj.acknowledgement_type << "\n"
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.service_check_command ? obj.service_check_command : "") << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.execution_time << "\n"
@@ -390,7 +387,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"
     "performance_data=" << (obj.perf_data ? obj.perf_data : "") << "\n"
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
-    "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
     "retry_check_interval=" << obj.retry_interval << "\n"
     "state_type=" << obj.state_type << "\n";
 
