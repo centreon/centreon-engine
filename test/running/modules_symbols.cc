@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2014 Merethis
+** Copyright 2012-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -72,7 +72,6 @@ extern "C" {
   extern unsigned int host_check_timeout;
   extern host* host_list;
   extern hostdependency* hostdependency_list;
-  extern hostescalation* hostescalation_list;
   extern hostgroup* hostgroup_list;
   extern int interval_length;
   extern time_t last_command_check;
@@ -87,7 +86,6 @@ extern "C" {
   extern int service_check_timeout;
   extern service* service_list;
   extern servicedependency* servicedependency_list;
-  extern serviceescalation* serviceescalation_list;
   extern servicegroup* servicegroup_list;
   extern int submit_external_command(char const* cmd, int* buffer_items);
   extern timeperiod* timeperiod_list;
@@ -170,8 +168,8 @@ extern "C" {
       << host_list << "\n"
       << "hostdependency_list: "
       << hostdependency_list << "\n"
-      << "hostescalation_list: "
-      << hostescalation_list << "\n"
+      // << "hostescalation_list: "
+      // << hostescalation_list << "\n"
       << "hostgroup_list: "
       << hostgroup_list << "\n"
       << "my_system: "
@@ -190,8 +188,8 @@ extern "C" {
       << service_list << "\n"
       << "servicedependency_list: "
       << servicedependency_list << "\n"
-      << "serviceescalation_list: "
-      << serviceescalation_list << "\n"
+      // << "serviceescalation_list: "
+      // << serviceescalation_list << "\n"
       << "servicegroup_list: "
       << servicegroup_list << "\n"
       << "strip: "

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -903,7 +903,6 @@ struct grab_value_redirection {
       MACRO_NOTIFICATIONTYPE,
       MACRO_NOTIFICATIONNUMBER,
       MACRO_NOTIFICATIONRECIPIENTS,
-      MACRO_NOTIFICATIONISESCALATED,
       MACRO_NOTIFICATIONAUTHOR,
       MACRO_NOTIFICATIONAUTHORNAME,
       MACRO_NOTIFICATIONAUTHORALIAS,

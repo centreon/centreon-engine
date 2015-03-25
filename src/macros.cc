@@ -960,7 +960,6 @@ int init_macrox_names() {
   add_macrox_name(HOSTATTEMPT);
   add_macrox_name(NOTIFICATIONTYPE);
   add_macrox_name(NOTIFICATIONNUMBER);
-  add_macrox_name(NOTIFICATIONISESCALATED);
   add_macrox_name(HOSTEXECUTIONTIME);
   add_macrox_name(SERVICEEXECUTIONTIME);
   add_macrox_name(HOSTLATENCY);

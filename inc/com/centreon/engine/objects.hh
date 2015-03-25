@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2008      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,13 +35,11 @@
 #  include "com/centreon/engine/objects/downtime.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/hostdependency.hh"
-#  include "com/centreon/engine/objects/hostescalation.hh"
 #  include "com/centreon/engine/objects/hostgroup.hh"
 #  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/objectlist.hh"
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/servicedependency.hh"
-#  include "com/centreon/engine/objects/serviceescalation.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "com/centreon/engine/objects/timeperiod.hh"
@@ -66,8 +64,6 @@
 #  define SERVICEGROUP_SKIPLIST            7
 #  define HOSTDEPENDENCY_SKIPLIST          8
 #  define SERVICEDEPENDENCY_SKIPLIST       9
-#  define HOSTESCALATION_SKIPLIST          10
-#  define SERVICEESCALATION_SKIPLIST       11
-#  define NUM_OBJECT_SKIPLISTS             12
+#  define NUM_OBJECT_SKIPLISTS             10
 
 #endif /* !CCE_OBJECTS_HH */

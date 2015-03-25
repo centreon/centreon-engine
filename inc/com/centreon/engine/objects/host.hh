@@ -200,7 +200,6 @@ host* add_host(
         char const* timezone);
 int   get_host_count();
 int   is_contact_for_host(host* hst, contact_struct* cntct);
-int   is_escalated_contact_for_host(host* hst, contact_struct* cntct);
 int   is_host_immediate_child_of_host(host* parent, host* child);
 int   is_host_immediate_parent_of_host(host* child, host* parent);
 int   number_of_immediate_child_hosts(host* hst);

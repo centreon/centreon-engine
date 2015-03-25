@@ -56,12 +56,10 @@ static xodtemplate_contactgroup*      xodtemplate_contactgroup_list = NULL;
 static xodtemplate_hostgroup*         xodtemplate_hostgroup_list = NULL;
 static xodtemplate_servicegroup*      xodtemplate_servicegroup_list = NULL;
 static xodtemplate_servicedependency* xodtemplate_servicedependency_list = NULL;
-static xodtemplate_serviceescalation* xodtemplate_serviceescalation_list = NULL;
 static xodtemplate_contact*           xodtemplate_contact_list = NULL;
 static xodtemplate_host*              xodtemplate_host_list = NULL;
 static xodtemplate_service*           xodtemplate_service_list = NULL;
 static xodtemplate_hostdependency*    xodtemplate_hostdependency_list = NULL;
-static xodtemplate_hostescalation*    xodtemplate_hostescalation_list = NULL;
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list_tail = NULL;
 static xodtemplate_command*           xodtemplate_command_list_tail = NULL;
@@ -70,12 +68,10 @@ static xodtemplate_contactgroup*      xodtemplate_contactgroup_list_tail = NULL;
 static xodtemplate_hostgroup*         xodtemplate_hostgroup_list_tail = NULL;
 static xodtemplate_servicegroup*      xodtemplate_servicegroup_list_tail = NULL;
 static xodtemplate_servicedependency* xodtemplate_servicedependency_list_tail = NULL;
-static xodtemplate_serviceescalation* xodtemplate_serviceescalation_list_tail = NULL;
 static xodtemplate_contact*           xodtemplate_contact_list_tail = NULL;
 static xodtemplate_host*              xodtemplate_host_list_tail = NULL;
 static xodtemplate_service*           xodtemplate_service_list_tail = NULL;
 static xodtemplate_hostdependency*    xodtemplate_hostdependency_list_tail = NULL;
-static xodtemplate_hostescalation*    xodtemplate_hostescalation_list_tail = NULL;
 
 static skiplist*                      xobject_template_skiplists[NUM_XOBJECT_SKIPLISTS];
 static skiplist*                      xobject_skiplists[NUM_XOBJECT_SKIPLISTS];
@@ -139,12 +135,10 @@ int xodtemplate_read_config_data(
   xodtemplate_hostgroup_list = NULL;
   xodtemplate_servicegroup_list = NULL;
   xodtemplate_servicedependency_list = NULL;
-  xodtemplate_serviceescalation_list = NULL;
   xodtemplate_contact_list = NULL;
   xodtemplate_host_list = NULL;
   xodtemplate_service_list = NULL;
   xodtemplate_hostdependency_list = NULL;
-  xodtemplate_hostescalation_list = NULL;
 
   /* initialize skiplists */
   xodtemplate_init_xobject_skiplists();
@@ -698,10 +692,7 @@ int xodtemplate_process_config_file(char* filename, int options) {
           && strcmp(input, "servicegroup")
           && strcmp(input, "service")
           && strcmp(input, "servicedependency")
-          && strcmp(input, "serviceescalation")
-          && strcmp(input, "hostgroupescalation")
           && strcmp(input, "hostdependency")
-          && strcmp(input, "hostescalation")
 	  && strcmp(input, "connector")) {
         logger(log_config_error, basic)
           << "Error: Invalid object definition type '" << input
@@ -869,12 +860,10 @@ int xodtemplate_begin_object_definition(
   xodtemplate_hostgroup* new_hostgroup = NULL;
   xodtemplate_servicegroup* new_servicegroup = NULL;
   xodtemplate_servicedependency* new_servicedependency = NULL;
-  xodtemplate_serviceescalation* new_serviceescalation = NULL;
   xodtemplate_contact* new_contact = NULL;
   xodtemplate_host* new_host = NULL;
   xodtemplate_service* new_service = NULL;
   xodtemplate_hostdependency* new_hostdependency = NULL;
-  xodtemplate_hostescalation* new_hostescalation = NULL;
 
   if (!strcmp(input, "service")) {
     xodtemplate_current_object_type = XODTEMPLATE_SERVICE;
@@ -956,23 +945,9 @@ int xodtemplate_begin_object_definition(
     xodtemplate_current_object_type = XODTEMPLATE_SERVICEDEPENDENCY;
     xod_begin_def(servicedependency);
   }
-  else if (!strcmp(input, "serviceescalation")) {
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEESCALATION;
-    xod_begin_def(serviceescalation);
-
-    new_serviceescalation->first_notification = -2;
-    new_serviceescalation->last_notification = -2;
-  }
   else if (!strcmp(input, "hostdependency")) {
     xodtemplate_current_object_type = XODTEMPLATE_HOSTDEPENDENCY;
     xod_begin_def(hostdependency);
-  }
-  else if (!strcmp(input, "hostescalation")) {
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTESCALATION;
-    xod_begin_def(hostescalation);
-
-    new_hostescalation->first_notification = -2;
-    new_hostescalation->last_notification = -2;
   }
   else if (!strcmp(input, "connector")) {
     xodtemplate_current_object_type = XODTEMPLATE_CONNECTOR;
@@ -1003,12 +978,10 @@ int xodtemplate_add_object_property(char* input, int options) {
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
   xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
   int x = 0;
   int y = 0;
   int force_skiplists = false;
@@ -2756,173 +2729,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     }
     break;
 
-  case XODTEMPLATE_SERVICEESCALATION:
-    temp_serviceescalation
-      = (xodtemplate_serviceescalation*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_serviceescalation->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_serviceescalation->name = string::dup(value);
-
-      /* add escalation to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_SERVICEESCALATION_SKIPLIST],
-                 (void*)temp_serviceescalation);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for service escalation '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_serviceescalation->_config_file)
-          << "', starting on line " << temp_serviceescalation->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "host")
-             || !strcmp(variable, "host_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->host_name = string::dup(value);
-      temp_serviceescalation->have_host_name = true;
-
-      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true
-          && temp_serviceescalation->host_name != NULL
-          && temp_serviceescalation->service_description != NULL) {
-        /* add serviceescalation to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
-                   (void*)temp_serviceescalation);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "description")
-	     || !strcmp(variable, "service_description")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->service_description = string::dup(value);
-      temp_serviceescalation->have_service_description = true;
-
-      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true
-          && temp_serviceescalation->host_name != NULL
-          && temp_serviceescalation->service_description != NULL) {
-        /* add serviceescalation to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
-                   (void*)temp_serviceescalation);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "servicegroup")
-             || !strcmp(variable, "servicegroups")
-             || !strcmp(variable, "servicegroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->servicegroup_name = string::dup(value);
-      temp_serviceescalation->have_servicegroup_name = true;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->hostgroup_name = string::dup(value);
-      temp_serviceescalation->have_hostgroup_name = true;
-    }
-    else if (!strcmp(variable, "contact_groups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->contact_groups = string::dup(value);
-      temp_serviceescalation->have_contact_groups = true;
-    }
-    else if (!strcmp(variable, "contacts")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->contacts = string::dup(value);
-      temp_serviceescalation->have_contacts = true;
-    }
-    else if (!strcmp(variable, "escalation_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->escalation_period = string::dup(value);
-      temp_serviceescalation->have_escalation_period = true;
-    }
-    else if (!strcmp(variable, "first_notification")) {
-      temp_serviceescalation->first_notification = atoi(value);
-      temp_serviceescalation->have_first_notification = true;
-    }
-    else if (!strcmp(variable, "last_notification")) {
-      temp_serviceescalation->last_notification = atoi(value);
-      temp_serviceescalation->have_last_notification = true;
-    }
-    else if (!strcmp(variable, "notification_interval")) {
-      temp_serviceescalation->notification_interval = strtod(value, NULL);
-      temp_serviceescalation->have_notification_interval = true;
-    }
-    else if (!strcmp(variable, "escalation_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_serviceescalation->escalate_on_warning = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_serviceescalation->escalate_on_unknown = true;
-        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_serviceescalation->escalate_on_critical = true;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_serviceescalation->escalate_on_recovery = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_serviceescalation->escalate_on_warning = false;
-          temp_serviceescalation->escalate_on_unknown = false;
-          temp_serviceescalation->escalate_on_critical = false;
-          temp_serviceescalation->escalate_on_recovery = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_serviceescalation->escalate_on_warning = true;
-          temp_serviceescalation->escalate_on_unknown = true;
-          temp_serviceescalation->escalate_on_critical = true;
-          temp_serviceescalation->escalate_on_recovery = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid escalation option '" << temp_ptr
-            << "' in serviceescalation definition.";
-          return (ERROR);
-        }
-      }
-      temp_serviceescalation->have_escalation_options = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_serviceescalation->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid serviceescalation object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
   case XODTEMPLATE_HOSTDEPENDENCY:
     temp_hostdependency
       =(xodtemplate_hostdependency*)xodtemplate_current_object;
@@ -3082,133 +2888,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else {
       logger(log_config_error, basic)
         << "Error: Invalid hostdependency object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_HOSTESCALATION:
-    temp_hostescalation
-      = (xodtemplate_hostescalation*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_hostescalation->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_hostescalation->name = string::dup(value);
-
-      /* add escalation to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_HOSTESCALATION_SKIPLIST],
-                 (void*)temp_hostescalation);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for host escalation '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_hostescalation->_config_file)
-          << "', starting on line " << temp_hostescalation->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostescalation->hostgroup_name = string::dup(value);
-      temp_hostescalation->have_hostgroup_name = true;
-    }
-    else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostescalation->host_name = string::dup(value);
-      temp_hostescalation->have_host_name = true;
-
-      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true) {
-        /* add hostescalation to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_HOSTESCALATION_SKIPLIST],
-                   (void*)temp_hostescalation);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "contact_groups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostescalation->contact_groups = string::dup(value);
-      temp_hostescalation->have_contact_groups = true;
-    }
-    else if (!strcmp(variable, "contacts")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostescalation->contacts = string::dup(value);
-      temp_hostescalation->have_contacts = true;
-    }
-    else if (!strcmp(variable, "escalation_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostescalation->escalation_period = string::dup(value);
-      temp_hostescalation->have_escalation_period = true;
-    }
-    else if (!strcmp(variable, "first_notification")) {
-      temp_hostescalation->first_notification = atoi(value);
-      temp_hostescalation->have_first_notification = true;
-    }
-    else if (!strcmp(variable, "last_notification")) {
-      temp_hostescalation->last_notification = atoi(value);
-      temp_hostescalation->have_last_notification = true;
-    }
-    else if (!strcmp(variable, "notification_interval")) {
-      temp_hostescalation->notification_interval = strtod(value, NULL);
-      temp_hostescalation->have_notification_interval = true;
-    }
-    else if (!strcmp(variable, "escalation_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_hostescalation->escalate_on_down = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_hostescalation->escalate_on_unreachable = true;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_hostescalation->escalate_on_recovery = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_hostescalation->escalate_on_down = false;
-          temp_hostescalation->escalate_on_unreachable = false;
-          temp_hostescalation->escalate_on_recovery = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_hostescalation->escalate_on_down = true;
-          temp_hostescalation->escalate_on_unreachable = true;
-          temp_hostescalation->escalate_on_recovery = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid escalation option '" << temp_ptr
-            << "' in hostescalation definition.";
-          return (ERROR);
-        }
-      }
-      temp_hostescalation->have_escalation_options = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_hostescalation->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid hostescalation object directive '"
         << variable << "'.";
       return (ERROR);
     }
@@ -4268,8 +3947,6 @@ int xodtemplate_duplicate_services() {
 /* duplicates object definitions */
 int xodtemplate_duplicate_objects() {
   int result = OK;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
   xodtemplate_memberlist* master_hostlist = NULL;
@@ -4287,244 +3964,6 @@ int xodtemplate_duplicate_objects() {
   /*************************************/
   /* SERVICES ARE DUPLICATED ELSEWHERE */
   /*************************************/
-
-  /****** DUPLICATE HOST ESCALATION DEFINITIONS WITH ONE OR MORE HOSTGROUP AND/OR HOST NAMES ******/
-  for (temp_hostescalation = xodtemplate_hostescalation_list;
-       temp_hostescalation != NULL;
-       temp_hostescalation = temp_hostescalation->next) {
-
-    /* skip host escalation definitions without enough data */
-    if (temp_hostescalation->hostgroup_name == NULL
-        && temp_hostescalation->host_name == NULL)
-      continue;
-
-    /* get list of hosts */
-    master_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                        temp_hostescalation->hostgroup_name,
-                        temp_hostescalation->host_name,
-                        temp_hostescalation->_config_file,
-                        temp_hostescalation->_start_line);
-    if (master_hostlist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand hostgroups and/or hosts specified "
-        "in host escalation (config file '"
-        << xodtemplate_config_file_name(temp_hostescalation->_config_file)
-        << "', starting on line " << temp_hostescalation->_start_line
-        << ")";
-        return (ERROR);
-    }
-
-    /* add a copy of the hostescalation for every host in the hostgroup/host name list */
-    first_item = true;
-    for (temp_masterhost = master_hostlist;
-	 temp_masterhost != NULL;
-         temp_masterhost = temp_masterhost->next) {
-
-      /* if this is the first duplication, use the existing entry */
-      if (first_item == true) {
-        delete[] temp_hostescalation->host_name;
-        temp_hostescalation->host_name
-          = string::dup(temp_masterhost->name1);
-        first_item = false;
-        continue;
-      }
-
-      /* duplicate hostescalation definition */
-      result = xodtemplate_duplicate_hostescalation(
-                 temp_hostescalation,
-                 temp_masterhost->name1);
-      /* exit on error */
-      if (result == ERROR) {
-        xodtemplate_free_memberlist(&master_hostlist);
-        return (ERROR);
-      }
-    }
-
-    /* free memory we used for host list */
-    xodtemplate_free_memberlist(&master_hostlist);
-  }
-
-  /****** DUPLICATE SERVICE ESCALATION DEFINITIONS WITH ONE OR MORE HOSTGROUP AND/OR HOST NAMES ******/
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-
-    /* skip service escalation definitions without enough data */
-    if (temp_serviceescalation->hostgroup_name == NULL
-        && temp_serviceescalation->host_name == NULL)
-      continue;
-
-    /* get list of hosts */
-    master_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                        temp_serviceescalation->hostgroup_name,
-                        temp_serviceescalation->host_name,
-                        temp_serviceescalation->_config_file,
-                        temp_serviceescalation->_start_line);
-    if (master_hostlist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand hostgroups and/or hosts specified "
-        "in service escalation (config file '"
-        << xodtemplate_config_file_name(temp_serviceescalation->_config_file)
-        << "', starting on line " << temp_serviceescalation->_start_line
-        << ")";
-      return (ERROR);
-    }
-
-    /* duplicate service escalation entries */
-    first_item = true;
-    for (temp_masterhost = master_hostlist;
-	 temp_masterhost != NULL;
-         temp_masterhost = temp_masterhost->next) {
-
-      /* if this is the first duplication,use the existing entry */
-      if (first_item == true) {
-        delete[] temp_serviceescalation->host_name;
-        temp_serviceescalation->host_name
-          = string::dup(temp_masterhost->name1);
-        first_item = false;
-        continue;
-      }
-
-      /* duplicate service escalation definition */
-      result = xodtemplate_duplicate_serviceescalation(
-                 temp_serviceescalation,
-                 temp_masterhost->name1,
-                 temp_serviceescalation->service_description);
-      /* exit on error */
-      if (result == ERROR) {
-        xodtemplate_free_memberlist(&master_hostlist);
-        return (ERROR);
-      }
-    }
-
-    /* free memory we used for host list */
-    xodtemplate_free_memberlist(&master_hostlist);
-  }
-
-  /****** DUPLICATE SERVICE ESCALATION DEFINITIONS WITH MULTIPLE DESCRIPTIONS ******/
-  /* THIS MUST BE DONE AFTER DUPLICATING FOR MULTIPLE HOST NAMES (SEE ABOVE) */
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-
-    /* skip serviceescalations without enough data */
-    if (temp_serviceescalation->service_description == NULL
-        || temp_serviceescalation->host_name == NULL)
-      continue;
-
-    /* get list of services */
-    master_servicelist = xodtemplate_expand_servicegroups_and_services(
-                           NULL,
-                           temp_serviceescalation->host_name,
-                           temp_serviceescalation->service_description,
-                           temp_serviceescalation->_config_file,
-                           temp_serviceescalation->_start_line);
-    if (master_servicelist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand services specified in service "
-        "escalation (config file '"
-        << xodtemplate_config_file_name(temp_serviceescalation->_config_file)
-        << "', starting on line " << temp_serviceescalation->_start_line
-        << ")";
-      return (ERROR);
-    }
-
-    /* duplicate service escalation entries */
-    first_item = true;
-    for (temp_masterservice = master_servicelist;
-         temp_masterservice != NULL;
-         temp_masterservice = temp_masterservice->next) {
-
-      /* if this is the first duplication, use the existing entry */
-      if (first_item == true) {
-        delete[] temp_serviceescalation->service_description;
-        temp_serviceescalation->service_description
-          = string::dup(temp_masterservice->name2);
-        first_item = false;
-        continue;
-      }
-
-      /* duplicate service escalation definition */
-      result = xodtemplate_duplicate_serviceescalation(
-                 temp_serviceescalation,
-                 temp_serviceescalation->host_name,
-                 temp_masterservice->name2);
-      /* exit on error */
-      if (result == ERROR) {
-        xodtemplate_free_memberlist(&master_servicelist);
-        return (ERROR);
-      }
-    }
-
-    /* free memory we used for service list */
-    xodtemplate_free_memberlist(&master_servicelist);
-  }
-
-  /****** DUPLICATE SERVICE ESCALATION DEFINITIONS WITH SERVICEGROUPS ******/
-  /* THIS MUST BE DONE AFTER DUPLICATING FOR MULTIPLE HOST NAMES (SEE ABOVE) */
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-
-    /* skip serviceescalations without enough data */
-    if (temp_serviceescalation->servicegroup_name == NULL)
-      continue;
-
-    /* get list of services */
-    master_servicelist = xodtemplate_expand_servicegroups_and_services(
-                           temp_serviceescalation->servicegroup_name,
-                           NULL,
-                           NULL,
-                           temp_serviceescalation->_config_file,
-                           temp_serviceescalation->_start_line);
-    if (master_servicelist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand servicegroups specified in service "
-        "escalation (config file '"
-        << xodtemplate_config_file_name(temp_serviceescalation->_config_file)
-        << "', starting on line " << temp_serviceescalation->_start_line
-        << ")";
-      return (ERROR);
-    }
-
-    /* duplicate service escalation entries */
-    first_item = true;
-    for (temp_masterservice = master_servicelist;
-         temp_masterservice != NULL;
-         temp_masterservice = temp_masterservice->next) {
-
-      /* if this is the first duplication, use the existing entry if possible */
-      if (first_item == true
-          && temp_serviceescalation->host_name == NULL
-          && temp_serviceescalation->service_description == NULL) {
-
-        delete[] temp_serviceescalation->host_name;
-        temp_serviceescalation->host_name
-          = string::dup(temp_masterservice->name1);
-
-        delete[] temp_serviceescalation->service_description;
-        temp_serviceescalation->service_description
-          = string::dup(temp_masterservice->name2);
-
-        first_item = false;
-        continue;
-      }
-
-      /* duplicate service escalation definition */
-      result = xodtemplate_duplicate_serviceescalation(
-                 temp_serviceescalation,
-                 temp_masterservice->name1,
-                 temp_masterservice->name2);
-      /* exit on error */
-      if (result == ERROR) {
-        xodtemplate_free_memberlist(&master_servicelist);
-        return (ERROR);
-      }
-    }
-
-    /* free memory we used for service list */
-    xodtemplate_free_memberlist(&master_servicelist);
-  }
 
   /****** DUPLICATE HOST DEPENDENCY DEFINITIONS WITH MULTIPLE HOSTGROUP AND/OR HOST NAMES (MASTER AND DEPENDENT) ******/
   for (temp_hostdependency = xodtemplate_hostdependency_list;
@@ -5157,61 +4596,6 @@ int xodtemplate_duplicate_objects() {
   /* SKIPLIST STUFF FOR FAST SORT/SEARCH */
   /***************************************/
 
-  /* host escalations */
-  for (temp_hostescalation = xodtemplate_hostescalation_list;
-       temp_hostescalation != NULL;
-       temp_hostescalation = temp_hostescalation->next) {
-
-    /* skip escalations that shouldn't be registered */
-    if (temp_hostescalation->register_object == false)
-      continue;
-
-    /* skip escalation definitions without enough data */
-    if (temp_hostescalation->host_name == NULL)
-      continue;
-
-    result = skiplist_insert(
-               xobject_skiplists[X_HOSTESCALATION_SKIPLIST],
-               (void*)temp_hostescalation);
-    switch (result) {
-    case SKIPLIST_OK:
-      result = OK;
-      break;
-
-    default:
-      result = ERROR;
-      break;
-    }
-  }
-
-  /* service escalations */
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-
-    /* skip escalations that shouldn't be registered */
-    if (temp_serviceescalation->register_object == false)
-      continue;
-
-    /* skip escalation definitions without enough data */
-    if (temp_serviceescalation->host_name == NULL
-        || temp_serviceescalation->service_description == NULL)
-      continue;
-
-    result = skiplist_insert(
-               xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
-               (void*)temp_serviceescalation);
-    switch (result) {
-    case SKIPLIST_OK:
-      result = OK;
-      break;
-
-    default:
-      result = ERROR;
-      break;
-    }
-  }
-
   /* host dependencies */
   for (temp_hostdependency = xodtemplate_hostdependency_list;
        temp_hostdependency != NULL;
@@ -5422,139 +4806,6 @@ int xodtemplate_duplicate_service(
   return (OK);
 }
 
-/* duplicates a host escalation definition (with a new host name) */
-int xodtemplate_duplicate_hostescalation(
-      xodtemplate_hostescalation* temp_hostescalation,
-      char* host_name) {
-  xodtemplate_hostescalation* new_hostescalation = NULL;
-
-  /* allocate memory for a new host escalation definition */
-  new_hostescalation = new xodtemplate_hostescalation;
-
-  /* standard items */
-  new_hostescalation->tmpl = NULL;
-  new_hostescalation->name = NULL;
-  new_hostescalation->has_been_resolved = temp_hostescalation->has_been_resolved;
-  new_hostescalation->register_object = temp_hostescalation->register_object;
-  new_hostescalation->_config_file = temp_hostescalation->_config_file;
-  new_hostescalation->_start_line = temp_hostescalation->_start_line;
-
-  /* string defaults */
-  new_hostescalation->hostgroup_name = NULL;
-  new_hostescalation->have_hostgroup_name = temp_hostescalation->have_hostgroup_name;
-  new_hostescalation->host_name = NULL;
-  new_hostescalation->have_host_name = (host_name) ? true : false;
-  new_hostescalation->contact_groups = NULL;
-  new_hostescalation->have_contact_groups = temp_hostescalation->have_contact_groups;
-  new_hostescalation->contacts = NULL;
-  new_hostescalation->have_contacts = temp_hostescalation->have_contacts;
-  new_hostescalation->escalation_period = NULL;
-  new_hostescalation->have_escalation_period = temp_hostescalation->have_escalation_period;
-
-  /* allocate memory for and copy string members of hostescalation definition */
-  if (host_name != NULL)
-    new_hostescalation->host_name = string::dup(host_name);
-  if (temp_hostescalation->tmpl != NULL)
-    new_hostescalation->tmpl = string::dup(temp_hostescalation->tmpl);
-  if (temp_hostescalation->name != NULL)
-    new_hostescalation->name = string::dup(temp_hostescalation->name);
-  if (temp_hostescalation->contact_groups != NULL)
-    new_hostescalation->contact_groups = string::dup(temp_hostescalation->contact_groups);
-  if (temp_hostescalation->contacts != NULL)
-    new_hostescalation->contacts = string::dup(temp_hostescalation->contacts);
-  if (temp_hostescalation->escalation_period != NULL)
-    new_hostescalation->escalation_period = string::dup(temp_hostescalation->escalation_period);
-
-  /* duplicate non-string members */
-  new_hostescalation->first_notification = temp_hostescalation->first_notification;
-  new_hostescalation->last_notification = temp_hostescalation->last_notification;
-  new_hostescalation->have_first_notification = temp_hostescalation->have_first_notification;
-  new_hostescalation->have_last_notification = temp_hostescalation->have_last_notification;
-  new_hostescalation->notification_interval = temp_hostescalation->notification_interval;
-  new_hostescalation->have_notification_interval = temp_hostescalation->have_notification_interval;
-  new_hostescalation->escalate_on_down = temp_hostescalation->escalate_on_down;
-  new_hostescalation->escalate_on_unreachable = temp_hostescalation->escalate_on_unreachable;
-  new_hostescalation->escalate_on_recovery = temp_hostescalation->escalate_on_recovery;
-  new_hostescalation->have_escalation_options = temp_hostescalation->have_escalation_options;
-
-  /* add new hostescalation to head of list in memory */
-  new_hostescalation->next = xodtemplate_hostescalation_list;
-  xodtemplate_hostescalation_list = new_hostescalation;
-
-  return (OK);
-}
-
-/* duplicates a service escalation definition (with a new host name and/or service description) */
-int xodtemplate_duplicate_serviceescalation(
-      xodtemplate_serviceescalation* temp_serviceescalation,
-      char* host_name,
-      char* svc_description) {
-  xodtemplate_serviceescalation* new_serviceescalation = NULL;
-
-  /* allocate memory for a new service escalation definition */
-  new_serviceescalation = new xodtemplate_serviceescalation;
-
-  /* standard items */
-  new_serviceescalation->tmpl = NULL;
-  new_serviceescalation->name = NULL;
-  new_serviceescalation->has_been_resolved = temp_serviceescalation->has_been_resolved;
-  new_serviceescalation->register_object = temp_serviceescalation->register_object;
-  new_serviceescalation->_config_file = temp_serviceescalation->_config_file;
-  new_serviceescalation->_start_line = temp_serviceescalation->_start_line;
-
-  /* string defaults */
-  new_serviceescalation->servicegroup_name = NULL;
-  new_serviceescalation->have_servicegroup_name = false;
-  new_serviceescalation->hostgroup_name = NULL;
-  new_serviceescalation->have_hostgroup_name = false;
-  new_serviceescalation->host_name = NULL;
-  new_serviceescalation->have_host_name = (host_name) ? true : false;
-  new_serviceescalation->service_description = NULL;
-  new_serviceescalation->have_service_description = (svc_description) ? true : false;
-  new_serviceescalation->contact_groups = NULL;
-  new_serviceescalation->have_contact_groups = temp_serviceescalation->have_contact_groups;
-  new_serviceescalation->contacts = NULL;
-  new_serviceescalation->have_contacts = temp_serviceescalation->have_contacts;
-  new_serviceescalation->escalation_period = NULL;
-  new_serviceescalation->have_escalation_period = temp_serviceescalation->have_escalation_period;
-
-  /* allocate memory for and copy string members of serviceescalation definition */
-  if (host_name != NULL)
-    new_serviceescalation->host_name = string::dup(host_name);
-  if (svc_description != NULL)
-    new_serviceescalation->service_description = string::dup(svc_description);
-
-  if (temp_serviceescalation->tmpl != NULL)
-    new_serviceescalation->tmpl = string::dup(temp_serviceescalation->tmpl);
-  if (temp_serviceescalation->name != NULL)
-    new_serviceescalation->name = string::dup(temp_serviceescalation->name);
-  if (temp_serviceescalation->contact_groups != NULL)
-    new_serviceescalation->contact_groups = string::dup(temp_serviceescalation->contact_groups);
-  if (temp_serviceescalation->contacts != NULL)
-    new_serviceescalation->contacts = string::dup(temp_serviceescalation->contacts);
-  if (temp_serviceescalation->escalation_period != NULL)
-    new_serviceescalation->escalation_period = string::dup(temp_serviceescalation->escalation_period);
-
-  /* duplicate non-string members */
-  new_serviceescalation->first_notification = temp_serviceescalation->first_notification;
-  new_serviceescalation->last_notification = temp_serviceescalation->last_notification;
-  new_serviceescalation->have_first_notification = temp_serviceescalation->have_first_notification;
-  new_serviceescalation->have_last_notification = temp_serviceescalation->have_last_notification;
-  new_serviceescalation->notification_interval = temp_serviceescalation->notification_interval;
-  new_serviceescalation->have_notification_interval = temp_serviceescalation->have_notification_interval;
-  new_serviceescalation->escalate_on_warning = temp_serviceescalation->escalate_on_warning;
-  new_serviceescalation->escalate_on_unknown = temp_serviceescalation->escalate_on_unknown;
-  new_serviceescalation->escalate_on_critical = temp_serviceescalation->escalate_on_critical;
-  new_serviceescalation->escalate_on_recovery = temp_serviceescalation->escalate_on_recovery;
-  new_serviceescalation->have_escalation_options = temp_serviceescalation->have_escalation_options;
-
-  /* add new serviceescalation to head of list in memory */
-  new_serviceescalation->next = xodtemplate_serviceescalation_list;
-  xodtemplate_serviceescalation_list = new_serviceescalation;
-
-  return (OK);
-}
-
 /* duplicates a host dependency definition (with master and dependent host names) */
 int xodtemplate_duplicate_hostdependency(
       xodtemplate_hostdependency* temp_hostdependency,
@@ -5724,8 +4975,6 @@ int xodtemplate_duplicate_servicedependency(
 int xodtemplate_inherit_object_properties() {
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
 
   /* fill in missing defaults for hosts... */
   for (temp_host = xodtemplate_host_list;
@@ -5795,151 +5044,6 @@ int xodtemplate_inherit_object_properties() {
     }
   }
 
-  /* service escalations inherit some properties from their associated service... */
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-
-    /* find the service */
-    if ((temp_service = xodtemplate_find_real_service(
-                          temp_serviceescalation->host_name,
-                          temp_serviceescalation->service_description)) == NULL)
-      continue;
-
-    /* service escalations inherit contact groups from service if not already specified */
-    if (temp_serviceescalation->have_contact_groups == false
-        && temp_service->have_contact_groups == true
-        && temp_service->contact_groups != NULL) {
-      temp_serviceescalation->contact_groups = string::dup(temp_service->contact_groups);
-      temp_serviceescalation->have_contact_groups = true;
-    }
-
-    /* SPECIAL RULE 10/04/07 - additive inheritance from service's contactgroup(s) */
-    if (temp_serviceescalation->contact_groups != NULL
-        && temp_serviceescalation->contact_groups[0] == '+')
-      xodtemplate_get_inherited_string(
-        &temp_service->have_contact_groups,
-        &temp_service->contact_groups,
-        &temp_serviceescalation->have_contact_groups,
-        &temp_serviceescalation->contact_groups);
-
-    /* service escalations inherit contacts from service if not already specified */
-    if (temp_serviceescalation->have_contacts == false
-        && temp_service->have_contacts == true
-        && temp_service->contacts != NULL) {
-      temp_serviceescalation->contacts = string::dup(temp_service->contacts);
-      temp_serviceescalation->have_contacts = true;
-    }
-
-    /* SPECIAL RULE 10/04/07 - additive inheritance from service's contact(s) */
-    if (temp_serviceescalation->contacts != NULL
-        && temp_serviceescalation->contacts[0] == '+')
-      xodtemplate_get_inherited_string(
-        &temp_service->have_contacts,
-        &temp_service->contacts,
-        &temp_serviceescalation->have_contacts,
-        &temp_serviceescalation->contacts);
-
-    /* service escalations inherit notification interval from service if not already defined */
-    if (temp_serviceescalation->have_notification_interval == false
-        && temp_service->have_notification_interval == true) {
-      temp_serviceescalation->notification_interval = temp_service->notification_interval;
-      temp_serviceescalation->have_notification_interval = true;
-    }
-
-    /* service escalations inherit escalation period from service if not already defined */
-    if (temp_serviceescalation->have_escalation_period == false
-        && temp_service->have_notification_period == true
-        && temp_service->notification_period != NULL) {
-      temp_serviceescalation->escalation_period = string::dup(temp_service->notification_period);
-      temp_serviceescalation->have_escalation_period = true;
-    }
-
-    /* if escalation options are missing, assume all */
-    if (temp_serviceescalation->have_escalation_options == false) {
-      temp_serviceescalation->escalate_on_unknown = true;
-      temp_serviceescalation->escalate_on_warning = true;
-      temp_serviceescalation->escalate_on_critical = true;
-      temp_serviceescalation->escalate_on_recovery = true;
-      temp_serviceescalation->have_escalation_options = true;
-    }
-
-    /* 03/05/08 clear additive string chars - not done in xodtemplate_clean_additive_strings() anymore */
-    xodtemplate_clean_additive_string(&temp_serviceescalation->contact_groups);
-    xodtemplate_clean_additive_string(&temp_serviceescalation->contacts);
-  }
-
-  /* host escalations inherit some properties from their associated host... */
-  for (temp_hostescalation = xodtemplate_hostescalation_list;
-       temp_hostescalation != NULL;
-       temp_hostescalation = temp_hostescalation->next) {
-
-    /* find the host */
-    if ((temp_host = xodtemplate_find_real_host(temp_hostescalation->host_name)) == NULL)
-      continue;
-
-    /* host escalations inherit contact groups from service if not already specified */
-    if (temp_hostescalation->have_contact_groups == false
-        && temp_host->have_contact_groups == true
-        && temp_host->contact_groups != NULL) {
-      temp_hostescalation->contact_groups = string::dup(temp_host->contact_groups);
-      temp_hostescalation->have_contact_groups = true;
-    }
-
-    /* SPECIAL RULE 10/04/07 - additive inheritance from host's contactgroup(s) */
-    if (temp_hostescalation->contact_groups != NULL
-        && temp_hostescalation->contact_groups[0] == '+')
-      xodtemplate_get_inherited_string(
-        &temp_host->have_contact_groups,
-        &temp_host->contact_groups,
-        &temp_hostescalation->have_contact_groups,
-        &temp_hostescalation->contact_groups);
-
-    /* host escalations inherit contacts from service if not already specified */
-    if (temp_hostescalation->have_contacts == false
-        && temp_host->have_contacts == true
-        && temp_host->contacts != NULL) {
-      temp_hostescalation->contacts = string::dup(temp_host->contacts);
-      temp_hostescalation->have_contacts = true;
-    }
-
-    /* SPECIAL RULE 10/04/07 - additive inheritance from host's contact(s) */
-    if (temp_hostescalation->contacts != NULL
-        && temp_hostescalation->contacts[0] == '+')
-      xodtemplate_get_inherited_string(
-        &temp_host->have_contacts,
-        &temp_host->contacts,
-        &temp_hostescalation->have_contacts,
-        &temp_hostescalation->contacts);
-
-    /* host escalations inherit notification interval from host if not already defined */
-    if (temp_hostescalation->have_notification_interval == false
-        && temp_host->have_notification_interval == true) {
-      temp_hostescalation->notification_interval = temp_host->notification_interval;
-      temp_hostescalation->have_notification_interval = true;
-    }
-
-    /* host escalations inherit escalation period from host if not already defined */
-    if (temp_hostescalation->have_escalation_period == false
-        && temp_host->have_notification_period == true
-        && temp_host->notification_period != NULL) {
-      temp_hostescalation->escalation_period = string::dup(temp_host->notification_period);
-      temp_hostescalation->have_escalation_period = true;
-    }
-
-    /* if escalation options are missing, assume all */
-    if (temp_hostescalation->have_escalation_options == false) {
-      temp_hostescalation->escalate_on_down = true;
-      temp_hostescalation->escalate_on_unreachable = true;
-      temp_hostescalation->escalate_on_recovery = true;
-      temp_hostescalation->have_escalation_options = true;
-    }
-
-    /* 03/05/08 clear additive string chars - not done in xodtemplate_clean_additive_strings() anymore */
-    xodtemplate_clean_additive_string(&temp_hostescalation->contact_groups);
-    xodtemplate_clean_additive_string(&temp_hostescalation->contacts);
-  }
-
   return (OK);
 }
 
@@ -5955,12 +5059,10 @@ int xodtemplate_resolve_objects() {
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
   xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
 
   /* resolve all timeperiod objects */
   for (temp_timeperiod = xodtemplate_timeperiod_list;
@@ -6010,14 +5112,6 @@ int xodtemplate_resolve_objects() {
       return (ERROR);
   }
 
-  /* resolve all serviceescalation objects */
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-    if (xodtemplate_resolve_serviceescalation(temp_serviceescalation) == ERROR)
-      return (ERROR);
-  }
-
   /* resolve all contact objects */
   for (temp_contact = xodtemplate_contact_list;
        temp_contact != NULL;
@@ -6047,14 +5141,6 @@ int xodtemplate_resolve_objects() {
        temp_hostdependency != NULL;
        temp_hostdependency = temp_hostdependency->next) {
     if (xodtemplate_resolve_hostdependency(temp_hostdependency) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all hostescalation objects */
-  for (temp_hostescalation = xodtemplate_hostescalation_list;
-       temp_hostescalation != NULL;
-       temp_hostescalation = temp_hostescalation->next) {
-    if (xodtemplate_resolve_hostescalation(temp_hostescalation) == ERROR)
       return (ERROR);
   }
 
@@ -6570,126 +5656,6 @@ int xodtemplate_resolve_servicedependency(
       this_servicedependency->fail_notify_on_pending
         = template_servicedependency->fail_notify_on_pending;
       this_servicedependency->have_notification_dependency_options = true;
-    }
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
-/* resolves a serviceescalation object */
-int xodtemplate_resolve_serviceescalation(
-      xodtemplate_serviceescalation* this_serviceescalation) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_serviceescalation* template_serviceescalation = NULL;
-
-  /* return if this serviceescalation has already been resolved */
-  if (this_serviceescalation->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_serviceescalation->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_serviceescalation->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_serviceescalation->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_serviceescalation
-      = xodtemplate_find_serviceescalation(temp_ptr);
-    if (template_serviceescalation == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in service "
-        "escalation definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_serviceescalation->_config_file)
-        << "', starting on line "
-        << this_serviceescalation->_start_line << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template serviceescalation... */
-    xodtemplate_resolve_serviceescalation(template_serviceescalation);
-
-    /* apply missing properties from template serviceescalation... */
-    xodtemplate_get_inherited_string(
-      &template_serviceescalation->have_servicegroup_name,
-      &template_serviceescalation->servicegroup_name,
-      &this_serviceescalation->have_servicegroup_name,
-      &this_serviceescalation->servicegroup_name);
-    xodtemplate_get_inherited_string(
-      &template_serviceescalation->have_hostgroup_name,
-      &template_serviceescalation->hostgroup_name,
-      &this_serviceescalation->have_hostgroup_name,
-      &this_serviceescalation->hostgroup_name);
-    xodtemplate_get_inherited_string(
-      &template_serviceescalation->have_host_name,
-      &template_serviceescalation->host_name,
-      &this_serviceescalation->have_host_name,
-      &this_serviceescalation->host_name);
-    xodtemplate_get_inherited_string(
-      &template_serviceescalation->have_service_description,
-      &template_serviceescalation->service_description,
-      &this_serviceescalation->have_service_description,
-      &this_serviceescalation->service_description);
-    xodtemplate_get_inherited_string(
-      &template_serviceescalation->have_contact_groups,
-      &template_serviceescalation->contact_groups,
-      &this_serviceescalation->have_contact_groups,
-      &this_serviceescalation->contact_groups);
-    xodtemplate_get_inherited_string(
-      &template_serviceescalation->have_contacts,
-      &template_serviceescalation->contacts,
-      &this_serviceescalation->have_contacts,
-      &this_serviceescalation->contacts);
-
-    if (this_serviceescalation->have_escalation_period == false
-        && template_serviceescalation->have_escalation_period == true) {
-      if (this_serviceescalation->escalation_period == NULL
-          && template_serviceescalation->escalation_period != NULL)
-        this_serviceescalation->escalation_period
-          = string::dup(template_serviceescalation->escalation_period);
-      this_serviceescalation->have_escalation_period = true;
-    }
-    if (this_serviceescalation->have_first_notification == false
-        && template_serviceescalation->have_first_notification == true) {
-      this_serviceescalation->first_notification
-        = template_serviceescalation->first_notification;
-      this_serviceescalation->have_first_notification = true;
-    }
-    if (this_serviceescalation->have_last_notification == false
-        && template_serviceescalation->have_last_notification == true) {
-      this_serviceescalation->last_notification
-        = template_serviceescalation->last_notification;
-      this_serviceescalation->have_last_notification = true;
-    }
-    if (this_serviceescalation->have_notification_interval == false
-        && template_serviceescalation->have_notification_interval == true) {
-      this_serviceescalation->notification_interval
-        = template_serviceescalation->notification_interval;
-      this_serviceescalation->have_notification_interval = true;
-    }
-    if (this_serviceescalation->have_escalation_options == false
-        && template_serviceescalation->have_escalation_options == true) {
-      this_serviceescalation->escalate_on_warning
-        = template_serviceescalation->escalate_on_warning;
-      this_serviceescalation->escalate_on_unknown
-        = template_serviceescalation->escalate_on_unknown;
-      this_serviceescalation->escalate_on_critical
-        = template_serviceescalation->escalate_on_critical;
-      this_serviceescalation->escalate_on_recovery
-        = template_serviceescalation->escalate_on_recovery;
-      this_serviceescalation->have_escalation_options = true;
     }
   }
 
@@ -7607,113 +6573,6 @@ int xodtemplate_resolve_hostdependency(
   return (OK);
 }
 
-/* resolves a hostescalation object */
-int xodtemplate_resolve_hostescalation(
-      xodtemplate_hostescalation* this_hostescalation) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_hostescalation* template_hostescalation = NULL;
-
-  /* return if this hostescalation has already been resolved */
-  if (this_hostescalation->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_hostescalation->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_hostescalation->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_hostescalation->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_hostescalation = xodtemplate_find_hostescalation(temp_ptr);
-    if (template_hostescalation == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in host "
-        "escalation definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_hostescalation->_config_file)
-        << "', starting on line " << this_hostescalation->_start_line
-        << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template hostescalation... */
-    xodtemplate_resolve_hostescalation(template_hostescalation);
-
-    /* apply missing properties from template hostescalation... */
-    xodtemplate_get_inherited_string(
-      &template_hostescalation->have_host_name,
-      &template_hostescalation->host_name,
-      &this_hostescalation->have_host_name,
-      &this_hostescalation->host_name);
-    xodtemplate_get_inherited_string(
-      &template_hostescalation->have_hostgroup_name,
-      &template_hostescalation->hostgroup_name,
-      &this_hostescalation->have_hostgroup_name,
-      &this_hostescalation->hostgroup_name);
-    xodtemplate_get_inherited_string(
-      &template_hostescalation->have_contact_groups,
-      &template_hostescalation->contact_groups,
-      &this_hostescalation->have_contact_groups,
-      &this_hostescalation->contact_groups);
-    xodtemplate_get_inherited_string(
-      &template_hostescalation->have_contacts,
-      &template_hostescalation->contacts,
-      &this_hostescalation->have_contacts,
-      &this_hostescalation->contacts);
-
-    if (this_hostescalation->have_escalation_period == false
-        && template_hostescalation->have_escalation_period == true) {
-      if (this_hostescalation->escalation_period == NULL
-          && template_hostescalation->escalation_period != NULL)
-        this_hostescalation->escalation_period
-          = string::dup(template_hostescalation->escalation_period);
-      this_hostescalation->have_escalation_period = true;
-    }
-    if (this_hostescalation->have_first_notification == false
-        && template_hostescalation->have_first_notification == true) {
-      this_hostescalation->first_notification
-        = template_hostescalation->first_notification;
-      this_hostescalation->have_first_notification = true;
-    }
-    if (this_hostescalation->have_last_notification == false
-        && template_hostescalation->have_last_notification == true) {
-      this_hostescalation->last_notification
-        = template_hostescalation->last_notification;
-      this_hostescalation->have_last_notification = true;
-    }
-    if (this_hostescalation->have_notification_interval == false
-        && template_hostescalation->have_notification_interval == true) {
-      this_hostescalation->notification_interval
-        = template_hostescalation->notification_interval;
-      this_hostescalation->have_notification_interval = true;
-    }
-    if (this_hostescalation->have_escalation_options == false
-        && template_hostescalation->have_escalation_options == true) {
-      this_hostescalation->escalate_on_down
-        = template_hostescalation->escalate_on_down;
-      this_hostescalation->escalate_on_unreachable
-        = template_hostescalation->escalate_on_unreachable;
-      this_hostescalation->escalate_on_recovery
-        = template_hostescalation->escalate_on_recovery;
-      this_hostescalation->have_escalation_options = true;
-    }
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
 /******************************************************************/
 /*************** OBJECT RECOMBOBULATION FUNCTIONS *****************/
 /******************************************************************/
@@ -8588,19 +7447,6 @@ xodtemplate_servicedependency* xodtemplate_find_servicedependency(
                                             NULL));
 }
 
-/* finds a specific serviceescalation object */
-xodtemplate_serviceescalation* xodtemplate_find_serviceescalation(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_serviceescalation temp_serviceescalation;
-  temp_serviceescalation.name = name;
-  return ((xodtemplate_serviceescalation*)skiplist_find_first(
-                                            xobject_template_skiplists[X_SERVICEESCALATION_SKIPLIST],
-                                            &temp_serviceescalation,
-                                            NULL));
-}
-
 /* finds a specific contact object */
 xodtemplate_contact* xodtemplate_find_contact(char* name) {
   if (name == NULL)
@@ -8665,20 +7511,6 @@ xodtemplate_hostdependency* xodtemplate_find_hostdependency(char* name) {
                                          &temp_hostdependency,
                                          NULL));
 }
-
-/* finds a specific hostescalation object */
-xodtemplate_hostescalation* xodtemplate_find_hostescalation(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_hostescalation temp_hostescalation;
-  temp_hostescalation.name = name;
-  return ((xodtemplate_hostescalation*)skiplist_find_first(
-                                         xobject_template_skiplists[X_HOSTESCALATION_SKIPLIST],
-                                         &temp_hostescalation,
-                                         NULL));
-}
-
 
 /* finds a specific service object */
 xodtemplate_service* xodtemplate_find_service(char* name) {
@@ -8826,16 +7658,6 @@ int xodtemplate_register_objects() {
       return (ERROR);
   }
 
-  /* register service escalations */
-  ptr = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation(NULL);
-  for (temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_first(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST], &ptr);
-       temp_serviceescalation;
-       temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_next(&ptr)) {
-    if (xodtemplate_register_serviceescalation(temp_serviceescalation) == ERROR)
-      return (ERROR);
-  }
-
   /* register host dependencies */
   ptr = NULL;
   xodtemplate_hostdependency* temp_hostdependency(NULL);
@@ -8843,16 +7665,6 @@ int xodtemplate_register_objects() {
        temp_hostdependency;
        temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_next(&ptr)) {
     if (xodtemplate_register_hostdependency(temp_hostdependency) == ERROR)
-      return (ERROR);
-  }
-
-  /* register host escalations */
-  ptr = NULL;
-  xodtemplate_hostescalation* temp_hostescalation(NULL);
-  for (temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_first(xobject_skiplists[X_HOSTESCALATION_SKIPLIST], &ptr);
-       temp_hostescalation;
-       temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_next(&ptr)) {
-    if (xodtemplate_register_hostescalation(temp_hostescalation) == ERROR)
       return (ERROR);
   }
 
@@ -9451,94 +8263,6 @@ int xodtemplate_register_servicedependency(
   return (OK);
 }
 
-/* registers a serviceescalation definition */
-int xodtemplate_register_serviceescalation(
-      xodtemplate_serviceescalation* this_serviceescalation) {
-  /* bail out if we shouldn't register this object */
-  if (this_serviceescalation->register_object == false)
-    return (OK);
-
-  /* default options if none specified */
-  if (this_serviceescalation->have_escalation_options == false) {
-    this_serviceescalation->escalate_on_warning = true;
-    this_serviceescalation->escalate_on_unknown = true;
-    this_serviceescalation->escalate_on_critical = true;
-    this_serviceescalation->escalate_on_recovery = true;
-  }
-
-  /* add the serviceescalation */
-  serviceescalation* new_serviceescalation
-    = add_service_escalation(
-        this_serviceescalation->host_name,
-        this_serviceescalation->service_description,
-        this_serviceescalation->first_notification,
-        this_serviceescalation->last_notification,
-        this_serviceescalation->notification_interval,
-        this_serviceescalation->escalation_period,
-        this_serviceescalation->escalate_on_warning,
-        this_serviceescalation->escalate_on_unknown,
-        this_serviceescalation->escalate_on_critical,
-        this_serviceescalation->escalate_on_recovery);
-
-  /* return with an error if we couldn't add the serviceescalation */
-  if (new_serviceescalation == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register service escalation (config file '"
-      << xodtemplate_config_file_name(this_serviceescalation->_config_file)
-      << "', starting on line " << this_serviceescalation->_start_line
-      << ")";
-    return (ERROR);
-  }
-
-  /* add the contact groups */
-  if (this_serviceescalation->contact_groups != NULL) {
-    for (char* contact_group(strtok(this_serviceescalation->contact_groups, ","));
-         contact_group != NULL;
-	 contact_group = strtok(NULL, ", ")) {
-
-      strip(contact_group);
-      contactgroupsmember* new_contactgroupsmember
-        = add_contactgroup_to_serviceescalation(
-            new_serviceescalation,
-            contact_group);
-      if (new_contactgroupsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contactgroup '" << contact_group
-          << "' to service escalation (config file '"
-          << xodtemplate_config_file_name(this_serviceescalation->_config_file)
-          << "', starting on line "
-          << this_serviceescalation->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  /* add the contacts */
-  if (this_serviceescalation->contacts != NULL) {
-    for (char* contact_name(strtok(this_serviceescalation->contacts, ","));
-         contact_name != NULL;
-	 contact_name = strtok(NULL, ", ")) {
-
-      strip(contact_name);
-      contactsmember* new_contactsmember
-        = add_contact_to_serviceescalation(
-            new_serviceescalation,
-            contact_name);
-      if (new_contactsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contact '" << contact_name
-          << "' to service escalation (config file '"
-          << xodtemplate_config_file_name(this_serviceescalation->_config_file)
-          << "', starting on line "
-          << this_serviceescalation->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  return (OK);
-}
-
 /* registers a contact definition */
 int xodtemplate_register_contact(xodtemplate_contact* this_contact) {
   contact* new_contact = NULL;
@@ -9992,93 +8716,6 @@ int xodtemplate_register_hostdependency(
   return (OK);
 }
 
-/* registers a hostescalation definition */
-int xodtemplate_register_hostescalation(
-      xodtemplate_hostescalation* this_hostescalation) {
-  /* bail out if we shouldn't register this object */
-  if (this_hostescalation->register_object == false)
-    return (OK);
-
-  /* default options if none specified */
-  if (this_hostescalation->have_escalation_options == false) {
-    this_hostescalation->escalate_on_down = true;
-    this_hostescalation->escalate_on_unreachable = true;
-    this_hostescalation->escalate_on_recovery = true;
-  }
-
-  /* add the hostescalation */
-  hostescalation* new_hostescalation
-    = add_host_escalation(
-        this_hostescalation->host_name,
-        this_hostescalation->first_notification,
-        this_hostescalation->last_notification,
-        this_hostescalation->notification_interval,
-        this_hostescalation->escalation_period,
-        this_hostescalation->escalate_on_down,
-        this_hostescalation->escalate_on_unreachable,
-        this_hostescalation->escalate_on_recovery);
-
-  /* return with an error if we couldn't add the hostescalation */
-  if (new_hostescalation == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register host escalation (config file '"
-      << xodtemplate_config_file_name(this_hostescalation->_config_file)
-      << "', starting on line " << this_hostescalation->_start_line
-      << ")";
-    return (ERROR);
-  }
-
-  /* add all contact groups */
-  if (this_hostescalation->contact_groups != NULL) {
-
-    for (char* contact_group(strtok(this_hostescalation->contact_groups, ","));
-         contact_group != NULL;
-	 contact_group = strtok(NULL, ",")) {
-
-      strip(contact_group);
-      contactgroupsmember* new_contactgroupsmember
-        = add_contactgroup_to_host_escalation(
-            new_hostescalation,
-            contact_group);
-      if (new_contactgroupsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contactgroup '" << contact_group
-          << "' to host escalation (config file '"
-          << xodtemplate_config_file_name(this_hostescalation->_config_file)
-          << "', starting on line " << this_hostescalation->_start_line
-          << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  /* add the contacts */
-  if (this_hostescalation->contacts != NULL) {
-
-    for (char* contact_name(strtok(this_hostescalation->contacts, ","));
-         contact_name != NULL;
-	 contact_name = strtok(NULL, ", ")) {
-
-      strip(contact_name);
-      contactsmember* new_contactsmember
-        = add_contact_to_host_escalation(
-            new_hostescalation,
-            contact_name);
-      if (new_contactsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contact '" << contact_name
-          << "' to host escalation (config file '"
-          << xodtemplate_config_file_name(this_hostescalation->_config_file)
-          << "', starting on line " << this_hostescalation->_start_line
-          << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  return (OK);
-}
-
 /******************************************************************/
 /********************** SORTING FUNCTIONS *************************/
 /******************************************************************/
@@ -10129,23 +8766,9 @@ int xodtemplate_sort_objects() {
   if (xodtemplate_sort_servicedependencies() == ERROR)
     return (ERROR);
 
-  /* sort service escalations */
-  if (xodtemplate_sort_serviceescalations() == ERROR)
-    return (ERROR);
-
   /* sort host dependencies */
   if (xodtemplate_sort_hostdependencies() == ERROR)
     return (ERROR);
-
-  /* sort hostescalations */
-  if (xodtemplate_sort_hostescalations() == ERROR)
-    return (ERROR);
-
-  /* sort host extended info */
-  /* NOT NEEDED */
-
-  /* sort service extended info */
-  /* NOT NEEDED */
 
   return (OK);
 }
@@ -10812,116 +9435,6 @@ int xodtemplate_sort_servicedependencies() {
   return (OK);
 }
 
-/* sort serviceescalations by name */
-int xodtemplate_sort_serviceescalations() {
-  xodtemplate_serviceescalation* new_serviceescalation_list = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
-  xodtemplate_serviceescalation* last_serviceescalation = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation_orig = NULL;
-  xodtemplate_serviceescalation* next_serviceescalation_orig = NULL;
-
-  /* sort all existing serviceescalations */
-  for (temp_serviceescalation_orig = xodtemplate_serviceescalation_list;
-       temp_serviceescalation_orig != NULL;
-       temp_serviceescalation_orig = next_serviceescalation_orig) {
-
-    next_serviceescalation_orig = temp_serviceescalation_orig->next;
-
-    /* add serviceescalation to new list, sorted by host name then service description */
-    last_serviceescalation = new_serviceescalation_list;
-    for (temp_serviceescalation = new_serviceescalation_list;
-         temp_serviceescalation != NULL;
-         temp_serviceescalation = temp_serviceescalation->next) {
-
-      if (xodtemplate_compare_strings2(
-            temp_serviceescalation_orig->host_name,
-            temp_serviceescalation_orig->service_description,
-            temp_serviceescalation->host_name,
-            temp_serviceescalation->service_description) <= 0)
-        break;
-      else
-        last_serviceescalation = temp_serviceescalation;
-    }
-
-    /* first item added to new sorted list */
-    if (new_serviceescalation_list == NULL) {
-      temp_serviceescalation_orig->next = NULL;
-      new_serviceescalation_list = temp_serviceescalation_orig;
-    }
-
-    /* item goes at head of new sorted list */
-    else if (temp_serviceescalation == new_serviceescalation_list) {
-      temp_serviceescalation_orig->next = new_serviceescalation_list;
-      new_serviceescalation_list = temp_serviceescalation_orig;
-    }
-
-    /* item goes in middle or at end of new sorted list */
-    else {
-      temp_serviceescalation_orig->next = temp_serviceescalation;
-      last_serviceescalation->next = temp_serviceescalation_orig;
-    }
-  }
-
-  /* list is now sorted */
-  xodtemplate_serviceescalation_list = new_serviceescalation_list;
-
-  return (OK);
-}
-
-/* sort hostescalations by name */
-int xodtemplate_sort_hostescalations() {
-  xodtemplate_hostescalation* new_hostescalation_list = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
-  xodtemplate_hostescalation* last_hostescalation = NULL;
-  xodtemplate_hostescalation* temp_hostescalation_orig = NULL;
-  xodtemplate_hostescalation* next_hostescalation_orig = NULL;
-
-  /* sort all existing hostescalations */
-  for (temp_hostescalation_orig = xodtemplate_hostescalation_list;
-       temp_hostescalation_orig != NULL;
-       temp_hostescalation_orig = next_hostescalation_orig) {
-
-    next_hostescalation_orig = temp_hostescalation_orig->next;
-
-    /* add hostescalation to new list, sorted by host name then hostescalation description */
-    last_hostescalation = new_hostescalation_list;
-    for (temp_hostescalation = new_hostescalation_list;
-         temp_hostescalation != NULL;
-         temp_hostescalation = temp_hostescalation->next) {
-
-      if (xodtemplate_compare_strings1(
-            temp_hostescalation_orig->host_name,
-            temp_hostescalation->host_name) <= 0)
-        break;
-      else
-        last_hostescalation = temp_hostescalation;
-    }
-
-    /* first item added to new sorted list */
-    if (new_hostescalation_list == NULL) {
-      temp_hostescalation_orig->next = NULL;
-      new_hostescalation_list = temp_hostescalation_orig;
-    }
-
-    /* item goes at head of new sorted list */
-    else if (temp_hostescalation == new_hostescalation_list) {
-      temp_hostescalation_orig->next = new_hostescalation_list;
-      new_hostescalation_list = temp_hostescalation_orig;
-    }
-
-    /* item goes in middle or at end of new sorted list */
-    else {
-      temp_hostescalation_orig->next = temp_hostescalation;
-      last_hostescalation->next = temp_hostescalation_orig;
-    }
-  }
-
-  /* list is now sorted */
-  xodtemplate_hostescalation_list = new_hostescalation_list;
-
-  return (OK);
-}
-
 /* sort hostdependencies by name */
 int xodtemplate_sort_hostdependencies() {
   xodtemplate_hostdependency* new_hostdependency_list = NULL;
@@ -10995,9 +9508,7 @@ int xodtemplate_cache_objects(char* cache_file) {
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
   xodtemplate_customvariablesmember* temp_customvariablesmember = NULL;
   time_t current_time = 0L;
   void* ptr = NULL;
@@ -11663,49 +10174,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\t}\n\n");
   }
 
-  /* cache service escalations */
-  /*for(temp_serviceescalation=xodtemplate_serviceescalation_list;temp_serviceescalation!=NULL;temp_serviceescalation=temp_serviceescalation->next){ */
-  ptr = NULL;
-  for (temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_first(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST], &ptr);
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_next(&ptr)) {
-    if (temp_serviceescalation->register_object == false)
-      continue;
-    fprintf(fp, "define serviceescalation {\n");
-    if (temp_serviceescalation->host_name)
-      fprintf(fp, "\thost_name\t%s\n", temp_serviceescalation->host_name);
-    if (temp_serviceescalation->service_description)
-      fprintf(fp, "\tservice_description\t%s\n", temp_serviceescalation->service_description);
-    fprintf(fp, "\tfirst_notification\t%d\n", temp_serviceescalation->first_notification);
-    fprintf(fp, "\tlast_notification\t%d\n", temp_serviceescalation->last_notification);
-    fprintf(fp, "\tnotification_interval\t%f\n", temp_serviceescalation->notification_interval);
-    if (temp_serviceescalation->escalation_period)
-      fprintf(fp, "\tescalation_period\t%s\n", temp_serviceescalation->escalation_period);
-    if (temp_serviceescalation->have_escalation_options == true) {
-      fprintf(fp, "\tescalation_options\t");
-      x = 0;
-      if (temp_serviceescalation->escalate_on_warning == true)
-        fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-      if (temp_serviceescalation->escalate_on_unknown == true)
-        fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_serviceescalation->escalate_on_critical == true)
-        fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-      if (temp_serviceescalation->escalate_on_recovery == true)
-        fprintf(fp, "%sr", (x++ > 0) ? "," : "");
-      if (x == 0)
-        fprintf(fp, "n");
-      fprintf(fp, "\n");
-    }
-    if (temp_serviceescalation->contacts)
-      fprintf(fp, "\tcontacts\t%s\n", temp_serviceescalation->contacts);
-    if (temp_serviceescalation->contact_groups)
-      fprintf(
-        fp,
-        "\tcontact_groups\t%s\n",
-        temp_serviceescalation->contact_groups);
-    fprintf(fp, "\t}\n\n");
-  }
-
   /* cache host dependencies */
   /*for(temp_hostdependency=xodtemplate_hostdependency_list;temp_hostdependency!=NULL;temp_hostdependency=temp_hostdependency->next){ */
   ptr = NULL;
@@ -11752,42 +10220,6 @@ int xodtemplate_cache_objects(char* cache_file) {
         fprintf(fp, "n");
       fprintf(fp, "\n");
     }
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache host escalations */
-  /*for(temp_hostescalation=xodtemplate_hostescalation_list;temp_hostescalation!=NULL;temp_hostescalation=temp_hostescalation->next){ */
-  ptr = NULL;
-  for (temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_first(xobject_skiplists[X_HOSTESCALATION_SKIPLIST], &ptr);
-       temp_hostescalation != NULL;
-       temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_next(&ptr)) {
-    if (temp_hostescalation->register_object == false)
-      continue;
-    fprintf(fp, "define hostescalation {\n");
-    if (temp_hostescalation->host_name)
-      fprintf(fp, "\thost_name\t%s\n", temp_hostescalation->host_name);
-    fprintf(fp, "\tfirst_notification\t%d\n", temp_hostescalation->first_notification);
-    fprintf(fp, "\tlast_notification\t%d\n", temp_hostescalation->last_notification);
-    fprintf(fp, "\tnotification_interval\t%f\n", temp_hostescalation->notification_interval);
-    if (temp_hostescalation->escalation_period)
-      fprintf(fp, "\tescalation_period\t%s\n", temp_hostescalation->escalation_period);
-    if (temp_hostescalation->have_escalation_options == true) {
-      fprintf(fp, "\tescalation_options\t");
-      x = 0;
-      if (temp_hostescalation->escalate_on_down == true)
-        fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-      if (temp_hostescalation->escalate_on_unreachable == true)
-        fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_hostescalation->escalate_on_recovery == true)
-        fprintf(fp, "%sr", (x++ > 0) ? "," : "");
-      if (x == 0)
-        fprintf(fp, "n");
-      fprintf(fp, "\n");
-    }
-    if (temp_hostescalation->contacts)
-      fprintf(fp, "\tcontacts\t%s\n", temp_hostescalation->contacts);
-    if (temp_hostescalation->contact_groups)
-      fprintf(fp, "\tcontact_groups\t%s\n", temp_hostescalation->contact_groups);
     fprintf(fp, "\t}\n\n");
   }
 
@@ -11878,20 +10310,6 @@ int xodtemplate_init_xobject_skiplists() {
         false,
         false,
         xodtemplate_skiplist_compare_servicedependency_template);
-  xobject_template_skiplists[X_HOSTESCALATION_SKIPLIST]
-    = skiplist_new(
-        16,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_hostescalation_template);
-  xobject_template_skiplists[X_SERVICEESCALATION_SKIPLIST]
-    = skiplist_new(
-        16,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_serviceescalation_template);
   xobject_skiplists[X_HOST_SKIPLIST]
     = skiplist_new(
         16,
@@ -11970,20 +10388,6 @@ int xodtemplate_init_xobject_skiplists() {
         true,
         false,
         xodtemplate_skiplist_compare_servicedependency);
-  xobject_skiplists[X_HOSTESCALATION_SKIPLIST]
-    = skiplist_new(
-        16,
-        0.5,
-        true,
-        false,
-        xodtemplate_skiplist_compare_hostescalation);
-  xobject_skiplists[X_SERVICEESCALATION_SKIPLIST]
-    = skiplist_new(
-        16,
-        0.5,
-        true,
-        false,
-        xodtemplate_skiplist_compare_serviceescalation);
 
   return (OK);
 }
@@ -12450,86 +10854,6 @@ int xodtemplate_skiplist_compare_servicedependency(
             ob->dependent_service_description));
 }
 
-int xodtemplate_skiplist_compare_hostescalation_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_hostescalation const* oa
-    = static_cast<xodtemplate_hostescalation const*>(a);
-  xodtemplate_hostescalation const* ob
-    = static_cast<xodtemplate_hostescalation const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_hostescalation(
-      void const* a,
-      void const* b) {
-  xodtemplate_hostescalation const* oa
-    = static_cast<xodtemplate_hostescalation const*>(a);
-  xodtemplate_hostescalation const* ob
-    = static_cast<xodtemplate_hostescalation const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(
-            oa->host_name,
-            NULL,
-            ob->host_name,
-            NULL));
-}
-
-int xodtemplate_skiplist_compare_serviceescalation_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_serviceescalation const* oa
-    = static_cast<xodtemplate_serviceescalation const*>(a);
-  xodtemplate_serviceescalation const* ob
-    = static_cast<xodtemplate_serviceescalation const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_serviceescalation(
-      void const* a,
-      void const* b) {
-  xodtemplate_serviceescalation const* oa
-    = static_cast<xodtemplate_serviceescalation const*>(a);
-  xodtemplate_serviceescalation const* ob
-    = static_cast<xodtemplate_serviceescalation const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(
-            oa->host_name,
-            oa->service_description,
-            ob->host_name,
-            ob->service_description));
-}
-
 /******************************************************************/
 /********************** CLEANUP FUNCTIONS *************************/
 /******************************************************************/
@@ -12572,8 +10896,6 @@ int xodtemplate_free_memory() {
   xodtemplate_servicegroup* next_servicegroup = NULL;
   xodtemplate_servicedependency* this_servicedependency = NULL;
   xodtemplate_servicedependency* next_servicedependency = NULL;
-  xodtemplate_serviceescalation* this_serviceescalation = NULL;
-  xodtemplate_serviceescalation* next_serviceescalation = NULL;
   xodtemplate_contact* this_contact = NULL;
   xodtemplate_contact* next_contact = NULL;
   xodtemplate_host* this_host = NULL;
@@ -12582,8 +10904,6 @@ int xodtemplate_free_memory() {
   xodtemplate_service* next_service = NULL;
   xodtemplate_hostdependency* this_hostdependency = NULL;
   xodtemplate_hostdependency* next_hostdependency = NULL;
-  xodtemplate_hostescalation* this_hostescalation = NULL;
-  xodtemplate_hostescalation* next_hostescalation = NULL;
   xodtemplate_customvariablesmember* this_customvariablesmember = NULL;
   xodtemplate_customvariablesmember* next_customvariablesmember = NULL;
   int x = 0;
@@ -12695,25 +11015,6 @@ int xodtemplate_free_memory() {
   }
   xodtemplate_servicedependency_list = NULL;
   xodtemplate_servicedependency_list_tail = NULL;
-
-  /* free memory allocated to serviceescalation list */
-  for (this_serviceescalation = xodtemplate_serviceescalation_list;
-       this_serviceescalation != NULL;
-       this_serviceescalation = next_serviceescalation) {
-    next_serviceescalation = this_serviceescalation->next;
-    delete[] this_serviceescalation->tmpl;
-    delete[] this_serviceescalation->name;
-    delete[] this_serviceescalation->servicegroup_name;
-    delete[] this_serviceescalation->hostgroup_name;
-    delete[] this_serviceescalation->host_name;
-    delete[] this_serviceescalation->service_description;
-    delete[] this_serviceescalation->escalation_period;
-    delete[] this_serviceescalation->contact_groups;
-    delete[] this_serviceescalation->contacts;
-    delete this_serviceescalation;
-  }
-  xodtemplate_serviceescalation_list = NULL;
-  xodtemplate_serviceescalation_list_tail = NULL;
 
   /* free memory allocated to contact list */
   for (this_contact = xodtemplate_contact_list;
@@ -12837,23 +11138,6 @@ int xodtemplate_free_memory() {
   }
   xodtemplate_hostdependency_list = NULL;
   xodtemplate_hostdependency_list_tail = NULL;
-
-  /* free memory allocated to hostescalation list */
-  for (this_hostescalation = xodtemplate_hostescalation_list;
-       this_hostescalation != NULL;
-       this_hostescalation = next_hostescalation) {
-    next_hostescalation = this_hostescalation->next;
-    delete[] this_hostescalation->tmpl;
-    delete[] this_hostescalation->name;
-    delete[] this_hostescalation->hostgroup_name;
-    delete[] this_hostescalation->host_name;
-    delete[] this_hostescalation->escalation_period;
-    delete[] this_hostescalation->contact_groups;
-    delete[] this_hostescalation->contacts;
-    delete this_hostescalation;
-  }
-  xodtemplate_hostescalation_list = NULL;
-  xodtemplate_hostescalation_list_tail = NULL;
 
   /* free memory for the config file names */
   for (x = 0; x < xodtemplate_current_config_file; x++) {
@@ -14444,12 +12728,10 @@ int xodtemplate_clean_additive_strings() {
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
   xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
 
   /* resolve all contactgroup objects */
   for (temp_contactgroup = xodtemplate_contactgroup_list;
@@ -14500,25 +12782,6 @@ int xodtemplate_clean_additive_strings() {
       &temp_servicedependency->dependent_service_description);
   }
 
-  /* resolve all serviceescalation objects */
-  for (temp_serviceescalation = xodtemplate_serviceescalation_list;
-       temp_serviceescalation != NULL;
-       temp_serviceescalation = temp_serviceescalation->next) {
-    /* 03/05/08 some vars are now handled in xodtemplate_inherit_object_properties() */
-    /*
-      xodtemplate_clean_additive_string(&temp_serviceescalation->contact_groups);
-      xodtemplate_clean_additive_string(&temp_serviceescalation->contacts);
-    */
-    xodtemplate_clean_additive_string(
-      &temp_serviceescalation->servicegroup_name);
-    xodtemplate_clean_additive_string(
-      &temp_serviceescalation->hostgroup_name);
-    xodtemplate_clean_additive_string(
-      &temp_serviceescalation->host_name);
-    xodtemplate_clean_additive_string(
-      &temp_serviceescalation->service_description);
-  }
-
   /* resolve all contact objects */
   for (temp_contact = xodtemplate_contact_list;
        temp_contact != NULL;
@@ -14562,20 +12825,6 @@ int xodtemplate_clean_additive_strings() {
       &temp_hostdependency->hostgroup_name);
     xodtemplate_clean_additive_string(
       &temp_hostdependency->dependent_hostgroup_name);
-  }
-
-  /* resolve all hostescalation objects */
-  for (temp_hostescalation = xodtemplate_hostescalation_list;
-       temp_hostescalation != NULL;
-       temp_hostescalation = temp_hostescalation->next) {
-    /* 03/05/08 some vars are now handled in xodtemplate_inherit_object_properties() */
-    /*
-      xodtemplate_clean_additive_string(&temp_hostescalation->contact_groups);
-      xodtemplate_clean_additive_string(&temp_hostescalation->contacts);
-    */
-    xodtemplate_clean_additive_string(&temp_hostescalation->host_name);
-    xodtemplate_clean_additive_string(
-      &temp_hostescalation->hostgroup_name);
   }
 
   return (OK);

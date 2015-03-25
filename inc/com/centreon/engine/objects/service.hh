@@ -195,9 +195,6 @@ int      get_service_count();
 int      is_contact_for_service(
            service_struct* svc,
            contact_struct* cntct);
-int      is_escalated_contact_for_service(
-           service_struct* svc,
-           contact_struct* cntct);
 
 #  ifdef __cplusplus
 }

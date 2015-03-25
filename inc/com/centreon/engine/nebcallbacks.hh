@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2007 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2007      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -65,7 +65,6 @@
 #  define NEBCALLBACK_RELATION_DATA                     38
 
 #  define NEBCALLBACK_ADAPTIVE_DEPENDENCY_DATA          39
-#  define NEBCALLBACK_ADAPTIVE_ESCALATION_DATA          40
 #  define NEBCALLBACK_ADAPTIVE_TIMEPERIOD_DATA          41
 
 #  define NEBCALLBACK_NUMITEMS                          42 /* Total number of callback types we have. */

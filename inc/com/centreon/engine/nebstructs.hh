@@ -75,16 +75,6 @@ typedef struct   nebstruct_adaptive_dependency_data_struct {
   void*          object_ptr;
 }                nebstruct_adaptive_dependency_data;
 
-/* Adaptive escalation data structure. */
-typedef struct   nebstruct_adaptive_escalation_data_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  void*          object_ptr;
-}                nebstruct_adaptive_escalation_data;
-
 /* Adaptive host data structure. */
 typedef struct   nebstruct_adaptive_host_data_struct {
   int            type;

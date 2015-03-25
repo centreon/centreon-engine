@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,9 +23,7 @@
 #include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/host.hh"
-#include "com/centreon/engine/objects/hostescalation.hh"
 #include "com/centreon/engine/objects/service.hh"
-#include "com/centreon/engine/objects/serviceescalation.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
@@ -162,20 +160,6 @@ contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
 }
 
 /**
- *  Adds a contact to a host escalation.
- *
- *  @param[in] he           Host escalation.
- *  @param[in] contact_name Contact name.
- *
- *  @return Contact membership object.
- */
-contactsmember* add_contact_to_host_escalation(
-                  hostescalation* he,
-                  char const* contact_name) {
-  return (add_contact_to_object(&he->contacts, contact_name));
-}
-
-/**
  *  Adds a contact to an object.
  *
  *  @param[in] object_ptr
@@ -230,18 +214,4 @@ contactsmember* add_contact_to_service(
                   service* svc,
                   char const* contact_name) {
   return (add_contact_to_object(&svc->contacts, contact_name));
-}
-
-/**
- *  Adds a contact to a service escalation.
- *
- *  @param[in] se           Service escalation.
- *  @param[in] contact_name Contact name.
- *
- *  @return Contact membership object.
- */
-contactsmember* add_contact_to_serviceescalation(
-                  serviceescalation* se,
-                  char const* contact_name) {
-  return (add_contact_to_object(&se->contacts, contact_name));
 }

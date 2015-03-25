@@ -23,12 +23,10 @@
 #include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
-#include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
-#include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
@@ -136,12 +134,8 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::hostgroup());
   else if (type_name == "servicedependency")
     obj = object_ptr(new configuration::servicedependency());
-  else if (type_name == "serviceescalation")
-    obj = object_ptr(new configuration::serviceescalation());
   else if (type_name == "hostdependency")
     obj = object_ptr(new configuration::hostdependency());
-  else if (type_name == "hostescalation")
-    obj = object_ptr(new configuration::hostescalation());
   else if (type_name == "command")
     obj = object_ptr(new configuration::command());
   else if (type_name == "timeperiod")
@@ -258,11 +252,9 @@ std::string const& object::type_name() const throw () {
     "contactgroup",
     "host",
     "hostdependency",
-    "hostescalation",
     "hostgroup",
     "service",
     "servicedependency",
-    "serviceescalation",
     "servicegroup",
     "timeperiod",
     "downtime"

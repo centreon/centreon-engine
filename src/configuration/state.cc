@@ -462,7 +462,6 @@ state& state::operator=(state const& right) {
     _high_host_flap_threshold = right._high_host_flap_threshold;
     _high_service_flap_threshold = right._high_service_flap_threshold;
     _hostdependencies = right._hostdependencies;
-    _hostescalations = right._hostescalations;
     _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _host_check_timeout = right._host_check_timeout;
@@ -506,7 +505,6 @@ state& state::operator=(state const& right) {
     _retention_scheduling_horizon = right._retention_scheduling_horizon;
     _retention_update_interval = right._retention_update_interval;
     _servicedependencies = right._servicedependencies;
-    _serviceescalations = right._serviceescalations;
     _servicegroups = right._servicegroups;
     _services = right._services;
     _service_check_timeout = right._service_check_timeout;
@@ -580,7 +578,6 @@ bool state::operator==(state const& right) const throw () {
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
           && cmp_set_ptr(_hostdependencies, right._hostdependencies)
-          && cmp_set_ptr(_hostescalations, right._hostescalations)
           && cmp_set_ptr(_hostgroups, right._hostgroups)
           && cmp_set_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
@@ -624,7 +621,6 @@ bool state::operator==(state const& right) const throw () {
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
           && cmp_set_ptr(_servicedependencies, right._servicedependencies)
-          && cmp_set_ptr(_serviceescalations, right._serviceescalations)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
           && cmp_set_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
@@ -1646,24 +1642,6 @@ set_hostdependency& state::hostdependencies() throw () {
 }
 
 /**
- *  Get all engine hostescalations.
- *
- *  @return All engine hostescalations.
- */
-set_hostescalation const& state::hostescalations() const throw () {
-  return (_hostescalations);
-}
-
-/**
- *  Get all engine hostescalations.
- *
- *  @return All engine hostescalations.
- */
-set_hostescalation& state::hostescalations() throw () {
-  return (_hostescalations);
-}
-
-/**
  *  Get all engine hostgroups.
  *
  *  @return All engine hostgroups.
@@ -2574,24 +2552,6 @@ set_servicedependency const& state::servicedependencies() const throw () {
  */
 set_servicedependency& state::servicedependencies() throw () {
   return (_servicedependencies);
-}
-
-/**
- *  Get all engine serviceescalations.
- *
- *  @return All engine serviceescalations.
- */
-set_serviceescalation const& state::serviceescalations() const throw () {
-  return (_serviceescalations);
-}
-
-/**
- *  Get all engine serviceescalations.
- *
- *  @return All engine serviceescalations.
- */
-set_serviceescalation& state::serviceescalations() throw () {
-  return (_serviceescalations);
 }
 
 /**

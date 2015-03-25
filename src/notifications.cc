@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1087,110 +1087,6 @@ int notify_contact_of_service(
   return (OK);
 }
 
-/* checks to see if a service escalation entry is a match for the current service notification */
-int is_valid_escalation_for_service_notification(
-      service* svc,
-      serviceescalation* se,
-      int options) {
-  int notification_number = 0;
-  time_t current_time = 0L;
-  service* temp_service = NULL;
-
-  logger(dbg_functions, basic)
-    << "is_valid_escalation_for_service_notification()";
-
-  /* get the current time */
-  time(&current_time);
-
-  /* if this is a recovery, really we check for who got notified about a previous problem */
-  if (svc->current_state == STATE_OK)
-    notification_number = svc->current_notification_number - 1;
-  else
-    notification_number = svc->current_notification_number;
-
-  /* this entry if it is not for this service */
-  temp_service = se->service_ptr;
-  if (temp_service == NULL || temp_service != svc)
-    return (false);
-
-  /*** EXCEPTION ***/
-  /* broadcast options go to everyone, so this escalation is valid */
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    return (true);
-
-  /* skip this escalation if it happens later */
-  if (se->first_notification > notification_number)
-    return (false);
-
-  /* skip this escalation if it has already passed */
-  if (se->last_notification != 0
-      && se->last_notification < notification_number)
-    return (false);
-
-  // Skip this escalation if it has a timeperiod
-  // and the current time isn't valid.
-  if (se->escalation_period != NULL
-      && check_time_against_period(
-           current_time,
-           se->escalation_period_ptr,
-           svc->timezone) == ERROR)
-    return (false);
-
-  /* skip this escalation if the state options don't match */
-  if (svc->current_state == STATE_OK
-      && se->escalate_on_recovery == false)
-    return (false);
-  else if (svc->current_state == STATE_WARNING
-           && se->escalate_on_warning == false)
-    return (false);
-  else if (svc->current_state == STATE_UNKNOWN
-           && se->escalate_on_unknown == false)
-    return (false);
-  else if (svc->current_state == STATE_CRITICAL
-           && se->escalate_on_critical == false)
-    return (false);
-
-  return (true);
-}
-
-/**
- *  Checks to see whether a service notification should be escalated.
- *
- *  @param[in] svc Service.
- *
- *  @return true if service notification should be escalated, false if
- *          it should not.
- */
-int should_service_notification_be_escalated(service* svc) {
-  // Debug.
-  logger(dbg_functions, basic)
-    << "should_service_notification_be_escalated()";
-
-  // Browse service escalations related to this service.
-  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = state::instance().serviceescalations().equal_range(
-        std::make_pair(svc->host_name, svc->description));
-  while (p.first != p.second) {
-    serviceescalation* temp_se(p.first->second.get());
-
-    // We found a matching entry, so escalate this notification!
-    if (is_valid_escalation_for_service_notification(
-          svc,
-          temp_se,
-          NOTIFICATION_OPTION_NONE) == true) {
-      logger(dbg_notifications, more)
-        << "Service notification WILL be escalated.";
-      return (true);
-    }
-
-    ++p.first;
-  }
-  logger(dbg_notifications, more)
-    << "Service notification will NOT be escalated.";
-  return (false);
-}
-
 /* given a service, create a list of contacts to be notified, removing duplicates */
 int create_notification_list_from_service(
       nagios_macros* mac,
@@ -1200,126 +1096,46 @@ int create_notification_list_from_service(
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
-  int escalate_notification = false;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_service()";
 
-  /* see if this notification should be escalated */
-  escalate_notification = should_service_notification_be_escalated(svc);
-
   /* set the escalation flag */
-  *escalated = escalate_notification;
+  *escalated = false;
 
   /* make sure there aren't any leftover contacts */
   free_notification_list();
 
-  /* set the escalation macro */
-  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
+  /* use normal, non-escalated contacts */
+  logger(dbg_notifications, more)
+    << "Adding normal contacts for service to notification list.";
 
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    logger(dbg_notifications, more)
-      << "This notification will be BROADCAST to all "
-      "(escalated and normal) contacts...";
-
-  /* use escalated contacts for this notification */
-  if (escalate_notification == true
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
-
-    logger(dbg_notifications, more)
-      << "Adding contacts from service escalation(s) to "
-      "notification list.";
-
-    std::pair<std::string, std::string>
-      id(std::make_pair(svc->host_name, svc->description));
-    umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
-      escalations(state::instance().serviceescalations());
-    for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
-           it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-         ++it) {
-      serviceescalation* temp_se(&*it->second);
-
-      /* skip this entry if it isn't appropriate */
-      if (is_valid_escalation_for_service_notification(
-            svc,
-            temp_se,
-            options) == false)
-        continue;
-
-      logger(dbg_notifications, most)
-        << "Adding individual contacts from service escalation(s) "
-        "to notification list.";
-
-      /* add all individual contacts for this escalation entry */
-      for (temp_contactsmember = temp_se->contacts;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-          continue;
-        add_notification(mac, temp_contact);
-      }
-
-      logger(dbg_notifications, most)
-        << "Adding members of contact groups from service escalation(s) "
-        "to notification list.";
-
-      /* add all contacts that belong to contactgroups for this escalation */
-      for (temp_contactgroupsmember = temp_se->contact_groups;
-           temp_contactgroupsmember != NULL;
-           temp_contactgroupsmember = temp_contactgroupsmember->next) {
-        logger(dbg_notifications, most)
-          << "Adding members of contact group '"
-          << temp_contactgroupsmember->group_name
-          << "' for service escalation to notification list.";
-
-        if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
-          continue;
-        for (temp_contactsmember = temp_contactgroup->members;
-             temp_contactsmember != NULL;
-             temp_contactsmember = temp_contactsmember->next) {
-          if (!(temp_contact = temp_contactsmember->contact_ptr))
-            continue;
-          add_notification(mac, temp_contact);
-        }
-      }
-    }
+  /* add all individual contacts for this service */
+  for (temp_contactsmember = svc->contacts;
+       temp_contactsmember != NULL;
+       temp_contactsmember = temp_contactsmember->next) {
+    if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+      continue;
+    add_notification(mac, temp_contact);
   }
 
-  /* else use normal, non-escalated contacts */
-  if (escalate_notification == false
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
+  /* add all contacts that belong to contactgroups for this service */
+  for (temp_contactgroupsmember = svc->contact_groups;
+       temp_contactgroupsmember != NULL;
+       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+    logger(dbg_notifications, most)
+      << "Adding members of contact group '"
+      << temp_contactgroupsmember->group_name
+      << "' for service to notification list.";
 
-    logger(dbg_notifications, more)
-      << "Adding normal contacts for service to notification list.";
-
-    /* add all individual contacts for this service */
-    for (temp_contactsmember = svc->contacts;
+    if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
+      continue;
+    for (temp_contactsmember = temp_contactgroup->members;
          temp_contactsmember != NULL;
          temp_contactsmember = temp_contactsmember->next) {
-      if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+      if (!(temp_contact = temp_contactsmember->contact_ptr))
         continue;
       add_notification(mac, temp_contact);
-    }
-
-    /* add all contacts that belong to contactgroups for this service */
-    for (temp_contactgroupsmember = svc->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
-      logger(dbg_notifications, most)
-        << "Adding members of contact group '"
-        << temp_contactgroupsmember->group_name
-        << "' for service to notification list.";
-
-      if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
-        continue;
-      for (temp_contactsmember = temp_contactgroup->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if (!(temp_contact = temp_contactsmember->contact_ptr))
-          continue;
-        add_notification(mac, temp_contact);
-      }
     }
   }
 
@@ -2272,100 +2088,6 @@ int notify_contact_of_host(
   return (OK);
 }
 
-/* checks to see if a host escalation entry is a match for the current host notification */
-int is_valid_escalation_for_host_notification(
-      host* hst,
-      hostescalation* he,
-      int options) {
-  int notification_number = 0;
-  time_t current_time = 0L;
-  host* temp_host = NULL;
-
-  logger(dbg_functions, basic)
-    << "is_valid_escalation_for_host_notification()";
-
-  /* get the current time */
-  time(&current_time);
-
-  /* if this is a recovery, really we check for who got notified about a previous problem */
-  if (hst->current_state == HOST_UP)
-    notification_number = hst->current_notification_number - 1;
-  else
-    notification_number = hst->current_notification_number;
-
-  /* find the host this escalation entry is associated with */
-  temp_host = he->host_ptr;
-  if (temp_host == NULL || temp_host != hst)
-    return (false);
-
-  /*** EXCEPTION ***/
-  /* broadcast options go to everyone, so this escalation is valid */
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    return (true);
-
-  /* skip this escalation if it happens later */
-  if (he->first_notification > notification_number)
-    return (false);
-
-  /* skip this escalation if it has already passed */
-  if (he->last_notification != 0
-      && he->last_notification < notification_number)
-    return (false);
-
-  // Skip this escalation if it has a timeperiod
-  // and the current time isn't valid.
-  if (he->escalation_period != NULL
-      && check_time_against_period(
-           current_time,
-           he->escalation_period_ptr,
-           hst->timezone) == ERROR)
-    return (false);
-
-  /* skip this escalation if the state options don't match */
-  if (hst->current_state == HOST_UP
-      && he->escalate_on_recovery == false)
-    return (false);
-  else if (hst->current_state == HOST_DOWN
-           && he->escalate_on_down == false)
-    return (false);
-  else if (hst->current_state == HOST_UNREACHABLE
-           && he->escalate_on_unreachable == false)
-    return (false);
-
-  return (true);
-}
-
-/* checks to see whether a host notification should be escalation */
-int should_host_notification_be_escalated(host* hst) {
-  logger(dbg_functions, basic)
-    << "should_host_notification_be_escalated()";
-
-  if (hst == NULL)
-    return (false);
-
-  std::string id(hst->name);
-  umultimap<std::string, shared_ptr<hostescalation> > const&
-    escalations(state::instance().hostescalations());
-  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-       it != end && it->first == id;
-       ++it) {
-    hostescalation* temp_he(&*it->second);
-
-    /* we found a matching entry, so escalate this notification! */
-    if (is_valid_escalation_for_host_notification(
-          hst,
-          temp_he,
-          NOTIFICATION_OPTION_NONE) == true)
-      return (true);
-  }
-
-  logger(dbg_notifications, more)
-    << "Host notification will NOT be escalated.";
-
-  return (false);
-}
-
 /* given a host, create a list of contacts to be notified, removing duplicates */
 int create_notification_list_from_host(
       nagios_macros* mac,
@@ -2376,132 +2098,53 @@ int create_notification_list_from_host(
   contact* temp_contact = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
-  int escalate_notification = false;
 
   logger(dbg_functions, basic)
     << "create_notification_list_from_host()";
 
-  /* see if this notification should be escalated */
-  escalate_notification = should_host_notification_be_escalated(hst);
-
   /* set the escalation flag */
-  *escalated = escalate_notification;
+  *escalated = false;
 
   /* make sure there aren't any leftover contacts */
   free_notification_list();
 
-  /* set the escalation macro */
-  string::setstr(mac->x[MACRO_NOTIFICATIONISESCALATED], escalate_notification);
+  /* use contacts for this notification */
+  logger(dbg_notifications, more)
+    << "Adding normal contacts for host to notification list.";
 
-  if (options & NOTIFICATION_OPTION_BROADCAST)
-    logger(dbg_notifications, more)
-      << "This notification will be BROADCAST to all (escalated and "
-      "normal) contacts...";
+  logger(dbg_notifications, most)
+    << "Adding individual contacts for host to notification list.";
 
-  /* use escalated contacts for this notification */
-  if (escalate_notification == true
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
-
-    logger(dbg_notifications, more)
-      << "Adding contacts from host escalation(s) to "
-      "notification list.";
-
-    std::string id(hst->name);
-    umultimap<std::string, shared_ptr<hostescalation> > const&
-      escalations(state::instance().hostescalations());
-    for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
-           it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-         ++it) {
-      hostescalation* temp_he(&*it->second);
-
-      /* see if this escalation if valid for this notification */
-      if (is_valid_escalation_for_host_notification(
-            hst,
-            temp_he,
-            options) == false)
-        continue;
-
-      logger(dbg_notifications, most)
-        << "Adding individual contacts from host escalation(s) "
-        "to notification list.";
-
-      /* add all individual contacts for this escalation */
-      for (temp_contactsmember = temp_he->contacts;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-          continue;
-        add_notification(mac, temp_contact);
-      }
-
-      logger(dbg_notifications, most)
-        << "Adding members of contact groups from host "
-        "escalation(s) to notification list.";
-
-      /* add all contacts that belong to contactgroups for this escalation */
-      for (temp_contactgroupsmember = temp_he->contact_groups;
-           temp_contactgroupsmember != NULL;
-           temp_contactgroupsmember = temp_contactgroupsmember->next) {
-        logger(dbg_notifications, most)
-          << "Adding members of contact group '"
-          << temp_contactgroupsmember->group_name
-          << "' for host escalation to notification list.";
-
-        if ((temp_contactgroup = temp_contactgroupsmember->group_ptr) == NULL)
-          continue;
-        for (temp_contactsmember = temp_contactgroup->members;
-             temp_contactsmember != NULL;
-             temp_contactsmember = temp_contactsmember->next) {
-          if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-            continue;
-          add_notification(mac, temp_contact);
-        }
-      }
-    }
+  /* add all individual contacts for this host */
+  for (temp_contactsmember = hst->contacts;
+       temp_contactsmember != NULL;
+       temp_contactsmember = temp_contactsmember->next) {
+    if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
+      continue;
+    add_notification(mac, temp_contact);
   }
 
-  /* use normal, non-escalated contacts for this notification */
-  if (escalate_notification == false
-      || (options & NOTIFICATION_OPTION_BROADCAST)) {
+  logger(dbg_notifications, most)
+    << "Adding members of contact groups for host to "
+    "notification list.";
 
-    logger(dbg_notifications, more)
-      << "Adding normal contacts for host to notification list.";
-
+  /* add all contacts that belong to contactgroups for this host */
+  for (temp_contactgroupsmember = hst->contact_groups;
+       temp_contactgroupsmember != NULL;
+       temp_contactgroupsmember = temp_contactgroupsmember->next) {
     logger(dbg_notifications, most)
-      << "Adding individual contacts for host to notification list.";
+      << "Adding members of contact group '"
+      << temp_contactgroupsmember->group_name
+      << "' for host to notification list.";
 
-    /* add all individual contacts for this host */
-    for (temp_contactsmember = hst->contacts;
+    if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
+      continue;
+    for (temp_contactsmember = temp_contactgroup->members;
          temp_contactsmember != NULL;
          temp_contactsmember = temp_contactsmember->next) {
       if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
         continue;
       add_notification(mac, temp_contact);
-    }
-
-    logger(dbg_notifications, most)
-      << "Adding members of contact groups for host to "
-      "notification list.";
-
-    /* add all contacts that belong to contactgroups for this host */
-    for (temp_contactgroupsmember = hst->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
-      logger(dbg_notifications, most)
-        << "Adding members of contact group '"
-        << temp_contactgroupsmember->group_name
-        << "' for host to notification list.";
-
-      if (!(temp_contactgroup = temp_contactgroupsmember->group_ptr))
-        continue;
-      for (temp_contactsmember = temp_contactgroup->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-          continue;
-        add_notification(mac, temp_contact);
-      }
     }
   }
 
@@ -2516,7 +2159,6 @@ int create_notification_list_from_host(
 time_t get_next_service_notification_time(service* svc, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
-  serviceescalation* temp_se = NULL;
   int have_escalated_interval = false;
 
   logger(dbg_functions, basic)
@@ -2529,40 +2171,6 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
 
   logger(dbg_notifications, most)
     << "Default interval: " << interval_to_use;
-
-  /* search all the escalation entries for valid matches for this service (at its current notification number) */
-  for (temp_se = serviceescalation_list;
-       temp_se != NULL;
-       temp_se = temp_se->next) {
-
-    /* interval < 0 means to use non-escalated interval */
-    if (temp_se->notification_interval < 0.0)
-      continue;
-
-    /* skip this entry if it isn't appropriate */
-    if (is_valid_escalation_for_service_notification(
-          svc,
-          temp_se,
-          NOTIFICATION_OPTION_NONE) == false)
-      continue;
-
-    logger(dbg_notifications, most)
-      << "Found a valid escalation w/ interval of "
-      << temp_se->notification_interval;
-
-    /* if we haven't used a notification interval from an escalation yet, use this one */
-    if (have_escalated_interval == false) {
-      have_escalated_interval = true;
-      interval_to_use = temp_se->notification_interval;
-    }
-
-    /* else use the shortest of all valid escalation intervals */
-    else if (temp_se->notification_interval < interval_to_use)
-      interval_to_use = temp_se->notification_interval;
-
-    logger(dbg_notifications, most)
-      << "New interval: " << interval_to_use;
-  }
 
   /* if notification interval is 0, we shouldn't send any more problem notifications (unless service is volatile) */
   if (interval_to_use == 0.0 && svc->is_volatile == false)
@@ -2583,7 +2191,6 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
 time_t get_next_host_notification_time(host* hst, time_t offset) {
   time_t next_notification = 0L;
   double interval_to_use = 0.0;
-  hostescalation* temp_he = NULL;
   int have_escalated_interval = false;
 
   logger(dbg_functions, basic)
@@ -2596,40 +2203,6 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
 
   logger(dbg_notifications, most)
     << "Default interval: " << interval_to_use;
-
-  /* check all the host escalation entries for valid matches for this host (at its current notification number) */
-  for (temp_he = hostescalation_list;
-       temp_he != NULL;
-       temp_he = temp_he->next) {
-
-    /* interval < 0 means to use non-escalated interval */
-    if (temp_he->notification_interval < 0.0)
-      continue;
-
-    /* skip this entry if it isn't appropriate */
-    if (is_valid_escalation_for_host_notification(
-          hst,
-          temp_he,
-          NOTIFICATION_OPTION_NONE) == false)
-      continue;
-
-    logger(dbg_notifications, most)
-      << "Found a valid escalation w/ interval of "
-      << temp_he->notification_interval;
-
-    /* if we haven't used a notification interval from an escalation yet, use this one */
-    if (have_escalated_interval == false) {
-      have_escalated_interval = true;
-      interval_to_use = temp_he->notification_interval;
-    }
-
-    /* else use the shortest of all valid escalation intervals  */
-    else if (temp_he->notification_interval < interval_to_use)
-      interval_to_use = temp_he->notification_interval;
-
-    logger(dbg_notifications, most)
-      << "New interval: " << interval_to_use;
-  }
 
   /* if interval is 0, no more notifications should be sent */
   if (interval_to_use == 0.0)

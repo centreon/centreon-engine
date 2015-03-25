@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -267,11 +267,9 @@ int main(int argc, char* argv[]) {
           << "Checked " << applier.connectors().size() << " connectors.\n"
           << "Checked " << applier.contacts().size() << " contacts.\n"
           << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
-          << "Checked " << applier.hostescalations().size() << " host escalations.\n"
           << "Checked " << applier.hostgroups().size() << " host groups.\n"
           << "Checked " << applier.hosts().size() << " hosts.\n"
           << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
-          << "Checked " << applier.serviceescalations().size() << " service escalations.\n"
           << "Checked " << applier.servicegroups().size() << " service groups.\n"
           << "Checked " << applier.services().size() << " services.\n"
           << "Checked " << applier.timeperiods().size() << " time periods.\n"

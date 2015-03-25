@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,9 +24,7 @@
 struct contact_struct;
 struct contactgroup_struct;
 struct host_struct;
-struct hostescalation_struct;
 struct service_struct;
-struct serviceescalation_struct;
 
 typedef struct                  contactsmember_struct {
   char*                         contact_name;
@@ -44,17 +42,11 @@ contactsmember* add_contact_to_contactgroup(
 contactsmember* add_contact_to_host(
                   host_struct* hst,
                   char const* contact_name);
-contactsmember* add_contact_to_host_escalation(
-                  hostescalation_struct* he,
-                  char const* contact_name);
 contactsmember* add_contact_to_object(
                   contactsmember** object_ptr,
                   char const* contact_name);
 contactsmember* add_contact_to_service(
                   service_struct* svc,
-                  char const* contact_name);
-contactsmember* add_contact_to_serviceescalation(
-                  serviceescalation_struct* se,
                   char const* contact_name);
 
 #  ifdef __cplusplus
@@ -76,5 +68,3 @@ std::ostream& operator<<(std::ostream& os, contactsmember const& obj);
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACTSMEMBER_HH
-
-

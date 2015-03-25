@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -303,19 +303,6 @@ int pre_flight_object_check(int* w, int* e) {
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " contact groups.";
 
-  // Check all service escalations...
-  if (verify_config == true)
-    logger(log_info_message, basic)
-      << "Checking service escalations...";
-  total_objects = 0;
-  for (serviceescalation* temp_se(serviceescalation_list);
-       temp_se;
-       temp_se = temp_se->next, ++total_objects)
-    check_serviceescalation(temp_se, &warnings, &errors);
-  if (verify_config == true)
-    logger(log_info_message, basic)
-      << "\tChecked " << total_objects << " service escalations.";
-
   // Check all service dependencies...
   if (verify_config == true)
     logger(log_info_message, basic)
@@ -328,18 +315,6 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service dependencies.";
-
-  // Check all host escalations...
-  if (verify_config == true)
-    logger(log_info_message, basic) << "Checking host escalations...";
-  total_objects = 0;
-  for (hostescalation* temp_he(hostescalation_list);
-       temp_he;
-       temp_he = temp_he->next, ++total_objects)
-    check_hostescalation(temp_he, &warnings, &errors);
-  if (verify_config == true)
-    logger(log_info_message, basic)
-      << "\tChecked " << total_objects << " host escalations.";
 
   // Check all host dependencies...
   if (verify_config == true)
@@ -1486,184 +1461,6 @@ int check_hostdependency(hostdependency* hd, int* w, int* e) {
   if (e)
     *e += errors;
 
-  return (errors == 0);
-}
-
-/**
- *  Check and resolve a service escalation.
- *
- *  @param[in,out] se Service escalation object.
- *  @param[out]    w  Warnings.
- *  @param[out]    e  Errors.
- *
- *  @return Non-zero on success.
- */
-int check_serviceescalation(serviceescalation* se, int* w, int* e) {
-  (void)w;
-  int errors(0);
-
-  // Find the service.
-  service* temp_service(find_service(se->host_name, se->description));
-  if (!temp_service) {
-    logger(log_verification_error, basic) << "Error: Service '"
-        << se->description << "' on host '" << se->host_name
-        << "' specified in service escalation is not defined anywhere!";
-    errors++;
-  }
-
-  // Save the service pointer for later.
-  se->service_ptr = temp_service;
-
-  // Find the timeperiod.
-  if (se->escalation_period) {
-    timeperiod* temp_timeperiod(find_timeperiod(se->escalation_period));
-    if (!temp_timeperiod) {
-      logger(log_verification_error, basic)
-        << "Error: Escalation period '" << se->escalation_period
-        << "' specified in service escalation for service '"
-        << se->description << "' on host '"
-        << se->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the timeperiod pointer for later.
-    se->escalation_period_ptr = temp_timeperiod;
-  }
-
-  // Check all contacts.
-  for (contactsmember* temp_contactsmember(se->contacts);
-       temp_contactsmember;
-       temp_contactsmember = temp_contactsmember->next) {
-    // Find the contact.
-    contact* temp_contact(find_contact(
-                            temp_contactsmember->contact_name));
-    if (!temp_contact) {
-      logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in service escalation for service '"
-        << se->description << "' on host '"
-        << se->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the contact pointer for later.
-    temp_contactsmember->contact_ptr = temp_contact;
-  }
-
-  // Check all contact groups.
-  for (contactgroupsmember*
-         temp_contactgroupsmember(se->contact_groups);
-       temp_contactgroupsmember;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
-    // Find the contact group.
-    contactgroup* temp_contactgroup(
-                    find_contactgroup(
-                      temp_contactgroupsmember->group_name));
-    if (!temp_contactgroup) {
-      logger(log_verification_error, basic)
-        << "Error: Contact group '"
-        << temp_contactgroupsmember->group_name
-        << "' specified in service escalation for service '"
-        << se->description << "' on host '" << se->host_name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the contact group pointer for later.
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
-  }
-
-  // Add errors.
-  if (e)
-    *e += errors;
-
-  return (errors == 0);
-}
-
-/**
- *  Check and resolve a host escalation.
- *
- *  @param[in,out] he Host escalation object.
- *  @param[out]    w  Warnings.
- *  @param[out]    e  Errors.
- *
- *  @return Non-zero on success.
- */
-int check_hostescalation(hostescalation* he, int* w, int* e) {
-  (void)w;
-  int errors(0);
-
-  // Find the host.
-  host* temp_host(find_host(he->host_name));
-  if (!temp_host) {
-    logger(log_verification_error, basic)
-      << "Error: Host '" << he->host_name
-      << "' specified in host escalation is not defined anywhere!";
-    errors++;
-  }
-
-  // Save the host pointer for later.
-  he->host_ptr = temp_host;
-
-  // Find the timeperiod.
-  if (he->escalation_period) {
-    timeperiod* temp_timeperiod(find_timeperiod(he->escalation_period));
-    if (!temp_timeperiod) {
-      logger(log_verification_error, basic)
-        << "Error: Escalation period '" << he->escalation_period
-        << "' specified in host escalation for host '"
-        << he->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the timeperiod pointer for later.
-    he->escalation_period_ptr = temp_timeperiod;
-  }
-
-  // Check all contacts.
-  for (contactsmember* temp_contactsmember(he->contacts);
-       temp_contactsmember;
-       temp_contactsmember = temp_contactsmember->next) {
-    // Find the contact.
-    contact* temp_contact(find_contact(
-                            temp_contactsmember->contact_name));
-    if (!temp_contact) {
-      logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in host escalation for host '"
-        << he->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the contact pointer for later.
-    temp_contactsmember->contact_ptr = temp_contact;
-  }
-
-  // Check all contact groups.
-  for (contactgroupsmember*
-         temp_contactgroupsmember(he->contact_groups);
-       temp_contactgroupsmember;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
-    // Find the contact group.
-    contactgroup* temp_contactgroup(
-                    find_contactgroup(
-                      temp_contactgroupsmember->group_name));
-    if (!temp_contactgroup) {
-      logger(log_verification_error, basic)
-        << "Error: Contact group '"
-        << temp_contactgroupsmember->group_name
-        << "' specified in host escalation for host '"
-        << he->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save the contact group pointer for later.
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
-  }
-
-  // Add errors.
-  if (e)
-    *e += errors;
   return (errors == 0);
 }
 

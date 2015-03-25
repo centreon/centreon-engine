@@ -31,11 +31,9 @@
 #  include "com/centreon/engine/configuration/contactgroup.hh"
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
-#  include "com/centreon/engine/configuration/hostescalation.hh"
 #  include "com/centreon/engine/configuration/hostgroup.hh"
 #  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/configuration/servicedependency.hh"
-#  include "com/centreon/engine/configuration/serviceescalation.hh"
 #  include "com/centreon/engine/configuration/servicegroup.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/logging/logger.hh"
@@ -201,9 +199,6 @@ namespace               configuration {
     set_hostdependency const&
                         hostdependencies() const throw ();
     set_hostdependency& hostdependencies() throw ();
-    set_hostescalation const&
-                        hostescalations() const throw ();
-    set_hostescalation& hostescalations() throw ();
     set_hostgroup const&
                         hostgroups() const throw ();
     set_hostgroup&      hostgroups() throw ();
@@ -303,10 +298,6 @@ namespace               configuration {
                         servicedependencies() const throw ();
     set_servicedependency&
                         servicedependencies() throw ();
-    set_serviceescalation const&
-                        serviceescalations() const throw ();
-    set_serviceescalation&
-                        serviceescalations() throw ();
     set_servicegroup const&
                         servicegroups() const throw ();
     set_servicegroup&   servicegroups() throw ();
@@ -514,7 +505,6 @@ namespace               configuration {
     float               _high_host_flap_threshold;
     float               _high_service_flap_threshold;
     set_hostdependency  _hostdependencies;
-    set_hostescalation  _hostescalations;
     set_hostgroup       _hostgroups;
     set_host            _hosts;
     unsigned int        _host_check_timeout;
@@ -561,8 +551,6 @@ namespace               configuration {
     unsigned int        _retention_update_interval;
     set_servicedependency
                         _servicedependencies;
-    set_serviceescalation
-                        _serviceescalations;
     set_servicegroup    _servicegroups;
     set_service         _services;
     unsigned int        _service_check_timeout;

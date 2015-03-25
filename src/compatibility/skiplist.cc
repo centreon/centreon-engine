@@ -1,6 +1,6 @@
 /*
-** Copyright 2008      Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2008           Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -534,10 +534,6 @@ int init_object_skiplists() {
     = skiplist_new(10, 0.5, false, false, skiplist_compare_hostgroup);
   object_skiplists[SERVICEGROUP_SKIPLIST]
     = skiplist_new(10, 0.5, false, false, skiplist_compare_servicegroup);
-  object_skiplists[HOSTESCALATION_SKIPLIST]
-    = skiplist_new(15, 0.5, true, false, skiplist_compare_hostescalation);
-  object_skiplists[SERVICEESCALATION_SKIPLIST]
-    = skiplist_new(15, 0.5, true, false, skiplist_compare_serviceescalation);
   object_skiplists[HOSTDEPENDENCY_SKIPLIST]
     = skiplist_new(15, 0.5, true, false, skiplist_compare_hostdependency);
   object_skiplists[SERVICEDEPENDENCY_SKIPLIST]
@@ -655,30 +651,6 @@ int skiplist_compare_hostdependency(void const* a, void const* b) {
 }
 
 /**
- *  Compare two host escalations.
- *
- *  @param[in] a Uncasted host escalation #1.
- *  @param[in] b Uncasted host escalation #2.
- *
- *  @return Similar to strcmp.
- */
-int skiplist_compare_hostescalation(void const* a, void const* b) {
-  hostescalation const* oa(static_cast<hostescalation const*>(a));
-  hostescalation const* ob(static_cast<hostescalation const*>(b));
-  if (!oa && !ob)
-    return (0);
-  if (!oa)
-    return (1);
-  if (!ob)
-    return (-1);
-  return (skiplist_compare_text(
-            oa->host_name,
-            NULL,
-            ob->host_name,
-            NULL));
-}
-
-/**
  *  Compare two host groups.
  *
  *  @param[in] a Uncasted host group #1.
@@ -748,30 +720,6 @@ int skiplist_compare_servicedependency(void const* a, void const* b) {
             oa->dependent_service_description,
             ob->dependent_host_name,
             ob->dependent_service_description));
-}
-
-/**
- *  Compare two service escalations.
- *
- *  @param[in] a Uncasted service escalation #1.
- *  @param[in] b Uncasted service escalation #2.
- *
- *  @return Similar to strcmp.
- */
-int skiplist_compare_serviceescalation(void const* a, void const* b) {
-  serviceescalation const* oa(static_cast<serviceescalation const*>(a));
-  serviceescalation const* ob(static_cast<serviceescalation const*>(b));
-  if (!oa && !ob)
-    return (0);
-  if (!oa)
-    return (1);
-  if (!ob)
-    return (-1);
-  return (skiplist_compare_text(
-            oa->host_name,
-            oa->description,
-            ob->host_name,
-            ob->description));
 }
 
 /**

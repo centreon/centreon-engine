@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2009 Ethan Galstad
-** Copyright 2009-2011 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2009      Ethan Galstad
+** Copyright 2009-2011      Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,11 +39,8 @@
 #  define READ_SERVICES             (1 << 4)
 #  define READ_COMMANDS             (1 << 5)
 #  define READ_TIMEPERIODS          (1 << 6)
-#  define READ_SERVICEESCALATIONS   (1 << 7)
-#  define READ_HOSTGROUPESCALATIONS (1 << 8)
 #  define READ_SERVICEDEPENDENCIES  (1 << 9)
 #  define READ_HOSTDEPENDENCIES     (1 << 10)
-#  define READ_HOSTESCALATIONS      (1 << 11)
 #  define READ_HOSTEXTINFO          (1 << 12)
 #  define READ_SERVICEEXTINFO       (1 << 13)
 #  define READ_SERVICEGROUPS        (1 << 14)

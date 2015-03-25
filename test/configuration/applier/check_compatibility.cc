@@ -51,11 +51,9 @@ struct                global {
   scheduled_downtime* downtimes;
   host*               hosts;
   hostdependency*     hostdependencies;
-  hostescalation*     hostescalations;
   hostgroup*          hostgroups;
   service*            services;
   servicedependency*  servicedependencies;
-  serviceescalation*  serviceescalations;
   servicegroup*       servicegroups;
   timeperiod*         timeperiods;
 
@@ -71,16 +69,12 @@ struct                global {
                       save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
                       save_hostdependencies;
-  umultimap<std::string, shared_ptr<hostescalation> >
-                      save_hostescalations;
   umap<std::string, shared_ptr<hostgroup> >
                       save_hostgroups;
   umap<std::pair<std::string, std::string>, shared_ptr<service> >
                       save_services;
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
                       save_servicedependencies;
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >
-                      save_serviceescalations;
   umap<std::string, shared_ptr<servicegroup> >
                       save_servicegroups;
   umap<std::string, shared_ptr<timeperiod> >
@@ -403,24 +397,6 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.hostdependencies);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
-  for (hostescalation_struct* he1(g1.hostescalations);
-       he1;
-       he1 = he1->next) {
-    sort_it(he1->contacts);
-    sort_it(he1->contact_groups);
-  }
-  sort_it(g1.hostescalations);
-  remove_duplicates(g1.hostescalations);
-  for (hostescalation_struct* he2(g2.hostescalations);
-       he2;
-       he2 = he2->next) {
-    sort_it(he2->contacts);
-    sort_it(he2->contact_groups);
-  }
-  sort_it(g2.hostescalations);
-  remove_duplicates(g2.hostescalations);
-  if (!chkdiff(g1.hostescalations, g2.hostescalations))
-    ret = false;
   if (!chkdiff(g1.hostgroups, g2.hostgroups))
     ret = false;
   reset_next_check(g1.services);
@@ -434,24 +410,6 @@ bool chkdiff(global& g1, global& g2) {
   sort_it(g2.servicedependencies);
   remove_duplicates(g2.servicedependencies);
   if (!chkdiff(g1.servicedependencies, g2.servicedependencies))
-    ret = false;
-  for (serviceescalation_struct* se1(g1.serviceescalations);
-       se1;
-       se1 = se1->next) {
-    sort_it(se1->contacts);
-    sort_it(se1->contact_groups);
-  }
-  sort_it(g1.serviceescalations);
-  remove_duplicates(g1.serviceescalations);
-  for (serviceescalation_struct* se2(g2.serviceescalations);
-       se2;
-       se2 = se2->next) {
-    sort_it(se2->contacts);
-    sort_it(se2->contact_groups);
-  }
-  sort_it(g2.serviceescalations);
-  remove_duplicates(g2.serviceescalations);
-  if (!chkdiff(g1.serviceescalations, g2.serviceescalations))
     ret = false;
   for (servicegroup_struct* sg1(g1.servicegroups);
        sg1;
@@ -489,16 +447,12 @@ static global get_globals() {
   host_list = NULL;
   g.hostdependencies = hostdependency_list;
   hostdependency_list = NULL;
-  g.hostescalations = hostescalation_list;
-  hostescalation_list = NULL;
   g.hostgroups = hostgroup_list;
   hostgroup_list = NULL;
   g.services = service_list;
   service_list = NULL;
   g.servicedependencies = servicedependency_list;
   servicedependency_list = NULL;
-  g.serviceescalations = serviceescalation_list;
-  serviceescalation_list = NULL;
   g.servicegroups = servicegroup_list;
   servicegroup_list = NULL;
   g.timeperiods = timeperiod_list;
@@ -518,16 +472,12 @@ static global get_globals() {
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();
   app_state.hostdependencies().clear();
-  g.save_hostescalations = app_state.hostescalations();
-  app_state.hostescalations().clear();
   g.save_hostgroups = app_state.hostgroups();
   app_state.hostgroups().clear();
   g.save_services = app_state.services();
   app_state.services().clear();
   g.save_servicedependencies = app_state.servicedependencies();
   app_state.servicedependencies().clear();
-  g.save_serviceescalations = app_state.serviceescalations();
-  app_state.serviceescalations().clear();
   g.save_servicegroups = app_state.servicegroups();
   app_state.servicegroups().clear();
   g.save_timeperiods = app_state.timeperiods();

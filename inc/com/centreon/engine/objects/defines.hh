@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2008      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,8 +36,6 @@
 #  define SERVICEGROUP_SKIPLIST            7
 #  define HOSTDEPENDENCY_SKIPLIST          8
 #  define SERVICEDEPENDENCY_SKIPLIST       9
-#  define HOSTESCALATION_SKIPLIST          10
-#  define SERVICEESCALATION_SKIPLIST       11
-#  define NUM_OBJECT_SKIPLISTS             12
+#  define NUM_OBJECT_SKIPLISTS             10
 
 #endif // !CCE_OBJECTS_DEFINES_HH

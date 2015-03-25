@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -33,13 +33,11 @@
 #  include "com/centreon/engine/objects/defines.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/hostdependency.hh"
-#  include "com/centreon/engine/objects/hostescalation.hh"
 #  include "com/centreon/engine/objects/hostgroup.hh"
 #  include "com/centreon/engine/objects/hostsmember.hh"
 #  include "com/centreon/engine/objects/objectlist.hh"
 #  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/engine/objects/servicedependency.hh"
-#  include "com/centreon/engine/objects/serviceescalation.hh"
 #  include "com/centreon/engine/objects/servicegroup.hh"
 #  include "com/centreon/engine/objects/servicesmember.hh"
 #  include "com/centreon/engine/objects/timeperiod.hh"

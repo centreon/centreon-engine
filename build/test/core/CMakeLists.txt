@@ -141,15 +141,6 @@ add_executable(
 target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Host escalated notifications.
-set(TEST_NAME "notifications_escalations")
-add_executable(
-  "${TEST_NAME}"
-  "${TEST_DIR}/notifications/escalations.cc"
-)
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 #
 # Downtimes tests.
 #

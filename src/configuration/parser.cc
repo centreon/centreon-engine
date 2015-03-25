@@ -34,9 +34,7 @@ parser::store parser::_store[] = {
   &parser::_store_into_map<contactgroup, &contactgroup::contactgroup_name>,
   &parser::_store_into_map<host, &host::host_name>,
   &parser::_store_into_list,
-  &parser::_store_into_list,
   &parser::_store_into_map<hostgroup, &hostgroup::hostgroup_name>,
-  &parser::_store_into_list,
   &parser::_store_into_list,
   &parser::_store_into_list,
   &parser::_store_into_map<servicegroup, &servicegroup::servicegroup_name>,
@@ -88,11 +86,9 @@ void parser::parse(std::string const& path, state& config) {
   _insert(_map_objects[object::contact], config.contacts());
   _insert(_map_objects[object::contactgroup], config.contactgroups());
   _insert(_lst_objects[object::hostdependency], config.hostdependencies());
-  _insert(_lst_objects[object::hostescalation], config.hostescalations());
   _insert(_map_objects[object::hostgroup], config.hostgroups());
   _insert(_map_objects[object::host], config.hosts());
   _insert(_lst_objects[object::servicedependency], config.servicedependencies());
-  _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
   _insert(_map_objects[object::servicegroup], config.servicegroups());
   _insert(_lst_objects[object::service], config.services());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
@@ -373,7 +369,10 @@ void parser::_parse_object_definitions(std::string const& path) {
       std::string const& type(string::trim_right(input.erase(last)));
       obj = object::create(type);
       if (obj.is_null()) {
-        if ((type == "hostextinfo") || (type == "serviceextinfo")) {
+        if ((type == "hostextinfo")
+            || (type == "serviceextinfo")
+            || (type == "hostescalation")
+            || (type == "serviceescalation")) {
           logger(logging::log_config_warning, logging::basic)
             << "Warning: " << type << " object is ignored";
           parse_object = false;

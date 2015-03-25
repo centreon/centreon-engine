@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -168,7 +168,6 @@
 # define MACRO_CONTACTGROUPMEMBERS              134
 # define MACRO_CONTACTGROUPNAMES                135
 # define MACRO_NOTIFICATIONRECIPIENTS           136
-# define MACRO_NOTIFICATIONISESCALATED          137
 # define MACRO_NOTIFICATIONAUTHOR               138
 # define MACRO_NOTIFICATIONAUTHORNAME           139
 # define MACRO_NOTIFICATIONAUTHORALIAS          140

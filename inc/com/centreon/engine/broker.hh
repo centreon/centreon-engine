@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -214,11 +214,6 @@
 #  define NEBTYPE_HOSTDEPENDENCY_DELETE            2601
 #  define NEBTYPE_HOSTDEPENDENCY_UPDATE            2602
 
-/* Hostescalation. */
-#  define NEBTYPE_HOSTESCALATION_ADD               2700
-#  define NEBTYPE_HOSTESCALATION_DELETE            2701
-#  define NEBTYPE_HOSTESCALATION_UPDATE            2702
-
 /* Host groups. */
 #  define NEBTYPE_HOSTGROUP_ADD                    2800
 #  define NEBTYPE_HOSTGROUP_DELETE                 2801
@@ -250,11 +245,6 @@
 #  define NEBTYPE_SERVICEDEPENDENCY_ADD            3400
 #  define NEBTYPE_SERVICEDEPENDENCY_DELETE         3401
 #  define NEBTYPE_SERVICEDEPENDENCY_UPDATE         3402
-
-/* Serviceescalation. */
-#  define NEBTYPE_SERVICEESCALATION_ADD            3500
-#  define NEBTYPE_SERVICEESCALATION_DELETE         3501
-#  define NEBTYPE_SERVICEESCALATION_UPDATE         3502
 
 /* Service group. */
 #  define NEBTYPE_SERVICEGROUP_ADD                 3600
@@ -331,12 +321,6 @@ void           broker_adaptive_contact_data(
                  unsigned long modsattrs,
                  struct timeval const* timestamp);
 void           broker_adaptive_dependency_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 void* data,
-                 struct timeval const* timestamp);
-void           broker_adaptive_escalation_data(
                  int type,
                  int flags,
                  int attr,

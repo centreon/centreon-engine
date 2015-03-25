@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -31,14 +31,12 @@
 #  include "com/centreon/engine/deleter/daterange.hh"
 #  include "com/centreon/engine/deleter/downtime.hh"
 #  include "com/centreon/engine/deleter/hostdependency.hh"
-#  include "com/centreon/engine/deleter/hostescalation.hh"
 #  include "com/centreon/engine/deleter/hostgroup.hh"
 #  include "com/centreon/engine/deleter/host.hh"
 #  include "com/centreon/engine/deleter/hostsmember.hh"
 #  include "com/centreon/engine/deleter/listmember.hh"
 #  include "com/centreon/engine/deleter/objectlist.hh"
 #  include "com/centreon/engine/deleter/servicedependency.hh"
-#  include "com/centreon/engine/deleter/serviceescalation.hh"
 #  include "com/centreon/engine/deleter/servicegroup.hh"
 #  include "com/centreon/engine/deleter/service.hh"
 #  include "com/centreon/engine/deleter/servicesmember.hh"
@@ -47,4 +45,3 @@
 #  include "com/centreon/engine/deleter/timerange.hh"
 
 #endif // !CCE_DELETER_HH
-

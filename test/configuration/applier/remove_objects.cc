@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -148,77 +148,6 @@ private:
                      _obj;
 };
 
-//
-// Check hostescalation
-//
-class chk_hostescalation : public check {
-public:
-                     ~chk_hostescalation() throw () {}
-  std::string const& id() const throw () {
-    return (_obj.type_name());
-  }
-
-  void               id(configuration::object const& obj) {
-    _obj = *static_cast<configuration::hostescalation const*>(&obj);
-    _all_hosts = _obj.hosts();
-    for (list_string::const_iterator
-           it(_obj.hostgroups().begin()), end(_obj.hostgroups().end());
-         it != end;
-         ++it) {
-      hostgroup_struct* hg(find_hostgroup(it->c_str()));
-      if (!hg)
-        throw (engine_error() << "invalid escalation: hostgroup not found!");
-      for (hostsmember_struct* m(hg->members); m; m = m->next)
-        _all_hosts.push_back(m->host_name);
-    }
-  }
-
-  bool               find_into_config() {
-    configuration::set_hostescalation const& objects(config->hostescalations());
-    for (configuration::set_hostescalation::const_iterator
-           it(objects.begin()), end(objects.end());
-         it != end;
-         ++it)
-      if (**it == _obj)
-        return (true);
-    return (false);
-  }
-
-  bool               find_into_applier() {
-    umultimap<std::string, shared_ptr<hostescalation_struct> > const&
-      escalations(configuration::applier::state::instance().hostescalations());
-    for (list_string::const_iterator
-           it(_all_hosts.begin()), end(_all_hosts.end());
-         it != end;
-         ++it) {
-      for (umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator
-             it_escalation(escalations.find(*it)), end(escalations.end());
-           it_escalation != end;
-           ++it_escalation) {
-        hostescalation_struct const& escalation(*it_escalation->second);
-        if (escalation.first_notification == static_cast<int>(_obj.first_notification())
-            && escalation.last_notification == static_cast<int>(_obj.last_notification())
-            && escalation.notification_interval == _obj.notification_interval()
-            && escalation.escalation_period == _obj.escalation_period()
-            && escalation.escalate_on_recovery == static_cast<bool>(_obj.escalation_options() & configuration::hostescalation::recovery)
-            && escalation.escalate_on_down == static_cast<bool>(_obj.escalation_options() & configuration::hostescalation::down)
-            && escalation.escalate_on_unreachable == static_cast<bool>(_obj.escalation_options() & configuration::hostescalation::unreachable))
-          return (true);
-      }
-    }
-    return (false);
-  }
-
-  std::string const& type_name() const throw () {
-    return (_obj.type_name());
-  }
-
-private:
-  list_string        _all_hosts;
-  configuration::hostescalation
-                     _obj;
-};
-
 /**
  *  Template to deeply copy a collection.
  *
@@ -262,9 +191,6 @@ static configuration::state deep_copy(configuration::state const& s) {
   deep_copy<configuration::set_hostdependency, configuration::hostdependency>(
     s.hostdependencies(),
     c.hostdependencies());
-  deep_copy<configuration::set_hostescalation, configuration::hostescalation>(
-    s.hostescalations(),
-    c.hostescalations());
   deep_copy<configuration::set_hostgroup, configuration::hostgroup>(
     s.hostgroups(),
     c.hostgroups());
@@ -274,9 +200,6 @@ static configuration::state deep_copy(configuration::state const& s) {
   deep_copy<configuration::set_servicedependency, configuration::servicedependency>(
     s.servicedependencies(),
     c.servicedependencies());
-  deep_copy<configuration::set_serviceescalation, configuration::serviceescalation>(
-    s.serviceescalations(),
-    c.serviceescalations());
   deep_copy<configuration::set_servicegroup, configuration::servicegroup>(
     s.servicegroups(),
     c.servicegroups());
@@ -577,13 +500,6 @@ int main_test(int argc, char* argv[]) {
       configuration::set_host,
       configuration::host,
       &configuration::state::hosts>(config, chk_host, remove_dependency_for_host);
-  }
-  else if (type == "hostescalation") {
-    chk_hostescalation chk_hostescalation;
-    check_remove_objects<
-      configuration::set_hostescalation,
-      configuration::hostescalation,
-      &configuration::state::hostescalations>(config, chk_hostescalation);
   }
   else if (type == "hostgroup") {
     chk_generic<

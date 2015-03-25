@@ -593,47 +593,6 @@ int is_contact_for_service(service* svc, contact* cntct) {
 }
 
 /**
- *  Tests whether or not a contact is an escalated contact for a
- *  particular service.
- *
- *  @param[in] svc   Target service.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_escalated_contact_for_service(service* svc, contact* cntct) {
-  if (!svc || !cntct)
-    return (false);
-
-  std::pair<std::string, std::string>
-    id(std::make_pair(svc->host_name, svc->description));
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
-    escalations(state::instance().serviceescalations());
-
-  for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-       it != end && it->first == id;
-       ++it) {
-    serviceescalation* svcescalation(&*it->second);
-    // Search all contacts of this service escalation.
-    for (contactsmember* member(svcescalation->contacts);
-         member;
-         member = member->next)
-      if (member->contact_ptr == cntct)
-        return (true);
-
-    // Search all contactgroups of this service escalation.
-    for (contactgroupsmember* member(svcescalation->contact_groups);
-         member;
-         member = member->next)
-      if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-        return (true);
-  }
-
-  return (false);
-}
-
-/**
  *  Get service by host name and service description.
  *
  *  @param[in] host_name           The host name.

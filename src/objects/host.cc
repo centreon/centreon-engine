@@ -588,46 +588,6 @@ int is_contact_for_host(host* hst, contact* cntct) {
 }
 
 /**
- *  Tests whether or not a contact is an escalated contact for a
- *  particular host.
- *
- *  @param[in] hst   Target host.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_escalated_contact_for_host(host* hst, contact* cntct) {
-  if (!hst || !cntct)
-    return (false);
-
-  std::string id(hst->name);
-  umultimap<std::string, shared_ptr<hostescalation> > const&
-    escalations(state::instance().hostescalations());
-
-  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-       ++it) {
-    hostescalation* hstescalation(&*it->second);
-    // Search all contacts of this host escalation.
-    for (contactsmember* member(hstescalation->contacts);
-         member;
-         member = member->next)
-      if (member->contact_ptr == cntct)
-        return (true);
-
-    // Search all contactgroups of this host escalation.
-    for (contactgroupsmember* member(hstescalation->contact_groups);
-         member;
-         member = member->next)
-      if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-        return (true);
-  }
-
-  return (false);
-}
-
-/**
  *  Determines whether or not a specific host is an immediate child of
  *  another host.
  *

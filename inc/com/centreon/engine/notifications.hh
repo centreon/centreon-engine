@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2008 Ethan Galstad
-** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2008      Ethan Galstad
+** Copyright 2009-2010      Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -26,9 +26,7 @@
 #  include "com/centreon/engine/macros/defines.hh"
 #  include "com/centreon/engine/objects/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
-#  include "com/centreon/engine/objects/hostescalation.hh"
 #  include "com/centreon/engine/objects/service.hh"
-#  include "com/centreon/engine/objects/serviceescalation.hh"
 
 // Notification Types
 #  define HOST_NOTIFICATION               0
@@ -85,13 +83,6 @@ int notify_contact_of_service(
       char* not_data,
       int options,
       int escalated);
-// checks if an escalation entry is valid for a particular service notification
-int is_valid_escalation_for_service_notification(
-      service* svc,
-      serviceescalation* se,
-      int options);
-// checks if a service notification should be escalated
-int should_service_notification_be_escalated(service* svc);
 // given a service, create list of contacts to be notified (remove duplicates)
 int create_notification_list_from_service(
       nagios_macros* mac,
@@ -126,13 +117,6 @@ int notify_contact_of_host(
       char* not_data,
       int options,
       int escalated);
-// checks if an escalation entry is valid for a particular host notification
-int is_valid_escalation_for_host_notification(
-      host* hst,
-      hostescalation* he,
-      int options);
-// checks if a host notification should be escalated
-int should_host_notification_be_escalated(host* hst);
 // given a host, create list of contacts to be notified (remove duplicates)
 int create_notification_list_from_host(
       nagios_macros* mac,

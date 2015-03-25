@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -55,16 +55,12 @@ struct         global {
                save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
                save_hostdependencies;
-  umultimap<std::string, shared_ptr<hostescalation> >
-               save_hostescalations;
   umap<std::string, shared_ptr<hostgroup> >
                save_hostgroups;
   umap<std::pair<std::string, std::string>, shared_ptr<service> >
                save_services;
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
                save_servicedependencies;
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >
-               save_serviceescalations;
   umap<std::string, shared_ptr<servicegroup> >
                save_servicegroups;
   umap<std::string, shared_ptr<timeperiod> >
@@ -80,11 +76,9 @@ static void clear(global& g) {
   contactgroup_list = NULL;
   host_list = NULL;
   hostdependency_list = NULL;
-  hostescalation_list = NULL;
   hostgroup_list = NULL;
   service_list = NULL;
   servicedependency_list = NULL;
-  serviceescalation_list = NULL;
   servicegroup_list = NULL;
   timeperiod_list = NULL;
 
@@ -102,16 +96,12 @@ static void clear(global& g) {
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();
   app_state.hostdependencies().clear();
-  g.save_hostescalations = app_state.hostescalations();
-  app_state.hostescalations().clear();
   g.save_hostgroups = app_state.hostgroups();
   app_state.hostgroups().clear();
   g.save_services = app_state.services();
   app_state.services().clear();
   g.save_servicedependencies = app_state.servicedependencies();
   app_state.servicedependencies().clear();
-  g.save_serviceescalations = app_state.serviceescalations();
-  app_state.serviceescalations().clear();
   g.save_servicegroups = app_state.servicegroups();
   app_state.servicegroups().clear();
   g.save_timeperiods = app_state.timeperiods();

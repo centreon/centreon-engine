@@ -45,11 +45,9 @@ namespace                  configuration {
       contactgroup,
       host,
       hostdependency,
-      hostescalation,
       hostgroup,
       service,
       servicedependency,
-      serviceescalation,
       servicegroup,
       timeperiod,
       downtime

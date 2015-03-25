@@ -182,38 +182,6 @@ void broker_adaptive_dependency_data(
 }
 
 /**
- *  Sends adaptative escalation updates to broker.
- *
- *  @param[in] type      Type.
- *  @param[in] flags     Flags.
- *  @param[in] attr      Attributes.
- *  @param[in] data      Target escalation.
- *  @param[in] timestamp Timestamp.
- */
-void broker_adaptive_escalation_data(
-       int type,
-       int flags,
-       int attr,
-       void* data,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  nebstruct_adaptive_escalation_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.object_ptr = data;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_ADAPTIVE_ESCALATION_DATA, &ds);
-  return;
-}
-
-/**
  *  Sends adaptive host updates to broker.
  *
  *  @param[in] type         Type.
