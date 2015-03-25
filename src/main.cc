@@ -54,7 +54,6 @@
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
@@ -377,9 +376,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize status data.
         initialize_status_data();
-
-        // Initialize comment data.
-        initialize_comment_data();
 
         // Initialize scheduled downtime data.
         initialize_downtime_data();

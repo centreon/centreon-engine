@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -49,7 +49,6 @@ state::~state() throw () {}
  */
 state& state::operator=(state const& right) {
   if (this != &right) {
-    _comments = right._comments;
     _contacts = right._contacts;
     _downtimes = right._downtimes;
     _globals = right._globals;
@@ -68,8 +67,7 @@ state& state::operator=(state const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool state::operator==(state const& right) const throw () {
-  return (_comments == right._comments
-          && _contacts == right._contacts
+  return (_contacts == right._contacts
           && _downtimes == right._downtimes
           && _globals == right._globals
           && _hosts == right._hosts
@@ -86,24 +84,6 @@ bool state::operator==(state const& right) const throw () {
  */
 bool state::operator!=(state const& right) const throw () {
   return (!operator==(right));
-}
-
-/**
- *  Get comments.
- *
- *  @return The comment list.
- */
-list_comment& state::comments() throw () {
-  return (_comments);
-}
-
-/**
- *  Get comments.
- *
- *  @return The comment list.
- */
-list_comment const& state::comments() const throw () {
-  return (_comments);
 }
 
 /**

@@ -158,13 +158,6 @@ int process_external_command1(char* cmd) {
   /**** HOST-RELATED COMMANDS ****/
   /*******************************/
 
-  else if (!strcmp(command_id, "ADD_HOST_COMMENT"))
-    command_type = CMD_ADD_HOST_COMMENT;
-  else if (!strcmp(command_id, "DEL_HOST_COMMENT"))
-    command_type = CMD_DEL_HOST_COMMENT;
-  else if (!strcmp(command_id, "DEL_ALL_HOST_COMMENTS"))
-    command_type = CMD_DEL_ALL_HOST_COMMENTS;
-
   else if (!strcmp(command_id, "DELAY_HOST_NOTIFICATION"))
     command_type = CMD_DELAY_HOST_NOTIFICATION;
 
@@ -233,8 +226,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_DEL_DOWNTIME_BY_HOST_NAME;
   else if (!strcmp(command_id, "DEL_DOWNTIME_BY_HOSTGROUP_NAME"))
     command_type = CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME;
-  else if (!strcmp(command_id, "DEL_DOWNTIME_BY_START_TIME_COMMENT"))
-    command_type = CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT;
 
   else if (!strcmp(command_id, "ENABLE_HOST_FLAP_DETECTION"))
     command_type = CMD_ENABLE_HOST_FLAP_DETECTION;
@@ -325,13 +316,6 @@ int process_external_command1(char* cmd) {
   /**********************************/
   /**** SERVICE-RELATED COMMANDS ****/
   /**********************************/
-
-  else if (!strcmp(command_id, "ADD_SVC_COMMENT"))
-    command_type = CMD_ADD_SVC_COMMENT;
-  else if (!strcmp(command_id, "DEL_SVC_COMMENT"))
-    command_type = CMD_DEL_SVC_COMMENT;
-  else if (!strcmp(command_id, "DEL_ALL_SVC_COMMENTS"))
-    command_type = CMD_DEL_ALL_SVC_COMMENTS;
 
   else if (!strcmp(command_id, "SCHEDULE_SVC_CHECK"))
     command_type = CMD_SCHEDULE_SVC_CHECK;
@@ -814,16 +798,6 @@ int process_external_command2(int cmd,
     /**** UNSORTED COMMANDS ****/
     /***************************/
 
-  case CMD_ADD_HOST_COMMENT:
-  case CMD_ADD_SVC_COMMENT:
-    cmd_add_comment(cmd, entry_time, args);
-    break;
-
-  case CMD_DEL_HOST_COMMENT:
-  case CMD_DEL_SVC_COMMENT:
-    cmd_delete_comment(cmd, args);
-    break;
-
   case CMD_DELAY_HOST_NOTIFICATION:
   case CMD_DELAY_SVC_NOTIFICATION:
     cmd_delay_notification(cmd, args);
@@ -837,11 +811,6 @@ int process_external_command2(int cmd,
   case CMD_SCHEDULE_HOST_SVC_CHECKS:
   case CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS:
     cmd_schedule_check(cmd, args);
-    break;
-
-  case CMD_DEL_ALL_HOST_COMMENTS:
-  case CMD_DEL_ALL_SVC_COMMENTS:
-    cmd_delete_all_comments(cmd, args);
     break;
 
   case CMD_PROCESS_SERVICE_CHECK_RESULT:
@@ -885,10 +854,6 @@ int process_external_command2(int cmd,
 
   case CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME:
     cmd_delete_downtime_by_hostgroup_name(cmd, args);
-    break ;
-
-  case CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT:
-    cmd_delete_downtime_by_start_time_comment(cmd, args);
     break ;
 
   case CMD_CANCEL_ACTIVE_HOST_SVC_DOWNTIME:

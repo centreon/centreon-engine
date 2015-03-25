@@ -268,20 +268,6 @@ static void _exec_event_reschedule_checks(timed_event* event) {
 }
 
 /**
- *  Execute expire comment.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_expire_comment(timed_event* event) {
-  logger(dbg_events, basic)
-    << "** Expire Comment Event";
-
-  // check for expired comment.
-  check_for_expired_comment((unsigned long)event->event_data);
-  return;
-}
-
-/**
  *  Execute user function.
  *
  *  @param[in] event The event to execute.
@@ -647,7 +633,6 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_host_check,
     &_exec_event_hfreshness_check,
     &_exec_event_reschedule_checks,
-    &_exec_event_expire_comment,
     NULL
   };
 
@@ -918,8 +903,7 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_EXPIRE_DOWNTIME",
     "EVENT_HOST_CHECK",
     "EVENT_HFRESHNESS_CHECK",
-    "EVENT_RESCHEDULE_CHECKS",
-    "EVENT_EXPIRE_COMMENT"
+    "EVENT_RESCHEDULE_CHECKS"
   };
 
   if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
@@ -960,8 +944,7 @@ bool operator==(
       return (false);
   }
   else if (is_not_null
-           && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME
-               || obj1.event_type == EVENT_EXPIRE_COMMENT)) {
+           && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME)) {
     unsigned long id1(*(unsigned long*)obj1.event_data);
     unsigned long id2(*(unsigned long*)obj2.event_data);
     if (id1 != id2)
@@ -1022,8 +1005,7 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
     os << "  event_data:                 "
        << svc.host_name << ", " << svc.description << "\n";
   }
-  else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME
-           || obj.event_type == EVENT_EXPIRE_COMMENT) {
+  else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME) {
     unsigned long id(*(unsigned long*)obj.event_data);
     os << "  event_data:                 " << id << "\n";
   }

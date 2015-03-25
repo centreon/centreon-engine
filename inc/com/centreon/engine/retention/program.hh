@@ -50,7 +50,6 @@ namespace                     retention {
     opt<std::string> const&   global_service_event_handler() const throw ();
     opt<unsigned long> const& modified_host_attributes() const throw ();
     opt<unsigned long> const& modified_service_attributes() const throw ();
-    opt<unsigned long> const& next_comment_id() const throw ();
     opt<unsigned long> const& next_downtime_id() const throw ();
     opt<unsigned long> const& next_event_id() const throw ();
     opt<unsigned long> const& next_notification_id() const throw ();
@@ -100,7 +99,6 @@ namespace                     retention {
     opt<std::string>          _global_service_event_handler;
     opt<unsigned long>        _modified_host_attributes;
     opt<unsigned long>        _modified_service_attributes;
-    opt<unsigned long>        _next_comment_id;
     opt<unsigned long>        _next_downtime_id;
     opt<unsigned long>        _next_event_id;
     opt<unsigned long>        _next_notification_id;

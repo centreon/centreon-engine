@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -26,7 +26,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
@@ -1057,18 +1056,12 @@ int handle_host_state(host* hst) {
 
       hst->problem_has_been_acknowledged = false;
       hst->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-
-      /* remove any non-persistant comments associated with the ack */
-      delete_host_acknowledgement_comments(hst);
     }
     else if (hst->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
              && hst->current_state == HOST_UP) {
 
       hst->problem_has_been_acknowledged = false;
       hst->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-
-      /* remove any non-persistant comments associated with the ack */
-      delete_host_acknowledgement_comments(hst);
     }
 
     /* reset the next and last notification times */

@@ -23,7 +23,6 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/timedevent.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/events/timed_event.hh"
@@ -263,10 +262,6 @@ int main_test(int argc, char* argv[]) {
 
   bool ret(chkdiff(oldcfg, newcfg));
 
-  deleter::listmember(oldcfg.events_high, &deleter::timedevent);
-  deleter::listmember(oldcfg.events_low, &deleter::timedevent);
-  deleter::listmember(newcfg.events_high, &deleter::timedevent);
-  deleter::listmember(newcfg.events_low, &deleter::timedevent);
   return (!ret);
 }
 

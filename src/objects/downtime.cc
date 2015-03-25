@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,7 +27,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -61,7 +60,6 @@ bool operator==(
           && obj1.downtime_id == obj2.downtime_id
           && is_equal(obj1.author, obj2.author)
           && is_equal(obj1.comment, obj2.comment)
-          && obj1.comment_id == obj2.comment_id
           && obj1.is_in_effect == obj2.is_in_effect
           && obj1.start_flex_downtime == obj2.start_flex_downtime
           && obj1.incremented_pending_downtime == obj2.incremented_pending_downtime
@@ -107,7 +105,6 @@ std::ostream& operator<<(
     "  downtime_id:                  " << obj.downtime_id << "\n"
     "  author:                       " << chkstr(obj.author) << "\n"
     "  comment:                      " << chkstr(obj.comment) << "\n"
-    "  comment_id:                   " << obj.comment_id << "\n"
     "  is_in_effect:                 " << obj.is_in_effect << "\n"
     "  start_flex_downtime:          " << obj.start_flex_downtime << "\n"
     "  incremented_pending_downtime: " << obj.incremented_pending_downtime << "\n"
@@ -422,36 +419,6 @@ int register_downtime(int type, unsigned long downtime_id) {
     " Duration:    " << hours << "h " << minutes << "m " << seconds << "s\n"
     " Downtime ID: " << temp_downtime->downtime_id << "\n"
     " Trigger ID:  " << temp_downtime->triggered_by;
-
-  /* add a non-persistent comment to the host or service regarding the scheduled outage */
-  if (temp_downtime->type == SERVICE_DOWNTIME)
-    add_new_comment(
-      SERVICE_COMMENT,
-      DOWNTIME_COMMENT,
-      svc->host_name,
-      svc->description,
-      time(NULL),
-      "(Centreon Engine Process)",
-      oss.str().c_str(),
-      0,
-      COMMENTSOURCE_INTERNAL,
-      false,
-      (time_t)0,
-      &(temp_downtime->comment_id));
-  else
-    add_new_comment(
-      HOST_COMMENT,
-      DOWNTIME_COMMENT,
-      hst->name,
-      NULL,
-      time(NULL),
-      "(Centreon Engine Process)",
-      oss.str().c_str(),
-      0,
-      COMMENTSOURCE_INTERNAL,
-      false,
-      (time_t)0,
-      &(temp_downtime->comment_id));
 
   /*** SCHEDULE DOWNTIME - FLEXIBLE (NON-FIXED) DOWNTIME IS HANDLED AT A LATER POINT ***/
 
@@ -1177,13 +1144,6 @@ int delete_downtime(int type, unsigned long downtime_id) {
   if (this_downtime == NULL)
     return (ERROR);
 
-  /* remove the downtime from the list in memory */
-  /* first remove the comment associated with this downtime */
-  if (this_downtime->type == HOST_DOWNTIME)
-    delete_host_comment(this_downtime->comment_id);
-  else
-    delete_service_comment(this_downtime->comment_id);
-
   /* send data to event broker */
   broker_downtime_data(
     NEBTYPE_DOWNTIME_DELETE,
@@ -1227,65 +1187,6 @@ int delete_service_downtime(unsigned long downtime_id) {
   /* delete the downtime from memory */
   delete_downtime(SERVICE_DOWNTIME, downtime_id);
   return (xdddefault_delete_service_downtime(downtime_id));
-}
-
-/*
-** Deletes all host and service downtimes on a host by hostname,
-** optionally filtered by service description, start time and comment.
-** All char* must be set or NULL - "" will silently fail to match.
-** Returns number deleted.
-*/
-int delete_downtime_by_hostname_service_description_start_time_comment(
-      char const* hostname,
-      char const* service_description,
-      time_t start_time,
-      char const* comment) {
-  scheduled_downtime* temp_downtime;
-  scheduled_downtime* next_downtime;
-  int deleted(0);
-
-  /* Do not allow deletion of everything - must have at least 1 filter on. */
-  if ((NULL == hostname)
-      && (NULL == service_description)
-      && (0 == start_time)
-      && (NULL == comment))
-    return (deleted);
-
-  for (temp_downtime = scheduled_downtime_list;
-       temp_downtime != NULL;
-       temp_downtime = next_downtime) {
-    next_downtime = temp_downtime->next;
-
-    if ((start_time != 0) && (temp_downtime->start_time != start_time))
-      continue;
-    if ((comment != NULL)
-        && (strcmp(temp_downtime->comment, comment) != 0))
-      continue;
-    if (HOST_DOWNTIME == temp_downtime->type) {
-      /* If service is specified, then do not delete the host downtime. */
-      if (service_description != NULL)
-	continue;
-      if ((hostname != NULL)
-	  && (strcmp(temp_downtime->host_name, hostname) != 0))
-	continue;
-    }
-    else if (SERVICE_DOWNTIME == temp_downtime->type) {
-      if ((hostname != NULL)
-          && (strcmp(temp_downtime->host_name, hostname) != 0))
-	continue;
-      if ((service_description != NULL)
-	  && (strcmp(
-                temp_downtime->service_description,
-                service_description) != 0))
-	continue;
-    }
-
-    unschedule_downtime(
-      temp_downtime->type,
-      temp_downtime->downtime_id);
-    ++deleted;
-  }
-  return (deleted);
 }
 
 /*

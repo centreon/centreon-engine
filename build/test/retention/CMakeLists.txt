@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -22,12 +22,6 @@ set(TEST_DIR "${TEST_DIR}/retention")
 
 # Subdirectory.
 add_subdirectory("applier")
-
-## comment.
-set(TEST_NAME "comment")
-add_executable("${TEST_NAME}" "${TEST_DIR}/comment.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
 
 ## contact.
 set(TEST_NAME "contact")
@@ -69,10 +63,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_BIN_NAME "retention_dump")
 add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/dump.cc")
 target_link_libraries("${TEST_BIN_NAME}" "cce_core")
-
-# comment_dump
-set(TEST_NAME "comment_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "comment")
 
 # contact_dump
 set(TEST_NAME "contact_dump")

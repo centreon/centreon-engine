@@ -26,7 +26,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
 #include "com/centreon/engine/objects/servicedependency.hh"
@@ -45,7 +44,6 @@ using namespace com::centreon::engine;
 
 struct                global {
   command*            commands;
-  comment*            comments;
   contact*            contacts;
   contactgroup*       contactgroups;
   scheduled_downtime* downtimes;
@@ -359,18 +357,7 @@ bool chkdiff(global& g1, global& g2) {
   check_value(use_syslog);
   check_value(use_timezone);
 
-  for (scheduled_downtime* d(g1.downtimes); d; d = d->next)
-    d->comment_id = 0;
-  for (scheduled_downtime* d(g2.downtimes); d; d = d->next)
-    d->comment_id = 0;
   if (!chkdiff(g1.downtimes, g2.downtimes))
-    ret = false;
-
-  for (comment* d(g1.comments); d; d = d->next)
-    d->entry_time = 0;
-  for (comment* d(g2.comments); d; d = d->next)
-    d->entry_time = 0;
-  if (!chkdiff(g1.comments, g2.comments))
     ret = false;
 
   if (!chkdiff(g1.commands, g2.commands))
@@ -435,8 +422,6 @@ static global get_globals() {
   global g;
   g.commands = command_list;
   command_list = NULL;
-  g.comments = comment_list;
-  comment_list = NULL;
   g.contacts = contact_list;
   contact_list = NULL;
   g.contactgroups = contactgroup_list;
@@ -780,9 +765,6 @@ int main_test(int argc, char** argv) {
   deleter::listmember(oldcfg.downtimes, &deleter::downtime);
   deleter::listmember(newcfg.downtimes, &deleter::downtime);
 
-  // Delete comments.
-  deleter::listmember(oldcfg.comments, &deleter::comment);
-  deleter::listmember(newcfg.comments, &deleter::comment);
   return (!ret);
 }
 

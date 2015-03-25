@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,7 +25,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine::logging;
@@ -392,19 +391,6 @@ void set_service_flap(
       << "% threshold).  When the service state stabilizes and the "
     "flapping " << "stops, notifications will be re-enabled.";
 
-  add_new_service_comment(
-    FLAPPING_COMMENT,
-    svc->host_name,
-    svc->description,
-    time(NULL),
-    "(Centreon Engine Process)",
-    oss.str().c_str(),
-    0,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    &(svc->flapping_comment_id));
-
   /* set the flapping indicator */
   svc->is_flapping = true;
 
@@ -463,11 +449,6 @@ void clear_service_flap(
     << ";STOPPED; Service appears to have stopped flapping ("
     << percent_change << "% change < " << low_threshold
     << "% threshold)";
-
-  /* delete the comment we added earlier */
-  if (svc->flapping_comment_id != 0)
-    delete_service_comment(svc->flapping_comment_id);
-  svc->flapping_comment_id = 0;
 
   /* clear the flapping indicator */
   svc->is_flapping = false;
@@ -540,18 +521,6 @@ void set_host_flap(
       << "% threshold).  When the host state stabilizes and the "
       << "flapping stops, notifications will be re-enabled.";
 
-  add_new_host_comment(
-    FLAPPING_COMMENT,
-    hst->name,
-    time(NULL),
-    "(Centreon Engine Process)",
-    oss.str().c_str(),
-    0,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    &(hst->flapping_comment_id));
-
   /* set the flapping indicator */
   hst->is_flapping = true;
 
@@ -608,11 +577,6 @@ void clear_host_flap(
     << ";STOPPED; Host appears to have stopped flapping ("
     << percent_change << "% change < "
     << low_threshold << "% threshold)";
-
-  /* delete the comment we added earlier */
-  if (hst->flapping_comment_id != 0)
-    delete_host_comment(hst->flapping_comment_id);
-  hst->flapping_comment_id = 0;
 
   /* clear the flapping indicator */
   hst->is_flapping = false;
@@ -841,11 +805,6 @@ void handle_host_flap_detection_disabled(host* hst) {
   if (hst->is_flapping == true) {
     hst->is_flapping = false;
 
-    /* delete the original comment we added earlier */
-    if (hst->flapping_comment_id != 0)
-      delete_host_comment(hst->flapping_comment_id);
-    hst->flapping_comment_id = 0;
-
     /* log a notice - this one is parsed by the history CGI */
     logger(log_info_message, basic)
       << "HOST FLAPPING ALERT: " << hst->name
@@ -984,11 +943,6 @@ void handle_service_flap_detection_disabled(service* svc) {
   /* if the service was flapping, remove the flapping indicator */
   if (svc->is_flapping == true) {
     svc->is_flapping = false;
-
-    /* delete the original comment we added earlier */
-    if (svc->flapping_comment_id != 0)
-      delete_service_comment(svc->flapping_comment_id);
-    svc->flapping_comment_id = 0;
 
     /* log a notice - this one is parsed by the history CGI */
     logger(log_info_message, basic)

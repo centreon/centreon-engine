@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,7 +24,6 @@
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
-struct comment_struct;
 struct contact_struct;
 struct customvariablesmember_struct;
 struct host_struct;
@@ -35,8 +34,6 @@ CCE_BEGIN()
 
 namespace         retention {
   namespace       dump {
-    std::ostream& comment(std::ostream& os, comment_struct const& obj);
-    std::ostream& comments(std::ostream& os);
     std::ostream& contact(std::ostream& os, contact_struct const& obj);
     std::ostream& contacts(std::ostream& os);
     std::ostream& customvariables(std::ostream& os, customvariablesmember_struct const& obj);

@@ -142,7 +142,6 @@ bool operator==(
           && obj1.state_history_index == obj2.state_history_index
           && obj1.last_state_history_update == obj2.last_state_history_update
           && obj1.is_flapping == obj2.is_flapping
-          && obj1.flapping_comment_id == obj2.flapping_comment_id
           && obj1.percent_state_change == obj2.percent_state_change
           && obj1.total_services == obj2.total_services
           && obj1.total_service_check_interval == obj2.total_service_check_interval
@@ -287,7 +286,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  state_history_index:                  " << obj.state_history_index << "\n"
     "  last_state_history_update:            " << string::ctime(obj.last_state_history_update) << "\n"
     "  is_flapping:                          " << obj.is_flapping << "\n"
-    "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  total_services:                       " << obj.total_services << "\n"
     "  total_service_check_interval:         " << obj.total_service_check_interval << "\n"

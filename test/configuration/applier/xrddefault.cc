@@ -249,7 +249,6 @@ int xrddefault_save_state_information() {
          << "enable_flap_detection=" << enable_flap_detection << "\n"
          << "global_host_event_handler=" << global_host_event_handler << "\n"
          << "global_service_event_handler=" << global_service_event_handler << "\n"
-         << "next_comment_id=" << next_comment_id << "\n"
          << "next_downtime_id=" << next_downtime_id << "\n"
          << "next_event_id=" << next_event_id << "\n"
          << "next_problem_id=" << next_problem_id << "\n"
@@ -438,30 +437,6 @@ int xrddefault_save_state_information() {
     stream << "}\n";
   }
 
-  /* save all comments */
-  for (comment* temp_comment = comment_list;
-       temp_comment != NULL;
-       temp_comment = temp_comment->next) {
-
-    if (temp_comment->comment_type == HOST_COMMENT)
-      stream << "hostcomment {\n";
-    else
-      stream << "servicecomment {\n";
-    stream << "host_name=" << temp_comment->host_name << "\n";
-    if (temp_comment->comment_type == SERVICE_COMMENT)
-      stream << "service_description=" << temp_comment->service_description << "\n";
-    stream << "entry_type=" << temp_comment->entry_type << "\n"
-           << "comment_id=" << temp_comment->comment_id << "\n"
-           << "source=" << temp_comment->source << "\n"
-           << "persistent=" << temp_comment->persistent << "\n"
-           << "entry_time=" << static_cast<unsigned long>(temp_comment->entry_time) << "\n"
-           << "expires=" << temp_comment->expires << "\n"
-           << "expire_time=" << static_cast<unsigned long>(temp_comment->expire_time) << "\n"
-           << "author=" << temp_comment->author << "\n"
-           << "comment_data=" << temp_comment->comment_data << "\n"
-           << "}\n";
-  }
-
   /* save all downtime */
   for (scheduled_downtime* temp_downtime = scheduled_downtime_list;
        temp_downtime != NULL;
@@ -548,12 +523,9 @@ int xrddefault_read_state_information() {
   char* val = NULL;
   char* tempval = NULL;
   char* ch = NULL;
-  unsigned long comment_id = 0;
   int persistent = FALSE;
   int expires = FALSE;
   time_t expire_time = 0L;
-  unsigned int entry_type = USER_COMMENT;
-  int source = COMMENTSOURCE_INTERNAL;
   time_t entry_time = 0L;
   time_t creation_time;
   time_t current_time;
@@ -571,7 +543,6 @@ int xrddefault_read_state_information() {
   unsigned long contact_service_attribute_mask = 0L;
   unsigned long process_host_attribute_mask = 0L;
   unsigned long process_service_attribute_mask = 0L;
-  int remove_comment = FALSE;
   int ack = FALSE;
   int was_flapping = FALSE;
   int allow_flapstart_notification = TRUE;
@@ -607,7 +578,6 @@ int xrddefault_read_state_information() {
 
   /* Big speedup when reading retention.dat in bulk */
   defer_downtime_sorting = 1;
-  defer_comment_sorting = 1;
 
   /* read all lines in the retention file */
   while (1) {
@@ -631,10 +601,6 @@ int xrddefault_read_state_information() {
       data_type = XRDDEFAULT_HOSTSTATUS_DATA;
     else if (!strcmp(input, "contact {"))
       data_type = XRDDEFAULT_CONTACTSTATUS_DATA;
-    else if (!strcmp(input, "hostcomment {"))
-      data_type = XRDDEFAULT_HOSTCOMMENT_DATA;
-    else if (!strcmp(input, "servicecomment {"))
-      data_type = XRDDEFAULT_SERVICECOMMENT_DATA;
     else if (!strcmp(input, "hostdowntime {"))
       data_type = XRDDEFAULT_HOSTDOWNTIME_DATA;
     else if (!strcmp(input, "servicedowntime {"))
@@ -788,70 +754,6 @@ int xrddefault_read_state_information() {
         delete[] contact_name;
         contact_name = NULL;
         temp_contact = NULL;
-        break;
-
-      case XRDDEFAULT_HOSTCOMMENT_DATA:
-      case XRDDEFAULT_SERVICECOMMENT_DATA:
-        /* add the comment */
-        add_comment((data_type == XRDDEFAULT_HOSTCOMMENT_DATA) ? HOST_COMMENT : SERVICE_COMMENT,
-		    entry_type,
-		    host_name,
-		    service_description,
-		    entry_time,
-		    author,
-                    comment_data,
-		    comment_id,
-		    persistent,
-		    expires,
-		    expire_time,
-		    source);
-
-        /* delete the comment if necessary */
-        /* it seems a bit backwards to add and then immediately delete the comment, but its necessary to track comment deletions in the event broker */
-        remove_comment = FALSE;
-        /* host no longer exists */
-        if ((temp_host = find_host(host_name)) == NULL)
-          remove_comment = TRUE;
-        /* service no longer exists */
-        else if (data_type == XRDDEFAULT_SERVICECOMMENT_DATA
-                 && (temp_service = find_service(host_name, service_description)) == NULL)
-          remove_comment = TRUE;
-        /* acknowledgement comments get deleted if they're not persistent and the original problem is no longer acknowledged */
-        else if (entry_type == ACKNOWLEDGEMENT_COMMENT) {
-          ack = FALSE;
-          if (data_type == XRDDEFAULT_HOSTCOMMENT_DATA)
-            ack = temp_host->problem_has_been_acknowledged;
-          else
-            ack = temp_service->problem_has_been_acknowledged;
-          if (ack == FALSE && persistent == FALSE)
-            remove_comment = TRUE;
-        }
-        /* non-persistent comments don't last past restarts UNLESS they're acks (see above) */
-        else if (persistent == FALSE)
-          remove_comment = TRUE;
-
-        if (remove_comment == TRUE)
-          delete_comment((data_type == XRDDEFAULT_HOSTCOMMENT_DATA) ? HOST_COMMENT : SERVICE_COMMENT, comment_id);
-
-        /* free temp memory */
-        delete[] host_name;
-        delete[] service_description;
-        delete[] author;
-        delete[] comment_data;
-
-        host_name = NULL;
-        service_description = NULL;
-        author = NULL;
-        comment_data = NULL;
-
-        /* reset defaults */
-        entry_type = USER_COMMENT;
-        comment_id = 0;
-        source = COMMENTSOURCE_INTERNAL;
-        persistent = FALSE;
-        entry_time = 0L;
-        expires = FALSE;
-        expire_time = 0L;
         break;
 
       case XRDDEFAULT_HOSTDOWNTIME_DATA:
@@ -1035,8 +937,6 @@ int xrddefault_read_state_information() {
               }
             }
           }
-          else if (!strcmp(var, "next_comment_id"))
-            next_comment_id = strtoul(val, NULL, 10);
           else if (!strcmp(var, "next_downtime_id"))
             next_downtime_id = strtoul(val, NULL, 10);
           else if (!strcmp(var, "next_event_id"))
@@ -1656,32 +1556,6 @@ int xrddefault_read_state_information() {
         }
         break;
 
-      case XRDDEFAULT_HOSTCOMMENT_DATA:
-      case XRDDEFAULT_SERVICECOMMENT_DATA:
-        if (!strcmp(var, "host_name"))
-          host_name = string::dup(val);
-        else if (!strcmp(var, "service_description"))
-          service_description = string::dup(val);
-        else if (!strcmp(var, "entry_type"))
-          entry_type = atoi(val);
-        else if (!strcmp(var, "comment_id"))
-          comment_id = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "source"))
-          source = atoi(val);
-        else if (!strcmp(var, "persistent"))
-          persistent = (atoi(val) > 0) ? TRUE : FALSE;
-        else if (!strcmp(var, "entry_time"))
-          entry_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "expires"))
-          expires = (atoi(val) > 0) ? TRUE : FALSE;
-        else if (!strcmp(var, "expire_time"))
-          expire_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "author"))
-          author = string::dup(val);
-        else if (!strcmp(var, "comment_data"))
-          comment_data = string::dup(val);
-            break;
-
       case XRDDEFAULT_HOSTDOWNTIME_DATA:
       case XRDDEFAULT_SERVICEDOWNTIME_DATA:
         if (!strcmp(var, "host_name"))
@@ -1719,8 +1593,6 @@ int xrddefault_read_state_information() {
   mmap_fclose(thefile);
 
   if (sort_downtime() != OK)
-    return (ERROR);
-  if (sort_comments() != OK)
     return (ERROR);
 
   if (test_scheduling == TRUE)

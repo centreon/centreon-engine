@@ -122,7 +122,6 @@ typedef struct                  service_struct {
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
   int                           is_flapping;
-  unsigned long                 flapping_comment_id;
   double                        percent_state_change;
   unsigned long                 modified_attributes;
   char*                         timezone;

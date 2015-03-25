@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2012 Icinga Development Team (http://www.icinga.org)
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -46,7 +46,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
@@ -956,9 +955,6 @@ void cleanup() {
  *  @param[in,out] mac Macros.
  */
 void free_memory(nagios_macros* mac) {
-  // Free memory allocated to comments.
-  free_comment_data();
-
   // Free memory allocated to downtimes.
   free_downtime_data();
 

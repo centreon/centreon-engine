@@ -38,10 +38,6 @@
 
 /* Commands. */
 #  define CMD_NONE                                             0
-#  define CMD_ADD_HOST_COMMENT                                 1
-#  define CMD_DEL_HOST_COMMENT                                 2
-#  define CMD_ADD_SVC_COMMENT                                  3
-#  define CMD_DEL_SVC_COMMENT                                  4
 #  define CMD_ENABLE_SVC_CHECK                                 5
 #  define CMD_DISABLE_SVC_CHECK                                6
 #  define CMD_SCHEDULE_SVC_CHECK                               7
@@ -55,8 +51,6 @@
 #  define CMD_DISABLE_HOST_SVC_CHECKS                         16
 #  define CMD_SCHEDULE_HOST_SVC_CHECKS                        17
 #  define CMD_DELAY_HOST_SVC_NOTIFICATIONS                    19  /* Currently unimplemented. */
-#  define CMD_DEL_ALL_HOST_COMMENTS                           20
-#  define CMD_DEL_ALL_SVC_COMMENTS                            21
 #  define CMD_ENABLE_SVC_NOTIFICATIONS                        22
 #  define CMD_DISABLE_SVC_NOTIFICATIONS                       23
 #  define CMD_ENABLE_HOST_NOTIFICATIONS                       24
@@ -202,7 +196,6 @@
 #  define CMD_CHANGE_CONTACT_MODSATTR                        169
 #  define CMD_DEL_DOWNTIME_BY_HOST_NAME                      170
 #  define CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME                 171
-#  define CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT             172
 #  define CMD_CUSTOM_COMMAND                                 999
 
 /* Service check types. */

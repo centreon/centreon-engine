@@ -1,6 +1,6 @@
 /*
-** Copyright 2003-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2003-2008      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -531,11 +531,6 @@ int display_stats() {
   printf("\n");
 
   /*
-    printf("CURRENT COMMENT DATA\n");
-    printf("----------------------------------------------------\n");
-    printf("\n");
-    printf("\n");
-
     printf("CURRENT DOWNTIME DATA\n");
     printf("----------------------------------------------------\n");
     printf("\n");

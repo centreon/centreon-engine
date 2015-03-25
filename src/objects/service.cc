@@ -139,7 +139,6 @@ bool operator==(
           && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
           && obj1.state_history_index == obj2.state_history_index
           && obj1.is_flapping == obj2.is_flapping
-          && obj1.flapping_comment_id == obj2.flapping_comment_id
           && obj1.percent_state_change == obj2.percent_state_change
           && obj1.modified_attributes == obj2.modified_attributes
           && is_equal(obj1.event_handler_args, obj2.event_handler_args)
@@ -286,7 +285,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
   os <<
     "  state_history_index:                  " << obj.state_history_index << "\n"
     "  is_flapping:                          " << obj.is_flapping << "\n"
-    "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  modified_attributes:                  " << obj.modified_attributes << "\n"
     "  host_ptr:                             " << chkstr(hst_str) << "\n"

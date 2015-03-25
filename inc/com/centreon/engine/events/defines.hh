@@ -35,7 +35,6 @@
 #  define EVENT_HOST_CHECK         10  // active host check
 #  define EVENT_HFRESHNESS_CHECK   11  // checks host result "freshness"
 #  define EVENT_RESCHEDULE_CHECKS  12  // adjust scheduling of host and service checks
-#  define EVENT_EXPIRE_COMMENT     13  // removes expired comments
 #  define EVENT_SLEEP              98  // asynchronous sleep event that occurs when event queues are empty
 #  define EVENT_USER_FUNCTION      99  // USER-defined function (modules)
 

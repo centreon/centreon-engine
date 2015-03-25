@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2014 Merethis
+## Copyright 2011-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -648,7 +648,6 @@ set(
   "${SRC_DIR}/timezone_locker.cc"
   "${SRC_DIR}/timezone_manager.cc"
   "${SRC_DIR}/utils.cc"
-  "${SRC_DIR}/xcddefault.cc"
   "${SRC_DIR}/xdddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
 
@@ -680,7 +679,6 @@ set(
   "${INC_DIR}/com/centreon/engine/timezone_manager.hh"
   "${INC_DIR}/com/centreon/engine/utils.hh"
   "${INC_DIR}/com/centreon/engine/version.hh"
-  "${INC_DIR}/com/centreon/engine/xcddefault.hh"
   "${INC_DIR}/com/centreon/engine/xdddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )

@@ -37,7 +37,6 @@ program::setters const program::_setters[] = {
   { "global_service_event_handler",   SETTER(std::string const&, _set_global_service_event_handler) },
   { "modified_host_attributes",       SETTER(unsigned long, _set_modified_host_attributes) },
   { "modified_service_attributes",    SETTER(unsigned long, _set_modified_service_attributes) },
-  { "next_comment_id",                SETTER(unsigned long, _set_next_comment_id) },
   { "next_downtime_id",               SETTER(unsigned long, _set_next_downtime_id) },
   { "next_event_id",                  SETTER(unsigned long, _set_next_event_id) },
   { "next_notification_id",           SETTER(unsigned long, _set_next_notification_id) },
@@ -49,6 +48,7 @@ program::setters const program::_setters[] = {
 
   // Deprecated.
   { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
+  { "next_comment_id",                SETTER(unsigned long, _set_next_comment_id) },
   { "process_performance_data",       SETTER(bool, _set_process_performance_data) }
 };
 
@@ -93,7 +93,6 @@ program& program::operator=(program const& right) {
     _global_service_event_handler = right._global_service_event_handler;
     _modified_host_attributes = right._modified_host_attributes;
     _modified_service_attributes = right._modified_service_attributes;
-    _next_comment_id = right._next_comment_id;
     _next_downtime_id = right._next_downtime_id;
     _next_event_id = right._next_event_id;
     _next_notification_id = right._next_notification_id;
@@ -126,7 +125,6 @@ bool program::operator==(program const& right) const throw () {
           && _global_service_event_handler == right._global_service_event_handler
           && _modified_host_attributes == right._modified_host_attributes
           && _modified_service_attributes == right._modified_service_attributes
-          && _next_comment_id == right._next_comment_id
           && _next_downtime_id == right._next_downtime_id
           && _next_event_id == right._next_event_id
           && _next_notification_id == right._next_notification_id
@@ -262,15 +260,6 @@ opt<unsigned long> const& program::modified_host_attributes() const throw () {
  */
 opt<unsigned long> const& program::modified_service_attributes() const throw () {
   return (_modified_service_attributes);
-}
-
-/**
- *  Get next_comment_id.
- *
- *  @return The next_comment_id.
- */
-opt<unsigned long> const& program::next_comment_id() const throw () {
-  return (_next_comment_id);
 }
 
 /**
@@ -466,12 +455,12 @@ bool program::_set_modified_service_attributes(unsigned long value) {
 }
 
 /**
- *  Set next_comment_id.
+ *  Deprecated variable.
  *
- *  @param[in] value The new next_comment_id.
+ *  @param[in] value  Unused.
  */
 bool program::_set_next_comment_id(unsigned long value) {
-  _next_comment_id = value;
+  (void)value;
   return (true);
 }
 

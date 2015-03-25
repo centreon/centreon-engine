@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,6 @@
 */
 
 
-#include "com/centreon/engine/retention/comment.hh"
 #include "com/centreon/engine/retention/contact.hh"
 #include "com/centreon/engine/retention/downtime.hh"
 #include "com/centreon/engine/retention/host.hh"
@@ -99,10 +98,6 @@ retention::object_ptr retention::object::create(std::string const& type_name) {
     obj = object_ptr(new retention::host);
   else if (type_name == "contact")
     obj = object_ptr(new retention::contact);
-  else if (type_name == "hostcomment")
-    obj = object_ptr(new retention::comment(comment::host));
-  else if (type_name == "servicecomment")
-    obj = object_ptr(new retention::comment(comment::service));
   else if (type_name == "hostdowntime")
     obj = object_ptr(new retention::downtime(downtime::host));
   else if (type_name == "servicedowntime")
@@ -130,7 +125,6 @@ retention::object::type_id retention::object::type() const throw () {
  */
 std::string const& retention::object::type_name() const throw () {
   static std::string const tab[] = {
-    "comment",
     "contact",
     "downtime",
     "host",

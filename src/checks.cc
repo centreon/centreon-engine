@@ -39,7 +39,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -544,17 +543,11 @@ int handle_async_service_check_result(
 
       temp_service->problem_has_been_acknowledged = false;
       temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-
-      /* remove any non-persistant comments associated with the ack */
-      delete_service_acknowledgement_comments(temp_service);
     }
     else if (temp_service->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
              && temp_service->current_state == STATE_OK) {
       temp_service->problem_has_been_acknowledged = false;
       temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-
-      /* remove any non-persistant comments associated with the ack */
-      delete_service_acknowledgement_comments(temp_service);
     }
 
     /* do NOT reset current notification number!!! */

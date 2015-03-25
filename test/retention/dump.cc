@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,9 +40,7 @@ int main_test(int argc, char* argv[]) {
   std::ostringstream oss;
   std::string const type(argv[1]);
 
-  if (type == "comment")
-    dump::comments(oss);
-  else if (type == "contact")
+  if (type == "contact")
     dump::contacts(oss);
   else if (type == "downtime")
     dump::downtimes(oss);

@@ -36,7 +36,6 @@
 #  define BROKER_LOGGED_DATA                       (1 << 5)
 #  define BROKER_NOTIFICATIONS                     (1 << 6)
 #  define BROKER_FLAPPING_DATA                     (1 << 7)
-#  define BROKER_COMMENT_DATA                      (1 << 8)
 #  define BROKER_DOWNTIME_DATA                     (1 << 9)
 #  define BROKER_SYSTEM_COMMANDS                   (1 << 10)
 #  define BROKER_OCP_DATA_UNUSED                   (1 << 11) /* Reusable. */
@@ -117,12 +116,6 @@
 #  define NEBTYPE_HOSTCHECK_RAW_END                803 /* A finished "raw" host check. */
 #  define NEBTYPE_HOSTCHECK_ASYNC_PRECHECK         804
 #  define NEBTYPE_HOSTCHECK_SYNC_PRECHECK          805
-
-/* Comments. */
-#  define NEBTYPE_COMMENT_ADD                      900
-#  define NEBTYPE_COMMENT_DELETE                   901
-#  define NEBTYPE_COMMENT_LOAD                     902
-#  define NEBTYPE_COMMENT_UPDATE                   903
 
 /* Flapping. */
 #  define NEBTYPE_FLAPPING_START                   1000
@@ -371,23 +364,6 @@ void           broker_command_data(
                  int flags,
                  int attr,
                  command_struct* cmd,
-                 struct timeval const* timestamp);
-void           broker_comment_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 int comment_type,
-                 int entry_type,
-                 char const* host_name,
-                 char const* svc_description,
-                 time_t entry_time,
-                 char const* author_name,
-                 char const* comment_data,
-                 int persistent,
-                 int source,
-                 int expires,
-                 time_t expire_time,
-                 unsigned long comment_id,
                  struct timeval const* timestamp);
 int            broker_contact_notification_data(
                  int type,

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -71,7 +71,6 @@ namespace logging {
     dbg_external_command     = (128ull << 32),
     dbg_commands             = (256ull << 32),
     dbg_downtime             = (512ull << 32),
-    dbg_comments             = (1024ull << 32),
     dbg_macros               = (2048ull << 32),
     dbg_all                  = (4095ull << 32),
 

@@ -255,27 +255,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling add_host_comment.
-set(TEST_NAME "modules_external_commands_add_host_comment")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/add_host_comment.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_host_comment.
-set(TEST_NAME "modules_external_commands_del_host_comment")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_host_comment.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_all_host_comments.
-set(TEST_NAME "modules_external_commands_del_all_host_comments")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_all_host_comments.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling delay_host_notification.
 set(TEST_NAME "modules_external_commands_delay_host_notification")
 add_executable("${TEST_NAME}"
@@ -469,13 +448,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_del_downtime_by_hostgroup_name")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/del_downtime_by_hostgroup_name.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_downtime_by_start_time_comment.
-set(TEST_NAME "modules_external_commands_del_downtime_by_start_time_comment")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_downtime_by_start_time_comment.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -693,27 +665,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_schedule_hostgroup_svc_downtime")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/schedule_hostgroup_svc_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling add_svc_comment.
-set(TEST_NAME "modules_external_commands_add_svc_comment")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/add_svc_comment.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_svc_comment.
-set(TEST_NAME "modules_external_commands_del_svc_comment")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_svc_comment.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_all_svc_comments.
-set(TEST_NAME "modules_external_commands_del_all_svc_comments")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_all_svc_comments.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 

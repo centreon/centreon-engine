@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -230,9 +230,6 @@ struct grab_service_redirection {
     // Acknowledgement author alias.
     routines[MACRO_SERVICEACKAUTHORALIAS].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORALIAS>;
     routines[MACRO_SERVICEACKAUTHORALIAS].second = true;
-    // Acknowledgement comment.
-    routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
-    routines[MACRO_SERVICEACKCOMMENT].second = true;
   }
 } static const redirector;
 

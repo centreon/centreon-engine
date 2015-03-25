@@ -136,15 +136,6 @@ processing::processing() {
                  &_redirector<&disable_host_freshness_checks>);
 
   // host-related commands.
-  _lst_command["ADD_HOST_COMMENT"] =
-    command_info(CMD_ADD_HOST_COMMENT,
-                 &_redirector<&cmd_add_comment>);
-  _lst_command["DEL_HOST_COMMENT"] =
-    command_info(CMD_DEL_HOST_COMMENT,
-                 &_redirector<&cmd_delete_comment>);
-  _lst_command["DEL_ALL_HOST_COMMENTS"] =
-    command_info(CMD_DEL_ALL_HOST_COMMENTS,
-                 &_redirector<&cmd_delete_all_comments>);
   _lst_command["DELAY_HOST_NOTIFICATION"] =
     command_info(CMD_DELAY_HOST_NOTIFICATION,
                  &_redirector<&cmd_delay_notification>);
@@ -229,9 +220,6 @@ processing::processing() {
   _lst_command["DEL_DOWNTIME_BY_HOSTGROUP_NAME"] =
     command_info(CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME,
                  &_redirector<&cmd_delete_downtime_by_hostgroup_name>);
-  _lst_command["DEL_DOWNTIME_BY_START_TIME_COMMENT"] =
-    command_info(CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT,
-                 &_redirector<&cmd_delete_downtime_by_start_time_comment>);
   _lst_command["ENABLE_HOST_FLAP_DETECTION"] =
     command_info(CMD_ENABLE_HOST_FLAP_DETECTION,
                  &_redirector_host<&enable_host_flap_detection>);
@@ -329,15 +317,6 @@ processing::processing() {
                  &_redirector<&cmd_schedule_downtime>);
 
   // service-related commands.
-  _lst_command["ADD_SVC_COMMENT"] =
-    command_info(CMD_ADD_SVC_COMMENT,
-                 &_redirector<&cmd_add_comment>);
-  _lst_command["DEL_SVC_COMMENT"] =
-    command_info(CMD_DEL_SVC_COMMENT,
-                 &_redirector<&cmd_delete_comment>);
-  _lst_command["DEL_ALL_SVC_COMMENTS"] =
-    command_info(CMD_DEL_ALL_SVC_COMMENTS,
-                 &_redirector<&cmd_delete_all_comments>);
   _lst_command["SCHEDULE_SVC_CHECK"] =
     command_info(CMD_SCHEDULE_SVC_CHECK,
                  &_redirector<&cmd_schedule_check>);

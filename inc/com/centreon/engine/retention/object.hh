@@ -31,13 +31,12 @@ namespace              retention {
   class                object {
   public:
     enum               type_id {
-      comment = 0,
-      contact = 1,
-      downtime = 2,
-      host = 3,
-      info = 4,
-      program = 5,
-      service = 6
+      contact = 0,
+      downtime,
+      host,
+      info,
+      program,
+      service
     };
 
                        object(type_id type);

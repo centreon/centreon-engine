@@ -23,54 +23,11 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::retention;
-
-/**
- *  Dump retention of comment.
- *
- *  @param[out] os  The output stream.
- *  @param[in]  obj The comment to dump.
- *
- *  @return The output stream.
- */
-std::ostream& dump::comment(std::ostream& os, comment_struct const& obj) {
-  if (obj.comment_type == HOST_COMMENT)
-    os << "hostcomment {\n";
-  else
-    os << "servicecomment {\n";
-  os << "host_name=" << obj.host_name << "\n";
-  if (obj.comment_type == SERVICE_COMMENT)
-    os << "service_description=" << obj.service_description << "\n";
-  os << "author=" << obj.author << "\n"
-    "comment_data=" << obj.comment_data << "\n"
-    "comment_id=" << obj.comment_id << "\n"
-    "entry_time=" << static_cast<unsigned long>(obj.entry_time) << "\n"
-    "expire_time=" << static_cast<unsigned long>(obj.expire_time) << "\n"
-    "expires=" << obj.expires << "\n"
-    "persistent=" << obj.persistent << "\n"
-    "source=" << obj.source << "\n"
-    "entry_type=" << obj.entry_type << "\n"
-    "}\n";
-  return (os);
-}
-
-/**
- *  Dump retention of comments.
- *
- *  @param[out] os The output stream.
- *
- *  @return The output stream.
- */
-std::ostream& dump::comments(std::ostream& os) {
-  for (comment_struct* obj(comment_list); obj; obj = obj->next)
-    dump::comment(os, *obj);
-  return (os);
-}
 
 /**
  *  Dump retention of contact.
@@ -312,7 +269,6 @@ std::ostream& dump::program(std::ostream& os) {
     "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
     "modified_host_attributes=" << (modified_host_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
     "modified_service_attributes=" << (modified_service_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
-    "next_comment_id=" << next_comment_id << "\n"
     "next_downtime_id=" << next_downtime_id << "\n"
     "next_event_id=" << next_event_id << "\n"
     "next_notification_id=" << next_notification_id << "\n"
@@ -357,7 +313,6 @@ bool dump::save(std::string const& path) {
     dump::hosts(stream);
     dump::services(stream);
     dump::contacts(stream);
-    dump::comments(stream);
     dump::downtimes(stream);
 
     ret = true;

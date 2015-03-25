@@ -188,9 +188,8 @@ int service_notification(
       }
     }
 
-    /* get author and comment macros */
+    /* get author macros */
     string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
-    string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
     if (temp_contact) {
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->name);
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->alias);
@@ -201,10 +200,9 @@ int service_notification(
     }
 
     /* NOTE: these macros are deprecated and will likely disappear in next major release */
-    /* if this is an acknowledgement, get author and comment macros */
+    /* if this is an acknowledgement, get author macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
       string::setstr(mac.x[MACRO_SERVICEACKAUTHOR], not_author);
-      string::setstr(mac.x[MACRO_SERVICEACKCOMMENT], not_data);
       if (temp_contact) {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);
@@ -1239,9 +1237,8 @@ int host_notification(
 
     }
 
-    /* get author and comment macros */
+    /* get author macros */
     string::setstr(mac.x[MACRO_NOTIFICATIONAUTHOR], not_author);
-    string::setstr(mac.x[MACRO_NOTIFICATIONCOMMENT], not_data);
     if (temp_contact) {
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORNAME], temp_contact->name);
       string::setstr(mac.x[MACRO_NOTIFICATIONAUTHORALIAS], temp_contact->alias);
@@ -1252,10 +1249,9 @@ int host_notification(
     }
 
     /* NOTE: these macros are deprecated and will likely disappear in next major release */
-    /* if this is an acknowledgement, get author and comment macros */
+    /* if this is an acknowledgement, get author macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
       string::setstr(mac.x[MACRO_HOSTACKAUTHOR], not_author);
-      string::setstr(mac.x[MACRO_HOSTACKCOMMENT], not_data);
       if (temp_contact) {
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORNAME], temp_contact->name);
         string::setstr(mac.x[MACRO_SERVICEACKAUTHORALIAS], temp_contact->alias);

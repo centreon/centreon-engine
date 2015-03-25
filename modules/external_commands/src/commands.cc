@@ -33,7 +33,6 @@
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -161,126 +160,6 @@ int process_external_command(char const* cmd) {
 /******************************************************************/
 /*************** EXTERNAL COMMAND IMPLEMENTATIONS  ****************/
 /******************************************************************/
-
-/* adds a host or service comment to the status log */
-int cmd_add_comment(int cmd, time_t entry_time, char* args) {
-  char* temp_ptr(NULL);
-  host* temp_host(NULL);
-  service* temp_service(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
-  char* user(NULL);
-  char* comment_data(NULL);
-  int persistent(0);
-  int result(0);
-
-  /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
-
-  /* if we're adding a service comment...  */
-  if (cmd == CMD_ADD_SVC_COMMENT) {
-
-    /* get the service description */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
-
-    /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
-  }
-
-  /* else verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
-
-  /* get the persistent flag */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
-  persistent = atoi(temp_ptr);
-  if (persistent > 1)
-    persistent = 1;
-  else if (persistent < 0)
-    persistent = 0;
-
-  /* get the name of the user who entered the comment */
-  if ((user = my_strtok(NULL, ";")) == NULL)
-    return (ERROR);
-
-  /* get the comment */
-  if ((comment_data = my_strtok(NULL, "\n")) == NULL)
-    return (ERROR);
-
-  /* add the comment */
-  result = add_new_comment(
-             (cmd == CMD_ADD_HOST_COMMENT) ? HOST_COMMENT : SERVICE_COMMENT,
-             USER_COMMENT,
-             host_name,
-             svc_description,
-             entry_time,
-             user,
-             comment_data,
-             persistent,
-             COMMENTSOURCE_EXTERNAL,
-             false,
-             (time_t)0,
-             NULL);
-  if (result < 0)
-    return (ERROR);
-  return (OK);
-}
-
-/* removes a host or service comment from the status log */
-int cmd_delete_comment(int cmd, char* args) {
-  unsigned long comment_id(0);
-
-  /* get the comment id we should delete */
-  if ((comment_id = strtoul(args, NULL, 10)) == 0)
-    return (ERROR);
-
-  /* delete the specified comment */
-  if (cmd == CMD_DEL_HOST_COMMENT)
-    delete_host_comment(comment_id);
-  else
-    delete_service_comment(comment_id);
-
-  return (OK);
-}
-
-/* removes all comments associated with a host or service from the status log */
-int cmd_delete_all_comments(int cmd, char* args) {
-  service* temp_service(NULL);
-  host* temp_host(NULL);
-  char* host_name(NULL);
-  char* svc_description(NULL);
-
-  /* get the host name */
-  if ((host_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
-
-  /* if we're deleting service comments...  */
-  if (cmd == CMD_DEL_ALL_SVC_COMMENTS) {
-
-    /* get the service description */
-    if ((svc_description = my_strtok(NULL, ";")) == NULL)
-      return (ERROR);
-
-    /* verify that the service is valid */
-    if ((temp_service = find_service(host_name, svc_description)) == NULL)
-      return (ERROR);
-  }
-
-  /* else verify that the host is valid */
-  if ((temp_host = find_host(host_name)) == NULL)
-    return (ERROR);
-
-  /* delete comments */
-  delete_all_comments(
-    (cmd == CMD_DEL_ALL_HOST_COMMENTS) ? HOST_COMMENT : SERVICE_COMMENT,
-    host_name,
-    svc_description);
-  return (OK);
-}
 
 /* delays a host or service notification for given number of minutes */
 int cmd_delay_notification(int cmd, char* args) {
@@ -1263,12 +1142,6 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
       }
     }
   }
-
-  deleted = delete_downtime_by_hostname_service_description_start_time_comment(
-              hostname,
-              service_description,
-              downtime_start_time,
-              downtime_comment);
   if (0 == deleted)
     return (ERROR);
   return (OK);
@@ -1352,49 +1225,7 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
       continue ;
     if ((host_name != NULL) && strcmp(temp_host->name, host_name))
       continue ;
-    deleted = delete_downtime_by_hostname_service_description_start_time_comment(
-                temp_host->name,
-                service_description,
-                downtime_start_time,
-                downtime_comment);
   }
-
-  if (0 == deleted)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* Delete downtimes based on start time and/or comment. */
-int cmd_delete_downtime_by_start_time_comment(int cmd, char* args){
-  time_t downtime_start_time(0L);
-  char *downtime_comment(NULL);
-  char *temp_ptr(NULL);
-  char *end_ptr(NULL);
-  int deleted(0);
-
-  (void)cmd;
-
-  /* Get start time if set. */
-  temp_ptr = my_strtok(args, ";");
-  if (temp_ptr != NULL)
-    /* This will be set to 0 if no start_time is entered or data is bad. */
-    downtime_start_time = strtoul(temp_ptr, &end_ptr, 10);
-
-  /* Get comment - not sure if this should be also tokenised by ; */
-  temp_ptr = my_strtok(NULL, "\n");
-  if ((temp_ptr != NULL) && (*temp_ptr != '\0'))
-    downtime_comment = temp_ptr;
-
-  /* No args should give an error. */
-  if ((0 == downtime_start_time) && (NULL == downtime_comment))
-    return (ERROR);
-
-  deleted = delete_downtime_by_hostname_service_description_start_time_comment(
-              NULL,
-              NULL,
-              downtime_start_time,
-              downtime_comment);
 
   if (0 == deleted)
     return (ERROR);
@@ -2801,20 +2632,6 @@ void acknowledge_host_problem(
 
   // Update the status log with the host info.
   update_host_status(hst);
-
-  /* add a comment for the acknowledgement */
-  time(&current_time);
-  add_new_host_comment(
-    ACKNOWLEDGEMENT_COMMENT,
-    hst->name,
-    current_time,
-    ack_author,
-    ack_data,
-    persistent,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    NULL);
 }
 
 /* acknowledges a service problem */
@@ -2863,21 +2680,6 @@ void acknowledge_service_problem(
 
   // Update the status log with the service info.
   update_service_status(svc);
-
-  /* add a comment for the acknowledgement */
-  time(&current_time);
-  add_new_service_comment(
-    ACKNOWLEDGEMENT_COMMENT,
-    svc->host_name,
-    svc->description,
-    current_time,
-    ack_author,
-    ack_data,
-    persistent,
-    COMMENTSOURCE_INTERNAL,
-    false,
-    (time_t)0,
-    NULL);
 }
 
 /* removes a host acknowledgement */
@@ -2887,9 +2689,6 @@ void remove_host_acknowledgement(host* hst) {
 
   // Update the status log with the host info.
   update_host_status(hst);
-
-  /* remove any non-persistant comments associated with the ack */
-  delete_host_acknowledgement_comments(hst);
 }
 
 /* removes a service acknowledgement */
@@ -2899,9 +2698,6 @@ void remove_service_acknowledgement(service* svc) {
 
   // Update the status log with the service info.
   update_service_status(svc);
-
-  /* remove any non-persistant comments associated with the ack */
-  delete_service_acknowledgement_comments(svc);
 }
 
 /* starts executing service checks */

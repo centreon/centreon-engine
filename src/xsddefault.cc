@@ -32,7 +32,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
@@ -150,7 +149,6 @@ int xsddefault_save_status_data() {
        "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
-       "\tnext_comment_id=" << next_comment_id << "\n"
        "\tnext_downtime_id=" << next_downtime_id << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
@@ -355,28 +353,6 @@ int xsddefault_save_status_data() {
                << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
     }
     stream << "\t}\n\n";
-  }
-
-  // save all comments
-  for (comment* com = comment_list; com; com = com->next) {
-    if (com->comment_type == HOST_COMMENT)
-      stream << "hostcomment {\n";
-    else
-      stream << "servicecomment {\n";
-    stream << "\thost_name=" << com->host_name << "\n";
-    if (com->comment_type == SERVICE_COMMENT)
-      stream << "\tservice_description=" << com->service_description << "\n";
-    stream
-      << "\tentry_type=" << com->entry_type << "\n"
-         "\tcomment_id=" << com->comment_id << "\n"
-         "\tsource=" << com->source << "\n"
-         "\tpersistent=" << com->persistent << "\n"
-         "\tentry_time=" << static_cast<unsigned long>(com->entry_time) << "\n"
-         "\texpires=" << com->expires << "\n"
-         "\texpire_time=" << static_cast<unsigned long>(com->expire_time) << "\n"
-         "\tauthor=" << com->author << "\n"
-         "\tcomment_data=" << com->comment_data << "\n"
-         "\t}\n\n";
   }
 
   // save all downtime

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,7 +20,6 @@
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/retention/applier/comment.hh"
 #include "com/centreon/engine/retention/applier/contact.hh"
 #include "com/centreon/engine/retention/applier/downtime.hh"
 #include "com/centreon/engine/retention/applier/host.hh"
@@ -58,9 +57,6 @@ void applier::state::apply(
 
     applier::program app_program;
     app_program.apply(config, state.globals());
-
-    applier::comment app_comments;
-    app_comments.apply(state.comments());
 
     applier::downtime app_downtimes;
     app_downtimes.apply(state.downtimes());

@@ -405,71 +405,6 @@ void broker_command_data(
 }
 
 /**
- *  Send comment data to broker.
- *
- *  @param[in] type            Type.
- *  @param[in] flags           Flags.
- *  @param[in] attr            Attributes.
- *  @param[in] comment_type    Comment type.
- *  @param[in] entry_type      Entry type.
- *  @param[in] host_name       Host name.
- *  @param[in] svc_description Service description.
- *  @param[in] author_name     Author name.
- *  @param[in] comment_data    Comment data.
- *  @param[in] persistent      Is this comment persistent.
- *  @param[in] source          Comment source.
- *  @param[in] expires         Does this comment expire ?
- *  @param[in] expire_time     Comment expiration time.
- *  @param[in] comment_id      Comment ID.
- *  @param[in] timestamp       Timestamp.
- */
-void broker_comment_data(
-       int type,
-       int flags,
-       int attr,
-       int comment_type,
-       int entry_type,
-       char const* host_name,
-       char const* svc_description,
-       time_t entry_time,
-       char const* author_name,
-       char const* comment_data,
-       int persistent,
-       int source,
-       int expires,
-       time_t expire_time,
-       unsigned long comment_id,
-       struct timeval const* timestamp) {
-  // Config check.
-  if (!(config->event_broker_options() & BROKER_COMMENT_DATA))
-    return;
-
-  // Fill struct with relevant data.
-  nebstruct_comment_data ds;
-  ds.type = type;
-  ds.flags = flags;
-  ds.attr = attr;
-  ds.timestamp = get_broker_timestamp(timestamp);
-  ds.comment_type = comment_type;
-  ds.entry_type = entry_type;
-  ds.host_name = host_name;
-  ds.service_description = svc_description;
-  ds.object_ptr = NULL; // Not implemented yet.
-  ds.entry_time = entry_time;
-  ds.author_name = author_name;
-  ds.comment_data = comment_data;
-  ds.persistent = persistent;
-  ds.source = source;
-  ds.expires = expires;
-  ds.expire_time = expire_time;
-  ds.comment_id = comment_id;
-
-  // Make callbacks.
-  neb_make_callbacks(NEBCALLBACK_COMMENT_DATA, &ds);
-  return;
-}
-
-/**
  *  Send contact notification data to broker.
  *
  *  @param[in] type              Type.
@@ -964,13 +899,11 @@ void broker_flapping_data(
     temp_service = (service*)data;
     ds.host_name = temp_service->host_name;
     ds.service_description = temp_service->description;
-    ds.comment_id = temp_service->flapping_comment_id;
   }
   else {
     temp_host = (host*)data;
     ds.host_name = temp_host->name;
     ds.service_description = NULL;
-    ds.comment_id = temp_host->flapping_comment_id;
   }
   ds.object_ptr = data;
   ds.percent_change = percent_change;

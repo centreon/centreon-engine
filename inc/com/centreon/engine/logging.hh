@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2007 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -76,7 +76,6 @@
 #  define DEBUGL_EXTERNALCOMMANDS    128
 #  define DEBUGL_COMMANDS            256
 #  define DEBUGL_DOWNTIME            512
-#  define DEBUGL_COMMENTS            1024
 #  define DEBUGL_MACROS              2048
 
 #  define DEBUGV_BASIC               0

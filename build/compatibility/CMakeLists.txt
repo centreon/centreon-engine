@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2014 Merethis
+## Copyright 2011-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -43,7 +43,6 @@ set(
   # Headers.
   "${INC_DIR}/broker.h"
   "${INC_DIR}/check_result.h"
-  "${INC_DIR}/comments.h"
   "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"
   "${INC_DIR}/downtime.h"

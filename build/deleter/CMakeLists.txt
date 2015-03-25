@@ -29,7 +29,6 @@ set(
   # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/commandsmember.cc"
-  "${SRC_DIR}/comment.cc"
   "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/contactgroup.cc"
   "${SRC_DIR}/contactgroupsmember.cc"
@@ -46,7 +45,6 @@ set(
   "${SRC_DIR}/servicedependency.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/servicesmember.cc"
-  "${SRC_DIR}/timedevent.cc"
   "${SRC_DIR}/timeperiod.cc"
   "${SRC_DIR}/timeperiodexclusion.cc"
   "${SRC_DIR}/timerange.cc"
@@ -54,7 +52,6 @@ set(
   # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/commandsmember.hh"
-  "${INC_DIR}/comment.hh"
   "${INC_DIR}/contact.hh"
   "${INC_DIR}/contactgroup.hh"
   "${INC_DIR}/contactgroupsmember.hh"
@@ -72,7 +69,6 @@ set(
   "${INC_DIR}/servicedependency.hh"
   "${INC_DIR}/servicegroup.hh"
   "${INC_DIR}/servicesmember.hh"
-  "${INC_DIR}/timedevent.hh"
   "${INC_DIR}/timeperiod.hh"
   "${INC_DIR}/timeperiodexclusion.hh"
   "${INC_DIR}/timerange.hh"

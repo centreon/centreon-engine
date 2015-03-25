@@ -123,7 +123,6 @@ typedef struct                  host_struct {
   unsigned int                  state_history_index;
   time_t                        last_state_history_update;
   int                           is_flapping;
-  unsigned long                 flapping_comment_id;
   double                        percent_state_change;
   int                           total_services;
   unsigned long                 total_service_check_interval;

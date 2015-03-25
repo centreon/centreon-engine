@@ -2,7 +2,7 @@
 ** Copyright 2007-2008 Ethan Galstad
 ** Copyright 2007,2010 Andreas Ericsson
 ** Copyright 2010      Max Schubert
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -31,7 +31,6 @@
 #  include "com/centreon/engine/events/defines.hh"
 #  include "com/centreon/engine/flapping.hh"
 #  include "com/centreon/engine/notifications.hh"
-#  include "com/centreon/engine/objects/comment.hh"
 #  include "com/centreon/engine/sehandlers.hh"
 #  include "com/centreon/engine/utils.hh"
 #  include "common.h"

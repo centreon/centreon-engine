@@ -79,7 +79,6 @@ using namespace com::centreon::engine;
 #define ACK_AUTHOR              mkermagoret
 #define ACK_AUTHOR_NAME         Matthieu Kermagoret
 #define ACK_AUTHOR_ALIAS        mk
-#define ACK_COMMENT             hello world
 
 /**
  *  Check that the grab_standard_host_macro function works properly.
@@ -156,7 +155,6 @@ int main_test(int argc, char** argv) {
   mac.x[MACRO_HOSTACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
   mac.x[MACRO_HOSTACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
   mac.x[MACRO_HOSTACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
-  mac.x[MACRO_HOSTACKCOMMENT] = string::dup(STR(ACK_COMMENT));
 
   // Macro values table.
   struct {
@@ -203,8 +201,7 @@ int main_test(int argc, char** argv) {
     { MACRO_TOTALHOSTSERVICESCRITICAL, STR(TOTAL_SERVICES_CRITICAL), false },
     { MACRO_HOSTACKAUTHOR, STR(ACK_AUTHOR), false },
     { MACRO_HOSTACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
-    { MACRO_HOSTACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false },
-    { MACRO_HOSTACKCOMMENT, STR(ACK_COMMENT), false }
+    { MACRO_HOSTACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false }
   };
 
   // Compare macros with expected values.
@@ -255,7 +252,6 @@ int main_test(int argc, char** argv) {
   delete [] mac.x[MACRO_HOSTACKAUTHOR];
   delete [] mac.x[MACRO_HOSTACKAUTHORNAME];
   delete [] mac.x[MACRO_HOSTACKAUTHORALIAS];
-  delete [] mac.x[MACRO_HOSTACKCOMMENT];
 
   return (retval);
 }

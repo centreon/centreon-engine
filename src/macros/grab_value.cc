@@ -763,7 +763,6 @@ struct grab_value_redirection {
       MACRO_HOSTSTATETYPE,
       MACRO_HOSTPERCENTCHANGE,
       MACRO_HOSTACKAUTHOR,
-      MACRO_HOSTACKCOMMENT,
       MACRO_LASTHOSTUP,
       MACRO_LASTHOSTDOWN,
       MACRO_LASTHOSTUNREACHABLE,
@@ -829,7 +828,6 @@ struct grab_value_redirection {
       MACRO_SERVICESTATETYPE,
       MACRO_SERVICEPERCENTCHANGE,
       MACRO_SERVICEACKAUTHOR,
-      MACRO_SERVICEACKCOMMENT,
       MACRO_LASTSERVICEOK,
       MACRO_LASTSERVICEWARNING,
       MACRO_LASTSERVICEUNKNOWN,
@@ -905,8 +903,7 @@ struct grab_value_redirection {
       MACRO_NOTIFICATIONRECIPIENTS,
       MACRO_NOTIFICATIONAUTHOR,
       MACRO_NOTIFICATIONAUTHORNAME,
-      MACRO_NOTIFICATIONAUTHORALIAS,
-      MACRO_NOTIFICATIONCOMMENT
+      MACRO_NOTIFICATIONAUTHORALIAS
     };
     for (unsigned int i = 0;
          i < sizeof(notification_ids) / sizeof(*notification_ids);
@@ -1056,7 +1053,7 @@ int grab_macro_value_r(
                  free_macro);
 
       /* post-processing */
-      /* host/service output/perfdata and author/comment macros should get cleaned */
+      /* host/service output/perfdata and author macros should get cleaned */
       if ((x >= 16 && x <= 19) || (x >= 49 && x <= 52)
           || (x >= 99 && x <= 100) || (x >= 124 && x <= 127)) {
         *clean_options |= (STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
