@@ -1373,9 +1373,7 @@ int check_service_check_viability(
     }
 
     /* check service dependencies for execution */
-    if (check_service_dependencies(
-          svc,
-          EXECUTION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+    if (check_service_dependencies(svc) == DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
@@ -1393,9 +1391,7 @@ int check_service_check_viability(
 }
 
 /* checks service dependencies */
-unsigned int check_service_dependencies(
-               service* svc,
-               int dependency_type) {
+unsigned int check_service_dependencies(service* svc) {
   service* temp_service = NULL;
   int state = STATE_OK;
   time_t current_time = 0L;
@@ -1412,10 +1408,6 @@ unsigned int check_service_dependencies(
        it != end && it->first == id;
        ++it) {
     servicedependency* temp_dependency(&*it->second);
-
-    /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->dependency_type != dependency_type)
-      continue;
 
     /* find the service we depend on... */
     if ((temp_service = temp_dependency->master_service_ptr) == NULL)
@@ -1456,9 +1448,7 @@ unsigned int check_service_dependencies(
 
     /* immediate dependencies ok at this point - check parent dependencies if necessary */
     if (temp_dependency->inherits_parent == true) {
-      if (check_service_dependencies(
-            temp_service,
-            dependency_type) != DEPENDENCIES_OK)
+      if (check_service_dependencies(temp_service) != DEPENDENCIES_OK)
         return (DEPENDENCIES_FAILED);
     }
   }
@@ -1818,7 +1808,7 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 }
 
 /* checks host dependencies */
-unsigned int check_host_dependencies(host* hst, int dependency_type) {
+unsigned int check_host_dependencies(host* hst) {
   host* temp_host = NULL;
   int state = HOST_UP;
   time_t current_time = 0L;
@@ -1836,10 +1826,6 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
        it != end && it->first == id;
        ++it) {
          hostdependency* temp_dependency(&*it->second);
-
-    /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->dependency_type != dependency_type)
-      continue;
 
     /* find the host we depend on... */
     if ((temp_host = temp_dependency->master_host_ptr) == NULL)
@@ -1876,9 +1862,7 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
 
     /* immediate dependencies ok at this point - check parent dependencies if necessary */
     if (temp_dependency->inherits_parent == true) {
-      if (check_host_dependencies(
-            temp_host,
-            dependency_type) != DEPENDENCIES_OK)
+      if (check_host_dependencies(temp_host) != DEPENDENCIES_OK)
         return (DEPENDENCIES_FAILED);
     }
   }
@@ -3189,9 +3173,7 @@ int check_host_check_viability_3x(
     }
 
     /* check host dependencies for execution */
-    if (check_host_dependencies(
-          hst,
-          EXECUTION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+    if (check_host_dependencies(hst) == DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
     }

@@ -2642,34 +2642,35 @@ int xodtemplate_add_object_property(char* input, int options) {
       temp_servicedependency->inherits_parent = (atoi(value) > 0) ? true : false;
       temp_servicedependency->have_inherits_parent = true;
     }
-    else if (!strcmp(variable, "execution_failure_options")
+    else if (!strcmp(variable, "failure_options")
+             || !strcmp(variable, "execution_failure_options")
              || !strcmp(variable, "execution_failure_criteria")) {
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
            temp_ptr = strtok(NULL, ", ")) {
         if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_servicedependency->fail_execute_on_ok = true;
+          temp_servicedependency->fail_on_ok = true;
         else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_servicedependency->fail_execute_on_unknown = true;
+          temp_servicedependency->fail_on_unknown = true;
         else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_servicedependency->fail_execute_on_warning = true;
+          temp_servicedependency->fail_on_warning = true;
         else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_servicedependency->fail_execute_on_critical = true;
+          temp_servicedependency->fail_on_critical = true;
         else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
-          temp_servicedependency->fail_execute_on_pending = true;
+          temp_servicedependency->fail_on_pending = true;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_servicedependency->fail_execute_on_ok = false;
-          temp_servicedependency->fail_execute_on_unknown = false;
-          temp_servicedependency->fail_execute_on_warning = false;
-          temp_servicedependency->fail_execute_on_critical = false;
-          temp_servicedependency->fail_execute_on_pending = false;
+          temp_servicedependency->fail_on_ok = false;
+          temp_servicedependency->fail_on_unknown = false;
+          temp_servicedependency->fail_on_warning = false;
+          temp_servicedependency->fail_on_critical = false;
+          temp_servicedependency->fail_on_pending = false;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_servicedependency->fail_execute_on_ok = true;
-          temp_servicedependency->fail_execute_on_unknown = true;
-          temp_servicedependency->fail_execute_on_warning = true;
-          temp_servicedependency->fail_execute_on_critical = true;
-          temp_servicedependency->fail_execute_on_pending = true;
+          temp_servicedependency->fail_on_ok = true;
+          temp_servicedependency->fail_on_unknown = true;
+          temp_servicedependency->fail_on_warning = true;
+          temp_servicedependency->fail_on_critical = true;
+          temp_servicedependency->fail_on_pending = true;
         }
         else {
           logger(log_config_error, basic)
@@ -2678,46 +2679,7 @@ int xodtemplate_add_object_property(char* input, int options) {
           return (ERROR);
         }
       }
-      temp_servicedependency->have_execution_dependency_options = true;
-    }
-    else if (!strcmp(variable, "notification_failure_options")
-             || !strcmp(variable, "notification_failure_criteria")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_servicedependency->fail_notify_on_ok = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_servicedependency->fail_notify_on_unknown = true;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_servicedependency->fail_notify_on_warning = true;
-        else if (!strcmp(temp_ptr, "c")
-                 || !strcmp(temp_ptr, "critical"))
-          temp_servicedependency->fail_notify_on_critical = true;
-        else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
-          temp_servicedependency->fail_notify_on_pending = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_servicedependency->fail_notify_on_ok = false;
-          temp_servicedependency->fail_notify_on_unknown = false;
-          temp_servicedependency->fail_notify_on_warning = false;
-          temp_servicedependency->fail_notify_on_critical = false;
-          temp_servicedependency->fail_notify_on_pending = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_servicedependency->fail_notify_on_ok = true;
-          temp_servicedependency->fail_notify_on_unknown = true;
-          temp_servicedependency->fail_notify_on_warning = true;
-          temp_servicedependency->fail_notify_on_critical = true;
-          temp_servicedependency->fail_notify_on_pending = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid notification dependency option '" << temp_ptr
-            << "' in servicedependency definition.";
-          return (ERROR);
-        }
-      }
-      temp_servicedependency->have_notification_dependency_options = true;
+      temp_servicedependency->have_dependency_options = true;
     }
     else if (!strcmp(variable, "register"))
       temp_servicedependency->register_object = (atoi(value) > 0) ? true : false;
@@ -2815,64 +2777,31 @@ int xodtemplate_add_object_property(char* input, int options) {
       temp_hostdependency->inherits_parent = (atoi(value) > 0) ? true : false;
       temp_hostdependency->have_inherits_parent = true;
     }
-    else if (!strcmp(variable, "notification_failure_options")
-             || !strcmp(variable, "notification_failure_criteria")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "up"))
-          temp_hostdependency->fail_notify_on_up = true;
-        else if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_hostdependency->fail_notify_on_down = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_hostdependency->fail_notify_on_unreachable = true;
-        else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
-          temp_hostdependency->fail_notify_on_pending = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_hostdependency->fail_notify_on_up = false;
-          temp_hostdependency->fail_notify_on_down = false;
-          temp_hostdependency->fail_notify_on_unreachable = false;
-          temp_hostdependency->fail_notify_on_pending = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_hostdependency->fail_notify_on_up = true;
-          temp_hostdependency->fail_notify_on_down = true;
-          temp_hostdependency->fail_notify_on_unreachable = true;
-          temp_hostdependency->fail_notify_on_pending = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid notification dependency option '"
-            << temp_ptr << "' in hostdependency definition.";
-          return (ERROR);
-        }
-      }
-      temp_hostdependency->have_notification_dependency_options = true;
-    }
-    else if (!strcmp(variable, "execution_failure_options")
+    else if (!strcmp(variable, "failure_options")
+             || !strcmp(variable, "execution_failure_options")
              || !strcmp(variable, "execution_failure_criteria")) {
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
            temp_ptr = strtok(NULL, ", ")) {
         if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "up"))
-          temp_hostdependency->fail_execute_on_up = true;
+          temp_hostdependency->fail_on_up = true;
         else if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_hostdependency->fail_execute_on_down = true;
+          temp_hostdependency->fail_on_down = true;
         else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_hostdependency->fail_execute_on_unreachable = true;
+          temp_hostdependency->fail_on_unreachable = true;
         else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
-          temp_hostdependency->fail_execute_on_pending = true;
+          temp_hostdependency->fail_on_pending = true;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_hostdependency->fail_execute_on_up = false;
-          temp_hostdependency->fail_execute_on_down = false;
-          temp_hostdependency->fail_execute_on_unreachable = false;
-          temp_hostdependency->fail_execute_on_pending = false;
+          temp_hostdependency->fail_on_up = false;
+          temp_hostdependency->fail_on_down = false;
+          temp_hostdependency->fail_on_unreachable = false;
+          temp_hostdependency->fail_on_pending = false;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_hostdependency->fail_execute_on_up = true;
-          temp_hostdependency->fail_execute_on_down = true;
-          temp_hostdependency->fail_execute_on_unreachable = true;
-          temp_hostdependency->fail_execute_on_pending = true;
+          temp_hostdependency->fail_on_up = true;
+          temp_hostdependency->fail_on_down = true;
+          temp_hostdependency->fail_on_unreachable = true;
+          temp_hostdependency->fail_on_pending = true;
         }
         else {
           logger(log_config_error, basic)
@@ -2881,7 +2810,7 @@ int xodtemplate_add_object_property(char* input, int options) {
           return (ERROR);
         }
       }
-      temp_hostdependency->have_execution_dependency_options = true;
+      temp_hostdependency->have_dependency_options = true;
     }
     else if (!strcmp(variable, "register"))
       temp_hostdependency->register_object = (atoi(value) > 0) ? true : false;
@@ -4850,16 +4779,11 @@ int xodtemplate_duplicate_hostdependency(
     new_hostdependency->name = string::dup(temp_hostdependency->name);
 
   /* duplicate non-string members */
-  new_hostdependency->fail_notify_on_up = temp_hostdependency->fail_notify_on_up;
-  new_hostdependency->fail_notify_on_down = temp_hostdependency->fail_notify_on_down;
-  new_hostdependency->fail_notify_on_unreachable = temp_hostdependency->fail_notify_on_unreachable;
-  new_hostdependency->fail_notify_on_pending = temp_hostdependency->fail_notify_on_pending;
-  new_hostdependency->have_notification_dependency_options = temp_hostdependency->have_notification_dependency_options;
-  new_hostdependency->fail_execute_on_up = temp_hostdependency->fail_execute_on_up;
-  new_hostdependency->fail_execute_on_down =  temp_hostdependency->fail_execute_on_down;
-  new_hostdependency->fail_execute_on_unreachable = temp_hostdependency->fail_execute_on_unreachable;
-  new_hostdependency->fail_execute_on_pending = temp_hostdependency->fail_execute_on_pending;
-  new_hostdependency->have_execution_dependency_options = temp_hostdependency->have_execution_dependency_options;
+  new_hostdependency->fail_on_up = temp_hostdependency->fail_on_up;
+  new_hostdependency->fail_on_down =  temp_hostdependency->fail_on_down;
+  new_hostdependency->fail_on_unreachable = temp_hostdependency->fail_on_unreachable;
+  new_hostdependency->fail_on_pending = temp_hostdependency->fail_on_pending;
+  new_hostdependency->have_dependency_options = temp_hostdependency->have_dependency_options;
   new_hostdependency->inherits_parent = temp_hostdependency->inherits_parent;
   new_hostdependency->have_inherits_parent = temp_hostdependency->have_inherits_parent;
 
@@ -4944,18 +4868,12 @@ int xodtemplate_duplicate_servicedependency(
     new_servicedependency->name = string::dup(temp_servicedependency->name);
 
   /* duplicate non-string members */
-  new_servicedependency->fail_notify_on_ok = temp_servicedependency->fail_notify_on_ok;
-  new_servicedependency->fail_notify_on_unknown = temp_servicedependency->fail_notify_on_unknown;
-  new_servicedependency->fail_notify_on_warning = temp_servicedependency->fail_notify_on_warning;
-  new_servicedependency->fail_notify_on_critical = temp_servicedependency->fail_notify_on_critical;
-  new_servicedependency->fail_notify_on_pending = temp_servicedependency->fail_notify_on_pending;
-  new_servicedependency->have_notification_dependency_options = temp_servicedependency->have_notification_dependency_options;
-  new_servicedependency->fail_execute_on_ok = temp_servicedependency->fail_execute_on_ok;
-  new_servicedependency->fail_execute_on_unknown = temp_servicedependency->fail_execute_on_unknown;
-  new_servicedependency->fail_execute_on_warning = temp_servicedependency->fail_execute_on_warning;
-  new_servicedependency->fail_execute_on_critical = temp_servicedependency->fail_execute_on_critical;
-  new_servicedependency->fail_execute_on_pending = temp_servicedependency->fail_execute_on_pending;
-  new_servicedependency->have_execution_dependency_options = temp_servicedependency->have_execution_dependency_options;
+  new_servicedependency->fail_on_ok = temp_servicedependency->fail_on_ok;
+  new_servicedependency->fail_on_unknown = temp_servicedependency->fail_on_unknown;
+  new_servicedependency->fail_on_warning = temp_servicedependency->fail_on_warning;
+  new_servicedependency->fail_on_critical = temp_servicedependency->fail_on_critical;
+  new_servicedependency->fail_on_pending = temp_servicedependency->fail_on_pending;
+  new_servicedependency->have_dependency_options = temp_servicedependency->have_dependency_options;
   new_servicedependency->inherits_parent = temp_servicedependency->inherits_parent;
   new_servicedependency->have_inherits_parent = temp_servicedependency->have_inherits_parent;
 
@@ -5629,33 +5547,19 @@ int xodtemplate_resolve_servicedependency(
         = template_servicedependency->inherits_parent;
       this_servicedependency->have_inherits_parent = true;
     }
-    if (this_servicedependency->have_execution_dependency_options == false
-        && template_servicedependency->have_execution_dependency_options == true) {
-      this_servicedependency->fail_execute_on_ok
-        = template_servicedependency->fail_execute_on_ok;
-      this_servicedependency->fail_execute_on_unknown
-        = template_servicedependency->fail_execute_on_unknown;
-      this_servicedependency->fail_execute_on_warning
-        = template_servicedependency->fail_execute_on_warning;
-      this_servicedependency->fail_execute_on_critical
-        = template_servicedependency->fail_execute_on_critical;
-      this_servicedependency->fail_execute_on_pending
-        = template_servicedependency->fail_execute_on_pending;
-      this_servicedependency->have_execution_dependency_options = true;
-    }
-    if (this_servicedependency->have_notification_dependency_options == false
-        && template_servicedependency->have_notification_dependency_options == true) {
-      this_servicedependency->fail_notify_on_ok
-        = template_servicedependency->fail_notify_on_ok;
-      this_servicedependency->fail_notify_on_unknown
-        = template_servicedependency->fail_notify_on_unknown;
-      this_servicedependency->fail_notify_on_warning
-        = template_servicedependency->fail_notify_on_warning;
-      this_servicedependency->fail_notify_on_critical
-        = template_servicedependency->fail_notify_on_critical;
-      this_servicedependency->fail_notify_on_pending
-        = template_servicedependency->fail_notify_on_pending;
-      this_servicedependency->have_notification_dependency_options = true;
+    if (this_servicedependency->have_dependency_options == false
+        && template_servicedependency->have_dependency_options == true) {
+      this_servicedependency->fail_on_ok
+        = template_servicedependency->fail_on_ok;
+      this_servicedependency->fail_on_unknown
+        = template_servicedependency->fail_on_unknown;
+      this_servicedependency->fail_on_warning
+        = template_servicedependency->fail_on_warning;
+      this_servicedependency->fail_on_critical
+        = template_servicedependency->fail_on_critical;
+      this_servicedependency->fail_on_pending
+        = template_servicedependency->fail_on_pending;
+      this_servicedependency->have_dependency_options = true;
     }
   }
 
@@ -6542,29 +6446,17 @@ int xodtemplate_resolve_hostdependency(
         = template_hostdependency->inherits_parent;
       this_hostdependency->have_inherits_parent = true;
     }
-    if (this_hostdependency->have_execution_dependency_options == false
-        && template_hostdependency->have_execution_dependency_options == true) {
-      this_hostdependency->fail_execute_on_up
-        = template_hostdependency->fail_execute_on_up;
-      this_hostdependency->fail_execute_on_down
-        = template_hostdependency->fail_execute_on_down;
-      this_hostdependency->fail_execute_on_unreachable
-        = template_hostdependency->fail_execute_on_unreachable;
-      this_hostdependency->fail_execute_on_pending
-        = template_hostdependency->fail_execute_on_pending;
-      this_hostdependency->have_execution_dependency_options = true;
-    }
-    if (this_hostdependency->have_notification_dependency_options == false
-        && template_hostdependency->have_notification_dependency_options == true) {
-      this_hostdependency->fail_notify_on_up
-        = template_hostdependency->fail_notify_on_up;
-      this_hostdependency->fail_notify_on_down
-        = template_hostdependency->fail_notify_on_down;
-      this_hostdependency->fail_notify_on_unreachable
-        = template_hostdependency->fail_notify_on_unreachable;
-      this_hostdependency->fail_notify_on_pending
-        = template_hostdependency->fail_notify_on_pending;
-      this_hostdependency->have_notification_dependency_options = true;
+    if (this_hostdependency->have_dependency_options == false
+        && template_hostdependency->have_dependency_options == true) {
+      this_hostdependency->fail_on_up
+        = template_hostdependency->fail_on_up;
+      this_hostdependency->fail_on_down
+        = template_hostdependency->fail_on_down;
+      this_hostdependency->fail_on_unreachable
+        = template_hostdependency->fail_on_unreachable;
+      this_hostdependency->fail_on_pending
+        = template_hostdependency->fail_on_pending;
+      this_hostdependency->have_dependency_options = true;
     }
   }
 
@@ -8197,8 +8089,7 @@ int xodtemplate_register_servicedependency(
     return (OK);
 
   /* throw a warning on servicedeps that have no options */
-  if (this_servicedependency->have_notification_dependency_options == false
-      && this_servicedependency->have_execution_dependency_options == false) {
+  if (this_servicedependency->have_dependency_options == false) {
     logger(log_config_warning, basic)
       << "Warning: Ignoring lame service dependency (config file '"
       << xodtemplate_config_file_name(this_servicedependency->_config_file)
@@ -8207,51 +8098,24 @@ int xodtemplate_register_servicedependency(
   }
 
   /* add the servicedependency */
-  if (this_servicedependency->have_execution_dependency_options == true) {
+  if (this_servicedependency->have_dependency_options == true) {
     new_servicedependency = add_service_dependency(
                               this_servicedependency->dependent_host_name,
                               this_servicedependency->dependent_service_description,
                               this_servicedependency->host_name,
                               this_servicedependency->service_description,
-                              EXECUTION_DEPENDENCY,
                               this_servicedependency->inherits_parent,
-                              this_servicedependency->fail_execute_on_ok,
-                              this_servicedependency->fail_execute_on_warning,
-                              this_servicedependency->fail_execute_on_unknown,
-                              this_servicedependency->fail_execute_on_critical,
-                              this_servicedependency->fail_execute_on_pending,
+                              this_servicedependency->fail_on_ok,
+                              this_servicedependency->fail_on_warning,
+                              this_servicedependency->fail_on_unknown,
+                              this_servicedependency->fail_on_critical,
+                              this_servicedependency->fail_on_pending,
                               this_servicedependency->dependency_period);
 
     /* return with an error if we couldn't add the servicedependency */
     if (new_servicedependency == NULL) {
       logger(log_config_error, basic)
         << "Error: Could not register service execution dependency "
-        "(config file '"
-        << xodtemplate_config_file_name(this_servicedependency->_config_file)
-        << "', starting on line " << this_servicedependency->_start_line
-        << ")";
-      return (ERROR);
-    }
-  }
-  if (this_servicedependency->have_notification_dependency_options == true) {
-    new_servicedependency = add_service_dependency(
-                              this_servicedependency->dependent_host_name,
-                              this_servicedependency->dependent_service_description,
-                              this_servicedependency->host_name,
-                              this_servicedependency->service_description,
-                              NOTIFICATION_DEPENDENCY,
-                              this_servicedependency->inherits_parent,
-                              this_servicedependency->fail_notify_on_ok,
-                              this_servicedependency->fail_notify_on_warning,
-                              this_servicedependency->fail_notify_on_unknown,
-                              this_servicedependency->fail_notify_on_critical,
-                              this_servicedependency->fail_notify_on_pending,
-                              this_servicedependency->dependency_period);
-
-    /* return with an error if we couldn't add the servicedependency */
-    if (new_servicedependency == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not register service notification dependency "
         "(config file '"
         << xodtemplate_config_file_name(this_servicedependency->_config_file)
         << "', starting on line " << this_servicedependency->_start_line
@@ -8662,55 +8526,25 @@ int xodtemplate_register_hostdependency(
     return (OK);
 
   /* add the host execution dependency */
-  if (this_hostdependency->have_execution_dependency_options == true) {
+  new_hostdependency = add_host_dependency(
+                         this_hostdependency->dependent_host_name,
+                         this_hostdependency->host_name,
+                         this_hostdependency->inherits_parent,
+                         this_hostdependency->fail_on_up,
+                         this_hostdependency->fail_on_down,
+                         this_hostdependency->fail_on_unreachable,
+                         this_hostdependency->fail_on_pending,
+                         this_hostdependency->dependency_period);
 
-    new_hostdependency = add_host_dependency(
-                           this_hostdependency->dependent_host_name,
-                           this_hostdependency->host_name,
-                           EXECUTION_DEPENDENCY,
-                           this_hostdependency->inherits_parent,
-                           this_hostdependency->fail_execute_on_up,
-                           this_hostdependency->fail_execute_on_down,
-                           this_hostdependency->fail_execute_on_unreachable,
-                           this_hostdependency->fail_execute_on_pending,
-                           this_hostdependency->dependency_period);
-
-    /* return with an error if we couldn't add the hostdependency */
-    if (new_hostdependency == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not register host execution dependency "
-        "(config file '"
-        << xodtemplate_config_file_name(this_hostdependency->_config_file)
-        << "', starting on line " << this_hostdependency->_start_line
-        << ")";
-      return (ERROR);
-    }
-  }
-
-  /* add the host notification dependency */
-  if (this_hostdependency->have_notification_dependency_options == true) {
-
-    new_hostdependency = add_host_dependency(
-                           this_hostdependency->dependent_host_name,
-                           this_hostdependency->host_name,
-                           NOTIFICATION_DEPENDENCY,
-                           this_hostdependency->inherits_parent,
-                           this_hostdependency->fail_notify_on_up,
-                           this_hostdependency->fail_notify_on_down,
-                           this_hostdependency->fail_notify_on_unreachable,
-                           this_hostdependency->fail_notify_on_pending,
-                           this_hostdependency->dependency_period);
-
-    /* return with an error if we couldn't add the hostdependency */
-    if (new_hostdependency == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not register host notification dependency "
-        "(config file '"
-        << xodtemplate_config_file_name(this_hostdependency->_config_file)
-        << "', starting on line " << this_hostdependency->_start_line
-        << ")";
-      return (ERROR);
-    }
+  /* return with an error if we couldn't add the hostdependency */
+  if (new_hostdependency == NULL) {
+    logger(log_config_error, basic)
+      << "Error: Could not register host execution dependency "
+      "(config file '"
+      << xodtemplate_config_file_name(this_hostdependency->_config_file)
+      << "', starting on line " << this_hostdependency->_start_line
+      << ")";
+    return (ERROR);
   }
 
   return (OK);
@@ -10137,35 +9971,18 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (temp_servicedependency->dependency_period)
       fprintf(fp, "\tdependency_period\t%s\n", temp_servicedependency->dependency_period);
     fprintf(fp, "\tinherits_parent\t%d\n", temp_servicedependency->inherits_parent);
-    if (temp_servicedependency->have_notification_dependency_options == true) {
-      fprintf(fp, "\tnotification_failure_options\t");
+    if (temp_servicedependency->have_dependency_options == true) {
+      fprintf(fp, "\tfailure_options\t");
       x = 0;
-      if (temp_servicedependency->fail_notify_on_ok == true)
+      if (temp_servicedependency->fail_on_ok == true)
         fprintf(fp, "%so", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_notify_on_unknown == true)
+      if (temp_servicedependency->fail_on_unknown == true)
         fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_notify_on_warning == true)
+      if (temp_servicedependency->fail_on_warning == true)
         fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_notify_on_critical == true)
+      if (temp_servicedependency->fail_on_critical == true)
         fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_notify_on_pending == true)
-        fprintf(fp, "%sp", (x++ > 0) ? "," : "");
-      if (x == 0)
-        fprintf(fp, "n");
-      fprintf(fp, "\n");
-    }
-    if (temp_servicedependency->have_execution_dependency_options == true) {
-      fprintf(fp, "\texecution_failure_options\t");
-      x = 0;
-      if (temp_servicedependency->fail_execute_on_ok == true)
-        fprintf(fp, "%so", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_execute_on_unknown == true)
-        fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_execute_on_warning == true)
-        fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_execute_on_critical == true)
-        fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_execute_on_pending == true)
+      if (temp_servicedependency->fail_on_pending == true)
         fprintf(fp, "%sp", (x++ > 0) ? "," : "");
       if (x == 0)
         fprintf(fp, "n");
@@ -10190,31 +10007,16 @@ int xodtemplate_cache_objects(char* cache_file) {
     if (temp_hostdependency->dependency_period)
       fprintf(fp, "\tdependency_period\t%s\n", temp_hostdependency->dependency_period);
     fprintf(fp, "\tinherits_parent\t%d\n", temp_hostdependency->inherits_parent);
-    if (temp_hostdependency->have_notification_dependency_options == true) {
-      fprintf(fp, "\tnotification_failure_options\t");
+    if (temp_hostdependency->have_dependency_options == true) {
+      fprintf(fp, "\tfailure_options\t");
       x = 0;
-      if (temp_hostdependency->fail_notify_on_up == true)
+      if (temp_hostdependency->fail_on_up == true)
         fprintf(fp, "%so", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_notify_on_down == true)
+      if (temp_hostdependency->fail_on_down == true)
         fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_notify_on_unreachable == true)
+      if (temp_hostdependency->fail_on_unreachable == true)
         fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_notify_on_pending == true)
-        fprintf(fp, "%sp", (x++ > 0) ? "," : "");
-      if (x == 0)
-        fprintf(fp, "n");
-      fprintf(fp, "\n");
-    }
-    if (temp_hostdependency->have_execution_dependency_options == true) {
-      fprintf(fp, "\texecution_failure_options\t");
-      x = 0;
-      if (temp_hostdependency->fail_execute_on_up == true)
-        fprintf(fp, "%so", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_execute_on_down == true)
-        fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_execute_on_unreachable == true)
-        fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_execute_on_pending == true)
+      if (temp_hostdependency->fail_on_pending == true)
         fprintf(fp, "%sp", (x++ > 0) ? "," : "");
       if (x == 0)
         fprintf(fp, "n");

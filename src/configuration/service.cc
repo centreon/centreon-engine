@@ -938,7 +938,7 @@ bool service::timezone_defined() const throw () {
 bool service::_set_action_url(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "Warning: service _action_url was ignored";
+    << "Warning: service action_url was ignored";
   ++config_warnings;
   return (true);
 }

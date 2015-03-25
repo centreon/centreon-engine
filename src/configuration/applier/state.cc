@@ -461,16 +461,7 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::st
       | (p.first->second->fail_on_pending
          ? configuration::hostdependency::pending
          : 0));
-    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
-      current.dependency_type(
-                configuration::hostdependency::notification_dependency);
-      current.notification_failure_options(options);
-    }
-    else {
-      current.dependency_type(
-                configuration::hostdependency::execution_dependency);
-      current.execution_failure_options(options);
-    }
+    current.failure_options(options);
     if (current == k)
       break ;
     ++p.first;
@@ -634,16 +625,7 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
                    | (p.first->second->fail_on_pending
                       ? configuration::servicedependency::pending
                       : 0));
-    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
-      current.dependency_type(
-        configuration::servicedependency::notification_dependency);
-      current.notification_failure_options(options);
-    }
-    else {
-      current.dependency_type(
-        configuration::servicedependency::execution_dependency);
-      current.execution_failure_options(options);
-    }
+    current.failure_options(options);
     if (current == k)
       break ;
     ++p.first;

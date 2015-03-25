@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -83,16 +83,6 @@ void applier::servicedependency::add_object(
     throw (engine_error() << "Could not create service "
            << "dependency with multiple (dependent) hosts / host groups "
            << "/ services / service groups");
-  if ((obj->dependency_type()
-       != configuration::servicedependency::execution_dependency)
-      && (obj->dependency_type()
-          != configuration::servicedependency::notification_dependency))
-    throw (engine_error() << "Could not create unexpanded "
-           << "dependency of service '"
-           << obj->dependent_service_description().front()
-           << "' of host '" << obj->dependent_hosts().front()
-           << "' on service '" << obj->service_description().front()
-           << "' of host '" << obj->hosts().front() << "'");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -106,69 +96,34 @@ void applier::servicedependency::add_object(
   config->servicedependencies().insert(obj);
 
   // Create execution dependency.
-  if (obj->dependency_type()
-      == configuration::servicedependency::execution_dependency) {
-    if (!add_service_dependency(
-           obj->dependent_hosts().front().c_str(),
-           obj->dependent_service_description().front().c_str(),
-           obj->hosts().front().c_str(),
-           obj->service_description().front().c_str(),
-           EXECUTION_DEPENDENCY,
-           obj->inherits_parent(),
-           static_cast<bool>(
-             obj->execution_failure_options()
-             & configuration::servicedependency::ok),
-           static_cast<bool>(
-             obj->execution_failure_options()
-             & configuration::servicedependency::warning),
-           static_cast<bool>(
-             obj->execution_failure_options()
-             & configuration::servicedependency::unknown),
-           static_cast<bool>(
-             obj->execution_failure_options()
-             & configuration::servicedependency::critical),
-           static_cast<bool>(
-             obj->execution_failure_options()
-             & configuration::servicedependency::pending),
-           NULL_IF_EMPTY(obj->dependency_period())))
-      throw (engine_error() << "Could not create service "
-             << "execution dependency of service '"
-             << obj->dependent_service_description().front()
-             << "' of host '" << obj->dependent_hosts().front()
-             << "' on service '" << obj->service_description().front()
-             << "' of host '" << obj->hosts().front() << "'");
-  }
-  // Create notification dependency.
-  else
-    if (!add_service_dependency(
-           obj->dependent_hosts().front().c_str(),
-           obj->dependent_service_description().front().c_str(),
-           obj->hosts().front().c_str(),
-           obj->service_description().front().c_str(),
-           NOTIFICATION_DEPENDENCY,
-           obj->inherits_parent(),
-           static_cast<bool>(
-             obj->notification_failure_options()
-             & configuration::servicedependency::ok),
-           static_cast<bool>(
-             obj->notification_failure_options()
-             & configuration::servicedependency::warning),
-           static_cast<bool>(
-             obj->notification_failure_options()
-             & configuration::servicedependency::unknown),
-           static_cast<bool>(
-             obj->notification_failure_options()
-             & configuration::servicedependency::critical),
-           static_cast<bool>(
-             obj->notification_failure_options()
-             & configuration::servicedependency::pending),
-           NULL_IF_EMPTY(obj->dependency_period())))
-      throw (engine_error() << "Could not create service "
-             << "notification dependency of service '"
-             << obj->dependent_service_description().front()
-             << "' of host '" << obj->dependent_hosts().front()
-             << "' on service '" << obj->service_description().front()
-             << "' of host '" << obj->hosts().front() << "'");
+  if (!add_service_dependency(
+         obj->dependent_hosts().front().c_str(),
+         obj->dependent_service_description().front().c_str(),
+         obj->hosts().front().c_str(),
+         obj->service_description().front().c_str(),
+         obj->inherits_parent(),
+         static_cast<bool>(
+           obj->failure_options()
+           & configuration::servicedependency::ok),
+         static_cast<bool>(
+           obj->failure_options()
+           & configuration::servicedependency::warning),
+         static_cast<bool>(
+           obj->failure_options()
+           & configuration::servicedependency::unknown),
+         static_cast<bool>(
+           obj->failure_options()
+           & configuration::servicedependency::critical),
+         static_cast<bool>(
+           obj->failure_options()
+           & configuration::servicedependency::pending),
+         NULL_IF_EMPTY(obj->dependency_period())))
+    throw (engine_error() << "Could not create service "
+           << "execution dependency of service '"
+           << obj->dependent_service_description().front()
+           << "' of host '" << obj->dependent_hosts().front()
+           << "' on service '" << obj->service_description().front()
+           << "' of host '" << obj->hosts().front() << "'");
 
   return ;
 }
@@ -190,9 +145,7 @@ void applier::servicedependency::expand_object(
       || (obj->dependent_hosts().size() != 1)
       || !obj->dependent_hostgroups().empty()
       || (obj->dependent_service_description().size() != 1)
-      || !obj->dependent_servicegroups().empty()
-      || (obj->dependency_type()
-          == configuration::servicedependency::unknown_type)) {
+      || !obj->dependent_servicegroups().empty()) {
     // Expand depended services.
     std::set<std::pair<std::string, std::string> >
       depended_services;
@@ -245,14 +198,7 @@ void applier::servicedependency::expand_object(
           sdep->dependent_servicegroups().clear();
           sdep->dependent_service_description().clear();
           sdep->dependent_service_description().push_back(it2->second);
-          sdep->dependency_type(
-            !i
-            ? configuration::servicedependency::execution_dependency
-            : configuration::servicedependency::notification_dependency);
-          if (i)
-            sdep->execution_failure_options(0);
-          else
-            sdep->notification_failure_options(0);
+          sdep->failure_options(0);
 
           // Insert new service dependency. We do not need to expand it
           // because no expansion is made on 1->1 dependency.

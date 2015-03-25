@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,8 +50,7 @@ using namespace com::centreon::engine::string;
 bool operator==(
        servicedependency const& obj1,
        servicedependency const& obj2) throw () {
-  return (obj1.dependency_type == obj2.dependency_type
-          && is_equal(obj1.dependent_host_name, obj2.dependent_host_name)
+  return (is_equal(obj1.dependent_host_name, obj2.dependent_host_name)
           && is_equal(obj1.dependent_service_description, obj2.dependent_service_description)
           && is_equal(obj1.host_name, obj2.host_name)
           && is_equal(obj1.service_description, obj2.service_description)
@@ -100,8 +99,6 @@ bool operator<(
     CMP_CSTR(obj1.host_name, obj2.host_name)
   else
     CMP_CSTR(obj1.service_description, obj2.service_description)
-  else if (obj1.dependency_type != obj2.dependency_type)
-    return (obj1.dependency_type < obj2.dependency_type);
   else
     CMP_CSTR(obj1.dependency_period, obj2.dependency_period)
   else if (obj1.inherits_parent != obj2.inherits_parent)
@@ -147,7 +144,6 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
   }
 
   os << "servicedependency {\n"
-    "  dependency_type:               " << obj.dependency_type << "\n"
     "  dependent_host_name:           " << chkstr(obj.dependent_host_name) << "\n"
     "  dependent_service_description: " << chkstr(obj.dependent_service_description) << "\n"
     "  host_name:                     " << chkstr(obj.host_name) << "\n"
@@ -177,7 +173,6 @@ std::ostream& operator<<(std::ostream& os, servicedependency const& obj) {
  *                                           description.
  *  @param[in] host_name                     Host name.
  *  @param[in] service_description           Service description.
- *  @param[in] dependency_type               Type of dependency.
  *  @param[in] inherits_parent               Inherits parent ?
  *  @param[in] fail_on_ok                    Does dependency fail on
  *                                           ok state ?
@@ -198,7 +193,6 @@ servicedependency* add_service_dependency(
                      char const* dependent_service_description,
                      char const* host_name,
                      char const* service_description,
-                     int dependency_type,
                      int inherits_parent,
                      int fail_on_ok,
                      int fail_on_warning,
@@ -239,7 +233,6 @@ servicedependency* add_service_dependency(
     if (dependency_period)
       obj->dependency_period = string::dup(dependency_period);
 
-    obj->dependency_type = (dependency_type == EXECUTION_DEPENDENCY) ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY;
     obj->fail_on_critical = (fail_on_critical == 1);
     obj->fail_on_ok = (fail_on_ok == 1);
     obj->fail_on_pending = (fail_on_pending == 1);
@@ -276,22 +269,15 @@ servicedependency* add_service_dependency(
 /**
  *  Checks to see if there exists a circular dependency for a service.
  *
- *  @param[in] root_dep        Root dependency.
- *  @param[in] dep             Dependency.
- *  @param[in] dependency_type Dependency type.
+ *  @param[in] root_dep  Root dependency.
+ *  @param[in] dep       Dependency.
  *
- *  @return true if circular path was found, false otherwise.
+ *  @return True if circular path was found, false otherwise.
  */
 int check_for_circular_servicedependency_path(
       servicedependency* root_dep,
-      servicedependency* dep,
-      int dependency_type) {
+      servicedependency* dep) {
   if (!root_dep || !dep)
-    return (false);
-
-  // This is not the proper dependency type.
-  if ((root_dep->dependency_type != dependency_type)
-      || (dep->dependency_type != dependency_type))
     return (false);
 
   // Don't go into a loop, don't bother checking anymore if we know this
@@ -317,12 +303,6 @@ int check_for_circular_servicedependency_path(
     }
   }
 
-  // Notification dependencies are ok at this point as long as they
-  // don't inherit.
-  if ((dependency_type == NOTIFICATION_DEPENDENCY)
-      && (dep->inherits_parent == false))
-    return (false);
-
   // Check all parent dependencies.
   for (servicedependency* temp_sd(servicedependency_list);
        temp_sd;
@@ -331,10 +311,7 @@ int check_for_circular_servicedependency_path(
     if (dep->master_service_ptr != temp_sd->dependent_service_ptr)
       continue;
 
-    if (check_for_circular_servicedependency_path(
-          root_dep,
-          temp_sd,
-          dependency_type) == true)
+    if (check_for_circular_servicedependency_path(root_dep, temp_sd))
       return (true);
   }
 

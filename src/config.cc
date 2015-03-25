@@ -508,37 +508,11 @@ int pre_flight_circular_check(int* w, int* e) {
 
     found = check_for_circular_servicedependency_path(
               temp_sd,
-              temp_sd,
-              EXECUTION_DEPENDENCY);
+              temp_sd);
     if (found == true) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could result "
         "in a deadlock) exists for service '"
-        << temp_sd->service_description << "' on host '"
-        << temp_sd->host_name << "'!";
-      errors++;
-    }
-  }
-
-  /* check notification dependencies between all services */
-  for (temp_sd = servicedependency_list;
-       temp_sd != NULL;
-       temp_sd = temp_sd->next) {
-
-    /* clear checked flag for all dependencies */
-    for (temp_sd2 = servicedependency_list;
-	 temp_sd2 != NULL;
-         temp_sd2 = temp_sd2->next)
-      temp_sd2->circular_path_checked = false;
-
-    found = check_for_circular_servicedependency_path(
-              temp_sd,
-              temp_sd,
-              NOTIFICATION_DEPENDENCY);
-    if (found == true) {
-      logger(log_verification_error, basic)
-        << "Error: A circular notification dependency (which could "
-        "result in a deadlock) exists for service '"
         << temp_sd->service_description << "' on host '"
         << temp_sd->host_name << "'!";
       errors++;
@@ -564,35 +538,10 @@ int pre_flight_circular_check(int* w, int* e) {
 
     found = check_for_circular_hostdependency_path(
               temp_hd,
-              temp_hd,
-              EXECUTION_DEPENDENCY);
+              temp_hd);
     if (found == true) {
       logger(log_verification_error, basic)
         << "Error: A circular execution dependency (which could "
-        "result in a deadlock) exists for host '"
-        << temp_hd->host_name << "'!";
-      errors++;
-    }
-  }
-
-  /* check notification dependencies between all hosts */
-  for (temp_hd = hostdependency_list;
-       temp_hd != NULL;
-       temp_hd = temp_hd->next) {
-
-    /* clear checked flag for all dependencies */
-    for (temp_hd2 = hostdependency_list;
-	 temp_hd2 != NULL;
-         temp_hd2 = temp_hd2->next)
-      temp_hd2->circular_path_checked = false;
-
-    found = check_for_circular_hostdependency_path(
-              temp_hd,
-              temp_hd,
-              NOTIFICATION_DEPENDENCY);
-    if (found == true) {
-      logger(log_verification_error, basic)
-        << "Error: A circular notification dependency (which could "
         "result in a deadlock) exists for host '"
         << temp_hd->host_name << "'!";
       errors++;

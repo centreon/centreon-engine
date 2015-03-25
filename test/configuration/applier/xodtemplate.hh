@@ -463,16 +463,11 @@ typedef struct xodtemplate_servicedependency_struct{
   char*        dependent_hostgroup_name;
   char*        dependency_period;
   int          inherits_parent;
-  int          fail_notify_on_ok;
-  int          fail_notify_on_unknown;
-  int          fail_notify_on_warning;
-  int          fail_notify_on_critical;
-  int          fail_notify_on_pending;
-  int          fail_execute_on_ok;
-  int          fail_execute_on_unknown;
-  int          fail_execute_on_warning;
-  int          fail_execute_on_critical;
-  int          fail_execute_on_pending;
+  int          fail_on_ok;
+  int          fail_on_unknown;
+  int          fail_on_warning;
+  int          fail_on_critical;
+  int          fail_on_pending;
 
   int          have_host_name;
   int          have_service_description;
@@ -485,8 +480,7 @@ typedef struct xodtemplate_servicedependency_struct{
   int          have_dependency_period;
 
   int          have_inherits_parent;
-  int          have_notification_dependency_options;
-  int          have_execution_dependency_options;
+  int          have_dependency_options;
 
   int          has_been_resolved;
   int          register_object;
@@ -507,14 +501,10 @@ typedef struct xodtemplate_hostdependency_struct{
   char*        dependent_hostgroup_name;
   char*        dependency_period;
   int          inherits_parent;
-  int          fail_notify_on_up;
-  int          fail_notify_on_down;
-  int          fail_notify_on_unreachable;
-  int          fail_notify_on_pending;
-  int          fail_execute_on_up;
-  int          fail_execute_on_down;
-  int          fail_execute_on_unreachable;
-  int          fail_execute_on_pending;
+  int          fail_on_up;
+  int          fail_on_down;
+  int          fail_on_unreachable;
+  int          fail_on_pending;
 
   int          have_host_name;
   int          have_dependent_host_name;
@@ -523,8 +513,7 @@ typedef struct xodtemplate_hostdependency_struct{
   int          have_dependency_period;
 
   int          have_inherits_parent;
-  int          have_notification_dependency_options;
-  int          have_execution_dependency_options;
+  int          have_dependency_options;
 
   int          has_been_resolved;
   int          register_object;

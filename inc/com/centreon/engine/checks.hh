@@ -103,9 +103,7 @@ void schedule_host_check(
 // Monitoring/Event Handler Functions
 
 // checks service dependencies
-unsigned int check_service_dependencies(
-               service* svc,
-               int dependency_type);
+unsigned int check_service_dependencies(service* svc);
 // checks the "freshness" of service check results
 void check_service_result_freshness();
 // determines if a service's check results are fresh
@@ -114,9 +112,7 @@ int is_service_result_fresh(
       time_t current_time,
       int log_this);
 // checks host dependencie
-unsigned int check_host_dependencies(
-               host* hst,
-               int dependency_type);
+unsigned int check_host_dependencies(host* hst);
 // checks the "freshness" of host check results
 void check_host_result_freshness();
 // determines if a host's check results are fresh
