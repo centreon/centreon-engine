@@ -53,7 +53,6 @@ namespace              configuration {
       read_servicedependency = (1 << 8),
       read_servicegroup = (1 << 9),
       read_timeperiod = (1 << 10),
-      read_downtime = (1 << 11),
       read_all = (~0)
     };
 

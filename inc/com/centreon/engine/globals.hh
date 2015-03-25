@@ -68,7 +68,6 @@ extern time_t                    last_command_status_update;
 extern unsigned long             modified_host_process_attributes;
 extern unsigned long             modified_service_process_attributes;
 
-extern unsigned long             next_downtime_id;
 extern unsigned long             next_event_id;
 extern unsigned long             next_problem_id;
 extern unsigned long             next_notification_id;
@@ -143,9 +142,6 @@ extern sched_info                scheduling_info;
 
 extern char*                     macro_x_names[];
 extern char*                     macro_user[];
-
-extern scheduled_downtime*       scheduled_downtime_list;
-extern int                       defer_downtime_sorting;
 
 extern FILE*                     debug_file_fp;
 

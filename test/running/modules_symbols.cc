@@ -21,7 +21,6 @@
 #include <time.h>
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/events/timed_event.hh"
-#include "downtime.h"
 #include "nagios.h"
 #include "nebstructs.h"
 
@@ -148,8 +147,8 @@ extern "C" {
       << contactgroup_list << "\n"
       << "find_command: "
       << (void (*)())find_command << "\n"
-      << "find_downtime: "
-      << (void (*)())find_downtime << "\n"
+      // << "find_downtime: "
+      // << (void (*)())find_downtime << "\n"
       // << "find_host_comment: "
       // << (void (*)())find_host_comment << "\n"
       // << "find_service_comment: "

@@ -56,7 +56,6 @@ typedef struct                  host_struct {
   int                           notify_on_unreachable;
   int                           notify_on_recovery;
   int                           notify_on_flapping;
-  int                           notify_on_downtime;
   char*                         notification_period;
   char*                         check_period;
   unsigned int                  check_timeout;
@@ -115,8 +114,6 @@ typedef struct                  host_struct {
   int                           no_more_notifications;
   unsigned long                 current_notification_id;
   int                           check_flapping_recovery_notification;
-  int                           scheduled_downtime_depth;
-  int                           pending_flex_downtime;
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
   time_t                        last_state_history_update;
@@ -169,7 +166,6 @@ host* add_host(
         int notify_down,
         int notify_unreachable,
         int notify_flapping,
-        int notify_downtime,
         double notification_interval,
         double first_notification_delay,
         char const* notification_period,

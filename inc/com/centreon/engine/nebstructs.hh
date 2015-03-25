@@ -219,31 +219,6 @@ typedef struct           nebstruct_custom_variable_struct {
   void*                  object_ptr;
 }                        nebstruct_custom_variable_data;
 
-/* Downtime data structure. */
-typedef struct   nebstruct_downtime_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  int            downtime_type;
-  char const*    host_name;
-  char const*    service_description;
-  time_t         entry_time;
-  char const*    author_name;
-  char const*    comment_data;
-  time_t         start_time;
-  time_t         end_time;
-  int            fixed;
-  unsigned long  duration;
-  unsigned long  triggered_by;
-  unsigned long  recurring_interval;
-  timeperiod*    recurring_period;
-  unsigned long  downtime_id;
-
-  void*          object_ptr; /* not implemented yet */
-}                nebstruct_downtime_data;
-
 /* Event handler structure. */
 typedef struct   nebstruct_event_handler_struct {
   int            type;

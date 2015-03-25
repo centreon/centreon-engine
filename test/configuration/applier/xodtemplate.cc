@@ -1298,15 +1298,12 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_service->notify_on_recovery = true;
         else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
           temp_service->notify_on_flapping = true;
-        else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_service->notify_on_downtime = true;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
           temp_service->notify_on_unknown = false;
           temp_service->notify_on_warning = false;
           temp_service->notify_on_critical = false;
           temp_service->notify_on_recovery = false;
           temp_service->notify_on_flapping = false;
-          temp_service->notify_on_downtime = false;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
           temp_service->notify_on_unknown = true;
@@ -1314,7 +1311,6 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_service->notify_on_critical = true;
           temp_service->notify_on_recovery = true;
           temp_service->notify_on_flapping = true;
-          temp_service->notify_on_downtime = true;
         }
         else {
           logger(log_config_error, basic)
@@ -1645,21 +1641,17 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_host->notify_on_recovery = true;
         else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
           temp_host->notify_on_flapping = true;
-        else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_host->notify_on_downtime = true;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
           temp_host->notify_on_down = false;
           temp_host->notify_on_unreachable = false;
           temp_host->notify_on_recovery = false;
           temp_host->notify_on_flapping = false;
-          temp_host->notify_on_downtime = false;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
           temp_host->notify_on_down = true;
           temp_host->notify_on_unreachable = true;
           temp_host->notify_on_recovery = true;
           temp_host->notify_on_flapping = true;
-          temp_host->notify_on_downtime = true;
         }
         else {
           logger(log_config_error, basic)
@@ -1962,21 +1954,17 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_contact->notify_on_host_recovery = true;
         else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
           temp_contact->notify_on_host_flapping = true;
-        else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_contact->notify_on_host_downtime = true;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
           temp_contact->notify_on_host_down = false;
           temp_contact->notify_on_host_unreachable = false;
           temp_contact->notify_on_host_recovery = false;
           temp_contact->notify_on_host_flapping = false;
-          temp_contact->notify_on_host_downtime = false;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
           temp_contact->notify_on_host_down = true;
           temp_contact->notify_on_host_unreachable = true;
           temp_contact->notify_on_host_recovery = true;
           temp_contact->notify_on_host_flapping = true;
-          temp_contact->notify_on_host_downtime = true;
         }
         else {
           logger(log_config_error, basic)
@@ -2001,15 +1989,12 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_contact->notify_on_service_recovery = true;
         else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
           temp_contact->notify_on_service_flapping = true;
-        else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_contact->notify_on_service_downtime = true;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
           temp_contact->notify_on_service_unknown = false;
           temp_contact->notify_on_service_warning = false;
           temp_contact->notify_on_service_critical = false;
           temp_contact->notify_on_service_recovery = false;
           temp_contact->notify_on_service_flapping = false;
-          temp_contact->notify_on_service_downtime = false;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
           temp_contact->notify_on_service_unknown = true;
@@ -2017,7 +2002,6 @@ int xodtemplate_add_object_property(char* input, int options) {
           temp_contact->notify_on_service_critical = true;
           temp_contact->notify_on_service_recovery = true;
           temp_contact->notify_on_service_flapping = true;
-          temp_contact->notify_on_service_downtime = true;
         }
         else {
           logger(log_config_error, basic)
@@ -4710,7 +4694,6 @@ int xodtemplate_duplicate_service(
   new_service->notify_on_critical = temp_service->notify_on_critical;
   new_service->notify_on_recovery = temp_service->notify_on_recovery;
   new_service->notify_on_flapping = temp_service->notify_on_flapping;
-  new_service->notify_on_downtime = temp_service->notify_on_downtime;
   new_service->have_notification_options = temp_service->have_notification_options;
   new_service->notifications_enabled = temp_service->notifications_enabled;
   new_service->have_notifications_enabled = temp_service->have_notifications_enabled;
@@ -4905,7 +4888,6 @@ int xodtemplate_inherit_object_properties() {
       temp_host->notify_on_unreachable = true;
       temp_host->notify_on_recovery = true;
       temp_host->notify_on_flapping = true;
-      temp_host->notify_on_downtime = true;
       temp_host->have_notification_options = true;
     }
   }
@@ -4957,7 +4939,6 @@ int xodtemplate_inherit_object_properties() {
       temp_service->notify_on_critical = true;
       temp_service->notify_on_recovery = true;
       temp_service->notify_on_flapping = true;
-      temp_service->notify_on_downtime = true;
       temp_service->have_notification_options = true;
     }
   }
@@ -5694,8 +5675,6 @@ int xodtemplate_resolve_contact(xodtemplate_contact* this_contact) {
         = template_contact->notify_on_host_recovery;
       this_contact->notify_on_host_flapping
         = template_contact->notify_on_host_flapping;
-      this_contact->notify_on_host_downtime
-        = template_contact->notify_on_host_downtime;
       this_contact->have_host_notification_options = true;
     }
     if (this_contact->have_service_notification_options == false
@@ -5710,8 +5689,6 @@ int xodtemplate_resolve_contact(xodtemplate_contact* this_contact) {
         = template_contact->notify_on_service_recovery;
       this_contact->notify_on_service_flapping
         = template_contact->notify_on_service_flapping;
-      this_contact->notify_on_service_downtime
-        = template_contact->notify_on_service_downtime;
       this_contact->have_service_notification_options = true;
     }
     if (this_contact->have_host_notifications_enabled == false
@@ -5981,7 +5958,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         = template_host->notify_on_unreachable;
       this_host->notify_on_recovery = template_host->notify_on_recovery;
       this_host->notify_on_flapping = template_host->notify_on_flapping;
-      this_host->notify_on_downtime = template_host->notify_on_downtime;
       this_host->have_notification_options = true;
     }
     if (this_host->have_notifications_enabled == false
@@ -6292,8 +6268,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
         = template_service->notify_on_recovery;
       this_service->notify_on_flapping
         = template_service->notify_on_flapping;
-      this_service->notify_on_downtime
-        = template_service->notify_on_downtime;
       this_service->have_notification_options = true;
     }
     if (this_service->have_notifications_enabled == false
@@ -8150,12 +8124,10 @@ int xodtemplate_register_contact(xodtemplate_contact* this_contact) {
                   this_contact->notify_on_service_warning,
                   this_contact->notify_on_service_unknown,
                   this_contact->notify_on_service_flapping,
-                  this_contact->notify_on_service_downtime,
                   this_contact->notify_on_host_recovery,
                   this_contact->notify_on_host_down,
                   this_contact->notify_on_host_unreachable,
                   this_contact->notify_on_host_flapping,
-                  this_contact->notify_on_host_downtime,
                   this_contact->host_notifications_enabled,
                   this_contact->service_notifications_enabled,
                   this_contact->retain_status_information,
@@ -8267,7 +8239,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->notify_on_down,
                this_host->notify_on_unreachable,
                this_host->notify_on_flapping,
-               this_host->notify_on_downtime,
                this_host->notification_interval,
                this_host->first_notification_delay,
                this_host->notification_period,
@@ -8416,7 +8387,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->notify_on_warning,
                   this_service->notify_on_critical,
                   this_service->notify_on_flapping,
-                  this_service->notify_on_downtime,
                   this_service->notifications_enabled,
                   this_service->is_volatile,
                   this_service->event_handler,
@@ -9650,8 +9620,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "%sr", (x++ > 0) ? "," : "");
     if (temp_contact->notify_on_service_flapping == true)
       fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_service_downtime == true)
-      fprintf(fp, "%ss", (x++ > 0) ? "," : "");
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
@@ -9665,8 +9633,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "%sr", (x++ > 0) ? "," : "");
     if (temp_contact->notify_on_host_flapping == true)
       fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_host_downtime == true)
-      fprintf(fp, "%ss", (x++ > 0) ? "," : "");
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
@@ -9793,8 +9759,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "%sr", (x++ > 0) ? "," : "");
     if (temp_host->notify_on_flapping == true)
       fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (temp_host->notify_on_downtime == true)
-      fprintf(fp, "%ss", (x++ > 0) ? "," : "");
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");
@@ -9908,8 +9872,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "%sr", (x++ > 0) ? "," : "");
     if (temp_service->notify_on_flapping == true)
       fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (temp_service->notify_on_downtime == true)
-      fprintf(fp, "%ss", (x++ > 0) ? "," : "");
     if (x == 0)
       fprintf(fp, "n");
     fprintf(fp, "\n");

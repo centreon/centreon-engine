@@ -107,7 +107,7 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(host::up | host::down | host::unreachable | host::flapping | host::downtime);
+static unsigned short const default_notification_options(host::up | host::down | host::unreachable | host::flapping);
 static bool const           default_obsess_over_host(true);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
@@ -1307,12 +1307,12 @@ bool host::_set_notification_options(
       options |= up;
     else if (*it == "f" || *it == "flapping")
       options |= flapping;
-    else if (*it == "s" || *it == "downtime")
-      options |= downtime;
     else if (*it == "n" || *it == "none")
       options = none;
     else if (*it == "a" || *it == "all")
-      options = down | unreachable | up | flapping | downtime;
+      options = down | unreachable | up | flapping;
+    else if (*it == "s" || *it == "downtime")
+      ;
     else
       return (false);
   }

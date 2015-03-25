@@ -24,7 +24,6 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "test/unittest.hh"

@@ -75,7 +75,6 @@
 #  define DEBUGL_EVENTBROKER         64
 #  define DEBUGL_EXTERNALCOMMANDS    128
 #  define DEBUGL_COMMANDS            256
-#  define DEBUGL_DOWNTIME            512
 #  define DEBUGL_MACROS              2048
 
 #  define DEBUGV_BASIC               0

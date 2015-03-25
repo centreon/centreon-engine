@@ -166,24 +166,6 @@ static void _exec_event_status_save(timed_event* event) {
 }
 
 /**
- *  Execute scheduled downtime.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_scheduled_downtime(timed_event* event) {
-  logger(dbg_events, basic)
-    << "** Scheduled Downtime Event";
-
-  // process scheduled downtime info.
-  if (event->event_data) {
-    handle_scheduled_downtime_by_id(*(unsigned long*)event->event_data);
-    delete static_cast<unsigned long*>(event->event_data);
-    event->event_data = NULL;
-  }
-  return;
-}
-
-/**
  *  Execute sfreshness check.
  *
  *  @param[in] event The event to execute.
@@ -195,21 +177,6 @@ static void _exec_event_sfreshness_check(timed_event* event) {
 
   // check service result freshness.
   check_service_result_freshness();
-  return;
-}
-
-/**
- *  Execute expire downtime.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_expire_downtime(timed_event* event) {
-  (void)event;
-  logger(dbg_events, basic)
-    << "** Expire Downtime Event";
-
-  // check for expired scheduled downtime entries.
-  check_for_expired_downtime();
   return;
 }
 
@@ -627,9 +594,7 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_check_reaper,
     &_exec_event_retention_save,
     &_exec_event_status_save,
-    &_exec_event_scheduled_downtime,
     &_exec_event_sfreshness_check,
-    &_exec_event_expire_downtime,
     &_exec_event_host_check,
     &_exec_event_hfreshness_check,
     &_exec_event_reschedule_checks,
@@ -898,9 +863,7 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_CHECK_REAPER",
     "EVENT_RETENTION_SAVE",
     "EVENT_STATUS_SAVE",
-    "EVENT_SCHEDULED_DOWNTIME",
     "EVENT_SFRESHNESS_CHECK",
-    "EVENT_EXPIRE_DOWNTIME",
     "EVENT_HOST_CHECK",
     "EVENT_HFRESHNESS_CHECK",
     "EVENT_RESCHEDULE_CHECKS"
@@ -941,13 +904,6 @@ bool operator==(
     service& svc2(*(service*)obj2.event_data);
     if (strcmp(svc1.host_name, svc2.host_name)
         || strcmp(svc1.description, svc2.description))
-      return (false);
-  }
-  else if (is_not_null
-           && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME)) {
-    unsigned long id1(*(unsigned long*)obj1.event_data);
-    unsigned long id2(*(unsigned long*)obj2.event_data);
-    if (id1 != id2)
       return (false);
   }
   else if (obj1.event_data != obj2.event_data)
@@ -1004,10 +960,6 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
     service& svc(*(service*)obj.event_data);
     os << "  event_data:                 "
        << svc.host_name << ", " << svc.description << "\n";
-  }
-  else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME) {
-    unsigned long id(*(unsigned long*)obj.event_data);
-    os << "  event_data:                 " << id << "\n";
   }
   else
     os << "  event_data:                 " << obj.event_data << "\n";

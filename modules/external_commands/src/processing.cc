@@ -199,21 +199,6 @@ processing::processing() {
   _lst_command["SCHEDULE_FORCED_HOST_CHECK"] =
     command_info(CMD_SCHEDULE_FORCED_HOST_CHECK,
                  &_redirector<&cmd_schedule_check>);
-  _lst_command["SCHEDULE_HOST_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_HOST_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_HOST_SVC_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_HOST_SVC_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
-  _lst_command["DEL_HOST_DOWNTIME"] =
-    command_info(CMD_DEL_HOST_DOWNTIME,
-                 &_redirector<&cmd_delete_downtime>);
-  _lst_command["DEL_DOWNTIME_BY_HOST_NAME"] =
-    command_info(CMD_DEL_DOWNTIME_BY_HOST_NAME,
-                 &_redirector<&cmd_delete_downtime_by_host_name>);
-  _lst_command["DEL_DOWNTIME_BY_HOSTGROUP_NAME"] =
-    command_info(CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME,
-                 &_redirector<&cmd_delete_downtime_by_hostgroup_name>);
   _lst_command["ENABLE_HOST_FLAP_DETECTION"] =
     command_info(CMD_ENABLE_HOST_FLAP_DETECTION,
                  &_redirector_host<&enable_host_flap_detection>);
@@ -241,12 +226,6 @@ processing::processing() {
   _lst_command["CHANGE_MAX_HOST_CHECK_ATTEMPTS"] =
     command_info(CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS,
                  &_redirector<&cmd_change_object_int_var>);
-  _lst_command["SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
   _lst_command["SET_HOST_NOTIFICATION_NUMBER"] =
     command_info(CMD_SET_HOST_NOTIFICATION_NUMBER,
                  &_redirector_host<&_wrapper_set_host_notification_number>);
@@ -303,12 +282,6 @@ processing::processing() {
   _lst_command["DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"] =
     command_info(CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
                  &_redirector_hostgroup<&_wrapper_disable_passive_service_checks>);
-  _lst_command["SCHEDULE_HOSTGROUP_HOST_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_HOSTGROUP_SVC_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
 
   // service-related commands.
   _lst_command["SCHEDULE_SVC_CHECK"] =
@@ -356,12 +329,6 @@ processing::processing() {
   _lst_command["DISABLE_SVC_FLAP_DETECTION"] =
     command_info(CMD_DISABLE_SVC_FLAP_DETECTION,
                  &_redirector_service<&disable_service_flap_detection>);
-  _lst_command["SCHEDULE_SVC_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_SVC_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
-  _lst_command["DEL_SVC_DOWNTIME"] =
-    command_info(CMD_DEL_SVC_DOWNTIME,
-                 &_redirector<&cmd_delete_downtime>);
   _lst_command["START_OBSESSING_OVER_SVC"] =
     command_info(CMD_START_OBSESSING_OVER_SVC,
                  &_redirector_service<&start_obsessing_over_service>);
@@ -442,12 +409,6 @@ processing::processing() {
   _lst_command["DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"] =
     command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
                  &_redirector_servicegroup<&disable_passive_service_checks>);
-  _lst_command["SCHEDULE_SERVICEGROUP_HOST_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
-  _lst_command["SCHEDULE_SERVICEGROUP_SVC_DOWNTIME"] =
-    command_info(CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME,
-                 &_redirector<&cmd_schedule_downtime>);
 
   // contact-related commands.
   _lst_command["ENABLE_CONTACT_HOST_NOTIFICATIONS"] =

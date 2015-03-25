@@ -79,11 +79,6 @@ int main_test(int argc, char* argv[]) {
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
-  else if (type == "downtime") {
-    scheduled_downtime obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
   else if (type == "hostdependency") {
     hostdependency obj;
     memset(&obj, 0, sizeof(obj));

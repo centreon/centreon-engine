@@ -22,7 +22,6 @@
 
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/retention/contact.hh"
-#  include "com/centreon/engine/retention/downtime.hh"
 #  include "com/centreon/engine/retention/host.hh"
 #  include "com/centreon/engine/retention/info.hh"
 #  include "com/centreon/engine/retention/program.hh"
@@ -41,8 +40,6 @@ namespace                retention {
     bool                 operator!=(state const& right) const throw ();
     list_contact&        contacts() throw ();
     list_contact const&  contacts() const throw ();
-    list_downtime&       downtimes() throw ();
-    list_downtime const& downtimes() const throw ();
     program&             globals() throw ();
     program const&       globals() const throw ();
     list_host&           hosts() throw ();
@@ -54,7 +51,6 @@ namespace                retention {
 
   private:
     list_contact         _contacts;
-    list_downtime        _downtimes;
     list_host            _hosts;
     info                 _info;
     program              _globals;

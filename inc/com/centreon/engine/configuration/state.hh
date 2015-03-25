@@ -24,7 +24,6 @@
 #  include <set>
 #  include <string>
 #  include <vector>
-#  include "com/centreon/engine/configuration/downtime.hh"
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/configuration/connector.hh"
 #  include "com/centreon/engine/configuration/contact.hh"
@@ -44,7 +43,6 @@
 CCE_BEGIN()
 
 namespace               configuration {
-  class downtime;
   /**
    *  @class state state.hh
    *  @brief Simple configuration state class.
@@ -166,8 +164,6 @@ namespace               configuration {
     void                debug_level(unsigned long value);
     unsigned int        debug_verbosity() const throw ();
     void                debug_verbosity(unsigned int value);
-    std::set<shared_ptr<downtime> >&
-                        downtimes() throw();
     bool                enable_event_handlers() const throw ();
     void                enable_event_handlers(bool value);
     bool                enable_flap_detection() const throw ();
@@ -488,8 +484,6 @@ namespace               configuration {
     std::string         _debug_file;
     unsigned long       _debug_level;
     unsigned int        _debug_verbosity;
-    std::set<shared_ptr<downtime> >
-                        _downtimes;
     bool                _enable_event_handlers;
     bool                _enable_flap_detection;
     bool                _enable_notifications;

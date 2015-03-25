@@ -50,7 +50,6 @@ state::~state() throw () {}
 state& state::operator=(state const& right) {
   if (this != &right) {
     _contacts = right._contacts;
-    _downtimes = right._downtimes;
     _globals = right._globals;
     _hosts = right._hosts;
     _info = right._info;
@@ -68,7 +67,6 @@ state& state::operator=(state const& right) {
  */
 bool state::operator==(state const& right) const throw () {
   return (_contacts == right._contacts
-          && _downtimes == right._downtimes
           && _globals == right._globals
           && _hosts == right._hosts
           && _info == right._info
@@ -102,24 +100,6 @@ list_contact& state::contacts() throw () {
  */
 list_contact const& state::contacts() const throw () {
   return (_contacts);
-}
-
-/**
- *  Get downtimes.
- *
- *  @return The downtime list.
- */
-list_downtime& state::downtimes() throw () {
-  return (_downtimes);
-}
-
-/**
- *  Get downtimes.
- *
- *  @return The downtime list.
- */
-list_downtime const& state::downtimes() const throw () {
-  return (_downtimes);
 }
 
 /**

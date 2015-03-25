@@ -70,7 +70,6 @@ namespace logging {
     dbg_eventbroker          = (64ull << 32),
     dbg_external_command     = (128ull << 32),
     dbg_commands             = (256ull << 32),
-    dbg_downtime             = (512ull << 32),
     dbg_macros               = (2048ull << 32),
     dbg_all                  = (4095ull << 32),
 

@@ -31,7 +31,6 @@ set(
 
   # Sources.
   "${SRC_DIR}/contact.cc"
-  "${SRC_DIR}/downtime.cc"
   "${SRC_DIR}/dump.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/info.cc"
@@ -43,7 +42,6 @@ set(
 
   # Headers.
   "${INC_DIR}/contact.hh"
-  "${INC_DIR}/downtime.hh"
   "${INC_DIR}/dump.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/info.hh"

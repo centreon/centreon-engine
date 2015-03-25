@@ -32,7 +32,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
 #include "skiplist.h"
@@ -149,7 +148,6 @@ int xsddefault_save_status_data() {
        "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
-       "\tnext_downtime_id=" << next_downtime_id << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
        "\tnext_notification_id=" << next_notification_id << "\n"
@@ -252,8 +250,7 @@ int xsddefault_save_status_data() {
          "\tobsess_over_host=" << hst->obsess_over_host << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << hst->is_flapping << "\n"
-         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << hst->percent_state_change << "\n"
-         "\tscheduled_downtime_depth=" << hst->scheduled_downtime_depth << "\n";
+         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << hst->percent_state_change << "\n";
 
     // custom variables
     for (customvariablesmember* cvarm = hst->custom_variables; cvarm; cvarm = cvarm->next) {
@@ -316,8 +313,7 @@ int xsddefault_save_status_data() {
          "\tobsess_over_service=" << svc->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << svc->is_flapping << "\n"
-         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << svc->percent_state_change << "\n"
-         "\tscheduled_downtime_depth=" << svc->scheduled_downtime_depth << "\n";
+         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << svc->percent_state_change << "\n";
 
     // custom variables
     for (customvariablesmember* cvarm = svc->custom_variables; cvarm; cvarm = cvarm->next) {
@@ -349,28 +345,6 @@ int xsddefault_save_status_data() {
                << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
     }
     stream << "\t}\n\n";
-  }
-
-  // save all downtime
-  for (scheduled_downtime* dt = scheduled_downtime_list; dt; dt = dt->next) {
-    if (dt->type == HOST_DOWNTIME)
-      stream << "hostdowntime {\n";
-    else
-      stream << "servicedowntime {\n";
-    stream << "\thost_name=" << dt->host_name << "\n";
-    if (dt->type == SERVICE_DOWNTIME)
-      stream << "\tservice_description=" << dt->service_description << "\n";
-    stream
-      << "\tdowntime_id=" << dt->downtime_id << "\n"
-         "\tentry_time=" << static_cast<unsigned long>(dt->entry_time) << "\n"
-         "\tstart_time=" << static_cast<unsigned long>(dt->start_time) << "\n"
-         "\tend_time=" << static_cast<unsigned long>(dt->end_time) << "\n"
-         "\ttriggered_by=" << dt->triggered_by << "\n"
-         "\tfixed=" << dt->fixed << "\n"
-         "\tduration=" << dt->duration << "\n"
-         "\tauthor=" << dt->author << "\n"
-         "\tcomment=" << dt->comment << "\n"
-         "\t}\n\n";
   }
 
   // Write data in buffer.

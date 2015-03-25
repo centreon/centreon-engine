@@ -402,41 +402,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling schedule_host_downtime.
-set(TEST_NAME "modules_external_commands_schedule_host_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_host_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_host_svc_downtime.
-set(TEST_NAME "modules_external_commands_schedule_host_svc_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_host_svc_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_host_downtime.
-set(TEST_NAME "modules_external_commands_del_host_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_host_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_downtime_by_host_name.
-set(TEST_NAME "modules_external_commands_del_downtime_by_host_name")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_downtime_by_host_name.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_downtime_by_hostgroup_name.
-set(TEST_NAME "modules_external_commands_del_downtime_by_hostgroup_name")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_downtime_by_hostgroup_name.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling enable_host_flap_detection.
 set(TEST_NAME "modules_external_commands_enable_host_flap_detection")
 add_executable("${TEST_NAME}"
@@ -497,20 +462,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_change_max_host_check_attempts")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/change_max_host_check_attempts.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_and_propagate_triggered_host_downtime.
-set(TEST_NAME "modules_external_commands_schedule_and_propagate_triggered_host_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_and_propagate_triggered_host_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_and_propagate_host_downtime.
-set(TEST_NAME "modules_external_commands_schedule_and_propagate_host_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_and_propagate_host_downtime.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -640,20 +591,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling schedule_hostgroup_host_downtime.
-set(TEST_NAME "modules_external_commands_schedule_hostgroup_host_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_hostgroup_host_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_hostgroup_svc_downtime.
-set(TEST_NAME "modules_external_commands_schedule_hostgroup_svc_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_hostgroup_svc_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling schedule_svc_check.
 set(TEST_NAME "modules_external_commands_schedule_svc_check")
 add_executable("${TEST_NAME}"
@@ -756,20 +693,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_svc_flap_detection")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_svc_flap_detection.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_svc_downtime.
-set(TEST_NAME "modules_external_commands_schedule_svc_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_svc_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling del_svc_downtime.
-set(TEST_NAME "modules_external_commands_del_svc_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/del_svc_downtime.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -952,20 +875,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_servicegroup_passive_svc_checks")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_servicegroup_passive_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_servicegroup_host_downtime.
-set(TEST_NAME "modules_external_commands_schedule_servicegroup_host_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_servicegroup_host_downtime.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling schedule_servicegroup_svc_downtime.
-set(TEST_NAME "modules_external_commands_schedule_servicegroup_svc_downtime")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/schedule_servicegroup_svc_downtime.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 

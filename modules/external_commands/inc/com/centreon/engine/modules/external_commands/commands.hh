@@ -48,15 +48,10 @@ int cmd_process_host_check_result(int cmd,time_t check_time,char* args);    // p
 int process_passive_host_check(time_t check_time, char const* host_name, int return_code, char const* output);
 int cmd_acknowledge_problem(int cmd,char* args);                            // acknowledges a host or service problem
 int cmd_remove_acknowledgement(int cmd,char* args);                         // removes a host or service acknowledgement
-int cmd_schedule_downtime(int cmd, time_t entry_time, char* args);          // schedules host or service downtime
-int cmd_delete_downtime(int cmd, char* args);                               // cancels active/pending host or service scheduled downtime
 int cmd_change_object_int_var(int cmd,char* args);                          // changes host/svc (int) variable
 int cmd_change_object_char_var(int cmd,char* args);                         // changes host/svc (char) variable
 int cmd_change_object_custom_var(int cmd, char* args);                      // changes host/svc custom variable
 int cmd_process_external_commands_from_file(int cmd, char* args);           // process external commands from a file
-int cmd_delete_downtime_by_start_time_comment(int, char*);
-int cmd_delete_downtime_by_host_name(int, char*);
-int cmd_delete_downtime_by_hostgroup_name(int, char*);
 void disable_service_checks(service* svc);                                  // disables a service check
 void enable_service_checks(service* svc);                                   // enables a service check
 void enable_all_notifications(void);                                        // enables notifications on a program-wide basis
@@ -71,7 +66,6 @@ void enable_contact_host_notifications(contact* cntct);                     // e
 void disable_contact_host_notifications(contact* cntct);                    // disables host notifications for a specific contact
 void enable_contact_service_notifications(contact* cntct);                  // enables service notifications for a specific contact
 void disable_contact_service_notifications(contact* cntct);                 // disables service notifications for a specific contact
-void schedule_and_propagate_downtime(host* temp_host, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long recurring_interval, timeperiod* recurring_period); // schedules downtime for all hosts beyond a given host
 void acknowledge_host_problem(host* hst, char* ack_author, char* ack_data, int type, int notify, int persistent);       // acknowledges a host problem
 void acknowledge_service_problem(service* svc, char* ack_author, char* ack_data, int type, int notify, int persistent); // acknowledges a service problem
 void remove_host_acknowledgement(host* hst);                               // removes a host acknowledgement

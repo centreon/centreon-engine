@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -55,7 +55,6 @@ int clear_service_macros_r(nagios_macros* mac) {
     MACRO_LASTSERVICEWARNING,
     MACRO_LASTSERVICEUNKNOWN,
     MACRO_LASTSERVICECRITICAL,
-    MACRO_SERVICEDOWNTIME,
     MACRO_SERVICEPERCENTCHANGE,
     MACRO_SERVICEDURATIONSEC,
     MACRO_SERVICEDURATION,

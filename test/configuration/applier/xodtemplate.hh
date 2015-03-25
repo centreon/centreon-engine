@@ -152,7 +152,6 @@ typedef struct xodtemplate_contact_struct{
   int          notify_on_host_unreachable;
   int          notify_on_host_recovery;
   int          notify_on_host_flapping;
-  int          notify_on_host_downtime;
   char*        service_notification_period;
   char*        service_notification_commands;
   char*        timezone;
@@ -161,7 +160,6 @@ typedef struct xodtemplate_contact_struct{
   int          notify_on_service_critical;
   int          notify_on_service_recovery;
   int          notify_on_service_flapping;
-  int          notify_on_service_downtime;
   int          host_notifications_enabled;
   int          service_notifications_enabled;
   int          retain_status_information;
@@ -251,7 +249,6 @@ typedef struct xodtemplate_host_struct{
   int          notify_on_unreachable;
   int          notify_on_recovery;
   int          notify_on_flapping;
-  int          notify_on_downtime;
   int          notifications_enabled;
   char*        notification_period;
   double       notification_interval;
@@ -364,7 +361,6 @@ typedef struct xodtemplate_service_struct{
   int          notify_on_critical;
   int          notify_on_recovery;
   int          notify_on_flapping;
-  int          notify_on_downtime;
   int          notifications_enabled;
   char*        notification_period;
   double       notification_interval;

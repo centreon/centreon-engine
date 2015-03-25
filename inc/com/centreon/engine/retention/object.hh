@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,7 +32,6 @@ namespace              retention {
   public:
     enum               type_id {
       contact = 0,
-      downtime,
       host,
       info,
       program,

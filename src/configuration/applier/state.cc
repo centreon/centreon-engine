@@ -29,7 +29,6 @@
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
-#include "com/centreon/engine/configuration/applier/downtime.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
@@ -46,7 +45,6 @@
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/xsddefault.hh"
-#include "com/centreon/engine/configuration/downtime.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -1151,11 +1149,6 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.contactgroups());
 
-  // Expand downtimes.
-  _expand<configuration::downtime, applier::downtime>(
-    new_cfg,
-    new_cfg.downtimes());
-
   // Expand hosts.
   _expand<configuration::host, applier::host>(
     new_cfg,
@@ -1219,12 +1212,6 @@ void applier::state::_processing(
   diff_contactgroups.parse(
     config->contactgroups(),
     new_cfg.contactgroups());
-
-  // Build difference for downtimes.
-  difference<std::set<shared_ptr<configuration::downtime> > > diff_downtimes;
-  diff_downtimes.parse(
-    config->downtimes(),
-    new_cfg.downtimes());
 
   // Build difference for hosts.
   difference<set_host> diff_hosts;
@@ -1351,12 +1338,6 @@ void applier::state::_processing(
       diff_servicedependencies);
     _resolve<configuration::servicedependency, applier::servicedependency>(
       config->servicedependencies());
-
-    // Apply downtimes
-    _apply<configuration::downtime, applier::downtime>(
-      diff_downtimes);
-    _resolve<configuration::downtime, applier::downtime>(
-      config->downtimes());
 
     // Load retention.
     if (state)

@@ -52,7 +52,6 @@ typedef struct                  service_struct {
   int                           notify_on_critical;
   int                           notify_on_recovery;
   int                           notify_on_flapping;
-  int                           notify_on_downtime;
   int                           stalk_on_ok;
   int                           stalk_on_warning;
   int                           stalk_on_unknown;
@@ -115,8 +114,6 @@ typedef struct                  service_struct {
   double                        execution_time;
   int                           is_executing;
   int                           check_options;
-  int                           scheduled_downtime_depth;
-  int                           pending_flex_downtime;
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
   int                           is_flapping;
@@ -164,7 +161,6 @@ service* add_service(
            int notify_warning,
            int notify_critical,
            int notify_flapping,
-           int notify_downtime,
            int notifications_enabled,
            int is_volatile,
            char const* event_handler,

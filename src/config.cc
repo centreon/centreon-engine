@@ -361,18 +361,6 @@ int pre_flight_object_check(int* w, int* e) {
     logger(log_verification_error, basic)
       << "\tChecked " << total_objects << " time periods.";
 
-  // Check all downtimes...
-  if (verify_config == true)
-    logger(log_info_message, basic) << "Checking downtimes...";
-  total_objects = 0;
-  for (scheduled_downtime* temp_downtime(scheduled_downtime_list);
-       temp_downtime;
-       temp_downtime = temp_downtime->next, ++total_objects)
-    check_downtime(temp_downtime, &warnings, &errors);
-  if (verify_config == true)
-    logger(log_verification_error, basic)
-      << "\tChecked " << total_objects << " recurring time periods.";
-
   // Update warning and error count.
   *w += warnings;
   *e += errors;
@@ -1457,39 +1445,6 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
   }
 
   // Add errors.
-  if (e)
-    *e += errors;
-
-  return (errors == 0);
-}
-
-/**
- *  Check downtime.
- *
- *  @param[in]     dw Downtime.
- *  @param[out]    w  Warnings.
- *  @param[out]    e  Errors.
- *
- *  @return Non-zero on success.
- */
-int check_downtime(scheduled_downtime *dw, int* w, int* e) {
-  (void)w;
-  int errors(0);
-
-  logger(log_verification_error, basic)
-    << "check_downtime() '";
-
-  // Check for the existence of the recurring time period.
-  if (dw->recurring_period) {
-    if (!timeperiod_exists(dw->recurring_period)) {
-      logger(log_verification_error, basic)
-        << "Error: recurring time period "
-        << "specified in recurring downtime "
-        << "is not defined anywhere!";
-      ++errors;
-    }
-  }
-
   if (e)
     *e += errors;
 

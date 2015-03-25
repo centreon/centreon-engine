@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/downtime.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/string.hh"
@@ -38,9 +37,7 @@ parser::store parser::_store[] = {
   &parser::_store_into_list,
   &parser::_store_into_list,
   &parser::_store_into_map<servicegroup, &servicegroup::servicegroup_name>,
-  &parser::_store_into_map<timeperiod, &timeperiod::timeperiod_name>,
-  //&parser::_store_into_list<list_downtime, &state::downtimes>,
-  &parser::_store_into_list
+  &parser::_store_into_map<timeperiod, &timeperiod::timeperiod_name>
 };
 
 /**
@@ -92,7 +89,6 @@ void parser::parse(std::string const& path, state& config) {
   _insert(_map_objects[object::servicegroup], config.servicegroups());
   _insert(_lst_objects[object::service], config.services());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
-  _insert(_lst_objects[object::downtime], config.downtimes());
 
   // cleanup.
   _objects_info.clear();
@@ -372,7 +368,10 @@ void parser::_parse_object_definitions(std::string const& path) {
         if ((type == "hostextinfo")
             || (type == "serviceextinfo")
             || (type == "hostescalation")
-            || (type == "serviceescalation")) {
+            || (type == "serviceescalation")
+            || (type == "downtime")
+            || (type == "hostdowntime")
+            || (type == "servicedowntime")) {
           logger(logging::log_config_warning, logging::basic)
             << "Warning: " << type << " object is ignored";
           parse_object = false;

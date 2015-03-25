@@ -211,17 +211,6 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "SCHEDULE_FORCED_HOST_CHECK"))
     command_type = CMD_SCHEDULE_FORCED_HOST_CHECK;
 
-  else if (!strcmp(command_id, "SCHEDULE_HOST_DOWNTIME"))
-    command_type = CMD_SCHEDULE_HOST_DOWNTIME;
-  else if (!strcmp(command_id, "SCHEDULE_HOST_SVC_DOWNTIME"))
-    command_type = CMD_SCHEDULE_HOST_SVC_DOWNTIME;
-  else if (!strcmp(command_id, "DEL_HOST_DOWNTIME"))
-    command_type = CMD_DEL_HOST_DOWNTIME;
-  else if (!strcmp(command_id, "DEL_DOWNTIME_BY_HOST_NAME"))
-    command_type = CMD_DEL_DOWNTIME_BY_HOST_NAME;
-  else if (!strcmp(command_id, "DEL_DOWNTIME_BY_HOSTGROUP_NAME"))
-    command_type = CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME;
-
   else if (!strcmp(command_id, "ENABLE_HOST_FLAP_DETECTION"))
     command_type = CMD_ENABLE_HOST_FLAP_DETECTION;
   else if (!strcmp(command_id, "DISABLE_HOST_FLAP_DETECTION"))
@@ -244,12 +233,6 @@ int process_external_command1(char* cmd) {
 
   else if (!strcmp(command_id, "CHANGE_MAX_HOST_CHECK_ATTEMPTS"))
     command_type = CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS;
-
-  else if (!strcmp(command_id, "SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME"))
-    command_type = CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME;
-
-  else if (!strcmp(command_id, "SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME"))
-    command_type = CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME;
 
   else if (!strcmp(command_id, "SET_HOST_NOTIFICATION_NUMBER"))
     command_type = CMD_SET_HOST_NOTIFICATION_NUMBER;
@@ -303,11 +286,6 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"))
     command_type = CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS;
 
-  else if (!strcmp(command_id, "SCHEDULE_HOSTGROUP_HOST_DOWNTIME"))
-    command_type = CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME;
-  else if (!strcmp(command_id, "SCHEDULE_HOSTGROUP_SVC_DOWNTIME"))
-    command_type = CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME;
-
   /**********************************/
   /**** SERVICE-RELATED COMMANDS ****/
   /**********************************/
@@ -348,11 +326,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_ENABLE_SVC_FLAP_DETECTION;
   else if (!strcmp(command_id, "DISABLE_SVC_FLAP_DETECTION"))
     command_type = CMD_DISABLE_SVC_FLAP_DETECTION;
-
-  else if (!strcmp(command_id, "SCHEDULE_SVC_DOWNTIME"))
-    command_type = CMD_SCHEDULE_SVC_DOWNTIME;
-  else if (!strcmp(command_id, "DEL_SVC_DOWNTIME"))
-    command_type = CMD_DEL_SVC_DOWNTIME;
 
   else if (!strcmp(command_id, "START_OBSESSING_OVER_SVC"))
     command_type = CMD_START_OBSESSING_OVER_SVC;
@@ -426,11 +399,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS;
   else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"))
     command_type = CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS;
-
-  else if (!strcmp(command_id, "SCHEDULE_SERVICEGROUP_HOST_DOWNTIME"))
-    command_type = CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME;
-  else if (!strcmp(command_id, "SCHEDULE_SERVICEGROUP_SVC_DOWNTIME"))
-    command_type = CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME;
 
   /**********************************/
   /**** CONTACT-RELATED COMMANDS ****/
@@ -809,35 +777,6 @@ int process_external_command2(int cmd,
 
   case CMD_PROCESS_HOST_CHECK_RESULT:
     cmd_process_host_check_result(cmd, entry_time, args);
-    break;
-
-  case CMD_SCHEDULE_HOST_DOWNTIME:
-  case CMD_SCHEDULE_SVC_DOWNTIME:
-  case CMD_SCHEDULE_HOST_SVC_DOWNTIME:
-  case CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME:
-  case CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME:
-  case CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME:
-  case CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME:
-  case CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME:
-  case CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME:
-    cmd_schedule_downtime(cmd, entry_time, args);
-    break;
-
-  case CMD_DEL_HOST_DOWNTIME:
-  case CMD_DEL_SVC_DOWNTIME:
-    cmd_delete_downtime(cmd, args);
-    break;
-
-  case CMD_DEL_DOWNTIME_BY_HOST_NAME:
-    cmd_delete_downtime_by_host_name(cmd, args);
-    break ;
-
-  case CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME:
-    cmd_delete_downtime_by_hostgroup_name(cmd, args);
-    break ;
-
-  case CMD_CANCEL_ACTIVE_HOST_SVC_DOWNTIME:
-  case CMD_CANCEL_PENDING_HOST_SVC_DOWNTIME:
     break;
 
   case CMD_SCHEDULE_HOST_CHECK:

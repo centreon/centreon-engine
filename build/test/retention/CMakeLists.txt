@@ -29,12 +29,6 @@ add_executable("${TEST_NAME}" "${TEST_DIR}/contact.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-## downtime.
-set(TEST_NAME "downtime")
-add_executable("${TEST_NAME}" "${TEST_DIR}/downtime.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 ## host.
 set(TEST_NAME "host")
 add_executable("${TEST_NAME}" "${TEST_DIR}/host.cc")
@@ -67,10 +61,6 @@ target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 # contact_dump
 set(TEST_NAME "contact_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact")
-
-# downtime_dump
-set(TEST_NAME "downtime_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "downtime")
 
 # header_dump
 set(TEST_NAME "header_dump")

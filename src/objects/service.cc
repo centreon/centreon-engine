@@ -69,7 +69,6 @@ bool operator==(
           && obj1.notify_on_critical == obj2.notify_on_critical
           && obj1.notify_on_recovery == obj2.notify_on_recovery
           && obj1.notify_on_flapping == obj2.notify_on_flapping
-          && obj1.notify_on_downtime == obj2.notify_on_downtime
           && obj1.stalk_on_ok == obj2.stalk_on_ok
           && obj1.stalk_on_warning == obj2.stalk_on_warning
           && obj1.stalk_on_unknown == obj2.stalk_on_unknown
@@ -132,8 +131,6 @@ bool operator==(
           && obj1.execution_time == obj2.execution_time
           && obj1.is_executing == obj2.is_executing
           && obj1.check_options == obj2.check_options
-          && obj1.scheduled_downtime_depth == obj2.scheduled_downtime_depth
-          && obj1.pending_flex_downtime == obj2.pending_flex_downtime
           && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
           && obj1.state_history_index == obj2.state_history_index
           && obj1.is_flapping == obj2.is_flapping
@@ -206,7 +203,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  notify_on_critical:                   " << obj.notify_on_critical << "\n"
     "  notify_on_recovery:                   " << obj.notify_on_recovery << "\n"
     "  notify_on_flapping:                   " << obj.notify_on_flapping << "\n"
-    "  notify_on_downtime:                   " << obj.notify_on_downtime << "\n"
     "  stalk_on_ok:                          " << obj.stalk_on_ok << "\n"
     "  stalk_on_warning:                     " << obj.stalk_on_warning << "\n"
     "  stalk_on_unknown:                     " << obj.stalk_on_unknown << "\n"
@@ -268,8 +264,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  execution_time:                       " << obj.execution_time << "\n"
     "  is_executing:                         " << obj.is_executing << "\n"
     "  check_options:                        " << obj.check_options << "\n"
-    "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
     "  timezone:                             " << chkstr(obj.timezone) << "\n";
 
   os << "  state_history:                        ";
@@ -325,8 +319,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *                                          critical state ?
  *  @param[in] notify_flapping              Does this service notify
  *                                          when flapping ?
- *  @param[in] notify_downtime              Does this service notify on
- *                                          downtime ?
  *  @param[in] notifications_enabled        Are notifications enabled
  *                                          for this service ?
  *  @param[in] is_volatile                  Is this service volatile ?
@@ -382,7 +374,6 @@ service* add_service(
            int notify_warning,
            int notify_critical,
            int notify_flapping,
-           int notify_downtime,
            int notifications_enabled,
            int is_volatile,
            char const* event_handler,
@@ -500,7 +491,6 @@ service* add_service(
     obj->notification_interval = notification_interval;
     obj->notifications_enabled = (notifications_enabled > 0);
     obj->notify_on_critical = (notify_critical > 0);
-    obj->notify_on_downtime = (notify_downtime > 0);
     obj->notify_on_flapping = (notify_flapping > 0);
     obj->notify_on_recovery = (notify_recovery > 0);
     obj->notify_on_unknown = (notify_unknown > 0);

@@ -105,9 +105,6 @@ void applier::program::apply(
         && utils::is_command_exist(*obj.global_service_event_handler()))
       string::setstr(global_service_event_handler, *obj.global_service_event_handler());
 
-    if (obj.next_downtime_id().is_set())
-      next_downtime_id = *obj.next_downtime_id();
-
     if (obj.next_event_id().is_set())
       next_event_id = *obj.next_event_id();
 

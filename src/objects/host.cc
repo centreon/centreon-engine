@@ -76,7 +76,6 @@ bool operator==(
           && obj1.notify_on_unreachable == obj2.notify_on_unreachable
           && obj1.notify_on_recovery == obj2.notify_on_recovery
           && obj1.notify_on_flapping == obj2.notify_on_flapping
-          && obj1.notify_on_downtime == obj2.notify_on_downtime
           && is_equal(obj1.notification_period, obj2.notification_period)
           && is_equal(obj1.check_period, obj2.check_period)
           && obj1.flap_detection_enabled == obj2.flap_detection_enabled
@@ -134,8 +133,6 @@ bool operator==(
           && obj1.no_more_notifications == obj2.no_more_notifications
           && obj1.current_notification_id == obj2.current_notification_id
           && obj1.check_flapping_recovery_notification == obj2.check_flapping_recovery_notification
-          && obj1.scheduled_downtime_depth == obj2.scheduled_downtime_depth
-          && obj1.pending_flex_downtime == obj2.pending_flex_downtime
           && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
           && obj1.state_history_index == obj2.state_history_index
           && obj1.last_state_history_update == obj2.last_state_history_update
@@ -211,7 +208,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  notify_on_unreachable:                " << obj.notify_on_unreachable << "\n"
     "  notify_on_recovery:                   " << obj.notify_on_recovery << "\n"
     "  notify_on_flapping:                   " << obj.notify_on_flapping << "\n"
-    "  notify_on_downtime:                   " << obj.notify_on_downtime << "\n"
     "  notification_period:                  " << chkstr(obj.notification_period) << "\n"
     "  check_period:                         " << chkstr(obj.check_period) << "\n"
     "  flap_detection_enabled:               " << obj.flap_detection_enabled << "\n"
@@ -268,8 +264,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  no_more_notifications:                " << obj.no_more_notifications << "\n"
     "  current_notification_id:              " << obj.current_notification_id << "\n"
     "  check_flapping_recovery_notification: " << obj.check_flapping_recovery_notification << "\n"
-    "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
     "  timezone:                             " << chkstr(obj.timezone) << "\n";
 
   os << "  state_history:                        ";
@@ -319,8 +313,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *                                           unreachable ?
  *  @param[in] notify_flapping               Does this host notify for
  *                                           flapping ?
- *  @param[in] notify_downtime               Does this host notify for
- *                                           downtimes ?
  *  @param[in] notification_interval         Notification interval.
  *  @param[in] first_notification_delay      First notification delay.
  *  @param[in] notification_period           Notification period.
@@ -377,7 +369,6 @@ host* add_host(
         int notify_down,
         int notify_unreachable,
         int notify_flapping,
-        int notify_downtime,
         double notification_interval,
         double first_notification_delay,
         char const* notification_period,
@@ -496,7 +487,6 @@ host* add_host(
     obj->notification_interval = notification_interval;
     obj->notifications_enabled = (notifications_enabled > 0);
     obj->notify_on_down = (notify_down > 0);
-    obj->notify_on_downtime = (notify_downtime > 0);
     obj->notify_on_flapping = (notify_flapping > 0);
     obj->notify_on_recovery = (notify_up > 0);
     obj->notify_on_unreachable = (notify_unreachable > 0);

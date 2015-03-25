@@ -39,7 +39,6 @@
 #  define NEBCALLBACK_NOTIFICATION_DATA                 12
 #  define NEBCALLBACK_SERVICE_CHECK_DATA                13
 #  define NEBCALLBACK_HOST_CHECK_DATA                   14
-#  define NEBCALLBACK_DOWNTIME_DATA                     16
 #  define NEBCALLBACK_FLAPPING_DATA                     17
 #  define NEBCALLBACK_PROGRAM_STATUS_DATA               18
 #  define NEBCALLBACK_HOST_STATUS_DATA                  19

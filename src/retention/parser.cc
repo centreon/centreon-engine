@@ -27,7 +27,6 @@ using namespace com::centreon::engine::retention;
 
 parser::store parser::_store[] = {
   &parser::_store_into_list<list_contact, &state::contacts>,
-  &parser::_store_into_list<list_downtime, &state::downtimes>,
   &parser::_store_into_list<list_host, &state::hosts>,
   &parser::_store_object<info, &state::informations>,
   &parser::_store_object<program, &state::globals>,

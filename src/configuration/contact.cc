@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -612,16 +612,15 @@ bool contact::_set_host_notification_options(std::string const& value) {
       options |= host::up;
     else if (*it == "f" || *it == "flapping")
       options |= host::flapping;
-    else if (*it == "s" || *it == "downtime")
-      options |= host::downtime;
     else if (*it == "n" || *it == "none")
       options = host::none;
     else if (*it == "a" || *it == "all")
       options = host::down
         | host::unreachable
         | host::up
-        | host::flapping
-        | host::downtime;
+        | host::flapping;
+    else if (*it == "s" || *it == "downtime")
+      ;
     else
       return (false);
   }
@@ -715,8 +714,6 @@ bool contact::_set_service_notification_options(std::string const& value) {
       options |= service::ok;
     else if (*it == "f" || *it == "flapping")
       options |= service::flapping;
-    else if (*it == "s" || *it == "downtime")
-      options |= service::downtime;
     else if (*it == "n" || *it == "none")
       options = service::none;
     else if (*it == "a" || *it == "all")
@@ -724,8 +721,9 @@ bool contact::_set_service_notification_options(std::string const& value) {
         | service::warning
         | service::critical
         | service::ok
-        | service::flapping
-        | service::downtime;
+        | service::flapping;
+    else if (*it == "s" || *it == "downtime")
+      ;
     else
       return (false);
   }

@@ -27,7 +27,6 @@
 struct contact_struct;
 struct customvariablesmember_struct;
 struct host_struct;
-struct scheduled_downtime_struct;
 struct service_struct;
 
 CCE_BEGIN()
@@ -37,8 +36,6 @@ namespace         retention {
     std::ostream& contact(std::ostream& os, contact_struct const& obj);
     std::ostream& contacts(std::ostream& os);
     std::ostream& customvariables(std::ostream& os, customvariablesmember_struct const& obj);
-    std::ostream& downtime(std::ostream& os, scheduled_downtime_struct const& obj);
-    std::ostream& downtimes(std::ostream& os);
     std::ostream& header(std::ostream& os);
     std::ostream& host(std::ostream& os, host_struct const& obj);
     std::ostream& hosts(std::ostream& os);

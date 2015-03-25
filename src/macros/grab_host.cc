@@ -231,9 +231,6 @@ struct grab_host_redirection {
     // Max attempt.
     routines[MACRO_MAXHOSTATTEMPTS].first = &get_member_as_string<host, int, &host::max_attempts>;
     routines[MACRO_MAXHOSTATTEMPTS].second = true;
-    // Downtime.
-    routines[MACRO_HOSTDOWNTIME].first = &get_member_as_string<host, int, &host::scheduled_downtime_depth>;
-    routines[MACRO_HOSTDOWNTIME].second = true;
     // Percent state change.
     routines[MACRO_HOSTPERCENTCHANGE].first = &get_double<host, &host::percent_state_change, 2>;
     routines[MACRO_HOSTPERCENTCHANGE].second = true;

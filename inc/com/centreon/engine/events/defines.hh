@@ -29,9 +29,7 @@
 #  define EVENT_CHECK_REAPER       4   // reaps results from host and service checks
 #  define EVENT_RETENTION_SAVE     5   // save (dump) retention data
 #  define EVENT_STATUS_SAVE        6   // save (dump) status data
-#  define EVENT_SCHEDULED_DOWNTIME 7   // scheduled host or service downtime
 #  define EVENT_SFRESHNESS_CHECK   8   // checks service result "freshness"
-#  define EVENT_EXPIRE_DOWNTIME    9   // checks for (and removes) expired scheduled downtime
 #  define EVENT_HOST_CHECK         10  // active host check
 #  define EVENT_HFRESHNESS_CHECK   11  // checks host result "freshness"
 #  define EVENT_RESCHEDULE_CHECKS  12  // adjust scheduling of host and service checks

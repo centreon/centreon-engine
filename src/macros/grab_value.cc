@@ -594,8 +594,6 @@ static int handle_summary_macro(
             && (temp_host->has_been_checked == true))
           hosts_up++;
         else if (temp_host->current_state == HOST_DOWN) {
-          if (temp_host->scheduled_downtime_depth > 0)
-            problem = false;
           if (temp_host->checks_enabled == false)
             problem = false;
           if (problem)
@@ -603,8 +601,6 @@ static int handle_summary_macro(
           hosts_down++;
         }
         else if (temp_host->current_state == HOST_UNREACHABLE) {
-          if (temp_host->scheduled_downtime_depth > 0)
-            problem = false;
           if (temp_host->checks_enabled == false)
             problem = false;
           if (problem)
@@ -648,8 +644,6 @@ static int handle_summary_macro(
               && (temp_host->current_state == HOST_DOWN
                   || temp_host->current_state == HOST_UNREACHABLE))
             problem = false;
-          if (temp_service->scheduled_downtime_depth > 0)
-            problem = false;
           if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
@@ -662,8 +656,6 @@ static int handle_summary_macro(
               && (temp_host->current_state == HOST_DOWN
                   || temp_host->current_state == HOST_UNREACHABLE))
             problem = false;
-          if (temp_service->scheduled_downtime_depth > 0)
-            problem = false;
           if (temp_service->checks_enabled == false)
             problem = false;
           if (problem)
@@ -675,8 +667,6 @@ static int handle_summary_macro(
           if (temp_host != NULL
               && (temp_host->current_state == HOST_DOWN
                   || temp_host->current_state == HOST_UNREACHABLE))
-            problem = false;
-          if (temp_service->scheduled_downtime_depth > 0)
             problem = false;
           if (temp_service->checks_enabled == false)
             problem = false;
@@ -749,7 +739,6 @@ struct grab_value_redirection {
       MACRO_HOSTLATENCY,
       MACRO_HOSTDURATION,
       MACRO_HOSTDURATIONSEC,
-      MACRO_HOSTDOWNTIME,
       MACRO_HOSTSTATETYPE,
       MACRO_HOSTPERCENTCHANGE,
       MACRO_LASTHOSTUP,
@@ -811,7 +800,6 @@ struct grab_value_redirection {
       MACRO_SERVICELATENCY,
       MACRO_SERVICEDURATION,
       MACRO_SERVICEDURATIONSEC,
-      MACRO_SERVICEDOWNTIME,
       MACRO_SERVICESTATETYPE,
       MACRO_SERVICEPERCENTCHANGE,
       MACRO_LASTSERVICEOK,

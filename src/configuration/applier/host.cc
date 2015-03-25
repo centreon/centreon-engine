@@ -105,8 +105,6 @@ void applier::host::add_object(
                           & configuration::host::unreachable),
         static_cast<bool>(obj->notification_options()
                           & configuration::host::flapping),
-        static_cast<bool>(obj->notification_options()
-                          & configuration::host::downtime),
         obj->notification_interval(),
         obj->first_notification_delay(),
         NULL_IF_EMPTY(obj->notification_period()),
@@ -305,10 +303,6 @@ void applier::host::modify_object(
     h->notify_on_flapping,
     static_cast<int>(static_cast<bool>(
       obj->notification_options() & configuration::host::flapping)));
-  modify_if_different(
-    h->notify_on_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::host::downtime)));
   modify_if_different(
     h->notification_interval,
     static_cast<double>(obj->notification_interval()));

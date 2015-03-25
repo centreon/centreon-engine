@@ -26,7 +26,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
 
@@ -1063,11 +1062,6 @@ int handle_host_state(host* hst) {
         || (hst->state_type == SOFT_STATE
             && config->log_host_retries() == true))
       log_host_event(hst);
-
-    /* check for start of flexible (non-fixed) scheduled downtime */
-    /* CHANGED 08-05-2010 EG flex downtime can now start on soft states */
-    /*if(hst->state_type==HARD_STATE) */
-    check_pending_flex_host_downtime(hst);
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (hst->state_type == HARD_STATE)

@@ -62,7 +62,6 @@ using namespace com::centreon::engine;
 #define LAST_WARNING 132569874
 #define LAST_UNKNOWN 102565478
 #define LAST_CRITICAL 15478632
-#define DOWNTIME 3
 #define PERCENT_CHANGE 42.26
 #define NOTIFICATION_NUMBER 7
 #define NOTIFICATION_ID 432
@@ -112,7 +111,6 @@ int main_test(int argc, char** argv) {
   service_list->last_time_warning = LAST_WARNING;
   service_list->last_time_unknown = LAST_UNKNOWN;
   service_list->last_time_critical = LAST_CRITICAL;
-  service_list->scheduled_downtime_depth = DOWNTIME;
   service_list->percent_state_change = PERCENT_CHANGE;
   service_list->current_notification_number = NOTIFICATION_NUMBER;
   service_list->current_notification_id = NOTIFICATION_ID;
@@ -174,7 +172,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTSERVICEWARNING, STR(LAST_WARNING), false },
     { MACRO_LASTSERVICEUNKNOWN, STR(LAST_UNKNOWN), false },
     { MACRO_LASTSERVICECRITICAL, STR(LAST_CRITICAL), false },
-    { MACRO_SERVICEDOWNTIME, STR(DOWNTIME), false },
     { MACRO_SERVICEPERCENTCHANGE, STR(PERCENT_CHANGE), true },
     { MACRO_SERVICENOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false },
     { MACRO_SERVICENOTIFICATIONID, STR(NOTIFICATION_ID), false },

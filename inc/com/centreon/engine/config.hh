@@ -43,7 +43,6 @@ int check_contactgroup(contactgroup* cg, int* w, int* e);
 int check_servicedependency(servicedependency* sd, int* w, int* e);
 int check_hostdependency(hostdependency* hd, int* w, int* e);
 int check_timeperiod(timeperiod* tp, int* w, int* e);
-int check_downtime(scheduled_downtime *dw, int* w, int* e);
 
 #  ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -44,12 +44,10 @@ typedef struct                  contact_struct {
   int                           notify_on_service_critical;
   int                           notify_on_service_recovery;
   int                           notify_on_service_flapping;
-  int                           notify_on_service_downtime;
   int                           notify_on_host_down;
   int                           notify_on_host_unreachable;
   int                           notify_on_host_recovery;
   int                           notify_on_host_flapping;
-  int                           notify_on_host_downtime;
   char*                         host_notification_period;
   char*                         service_notification_period;
   int                           host_notifications_enabled;
@@ -88,12 +86,10 @@ contact* add_contact(
            int notify_service_warning,
            int notify_service_unknown,
            int notify_service_flapping,
-           int notify_service_downtime,
            int notify_host_up,
            int notify_host_down,
            int notify_host_unreachable,
            int notify_host_flapping,
-           int notify_host_downtime,
            int host_notifications_enabled,
            int service_notifications_enabled,
            int retain_status_information,

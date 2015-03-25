@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -133,8 +133,6 @@ void applier::contact::add_object(
         static_cast<bool>(
           obj->service_notification_options() & service::flapping),
         static_cast<bool>(
-          obj->service_notification_options() & service::downtime),
-        static_cast<bool>(
           obj->host_notification_options() & host::up),
         static_cast<bool>(
           obj->host_notification_options() & host::down),
@@ -142,8 +140,6 @@ void applier::contact::add_object(
           obj->host_notification_options() & host::unreachable),
         static_cast<bool>(
           obj->host_notification_options() & host::flapping),
-        static_cast<bool>(
-          obj->host_notification_options() & host::downtime),
         obj->host_notifications_enabled(),
         obj->service_notifications_enabled(),
         obj->retain_status_information(),
@@ -303,10 +299,6 @@ void applier::contact::modify_object(
     static_cast<int>(static_cast<bool>(
       obj->service_notification_options() & service::flapping)));
   modify_if_different(
-    c->notify_on_service_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj->service_notification_options() & service::downtime)));
-  modify_if_different(
     c->notify_on_host_down,
     static_cast<int>(static_cast<bool>(
       obj->host_notification_options() & host::down)));
@@ -322,10 +314,6 @@ void applier::contact::modify_object(
     c->notify_on_host_flapping,
     static_cast<int>(static_cast<bool>(
       obj->host_notification_options() & host::flapping)));
-  modify_if_different(
-    c->notify_on_host_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj->host_notification_options() & host::downtime)));
   modify_if_different(
     c->host_notification_period,
     NULL_IF_EMPTY(obj->host_notification_period()));

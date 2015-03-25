@@ -188,9 +188,6 @@ struct grab_service_redirection {
     // Last time critical.
     routines[MACRO_LASTSERVICECRITICAL].first = &get_member_as_string<service, time_t, &service::last_time_critical>;
     routines[MACRO_LASTSERVICECRITICAL].second = true;
-    // Downtime.
-    routines[MACRO_SERVICEDOWNTIME].first = &get_member_as_string<service, int, &service::scheduled_downtime_depth>;
-    routines[MACRO_SERVICEDOWNTIME].second = true;
     // Percent state change.
     routines[MACRO_SERVICEPERCENTCHANGE].first = &get_double<service, &service::percent_state_change, 2>;
     routines[MACRO_SERVICEPERCENTCHANGE].second = true;

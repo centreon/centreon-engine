@@ -40,10 +40,7 @@ static char const* tab_notification_str[] = {
   "NORMAL",
   "FLAPPINGSTART",
   "FLAPPINGSTOP",
-  "FLAPPINGDISABLED",
-  "DOWNTIMESTART",
-  "DOWNTIMEEND",
-  "DOWNTIMECANCELLED",
+  "FLAPPINGDISABLED"
 };
 
 static char const* tab_host_state_str[] = {
@@ -203,12 +200,6 @@ int service_notification(
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
     else if (type == NOTIFICATION_FLAPPINGDISABLED)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
-    else if (type == NOTIFICATION_DOWNTIMESTART)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
-    else if (type == NOTIFICATION_DOWNTIMEEND)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
-    else if (type == NOTIFICATION_DOWNTIMECANCELLED)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
     else if (svc->current_state == STATE_OK)
@@ -429,22 +420,6 @@ int check_service_notification_viability(
     return (ERROR);
   }
 
-  /*********************************************/
-  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
-  /*********************************************/
-
-  /* custom notifications are good to go at this point... */
-  if (type == NOTIFICATION_CUSTOM) {
-    if (svc->scheduled_downtime_depth > 0
-        || temp_host->scheduled_downtime_depth > 0) {
-      logger(dbg_notifications, more)
-        << "We shouldn't send custom notification during "
-        "scheduled downtime.";
-      return (ERROR);
-    }
-    return (OK);
-  }
-
   /****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /****************************************/
@@ -462,45 +437,7 @@ int check_service_notification_viability(
       return (ERROR);
     }
 
-    /* don't send notifications during scheduled downtime */
-    if (svc->scheduled_downtime_depth > 0
-        || temp_host->scheduled_downtime_depth > 0) {
-      logger(dbg_notifications, more)
-        << "We shouldn't notify about FLAPPING events during "
-        "scheduled downtime.";
-      return (ERROR);
-    }
-
     /* flapping viability test passed, so the notification can be sent out */
-    return (OK);
-  }
-
-  /****************************************/
-  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
-  /****************************************/
-
-  /* downtime notifications only have to pass three general filters */
-  if (type == NOTIFICATION_DOWNTIMESTART
-      || type == NOTIFICATION_DOWNTIMEEND
-      || type == NOTIFICATION_DOWNTIMECANCELLED) {
-
-    /* don't send a notification if we're not supposed to... */
-    if (svc->notify_on_downtime == false) {
-      logger(dbg_notifications, more)
-        << "We shouldn't notify about DOWNTIME events for "
-        "this service.";
-      return (ERROR);
-    }
-
-    /* don't send notifications during scheduled downtime (for service only, not host) */
-    if (svc->scheduled_downtime_depth > 0) {
-      logger(dbg_notifications, more)
-        << "We shouldn't notify about DOWNTIME events during "
-        "scheduled downtime.";
-      return (ERROR);
-    }
-
-    /* downtime viability test passed, so the notification can be sent out */
     return (OK);
   }
 
@@ -581,22 +518,6 @@ int check_service_notification_viability(
     logger(dbg_notifications, more)
       << "This service is currently flapping, so we won't send "
       "notifications.";
-    return (ERROR);
-  }
-
-  /* if this service is currently in a scheduled downtime period, don't send the notification */
-  if (svc->scheduled_downtime_depth > 0) {
-    logger(dbg_notifications, more)
-      << "This service is currently in a scheduled downtime, so "
-      "we won't send notifications.";
-    return (ERROR);
-  }
-
-  /* if this host is currently in a scheduled downtime period, don't send the notification */
-  if (temp_host->scheduled_downtime_depth > 0) {
-    logger(dbg_notifications, more)
-      << "The host this service is associated with is currently in "
-      "a scheduled downtime, so we won't send notifications.";
     return (ERROR);
   }
 
@@ -692,24 +613,6 @@ int check_contact_service_notification_viability(
     if (cntct->notify_on_service_flapping == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
-        "service events.";
-      return (ERROR);
-    }
-
-    return (OK);
-  }
-
-  /****************************************/
-  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
-  /****************************************/
-
-  if (type == NOTIFICATION_DOWNTIMESTART
-      || type == NOTIFICATION_DOWNTIMEEND
-      || type == NOTIFICATION_DOWNTIMECANCELLED) {
-
-    if (cntct->notify_on_service_downtime == false) {
-      logger(dbg_notifications, most)
-        << "We shouldn't notify this contact about DOWNTIME "
         "service events.";
       return (ERROR);
     }
@@ -1189,12 +1092,6 @@ int host_notification(
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGSTOP");
     else if (type == NOTIFICATION_FLAPPINGDISABLED)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "FLAPPINGDISABLED");
-    else if (type == NOTIFICATION_DOWNTIMESTART)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMESTART");
-    else if (type == NOTIFICATION_DOWNTIMEEND)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMEEND");
-    else if (type == NOTIFICATION_DOWNTIMECANCELLED)
-      string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
       string::setstr(mac.x[MACRO_NOTIFICATIONTYPE], "CUSTOM");
     else if (hst->current_state == HOST_UP)
@@ -1396,21 +1293,6 @@ int check_host_notification_viability(
     return (ERROR);
   }
 
-  /*********************************************/
-  /*** SPECIAL CASE FOR CUSTOM NOTIFICATIONS ***/
-  /*********************************************/
-
-  /* custom notifications are good to go at this point... */
-  if (type == NOTIFICATION_CUSTOM) {
-    if (hst->scheduled_downtime_depth > 0) {
-      logger(dbg_notifications, more)
-        << "We shouldn't send custom notification during "
-        "scheduled downtime.";
-      return (ERROR);
-    }
-    return (OK);
-  }
-
   /*****************************************/
   /*** SPECIAL CASE FOR FLAPPING ALERTS ***/
   /*****************************************/
@@ -1427,43 +1309,7 @@ int check_host_notification_viability(
       return (ERROR);
     }
 
-    /* don't send notifications during scheduled downtime */
-    if (hst->scheduled_downtime_depth > 0) {
-      logger(dbg_notifications, more)
-        << "We shouldn't notify about FLAPPING events during "
-        "scheduled downtime.";
-      return (ERROR);
-    }
-
     /* flapping viability test passed, so the notification can be sent out */
-    return (OK);
-  }
-
-  /*****************************************/
-  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
-  /*****************************************/
-
-  /* flapping notifications only have to pass three general filters */
-  if (type == NOTIFICATION_DOWNTIMESTART
-      || type == NOTIFICATION_DOWNTIMEEND
-      || type == NOTIFICATION_DOWNTIMECANCELLED) {
-
-    /* don't send a notification if we're not supposed to... */
-    if (hst->notify_on_downtime == false) {
-      logger(dbg_notifications, more)
-        << "We shouldn't notify about DOWNTIME events for this host.";
-      return (ERROR);
-    }
-
-    /* don't send notifications during scheduled downtime */
-    if (hst->scheduled_downtime_depth > 0) {
-      logger(dbg_notifications, more)
-        << "We shouldn't notify about DOWNTIME events during "
-        "scheduled downtime!";
-      return (ERROR);
-    }
-
-    /* downtime viability test passed, so the notification can be sent out */
     return (OK);
   }
 
@@ -1537,14 +1383,6 @@ int check_host_notification_viability(
     logger(dbg_notifications, more)
       << "This host is currently flapping, so we won't "
       "send notifications.";
-    return (ERROR);
-  }
-
-  /* if this host is currently in a scheduled downtime period, don't send the notification */
-  if (hst->scheduled_downtime_depth > 0) {
-    logger(dbg_notifications, more)
-      << "This host is currently in a scheduled downtime, "
-      "so we won't send notifications.";
     return (ERROR);
   }
 
@@ -1629,24 +1467,6 @@ int check_contact_host_notification_viability(
     if (cntct->notify_on_host_flapping == false) {
       logger(dbg_notifications, most)
         << "We shouldn't notify this contact about FLAPPING "
-        "host events.";
-      return (ERROR);
-    }
-
-    return (OK);
-  }
-
-  /****************************************/
-  /*** SPECIAL CASE FOR DOWNTIME ALERTS ***/
-  /****************************************/
-
-  if (type == NOTIFICATION_DOWNTIMESTART
-      || type == NOTIFICATION_DOWNTIMEEND
-      || type == NOTIFICATION_DOWNTIMECANCELLED) {
-
-    if (cntct->notify_on_host_downtime == false) {
-      logger(dbg_notifications, most)
-        << "We shouldn't notify this contact about DOWNTIME "
         "host events.";
       return (ERROR);
     }

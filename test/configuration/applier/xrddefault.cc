@@ -249,7 +249,6 @@ int xrddefault_save_state_information() {
          << "enable_flap_detection=" << enable_flap_detection << "\n"
          << "global_host_event_handler=" << global_host_event_handler << "\n"
          << "global_service_event_handler=" << global_service_event_handler << "\n"
-         << "next_downtime_id=" << next_downtime_id << "\n"
          << "next_event_id=" << next_event_id << "\n"
          << "next_problem_id=" << next_problem_id << "\n"
          << "next_notification_id=" << next_notification_id << "\n"
@@ -433,30 +432,6 @@ int xrddefault_save_state_information() {
     stream << "}\n";
   }
 
-  /* save all downtime */
-  for (scheduled_downtime* temp_downtime = scheduled_downtime_list;
-       temp_downtime != NULL;
-       temp_downtime = temp_downtime->next) {
-
-    if (temp_downtime->type == HOST_DOWNTIME)
-      stream << "hostdowntime {\n";
-    else
-      stream << "servicedowntime {\n";
-    stream << "host_name=" << temp_downtime->host_name << "\n";
-    if (temp_downtime->type == SERVICE_DOWNTIME)
-      stream << "service_description=" << temp_downtime->service_description << "\n";
-    stream << "downtime_id=" << temp_downtime->downtime_id << "\n"
-           << "entry_time=" << static_cast<unsigned long>(temp_downtime->entry_time) << "\n"
-           << "start_time=" << static_cast<unsigned long>(temp_downtime->start_time) << "\n"
-           << "end_time=" << static_cast<unsigned long>(temp_downtime->end_time) << "\n"
-           << "triggered_by=" << temp_downtime->triggered_by << "\n"
-           << "fixed=" << temp_downtime->fixed << "\n"
-           << "duration=" << temp_downtime->duration << "\n"
-           << "author=" << temp_downtime->author << "\n"
-           << "comment=" << temp_downtime->comment << "\n"
-           << "}\n";
-  }
-
   // Write data in buffer.
   stream.flush();
 
@@ -526,7 +501,6 @@ int xrddefault_read_state_information() {
   time_t creation_time;
   time_t current_time;
   int scheduling_info_is_ok = FALSE;
-  unsigned long downtime_id = 0;
   time_t start_time = 0L;
   time_t end_time = 0L;
   int fixed = FALSE;
@@ -571,9 +545,6 @@ int xrddefault_read_state_information() {
   contact_host_attribute_mask = retained_contact_host_attribute_mask;
   contact_service_attribute_mask = retained_contact_service_attribute_mask;
 
-  /* Big speedup when reading retention.dat in bulk */
-  defer_downtime_sorting = 1;
-
   /* read all lines in the retention file */
   while (1) {
     /* free memory */
@@ -596,10 +567,6 @@ int xrddefault_read_state_information() {
       data_type = XRDDEFAULT_HOSTSTATUS_DATA;
     else if (!strcmp(input, "contact {"))
       data_type = XRDDEFAULT_CONTACTSTATUS_DATA;
-    else if (!strcmp(input, "hostdowntime {"))
-      data_type = XRDDEFAULT_HOSTDOWNTIME_DATA;
-    else if (!strcmp(input, "servicedowntime {"))
-      data_type = XRDDEFAULT_SERVICEDOWNTIME_DATA;
     else if (!strcmp(input, "info {"))
       data_type = XRDDEFAULT_INFO_DATA;
     else if (!strcmp(input, "program {"))
@@ -751,67 +718,6 @@ int xrddefault_read_state_information() {
         temp_contact = NULL;
         break;
 
-      case XRDDEFAULT_HOSTDOWNTIME_DATA:
-      case XRDDEFAULT_SERVICEDOWNTIME_DATA:
-        /* add the downtime */
-        if (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA)
-          add_host_downtime(
-            host_name,
-            entry_time,
-            author,
-            comment_data,
-            start_time,
-            end_time,
-            fixed,
-            triggered_by,
-            duration,
-            0,
-            NULL,
-            downtime_id);
-        else
-          add_service_downtime(
-            host_name,
-            service_description,
-            entry_time,
-            author,
-            comment_data,
-            start_time,
-            end_time,
-            fixed,
-            triggered_by,
-            duration,
-            0,
-            NULL,
-            downtime_id);
-
-        /* must register the downtime with Centreon Engine so it can schedule it, add comments, etc. */
-        register_downtime(
-          (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA
-           ? HOST_DOWNTIME
-           : SERVICE_DOWNTIME),
-          downtime_id);
-
-        /* free temp memory */
-        delete[] host_name;
-        delete[] service_description;
-        delete[] author;
-        delete[] comment_data;
-
-        host_name = NULL;
-        service_description = NULL;
-        author = NULL;
-        comment_data = NULL;
-
-        /* reset defaults */
-        downtime_id = 0;
-        entry_time = 0L;
-        start_time = 0L;
-        end_time = 0L;
-        fixed = FALSE;
-        triggered_by = 0;
-        duration = 0L;
-        break;
-
       default:
         break;
       }
@@ -932,8 +838,6 @@ int xrddefault_read_state_information() {
               }
             }
           }
-          else if (!strcmp(var, "next_downtime_id"))
-            next_downtime_id = strtoul(val, NULL, 10);
           else if (!strcmp(var, "next_event_id"))
             next_event_id = strtoul(val, NULL, 10);
           else if (!strcmp(var, "next_problem_id"))
@@ -1543,32 +1447,6 @@ int xrddefault_read_state_information() {
         }
         break;
 
-      case XRDDEFAULT_HOSTDOWNTIME_DATA:
-      case XRDDEFAULT_SERVICEDOWNTIME_DATA:
-        if (!strcmp(var, "host_name"))
-          host_name = string::dup(val);
-        else if (!strcmp(var, "service_description"))
-          service_description = string::dup(val);
-        else if (!strcmp(var, "downtime_id"))
-          downtime_id = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "entry_time"))
-          entry_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "start_time"))
-          start_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "end_time"))
-          end_time = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "fixed"))
-          fixed = (atoi(val) > 0) ? TRUE : FALSE;
-        else if (!strcmp(var, "triggered_by"))
-          triggered_by = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "duration"))
-          duration = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "author"))
-          author = string::dup(val);
-        else if (!strcmp(var, "comment"))
-          comment_data = string::dup(val);
-            break;
-
       default:
         break;
       }
@@ -1578,9 +1456,6 @@ int xrddefault_read_state_information() {
   /* free memory and close the file */
   delete[] inputbuf;
   mmap_fclose(thefile);
-
-  if (sort_downtime() != OK)
-    return (ERROR);
 
   if (test_scheduling == TRUE)
     gettimeofday(&tv[1], NULL);

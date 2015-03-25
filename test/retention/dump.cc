@@ -42,8 +42,6 @@ int main_test(int argc, char* argv[]) {
 
   if (type == "contact")
     dump::contacts(oss);
-  else if (type == "downtime")
-    dump::downtimes(oss);
   else if (type == "header")
     dump::header(oss);
   else if (type == "host")

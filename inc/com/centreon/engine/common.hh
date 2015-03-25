@@ -80,8 +80,6 @@
 #  define CMD_STOP_OBSESSING_OVER_SVC_CHECKS                  50
 #  define CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS                 53
 #  define CMD_SCHEDULE_FORCED_SVC_CHECK                       54
-#  define CMD_SCHEDULE_HOST_DOWNTIME                          55
-#  define CMD_SCHEDULE_SVC_DOWNTIME                           56
 #  define CMD_ENABLE_HOST_FLAP_DETECTION                      57
 #  define CMD_DISABLE_HOST_FLAP_DETECTION                     58
 #  define CMD_ENABLE_SVC_FLAP_DETECTION                       59
@@ -94,20 +92,7 @@
 #  define CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS            66
 #  define CMD_ENABLE_HOSTGROUP_SVC_CHECKS                     67
 #  define CMD_DISABLE_HOSTGROUP_SVC_CHECKS                    68
-#  define CMD_CANCEL_HOST_DOWNTIME                            69 /* Not internally implemented. */
-#  define CMD_CANCEL_SVC_DOWNTIME                             70 /* Not internally implemented. */
-#  define CMD_CANCEL_ACTIVE_HOST_DOWNTIME                     71 /* Old - no longer used. */
-#  define CMD_CANCEL_PENDING_HOST_DOWNTIME                    72 /* Old - no longer used. */
-#  define CMD_CANCEL_ACTIVE_SVC_DOWNTIME                      73 /* Old - no longer used. */
-#  define CMD_CANCEL_PENDING_SVC_DOWNTIME                     74 /* Old - no longer used. */
-#  define CMD_CANCEL_ACTIVE_HOST_SVC_DOWNTIME                 75 /* Unimplemented. */
-#  define CMD_CANCEL_PENDING_HOST_SVC_DOWNTIME                76 /* Unimplemented. */
 #  define CMD_FLUSH_PENDING_COMMANDS                          77
-#  define CMD_DEL_HOST_DOWNTIME                               78
-#  define CMD_DEL_SVC_DOWNTIME                                79
-#  define CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME                84
-#  define CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME                 85
-#  define CMD_SCHEDULE_HOST_SVC_DOWNTIME                      86
 #  define CMD_PROCESS_HOST_CHECK_RESULT                       87
 #  define CMD_START_EXECUTING_HOST_CHECKS                     88
 #  define CMD_STOP_EXECUTING_HOST_CHECKS                      89
@@ -141,8 +126,6 @@
 #  define CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS        118
 #  define CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS        119
 #  define CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS       120
-#  define CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME            121
-#  define CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME             122
 #  define CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER               123
 #  define CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER                124
 #  define CMD_CHANGE_HOST_EVENT_HANDLER                      125
@@ -154,10 +137,8 @@
 #  define CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL                131
 #  define CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS                 132
 #  define CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS                  133
-#  define CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME 134
 #  define CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS            135
 #  define CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS           136
-#  define CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME           137
 #  define CMD_ENABLE_SERVICE_FRESHNESS_CHECKS                138
 #  define CMD_DISABLE_SERVICE_FRESHNESS_CHECKS               139
 #  define CMD_ENABLE_HOST_FRESHNESS_CHECKS                   140
@@ -190,8 +171,6 @@
 #  define CMD_CHANGE_CONTACT_MODATTR                         167
 #  define CMD_CHANGE_CONTACT_MODHATTR                        168
 #  define CMD_CHANGE_CONTACT_MODSATTR                        169
-#  define CMD_DEL_DOWNTIME_BY_HOST_NAME                      170
-#  define CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME                 171
 #  define CMD_CUSTOM_COMMAND                                 999
 
 /* Service check types. */
@@ -205,11 +184,6 @@
 /* Service state types. */
 #  define SOFT_STATE 0
 #  define HARD_STATE 1
-
-/* Scheduled downtime types. */
-#  define SERVICE_DOWNTIME 1 /* Service downtime. */
-#  define HOST_DOWNTIME    2 /* Host downtime. */
-#  define ANY_DOWNTIME     3 /* Host or service downtime. */
 
 /* Notification options. */
 #  define NOTIFICATION_OPTION_NONE      0

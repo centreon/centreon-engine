@@ -49,8 +49,7 @@ namespace                  configuration {
       service,
       servicedependency,
       servicegroup,
-      timeperiod,
-      downtime
+      timeperiod
     };
 
                            object(object_type type);

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -60,12 +60,10 @@ bool operator==(
           && obj1.notify_on_service_critical == obj2.notify_on_service_critical
           && obj1.notify_on_service_recovery == obj2.notify_on_service_recovery
           && obj1.notify_on_service_flapping == obj2.notify_on_service_flapping
-          && obj1.notify_on_service_downtime == obj2.notify_on_service_downtime
           && obj1.notify_on_host_down == obj2.notify_on_host_down
           && obj1.notify_on_host_unreachable == obj2.notify_on_host_unreachable
           && obj1.notify_on_host_recovery == obj2.notify_on_host_recovery
           && obj1.notify_on_host_flapping == obj2.notify_on_host_flapping
-          && obj1.notify_on_host_downtime == obj2.notify_on_host_downtime
           && is_equal(obj1.host_notification_period, obj2.host_notification_period)
           && is_equal(obj1.service_notification_period, obj2.service_notification_period)
           && obj1.host_notifications_enabled == obj2.host_notifications_enabled
@@ -131,12 +129,10 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     "  notify_on_service_critical:      " << obj.notify_on_service_critical << "\n"
     "  notify_on_service_recovery:      " << obj.notify_on_service_recovery << "\n"
     "  notify_on_service_flapping:      " << obj.notify_on_service_flapping << "\n"
-    "  notify_on_service_downtime:      " << obj.notify_on_service_downtime << "\n"
     "  notify_on_host_down:             " << obj.notify_on_host_down << "\n"
     "  notify_on_host_unreachable:      " << obj.notify_on_host_unreachable << "\n"
     "  notify_on_host_recovery:         " << obj.notify_on_host_recovery << "\n"
     "  notify_on_host_flapping:         " << obj.notify_on_host_flapping << "\n"
-    "  notify_on_host_downtime:         " << obj.notify_on_host_downtime << "\n"
     "  host_notification_period:        " << chkstr(obj.host_notification_period) << "\n"
     "  service_notification_period:     " << chkstr(obj.service_notification_period) << "\n"
     "  host_notifications_enabled:      " << obj.host_notifications_enabled << "\n"
@@ -178,8 +174,6 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
  *                                           when service is unknown.
  *  @param[in] notify_service_flapping       Contact can be notified
  *                                           when service is flapping.
- *  @param[in] notify_sevice_downtime        Contact can be notified on
- *                                           service downtime.
  *  @param[in] notify_host_up                Contact can be notified
  *                                           when host is up.
  *  @param[in] notify_host_down              Contact can be notified
@@ -188,8 +182,6 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
  *                                           when host is unreachable.
  *  @param[in] notify_host_flapping          Contact can be notified
  *                                           when host is flapping.
- *  @param[in] notify_host_downtime          Contact can be notified on
- *                                           host downtime.
  *  @param[in] host_notifications_enabled    Are contact host
  *                                           notifications enabled ?
  *  @param[in] service_notifications_enabled Are contact service
@@ -215,12 +207,10 @@ contact* add_contact(
            int notify_service_warning,
            int notify_service_unknown,
            int notify_service_flapping,
-           int notify_service_downtime,
            int notify_host_up,
            int notify_host_down,
            int notify_host_unreachable,
            int notify_host_flapping,
-           int notify_host_downtime,
            int host_notifications_enabled,
            int service_notifications_enabled,
            int retain_status_information,
@@ -271,12 +261,10 @@ contact* add_contact(
     obj->modified_host_attributes = MODATTR_NONE;
     obj->modified_service_attributes = MODATTR_NONE;
     obj->notify_on_host_down = (notify_host_down > 0);
-    obj->notify_on_host_downtime = (notify_host_downtime > 0);
     obj->notify_on_host_flapping = (notify_host_flapping > 0);
     obj->notify_on_host_recovery = (notify_host_up > 0);
     obj->notify_on_host_unreachable = (notify_host_unreachable > 0);
     obj->notify_on_service_critical = (notify_service_critical > 0);
-    obj->notify_on_service_downtime = (notify_service_downtime > 0);
     obj->notify_on_service_flapping = (notify_service_flapping > 0);
     obj->notify_on_service_recovery = (notify_service_ok > 0);
     obj->notify_on_service_unknown = (notify_service_unknown > 0);

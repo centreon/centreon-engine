@@ -135,8 +135,6 @@ void applier::service::add_object(
                       & configuration::service::critical),
     static_cast<bool>(obj->notification_options()
                       & configuration::service::flapping),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::downtime),
     obj->notifications_enabled(),
     obj->is_volatile(),
     NULL_IF_EMPTY(obj->event_handler()),
@@ -397,10 +395,6 @@ void applier::service::modify_object(
     s->notify_on_flapping,
     static_cast<int>(static_cast<bool>(
       obj->notification_options() & configuration::service::flapping)));
-  modify_if_different(
-    s->notify_on_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::downtime)));
   modify_if_different(
     s->stalk_on_ok,
     static_cast<int>(static_cast<bool>(

@@ -55,7 +55,6 @@ using namespace com::centreon::engine;
 #define CHECK_COMMAND           check_this host
 #define ATTEMPT                 5
 #define MAX_ATTEMPTS            7
-#define DOWNTIME                2
 #define PERCENT_CHANGE          25.72
 #define EXECUTION_TIME          14.27
 #define LATENCY                 74.91
@@ -130,7 +129,6 @@ int main_test(int argc, char** argv) {
   host_list->host_check_command = string::dup(STR(CHECK_COMMAND));
   host_list->current_attempt = ATTEMPT;
   host_list->max_attempts = MAX_ATTEMPTS;
-  host_list->scheduled_downtime_depth = DOWNTIME;
   host_list->percent_state_change = PERCENT_CHANGE;
   host_list->execution_time = EXECUTION_TIME;
   host_list->latency = LATENCY;
@@ -172,7 +170,6 @@ int main_test(int argc, char** argv) {
     { MACRO_HOSTCHECKCOMMAND, STR(CHECK_COMMAND), false },
     { MACRO_HOSTATTEMPT, STR(ATTEMPT), false },
     { MACRO_MAXHOSTATTEMPTS, STR(MAX_ATTEMPTS), false },
-    { MACRO_HOSTDOWNTIME, STR(DOWNTIME), false },
     { MACRO_HOSTPERCENTCHANGE, STR(PERCENT_CHANGE), true },
     { MACRO_HOSTEXECUTIONTIME, STR(EXECUTION_TIME), true },
     { MACRO_HOSTLATENCY, STR(LATENCY), true },

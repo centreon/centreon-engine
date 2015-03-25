@@ -968,8 +968,6 @@ int init_macrox_names() {
   add_macrox_name(SERVICEDURATION);
   add_macrox_name(HOSTDURATIONSEC);
   add_macrox_name(SERVICEDURATIONSEC);
-  add_macrox_name(HOSTDOWNTIME);
-  add_macrox_name(SERVICEDOWNTIME);
   add_macrox_name(HOSTSTATETYPE);
   add_macrox_name(SERVICESTATETYPE);
   add_macrox_name(HOSTPERCENTCHANGE);

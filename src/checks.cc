@@ -39,7 +39,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -968,12 +967,6 @@ int handle_async_service_check_result(
         log_service_event(temp_service);
         state_was_logged = true;
       }
-
-      /* check for start of flexible (non-fixed) scheduled downtime if we just had a hard error */
-      /* we need to check for both, state_change (SOFT) and hard_state_change (HARD) values */
-      if (((true == hard_state_change) || (true == state_change))
-          && (temp_service->pending_flex_downtime > 0))
-        check_pending_flex_service_downtime(temp_service);
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */

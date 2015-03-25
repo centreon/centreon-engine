@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/downtime.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/configuration/contactgroup.hh"
@@ -142,10 +141,6 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::timeperiod());
   else if (type_name == "connector")
     obj = object_ptr(new configuration::connector());
-  else if (type_name == "hostdowntime")
-    obj = object_ptr(new configuration::downtime(configuration::downtime::host));
-  else if (type_name == "servicedowntime")
-    obj = object_ptr(new configuration::downtime(configuration::downtime::service));
   return (obj);
 }
 
@@ -256,8 +251,7 @@ std::string const& object::type_name() const throw () {
     "service",
     "servicedependency",
     "servicegroup",
-    "timeperiod",
-    "downtime"
+    "timeperiod"
   };
   return (tab[_type]);
 }

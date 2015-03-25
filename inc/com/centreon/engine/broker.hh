@@ -36,7 +36,6 @@
 #  define BROKER_LOGGED_DATA                       (1 << 5)
 #  define BROKER_NOTIFICATIONS                     (1 << 6)
 #  define BROKER_FLAPPING_DATA                     (1 << 7)
-#  define BROKER_DOWNTIME_DATA                     (1 << 9)
 #  define BROKER_SYSTEM_COMMANDS                   (1 << 10)
 #  define BROKER_OCP_DATA_UNUSED                   (1 << 11) /* Reusable. */
 #  define BROKER_STATUS_DATA                       (1 << 12)
@@ -119,14 +118,6 @@
 /* Flapping. */
 #  define NEBTYPE_FLAPPING_START                   1000
 #  define NEBTYPE_FLAPPING_STOP                    1001
-
-/* Downtimes. */
-#  define NEBTYPE_DOWNTIME_ADD                     1100
-#  define NEBTYPE_DOWNTIME_DELETE                  1101
-#  define NEBTYPE_DOWNTIME_LOAD                    1102
-#  define NEBTYPE_DOWNTIME_START                   1103
-#  define NEBTYPE_DOWNTIME_STOP                    1104
-#  define NEBTYPE_DOWNTIME_UPDATE                  1105
 
 /* Statuses. */
 #  define NEBTYPE_PROGRAMSTATUS_UPDATE             1200
@@ -266,10 +257,6 @@
 #  define NEBATTR_FLAPPING_STOP_NORMAL             1
 #  define NEBATTR_FLAPPING_STOP_DISABLED           2 /* Flapping stopped because flap detection was disabled. */
 
-/* Downtime. */
-#  define NEBATTR_DOWNTIME_STOP_NORMAL             1
-#  define NEBATTR_DOWNTIME_STOP_CANCELLED          2
-
 // Forward declaration.
 struct command_struct;
 struct customvariablesmember_struct;
@@ -383,25 +370,6 @@ void           broker_custom_variable(
                  void* data,
                  char const* varname,
                  char const* varvalue,
-                 struct timeval const* timestamp);
-void           broker_downtime_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 int downtime_type,
-                 char const* host_name,
-                 char const* svc_description,
-                 time_t entry_time,
-                 char const* author_name,
-                 char const* comment_data,
-                 time_t start_time,
-                 time_t end_time,
-                 int fixed,
-                 unsigned long triggered_by,
-                 unsigned long duration,
-                 unsigned long recurring_interval,
-                 struct timeperiod_struct* recurring_period,
-                 unsigned long downtime_id,
                  struct timeval const* timestamp);
 int            broker_event_handler(
                  int type,

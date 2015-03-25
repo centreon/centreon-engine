@@ -58,7 +58,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     1,                              // Notify down
     1,                              // Notify unreachable
     0,                              // Notify flapping
-    0,                              // Notify downtime
     1.0,                            // Notification interval
     FIRST_NOTIF_DELAY,              // First notification delay
     NULL,                           // Notification period
@@ -109,7 +108,6 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     1,                              // Notify warning
     1,                              // Notify critical
     0,                              // Notify flapping
-    0,                              // Notify downtime
     1,                              // Notifications enabled
     0,                              // Volatile
     NULL,                           // Event handler
@@ -150,12 +148,10 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
     1,                                    // Notify service warning
     1,                                    // Notify service unknown
     0,                                    // Notify service flapping
-    0,                                    // Notify service downtime
     0,                                    // Notify host up
     1,                                    // Notify host down
     1,                                    // Notify host unreachable
     0,                                    // Notify host flapping
-    0,                                    // Notify host downtime
     1,                                    // Host notifications enabled
     1,                                    // Service notifications enabled
     0,                                    // Retain status information

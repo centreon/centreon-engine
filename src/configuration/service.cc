@@ -116,8 +116,7 @@ static unsigned short const default_notification_options(
                               | service::warning
                               | service::critical
                               | service::unknown
-                              | service::flapping
-                              | service::downtime);
+                              | service::flapping);
 static std::string const    default_notification_period;
 static bool const           default_obsess_over_service(true);
 static bool const           default_retain_nonstatus_information(true);
@@ -1390,12 +1389,12 @@ bool service::_set_notification_options(std::string const& value) {
       options |= ok;
     else if (*it == "f" || *it == "flapping")
       options |= flapping;
-    else if (*it == "s" || *it == "downtime")
-      options |= downtime;
     else if (*it == "n" || *it == "none")
       options = none;
     else if (*it == "a" || *it == "all")
-      options = unknown | warning | critical | ok | flapping | downtime;
+      options = unknown | warning | critical | ok | flapping;
+    else if (*it == "s" || *it == "downtime")
+      ;
     else
       return (false);
   }

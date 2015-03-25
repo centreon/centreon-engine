@@ -21,7 +21,6 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/retention/applier/contact.hh"
-#include "com/centreon/engine/retention/applier/downtime.hh"
 #include "com/centreon/engine/retention/applier/host.hh"
 #include "com/centreon/engine/retention/applier/program.hh"
 #include "com/centreon/engine/retention/applier/service.hh"
@@ -57,9 +56,6 @@ void applier::state::apply(
 
     applier::program app_program;
     app_program.apply(config, state.globals());
-
-    applier::downtime app_downtimes;
-    app_downtimes.apply(state.downtimes());
 
     applier::contact app_contacts;
     app_contacts.apply(config, state.contacts());

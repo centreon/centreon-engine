@@ -39,8 +39,7 @@ namespace                  configuration {
       up = (1 << 0),
       down = (1 << 1),
       unreachable = (1 << 2),
-      flapping = (1 << 3),
-      downtime = (1 << 4)
+      flapping = (1 << 3)
     };
     typedef std::string    key_type;
 

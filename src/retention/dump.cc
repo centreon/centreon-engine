@@ -23,7 +23,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/dump.hh"
 
 using namespace com::centreon::engine::logging;
@@ -86,52 +85,6 @@ std::ostream& dump::customvariables(
          << member->has_been_modified << ";"
          << (member->variable_value ? member->variable_value : "")
          << "\n";
-  return (os);
-}
-
-/**
- *  Dump retention of downtime.
- *
- *  @param[out] os  The output stream.
- *  @param[in]  obj The downtime to dump.
- *
- *  @return The output stream.
- */
-std::ostream& dump::downtime(std::ostream& os, scheduled_downtime_struct const& obj) {
-  if (obj.type == HOST_DOWNTIME)
-    os << "hostdowntime {\n";
-  else
-    os << "servicedowntime {\n";
-  os << "host_name=" << obj.host_name << "\n";
-  if (obj.type == SERVICE_DOWNTIME)
-    os << "service_description=" << obj.service_description << "\n";
-  os << "author=" << obj.author << "\n"
-    "comment=" << obj.comment << "\n"
-    "duration=" << obj.duration << "\n"
-    "end_time=" << static_cast<unsigned long>(obj.end_time) << "\n"
-    "entry_time=" << static_cast<unsigned long>(obj.entry_time) << "\n"
-    "fixed=" << obj.fixed << "\n"
-    "start_time=" << static_cast<unsigned long>(obj.start_time) << "\n"
-    "triggered_by=" << obj.triggered_by << "\n"
-    "downtime_id=" << obj.downtime_id << "\n"
-    "recurring_interval=" << obj.recurring_interval << "\n"
-    "recurring_period=" << obj.recurring_period->name << "\n"
-    "}\n";
-  return (os);
-}
-
-/**
- *  Dump retention of downtimes.
- *
- *  @param[out] os The output stream.
- *
- *  @return The output stream.
- */
-std::ostream& dump::downtimes(std::ostream& os) {
-  for (scheduled_downtime* obj(scheduled_downtime_list);
-       obj;
-       obj = obj->next)
-    dump::downtime(os, *obj);
   return (os);
 }
 
@@ -267,7 +220,6 @@ std::ostream& dump::program(std::ostream& os) {
     "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
     "modified_host_attributes=" << (modified_host_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
     "modified_service_attributes=" << (modified_service_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
-    "next_downtime_id=" << next_downtime_id << "\n"
     "next_event_id=" << next_event_id << "\n"
     "next_notification_id=" << next_notification_id << "\n"
     "next_problem_id=" << next_problem_id << "\n"
@@ -311,7 +263,6 @@ bool dump::save(std::string const& path) {
     dump::hosts(stream);
     dump::services(stream);
     dump::contacts(stream);
-    dump::downtimes(stream);
 
     ret = true;
   }

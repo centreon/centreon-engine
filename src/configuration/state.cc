@@ -25,7 +25,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/io/file_entry.hh"
-#include "com/centreon/engine/configuration/downtime.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -130,8 +129,6 @@ state::setters const state::_setters[] = {
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
   { "use_syslog",                                  SETTER(bool, use_syslog) },
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
-  { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
-  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) },
 
   // Deprecated.
   { "admin_email",                                 SETTER(std::string const&, _set_admin_email) },
@@ -183,7 +180,9 @@ state::setters const state::_setters[] = {
   { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
   { "use_large_installation_tweaks",               SETTER(bool, _set_use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, _set_use_regexp_matching) },
-  { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) }
+  { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) },
+  { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
+  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) }
 };
 
 // Default values.
@@ -446,7 +445,6 @@ state& state::operator=(state const& right) {
     _debug_file = right._debug_file;
     _debug_level = right._debug_level;
     _debug_verbosity = right._debug_verbosity;
-    _downtimes = right._downtimes;
     _enable_event_handlers = right._enable_event_handlers;
     _enable_flap_detection = right._enable_flap_detection;
     _enable_notifications = right._enable_notifications;
@@ -562,7 +560,6 @@ bool state::operator==(state const& right) const throw () {
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
           && _debug_verbosity == right._debug_verbosity
-          && cmp_set_ptr(_downtimes, right._downtimes)
           && _enable_event_handlers == right._enable_event_handlers
           && _enable_flap_detection == right._enable_flap_detection
           && _enable_notifications == right._enable_notifications
@@ -1349,15 +1346,6 @@ void state::debug_verbosity(unsigned int value) {
     _debug_verbosity = static_cast<unsigned int>(most);
   else
     _debug_verbosity = value;
-}
-
-/**
- *  Get the downtime set.
- *
- *  @return Downtime set.
- */
-std::set<shared_ptr<downtime> >& state::downtimes() throw() {
-   return (_downtimes);
 }
 
 /**
