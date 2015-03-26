@@ -26,8 +26,6 @@
 #  include <vector>
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/configuration/connector.hh"
-#  include "com/centreon/engine/configuration/contact.hh"
-#  include "com/centreon/engine/configuration/contactgroup.hh"
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
 #  include "com/centreon/engine/configuration/hostgroup.hh"
@@ -143,19 +141,6 @@ namespace               configuration {
                         connectors_find(connector::key_type const& k) const;
     set_connector::iterator
                         connectors_find(connector::key_type const& k);
-    set_contact const&  contacts() const throw ();
-    set_contact&        contacts() throw ();
-    set_contact::const_iterator
-                        contacts_find(contact::key_type const& k) const;
-    set_contact::iterator
-                        contacts_find(contact::key_type const& k);
-    set_contactgroup const&
-                        contactgroups() const throw ();
-    set_contactgroup&   contactgroups() throw ();
-    set_contactgroup::const_iterator
-                        contactgroups_find(contactgroup::key_type const& k) const;
-    set_contactgroup::iterator
-                        contactgroups_find(contactgroup::key_type const& k);
     date_type           date_format() const throw ();
     void                date_format(date_type value);
     std::string const&  debug_file() const throw ();
@@ -168,8 +153,6 @@ namespace               configuration {
     void                enable_event_handlers(bool value);
     bool                enable_flap_detection() const throw ();
     void                enable_flap_detection(bool value);
-    bool                enable_notifications() const throw ();
-    void                enable_notifications(bool value);
     bool                enable_predictive_host_dependency_checks() const throw ();
     void                enable_predictive_host_dependency_checks(bool value);
     bool                enable_predictive_service_dependency_checks() const throw ();
@@ -229,8 +212,6 @@ namespace               configuration {
     void                log_host_retries(bool value);
     bool                log_initial_states() const throw ();
     void                log_initial_states(bool value);
-    bool                log_notifications() const throw ();
-    void                log_notifications(bool value);
     bool                log_passive_checks() const throw ();
     void                log_passive_checks(bool value);
     bool                log_service_retries() const throw ();
@@ -253,8 +234,6 @@ namespace               configuration {
     void                max_parallel_service_checks(unsigned int value);
     unsigned int        max_service_check_spread() const throw ();
     void                max_service_check_spread(unsigned int value);
-    unsigned int        notification_timeout() const throw ();
-    void                notification_timeout(unsigned int value);
     std::string const&  object_cache_file() const throw ();
     void                object_cache_file(std::string const& value);
     bool                obsess_over_hosts() const throw ();
@@ -276,10 +255,6 @@ namespace               configuration {
     std::list<std::string> const&
                         resource_file() const throw ();
     void                resource_file(std::list<std::string> const& value);
-    unsigned long       retained_contact_host_attribute_mask() const throw ();
-    void                retained_contact_host_attribute_mask(unsigned long value);
-    unsigned long       retained_contact_service_attribute_mask() const throw ();
-    void                retained_contact_service_attribute_mask(unsigned long value);
     unsigned long       retained_host_attribute_mask() const throw ();
     void                retained_host_attribute_mask(unsigned long value);
     unsigned long       retained_process_host_attribute_mask() const throw ();
@@ -384,6 +359,7 @@ namespace               configuration {
     void                _set_enable_embedded_perl(std::string const& value);
     void                _set_enable_environment_macros(bool value);
     void                _set_enable_failure_prediction(bool value);
+    void                _set_enable_notifications(bool value);
     void                _set_event_broker_options(std::string const& value);
     void                _set_free_child_process_memory(std::string const& value);
     void                _set_host_inter_check_delay_method(std::string const& value);
@@ -395,13 +371,17 @@ namespace               configuration {
     void                _set_host_perfdata_file_template(std::string const& value);
     void                _set_lock_file(std::string const& value);
     void                _set_log_archive_path(std::string const& value);
+    void                _set_log_notifications(bool value);
     void                _set_log_rotation_method(std::string const& value);
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
+    void                _set_notification_timeout(unsigned int value);
     void                _set_p1_file(std::string const& value);
     void                _set_perfdata_timeout(int value);
     void                _set_process_performance_data(bool value);
     void                _set_resource_file(std::string const& value);
+    void                _set_retained_contact_host_attribute_mask(unsigned long value);
+    void                _set_retained_contact_service_attribute_mask(unsigned long value);
     void                _set_retained_process_service_attribute_mask(std::string const& value);
     void                _set_retained_service_attribute_mask(std::string const& value);
     void                _set_service_inter_check_delay_method(std::string const& value);
@@ -478,15 +458,12 @@ namespace               configuration {
     bool                _command_check_interval_is_seconds;
     std::string         _command_file;
     set_connector       _connectors;
-    set_contactgroup    _contactgroups;
-    set_contact         _contacts;
     date_type           _date_format;
     std::string         _debug_file;
     unsigned long       _debug_level;
     unsigned int        _debug_verbosity;
     bool                _enable_event_handlers;
     bool                _enable_flap_detection;
-    bool                _enable_notifications;
     bool                _enable_predictive_host_dependency_checks;
     bool                _enable_predictive_service_dependency_checks;
     unsigned long       _event_broker_options;
@@ -512,7 +489,6 @@ namespace               configuration {
     std::string         _log_file;
     bool                _log_host_retries;
     bool                _log_initial_states;
-    bool                _log_notifications;
     bool                _log_passive_checks;
     bool                _log_service_retries;
     float               _low_host_flap_threshold;
@@ -524,7 +500,6 @@ namespace               configuration {
     unsigned long       _max_log_file_size;
     unsigned int        _max_parallel_service_checks;
     unsigned int        _max_service_check_spread;
-    unsigned int        _notification_timeout;
     std::string         _object_cache_file;
     bool                _obsess_over_hosts;
     bool                _obsess_over_services;
@@ -536,8 +511,6 @@ namespace               configuration {
     std::string         _precached_object_file;
     std::list<std::string>
                         _resource_file;
-    unsigned long       _retained_contact_host_attribute_mask;
-    unsigned long       _retained_contact_service_attribute_mask;
     unsigned long       _retained_host_attribute_mask;
     unsigned long       _retained_process_host_attribute_mask;
     bool                _retain_state_information;

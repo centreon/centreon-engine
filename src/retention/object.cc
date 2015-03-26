@@ -18,7 +18,6 @@
 */
 
 
-#include "com/centreon/engine/retention/contact.hh"
 #include "com/centreon/engine/retention/host.hh"
 #include "com/centreon/engine/retention/info.hh"
 #include "com/centreon/engine/retention/object.hh"
@@ -95,8 +94,6 @@ retention::object_ptr retention::object::create(std::string const& type_name) {
     obj = object_ptr(new retention::service);
   else if (type_name == "host")
     obj = object_ptr(new retention::host);
-  else if (type_name == "contact")
-    obj = object_ptr(new retention::contact);
   else if (type_name == "info")
     obj = object_ptr(new retention::info);
   else if (type_name == "program")
@@ -120,7 +117,6 @@ retention::object::type_id retention::object::type() const throw () {
  */
 std::string const& retention::object::type_name() const throw () {
   static std::string const tab[] = {
-    "contact",
     "host",
     "info",
     "program",

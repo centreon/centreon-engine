@@ -329,164 +329,6 @@ static int handle_servicegroup_macro(
 }
 
 /**
- *  Get contact macro.
- *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer must be freed by
- *                         caller.
- *
- *  @return OK on success.
- */
-static int handle_contact_macro(
-             nagios_macros* mac,
-             int macro_type,
-             char const* arg1,
-             char const* arg2,
-             char** output,
-             int* free_macro) {
-  // Return value.
-  int retval;
-
-  if (arg2 == NULL) {
-    // Find the contact for on-demand macros
-    // or use saved contact pointer.
-    contact* cntct(arg1 ? find_contact(arg1) : mac->contact_ptr);
-    if (!cntct)
-      retval = ERROR;
-    else {
-      // Get the contact macro value.
-      retval = grab_standard_contact_macro_r(
-                 mac,
-                 macro_type,
-                 cntct,
-                 output);
-      if (OK == retval)
-        *free_macro = true;
-    }
-  }
-  // A contact macro with a contactgroup name and delimiter.
-  else if (arg1 && arg2) {
-    contactgroup* cg(find_contactgroup(arg1));
-    if (!cg)
-      retval = ERROR;
-    else {
-      size_t delimiter_len(strlen(arg2));
-
-      // Concatenate macro values for all contactgroup members.
-      for (contactsmember* temp_contactsmember = cg->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-        contact* cntct(temp_contactsmember->contact_ptr);
-        if (cntct) {
-          // Get the macro value for this contact.
-          char* buffer(NULL);
-          grab_standard_contact_macro_r(
-            mac,
-            macro_type,
-            cntct,
-            &buffer);
-          if (buffer) {
-            // Add macro value to already running macro.
-            if (*output == NULL)
-              *output = string::dup(buffer);
-            else {
-              *output = resize_string(
-                          *output,
-                          strlen(*output)
-                          + strlen(buffer)
-                          + delimiter_len
-                          + 1);
-              strcat(*output, arg2);
-              strcat(*output, buffer);
-            }
-            delete[] buffer;
-            buffer = NULL;
-          }
-        }
-      }
-      *free_macro = true;
-      retval = OK;
-    }
-  }
-  else
-    retval = ERROR;
-  return (retval);
-}
-
-/**
- *  Get contactgroup macro.
- *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer must be freed by
- *                         caller.
- *
- *  @return OK on success.
- */
-static int handle_contactgroup_macro(
-             nagios_macros* mac,
-             int macro_type,
-             char const* arg1,
-             char const* arg2,
-             char** output,
-             int* free_macro) {
-  (void)arg2;
-
-  // Return value.
-  int retval;
-
-  // Use the saved contactgroup pointer.
-  // or find the contactgroup for on-demand macros.
-  contactgroup* cg(arg1 ? find_contactgroup(arg1) : mac->contactgroup_ptr);
-  if (!cg)
-    retval = ERROR;
-  else {
-    // Get the contactgroup macro value.
-    retval = grab_standard_contactgroup_macro(macro_type, cg, output);
-    if (OK == retval)
-      *free_macro = true;
-  }
-
-  return (retval);
-}
-
-/**
- *  Get a notification macro.
- *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to false.
- *
- *  @return OK on success.
- */
-static int handle_notification_macro(
-             nagios_macros* mac,
-             int macro_type,
-             char const* arg1,
-             char const* arg2,
-             char** output,
-             int* free_macro) {
-  (void)arg1;
-  (void)arg2;
-
-  // Notification macros have already been pre-computed.
-  *output = mac->x[macro_type];
-  *free_macro = false;
-
-  return (OK);
-}
-
-/**
  *  Get a date/time macro.
  *
  *  @param[out] mac        Macro object.
@@ -583,30 +425,23 @@ static int handle_summary_macro(
     for (host* temp_host = host_list;
          temp_host != NULL;
          temp_host = temp_host->next) {
-      // Filter totals based on contact if necessary.
-      bool authorized(
-             mac->contact_ptr
-             ? is_contact_for_host(temp_host, mac->contact_ptr)
-             : true);
-      if (authorized) {
-        bool problem(true);
-        if ((temp_host->current_state == HOST_UP)
-            && (temp_host->has_been_checked == true))
-          hosts_up++;
-        else if (temp_host->current_state == HOST_DOWN) {
-          if (temp_host->checks_enabled == false)
-            problem = false;
-          if (problem)
-            hosts_down_unhandled++;
-          hosts_down++;
-        }
-        else if (temp_host->current_state == HOST_UNREACHABLE) {
-          if (temp_host->checks_enabled == false)
-            problem = false;
-          if (problem)
-            hosts_down_unhandled++;
-          hosts_unreachable++;
-        }
+      bool problem(true);
+      if ((temp_host->current_state == HOST_UP)
+          && (temp_host->has_been_checked == true))
+        hosts_up++;
+      else if (temp_host->current_state == HOST_DOWN) {
+        if (temp_host->checks_enabled == false)
+          problem = false;
+        if (problem)
+          hosts_down_unhandled++;
+        hosts_down++;
+      }
+      else if (temp_host->current_state == HOST_UNREACHABLE) {
+        if (temp_host->checks_enabled == false)
+          problem = false;
+        if (problem)
+          hosts_down_unhandled++;
+        hosts_unreachable++;
       }
     }
     host_problems = hosts_down + hosts_unreachable;
@@ -626,54 +461,45 @@ static int handle_summary_macro(
     for (service* temp_service = service_list;
          temp_service != NULL;
          temp_service = temp_service->next) {
-      // Filter totals based on contact if necessary.
-      bool authorized(
-             mac->contact_ptr
-             ? is_contact_for_service(
-                 temp_service,
-                 mac->contact_ptr)
-             : true);
-      if (authorized) {
-        bool problem(true);
-        if (temp_service->current_state == STATE_OK
-            && temp_service->has_been_checked == true)
-          services_ok++;
-        else if (temp_service->current_state == STATE_WARNING) {
-          host* temp_host(find_host(temp_service->host_name));
-          if (temp_host != NULL
-              && (temp_host->current_state == HOST_DOWN
-                  || temp_host->current_state == HOST_UNREACHABLE))
-            problem = false;
-          if (temp_service->checks_enabled == false)
-            problem = false;
-          if (problem)
-            services_warning_unhandled++;
-          services_warning++;
-        }
-        else if (temp_service->current_state == STATE_UNKNOWN) {
-          host* temp_host(find_host(temp_service->host_name));
-          if (temp_host != NULL
-              && (temp_host->current_state == HOST_DOWN
-                  || temp_host->current_state == HOST_UNREACHABLE))
-            problem = false;
-          if (temp_service->checks_enabled == false)
-            problem = false;
-          if (problem)
-            services_unknown_unhandled++;
-          services_unknown++;
-        }
-        else if (temp_service->current_state == STATE_CRITICAL) {
-          host* temp_host(find_host(temp_service->host_name));
-          if (temp_host != NULL
-              && (temp_host->current_state == HOST_DOWN
-                  || temp_host->current_state == HOST_UNREACHABLE))
-            problem = false;
-          if (temp_service->checks_enabled == false)
-            problem = false;
-          if (problem)
-            services_critical_unhandled++;
-          services_critical++;
-        }
+      bool problem(true);
+      if (temp_service->current_state == STATE_OK
+          && temp_service->has_been_checked == true)
+        services_ok++;
+      else if (temp_service->current_state == STATE_WARNING) {
+        host* temp_host(find_host(temp_service->host_name));
+        if (temp_host != NULL
+            && (temp_host->current_state == HOST_DOWN
+                || temp_host->current_state == HOST_UNREACHABLE))
+          problem = false;
+        if (temp_service->checks_enabled == false)
+          problem = false;
+        if (problem)
+          services_warning_unhandled++;
+        services_warning++;
+      }
+      else if (temp_service->current_state == STATE_UNKNOWN) {
+        host* temp_host(find_host(temp_service->host_name));
+        if (temp_host != NULL
+            && (temp_host->current_state == HOST_DOWN
+                || temp_host->current_state == HOST_UNREACHABLE))
+          problem = false;
+        if (temp_service->checks_enabled == false)
+          problem = false;
+        if (problem)
+          services_unknown_unhandled++;
+        services_unknown++;
+      }
+      else if (temp_service->current_state == STATE_CRITICAL) {
+        host* temp_host(find_host(temp_service->host_name));
+        if (temp_host != NULL
+            && (temp_host->current_state == HOST_DOWN
+                || temp_host->current_state == HOST_UNREACHABLE))
+          problem = false;
+        if (temp_service->checks_enabled == false)
+          problem = false;
+        if (problem)
+          services_critical_unhandled++;
+        services_critical++;
       }
     }
     service_problems
@@ -751,8 +577,6 @@ struct grab_value_redirection {
       MACRO_HOSTNOTES,
       MACRO_HOSTCHECKTYPE,
       MACRO_LONGHOSTOUTPUT,
-      MACRO_HOSTNOTIFICATIONNUMBER,
-      MACRO_HOSTNOTIFICATIONID,
       MACRO_HOSTEVENTID,
       MACRO_LASTHOSTEVENTID,
       MACRO_HOSTGROUPNAMES,
@@ -813,8 +637,6 @@ struct grab_value_redirection {
       MACRO_SERVICENOTES,
       MACRO_SERVICECHECKTYPE,
       MACRO_LONGSERVICEOUTPUT,
-      MACRO_SERVICENOTIFICATIONNUMBER,
-      MACRO_SERVICENOTIFICATIONID,
       MACRO_SERVICEEVENTID,
       MACRO_LASTSERVICEEVENTID,
       MACRO_SERVICEGROUPNAMES,
@@ -843,44 +665,6 @@ struct grab_value_redirection {
          i < sizeof(servicegroup_ids) / sizeof(*servicegroup_ids);
          ++i)
       routines[servicegroup_ids[i]] = &handle_servicegroup_macro;
-
-    // Contact macros.
-    static unsigned int const contact_ids[] = {
-      MACRO_CONTACTNAME,
-      MACRO_CONTACTALIAS,
-      MACRO_CONTACTEMAIL,
-      MACRO_CONTACTPAGER,
-      MACRO_CONTACTGROUPNAMES
-    };
-    for (unsigned int i = 0;
-         i < sizeof(contact_ids) / sizeof(*contact_ids);
-         ++i)
-      routines[contact_ids[i]] = &handle_contact_macro;
-
-    // Contactgroup macros.
-    static unsigned int const contactgroup_ids[] = {
-      MACRO_CONTACTGROUPNAME,
-      MACRO_CONTACTGROUPALIAS,
-      MACRO_CONTACTGROUPMEMBERS
-    };
-    for (unsigned int i = 0;
-         i < sizeof(contactgroup_ids) / sizeof(*contactgroup_ids);
-         ++i)
-      routines[contactgroup_ids[i]] = &handle_contactgroup_macro;
-
-    // Notification macros.
-    static unsigned int const notification_ids[] = {
-      MACRO_NOTIFICATIONTYPE,
-      MACRO_NOTIFICATIONNUMBER,
-      MACRO_NOTIFICATIONRECIPIENTS,
-      MACRO_NOTIFICATIONAUTHOR,
-      MACRO_NOTIFICATIONAUTHORNAME,
-      MACRO_NOTIFICATIONAUTHORALIAS
-    };
-    for (unsigned int i = 0;
-         i < sizeof(notification_ids) / sizeof(*notification_ids);
-         ++i)
-      routines[notification_ids[i]] = &handle_notification_macro;
 
     // Date/Time macros.
     static unsigned int const datetime_ids[] = {
@@ -959,11 +743,6 @@ int grab_macro_value_r(
   char* ptr = NULL;
   char* macro_name = NULL;
   char* arg[2] = { NULL, NULL };
-  contact* temp_contact = NULL;
-  contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_contactsmember = NULL;
-  char* temp_buffer = NULL;
-  int delimiter_len = 0;
   unsigned int x;
   int result = OK;
 
@@ -1076,78 +855,6 @@ int grab_macro_value_r(
     *free_macro = false;
   }
 
-  /***** CONTACT ADDRESS MACROS *****/
-  /* NOTE: the code below should be broken out into a separate function */
-  else if (strstr(macro_name, "CONTACTADDRESS") == macro_name) {
-    /* which address do we want? */
-    x = atoi(macro_name + 14) - 1;
-
-    /* regular macro */
-    if (arg[0] == NULL) {
-      /* use the saved pointer */
-      if ((temp_contact = mac->contact_ptr) == NULL) {
-        delete[] buf;
-        return (ERROR);
-      }
-
-      /* get the macro value */
-      result = grab_contact_address_macro(x, temp_contact, output);
-    }
-    /* on-demand macro */
-    else {
-      /* on-demand contact macro with a contactgroup and a delimiter */
-      if (arg[1] != NULL) {
-        if ((temp_contactgroup = find_contactgroup(arg[0])) == NULL)
-          return (ERROR);
-
-        delimiter_len = strlen(arg[1]);
-
-        /* concatenate macro values for all contactgroup members */
-        for (temp_contactsmember = temp_contactgroup->members;
-             temp_contactsmember != NULL;
-             temp_contactsmember = temp_contactsmember->next) {
-
-          if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-            continue;
-          if ((temp_contact = find_contact(temp_contactsmember->contact_name)) == NULL)
-            continue;
-
-          /* get the macro value for this contact */
-          grab_contact_address_macro(x, temp_contact, &temp_buffer);
-
-          if (temp_buffer == NULL)
-            continue;
-
-          /* add macro value to already running macro */
-          if (*output == NULL)
-            *output = string::dup(temp_buffer);
-          else {
-            *output = resize_string(
-                        *output,
-                        strlen(*output)
-                        + strlen(temp_buffer)
-                        + delimiter_len
-                        + 1);
-            strcat(*output, arg[1]);
-            strcat(*output, temp_buffer);
-          }
-          delete[] temp_buffer;
-          temp_buffer = NULL;
-        }
-      }
-      /* else on-demand contact macro */
-      else {
-        /* find the contact */
-        if ((temp_contact = find_contact(arg[0])) == NULL) {
-          delete[] buf;
-          return (ERROR);
-        }
-
-        /* get the macro value */
-        result = grab_contact_address_macro(x, temp_contact, output);
-      }
-    }
-  }
   /***** CUSTOM VARIABLE MACROS *****/
   else if (macro_name[0] == '_') {
     /* get the macro value */

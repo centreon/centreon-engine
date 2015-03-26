@@ -29,8 +29,6 @@ set(
   # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/connector.cc"
-  "${SRC_DIR}/contact.cc"
-  "${SRC_DIR}/contactgroup.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/hostdependency.cc"
   "${SRC_DIR}/hostgroup.cc"
@@ -49,8 +47,6 @@ set(
   # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
-  "${INC_DIR}/contact.hh"
-  "${INC_DIR}/contactgroup.hh"
   "${INC_DIR}/difference.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/hostdependency.hh"

@@ -24,7 +24,6 @@
 #  include "com/centreon/engine/namespace.hh"
 
 // Forward declaration.
-struct contact_struct;
 struct customvariablesmember_struct;
 struct host_struct;
 struct service_struct;
@@ -33,8 +32,6 @@ CCE_BEGIN()
 
 namespace         retention {
   namespace       dump {
-    std::ostream& contact(std::ostream& os, contact_struct const& obj);
-    std::ostream& contacts(std::ostream& os);
     std::ostream& customvariables(std::ostream& os, customvariablesmember_struct const& obj);
     std::ostream& header(std::ostream& os);
     std::ostream& host(std::ostream& os, host_struct const& obj);

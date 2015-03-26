@@ -32,8 +32,6 @@ set(
   # Sources.
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/connector.cc"
-  "${SRC_DIR}/contact.cc"
-  "${SRC_DIR}/contactgroup.cc"
   "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/group.cc"
   "${SRC_DIR}/host.cc"
@@ -52,8 +50,6 @@ set(
   # Headers.
   "${INC_DIR}/command.hh"
   "${INC_DIR}/connector.hh"
-  "${INC_DIR}/contactgroup.hh"
-  "${INC_DIR}/contact.hh"
   "${INC_DIR}/daterange.hh"
   "${INC_DIR}/file_info.hh"
   "${INC_DIR}/group.hh"

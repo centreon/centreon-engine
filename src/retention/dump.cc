@@ -29,44 +29,6 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::retention;
 
 /**
- *  Dump retention of contact.
- *
- *  @param[out] os  The output stream.
- *  @param[in]  obj The contact to dump.
- *
- *  @return The output stream.
- */
-std::ostream& dump::contact(std::ostream& os, contact_struct const& obj) {
-  os << "contact {\n"
-    "contact_name=" << obj.name << "\n"
-    "host_notification_period=" << (obj.host_notification_period ? obj.host_notification_period : "") << "\n"
-    "host_notifications_enabled=" << obj.host_notifications_enabled << "\n"
-    "last_host_notification=" << static_cast<unsigned long>(obj.last_host_notification) << "\n"
-    "last_service_notification=" << static_cast<unsigned long>(obj.last_service_notification) << "\n"
-    "modified_attributes=" << (obj.modified_attributes & ~0L) << "\n"
-    "modified_host_attributes=" << (obj.modified_host_attributes & ~config->retained_contact_host_attribute_mask()) << "\n"
-    "modified_service_attributes=" << (obj.modified_service_attributes & ~config->retained_contact_service_attribute_mask()) << "\n"
-    "service_notification_period=" << (obj.service_notification_period ? obj.service_notification_period : "") << "\n"
-    "service_notifications_enabled=" << obj.service_notifications_enabled << "\n";
-  dump::customvariables(os, *obj.custom_variables);
-  os << "}\n";
-  return (os);
-}
-
-/**
- *  Dump retention of contacts.
- *
- *  @param[out] os The output stream.
- *
- *  @return The output stream.
- */
-std::ostream& dump::contacts(std::ostream& os) {
-  for (contact_struct* obj(contact_list); obj; obj = obj->next)
-    dump::contact(os, *obj);
-  return (os);
-}
-
-/**
  *  Dump retention of custom variables.
  *
  *  @param[out] os  The output stream.
@@ -119,15 +81,12 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.host_check_command ? obj.host_check_command : "") << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.execution_time << "\n"
-    "check_flapping_recovery_notification=" << obj.check_flapping_recovery_notification << "\n"
     "check_latency=" << std::setprecision(3) << std::fixed << obj.latency << "\n"
     "check_options=" << obj.check_options << "\n"
     "check_period=" << (obj.check_period ? obj.check_period : "") << "\n"
     "check_type=" << obj.check_type << "\n"
     "current_attempt=" << obj.current_attempt << "\n"
     "current_event_id=" << obj.current_event_id << "\n"
-    "current_notification_id=" << obj.current_notification_id << "\n"
-    "current_notification_number=" << obj.current_notification_number << "\n"
     "current_problem_id=" << obj.current_problem_id << "\n"
     "current_state=" << obj.current_state << "\n"
     "event_handler=" << (obj.event_handler ? obj.event_handler : "") << "\n"
@@ -139,7 +98,6 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.last_hard_state_change) << "\n"
-    "last_notification=" << static_cast<unsigned long>(obj.last_host_notification) << "\n"
     "last_problem_id=" << obj.last_problem_id << "\n"
     "last_state=" << obj.last_state << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.last_state_change) << "\n"
@@ -151,10 +109,6 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.check_interval << "\n"
-    "notification_period=" << (obj.notification_period ? obj.notification_period : "") << "\n"
-    "notifications_enabled=" << obj.notifications_enabled << "\n"
-    "notified_on_down=" << obj.notified_on_down << "\n"
-    "notified_on_unreachable=" << obj.notified_on_unreachable << "\n"
     "obsess_over_host=" << obj.obsess_over_host << "\n"
     "passive_checks_enabled=" << obj.accept_passive_host_checks << "\n"
     "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"
@@ -215,13 +169,11 @@ std::ostream& dump::program(std::ostream& os) {
     "check_service_freshness=" << config->check_service_freshness() << "\n"
     "enable_event_handlers=" << config->enable_event_handlers() << "\n"
     "enable_flap_detection=" << config->enable_flap_detection() << "\n"
-    "enable_notifications=" << config->enable_notifications() << "\n"
     "global_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
     "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
     "modified_host_attributes=" << (modified_host_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
     "modified_service_attributes=" << (modified_service_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
     "next_event_id=" << next_event_id << "\n"
-    "next_notification_id=" << next_notification_id << "\n"
     "next_problem_id=" << next_problem_id << "\n"
     "obsess_over_hosts=" << config->obsess_over_hosts() << "\n"
     "obsess_over_services=" << config->obsess_over_services() << "\n"
@@ -262,7 +214,6 @@ bool dump::save(std::string const& path) {
     dump::program(stream);
     dump::hosts(stream);
     dump::services(stream);
-    dump::contacts(stream);
 
     ret = true;
   }
@@ -295,15 +246,12 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "active_checks_enabled=" << obj.checks_enabled << "\n"
     "check_command=" << (obj.service_check_command ? obj.service_check_command : "") << "\n"
     "check_execution_time=" << std::setprecision(3) << std::fixed << obj.execution_time << "\n"
-    "check_flapping_recovery_notification=" << obj.check_flapping_recovery_notification << "\n"
     "check_latency=" << std::setprecision(3) << std::fixed << obj.latency << "\n"
     "check_options=" << obj.check_options << "\n"
     "check_period=" << (obj.check_period ? obj.check_period : "") << "\n"
     "check_type=" << obj.check_type << "\n"
     "current_attempt=" << obj.current_attempt << "\n"
     "current_event_id=" << obj.current_event_id << "\n"
-    "current_notification_id=" << obj.current_notification_id << "\n"
-    "current_notification_number=" << obj.current_notification_number << "\n"
     "current_problem_id=" << obj.current_problem_id << "\n"
     "current_state=" << obj.current_state << "\n"
     "event_handler=" << (obj.event_handler ? obj.event_handler : "") << "\n"
@@ -315,7 +263,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
     "last_hard_state_change=" << static_cast<unsigned long>(obj.last_hard_state_change) << "\n"
-    "last_notification=" << static_cast<unsigned long>(obj.last_notification) << "\n"
     "last_problem_id=" << obj.last_problem_id << "\n"
     "last_state=" << obj.last_state << "\n"
     "last_state_change=" << static_cast<unsigned long>(obj.last_state_change) << "\n"
@@ -328,11 +275,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.check_interval << "\n"
-    "notification_period=" << (obj.notification_period ? obj.notification_period : "") << "\n"
-    "notifications_enabled=" << obj.notifications_enabled << "\n"
-    "notified_on_critical=" << obj.notified_on_critical << "\n"
-    "notified_on_unknown=" << obj.notified_on_unknown << "\n"
-    "notified_on_warning=" << obj.notified_on_warning << "\n"
     "obsess_over_service=" << obj.obsess_over_service << "\n"
     "passive_checks_enabled=" << obj.accept_passive_service_checks << "\n"
     "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"

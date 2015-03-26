@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,8 +19,6 @@
 
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/objects/command.hh"
-#include "com/centreon/engine/objects/contact.hh"
-#include "com/centreon/engine/objects/contactgroup.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostgroup.hh"
 #include "com/centreon/engine/objects/service.hh"
@@ -53,42 +51,6 @@ command* find_command(char const* name) {
   umap<std::string, shared_ptr<command_struct> >::const_iterator
     it(state::instance().commands().find(name));
   if (it != state::instance().commands().end())
-    return (it->second.get());
-  return (NULL);
-}
-
-/**
- *  Find a contact from the list in memory.
- *
- *  @param[in] name Contact name.
- *
- *  @return Contact object if found, NULL otherwise.
- */
-contact* find_contact(char const* name) {
-  if (!name)
-    return (NULL);
-
-  umap<std::string, shared_ptr<contact_struct> >::const_iterator
-    it(state::instance().contacts().find(name));
-  if (it != state::instance().contacts().end())
-    return (it->second.get());
-  return (NULL);
-}
-
-/**
- *  Find a contact group from the list in memory.
- *
- *  @param[in] name Contact group name.
- *
- *  @return Contact group object if found, NULL otherwise.
- */
-contactgroup* find_contactgroup(char const* name) {
-  if (!name)
-    return (NULL);
-
-  umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
-    it(state::instance().contactgroups().find(name));
-  if (it != state::instance().contactgroups().end())
     return (it->second.get());
   return (NULL);
 }

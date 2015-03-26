@@ -23,12 +23,6 @@ set(TEST_DIR "${TEST_DIR}/retention")
 # Subdirectory.
 add_subdirectory("applier")
 
-## contact.
-set(TEST_NAME "contact")
-add_executable("${TEST_NAME}" "${TEST_DIR}/contact.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 ## host.
 set(TEST_NAME "host")
 add_executable("${TEST_NAME}" "${TEST_DIR}/host.cc")
@@ -57,10 +51,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_BIN_NAME "retention_dump")
 add_executable("${TEST_BIN_NAME}" "${TEST_DIR}/dump.cc")
 target_link_libraries("${TEST_BIN_NAME}" "cce_core")
-
-# contact_dump
-set(TEST_NAME "contact_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact")
 
 # header_dump
 set(TEST_NAME "header_dump")

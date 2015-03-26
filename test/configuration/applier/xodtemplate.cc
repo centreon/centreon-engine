@@ -52,11 +52,9 @@ using namespace com::centreon::engine::logging;
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list = NULL;
 static xodtemplate_command*           xodtemplate_command_list = NULL;
 static xodtemplate_connector*         xodtemplate_connector_list = NULL;
-static xodtemplate_contactgroup*      xodtemplate_contactgroup_list = NULL;
 static xodtemplate_hostgroup*         xodtemplate_hostgroup_list = NULL;
 static xodtemplate_servicegroup*      xodtemplate_servicegroup_list = NULL;
 static xodtemplate_servicedependency* xodtemplate_servicedependency_list = NULL;
-static xodtemplate_contact*           xodtemplate_contact_list = NULL;
 static xodtemplate_host*              xodtemplate_host_list = NULL;
 static xodtemplate_service*           xodtemplate_service_list = NULL;
 static xodtemplate_hostdependency*    xodtemplate_hostdependency_list = NULL;
@@ -64,11 +62,9 @@ static xodtemplate_hostdependency*    xodtemplate_hostdependency_list = NULL;
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list_tail = NULL;
 static xodtemplate_command*           xodtemplate_command_list_tail = NULL;
 static xodtemplate_connector*         xodtemplate_connector_list_tail = NULL;
-static xodtemplate_contactgroup*      xodtemplate_contactgroup_list_tail = NULL;
 static xodtemplate_hostgroup*         xodtemplate_hostgroup_list_tail = NULL;
 static xodtemplate_servicegroup*      xodtemplate_servicegroup_list_tail = NULL;
 static xodtemplate_servicedependency* xodtemplate_servicedependency_list_tail = NULL;
-static xodtemplate_contact*           xodtemplate_contact_list_tail = NULL;
 static xodtemplate_host*              xodtemplate_host_list_tail = NULL;
 static xodtemplate_service*           xodtemplate_service_list_tail = NULL;
 static xodtemplate_hostdependency*    xodtemplate_hostdependency_list_tail = NULL;
@@ -131,11 +127,9 @@ int xodtemplate_read_config_data(
   /* initialize variables */
   xodtemplate_timeperiod_list = NULL;
   xodtemplate_command_list = NULL;
-  xodtemplate_contactgroup_list = NULL;
   xodtemplate_hostgroup_list = NULL;
   xodtemplate_servicegroup_list = NULL;
   xodtemplate_servicedependency_list = NULL;
-  xodtemplate_contact_list = NULL;
   xodtemplate_host_list = NULL;
   xodtemplate_service_list = NULL;
   xodtemplate_hostdependency_list = NULL;
@@ -279,11 +273,6 @@ int xodtemplate_read_config_data(
 
     /* do the meat and potatoes stuff... */
     if (result == OK)
-      result = xodtemplate_recombobulate_contactgroups();
-    if (test_scheduling == true)
-      gettimeofday(&tv[3], NULL);
-
-    if (result == OK)
       result = xodtemplate_recombobulate_hostgroups();
     if (test_scheduling == true)
       gettimeofday(&tv[4], NULL);
@@ -303,16 +292,8 @@ int xodtemplate_read_config_data(
     if (test_scheduling == true)
       gettimeofday(&tv[7], NULL);
 
-    /* NOTE: some missing defaults (notification options, etc.) are also applied here */
-    if (result == OK)
-      result = xodtemplate_inherit_object_properties();
     if (test_scheduling == true)
       gettimeofday(&tv[8], NULL);
-
-    if (result == OK)
-      result = xodtemplate_recombobulate_object_contacts();
-    if (test_scheduling == true)
-      gettimeofday(&tv[9], NULL);
 
     /* sort objects */
     if (result == OK)
@@ -429,13 +410,11 @@ int xodtemplate_read_config_data(
     printf("----------------------------------\n");
     printf("Read:                 %.6f sec\n", runtime[0]);
     printf("Resolve:              %.6f sec  *\n", runtime[1]);
-    printf("Recomb Contactgroups: %.6f sec  *\n", runtime[2]);
     printf("Recomb Hostgroups:    %.6f sec  *\n", runtime[3]);
     printf("Dup Services:         %.6f sec  *\n", runtime[4]);
     printf("Recomb Servicegroups: %.6f sec  *\n", runtime[5]);
     printf("Duplicate:            %.6f sec  *\n", runtime[6]);
     printf("Inherit:              %.6f sec  *\n", runtime[7]);
-    printf("Recomb Contacts:      %.6f sec  *\n", runtime[8]);
     printf("Sort:                 %.6f sec  *\n", runtime[9]);
     /*		printf("Cache:                %.6f sec\n",runtime[10]);*/
     printf("Register:             %.6f sec\n", runtime[11]);
@@ -685,8 +664,6 @@ int xodtemplate_process_config_file(char* filename, int options) {
       /* check validity of object type */
       if (strcmp(input, "timeperiod")
           && strcmp(input, "command")
-          && strcmp(input, "contact")
-          && strcmp(input, "contactgroup")
           && strcmp(input, "host")
           && strcmp(input, "hostgroup")
           && strcmp(input, "servicegroup")
@@ -856,11 +833,9 @@ int xodtemplate_begin_object_definition(
   xodtemplate_timeperiod* new_timeperiod = NULL;
   xodtemplate_command* new_command = NULL;
   xodtemplate_connector* new_connector = NULL;
-  xodtemplate_contactgroup* new_contactgroup = NULL;
   xodtemplate_hostgroup* new_hostgroup = NULL;
   xodtemplate_servicegroup* new_servicegroup = NULL;
   xodtemplate_servicedependency* new_servicedependency = NULL;
-  xodtemplate_contact* new_contact = NULL;
   xodtemplate_host* new_host = NULL;
   xodtemplate_service* new_service = NULL;
   xodtemplate_hostdependency* new_hostdependency = NULL;
@@ -883,8 +858,6 @@ int xodtemplate_begin_object_definition(
     new_service->flap_detection_on_warning = true;
     new_service->flap_detection_on_unknown = true;
     new_service->flap_detection_on_critical = true;
-    new_service->notifications_enabled = true;
-    new_service->notification_interval = 30.0;
     new_service->retain_status_information = true;
     new_service->retain_nonstatus_information = true;
 
@@ -907,8 +880,6 @@ int xodtemplate_begin_object_definition(
     new_host->flap_detection_on_up = true;
     new_host->flap_detection_on_down = true;
     new_host->flap_detection_on_unreachable = true;
-    new_host->notifications_enabled = true;
-    new_host->notification_interval = 30.0;
     new_host->retain_status_information = true;
     new_host->retain_nonstatus_information = true;
   }
@@ -916,22 +887,9 @@ int xodtemplate_begin_object_definition(
     xodtemplate_current_object_type = XODTEMPLATE_COMMAND;
     xod_begin_def(command);
   }
-  else if (!strcmp(input, "contact")) {
-    xodtemplate_current_object_type = XODTEMPLATE_CONTACT;
-    xod_begin_def(contact);
-
-    new_contact->host_notifications_enabled = true;
-    new_contact->service_notifications_enabled = true;
-    new_contact->retain_status_information = true;
-    new_contact->retain_nonstatus_information = true;
-  }
   else if (!strcmp(input, "timeperiod")) {
     xodtemplate_current_object_type = XODTEMPLATE_TIMEPERIOD;
     xod_begin_def(timeperiod);
-  }
-  else if (!strcmp(input, "contactgroup")) {
-    xodtemplate_current_object_type = XODTEMPLATE_CONTACTGROUP;
-    xod_begin_def(contactgroup);
   }
   else if (!strcmp(input, "hostgroup")) {
     xodtemplate_current_object_type = XODTEMPLATE_HOSTGROUP;
@@ -974,11 +932,9 @@ int xodtemplate_add_object_property(char* input, int options) {
   xodtemplate_timeperiod* temp_timeperiod = NULL;
   xodtemplate_command* temp_command = NULL;
   xodtemplate_connector* temp_connector = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
@@ -1150,21 +1106,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_service->event_handler = string::dup(value);
       temp_service->have_event_handler = true;
     }
-    else if (!strcmp(variable, "notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->notification_period = string::dup(value);
-      temp_service->have_notification_period = true;
-    }
-    else if (!strcmp(variable, "contact_groups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->contact_groups = string::dup(value);
-      temp_service->have_contact_groups = true;
-    }
-    else if (!strcmp(variable, "contacts")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->contacts = string::dup(value);
-      temp_service->have_contacts = true;
-    }
     else if (!strcmp(variable, "timezone")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->timezone = string::dup(value);
@@ -1283,55 +1224,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
       temp_service->have_flap_detection_options = true;
-    }
-    else if (!strcmp(variable, "notification_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_service->notify_on_unknown = true;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_service->notify_on_warning = true;
-        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_service->notify_on_critical = true;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_service->notify_on_recovery = true;
-        else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_service->notify_on_flapping = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_service->notify_on_unknown = false;
-          temp_service->notify_on_warning = false;
-          temp_service->notify_on_critical = false;
-          temp_service->notify_on_recovery = false;
-          temp_service->notify_on_flapping = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_service->notify_on_unknown = true;
-          temp_service->notify_on_warning = true;
-          temp_service->notify_on_critical = true;
-          temp_service->notify_on_recovery = true;
-          temp_service->notify_on_flapping = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid notification option '" << temp_ptr
-            << "' in service definition.";
-          return (ERROR);
-        }
-      }
-      temp_service->have_notification_options = true;
-    }
-    else if (!strcmp(variable, "notifications_enabled")) {
-      temp_service->notifications_enabled = (atoi(value) > 0) ? true : false;
-      temp_service->have_notifications_enabled = true;
-    }
-    else if (!strcmp(variable, "notification_interval")) {
-      temp_service->notification_interval = strtod(value, NULL);
-      temp_service->have_notification_interval = true;
-    }
-    else if (!strcmp(variable, "first_notification_delay")) {
-      temp_service->first_notification_delay = strtod(value, NULL);
-      temp_service->have_first_notification_delay = true;
     }
     else if (!strcmp(variable, "stalking_options")) {
       for (temp_ptr = strtok(value, ", ");
@@ -1494,21 +1386,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_host->host_groups = string::dup(value);
       temp_host->have_host_groups = true;
     }
-    else if (!strcmp(variable, "contact_groups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->contact_groups = string::dup(value);
-      temp_host->have_contact_groups = true;
-    }
-    else if (!strcmp(variable, "contacts")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->contacts = string::dup(value);
-      temp_host->have_contacts = true;
-    }
-    else if (!strcmp(variable, "notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->notification_period = string::dup(value);
-      temp_host->have_notification_period = true;
-    }
     else if (!strcmp(variable, "check_command")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_host->check_command = string::dup(value);
@@ -1628,51 +1505,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
       temp_host->have_flap_detection_options = true;
-    }
-    else if (!strcmp(variable, "notification_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_host->notify_on_down = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_host->notify_on_unreachable = true;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_host->notify_on_recovery = true;
-        else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_host->notify_on_flapping = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_host->notify_on_down = false;
-          temp_host->notify_on_unreachable = false;
-          temp_host->notify_on_recovery = false;
-          temp_host->notify_on_flapping = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_host->notify_on_down = true;
-          temp_host->notify_on_unreachable = true;
-          temp_host->notify_on_recovery = true;
-          temp_host->notify_on_flapping = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid notification option '" << temp_ptr
-            << "' in host definition.";
-          result = ERROR;
-        }
-      }
-      temp_host->have_notification_options = true;
-    }
-    else if (!strcmp(variable, "notifications_enabled")) {
-      temp_host->notifications_enabled = (atoi(value) > 0) ? true : false;
-      temp_host->have_notifications_enabled = true;
-    }
-    else if (!strcmp(variable, "notification_interval")) {
-      temp_host->notification_interval = strtod(value, NULL);
-      temp_host->have_notification_interval = true;
-    }
-    else if (!strcmp(variable, "first_notification_delay")) {
-      temp_host->first_notification_delay = strtod(value, NULL);
-      temp_host->have_first_notification_delay = true;
     }
     else if (!strcmp(variable, "stalking_options")) {
       for (temp_ptr = strtok(value, ", ");
@@ -1833,244 +1665,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     }
     break;
 
-  case XODTEMPLATE_CONTACT:
-    temp_contact = (xodtemplate_contact*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_contact->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_contact->name = string::dup(value);
-
-      /* add contact to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_CONTACT_SKIPLIST],
-                 (void*)temp_contact);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contact '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_contact->_config_file)
-          << "', starting on line " << temp_contact->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "contact_name")) {
-      temp_contact->contact_name = string::dup(value);
-
-      /* add contact to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_skiplists[X_CONTACT_SKIPLIST],
-                 (void*)temp_contact);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contact '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_contact->_config_file)
-          << "', starting on line " << temp_contact->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_contact->alias = string::dup(value);
-    else if (!strcmp(variable, "contact_groups")
-	     || !strcmp(variable, "contactgroups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->contact_groups = string::dup(value);
-      temp_contact->have_contact_groups = true;
-    }
-    else if (!strcmp(variable, "email")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->email = string::dup(value);
-      temp_contact->have_email = true;
-    }
-    else if (!strcmp(variable, "pager")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->pager = string::dup(value);
-      temp_contact->have_pager = true;
-    }
-    else if (strstr(variable, "address") == variable) {
-      x = atoi(variable + 7);
-      if (x < 1 || x > MAX_XODTEMPLATE_CONTACT_ADDRESSES)
-        result = ERROR;
-      else if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->address[x - 1] = string::dup(value);
-      if (result == OK)
-        temp_contact->have_address[x - 1] = true;
-    }
-    else if (!strcmp(variable, "host_notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->host_notification_period = string::dup(value);
-      temp_contact->have_host_notification_period = true;
-    }
-    else if (!strcmp(variable, "host_notification_commands")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->host_notification_commands = string::dup(value);
-      temp_contact->have_host_notification_commands = true;
-    }
-    else if (!strcmp(variable, "service_notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->service_notification_period = string::dup(value);
-      temp_contact->have_service_notification_period = true;
-    }
-    else if (!strcmp(variable, "service_notification_commands")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->service_notification_commands = string::dup(value);
-      temp_contact->have_service_notification_commands = true;
-    }
-    else if (!strcmp(variable, "timezone")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->timezone = string::dup(value);
-      temp_contact->have_timezone = true;
-    }
-    else if (!strcmp(variable, "host_notification_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_contact->notify_on_host_down = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_contact->notify_on_host_unreachable = true;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_contact->notify_on_host_recovery = true;
-        else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_contact->notify_on_host_flapping = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_contact->notify_on_host_down = false;
-          temp_contact->notify_on_host_unreachable = false;
-          temp_contact->notify_on_host_recovery = false;
-          temp_contact->notify_on_host_flapping = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_contact->notify_on_host_down = true;
-          temp_contact->notify_on_host_unreachable = true;
-          temp_contact->notify_on_host_recovery = true;
-          temp_contact->notify_on_host_flapping = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid host notification option '" << temp_ptr
-            << "' in contact definition.";
-          return (ERROR);
-        }
-      }
-      temp_contact->have_host_notification_options = true;
-    }
-    else if (!strcmp(variable, "service_notification_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_contact->notify_on_service_unknown = true;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_contact->notify_on_service_warning = true;
-        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_contact->notify_on_service_critical = true;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_contact->notify_on_service_recovery = true;
-        else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_contact->notify_on_service_flapping = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_contact->notify_on_service_unknown = false;
-          temp_contact->notify_on_service_warning = false;
-          temp_contact->notify_on_service_critical = false;
-          temp_contact->notify_on_service_recovery = false;
-          temp_contact->notify_on_service_flapping = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_contact->notify_on_service_unknown = true;
-          temp_contact->notify_on_service_warning = true;
-          temp_contact->notify_on_service_critical = true;
-          temp_contact->notify_on_service_recovery = true;
-          temp_contact->notify_on_service_flapping = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid service notification option '" << temp_ptr
-            << "' in contact definition.";
-          return (ERROR);
-        }
-      }
-      temp_contact->have_service_notification_options = true;
-    }
-    else if (!strcmp(variable, "host_notifications_enabled")) {
-      temp_contact->host_notifications_enabled = (atoi(value) > 0) ? true : false;
-      temp_contact->have_host_notifications_enabled = true;
-    }
-    else if (!strcmp(variable, "service_notifications_enabled")) {
-      temp_contact->service_notifications_enabled = (atoi(value) > 0) ? true : false;
-      temp_contact->have_service_notifications_enabled = true;
-    }
-    else if (!strcmp(variable, "retain_status_information")) {
-      temp_contact->retain_status_information = (atoi(value) > 0) ? true : false;
-      temp_contact->have_retain_status_information = true;
-    }
-    else if (!strcmp(variable, "retain_nonstatus_information")) {
-      temp_contact->retain_nonstatus_information = (atoi(value) > 0) ? true : false;
-      temp_contact->have_retain_nonstatus_information = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_contact->register_object = (atoi(value) > 0) ? true : false;
-    else if (variable[0] == '_') {
-      /* get the variable name */
-      customvarname = string::dup(variable + 1);
-
-      /* make sure we have a variable name */
-      if (customvarname == NULL || !strcmp(customvarname, "")) {
-        logger(log_config_error, basic)
-          << "Error: Null custom variable name.";
-        delete[] customvarname;
-        return (ERROR);
-      }
-
-      /* get the variable value */
-      if (strcmp(value, XODTEMPLATE_NULL))
-        customvarvalue = string::dup(value);
-      else
-        customvarvalue = NULL;
-
-      /* add the custom variable */
-      if (xodtemplate_add_custom_variable_to_contact(
-            temp_contact,
-            customvarname,
-            customvarvalue) == NULL) {
-        delete[] customvarname;
-        delete[] customvarvalue;
-        return (ERROR);
-      }
-
-      /* free memory */
-      delete[] customvarname;
-      delete[] customvarvalue;
-    }
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid contact object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
   case XODTEMPLATE_COMMAND:
     temp_command = (xodtemplate_command*)xodtemplate_current_object;
 
@@ -2179,110 +1773,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         << variable << "'.";
       return (ERROR);
     }
-    break;
-
-  case XODTEMPLATE_CONTACTGROUP:
-    temp_contactgroup
-      = (xodtemplate_contactgroup*)xodtemplate_current_object;
-    if (!strcmp(variable, "use"))
-      temp_contactgroup->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_contactgroup->name = string::dup(value);
-
-      /* add contactgroup to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_CONTACTGROUP_SKIPLIST],
-                 (void*)temp_contactgroup);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contactgroup '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_contactgroup->_config_file)
-          << "', starting on line " << temp_contactgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "contactgroup_name")) {
-      temp_contactgroup->contactgroup_name = string::dup(value);
-
-      /* add contactgroup to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_skiplists[X_CONTACTGROUP_SKIPLIST],
-                 (void*)temp_contactgroup);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contactgroup '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_contactgroup->_config_file)
-          << "', starting on line " << temp_contactgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_contactgroup->alias = string::dup(value);
-    else if (!strcmp(variable, "members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_contactgroup->members == NULL)
-          temp_contactgroup->members = string::dup(value);
-        else {
-          temp_contactgroup->members
-            = resize_string(
-                temp_contactgroup->members,
-                strlen(temp_contactgroup->members) + strlen(value) + 2);
-          strcat(temp_contactgroup->members, ",");
-          strcat(temp_contactgroup->members, value);
-        }
-        if (temp_contactgroup->members == NULL)
-          result = ERROR;
-      }
-      temp_contactgroup->have_members = true;
-    }
-    else if (!strcmp(variable, "contactgroup_members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_contactgroup->contactgroup_members == NULL)
-          temp_contactgroup->contactgroup_members = string::dup(value);
-        else {
-          temp_contactgroup->contactgroup_members
-            = resize_string(
-                temp_contactgroup->contactgroup_members,
-                strlen(temp_contactgroup->contactgroup_members) + strlen(value) + 2);
-          strcat(temp_contactgroup->contactgroup_members, ",");
-          strcat(temp_contactgroup->contactgroup_members, value);
-        }
-        if (temp_contactgroup->contactgroup_members == NULL)
-          result = ERROR;
-      }
-      temp_contactgroup->have_contactgroup_members = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_contactgroup->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid contactgroup object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-
     break;
 
   case XODTEMPLATE_HOSTGROUP:
@@ -2846,17 +2336,6 @@ xodtemplate_customvariablesmember* xodtemplate_add_custom_variable_to_service(
                                      char* varvalue) {
   return (xodtemplate_add_custom_variable_to_object(
             &svc->custom_variables,
-            varname,
-            varvalue));
-}
-
-/* adds a custom variable to a contact */
-xodtemplate_customvariablesmember* xodtemplate_add_custom_variable_to_contact(
-                                     xodtemplate_contact* cntct,
-                                     char* varname,
-                                     char* varvalue) {
-  return (xodtemplate_add_custom_variable_to_object(
-            &cntct->custom_variables,
             varname,
             varvalue));
 }
@@ -4604,12 +4083,6 @@ int xodtemplate_duplicate_service(
   new_service->have_check_period = temp_service->have_check_period;
   new_service->event_handler = NULL;
   new_service->have_event_handler = temp_service->have_event_handler;
-  new_service->notification_period = NULL;
-  new_service->have_notification_period = temp_service->have_notification_period;
-  new_service->contact_groups = NULL;
-  new_service->have_contact_groups = temp_service->have_contact_groups;
-  new_service->contacts = NULL;
-  new_service->have_contacts = temp_service->have_contacts;
   new_service->timezone = NULL;
   new_service->have_timezone = temp_service->have_timezone;
   new_service->custom_variables = NULL;
@@ -4636,12 +4109,6 @@ int xodtemplate_duplicate_service(
     new_service->check_period = string::dup(temp_service->check_period);
   if (temp_service->event_handler != NULL)
     new_service->event_handler = string::dup(temp_service->event_handler);
-  if (temp_service->notification_period != NULL)
-    new_service->notification_period = string::dup(temp_service->notification_period);
-  if (temp_service->contact_groups != NULL)
-    new_service->contact_groups = string::dup(temp_service->contact_groups);
-  if (temp_service->contacts != NULL)
-    new_service->contacts = string::dup(temp_service->contacts);
   if (temp_service->timezone != NULL)
     new_service->timezone = string::dup(temp_service->timezone);
 
@@ -4689,18 +4156,6 @@ int xodtemplate_duplicate_service(
   new_service->flap_detection_on_unknown = temp_service->flap_detection_on_unknown;
   new_service->flap_detection_on_critical = temp_service->flap_detection_on_critical;
   new_service->have_flap_detection_options = temp_service->have_flap_detection_options;
-  new_service->notify_on_unknown = temp_service->notify_on_unknown;
-  new_service->notify_on_warning = temp_service->notify_on_warning;
-  new_service->notify_on_critical = temp_service->notify_on_critical;
-  new_service->notify_on_recovery = temp_service->notify_on_recovery;
-  new_service->notify_on_flapping = temp_service->notify_on_flapping;
-  new_service->have_notification_options = temp_service->have_notification_options;
-  new_service->notifications_enabled = temp_service->notifications_enabled;
-  new_service->have_notifications_enabled = temp_service->have_notifications_enabled;
-  new_service->notification_interval = temp_service->notification_interval;
-  new_service->have_notification_interval = temp_service->have_notification_interval;
-  new_service->first_notification_delay = temp_service->first_notification_delay;
-  new_service->have_first_notification_delay = temp_service->have_first_notification_delay;
   new_service->stalk_on_ok = temp_service->stalk_on_ok;
   new_service->stalk_on_unknown = temp_service->stalk_on_unknown;
   new_service->stalk_on_warning = temp_service->stalk_on_warning;
@@ -4871,94 +4326,13 @@ int xodtemplate_duplicate_servicedependency(
 /***************** OBJECT RESOLUTION FUNCTIONS ********************/
 /******************************************************************/
 
-/* inherit object properties */
-/* some missing defaults (notification options, etc.) are also applied here */
-int xodtemplate_inherit_object_properties() {
-  xodtemplate_host* temp_host = NULL;
-  xodtemplate_service* temp_service = NULL;
-
-  /* fill in missing defaults for hosts... */
-  for (temp_host = xodtemplate_host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-
-    /* if notification options are missing, assume all */
-    if (temp_host->have_notification_options == false) {
-      temp_host->notify_on_down = true;
-      temp_host->notify_on_unreachable = true;
-      temp_host->notify_on_recovery = true;
-      temp_host->notify_on_flapping = true;
-      temp_host->have_notification_options = true;
-    }
-  }
-
-  /* services inherit some properties from their associated host... */
-  for (temp_service = xodtemplate_service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
-
-    /* find the host */
-    if ((temp_host = xodtemplate_find_real_host(temp_service->host_name)) == NULL)
-      continue;
-
-    /* services inherit contact groups from host if not already specified */
-    if (temp_service->have_contact_groups == false
-        && temp_host->have_contact_groups == true
-        && temp_host->contact_groups != NULL) {
-      temp_service->contact_groups = string::dup(temp_host->contact_groups);
-      temp_service->have_contact_groups = true;
-    }
-
-    /* services inherit contacts from host if not already specified */
-    if (temp_service->have_contacts == false
-        && temp_host->have_contacts == true
-        && temp_host->contacts != NULL) {
-      temp_service->contacts = string::dup(temp_host->contacts);
-      temp_service->have_contacts = true;
-    }
-
-    /* services inherit notification interval from host if not already specified */
-    if (temp_service->have_notification_interval == false
-        && temp_host->have_notification_interval == true) {
-      temp_service->notification_interval = temp_host->notification_interval;
-      temp_service->have_notification_interval = true;
-    }
-
-    /* services inherit notification period from host if not already specified */
-    if (temp_service->have_notification_period == false
-        && temp_host->have_notification_period == true
-        && temp_host->notification_period != NULL) {
-      temp_service->notification_period = string::dup(temp_host->notification_period);
-      temp_service->have_notification_period = true;
-    }
-
-    /* if notification options are missing, assume all */
-    if (temp_service->have_notification_options == false) {
-      temp_service->notify_on_unknown = true;
-      temp_service->notify_on_warning = true;
-      temp_service->notify_on_critical = true;
-      temp_service->notify_on_recovery = true;
-      temp_service->notify_on_flapping = true;
-      temp_service->have_notification_options = true;
-    }
-  }
-
-  return (OK);
-}
-
-/******************************************************************/
-/***************** OBJECT RESOLUTION FUNCTIONS ********************/
-/******************************************************************/
-
 /* resolves object definitions */
 int xodtemplate_resolve_objects() {
   xodtemplate_timeperiod* temp_timeperiod = NULL;
   xodtemplate_command* temp_command = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
@@ -4976,14 +4350,6 @@ int xodtemplate_resolve_objects() {
        temp_command != NULL;
        temp_command = temp_command->next) {
     if (xodtemplate_resolve_command(temp_command) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all contactgroup objects */
-  for (temp_contactgroup = xodtemplate_contactgroup_list;
-       temp_contactgroup != NULL;
-       temp_contactgroup = temp_contactgroup->next) {
-    if (xodtemplate_resolve_contactgroup(temp_contactgroup) == ERROR)
       return (ERROR);
   }
 
@@ -5008,14 +4374,6 @@ int xodtemplate_resolve_objects() {
        temp_servicedependency != NULL;
        temp_servicedependency = temp_servicedependency->next) {
     if (xodtemplate_resolve_servicedependency(temp_servicedependency) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all contact objects */
-  for (temp_contact = xodtemplate_contact_list;
-       temp_contact != NULL;
-       temp_contact = temp_contact->next) {
-    if (xodtemplate_resolve_contact(temp_contact) == ERROR)
       return (ERROR);
   }
 
@@ -5219,74 +4577,6 @@ int xodtemplate_resolve_command(xodtemplate_command* this_command) {
         && template_command->command_line != NULL)
       this_command->command_line
         = string::dup(template_command->command_line);
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
-/* resolves a contactgroup object */
-int xodtemplate_resolve_contactgroup(
-      xodtemplate_contactgroup* this_contactgroup) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_contactgroup* template_contactgroup = NULL;
-
-  /* return if this contactgroup has already been resolved */
-  if (this_contactgroup->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_contactgroup->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_contactgroup->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_contactgroup->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_contactgroup = xodtemplate_find_contactgroup(temp_ptr);
-    if (template_contactgroup == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in "
-        "contactgroup definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_contactgroup->_config_file)
-        << "', starting on line " << this_contactgroup->_start_line
-        << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template contactgroup... */
-    xodtemplate_resolve_contactgroup(template_contactgroup);
-
-    /* apply missing properties from template contactgroup... */
-    if (this_contactgroup->contactgroup_name == NULL
-        && template_contactgroup->contactgroup_name != NULL)
-      this_contactgroup->contactgroup_name
-        = string::dup(template_contactgroup->contactgroup_name);
-    if (this_contactgroup->alias == NULL
-        && template_contactgroup->alias != NULL)
-      this_contactgroup->alias = string::dup(template_contactgroup->alias);
-
-    xodtemplate_get_inherited_string(
-      &template_contactgroup->have_members,
-      &template_contactgroup->members,
-      &this_contactgroup->have_members,
-      &this_contactgroup->members);
-    xodtemplate_get_inherited_string(
-      &template_contactgroup->have_contactgroup_members,
-      &template_contactgroup->contactgroup_members,
-      &this_contactgroup->have_contactgroup_members,
-      &this_contactgroup->contactgroup_members);
   }
 
   delete[] template_names;
@@ -5549,202 +4839,6 @@ int xodtemplate_resolve_servicedependency(
   return (OK);
 }
 
-/* resolves a contact object */
-int xodtemplate_resolve_contact(xodtemplate_contact* this_contact) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_contact* template_contact = NULL;
-  xodtemplate_customvariablesmember* this_customvariablesmember = NULL;
-  xodtemplate_customvariablesmember* temp_customvariablesmember = NULL;
-  int x;
-
-  /* return if this contact has already been resolved */
-  if (this_contact->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_contact->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_contact->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_contact->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_contact = xodtemplate_find_contact(temp_ptr);
-    if (template_contact == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in contact "
-        "definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_contact->_config_file)
-        << "', starting on line " << this_contact->_start_line << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template contact... */
-    xodtemplate_resolve_contact(template_contact);
-
-    /* apply missing properties from template contact... */
-    if (this_contact->contact_name == NULL
-        && template_contact->contact_name != NULL)
-      this_contact->contact_name
-        = string::dup(template_contact->contact_name);
-    if (this_contact->alias == NULL
-        && template_contact->alias != NULL)
-      this_contact->alias = string::dup(template_contact->alias);
-
-    if (this_contact->have_email == false
-        && template_contact->have_email == true) {
-      if (this_contact->email == NULL
-          && template_contact->email != NULL)
-        this_contact->email = string::dup(template_contact->email);
-      this_contact->have_email = true;
-    }
-    if (this_contact->have_pager == false
-        && template_contact->have_pager == true) {
-      if (this_contact->pager == NULL
-          && template_contact->pager != NULL)
-        this_contact->pager = string::dup(template_contact->pager);
-      this_contact->have_pager = true;
-    }
-    for (x = 0; x < MAX_XODTEMPLATE_CONTACT_ADDRESSES; x++) {
-      if (this_contact->have_address[x] == false
-          && template_contact->have_address[x] == true) {
-        if (this_contact->address[x] == NULL
-            && template_contact->address[x] != NULL)
-          this_contact->address[x]
-            = string::dup(template_contact->address[x]);
-        this_contact->have_address[x] = true;
-      }
-    }
-
-    xodtemplate_get_inherited_string(
-      &template_contact->have_contact_groups,
-      &template_contact->contact_groups,
-      &this_contact->have_contact_groups,
-      &this_contact->contact_groups);
-    xodtemplate_get_inherited_string(
-      &template_contact->have_host_notification_commands,
-      &template_contact->host_notification_commands,
-      &this_contact->have_host_notification_commands,
-      &this_contact->host_notification_commands);
-    xodtemplate_get_inherited_string(
-      &template_contact->have_service_notification_commands,
-      &template_contact->service_notification_commands,
-      &this_contact->have_service_notification_commands,
-      &this_contact->service_notification_commands);
-
-    if (this_contact->have_timezone == false
-        && template_contact->have_timezone == true) {
-      if (this_contact->timezone == NULL
-          && template_contact->timezone != NULL)
-        this_contact->timezone = string::dup(template_contact->timezone);
-      this_contact->have_timezone = true;
-    }
-    if (this_contact->have_host_notification_period == false
-        && template_contact->have_host_notification_period == true) {
-      if (this_contact->host_notification_period == NULL
-          && template_contact->host_notification_period != NULL)
-        this_contact->host_notification_period
-          = string::dup(template_contact->host_notification_period);
-      this_contact->have_host_notification_period = true;
-    }
-    if (this_contact->have_service_notification_period == false
-        && template_contact->have_service_notification_period == true) {
-      if (this_contact->service_notification_period == NULL
-          && template_contact->service_notification_period != NULL)
-        this_contact->service_notification_period
-          = string::dup(template_contact->service_notification_period);
-      this_contact->have_service_notification_period = true;
-    }
-    if (this_contact->have_host_notification_options == false
-        && template_contact->have_host_notification_options == true) {
-      this_contact->notify_on_host_down
-        = template_contact->notify_on_host_down;
-      this_contact->notify_on_host_unreachable
-        = template_contact->notify_on_host_unreachable;
-      this_contact->notify_on_host_recovery
-        = template_contact->notify_on_host_recovery;
-      this_contact->notify_on_host_flapping
-        = template_contact->notify_on_host_flapping;
-      this_contact->have_host_notification_options = true;
-    }
-    if (this_contact->have_service_notification_options == false
-        && template_contact->have_service_notification_options == true) {
-      this_contact->notify_on_service_unknown
-        = template_contact->notify_on_service_unknown;
-      this_contact->notify_on_service_warning
-        = template_contact->notify_on_service_warning;
-      this_contact->notify_on_service_critical
-        = template_contact->notify_on_service_critical;
-      this_contact->notify_on_service_recovery
-        = template_contact->notify_on_service_recovery;
-      this_contact->notify_on_service_flapping
-        = template_contact->notify_on_service_flapping;
-      this_contact->have_service_notification_options = true;
-    }
-    if (this_contact->have_host_notifications_enabled == false
-        && template_contact->have_host_notifications_enabled == true) {
-      this_contact->host_notifications_enabled
-        = template_contact->host_notifications_enabled;
-      this_contact->have_host_notifications_enabled = true;
-    }
-    if (this_contact->have_service_notifications_enabled == false
-        && template_contact->have_service_notifications_enabled == true) {
-      this_contact->service_notifications_enabled
-        = template_contact->service_notifications_enabled;
-      this_contact->have_service_notifications_enabled = true;
-    }
-    if (this_contact->have_retain_status_information == false
-        && template_contact->have_retain_status_information == true) {
-      this_contact->retain_status_information
-        = template_contact->retain_status_information;
-      this_contact->have_retain_status_information = true;
-    }
-    if (this_contact->have_retain_nonstatus_information == false
-        && template_contact->have_retain_nonstatus_information == true) {
-      this_contact->retain_nonstatus_information
-        = template_contact->retain_nonstatus_information;
-      this_contact->have_retain_nonstatus_information = true;
-    }
-
-    /* apply missing custom variables from template contact... */
-    for (temp_customvariablesmember = template_contact->custom_variables;
-         temp_customvariablesmember != NULL;
-         temp_customvariablesmember = temp_customvariablesmember->next) {
-
-      /* see if this host has a variable by the same name */
-      for (this_customvariablesmember = this_contact->custom_variables;
-           this_customvariablesmember != NULL;
-           this_customvariablesmember = this_customvariablesmember->next) {
-        if (!strcmp(
-               temp_customvariablesmember->variable_name,
-               this_customvariablesmember->variable_name))
-          break;
-      }
-
-      /* we didn't find the same variable name, so add a new custom variable */
-      if (this_customvariablesmember == NULL)
-        xodtemplate_add_custom_variable_to_contact(
-          this_contact,
-          temp_customvariablesmember->variable_name,
-          temp_customvariablesmember->variable_value);
-    }
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
 /* resolves a host object */
 int xodtemplate_resolve_host(xodtemplate_host* this_host) {
   char* temp_ptr = NULL;
@@ -5814,16 +4908,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
       &template_host->host_groups,
       &this_host->have_host_groups,
       &this_host->host_groups);
-    xodtemplate_get_inherited_string(
-      &template_host->have_contact_groups,
-      &template_host->contact_groups,
-      &this_host->have_contact_groups,
-      &this_host->contact_groups);
-    xodtemplate_get_inherited_string(
-      &template_host->have_contacts,
-      &template_host->contacts,
-      &this_host->have_contacts,
-      &this_host->contacts);
 
     if (this_host->have_check_command == false
         && template_host->have_check_command == true) {
@@ -5848,14 +4932,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         this_host->event_handler
           = string::dup(template_host->event_handler);
       this_host->have_event_handler = true;
-    }
-    if (this_host->have_notification_period == false
-        && template_host->have_notification_period == true) {
-      if (this_host->notification_period == NULL
-          && template_host->notification_period != NULL)
-        this_host->notification_period
-          = string::dup(template_host->notification_period);
-      this_host->have_notification_period = true;
     }
     if (this_host->have_timezone == false
         && template_host->have_timezone == true) {
@@ -5950,33 +5026,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
       this_host->flap_detection_on_unreachable
         = template_host->flap_detection_on_unreachable;
       this_host->have_flap_detection_options = true;
-    }
-    if (this_host->have_notification_options == false
-        && template_host->have_notification_options == true) {
-      this_host->notify_on_down = template_host->notify_on_down;
-      this_host->notify_on_unreachable
-        = template_host->notify_on_unreachable;
-      this_host->notify_on_recovery = template_host->notify_on_recovery;
-      this_host->notify_on_flapping = template_host->notify_on_flapping;
-      this_host->have_notification_options = true;
-    }
-    if (this_host->have_notifications_enabled == false
-        && template_host->have_notifications_enabled == true) {
-      this_host->notifications_enabled
-        = template_host->notifications_enabled;
-      this_host->have_notifications_enabled = true;
-    }
-    if (this_host->have_notification_interval == false
-        && template_host->have_notification_interval == true) {
-      this_host->notification_interval
-        = template_host->notification_interval;
-      this_host->have_notification_interval = true;
-    }
-    if (this_host->have_first_notification_delay == false
-        && template_host->have_first_notification_delay == true) {
-      this_host->first_notification_delay
-        = template_host->first_notification_delay;
-      this_host->have_first_notification_delay = true;
     }
     if (this_host->have_stalking_options == false
         && template_host->have_stalking_options == true) {
@@ -6102,16 +5151,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       &template_service->service_groups,
       &this_service->have_service_groups,
       &this_service->service_groups);
-    xodtemplate_get_inherited_string(
-      &template_service->have_contact_groups,
-      &template_service->contact_groups,
-      &this_service->have_contact_groups,
-      &this_service->contact_groups);
-    xodtemplate_get_inherited_string(
-      &template_service->have_contacts,
-      &template_service->contacts,
-      &this_service->have_contacts,
-      &this_service->contacts);
 
     if (template_service->have_check_command == true) {
       if (template_service->have_important_check_command == true) {
@@ -6142,14 +5181,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
         this_service->event_handler
           = string::dup(template_service->event_handler);
       this_service->have_event_handler = true;
-    }
-    if (this_service->have_notification_period == false
-        && template_service->have_notification_period == true) {
-      if (this_service->notification_period == NULL
-          && template_service->notification_period != NULL)
-        this_service->notification_period
-          = string::dup(template_service->notification_period);
-      this_service->have_notification_period = true;
     }
     if (this_service->have_timezone == false
         && template_service->have_timezone == true) {
@@ -6255,38 +5286,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->flap_detection_on_critical
         = template_service->flap_detection_on_critical;
       this_service->have_flap_detection_options = true;
-    }
-    if (this_service->have_notification_options == false
-        && template_service->have_notification_options == true) {
-      this_service->notify_on_unknown
-        = template_service->notify_on_unknown;
-      this_service->notify_on_warning
-        = template_service->notify_on_warning;
-      this_service->notify_on_critical
-        = template_service->notify_on_critical;
-      this_service->notify_on_recovery
-        = template_service->notify_on_recovery;
-      this_service->notify_on_flapping
-        = template_service->notify_on_flapping;
-      this_service->have_notification_options = true;
-    }
-    if (this_service->have_notifications_enabled == false
-        && template_service->have_notifications_enabled == true) {
-      this_service->notifications_enabled
-        = template_service->notifications_enabled;
-      this_service->have_notifications_enabled = true;
-    }
-    if (this_service->have_notification_interval == false
-        && template_service->have_notification_interval == true) {
-      this_service->notification_interval
-        = template_service->notification_interval;
-      this_service->have_notification_interval = true;
-    }
-    if (this_service->have_first_notification_delay == false
-        && template_service->have_first_notification_delay == true) {
-      this_service->first_notification_delay
-        = template_service->first_notification_delay;
-      this_service->have_first_notification_delay = true;
     }
     if (this_service->have_stalking_options == false
         && template_service->have_stalking_options == true) {
@@ -6442,218 +5441,6 @@ int xodtemplate_resolve_hostdependency(
 /******************************************************************/
 /*************** OBJECT RECOMBOBULATION FUNCTIONS *****************/
 /******************************************************************/
-
-/* recombobulates contactgroup definitions */
-int xodtemplate_recombobulate_contactgroups() {
-  xodtemplate_contact* temp_contact = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
-  xodtemplate_memberlist* temp_memberlist = NULL;
-  xodtemplate_memberlist* this_memberlist = NULL;
-  char* contactgroup_names = NULL;
-  char* temp_ptr = NULL;
-  char* new_members = NULL;
-
-  /* This should happen before we expand contactgroup members, to avoid duplicate contact memberships 01/07/2006 EG */
-  /* process all contacts that have contactgroup directives */
-  for (temp_contact = xodtemplate_contact_list;
-       temp_contact != NULL;
-       temp_contact = temp_contact->next) {
-
-    /* skip contacts without contactgroup directives or contact names */
-    if (temp_contact->contact_groups == NULL
-        || temp_contact->contact_name == NULL)
-      continue;
-
-    /* preprocess the contactgroup list, to change "grp1,grp2,grp3,!grp2" into "grp1,grp3" */
-    if ((contactgroup_names = xodtemplate_process_contactgroup_names(
-                                temp_contact->contact_groups,
-                                temp_contact->_config_file,
-                                temp_contact->_start_line)) == NULL)
-      return (ERROR);
-
-    /* process the list of contactgroups */
-    for (temp_ptr = strtok(contactgroup_names, ",");
-	 temp_ptr != NULL;
-         temp_ptr = strtok(NULL, ",")) {
-
-      /* strip trailing spaces */
-      strip(temp_ptr);
-
-      /* find the contactgroup */
-      temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
-      if (temp_contactgroup == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not find contactgroup '" << temp_ptr
-          << "' specified in contact '" << temp_contact->contact_name
-          << "' definition (config file '"
-          << xodtemplate_config_file_name(temp_contact->_config_file)
-          << "', starting on line " << temp_contact->_start_line << ")";
-        delete[] contactgroup_names;
-        return (ERROR);
-      }
-
-      /* add this contact to the contactgroup members directive */
-      if (temp_contactgroup->members == NULL)
-        temp_contactgroup->members = string::dup(temp_contact->contact_name);
-      else {
-        new_members = resize_string(
-                        temp_contactgroup->members,
-                        strlen(temp_contactgroup->members) +
-                        strlen(temp_contact->contact_name) + 2);
-        temp_contactgroup->members = new_members;
-        strcat(temp_contactgroup->members, ",");
-        strcat(temp_contactgroup->members, temp_contact->contact_name);
-      }
-    }
-
-    /* free memory */
-    delete[] contactgroup_names;
-    contactgroup_names = NULL;
-  }
-
-  /* expand subgroup membership recursively */
-  for (temp_contactgroup = xodtemplate_contactgroup_list;
-       temp_contactgroup != NULL;
-       temp_contactgroup = temp_contactgroup->next)
-    xodtemplate_recombobulate_contactgroup_subgroups(
-      temp_contactgroup,
-      NULL);
-
-  /* expand members of all contactgroups - this could be done in xodtemplate_register_contactgroup(), but we can save the CGIs some work if we do it here */
-  for (temp_contactgroup = xodtemplate_contactgroup_list;
-       temp_contactgroup != NULL;
-       temp_contactgroup = temp_contactgroup->next) {
-
-    if (temp_contactgroup->members == NULL)
-      continue;
-
-    /* get list of contacts in the contactgroup */
-    temp_memberlist = xodtemplate_expand_contactgroups_and_contacts(
-                        temp_contactgroup->contactgroup_members,
-                        temp_contactgroup->members,
-                        temp_contactgroup->_config_file,
-                        temp_contactgroup->_start_line);
-
-    /* add all members to the contact group */
-    if (temp_memberlist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand member contacts specified in "
-        "contactgroup (config file '"
-        << xodtemplate_config_file_name(temp_contactgroup->_config_file)
-        << "', starting on line " << temp_contactgroup->_start_line
-        << ")";
-      return (ERROR);
-    }
-    delete[] temp_contactgroup->members;
-    temp_contactgroup->members = NULL;
-    for (this_memberlist = temp_memberlist;
-	 this_memberlist != NULL;
-         this_memberlist = this_memberlist->next) {
-
-      /* add this contact to the contactgroup members directive */
-      if (temp_contactgroup->members == NULL)
-        temp_contactgroup->members = string::dup(this_memberlist->name1);
-      else {
-        new_members = resize_string(
-                        temp_contactgroup->members,
-                        strlen(temp_contactgroup->members) +
-                        strlen(this_memberlist->name1) + 2);
-        temp_contactgroup->members = new_members;
-        strcat(temp_contactgroup->members, ",");
-        strcat(temp_contactgroup->members, this_memberlist->name1);
-      }
-    }
-    xodtemplate_free_memberlist(&temp_memberlist);
-  }
-
-  return (OK);
-}
-
-int xodtemplate_recombobulate_contactgroup_subgroups(
-      xodtemplate_contactgroup* temp_contactgroup,
-      char** members) {
-  if (temp_contactgroup == NULL)
-    return (ERROR);
-
-  /* resolve subgroup memberships first */
-  if (temp_contactgroup->contactgroup_members != NULL) {
-
-    /* save members, null pointer so we don't recurse into infinite hell */
-    char* orig_cgmembers(temp_contactgroup->contactgroup_members);
-    temp_contactgroup->contactgroup_members = NULL;
-
-    /* make new working copy of members */
-    char* cgmembers(string::dup(orig_cgmembers));
-
-    char* buf(NULL);
-    char* ptr(cgmembers);
-    while ((buf = ptr) != NULL) {
-
-      /* get next member for next run */
-      ptr = strchr(ptr, ',');
-      if (ptr) {
-        ptr[0] = '\x0';
-        ptr++;
-      }
-
-      strip(buf);
-
-      /* find subgroup and recurse */
-      xodtemplate_contactgroup* sub_group(NULL);
-      if ((sub_group = xodtemplate_find_real_contactgroup(buf)) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not find member group '" << buf
-          << "' specified in contactgroup (config file '"
-          << xodtemplate_config_file_name(temp_contactgroup->_config_file)
-          << "', starting on line " << temp_contactgroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-
-      char* newmembers(NULL);
-      xodtemplate_recombobulate_contactgroup_subgroups(
-        sub_group,
-        &newmembers);
-
-      /* add new (sub) members */
-      if (newmembers != NULL) {
-        if (temp_contactgroup->members == NULL)
-          temp_contactgroup->members = string::dup(newmembers);
-        else {
-          temp_contactgroup->members
-            = resize_string(
-                temp_contactgroup->members,
-                strlen(temp_contactgroup->members)
-                + strlen(newmembers) + 2);
-          strcat(temp_contactgroup->members, ",");
-          strcat(temp_contactgroup->members, newmembers);
-        }
-      }
-    }
-
-    /* free memory */
-    delete[] cgmembers;
-    cgmembers = NULL;
-
-    /* restore group members */
-    temp_contactgroup->contactgroup_members = orig_cgmembers;
-  }
-
-  /* return contact members */
-  if (members != NULL)
-    *members = temp_contactgroup->members;
-
-  return (OK);
-}
-
-/* NOTE: this was originally implemented in the late alpha cycle of
- * 3.0 development, but was removed in 3.0b2, as flattening
- * contactgroups into a list of contacts makes it impossible for
- * NDOUtils to create a reverse mapping */
-/* recombobulates contacts in various object definitions */
-int xodtemplate_recombobulate_object_contacts() {
-  return (OK);
-}
 
 /* recombobulates hostgroup definitions */
 int xodtemplate_recombobulate_hostgroups() {
@@ -7221,32 +6008,6 @@ xodtemplate_command* xodtemplate_find_command(char* name) {
                                   NULL));
 }
 
-/* finds a specific contactgroup object */
-xodtemplate_contactgroup* xodtemplate_find_contactgroup(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_contactgroup temp_contactgroup;
-  temp_contactgroup.name = name;
-  return ((xodtemplate_contactgroup*)skiplist_find_first(
-                                       xobject_template_skiplists[X_CONTACTGROUP_SKIPLIST],
-                                       &temp_contactgroup,
-                                       NULL));
-}
-
-/* finds a specific contactgroup object by its REAL name, not its TEMPLATE name */
-xodtemplate_contactgroup* xodtemplate_find_real_contactgroup(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_contactgroup temp_contactgroup;
-  temp_contactgroup.contactgroup_name = name;
-  return ((xodtemplate_contactgroup*)skiplist_find_first(
-                                       xobject_skiplists[X_CONTACTGROUP_SKIPLIST],
-                                       &temp_contactgroup,
-                                       NULL));
-}
-
 /* finds a specific hostgroup object */
 xodtemplate_hostgroup* xodtemplate_find_hostgroup(char* name) {
   if (name == NULL)
@@ -7311,32 +6072,6 @@ xodtemplate_servicedependency* xodtemplate_find_servicedependency(
                                             xobject_template_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
                                             &temp_servicedependency,
                                             NULL));
-}
-
-/* finds a specific contact object */
-xodtemplate_contact* xodtemplate_find_contact(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_contact temp_contact;
-  temp_contact.name = name;
-  return ((xodtemplate_contact*)skiplist_find_first(
-                                  xobject_template_skiplists[X_CONTACT_SKIPLIST],
-                                  &temp_contact,
-                                  NULL));
-}
-
-/* finds a specific contact object by its REAL name, not its TEMPLATE name */
-xodtemplate_contact* xodtemplate_find_real_contact(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_contact temp_contact;
-  temp_contact.contact_name = name;
-  return ((xodtemplate_contact*)skiplist_find_first(
-                                  xobject_skiplists[X_CONTACT_SKIPLIST],
-                                  &temp_contact,
-                                  NULL));
 }
 
 /* finds a specific host object */
@@ -7453,16 +6188,6 @@ int xodtemplate_register_objects() {
       return (ERROR);
   }
 
-  /* register contactgroups */
-  ptr = NULL;
-  xodtemplate_contactgroup* temp_contactgroup(NULL);
-  for (temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_first(xobject_skiplists[X_CONTACTGROUP_SKIPLIST], &ptr);
-       temp_contactgroup;
-       temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_next(&ptr)) {
-    if (xodtemplate_register_contactgroup(temp_contactgroup) == ERROR)
-      return (ERROR);
-  }
-
   /* register hostgroups */
   ptr = NULL;
   xodtemplate_hostgroup* temp_hostgroup(NULL);
@@ -7480,16 +6205,6 @@ int xodtemplate_register_objects() {
        temp_servicegroup;
        temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_next(&ptr)) {
     if (xodtemplate_register_servicegroup(temp_servicegroup) == ERROR)
-      return (ERROR);
-  }
-
-  /* register contacts */
-  ptr = NULL;
-  xodtemplate_contact* temp_contact(NULL);
-  for (temp_contact = (xodtemplate_contact*)skiplist_get_first(xobject_skiplists[X_CONTACT_SKIPLIST], &ptr);
-       temp_contact;
-       temp_contact = (xodtemplate_contact*)skiplist_get_next(&ptr)) {
-    if (xodtemplate_register_contact(temp_contact) == ERROR)
       return (ERROR);
   }
 
@@ -7899,54 +6614,6 @@ int xodtemplate_register_connector(xodtemplate_connector* this_connector) {
   return (OK);
 }
 
-/* registers a contactgroup definition */
-int xodtemplate_register_contactgroup(
-      xodtemplate_contactgroup* this_contactgroup) {
-  /* bail out if we shouldn't register this object */
-  if (this_contactgroup->register_object == false)
-    return (OK);
-
-  /* add the contact group */
-  contactgroup* new_contactgroup
-    = add_contactgroup(
-        this_contactgroup->contactgroup_name,
-        this_contactgroup->alias);
-
-  /* return with an error if we couldn't add the contactgroup */
-  if (new_contactgroup == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register contactgroup (config file '"
-      << xodtemplate_config_file_name(this_contactgroup->_config_file)
-      << "', starting on line " << this_contactgroup->_start_line
-      << ")";
-    return (ERROR);
-  }
-
-  /* Need to check for NULL because strtok could use a NULL value to check the previous string's token value */
-  if (this_contactgroup->members != NULL) {
-    for (char* contact_name(strtok(this_contactgroup->members, ","));
-         contact_name != NULL;
-	 contact_name = strtok(NULL, ",")) {
-      strip(contact_name);
-      contactsmember* new_contactsmember
-        = add_contact_to_contactgroup(
-            new_contactgroup,
-            contact_name);
-      if (new_contactsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contact '" << contact_name
-          << "' to contactgroup (config file '"
-          << xodtemplate_config_file_name(this_contactgroup->_config_file)
-          << "', starting on line " << this_contactgroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  return (OK);
-}
-
 /* registers a hostgroup definition */
 int xodtemplate_register_hostgroup(
       xodtemplate_hostgroup* this_hostgroup) {
@@ -8101,116 +6768,11 @@ int xodtemplate_register_servicedependency(
   return (OK);
 }
 
-/* registers a contact definition */
-int xodtemplate_register_contact(xodtemplate_contact* this_contact) {
-  contact* new_contact = NULL;
-  char* command_name = NULL;
-  commandsmember* new_commandsmember = NULL;
-  xodtemplate_customvariablesmember* temp_customvariablesmember = NULL;
-
-  /* bail out if we shouldn't register this object */
-  if (this_contact->register_object == false)
-    return (OK);
-
-  /* add the contact */
-  new_contact = add_contact(
-                  this_contact->contact_name, this_contact->alias,
-                  this_contact->email, this_contact->pager,
-                  this_contact->address,
-                  this_contact->service_notification_period,
-                  this_contact->host_notification_period,
-                  this_contact->notify_on_service_recovery,
-                  this_contact->notify_on_service_critical,
-                  this_contact->notify_on_service_warning,
-                  this_contact->notify_on_service_unknown,
-                  this_contact->notify_on_service_flapping,
-                  this_contact->notify_on_host_recovery,
-                  this_contact->notify_on_host_down,
-                  this_contact->notify_on_host_unreachable,
-                  this_contact->notify_on_host_flapping,
-                  this_contact->host_notifications_enabled,
-                  this_contact->service_notifications_enabled,
-                  this_contact->retain_status_information,
-                  this_contact->retain_nonstatus_information,
-                  this_contact->timezone);
-
-  /* return with an error if we couldn't add the contact */
-  if (new_contact == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register contact (config file '"
-      << xodtemplate_config_file_name(this_contact->_config_file)
-      << "', starting on line " << this_contact->_start_line << ")";
-    return (ERROR);
-  }
-
-  /* add all the host notification commands */
-  if (this_contact->host_notification_commands != NULL) {
-
-    for (command_name = strtok(this_contact->host_notification_commands, ", ");
-         command_name != NULL;
-	 command_name = strtok(NULL, ", ")) {
-      new_commandsmember = add_host_notification_command_to_contact(
-                             new_contact,
-                             command_name);
-      if (new_commandsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add host notification command '"
-          << command_name << "' to contact (config file '"
-          << xodtemplate_config_file_name(this_contact->_config_file)
-          << "', starting on line " << this_contact->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  /* add all the service notification commands */
-  if (this_contact->service_notification_commands != NULL) {
-
-    for (command_name = strtok(this_contact->service_notification_commands, ", ");
-         command_name != NULL;
-	 command_name = strtok(NULL, ", ")) {
-      new_commandsmember = add_service_notification_command_to_contact(
-                             new_contact,
-                             command_name);
-      if (new_commandsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add service notification command '"
-          << command_name << "' to contact (config file '"
-          << xodtemplate_config_file_name(this_contact->_config_file)
-          << "', starting on line " << this_contact->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  /* add all custom variables */
-  for (temp_customvariablesmember = this_contact->custom_variables;
-       temp_customvariablesmember != NULL;
-       temp_customvariablesmember = temp_customvariablesmember->next) {
-    if ((add_custom_variable_to_contact(
-           new_contact,
-           temp_customvariablesmember->variable_name,
-           temp_customvariablesmember->variable_value)) == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not custom variable to contact (config file '"
-        << xodtemplate_config_file_name(this_contact->_config_file)
-        << "', starting on line " << this_contact->_start_line << ")";
-      return (ERROR);
-    }
-  }
-
-  return (OK);
-}
-
 /* registers a host definition */
 int xodtemplate_register_host(xodtemplate_host* this_host) {
   host* new_host = NULL;
   char* parent_host = NULL;
   hostsmember* new_hostsmember = NULL;
-  contactsmember* new_contactsmember = NULL;
-  contactgroupsmember* new_contactgroupsmember = NULL;
-  char* contact_name = NULL;
-  char* contact_group = NULL;
   xodtemplate_customvariablesmember* temp_customvariablesmember = NULL;
 
   /* bail out if we shouldn't register this object */
@@ -8235,14 +6797,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->retry_interval,
                this_host->max_check_attempts,
                this_host->check_timeout,
-               this_host->notify_on_recovery,
-               this_host->notify_on_down,
-               this_host->notify_on_unreachable,
-               this_host->notify_on_flapping,
-               this_host->notification_interval,
-               this_host->first_notification_delay,
-               this_host->notification_period,
-               this_host->notifications_enabled,
                this_host->check_command,
                this_host->active_checks_enabled,
                this_host->passive_checks_enabled,
@@ -8293,48 +6847,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
     }
   }
 
-  /* add all contact groups to the host */
-  if (this_host->contact_groups != NULL) {
-
-    for (contact_group = strtok(this_host->contact_groups, ",");
-         contact_group != NULL;
-	 contact_group = strtok(NULL, ",")) {
-
-      strip(contact_group);
-      new_contactgroupsmember = add_contactgroup_to_host(
-                                  new_host,
-                                  contact_group);
-      if (new_contactgroupsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contactgroup '" << contact_group
-          << "' to host (config file '"
-          << xodtemplate_config_file_name(this_host->_config_file)
-          << "', starting on line " << this_host->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  /* add all contacts to the host */
-  if (this_host->contacts != NULL) {
-
-    for (contact_name = strtok(this_host->contacts, ",");
-         contact_name != NULL;
-	 contact_name = strtok(NULL, ",")) {
-
-      strip(contact_name);
-      new_contactsmember = add_contact_to_host(new_host, contact_name);
-      if (new_contactsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contact '" << contact_name
-          << "' to host (config file '"
-          << xodtemplate_config_file_name(this_host->_config_file)
-          << "', starting on line " << this_host->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
   /* add all custom variables */
   for (temp_customvariablesmember = this_host->custom_variables;
        temp_customvariablesmember != NULL;
@@ -8357,10 +6869,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
 /* registers a service definition */
 int xodtemplate_register_service(xodtemplate_service* this_service) {
   service* new_service = NULL;
-  contactsmember* new_contactsmember = NULL;
-  contactgroupsmember* new_contactgroupsmember = NULL;
-  char* contact_name = NULL;
-  char* contact_group = NULL;
   xodtemplate_customvariablesmember* temp_customvariablesmember = NULL;
 
   /* bail out if we shouldn't register this object */
@@ -8379,15 +6887,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->passive_checks_enabled,
                   this_service->check_interval,
                   this_service->retry_interval,
-                  this_service->notification_interval,
-                  this_service->first_notification_delay,
-                  this_service->notification_period,
-                  this_service->notify_on_recovery,
-                  this_service->notify_on_unknown,
-                  this_service->notify_on_warning,
-                  this_service->notify_on_critical,
-                  this_service->notify_on_flapping,
-                  this_service->notifications_enabled,
                   this_service->is_volatile,
                   this_service->event_handler,
                   this_service->event_handler_enabled,
@@ -8418,53 +6917,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
       << xodtemplate_config_file_name(this_service->_config_file)
       << "', starting on line " << this_service->_start_line << ")";
     return (ERROR);
-  }
-
-  /* add all contact groups to the service */
-  if (this_service->contact_groups != NULL) {
-
-    for (contact_group = strtok(this_service->contact_groups, ",");
-         contact_group != NULL;
-	 contact_group = strtok(NULL, ",")) {
-
-      strip(contact_group);
-      new_contactgroupsmember = add_contactgroup_to_service(
-                                  new_service,
-                                  contact_group);
-      if (new_contactgroupsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contactgroup '" << contact_group
-          << "' to service (config file '"
-          << xodtemplate_config_file_name(this_service->_config_file)
-          << "', starting on line " << this_service->_start_line << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  /* add all the contacts to the service */
-  if (this_service->contacts != NULL) {
-
-    for (contact_name = strtok(this_service->contacts, ",");
-         contact_name != NULL;
-	 contact_name = strtok(NULL, ",")) {
-
-      /* add this contact to the service definition */
-      strip(contact_name);
-      new_contactsmember = add_contact_to_service(
-                             new_service,
-                             contact_name);
-
-      /* stop adding contacts if we ran into an error */
-      if (new_contactsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add contact '" << contact_name
-          << "' to service (config file '"
-          << xodtemplate_config_file_name(this_service->_config_file)
-          << "', starting on line " << this_service->_start_line << ")";
-        return (ERROR);
-      }
-    }
   }
 
   /* add all custom variables */
@@ -8542,20 +6994,12 @@ int xodtemplate_sort_objects() {
   if (xodtemplate_sort_connectors() == ERROR)
     return (ERROR);
 
-  /* sort contactgroups */
-  if (xodtemplate_sort_contactgroups() == ERROR)
-    return (ERROR);
-
   /* sort hostgroups */
   if (xodtemplate_sort_hostgroups() == ERROR)
     return (ERROR);
 
   /* sort servicegroups */
   if (xodtemplate_sort_servicegroups() == ERROR)
-    return (ERROR);
-
-  /* sort contacts */
-  if (xodtemplate_sort_contacts() == ERROR)
     return (ERROR);
 
   /* sort hosts */
@@ -8764,60 +7208,6 @@ int xodtemplate_sort_connectors() {
   return (OK);
 }
 
-/* sort contactgroups by name */
-int xodtemplate_sort_contactgroups() {
-  xodtemplate_contactgroup* new_contactgroup_list = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
-  xodtemplate_contactgroup* last_contactgroup = NULL;
-  xodtemplate_contactgroup* temp_contactgroup_orig = NULL;
-  xodtemplate_contactgroup* next_contactgroup_orig = NULL;
-
-  /* sort all existing contactgroups */
-  for (temp_contactgroup_orig = xodtemplate_contactgroup_list;
-       temp_contactgroup_orig != NULL;
-       temp_contactgroup_orig = next_contactgroup_orig) {
-
-    next_contactgroup_orig = temp_contactgroup_orig->next;
-
-    /* add contactgroup to new list, sorted by contactgroup name */
-    last_contactgroup = new_contactgroup_list;
-    for (temp_contactgroup = new_contactgroup_list;
-         temp_contactgroup != NULL;
-         temp_contactgroup = temp_contactgroup->next) {
-
-      if (xodtemplate_compare_strings1(
-            temp_contactgroup_orig->contactgroup_name,
-            temp_contactgroup->contactgroup_name) <= 0)
-        break;
-      else
-        last_contactgroup = temp_contactgroup;
-    }
-
-    /* first item added to new sorted list */
-    if (new_contactgroup_list == NULL) {
-      temp_contactgroup_orig->next = NULL;
-      new_contactgroup_list = temp_contactgroup_orig;
-    }
-
-    /* item goes at head of new sorted list */
-    else if (temp_contactgroup == new_contactgroup_list) {
-      temp_contactgroup_orig->next = new_contactgroup_list;
-      new_contactgroup_list = temp_contactgroup_orig;
-    }
-
-    /* item goes in middle or at end of new sorted list */
-    else {
-      temp_contactgroup_orig->next = temp_contactgroup;
-      last_contactgroup->next = temp_contactgroup_orig;
-    }
-  }
-
-  /* list is now sorted */
-  xodtemplate_contactgroup_list = new_contactgroup_list;
-
-  return (OK);
-}
-
 /* sort hostgroups by name */
 int xodtemplate_sort_hostgroups() {
   xodtemplate_hostgroup* new_hostgroup_list = NULL;
@@ -8922,60 +7312,6 @@ int xodtemplate_sort_servicegroups() {
 
   /* list is now sorted */
   xodtemplate_servicegroup_list = new_servicegroup_list;
-
-  return (OK);
-}
-
-/* sort contacts by name */
-int xodtemplate_sort_contacts() {
-  xodtemplate_contact* new_contact_list = NULL;
-  xodtemplate_contact* temp_contact = NULL;
-  xodtemplate_contact* last_contact = NULL;
-  xodtemplate_contact* temp_contact_orig = NULL;
-  xodtemplate_contact* next_contact_orig = NULL;
-
-  /* sort all existing contacts */
-  for (temp_contact_orig = xodtemplate_contact_list;
-       temp_contact_orig != NULL;
-       temp_contact_orig = next_contact_orig) {
-
-    next_contact_orig = temp_contact_orig->next;
-
-    /* add contact to new list, sorted by contact name */
-    last_contact = new_contact_list;
-    for (temp_contact = new_contact_list;
-	 temp_contact != NULL;
-         temp_contact = temp_contact->next) {
-
-      if (xodtemplate_compare_strings1(
-            temp_contact_orig->contact_name,
-            temp_contact->contact_name) <= 0)
-        break;
-      else
-        last_contact = temp_contact;
-    }
-
-    /* first item added to new sorted list */
-    if (new_contact_list == NULL) {
-      temp_contact_orig->next = NULL;
-      new_contact_list = temp_contact_orig;
-    }
-
-    /* item goes at head of new sorted list */
-    else if (temp_contact == new_contact_list) {
-      temp_contact_orig->next = new_contact_list;
-      new_contact_list = temp_contact_orig;
-    }
-
-    /* item goes in middle or at end of new sorted list */
-    else {
-      temp_contact_orig->next = temp_contact;
-      last_contact->next = temp_contact_orig;
-    }
-  }
-
-  /* list is now sorted */
-  xodtemplate_contact_list = new_contact_list;
 
   return (OK);
 }
@@ -9305,10 +7641,8 @@ int xodtemplate_cache_objects(char* cache_file) {
   xodtemplate_daterange* temp_daterange = NULL;
   xodtemplate_command* temp_command = NULL;
   xodtemplate_connector* temp_connector = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
-  xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
@@ -9528,24 +7862,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\t}\n\n");
   }
 
-  /* cache contactgroups */
-  /*for(temp_contactgroup=xodtemplate_contactgroup_list;temp_contactgroup!=NULL;temp_contactgroup=temp_contactgroup->next){ */
-  ptr = NULL;
-  for (temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_first(xobject_skiplists[X_CONTACTGROUP_SKIPLIST], &ptr);
-       temp_contactgroup != NULL;
-       temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_next(&ptr)) {
-    if (temp_contactgroup->register_object == false)
-      continue;
-    fprintf(fp, "define contactgroup {\n");
-    if (temp_contactgroup->contactgroup_name)
-      fprintf(fp, "\tcontactgroup_name\t%s\n", temp_contactgroup->contactgroup_name);
-    if (temp_contactgroup->alias)
-      fprintf(fp, "\talias\t%s\n", temp_contactgroup->alias);
-    if (temp_contactgroup->members)
-      fprintf(fp, "\tmembers\t%s\n", temp_contactgroup->members);
-    fprintf(fp, "\t}\n\n");
-  }
-
   /* cache hostgroups */
   /*for(temp_hostgroup=xodtemplate_hostgroup_list;temp_hostgroup!=NULL;temp_hostgroup=temp_hostgroup->next){ */
   ptr = NULL;
@@ -9585,109 +7901,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\t}\n\n");
   }
 
-  /* cache contacts */
-  /*for(temp_contact=xodtemplate_contact_list;temp_contact!=NULL;temp_contact=temp_contact->next){ */
-  ptr = NULL;
-  for (temp_contact = (xodtemplate_contact*)skiplist_get_first(xobject_skiplists[X_CONTACT_SKIPLIST], &ptr);
-       temp_contact != NULL;
-       temp_contact = (xodtemplate_contact*)skiplist_get_next(&ptr)) {
-    if (temp_contact->register_object == false)
-      continue;
-    fprintf(fp, "define contact {\n");
-    if (temp_contact->contact_name)
-      fprintf(fp, "\tcontact_name\t%s\n", temp_contact->contact_name);
-    if (temp_contact->alias)
-      fprintf(fp, "\talias\t%s\n", temp_contact->alias);
-    if (temp_contact->service_notification_period)
-      fprintf(
-        fp,
-        "\tservice_notification_period\t%s\n",
-        temp_contact->service_notification_period);
-    if (temp_contact->host_notification_period)
-      fprintf(
-        fp,
-        "\thost_notification_period\t%s\n",
-        temp_contact->host_notification_period);
-    fprintf(fp, "\tservice_notification_options\t");
-    x = 0;
-    if (temp_contact->notify_on_service_warning == true)
-      fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_service_unknown == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_service_critical == true)
-      fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_service_recovery == true)
-      fprintf(fp, "%sr", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_service_flapping == true)
-      fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
-    fprintf(fp, "\thost_notification_options\t");
-    x = 0;
-    if (temp_contact->notify_on_host_down == true)
-      fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_host_unreachable == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_host_recovery == true)
-      fprintf(fp, "%sr", (x++ > 0) ? "," : "");
-    if (temp_contact->notify_on_host_flapping == true)
-      fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
-    if (temp_contact->service_notification_commands)
-      fprintf(fp, "\tservice_notification_commands\t%s\n",
-	      temp_contact->service_notification_commands);
-    if (temp_contact->timezone)
-      fprintf(fp, "\ttimezone\t%s\n", temp_contact->timezone);
-    if (temp_contact->host_notification_commands)
-      fprintf(
-        fp,
-        "\thost_notification_commands\t%s\n",
-        temp_contact->host_notification_commands);
-    if (temp_contact->email)
-      fprintf(fp, "\temail\t%s\n", temp_contact->email);
-    if (temp_contact->pager)
-      fprintf(fp, "\tpager\t%s\n", temp_contact->pager);
-    for (x = 0; x < MAX_XODTEMPLATE_CONTACT_ADDRESSES; x++) {
-      if (temp_contact->address[x])
-        fprintf(fp, "\taddress%d\t%s\n", x + 1, temp_contact->address[x]);
-    }
-    fprintf(
-      fp,
-      "\thost_notifications_enabled\t%d\n",
-      temp_contact->host_notifications_enabled);
-    fprintf(
-      fp,
-      "\tservice_notifications_enabled\t%d\n",
-      temp_contact->service_notifications_enabled);
-    fprintf(
-      fp,
-      "\tretain_status_information\t%d\n",
-      temp_contact->retain_status_information);
-    fprintf(
-      fp,
-      "\tretain_nonstatus_information\t%d\n",
-      temp_contact->retain_nonstatus_information);
-
-    /* custom variables */
-    for (temp_customvariablesmember = temp_contact->custom_variables;
-         temp_customvariablesmember != NULL;
-         temp_customvariablesmember = temp_customvariablesmember->next) {
-      if (temp_customvariablesmember->variable_name)
-        fprintf(
-          fp,
-          "\t_%s\t%s\n",
-          temp_customvariablesmember->variable_name,
-          (temp_customvariablesmember->variable_value == NULL
-           ? XODTEMPLATE_NULL
-           : temp_customvariablesmember->variable_value));
-    }
-
-    fprintf(fp, "\t}\n\n");
-  }
-
   /* cache hosts */
   /*for(temp_host=xodtemplate_host_list;temp_host!=NULL;temp_host=temp_host->next){ */
   ptr = NULL;
@@ -9713,12 +7926,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\tcheck_command\t%s\n", temp_host->check_command);
     if (temp_host->event_handler)
       fprintf(fp, "\tevent_handler\t%s\n", temp_host->event_handler);
-    if (temp_host->contacts)
-      fprintf(fp, "\tcontacts\t%s\n", temp_host->contacts);
-    if (temp_host->contact_groups)
-      fprintf(fp, "\tcontact_groups\t%s\n", temp_host->contact_groups);
-    if (temp_host->notification_period)
-      fprintf(fp, "\tnotification_period\t%s\n", temp_host->notification_period);
     fprintf(fp, "\tinitial_state\t");
     if (temp_host->initial_state == HOST_DOWN)
       fprintf(fp, "d\n");
@@ -9749,22 +7956,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\n");
     fprintf(fp, "\tfreshness_threshold\t%d\n", temp_host->freshness_threshold);
     fprintf(fp, "\tcheck_freshness\t%d\n", temp_host->check_freshness);
-    fprintf(fp, "\tnotification_options\t");
-    x = 0;
-    if (temp_host->notify_on_down == true)
-      fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-    if (temp_host->notify_on_unreachable == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (temp_host->notify_on_recovery == true)
-      fprintf(fp, "%sr", (x++ > 0) ? "," : "");
-    if (temp_host->notify_on_flapping == true)
-      fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
-    fprintf(fp, "\tnotifications_enabled\t%d\n", temp_host->notifications_enabled);
-    fprintf(fp, "\tnotification_interval\t%f\n", temp_host->notification_interval);
-    fprintf(fp, "\tfirst_notification_delay\t%f\n", temp_host->first_notification_delay);
     fprintf(fp, "\tstalking_options\t");
     x = 0;
     if (temp_host->stalk_on_up == true)
@@ -9819,12 +8010,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\tcheck_command\t%s\n", temp_service->check_command);
     if (temp_service->event_handler)
       fprintf(fp, "\tevent_handler\t%s\n", temp_service->event_handler);
-    if (temp_service->contacts)
-      fprintf(fp, "\tcontacts\t%s\n", temp_service->contacts);
-    if (temp_service->contact_groups)
-      fprintf(fp, "\tcontact_groups\t%s\n", temp_service->contact_groups);
-    if (temp_service->notification_period)
-      fprintf(fp, "\tnotification_period\t%s\n", temp_service->notification_period);
     fprintf(fp, "\tinitial_state\t");
     if (temp_service->initial_state == STATE_WARNING)
       fprintf(fp, "w\n");
@@ -9860,24 +8045,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\n");
     fprintf(fp, "\tfreshness_threshold\t%d\n", temp_service->freshness_threshold);
     fprintf(fp, "\tcheck_freshness\t%d\n", temp_service->check_freshness);
-    fprintf(fp, "\tnotification_options\t");
-    x = 0;
-    if (temp_service->notify_on_unknown == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (temp_service->notify_on_warning == true)
-      fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-    if (temp_service->notify_on_critical == true)
-      fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-    if (temp_service->notify_on_recovery == true)
-      fprintf(fp, "%sr", (x++ > 0) ? "," : "");
-    if (temp_service->notify_on_flapping == true)
-      fprintf(fp, "%sf", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
-    fprintf(fp, "\tnotifications_enabled\t%d\n", temp_service->notifications_enabled);
-    fprintf(fp, "\tnotification_interval\t%f\n", temp_service->notification_interval);
-    fprintf(fp, "\tfirst_notification_delay\t%f\n", temp_service->first_notification_delay);
     fprintf(fp, "\tstalking_options\t");
     x = 0;
     if (temp_service->stalk_on_ok == true)
@@ -10032,20 +8199,6 @@ int xodtemplate_init_xobject_skiplists() {
         false,
         false,
         xodtemplate_skiplist_compare_timeperiod_template);
-  xobject_template_skiplists[X_CONTACT_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_contact_template);
-  xobject_template_skiplists[X_CONTACTGROUP_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_contactgroup_template);
   xobject_template_skiplists[X_HOSTGROUP_SKIPLIST]
     = skiplist_new(
         10,
@@ -10109,20 +8262,6 @@ int xodtemplate_init_xobject_skiplists() {
         false,
         false,
         xodtemplate_skiplist_compare_timeperiod);
-  xobject_skiplists[X_CONTACT_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_contact);
-  xobject_skiplists[X_CONTACTGROUP_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_contactgroup);
   xobject_skiplists[X_HOSTGROUP_SKIPLIST]
     = skiplist_new(
         10,
@@ -10380,84 +8519,6 @@ int xodtemplate_skiplist_compare_connector(
             NULL));
 }
 
-int xodtemplate_skiplist_compare_contact_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_contact const* oa
-    = static_cast<xodtemplate_contact const*>(a);
-  xodtemplate_contact const* ob
-    = static_cast<xodtemplate_contact const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_contact(void const* a, void const* b) {
-  xodtemplate_contact const* oa
-    = static_cast<xodtemplate_contact const*>(a);
-  xodtemplate_contact const* ob
-    = static_cast<xodtemplate_contact const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(
-            oa->contact_name,
-            NULL,
-            ob->contact_name,
-            NULL));
-}
-
-int xodtemplate_skiplist_compare_contactgroup_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_contactgroup const* oa
-    = static_cast<xodtemplate_contactgroup const*>(a);
-  xodtemplate_contactgroup const* ob
-    = static_cast<xodtemplate_contactgroup const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_contactgroup(
-      void const* a,
-      void const* b) {
-  xodtemplate_contactgroup const* oa
-    = static_cast<xodtemplate_contactgroup const*>(a);
-  xodtemplate_contactgroup const* ob
-    = static_cast<xodtemplate_contactgroup const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(
-            oa->contactgroup_name,
-            NULL,
-            ob->contactgroup_name,
-            NULL));
-}
-
 int xodtemplate_skiplist_compare_hostgroup_template(
       void const* a,
       void const* b) {
@@ -10652,16 +8713,12 @@ int xodtemplate_free_memory() {
   xodtemplate_command* next_command = NULL;
   xodtemplate_connector* this_connector = NULL;
   xodtemplate_connector* next_connector = NULL;
-  xodtemplate_contactgroup* this_contactgroup = NULL;
-  xodtemplate_contactgroup* next_contactgroup = NULL;
   xodtemplate_hostgroup* this_hostgroup = NULL;
   xodtemplate_hostgroup* next_hostgroup = NULL;
   xodtemplate_servicegroup* this_servicegroup = NULL;
   xodtemplate_servicegroup* next_servicegroup = NULL;
   xodtemplate_servicedependency* this_servicedependency = NULL;
   xodtemplate_servicedependency* next_servicedependency = NULL;
-  xodtemplate_contact* this_contact = NULL;
-  xodtemplate_contact* next_contact = NULL;
   xodtemplate_host* this_host = NULL;
   xodtemplate_host* next_host = NULL;
   xodtemplate_service* this_service = NULL;
@@ -10710,22 +8767,6 @@ int xodtemplate_free_memory() {
   }
   xodtemplate_connector_list = NULL;
   xodtemplate_connector_list_tail = NULL;
-
-  /* free memory allocated to contactgroup list */
-  for (this_contactgroup = xodtemplate_contactgroup_list;
-       this_contactgroup != NULL;
-       this_contactgroup = next_contactgroup) {
-    next_contactgroup = this_contactgroup->next;
-    delete[] this_contactgroup->tmpl;
-    delete[] this_contactgroup->name;
-    delete[] this_contactgroup->contactgroup_name;
-    delete[] this_contactgroup->alias;
-    delete[] this_contactgroup->members;
-    delete[] this_contactgroup->contactgroup_members;
-    delete this_contactgroup;
-  }
-  xodtemplate_contactgroup_list = NULL;
-  xodtemplate_contactgroup_list_tail = NULL;
 
   /* free memory allocated to hostgroup list */
   for (this_hostgroup = xodtemplate_hostgroup_list;
@@ -10780,41 +8821,6 @@ int xodtemplate_free_memory() {
   xodtemplate_servicedependency_list = NULL;
   xodtemplate_servicedependency_list_tail = NULL;
 
-  /* free memory allocated to contact list */
-  for (this_contact = xodtemplate_contact_list;
-       this_contact != NULL;
-       this_contact = next_contact) {
-
-    /* free custom variables */
-    this_customvariablesmember = this_contact->custom_variables;
-    while (this_customvariablesmember != NULL) {
-      next_customvariablesmember = this_customvariablesmember->next;
-      delete[] this_customvariablesmember->variable_name;
-      delete[] this_customvariablesmember->variable_value;
-      delete this_customvariablesmember;
-      this_customvariablesmember = next_customvariablesmember;
-    }
-
-    next_contact = this_contact->next;
-    delete[] this_contact->tmpl;
-    delete[] this_contact->name;
-    delete[] this_contact->contact_name;
-    delete[] this_contact->alias;
-    delete[] this_contact->contact_groups;
-    delete[] this_contact->email;
-    delete[] this_contact->pager;
-    for (x = 0; x < MAX_XODTEMPLATE_CONTACT_ADDRESSES; x++)
-      delete[] this_contact->address[x];
-    delete[] this_contact->service_notification_period;
-    delete[] this_contact->service_notification_commands;
-    delete[] this_contact->timezone;
-    delete[] this_contact->host_notification_period;
-    delete[] this_contact->host_notification_commands;
-    delete this_contact;
-  }
-  xodtemplate_contact_list = NULL;
-  xodtemplate_contact_list_tail = NULL;
-
   /* free memory allocated to host list */
   for (this_host = xodtemplate_host_list;
        this_host != NULL;
@@ -10842,9 +8848,6 @@ int xodtemplate_free_memory() {
     delete[] this_host->check_command;
     delete[] this_host->check_period;
     delete[] this_host->event_handler;
-    delete[] this_host->contact_groups;
-    delete[] this_host->contacts;
-    delete[] this_host->notification_period;
     delete[] this_host->timezone;
     delete this_host;
   }
@@ -10877,9 +8880,6 @@ int xodtemplate_free_memory() {
     delete[] this_service->check_command;
     delete[] this_service->check_period;
     delete[] this_service->event_handler;
-    delete[] this_service->notification_period;
-    delete[] this_service->contact_groups;
-    delete[] this_service->contacts;
     delete[] this_service->timezone;
     delete this_service;
   }
@@ -11017,298 +9017,6 @@ void xodtemplate_remove_memberlist_item(
 /******************************************************************/
 /********************** UTILITY FUNCTIONS *************************/
 /******************************************************************/
-
-/* expands a comma-delimited list of contactgroups and/or contacts to member contact names */
-xodtemplate_memberlist* xodtemplate_expand_contactgroups_and_contacts(
-                          char* contactgroups,
-                          char* contacts,
-                          int _config_file,
-                          int _start_line) {
-  xodtemplate_memberlist* temp_list = NULL;
-  xodtemplate_memberlist* reject_list = NULL;
-  xodtemplate_memberlist* list_ptr = NULL;
-  xodtemplate_memberlist* reject_ptr = NULL;
-  int result = OK;
-
-  /* process list of contactgroups... */
-  if (contactgroups != NULL) {
-
-    /* expand contactgroups */
-    result = xodtemplate_expand_contactgroups(
-               &temp_list,
-               &reject_list,
-               contactgroups,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-  }
-
-  /* process contact names */
-  if (contacts != NULL) {
-
-    /* expand contacts */
-    result = xodtemplate_expand_contacts(
-               &temp_list,
-               &reject_list, contacts,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-  }
-
-  /* remove rejects (if any) from the list (no duplicate entries exist in either list) */
-  /* NOTE: rejects from this list also affect contacts generated from processing contactgroup names (see above) */
-  for (reject_ptr = reject_list;
-       reject_ptr != NULL;
-       reject_ptr = reject_ptr->next) {
-    for (list_ptr = temp_list;
-	 list_ptr != NULL;
-         list_ptr = list_ptr->next) {
-      if (!strcmp(reject_ptr->name1, list_ptr->name1)) {
-        xodtemplate_remove_memberlist_item(list_ptr, &temp_list);
-        break;
-      }
-    }
-  }
-  xodtemplate_free_memberlist(&reject_list);
-  reject_list = NULL;
-
-  return (temp_list);
-}
-
-/* expands contactgroups */
-int xodtemplate_expand_contactgroups(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* contactgroups,
-      int _config_file,
-      int _start_line) {
-  char* contactgroup_names = NULL;
-  char* temp_ptr = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL || contactgroups == NULL)
-    return (ERROR);
-
-  /* allocate memory for contactgroup name list */
-  contactgroup_names = string::dup(contactgroups);
-
-  for (temp_ptr = strtok(contactgroup_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all contactgroups */
-    if (!strcmp(temp_ptr, "*")) {
-
-      found_match = true;
-
-      for (temp_contactgroup = xodtemplate_contactgroup_list;
-           temp_contactgroup != NULL;
-           temp_contactgroup = temp_contactgroup->next) {
-
-        /* dont' add contactgroups that shouldn't be registered */
-        if (temp_contactgroup->register_object == false)
-          continue;
-
-        /* add contactgroup to list */
-        xodtemplate_add_contactgroup_members_to_memberlist(
-          list,
-          temp_contactgroup,
-          _config_file,
-          _start_line);
-      }
-    }
-    /* else this is just a single contactgroup... */
-    else {
-      /* this contactgroup should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the contactgroup */
-      temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
-      if (temp_contactgroup != NULL) {
-        found_match = true;
-
-        /* add contactgroup members to proper list */
-        xodtemplate_add_contactgroup_members_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_contactgroup,
-          _config_file,
-          _start_line);
-      }
-    }
-
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any contactgroup matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] contactgroup_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* expands contacts */
-int xodtemplate_expand_contacts(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* contacts,
-      int _config_file,
-      int _start_line) {
-  char* contact_names = NULL;
-  char* temp_ptr = NULL;
-  xodtemplate_contact* temp_contact = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL || contacts == NULL)
-    return (ERROR);
-
-  contact_names = string::dup(contacts);
-
-  /* expand each contact name */
-  for (temp_ptr = strtok(contact_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all contacts */
-    if (!strcmp(temp_ptr, "*")) {
-
-      found_match = true;
-
-      for (temp_contact = xodtemplate_contact_list;
-           temp_contact != NULL;
-           temp_contact = temp_contact->next) {
-
-        if (temp_contact->contact_name == NULL)
-          continue;
-
-        /* dont' add contacts that shouldn't be registered */
-        if (temp_contact->register_object == false)
-          continue;
-
-        /* add contact to list */
-        xodtemplate_add_member_to_memberlist(
-          list,
-          temp_contact->contact_name,
-          NULL);
-      }
-    }
-
-    /* else this is just a single contact... */
-    else {
-
-      /* this contact should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the contact */
-      temp_contact = xodtemplate_find_real_contact(temp_ptr);
-      if (temp_contact != NULL) {
-        found_match = true;
-
-        /* add contact to list */
-        xodtemplate_add_member_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_ptr,
-          NULL);
-      }
-    }
-
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any contact matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] contact_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* adds members of a contactgroups to the list of expanded (accepted) or rejected contacts */
-int xodtemplate_add_contactgroup_members_to_memberlist(
-      xodtemplate_memberlist** list,
-      xodtemplate_contactgroup* temp_contactgroup,
-      int _config_file,
-      int _start_line) {
-  char* group_members = NULL;
-  char* member_name = NULL;
-  char* member_ptr = NULL;
-
-  (void)_config_file;
-  (void)_start_line;
-
-  if (list == NULL || temp_contactgroup == NULL)
-    return (ERROR);
-
-  /* if we have no members, just return. Empty contactgroups are ok */
-  if (temp_contactgroup->members == NULL)
-    return (OK);
-
-  /* save a copy of the members */
-  group_members = string::dup(temp_contactgroup->members);
-
-  /* process all contacts that belong to the contactgroup */
-  /* NOTE: members of the group have already have been expanded by xodtemplate_recombobulate_contactgroups(), so we don't need to do it here */
-  member_ptr = group_members;
-  for (member_name = my_strsep(&member_ptr, ",");
-       member_name != NULL;
-       member_name = my_strsep(&member_ptr, ",")) {
-
-    /* strip trailing spaces from member name */
-    strip(member_name);
-
-    /* add contact to the list */
-    xodtemplate_add_member_to_memberlist(list, member_name, NULL);
-  }
-
-  delete[] group_members;
-
-  return (OK);
-}
 
 /* expands a comma-delimited list of hostgroups and/or hosts to member host names */
 xodtemplate_memberlist* xodtemplate_expand_hostgroups_and_hosts(
@@ -12098,166 +9806,6 @@ int xodtemplate_get_hostgroup_names(
   return (OK);
 }
 
-/* returns a comma-delimited list of contactgroup names */
-char* xodtemplate_process_contactgroup_names(
-        char* contactgroups,
-        int _config_file,
-        int _start_line) {
-  xodtemplate_memberlist* temp_list = NULL;
-  xodtemplate_memberlist* reject_list = NULL;
-  xodtemplate_memberlist* list_ptr = NULL;
-  xodtemplate_memberlist* reject_ptr = NULL;
-  xodtemplate_memberlist* this_list = NULL;
-  char* buf = NULL;
-  int result = OK;
-
-  /* process list of contactgroups... */
-  if (contactgroups != NULL) {
-
-    /* split group names into two lists */
-    result = xodtemplate_get_contactgroup_names(
-               &temp_list,
-               &reject_list,
-               contactgroups,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-
-    /* remove rejects (if any) from the list (no duplicate entries exist in either list) */
-    for (reject_ptr = reject_list;
-         reject_ptr != NULL;
-         reject_ptr = reject_ptr->next) {
-      for (list_ptr = temp_list;
-           list_ptr != NULL;
-           list_ptr = list_ptr->next) {
-        if (!strcmp(reject_ptr->name1, list_ptr->name1)) {
-          xodtemplate_remove_memberlist_item(list_ptr, &temp_list);
-          break;
-        }
-      }
-    }
-
-    xodtemplate_free_memberlist(&reject_list);
-    reject_list = NULL;
-  }
-
-  /* generate the list of group members */
-  for (this_list = temp_list;
-       this_list != NULL;
-       this_list = this_list->next) {
-    if (buf == NULL) {
-      buf = new char[strlen(this_list->name1) + 1];
-      strcpy(buf, this_list->name1);
-    }
-    else {
-      buf = resize_string(
-              buf,
-              strlen(buf) + strlen(this_list->name1) + 2);
-      strcat(buf, ",");
-      strcat(buf, this_list->name1);
-    }
-  }
-
-  xodtemplate_free_memberlist(&temp_list);
-
-  return (buf);
-}
-
-/* return a list of contactgroup names */
-int xodtemplate_get_contactgroup_names(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* contactgroups,
-      int _config_file,
-      int _start_line) {
-  char* contactgroup_names = NULL;
-  char* temp_ptr = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL || contactgroups == NULL)
-    return (ERROR);
-
-  /* allocate memory for contactgroup name list */
-  contactgroup_names = string::dup(contactgroups);
-
-  for (temp_ptr = strtok(contactgroup_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all contactgroups */
-    if (!strcmp(temp_ptr, "*")) {
-
-      found_match = true;
-
-      for (temp_contactgroup = xodtemplate_contactgroup_list;
-           temp_contactgroup != NULL;
-           temp_contactgroup = temp_contactgroup->next) {
-
-        /* dont' add contactgroups that shouldn't be registered */
-        if (temp_contactgroup->register_object == false)
-          continue;
-
-        /* add contactgroup to list */
-        xodtemplate_add_member_to_memberlist(
-          list,
-          temp_contactgroup->contactgroup_name,
-          NULL);
-      }
-    }
-
-    /* else this is just a single contactgroup... */
-    else {
-
-      /* this contactgroup should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the contactgroup */
-      temp_contactgroup = xodtemplate_find_real_contactgroup(temp_ptr);
-      if (temp_contactgroup != NULL) {
-
-        found_match = true;
-
-        /* add contactgroup members to proper list */
-        xodtemplate_add_member_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_contactgroup->contactgroup_name,
-          NULL);
-      }
-    }
-
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any contactgroup matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] contactgroup_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
-}
-
 /* returns a comma-delimited list of servicegroup names */
 char* xodtemplate_process_servicegroup_names(
         char* servicegroups,
@@ -12488,23 +10036,12 @@ int xodtemplate_clean_additive_string(char** str) {
 /* cleans strings which may contain additive inheritance directives */
 /* NOTE: this must be done after objects are resolved */
 int xodtemplate_clean_additive_strings() {
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_contact* temp_contact = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
-
-  /* resolve all contactgroup objects */
-  for (temp_contactgroup = xodtemplate_contactgroup_list;
-       temp_contactgroup != NULL;
-       temp_contactgroup = temp_contactgroup->next) {
-    xodtemplate_clean_additive_string(&temp_contactgroup->members);
-    xodtemplate_clean_additive_string(
-      &temp_contactgroup->contactgroup_members);
-  }
 
   /* resolve all hostgroup objects */
   for (temp_hostgroup = xodtemplate_hostgroup_list;
@@ -12546,23 +10083,10 @@ int xodtemplate_clean_additive_strings() {
       &temp_servicedependency->dependent_service_description);
   }
 
-  /* resolve all contact objects */
-  for (temp_contact = xodtemplate_contact_list;
-       temp_contact != NULL;
-       temp_contact = temp_contact->next) {
-    xodtemplate_clean_additive_string(&temp_contact->contact_groups);
-    xodtemplate_clean_additive_string(
-      &temp_contact->host_notification_commands);
-    xodtemplate_clean_additive_string(
-      &temp_contact->service_notification_commands);
-  }
-
   /* clean all host objects */
   for (temp_host = xodtemplate_host_list;
        temp_host != NULL;
        temp_host = temp_host->next) {
-    xodtemplate_clean_additive_string(&temp_host->contact_groups);
-    xodtemplate_clean_additive_string(&temp_host->contacts);
     xodtemplate_clean_additive_string(&temp_host->parents);
     xodtemplate_clean_additive_string(&temp_host->host_groups);
   }
@@ -12571,8 +10095,6 @@ int xodtemplate_clean_additive_strings() {
   for (temp_service = xodtemplate_service_list;
        temp_service != NULL;
        temp_service = temp_service->next) {
-    xodtemplate_clean_additive_string(&temp_service->contact_groups);
-    xodtemplate_clean_additive_string(&temp_service->contacts);
     xodtemplate_clean_additive_string(&temp_service->host_name);
     xodtemplate_clean_additive_string(&temp_service->hostgroup_name);
     xodtemplate_clean_additive_string(&temp_service->service_groups);
@@ -12792,17 +10314,6 @@ int read_main_config_file(char const* main_config_file) {
       use_syslog=(atoi(value)>0)?true:false;
     }
 
-    else if(!strcmp(variable,"log_notifications")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for log_notifications")) {}
-        error=true;
-        break;
-      }
-
-      log_notifications=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"log_service_retries")){
 
       if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
@@ -12938,12 +10449,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"retained_process_service_attribute_mask")) {
       // retained_process_service_attribute_mask=strtoul(value,NULL,0);
     }
-    else if(!strcmp(variable,"retained_contact_host_attribute_mask"))
-      retained_contact_host_attribute_mask=strtoul(value,NULL,0);
-
-    else if(!strcmp(variable,"retained_contact_service_attribute_mask"))
-      retained_contact_service_attribute_mask=strtoul(value,NULL,0);
-
     else if(!strcmp(variable,"obsess_over_services")){
 
       if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
@@ -13013,17 +10518,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"notification_timeout")){
-
-      notification_timeout=atoi(value);
-
-      if(notification_timeout<=0){
-        if (asprintf(&error_message,"Illegal value for notification_timeout")) {}
-        error=true;
-        break;
-      }
-    }
-
     else if(!strcmp(variable,"ocsp_timeout")){
 
       ocsp_timeout=atoi(value);
@@ -13070,9 +10564,6 @@ int read_main_config_file(char const* main_config_file) {
 
     else if(!strcmp(variable,"enable_event_handlers"))
       enable_event_handlers=(atoi(value)>0)?true:false;
-
-    else if(!strcmp(variable,"enable_notifications"))
-      enable_notifications=(atoi(value)>0)?true:false;
 
     else if(!strcmp(variable,"execute_service_checks"))
       execute_service_checks=(atoi(value)>0)?true:false;

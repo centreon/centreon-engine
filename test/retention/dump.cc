@@ -40,9 +40,7 @@ int main_test(int argc, char* argv[]) {
   std::ostringstream oss;
   std::string const type(argv[1]);
 
-  if (type == "contact")
-    dump::contacts(oss);
-  else if (type == "header")
+  if (type == "header")
     dump::header(oss);
   else if (type == "host")
     dump::hosts(oss);

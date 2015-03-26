@@ -25,9 +25,6 @@
 
 /* Forward declaration. */
 struct command_struct;
-struct contact_struct;
-struct contactgroupsmember_struct;
-struct contactsmember_struct;
 struct customvariablesmember_struct;
 struct hostsmember_struct;
 struct objectlist_struct;
@@ -48,15 +45,6 @@ typedef struct                  host_struct {
   double                        retry_interval;
   int                           max_attempts;
   char*                         event_handler;
-  contactgroupsmember_struct*   contact_groups;
-  contactsmember_struct*        contacts;
-  double                        notification_interval;
-  double                        first_notification_delay;
-  int                           notify_on_down;
-  int                           notify_on_unreachable;
-  int                           notify_on_recovery;
-  int                           notify_on_flapping;
-  char*                         notification_period;
   char*                         check_period;
   unsigned int                  check_timeout;
   int                           flap_detection_enabled;
@@ -95,9 +83,6 @@ typedef struct                  host_struct {
   double                        execution_time;
   int                           is_executing;
   int                           check_options;
-  int                           notifications_enabled;
-  time_t                        last_host_notification;
-  time_t                        next_host_notification;
   time_t                        next_check;
   int                           should_be_scheduled;
   time_t                        last_check;
@@ -108,12 +93,6 @@ typedef struct                  host_struct {
   time_t                        last_time_unreachable;
   int                           has_been_checked;
   int                           is_being_freshened;
-  int                           notified_on_down;
-  int                           notified_on_unreachable;
-  int                           current_notification_number;
-  int                           no_more_notifications;
-  unsigned long                 current_notification_id;
-  int                           check_flapping_recovery_notification;
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
   time_t                        last_state_history_update;
@@ -129,7 +108,6 @@ typedef struct                  host_struct {
   command_struct*               event_handler_ptr;
   command_struct*               check_command_ptr;
   timeperiod_struct*            check_period_ptr;
-  timeperiod_struct*            notification_period_ptr;
   objectlist_struct*            hostgroups_ptr;
   struct host_struct*           next;
   struct host_struct*           nexthash;
@@ -137,7 +115,6 @@ typedef struct                  host_struct {
 
 /* Other HOST structure. */
 struct                          host_other_properties {
-  time_t                        initial_notif_time;
   bool                          should_reschedule_current_check;
 };
 
@@ -162,14 +139,6 @@ host* add_host(
         double retry_interval,
         int max_attempts,
         unsigned int check_timeout,
-        int notify_up,
-        int notify_down,
-        int notify_unreachable,
-        int notify_flapping,
-        double notification_interval,
-        double first_notification_delay,
-        char const* notification_period,
-        int notifications_enabled,
         char const* check_command,
         int checks_enabled,
         int accept_passive_checks,
@@ -192,7 +161,6 @@ host* add_host(
         int obsess_over_host,
         char const* timezone);
 int   get_host_count();
-int   is_contact_for_host(host* hst, contact_struct* cntct);
 int   is_host_immediate_child_of_host(host* parent, host* child);
 int   is_host_immediate_parent_of_host(host* child, host* parent);
 int   number_of_immediate_child_hosts(host* hst);

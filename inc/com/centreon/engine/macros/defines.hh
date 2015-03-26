@@ -21,8 +21,6 @@
 #ifndef CCE_MACROS_DEFINES_HH_
 # define CCE_MACROS_DEFINES_HH_
 
-# include "com/centreon/engine/objects/contact.hh"
-# include "com/centreon/engine/objects/contactgroup.hh"
 # include "com/centreon/engine/objects/customvariablesmember.hh"
 # include "com/centreon/engine/objects/host.hh"
 # include "com/centreon/engine/objects/hostgroup.hh"
@@ -57,15 +55,9 @@
 # define MACRO_SERVICEOUTPUT                    17
 # define MACRO_HOSTPERFDATA                     18
 # define MACRO_SERVICEPERFDATA                  19
-# define MACRO_CONTACTNAME                      20
-# define MACRO_CONTACTALIAS                     21
-# define MACRO_CONTACTEMAIL                     22
-# define MACRO_CONTACTPAGER                     23
 # define MACRO_HOSTSTATE                        26
 # define MACRO_HOSTSTATEID                      27
 # define MACRO_HOSTATTEMPT                      28
-# define MACRO_NOTIFICATIONTYPE                 29
-# define MACRO_NOTIFICATIONNUMBER               30  // deprecated - see HOSTNOTIFICATIONNUMBER and SERVICENOTIFICATIONNUMBER macros
 # define MACRO_HOSTEXECUTIONTIME                31
 # define MACRO_SERVICEEXECUTIONTIME             32
 # define MACRO_HOSTLATENCY                      33
@@ -127,10 +119,6 @@
 # define MACRO_SERVICECHECKTYPE                 98
 # define MACRO_LONGHOSTOUTPUT                   99
 # define MACRO_LONGSERVICEOUTPUT                100
-# define MACRO_HOSTNOTIFICATIONNUMBER           102
-# define MACRO_SERVICENOTIFICATIONNUMBER        103
-# define MACRO_HOSTNOTIFICATIONID               104
-# define MACRO_SERVICENOTIFICATIONID            105
 # define MACRO_HOSTEVENTID                      106
 # define MACRO_LASTHOSTEVENTID                  107
 # define MACRO_SERVICEEVENTID                   108
@@ -153,14 +141,6 @@
 # define MACRO_SERVICEGROUPACTIONURL            129
 # define MACRO_HOSTGROUPMEMBERS                 130
 # define MACRO_SERVICEGROUPMEMBERS              131
-# define MACRO_CONTACTGROUPNAME                 132
-# define MACRO_CONTACTGROUPALIAS                133
-# define MACRO_CONTACTGROUPMEMBERS              134
-# define MACRO_CONTACTGROUPNAMES                135
-# define MACRO_NOTIFICATIONRECIPIENTS           136
-# define MACRO_NOTIFICATIONAUTHOR               138
-# define MACRO_NOTIFICATIONAUTHORNAME           139
-# define MACRO_NOTIFICATIONAUTHORALIAS          140
 # define MACRO_EVENTSTARTTIME                   142
 # define MACRO_HOSTPROBLEMID                    143
 # define MACRO_LASTHOSTPROBLEMID                144
@@ -182,17 +162,13 @@
 struct                   nagios_macros {
   char*                  x[MACRO_X_COUNT];
   char*                  argv[MAX_COMMAND_ARGUMENTS];
-  char*                  contactaddress[MAX_CONTACT_ADDRESSES];
   char*                  ondemand;
   host*                  host_ptr;
   hostgroup*             hostgroup_ptr;
   service*               service_ptr;
   servicegroup*          servicegroup_ptr;
-  contact*               contact_ptr;
-  contactgroup*          contactgroup_ptr;
   customvariablesmember* custom_host_vars;
   customvariablesmember* custom_service_vars;
-  customvariablesmember* custom_contact_vars;
 };
 
 typedef struct nagios_macros nagios_macros;

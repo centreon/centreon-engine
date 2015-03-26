@@ -30,7 +30,6 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/dump.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/info.cc"
@@ -41,7 +40,6 @@ set(
   "${SRC_DIR}/state.cc"
 
   # Headers.
-  "${INC_DIR}/contact.hh"
   "${INC_DIR}/dump.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/info.hh"

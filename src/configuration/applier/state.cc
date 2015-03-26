@@ -23,8 +23,6 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
-#include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
@@ -266,90 +264,6 @@ umap<std::string, shared_ptr<commands::connector> > const& applier::state::conne
  */
 umap<std::string, shared_ptr<commands::connector> >& applier::state::connectors() throw () {
   return (_connectors);
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-umap<std::string, shared_ptr<contact_struct> > const& applier::state::contacts() const throw () {
-  return (_contacts);
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-umap<std::string, shared_ptr<contact_struct> >& applier::state::contacts() throw () {
-  return (_contacts);
-}
-
-/**
- *  Find a contact from its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contact_struct> >::const_iterator applier::state::contacts_find(configuration::contact::key_type const& k) const {
-  return (_contacts.find(k));
-}
-
-/**
- *  Find a contact from its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contact_struct> >::iterator applier::state::contacts_find(configuration::contact::key_type const& k) {
-  return (_contacts.find(k));
-}
-
-/**
- *  Get the current contactgroups.
- *
- *  @return The current contactgroups.
- */
-umap<std::string, shared_ptr<contactgroup_struct> > const& applier::state::contactgroups() const throw () {
-  return (_contactgroups);
-}
-
-/**
- *  Get the current contactgroups.
- *
- *  @return The current contactgroups.
- */
-umap<std::string, shared_ptr<contactgroup_struct> >& applier::state::contactgroups() throw () {
-  return (_contactgroups);
-}
-
-/**
- *  Find a contact group from its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
-  return (_contactgroups.find(k));
-}
-
-/**
- *  Find a contact group from its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contactgroup_struct> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
-  return (_contactgroups.find(k));
 }
 
 /**
@@ -796,7 +710,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->debug_verbosity(new_cfg.debug_verbosity());
   config->enable_event_handlers(new_cfg.enable_event_handlers());
   config->enable_flap_detection(new_cfg.enable_flap_detection());
-  config->enable_notifications(new_cfg.enable_notifications());
   config->enable_predictive_host_dependency_checks(new_cfg.enable_predictive_host_dependency_checks());
   config->enable_predictive_service_dependency_checks(new_cfg.enable_predictive_service_dependency_checks());
   config->event_broker_options(new_cfg.event_broker_options());
@@ -818,7 +731,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->log_file(new_cfg.log_file());
   config->log_host_retries(new_cfg.log_host_retries());
   config->log_initial_states(new_cfg.log_initial_states());
-  config->log_notifications(new_cfg.log_notifications());
   config->log_passive_checks(new_cfg.log_passive_checks());
   config->log_service_retries(new_cfg.log_service_retries());
   config->low_host_flap_threshold(new_cfg.low_host_flap_threshold());
@@ -831,7 +743,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->max_log_file_size(new_cfg.max_log_file_size());
   config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
   config->max_service_check_spread(new_cfg.max_service_check_spread());
-  config->notification_timeout(new_cfg.notification_timeout());
   config->object_cache_file(new_cfg.object_cache_file());
   config->obsess_over_hosts(new_cfg.obsess_over_hosts());
   config->obsess_over_services(new_cfg.obsess_over_services());
@@ -843,8 +754,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->precached_object_file(new_cfg.precached_object_file());
   config->resource_file(new_cfg.resource_file());
   config->retain_state_information(new_cfg.retain_state_information());
-  config->retained_contact_host_attribute_mask(new_cfg.retained_contact_host_attribute_mask());
-  config->retained_contact_service_attribute_mask(new_cfg.retained_contact_service_attribute_mask());
   config->retained_host_attribute_mask(new_cfg.retained_host_attribute_mask());
   config->retained_process_host_attribute_mask(new_cfg.retained_process_host_attribute_mask());
   config->retention_scheduling_horizon(new_cfg.retention_scheduling_horizon());
@@ -1139,16 +1048,6 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.commands());
 
-  // Expand contacts.
-  _expand<configuration::contact, applier::contact>(
-    new_cfg,
-    new_cfg.contacts());
-
-  // Expand contactgroups.
-  _expand<configuration::contactgroup, applier::contactgroup>(
-    new_cfg,
-    new_cfg.contactgroups());
-
   // Expand hosts.
   _expand<configuration::host, applier::host>(
     new_cfg,
@@ -1200,18 +1099,6 @@ void applier::state::_processing(
   diff_commands.parse(
     config->commands(),
     new_cfg.commands());
-
-  // Build difference for contacts.
-  difference<set_contact> diff_contacts;
-  diff_contacts.parse(
-    config->contacts(),
-    new_cfg.contacts());
-
-  // Build difference for contactgroups.
-  difference<set_contactgroup> diff_contactgroups;
-  diff_contactgroups.parse(
-    config->contactgroups(),
-    new_cfg.contactgroups());
 
   // Build difference for hosts.
   difference<set_host> diff_hosts;
@@ -1294,16 +1181,6 @@ void applier::state::_processing(
       diff_commands);
     _resolve<configuration::command, applier::command>(
       config->commands());
-
-    // Apply contacts and contactgroups.
-    _apply<configuration::contact, applier::contact>(
-      diff_contacts);
-    _apply<configuration::contactgroup, applier::contactgroup>(
-      diff_contactgroups);
-    _resolve<configuration::contactgroup, applier::contactgroup>(
-      config->contactgroups());
-    _resolve<configuration::contact, applier::contact>(
-      config->contacts());
 
     // Apply hosts and hostgroups.
     _apply<configuration::host, applier::host>(

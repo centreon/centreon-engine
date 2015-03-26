@@ -32,7 +32,6 @@
 #  include "com/centreon/engine/events/sched_info.hh"
 #  include "com/centreon/engine/events/timed_event.hh"
 #  include "com/centreon/engine/nebmods.hh"
-#  include "com/centreon/engine/notifications.hh"
 #  include "com/centreon/engine/objects.hh"
 #  include "com/centreon/engine/utils.hh"
 #  include "skiplist.h"
@@ -70,7 +69,6 @@ extern unsigned long             modified_service_process_attributes;
 
 extern unsigned long             next_event_id;
 extern unsigned long             next_problem_id;
-extern unsigned long             next_notification_id;
 
 extern int                       sighup;
 extern int                       sigshutdown;
@@ -100,11 +98,6 @@ extern host*                     host_list_tail;
 extern std::map<std::string, host_other_properties> host_other_props;
 extern service*                  service_list;
 extern service*                  service_list_tail;
-extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
-extern contact*                  contact_list;
-extern contact*                  contact_list_tail;
-extern contactgroup*             contactgroup_list;
-extern contactgroup*             contactgroup_list_tail;
 extern hostgroup*                hostgroup_list;
 extern hostgroup*                hostgroup_list_tail;
 extern servicegroup*             servicegroup_list;
@@ -121,8 +114,6 @@ extern hostdependency*           hostdependency_list_tail;
 extern skiplist*                 object_skiplists[];
 
 extern int                       __nagios_object_structure_version;
-
-extern notification*             notification_list;
 
 extern check_result              check_result_info;
 extern check_result*             check_result_list;
@@ -160,7 +151,6 @@ extern char* global_service_event_handler;
 extern char* ocsp_command;
 extern char* ochp_command;
 extern unsigned int use_syslog;
-extern unsigned int log_notifications;
 extern unsigned int log_service_retries;
 extern unsigned int log_event_handlers;
 extern unsigned int log_external_commands;
@@ -177,8 +167,6 @@ extern unsigned long retained_host_attribute_mask;
 /* retained_service_attribute_mask; */
 extern unsigned long retained_process_host_attribute_mask;
 /* retained_process_service_attribute_mask; */
-extern unsigned long retained_contact_service_attribute_mask;
-extern unsigned long retained_contact_host_attribute_mask;
 extern unsigned int obsess_over_services;
 extern unsigned int obsess_over_hosts;
 extern unsigned int translate_passive_host_checks;
@@ -186,7 +174,6 @@ extern unsigned int passive_host_checks_are_soft;
 extern unsigned int service_check_timeout;
 extern unsigned int host_check_timeout;
 extern unsigned int event_handler_timeout;
-extern unsigned int notification_timeout;
 extern unsigned int ocsp_timeout;
 extern unsigned int ochp_timeout;
 extern unsigned long cached_host_check_horizon;
@@ -195,7 +182,6 @@ extern unsigned long cached_service_check_horizon;
 extern unsigned int enable_predictive_service_dependency_checks;
 extern unsigned int soft_state_dependencies;
 extern unsigned int enable_event_handlers;
-extern unsigned int enable_notifications;
 extern unsigned int execute_service_checks;
 extern unsigned int accept_passive_service_checks;
 extern unsigned int execute_host_checks;

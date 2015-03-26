@@ -197,12 +197,6 @@ struct grab_service_redirection {
     // Duration in seconds.
     routines[MACRO_SERVICEDURATIONSEC].first = &get_duration_sec<service>;
     routines[MACRO_SERVICEDURATIONSEC].second = true;
-    // Notification number.
-    routines[MACRO_SERVICENOTIFICATIONNUMBER].first = &get_member_as_string<service, int, &service::current_notification_number>;
-    routines[MACRO_SERVICENOTIFICATIONNUMBER].second = true;
-    // Notification ID.
-    routines[MACRO_SERVICENOTIFICATIONID].first = &get_member_as_string<service, unsigned long, &service::current_notification_id>;
-    routines[MACRO_SERVICENOTIFICATIONID].second = true;
     // Event ID.
     routines[MACRO_SERVICEEVENTID].first = &get_member_as_string<service, unsigned long, &service::current_event_id>;
     routines[MACRO_SERVICEEVENTID].second = true;

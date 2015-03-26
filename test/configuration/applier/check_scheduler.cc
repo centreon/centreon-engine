@@ -46,10 +46,6 @@ struct         global {
                save_commands;
   umap<std::string, shared_ptr<commands::connector> >
                save_connectors;
-  umap<std::string, shared_ptr<contact> >
-               save_contacts;
-  umap<std::string, shared_ptr<contactgroup> >
-               save_contactgroups;
   umap<std::string, shared_ptr<host> >
                save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
@@ -71,8 +67,6 @@ struct         global {
  */
 static void clear(global& g) {
   command_list = NULL;
-  contact_list = NULL;
-  contactgroup_list = NULL;
   host_list = NULL;
   hostdependency_list = NULL;
   hostgroup_list = NULL;
@@ -87,10 +81,6 @@ static void clear(global& g) {
   app_state.commands().clear();
   g.save_connectors = app_state.connectors();
   app_state.connectors().clear();
-  g.save_contacts = app_state.contacts();
-  app_state.contacts().clear();
-  g.save_contactgroups = app_state.contactgroups();
-  app_state.contactgroups().clear();
   g.save_hosts = app_state.hosts();
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();

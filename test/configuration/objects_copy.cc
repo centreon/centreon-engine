@@ -18,8 +18,6 @@
 */
 
 #include "com/centreon/engine/configuration/command.hh"
-#include "com/centreon/engine/configuration/contact.hh"
-#include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
@@ -82,18 +80,6 @@ int main_test(int argc, char* argv[]) {
       configuration::command,
       configuration::set_command,
       &configuration::state::commands>(fe.path());
-  }
-  else if (type == "contactgroup") {
-    check_objects<
-      configuration::contactgroup,
-      configuration::set_contactgroup,
-      &configuration::state::contactgroups>(fe.path());
-  }
-  else if (type == "contact") {
-    check_objects<
-      configuration::contact,
-      configuration::set_contact,
-      &configuration::state::contacts>(fe.path());
   }
   else if (type == "hostdependency") {
     check_objects<

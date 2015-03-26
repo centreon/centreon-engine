@@ -21,7 +21,6 @@
 #  define CCE_RETENTION_STATE_HH
 
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/engine/retention/contact.hh"
 #  include "com/centreon/engine/retention/host.hh"
 #  include "com/centreon/engine/retention/info.hh"
 #  include "com/centreon/engine/retention/program.hh"
@@ -38,8 +37,6 @@ namespace                retention {
     state&               operator=(state const& right);
     bool                 operator==(state const& right) const throw ();
     bool                 operator!=(state const& right) const throw ();
-    list_contact&        contacts() throw ();
-    list_contact const&  contacts() const throw ();
     program&             globals() throw ();
     program const&       globals() const throw ();
     list_host&           hosts() throw ();
@@ -50,7 +47,6 @@ namespace                retention {
     list_service const&  services() const throw ();
 
   private:
-    list_contact         _contacts;
     list_host            _hosts;
     info                 _info;
     program              _globals;

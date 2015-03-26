@@ -77,14 +77,7 @@ int process_external_command1(char* cmd) {
   /**** PROCESS COMMANDS ****/
   /**************************/
 
-  if (!strcmp(command_id, "ENTER_STANDBY_MODE")
-      || !strcmp(command_id, "DISABLE_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_NOTIFICATIONS;
-  else if (!strcmp(command_id, "ENTER_ACTIVE_MODE")
-           || !strcmp(command_id, "ENABLE_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "SHUTDOWN_PROGRAM")
+  if (!strcmp(command_id, "SHUTDOWN_PROGRAM")
            || !strcmp(command_id, "SHUTDOWN_PROCESS"))
     command_type = CMD_SHUTDOWN_PROCESS;
   else if (!strcmp(command_id, "RESTART_PROGRAM")
@@ -158,29 +151,6 @@ int process_external_command1(char* cmd) {
   /**** HOST-RELATED COMMANDS ****/
   /*******************************/
 
-  else if (!strcmp(command_id, "DELAY_HOST_NOTIFICATION"))
-    command_type = CMD_DELAY_HOST_NOTIFICATION;
-
-  else if (!strcmp(command_id, "ENABLE_HOST_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_HOST_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_HOST_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_HOST_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST"))
-    command_type = CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST;
-  else if (!strcmp(command_id, "DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST"))
-    command_type = CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST;
-
-  else if (!strcmp(command_id, "ENABLE_HOST_AND_CHILD_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_HOST_AND_CHILD_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "ENABLE_HOST_SVC_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_HOST_SVC_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_HOST_SVC_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_HOST_SVC_NOTIFICATIONS;
-
   else if (!strcmp(command_id, "ENABLE_HOST_SVC_CHECKS"))
     command_type = CMD_ENABLE_HOST_SVC_CHECKS;
   else if (!strcmp(command_id, "DISABLE_HOST_SVC_CHECKS"))
@@ -234,20 +204,11 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "CHANGE_MAX_HOST_CHECK_ATTEMPTS"))
     command_type = CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS;
 
-  else if (!strcmp(command_id, "SET_HOST_NOTIFICATION_NUMBER"))
-    command_type = CMD_SET_HOST_NOTIFICATION_NUMBER;
-
   else if (!strcmp(command_id, "CHANGE_HOST_CHECK_TIMEPERIOD"))
     command_type = CMD_CHANGE_HOST_CHECK_TIMEPERIOD;
 
   else if (!strcmp(command_id, "CHANGE_CUSTOM_HOST_VAR"))
     command_type = CMD_CHANGE_CUSTOM_HOST_VAR;
-
-  else if (!strcmp(command_id, "SEND_CUSTOM_HOST_NOTIFICATION"))
-    command_type = CMD_SEND_CUSTOM_HOST_NOTIFICATION;
-
-  else if (!strcmp(command_id, "CHANGE_HOST_NOTIFICATION_TIMEPERIOD"))
-    command_type = CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD;
 
   else if (!strcmp(command_id, "CHANGE_HOST_MODATTR"))
     command_type = CMD_CHANGE_HOST_MODATTR;
@@ -255,16 +216,6 @@ int process_external_command1(char* cmd) {
   /************************************/
   /**** HOSTGROUP-RELATED COMMANDS ****/
   /************************************/
-
-  else if (!strcmp(command_id, "ENABLE_HOSTGROUP_HOST_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_HOSTGROUP_HOST_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "ENABLE_HOSTGROUP_SVC_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_HOSTGROUP_SVC_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS;
 
   else if (!strcmp(command_id, "ENABLE_HOSTGROUP_HOST_CHECKS"))
     command_type = CMD_ENABLE_HOSTGROUP_HOST_CHECKS;
@@ -305,13 +256,6 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "DISABLE_PASSIVE_SVC_CHECKS"))
     command_type = CMD_DISABLE_PASSIVE_SVC_CHECKS;
 
-  else if (!strcmp(command_id, "DELAY_SVC_NOTIFICATION"))
-    command_type = CMD_DELAY_SVC_NOTIFICATION;
-  else if (!strcmp(command_id, "ENABLE_SVC_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_SVC_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_SVC_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_SVC_NOTIFICATIONS;
-
   else if (!strcmp(command_id, "PROCESS_SERVICE_CHECK_RESULT"))
     command_type = CMD_PROCESS_SERVICE_CHECK_RESULT;
   else if (!strcmp(command_id, "PROCESS_HOST_CHECK_RESULT"))
@@ -345,23 +289,11 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "CHANGE_MAX_SVC_CHECK_ATTEMPTS"))
     command_type = CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS;
 
-  else if (!strcmp(command_id, "SET_SVC_NOTIFICATION_NUMBER"))
-    command_type = CMD_SET_SVC_NOTIFICATION_NUMBER;
-
   else if (!strcmp(command_id, "CHANGE_SVC_CHECK_TIMEPERIOD"))
     command_type = CMD_CHANGE_SVC_CHECK_TIMEPERIOD;
 
   else if (!strcmp(command_id, "CHANGE_CUSTOM_SVC_VAR"))
     command_type = CMD_CHANGE_CUSTOM_SVC_VAR;
-
-  else if (!strcmp(command_id, "CHANGE_CUSTOM_CONTACT_VAR"))
-    command_type = CMD_CHANGE_CUSTOM_CONTACT_VAR;
-
-  else if (!strcmp(command_id, "SEND_CUSTOM_SVC_NOTIFICATION"))
-    command_type = CMD_SEND_CUSTOM_SVC_NOTIFICATION;
-
-  else if (!strcmp(command_id, "CHANGE_SVC_NOTIFICATION_TIMEPERIOD"))
-    command_type = CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD;
 
   else if (!strcmp(command_id, "CHANGE_SVC_MODATTR"))
     command_type = CMD_CHANGE_SVC_MODATTR;
@@ -369,16 +301,6 @@ int process_external_command1(char* cmd) {
   /***************************************/
   /**** SERVICEGROUP-RELATED COMMANDS ****/
   /***************************************/
-
-  else if (!strcmp(command_id, "ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS;
 
   else if (!strcmp(command_id, "ENABLE_SERVICEGROUP_HOST_CHECKS"))
     command_type = CMD_ENABLE_SERVICEGROUP_HOST_CHECKS;
@@ -399,47 +321,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS;
   else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"))
     command_type = CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS;
-
-  /**********************************/
-  /**** CONTACT-RELATED COMMANDS ****/
-  /**********************************/
-
-  else if (!strcmp(command_id, "ENABLE_CONTACT_HOST_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_CONTACT_HOST_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "ENABLE_CONTACT_SVC_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_CONTACT_SVC_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD"))
-    command_type = CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD;
-
-  else if (!strcmp(command_id, "CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD"))
-    command_type = CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD;
-
-  else if (!strcmp(command_id, "CHANGE_CONTACT_MODATTR"))
-    command_type = CMD_CHANGE_CONTACT_MODATTR;
-  else if (!strcmp(command_id, "CHANGE_CONTACT_MODHATTR"))
-    command_type = CMD_CHANGE_CONTACT_MODHATTR;
-  else if (!strcmp(command_id, "CHANGE_CONTACT_MODSATTR"))
-    command_type = CMD_CHANGE_CONTACT_MODSATTR;
-
-  /***************************************/
-  /**** CONTACTGROUP-RELATED COMMANDS ****/
-  /***************************************/
-
-  else if (!strcmp(command_id, "ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS;
-
-  else if (!strcmp(command_id, "ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS"))
-    command_type = CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS;
-  else if (!strcmp(command_id, "DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS"))
-    command_type = CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS;
 
   /**************************/
   /****** MISC COMMANDS *****/
@@ -554,14 +435,6 @@ int process_external_command2(int cmd,
     }
     break;
 
-  case CMD_ENABLE_NOTIFICATIONS:
-    enable_all_notifications();
-    break;
-
-  case CMD_DISABLE_NOTIFICATIONS:
-    disable_all_notifications();
-    break;
-
   case CMD_START_EXECUTING_SVC_CHECKS:
     start_executing_service_checks();
     break;
@@ -652,22 +525,12 @@ int process_external_command2(int cmd,
   case CMD_DISABLE_PASSIVE_HOST_CHECKS:
   case CMD_ENABLE_HOST_SVC_CHECKS:
   case CMD_DISABLE_HOST_SVC_CHECKS:
-  case CMD_ENABLE_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_HOST_NOTIFICATIONS:
-  case CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST:
-  case CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST:
-  case CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS:
-  case CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS:
-  case CMD_ENABLE_HOST_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_HOST_SVC_NOTIFICATIONS:
   case CMD_ENABLE_HOST_FLAP_DETECTION:
   case CMD_DISABLE_HOST_FLAP_DETECTION:
   case CMD_ENABLE_HOST_EVENT_HANDLER:
   case CMD_DISABLE_HOST_EVENT_HANDLER:
   case CMD_START_OBSESSING_OVER_HOST:
   case CMD_STOP_OBSESSING_OVER_HOST:
-  case CMD_SET_HOST_NOTIFICATION_NUMBER:
-  case CMD_SEND_CUSTOM_HOST_NOTIFICATION:
     process_host_command(cmd, entry_time, args);
     break;
 
@@ -675,10 +538,6 @@ int process_external_command2(int cmd,
     /***** HOSTGROUP COMMANDS ****/
     /*****************************/
 
-  case CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS:
-  case CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS:
   case CMD_ENABLE_HOSTGROUP_HOST_CHECKS:
   case CMD_DISABLE_HOSTGROUP_HOST_CHECKS:
   case CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
@@ -698,16 +557,12 @@ int process_external_command2(int cmd,
   case CMD_DISABLE_SVC_CHECK:
   case CMD_ENABLE_PASSIVE_SVC_CHECKS:
   case CMD_DISABLE_PASSIVE_SVC_CHECKS:
-  case CMD_ENABLE_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_SVC_NOTIFICATIONS:
   case CMD_ENABLE_SVC_FLAP_DETECTION:
   case CMD_DISABLE_SVC_FLAP_DETECTION:
   case CMD_ENABLE_SVC_EVENT_HANDLER:
   case CMD_DISABLE_SVC_EVENT_HANDLER:
   case CMD_START_OBSESSING_OVER_SVC:
   case CMD_STOP_OBSESSING_OVER_SVC:
-  case CMD_SET_SVC_NOTIFICATION_NUMBER:
-  case CMD_SEND_CUSTOM_SVC_NOTIFICATION:
     process_service_command(cmd, entry_time, args);
     break;
 
@@ -715,10 +570,6 @@ int process_external_command2(int cmd,
     /***** SERVICEGROUP COMMANDS ****/
     /********************************/
 
-  case CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-  case CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
   case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
   case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
@@ -730,36 +581,9 @@ int process_external_command2(int cmd,
     process_servicegroup_command(cmd, entry_time, args);
     break;
 
-    /**********************************/
-    /**** CONTACT-RELATED COMMANDS ****/
-    /**********************************/
-
-  case CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS:
-  case CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS:
-    process_contact_command(cmd, entry_time, args);
-    break;
-
-    /***************************************/
-    /**** CONTACTGROUP-RELATED COMMANDS ****/
-    /***************************************/
-
-  case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-  case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-    process_contactgroup_command(cmd, entry_time, args);
-    break;
-
     /***************************/
     /**** UNSORTED COMMANDS ****/
     /***************************/
-
-  case CMD_DELAY_HOST_NOTIFICATION:
-  case CMD_DELAY_SVC_NOTIFICATION:
-    cmd_delay_notification(cmd, args);
-    break;
 
   case CMD_SCHEDULE_SVC_CHECK:
   case CMD_SCHEDULE_FORCED_SVC_CHECK:
@@ -792,10 +616,6 @@ int process_external_command2(int cmd,
   case CMD_CHANGE_SVC_CHECK_COMMAND:
   case CMD_CHANGE_HOST_CHECK_TIMEPERIOD:
   case CMD_CHANGE_SVC_CHECK_TIMEPERIOD:
-  case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
-  case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
-  case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
-  case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
     cmd_change_object_char_var(cmd, args);
     break;
 
@@ -807,15 +627,11 @@ int process_external_command2(int cmd,
   case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
   case CMD_CHANGE_HOST_MODATTR:
   case CMD_CHANGE_SVC_MODATTR:
-  case CMD_CHANGE_CONTACT_MODATTR:
-  case CMD_CHANGE_CONTACT_MODHATTR:
-  case CMD_CHANGE_CONTACT_MODSATTR:
     cmd_change_object_int_var(cmd, args);
     break;
 
   case CMD_CHANGE_CUSTOM_HOST_VAR:
   case CMD_CHANGE_CUSTOM_SVC_VAR:
-  case CMD_CHANGE_CUSTOM_CONTACT_VAR:
     cmd_change_object_custom_var(cmd, args);
     break;
 
@@ -872,14 +688,6 @@ int process_hostgroup_command(int cmd,
 
     switch (cmd) {
 
-    case CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS:
-      enable_host_notifications(temp_host);
-      break;
-
-    case CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS:
-      disable_host_notifications(temp_host);
-      break;
-
     case CMD_ENABLE_HOSTGROUP_HOST_CHECKS:
       enable_host_checks(temp_host);
       break;
@@ -906,14 +714,6 @@ int process_hostgroup_command(int cmd,
           continue;
 
         switch (cmd) {
-
-        case CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS:
-          enable_service_notifications(temp_service);
-          break;
-
-        case CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS:
-          disable_service_notifications(temp_service);
-          break;
 
         case CMD_ENABLE_HOSTGROUP_SVC_CHECKS:
           enable_service_checks(temp_service);
@@ -948,9 +748,6 @@ int process_host_command(int cmd,
   host* temp_host = NULL;
   service* temp_service = NULL;
   servicesmember* temp_servicesmember = NULL;
-  char* str = NULL;
-  char* buf[2] = { NULL, NULL };
-  int intval = 0;
 
   (void)entry_time;
 
@@ -963,44 +760,6 @@ int process_host_command(int cmd,
     return (ERROR);
 
   switch (cmd) {
-  case CMD_ENABLE_HOST_NOTIFICATIONS:
-    enable_host_notifications(temp_host);
-    break;
-
-  case CMD_DISABLE_HOST_NOTIFICATIONS:
-    disable_host_notifications(temp_host);
-    break;
-
-  case CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS:
-    enable_and_propagate_notifications(temp_host, 0, true, true, false);
-    break;
-
-  case CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS:
-    disable_and_propagate_notifications(temp_host, 0, true, true, false);
-    break;
-
-  case CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST:
-    enable_and_propagate_notifications(temp_host, 0, false, true, true);
-    break;
-
-  case CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST:
-    disable_and_propagate_notifications(temp_host, 0, false, true, true);
-    break;
-
-  case CMD_ENABLE_HOST_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_HOST_SVC_NOTIFICATIONS:
-    for (temp_servicesmember = temp_host->services;
-         temp_servicesmember != NULL;
-         temp_servicesmember = temp_servicesmember->next) {
-      if ((temp_service = temp_servicesmember->service_ptr) == NULL)
-        continue;
-      if (cmd == CMD_ENABLE_HOST_SVC_NOTIFICATIONS)
-        enable_service_notifications(temp_service);
-      else
-        disable_service_notifications(temp_service);
-    }
-    break;
-
   case CMD_ENABLE_HOST_SVC_CHECKS:
   case CMD_DISABLE_HOST_SVC_CHECKS:
     for (temp_servicesmember = temp_host->services;
@@ -1055,26 +814,6 @@ int process_host_command(int cmd,
     stop_obsessing_over_host(temp_host);
     break;
 
-  case CMD_SET_HOST_NOTIFICATION_NUMBER:
-    if ((str = my_strtok(NULL, ";"))) {
-      intval = atoi(str);
-      set_host_notification_number(temp_host, intval);
-    }
-    break;
-
-  case CMD_SEND_CUSTOM_HOST_NOTIFICATION:
-    if ((str = my_strtok(NULL, ";")))
-      intval = atoi(str);
-    str = my_strtok(NULL, ";");
-    if (str)
-      buf[0] = string::dup(str);
-    str = my_strtok(NULL, ";");
-    if (str)
-      buf[1] = string::dup(str);
-    if (buf[0] && buf[1])
-      host_notification(temp_host, NOTIFICATION_CUSTOM, buf[0], buf[1], intval);
-    break;
-
   default:
     break;
   }
@@ -1088,9 +827,6 @@ int process_service_command(int cmd,
   char* host_name = NULL;
   char* svc_description = NULL;
   service* temp_service = NULL;
-  char* str = NULL;
-  char* buf[2] = { NULL, NULL };
-  int intval = 0;
 
   (void)entry_time;
 
@@ -1107,14 +843,6 @@ int process_service_command(int cmd,
     return (ERROR);
 
   switch (cmd) {
-  case CMD_ENABLE_SVC_NOTIFICATIONS:
-    enable_service_notifications(temp_service);
-    break;
-
-  case CMD_DISABLE_SVC_NOTIFICATIONS:
-    disable_service_notifications(temp_service);
-    break;
-
   case CMD_ENABLE_SVC_CHECK:
     enable_service_checks(temp_service);
     break;
@@ -1155,30 +883,6 @@ int process_service_command(int cmd,
     stop_obsessing_over_service(temp_service);
     break;
 
-  case CMD_SET_SVC_NOTIFICATION_NUMBER:
-    if ((str = my_strtok(NULL, ";"))) {
-      intval = atoi(str);
-      set_service_notification_number(temp_service, intval);
-    }
-    break;
-
-  case CMD_SEND_CUSTOM_SVC_NOTIFICATION:
-    if ((str = my_strtok(NULL, ";")))
-      intval = atoi(str);
-    str = my_strtok(NULL, ";");
-    if (str)
-      buf[0] = string::dup(str);
-    str = my_strtok(NULL, ";");
-    if (str)
-      buf[1] = string::dup(str);
-    if (buf[0] && buf[1])
-      service_notification(temp_service,
-                           NOTIFICATION_CUSTOM,
-                           buf[0],
-                           buf[1],
-                           intval);
-    break;
-
   default:
     break;
   }
@@ -1208,8 +912,6 @@ int process_servicegroup_command(int cmd,
 
   switch (cmd) {
 
-  case CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
   case CMD_ENABLE_SERVICEGROUP_SVC_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_SVC_CHECKS:
   case CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
@@ -1225,14 +927,6 @@ int process_servicegroup_command(int cmd,
         continue;
 
       switch (cmd) {
-
-      case CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
-        enable_service_notifications(temp_service);
-        break;
-
-      case CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS:
-        disable_service_notifications(temp_service);
-        break;
 
       case CMD_ENABLE_SERVICEGROUP_SVC_CHECKS:
         enable_service_checks(temp_service);
@@ -1256,8 +950,6 @@ int process_servicegroup_command(int cmd,
     }
     break;
 
-  case CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
   case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
   case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
@@ -1275,14 +967,6 @@ int process_servicegroup_command(int cmd,
         continue;
 
       switch (cmd) {
-
-      case CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-        enable_host_notifications(temp_host);
-        break;
-
-      case CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS:
-        disable_host_notifications(temp_host);
-        break;
 
       case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
         enable_host_checks(temp_host);
@@ -1305,109 +989,6 @@ int process_servicegroup_command(int cmd,
       }
 
       last_host = temp_host;
-    }
-    break;
-
-  default:
-    break;
-  }
-  return (OK);
-}
-
-int process_contact_command(int cmd,
-                            time_t entry_time,
-                            char* args) {
-  char* contact_name = NULL;
-  contact* temp_contact = NULL;
-
-  (void)entry_time;
-
-  /* get the contact name */
-  if ((contact_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
-
-  /* find the contact */
-  if ((temp_contact = find_contact(contact_name)) == NULL)
-    return (ERROR);
-
-  switch (cmd) {
-
-  case CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS:
-    enable_contact_host_notifications(temp_contact);
-    break;
-
-  case CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS:
-    disable_contact_host_notifications(temp_contact);
-    break;
-
-  case CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS:
-    enable_contact_service_notifications(temp_contact);
-    break;
-
-  case CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS:
-    disable_contact_service_notifications(temp_contact);
-    break;
-
-  default:
-    break;
-  }
-  return (OK);
-}
-
-int process_contactgroup_command(int cmd,
-                                 time_t entry_time,
-                                 char* args) {
-  char* contactgroup_name = NULL;
-  contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_member = NULL;
-  contact* temp_contact = NULL;
-
-  (void)entry_time;
-
-  /* get the contactgroup name */
-  if ((contactgroup_name = my_strtok(args, ";")) == NULL)
-    return (ERROR);
-
-  /* find the contactgroup */
-  if ((temp_contactgroup = find_contactgroup(contactgroup_name)) == NULL)
-    return (ERROR);
-
-  switch (cmd) {
-
-  case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-  case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-  case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-  case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-
-    /* loop through all contactgroup members */
-    for (temp_member = temp_contactgroup->members;
-         temp_member != NULL;
-         temp_member = temp_member->next) {
-
-      if ((temp_contact = temp_member->contact_ptr) == NULL)
-        continue;
-
-      switch (cmd) {
-
-      case CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        enable_contact_host_notifications(temp_contact);
-        break;
-
-      case CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS:
-        disable_contact_host_notifications(temp_contact);
-        break;
-
-      case CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        enable_contact_service_notifications(temp_contact);
-        break;
-
-      case CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS:
-        disable_contact_service_notifications(temp_contact);
-        break;
-
-      default:
-        break;
-      }
     }
     break;
 

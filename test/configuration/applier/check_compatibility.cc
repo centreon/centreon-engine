@@ -43,8 +43,6 @@ using namespace com::centreon::engine;
 
 struct                global {
   command*            commands;
-  contact*            contacts;
-  contactgroup*       contactgroups;
   host*               hosts;
   hostdependency*     hostdependencies;
   hostgroup*          hostgroups;
@@ -57,10 +55,6 @@ struct                global {
                       save_commands;
   umap<std::string, shared_ptr<commands::connector> >
                       save_connectors;
-  umap<std::string, shared_ptr<contact> >
-                      save_contacts;
-  umap<std::string, shared_ptr<contactgroup> >
-                      save_contactgroups;
   umap<std::string, shared_ptr<host> >
                       save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
@@ -96,7 +90,6 @@ struct                global {
   unsigned int        debug_verbosity;
   bool                enable_event_handlers;
   bool                enable_flap_detection;
-  bool                enable_notifications;
   bool                enable_predictive_host_dependency_checks;
   bool                enable_predictive_service_dependency_checks;
   unsigned long       event_broker_options;
@@ -119,7 +112,6 @@ struct                global {
   //  std::string         log_file;
   bool                log_host_retries;
   bool                log_initial_states;
-  bool                log_notifications;
   bool                log_passive_checks;
   bool                log_service_retries;
   float               low_host_flap_threshold;
@@ -130,7 +122,6 @@ struct                global {
   unsigned int        max_host_check_spread;
   unsigned int        max_parallel_service_checks;
   unsigned int        max_service_check_spread;
-  unsigned int        notification_timeout;
   bool                obsess_over_hosts;
   bool                obsess_over_services;
   std::string         ochp_command;
@@ -138,8 +129,6 @@ struct                global {
   std::string         ocsp_command;
   unsigned int        ocsp_timeout;
   bool                passive_host_checks_are_soft;
-  unsigned long       retained_contact_host_attribute_mask;
-  unsigned long       retained_contact_service_attribute_mask;
   unsigned long       retained_host_attribute_mask;
   unsigned long       retained_process_host_attribute_mask;
   bool                retain_state_information;
@@ -292,7 +281,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(debug_verbosity);
   check_value(enable_event_handlers);
   check_value(enable_flap_detection);
-  check_value(enable_notifications);
   check_value(enable_predictive_host_dependency_checks);
   check_value(enable_predictive_service_dependency_checks);
   check_value(event_broker_options);
@@ -315,7 +303,6 @@ bool chkdiff(global& g1, global& g2) {
   // check_value(log_file);
   check_value(log_host_retries);
   check_value(log_initial_states);
-  check_value(log_notifications);
   check_value(log_passive_checks);
   check_value(log_service_retries);
   check_value(low_host_flap_threshold);
@@ -326,7 +313,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(max_host_check_spread);
   check_value(max_parallel_service_checks);
   check_value(max_service_check_spread);
-  check_value(notification_timeout);
   check_value(obsess_over_hosts);
   check_value(obsess_over_services);
   check_value(ochp_command);
@@ -334,8 +320,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(ocsp_command);
   check_value(ocsp_timeout);
   check_value(passive_host_checks_are_soft);
-  check_value(retained_contact_host_attribute_mask);
-  check_value(retained_contact_service_attribute_mask);
   check_value(retained_host_attribute_mask);
   check_value(retained_process_host_attribute_mask);
   check_value(retain_state_information);
@@ -356,18 +340,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(use_timezone);
 
   if (!chkdiff(g1.commands, g2.commands))
-    ret = false;
-  if (!chkdiff(g1.contacts, g2.contacts))
-    ret = false;
-  for (contactgroup_struct* cg1(g1.contactgroups);
-       cg1;
-       cg1 = cg1->next)
-    sort_it(cg1->members);
-  for (contactgroup_struct* cg2(g2.contactgroups);
-       cg2;
-       cg2 = cg2->next)
-    sort_it(cg2->members);
-  if (!chkdiff(g1.contactgroups, g2.contactgroups))
     ret = false;
   reset_next_check(g1.hosts);
   reset_next_check(g2.hosts);
@@ -417,10 +389,6 @@ static global get_globals() {
   global g;
   g.commands = command_list;
   command_list = NULL;
-  g.contacts = contact_list;
-  contact_list = NULL;
-  g.contactgroups = contactgroup_list;
-  contactgroup_list = NULL;
   g.hosts = host_list;
   host_list = NULL;
   g.hostdependencies = hostdependency_list;
@@ -442,10 +410,6 @@ static global get_globals() {
   app_state.commands().clear();
   g.save_connectors = app_state.connectors();
   app_state.connectors().clear();
-  g.save_contacts = app_state.contacts();
-  app_state.contacts().clear();
-  g.save_contactgroups = app_state.contactgroups();
-  app_state.contactgroups().clear();
   g.save_hosts = app_state.hosts();
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();
@@ -481,7 +445,6 @@ static global get_globals() {
   g.debug_verbosity = debug_verbosity;
   g.enable_event_handlers = enable_event_handlers;
   g.enable_flap_detection = enable_flap_detection;
-  g.enable_notifications = enable_notifications;
   g.enable_predictive_host_dependency_checks = enable_predictive_host_dependency_checks;
   g.enable_predictive_service_dependency_checks = enable_predictive_service_dependency_checks;
   g.event_broker_options = event_broker_options;
@@ -504,7 +467,6 @@ static global get_globals() {
   // g.log_file = to_str(log_file);
   g.log_host_retries = log_host_retries;
   g.log_initial_states = log_initial_states;
-  g.log_notifications = log_notifications;
   g.log_passive_checks = log_passive_checks;
   g.log_service_retries = log_service_retries;
   g.low_host_flap_threshold = low_host_flap_threshold;
@@ -515,7 +477,6 @@ static global get_globals() {
   g.max_host_check_spread = max_host_check_spread;
   g.max_parallel_service_checks = max_parallel_service_checks;
   g.max_service_check_spread = max_service_check_spread;
-  g.notification_timeout = notification_timeout;
   g.obsess_over_hosts = obsess_over_hosts;
   g.obsess_over_services = obsess_over_services;
   g.ochp_command = to_str(ochp_command);
@@ -523,8 +484,6 @@ static global get_globals() {
   g.ocsp_command = to_str(ocsp_command);
   g.ocsp_timeout = ocsp_timeout;
   g.passive_host_checks_are_soft = passive_host_checks_are_soft;
-  g.retained_contact_host_attribute_mask = retained_contact_host_attribute_mask;
-  g.retained_contact_service_attribute_mask = retained_contact_service_attribute_mask;
   g.retained_host_attribute_mask = retained_host_attribute_mask;
   g.retained_process_host_attribute_mask = retained_process_host_attribute_mask;
   g.retain_state_information = retain_state_information;
@@ -544,21 +503,6 @@ static global get_globals() {
   g.use_syslog = use_syslog;
   g.use_timezone = to_str(use_timezone);
   return (g);
-}
-
-/**
- *  Check for contact member.
- *
- *  @param[in] lst The object list to check.
- *  @param[in] obj The object to check.
- */
-static bool member_is_already_in_list(
-              contactsmember const* lst,
-              contactsmember const* obj) {
-  for (contactsmember const* m(lst); m && m != obj; m = m->next)
-    if (!strcmp(m->contact_name, obj->contact_name))
-      return (true);
-  return (false);
 }
 
 /**
@@ -713,9 +657,6 @@ static bool oldparser_read_config(
   if (!illegal_output_chars)
     illegal_output_chars = string::dup("`~$&|'\"<>");
   if (ret == OK) {
-    remove_duplicate_members_for_object(
-      contactgroup_list,
-      &deleter::contactsmember);
     remove_duplicate_members_for_object(
       hostgroup_list,
       &deleter::hostsmember);

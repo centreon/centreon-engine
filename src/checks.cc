@@ -38,7 +38,6 @@
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -529,17 +528,6 @@ int handle_async_service_check_result(
 
     /* reschedule the service check */
     reschedule_check = true;
-
-    /* reset notification times */
-    temp_service->last_notification = (time_t)0;
-    temp_service->next_notification = (time_t)0;
-
-    /* reset notification suppression option */
-    temp_service->no_more_notifications = false;
-
-    /* do NOT reset current notification number!!! */
-    /* hard changes between non-OK states should continue to be escalated, so don't reset current notification number */
-    /*temp_service->current_notification_number=0; */
   }
 
   /* initialize the last host and service state change times if necessary */
@@ -642,17 +630,9 @@ int handle_async_service_check_result(
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
-      check_for_service_flapping(temp_service, true, true);
-      check_for_host_flapping(temp_host, true, false, true);
+      check_for_service_flapping(temp_service, true);
+      check_for_host_flapping(temp_host, true, false);
       flapping_check_done = true;
-
-      /* notify contacts about the service recovery */
-      service_notification(
-        temp_service,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event(temp_service);
@@ -688,18 +668,6 @@ int handle_async_service_check_result(
     temp_service->current_attempt = 1;
     temp_service->state_type = HARD_STATE;
     temp_service->last_hard_state = STATE_OK;
-    temp_service->last_notification = (time_t)0;
-    temp_service->next_notification = (time_t)0;
-    temp_service->current_notification_number = 0;
-    temp_service->notified_on_unknown = false;
-    temp_service->notified_on_warning = false;
-    temp_service->notified_on_critical = false;
-    temp_service->no_more_notifications = false;
-    service_other_props[
-      std::make_pair(
-             std::string(temp_service->host_ptr->name),
-             std::string(temp_service->description))].initial_notif_time
-      = 0;
 
     if (reschedule_check == true)
       next_service_check
@@ -791,8 +759,7 @@ int handle_async_service_check_result(
           NULL);
       }
 
-      // Else fake the host check, but (possibly) resend host
-      // notifications to contacts...
+      // Else fake the host check.
       else {
         logger(dbg_checks, more)
           << "Assuming host is in same state as before...";
@@ -807,14 +774,6 @@ int handle_async_service_check_result(
 
         // Fake the route check result.
         route_result = temp_host->current_state;
-
-        // Possibly re-send host notifications...
-        host_notification(
-          temp_host,
-          NOTIFICATION_NORMAL,
-          NULL,
-          NULL,
-          NOTIFICATION_OPTION_NONE);
       }
     }
 
@@ -970,17 +929,9 @@ int handle_async_service_check_result(
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
-      check_for_service_flapping(temp_service, true, true);
-      check_for_host_flapping(temp_host, true, false, true);
+      check_for_service_flapping(temp_service, true);
+      check_for_host_flapping(temp_host, true, false);
       flapping_check_done = true;
-
-      /* (re)send notifications out about this service problem if the host is up (and was at last check also) and the dependencies were okay... */
-      service_notification(
-        temp_service,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler if we changed state from the last hard state or if this service is flagged as being volatile */
       if (hard_state_change == true
@@ -1103,8 +1054,8 @@ int handle_async_service_check_result(
 
   /* check to see if the service and/or associate host is flapping */
   if (flapping_check_done == false) {
-    check_for_service_flapping(temp_service, true, true);
-    check_for_host_flapping(temp_host, true, false, true);
+    check_for_service_flapping(temp_service, true);
+    check_for_host_flapping(temp_host, true, false);
   }
 
   /* free allocated memory */
@@ -3001,7 +2952,7 @@ int process_host_check_result_3x(
   }
 
   /* check to see if the associated host is flapping */
-  check_for_host_flapping(hst, true, true, true);
+  check_for_host_flapping(hst, true, true);
 
   /* reschedule the next check of the host (usually ONLY for scheduled, active checks, unless overridden above) */
   if (reschedule_check == true) {

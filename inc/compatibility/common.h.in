@@ -34,8 +34,6 @@
 /* Host config file reading options. */
 #  define READ_HOSTS                (1 << 0)
 #  define READ_HOSTGROUPS           (1 << 1)
-#  define READ_CONTACTS             (1 << 2)
-#  define READ_CONTACTGROUPS        (1 << 3)
 #  define READ_SERVICES             (1 << 4)
 #  define READ_COMMANDS             (1 << 5)
 #  define READ_TIMEPERIODS          (1 << 6)

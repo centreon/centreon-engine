@@ -31,15 +31,12 @@ service::setters const service::_setters[] = {
   { "active_checks_enabled",                SETTER(bool, _set_active_checks_enabled) },
   { "check_command",                        SETTER(std::string const&, _set_check_command) },
   { "check_execution_time",                 SETTER(double, _set_check_execution_time) },
-  { "check_flapping_recovery_notification", SETTER(int, _set_check_flapping_recovery_notification) },
   { "check_latency",                        SETTER(double, _set_check_latency) },
   { "check_options",                        SETTER(int, _set_check_options) },
   { "check_period",                         SETTER(std::string const&, _set_check_period) },
   { "check_type",                           SETTER(int, _set_check_type) },
   { "current_attempt",                      SETTER(int, _set_current_attempt) },
   { "current_event_id",                     SETTER(unsigned long, _set_current_event_id) },
-  { "current_notification_id",              SETTER(unsigned long, _set_current_notification_id) },
-  { "current_notification_number",          SETTER(int, _set_current_notification_number) },
   { "current_problem_id",                   SETTER(unsigned long, _set_current_problem_id) },
   { "current_state",                        SETTER(int, _set_current_state) },
   { "event_handler",                        SETTER(std::string const&, _set_event_handler) },
@@ -52,7 +49,6 @@ service::setters const service::_setters[] = {
   { "last_event_id",                        SETTER(unsigned long, _set_last_event_id) },
   { "last_hard_state",                      SETTER(time_t, _set_last_hard_state) },
   { "last_hard_state_change",               SETTER(time_t, _set_last_hard_state_change) },
-  { "last_notification",                    SETTER(time_t, _set_last_notification) },
   { "last_problem_id",                      SETTER(unsigned long, _set_last_problem_id) },
   { "last_state",                           SETTER(time_t, _set_last_state) },
   { "last_state_change",                    SETTER(time_t, _set_last_state_change) },
@@ -65,11 +61,6 @@ service::setters const service::_setters[] = {
   { "modified_attributes",                  SETTER(unsigned long, _set_modified_attributes) },
   { "next_check",                           SETTER(time_t, _set_next_check) },
   { "normal_check_interval",                SETTER(unsigned int, _set_normal_check_interval) },
-  { "notification_period",                  SETTER(std::string const&, _set_notification_period) },
-  { "notifications_enabled",                SETTER(bool, _set_notifications_enabled) },
-  { "notified_on_critical",                 SETTER(bool, _set_notified_on_critical) },
-  { "notified_on_unknown",                  SETTER(bool, _set_notified_on_unknown) },
-  { "notified_on_warning",                  SETTER(bool, _set_notified_on_warning) },
   { "obsess_over_service",                  SETTER(int, _set_obsess_over_service) },
   { "passive_checks_enabled",               SETTER(bool, _set_passive_checks_enabled) },
   { "percent_state_change",                 SETTER(double, _set_percent_state_change) },
@@ -82,7 +73,16 @@ service::setters const service::_setters[] = {
 
   // Deprecated.
   { "acknowledgement_type",                 SETTER(int, _set_acknowledgement_type) },
+  { "check_flapping_recovery_notification", SETTER(int, _set_check_flapping_recovery_notification) },
+  { "current_notification_id",              SETTER(unsigned long, _set_current_notification_id) },
+  { "current_notification_number",          SETTER(int, _set_current_notification_number) },
   { "failure_prediction_enabled",           SETTER(bool, _set_failure_prediction_enabled) },
+  { "last_notification",                    SETTER(time_t, _set_last_notification) },
+  { "notification_period",                  SETTER(std::string const&, _set_notification_period) },
+  { "notifications_enabled",                SETTER(bool, _set_notifications_enabled) },
+  { "notified_on_critical",                 SETTER(bool, _set_notified_on_critical) },
+  { "notified_on_unknown",                  SETTER(bool, _set_notified_on_unknown) },
+  { "notified_on_warning",                  SETTER(bool, _set_notified_on_warning) },
   { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
@@ -119,15 +119,12 @@ service& service::operator=(service const& right) {
     _active_checks_enabled = right._active_checks_enabled;
     _check_command = right._check_command;
     _check_execution_time = right._check_execution_time;
-    _check_flapping_recovery_notification = right._check_flapping_recovery_notification;
     _check_latency = right._check_latency;
     _check_options = right._check_options;
     _check_period = right._check_period;
     _check_type = right._check_type;
     _current_attempt = right._current_attempt;
     _current_event_id = right._current_event_id;
-    _current_notification_id = right._current_notification_id;
-    _current_notification_number = right._current_notification_number;
     _current_problem_id = right._current_problem_id;
     _current_state = right._current_state;
     _customvariables = right._customvariables;
@@ -141,7 +138,6 @@ service& service::operator=(service const& right) {
     _last_event_id = right._last_event_id;
     _last_hard_state = right._last_hard_state;
     _last_hard_state_change = right._last_hard_state_change;
-    _last_notification = right._last_notification;
     _last_problem_id = right._last_problem_id;
     _last_state = right._last_state;
     _last_state_change = right._last_state_change;
@@ -155,11 +151,6 @@ service& service::operator=(service const& right) {
     _next_check = right._next_check;
     _next_setter = right._next_setter;
     _normal_check_interval = right._normal_check_interval;
-    _notification_period = right._notification_period;
-    _notifications_enabled = right._notifications_enabled;
-    _notified_on_critical = right._notified_on_critical;
-    _notified_on_unknown = right._notified_on_unknown;
-    _notified_on_warning = right._notified_on_warning;
     _obsess_over_service = right._obsess_over_service;
     _passive_checks_enabled = right._passive_checks_enabled;
     _percent_state_change = right._percent_state_change;
@@ -185,15 +176,12 @@ bool service::operator==(service const& right) const throw () {
           && _active_checks_enabled == right._active_checks_enabled
           && _check_command == right._check_command
           && _check_execution_time == right._check_execution_time
-          && _check_flapping_recovery_notification == right._check_flapping_recovery_notification
           && _check_latency == right._check_latency
           && _check_options == right._check_options
           && _check_period == right._check_period
           && _check_type == right._check_type
           && _current_attempt == right._current_attempt
           && _current_event_id == right._current_event_id
-          && _current_notification_id == right._current_notification_id
-          && _current_notification_number == right._current_notification_number
           && _current_problem_id == right._current_problem_id
           && _current_state == right._current_state
           && std::operator==(_customvariables, right._customvariables)
@@ -207,7 +195,6 @@ bool service::operator==(service const& right) const throw () {
           && _last_event_id == right._last_event_id
           && _last_hard_state == right._last_hard_state
           && _last_hard_state_change == right._last_hard_state_change
-          && _last_notification == right._last_notification
           && _last_problem_id == right._last_problem_id
           && _last_state == right._last_state
           && _last_state_change == right._last_state_change
@@ -220,11 +207,6 @@ bool service::operator==(service const& right) const throw () {
           && _modified_attributes == right._modified_attributes
           && _next_check == right._next_check
           && _normal_check_interval == right._normal_check_interval
-          && _notification_period == right._notification_period
-          && _notifications_enabled == right._notifications_enabled
-          && _notified_on_critical == right._notified_on_critical
-          && _notified_on_unknown == right._notified_on_unknown
-          && _notified_on_warning == right._notified_on_warning
           && _obsess_over_service == right._obsess_over_service
           && _passive_checks_enabled == right._passive_checks_enabled
           && _percent_state_change == right._percent_state_change
@@ -318,15 +300,6 @@ opt<double> const& service::check_execution_time() const throw () {
 }
 
 /**
- *  Get check_flapping_recovery_notification.
- *
- *  @return The check_flapping_recovery_notification.
- */
-opt<int> const& service::check_flapping_recovery_notification() const throw () {
-  return (_check_flapping_recovery_notification);
-}
-
-/**
  *  Get check_latency.
  *
  *  @return The check_latency.
@@ -378,24 +351,6 @@ opt<int> const& service::current_attempt() const throw () {
  */
 opt<unsigned long> const& service::current_event_id() const throw () {
   return (_current_event_id);
-}
-
-/**
- *  Get current_notification_id.
- *
- *  @return The current_notification_id.
- */
-opt<unsigned long> const& service::current_notification_id() const throw () {
-  return (_current_notification_id);
-}
-
-/**
- *  Get current_notification_number.
- *
- *  @return The current_notification_number.
- */
-opt<int> const& service::current_notification_number() const throw () {
-  return (_current_notification_number);
 }
 
 /**
@@ -516,15 +471,6 @@ opt<time_t> const& service::last_hard_state_change() const throw () {
 }
 
 /**
- *  Get last_notification.
- *
- *  @return The last_notification.
- */
-opt<time_t> const& service::last_notification() const throw () {
-  return (_last_notification);
-}
-
-/**
  *  Get last_problem_id.
  *
  *  @return The last_problem_id.
@@ -630,51 +576,6 @@ opt<time_t> const& service::next_check() const throw () {
  */
 opt<unsigned int> const& service::normal_check_interval() const throw () {
   return (_normal_check_interval);
-}
-
-/**
- *  Get notification_period.
- *
- *  @return The notification_period.
- */
-opt<std::string> const& service::notification_period() const throw () {
-  return (_notification_period);
-}
-
-/**
- *  Get notifications_enabled.
- *
- *  @return The notifications_enabled.
- */
-opt<bool> const& service::notifications_enabled() const throw () {
-  return (_notifications_enabled);
-}
-
-/**
- *  Get notified_on_critical.
- *
- *  @return The notified_on_critical.
- */
-opt<bool> const& service::notified_on_critical() const throw () {
-  return (_notified_on_critical);
-}
-
-/**
- *  Get notified_on_unknown.
- *
- *  @return The notified_on_unknown.
- */
-opt<bool> const& service::notified_on_unknown() const throw () {
-  return (_notified_on_unknown);
-}
-
-/**
- *  Get notified_on_warning.
- *
- *  @return The notified_on_warning.
- */
-opt<bool> const& service::notified_on_warning() const throw () {
-  return (_notified_on_warning);
 }
 
 /**
@@ -801,12 +702,14 @@ bool service::_set_check_execution_time(double value) {
 }
 
 /**
- *  Set check_flapping_recovery_notification.
+ *  Deprecated variable.
  *
- *  @param[in] value The new check_flapping_recovery_notification.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_check_flapping_recovery_notification(int value) {
-  _check_flapping_recovery_notification = value;
+  (void)value;
   return (true);
 }
 
@@ -871,22 +774,26 @@ bool service::_set_current_event_id(unsigned long value) {
 }
 
 /**
- *  Set current_notification_id.
+ *  Deprecated variable.
  *
- *  @param[in] value The new current_notification_id.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_current_notification_id(unsigned long value) {
-  _current_notification_id = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set current_notification_number.
+ *  Deprecated variable.
  *
- *  @param[in] value The new current_notification_number.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_current_notification_number(int value) {
-  _current_notification_number = value;
+  (void)value;
   return (true);
 }
 
@@ -1021,12 +928,14 @@ bool service::_set_last_hard_state_change(time_t value) {
 }
 
 /**
- *  Set last_notification.
+ *  Deprecated variable.
  *
- *  @param[in] value The new last_notification.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_last_notification(time_t value) {
-  _last_notification = value;
+  (void)value;
   return (true);
 }
 
@@ -1154,52 +1063,62 @@ bool service::_set_normal_check_interval(unsigned int value) {
 }
 
 /**
- *  Set notification_period.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notification_period.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_notification_period(std::string const& value) {
-  _notification_period = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set notifications_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notifications_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_notifications_enabled(bool value) {
-  _notifications_enabled = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set notified_on_critical.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notified_on_critical.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_notified_on_critical(bool value) {
-  _notified_on_critical = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set notified_on_unknown.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notified_on_unknown.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_notified_on_unknown(bool value) {
-  _notified_on_unknown = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set notified_on_warning.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notified_on_warning.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_notified_on_warning(bool value) {
-  _notified_on_warning = value;
+  (void)value;
   return (true);
 }
 

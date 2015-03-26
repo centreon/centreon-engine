@@ -39,7 +39,6 @@
 
 #  define NSLOG_PROCESS_INFO         64
 #  define NSLOG_EVENT_HANDLER        128
-// #  define NSLOG_NOTIFICATION       256 //NOT USED ANYMORE - CAN BE REUSED
 #  define NSLOG_EXTERNAL_COMMAND     512
 
 #  define NSLOG_HOST_UP              1024
@@ -55,9 +54,6 @@
 
 #  define NSLOG_INFO_MESSAGE         262144
 
-#  define NSLOG_HOST_NOTIFICATION    524288
-#  define NSLOG_SERVICE_NOTIFICATION 1048576
-
 // Debugging Levels
 #  define DEBUGL_ALL                 (unsigned int)-1
 #  define DEBUGL_NONE                0
@@ -71,7 +67,6 @@
 #  define DEBUGL_IPC                 16
 #  define DEBUGL_FLAPPING            16
 #  define DEBUGL_EVENTHANDLERS       16
-#  define DEBUGL_NOTIFICATIONS       32
 #  define DEBUGL_EVENTBROKER         64
 #  define DEBUGL_EXTERNALCOMMANDS    128
 #  define DEBUGL_COMMANDS            256

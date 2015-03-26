@@ -51,10 +51,6 @@ void applier::program::apply(
   }
 
   if (config.use_retained_program_state()) {
-    if (obj.enable_notifications().is_set()
-        && (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED))
-      enable_notifications = *obj.enable_notifications();
-
     if (obj.active_service_checks_enabled().is_set()
         && (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
       execute_service_checks = *obj.active_service_checks_enabled();
@@ -110,9 +106,6 @@ void applier::program::apply(
 
     if (obj.next_problem_id().is_set())
       next_problem_id = *obj.next_problem_id();
-
-    if (obj.next_notification_id().is_set())
-      next_notification_id = *obj.next_notification_id();
   }
 
   if (!config.use_retained_program_state()) {

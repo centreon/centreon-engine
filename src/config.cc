@@ -26,7 +26,6 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/string.hh"
 
 using namespace com::centreon::engine;
@@ -278,30 +277,6 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config == true)
     logger(log_info_message, basic)
       << "\tChecked " << total_objects << " service groups.";
-
-  // Check all contacts...
-  if (verify_config == true)
-    logger(log_info_message, basic) << "Checking contacts...";
-  total_objects = 0;
-  for (contact* temp_contact(contact_list);
-       temp_contact;
-       temp_contact = temp_contact->next, ++total_objects)
-    check_contact(temp_contact, &warnings, &errors);
-  if (verify_config == true)
-    logger(log_info_message, basic)
-      << "\tChecked " << total_objects << " contacts.";
-
-  // Check each contact group...
-  if (verify_config == true)
-    logger(log_info_message, basic) << "Checking contact groups...";
-  total_objects = 0;
-  for (contactgroup* temp_contactgroup(contactgroup_list);
-       temp_contactgroup;
-       temp_contactgroup = temp_contactgroup->next, ++total_objects)
-    check_contactgroup(temp_contactgroup, &warnings, &errors);
-  if (verify_config == true)
-    logger(log_info_message, basic)
-      << "\tChecked " << total_objects << " contact groups.";
 
   // Check all service dependencies...
   if (verify_config == true)
@@ -617,66 +592,6 @@ int check_service(service* svc, int* w, int* e) {
   /* save the pointer to the check command for later */
   svc->check_command_ptr = temp_command;
 
-  /* check for sane recovery options */
-  if (svc->notify_on_recovery == true
-      && svc->notify_on_warning == false
-      && svc->notify_on_critical == false) {
-    logger(log_verification_error, basic)
-      << "Warning: Recovery notification option in service '"
-      << svc->description << "' for host '" << svc->host_name
-      << "' doesn't make any sense - specify warning and/or critical "
-      "options as well";
-    warnings++;
-  }
-
-  /* check for valid contacts */
-  for (contactsmember* temp_contactsmember = svc->contacts;
-       temp_contactsmember != NULL;
-       temp_contactsmember = temp_contactsmember->next) {
-
-    contact* temp_contact = find_contact(temp_contactsmember->contact_name);
-
-    if (temp_contact == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in service '" << svc->description << "' for "
-        "host '" << svc->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the contact pointer for later */
-    temp_contactsmember->contact_ptr = temp_contact;
-  }
-
-  /* check all contact groupss */
-  for (contactgroupsmember* temp_contactgroupsmember = svc->contact_groups;
-       temp_contactgroupsmember != NULL;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-    contactgroup* temp_contactgroup
-      = find_contactgroup(temp_contactgroupsmember->group_name);
-
-    if (temp_contactgroup == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Contact group '" << temp_contactgroupsmember->group_name
-        << "' specified in service '" << svc->description << "' for "
-        "host '" << svc->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the contact group pointer for later */
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
-  }
-
-  /* check to see if there is at least one contact/group */
-  if (svc->contacts == NULL && svc->contact_groups == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "' has no default contacts or "
-      "contactgroups defined!";
-    warnings++;
-  }
-
   /* verify service check timeperiod */
   if (svc->check_period == NULL) {
     logger(log_verification_error, basic)
@@ -697,42 +612,6 @@ int check_service(service* svc, int* w, int* e) {
 
     /* save the pointer to the check timeperiod for later */
     svc->check_period_ptr = temp_timeperiod;
-  }
-
-  /* check service notification timeperiod */
-  if (svc->notification_period == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host "
-      "'" << svc->host_name << "' has no notification time period "
-      "defined!";
-    warnings++;
-  }
-
-  else {
-    timeperiod* temp_timeperiod
-      = find_timeperiod(svc->notification_period);
-    if (temp_timeperiod == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Notification period '" << svc->notification_period
-        << "' specified for service '" << svc->description << "' on "
-        "host '" << svc->host_name << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the pointer to the notification timeperiod for later */
-    svc->notification_period_ptr = temp_timeperiod;
-  }
-
-  /* see if the notification interval is less than the check interval */
-  if (svc->notification_interval < svc->check_interval
-      && svc->notification_interval != 0) {
-    logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "'  has a notification interval less than "
-      "its check interval!  Notifications are only re-sent after "
-      "checks are made, so the effective notification interval will "
-      "be that of the check interval.";
-    warnings++;
   }
 
   /* check for illegal characters in service description */
@@ -820,70 +699,6 @@ int check_host(host* hst, int* w, int* e) {
     hst->check_period_ptr = temp_timeperiod;
   }
 
-  /* check all contacts */
-  for (contactsmember* temp_contactsmember = hst->contacts;
-       temp_contactsmember != NULL;
-       temp_contactsmember = temp_contactsmember->next) {
-
-    contact* temp_contact
-      = find_contact(temp_contactsmember->contact_name);
-
-    if (temp_contact == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in host '" << hst->name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the contact pointer for later */
-    temp_contactsmember->contact_ptr = temp_contact;
-  }
-
-  /* check all contact groups */
-  for (contactgroupsmember* temp_contactgroupsmember = hst->contact_groups;
-       temp_contactgroupsmember != NULL;
-       temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-    contactgroup* temp_contactgroup
-      = find_contactgroup(temp_contactgroupsmember->group_name);
-
-    if (temp_contactgroup == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Contact group '"
-        << temp_contactgroupsmember->group_name
-        << "' specified in host '" << hst->name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the contact group pointer for later */
-    temp_contactgroupsmember->group_ptr = temp_contactgroup;
-  }
-
-  /* check to see if there is at least one contact/group */
-  if (hst->contacts == NULL && hst->contact_groups == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Host '" << hst->name << "' has no default contacts "
-      "or contactgroups defined!";
-    warnings++;
-  }
-
-  /* check notification timeperiod */
-  if (hst->notification_period != NULL) {
-    timeperiod* temp_timeperiod = find_timeperiod(hst->notification_period);
-    if (temp_timeperiod == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Notification period '" << hst->notification_period
-        << "' specified for host '" << hst->name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the pointer to the notification timeperiod for later */
-    hst->notification_period_ptr = temp_timeperiod;
-  }
-
   /* check all parent parent host */
   for (hostsmember* temp_hostsmember = hst->parent_hosts;
        temp_hostsmember != NULL;
@@ -904,179 +719,11 @@ int check_host(host* hst, int* w, int* e) {
     add_child_link_to_host(hst2, hst);
   }
 
-  /* check for sane recovery options */
-  if (hst->notify_on_recovery == true
-      && hst->notify_on_down == false
-      && hst->notify_on_unreachable == false) {
-    logger(log_verification_error, basic)
-      << "Warning: Recovery notification option in host '" << hst->name
-      << "' definition doesn't make any sense - specify down and/or "
-      "unreachable options as well";
-    warnings++;
-  }
-
   /* check for illegal characters in host name */
   if (use_precached_objects == false) {
     if (contains_illegal_object_chars(hst->name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of host '" << hst->name
-        << "' contains one or more illegal characters.";
-      errors++;
-    }
-  }
-
-  if (w != NULL)
-    *w += warnings;
-  if (e != NULL)
-    *e += errors;
-  return (errors == 0);
-}
-
-int check_contact(contact* cntct, int* w, int* e) {
-  int warnings(0);
-  int errors(0);
-
-  /* check service notification commands */
-  if (cntct->service_notification_commands == NULL) {
-    logger(log_verification_error, basic)
-      << "Error: Contact '" << cntct->name << "' has no service "
-      "notification commands defined!";
-    errors++;
-  }
-  else
-    for (commandsmember* temp_commandsmember = cntct->service_notification_commands;
-	 temp_commandsmember != NULL;
-	 temp_commandsmember = temp_commandsmember->next) {
-
-      /* check the host notification command */
-      char* buf = string::dup(temp_commandsmember->cmd);
-
-      /* get the command name, leave any arguments behind */
-      char* temp_command_name = my_strtok(buf, "!");
-
-      command* temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Service notification command '"
-          << temp_command_name << "' specified for contact '"
-          << cntct->name << "' is not defined anywhere!";
-	errors++;
-      }
-
-      /* save pointer to the command for later */
-      temp_commandsmember->command_ptr = temp_command;
-
-      delete[] buf;
-    }
-
-  /* check host notification commands */
-  if (cntct->host_notification_commands == NULL) {
-    logger(log_verification_error, basic)
-      << "Error: Contact '" << cntct->name << "' has no host "
-      "notification commands defined!";
-    errors++;
-  }
-  else
-    for (commandsmember* temp_commandsmember = cntct->host_notification_commands;
-	 temp_commandsmember != NULL;
-	 temp_commandsmember = temp_commandsmember->next) {
-
-      /* check the host notification command */
-      char* buf = string::dup(temp_commandsmember->cmd);
-
-      /* get the command name, leave any arguments behind */
-      char* temp_command_name = my_strtok(buf, "!");
-
-      command* temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logger(log_verification_error, basic)
-          << "Error: Host notification command '" << temp_command_name
-          << "' specified for contact '" << cntct->name
-          << "' is not defined anywhere!";
-	errors++;
-      }
-
-      /* save pointer to the command for later */
-      temp_commandsmember->command_ptr = temp_command;
-
-      delete[] buf;
-    }
-
-  /* check service notification timeperiod */
-  if (cntct->service_notification_period == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Contact '" << cntct->name << "' has no service "
-      "notification time period defined!";
-    warnings++;
-  }
-
-  else {
-    timeperiod* temp_timeperiod
-      = find_timeperiod(cntct->service_notification_period);
-    if (temp_timeperiod == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Service notification period '"
-        << cntct->service_notification_period
-        << "' specified for contact '" << cntct->name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the pointer to the service notification timeperiod for later */
-    cntct->service_notification_period_ptr = temp_timeperiod;
-  }
-
-  /* check host notification timeperiod */
-  if (cntct->host_notification_period == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Contact '" << cntct->name << "' has no host "
-      "notification time period defined!";
-    warnings++;
-  }
-
-  else {
-    timeperiod* temp_timeperiod
-      = find_timeperiod(cntct->host_notification_period);
-    if (temp_timeperiod == NULL) {
-      logger(log_verification_error, basic)
-        << "Error: Host notification period '"
-        << cntct->host_notification_period
-        << "' specified for contact '" << cntct->name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    /* save the pointer to the host notification timeperiod for later */
-    cntct->host_notification_period_ptr = temp_timeperiod;
-  }
-
-  /* check for sane host recovery options */
-  if (cntct->notify_on_host_recovery == true
-      && cntct->notify_on_host_down == false
-      && cntct->notify_on_host_unreachable == false) {
-    logger(log_verification_error, basic)
-      << "Warning: Host recovery notification option for contact '"
-      << cntct->name << "' doesn't make any sense - specify down "
-      "and/or unreachable options as well";
-    warnings++;
-  }
-
-  /* check for sane service recovery options */
-  if (cntct->notify_on_service_recovery == true
-      && cntct->notify_on_service_critical == false
-      && cntct->notify_on_service_warning == false) {
-    logger(log_verification_error, basic)
-      << "Warning: Service recovery notification option for contact '"
-      << cntct->name << "' doesn't make any sense - specify critical "
-      "and/or warning options as well";
-    warnings++;
-  }
-
-  /* check for illegal characters in contact name */
-  if (use_precached_objects == false) {
-    if (contains_illegal_object_chars(cntct->name) == true) {
-      logger(log_verification_error, basic)
-        << "Error: The name of contact '" << cntct->name
         << "' contains one or more illegal characters.";
       errors++;
     }
@@ -1185,59 +832,6 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
     if (contains_illegal_object_chars(hg->group_name) == true) {
       logger(log_verification_error, basic)
         << "Error: The name of hostgroup '" << hg->group_name
-        << "' contains one or more illegal characters.";
-      errors++;
-    }
-  }
-
-  // Add errors.
-  if (e)
-    *e += errors;
-
-  return (errors == 0);
-}
-
-/**
- *  Check and resolve a contact group.
- *
- *  @param[in,out] cg Contact group object.
- *  @param[out]    w  Warnings.
- *  @param[out]    e  Errors.
- *
- *  @return Non-zero on success.
- */
-int check_contactgroup(contactgroup* cg, int* w, int* e) {
-  (void)w;
-  int errors(0);
-
-  // Check all the group members.
-  for (contactsmember* temp_contactsmember(cg->members);
-       temp_contactsmember;
-       temp_contactsmember = temp_contactsmember->next) {
-    contact* temp_contact(
-               find_contact(temp_contactsmember->contact_name));
-    if (!temp_contact) {
-      logger(log_verification_error, basic)
-        << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in contact group '" << cg->group_name
-        << "' is not defined anywhere!";
-      errors++;
-    }
-
-    // Save a pointer to this contact group for faster contact/group
-    // membership lookups later.
-    else
-      add_object_to_objectlist(&temp_contact->contactgroups_ptr, cg);
-
-    // Save the contact pointer for later.
-    temp_contactsmember->contact_ptr = temp_contact;
-  }
-
-  // Check for illegal characters in contact group name.
-  if (use_precached_objects == false) {
-    if (contains_illegal_object_chars(cg->group_name) == true) {
-      logger(log_verification_error, basic)
-        << "Error: The name of contact group '" << cg->group_name
         << "' contains one or more illegal characters.";
       errors++;
     }

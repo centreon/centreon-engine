@@ -17,16 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/deleter/contactgroupsmember.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/customvariablesmember.hh"
 #include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
@@ -49,8 +45,6 @@ void deleter::host(void* ptr) throw () {
   listmember(obj->parent_hosts, &hostsmember);
   listmember(obj->child_hosts, &hostsmember);
   listmember(obj->services, &servicesmember);
-  listmember(obj->contact_groups, &contactgroupsmember);
-  listmember(obj->contacts, &contactsmember);
   listmember(obj->custom_variables, &customvariablesmember);
   listmember(obj->hostgroups_ptr, &objectlist);
 
@@ -66,8 +60,6 @@ void deleter::host(void* ptr) throw () {
   obj->host_check_command = NULL;
   delete[] obj->event_handler;
   obj->event_handler = NULL;
-  delete[] obj->notification_period;
-  obj->notification_period = NULL;
   delete[] obj->check_period;
   obj->check_period = NULL;
   delete[] obj->plugin_output;
@@ -80,7 +72,6 @@ void deleter::host(void* ptr) throw () {
   // event_handler_ptr not free.
   // check_command_ptr not free.
   // check_period_ptr not free.
-  // notification_period_ptr not free.
 
   delete obj;
 }

@@ -49,26 +49,6 @@ int main_test(int argc, char* argv[]) {
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
-  else if (type == "contactgroup") {
-    contactgroup obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contactgroupsmember") {
-    contactgroupsmember obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contact") {
-    contact obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contactsmember") {
-    contactsmember obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
   else if (type == "customvariablesmember") {
     customvariablesmember obj;
     memset(&obj, 0, sizeof(obj));

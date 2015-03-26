@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -28,17 +28,11 @@
 
 struct command_struct;
 struct commandsmember_struct;
-struct contact_struct;
-struct contactsmember_struct;
 
 CCE_BEGIN()
 
 namespace             configuration {
   namespace           applier {
-    void    add_member(
-              umap<std::string, shared_ptr<contact_struct> > const& contacts,
-              std::string const& name,
-              contactsmember_struct*& members);
     void    add_member(
               umap<std::string, shared_ptr<command_struct> > const& commands,
               std::string const& name,
@@ -68,10 +62,6 @@ namespace             configuration {
           return (true);
       return (false);
     }
-    void    update_members(
-              umap<std::string, shared_ptr<contact_struct> > const& contacts,
-              std::list<std::string> const& lst,
-              contactsmember_struct*& members);
   }
 }
 

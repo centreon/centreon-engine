@@ -526,10 +526,6 @@ int init_object_skiplists() {
     = skiplist_new(10, 0.5, false, false, skiplist_compare_command);
   object_skiplists[TIMEPERIOD_SKIPLIST]
     = skiplist_new(10, 0.5, false, false, skiplist_compare_timeperiod);
-  object_skiplists[CONTACT_SKIPLIST]
-    = skiplist_new(10, 0.5, false, false, skiplist_compare_contact);
-  object_skiplists[CONTACTGROUP_SKIPLIST]
-    = skiplist_new(10, 0.5, false, false, skiplist_compare_contactgroup);
   object_skiplists[HOSTGROUP_SKIPLIST]
     = skiplist_new(10, 0.5, false, false, skiplist_compare_hostgroup);
   object_skiplists[SERVICEGROUP_SKIPLIST]
@@ -560,50 +556,6 @@ int skiplist_compare_command(void const* a, void const* b) {
   if (!ob)
     return (-1);
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-/**
- *  Compare two contacts.
- *
- *  @param[in] a Uncasted command #1.
- *  @param[in] b Uncasted command #2.
- *
- *  @return Similar to strcmp.
- */
-int skiplist_compare_contact(void const* a, void const* b) {
-  contact const* oa(static_cast<contact const*>(a));
-  contact const* ob(static_cast<contact const*>(b));
-  if (!oa && !ob)
-    return (0);
-  if (!oa)
-    return (1);
-  if (!ob)
-    return (-1);
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-/**
- *  Compare two contact groups.
- *
- *  @param[in] a Uncasted contactgroup #1.
- *  @param[in] b Uncasted contactgroup #2.
- *
- *  @return Similar to strcmp.
- */
-int skiplist_compare_contactgroup(void const* a, void const* b) {
-  contactgroup const* oa(static_cast<contactgroup const*>(a));
-  contactgroup const* ob(static_cast<contactgroup const*>(b));
-  if (!oa && !ob)
-    return (0);
-  if (!oa)
-    return (1);
-  if (!ob)
-    return (-1);
-  return (skiplist_compare_text(
-            oa->group_name,
-            NULL,
-            ob->group_name,
-            NULL));
 }
 
 /**

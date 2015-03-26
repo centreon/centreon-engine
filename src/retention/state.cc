@@ -49,7 +49,6 @@ state::~state() throw () {}
  */
 state& state::operator=(state const& right) {
   if (this != &right) {
-    _contacts = right._contacts;
     _globals = right._globals;
     _hosts = right._hosts;
     _info = right._info;
@@ -66,8 +65,7 @@ state& state::operator=(state const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool state::operator==(state const& right) const throw () {
-  return (_contacts == right._contacts
-          && _globals == right._globals
+  return (_globals == right._globals
           && _hosts == right._hosts
           && _info == right._info
           && _services == right._services);
@@ -82,24 +80,6 @@ bool state::operator==(state const& right) const throw () {
  */
 bool state::operator!=(state const& right) const throw () {
   return (!operator==(right));
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contact list.
- */
-list_contact& state::contacts() throw () {
-  return (_contacts);
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contact list.
- */
-list_contact const& state::contacts() const throw () {
-  return (_contacts);
 }
 
 /**

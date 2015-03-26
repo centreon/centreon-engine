@@ -63,8 +63,6 @@ using namespace com::centreon::engine;
 #define LAST_UP                 121567890
 #define LAST_DOWN               187456321
 #define LAST_UNREACHABLE        115678925
-#define NOTIFICATION_NUMBER     42
-#define NOTIFICATION_ID         123456
 #define EVENT_ID                6547985
 #define LAST_EVENT_ID           1253887
 #define PROBLEM_ID              447786
@@ -137,8 +135,6 @@ int main_test(int argc, char** argv) {
   host_list->last_time_up = LAST_UP;
   host_list->last_time_down = LAST_DOWN;
   host_list->last_time_unreachable = LAST_UNREACHABLE;
-  host_list->current_notification_number = NOTIFICATION_NUMBER;
-  host_list->current_notification_id = NOTIFICATION_ID;
   host_list->current_event_id = EVENT_ID;
   host_list->last_event_id = LAST_EVENT_ID;
   host_list->current_problem_id = PROBLEM_ID;
@@ -178,8 +174,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTHOSTUP, STR(LAST_UP), false },
     { MACRO_LASTHOSTDOWN, STR(LAST_DOWN), false },
     { MACRO_LASTHOSTUNREACHABLE, STR(LAST_UNREACHABLE), false },
-    { MACRO_HOSTNOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false },
-    { MACRO_HOSTNOTIFICATIONID, STR(NOTIFICATION_ID), false },
     { MACRO_HOSTEVENTID, STR(EVENT_ID), false },
     { MACRO_LASTHOSTEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_HOSTPROBLEMID, STR(PROBLEM_ID), false },

@@ -52,8 +52,6 @@ extern "C" {
   extern int check_service_freshness;
   extern command* command_list;
   extern char* config_file;
-  extern contact* contact_list;
-  extern contactgroup* contactgroup_list;
   extern int currently_running_host_checks;
   extern int currently_running_service_checks;
   extern int enable_event_handlers;
@@ -141,10 +139,10 @@ extern "C" {
       << command_list << "\n"
       << "config_file: "
       << config_file << "\n"
-      << "contact_list: "
-      << contact_list << "\n"
-      << "contactgroup_list: "
-      << contactgroup_list << "\n"
+      // << "contact_list: "
+      // << contact_list << "\n"
+      // << "contactgroup_list: "
+      // << contactgroup_list << "\n"
       << "find_command: "
       << (void (*)())find_command << "\n"
       // << "find_downtime: "

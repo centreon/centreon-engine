@@ -31,8 +31,6 @@
 
 // Forward declaration.
 struct command_struct;
-struct contact_struct;
-struct contactgroup_struct;
 struct host_struct;
 struct hostdependency_struct;
 struct hostgroup_struct;
@@ -90,22 +88,6 @@ namespace           configuration {
                     connectors_find(configuration::connector::key_type const& k) const;
       umap<std::string, shared_ptr<commands::connector> >::iterator
                     connectors_find(configuration::connector::key_type const& k);
-      umap<std::string, shared_ptr<contact_struct> > const&
-                    contacts() const throw ();
-      umap<std::string, shared_ptr<contact_struct> >&
-                    contacts() throw ();
-      umap<std::string, shared_ptr<contact_struct> >::const_iterator
-                    contacts_find(configuration::contact::key_type const& k) const;
-      umap<std::string, shared_ptr<contact_struct> >::iterator
-                    contacts_find(configuration::contact::key_type const& k);
-      umap<std::string, shared_ptr<contactgroup_struct> > const&
-                    contactgroups() const throw ();
-      umap<std::string, shared_ptr<contactgroup_struct> >&
-                    contactgroups() throw ();
-      umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator
-                    contactgroups_find(configuration::contactgroup::key_type const& k) const;
-      umap<std::string, shared_ptr<contactgroup_struct> >::iterator
-                    contactgroups_find(configuration::contactgroup::key_type const& k);
       umap<std::string, shared_ptr<host_struct> > const&
                     hosts() const throw ();
       umap<std::string, shared_ptr<host_struct> >&
@@ -204,10 +186,6 @@ namespace           configuration {
                     _commands;
       umap<std::string, shared_ptr<commands::connector> >
                     _connectors;
-      umap<std::string, shared_ptr<contact_struct> >
-                    _contacts;
-      umap<std::string, shared_ptr<contactgroup_struct> >
-                    _contactgroups;
       concurrency::condvar
                     _cv_lock;
       umap<std::string, shared_ptr<host_struct> >

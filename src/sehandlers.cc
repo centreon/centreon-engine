@@ -25,7 +25,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/utils.hh"
 
@@ -1050,27 +1049,11 @@ int handle_host_state(host* hst) {
       hst->current_problem_id = 0L;
     }
 
-    /* reset the next and last notification times */
-    hst->last_host_notification = (time_t)0;
-    hst->next_host_notification = (time_t)0;
-
-    /* reset notification suppression option */
-    hst->no_more_notifications = false;
-
     /* write the host state change to the main log file */
     if (hst->state_type == HARD_STATE
         || (hst->state_type == SOFT_STATE
             && config->log_host_retries() == true))
       log_host_event(hst);
-
-    /* notify contacts about the recovery or problem if its a "hard" state */
-    if (hst->state_type == HARD_STATE)
-      host_notification(
-        hst,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
 
     /* handle the host state change */
     handle_host_event(hst);
@@ -1078,29 +1061,10 @@ int handle_host_state(host* hst) {
     /* the host just recovered, so reset the current host attempt */
     if (hst->current_state == HOST_UP)
       hst->current_attempt = 1;
-
-    /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
-    if (hst->current_state == HOST_UP) {
-      hst->current_notification_number = 0;
-      hst->notified_on_down = false;
-      hst->notified_on_unreachable = false;
-      host_other_props[hst->name].initial_notif_time = 0;
-    }
   }
 
   /* else the host state has not changed */
   else {
-
-    /* notify contacts if host is still down or unreachable */
-    if (hst->current_state != HOST_UP
-        && hst->state_type == HARD_STATE)
-      host_notification(
-        hst,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
-
     /* if we're in a soft state and we should log host retries, do so now... */
     if (hst->state_type == SOFT_STATE
         && config->log_host_retries() == true)

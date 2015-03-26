@@ -480,11 +480,6 @@ void compensate_for_system_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->last_notification);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
       &svc->last_check);
     adjust_timestamp_for_time_change(
       last_time,
@@ -502,23 +497,12 @@ void compensate_for_system_time_change(
       time_difference,
       &svc->last_hard_state_change);
 
-    // recalculate next re-notification time.
-    svc->next_notification
-      = get_next_service_notification_time(
-          svc,
-          svc->last_notification);
-
     // Update the status data.
     update_service_status(svc);
   }
 
   // adjust host timestamps.
   for (host* hst(host_list); hst; hst = hst->next) {
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_host_notification);
     adjust_timestamp_for_time_change(
       last_time,
       current_time,
@@ -544,12 +528,6 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       &hst->last_state_history_update);
-
-    // recalculate next re-notification time.
-    hst->next_host_notification
-      = get_next_host_notification_time(
-          hst,
-          hst->last_host_notification);
 
     // Update the status data.
     update_host_status(hst);

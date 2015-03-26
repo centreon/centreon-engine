@@ -35,18 +35,6 @@ using namespace com::centreon::engine::modules::external_command;
 
 processing::processing() {
   // process commands.
-  _lst_command["ENTER_STANDBY_MODE"] =
-    command_info(CMD_DISABLE_NOTIFICATIONS,
-                 &_redirector<&disable_all_notifications>);
-  _lst_command["DISABLE_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_NOTIFICATIONS,
-                 &_redirector<&disable_all_notifications>);
-  _lst_command["ENTER_ACTIVE_MODE"] =
-    command_info(CMD_ENABLE_NOTIFICATIONS,
-                 &_redirector<&enable_all_notifications>);
-  _lst_command["ENABLE_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_NOTIFICATIONS,
-                 &_redirector<&enable_all_notifications>);
   _lst_command["SHUTDOWN_PROGRAM"] =
     command_info(CMD_SHUTDOWN_PROCESS,
                  &_redirector<&cmd_signal_process>);
@@ -136,33 +124,6 @@ processing::processing() {
                  &_redirector<&disable_host_freshness_checks>);
 
   // host-related commands.
-  _lst_command["DELAY_HOST_NOTIFICATION"] =
-    command_info(CMD_DELAY_HOST_NOTIFICATION,
-                 &_redirector<&cmd_delay_notification>);
-  _lst_command["ENABLE_HOST_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_HOST_NOTIFICATIONS,
-                 &_redirector_host<&enable_host_notifications>);
-  _lst_command["DISABLE_HOST_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_HOST_NOTIFICATIONS,
-                 &_redirector_host<&disable_host_notifications>);
-  _lst_command["ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST"] =
-    command_info(CMD_ENABLE_ALL_NOTIFICATIONS_BEYOND_HOST,
-                 &_redirector_host<&_wrapper_enable_all_notifications_beyond_host>);
-  _lst_command["DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST"] =
-    command_info(CMD_DISABLE_ALL_NOTIFICATIONS_BEYOND_HOST,
-                 &_redirector_host<&_wrapper_disable_all_notifications_beyond_host>);
-  _lst_command["ENABLE_HOST_AND_CHILD_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_HOST_AND_CHILD_NOTIFICATIONS,
-                 &_redirector_host<&_wrapper_enable_host_and_child_notifications>);
-  _lst_command["DISABLE_HOST_AND_CHILD_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_HOST_AND_CHILD_NOTIFICATIONS,
-                 &_redirector_host<&_wrapper_disable_host_and_child_notifications>);
-  _lst_command["ENABLE_HOST_SVC_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_HOST_SVC_NOTIFICATIONS,
-                 &_redirector_host<&_wrapper_enable_host_svc_notifications>);
-  _lst_command["DISABLE_HOST_SVC_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_HOST_SVC_NOTIFICATIONS,
-                 &_redirector_host<&_wrapper_disable_host_svc_notifications>);
   _lst_command["ENABLE_HOST_SVC_CHECKS"] =
     command_info(CMD_ENABLE_HOST_SVC_CHECKS,
                  &_redirector_host<&_wrapper_enable_host_svc_checks>);
@@ -226,38 +187,17 @@ processing::processing() {
   _lst_command["CHANGE_MAX_HOST_CHECK_ATTEMPTS"] =
     command_info(CMD_CHANGE_MAX_HOST_CHECK_ATTEMPTS,
                  &_redirector<&cmd_change_object_int_var>);
-  _lst_command["SET_HOST_NOTIFICATION_NUMBER"] =
-    command_info(CMD_SET_HOST_NOTIFICATION_NUMBER,
-                 &_redirector_host<&_wrapper_set_host_notification_number>);
   _lst_command["CHANGE_HOST_CHECK_TIMEPERIOD"] =
     command_info(CMD_CHANGE_HOST_CHECK_TIMEPERIOD,
                  &_redirector<&cmd_change_object_char_var>);
   _lst_command["CHANGE_CUSTOM_HOST_VAR"] =
     command_info(CMD_CHANGE_CUSTOM_HOST_VAR,
                  &_redirector<&cmd_change_object_custom_var>);
-  _lst_command["SEND_CUSTOM_HOST_NOTIFICATION"] =
-    command_info(CMD_SEND_CUSTOM_HOST_NOTIFICATION,
-                 &_redirector_host<&_wrapper_send_custom_host_notification>);
-  _lst_command["CHANGE_HOST_NOTIFICATION_TIMEPERIOD"] =
-    command_info(CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD,
-                 &_redirector<&cmd_change_object_char_var>);
   _lst_command["CHANGE_HOST_MODATTR"] =
     command_info(CMD_CHANGE_HOST_MODATTR,
                  &_redirector<&cmd_change_object_int_var>);
 
   // hostgroup-related commands.
-  _lst_command["ENABLE_HOSTGROUP_HOST_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_HOSTGROUP_HOST_NOTIFICATIONS,
-                 &_redirector_hostgroup<&enable_host_notifications>);
-  _lst_command["DISABLE_HOSTGROUP_HOST_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_HOSTGROUP_HOST_NOTIFICATIONS,
-                 &_redirector_hostgroup<&disable_host_notifications>);
-  _lst_command["ENABLE_HOSTGROUP_SVC_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS,
-                 &_redirector_hostgroup<&_wrapper_enable_service_notifications>);
-  _lst_command["DISABLE_HOSTGROUP_SVC_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_HOSTGROUP_SVC_NOTIFICATIONS,
-                 &_redirector_hostgroup<&_wrapper_disable_service_notifications>);
   _lst_command["ENABLE_HOSTGROUP_HOST_CHECKS"] =
     command_info(CMD_ENABLE_HOSTGROUP_HOST_CHECKS,
                  &_redirector_hostgroup<&enable_host_checks>);
@@ -302,15 +242,6 @@ processing::processing() {
   _lst_command["DISABLE_PASSIVE_SVC_CHECKS"] =
     command_info(CMD_DISABLE_PASSIVE_SVC_CHECKS,
                  &_redirector_service<&disable_passive_service_checks>);
-  _lst_command["DELAY_SVC_NOTIFICATION"] =
-    command_info(CMD_DELAY_SVC_NOTIFICATION,
-                 &_redirector<&cmd_delay_notification>);
-  _lst_command["ENABLE_SVC_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_SVC_NOTIFICATIONS,
-                 &_redirector_service<&enable_service_notifications>);
-  _lst_command["DISABLE_SVC_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_SVC_NOTIFICATIONS,
-                 &_redirector_service<&disable_service_notifications>);
   _lst_command["PROCESS_SERVICE_CHECK_RESULT"] =
     command_info(CMD_PROCESS_SERVICE_CHECK_RESULT,
                  &_redirector<&cmd_process_service_check_result>);
@@ -350,41 +281,17 @@ processing::processing() {
   _lst_command["CHANGE_MAX_SVC_CHECK_ATTEMPTS"] =
     command_info(CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS,
                  &_redirector<&cmd_change_object_int_var>);
-  _lst_command["SET_SVC_NOTIFICATION_NUMBER"] =
-    command_info(CMD_SET_SVC_NOTIFICATION_NUMBER,
-                 &_redirector_service<&_wrapper_set_service_notification_number>);
   _lst_command["CHANGE_SVC_CHECK_TIMEPERIOD"] =
     command_info(CMD_CHANGE_SVC_CHECK_TIMEPERIOD,
                  &_redirector<&cmd_change_object_char_var>);
   _lst_command["CHANGE_CUSTOM_SVC_VAR"] =
     command_info(CMD_CHANGE_CUSTOM_SVC_VAR,
                  &_redirector<&cmd_change_object_custom_var>);
-  _lst_command["CHANGE_CUSTOM_CONTACT_VAR"] =
-    command_info(CMD_CHANGE_CUSTOM_CONTACT_VAR,
-                 &_redirector<&cmd_change_object_custom_var>);
-  _lst_command["SEND_CUSTOM_SVC_NOTIFICATION"] =
-    command_info(CMD_SEND_CUSTOM_SVC_NOTIFICATION,
-                 &_redirector_service<&_wrapper_send_custom_service_notification>);
-  _lst_command["CHANGE_SVC_NOTIFICATION_TIMEPERIOD"] =
-    command_info(CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD,
-                 &_redirector<&cmd_change_object_char_var>);
   _lst_command["CHANGE_SVC_MODATTR"] =
     command_info(CMD_CHANGE_SVC_MODATTR,
                  &_redirector<&cmd_change_object_int_var>);
 
   // servicegroup-related commands.
-  _lst_command["ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_SERVICEGROUP_HOST_NOTIFICATIONS,
-                 &_redirector_servicegroup<&enable_host_notifications>);
-  _lst_command["DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_SERVICEGROUP_HOST_NOTIFICATIONS,
-                 &_redirector_servicegroup<&disable_host_notifications>);
-  _lst_command["ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
-                 &_redirector_servicegroup<&enable_service_notifications>);
-  _lst_command["DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS,
-                 &_redirector_servicegroup<&disable_service_notifications>);
   _lst_command["ENABLE_SERVICEGROUP_HOST_CHECKS"] =
     command_info(CMD_ENABLE_SERVICEGROUP_HOST_CHECKS,
                  &_redirector_servicegroup<&enable_host_checks>);
@@ -409,49 +316,6 @@ processing::processing() {
   _lst_command["DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"] =
     command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
                  &_redirector_servicegroup<&disable_passive_service_checks>);
-
-  // contact-related commands.
-  _lst_command["ENABLE_CONTACT_HOST_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_CONTACT_HOST_NOTIFICATIONS,
-                 &_redirector_contact<&enable_contact_host_notifications>);
-  _lst_command["DISABLE_CONTACT_HOST_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_CONTACT_HOST_NOTIFICATIONS,
-                 &_redirector_contact<&disable_contact_host_notifications>);
-  _lst_command["ENABLE_CONTACT_SVC_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_CONTACT_SVC_NOTIFICATIONS,
-                 &_redirector_contact<&enable_contact_service_notifications>);
-  _lst_command["DISABLE_CONTACT_SVC_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_CONTACT_SVC_NOTIFICATIONS,
-                 &_redirector_contact<&disable_contact_service_notifications>);
-  _lst_command["CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD"] =
-    command_info(CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD,
-                 &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD"] =
-    command_info(CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD,
-                 &_redirector<&cmd_change_object_char_var>);
-  _lst_command["CHANGE_CONTACT_MODATTR"] =
-    command_info(CMD_CHANGE_CONTACT_MODATTR,
-                 &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_CONTACT_MODHATTR"] =
-    command_info(CMD_CHANGE_CONTACT_MODHATTR,
-                 &_redirector<&cmd_change_object_int_var>);
-  _lst_command["CHANGE_CONTACT_MODSATTR"] =
-    command_info(CMD_CHANGE_CONTACT_MODSATTR,
-                 &_redirector<&cmd_change_object_int_var>);
-
-  // contactgroup-related commands.
-  _lst_command["ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_CONTACTGROUP_HOST_NOTIFICATIONS,
-                 &_redirector_contactgroup<&enable_contact_host_notifications>);
-  _lst_command["DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS,
-                 &_redirector_contactgroup<&disable_contact_host_notifications>);
-  _lst_command["ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS"] =
-    command_info(CMD_ENABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
-                 &_redirector_contactgroup<&enable_contact_service_notifications>);
-  _lst_command["DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS"] =
-    command_info(CMD_DISABLE_CONTACTGROUP_SVC_NOTIFICATIONS,
-                 &_redirector_contactgroup<&disable_contact_service_notifications>);
 
   // misc commands.
   _lst_command["PROCESS_FILE"] =
@@ -583,38 +447,6 @@ void processing::_wrapper_save_state_information() {
   retention::dump::save(config->state_retention_file());
 }
 
-void processing::_wrapper_enable_host_and_child_notifications(host* hst) {
-  enable_and_propagate_notifications(hst, 0, true, true, false);
-}
-
-void processing::_wrapper_disable_host_and_child_notifications(host* hst) {
-  disable_and_propagate_notifications(hst, 0, true, true, false);
-}
-
-void processing::_wrapper_enable_all_notifications_beyond_host(host* hst) {
-  enable_and_propagate_notifications(hst, 0, false, true, true);
-}
-
-void processing::_wrapper_disable_all_notifications_beyond_host(host* hst) {
-  disable_and_propagate_notifications(hst, 0, false, true, true);
-}
-
-void processing::_wrapper_enable_host_svc_notifications(host* hst) {
-  for (servicesmember* member = hst->services;
-       member != NULL;
-       member = member->next)
-    if (member->service_ptr)
-      enable_service_notifications(member->service_ptr);
-}
-
-void processing::_wrapper_disable_host_svc_notifications(host* hst) {
-  for (servicesmember* member = hst->services;
-       member != NULL;
-       member = member->next)
-    if (member->service_ptr)
-      disable_service_notifications(member->service_ptr);
-}
-
 void processing::_wrapper_disable_host_svc_checks(host* hst) {
   for (servicesmember* member = hst->services;
        member != NULL;
@@ -629,45 +461,6 @@ void processing::_wrapper_enable_host_svc_checks(host* hst) {
        member = member->next)
     if (member->service_ptr)
       enable_service_checks(member->service_ptr);
-}
-
-void processing::_wrapper_set_host_notification_number(
-       host* hst,
-       char* args) {
-  if (args)
-    set_host_notification_number(hst, atoi(args));
-}
-
-void processing::_wrapper_send_custom_host_notification(
-       host* hst,
-       char* args) {
-  char* buf[3] = { NULL, NULL, NULL };
-  if ((buf[0] = my_strtok(args, ";"))
-      && (buf[1] = my_strtok(NULL, ";"))
-      && (buf[2] = my_strtok(NULL, ";"))) {
-    host_notification(
-      hst,
-      NOTIFICATION_CUSTOM,
-      buf[1],
-      buf[2],
-      atoi(buf[0]));
-  }
-}
-
-void processing::_wrapper_enable_service_notifications(host* hst) {
-  for (servicesmember* member = hst->services;
-       member != NULL;
-       member = member->next)
-    if (member->service_ptr)
-      enable_service_notifications(member->service_ptr);
-}
-
-void processing::_wrapper_disable_service_notifications(host* hst) {
-  for (servicesmember* member = hst->services;
-       member != NULL;
-       member = member->next)
-    if (member->service_ptr)
-      disable_service_notifications(member->service_ptr);
 }
 
 void processing::_wrapper_enable_service_checks(host* hst) {
@@ -700,28 +493,4 @@ void processing::_wrapper_disable_passive_service_checks(host* hst) {
        member = member->next)
     if (member->service_ptr)
       disable_passive_service_checks(member->service_ptr);
-}
-
-void processing::_wrapper_set_service_notification_number(
-       service* svc,
-       char* args) {
-  char* str(my_strtok(args, ";"));
-  if (str)
-    set_service_notification_number(svc, atoi(str));
-}
-
-void processing::_wrapper_send_custom_service_notification(
-       service* svc,
-       char* args) {
-  char* buf[3] = { NULL, NULL, NULL };
-  if ((buf[0] = my_strtok(args, ";"))
-      && (buf[1] = my_strtok(NULL, ";"))
-      && (buf[2] = my_strtok(NULL, ";"))) {
-    service_notification(
-      svc,
-      NOTIFICATION_CUSTOM,
-      buf[1],
-      buf[2],
-      atoi(buf[0]));
-  }
 }

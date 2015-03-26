@@ -20,8 +20,6 @@
 #include <algorithm>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/command.hh"
-#include "com/centreon/engine/configuration/contact.hh"
-#include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/parser.hh"
@@ -182,12 +180,6 @@ static configuration::state deep_copy(configuration::state const& s) {
   deep_copy<configuration::set_connector, configuration::connector>(
     s.connectors(),
     c.connectors());
-  deep_copy<configuration::set_contactgroup, configuration::contactgroup>(
-    s.contactgroups(),
-    c.contactgroups());
-  deep_copy<configuration::set_contact, configuration::contact>(
-    s.contacts(),
-    c.contacts());
   deep_copy<configuration::set_hostdependency, configuration::hostdependency>(
     s.hostdependencies(),
     c.hostdependencies());
@@ -211,14 +203,6 @@ static configuration::state deep_copy(configuration::state const& s) {
     c.timeperiods());
 
   // Clean groups.
-  for (configuration::set_contactgroup::iterator
-         it(c.contactgroups().begin()),
-         end(c.contactgroups().end());
-       it != end;
-       ++it) {
-    (*it)->set_resolved(false);
-    (*it)->resolved_members().clear();
-  }
   for (configuration::set_hostgroup::iterator
          it(c.hostgroups().begin()),
          end(c.hostgroups().end());
@@ -237,47 +221,6 @@ static configuration::state deep_copy(configuration::state const& s) {
   }
 
   return (c);
-}
-
-/**
- *  Remove contact dependency for contact removal.
- *
- *  @param[in,out] cfg The configuration to update.
- *  @param[in]     hst Contact that will be removed.
- */
-static void remove_dependency_for_contact(
-              configuration::state& cfg,
-              configuration::contact const& cntct) {
-  for (configuration::set_contactgroup::iterator
-         it(cfg.contactgroups().begin()),
-         end(cfg.contactgroups().end());
-       it != end;
-       ++it)
-    (*it)->members().remove(cntct.contact_name());
-  return ;
-}
-
-
-/**
- *  Remove contact dependency for remove contactgroup.
- *
- *  @param[in,out] config The configuration to update.
- *  @param[in]     grp    The group to remove.
- */
-static void remove_dependency_for_contactgroup(
-              configuration::state& config,
-              configuration::contactgroup const& grp) {
-  for (list_string::const_iterator
-         m(grp.members().begin()), end(grp.members().end());
-       m != end;
-       ++m)
-    for (configuration::set_contact::iterator
-           it(config.contacts().begin()), end(config.contacts().end());
-         it != end;
-         ++it)
-      if ((*it)->contact_name() == *m)
-        (*it)->contactgroups().remove(grp.contactgroup_name());
-  return ;
 }
 
 /**
@@ -461,32 +404,6 @@ int main_test(int argc, char* argv[]) {
       configuration::set_command,
       configuration::command,
       &configuration::state::commands>(config, chk_command);
-  }
-  else if (type == "contact") {
-    chk_generic<
-      configuration::contact,
-      &configuration::contact::contact_name,
-      configuration::set_contact,
-      &configuration::state::contacts,
-      contact_struct,
-      &find_contact> chk_contact;
-    check_remove_objects<
-      configuration::set_contact,
-      configuration::contact,
-      &configuration::state::contacts>(config, chk_contact, remove_dependency_for_contact);
-  }
-  else if (type == "contactgroup") {
-    chk_generic<
-      configuration::contactgroup,
-      &configuration::contactgroup::contactgroup_name,
-      configuration::set_contactgroup,
-      &configuration::state::contactgroups,
-      contactgroup_struct,
-      &find_contactgroup> chk_contactgroup;
-    check_remove_objects<
-      configuration::set_contactgroup,
-      configuration::contactgroup,
-      &configuration::state::contactgroups>(config, chk_contactgroup, remove_dependency_for_contactgroup);
   }
   else if (type == "host") {
     chk_generic<

@@ -22,10 +22,6 @@
 
 #  include "com/centreon/engine/deleter/command.hh"
 #  include "com/centreon/engine/deleter/commandsmember.hh"
-#  include "com/centreon/engine/deleter/contactgroup.hh"
-#  include "com/centreon/engine/deleter/contactgroupsmember.hh"
-#  include "com/centreon/engine/deleter/contact.hh"
-#  include "com/centreon/engine/deleter/contactsmember.hh"
 #  include "com/centreon/engine/deleter/customvariablesmember.hh"
 #  include "com/centreon/engine/deleter/daterange.hh"
 #  include "com/centreon/engine/deleter/hostdependency.hh"

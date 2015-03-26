@@ -35,8 +35,6 @@ public:
                  : _config(new cce::configuration::state(config)) {
     _commands = state.commands();
     _connectors = state.connectors();
-    _contacts = state.contacts();
-    _contactgroups = state.contactgroups();
     _hosts = state.hosts();
     _hostdependencies = state.hostdependencies();
     _hostgroups = state.hostgroups();
@@ -55,8 +53,6 @@ public:
       _config = new cce::configuration::state(*right._config);
       _commands = right._commands;
       _connectors = right._connectors;
-      _contacts = right._contacts;
-      _contactgroups = right._contactgroups;
       _hosts = right._hosts;
       _hostdependencies = right._hostdependencies;
       _hostgroups = right._hostgroups;
@@ -81,10 +77,6 @@ public:
       throw (engine_error() << "commands are not equal");
     if (!compare_with_true_contents(_connectors, state.connectors()))
       throw (engine_error() << "connectors are not equal");
-    if (!compare_with_true_contents(_contacts, state.contacts()))
-      throw (engine_error() << "contacts are not equal");
-    if (!compare_with_true_contents(_contactgroups, state.contactgroups()))
-      throw (engine_error() << "contactgroups are not equal");
     if (!compare_with_true_contents(_hosts, state.hosts()))
       throw (engine_error() << "hosts are not equal");
     if (!compare_with_true_contents(_hostdependencies, state.hostdependencies()))
@@ -102,8 +94,6 @@ public:
   }
   static void  set_to_null() {
     ::command_list = NULL;
-    ::contact_list = NULL;
-    ::contactgroup_list = NULL;
     ::host_list = NULL;
     ::hostdependency_list = NULL;
     ::hostgroup_list = NULL;
@@ -120,10 +110,6 @@ private:
                _config;
   umap<std::string, cc::shared_ptr<cce::commands::connector> >
                _connectors;
-  umap<std::string, cc::shared_ptr<contact_struct> >
-               _contacts;
-  umap<std::string, cc::shared_ptr<contactgroup_struct> >
-               _contactgroups;
   umap<std::string, cc::shared_ptr<host_struct> >
                _hosts;
   umultimap<std::string, cc::shared_ptr<hostdependency_struct> >

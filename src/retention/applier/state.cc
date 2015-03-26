@@ -20,7 +20,6 @@
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/retention/applier/contact.hh"
 #include "com/centreon/engine/retention/applier/host.hh"
 #include "com/centreon/engine/retention/applier/program.hh"
 #include "com/centreon/engine/retention/applier/service.hh"
@@ -56,9 +55,6 @@ void applier::state::apply(
 
     applier::program app_program;
     app_program.apply(config, state.globals());
-
-    applier::contact app_contacts;
-    app_contacts.apply(config, state.contacts());
 
     applier::host app_hosts;
     app_hosts.apply(config, state.hosts(), scheduling_info_is_ok);

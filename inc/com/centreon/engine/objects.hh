@@ -25,10 +25,6 @@
 #  include "com/centreon/engine/common.hh"
 #  include "com/centreon/engine/objects/command.hh"
 #  include "com/centreon/engine/objects/commandsmember.hh"
-#  include "com/centreon/engine/objects/contact.hh"
-#  include "com/centreon/engine/objects/contactgroup.hh"
-#  include "com/centreon/engine/objects/contactgroupsmember.hh"
-#  include "com/centreon/engine/objects/contactsmember.hh"
 #  include "com/centreon/engine/objects/customvariablesmember.hh"
 #  include "com/centreon/engine/objects/daterange.hh"
 #  include "com/centreon/engine/objects/host.hh"
@@ -56,8 +52,6 @@
 #  define SERVICE_SKIPLIST                 1
 #  define COMMAND_SKIPLIST                 2
 #  define TIMEPERIOD_SKIPLIST              3
-#  define CONTACT_SKIPLIST                 4
-#  define CONTACTGROUP_SKIPLIST            5
 #  define HOSTGROUP_SKIPLIST               6
 #  define SERVICEGROUP_SKIPLIST            7
 #  define HOSTDEPENDENCY_SKIPLIST          8

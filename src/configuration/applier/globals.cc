@@ -61,7 +61,6 @@ void applier::globals::apply(state& config) {
   ::debug_verbosity = config.debug_verbosity();
   ::enable_event_handlers = config.enable_event_handlers();
   ::enable_flap_detection = config.enable_flap_detection();
-  ::enable_notifications = config.enable_notifications();
   ::enable_predictive_host_dependency_checks = config.enable_predictive_host_dependency_checks();
   ::enable_predictive_service_dependency_checks = config.enable_predictive_service_dependency_checks();
   ::event_broker_options = config.event_broker_options();
@@ -79,7 +78,6 @@ void applier::globals::apply(state& config) {
   ::log_external_commands = config.log_external_commands();
   ::log_host_retries = config.log_host_retries();
   ::log_initial_states = config.log_initial_states();
-  ::log_notifications = config.log_notifications();
   ::log_passive_checks = config.log_passive_checks();
   ::log_service_retries = config.log_service_retries();
   ::low_host_flap_threshold = config.low_host_flap_threshold();
@@ -90,14 +88,11 @@ void applier::globals::apply(state& config) {
   ::max_host_check_spread = config.max_host_check_spread();
   ::max_parallel_service_checks = config.max_parallel_service_checks();
   ::max_service_check_spread = config.max_service_check_spread();
-  ::notification_timeout = config.notification_timeout();
   ::obsess_over_hosts = config.obsess_over_hosts();
   ::obsess_over_services = config.obsess_over_services();
   ::ochp_timeout = config.ochp_timeout();
   ::ocsp_timeout = config.ocsp_timeout();
   ::passive_host_checks_are_soft = config.passive_host_checks_are_soft();
-  ::retained_contact_host_attribute_mask = config.retained_contact_host_attribute_mask();
-  ::retained_contact_service_attribute_mask = config.retained_contact_service_attribute_mask();
   ::retained_host_attribute_mask = config.retained_host_attribute_mask();
   ::retained_process_host_attribute_mask = config.retained_process_host_attribute_mask();
   ::retain_state_information = config.retain_state_information();

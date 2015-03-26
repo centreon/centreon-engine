@@ -22,7 +22,6 @@
 #  define CCE_BROKER_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/objects/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -34,7 +33,6 @@
 #  define BROKER_HOST_CHECKS                       (1 << 3)
 #  define BROKER_EVENT_HANDLERS                    (1 << 4)
 #  define BROKER_LOGGED_DATA                       (1 << 5)
-#  define BROKER_NOTIFICATIONS                     (1 << 6)
 #  define BROKER_FLAPPING_DATA                     (1 << 7)
 #  define BROKER_SYSTEM_COMMANDS                   (1 << 10)
 #  define BROKER_OCP_DATA_UNUSED                   (1 << 11) /* Reusable. */
@@ -92,14 +90,6 @@
 #  define NEBTYPE_EVENTHANDLER_START               500
 #  define NEBTYPE_EVENTHANDLER_END                 501
 
-/* Notifications. */
-#  define NEBTYPE_NOTIFICATION_START               600
-#  define NEBTYPE_NOTIFICATION_END                 601
-#  define NEBTYPE_CONTACTNOTIFICATION_START        602
-#  define NEBTYPE_CONTACTNOTIFICATION_END          603
-#  define NEBTYPE_CONTACTNOTIFICATIONMETHOD_START  604
-#  define NEBTYPE_CONTACTNOTIFICATIONMETHOD_END    605
-
 /* Service checks. */
 #  define NEBTYPE_SERVICECHECK_INITIATE            700
 #  define NEBTYPE_SERVICECHECK_PROCESSED           701
@@ -123,13 +113,11 @@
 #  define NEBTYPE_PROGRAMSTATUS_UPDATE             1200
 #  define NEBTYPE_HOSTSTATUS_UPDATE                1201
 #  define NEBTYPE_SERVICESTATUS_UPDATE             1202
-#  define NEBTYPE_CONTACTSTATUS_UPDATE             1203
 
 /* Adaptive modifications. */
 #  define NEBTYPE_ADAPTIVEPROGRAM_UPDATE           1300
 #  define NEBTYPE_ADAPTIVEHOST_UPDATE              1301
 #  define NEBTYPE_ADAPTIVESERVICE_UPDATE           1302
-#  define NEBTYPE_ADAPTIVECONTACT_UPDATE           1303
 
 /* External commands. */
 #  define NEBTYPE_EXTERNALCOMMAND_START            1400
@@ -154,26 +142,6 @@
 #  define NEBTYPE_COMMAND_ADD                      1900
 #  define NEBTYPE_COMMAND_DELETE                   1901
 #  define NEBTYPE_COMMAND_UPDATE                   1902
-
-/* Contacts. */
-#  define NEBTYPE_CONTACT_ADD                      2000
-#  define NEBTYPE_CONTACT_DELETE                   2001
-#  define NEBTYPE_CONTACT_UPDATE                   NEBTYPE_ADAPTIVECONTACT_UPDATE
-
-/* Contact custom variables. */
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_ADD        2100
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE     2101
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_UPDATE     2102
-
-/* Contact groups. */
-#  define NEBTYPE_CONTACTGROUP_ADD                 2200
-#  define NEBTYPE_CONTACTGROUP_DELETE              2201
-#  define NEBTYPE_CONTACTGROUP_UPDATE              2202
-
-/* Contact group members. */
-#  define NEBTYPE_CONTACTGROUPMEMBER_ADD           2300
-#  define NEBTYPE_CONTACTGROUPMEMBER_DELETE        2301
-#  define NEBTYPE_CONTACTGROUPMEMBER_UPDATE        2302
 
 /* Hosts. */
 #  define NEBTYPE_HOST_ADD                         2400
@@ -267,19 +235,6 @@ struct timeperiod_struct;
 extern "C" {
 #  endif /* C++ */
 
-void           broker_adaptive_contact_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 contact* cntct,
-                 int command_type,
-                 unsigned long modattr,
-                 unsigned long modattrs,
-                 unsigned long modhattr,
-                 unsigned long modhattrs,
-                 unsigned long modsattr,
-                 unsigned long modsattrs,
-                 struct timeval const* timestamp);
 void           broker_adaptive_dependency_data(
                  int type,
                  int flags,
@@ -331,37 +286,6 @@ void           broker_command_data(
                  int flags,
                  int attr,
                  command_struct* cmd,
-                 struct timeval const* timestamp);
-int            broker_contact_notification_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 unsigned int notification_type,
-                 int reason_type,
-                 struct timeval start_time,
-                 struct timeval end_time,
-                 void* data,
-                 contact* cntct,
-                 int escalated,
-                 struct timeval const* timestamp);
-int            broker_contact_notification_method_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 unsigned int notification_type,
-                 int reason_type,
-                 struct timeval start_time,
-                 struct timeval end_time,
-                 void* data,
-                 contact* cntct,
-                 char const* cmd,
-                 int escalated,
-                 struct timeval const* timestamp);
-void           broker_contact_status(
-                 int type,
-                 int flags,
-                 int attr,
-                 contact* cntct,
                  struct timeval const* timestamp);
 void           broker_custom_variable(
                  int type,
@@ -462,18 +386,6 @@ void           broker_module_data(
                  int attr,
                  char const* module,
                  char const* args,
-                 struct timeval const* timestamp);
-int            broker_notification_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 unsigned int notification_type,
-                 int reason_type,
-                 struct timeval start_time,
-                 struct timeval end_time,
-                 void* data,
-                 int escalated,
-                 int contacts_notified,
                  struct timeval const* timestamp);
 void           broker_program_state(
                  int type,

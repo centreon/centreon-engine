@@ -24,7 +24,6 @@
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine::logging;
@@ -34,10 +33,7 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* detects service flapping */
-void check_for_service_flapping(
-       service* svc,
-       int update,
-       int allow_flapstart_notification) {
+void check_for_service_flapping(service* svc, int update) {
   int update_history = true;
   int is_flapping = false;
   unsigned int x = 0;
@@ -171,8 +167,7 @@ void check_for_service_flapping(
       svc,
       curved_percent_change,
       high_threshold,
-      low_threshold,
-      allow_flapstart_notification);
+      low_threshold);
 
   /* did the service just stop flapping? */
   else if (is_flapping == false && svc->is_flapping == true)
@@ -185,11 +180,7 @@ void check_for_service_flapping(
 }
 
 /* detects host flapping */
-void check_for_host_flapping(
-       host* hst,
-       int update,
-       int actual_check,
-       int allow_flapstart_notification) {
+void check_for_host_flapping(host* hst, int update, int actual_check) {
   int update_history = true;
   int is_flapping = false;
   unsigned int x = 0;
@@ -216,15 +207,10 @@ void check_for_host_flapping(
   time(&current_time);
 
   /* period to wait for updating archived state info if we have no state change */
-  if (hst->total_services == 0)
-    wait_threshold
-      = static_cast<unsigned long>(hst->notification_interval
-                                   * config->interval_length());
-  else
-    wait_threshold
-      = static_cast<unsigned long>((hst->total_service_check_interval
-                                    * config->interval_length())
-                                   / hst->total_services);
+  wait_threshold
+    = static_cast<unsigned long>((hst->total_service_check_interval
+                                  * config->interval_length())
+                                 / hst->total_services);
 
   update_history = update;
 
@@ -339,8 +325,7 @@ void check_for_host_flapping(
       hst,
       curved_percent_change,
       high_threshold,
-      low_threshold,
-      allow_flapstart_notification);
+      low_threshold);
 
   /* did the host just stop flapping? */
   else if (is_flapping == false && hst->is_flapping == true)
@@ -361,8 +346,7 @@ void set_service_flap(
        service* svc,
        double percent_change,
        double high_threshold,
-       double low_threshold,
-       int allow_flapstart_notification) {
+       double low_threshold) {
   logger(dbg_functions, basic)
     << "set_service_flap()";
 
@@ -385,11 +369,9 @@ void set_service_flap(
   /* add a non-persistent comment to the service */
   std::ostringstream oss;
   oss << std::fixed << std::setprecision(1)
-      << "Notifications for this service are being suppressed because "
-    "it was detected as " << "having been flapping between different "
-    "states (" << percent_change << "% change >= " << high_threshold
-      << "% threshold).  When the service state stabilizes and the "
-    "flapping " << "stops, notifications will be re-enabled.";
+      << "This service was detected as having been flapping between "
+      << "different states (" << percent_change << "% change >= "
+      << high_threshold << "% threshold).";
 
   /* set the flapping indicator */
   svc->is_flapping = true;
@@ -406,21 +388,6 @@ void set_service_flap(
     low_threshold,
     NULL);
 
-  /* see if we should check to send a recovery notification out when flapping stops */
-  if (svc->current_state != STATE_OK
-      && svc->current_notification_number > 0)
-    svc->check_flapping_recovery_notification = true;
-  else
-    svc->check_flapping_recovery_notification = false;
-
-  /* send a notification */
-  if (allow_flapstart_notification == true)
-    service_notification(
-      svc,
-      NOTIFICATION_FLAPPINGSTART,
-      NULL,
-      NULL,
-      NOTIFICATION_OPTION_NONE);
   return;
 }
 
@@ -465,26 +432,6 @@ void clear_service_flap(
     low_threshold,
     NULL);
 
-  /* send a notification */
-  service_notification(
-    svc,
-    NOTIFICATION_FLAPPINGSTOP,
-    NULL,
-    NULL,
-    NOTIFICATION_OPTION_NONE);
-
-  /* should we send a recovery notification? */
-  if (svc->check_flapping_recovery_notification == true
-      && svc->current_state == STATE_OK)
-    service_notification(
-      svc,
-      NOTIFICATION_NORMAL,
-      NULL,
-      NULL,
-      NOTIFICATION_OPTION_NONE);
-
-  /* clear the recovery notification flag */
-  svc->check_flapping_recovery_notification = false;
   return;
 }
 
@@ -493,8 +440,7 @@ void set_host_flap(
        host* hst,
        double percent_change,
        double high_threshold,
-       double low_threshold,
-       int allow_flapstart_notification) {
+       double low_threshold) {
   logger(dbg_functions, basic)
     << "set_host_flap()";
 
@@ -515,11 +461,9 @@ void set_host_flap(
   /* add a non-persistent comment to the host */
   std::ostringstream oss;
   oss << std::fixed << std::setprecision(1)
-      << "Notifications for this host are being suppressed because it "
-      "was detected as " << "having been flapping between different "
-      "states (" << percent_change << "% change > " << high_threshold
-      << "% threshold).  When the host state stabilizes and the "
-      << "flapping stops, notifications will be re-enabled.";
+      << "This service was detected as having been flapping between "
+      << "different states (" << percent_change << "% change > "
+      << high_threshold << "% threshold).";
 
   /* set the flapping indicator */
   hst->is_flapping = true;
@@ -536,21 +480,6 @@ void set_host_flap(
     low_threshold,
     NULL);
 
-  /* see if we should check to send a recovery notification out when flapping stops */
-  if (hst->current_state != HOST_UP
-      && hst->current_notification_number > 0)
-    hst->check_flapping_recovery_notification = true;
-  else
-    hst->check_flapping_recovery_notification = false;
-
-  /* send a notification */
-  if (allow_flapstart_notification == true)
-    host_notification(
-      hst,
-      NOTIFICATION_FLAPPINGSTART,
-      NULL,
-      NULL,
-      NOTIFICATION_OPTION_NONE);
   return;
 }
 
@@ -593,26 +522,6 @@ void clear_host_flap(
     low_threshold,
     NULL);
 
-  /* send a notification */
-  host_notification(
-    hst,
-    NOTIFICATION_FLAPPINGSTOP,
-    NULL,
-    NULL,
-    NOTIFICATION_OPTION_NONE);
-
-  /* should we send a recovery notification? */
-  if (hst->check_flapping_recovery_notification == true
-      && hst->current_state == HOST_UP)
-    host_notification(
-      hst,
-      NOTIFICATION_NORMAL,
-      NULL,
-      NULL,
-      NOTIFICATION_OPTION_NONE);
-
-  /* clear the recovery notification flag */
-  hst->check_flapping_recovery_notification = false;
   return;
 }
 
@@ -658,11 +567,11 @@ void enable_flap_detection_routines() {
   for (temp_host = host_list;
        temp_host != NULL;
        temp_host = temp_host->next)
-    check_for_host_flapping(temp_host, false, false, true);
+    check_for_host_flapping(temp_host, false, false);
   for (temp_service = service_list;
        temp_service != NULL;
        temp_service = temp_service->next)
-    check_for_service_flapping(temp_service, false, true);
+    check_for_service_flapping(temp_service, false);
   return;
 }
 
@@ -747,7 +656,7 @@ void enable_host_flap_detection(host* hst) {
     NULL);
 
   /* check for flapping */
-  check_for_host_flapping(hst, false, false, true);
+  check_for_host_flapping(hst, false, false);
 
   // Update host status.
   update_host_status(hst);
@@ -821,27 +730,6 @@ void handle_host_flap_detection_disabled(host* hst) {
       0.0,
       0.0,
       NULL);
-
-    /* send a notification */
-    host_notification(
-      hst,
-      NOTIFICATION_FLAPPINGDISABLED,
-      NULL,
-      NULL,
-      NOTIFICATION_OPTION_NONE);
-
-    /* should we send a recovery notification? */
-    if (hst->check_flapping_recovery_notification == true
-        && hst->current_state == HOST_UP)
-      host_notification(
-        hst,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
-
-    /* clear the recovery notification flag */
-    hst->check_flapping_recovery_notification = false;
   }
 
   // Update host status.
@@ -885,7 +773,7 @@ void enable_service_flap_detection(service* svc) {
     NULL);
 
   /* check for flapping */
-  check_for_service_flapping(svc, false, true);
+  check_for_service_flapping(svc, false);
 
   // Update service status.
   update_service_status(svc);
@@ -961,27 +849,6 @@ void handle_service_flap_detection_disabled(service* svc) {
       0.0,
       0.0,
       NULL);
-
-    /* send a notification */
-    service_notification(
-      svc,
-      NOTIFICATION_FLAPPINGDISABLED,
-      NULL,
-      NULL,
-      NOTIFICATION_OPTION_NONE);
-
-    /* should we send a recovery notification? */
-    if (svc->check_flapping_recovery_notification == true
-        && svc->current_state == STATE_OK)
-      service_notification(
-        svc,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
-
-    /* clear the recovery notification flag */
-    svc->check_flapping_recovery_notification = false;
   }
 
   // Update service status.

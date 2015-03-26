@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -132,8 +132,6 @@ bool set_cloexec(int fd);
 void cleanup();
 // free memory allocated to all linked lists in memory
 void free_memory(nagios_macros* mac);
-// frees all memory allocated to the notification list
-void free_notification_list();
 
 // frees memory associated with a host/service check result
 int free_check_result(check_result* info);

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -98,39 +98,6 @@ std::ostream& operator<<(std::ostream& os, customvariablesmember const& obj) {
   for (customvariablesmember const* m(&obj); m; m = m->next)
     os << "  _" << chkstr(m->variable_name) << ": " << chkstr(m->variable_value) << "\n";
   return (os);
-}
-
-/**
- *  Adds a custom variable to a contact.
- *
- *  @param[in] cntct    Contact object.
- *  @param[in] varname  Custom variable name.
- *  @param[in] varvalue Custom variable value.
- *
- *  @return Contact custom variable.
- */
-customvariablesmember* add_custom_variable_to_contact(
-                         contact* cntct,
-                         char const* varname,
-                         char const* varvalue) {
-  // Add custom variable to contact.
-  customvariablesmember* retval(add_custom_variable_to_object(
-                                  &cntct->custom_variables,
-                                  varname,
-                                  varvalue));
-
-  // Notify event broker.
-  timeval tv(get_broker_timestamp(NULL));
-  broker_custom_variable(
-    NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    cntct,
-    varname,
-    varvalue,
-    &tv);
-
-  return (retval);
 }
 
 /**
@@ -243,37 +210,6 @@ customvariablesmember* add_custom_variable_to_service(
     &tv);
 
   return (retval);
-}
-
-/**
- *  Remove all custom variables of a contact.
- *
- *  @param[in,out] cntct  Target contact.
- */
-void remove_all_custom_variables_from_contact(contact_struct* cntct) {
-  // Browse all custom vars.
-  customvariablesmember* m(cntct->custom_variables);
-  cntct->custom_variables = NULL;
-  while (m) {
-    // Point to next custom var.
-    customvariablesmember* to_delete(m);
-    m = m->next;
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_custom_variable(
-      NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      cntct,
-      to_delete->variable_name,
-      to_delete->variable_value,
-      &tv);
-
-    // Delete custom variable.
-    deleter::customvariablesmember(to_delete);
-  }
-  return ;
 }
 
 /**

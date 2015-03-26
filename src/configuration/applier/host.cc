@@ -26,8 +26,6 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
-#include "com/centreon/engine/deleter/contactgroupsmember.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
@@ -97,18 +95,6 @@ void applier::host::add_object(
         obj->retry_interval(),
         obj->max_check_attempts(),
         obj->check_timeout_defined() ? obj->check_timeout() : 0,
-        static_cast<bool>(obj->notification_options()
-                          & configuration::host::up),
-        static_cast<bool>(obj->notification_options()
-                          & configuration::host::down),
-        static_cast<bool>(obj->notification_options()
-                          & configuration::host::unreachable),
-        static_cast<bool>(obj->notification_options()
-                          & configuration::host::flapping),
-        obj->notification_interval(),
-        obj->first_notification_delay(),
-        NULL_IF_EMPTY(obj->notification_period()),
-        obj->notifications_enabled(),
         NULL_IF_EMPTY(obj->check_command()),
         obj->checks_active(),
         obj->checks_passive(),
@@ -139,28 +125,7 @@ void applier::host::add_object(
   if (!h)
     throw (engine_error() << "Could not register host '"
            << obj->host_name() << "'");
-  host_other_props[obj->host_name()].initial_notif_time = 0;
   host_other_props[obj->host_name()].should_reschedule_current_check = false;
-
-  // Contacts.
-  for (list_string::const_iterator
-         it(obj->contacts().begin()),
-         end(obj->contacts().end());
-       it != end;
-       ++it)
-    if (!add_contact_to_host(h, it->c_str()))
-      throw (engine_error() << "Could not add contact '"
-             << *it << "' to host '" << obj->host_name() << "'");
-
-  // Contact groups.
-  for (list_string::const_iterator
-         it(obj->contactgroups().begin()),
-         end(obj->contactgroups().end());
-       it != end;
-       ++it)
-    if (!add_contactgroup_to_host(h, it->c_str()))
-      throw (engine_error() << "Could not add contact group '"
-             << *it << "' to host '" << obj->host_name() << "'");
 
   // Custom variables.
   for (map_customvar::const_iterator
@@ -288,34 +253,6 @@ void applier::host::modify_object(
     h->check_timeout,
     obj->check_timeout());
   modify_if_different(
-    h->notify_on_recovery,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::host::up)));
-  modify_if_different(
-    h->notify_on_down,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::host::down)));
-  modify_if_different(
-    h->notify_on_unreachable,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::host::unreachable)));
-  modify_if_different(
-    h->notify_on_flapping,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::host::flapping)));
-  modify_if_different(
-    h->notification_interval,
-    static_cast<double>(obj->notification_interval()));
-  modify_if_different(
-    h->first_notification_delay,
-    static_cast<double>(obj->first_notification_delay()));
-  modify_if_different(
-    h->notification_period,
-    NULL_IF_EMPTY(obj->notification_period()));
-  modify_if_different(
-    h->notifications_enabled,
-    static_cast<int>(obj->notifications_enabled()));
-  modify_if_different(
     h->host_check_command,
     NULL_IF_EMPTY(obj->check_command()));
   modify_if_different(
@@ -381,40 +318,6 @@ void applier::host::modify_object(
   modify_if_different(
     h->timezone,
     NULL_IF_EMPTY(obj->timezone()));
-
-  // Contacts.
-  if (obj->contacts() != obj_old->contacts()) {
-    // Delete old contacts.
-    deleter::listmember(h->contacts, &deleter::contactsmember);
-
-    // Add contacts to host.
-    for (list_string::const_iterator
-           it(obj->contacts().begin()),
-           end(obj->contacts().end());
-         it != end;
-         ++it)
-      if (!add_contact_to_host(h, it->c_str()))
-        throw (engine_error() << "Could not add contact '"
-               << *it << "' to host '" << obj->host_name() << "'");
-  }
-
-  // Contact groups.
-  if (obj->contactgroups() != obj_old->contactgroups()) {
-    // Delete old contact groups.
-    deleter::listmember(
-      h->contact_groups,
-      &deleter::contactgroupsmember);
-
-    // Add contact groups to host.
-    for (list_string::const_iterator
-           it(obj->contactgroups().begin()),
-           end(obj->contactgroups().end());
-         it != end;
-         ++it)
-      if (!add_contactgroup_to_host(h, it->c_str()))
-        throw (engine_error() << "Could not add contact group '"
-               << *it << "' to host '" << obj->host_name() << "'");
-  }
 
   // Custom variables.
   if (obj->customvariables() != obj_old->customvariables()) {

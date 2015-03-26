@@ -27,7 +27,6 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/program.cc"
   "${SRC_DIR}/service.cc"
@@ -35,7 +34,6 @@ set(
   "${SRC_DIR}/utils.cc"
 
   # Headers.
-  "${INC_DIR}/contact.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/program.hh"
   "${INC_DIR}/service.hh"

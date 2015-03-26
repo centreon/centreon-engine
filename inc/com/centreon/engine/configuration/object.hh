@@ -41,8 +41,6 @@ namespace                  configuration {
     enum                   object_type {
       command = 0,
       connector,
-      contact,
-      contactgroup,
       host,
       hostdependency,
       hostgroup,

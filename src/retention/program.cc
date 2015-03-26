@@ -32,13 +32,11 @@ program::setters const program::_setters[] = {
   { "check_service_freshness",        SETTER(bool, _set_check_service_freshness) },
   { "enable_event_handlers",          SETTER(bool, _set_enable_event_handlers) },
   { "enable_flap_detection",          SETTER(bool, _set_enable_flap_detection) },
-  { "enable_notifications",           SETTER(bool, _set_enable_notifications) },
   { "global_host_event_handler",      SETTER(std::string const&, _set_global_host_event_handler) },
   { "global_service_event_handler",   SETTER(std::string const&, _set_global_service_event_handler) },
   { "modified_host_attributes",       SETTER(unsigned long, _set_modified_host_attributes) },
   { "modified_service_attributes",    SETTER(unsigned long, _set_modified_service_attributes) },
   { "next_event_id",                  SETTER(unsigned long, _set_next_event_id) },
-  { "next_notification_id",           SETTER(unsigned long, _set_next_notification_id) },
   { "next_problem_id",                SETTER(unsigned long, _set_next_problem_id) },
   { "obsess_over_hosts",              SETTER(bool, _set_obsess_over_hosts) },
   { "obsess_over_services",           SETTER(bool, _set_obsess_over_services) },
@@ -47,8 +45,10 @@ program::setters const program::_setters[] = {
 
   // Deprecated.
   { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
+  { "enable_notifications",           SETTER(bool, _set_enable_notifications) },
   { "next_comment_id",                SETTER(unsigned long, _set_next_comment_id) },
   { "next_downtime_id",               SETTER(unsigned long, _set_next_downtime_id) },
+  { "next_notification_id",           SETTER(unsigned long, _set_next_notification_id) },
   { "process_performance_data",       SETTER(bool, _set_process_performance_data) }
 };
 
@@ -88,13 +88,11 @@ program& program::operator=(program const& right) {
     _check_service_freshness = right._check_service_freshness;
     _enable_event_handlers = right._enable_event_handlers;
     _enable_flap_detection = right._enable_flap_detection;
-    _enable_notifications = right._enable_notifications;
     _global_host_event_handler = right._global_host_event_handler;
     _global_service_event_handler = right._global_service_event_handler;
     _modified_host_attributes = right._modified_host_attributes;
     _modified_service_attributes = right._modified_service_attributes;
     _next_event_id = right._next_event_id;
-    _next_notification_id = right._next_notification_id;
     _next_problem_id = right._next_problem_id;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
@@ -119,13 +117,11 @@ bool program::operator==(program const& right) const throw () {
           && _check_service_freshness == right._check_service_freshness
           && _enable_event_handlers == right._enable_event_handlers
           && _enable_flap_detection == right._enable_flap_detection
-          && _enable_notifications == right._enable_notifications
           && _global_host_event_handler == right._global_host_event_handler
           && _global_service_event_handler == right._global_service_event_handler
           && _modified_host_attributes == right._modified_host_attributes
           && _modified_service_attributes == right._modified_service_attributes
           && _next_event_id == right._next_event_id
-          && _next_notification_id == right._next_notification_id
           && _next_problem_id == right._next_problem_id
           && _obsess_over_hosts == right._obsess_over_hosts
           && _obsess_over_services == right._obsess_over_services
@@ -216,15 +212,6 @@ opt<bool> const& program::enable_flap_detection() const throw () {
 }
 
 /**
- *  Get enable_notifications.
- *
- *  @return The enable_notifications.
- */
-opt<bool> const& program::enable_notifications() const throw () {
-  return (_enable_notifications);
-}
-
-/**
  *  Get global_host_event_handler.
  *
  *  @return The global_host_event_handler.
@@ -267,15 +254,6 @@ opt<unsigned long> const& program::modified_service_attributes() const throw () 
  */
 opt<unsigned long> const& program::next_event_id() const throw () {
   return (_next_event_id);
-}
-
-/**
- *  Get next_notification_id.
- *
- *  @return The next_notification_id.
- */
-opt<unsigned long> const& program::next_notification_id() const throw () {
-  return (_next_notification_id);
 }
 
 /**
@@ -394,12 +372,14 @@ bool program::_set_enable_flap_detection(bool value) {
 }
 
 /**
- *  Set enable_notifications.
+ *  Deprecated variable.
  *
- *  @param[in] value The new enable_notifications.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_enable_notifications(bool value) {
-  _enable_notifications = value;
+  (void)value;
   return (true);
 }
 
@@ -476,12 +456,14 @@ bool program::_set_next_event_id(unsigned long value) {
 }
 
 /**
- *  Set next_notification_id.
+ *  Deprecated variable.
  *
- *  @param[in] value The new next_notification_id.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_next_notification_id(unsigned long value) {
-  _next_notification_id = value;
+  (void)value;
   return (true);
 }
 

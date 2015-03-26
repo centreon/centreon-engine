@@ -29,8 +29,6 @@ using namespace com::centreon::io;
 parser::store parser::_store[] = {
   &parser::_store_into_map<command, &command::command_name>,
   &parser::_store_into_map<connector, &connector::connector_name>,
-  &parser::_store_into_map<contact, &contact::contact_name>,
-  &parser::_store_into_map<contactgroup, &contactgroup::contactgroup_name>,
   &parser::_store_into_map<host, &host::host_name>,
   &parser::_store_into_list,
   &parser::_store_into_map<hostgroup, &hostgroup::hostgroup_name>,
@@ -80,8 +78,6 @@ void parser::parse(std::string const& path, state& config) {
   // Fill state.
   _insert(_map_objects[object::command], config.commands());
   _insert(_map_objects[object::connector], config.connectors());
-  _insert(_map_objects[object::contact], config.contacts());
-  _insert(_map_objects[object::contactgroup], config.contactgroups());
   _insert(_lst_objects[object::hostdependency], config.hostdependencies());
   _insert(_map_objects[object::hostgroup], config.hostgroups());
   _insert(_map_objects[object::host], config.hosts());
@@ -371,7 +367,9 @@ void parser::_parse_object_definitions(std::string const& path) {
             || (type == "serviceescalation")
             || (type == "downtime")
             || (type == "hostdowntime")
-            || (type == "servicedowntime")) {
+            || (type == "servicedowntime")
+            || (type == "contact")
+            || (type == "contactgroup")) {
           logger(logging::log_config_warning, logging::basic)
             << "Warning: " << type << " object is ignored";
           parse_object = false;

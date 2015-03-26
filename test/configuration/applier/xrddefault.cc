@@ -34,7 +34,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
@@ -204,14 +203,11 @@ int xrddefault_save_state_information() {
   }
 
   /* what attributes should be masked out? */
-  /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
+  /* NOTE: host/service-specific values may be added in the future, but for now we only have global masks */
   unsigned long process_host_attribute_mask = retained_process_host_attribute_mask;
   unsigned long process_service_attribute_mask = retained_process_host_attribute_mask;
   unsigned long host_attribute_mask = retained_host_attribute_mask;
   unsigned long service_attribute_mask = retained_host_attribute_mask;
-  unsigned long contact_host_attribute_mask = retained_contact_host_attribute_mask;
-  unsigned long contact_service_attribute_mask = retained_contact_service_attribute_mask;
-  unsigned long contact_attribute_mask = 0L;
 
   std::ostringstream stream;
   std::streamsize ss(stream.precision());
@@ -236,7 +232,6 @@ int xrddefault_save_state_information() {
   stream << "program {\n"
          << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
          << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
-         << "enable_notifications=" << enable_notifications << "\n"
          << "active_service_checks_enabled=" << execute_service_checks << "\n"
          << "passive_service_checks_enabled=" << accept_passive_service_checks << "\n"
          << "active_host_checks_enabled=" << execute_host_checks << "\n"
@@ -251,7 +246,6 @@ int xrddefault_save_state_information() {
          << "global_service_event_handler=" << global_service_event_handler << "\n"
          << "next_event_id=" << next_event_id << "\n"
          << "next_problem_id=" << next_problem_id << "\n"
-         << "next_notification_id=" << next_notification_id << "\n"
          << "}\n";
 
   /* save host state information */
@@ -264,7 +258,6 @@ int xrddefault_save_state_information() {
            << "modified_attributes=" << (temp_host->modified_attributes & ~host_attribute_mask) << "\n"
            << "check_command=" << (temp_host->host_check_command ? temp_host->host_check_command : "") << "\n"
            << "check_period=" << (temp_host->check_period ? temp_host->check_period : "") << "\n"
-           << "notification_period=" << (temp_host->notification_period ? temp_host->notification_period : "") << "\n"
            << "event_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
            << "has_been_checked=" << temp_host->has_been_checked << "\n"
            << "check_execution_time=" << std::setprecision(3) << std::fixed<< temp_host->execution_time << std::setprecision(ss) << "\n"
@@ -293,20 +286,13 @@ int xrddefault_save_state_information() {
            << "last_time_up=" << static_cast<unsigned long>(temp_host->last_time_up) << "\n"
            << "last_time_down=" << static_cast<unsigned long>(temp_host->last_time_down) << "\n"
            << "last_time_unreachable=" << static_cast<unsigned long>(temp_host->last_time_unreachable) << "\n"
-           << "notified_on_down=" << temp_host->notified_on_down << "\n"
-           << "notified_on_unreachable=" << temp_host->notified_on_unreachable << "\n"
-           << "last_notification=" << static_cast<unsigned long>(temp_host->last_host_notification) << "\n"
-           << "current_notification_number=" << temp_host->current_notification_number << "\n"
-           << "current_notification_id=" << temp_host->current_notification_id << "\n"
-           << "notifications_enabled=" << temp_host->notifications_enabled << "\n"
            << "active_checks_enabled=" << temp_host->checks_enabled << "\n"
            << "passive_checks_enabled=" << temp_host->accept_passive_host_checks << "\n"
            << "event_handler_enabled=" << temp_host->event_handler_enabled << "\n"
            << "flap_detection_enabled=" << temp_host->flap_detection_enabled << "\n"
            << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
            << "is_flapping=" << temp_host->is_flapping << "\n"
-           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_host->percent_state_change << std::setprecision(ss) << "\n"
-           << "check_flapping_recovery_notification=" << temp_host->check_flapping_recovery_notification << "\n";
+           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_host->percent_state_change << std::setprecision(ss) << "\n";
     stream << "state_history=";
     for (unsigned int x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
       stream << (x > 0 ? "," : "") << temp_host->state_history[(x + temp_host->state_history_index) % MAX_STATE_HISTORY_ENTRIES];
@@ -337,7 +323,6 @@ int xrddefault_save_state_information() {
            << "modified_attributes=" << (temp_service->modified_attributes & ~service_attribute_mask) << "\n"
            << "check_command=" << (temp_service->service_check_command ? temp_service->service_check_command : "") << "\n"
            << "check_period=" << (temp_service->check_period ? temp_service->check_period : "") << "\n"
-           << "notification_period=" << (temp_service->notification_period ? temp_service->notification_period : "") << "\n"
            << "event_handler=" << (temp_service->event_handler ? temp_service->event_handler : "") << "\n"
            << "has_been_checked=" << temp_service->has_been_checked << "\n"
            << "check_execution_time=" << std::setprecision(3) << std::fixed << temp_service->execution_time << std::setprecision(ss) << "\n"
@@ -367,21 +352,13 @@ int xrddefault_save_state_information() {
            << "last_check=" << static_cast<unsigned long>(temp_service->last_check) << "\n"
            << "next_check=" << static_cast<unsigned long>(temp_service->next_check) << "\n"
            << "check_options=" << temp_service->check_options << "\n"
-           << "notified_on_unknown=" << temp_service->notified_on_unknown << "\n"
-           << "notified_on_warning=" << temp_service->notified_on_warning << "\n"
-           << "notified_on_critical=" << temp_service->notified_on_critical << "\n"
-           << "current_notification_number=" << temp_service->current_notification_number << "\n"
-           << "current_notification_id=" << temp_service->current_notification_id << "\n"
-           << "last_notification=" << static_cast<unsigned long>(temp_service->last_notification) << "\n"
-           << "notifications_enabled=" << temp_service->notifications_enabled << "\n"
            << "active_checks_enabled=" << temp_service->checks_enabled << "\n"
            << "passive_checks_enabled=" << temp_service->accept_passive_service_checks << "\n"
            << "event_handler_enabled=" << temp_service->event_handler_enabled << "\n"
            << "flap_detection_enabled=" << temp_service->flap_detection_enabled << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "is_flapping=" << temp_service->is_flapping << "\n"
-           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_service->percent_state_change << std::setprecision(ss) << "\n"
-           << "check_flapping_recovery_notification=" << temp_service->check_flapping_recovery_notification << "\n";
+           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_service->percent_state_change << std::setprecision(ss) << "\n";
 
     stream << "state_history=";
     for (unsigned int x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
@@ -398,37 +375,6 @@ int xrddefault_save_state_information() {
                << (temp_customvariablesmember->variable_value
                    ? temp_customvariablesmember->variable_value : "") << "\n";
     }
-    stream << "}\n";
-  }
-
-  /* save contact state information */
-  for (contact* temp_contact = contact_list;
-       temp_contact != NULL;
-       temp_contact = temp_contact->next) {
-
-    stream << "contact {\n"
-           << "contact_name=" << temp_contact->name << "\n"
-           << "modified_attributes=" << (temp_contact->modified_attributes & ~contact_attribute_mask) << "\n"
-           << "modified_host_attributes=" << (temp_contact->modified_host_attributes & ~contact_host_attribute_mask) << "\n"
-           << "modified_service_attributes=" << (temp_contact->modified_service_attributes & ~contact_service_attribute_mask) << "\n"
-           << "host_notification_period=" << (temp_contact->host_notification_period ? temp_contact->host_notification_period : "") << "\n"
-           << "service_notification_period=" << (temp_contact->service_notification_period ? temp_contact->service_notification_period : "") << "\n"
-           << "last_host_notification=" << static_cast<unsigned long>(temp_contact->last_host_notification) << "\n"
-           << "last_service_notification=" << static_cast<unsigned long>(temp_contact->last_service_notification) << "\n"
-           << "host_notifications_enabled=" << temp_contact->host_notifications_enabled << "\n"
-           << "service_notifications_enabled=" << temp_contact->service_notifications_enabled << "\n";
-
-    /* custom variables */
-    for (customvariablesmember* temp_customvariablesmember = temp_contact->custom_variables;
-         temp_customvariablesmember != NULL;
-         temp_customvariablesmember = temp_customvariablesmember->next) {
-      if (temp_customvariablesmember->variable_name)
-        stream << "_" << temp_customvariablesmember->variable_name << "="
-               << temp_customvariablesmember->has_been_modified << ";"
-               << (temp_customvariablesmember->variable_value
-                   ? temp_customvariablesmember->variable_value : "") << "\n";
-    }
-
     stream << "}\n";
   }
 
@@ -478,14 +424,12 @@ int xrddefault_read_state_information() {
   mmapfile* thefile;
   char* host_name = NULL;
   char* service_description = NULL;
-  char* contact_name = NULL;
   char* author = NULL;
   char* comment_data = NULL;
   unsigned int data_type = XRDDEFAULT_NO_DATA;
   unsigned int x = 0;
   host* temp_host = NULL;
   service* temp_service = NULL;
-  contact* temp_contact = NULL;
   command* temp_command = NULL;
   timeperiod* temp_timeperiod = NULL;
   customvariablesmember* temp_customvariablesmember = NULL;
@@ -508,13 +452,9 @@ int xrddefault_read_state_information() {
   unsigned long duration = 0L;
   unsigned long host_attribute_mask = 0L;
   unsigned long service_attribute_mask = 0L;
-  unsigned long contact_attribute_mask = 0L;
-  unsigned long contact_host_attribute_mask = 0L;
-  unsigned long contact_service_attribute_mask = 0L;
   unsigned long process_host_attribute_mask = 0L;
   unsigned long process_service_attribute_mask = 0L;
   int was_flapping = FALSE;
-  int allow_flapstart_notification = TRUE;
   struct timeval tv[2];
   double runtime[2];
   int found_directive = FALSE;
@@ -537,13 +477,11 @@ int xrddefault_read_state_information() {
     return (ERROR);
 
   /* what attributes should be masked out? */
-  /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
+  /* NOTE: host/service-specific values may be added in the future, but for now we only have global masks */
   process_host_attribute_mask = retained_process_host_attribute_mask;
   process_service_attribute_mask = retained_process_host_attribute_mask;
   host_attribute_mask = retained_host_attribute_mask;
   service_attribute_mask = retained_host_attribute_mask;
-  contact_host_attribute_mask = retained_contact_host_attribute_mask;
-  contact_service_attribute_mask = retained_contact_service_attribute_mask;
 
   /* read all lines in the retention file */
   while (1) {
@@ -565,8 +503,6 @@ int xrddefault_read_state_information() {
       data_type = XRDDEFAULT_SERVICESTATUS_DATA;
     else if (!strcmp(input, "host {"))
       data_type = XRDDEFAULT_HOSTSTATUS_DATA;
-    else if (!strcmp(input, "contact {"))
-      data_type = XRDDEFAULT_CONTACTSTATUS_DATA;
     else if (!strcmp(input, "info {"))
       data_type = XRDDEFAULT_INFO_DATA;
     else if (!strcmp(input, "program {"))
@@ -602,11 +538,6 @@ int xrddefault_read_state_information() {
               temp_host->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
           }
 
-          /* calculate next possible notification time */
-          if (temp_host->current_state != HOST_UP
-              && temp_host->last_host_notification != (time_t)0)
-            temp_host->next_host_notification = get_next_host_notification_time(temp_host, temp_host->last_host_notification);
-
           /* ADDED 01/23/2009 adjust current check attempts if host in hard problem state (max attempts may have changed in config since restart) */
           if (temp_host->current_state != HOST_UP
               && temp_host->state_type == HARD_STATE)
@@ -625,7 +556,6 @@ int xrddefault_read_state_information() {
 
         /* reset vars */
         was_flapping = FALSE;
-        allow_flapstart_notification = TRUE;
 
         delete[] host_name;
         host_name = NULL;
@@ -649,14 +579,6 @@ int xrddefault_read_state_information() {
             if (temp_customvariablesmember == NULL)
               temp_service->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
           }
-
-          /* calculate next possible notification time */
-          if (temp_service->current_state != STATE_OK
-              && temp_service->last_notification != (time_t)0)
-            temp_service->next_notification
-              = get_next_service_notification_time(
-                  temp_service,
-                  temp_service->last_notification);
 
           /* fix old vars */
           if (temp_service->has_been_checked == FALSE
@@ -682,40 +604,12 @@ int xrddefault_read_state_information() {
 
         /* reset vars */
         was_flapping = FALSE;
-        allow_flapstart_notification = TRUE;
 
         delete[] host_name;
         delete[] service_description;
         host_name = NULL;
         service_description = NULL;
         temp_service = NULL;
-        break;
-
-      case XRDDEFAULT_CONTACTSTATUS_DATA:
-        if (temp_contact != NULL) {
-          /* adjust modified attributes if necessary */
-          if (temp_contact->retain_nonstatus_information == FALSE)
-            temp_contact->modified_attributes = MODATTR_NONE;
-
-          /* adjust modified attributes if no custom variables have been changed */
-          if (temp_contact->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-            for (temp_customvariablesmember = temp_contact->custom_variables;
-                 temp_customvariablesmember != NULL;
-                 temp_customvariablesmember = temp_customvariablesmember->next) {
-              if (temp_customvariablesmember->has_been_modified == TRUE)
-                break;
-            }
-            if (temp_customvariablesmember == NULL)
-              temp_contact->modified_attributes -= MODATTR_CUSTOM_VARIABLE;
-          }
-
-          /* update contact status */
-          // update_contact_status(temp_contact, FALSE);
-        }
-
-        delete[] contact_name;
-        contact_name = NULL;
-        temp_contact = NULL;
         break;
 
       default:
@@ -766,11 +660,7 @@ int xrddefault_read_state_information() {
           modified_service_process_attributes &= ~process_service_attribute_mask;
         }
         if (use_retained_program_state == true) {
-          if (!strcmp(var, "enable_notifications")) {
-            if (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-              config->enable_notifications((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "active_service_checks_enabled")) {
+          if (!strcmp(var, "active_service_checks_enabled")) {
             if (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
               config->execute_service_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
@@ -842,8 +732,6 @@ int xrddefault_read_state_information() {
             next_event_id = strtoul(val, NULL, 10);
           else if (!strcmp(var, "next_problem_id"))
             next_problem_id = strtoul(val, NULL, 10);
-          else if (!strcmp(var, "next_notification_id"))
-            next_notification_id = strtoul(val, NULL, 10);
         }
         break;
 
@@ -925,24 +813,12 @@ int xrddefault_read_state_information() {
               temp_host->last_time_down = strtoul(val, NULL, 10);
             else if (!strcmp(var, "last_time_unreachable"))
               temp_host->last_time_unreachable = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "notified_on_down"))
-              temp_host->notified_on_down = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "notified_on_unreachable"))
-              temp_host->notified_on_unreachable = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "last_notification"))
-              temp_host->last_host_notification = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "current_notification_number"))
-              temp_host->current_notification_number = atoi(val);
-            else if (!strcmp(var, "current_notification_id"))
-              temp_host->current_notification_id = strtoul(val, NULL, 10);
             else if (!strcmp(var, "is_flapping"))
               was_flapping = atoi(val);
             else if (!strcmp(var, "percent_state_change"))
               temp_host->percent_state_change = strtod(val, NULL);
             else
-              if (!strcmp(var, "check_flapping_recovery_notification"))
-                temp_host->check_flapping_recovery_notification = atoi(val);
-              else if (!strcmp(var, "state_history")) {
+              if (!strcmp(var, "state_history")) {
                 temp_ptr = val;
                 for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
                   if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
@@ -959,10 +835,6 @@ int xrddefault_read_state_information() {
             /* null-op speeds up logic */
             if (found_directive == TRUE);
 
-            else if (!strcmp(var, "notifications_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                temp_host->notifications_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
             else if (!strcmp(var, "active_checks_enabled")) {
               if (temp_host->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
                 temp_host->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
@@ -1012,20 +884,6 @@ int xrddefault_read_state_information() {
                 }
                 else
                   temp_host->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "notification_period")) {
-              if (temp_host->modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                temp_timeperiod = find_timeperiod(val);
-                temp_ptr = string::dup(val);
-
-                if (temp_timeperiod != NULL && temp_ptr != NULL) {
-                  delete[] temp_host->notification_period;
-                  temp_host->notification_period = temp_ptr;
-                }
-                else
-                  temp_host->modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
               }
             }
             else if (!strcmp(var, "event_handler")) {
@@ -1180,26 +1038,12 @@ int xrddefault_read_state_information() {
                   && scheduling_info_is_ok == TRUE)
                 temp_service->check_options = atoi(val);
             }
-            else if (!strcmp(var, "notified_on_unknown"))
-              temp_service->notified_on_unknown = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "notified_on_warning"))
-              temp_service->notified_on_warning = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "notified_on_critical"))
-              temp_service->notified_on_critical = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "current_notification_number"))
-              temp_service->current_notification_number = atoi(val);
-            else if (!strcmp(var, "current_notification_id"))
-              temp_service->current_notification_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_notification"))
-              temp_service->last_notification = strtoul(val, NULL, 10);
             else if (!strcmp(var, "is_flapping"))
               was_flapping = atoi(val);
             else if (!strcmp(var, "percent_state_change"))
               temp_service->percent_state_change = strtod(val, NULL);
             else
-              if (!strcmp(var, "check_flapping_recovery_notification"))
-                temp_service->check_flapping_recovery_notification = atoi(val);
-              else if (!strcmp(var, "state_history")) {
+              if (!strcmp(var, "state_history")) {
                 temp_ptr = val;
                 for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
                   if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
@@ -1216,10 +1060,6 @@ int xrddefault_read_state_information() {
             /* null-op speeds up logic */
             if (found_directive == TRUE);
 
-            else if (!strcmp(var, "notifications_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                temp_service->notifications_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
             else if (!strcmp(var, "active_checks_enabled")) {
               if (temp_service->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
                 temp_service->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
@@ -1271,20 +1111,6 @@ int xrddefault_read_state_information() {
                   temp_service->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
               }
             }
-            else if (!strcmp(var, "notification_period")) {
-              if (temp_service->modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                temp_timeperiod = find_timeperiod(val);
-                temp_ptr = string::dup(val);
-
-                if (temp_timeperiod != NULL && temp_ptr != NULL) {
-                  delete[] temp_service->notification_period;
-                  temp_service->notification_period = temp_ptr;
-                }
-                else
-                  temp_service->modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-              }
-            }
             else if (!strcmp(var, "event_handler")) {
               if (temp_service->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
                 /* make sure the check command still exists... */
@@ -1332,104 +1158,6 @@ int xrddefault_read_state_information() {
                 customvarname = var + 1;
 
                 for (temp_customvariablesmember = temp_service->custom_variables;
-                     temp_customvariablesmember != NULL;
-                     temp_customvariablesmember = temp_customvariablesmember->next) {
-                  if (!strcmp(customvarname, temp_customvariablesmember->variable_name)) {
-                    if ((x = atoi(val)) > 0 && strlen(val) > 3) {
-                      delete[] temp_customvariablesmember->variable_value;
-                      temp_customvariablesmember->variable_value = string::dup(val + 2);
-                      temp_customvariablesmember->has_been_modified = (x > 0) ? TRUE : FALSE;
-                    }
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-        break;
-
-      case XRDDEFAULT_CONTACTSTATUS_DATA:
-        if (temp_contact == NULL) {
-          if (!strcmp(var, "contact_name")) {
-            contact_name = string::dup(val);
-            temp_contact = find_contact(contact_name);
-          }
-        }
-        else {
-          if (!strcmp(var, "modified_attributes")) {
-            temp_contact->modified_attributes = strtoul(val, NULL, 10);
-
-            /* mask out attributes we don't want to retain */
-            temp_contact->modified_attributes &= ~contact_attribute_mask;
-          }
-          else if (!strcmp(var, "modified_host_attributes")) {
-            temp_contact->modified_host_attributes = strtoul(val, NULL, 10);
-
-            /* mask out attributes we don't want to retain */
-            temp_contact->modified_host_attributes &= ~contact_host_attribute_mask;
-          }
-          else if (!strcmp(var, "modified_service_attributes")) {
-            temp_contact->modified_service_attributes = strtoul(val, NULL, 10);
-
-            /* mask out attributes we don't want to retain */
-            temp_contact->modified_service_attributes &= ~contact_service_attribute_mask;
-          }
-          else if (temp_contact->retain_status_information == TRUE) {
-            if (!strcmp(var, "last_host_notification"))
-              temp_contact->last_host_notification = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_service_notification"))
-              temp_contact->last_service_notification = strtoul(val, NULL, 10);
-            else
-              found_directive = FALSE;
-          }
-          if (temp_contact->retain_nonstatus_information == TRUE) {
-            /* null-op speeds up logic */
-            if (found_directive == TRUE);
-
-            else if (!strcmp(var, "host_notification_period")) {
-              if (temp_contact->modified_host_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                temp_timeperiod = find_timeperiod(val);
-                temp_ptr = string::dup(val);
-
-                if (temp_timeperiod != NULL && temp_ptr != NULL) {
-                  delete[] temp_contact->host_notification_period;
-                  temp_contact->host_notification_period = temp_ptr;
-                }
-                else
-                  temp_contact->modified_host_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "service_notification_period")) {
-              if (temp_contact->modified_service_attributes & MODATTR_NOTIFICATION_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                temp_timeperiod = find_timeperiod(val);
-                temp_ptr = string::dup(val);
-
-                if (temp_timeperiod != NULL && temp_ptr != NULL) {
-                  delete[] temp_contact->service_notification_period;
-                  temp_contact->service_notification_period = temp_ptr;
-                }
-                else
-                  temp_contact->modified_service_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "host_notifications_enabled")) {
-              if (temp_contact->modified_host_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                temp_contact->host_notifications_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "service_notifications_enabled")) {
-              if (temp_contact->modified_service_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-                temp_contact->service_notifications_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            /* custom variables */
-            else if (var[0] == '_') {
-              if (temp_contact->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-                /* get the variable name */
-                customvarname = var + 1;
-
-                for (temp_customvariablesmember = temp_contact->custom_variables;
                      temp_customvariablesmember != NULL;
                      temp_customvariablesmember = temp_customvariablesmember->next) {
                   if (!strcmp(customvarname, temp_customvariablesmember->variable_name)) {

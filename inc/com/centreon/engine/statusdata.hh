@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2007 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,7 +21,6 @@
 #ifndef CCE_STATUSDATA_HH
 #  define CCE_STATUSDATA_HH
 
-#  include "com/centreon/engine/objects/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -41,8 +40,6 @@ int update_program_status();
 int update_host_status(host* hst);
 // updates service status data
 int update_service_status(service* svc);
-// updates contact status data
-int update_contact_status(contact* cntct);
 
 #  ifdef __cplusplus
 }

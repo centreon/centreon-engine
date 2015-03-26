@@ -63,8 +63,6 @@ using namespace com::centreon::engine;
 #define LAST_UNKNOWN 102565478
 #define LAST_CRITICAL 15478632
 #define PERCENT_CHANGE 42.26
-#define NOTIFICATION_NUMBER 7
-#define NOTIFICATION_ID 432
 #define EVENT_ID 2348972
 #define LAST_EVENT_ID 21384723
 #define PROBLEM_ID 123900
@@ -112,8 +110,6 @@ int main_test(int argc, char** argv) {
   service_list->last_time_unknown = LAST_UNKNOWN;
   service_list->last_time_critical = LAST_CRITICAL;
   service_list->percent_state_change = PERCENT_CHANGE;
-  service_list->current_notification_number = NOTIFICATION_NUMBER;
-  service_list->current_notification_id = NOTIFICATION_ID;
   service_list->current_event_id = EVENT_ID;
   service_list->last_event_id = LAST_EVENT_ID;
   service_list->current_problem_id = PROBLEM_ID;
@@ -173,8 +169,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTSERVICEUNKNOWN, STR(LAST_UNKNOWN), false },
     { MACRO_LASTSERVICECRITICAL, STR(LAST_CRITICAL), false },
     { MACRO_SERVICEPERCENTCHANGE, STR(PERCENT_CHANGE), true },
-    { MACRO_SERVICENOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false },
-    { MACRO_SERVICENOTIFICATIONID, STR(NOTIFICATION_ID), false },
     { MACRO_SERVICEEVENTID, STR(EVENT_ID), false },
     { MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false },

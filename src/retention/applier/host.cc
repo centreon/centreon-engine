@@ -127,20 +127,8 @@ void applier::host::_update(
       obj.last_time_down = *state.last_time_down();
     if (state.last_time_unreachable().is_set())
       obj.last_time_unreachable = *state.last_time_unreachable();
-    if (state.notified_on_down().is_set())
-      obj.notified_on_down = *state.notified_on_down();
-    if (state.notified_on_unreachable().is_set())
-      obj.notified_on_unreachable = *state.notified_on_unreachable();
-    if (state.last_notification().is_set())
-      obj.last_host_notification = *state.last_notification();
-    if (state.current_notification_number().is_set())
-      obj.current_notification_number = *state.current_notification_number();
-    if (state.current_notification_id().is_set())
-      obj.current_notification_id = *state.current_notification_id();
     if (state.percent_state_change().is_set())
       obj.percent_state_change = *state.percent_state_change();
-    if (state.check_flapping_recovery_notification().is_set())
-      obj.check_flapping_recovery_notification = *state.check_flapping_recovery_notification();
     if (state.state_history().is_set()) {
       utils::set_state_history(
         *state.state_history(),
@@ -150,10 +138,6 @@ void applier::host::_update(
   }
 
   if (obj.retain_nonstatus_information) {
-    if (state.notifications_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_NOTIFICATIONS_ENABLED))
-      obj.notifications_enabled = *state.notifications_enabled();
-
     if (state.active_checks_enabled().is_set()
         && (obj.modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
         obj.checks_enabled = *state.active_checks_enabled();
@@ -188,14 +172,6 @@ void applier::host::_update(
         string::setstr(obj.check_period, *state.check_period());
       else
         obj.modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-    }
-
-    if (state.notification_period().is_set()
-        && (obj.modified_attributes & MODATTR_NOTIFICATION_TIMEPERIOD)) {
-      if (is_timeperiod_exist(*state.notification_period()))
-          string::setstr(obj.notification_period, *state.notification_period());
-      else
-        obj.modified_attributes -= MODATTR_NOTIFICATION_TIMEPERIOD;
     }
 
     if (state.event_handler().is_set()
@@ -240,8 +216,6 @@ void applier::host::_update(
     }
   }
 
-  bool allow_flapstart_notification(true);
-
   // adjust modified attributes if necessary.
   if (!obj.retain_nonstatus_information)
     obj.modified_attributes = MODATTR_NONE;
@@ -257,13 +231,6 @@ void applier::host::_update(
         break;
       }
   }
-
-  // calculate next possible notification time.
-  if (obj.current_state != HOST_UP && obj.last_host_notification)
-    obj.next_host_notification
-      = get_next_host_notification_time(
-          &obj,
-          obj.last_host_notification);
 
   // ADDED 01/23/2009 adjust current check attempts if host in hard
   // problem state (max attempts may have changed in config

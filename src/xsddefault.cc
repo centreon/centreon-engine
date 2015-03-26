@@ -135,7 +135,6 @@ int xsddefault_save_status_data() {
        "\tnagios_pid=" << static_cast<unsigned int>(getpid()) << "\n"
        "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
        "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
-       "\tenable_notifications=" << config->enable_notifications() << "\n"
        "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
        "\tpassive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
        "\tactive_host_checks_enabled=" << config->execute_host_checks() << "\n"
@@ -150,7 +149,6 @@ int xsddefault_save_status_data() {
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
-       "\tnext_notification_id=" << next_notification_id << "\n"
        "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
        "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
        "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
@@ -208,7 +206,6 @@ int xsddefault_save_status_data() {
          "\tmodified_attributes=" << hst->modified_attributes << "\n"
          "\tcheck_command=" << (hst->host_check_command ? hst->host_check_command : "") << "\n"
          "\tcheck_period=" << (hst->check_period ? hst->check_period : "") << "\n"
-         "\tnotification_period=" << (hst->notification_period ? hst->notification_period : "") << "\n"
          "\tcheck_interval=" << hst->check_interval << "\n"
          "\tretry_interval=" << hst->retry_interval << "\n"
          "\tevent_handler=" << (hst->event_handler ? hst->event_handler : "") << "\n"
@@ -237,12 +234,6 @@ int xsddefault_save_status_data() {
          "\tlast_time_up=" << static_cast<unsigned long>(hst->last_time_up) << "\n"
          "\tlast_time_down=" << static_cast<unsigned long>(hst->last_time_down) << "\n"
          "\tlast_time_unreachable=" << static_cast<unsigned long>(hst->last_time_unreachable) << "\n"
-         "\tlast_notification=" << static_cast<unsigned long>(hst->last_host_notification) << "\n"
-         "\tnext_notification=" << static_cast<unsigned long>(hst->next_host_notification) << "\n"
-         "\tno_more_notifications=" << hst->no_more_notifications << "\n"
-         "\tcurrent_notification_number=" << hst->current_notification_number << "\n"
-         "\tcurrent_notification_id=" << hst->current_notification_id << "\n"
-         "\tnotifications_enabled=" << hst->notifications_enabled << "\n"
          "\tactive_checks_enabled=" << hst->checks_enabled << "\n"
          "\tpassive_checks_enabled=" << hst->accept_passive_host_checks << "\n"
          "\tevent_handler_enabled=" << hst->event_handler_enabled << "\n"
@@ -270,7 +261,6 @@ int xsddefault_save_status_data() {
          "\tmodified_attributes=" << svc->modified_attributes << "\n"
          "\tcheck_command=" << (svc->service_check_command ? svc->service_check_command : "") << "\n"
          "\tcheck_period=" << (svc->check_period ? svc->check_period : "") << "\n"
-         "\tnotification_period=" << (svc->notification_period ? svc->notification_period : "") << "\n"
          "\tcheck_interval=" << svc->check_interval << "\n"
          "\tretry_interval=" << svc->retry_interval << "\n"
          "\tevent_handler=" << (svc->event_handler ? svc->event_handler : "") << "\n"
@@ -300,12 +290,6 @@ int xsddefault_save_status_data() {
          "\tlast_check=" << static_cast<unsigned long>(svc->last_check) << "\n"
          "\tnext_check=" << static_cast<unsigned long>(svc->next_check) << "\n"
          "\tcheck_options=" << svc->check_options << "\n"
-         "\tcurrent_notification_number=" << svc->current_notification_number << "\n"
-         "\tcurrent_notification_id=" << svc->current_notification_id << "\n"
-         "\tlast_notification=" << static_cast<unsigned long>(svc->last_notification) << "\n"
-         "\tnext_notification=" << static_cast<unsigned long>(svc->next_notification) << "\n"
-         "\tno_more_notifications=" << svc->no_more_notifications << "\n"
-         "\tnotifications_enabled=" << svc->notifications_enabled << "\n"
          "\tactive_checks_enabled=" << svc->checks_enabled << "\n"
          "\tpassive_checks_enabled=" << svc->accept_passive_service_checks << "\n"
          "\tevent_handler_enabled=" << svc->event_handler_enabled << "\n"
@@ -317,29 +301,6 @@ int xsddefault_save_status_data() {
 
     // custom variables
     for (customvariablesmember* cvarm = svc->custom_variables; cvarm; cvarm = cvarm->next) {
-      if (cvarm->variable_name)
-        stream << "\t_" << cvarm->variable_name << "=" << cvarm->has_been_modified << ";"
-               << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
-    }
-    stream << "\t}\n\n";
-  }
-
-  // save contact status data
-  for (contact* cntct = contact_list; cntct; cntct = cntct->next) {
-    stream
-      << "contactstatus {\n"
-         "\tcontact_name=" << cntct->name << "\n"
-         "\tmodified_attributes=" << cntct->modified_attributes << "\n"
-         "\tmodified_host_attributes=" << cntct->modified_host_attributes << "\n"
-         "\tmodified_service_attributes=" << cntct->modified_service_attributes << "\n"
-         "\thost_notification_period=" << (cntct->host_notification_period ? cntct->host_notification_period : "") << "\n"
-         "\tservice_notification_period=" << (cntct->service_notification_period ? cntct->service_notification_period : "") << "\n"
-         "\tlast_host_notification=" << static_cast<unsigned long>(cntct->last_host_notification) << "\n"
-         "\tlast_service_notification=" << static_cast<unsigned long>(cntct->last_service_notification) << "\n"
-         "\thost_notifications_enabled=" << cntct->host_notifications_enabled << "\n"
-         "\tservice_notifications_enabled=" << cntct->service_notifications_enabled << "\n";
-    // custom variables
-    for (customvariablesmember* cvarm = cntct->custom_variables; cvarm; cvarm = cvarm->next) {
       if (cvarm->variable_name)
         stream << "\t_" << cvarm->variable_name << "=" << cvarm->has_been_modified << ";"
                << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";

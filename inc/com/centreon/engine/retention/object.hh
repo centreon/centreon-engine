@@ -31,8 +31,7 @@ namespace              retention {
   class                object {
   public:
     enum               type_id {
-      contact = 0,
-      host,
+      host = 0,
       info,
       program,
       service

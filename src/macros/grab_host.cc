@@ -261,12 +261,6 @@ struct grab_host_redirection {
     // Last unreachable.
     routines[MACRO_LASTHOSTUNREACHABLE].first = &get_member_as_string<host, time_t, &host::last_time_unreachable>;
     routines[MACRO_LASTHOSTUNREACHABLE].second = true;
-    // Notification number.
-    routines[MACRO_HOSTNOTIFICATIONNUMBER].first = &get_member_as_string<host, int, &host::current_notification_number>;
-    routines[MACRO_HOSTNOTIFICATIONNUMBER].second = true;
-    // Notification ID.
-    routines[MACRO_HOSTNOTIFICATIONID].first = &get_member_as_string<host, unsigned long, &host::current_notification_id>;
-    routines[MACRO_HOSTNOTIFICATIONID].second = true;
     // Event ID.
     routines[MACRO_HOSTEVENTID].first = &get_member_as_string<host, unsigned long, &host::current_event_id>;
     routines[MACRO_HOSTEVENTID].second = true;
