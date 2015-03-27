@@ -57,7 +57,6 @@ service::setters const service::_setters[] = {
   { "retry_interval",               SETTER(unsigned int, _set_retry_interval) },
   { "retry_check_interval",         SETTER(unsigned int, _set_retry_interval) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
-  { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "parallelize_check",            SETTER(bool, _set_parallelize_check) },
   { "is_volatile",                  SETTER(bool, _set_is_volatile) },
   { "obsess_over_service",          SETTER(bool, _set_obsess_over_service) },
@@ -87,12 +86,12 @@ service::setters const service::_setters[] = {
   { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
   { "notification_options",         SETTER(std::string const&, _set_notification_options) },
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
+  { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) }
 };
 
 // Default values.
 static bool const           default_checks_active(true);
-static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(0);
 static unsigned int const   default_check_interval(5);
 static bool const           default_event_handler_enabled(true);
@@ -121,7 +120,6 @@ static unsigned int const   default_check_timeout(0);
 service::service()
   : object(object::service),
     _checks_active(default_checks_active),
-    _checks_passive(default_checks_passive),
     _check_command_is_important(false),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
@@ -167,7 +165,6 @@ service& service::operator=(service const& right) {
   if (this != &right) {
     object::operator=(right);
     _checks_active = right._checks_active;
-    _checks_passive = right._checks_passive;
     _check_command = right._check_command;
     _check_command_is_important = right._check_command_is_important;
     _check_freshness = right._check_freshness;
@@ -210,7 +207,6 @@ service& service::operator=(service const& right) {
 bool service::operator==(service const& right) const throw () {
   return (object::operator==(right)
           && _checks_active == right._checks_active
-          && _checks_passive == right._checks_passive
           && _check_command == right._check_command
           && _check_command_is_important == right._check_command_is_important
           && _check_freshness == right._check_freshness
@@ -266,8 +262,6 @@ bool service::operator<(service const& right) const throw () {
     return (_service_description < right._service_description);
   else if (_checks_active != right._checks_active)
     return (_checks_active < right._checks_active);
-  else if (_checks_passive != right._checks_passive)
-    return (_checks_passive < right._checks_passive);
   else if (_check_command != right._check_command)
     return (_check_command < right._check_command);
   else if (_check_command_is_important
@@ -372,7 +366,6 @@ void service::merge(object const& obj) {
 
   MRG_IMPORTANT(_check_command);
   MRG_OPTION(_checks_active);
-  MRG_OPTION(_checks_passive);
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
   MRG_OPTION(_check_timeout);
@@ -429,15 +422,6 @@ bool service::parse(char const* key, char const* value) {
  */
 bool service::checks_active() const throw () {
   return (_checks_active);
-}
-
-/**
- *  Get checks_passive.
- *
- *  @return The checks_passive.
- */
-bool service::checks_passive() const throw () {
-  return (_checks_passive);
 }
 
 /**
@@ -804,14 +788,17 @@ bool service::_set_checks_active(bool value) {
 }
 
 /**
- *  Set checks_passive value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new checks_passive value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_checks_passive(bool value) {
-  _checks_passive = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service passive_checks_enabled ignored";
+  ++config_warnings;
   return (true);
 }
 

@@ -62,7 +62,6 @@ namespace                  configuration {
     bool                   parse(char const* key, char const* value);
 
     bool                   checks_active() const throw ();
-    bool                   checks_passive() const throw ();
     std::string const&     check_command() const throw ();
     bool                   check_command_is_important() const throw ();
     bool                   check_freshness() const throw ();
@@ -151,7 +150,6 @@ namespace                  configuration {
     bool                   _set_timezone(std::string const& value);
 
     opt<bool>              _checks_active;
-    opt<bool>              _checks_passive;
     std::string            _check_command;
     bool                   _check_command_is_important;
     opt<bool>              _check_freshness;

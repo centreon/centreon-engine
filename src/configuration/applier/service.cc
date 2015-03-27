@@ -117,7 +117,6 @@ void applier::service::add_object(
     obj->initial_state(),
     obj->max_check_attempts(),
     obj->check_timeout_defined() ? obj->check_timeout() : 0,
-    obj->checks_passive(),
     obj->check_interval(),
     obj->retry_interval(),
     obj->is_volatile(),
@@ -378,9 +377,6 @@ void applier::service::modify_object(
   modify_if_different(
     s->freshness_threshold,
     static_cast<int>(obj->freshness_threshold()));
-  modify_if_different(
-    s->accept_passive_service_checks,
-    static_cast<int>(obj->checks_passive()));
   modify_if_different(
     s->event_handler,
     NULL_IF_EMPTY(obj->event_handler()));

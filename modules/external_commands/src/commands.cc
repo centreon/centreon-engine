@@ -344,10 +344,6 @@ int process_passive_service_check(
   service* temp_service(NULL);
   char const* real_host_name(NULL);
 
-  /* skip this service check result if we aren't accepting passive service checks */
-  if (config->accept_passive_service_checks() == false)
-    return (ERROR);
-
   /* make sure we have all required data */
   if (host_name == NULL || svc_description == NULL || output == NULL)
     return (ERROR);
@@ -381,10 +377,6 @@ int process_passive_service_check(
       << "', but the service could not be found!";
     return (ERROR);
   }
-
-  /* skip this is we aren't accepting passive checks for this service */
-  if (temp_service->accept_passive_service_checks == false)
-    return (ERROR);
 
   timeval tv;
   gettimeofday(&tv, NULL);
@@ -469,10 +461,6 @@ int process_passive_host_check(
   host const* temp_host(NULL);
   char const* real_host_name(NULL);
 
-  /* skip this host check result if we aren't accepting passive host checks */
-  if (config->accept_passive_service_checks() == false)
-    return (ERROR);
-
   /* make sure we have all required data */
   if (host_name == NULL || output == NULL)
     return (ERROR);
@@ -500,10 +488,6 @@ int process_passive_host_check(
       << host_name << "', but the host could not be found!";
     return (ERROR);
   }
-
-  /* skip this is we aren't accepting passive checks for this host */
-  if (temp_host->accept_passive_host_checks == false)
-    return (ERROR);
 
   timeval tv;
   gettimeofday(&tv, NULL);
@@ -1336,124 +1320,6 @@ void stop_executing_service_checks(void) {
   update_program_status();
 }
 
-/* starts accepting passive service checks */
-void start_accepting_passive_service_checks(void) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* bail out if we're already accepting passive services */
-  if (config->accept_passive_service_checks())
-    return;
-
-  /* set the attribute modified flag */
-  modified_service_process_attributes |= attr;
-
-  /* set the service check flag */
-  config->accept_passive_service_checks(true);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    MODATTR_NONE,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  // Update the status log with the program info.
-  update_program_status();
-}
-
-/* stops accepting passive service checks */
-void stop_accepting_passive_service_checks(void) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* bail out if we're already not accepting passive services */
-  if (config->accept_passive_service_checks() == false)
-    return;
-
-  /* set the attribute modified flag */
-  modified_service_process_attributes |= attr;
-
-  /* set the service check flag */
-  config->accept_passive_service_checks(false);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    MODATTR_NONE,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  // Update the status log with the program info.
-  update_program_status();
-}
-
-/* enables passive service checks for a particular service */
-void enable_passive_service_checks(service* svc) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* no change */
-  if (svc->accept_passive_service_checks)
-    return;
-
-  /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
-
-  /* set the passive check flag */
-  svc->accept_passive_service_checks = true;
-
-  /* send data to event broker */
-  broker_adaptive_service_data(
-    NEBTYPE_ADAPTIVESERVICE_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    svc,
-    CMD_NONE,
-    attr,
-    svc->modified_attributes,
-    NULL);
-
-  // Update the status log with the service info.
-  update_service_status(svc);
-}
-
-/* disables passive service checks for a particular service */
-void disable_passive_service_checks(service* svc) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* no change */
-  if (svc->accept_passive_service_checks == false)
-    return;
-
-  /* set the attribute modified flag */
-  svc->modified_attributes |= attr;
-
-  /* set the passive check flag */
-  svc->accept_passive_service_checks = false;
-
-  /* send data to event broker */
-  broker_adaptive_service_data(
-    NEBTYPE_ADAPTIVESERVICE_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    svc,
-    CMD_NONE,
-    attr,
-    svc->modified_attributes,
-    NULL);
-
-  // Update the status log with the service info.
-  update_service_status(svc);
-}
-
 /* starts executing host checks */
 void start_executing_host_checks(void) {
   unsigned long attr(MODATTR_ACTIVE_CHECKS_ENABLED);
@@ -1512,123 +1378,6 @@ void stop_executing_host_checks(void) {
 
   // Update the status log with the program info.
   update_program_status();
-}
-
-/* starts accepting passive host checks */
-void start_accepting_passive_host_checks(void) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* bail out if we're already accepting passive hosts */
-  if (config->accept_passive_host_checks())
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-
-  /* set the host check flag */
-  config->accept_passive_host_checks(true);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    MODATTR_NONE,
-    modified_service_process_attributes,
-    NULL);
-
-  // Update the status log with the program info.
-  update_program_status();
-}
-
-/* stops accepting passive host checks */
-void stop_accepting_passive_host_checks(void) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* bail out if we're already not accepting passive hosts */
-  if (config->accept_passive_host_checks() == false)
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-
-  /* set the host check flag */
-  config->accept_passive_host_checks(false);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    MODATTR_NONE,
-    modified_service_process_attributes,
-    NULL);
-  // Update the status log with the program info.
-  update_program_status();
-}
-
-/* enables passive host checks for a particular host */
-void enable_passive_host_checks(host* hst) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* no change */
-  if (hst->accept_passive_host_checks)
-    return;
-
-  /* set the attribute modified flag */
-  hst->modified_attributes |= attr;
-
-  /* set the passive check flag */
-  hst->accept_passive_host_checks = true;
-
-  /* send data to event broker */
-  broker_adaptive_host_data(
-    NEBTYPE_ADAPTIVEHOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    hst,
-    CMD_NONE,
-    attr,
-    hst->modified_attributes,
-    NULL);
-
-  // Update the status log with the host info.
-  update_host_status(hst);
-}
-
-/* disables passive host checks for a particular host */
-void disable_passive_host_checks(host* hst) {
-  unsigned long attr(MODATTR_PASSIVE_CHECKS_ENABLED);
-
-  /* no change */
-  if (hst->accept_passive_host_checks == false)
-    return;
-
-  /* set the attribute modified flag */
-  hst->modified_attributes |= attr;
-
-  /* set the passive check flag */
-  hst->accept_passive_host_checks = false;
-
-  /* send data to event broker */
-  broker_adaptive_host_data(
-    NEBTYPE_ADAPTIVEHOST_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    hst,
-    CMD_NONE,
-    attr,
-    hst->modified_attributes,
-    NULL);
-
-  // Update the status log with the host info.
-  update_host_status(hst);
 }
 
 /* enables event handlers on a program-wide basis */

@@ -97,7 +97,6 @@ void applier::host::add_object(
         obj->check_timeout_defined() ? obj->check_timeout() : 0,
         NULL_IF_EMPTY(obj->check_command()),
         obj->checks_active(),
-        obj->checks_passive(),
         NULL_IF_EMPTY(obj->event_handler()),
         obj->event_handler_enabled(),
         obj->flap_detection_enabled(),
@@ -258,9 +257,6 @@ void applier::host::modify_object(
   modify_if_different(
     h->checks_enabled,
     static_cast<int>(obj->checks_active()));
-  modify_if_different(
-    h->accept_passive_host_checks,
-    static_cast<int>(obj->checks_passive()));
   modify_if_different(
     h->event_handler,
     NULL_IF_EMPTY(obj->event_handler()));

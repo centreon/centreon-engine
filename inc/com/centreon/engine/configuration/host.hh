@@ -58,7 +58,6 @@ namespace                  configuration {
     std::string const&     address() const throw ();
     std::string const&     alias() const throw ();
     bool                   checks_active() const throw ();
-    bool                   checks_passive() const throw ();
     std::string const&     check_command() const throw ();
     bool                   check_freshness() const throw ();
     unsigned int           check_interval() const throw ();
@@ -145,7 +144,6 @@ namespace                  configuration {
     std::string            _address;
     std::string            _alias;
     opt<bool>              _checks_active;
-    opt<bool>              _checks_passive;
     std::string            _check_command;
     opt<bool>              _check_freshness;
     opt<unsigned int>      _check_interval;

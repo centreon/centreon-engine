@@ -107,16 +107,6 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "STOP_EXECUTING_SVC_CHECKS"))
     command_type = CMD_STOP_EXECUTING_SVC_CHECKS;
 
-  else if (!strcmp(command_id, "START_ACCEPTING_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_START_ACCEPTING_PASSIVE_HOST_CHECKS;
-  else if (!strcmp(command_id, "STOP_ACCEPTING_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_STOP_ACCEPTING_PASSIVE_HOST_CHECKS;
-
-  else if (!strcmp(command_id, "START_ACCEPTING_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS;
-  else if (!strcmp(command_id, "STOP_ACCEPTING_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_STOP_ACCEPTING_PASSIVE_SVC_CHECKS;
-
   else if (!strcmp(command_id, "START_OBSESSING_OVER_HOST_CHECKS"))
     command_type = CMD_START_OBSESSING_OVER_HOST_CHECKS;
   else if (!strcmp(command_id, "STOP_OBSESSING_OVER_HOST_CHECKS"))
@@ -155,11 +145,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_ENABLE_HOST_SVC_CHECKS;
   else if (!strcmp(command_id, "DISABLE_HOST_SVC_CHECKS"))
     command_type = CMD_DISABLE_HOST_SVC_CHECKS;
-
-  else if (!strcmp(command_id, "ENABLE_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_ENABLE_PASSIVE_HOST_CHECKS;
-  else if (!strcmp(command_id, "DISABLE_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_DISABLE_PASSIVE_HOST_CHECKS;
 
   else if (!strcmp(command_id, "SCHEDULE_HOST_SVC_CHECKS"))
     command_type = CMD_SCHEDULE_HOST_SVC_CHECKS;
@@ -222,20 +207,10 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "DISABLE_HOSTGROUP_HOST_CHECKS"))
     command_type = CMD_DISABLE_HOSTGROUP_HOST_CHECKS;
 
-  else if (!strcmp(command_id, "ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS;
-  else if (!strcmp(command_id, "DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS;
-
   else if (!strcmp(command_id, "ENABLE_HOSTGROUP_SVC_CHECKS"))
     command_type = CMD_ENABLE_HOSTGROUP_SVC_CHECKS;
   else if (!strcmp(command_id, "DISABLE_HOSTGROUP_SVC_CHECKS"))
     command_type = CMD_DISABLE_HOSTGROUP_SVC_CHECKS;
-
-  else if (!strcmp(command_id, "ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS;
-  else if (!strcmp(command_id, "DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS;
 
   /**********************************/
   /**** SERVICE-RELATED COMMANDS ****/
@@ -250,11 +225,6 @@ int process_external_command1(char* cmd) {
     command_type = CMD_ENABLE_SVC_CHECK;
   else if (!strcmp(command_id, "DISABLE_SVC_CHECK"))
     command_type = CMD_DISABLE_SVC_CHECK;
-
-  else if (!strcmp(command_id, "ENABLE_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_ENABLE_PASSIVE_SVC_CHECKS;
-  else if (!strcmp(command_id, "DISABLE_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_DISABLE_PASSIVE_SVC_CHECKS;
 
   else if (!strcmp(command_id, "PROCESS_SERVICE_CHECK_RESULT"))
     command_type = CMD_PROCESS_SERVICE_CHECK_RESULT;
@@ -307,20 +277,10 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_HOST_CHECKS"))
     command_type = CMD_DISABLE_SERVICEGROUP_HOST_CHECKS;
 
-  else if (!strcmp(command_id, "ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS;
-  else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS"))
-    command_type = CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS;
-
   else if (!strcmp(command_id, "ENABLE_SERVICEGROUP_SVC_CHECKS"))
     command_type = CMD_ENABLE_SERVICEGROUP_SVC_CHECKS;
   else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_SVC_CHECKS"))
     command_type = CMD_DISABLE_SERVICEGROUP_SVC_CHECKS;
-
-  else if (!strcmp(command_id, "ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS;
-  else if (!strcmp(command_id, "DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"))
-    command_type = CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS;
 
   /**************************/
   /****** MISC COMMANDS *****/
@@ -443,14 +403,6 @@ int process_external_command2(int cmd,
     stop_executing_service_checks();
     break;
 
-  case CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS:
-    start_accepting_passive_service_checks();
-    break;
-
-  case CMD_STOP_ACCEPTING_PASSIVE_SVC_CHECKS:
-    stop_accepting_passive_service_checks();
-    break;
-
   case CMD_START_OBSESSING_OVER_SVC_CHECKS:
     start_obsessing_over_service_checks();
     break;
@@ -465,14 +417,6 @@ int process_external_command2(int cmd,
 
   case CMD_STOP_EXECUTING_HOST_CHECKS:
     stop_executing_host_checks();
-    break;
-
-  case CMD_START_ACCEPTING_PASSIVE_HOST_CHECKS:
-    start_accepting_passive_host_checks();
-    break;
-
-  case CMD_STOP_ACCEPTING_PASSIVE_HOST_CHECKS:
-    stop_accepting_passive_host_checks();
     break;
 
   case CMD_START_OBSESSING_OVER_HOST_CHECKS:
@@ -521,8 +465,6 @@ int process_external_command2(int cmd,
 
   case CMD_ENABLE_HOST_CHECK:
   case CMD_DISABLE_HOST_CHECK:
-  case CMD_ENABLE_PASSIVE_HOST_CHECKS:
-  case CMD_DISABLE_PASSIVE_HOST_CHECKS:
   case CMD_ENABLE_HOST_SVC_CHECKS:
   case CMD_DISABLE_HOST_SVC_CHECKS:
   case CMD_ENABLE_HOST_FLAP_DETECTION:
@@ -540,12 +482,8 @@ int process_external_command2(int cmd,
 
   case CMD_ENABLE_HOSTGROUP_HOST_CHECKS:
   case CMD_DISABLE_HOSTGROUP_HOST_CHECKS:
-  case CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
-  case CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
   case CMD_ENABLE_HOSTGROUP_SVC_CHECKS:
   case CMD_DISABLE_HOSTGROUP_SVC_CHECKS:
-  case CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS:
-  case CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS:
     process_hostgroup_command(cmd, entry_time, args);
     break;
 
@@ -555,8 +493,6 @@ int process_external_command2(int cmd,
 
   case CMD_ENABLE_SVC_CHECK:
   case CMD_DISABLE_SVC_CHECK:
-  case CMD_ENABLE_PASSIVE_SVC_CHECKS:
-  case CMD_DISABLE_PASSIVE_SVC_CHECKS:
   case CMD_ENABLE_SVC_FLAP_DETECTION:
   case CMD_DISABLE_SVC_FLAP_DETECTION:
   case CMD_ENABLE_SVC_EVENT_HANDLER:
@@ -572,12 +508,8 @@ int process_external_command2(int cmd,
 
   case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
-  case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
-  case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
   case CMD_ENABLE_SERVICEGROUP_SVC_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_SVC_CHECKS:
-  case CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
-  case CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
     process_servicegroup_command(cmd, entry_time, args);
     break;
 
@@ -696,14 +628,6 @@ int process_hostgroup_command(int cmd,
       disable_host_checks(temp_host);
       break;
 
-    case CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
-      enable_passive_host_checks(temp_host);
-      break;
-
-    case CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS:
-      disable_passive_host_checks(temp_host);
-      break;
-
     default:
 
       /* loop through all services on the host */
@@ -721,14 +645,6 @@ int process_hostgroup_command(int cmd,
 
         case CMD_DISABLE_HOSTGROUP_SVC_CHECKS:
           disable_service_checks(temp_service);
-          break;
-
-        case CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS:
-          enable_passive_service_checks(temp_service);
-          break;
-
-        case CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS:
-          disable_passive_service_checks(temp_service);
           break;
 
         default:
@@ -798,14 +714,6 @@ int process_host_command(int cmd,
     disable_host_flap_detection(temp_host);
     break;
 
-  case CMD_ENABLE_PASSIVE_HOST_CHECKS:
-    enable_passive_host_checks(temp_host);
-    break;
-
-  case CMD_DISABLE_PASSIVE_HOST_CHECKS:
-    disable_passive_host_checks(temp_host);
-    break;
-
   case CMD_START_OBSESSING_OVER_HOST:
     start_obsessing_over_host(temp_host);
     break;
@@ -867,14 +775,6 @@ int process_service_command(int cmd,
     disable_service_flap_detection(temp_service);
     break;
 
-  case CMD_ENABLE_PASSIVE_SVC_CHECKS:
-    enable_passive_service_checks(temp_service);
-    break;
-
-  case CMD_DISABLE_PASSIVE_SVC_CHECKS:
-    disable_passive_service_checks(temp_service);
-    break;
-
   case CMD_START_OBSESSING_OVER_SVC:
     start_obsessing_over_service(temp_service);
     break;
@@ -914,8 +814,6 @@ int process_servicegroup_command(int cmd,
 
   case CMD_ENABLE_SERVICEGROUP_SVC_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_SVC_CHECKS:
-  case CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
-  case CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
 
     /* loop through all servicegroup members */
     for (temp_member = temp_servicegroup->members;
@@ -936,14 +834,6 @@ int process_servicegroup_command(int cmd,
         disable_service_checks(temp_service);
         break;
 
-      case CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
-        enable_passive_service_checks(temp_service);
-        break;
-
-      case CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS:
-        disable_passive_service_checks(temp_service);
-        break;
-
       default:
         break;
       }
@@ -952,8 +842,6 @@ int process_servicegroup_command(int cmd,
 
   case CMD_ENABLE_SERVICEGROUP_HOST_CHECKS:
   case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
-  case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
-  case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
     /* loop through all hosts that have services belonging to the servicegroup */
     last_host = NULL;
     for (temp_member = temp_servicegroup->members;
@@ -974,14 +862,6 @@ int process_servicegroup_command(int cmd,
 
       case CMD_DISABLE_SERVICEGROUP_HOST_CHECKS:
         disable_host_checks(temp_host);
-        break;
-
-      case CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
-        enable_passive_host_checks(temp_host);
-        break;
-
-      case CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS:
-        disable_passive_host_checks(temp_host);
         break;
 
       default:

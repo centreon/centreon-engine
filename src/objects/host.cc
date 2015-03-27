@@ -79,7 +79,6 @@ bool operator==(
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
           && obj1.checks_enabled == obj2.checks_enabled
-          && obj1.accept_passive_host_checks == obj2.accept_passive_host_checks
           && obj1.event_handler_enabled == obj2.event_handler_enabled
           && obj1.retain_status_information == obj2.retain_status_information
           && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
@@ -190,7 +189,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
-    "  accept_passive_host_checks:           " << obj.accept_passive_host_checks << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
     "  retain_status_information:            " << obj.retain_status_information << "\n"
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
@@ -265,8 +263,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] check_timeout                 The check timeout.
  *  @param[in] check_command                 Active check command name.
  *  @param[in] checks_enabled                Are active checks enabled ?
- *  @param[in] accept_passive_checks         Can we submit passive check
- *                                           results ?
  *  @param[in] event_handler                 Event handler command name.
  *  @param[in] event_handler_enabled         Whether event handler is
  *                                           enabled or not.
@@ -312,7 +308,6 @@ host* add_host(
         unsigned int check_timeout,
         char const* check_command,
         int checks_enabled,
-        int accept_passive_checks,
         char const* event_handler,
         int event_handler_enabled,
         int flap_detection_enabled,
@@ -384,7 +379,6 @@ host* add_host(
       obj->timezone = string::dup(timezone);
 
     // Duplicate non-string vars.
-    obj->accept_passive_host_checks = (accept_passive_checks > 0);
     obj->check_freshness = (check_freshness > 0);
     obj->check_interval = check_interval;
     obj->check_options = CHECK_OPTION_NONE;

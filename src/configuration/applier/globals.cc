@@ -44,8 +44,6 @@ void applier::globals::apply(state& config) {
   _set_global(::ocsp_command, config.ocsp_command());
   _set_global(::use_timezone, config.use_timezone());
 
-  ::accept_passive_host_checks = config.accept_passive_host_checks();
-  ::accept_passive_service_checks = config.accept_passive_service_checks();
   ::additional_freshness_latency = config.additional_freshness_latency();
   ::auto_reschedule_checks = config.auto_reschedule_checks();
   ::auto_rescheduling_interval = config.auto_rescheduling_interval();

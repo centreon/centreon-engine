@@ -35,8 +35,6 @@ using namespace com::centreon::engine::logging;
   &state::setter<type, &state::method>::generic
 
 state::setters const state::_setters[] = {
-  { "accept_passive_host_checks",                  SETTER(bool, accept_passive_host_checks) },
-  { "accept_passive_service_checks",               SETTER(bool, accept_passive_service_checks) },
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
   { "auto_reschedule_checks",                      SETTER(bool, auto_reschedule_checks) },
   { "auto_rescheduling_interval",                  SETTER(unsigned int, auto_rescheduling_interval) },
@@ -126,6 +124,8 @@ state::setters const state::_setters[] = {
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
 
   // Deprecated.
+  { "accept_passive_host_checks",                  SETTER(bool, _set_accept_passive_host_checks) },
+  { "accept_passive_service_checks",               SETTER(bool, _set_accept_passive_service_checks) },
   { "admin_email",                                 SETTER(std::string const&, _set_admin_email) },
   { "admin_pager",                                 SETTER(std::string const&, _set_admin_pager) },
   { "aggregate_status_updates",                    SETTER(std::string const&, _set_aggregate_status_updates) },
@@ -186,8 +186,6 @@ state::setters const state::_setters[] = {
 };
 
 // Default values.
-static bool const                      default_accept_passive_host_checks(true);
-static bool const                      default_accept_passive_service_checks(true);
 static int const                       default_additional_freshness_latency(15);
 static bool const                      default_auto_reschedule_checks(false);
 static unsigned int const              default_auto_rescheduling_interval(30);
@@ -300,9 +298,7 @@ static bool cmp_set_ptr(
  *  Default constructor.
  */
 state::state()
-  : _accept_passive_host_checks(default_accept_passive_host_checks),
-    _accept_passive_service_checks(default_accept_passive_service_checks),
-    _additional_freshness_latency(default_additional_freshness_latency),
+  : _additional_freshness_latency(default_additional_freshness_latency),
     _auto_reschedule_checks(default_auto_reschedule_checks),
     _auto_rescheduling_interval(default_auto_rescheduling_interval),
     _auto_rescheduling_window(default_auto_rescheduling_window),
@@ -411,8 +407,6 @@ state::~state() throw () {}
  */
 state& state::operator=(state const& right) {
   if (this != &right) {
-    _accept_passive_host_checks = right._accept_passive_host_checks;
-    _accept_passive_service_checks = right._accept_passive_service_checks;
     _additional_freshness_latency = right._additional_freshness_latency;
     _auto_reschedule_checks = right._auto_reschedule_checks;
     _auto_rescheduling_interval = right._auto_rescheduling_interval;
@@ -519,9 +513,7 @@ state& state::operator=(state const& right) {
  *  @return True if object is the same object, otherwise false.
  */
 bool state::operator==(state const& right) const throw () {
-  return (_accept_passive_host_checks == right._accept_passive_host_checks
-          && _accept_passive_service_checks == right._accept_passive_service_checks
-          && _additional_freshness_latency == right._additional_freshness_latency
+  return (_additional_freshness_latency == right._additional_freshness_latency
           && _auto_reschedule_checks == right._auto_reschedule_checks
           && _auto_rescheduling_interval == right._auto_rescheduling_interval
           && _auto_rescheduling_window == right._auto_rescheduling_window
@@ -626,42 +618,6 @@ bool state::operator==(state const& right) const throw () {
  */
 bool state::operator!=(state const& right) const throw () {
   return (!operator==(right));
-}
-
-/**
- *  Get accept_passive_host_checks value.
- *
- *  @return The accept_passive_host_checks value.
- */
-bool state::accept_passive_host_checks() const throw () {
-  return (_accept_passive_host_checks);
-}
-
-/**
- *  Set accept_passive_host_checks value.
- *
- *  @param[in] value The new accept_passive_host_checks value.
- */
-void state::accept_passive_host_checks(bool value) {
-  _accept_passive_host_checks = value;
-}
-
-/**
- *  Get accept_passive_service_checks value.
- *
- *  @return The accept_passive_service_checks value.
- */
-bool state::accept_passive_service_checks() const throw () {
-  return (_accept_passive_service_checks);
-}
-
-/**
- *  Set accept_passive_service_checks value.
- *
- *  @param[in] value The new accept_passive_service_checks value.
- */
-void state::accept_passive_service_checks(bool value) {
-  _accept_passive_service_checks = value;
 }
 
 /**
@@ -2902,6 +2858,32 @@ std::string const& state::use_timezone() const throw () {
 void state::use_timezone(std::string const& value) {
   _use_timezone = value;
 
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_accept_passive_host_checks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: accept_passive_host_checks variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_accept_passive_service_checks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: accept_passive_service_checks variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

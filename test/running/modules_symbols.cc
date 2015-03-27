@@ -43,8 +43,6 @@ std::ostream& operator<<(std::ostream& out, void (* ptr)()) {
 
 extern "C" {
   // External symbols not exported by headers.
-  extern int accept_passive_host_checks;
-  extern int accept_passive_service_checks;
   extern int check_external_commands;
   extern int check_host_freshness;
   extern check_result check_result_info;

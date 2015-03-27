@@ -233,9 +233,7 @@ int xrddefault_save_state_information() {
          << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
          << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
          << "active_service_checks_enabled=" << execute_service_checks << "\n"
-         << "passive_service_checks_enabled=" << accept_passive_service_checks << "\n"
          << "active_host_checks_enabled=" << execute_host_checks << "\n"
-         << "passive_host_checks_enabled=" << accept_passive_host_checks << "\n"
          << "enable_event_handlers=" << enable_event_handlers << "\n"
          << "obsess_over_services=" << obsess_over_services << "\n"
          << "obsess_over_hosts=" << obsess_over_hosts << "\n"
@@ -287,7 +285,6 @@ int xrddefault_save_state_information() {
            << "last_time_down=" << static_cast<unsigned long>(temp_host->last_time_down) << "\n"
            << "last_time_unreachable=" << static_cast<unsigned long>(temp_host->last_time_unreachable) << "\n"
            << "active_checks_enabled=" << temp_host->checks_enabled << "\n"
-           << "passive_checks_enabled=" << temp_host->accept_passive_host_checks << "\n"
            << "event_handler_enabled=" << temp_host->event_handler_enabled << "\n"
            << "flap_detection_enabled=" << temp_host->flap_detection_enabled << "\n"
            << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
@@ -353,7 +350,6 @@ int xrddefault_save_state_information() {
            << "next_check=" << static_cast<unsigned long>(temp_service->next_check) << "\n"
            << "check_options=" << temp_service->check_options << "\n"
            << "active_checks_enabled=" << temp_service->checks_enabled << "\n"
-           << "passive_checks_enabled=" << temp_service->accept_passive_service_checks << "\n"
            << "event_handler_enabled=" << temp_service->event_handler_enabled << "\n"
            << "flap_detection_enabled=" << temp_service->flap_detection_enabled << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
@@ -664,17 +660,9 @@ int xrddefault_read_state_information() {
             if (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
               config->execute_service_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
-          else if (!strcmp(var, "passive_service_checks_enabled")) {
-            if (modified_service_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-              config->accept_passive_service_checks((atoi(val) > 0) ? TRUE : FALSE);
-          }
           else if (!strcmp(var, "active_host_checks_enabled")) {
             if (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
               config->execute_host_checks((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "passive_host_checks_enabled")) {
-            if (modified_host_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-              config->accept_passive_host_checks((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "enable_event_handlers")) {
             if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
@@ -838,10 +826,6 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "active_checks_enabled")) {
               if (temp_host->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
                 temp_host->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "passive_checks_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-                temp_host->accept_passive_host_checks = (atoi(val) > 0) ? TRUE : FALSE;
             }
             else if (!strcmp(var, "event_handler_enabled")) {
               if (temp_host->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
@@ -1063,10 +1047,6 @@ int xrddefault_read_state_information() {
             else if (!strcmp(var, "active_checks_enabled")) {
               if (temp_service->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
                 temp_service->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "passive_checks_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-                temp_service->accept_passive_service_checks = (atoi(val) > 0) ? TRUE : FALSE;
             }
             else if (!strcmp(var, "event_handler_enabled")) {
               if (temp_service->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)

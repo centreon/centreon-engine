@@ -53,8 +53,6 @@ namespace                     retention {
     opt<unsigned long> const& next_problem_id() const throw ();
     opt<bool> const&          obsess_over_hosts() const throw ();
     opt<bool> const&          obsess_over_services() const throw ();
-    opt<bool> const&          passive_host_checks_enabled() const throw ();
-    opt<bool> const&          passive_service_checks_enabled() const throw ();
 
   private:
     struct                    setters {
@@ -99,8 +97,6 @@ namespace                     retention {
     opt<unsigned long>        _next_problem_id;
     opt<bool>                 _obsess_over_hosts;
     opt<bool>                 _obsess_over_services;
-    opt<bool>                 _passive_host_checks_enabled;
-    opt<bool>                 _passive_service_checks_enabled;
     static setters const      _setters[];
   };
 

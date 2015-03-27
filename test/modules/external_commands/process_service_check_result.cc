@@ -42,7 +42,6 @@ static int check_process_service_check_result(int argc, char** argv) {
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  svc->accept_passive_service_checks = true;
   char const* cmd("[1317196300] PROCESS_SERVICE_CHECK_RESULT;name;description;0;output");
   process_external_command(cmd);
 

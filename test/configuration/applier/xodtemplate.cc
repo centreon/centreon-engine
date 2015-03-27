@@ -850,7 +850,6 @@ int xodtemplate_begin_object_definition(
     new_service->check_interval = 5.0;
     new_service->retry_interval = 1.0;
     new_service->active_checks_enabled = true;
-    new_service->passive_checks_enabled = true;
     new_service->obsess_over_service = true;
     new_service->event_handler_enabled = true;
     new_service->flap_detection_enabled = true;
@@ -871,7 +870,6 @@ int xodtemplate_begin_object_definition(
     new_host->check_interval = 5.0;
     new_host->retry_interval = 1.0;
     new_host->active_checks_enabled = true;
-    new_host->passive_checks_enabled = true;
     new_host->obsess_over_host = true;
     new_host->max_check_attempts = -2;
     new_host->check_timeout = 0;
@@ -1149,10 +1147,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "active_checks_enabled")) {
       temp_service->active_checks_enabled = (atoi(value) > 0) ? true : false;
       temp_service->have_active_checks_enabled = true;
-    }
-    else if (!strcmp(variable, "passive_checks_enabled")) {
-      temp_service->passive_checks_enabled = (atoi(value) > 0) ? true : false;
-      temp_service->have_passive_checks_enabled = true;
     }
     else if (!strcmp(variable, "is_volatile")) {
       temp_service->is_volatile = (atoi(value) > 0) ? true : false;
@@ -1443,10 +1437,6 @@ int xodtemplate_add_object_property(char* input, int options) {
              || !strcmp(variable, "active_checks_enabled")) {
       temp_host->active_checks_enabled = (atoi(value) > 0) ? true : false;
       temp_host->have_active_checks_enabled = true;
-    }
-    else if (!strcmp(variable, "passive_checks_enabled")) {
-      temp_host->passive_checks_enabled = (atoi(value) > 0) ? true : false;
-      temp_host->have_passive_checks_enabled = true;
     }
     else if (!strcmp(variable, "event_handler_enabled")) {
       temp_host->event_handler_enabled = (atoi(value) > 0) ? true : false;
@@ -4133,8 +4123,6 @@ int xodtemplate_duplicate_service(
   new_service->have_retry_interval = temp_service->have_retry_interval;
   new_service->active_checks_enabled = temp_service->active_checks_enabled;
   new_service->have_active_checks_enabled = temp_service->have_active_checks_enabled;
-  new_service->passive_checks_enabled = temp_service->passive_checks_enabled;
-  new_service->have_passive_checks_enabled = temp_service->have_passive_checks_enabled;
   new_service->is_volatile = temp_service->is_volatile;
   new_service->have_is_volatile = temp_service->have_is_volatile;
   new_service->obsess_over_service = temp_service->obsess_over_service;
@@ -4971,12 +4959,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         = template_host->active_checks_enabled;
       this_host->have_active_checks_enabled = true;
     }
-    if (this_host->have_passive_checks_enabled == false
-        && template_host->have_passive_checks_enabled == true) {
-      this_host->passive_checks_enabled
-        = template_host->passive_checks_enabled;
-      this_host->have_passive_checks_enabled = true;
-    }
     if (this_host->have_obsess_over_host == false
         && template_host->have_obsess_over_host == true) {
       this_host->obsess_over_host
@@ -5222,12 +5204,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->active_checks_enabled
         = template_service->active_checks_enabled;
       this_service->have_active_checks_enabled = true;
-    }
-    if (this_service->have_passive_checks_enabled == false
-        && template_service->have_passive_checks_enabled == true) {
-      this_service->passive_checks_enabled
-        = template_service->passive_checks_enabled;
-      this_service->have_passive_checks_enabled = true;
     }
     if (this_service->have_is_volatile == false
         && template_service->have_is_volatile == true) {
@@ -6799,7 +6775,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->check_timeout,
                this_host->check_command,
                this_host->active_checks_enabled,
-               this_host->passive_checks_enabled,
                this_host->event_handler,
                this_host->event_handler_enabled,
                this_host->flap_detection_enabled,
@@ -6884,7 +6859,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->initial_state,
                   this_service->max_check_attempts,
                   this_service->check_timeout,
-                  this_service->passive_checks_enabled,
                   this_service->check_interval,
                   this_service->retry_interval,
                   this_service->is_volatile,
@@ -7937,7 +7911,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\tretry_interval\t%f\n", temp_host->retry_interval);
     fprintf(fp, "\tmax_check_attempts\t%d\n", temp_host->max_check_attempts);
     fprintf(fp, "\tactive_checks_enabled\t%d\n", temp_host->active_checks_enabled);
-    fprintf(fp, "\tpassive_checks_enabled\t%d\n", temp_host->passive_checks_enabled);
     fprintf(fp, "\tobsess_over_host\t%d\n", temp_host->obsess_over_host);
     fprintf(fp, "\tevent_handler_enabled\t%d\n", temp_host->event_handler_enabled);
     fprintf(fp, "\tlow_flap_threshold\t%f\n", temp_host->low_flap_threshold);
@@ -8024,7 +7997,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\tmax_check_attempts\t%d\n", temp_service->max_check_attempts);
     fprintf(fp, "\tis_volatile\t%d\n", temp_service->is_volatile);
     fprintf(fp, "\tactive_checks_enabled\t%d\n", temp_service->active_checks_enabled);
-    fprintf(fp, "\tpassive_checks_enabled\t%d\n", temp_service->passive_checks_enabled);
     fprintf(fp, "\tobsess_over_service\t%d\n", temp_service->obsess_over_service);
     fprintf(fp, "\tevent_handler_enabled\t%d\n", temp_service->event_handler_enabled);
     fprintf(fp, "\tlow_flap_threshold\t%f\n", temp_service->low_flap_threshold);
@@ -10568,14 +10540,8 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"execute_service_checks"))
       execute_service_checks=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"accept_passive_service_checks"))
-      accept_passive_service_checks=(atoi(value)>0)?true:false;
-
     else if(!strcmp(variable,"execute_host_checks"))
       execute_host_checks=(atoi(value)>0)?true:false;
-
-    else if(!strcmp(variable,"accept_passive_host_checks"))
-      accept_passive_host_checks=(atoi(value)>0)?true:false;
 
     else if(!strcmp(variable,"service_inter_check_delay_method")){
       if(!strcmp(value,"n"))

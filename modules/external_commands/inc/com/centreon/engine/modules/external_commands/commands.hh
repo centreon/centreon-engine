@@ -53,16 +53,8 @@ void disable_service_checks(service* svc);                                  // d
 void enable_service_checks(service* svc);                                   // enables a service check
 void start_executing_service_checks(void);                                 // starts executing service checks
 void stop_executing_service_checks(void);                                  // stops executing service checks
-void start_accepting_passive_service_checks(void);                         // starts accepting passive service check results
-void stop_accepting_passive_service_checks(void);                          // stops accepting passive service check results
-void enable_passive_service_checks(service* svc);                          // enables passive service checks for a particular service
-void disable_passive_service_checks(service* svc);                         // disables passive service checks for a particular service
 void start_executing_host_checks(void);                                    // starts executing host checks
 void stop_executing_host_checks(void);                                     // stops executing host checks
-void start_accepting_passive_host_checks(void);                            // starts accepting passive host check results
-void stop_accepting_passive_host_checks(void);                             // stops accepting passive host check results
-void enable_passive_host_checks(host* hst);                                // enables passive host checks for a particular host
-void disable_passive_host_checks(host* hst);                               // disables passive host checks for a particular host
 void start_using_event_handlers(void);                                     // enables event handlers on a program-wide basis
 void stop_using_event_handlers(void);                                      // disables event handlers on a program-wide basis
 void enable_service_event_handler(service* svc);                           // enables the event handler for a particular service

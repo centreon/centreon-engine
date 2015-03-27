@@ -73,7 +73,6 @@ bool operator==(
           && obj1.flap_detection_on_critical == obj2.flap_detection_on_critical
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
-          && obj1.accept_passive_service_checks == obj2.accept_passive_service_checks
           && obj1.event_handler_enabled == obj2.event_handler_enabled
           && obj1.checks_enabled == obj2.checks_enabled
           && obj1.retain_status_information == obj2.retain_status_information
@@ -184,7 +183,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  flap_detection_on_critical:           " << obj.flap_detection_on_critical << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
-    "  accept_passive_service_checks:        " << obj.accept_passive_service_checks << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
     "  retain_status_information:            " << obj.retain_status_information << "\n"
@@ -255,8 +253,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
  *  @param[in] check_timeout                Check timeout.
- *  @param[in] accept_passive_checks        Does this service accept
- *                                          check result submission ?
  *  @param[in] check_interval               Normal check interval.
  *  @param[in] retry_interval               Retry check interval.
  *  @param[in] is_volatile                  Is this service volatile ?
@@ -301,7 +297,6 @@ service* add_service(
            int initial_state,
            int max_attempts,
            unsigned int check_timeout,
-           int accept_passive_checks,
            double check_interval,
            double retry_interval,
            int is_volatile,
@@ -383,7 +378,6 @@ service* add_service(
     if (timezone)
       obj->timezone = string::dup(timezone);
 
-    obj->accept_passive_service_checks = (accept_passive_checks > 0);
     obj->check_freshness = (check_freshness > 0);
     obj->check_interval = check_interval;
     obj->check_options = CHECK_OPTION_NONE;

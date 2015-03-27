@@ -87,10 +87,6 @@ namespace               configuration {
     state&              operator=(state const& right);
     bool                operator==(state const& right) const throw ();
     bool                operator!=(state const& right) const throw ();
-    bool                accept_passive_host_checks() const throw ();
-    void                accept_passive_host_checks(bool value);
-    bool                accept_passive_service_checks() const throw ();
-    void                accept_passive_service_checks(bool value);
     int                 additional_freshness_latency() const throw ();
     void                additional_freshness_latency(int value);
     bool                auto_reschedule_checks() const throw ();
@@ -336,6 +332,8 @@ namespace               configuration {
       bool              (*func)(state&, char const*);
     };
 
+    void                _set_accept_passive_host_checks(bool value);
+    void                _set_accept_passive_service_checks(bool value);
     void                _set_admin_email(std::string const& value);
     void                _set_admin_pager(std::string const& value);
     void                _set_aggregate_status_updates(std::string const& value);
@@ -433,8 +431,6 @@ namespace               configuration {
       }
     };
 
-    bool                _accept_passive_host_checks;
-    bool                _accept_passive_service_checks;
     int                 _additional_freshness_latency;
     bool                _auto_reschedule_checks;
     unsigned int        _auto_rescheduling_interval;

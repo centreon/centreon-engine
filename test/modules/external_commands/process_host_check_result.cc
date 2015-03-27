@@ -38,7 +38,6 @@ static int check_process_host_check_result(int argc, char** argv) {
   if (!hst)
     throw (engine_error() << "create host failed.");
 
-  hst->accept_passive_host_checks = true;
   char const* cmd("[1317196300] PROCESS_HOST_CHECK_RESULT;name;0;output");
   process_external_command(cmd);
 

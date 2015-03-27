@@ -306,9 +306,7 @@ typedef struct   nebstruct_program_status_struct {
   int            daemon_mode;
   time_t         last_command_check;
   int            active_service_checks_enabled;
-  int            passive_service_checks_enabled;
   int            active_host_checks_enabled;
-  int            passive_host_checks_enabled;
   int            event_handlers_enabled;
   int            flap_detection_enabled;
   int            obsess_over_hosts;

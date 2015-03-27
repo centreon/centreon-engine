@@ -62,7 +62,6 @@ service::setters const service::_setters[] = {
   { "next_check",                           SETTER(time_t, _set_next_check) },
   { "normal_check_interval",                SETTER(unsigned int, _set_normal_check_interval) },
   { "obsess_over_service",                  SETTER(int, _set_obsess_over_service) },
-  { "passive_checks_enabled",               SETTER(bool, _set_passive_checks_enabled) },
   { "percent_state_change",                 SETTER(double, _set_percent_state_change) },
   { "performance_data",                     SETTER(std::string const&, _set_performance_data) },
   { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
@@ -83,6 +82,7 @@ service::setters const service::_setters[] = {
   { "notified_on_critical",                 SETTER(bool, _set_notified_on_critical) },
   { "notified_on_unknown",                  SETTER(bool, _set_notified_on_unknown) },
   { "notified_on_warning",                  SETTER(bool, _set_notified_on_warning) },
+  { "passive_checks_enabled",               SETTER(bool, _set_passive_checks_enabled) },
   { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
@@ -152,7 +152,6 @@ service& service::operator=(service const& right) {
     _next_setter = right._next_setter;
     _normal_check_interval = right._normal_check_interval;
     _obsess_over_service = right._obsess_over_service;
-    _passive_checks_enabled = right._passive_checks_enabled;
     _percent_state_change = right._percent_state_change;
     _performance_data = right._performance_data;
     _plugin_output = right._plugin_output;
@@ -208,7 +207,6 @@ bool service::operator==(service const& right) const throw () {
           && _next_check == right._next_check
           && _normal_check_interval == right._normal_check_interval
           && _obsess_over_service == right._obsess_over_service
-          && _passive_checks_enabled == right._passive_checks_enabled
           && _percent_state_change == right._percent_state_change
           && _performance_data == right._performance_data
           && _plugin_output == right._plugin_output
@@ -585,15 +583,6 @@ opt<unsigned int> const& service::normal_check_interval() const throw () {
  */
 opt<int> const& service::obsess_over_service() const throw () {
   return (_obsess_over_service);
-}
-
-/**
- *  Get passive_checks_enabled.
- *
- *  @return The passive_checks_enabled.
- */
-opt<bool> const& service::passive_checks_enabled() const throw () {
-  return (_passive_checks_enabled);
 }
 
 /**
@@ -1133,12 +1122,14 @@ bool service::_set_obsess_over_service(int value) {
 }
 
 /**
- *  Set passive_checks_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new passive_checks_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool service::_set_passive_checks_enabled(bool value) {
-  _passive_checks_enabled = value;
+  (void)value;
   return (true);
 }
 

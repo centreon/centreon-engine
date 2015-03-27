@@ -149,7 +149,6 @@ typedef struct xodtemplate_host_struct{
   double       retry_interval;
   int          max_check_attempts;
   int          active_checks_enabled;
-  int          passive_checks_enabled;
   int          obsess_over_host;
   char*        event_handler;
   int          event_handler_enabled;
@@ -192,7 +191,6 @@ typedef struct xodtemplate_host_struct{
   int          have_retry_interval;
   int          have_max_check_attempts;
   int          have_active_checks_enabled;
-  int          have_passive_checks_enabled;
   int          have_obsess_over_host;
   int          have_event_handler_enabled;
   int          have_check_freshness;
@@ -256,7 +254,6 @@ typedef struct xodtemplate_service_struct{
   char*        check_period;
   unsigned int check_timeout;
   int          active_checks_enabled;
-  int          passive_checks_enabled;
   int          is_volatile;
   int          obsess_over_service;
   char*        event_handler;
@@ -306,7 +303,6 @@ typedef struct xodtemplate_service_struct{
   int          have_check_interval;
   int          have_retry_interval;
   int          have_active_checks_enabled;
-  int          have_passive_checks_enabled;
   int          have_is_volatile;
   int          have_obsess_over_service;
   int          have_event_handler_enabled;

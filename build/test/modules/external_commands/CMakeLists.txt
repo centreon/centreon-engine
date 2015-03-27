@@ -115,34 +115,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling start_accepting_passive_host_checks.
-set(TEST_NAME "modules_external_commands_start_accepting_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/start_accepting_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling stop_accepting_passive_host_checks.
-set(TEST_NAME "modules_external_commands_stop_accepting_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/stop_accepting_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling start_accepting_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_start_accepting_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/start_accepting_passive_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling stop_accepting_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_stop_accepting_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/stop_accepting_passive_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling start_obsessing_over_host_checks.
 set(TEST_NAME "modules_external_commands_start_obsessing_over_host_checks")
 add_executable("${TEST_NAME}"
@@ -238,20 +210,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_host_svc_checks")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_host_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling enable_passive_host_checks.
-set(TEST_NAME "modules_external_commands_enable_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_passive_host_checks.
-set(TEST_NAME "modules_external_commands_disable_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_passive_host_checks.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -409,20 +367,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling enable_hostgroup_passive_host_checks.
-set(TEST_NAME "modules_external_commands_enable_hostgroup_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_hostgroup_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_hostgroup_passive_host_checks.
-set(TEST_NAME "modules_external_commands_disable_hostgroup_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_hostgroup_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling enable_hostgroup_svc_checks.
 set(TEST_NAME "modules_external_commands_enable_hostgroup_svc_checks")
 add_executable("${TEST_NAME}"
@@ -434,20 +378,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_hostgroup_svc_checks")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_hostgroup_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling enable_hostgroup_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_enable_hostgroup_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_hostgroup_passive_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_hostgroup_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_disable_hostgroup_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_hostgroup_passive_svc_checks.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -476,20 +406,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_svc_check")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_svc_check.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling enable_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_enable_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_passive_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_disable_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_passive_svc_checks.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
@@ -619,20 +535,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling enable_servicegroup_passive_host_checks.
-set(TEST_NAME "modules_external_commands_enable_servicegroup_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_servicegroup_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_servicegroup_passive_host_checks.
-set(TEST_NAME "modules_external_commands_disable_servicegroup_passive_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_servicegroup_passive_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling enable_servicegroup_svc_checks.
 set(TEST_NAME "modules_external_commands_enable_servicegroup_svc_checks")
 add_executable("${TEST_NAME}"
@@ -644,20 +546,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_disable_servicegroup_svc_checks")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/disable_servicegroup_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling enable_servicegroup_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_enable_servicegroup_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_servicegroup_passive_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_servicegroup_passive_svc_checks.
-set(TEST_NAME "modules_external_commands_disable_servicegroup_passive_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_servicegroup_passive_svc_checks.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 

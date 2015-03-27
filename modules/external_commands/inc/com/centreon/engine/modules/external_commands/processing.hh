@@ -51,8 +51,6 @@ namespace         modules {
       static void _wrapper_disable_host_svc_checks(host* hst);
       static void _wrapper_enable_service_checks(host* hst);
       static void _wrapper_disable_service_checks(host* hst);
-      static void _wrapper_enable_passive_service_checks(host* hst);
-      static void _wrapper_disable_passive_service_checks(host* hst);
 
       template <void (*fptr)()>
       static void _redirector(

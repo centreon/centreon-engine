@@ -44,7 +44,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Host check timeout
     const_cast<char*>("mycommand"), // Check command
     1,                              // Checks enabled
-    1,                              // Accept passive checks
     NULL,                           // Event handler
     0,                              // Event handler enabled
     0,                              // Flap detection enabled
@@ -78,7 +77,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Initial state
     1,                              // Max attempts
     0,                              // Service check timeout
-    1,                              // Accept passive checks
     1.0,                            // Check interval
     1.0,                            // Retry interval
     0,                              // Volatile

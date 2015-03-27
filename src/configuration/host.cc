@@ -55,7 +55,6 @@ host::setters const host::_setters[] = {
   { "max_check_attempts",           SETTER(unsigned int, _set_max_check_attempts) },
   { "checks_enabled",               SETTER(bool, _set_checks_active) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
-  { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "event_handler_enabled",        SETTER(bool, _set_event_handler_enabled) },
   { "check_freshness",              SETTER(bool, _set_check_freshness) },
   { "freshness_threshold",          SETTER(unsigned int, _set_freshness_threshold) },
@@ -85,6 +84,7 @@ host::setters const host::_setters[] = {
   { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
   { "notification_options",         SETTER(std::string const&, _set_notification_options) },
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
+  { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
   { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) }
@@ -92,7 +92,6 @@ host::setters const host::_setters[] = {
 
 // Default values.
 static bool const           default_checks_active(true);
-static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
 static unsigned int const   default_check_interval(5);
 static bool const           default_event_handler_enabled(true);
@@ -118,7 +117,6 @@ static unsigned int const   default_check_timeout(0);
 host::host(key_type const& key)
   : object(object::host),
     _checks_active(default_checks_active),
-    _checks_passive(default_checks_passive),
     _check_freshness(default_check_freshness),
     _check_interval(default_check_interval),
     _check_timeout(default_check_timeout),
@@ -165,7 +163,6 @@ host& host::operator=(host const& right) {
     _address = right._address;
     _alias = right._alias;
     _checks_active = right._checks_active;
-    _checks_passive = right._checks_passive;
     _check_command = right._check_command;
     _check_freshness = right._check_freshness;
     _check_interval = right._check_interval;
@@ -206,7 +203,6 @@ bool host::operator==(host const& right) const throw () {
           && _address == right._address
           && _alias == right._alias
           && _checks_active == right._checks_active
-          && _checks_passive == right._checks_passive
           && _check_command == right._check_command
           && _check_freshness == right._check_freshness
           && _check_interval == right._check_interval
@@ -261,8 +257,6 @@ bool host::operator<(host const& right) const throw () {
     return (_alias < right._alias);
   else if (_checks_active != right._checks_active)
     return (_checks_active < right._checks_active);
-  else if (_checks_passive != right._checks_passive)
-    return (_checks_passive < right._checks_passive);
   else if (_check_command != right._check_command)
     return (_check_command < right._check_command);
   else if (_check_freshness != right._check_freshness)
@@ -353,7 +347,6 @@ void host::merge(object const& obj) {
   MRG_DEFAULT(_address);
   MRG_DEFAULT(_alias);
   MRG_OPTION(_checks_active);
-  MRG_OPTION(_checks_passive);
   MRG_DEFAULT(_check_command);
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
@@ -427,15 +420,6 @@ std::string const& host::alias() const throw () {
  */
 bool host::checks_active() const throw () {
   return (_checks_active);
-}
-
-/**
- *  Get checks_passive.
- *
- *  @return The checks_passive.
- */
-bool host::checks_passive() const throw () {
-  return (_checks_passive);
 }
 
 /**
@@ -741,14 +725,17 @@ bool host::_set_checks_active(bool value) {
 }
 
 /**
- *  Set checks_passive value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new checks_passive value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool host::_set_checks_passive(bool value) {
-  _checks_passive = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host passive_checks_enabled ignored";
+  ++config_warnings;
   return (true);
 }
 

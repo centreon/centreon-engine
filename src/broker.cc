@@ -861,11 +861,7 @@ void broker_program_status(
   ds.last_command_check = last_command_check;
   ds.active_service_checks_enabled
     = config->execute_service_checks();
-  ds.passive_service_checks_enabled
-    = config->accept_passive_service_checks();
   ds.active_host_checks_enabled = config->execute_host_checks();
-  ds.passive_host_checks_enabled
-    = config->accept_passive_host_checks();
   ds.event_handlers_enabled = config->enable_event_handlers();
   ds.flap_detection_enabled = config->enable_flap_detection();
   ds.obsess_over_hosts = config->obsess_over_hosts();

@@ -56,7 +56,6 @@ typedef struct                  service_struct {
   int                           flap_detection_on_critical;
   int                           check_freshness;
   int                           freshness_threshold;
-  int                           accept_passive_service_checks;
   int                           event_handler_enabled;
   int                           checks_enabled;
   int                           retain_status_information;
@@ -122,7 +121,6 @@ service* add_service(
            int initial_state,
            int max_attempts,
            unsigned int check_timeout,
-           int accept_passive_checks,
            double check_interval,
            double retry_interval,
            int is_volatile,

@@ -258,22 +258,6 @@ int handle_async_service_check_result(
       && currently_running_service_checks > 0)
     currently_running_service_checks--;
 
-  /* skip this service check results if its passive and we aren't accepting passive check results */
-  if (queued_check_result->check_type == SERVICE_CHECK_PASSIVE) {
-    if (config->accept_passive_service_checks() == false) {
-      logger(dbg_checks, basic)
-        << "Discarding passive service check result because passive "
-        "service checks are disabled globally.";
-      return (ERROR);
-    }
-    if (temp_service->accept_passive_service_checks == false) {
-      logger(dbg_checks, basic)
-        << "Discarding passive service check result because passive "
-        "checks are disabled for this service.";
-      return (ERROR);
-    }
-  }
-
   /* clear the freshening flag (it would have been set if this service was determined to be stale) */
   if (queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK)
     temp_service->is_being_freshened = false;
@@ -1406,9 +1390,8 @@ void check_service_result_freshness() {
     if (temp_service->is_executing == true)
       continue;
 
-    /* skip services that have both active and passive checks disabled */
-    if (temp_service->checks_enabled == false
-        && temp_service->accept_passive_service_checks == false)
+    /* skip services that have active checks disabled */
+    if (temp_service->checks_enabled == false)
       continue;
 
     /* skip services that are already being freshened */
@@ -1817,9 +1800,8 @@ void check_host_result_freshness() {
     if (temp_host->check_freshness == false)
       continue;
 
-    /* skip hosts that have both active and passive checks disabled */
-    if (temp_host->checks_enabled == false
-        && temp_host->accept_passive_host_checks == false)
+    /* skip hosts that have active checks disabled */
+    if (temp_host->checks_enabled == false)
       continue;
 
     /* skip hosts that are currently executing */
@@ -2221,22 +2203,6 @@ int handle_async_host_check_result_3x(
   if (queued_check_result->check_type == HOST_CHECK_ACTIVE
       && currently_running_host_checks > 0)
     currently_running_host_checks--;
-
-  /* skip this host check results if its passive and we aren't accepting passive check results */
-  if (queued_check_result->check_type == HOST_CHECK_PASSIVE) {
-    if (config->accept_passive_host_checks() == false) {
-      logger(dbg_checks, basic)
-        << "Discarding passive host check result because passive host "
-        "checks are disabled globally.";
-      return (ERROR);
-    }
-    if (temp_host->accept_passive_host_checks == false) {
-      logger(dbg_checks, basic)
-        << "Discarding passive host check result because passive checks "
-        "are disabled for this host.";
-      return (ERROR);
-    }
-  }
 
   /* clear the freshening flag (it would have been set if this host was determined to be stale) */
   if (queued_check_result->check_options & CHECK_OPTION_FRESHNESS_CHECK)

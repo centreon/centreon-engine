@@ -70,25 +70,6 @@ The processing of active and passive check results is essentially
 identical. This allows for seamless integration of status information
 from external applications with Centreon Engine.
 
-Enabling Passive Checks
-=======================
-
-In order to enable passive checks in Centreon Engine, you'll need to do
-the following:
-
-  * Set :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
-    directive to 1.
-  * Set the passive_checks_enabled directive in your host and service
-    definitions to 1.
-
-If you want to disable processing of passive checks on a global basis,
-set the :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
-directive to 0.
-
-If you would like to disable passive checks for just a few hosts or
-services, use the passive_checks_enabled directive in the host and/or
-service definitions to do so.
-
 Submitting Passive Service Check Results
 ========================================
 
@@ -196,4 +177,3 @@ validation on the results being submitted, and then write the check
 results directly into the external command file (as described
 above). More information on the NSCA addon can be found
 :ref:`here <addons_nsca>`.
-

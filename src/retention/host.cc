@@ -61,7 +61,6 @@ host::setters const host::_setters[] = {
   { "next_check",                           SETTER(time_t, _set_next_check) },
   { "normal_check_interval",                SETTER(unsigned int, _set_normal_check_interval) },
   { "obsess_over_host",                     SETTER(int, _set_obsess_over_host) },
-  { "passive_checks_enabled",               SETTER(bool, _set_passive_checks_enabled) },
   { "percent_state_change",                 SETTER(double, _set_percent_state_change) },
   { "performance_data",                     SETTER(std::string const&, _set_performance_data) },
   { "plugin_output",                        SETTER(std::string const&, _set_plugin_output) },
@@ -80,6 +79,7 @@ host::setters const host::_setters[] = {
   { "notifications_enabled",                SETTER(bool, _set_notifications_enabled) },
   { "notified_on_down",                     SETTER(bool, _set_notified_on_down) },
   { "notified_on_unreachable",              SETTER(bool, _set_notified_on_unreachable) },
+  { "passive_checks_enabled",               SETTER(bool, _set_passive_checks_enabled) },
   { "problem_has_been_acknowledged",        SETTER(bool, _set_problem_has_been_acknowledged) },
   { "process_performance_data",             SETTER(int, _set_process_performance_data) }
 };
@@ -148,7 +148,6 @@ host& host::operator=(host const& right) {
     _next_check = right._next_check;
     _normal_check_interval = right._normal_check_interval;
     _obsess_over_host = right._obsess_over_host;
-    _passive_checks_enabled = right._passive_checks_enabled;
     _percent_state_change = right._percent_state_change;
     _performance_data = right._performance_data;
     _plugin_output = right._plugin_output;
@@ -202,7 +201,6 @@ bool host::operator==(host const& right) const throw () {
           && _next_check == right._next_check
           && _normal_check_interval == right._normal_check_interval
           && _obsess_over_host == right._obsess_over_host
-          && _passive_checks_enabled == right._passive_checks_enabled
           && _percent_state_change == right._percent_state_change
           && _performance_data == right._performance_data
           && _plugin_output == right._plugin_output
@@ -547,15 +545,6 @@ opt<unsigned int> const& host::normal_check_interval() const throw () {
  */
 opt<int> const& host::obsess_over_host() const throw () {
   return (_obsess_over_host);
-}
-
-/**
- *  Get passive_checks_enabled.
- *
- *  @return The passive_checks_enabled.
- */
-opt<bool> const& host::passive_checks_enabled() const throw () {
-  return (_passive_checks_enabled);
 }
 
 /**
@@ -1064,12 +1053,14 @@ bool host::_set_obsess_over_host(int value) {
 }
 
 /**
- *  Set passive_checks_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new passive_checks_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool host::_set_passive_checks_enabled(bool value) {
-  _passive_checks_enabled = value;
+  (void)value;
   return (true);
 }
 

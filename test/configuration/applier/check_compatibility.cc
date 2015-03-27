@@ -70,8 +70,6 @@ struct                global {
   umap<std::string, shared_ptr<timeperiod> >
                       save_timeperiods;
 
-  bool                accept_passive_host_checks;
-  bool                accept_passive_service_checks;
   int                 additional_freshness_latency;
   bool                auto_reschedule_checks;
   unsigned int        auto_rescheduling_interval;
@@ -261,8 +259,6 @@ static void remove_duplicates(T* l) {
 bool chkdiff(global& g1, global& g2) {
   bool ret(true);
 
-  check_value(accept_passive_host_checks);
-  check_value(accept_passive_service_checks);
   check_value(additional_freshness_latency);
   check_value(auto_reschedule_checks);
   check_value(auto_rescheduling_interval);
@@ -425,8 +421,6 @@ static global get_globals() {
   g.save_timeperiods = app_state.timeperiods();
   app_state.timeperiods().clear();
 
-  g.accept_passive_host_checks = accept_passive_host_checks;
-  g.accept_passive_service_checks = accept_passive_service_checks;
   g.additional_freshness_latency = additional_freshness_latency;
   g.auto_reschedule_checks = auto_reschedule_checks;
   g.auto_rescheduling_interval = auto_rescheduling_interval;

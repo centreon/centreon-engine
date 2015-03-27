@@ -688,8 +688,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
     xsddefault_cleanup_status_data(true);
 
   // Set new values.
-  config->accept_passive_host_checks(new_cfg.accept_passive_host_checks());
-  config->accept_passive_service_checks(new_cfg.accept_passive_service_checks());
   config->additional_freshness_latency(new_cfg.additional_freshness_latency());
   config->auto_reschedule_checks(new_cfg.auto_reschedule_checks());
   config->auto_rescheduling_interval(new_cfg.auto_rescheduling_interval());

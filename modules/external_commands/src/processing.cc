@@ -74,18 +74,6 @@ processing::processing() {
   _lst_command["STOP_EXECUTING_SVC_CHECKS"] =
     command_info(CMD_STOP_EXECUTING_SVC_CHECKS,
                  &_redirector<&stop_executing_service_checks>);
-  _lst_command["START_ACCEPTING_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_START_ACCEPTING_PASSIVE_HOST_CHECKS,
-                 &_redirector<&start_accepting_passive_host_checks>);
-  _lst_command["STOP_ACCEPTING_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_STOP_ACCEPTING_PASSIVE_HOST_CHECKS,
-                 &_redirector<&stop_accepting_passive_host_checks>);
-  _lst_command["START_ACCEPTING_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS,
-                 &_redirector<&start_accepting_passive_service_checks>);
-  _lst_command["STOP_ACCEPTING_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_STOP_ACCEPTING_PASSIVE_SVC_CHECKS,
-                 &_redirector<&stop_accepting_passive_service_checks>);
   _lst_command["START_OBSESSING_OVER_HOST_CHECKS"] =
     command_info(CMD_START_OBSESSING_OVER_HOST_CHECKS,
                  &_redirector<&start_obsessing_over_host_checks>);
@@ -130,12 +118,6 @@ processing::processing() {
   _lst_command["DISABLE_HOST_SVC_CHECKS"] =
     command_info(CMD_DISABLE_HOST_SVC_CHECKS,
                  &_redirector_host<&_wrapper_disable_host_svc_checks>);
-  _lst_command["ENABLE_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_ENABLE_PASSIVE_HOST_CHECKS,
-                 &_redirector_host<&enable_passive_host_checks>);
-  _lst_command["DISABLE_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_DISABLE_PASSIVE_HOST_CHECKS,
-                 &_redirector_host<&disable_passive_host_checks>);
   _lst_command["SCHEDULE_HOST_SVC_CHECKS"] =
     command_info(CMD_SCHEDULE_HOST_SVC_CHECKS,
                  &_redirector<&cmd_schedule_check>);
@@ -204,24 +186,12 @@ processing::processing() {
   _lst_command["DISABLE_HOSTGROUP_HOST_CHECKS"] =
     command_info(CMD_DISABLE_HOSTGROUP_HOST_CHECKS,
                  &_redirector_hostgroup<&disable_host_checks>);
-  _lst_command["ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS,
-                 &_redirector_hostgroup<&enable_passive_host_checks>);
-  _lst_command["DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS,
-                 &_redirector_hostgroup<&disable_passive_host_checks>);
   _lst_command["ENABLE_HOSTGROUP_SVC_CHECKS"] =
     command_info(CMD_ENABLE_HOSTGROUP_SVC_CHECKS,
                  &_redirector_hostgroup<&_wrapper_enable_service_checks>);
   _lst_command["DISABLE_HOSTGROUP_SVC_CHECKS"] =
     command_info(CMD_DISABLE_HOSTGROUP_SVC_CHECKS,
                  &_redirector_hostgroup<&_wrapper_disable_service_checks>);
-  _lst_command["ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
-                 &_redirector_hostgroup<&_wrapper_enable_passive_service_checks>);
-  _lst_command["DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS,
-                 &_redirector_hostgroup<&_wrapper_disable_passive_service_checks>);
 
   // service-related commands.
   _lst_command["SCHEDULE_SVC_CHECK"] =
@@ -236,12 +206,6 @@ processing::processing() {
   _lst_command["DISABLE_SVC_CHECK"] =
     command_info(CMD_DISABLE_SVC_CHECK,
                  &_redirector_service<&disable_service_checks>);
-  _lst_command["ENABLE_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_ENABLE_PASSIVE_SVC_CHECKS,
-                 &_redirector_service<&enable_passive_service_checks>);
-  _lst_command["DISABLE_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_DISABLE_PASSIVE_SVC_CHECKS,
-                 &_redirector_service<&disable_passive_service_checks>);
   _lst_command["PROCESS_SERVICE_CHECK_RESULT"] =
     command_info(CMD_PROCESS_SERVICE_CHECK_RESULT,
                  &_redirector<&cmd_process_service_check_result>);
@@ -298,24 +262,12 @@ processing::processing() {
   _lst_command["DISABLE_SERVICEGROUP_HOST_CHECKS"] =
     command_info(CMD_DISABLE_SERVICEGROUP_HOST_CHECKS,
                  &_redirector_servicegroup<&disable_host_checks>);
-  _lst_command["ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS,
-                 &_redirector_servicegroup<&enable_passive_host_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS"] =
-    command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS,
-                 &_redirector_servicegroup<&disable_passive_host_checks>);
   _lst_command["ENABLE_SERVICEGROUP_SVC_CHECKS"] =
     command_info(CMD_ENABLE_SERVICEGROUP_SVC_CHECKS,
                  &_redirector_servicegroup<&enable_service_checks>);
   _lst_command["DISABLE_SERVICEGROUP_SVC_CHECKS"] =
     command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS,
                  &_redirector_servicegroup<&disable_service_checks>);
-  _lst_command["ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
-                 &_redirector_servicegroup<&enable_passive_service_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS"] =
-    command_info(CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS,
-                 &_redirector_servicegroup<&disable_passive_service_checks>);
 
   // misc commands.
   _lst_command["PROCESS_FILE"] =
@@ -477,20 +429,4 @@ void processing::_wrapper_disable_service_checks(host* hst) {
        member = member->next)
     if (member->service_ptr)
       disable_service_checks(member->service_ptr);
-}
-
-void processing::_wrapper_enable_passive_service_checks(host* hst) {
-  for (servicesmember* member = hst->services;
-       member != NULL;
-       member = member->next)
-    if (member->service_ptr)
-      enable_passive_service_checks(member->service_ptr);
-}
-
-void processing::_wrapper_disable_passive_service_checks(host* hst) {
-  for (servicesmember* member = hst->services;
-       member != NULL;
-       member = member->next)
-    if (member->service_ptr)
-      disable_passive_service_checks(member->service_ptr);
 }

@@ -99,7 +99,6 @@ required options are omitted)::
     host_name              backup-server
     service_description    ArcServe Backup Job
     active_checks_enabled  0                ; active checks are NOT enabled
-    passive_checks_enabled 1                ; passive checks are enabled (this is how results are reported)
     check_freshness        1
     freshness_threshold    93600            ; 26 hour threshold, since backups may not always finish at the same time
     check_command          no-backup-report ; this command is run only if the service results are "stale"
@@ -127,4 +126,3 @@ the check_dummy plugin to be executed, which returns a critical state to
 Centreon Engine. The service will then go into to a critical state (if
 it isn't already there) and someone will probably get notified of the
 problem.
-

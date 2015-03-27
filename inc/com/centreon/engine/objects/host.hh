@@ -59,7 +59,6 @@ typedef struct                  host_struct {
   int                           check_freshness;
   int                           freshness_threshold;
   int                           checks_enabled;
-  int                           accept_passive_host_checks;
   int                           event_handler_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
@@ -141,7 +140,6 @@ host* add_host(
         unsigned int check_timeout,
         char const* check_command,
         int checks_enabled,
-        int accept_passive_checks,
         char const* event_handler,
         int event_handler_enabled,
         int flap_detection_enabled,

@@ -243,37 +243,6 @@ monitoring environment.
     * 0 = Don't execute service checks
     * 1 = Execute service checks (default)
 
-.. _main_cfg_opt_passive_service_check_acceptance:
-
-Passive Service Check Acceptance Option
----------------------------------------
-
-This option determines whether or not Centreon Engine will accept
-:ref:`passive service checks <passive_checks>` when it initially
-(re)starts. If this option is disabled, Centreon Engine will not accept
-any passive service checks.
-
-=========== ===================================
-**Format**  accept_passive_service_checks=<0/1>
-**Example** accept_passive_service_checks=1
-=========== ===================================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the :ref:`use_retained_program_state
-   <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't accept passive service checks
-    * 1 = Accept passive service checks (default)
-
 Host Check Execution Option
 ---------------------------
 
@@ -309,38 +278,6 @@ monitoring environment.
 
     * 0 = Don't execute host checks
     * 1 = Execute host checks (default)
-
-.. _main_cfg_opt_passive_host_check_acceptance:
-
-Passive Host Check Acceptance Option
-------------------------------------
-
-This option determines whether or not Centreon Engine will accept
-:ref:`passive host checks <passive_checks>` when it initially
-(re)starts. If this option is disabled, Centreon Engine will not accept
-any passive host checks.
-
-=========== ================================
-**Format**  accept_passive_host_checks=<0/1>
-**Example** accept_passive_host_checks=1
-=========== ================================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't accept passive host checks
-    * 1 = Accept passive host checks (default)
 
 .. _main_cfg_opt_event_handler:
 
@@ -504,9 +441,8 @@ file. Some of these program-wide state variables that are normally saved
 across program restarts if state retention is enabled include the
 :ref:`enable_notifications <main_cfg_opt_notifications>`,
 :ref:`enable_flap_detection <main_cfg_opt_flap_detection>`,
-:ref:`enable_event_handlers <main_cfg_opt_event_handler>`,
-:ref:`execute_service_checks <main_cfg_opt_service_check_execution>`,
-and :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
+:ref:`enable_event_handlers <main_cfg_opt_event_handler>`
+and :ref:`execute_service_checks <main_cfg_opt_service_check_execution>`
 options. If you do not have :ref:`state retention <main_cfg_opt_state_retention>`
 enabled, this option has no effect.
 

@@ -107,7 +107,6 @@ Definition Format
     # check_interval               #
     # retry_interval               #
     # active_checks_enabled        [0/1]
-    # passive_checks_enabled       [0/1]
     check_period                   timeperiod_name
     # obsess_over_host             [0/1]
     # check_freshness              [0/1]
@@ -223,8 +222,6 @@ retry_interval               This directive is used to define the number of "tim
 active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active
                              checks (either regularly scheduled or on-demand) of this host are enabled. Values: 0 = disable active host checks,
                              1 = enable active host checks (default).
-passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive
-                             checks are enabled for this host. Values: 0 = disable passive host checks, 1 = enable passive host checks (default).
 check_period                 This directive is used to specify the short name of the
                              :ref:`time period <obj_def_timeperiod>` during which active checks of this host can be made.
 obsess_over_host             :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the
@@ -393,7 +390,6 @@ Definition Format
     check_interval                 #
     retry_interval                 #
     # active_checks_enabled        [0/1]
-    # passive_checks_enabled       [0/1]
     check_period                   timeperiod_name
     # obsess_over_service          [0/1]
     # check_freshness              [0/1]
@@ -488,8 +484,6 @@ retry_interval               This directive is used to define the number of "tim
                              documentation.
 active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active checks of this service are
                              enabled. Values: 0 = disable active service checks, 1 = enable active service checks (default).
-passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive checks of this service are
-                             enabled. Values: 0 = disable passive service checks, 1 = enable passive service checks (default).
 check_period                 This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>` during which active
                              checks of this service can be made.
 obsess_over_service          :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the service will be "obsessed"

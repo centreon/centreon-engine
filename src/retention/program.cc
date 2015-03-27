@@ -40,8 +40,6 @@ program::setters const program::_setters[] = {
   { "next_problem_id",                SETTER(unsigned long, _set_next_problem_id) },
   { "obsess_over_hosts",              SETTER(bool, _set_obsess_over_hosts) },
   { "obsess_over_services",           SETTER(bool, _set_obsess_over_services) },
-  { "passive_host_checks_enabled",    SETTER(bool, _set_passive_host_checks_enabled) },
-  { "passive_service_checks_enabled", SETTER(bool, _set_passive_service_checks_enabled) },
 
   // Deprecated.
   { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
@@ -49,6 +47,8 @@ program::setters const program::_setters[] = {
   { "next_comment_id",                SETTER(unsigned long, _set_next_comment_id) },
   { "next_downtime_id",               SETTER(unsigned long, _set_next_downtime_id) },
   { "next_notification_id",           SETTER(unsigned long, _set_next_notification_id) },
+  { "passive_host_checks_enabled",    SETTER(bool, _set_passive_host_checks_enabled) },
+  { "passive_service_checks_enabled", SETTER(bool, _set_passive_service_checks_enabled) },
   { "process_performance_data",       SETTER(bool, _set_process_performance_data) }
 };
 
@@ -96,8 +96,6 @@ program& program::operator=(program const& right) {
     _next_problem_id = right._next_problem_id;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
-    _passive_host_checks_enabled = right._passive_host_checks_enabled;
-    _passive_service_checks_enabled = right._passive_service_checks_enabled;
   }
   return (*this);
 }
@@ -124,9 +122,7 @@ bool program::operator==(program const& right) const throw () {
           && _next_event_id == right._next_event_id
           && _next_problem_id == right._next_problem_id
           && _obsess_over_hosts == right._obsess_over_hosts
-          && _obsess_over_services == right._obsess_over_services
-          && _passive_host_checks_enabled == right._passive_host_checks_enabled
-          && _passive_service_checks_enabled == right._passive_service_checks_enabled);
+          && _obsess_over_services == right._obsess_over_services);
 }
 
 /**
@@ -281,24 +277,6 @@ opt<bool> const& program::obsess_over_hosts() const throw () {
  */
 opt<bool> const& program::obsess_over_services() const throw () {
   return (_obsess_over_services);
-}
-
-/**
- *  Get passive_host_checks_enabled.
- *
- *  @return The passive_host_checks_enabled.
- */
-opt<bool> const& program::passive_host_checks_enabled() const throw () {
-  return (_passive_host_checks_enabled);
-}
-
-/**
- *  Get passive_service_checks_enabled.
- *
- *  @return The passive_service_checks_enabled.
- */
-opt<bool> const& program::passive_service_checks_enabled() const throw () {
-  return (_passive_service_checks_enabled);
 }
 
 /**
@@ -498,22 +476,26 @@ bool program::_set_obsess_over_services(bool value) {
 }
 
 /**
- *  Set passive_host_checks_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new passive_host_checks_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_passive_host_checks_enabled(bool value) {
-  _passive_host_checks_enabled = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set passive_service_checks_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new passive_service_checks_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_passive_service_checks_enabled(bool value) {
-  _passive_service_checks_enabled = value;
+  (void)value;
   return (true);
 }
 

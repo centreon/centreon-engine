@@ -47,11 +47,6 @@ set(TEST_NAME "parse_and_apply_configuration_command")
 set(TEST_CONF_FILE "main_command.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_apply_configuration_comment
-set(TEST_NAME "parse_and_apply_configuration_comment")
-set(TEST_CONF_FILE "main_comment.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_apply_configuration_connector
 set(TEST_NAME "parse_and_apply_configuration_connector")
 set(TEST_CONF_FILE "main_connector.cfg")

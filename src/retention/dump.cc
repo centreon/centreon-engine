@@ -110,7 +110,6 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.check_interval << "\n"
     "obsess_over_host=" << obj.obsess_over_host << "\n"
-    "passive_checks_enabled=" << obj.accept_passive_host_checks << "\n"
     "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"
     "performance_data=" << (obj.perf_data ? obj.perf_data : "") << "\n"
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"
@@ -177,8 +176,6 @@ std::ostream& dump::program(std::ostream& os) {
     "next_problem_id=" << next_problem_id << "\n"
     "obsess_over_hosts=" << config->obsess_over_hosts() << "\n"
     "obsess_over_services=" << config->obsess_over_services() << "\n"
-    "passive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
-    "passive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
     "}\n";
   return (os);
 }
@@ -276,7 +273,6 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.check_interval << "\n"
     "obsess_over_service=" << obj.obsess_over_service << "\n"
-    "passive_checks_enabled=" << obj.accept_passive_service_checks << "\n"
     "percent_state_change=" << std::setprecision(2) << std::fixed << obj.percent_state_change << "\n"
     "performance_data=" << (obj.perf_data ? obj.perf_data : "") << "\n"
     "plugin_output=" << (obj.plugin_output ? obj.plugin_output : "") << "\n"

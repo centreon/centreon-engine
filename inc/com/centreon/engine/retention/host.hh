@@ -76,7 +76,6 @@ namespace                         retention {
     opt<time_t> const&            next_check() const throw ();
     opt<unsigned int> const&      normal_check_interval() const throw ();
     opt<int> const&               obsess_over_host() const throw ();
-    opt<bool> const&              passive_checks_enabled() const throw ();
     opt<double> const&            percent_state_change() const throw ();
     opt<std::string> const&       performance_data() const throw ();
     opt<std::string> const&       plugin_output() const throw ();
@@ -177,7 +176,6 @@ namespace                         retention {
     opt<time_t>                   _next_check;
     opt<unsigned int>             _normal_check_interval;
     opt<int>                      _obsess_over_host;
-    opt<bool>                     _passive_checks_enabled;
     opt<double>                   _percent_state_change;
     opt<std::string>              _performance_data;
     opt<std::string>              _plugin_output;

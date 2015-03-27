@@ -70,7 +70,6 @@ int main_test(int argc, char* argv[]) {
   ref.set("next_check", "1300009");
   ref.set("normal_check_interval", "20");
   ref.set("obsess_over_host", "10");
-  ref.set("passive_checks_enabled", "1");
   ref.set("percent_state_change", "44.4");
   ref.set("performance_data", "performance_data");
   ref.set("plugin_output", "plugin_output");

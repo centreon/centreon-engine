@@ -142,10 +142,6 @@ void applier::host::_update(
         && (obj.modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
         obj.checks_enabled = *state.active_checks_enabled();
 
-    if (state.passive_checks_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_PASSIVE_CHECKS_ENABLED))
-      obj.accept_passive_host_checks = *state.passive_checks_enabled();
-
     if (state.event_handler_enabled().is_set()
         && (obj.modified_attributes & MODATTR_EVENT_HANDLER_ENABLED))
       obj.event_handler_enabled = *state.event_handler_enabled();

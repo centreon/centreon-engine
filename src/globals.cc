@@ -113,8 +113,6 @@ timed_event*        event_list_low(NULL);
 timed_event*        event_list_low_tail(NULL);
 timeperiod*         timeperiod_list(NULL);
 timeperiod*         timeperiod_list_tail(NULL);
-unsigned int        accept_passive_host_checks(true);
-unsigned int        accept_passive_service_checks(true);
 unsigned int        auto_reschedule_checks(false);
 unsigned int        auto_rescheduling_interval(30);
 unsigned int        auto_rescheduling_window(180);

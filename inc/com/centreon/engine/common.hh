@@ -51,10 +51,6 @@
 #  define CMD_READ_STATE_INFORMATION                          32
 #  define CMD_START_EXECUTING_SVC_CHECKS                      35
 #  define CMD_STOP_EXECUTING_SVC_CHECKS                       36
-#  define CMD_START_ACCEPTING_PASSIVE_SVC_CHECKS              37
-#  define CMD_STOP_ACCEPTING_PASSIVE_SVC_CHECKS               38
-#  define CMD_ENABLE_PASSIVE_SVC_CHECKS                       39
-#  define CMD_DISABLE_PASSIVE_SVC_CHECKS                      40
 #  define CMD_ENABLE_EVENT_HANDLERS                           41
 #  define CMD_DISABLE_EVENT_HANDLERS                          42
 #  define CMD_ENABLE_HOST_EVENT_HANDLER                       43
@@ -79,10 +75,6 @@
 #  define CMD_PROCESS_HOST_CHECK_RESULT                       87
 #  define CMD_START_EXECUTING_HOST_CHECKS                     88
 #  define CMD_STOP_EXECUTING_HOST_CHECKS                      89
-#  define CMD_START_ACCEPTING_PASSIVE_HOST_CHECKS             90
-#  define CMD_STOP_ACCEPTING_PASSIVE_HOST_CHECKS              91
-#  define CMD_ENABLE_PASSIVE_HOST_CHECKS                      92
-#  define CMD_DISABLE_PASSIVE_HOST_CHECKS                     93
 #  define CMD_START_OBSESSING_OVER_HOST_CHECKS                94
 #  define CMD_STOP_OBSESSING_OVER_HOST_CHECKS                 95
 #  define CMD_SCHEDULE_HOST_CHECK                             96
@@ -93,18 +85,10 @@
 #  define CMD_STOP_OBSESSING_OVER_HOST                       102
 #  define CMD_ENABLE_HOSTGROUP_HOST_CHECKS                   103
 #  define CMD_DISABLE_HOSTGROUP_HOST_CHECKS                  104
-#  define CMD_ENABLE_HOSTGROUP_PASSIVE_SVC_CHECKS            105
-#  define CMD_DISABLE_HOSTGROUP_PASSIVE_SVC_CHECKS           106
-#  define CMD_ENABLE_HOSTGROUP_PASSIVE_HOST_CHECKS           107
-#  define CMD_DISABLE_HOSTGROUP_PASSIVE_HOST_CHECKS          108
 #  define CMD_ENABLE_SERVICEGROUP_SVC_CHECKS                 113
 #  define CMD_DISABLE_SERVICEGROUP_SVC_CHECKS                114
 #  define CMD_ENABLE_SERVICEGROUP_HOST_CHECKS                115
 #  define CMD_DISABLE_SERVICEGROUP_HOST_CHECKS               116
-#  define CMD_ENABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS         117
-#  define CMD_DISABLE_SERVICEGROUP_PASSIVE_SVC_CHECKS        118
-#  define CMD_ENABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS        119
-#  define CMD_DISABLE_SERVICEGROUP_PASSIVE_HOST_CHECKS       120
 #  define CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER               123
 #  define CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER                124
 #  define CMD_CHANGE_HOST_EVENT_HANDLER                      125
@@ -201,7 +185,6 @@
 /* Modified attributes. */
 #  define MODATTR_NONE                       0
 #  define MODATTR_ACTIVE_CHECKS_ENABLED      (1 << 1)
-#  define MODATTR_PASSIVE_CHECKS_ENABLED     (1 << 2)
 #  define MODATTR_EVENT_HANDLER_ENABLED      (1 << 3)
 #  define MODATTR_FLAP_DETECTION_ENABLED     (1 << 4)
 #  define MODATTR_OBSESSIVE_HANDLER_ENABLED  (1 << 7)
