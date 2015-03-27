@@ -60,8 +60,6 @@ state::setters const state::_setters[] = {
   { "enable_predictive_service_dependency_checks", SETTER(bool, enable_predictive_service_dependency_checks) },
   { "event_broker_options",                        SETTER(std::string const&, _set_event_broker_options) },
   { "event_handler_timeout",                       SETTER(unsigned int, event_handler_timeout) },
-  { "execute_host_checks",                         SETTER(bool, execute_host_checks) },
-  { "execute_service_checks",                      SETTER(bool, execute_service_checks) },
   { "external_command_buffer_slots",               SETTER(int, external_command_buffer_slots) },
   { "global_host_event_handler",                   SETTER(std::string const&, global_host_event_handler) },
   { "global_service_event_handler",                SETTER(std::string const&, global_service_event_handler) },
@@ -144,6 +142,8 @@ state::setters const state::_setters[] = {
   { "enable_environment_macros",                   SETTER(bool, _set_enable_environment_macros) },
   { "enable_failure_prediction",                   SETTER(bool, _set_enable_failure_prediction) },
   { "enable_notifications",                        SETTER(bool, _set_enable_notifications) },
+  { "execute_host_checks",                         SETTER(bool, _set_execute_host_checks) },
+  { "execute_service_checks",                      SETTER(bool, _set_execute_service_checks) },
   { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
   { "host_perfdata_command",                       SETTER(std::string const&, _set_host_perfdata_command) },
   { "host_perfdata_file",                          SETTER(std::string const&, _set_host_perfdata_file) },
@@ -208,8 +208,6 @@ static bool const                      default_enable_predictive_host_dependency
 static bool const                      default_enable_predictive_service_dependency_checks(true);
 static unsigned long const             default_event_broker_options(std::numeric_limits<unsigned long>::max());
 static unsigned int const              default_event_handler_timeout(30);
-static bool const                      default_execute_host_checks(true);
-static bool const                      default_execute_service_checks(true);
 static int const                       default_external_command_buffer_slots(4096);
 static std::string const               default_global_host_event_handler("");
 static std::string const               default_global_service_event_handler("");
@@ -317,8 +315,6 @@ state::state()
     _enable_predictive_service_dependency_checks(default_enable_predictive_service_dependency_checks),
     _event_broker_options(default_event_broker_options),
     _event_handler_timeout(default_event_handler_timeout),
-    _execute_host_checks(default_execute_host_checks),
-    _execute_service_checks(default_execute_service_checks),
     _external_command_buffer_slots(default_external_command_buffer_slots),
     _global_host_event_handler(default_global_host_event_handler),
     _global_service_event_handler(default_global_service_event_handler),
@@ -426,8 +422,6 @@ state& state::operator=(state const& right) {
     _enable_predictive_service_dependency_checks = right._enable_predictive_service_dependency_checks;
     _event_broker_options = right._event_broker_options;
     _event_handler_timeout = right._event_handler_timeout;
-    _execute_host_checks = right._execute_host_checks;
-    _execute_service_checks = right._execute_service_checks;
     _external_command_buffer_slots = right._external_command_buffer_slots;
     _global_host_event_handler = right._global_host_event_handler;
     _global_service_event_handler = right._global_service_event_handler;
@@ -529,8 +523,6 @@ bool state::operator==(state const& right) const throw () {
           && _enable_predictive_service_dependency_checks == right._enable_predictive_service_dependency_checks
           && _event_broker_options == right._event_broker_options
           && _event_handler_timeout == right._event_handler_timeout
-          && _execute_host_checks == right._execute_host_checks
-          && _execute_service_checks == right._execute_service_checks
           && _external_command_buffer_slots == right._external_command_buffer_slots
           && _global_host_event_handler == right._global_host_event_handler
           && _global_service_event_handler == right._global_service_event_handler
@@ -1233,42 +1225,6 @@ void state::event_handler_timeout(unsigned int value) {
     throw (engine_error()
            << "event_handler_timeout cannot be 0");
   _event_handler_timeout = value;
-}
-
-/**
- *  Get execute_host_checks value.
- *
- *  @return The execute_host_checks value.
- */
-bool state::execute_host_checks() const throw () {
-  return (_execute_host_checks);
-}
-
-/**
- *  Set execute_host_checks value.
- *
- *  @param[in] value The new execute_host_checks value.
- */
-void state::execute_host_checks(bool value) {
-  _execute_host_checks = value;
-}
-
-/**
- *  Get execute_service_checks value.
- *
- *  @return The execute_service_checks value.
- */
-bool state::execute_service_checks() const throw () {
-  return (_execute_service_checks);
-}
-
-/**
- *  Set execute_service_checks value.
- *
- *  @param[in] value The new execute_service_checks value.
- */
-void state::execute_service_checks(bool value) {
-  _execute_service_checks = value;
 }
 
 /**
@@ -3134,7 +3090,33 @@ void state::_set_event_broker_options(std::string const& value) {
     setter<unsigned long, &state::event_broker_options>::generic(*this, value.c_str());
   else {
     _event_broker_options = BROKER_EVERYTHING;
-    }
+  }
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_execute_host_checks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: execute_host_checks variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_execute_service_checks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: execute_service_checks variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

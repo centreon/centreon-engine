@@ -51,14 +51,6 @@ void applier::program::apply(
   }
 
   if (config.use_retained_program_state()) {
-    if (obj.active_service_checks_enabled().is_set()
-        && (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
-      execute_service_checks = *obj.active_service_checks_enabled();
-
-    if (obj.active_host_checks_enabled().is_set()
-        && (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
-      execute_host_checks = *obj.active_host_checks_enabled();
-
     if (obj.enable_event_handlers().is_set()
         && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED))
       enable_event_handlers = *obj.enable_event_handlers();

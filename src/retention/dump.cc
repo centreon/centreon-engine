@@ -162,8 +162,6 @@ std::ostream& dump::info(std::ostream& os) {
  */
 std::ostream& dump::program(std::ostream& os) {
   os << "program {\n"
-    "active_host_checks_enabled=" << config->execute_host_checks() << "\n"
-    "active_service_checks_enabled=" << config->execute_service_checks() << "\n"
     "check_host_freshness=" << config->check_host_freshness() << "\n"
     "check_service_freshness=" << config->check_service_freshness() << "\n"
     "enable_event_handlers=" << config->enable_event_handlers() << "\n"

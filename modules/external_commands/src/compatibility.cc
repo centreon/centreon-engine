@@ -97,16 +97,6 @@ int process_external_command1(char* cmd) {
   else if (!strcmp(command_id, "FLUSH_PENDING_COMMANDS"))
     command_type = CMD_FLUSH_PENDING_COMMANDS;
 
-  else if (!strcmp(command_id, "START_EXECUTING_HOST_CHECKS"))
-    command_type = CMD_START_EXECUTING_HOST_CHECKS;
-  else if (!strcmp(command_id, "STOP_EXECUTING_HOST_CHECKS"))
-    command_type = CMD_STOP_EXECUTING_HOST_CHECKS;
-
-  else if (!strcmp(command_id, "START_EXECUTING_SVC_CHECKS"))
-    command_type = CMD_START_EXECUTING_SVC_CHECKS;
-  else if (!strcmp(command_id, "STOP_EXECUTING_SVC_CHECKS"))
-    command_type = CMD_STOP_EXECUTING_SVC_CHECKS;
-
   else if (!strcmp(command_id, "START_OBSESSING_OVER_HOST_CHECKS"))
     command_type = CMD_START_OBSESSING_OVER_HOST_CHECKS;
   else if (!strcmp(command_id, "STOP_OBSESSING_OVER_HOST_CHECKS"))
@@ -395,28 +385,12 @@ int process_external_command2(int cmd,
     }
     break;
 
-  case CMD_START_EXECUTING_SVC_CHECKS:
-    start_executing_service_checks();
-    break;
-
-  case CMD_STOP_EXECUTING_SVC_CHECKS:
-    stop_executing_service_checks();
-    break;
-
   case CMD_START_OBSESSING_OVER_SVC_CHECKS:
     start_obsessing_over_service_checks();
     break;
 
   case CMD_STOP_OBSESSING_OVER_SVC_CHECKS:
     stop_obsessing_over_service_checks();
-    break;
-
-  case CMD_START_EXECUTING_HOST_CHECKS:
-    start_executing_host_checks();
-    break;
-
-  case CMD_STOP_EXECUTING_HOST_CHECKS:
-    stop_executing_host_checks();
     break;
 
   case CMD_START_OBSESSING_OVER_HOST_CHECKS:

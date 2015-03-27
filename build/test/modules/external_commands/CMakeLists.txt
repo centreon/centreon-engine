@@ -87,34 +87,6 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
-# Test calling start_executing_host_checks.
-set(TEST_NAME "modules_external_commands_start_executing_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/start_executing_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling stop_executing_host_checks.
-set(TEST_NAME "modules_external_commands_stop_executing_host_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/stop_executing_host_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling start_executing_svc_checks.
-set(TEST_NAME "modules_external_commands_start_executing_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/start_executing_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling stop_executing_svc_checks.
-set(TEST_NAME "modules_external_commands_stop_executing_svc_checks")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/stop_executing_svc_checks.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
 # Test calling start_obsessing_over_host_checks.
 set(TEST_NAME "modules_external_commands_start_obsessing_over_host_checks")
 add_executable("${TEST_NAME}"

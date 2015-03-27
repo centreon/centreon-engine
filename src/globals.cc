@@ -123,8 +123,6 @@ unsigned int        enable_flap_detection(false);
 unsigned int        enable_predictive_host_dependency_checks(true);
 unsigned int        enable_predictive_service_dependency_checks(true);
 unsigned int        event_handler_timeout(30);
-unsigned int        execute_host_checks(true);
-unsigned int        execute_service_checks(true);
 unsigned int        host_check_timeout(30);
 unsigned int        host_freshness_check_interval(60);
 unsigned int        host_inter_check_delay_method(2);// XXX ICD_SMART);

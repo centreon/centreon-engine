@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -276,14 +276,6 @@ void loop::_dispatching() {
           run_event = false;
         }
 
-        // Don't run a service check if active checks are disabled.
-        if (!config->execute_service_checks()) {
-          logger(dbg_events | dbg_checks, more)
-            << "We're not executing service checks right now, "
-            << "so we'll skip this event.";
-          run_event = false;
-        }
-
         // Forced checks override normal check logic.
         if (temp_service->check_options & CHECK_OPTION_FORCE_EXECUTION)
           run_event = true;
@@ -331,14 +323,6 @@ void loop::_dispatching() {
         // Default action is to execute the event.
         run_event = true;
         host* temp_host(static_cast<host*>(event_list_low->event_data));
-
-        // Don't run a host check if active checks are disabled.
-        if (!config->execute_host_checks()) {
-          logger(dbg_events | dbg_checks, more)
-            << "We're not executing host checks right now, "
-            << "so we'll skip this event.";
-          run_event = false;
-        }
 
         // Forced checks override normal check logic.
         if (temp_host->check_options & CHECK_OPTION_FORCE_EXECUTION)

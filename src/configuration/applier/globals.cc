@@ -62,8 +62,6 @@ void applier::globals::apply(state& config) {
   ::enable_predictive_service_dependency_checks = config.enable_predictive_service_dependency_checks();
   ::event_broker_options = config.event_broker_options();
   ::event_handler_timeout = config.event_handler_timeout();
-  ::execute_host_checks = config.execute_host_checks();
-  ::execute_service_checks = config.execute_service_checks();
   ::external_command_buffer_slots = config.external_command_buffer_slots();
   ::high_host_flap_threshold = config.high_host_flap_threshold();
   ::high_service_flap_threshold = config.high_service_flap_threshold();

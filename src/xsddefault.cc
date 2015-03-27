@@ -134,8 +134,6 @@ int xsddefault_save_status_data() {
        "\tnagios_pid=" << static_cast<unsigned int>(getpid()) << "\n"
        "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
        "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
-       "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
-       "\tactive_host_checks_enabled=" << config->execute_host_checks() << "\n"
        "\tenable_event_handlers=" << config->enable_event_handlers() << "\n"
        "\tobsess_over_services=" << config->obsess_over_services() << "\n"
        "\tobsess_over_hosts=" << config->obsess_over_hosts() << "\n"

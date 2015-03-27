@@ -232,8 +232,6 @@ int xrddefault_save_state_information() {
   stream << "program {\n"
          << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
          << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
-         << "active_service_checks_enabled=" << execute_service_checks << "\n"
-         << "active_host_checks_enabled=" << execute_host_checks << "\n"
          << "enable_event_handlers=" << enable_event_handlers << "\n"
          << "obsess_over_services=" << obsess_over_services << "\n"
          << "obsess_over_hosts=" << obsess_over_hosts << "\n"
@@ -656,15 +654,7 @@ int xrddefault_read_state_information() {
           modified_service_process_attributes &= ~process_service_attribute_mask;
         }
         if (use_retained_program_state == true) {
-          if (!strcmp(var, "active_service_checks_enabled")) {
-            if (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-              config->execute_service_checks((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "active_host_checks_enabled")) {
-            if (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-              config->execute_host_checks((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "enable_event_handlers")) {
+          if (!strcmp(var, "enable_event_handlers")) {
             if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
               config->enable_event_handlers((atoi(val) > 0) ? TRUE : FALSE);
           }

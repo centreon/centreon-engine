@@ -51,10 +51,6 @@ int cmd_change_object_custom_var(int cmd, char* args);                      // c
 int cmd_process_external_commands_from_file(int cmd, char* args);           // process external commands from a file
 void disable_service_checks(service* svc);                                  // disables a service check
 void enable_service_checks(service* svc);                                   // enables a service check
-void start_executing_service_checks(void);                                 // starts executing service checks
-void stop_executing_service_checks(void);                                  // stops executing service checks
-void start_executing_host_checks(void);                                    // starts executing host checks
-void stop_executing_host_checks(void);                                     // stops executing host checks
 void start_using_event_handlers(void);                                     // enables event handlers on a program-wide basis
 void stop_using_event_handlers(void);                                      // disables event handlers on a program-wide basis
 void enable_service_event_handler(service* svc);                           // enables the event handler for a particular service

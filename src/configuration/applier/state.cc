@@ -710,8 +710,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->enable_predictive_service_dependency_checks(new_cfg.enable_predictive_service_dependency_checks());
   config->event_broker_options(new_cfg.event_broker_options());
   config->event_handler_timeout(new_cfg.event_handler_timeout());
-  config->execute_host_checks(new_cfg.execute_host_checks());
-  config->execute_service_checks(new_cfg.execute_service_checks());
   config->global_host_event_handler(new_cfg.global_host_event_handler());
   config->global_service_event_handler(new_cfg.global_service_event_handler());
   config->high_host_flap_threshold(new_cfg.high_host_flap_threshold());

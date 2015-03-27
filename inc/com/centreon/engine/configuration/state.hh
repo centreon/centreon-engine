@@ -155,10 +155,6 @@ namespace               configuration {
     void                event_broker_options(unsigned long value);
     unsigned int        event_handler_timeout() const throw ();
     void                event_handler_timeout(unsigned int value);
-    bool                execute_host_checks() const throw ();
-    void                execute_host_checks(bool value);
-    bool                execute_service_checks() const throw ();
-    void                execute_service_checks(bool value);
     int                 external_command_buffer_slots() const throw ();
     void                external_command_buffer_slots(int value);
     std::string const&  global_host_event_handler() const throw ();
@@ -353,6 +349,8 @@ namespace               configuration {
     void                _set_enable_failure_prediction(bool value);
     void                _set_enable_notifications(bool value);
     void                _set_event_broker_options(std::string const& value);
+    void                _set_execute_host_checks(bool value);
+    void                _set_execute_service_checks(bool value);
     void                _set_free_child_process_memory(std::string const& value);
     void                _set_host_inter_check_delay_method(std::string const& value);
     void                _set_host_perfdata_command(std::string const& value);
@@ -459,8 +457,6 @@ namespace               configuration {
     bool                _enable_predictive_service_dependency_checks;
     unsigned long       _event_broker_options;
     unsigned int        _event_handler_timeout;
-    bool                _execute_host_checks;
-    bool                _execute_service_checks;
     int                 _external_command_buffer_slots;
     std::string         _global_host_event_handler;
     std::string         _global_service_event_handler;

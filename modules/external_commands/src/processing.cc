@@ -62,18 +62,6 @@ processing::processing() {
   // _lst_command["FLUSH_PENDING_COMMANDS"] =
   //   command_info(CMD_FLUSH_PENDING_COMMANDS,
   //                &_redirector<&>);
-  _lst_command["START_EXECUTING_HOST_CHECKS"] =
-    command_info(CMD_START_EXECUTING_HOST_CHECKS,
-                 &_redirector<&start_executing_host_checks>);
-  _lst_command["STOP_EXECUTING_HOST_CHECKS"] =
-    command_info(CMD_STOP_EXECUTING_HOST_CHECKS,
-                 &_redirector<&stop_executing_host_checks>);
-  _lst_command["START_EXECUTING_SVC_CHECKS"] =
-    command_info(CMD_START_EXECUTING_SVC_CHECKS,
-                 &_redirector<&start_executing_service_checks>);
-  _lst_command["STOP_EXECUTING_SVC_CHECKS"] =
-    command_info(CMD_STOP_EXECUTING_SVC_CHECKS,
-                 &_redirector<&stop_executing_service_checks>);
   _lst_command["START_OBSESSING_OVER_HOST_CHECKS"] =
     command_info(CMD_START_OBSESSING_OVER_HOST_CHECKS,
                  &_redirector<&start_obsessing_over_host_checks>);

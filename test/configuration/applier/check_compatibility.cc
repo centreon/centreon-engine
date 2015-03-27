@@ -92,8 +92,6 @@ struct                global {
   bool                enable_predictive_service_dependency_checks;
   unsigned long       event_broker_options;
   unsigned int        event_handler_timeout;
-  bool                execute_host_checks;
-  bool                execute_service_checks;
   int                 external_command_buffer_slots;
   std::string         global_host_event_handler;
   std::string         global_service_event_handler;
@@ -279,8 +277,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(enable_predictive_service_dependency_checks);
   check_value(event_broker_options);
   check_value(event_handler_timeout);
-  check_value(execute_host_checks);
-  check_value(execute_service_checks);
   check_value(external_command_buffer_slots);
   check_value(global_host_event_handler);
   check_value(global_service_event_handler);
@@ -439,8 +435,6 @@ static global get_globals() {
   g.enable_predictive_service_dependency_checks = enable_predictive_service_dependency_checks;
   g.event_broker_options = event_broker_options;
   g.event_handler_timeout = event_handler_timeout;
-  g.execute_host_checks = execute_host_checks;
-  g.execute_service_checks = execute_service_checks;
   g.external_command_buffer_slots = external_command_buffer_slots;
   g.global_host_event_handler = to_str(global_host_event_handler);
   g.global_service_event_handler = to_str(global_service_event_handler);

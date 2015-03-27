@@ -205,80 +205,6 @@ for any host or service.
     * 0 = Disable notifications
     * 1 = Enable notifications (default)
 
-.. _main_cfg_opt_service_check_execution:
-
-Service Check Execution Option
-------------------------------
-
-This option determines whether or not Centreon Engine will execute
-service checks when it initially (re)starts. If this option is disabled,
-Centreon Engine will not actively execute any service checks and will
-remain in a sort of "sleep" mode (it can still accept
-:ref:`passive checks <passive_checks>` unless you've
-:ref:`disabled them <main_cfg_opt_passive_service_check_acceptance>`).
-This option is most often used when configuring backup monitoring
-servers, as described in the documentation on
-:ref:`redundancy <redundant_and_failover_monitoring>`,
-or when setting up a :ref:`distributed <distributed_monitoring>`
-monitoring environment.
-
-=========== ============================
-**Format**  execute_service_checks=<0/1>
-**Example** execute_service_checks=1
-=========== ============================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the :ref:`use_retained_program_state
-   <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't execute service checks
-    * 1 = Execute service checks (default)
-
-Host Check Execution Option
----------------------------
-
-This option determines whether or not Centreon Engine will execute
-on-demand and regularly scheduled host checks when it initially
-(re)starts. If this option is disabled, Centreon Engine will not
-actively execute any host checks, although it can still accept
-:ref:`passive host checks <passive_checks>` unless you've
-:ref:`disabled them <main_cfg_opt_passive_host_check_acceptance>`).
-This option is most often used when configuring backup monitoring
-servers, as described in the documentation on
-:ref:`redundancy <redundant_and_failover_monitoring>`,
-or when setting up a :ref:`distributed <distributed_monitoring>`
-monitoring environment.
-
-=========== =====================================
-**Format**  execute_host_checks=<0/1>
-**Example** execute_host_checks=1
-=========== =====================================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't execute host checks
-    * 1 = Execute host checks (default)
-
 .. _main_cfg_opt_event_handler:
 
 Event Handler Option
@@ -440,9 +366,8 @@ program-wide state variables based on the values saved in the retention
 file. Some of these program-wide state variables that are normally saved
 across program restarts if state retention is enabled include the
 :ref:`enable_notifications <main_cfg_opt_notifications>`,
-:ref:`enable_flap_detection <main_cfg_opt_flap_detection>`,
-:ref:`enable_event_handlers <main_cfg_opt_event_handler>`
-and :ref:`execute_service_checks <main_cfg_opt_service_check_execution>`
+:ref:`enable_flap_detection <main_cfg_opt_flap_detection>`
+and :ref:`enable_event_handlers <main_cfg_opt_event_handler>`
 options. If you do not have :ref:`state retention <main_cfg_opt_state_retention>`
 enabled, this option has no effect.
 

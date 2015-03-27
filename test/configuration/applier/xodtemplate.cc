@@ -10510,12 +10510,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(!strcmp(variable,"enable_event_handlers"))
       enable_event_handlers=(atoi(value)>0)?true:false;
 
-    else if(!strcmp(variable,"execute_service_checks"))
-      execute_service_checks=(atoi(value)>0)?true:false;
-
-    else if(!strcmp(variable,"execute_host_checks"))
-      execute_host_checks=(atoi(value)>0)?true:false;
-
     else if(!strcmp(variable,"service_inter_check_delay_method")){
       if(!strcmp(value,"n"))
         service_inter_check_delay_method=ICD_NONE;

@@ -168,8 +168,6 @@ static std::map<std::string, std::string> build_configuration(
   var["soft_state_dependencies"] = obj2str(my_rand(0, 1));
   var["enable_event_handlers"] = obj2str(my_rand(0, 1));
   var["enable_notifications"] = obj2str(my_rand(0, 1));
-  var["execute_service_checks"] = obj2str(my_rand(0, 1));
-  var["execute_host_checks"] = obj2str(my_rand(0, 1));
   var["max_service_check_spread"] = obj2str(my_rand(1));
   var["max_host_check_spread"] = obj2str(my_rand(1));
   var["max_concurrent_checks"] = obj2str(my_rand(0));
@@ -357,12 +355,6 @@ void test_configuration(
   }
   if (my_conf["enable_notifications"] != obj2str(config->enable_notifications())) {
     throw (engine_error() << "enable_notifications: init with '" << my_conf["enable_notifications"] << "'");
-  }
-  if (my_conf["execute_service_checks"] != obj2str(config->execute_service_checks())) {
-    throw (engine_error() << "execute_service_checks: init with '" << my_conf["execute_service_checks"] << "'");
-  }
-  if (my_conf["execute_host_checks"] != obj2str(config->execute_host_checks())) {
-    throw (engine_error() << "execute_host_checks: init with '" << my_conf["execute_host_checks"] << "'");
   }
   if (my_conf["max_service_check_spread"] != obj2str(config->max_service_check_spread())) {
     throw (engine_error() << "max_service_check_spread: init with '" << my_conf["max_service_check_spread"] << "'");
