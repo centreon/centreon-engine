@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -70,15 +70,11 @@ int skiplist_delete_node(skiplist* list, void const* node_ptr);
 int free_object_skiplists();
 int init_object_skiplists();
 int skiplist_compare_command(void const* a, void const* b);
-int skiplist_compare_contact(void const* a, void const* b);
-int skiplist_compare_contactgroup(void const* a, void const* b);
 int skiplist_compare_host(void const* a, void const* b);
 int skiplist_compare_hostdependency(void const* a, void const* b);
-int skiplist_compare_hostescalation(void const* a, void const* b);
 int skiplist_compare_hostgroup(void const* a, void const* b);
 int skiplist_compare_service(void const* a, void const* b);
 int skiplist_compare_servicedependency(void const* a, void const* b);
-int skiplist_compare_serviceescalation(void const* a, void const* b);
 int skiplist_compare_servicegroup(void const* a, void const* b);
 int skiplist_compare_text(
       char const* val1a,

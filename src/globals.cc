@@ -28,7 +28,6 @@ using namespace com::centreon::engine;
 configuration::state* config(NULL);
 events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
-std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
 
 char const*         sigs[] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",
@@ -64,11 +63,6 @@ command*            global_host_event_handler_ptr(NULL);
 command*            global_service_event_handler_ptr(NULL);
 command*            ochp_command_ptr(NULL);
 command*            ocsp_command_ptr(NULL);
-comment*            comment_list(NULL);
-contact*            contact_list(NULL);
-contact*            contact_list_tail(NULL);
-contactgroup*       contactgroup_list(NULL);
-contactgroup*       contactgroup_list_tail(NULL);
 dbuf                check_result_dbuf;
 float               high_host_flap_threshold(30.0);
 float               high_service_flap_threshold(30.0);
@@ -79,8 +73,6 @@ host*               host_list(NULL);
 host*               host_list_tail(NULL);
 hostdependency*     hostdependency_list(NULL);
 hostdependency*     hostdependency_list_tail(NULL);
-hostescalation*     hostescalation_list(NULL);
-hostescalation*     hostescalation_list_tail(NULL);
 hostgroup*          hostgroup_list(NULL);
 hostgroup*          hostgroup_list_tail(NULL);
 int                 __nagios_object_structure_version(CURRENT_OBJECT_STRUCTURE_VERSION);
@@ -89,8 +81,6 @@ int                 caught_signal(false);
 int                 command_check_interval(-1);
 int                 config_errors(0);
 int                 config_warnings(0);
-int                 defer_comment_sorting(0);
-int                 defer_downtime_sorting(0);
 int                 external_command_buffer_slots(4096);
 int                 log_host_retries(false);
 int                 precache_objects(false);
@@ -104,16 +94,12 @@ int                 use_precached_objects(false);
 int                 verify_circular_paths(true);
 int                 verify_config(false);
 nebcallback*        neb_callback_list[NEBCALLBACK_NUMITEMS];
-notification*       notification_list(NULL);
 pthread_t           worker_threads[TOTAL_WORKER_THREADS];
 sched_info          scheduling_info;
-scheduled_downtime* scheduled_downtime_list(NULL);
 service*            service_list(NULL);
 service*            service_list_tail(NULL);
 servicedependency*  servicedependency_list(NULL);
 servicedependency*  servicedependency_list_tail(NULL);
-serviceescalation*  serviceescalation_list(NULL);
-serviceescalation*  serviceescalation_list_tail(NULL);
 servicegroup*       servicegroup_list(NULL);
 servicegroup*       servicegroup_list_tail(NULL);
 skiplist*           object_skiplists[NUM_OBJECT_SKIPLISTS];
@@ -142,7 +128,6 @@ unsigned int        debug_level(0);
 unsigned int        debug_verbosity(1);
 unsigned int        enable_event_handlers(true);
 unsigned int        enable_flap_detection(false);
-unsigned int        enable_notifications(true);
 unsigned int        enable_predictive_host_dependency_checks(true);
 unsigned int        enable_predictive_service_dependency_checks(true);
 unsigned int        event_handler_timeout(30);
@@ -155,14 +140,12 @@ unsigned int        interval_length(60);
 unsigned int        log_event_handlers(true);
 unsigned int        log_external_commands(true);
 unsigned int        log_initial_states(false);
-unsigned int        log_notifications(true);
 unsigned int        log_passive_checks(true);
 unsigned int        log_service_retries(false);
 unsigned int        max_check_reaper_time(30);
 unsigned int        max_host_check_spread(30);
 unsigned int        max_parallel_service_checks(0);
 unsigned int        max_service_check_spread(30);
-unsigned int        notification_timeout(30);
 unsigned int        obsess_over_hosts(false);
 unsigned int        obsess_over_services(false);
 unsigned int        ochp_timeout(15);
@@ -193,8 +176,6 @@ unsigned long       logging_options(
                       | logging::log_config_error
                       | logging::log_config_warning
                       | logging::log_process_info
-                      | logging::log_host_notification
-                      | logging::log_service_notification
                       | logging::log_event_handler
                       | logging::log_external_command
                       | logging::log_passive_check
@@ -210,13 +191,8 @@ unsigned long       max_check_result_file_age(3600);
 unsigned long       max_debug_file_size(1000000);
 unsigned long       modified_host_process_attributes(MODATTR_NONE);
 unsigned long       modified_service_process_attributes(MODATTR_NONE);
-unsigned long       next_comment_id(0L);
-unsigned long       next_downtime_id(0L);
 unsigned long       next_event_id(1);
-unsigned long       next_notification_id(1);
 unsigned long       next_problem_id(0L);
-unsigned long       retained_contact_host_attribute_mask(0);
-unsigned long       retained_contact_service_attribute_mask(0);
 unsigned long       retained_host_attribute_mask(0);
 unsigned long       retained_process_host_attribute_mask(0);
 unsigned long       syslog_options(
@@ -227,8 +203,6 @@ unsigned long       syslog_options(
                       | logging::log_config_error
                       | logging::log_config_warning
                       | logging::log_process_info
-                      | logging::log_host_notification
-                      | logging::log_service_notification
                       | logging::log_event_handler
                       | logging::log_external_command
                       | logging::log_passive_check

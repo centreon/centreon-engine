@@ -94,73 +94,6 @@ target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
 #
-# Notifications tests.
-#
-
-# First notification delay on host.
-set(TEST_NAME "notifications_first_notif_delay_host")
-add_executable(
-  "${TEST_NAME}"
-  "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-  "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-  "${TEST_DIR}/notifications/first_notif_delay/host.cc"
-)
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# First notification delay on service.
-set(TEST_NAME "notifications_first_notif_delay_service")
-add_executable(
-  "${TEST_NAME}"
-  "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-  "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-  "${TEST_DIR}/notifications/first_notif_delay/service.cc"
-)
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# First notification delay on host recovery.
-set(TEST_NAME "notifications_first_notif_delay_host_recovery")
-add_executable(
-  "${TEST_NAME}"
-  "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-  "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-  "${TEST_DIR}/notifications/first_notif_delay/host_recovery.cc"
-)
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# First notification delay on service recovery.
-set(TEST_NAME "notifications_first_notif_delay_service_recovery")
-add_executable(
-  "${TEST_NAME}"
-  "${TEST_DIR}/notifications/first_notif_delay/common.cc"
-  "${TEST_DIR}/notifications/first_notif_delay/common.hh"
-  "${TEST_DIR}/notifications/first_notif_delay/service_recovery.cc"
-)
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Host escalated notifications.
-set(TEST_NAME "notifications_escalations")
-add_executable(
-  "${TEST_NAME}"
-  "${TEST_DIR}/notifications/escalations.cc"
-)
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-#
-# Downtimes tests.
-#
-
-# Recurring downtimes recur.
-set(TEST_NAME "downtimes_recurring")
-add_executable("${TEST_NAME}" "${TEST_DIR}/downtimes/recurring.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-#
 # Stats tests.
 #
 
@@ -347,13 +280,6 @@ configure_file(
 add_test(
   "${TEST_NAME}"
   "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
-)
-
-# Recurring downtimes are correctly parsed and not crashing the engine.
-set (TEST_NAME "running_recurring_downtimes")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/recurring_downtime.cfg"
 )
 
 # Precache file generation.

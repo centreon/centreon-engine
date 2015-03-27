@@ -23,20 +23,15 @@
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/configuration/applier/command.hh"
 #include "com/centreon/engine/configuration/applier/connector.hh"
-#include "com/centreon/engine/configuration/applier/contact.hh"
-#include "com/centreon/engine/configuration/applier/contactgroup.hh"
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
-#include "com/centreon/engine/configuration/applier/hostescalation.hh"
 #include "com/centreon/engine/configuration/applier/hostgroup.hh"
-#include "com/centreon/engine/configuration/applier/downtime.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
-#include "com/centreon/engine/configuration/applier/serviceescalation.hh"
 #include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
@@ -48,7 +43,6 @@
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/xsddefault.hh"
-#include "com/centreon/engine/configuration/downtime.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -273,90 +267,6 @@ umap<std::string, shared_ptr<commands::connector> >& applier::state::connectors(
 }
 
 /**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-umap<std::string, shared_ptr<contact_struct> > const& applier::state::contacts() const throw () {
-  return (_contacts);
-}
-
-/**
- *  Get the current contacts.
- *
- *  @return The current contacts.
- */
-umap<std::string, shared_ptr<contact_struct> >& applier::state::contacts() throw () {
-  return (_contacts);
-}
-
-/**
- *  Find a contact from its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contact_struct> >::const_iterator applier::state::contacts_find(configuration::contact::key_type const& k) const {
-  return (_contacts.find(k));
-}
-
-/**
- *  Find a contact from its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contact_struct> >::iterator applier::state::contacts_find(configuration::contact::key_type const& k) {
-  return (_contacts.find(k));
-}
-
-/**
- *  Get the current contactgroups.
- *
- *  @return The current contactgroups.
- */
-umap<std::string, shared_ptr<contactgroup_struct> > const& applier::state::contactgroups() const throw () {
-  return (_contactgroups);
-}
-
-/**
- *  Get the current contactgroups.
- *
- *  @return The current contactgroups.
- */
-umap<std::string, shared_ptr<contactgroup_struct> >& applier::state::contactgroups() throw () {
-  return (_contactgroups);
-}
-
-/**
- *  Find a contact group from its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contactgroup_struct> >::const_iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) const {
-  return (_contactgroups.find(k));
-}
-
-/**
- *  Find a contact group from its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<contactgroup_struct> >::iterator applier::state::contactgroups_find(configuration::contactgroup::key_type const& k) {
-  return (_contactgroups.find(k));
-}
-
-/**
  *  Get the current hosts.
  *
  *  @return The current hosts.
@@ -463,118 +373,12 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::st
       | (p.first->second->fail_on_pending
          ? configuration::hostdependency::pending
          : 0));
-    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
-      current.dependency_type(
-                configuration::hostdependency::notification_dependency);
-      current.notification_failure_options(options);
-    }
-    else {
-      current.dependency_type(
-                configuration::hostdependency::execution_dependency);
-      current.execution_failure_options(options);
-    }
+    current.failure_options(options);
     if (current == k)
       break ;
     ++p.first;
   }
   return ((p.first == p.second) ? _hostdependencies.end() : p.first);
-}
-
-/**
- *  Get the current hostescalations.
- *
- *  @return The current hostescalations.
- */
-umultimap<std::string, shared_ptr<hostescalation_struct> > const& applier::state::hostescalations() const throw () {
-  return (_hostescalations);
-}
-
-/**
- *  Get the current hostescalations.
- *
- *  @return The current hostescalations.
- */
-umultimap<std::string, shared_ptr<hostescalation_struct> >& applier::state::hostescalations() throw () {
-  return (_hostescalations);
-}
-
-/**
- *  Find a host escalation by its key.
- *
- *  @param[in] k Host escalation configuration.
- *
- *  @return Iterator to the element if found, hostescalations().end()
- *          otherwise.
- */
-umultimap<std::string, shared_ptr<hostescalation_struct> >::const_iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) const {
-  return (const_cast<state*>(this)->hostescalations_find(k));
-}
-
-/**
- *  Find a host escalation by its key.
- *
- *  @param[in] k Host escalation configuration.
- *
- *  @return Iterator to the element if found, hostescalations().end()
- *          otherwise.
- */
-umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::state::hostescalations_find(configuration::hostescalation::key_type const& k) {
-  // Copy host escalation configuration to sort some
-  // members (used for comparison below).
-  configuration::hostescalation hesc(k);
-  hesc.contacts().sort();
-  hesc.contactgroups().sort();
-
-  // Browse escalations matching target host.
-  typedef umultimap<std::string, shared_ptr<hostescalation_struct> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _hostescalations.equal_range(k.hosts().front());
-  while (p.first != p.second) {
-    // Create host escalation configuration from object.
-    configuration::hostescalation current;
-    current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->host_name);
-    current.first_notification(p.first->second->first_notification);
-    current.last_notification(p.first->second->last_notification);
-    current.notification_interval(
-              static_cast<unsigned int>(p.first->second->notification_interval));
-    current.escalation_period(p.first->second->escalation_period
-                              ? p.first->second->escalation_period
-                              : "");
-    unsigned int options(
-                   (p.first->second->escalate_on_recovery
-                    ? configuration::hostescalation::recovery
-                    : 0)
-                   | (p.first->second->escalate_on_down
-                      ? configuration::hostescalation::down
-                      : 0)
-                   | (p.first->second->escalate_on_unreachable
-                      ? configuration::hostescalation::unreachable
-                      : 0));
-    current.escalation_options(options);
-    for (contactsmember_struct* m(p.first->second->contacts);
-         m;
-         m = m->next)
-      current.contacts().push_front(m->contact_ptr
-                                   ? m->contact_ptr->name
-                                   : m->contact_name);
-    current.contacts().sort();
-    for (contactgroupsmember_struct* m(p.first->second->contact_groups);
-         m;
-         m = m->next)
-      current.contactgroups().push_front(m->group_ptr
-                                        ? m->group_ptr->group_name
-                                        : m->group_name);
-    current.contactgroups().sort();
-
-    // Found !
-    if (current == hesc)
-      break ;
-
-    // Keep going.
-    ++p.first;
-  }
-  return ((p.first == p.second) ? _hostescalations.end() : p.first);
 }
 
 /**
@@ -733,122 +537,12 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
                    | (p.first->second->fail_on_pending
                       ? configuration::servicedependency::pending
                       : 0));
-    if (p.first->second->dependency_type == NOTIFICATION_DEPENDENCY) {
-      current.dependency_type(
-        configuration::servicedependency::notification_dependency);
-      current.notification_failure_options(options);
-    }
-    else {
-      current.dependency_type(
-        configuration::servicedependency::execution_dependency);
-      current.execution_failure_options(options);
-    }
+    current.failure_options(options);
     if (current == k)
       break ;
     ++p.first;
   }
   return ((p.first == p.second) ? _servicedependencies.end() : p.first);
-}
-
-/**
- *  Get the current serviceescalations.
- *
- *  @return The current serviceescalations.
- */
-umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > const& applier::state::serviceescalations() const throw () {
-  return (_serviceescalations);
-}
-
-/**
- *  Get the current serviceescalations.
- *
- *  @return The current serviceescalations.
- */
-umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >& applier::state::serviceescalations() throw () {
-  return (_serviceescalations);
-}
-
-/**
- *  Find a service escalation by its key.
- *
- *  @param[in] k Service escalation configuration object.
- *
- *  @return Iterator to the element if found, serviceescalations().end()
- *          otherwise.
- */
-umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::const_iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) const {
-  return (const_cast<state*>(this)->serviceescalations_find(k));
-}
-
-/**
- *  Find a service escalation by its key.
- *
- *  @param[in] k Service escalation configuration object.
- *
- *  @return Iterator to the element if found, serviceescalations().end()
- *          otherwise.
- */
-umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> >::iterator applier::state::serviceescalations_find(configuration::serviceescalation::key_type const& k) {
-  // Copy service escalation configuration to sort some
-  // members (used for comparison below).
-  configuration::serviceescalation sesc(k);
-  sesc.contacts().sort();
-  sesc.contactgroups().sort();
-
-  // Browse escalations matching target service.
-  typedef umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_struct> > collection;
-  std::pair<collection::iterator, collection::iterator> p;
-  p = _serviceescalations.equal_range(std::make_pair(k.hosts().front(), k.service_description().front()));
-  while (p.first != p.second) {
-    // Create service escalation configuration from object.
-    configuration::serviceescalation current;
-    current.configuration::object::operator=(k);
-    current.hosts().push_back(p.first->second->host_name);
-    current.service_description().push_back(
-                                    p.first->second->description);
-    current.first_notification(p.first->second->first_notification);
-    current.last_notification(p.first->second->last_notification);
-    current.notification_interval(
-              static_cast<unsigned int>(p.first->second->notification_interval));
-    current.escalation_period(p.first->second->escalation_period
-                              ? p.first->second->escalation_period
-                              : "");
-    unsigned int options((p.first->second->escalate_on_recovery
-                          ? configuration::serviceescalation::recovery
-                          : 0)
-                         | (p.first->second->escalate_on_warning
-                            ? configuration::serviceescalation::warning
-                            : 0)
-                         | (p.first->second->escalate_on_unknown
-                            ? configuration::serviceescalation::unknown
-                            : 0)
-                         | (p.first->second->escalate_on_critical
-                            ? configuration::serviceescalation::critical
-                            : 0));
-    current.escalation_options(options);
-    for (contactsmember_struct* m(p.first->second->contacts);
-         m;
-         m = m->next)
-      current.contacts().push_front(m->contact_ptr
-                                   ? m->contact_ptr->name
-                                   : m->contact_name);
-    current.contacts().sort();
-    for (contactgroupsmember_struct* m(p.first->second->contact_groups);
-         m;
-         m = m->next)
-      current.contactgroups().push_front(m->group_ptr
-                                        ? m->group_ptr->group_name
-                                        : m->group_name);
-    current.contactgroups().sort();
-
-    // Found !
-    if (current == sesc)
-      break ;
-
-    // Keep going.
-    ++p.first;
-  }
-  return ((p.first == p.second) ? _serviceescalations.end() : p.first);
 }
 
 /**
@@ -1016,7 +710,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->debug_verbosity(new_cfg.debug_verbosity());
   config->enable_event_handlers(new_cfg.enable_event_handlers());
   config->enable_flap_detection(new_cfg.enable_flap_detection());
-  config->enable_notifications(new_cfg.enable_notifications());
   config->enable_predictive_host_dependency_checks(new_cfg.enable_predictive_host_dependency_checks());
   config->enable_predictive_service_dependency_checks(new_cfg.enable_predictive_service_dependency_checks());
   config->event_broker_options(new_cfg.event_broker_options());
@@ -1038,7 +731,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->log_file(new_cfg.log_file());
   config->log_host_retries(new_cfg.log_host_retries());
   config->log_initial_states(new_cfg.log_initial_states());
-  config->log_notifications(new_cfg.log_notifications());
   config->log_passive_checks(new_cfg.log_passive_checks());
   config->log_service_retries(new_cfg.log_service_retries());
   config->low_host_flap_threshold(new_cfg.low_host_flap_threshold());
@@ -1051,7 +743,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->max_log_file_size(new_cfg.max_log_file_size());
   config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
   config->max_service_check_spread(new_cfg.max_service_check_spread());
-  config->notification_timeout(new_cfg.notification_timeout());
   config->object_cache_file(new_cfg.object_cache_file());
   config->obsess_over_hosts(new_cfg.obsess_over_hosts());
   config->obsess_over_services(new_cfg.obsess_over_services());
@@ -1063,8 +754,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->precached_object_file(new_cfg.precached_object_file());
   config->resource_file(new_cfg.resource_file());
   config->retain_state_information(new_cfg.retain_state_information());
-  config->retained_contact_host_attribute_mask(new_cfg.retained_contact_host_attribute_mask());
-  config->retained_contact_service_attribute_mask(new_cfg.retained_contact_service_attribute_mask());
   config->retained_host_attribute_mask(new_cfg.retained_host_attribute_mask());
   config->retained_process_host_attribute_mask(new_cfg.retained_process_host_attribute_mask());
   config->retention_scheduling_horizon(new_cfg.retention_scheduling_horizon());
@@ -1359,21 +1048,6 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.commands());
 
-  // Expand contacts.
-  _expand<configuration::contact, applier::contact>(
-    new_cfg,
-    new_cfg.contacts());
-
-  // Expand contactgroups.
-  _expand<configuration::contactgroup, applier::contactgroup>(
-    new_cfg,
-    new_cfg.contactgroups());
-
-  // Expand downtimes.
-  _expand<configuration::downtime, applier::downtime>(
-    new_cfg,
-    new_cfg.downtimes());
-
   // Expand hosts.
   _expand<configuration::host, applier::host>(
     new_cfg,
@@ -1404,16 +1078,6 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.servicedependencies());
 
-  // Expand hostescalations.
-  _expand<configuration::hostescalation, applier::hostescalation>(
-    new_cfg,
-    new_cfg.hostescalations());
-
-  // Expand serviceescalations.
-  _expand<configuration::serviceescalation, applier::serviceescalation>(
-    new_cfg,
-    new_cfg.serviceescalations());
-
   //
   //  Build difference for all objects.
   //
@@ -1435,24 +1099,6 @@ void applier::state::_processing(
   diff_commands.parse(
     config->commands(),
     new_cfg.commands());
-
-  // Build difference for contacts.
-  difference<set_contact> diff_contacts;
-  diff_contacts.parse(
-    config->contacts(),
-    new_cfg.contacts());
-
-  // Build difference for contactgroups.
-  difference<set_contactgroup> diff_contactgroups;
-  diff_contactgroups.parse(
-    config->contactgroups(),
-    new_cfg.contactgroups());
-
-  // Build difference for downtimes.
-  difference<std::set<shared_ptr<configuration::downtime> > > diff_downtimes;
-  diff_downtimes.parse(
-    config->downtimes(),
-    new_cfg.downtimes());
 
   // Build difference for hosts.
   difference<set_host> diff_hosts;
@@ -1489,18 +1135,6 @@ void applier::state::_processing(
   diff_servicedependencies.parse(
     config->servicedependencies(),
     new_cfg.servicedependencies());
-
-  // Build difference for hostescalations.
-  difference<set_hostescalation> diff_hostescalations;
-  diff_hostescalations.parse(
-    config->hostescalations(),
-    new_cfg.hostescalations());
-
-  // Build difference for serviceescalations.
-  difference<set_serviceescalation> diff_serviceescalations;
-  diff_serviceescalations.parse(
-    config->serviceescalations(),
-    new_cfg.serviceescalations());
 
   // Timing.
   gettimeofday(tv + 1, NULL);
@@ -1548,16 +1182,6 @@ void applier::state::_processing(
     _resolve<configuration::command, applier::command>(
       config->commands());
 
-    // Apply contacts and contactgroups.
-    _apply<configuration::contact, applier::contact>(
-      diff_contacts);
-    _apply<configuration::contactgroup, applier::contactgroup>(
-      diff_contactgroups);
-    _resolve<configuration::contactgroup, applier::contactgroup>(
-      config->contactgroups());
-    _resolve<configuration::contact, applier::contact>(
-      config->contacts());
-
     // Apply hosts and hostgroups.
     _apply<configuration::host, applier::host>(
       diff_hosts);
@@ -1591,24 +1215,6 @@ void applier::state::_processing(
       diff_servicedependencies);
     _resolve<configuration::servicedependency, applier::servicedependency>(
       config->servicedependencies());
-
-    // Apply host escalations.
-    _apply<configuration::hostescalation, applier::hostescalation>(
-      diff_hostescalations);
-    _resolve<configuration::hostescalation, applier::hostescalation>(
-      config->hostescalations());
-
-    // Apply service escalations.
-    _apply<configuration::serviceescalation, applier::serviceescalation>(
-      diff_serviceescalations);
-    _resolve<configuration::serviceescalation, applier::serviceescalation>(
-      config->serviceescalations());
-
-    // Apply downtimes
-    _apply<configuration::downtime, applier::downtime>(
-      diff_downtimes);
-    _resolve<configuration::downtime, applier::downtime>(
-      config->downtimes());
 
     // Load retention.
     if (state)

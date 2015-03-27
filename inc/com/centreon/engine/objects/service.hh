@@ -25,8 +25,6 @@
 
 /* Forward declaration. */
 struct command_struct;
-struct contactgroupsmember_struct;
-struct contactsmember_struct;
 struct customvariablesmember_struct;
 struct host_struct;
 struct objectlist_struct;
@@ -43,22 +41,11 @@ typedef struct                  service_struct {
   double                        retry_interval;
   int                           max_attempts;
   unsigned int                  check_timeout;
-  contactgroupsmember_struct*   contact_groups;
-  contactsmember_struct*        contacts;
-  double                        notification_interval;
-  double                        first_notification_delay;
-  int                           notify_on_unknown;
-  int                           notify_on_warning;
-  int                           notify_on_critical;
-  int                           notify_on_recovery;
-  int                           notify_on_flapping;
-  int                           notify_on_downtime;
   int                           stalk_on_ok;
   int                           stalk_on_warning;
   int                           stalk_on_unknown;
   int                           stalk_on_critical;
   int                           is_volatile;
-  char*                         notification_period;
   char*                         check_period;
   int                           flap_detection_enabled;
   double                        low_flap_threshold;
@@ -74,11 +61,8 @@ typedef struct                  service_struct {
   int                           checks_enabled;
   int                           retain_status_information;
   int                           retain_nonstatus_information;
-  int                           notifications_enabled;
   int                           obsess_over_service;
   customvariablesmember_struct* custom_variables;
-  int                           problem_has_been_acknowledged;
-  int                           acknowledgement_type;
   int                           host_problem_at_last_check;
   int                           check_type;
   int                           current_state;
@@ -96,10 +80,6 @@ typedef struct                  service_struct {
   unsigned long                 last_event_id;
   unsigned long                 current_problem_id;
   unsigned long                 last_problem_id;
-  time_t                        last_notification;
-  time_t                        next_notification;
-  int                           no_more_notifications;
-  int                           check_flapping_recovery_notification;
   time_t                        last_state_change;
   time_t                        last_hard_state_change;
   time_t                        last_time_ok;
@@ -108,21 +88,13 @@ typedef struct                  service_struct {
   time_t                        last_time_critical;
   int                           has_been_checked;
   int                           is_being_freshened;
-  int                           notified_on_unknown;
-  int                           notified_on_warning;
-  int                           notified_on_critical;
-  int                           current_notification_number;
-  unsigned long                 current_notification_id;
   double                        latency;
   double                        execution_time;
   int                           is_executing;
   int                           check_options;
-  int                           scheduled_downtime_depth;
-  int                           pending_flex_downtime;
   int                           state_history[MAX_STATE_HISTORY_ENTRIES];
   unsigned int                  state_history_index;
   int                           is_flapping;
-  unsigned long                 flapping_comment_id;
   double                        percent_state_change;
   unsigned long                 modified_attributes;
   char*                         timezone;
@@ -133,16 +105,10 @@ typedef struct                  service_struct {
   command_struct*               check_command_ptr;
   char*                         check_command_args;
   timeperiod_struct*            check_period_ptr;
-  timeperiod_struct*            notification_period_ptr;
   objectlist_struct*            servicegroups_ptr;
   struct service_struct*        next;
   struct service_struct*        nexthash;
 }                               service;
-
-/* Other SERVICE structure. */
-struct                          service_other_properties {
-  time_t                        initial_notif_time;
-};
 
 #  ifdef __cplusplus
 extern "C" {
@@ -159,16 +125,6 @@ service* add_service(
            int accept_passive_checks,
            double check_interval,
            double retry_interval,
-           double notification_interval,
-           double first_notification_delay,
-           char const* notification_period,
-           int notify_recovery,
-           int notify_unknown,
-           int notify_warning,
-           int notify_critical,
-           int notify_flapping,
-           int notify_downtime,
-           int notifications_enabled,
            int is_volatile,
            char const* event_handler,
            int event_handler_enabled,
@@ -192,12 +148,6 @@ service* add_service(
            int obsess_over_service,
            char const* timezone);
 int      get_service_count();
-int      is_contact_for_service(
-           service_struct* svc,
-           contact_struct* cntct);
-int      is_escalated_contact_for_service(
-           service_struct* svc,
-           contact_struct* cntct);
 
 #  ifdef __cplusplus
 }

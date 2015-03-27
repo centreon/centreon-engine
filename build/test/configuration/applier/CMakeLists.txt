@@ -57,26 +57,6 @@ set(TEST_NAME "parse_and_apply_configuration_connector")
 set(TEST_CONF_FILE "main_connector.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_apply_configuration_contact
-set(TEST_NAME "parse_and_apply_configuration_contact")
-set(TEST_CONF_FILE "main_contact.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_apply_configuration_contact_retention
-set(TEST_NAME "parse_and_apply_configuration_contact_retention")
-set(TEST_CONF_FILE "main_contact_retention.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_apply_configuration_contact_template
-set(TEST_NAME "parse_and_apply_configuration_contact_template")
-set(TEST_CONF_FILE "main_contact_template.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_apply_configuration_contact_template_retention
-set(TEST_NAME "parse_and_apply_configuration_contact_template_retention")
-set(TEST_CONF_FILE "main_contact_template_retention.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_apply_configuration_globals
 set(TEST_NAME "parse_and_apply_configuration_globals")
 set(TEST_CONF_FILE "main_globals.cfg")
@@ -112,16 +92,6 @@ set(TEST_NAME "parse_and_apply_configuration_hostdependency_template")
 set(TEST_CONF_FILE "main_hostdependency_template.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_apply_configuration_hostescalation
-set(TEST_NAME "parse_and_apply_configuration_hostescalation")
-set(TEST_CONF_FILE "main_hostescalation.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_apply_configuration_hostescalation_template
-set(TEST_NAME "parse_and_apply_configuration_hostescalation_template")
-set(TEST_CONF_FILE "main_hostescalation_template.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_apply_configuration_service
 set(TEST_NAME "parse_and_apply_configuration_service")
 set(TEST_CONF_FILE "main_service.cfg")
@@ -152,16 +122,6 @@ set(TEST_NAME "parse_and_apply_configuration_servicedependency_template")
 set(TEST_CONF_FILE "main_servicedependency_template.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_apply_configuration_serviceescalation
-set(TEST_NAME "parse_and_apply_configuration_serviceescalation")
-set(TEST_CONF_FILE "main_serviceescalation.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_apply_configuration_serviceescalation_template
-set(TEST_NAME "parse_and_apply_configuration_serviceescalation_template")
-set(TEST_CONF_FILE "main_serviceescalation_template.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_apply_configuration_timeperiod
 set(TEST_NAME "parse_and_apply_configuration_timeperiod")
 set(TEST_CONF_FILE "main_timeperiod.cfg")
@@ -187,34 +147,14 @@ set(TEST_NAME "parse_and_remove_configuration_command")
 set(TEST_CONF_FILE "main_command.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "command" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_remove_configuration_contact
-set(TEST_NAME "parse_and_remove_configuration_contact")
-set(TEST_CONF_FILE "main_contact.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_remove_configuration_contact_template
-set(TEST_NAME "parse_and_remove_configuration_contact_template")
-set(TEST_CONF_FILE "main_contact_template.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_remove_configuration_contactgroup
-set(TEST_NAME "parse_and_remove_configuration_contactgroup")
-set(TEST_CONF_FILE "main_contact.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactgroup" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_remove_configuration_host
 set(TEST_NAME "parse_and_remove_configuration_host")
 set(TEST_CONF_FILE "main_host.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostescalation" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_remove_configuration_host_template
 set(TEST_NAME "parse_and_remove_configuration_host_template")
 set(TEST_CONF_FILE "main_host_template.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_remove_configuration_hostescalation
-set(TEST_NAME "parse_and_remove_configuration_hostescalation")
-set(TEST_CONF_FILE "main_host.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_remove_configuration_hostgroup
@@ -302,28 +242,6 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_connector_2.cfg")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
 
-# check modify_contact
-set(TEST_NAME "check_modify_contact")
-set(TEST_MAIN_CONFIG "chkmodify_contact.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkmodify_contact_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact_2.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
 # check modify_host
 set(TEST_NAME "check_modify_host")
 set(TEST_MAIN_CONFIG "chkmodify_host.cfg")
@@ -333,7 +251,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
@@ -342,7 +259,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host_2.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
@@ -357,7 +273,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_hostdependency.cfg"
   "cfg_file=base_timeperiod.cfg")
@@ -367,35 +282,8 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_hostdependency_2.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
-# check modify_hostescalation
-set(TEST_NAME "check_modify_hostescalation")
-set(TEST_MAIN_CONFIG "chkmodify_hostescalation.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkmodify_hostescalation_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_hostescalation.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_hostescalation_2.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
@@ -409,7 +297,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service.cfg"
   "cfg_file=base_timeperiod.cfg")
@@ -419,7 +306,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service_2.cfg"
   "cfg_file=base_timeperiod.cfg")
@@ -435,7 +321,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service.cfg"
   "cfg_file=base_servicedependency.cfg"
@@ -446,38 +331,9 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service.cfg"
   "cfg_file=base_servicedependency_2.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
-# check modify_serviceescalation
-set(TEST_NAME "check_modify_serviceescalation")
-set(TEST_MAIN_CONFIG "chkmodify_serviceescalation.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkmodify_serviceescalation_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_service.cfg"
-  "cfg_file=base_serviceescalation.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_service.cfg"
-  "cfg_file=base_serviceescalation_2.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
@@ -492,28 +348,6 @@ configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_timeperiod_2.cfg")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
 
-# check modify_contact_template
-set(TEST_NAME "check_modify_contact_template")
-set(TEST_MAIN_CONFIG "chkmodify_contact_template.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkmodify_contact_template_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=template_contact.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
 # check modify_host_template
 set(TEST_NAME "check_modify_host_template")
 set(TEST_MAIN_CONFIG "chkmodify_host_template.cfg")
@@ -523,7 +357,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
@@ -532,7 +365,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=template_host.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
@@ -547,7 +379,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_hostdependency.cfg"
   "cfg_file=base_timeperiod.cfg")
@@ -557,35 +388,8 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=template_hostdependency.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
-# check modify_hostescalation_template
-set(TEST_NAME "check_modify_hostescalation_template")
-set(TEST_MAIN_CONFIG "chkmodify_hostescalation_template.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkmodify_hostescalation_template_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_hostescalation.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=template_hostescalation.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
@@ -599,7 +403,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service.cfg"
   "cfg_file=base_timeperiod.cfg")
@@ -609,7 +412,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=template_service.cfg"
   "cfg_file=base_timeperiod.cfg")
@@ -625,7 +427,6 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service.cfg"
   "cfg_file=base_servicedependency.cfg"
@@ -636,38 +437,9 @@ set(
   CFG_FILES
   "cfg_file=base_command.cfg"
   "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
   "cfg_file=base_host.cfg"
   "cfg_file=base_service.cfg"
   "cfg_file=template_servicedependency.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
-# check modify_serviceescalation_template
-set(TEST_NAME "check_modify_serviceescalation_template")
-set(TEST_MAIN_CONFIG "chkmodify_serviceescalation_template.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkmodify_serviceescalation_template_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_service.cfg"
-  "cfg_file=base_serviceescalation.cfg"
-  "cfg_file=base_timeperiod.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(
-  CFG_FILES
-  "cfg_file=base_command.cfg"
-  "cfg_file=base_connector.cfg"
-  "cfg_file=base_contact.cfg"
-  "cfg_file=base_host.cfg"
-  "cfg_file=base_service.cfg"
-  "cfg_file=template_serviceescalation.cfg"
   "cfg_file=base_timeperiod.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
@@ -709,17 +481,6 @@ set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_connector.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
 
-# check invalid_contact
-set(TEST_NAME "check_invalid_contact")
-set(TEST_MAIN_CONFIG "chkinvalid_contact.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkinvalid_contact_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(CFG_FILES "cfg_file=base_all.cfg")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_contact.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
 # check invalid_host
 set(TEST_NAME "check_invalid_host")
 set(TEST_MAIN_CONFIG "chkinvalid_host.cfg")
@@ -742,17 +503,6 @@ set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_hostdependency.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
 
-# check invalid_hostescalation
-set(TEST_NAME "check_invalid_hostescalation")
-set(TEST_MAIN_CONFIG "chkinvalid_hostescalation.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkinvalid_hostescalation_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(CFG_FILES "cfg_file=base_all.cfg")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_hostescalation.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
 # check invalid_service
 set(TEST_NAME "check_invalid_service")
 set(TEST_MAIN_CONFIG "chkinvalid_service.cfg")
@@ -772,17 +522,6 @@ add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}"
 set(CFG_FILES "cfg_file=base_all.cfg")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
 set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_servicedependency.cfg")
-string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
-
-# check invalid_serviceescalation
-set(TEST_NAME "check_invalid_serviceescalation")
-set(TEST_MAIN_CONFIG "chkinvalid_serviceescalation.cfg")
-set(TEST_MAIN_MODIFY_CONFIG "chkinvalid_serviceescalation_2.cfg")
-add_test("${TEST_NAME}" "${CENTENGINE_BINARY}" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(CFG_FILES "cfg_file=base_all.cfg")
-configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_CONFIG}")
-set(CFG_FILES "cfg_file=base_all_2.cfg" "cfg_file=invalid_serviceescalation.cfg")
 string(REPLACE ";" "\n" CFG_FILES "${CFG_FILES}")
 configure_file("${CONF_DIR}/chkmodify.cfg.in" "${CONF_DIR}/${TEST_MAIN_MODIFY_CONFIG}")
 

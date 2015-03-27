@@ -1,6 +1,6 @@
 /*
-** Copyright 2003-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2003-2008      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -121,7 +121,6 @@ int services_warning = 0;
 int services_unknown = 0;
 int services_critical = 0;
 int services_flapping = 0;
-int services_in_downtime = 0;
 int services_checked = 0;
 int services_scheduled = 0;
 int passive_host_checks = 0;
@@ -130,7 +129,6 @@ int hosts_up = 0;
 int hosts_down = 0;
 int hosts_unreachable = 0;
 int hosts_flapping = 0;
-int hosts_in_downtime = 0;
 int hosts_checked = 0;
 int hosts_scheduled = 0;
 
@@ -432,7 +430,6 @@ int display_stats() {
          services_ok, services_warning, services_unknown,
          services_critical);
   printf("Services Flapping:                      %d\n", services_flapping);
-  printf("Services In Downtime:                   %d\n", services_in_downtime);
   printf("\n");
   printf("Total Hosts:                            %d\n", status_host_entries);
   printf("Hosts Checked:                          %d\n", hosts_checked);
@@ -471,7 +468,6 @@ int display_stats() {
 	 hosts_down,
 	 hosts_unreachable);
   printf("Hosts Flapping:                         %d\n", hosts_flapping);
-  printf("Hosts In Downtime:                      %d\n", hosts_in_downtime);
   printf("\n");
   printf("Active Host Checks Last 1/5/15 min:     %d / %d / %d\n",
          active_host_checks_last_1min,
@@ -530,17 +526,6 @@ int display_stats() {
   printf("\n");
   printf("\n");
 
-  /*
-    printf("CURRENT COMMENT DATA\n");
-    printf("----------------------------------------------------\n");
-    printf("\n");
-    printf("\n");
-
-    printf("CURRENT DOWNTIME DATA\n");
-    printf("----------------------------------------------------\n");
-    printf("\n");
-  */
-
   return (OK);
 }
 
@@ -596,7 +581,6 @@ int read_status_file() {
   int current_state = STATE_OK;
   double state_change = 0.0;
   int is_flapping = false;
-  int downtime_depth = 0;
   time_t last_check = 0L;
   int should_be_scheduled = true;
   int has_been_checked = true;
@@ -751,8 +735,6 @@ int read_status_file() {
         }
         if (is_flapping == true)
           hosts_flapping++;
-        if (downtime_depth > 0)
-          hosts_in_downtime++;
         if (has_been_checked == true)
           hosts_checked++;
         if (should_be_scheduled == true)
@@ -884,8 +866,6 @@ int read_status_file() {
         }
         if (is_flapping == true)
           services_flapping++;
-        if (downtime_depth > 0)
-          services_in_downtime++;
         if (has_been_checked == true)
           services_checked++;
         if (should_be_scheduled == true)
@@ -904,7 +884,6 @@ int read_status_file() {
       current_state = 0;
       state_change = 0.0;
       is_flapping = false;
-      downtime_depth = 0;
       last_check = (time_t) 0;
       has_been_checked = false;
       should_be_scheduled = false;
@@ -1041,8 +1020,6 @@ int read_status_file() {
           current_state = atoi(val);
         else if (!strcmp(var, "is_flapping"))
           is_flapping = (atoi(val) > 0) ? true : false;
-        else if (!strcmp(var, "scheduled_downtime_depth"))
-          downtime_depth = atoi(val);
         else if (!strcmp(var, "last_check"))
           last_check = strtoul(val, NULL, 10);
         else if (!strcmp(var, "has_been_checked"))
@@ -1064,8 +1041,6 @@ int read_status_file() {
           current_state = atoi(val);
         else if (!strcmp(var, "is_flapping"))
           is_flapping = (atoi(val) > 0) ? true : false;
-        else if (!strcmp(var, "scheduled_downtime_depth"))
-          downtime_depth = atoi(val);
         else if (!strcmp(var, "last_check"))
           last_check = strtoul(val, NULL, 10);
         else if (!strcmp(var, "has_been_checked"))
@@ -1227,8 +1202,6 @@ int read_stats_file() {
       hosts_scheduled = atoi(val);
     else if (!strcmp(var, "hosts_flapping"))
       hosts_flapping = atoi(val);
-    else if (!strcmp(var, "hosts_in_downtime"))
-      hosts_in_downtime = atoi(val);
     else if (!strcmp(var, "hosts_up"))
       hosts_up = atoi(val);
     else if (!strcmp(var, "hosts_down"))
@@ -1317,8 +1290,6 @@ int read_stats_file() {
       services_scheduled = atoi(val);
     else if (!strcmp(var, "services_flapping"))
       services_flapping = atoi(val);
-    else if (!strcmp(var, "services_in_downtime"))
-      services_in_downtime = atoi(val);
     else if (!strcmp(var, "services_ok"))
       services_ok = atoi(val);
     else if (!strcmp(var, "services_warning"))

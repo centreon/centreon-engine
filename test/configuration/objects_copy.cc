@@ -18,16 +18,12 @@
 */
 
 #include "com/centreon/engine/configuration/command.hh"
-#include "com/centreon/engine/configuration/contact.hh"
-#include "com/centreon/engine/configuration/contactgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
-#include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
-#include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
@@ -85,29 +81,11 @@ int main_test(int argc, char* argv[]) {
       configuration::set_command,
       &configuration::state::commands>(fe.path());
   }
-  else if (type == "contactgroup") {
-    check_objects<
-      configuration::contactgroup,
-      configuration::set_contactgroup,
-      &configuration::state::contactgroups>(fe.path());
-  }
-  else if (type == "contact") {
-    check_objects<
-      configuration::contact,
-      configuration::set_contact,
-      &configuration::state::contacts>(fe.path());
-  }
   else if (type == "hostdependency") {
     check_objects<
       configuration::hostdependency,
       configuration::set_hostdependency,
       &configuration::state::hostdependencies>(fe.path());
-  }
-  else if (type == "hostescalation") {
-    check_objects<
-      configuration::hostescalation,
-      configuration::set_hostescalation,
-      &configuration::state::hostescalations>(fe.path());
   }
   else if (type == "hostgroup") {
     check_objects<
@@ -126,12 +104,6 @@ int main_test(int argc, char* argv[]) {
       configuration::servicedependency,
       configuration::set_servicedependency,
       &configuration::state::servicedependencies>(fe.path());
-  }
-  else if (type == "serviceescalation") {
-    check_objects<
-      configuration::serviceescalation,
-      configuration::set_serviceescalation,
-      &configuration::state::serviceescalations>(fe.path());
   }
   else if (type == "servicegroup") {
     check_objects<

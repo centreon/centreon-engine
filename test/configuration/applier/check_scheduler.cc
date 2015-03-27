@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,7 +23,6 @@
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
-#include "com/centreon/engine/deleter/timedevent.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/events/timed_event.hh"
@@ -47,24 +46,16 @@ struct         global {
                save_commands;
   umap<std::string, shared_ptr<commands::connector> >
                save_connectors;
-  umap<std::string, shared_ptr<contact> >
-               save_contacts;
-  umap<std::string, shared_ptr<contactgroup> >
-               save_contactgroups;
   umap<std::string, shared_ptr<host> >
                save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
                save_hostdependencies;
-  umultimap<std::string, shared_ptr<hostescalation> >
-               save_hostescalations;
   umap<std::string, shared_ptr<hostgroup> >
                save_hostgroups;
   umap<std::pair<std::string, std::string>, shared_ptr<service> >
                save_services;
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
                save_servicedependencies;
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >
-               save_serviceescalations;
   umap<std::string, shared_ptr<servicegroup> >
                save_servicegroups;
   umap<std::string, shared_ptr<timeperiod> >
@@ -76,15 +67,11 @@ struct         global {
  */
 static void clear(global& g) {
   command_list = NULL;
-  contact_list = NULL;
-  contactgroup_list = NULL;
   host_list = NULL;
   hostdependency_list = NULL;
-  hostescalation_list = NULL;
   hostgroup_list = NULL;
   service_list = NULL;
   servicedependency_list = NULL;
-  serviceescalation_list = NULL;
   servicegroup_list = NULL;
   timeperiod_list = NULL;
 
@@ -94,24 +81,16 @@ static void clear(global& g) {
   app_state.commands().clear();
   g.save_connectors = app_state.connectors();
   app_state.connectors().clear();
-  g.save_contacts = app_state.contacts();
-  app_state.contacts().clear();
-  g.save_contactgroups = app_state.contactgroups();
-  app_state.contactgroups().clear();
   g.save_hosts = app_state.hosts();
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();
   app_state.hostdependencies().clear();
-  g.save_hostescalations = app_state.hostescalations();
-  app_state.hostescalations().clear();
   g.save_hostgroups = app_state.hostgroups();
   app_state.hostgroups().clear();
   g.save_services = app_state.services();
   app_state.services().clear();
   g.save_servicedependencies = app_state.servicedependencies();
   app_state.servicedependencies().clear();
-  g.save_serviceescalations = app_state.serviceescalations();
-  app_state.serviceescalations().clear();
   g.save_servicegroups = app_state.servicegroups();
   app_state.servicegroups().clear();
   g.save_timeperiods = app_state.timeperiods();
@@ -273,10 +252,6 @@ int main_test(int argc, char* argv[]) {
 
   bool ret(chkdiff(oldcfg, newcfg));
 
-  deleter::listmember(oldcfg.events_high, &deleter::timedevent);
-  deleter::listmember(oldcfg.events_low, &deleter::timedevent);
-  deleter::listmember(newcfg.events_high, &deleter::timedevent);
-  deleter::listmember(newcfg.events_low, &deleter::timedevent);
   return (!ret);
 }
 

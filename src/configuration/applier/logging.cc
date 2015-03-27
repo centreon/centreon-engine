@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -167,9 +167,7 @@ void applier::logging::_add_stdout() {
                          | engine::logging::log_service_warning
                          | engine::logging::log_service_critical
                          | engine::logging::log_passive_check
-                         | engine::logging::log_info_message
-                         | engine::logging::log_host_notification
-                         | engine::logging::log_service_notification);
+                         | engine::logging::log_info_message);
     com::centreon::logging::engine::instance().add(
                                                  _stdout,
                                                  type,

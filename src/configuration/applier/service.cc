@@ -24,8 +24,6 @@
 #include "com/centreon/engine/configuration/applier/object.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/deleter/contactgroupsmember.hh"
-#include "com/centreon/engine/deleter/contactsmember.hh"
 #include "com/centreon/engine/deleter/listmember.hh"
 #include "com/centreon/engine/deleter/objectlist.hh"
 #include "com/centreon/engine/error.hh"
@@ -122,22 +120,6 @@ void applier::service::add_object(
     obj->checks_passive(),
     obj->check_interval(),
     obj->retry_interval(),
-    obj->notification_interval(),
-    obj->first_notification_delay(),
-    NULL_IF_EMPTY(obj->notification_period()),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::ok),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::unknown),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::warning),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::critical),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::flapping),
-    static_cast<bool>(obj->notification_options()
-                      & configuration::service::downtime),
-    obj->notifications_enabled(),
     obj->is_volatile(),
     NULL_IF_EMPTY(obj->event_handler()),
     obj->event_handler_enabled(),
@@ -171,31 +153,6 @@ void applier::service::add_object(
   if (!svc)
       throw (engine_error() << "Could not register service '"
              << obj->service_description()
-             << "' of host '" << obj->hosts().front() << "'");
-  service_other_props[std::make_pair(
-                             obj->hosts().front(),
-                             obj->service_description())].initial_notif_time = 0;
-
-  // Add contacts.
-  for (list_string::const_iterator
-         it(obj->contacts().begin()),
-         end(obj->contacts().end());
-       it != end;
-       ++it)
-    if (!add_contact_to_service(svc, it->c_str()))
-      throw (engine_error() << "Could not add contact '"
-             << *it << "' to service '" << obj->service_description()
-             << "' of host '" << obj->hosts().front() << "'");
-
-  // Add contactgroups.
-  for (list_string::const_iterator
-         it(obj->contactgroups().begin()),
-         end(obj->contactgroups().end());
-       it != end;
-       ++it)
-    if (!add_contactgroup_to_service(svc, it->c_str()))
-      throw (engine_error() << "Could not add contact group '"
-             << *it << "' to service '" << obj->service_description()
              << "' of host '" << obj->hosts().front() << "'");
 
   // Add custom variables.
@@ -372,36 +329,6 @@ void applier::service::modify_object(
     s->check_timeout,
     obj->check_timeout());
   modify_if_different(
-    s->notification_interval,
-    static_cast<double>(obj->notification_interval()));
-  modify_if_different(
-    s->first_notification_delay,
-    static_cast<double>(obj->first_notification_delay()));
-  modify_if_different(
-    s->notify_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->notify_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::warning)));
-  modify_if_different(
-    s->notify_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::critical)));
-  modify_if_different(
-    s->notify_on_recovery,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::ok)));
-  modify_if_different(
-    s->notify_on_flapping,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::flapping)));
-  modify_if_different(
-    s->notify_on_downtime,
-    static_cast<int>(static_cast<bool>(
-      obj->notification_options() & configuration::service::downtime)));
-  modify_if_different(
     s->stalk_on_ok,
     static_cast<int>(static_cast<bool>(
       obj->stalking_options() & configuration::service::ok)));
@@ -417,9 +344,6 @@ void applier::service::modify_object(
     s->stalk_on_critical,
     static_cast<int>(static_cast<bool>(
       obj->stalking_options() & configuration::service::critical)));
-  modify_if_different(
-    s->notification_period,
-    NULL_IF_EMPTY(obj->notification_period()));
   modify_if_different(
     s->check_period,
     NULL_IF_EMPTY(obj->check_period()));
@@ -470,9 +394,6 @@ void applier::service::modify_object(
     s->retain_nonstatus_information,
     static_cast<int>(obj->retain_nonstatus_information()));
   modify_if_different(
-    s->notifications_enabled,
-    static_cast<int>(obj->notifications_enabled()));
-  modify_if_different(
     s->obsess_over_service,
     static_cast<int>(obj->obsess_over_service()));
   modify_if_different(
@@ -481,42 +402,6 @@ void applier::service::modify_object(
   modify_if_different(
     s->timezone,
     NULL_IF_EMPTY(obj->timezone()));
-
-  // Contacts.
-  if (obj->contacts() != obj_old->contacts()) {
-    // Delete old contacts.
-    deleter::listmember(s->contacts, &deleter::contactsmember);
-
-    // Add contacts to host.
-    for (list_string::const_iterator
-           it(obj->contacts().begin()),
-           end(obj->contacts().end());
-         it != end;
-         ++it)
-      if (!add_contact_to_service(s, it->c_str()))
-        throw (engine_error() << "Could not add contact '"
-               << *it << "' to service '" << service_description
-               << "' on host '" << host_name << "'");
-  }
-
-  // Contact groups.
-  if (obj->contactgroups() != obj_old->contactgroups()) {
-    // Delete old contact groups.
-    deleter::listmember(
-      s->contact_groups,
-      &deleter::contactgroupsmember);
-
-    // Add contact groups to host.
-    for (list_string::const_iterator
-           it(obj->contactgroups().begin()),
-           end(obj->contactgroups().end());
-         it != end;
-         ++it)
-      if (!add_contactgroup_to_service(s, it->c_str()))
-        throw (engine_error() << "Could not add contact group '"
-               << *it << "' to service '" << service_description
-               << "' on host '" << host_name << "'");
-  }
 
   // Custom variables.
   if (obj->customvariables() != obj_old->customvariables()) {
@@ -601,9 +486,6 @@ void applier::service::remove_object(
       &tv);
 
     // Remove service object (will effectively delete the object).
-    service_other_props.erase(std::make_pair(
-                                     obj->hosts().front(),
-                                     obj->service_description()));
     applier::state::instance().services().erase(it);
   }
 
@@ -702,8 +584,6 @@ void applier::service::_expand_service_memberships(
  *  @brief Inherits special variables from host.
  *
  *  These special variables, if not defined are inherited from host.
- *  They are contact_groups, notification_interval and
- *  notification_period.
  *
  *  @param[in,out] obj Target service.
  *  @param[in,out] s   Configuration state.
@@ -712,10 +592,7 @@ void applier::service::_inherits_special_vars(
                          shared_ptr<configuration::service> obj,
                          configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj->contactgroups_defined()
-      || !obj->notification_interval_defined()
-      || !obj->notification_period_defined()
-      || !obj->timezone_defined()) {
+  if (!obj->timezone_defined()) {
     // Remove service from state (it will be modified
     // and reinserted at the end of the method).
     s.services().erase(obj);
@@ -736,12 +613,6 @@ void applier::service::_inherits_special_vars(
              << obj->hosts().front() << "' does not exist");
 
     // Inherits variables.
-    if (!obj->contactgroups_defined())
-      obj->contactgroups() = (*it)->contactgroups();
-    if (!obj->notification_interval_defined())
-      obj->notification_interval((*it)->notification_interval());
-    if (!obj->notification_period_defined())
-      obj->notification_period((*it)->notification_period());
     if (!obj->timezone_defined())
       obj->timezone((*it)->timezone());
 

@@ -70,30 +70,6 @@ int grab_servicegroup_macros(servicegroup* sg) {
   return (grab_servicegroup_macros_r(get_global_macros(), sg));
 }
 
-/* grab macros that are specific to a particular contact */
-int grab_contact_macros_r(nagios_macros* mac, contact* cntct) {
-  /* clear contact-related macros */
-  clear_contact_macros_r(mac);
-  clear_contactgroup_macros_r(mac);
-
-  /* save pointer to contact for later */
-  mac->contact_ptr = cntct;
-  mac->contactgroup_ptr = NULL;
-
-  if (cntct == NULL)
-    return (ERROR);
-
-  /* save pointer to first/primary contactgroup for later */
-  if (cntct->contactgroups_ptr)
-    mac->contactgroup_ptr
-      = (contactgroup*)cntct->contactgroups_ptr->object_ptr;
-  return (OK);
-}
-
-int grab_contact_macros(contact* cntct) {
-  return (grab_contact_macros_r(get_global_macros(), cntct));
-}
-
 /******************************************************************/
 /******************* MACRO GENERATION FUNCTIONS *******************/
 /******************************************************************/
@@ -109,8 +85,6 @@ int grab_custom_macro_value_r(
   hostsmember* temp_hostsmember = NULL;
   servicegroup* temp_servicegroup = NULL;
   servicesmember* temp_servicesmember = NULL;
-  contactgroup* temp_contactgroup = NULL;
-  contactsmember* temp_contactsmember = NULL;
   int delimiter_len = 0;
   char* temp_buffer = NULL;
   int result = OK;
@@ -250,69 +224,6 @@ int grab_custom_macro_value_r(
           delete[] temp_buffer;
           temp_buffer = NULL;
         }
-      }
-    }
-  }
-  /***** CUSTOM CONTACT VARIABLE *****/
-  else if (strstr(macro_name, "_CONTACT") == macro_name) {
-    contact* temp_contact(NULL);
-
-    /* a standard contact macro */
-    if (arg2 == NULL) {
-      /* find the contact for on-demand macros */
-      if (arg1) {
-        if ((temp_contact = find_contact(arg1)) == NULL)
-          return (ERROR);
-      }
-      /* else use saved contact pointer */
-      else if ((temp_contact = mac->contact_ptr) == NULL)
-        return (ERROR);
-
-      /* get the contact macro value */
-      result = grab_custom_object_macro_r(
-                 mac,
-                 macro_name + 8,
-                 temp_contact->custom_variables,
-                 output);
-    }
-    /* a contact macro with a contactgroup name and delimiter */
-    else {
-      if ((temp_contactgroup = find_contactgroup(arg1)) == NULL)
-        return (ERROR);
-
-      delimiter_len = strlen(arg2);
-
-      /* concatenate macro values for all contactgroup members */
-      for (temp_contactsmember = temp_contactgroup->members;
-           temp_contactsmember != NULL;
-           temp_contactsmember = temp_contactsmember->next) {
-
-        if ((temp_contact = temp_contactsmember->contact_ptr) == NULL)
-          continue;
-
-        /* get the macro value for this contact */
-        grab_custom_macro_value_r(
-          mac,
-          macro_name,
-          temp_contact->name,
-          NULL,
-          &temp_buffer);
-
-        if (temp_buffer == NULL)
-          continue;
-
-        /* add macro value to already running macro */
-        if (*output == NULL)
-          *output = string::dup(temp_buffer);
-        else {
-          *output = resize_string(
-                      *output,
-                      strlen(*output) + strlen(temp_buffer) + delimiter_len + 1);
-          strcat(*output, arg2);
-          strcat(*output, temp_buffer);
-        }
-        delete[] temp_buffer;
-        temp_buffer = NULL;
       }
     }
   }
@@ -638,145 +549,6 @@ int grab_standard_servicegroup_macro(
             output));
 }
 
-/* computes a contact macro */
-int grab_standard_contact_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      contact* temp_contact,
-      char** output) {
-  contactgroup* temp_contactgroup = NULL;
-  objectlist* temp_objectlist = NULL;
-
-  (void)mac;
-
-  if (temp_contact == NULL || output == NULL)
-    return (ERROR);
-
-  /* get the macro value */
-  switch (macro_type) {
-  case MACRO_CONTACTNAME:
-    *output = string::dup(temp_contact->name);
-    break;
-
-  case MACRO_CONTACTALIAS:
-    *output = string::dup(temp_contact->alias);
-    break;
-
-  case MACRO_CONTACTEMAIL:
-    if (temp_contact->email)
-      *output = string::dup(temp_contact->email);
-    break;
-
-  case MACRO_CONTACTPAGER:
-    if (temp_contact->pager)
-      *output = string::dup(temp_contact->pager);
-    break;
-
-  case MACRO_CONTACTGROUPNAMES: {
-    std::string buf;
-    /* get the contactgroup names */
-    /* find all contactgroups this contact is a member of */
-    for (temp_objectlist = temp_contact->contactgroups_ptr;
-         temp_objectlist != NULL;
-         temp_objectlist = temp_objectlist->next) {
-      if ((temp_contactgroup = (contactgroup*)temp_objectlist->object_ptr) == NULL)
-        continue;
-
-      if (!buf.empty())
-        buf.append(",");
-      buf.append(temp_contactgroup->group_name);
-    }
-    if (!buf.empty())
-      *output = string::dup(buf);
-  }
-    break;
-
-  default:
-    logger(dbg_macros, basic)
-      << "UNHANDLED CONTACT MACRO #" << macro_type
-      << "! THIS IS A BUG!";
-    return (ERROR);
-  }
-  return (OK);
-}
-
-int grab_standard_contact_macro(
-      int macro_type,
-      contact* temp_contact,
-      char** output) {
-  return (grab_standard_contact_macro_r(
-            get_global_macros(),
-            macro_type,
-            temp_contact,
-            output));
-}
-
-/* computes a contact address macro */
-int grab_contact_address_macro(
-      unsigned int macro_num,
-      contact* temp_contact,
-      char** output) {
-  if (macro_num >= MAX_CONTACT_ADDRESSES)
-    return (ERROR);
-
-  if (temp_contact == NULL || output == NULL)
-    return (ERROR);
-
-  /* get the macro */
-  if (temp_contact->address[macro_num])
-    *output = string::dup(temp_contact->address[macro_num]);
-  return (OK);
-}
-
-/* computes a contactgroup macro */
-int grab_standard_contactgroup_macro(
-      int macro_type,
-      contactgroup* temp_contactgroup,
-      char** output) {
-  contactsmember* temp_contactsmember = NULL;
-
-  if (temp_contactgroup == NULL || output == NULL)
-    return (ERROR);
-
-  /* get the macro value */
-  switch (macro_type) {
-  case MACRO_CONTACTGROUPNAME:
-    *output = string::dup(temp_contactgroup->group_name);
-    break;
-
-  case MACRO_CONTACTGROUPALIAS:
-    if (temp_contactgroup->alias)
-      *output = string::dup(temp_contactgroup->alias);
-    break;
-
-  case MACRO_CONTACTGROUPMEMBERS:
-    /* get the member list */
-    for (temp_contactsmember = temp_contactgroup->members;
-         temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-      if (temp_contactsmember->contact_name == NULL)
-        continue;
-      if (*output == NULL)
-        *output = string::dup(temp_contactsmember->contact_name);
-      else {
-        *output = resize_string(
-                    *output,
-                    strlen(*output) + strlen(temp_contactsmember->contact_name) + 2);
-        strcat(*output, ",");
-        strcat(*output, temp_contactsmember->contact_name);
-      }
-    }
-    break;
-
-  default:
-    logger(dbg_macros, basic)
-      << "UNHANDLED CONTACTGROUP MACRO #" << macro_type
-      << "! THIS IS A BUG!";
-      return (ERROR);
-  }
-  return (OK);
-}
-
 /* computes a custom object macro */
 int grab_custom_object_macro_r(
       nagios_macros* mac,
@@ -951,16 +723,9 @@ int init_macrox_names() {
   add_macrox_name(SERVICEOUTPUT);
   add_macrox_name(HOSTPERFDATA);
   add_macrox_name(SERVICEPERFDATA);
-  add_macrox_name(CONTACTNAME);
-  add_macrox_name(CONTACTALIAS);
-  add_macrox_name(CONTACTEMAIL);
-  add_macrox_name(CONTACTPAGER);
   add_macrox_name(HOSTSTATE);
   add_macrox_name(HOSTSTATEID);
   add_macrox_name(HOSTATTEMPT);
-  add_macrox_name(NOTIFICATIONTYPE);
-  add_macrox_name(NOTIFICATIONNUMBER);
-  add_macrox_name(NOTIFICATIONISESCALATED);
   add_macrox_name(HOSTEXECUTIONTIME);
   add_macrox_name(SERVICEEXECUTIONTIME);
   add_macrox_name(HOSTLATENCY);
@@ -969,8 +734,6 @@ int init_macrox_names() {
   add_macrox_name(SERVICEDURATION);
   add_macrox_name(HOSTDURATIONSEC);
   add_macrox_name(SERVICEDURATIONSEC);
-  add_macrox_name(HOSTDOWNTIME);
-  add_macrox_name(SERVICEDOWNTIME);
   add_macrox_name(HOSTSTATETYPE);
   add_macrox_name(SERVICESTATETYPE);
   add_macrox_name(HOSTPERCENTCHANGE);
@@ -979,10 +742,6 @@ int init_macrox_names() {
   add_macrox_name(HOSTGROUPALIAS);
   add_macrox_name(SERVICEGROUPNAME);
   add_macrox_name(SERVICEGROUPALIAS);
-  add_macrox_name(HOSTACKAUTHOR);
-  add_macrox_name(HOSTACKCOMMENT);
-  add_macrox_name(SERVICEACKAUTHOR);
-  add_macrox_name(SERVICEACKCOMMENT);
   add_macrox_name(LASTSERVICEOK);
   add_macrox_name(LASTSERVICEWARNING);
   add_macrox_name(LASTSERVICEUNKNOWN);
@@ -1022,20 +781,12 @@ int init_macrox_names() {
   add_macrox_name(SERVICECHECKTYPE);
   add_macrox_name(LONGHOSTOUTPUT);
   add_macrox_name(LONGSERVICEOUTPUT);
-  add_macrox_name(HOSTNOTIFICATIONNUMBER);
-  add_macrox_name(SERVICENOTIFICATIONNUMBER);
-  add_macrox_name(HOSTNOTIFICATIONID);
-  add_macrox_name(SERVICENOTIFICATIONID);
   add_macrox_name(HOSTEVENTID);
   add_macrox_name(LASTHOSTEVENTID);
   add_macrox_name(SERVICEEVENTID);
   add_macrox_name(LASTSERVICEEVENTID);
   add_macrox_name(HOSTGROUPNAMES);
   add_macrox_name(SERVICEGROUPNAMES);
-  add_macrox_name(HOSTACKAUTHORNAME);
-  add_macrox_name(HOSTACKAUTHORALIAS);
-  add_macrox_name(SERVICEACKAUTHORNAME);
-  add_macrox_name(SERVICEACKAUTHORALIAS);
   add_macrox_name(MAXHOSTATTEMPTS);
   add_macrox_name(MAXSERVICEATTEMPTS);
   add_macrox_name(TOTALHOSTSERVICES);
@@ -1045,15 +796,6 @@ int init_macrox_names() {
   add_macrox_name(TOTALHOSTSERVICESCRITICAL);
   add_macrox_name(HOSTGROUPMEMBERS);
   add_macrox_name(SERVICEGROUPMEMBERS);
-  add_macrox_name(CONTACTGROUPNAME);
-  add_macrox_name(CONTACTGROUPALIAS);
-  add_macrox_name(CONTACTGROUPMEMBERS);
-  add_macrox_name(CONTACTGROUPNAMES);
-  add_macrox_name(NOTIFICATIONRECIPIENTS);
-  add_macrox_name(NOTIFICATIONAUTHOR);
-  add_macrox_name(NOTIFICATIONAUTHORNAME);
-  add_macrox_name(NOTIFICATIONAUTHORALIAS);
-  add_macrox_name(NOTIFICATIONCOMMENT);
   add_macrox_name(EVENTSTARTTIME);
   add_macrox_name(HOSTPROBLEMID);
   add_macrox_name(LASTHOSTPROBLEMID);
@@ -1149,19 +891,11 @@ int clear_volatile_macros_r(nagios_macros* mac) {
     }
   }
 
-  /* contact address macros */
-  for (x = 0; x < MAX_CONTACT_ADDRESSES; x++) {
-    delete[] mac->contactaddress[x];
-    mac->contactaddress[x] = NULL;
-  }
-
   /* clear macro pointers */
   mac->host_ptr = NULL;
   mac->hostgroup_ptr = NULL;
   mac->service_ptr = NULL;
   mac->servicegroup_ptr = NULL;
-  mac->contact_ptr = NULL;
-  mac->contactgroup_ptr = NULL;
 
   /* clear on-demand macro */
   delete[] mac->ondemand;
@@ -1192,99 +926,11 @@ int clear_volatile_macros_r(nagios_macros* mac) {
   }
   mac->custom_service_vars = NULL;
 
-  /* clear custom contact variables */
-  for (this_customvariablesmember = mac->custom_contact_vars;
-       this_customvariablesmember != NULL;
-       this_customvariablesmember = next_customvariablesmember) {
-    next_customvariablesmember = this_customvariablesmember->next;
-    delete[] this_customvariablesmember->variable_name;
-    delete[] this_customvariablesmember->variable_value;
-    delete this_customvariablesmember;
-  }
-  mac->custom_contact_vars = NULL;
-
   return (OK);
 }
 
 int clear_volatile_macros() {
   return (clear_volatile_macros_r(get_global_macros()));
-}
-
-/* clear contact macros */
-int clear_contact_macros_r(nagios_macros* mac) {
-  unsigned int x;
-  customvariablesmember* this_customvariablesmember = NULL;
-  customvariablesmember* next_customvariablesmember = NULL;
-
-  for (x = 0; x < MACRO_X_COUNT; x++) {
-    switch (x) {
-    case MACRO_CONTACTNAME:
-    case MACRO_CONTACTALIAS:
-    case MACRO_CONTACTEMAIL:
-    case MACRO_CONTACTPAGER:
-    case MACRO_CONTACTGROUPNAMES:
-      delete[] mac->x[x];
-      mac->x[x] = NULL;
-      break;
-
-    default:
-      break;
-    }
-  }
-
-  /* clear contact addresses */
-  for (x = 0; x < MAX_CONTACT_ADDRESSES; x++) {
-    delete[] mac->contactaddress[x];
-    mac->contactaddress[x] = NULL;
-  }
-
-  /* clear custom contact variables */
-  for (this_customvariablesmember = mac->custom_contact_vars;
-       this_customvariablesmember != NULL;
-       this_customvariablesmember = next_customvariablesmember) {
-    next_customvariablesmember = this_customvariablesmember->next;
-    delete[] this_customvariablesmember->variable_name;
-    delete[] this_customvariablesmember->variable_value;
-    delete this_customvariablesmember;
-  }
-  mac->custom_contact_vars = NULL;
-
-  /* clear pointers */
-  mac->contact_ptr = NULL;
-
-  return (OK);
-}
-
-int clear_contact_macros() {
-  return (clear_contact_macros_r(get_global_macros()));
-}
-
-/* clear contactgroup macros */
-int clear_contactgroup_macros_r(nagios_macros* mac) {
-  unsigned int x;
-
-  for (x = 0; x < MACRO_X_COUNT; x++) {
-    switch (x) {
-    case MACRO_CONTACTGROUPNAME:
-    case MACRO_CONTACTGROUPALIAS:
-    case MACRO_CONTACTGROUPMEMBERS:
-      delete[] mac->x[x];
-      mac->x[x] = NULL;
-      break;
-
-    default:
-      break;
-    }
-  }
-
-  /* clear pointers */
-  mac->contactgroup_ptr = NULL;
-
-  return (OK);
-}
-
-int clear_contactgroup_macros() {
-  return (clear_contactgroup_macros_r(get_global_macros()));
 }
 
 /* clear summary macros */

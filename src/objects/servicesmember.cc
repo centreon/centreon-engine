@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,7 +20,6 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/servicesmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"

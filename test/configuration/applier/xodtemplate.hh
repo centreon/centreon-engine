@@ -26,38 +26,28 @@
 // General definitions.
 #  define XODTEMPLATE_NULL                  "null"
 #  define MAX_XODTEMPLATE_INPUT_BUFFER      1024
-#  define MAX_XODTEMPLATE_CONTACT_ADDRESSES 6
 #  define XODTEMPLATE_NONE                  0
 #  define XODTEMPLATE_TIMEPERIOD            1
 #  define XODTEMPLATE_COMMAND               2
-#  define XODTEMPLATE_CONTACT               3
-#  define XODTEMPLATE_CONTACTGROUP          4
-#  define XODTEMPLATE_HOST                  5
-#  define XODTEMPLATE_HOSTGROUP             6
-#  define XODTEMPLATE_SERVICE               7
-#  define XODTEMPLATE_SERVICEDEPENDENCY     8
-#  define XODTEMPLATE_HOSTGROUPESCALATION   9  // No longer implemented.
-#  define XODTEMPLATE_SERVICEESCALATION     10
-#  define XODTEMPLATE_HOSTESCALATION        11
-#  define XODTEMPLATE_HOSTDEPENDENCY        12
-#  define XODTEMPLATE_SERVICEGROUP          13
-#  define XODTEMPLATE_CONNECTOR             14
+#  define XODTEMPLATE_HOST                  3
+#  define XODTEMPLATE_HOSTGROUP             4
+#  define XODTEMPLATE_SERVICE               5
+#  define XODTEMPLATE_SERVICEDEPENDENCY     6
+#  define XODTEMPLATE_HOSTDEPENDENCY        7
+#  define XODTEMPLATE_SERVICEGROUP          8
+#  define XODTEMPLATE_CONNECTOR             9
 
 // Skip lists.
-#  define X_HOST_SKIPLIST                   1
-#  define X_SERVICE_SKIPLIST                2
-#  define X_COMMAND_SKIPLIST                3
-#  define X_TIMEPERIOD_SKIPLIST             4
-#  define X_CONTACT_SKIPLIST                5
-#  define X_CONTACTGROUP_SKIPLIST           6
-#  define X_HOSTGROUP_SKIPLIST              7
-#  define X_SERVICEGROUP_SKIPLIST           8
-#  define X_HOSTDEPENDENCY_SKIPLIST         9
-#  define X_SERVICEDEPENDENCY_SKIPLIST      10
-#  define X_HOSTESCALATION_SKIPLIST         11
-#  define X_SERVICEESCALATION_SKIPLIST      12
-#  define X_CONNECTOR_SKIPLIST              13
-#  define NUM_XOBJECT_SKIPLISTS             14
+#  define X_HOST_SKIPLIST                   0
+#  define X_SERVICE_SKIPLIST                1
+#  define X_COMMAND_SKIPLIST                2
+#  define X_TIMEPERIOD_SKIPLIST             3
+#  define X_HOSTGROUP_SKIPLIST              4
+#  define X_SERVICEGROUP_SKIPLIST           5
+#  define X_HOSTDEPENDENCY_SKIPLIST         6
+#  define X_SERVICEDEPENDENCY_SKIPLIST      7
+#  define X_CONNECTOR_SKIPLIST              8
+#  define NUM_XOBJECT_SKIPLISTS             9
 
 
 /* CUSTOMVARIABLESMEMBER structure */
@@ -138,85 +128,6 @@ typedef struct xodtemplate_connector_struct{
 }              xodtemplate_connector;
 
 
-/* CONTACT TEMPLATE STRUCTURE */
-typedef struct xodtemplate_contact_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        contact_name;
-  char*        alias;
-  char*        contact_groups;
-  char*        email;
-  char*        pager;
-  char*        address[MAX_XODTEMPLATE_CONTACT_ADDRESSES];
-  char*        host_notification_period;
-  char*        host_notification_commands;
-  int          notify_on_host_down;
-  int          notify_on_host_unreachable;
-  int          notify_on_host_recovery;
-  int          notify_on_host_flapping;
-  int          notify_on_host_downtime;
-  char*        service_notification_period;
-  char*        service_notification_commands;
-  char*        timezone;
-  int          notify_on_service_unknown;
-  int          notify_on_service_warning;
-  int          notify_on_service_critical;
-  int          notify_on_service_recovery;
-  int          notify_on_service_flapping;
-  int          notify_on_service_downtime;
-  int          host_notifications_enabled;
-  int          service_notifications_enabled;
-  int          retain_status_information;
-  int          retain_nonstatus_information;
-  xodtemplate_customvariablesmember* custom_variables;
-
-  int          have_contact_groups;
-  int          have_email;
-  int          have_pager;
-  int          have_address[MAX_XODTEMPLATE_CONTACT_ADDRESSES];
-  int          have_host_notification_period;
-  int          have_host_notification_commands;
-  int          have_service_notification_period;
-  int          have_service_notification_commands;
-  int          have_timezone;
-
-  int          have_host_notification_options;
-  int          have_service_notification_options;
-  int          have_host_notifications_enabled;
-  int          have_service_notifications_enabled;
-  int          have_retain_status_information;
-  int          have_retain_nonstatus_information;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_contact_struct* next;
-}              xodtemplate_contact;
-
-
-/* CONTACTGROUP TEMPLATE STRUCTURE */
-typedef struct xodtemplate_contactgroup_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        contactgroup_name;
-  char*        alias;
-  char*        members;
-  char*        contactgroup_members;
-
-  int          have_members;
-  int          have_contactgroup_members;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_contactgroup_struct* next;
-}              xodtemplate_contactgroup;
-
-
 /* HOST TEMPLATE STRUCTURE */
 typedef struct xodtemplate_host_struct{
   char*        tmpl;
@@ -250,13 +161,10 @@ typedef struct xodtemplate_host_struct{
   int          flap_detection_on_up;
   int          flap_detection_on_down;
   int          flap_detection_on_unreachable;
-  char*        contact_groups;
-  char*        contacts;
   int          notify_on_down;
   int          notify_on_unreachable;
   int          notify_on_recovery;
   int          notify_on_flapping;
-  int          notify_on_downtime;
   int          notifications_enabled;
   char*        notification_period;
   double       notification_interval;
@@ -276,8 +184,6 @@ typedef struct xodtemplate_host_struct{
   int          have_check_period;
   int          have_check_timeout;
   int          have_event_handler;
-  int          have_contact_groups;
-  int          have_contacts;
   int          have_notification_period;
   int          have_timezone;
 
@@ -369,13 +275,10 @@ typedef struct xodtemplate_service_struct{
   int          notify_on_critical;
   int          notify_on_recovery;
   int          notify_on_flapping;
-  int          notify_on_downtime;
   int          notifications_enabled;
   char*        notification_period;
   double       notification_interval;
   double       first_notification_delay;
-  char*        contact_groups;
-  char*        contacts;
   int          stalk_on_ok;
   int          stalk_on_unknown;
   int          stalk_on_warning;
@@ -396,8 +299,6 @@ typedef struct xodtemplate_service_struct{
   int          have_check_timeout;
   int          have_event_handler;
   int          have_notification_period;
-  int          have_contact_groups;
-  int          have_contacts;
   int          have_timezone;
 
   int          have_initial_state;
@@ -468,16 +369,11 @@ typedef struct xodtemplate_servicedependency_struct{
   char*        dependent_hostgroup_name;
   char*        dependency_period;
   int          inherits_parent;
-  int          fail_notify_on_ok;
-  int          fail_notify_on_unknown;
-  int          fail_notify_on_warning;
-  int          fail_notify_on_critical;
-  int          fail_notify_on_pending;
-  int          fail_execute_on_ok;
-  int          fail_execute_on_unknown;
-  int          fail_execute_on_warning;
-  int          fail_execute_on_critical;
-  int          fail_execute_on_pending;
+  int          fail_on_ok;
+  int          fail_on_unknown;
+  int          fail_on_warning;
+  int          fail_on_critical;
+  int          fail_on_pending;
 
   int          have_host_name;
   int          have_service_description;
@@ -490,54 +386,12 @@ typedef struct xodtemplate_servicedependency_struct{
   int          have_dependency_period;
 
   int          have_inherits_parent;
-  int          have_notification_dependency_options;
-  int          have_execution_dependency_options;
+  int          have_dependency_options;
 
   int          has_been_resolved;
   int          register_object;
   struct xodtemplate_servicedependency_struct* next;
 }              xodtemplate_servicedependency;
-
-
-/* SERVICEESCALATION TEMPLATE STRUCTURE */
-typedef struct xodtemplate_serviceescalation_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        host_name;
-  char*        service_description;
-  char*        servicegroup_name;
-  char*        hostgroup_name;
-  int          first_notification;
-  int          last_notification;
-  double       notification_interval;
-  char*        escalation_period;
-  int          escalate_on_warning;
-  int          escalate_on_unknown;
-  int          escalate_on_critical;
-  int          escalate_on_recovery;
-  char*        contact_groups;
-  char*        contacts;
-
-  int          have_host_name;
-  int          have_service_description;
-  int          have_servicegroup_name;
-  int          have_hostgroup_name;
-  int          have_escalation_period;
-  int          have_contact_groups;
-  int          have_contacts;
-
-  int          have_first_notification;
-  int          have_last_notification;
-  int          have_notification_interval;
-  int          have_escalation_options;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_serviceescalation_struct* next;
-}              xodtemplate_serviceescalation;
 
 
 /* HOSTDEPENDENCY TEMPLATE STRUCTURE */
@@ -553,14 +407,10 @@ typedef struct xodtemplate_hostdependency_struct{
   char*        dependent_hostgroup_name;
   char*        dependency_period;
   int          inherits_parent;
-  int          fail_notify_on_up;
-  int          fail_notify_on_down;
-  int          fail_notify_on_unreachable;
-  int          fail_notify_on_pending;
-  int          fail_execute_on_up;
-  int          fail_execute_on_down;
-  int          fail_execute_on_unreachable;
-  int          fail_execute_on_pending;
+  int          fail_on_up;
+  int          fail_on_down;
+  int          fail_on_unreachable;
+  int          fail_on_pending;
 
   int          have_host_name;
   int          have_dependent_host_name;
@@ -569,56 +419,12 @@ typedef struct xodtemplate_hostdependency_struct{
   int          have_dependency_period;
 
   int          have_inherits_parent;
-  int          have_notification_dependency_options;
-  int          have_execution_dependency_options;
+  int          have_dependency_options;
 
   int          has_been_resolved;
   int          register_object;
   struct xodtemplate_hostdependency_struct* next;
 }              xodtemplate_hostdependency;
-
-
-/* HOSTESCALATION TEMPLATE STRUCTURE */
-typedef struct xodtemplate_hostescalation_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        host_name;
-  char*        hostgroup_name;
-  int          first_notification;
-  int          last_notification;
-  double       notification_interval;
-  char*        escalation_period;
-  int          escalate_on_down;
-  int          escalate_on_unreachable;
-  int          escalate_on_recovery;
-  char*        contact_groups;
-  char*        contacts;
-
-  int          have_host_name;
-  int          have_hostgroup_name;
-  int          have_escalation_period;
-  int          have_contact_groups;
-  int          have_contacts;
-
-  int          have_first_notification;
-  int          have_last_notification;
-  int          have_notification_interval;
-  int          have_escalation_options;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_hostescalation_struct* next;
-}              xodtemplate_hostescalation;
-
-
-/* CONTACT LIST STRUCTURE */
-typedef struct xodtemplate_contactlist_struct{
-  char*        contact_name;
-  struct xodtemplate_contactlist_struct* next;
-}              xodtemplate_contactlist;
 
 
 /* HOST LIST STRUCTURE */
@@ -667,29 +473,6 @@ int xodtemplate_process_config_file(char*, int);
 /* process all files in a specific config directory */
 int xodtemplate_process_config_dir(char*, int);
 
-xodtemplate_memberlist* xodtemplate_expand_contactgroups_and_contacts(
-                          char*,
-                          char*,
-                          int,
-                          int);
-int xodtemplate_expand_contactgroups(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
-int xodtemplate_expand_contacts(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
-int xodtemplate_add_contactgroup_members_to_memberlist(
-      xodtemplate_memberlist**,
-      xodtemplate_contactgroup*,
-      int,
-      int);
-
 xodtemplate_memberlist* xodtemplate_expand_hostgroups_and_hosts(
                           char*,
                           char*,
@@ -735,14 +518,6 @@ int xodtemplate_expand_services(
 int xodtemplate_add_servicegroup_members_to_memberlist(
       xodtemplate_memberlist**,
       xodtemplate_servicegroup*,
-      int,
-      int);
-
-char* xodtemplate_process_contactgroup_names(char*, int, int);
-int xodtemplate_get_contactgroup_names(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
       int,
       int);
 
@@ -807,10 +582,6 @@ xodtemplate_customvariablesmember* xodtemplate_add_custom_variable_to_service(
                                      xodtemplate_service*,
                                      char*,
                                      char*);
-xodtemplate_customvariablesmember* xodtemplate_add_custom_variable_to_contact(
-                                     xodtemplate_contact*,
-                                     char*,
-                                     char*);
 xodtemplate_customvariablesmember* xodtemplate_add_custom_variable_to_object(
                                      xodtemplate_customvariablesmember**,
                                      char*,
@@ -834,13 +605,6 @@ int xodtemplate_compare_strings2(char*, char*, char*, char*);
 int xodtemplate_cache_objects(char*);
 
 int xodtemplate_duplicate_service(xodtemplate_service*,char*);
-int xodtemplate_duplicate_hostescalation(
-      xodtemplate_hostescalation*,
-      char*);
-int xodtemplate_duplicate_serviceescalation(
-      xodtemplate_serviceescalation*,
-      char*,
-      char*);
 int xodtemplate_duplicate_hostdependency(
       xodtemplate_hostdependency*,
       char*,
@@ -856,11 +620,6 @@ int xodtemplate_duplicate_servicedependency(
       char*,
       char*);
 
-int xodtemplate_recombobulate_contactgroups();
-int xodtemplate_recombobulate_contactgroup_subgroups(
-      xodtemplate_contactgroup*,
-      char **);
-int xodtemplate_recombobulate_object_contacts();
 int xodtemplate_recombobulate_hostgroups();
 int xodtemplate_recombobulate_hostgroup_subgroups(
       xodtemplate_hostgroup*,
@@ -872,50 +631,36 @@ int xodtemplate_recombobulate_servicegroup_subgroups(
 
 int xodtemplate_resolve_timeperiod(xodtemplate_timeperiod*);
 int xodtemplate_resolve_command(xodtemplate_command*);
-int xodtemplate_resolve_contactgroup(xodtemplate_contactgroup*);
 int xodtemplate_resolve_hostgroup(xodtemplate_hostgroup*);
 int xodtemplate_resolve_servicegroup(xodtemplate_servicegroup*);
 int xodtemplate_resolve_servicedependency(xodtemplate_servicedependency*);
-int xodtemplate_resolve_serviceescalation(xodtemplate_serviceescalation*);
-int xodtemplate_resolve_contact(xodtemplate_contact*);
 int xodtemplate_resolve_host(xodtemplate_host*);
 int xodtemplate_resolve_service(xodtemplate_service*);
 int xodtemplate_resolve_hostdependency(xodtemplate_hostdependency*);
-int xodtemplate_resolve_hostescalation(xodtemplate_hostescalation*);
 
 int xodtemplate_sort_timeperiods();
 int xodtemplate_sort_commands();
 int xodtemplate_sort_connectors();
-int xodtemplate_sort_contactgroups();
 int xodtemplate_sort_hostgroups();
 int xodtemplate_sort_servicegroups();
-int xodtemplate_sort_contacts();
 int xodtemplate_sort_hosts();
 int xodtemplate_sort_services();
 int xodtemplate_sort_servicedependencies();
-int xodtemplate_sort_serviceescalations();
 int xodtemplate_sort_hostdependencies();
-int xodtemplate_sort_hostescalations();
 
 xodtemplate_timeperiod* xodtemplate_find_timeperiod(char*);
 xodtemplate_command* xodtemplate_find_command(char*);
 xodtemplate_connector* xodtemplate_find_connector(char*);
-xodtemplate_contactgroup* xodtemplate_find_contactgroup(char*);
-xodtemplate_contactgroup* xodtemplate_find_real_contactgroup(char*);
 xodtemplate_hostgroup* xodtemplate_find_hostgroup(char*);
 xodtemplate_hostgroup* xodtemplate_find_real_hostgroup(char*);
 xodtemplate_servicegroup* xodtemplate_find_servicegroup(char*);
 xodtemplate_servicegroup* xodtemplate_find_real_servicegroup(char*);
 xodtemplate_servicedependency* xodtemplate_find_servicedependency(char*);
-xodtemplate_serviceescalation* xodtemplate_find_serviceescalation(char*);
-xodtemplate_contact* xodtemplate_find_contact(char*);
-xodtemplate_contact* xodtemplate_find_real_contact(char*);
 xodtemplate_host* xodtemplate_find_host(char*);
 xodtemplate_host* xodtemplate_find_real_host(char*);
 xodtemplate_service* xodtemplate_find_service(char*);
 xodtemplate_service* xodtemplate_find_real_service(char*,char*);
 xodtemplate_hostdependency* xodtemplate_find_hostdependency(char*);
-xodtemplate_hostescalation* xodtemplate_find_hostescalation(char*);
 
 int xodtemplate_get_inherited_string(int*, char**, int*, char **);
 int xodtemplate_clean_additive_string(char **);
@@ -928,16 +673,12 @@ int xodtemplate_get_time_ranges(char*, unsigned long*, unsigned long*);
 
 int xodtemplate_register_command(xodtemplate_command*);
 int xodtemplate_register_connector(xodtemplate_connector *);
-int xodtemplate_register_contactgroup(xodtemplate_contactgroup*);
 int xodtemplate_register_hostgroup(xodtemplate_hostgroup*);
 int xodtemplate_register_servicegroup(xodtemplate_servicegroup*);
 int xodtemplate_register_servicedependency(xodtemplate_servicedependency*);
-int xodtemplate_register_serviceescalation(xodtemplate_serviceescalation*);
-int xodtemplate_register_contact(xodtemplate_contact*);
 int xodtemplate_register_host(xodtemplate_host*);
 int xodtemplate_register_service(xodtemplate_service*);
 int xodtemplate_register_hostdependency(xodtemplate_hostdependency*);
-int xodtemplate_register_hostescalation(xodtemplate_hostescalation*);
 
 
 int xodtemplate_init_xobject_skiplists();
@@ -963,12 +704,6 @@ int xodtemplate_skiplist_compare_command_template(
 int xodtemplate_skiplist_compare_timeperiod_template(
       void const* a,
       void const* b);
-int xodtemplate_skiplist_compare_contact_template(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_contactgroup_template(
-      void const* a,
-      void const* b);
 int xodtemplate_skiplist_compare_hostgroup_template(
       void const* a,
       void const* b);
@@ -981,23 +716,11 @@ int xodtemplate_skiplist_compare_hostdependency_template(
 int xodtemplate_skiplist_compare_servicedependency_template(
       void const* a,
       void const* b);
-int xodtemplate_skiplist_compare_hostescalation_template(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_serviceescalation_template(
-      void const* a,
-      void const* b);
 
 int xodtemplate_skiplist_compare_host(
       void const* a,
       void const* b);
 int xodtemplate_skiplist_compare_service(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_contact(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_contactgroup(
       void const* a,
       void const* b);
 int xodtemplate_skiplist_compare_hostgroup(
@@ -1019,12 +742,6 @@ int xodtemplate_skiplist_compare_hostdependency(
       void const* a,
       void const* b);
 int xodtemplate_skiplist_compare_servicedependency(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_hostescalation(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_serviceescalation(
       void const* a,
       void const* b);
 

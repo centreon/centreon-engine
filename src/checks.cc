@@ -38,9 +38,6 @@
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
-#include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
@@ -526,40 +523,11 @@ int handle_async_service_check_result(
   }
 
   /* a state change occurred... */
-  /* reset last and next notification times and acknowledgement flag if necessary, misc other stuff */
+  /* reset last and next notification times, misc other stuff */
   if (state_change == true || hard_state_change == true) {
 
     /* reschedule the service check */
     reschedule_check = true;
-
-    /* reset notification times */
-    temp_service->last_notification = (time_t)0;
-    temp_service->next_notification = (time_t)0;
-
-    /* reset notification suppression option */
-    temp_service->no_more_notifications = false;
-
-    if ((ACKNOWLEDGEMENT_NORMAL == temp_service->acknowledgement_type)
-	&& ((true == state_change) || (false == hard_state_change))) {
-
-      temp_service->problem_has_been_acknowledged = false;
-      temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-
-      /* remove any non-persistant comments associated with the ack */
-      delete_service_acknowledgement_comments(temp_service);
-    }
-    else if (temp_service->acknowledgement_type == ACKNOWLEDGEMENT_STICKY
-             && temp_service->current_state == STATE_OK) {
-      temp_service->problem_has_been_acknowledged = false;
-      temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-
-      /* remove any non-persistant comments associated with the ack */
-      delete_service_acknowledgement_comments(temp_service);
-    }
-
-    /* do NOT reset current notification number!!! */
-    /* hard changes between non-OK states should continue to be escalated, so don't reset current notification number */
-    /*temp_service->current_notification_number=0; */
   }
 
   /* initialize the last host and service state change times if necessary */
@@ -610,10 +578,6 @@ int handle_async_service_check_result(
 
     logger(dbg_checks, more)
       << "Service is OK.";
-
-    /* reset the acknowledgement flag (this should already have been done, but just in case...) */
-    temp_service->problem_has_been_acknowledged = false;
-    temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
 
     /* verify the route to the host and send out host recovery notifications */
     if (temp_host->current_state != HOST_UP) {
@@ -666,17 +630,9 @@ int handle_async_service_check_result(
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
-      check_for_service_flapping(temp_service, true, true);
-      check_for_host_flapping(temp_host, true, false, true);
+      check_for_service_flapping(temp_service, true);
+      check_for_host_flapping(temp_host, true, false);
       flapping_check_done = true;
-
-      /* notify contacts about the service recovery */
-      service_notification(
-        temp_service,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler to handle the hard state change */
       handle_service_event(temp_service);
@@ -712,20 +668,6 @@ int handle_async_service_check_result(
     temp_service->current_attempt = 1;
     temp_service->state_type = HARD_STATE;
     temp_service->last_hard_state = STATE_OK;
-    temp_service->last_notification = (time_t)0;
-    temp_service->next_notification = (time_t)0;
-    temp_service->current_notification_number = 0;
-    temp_service->problem_has_been_acknowledged = false;
-    temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    temp_service->notified_on_unknown = false;
-    temp_service->notified_on_warning = false;
-    temp_service->notified_on_critical = false;
-    temp_service->no_more_notifications = false;
-    service_other_props[
-      std::make_pair(
-             std::string(temp_service->host_ptr->name),
-             std::string(temp_service->description))].initial_notif_time
-      = 0;
 
     if (reschedule_check == true)
       next_service_check
@@ -817,8 +759,7 @@ int handle_async_service_check_result(
           NULL);
       }
 
-      // Else fake the host check, but (possibly) resend host
-      // notifications to contacts...
+      // Else fake the host check.
       else {
         logger(dbg_checks, more)
           << "Assuming host is in same state as before...";
@@ -833,14 +774,6 @@ int handle_async_service_check_result(
 
         // Fake the route check result.
         route_result = temp_host->current_state;
-
-        // Possibly re-send host notifications...
-        host_notification(
-          temp_host,
-          NOTIFICATION_NORMAL,
-          NULL,
-          NULL,
-          NOTIFICATION_OPTION_NONE);
       }
     }
 
@@ -994,25 +927,11 @@ int handle_async_service_check_result(
         state_was_logged = true;
       }
 
-      /* check for start of flexible (non-fixed) scheduled downtime if we just had a hard error */
-      /* we need to check for both, state_change (SOFT) and hard_state_change (HARD) values */
-      if (((true == hard_state_change) || (true == state_change))
-          && (temp_service->pending_flex_downtime > 0))
-        check_pending_flex_service_downtime(temp_service);
-
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
-      check_for_service_flapping(temp_service, true, true);
-      check_for_host_flapping(temp_host, true, false, true);
+      check_for_service_flapping(temp_service, true);
+      check_for_host_flapping(temp_host, true, false);
       flapping_check_done = true;
-
-      /* (re)send notifications out about this service problem if the host is up (and was at last check also) and the dependencies were okay... */
-      service_notification(
-        temp_service,
-        NOTIFICATION_NORMAL,
-        NULL,
-        NULL,
-        NOTIFICATION_OPTION_NONE);
 
       /* run the service event handler if we changed state from the last hard state or if this service is flagged as being volatile */
       if (hard_state_change == true
@@ -1135,8 +1054,8 @@ int handle_async_service_check_result(
 
   /* check to see if the service and/or associate host is flapping */
   if (flapping_check_done == false) {
-    check_for_service_flapping(temp_service, true, true);
-    check_for_host_flapping(temp_host, true, false, true);
+    check_for_service_flapping(temp_service, true);
+    check_for_host_flapping(temp_host, true, false);
   }
 
   /* free allocated memory */
@@ -1373,9 +1292,7 @@ int check_service_check_viability(
     }
 
     /* check service dependencies for execution */
-    if (check_service_dependencies(
-          svc,
-          EXECUTION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+    if (check_service_dependencies(svc) == DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
 
@@ -1393,9 +1310,7 @@ int check_service_check_viability(
 }
 
 /* checks service dependencies */
-unsigned int check_service_dependencies(
-               service* svc,
-               int dependency_type) {
+unsigned int check_service_dependencies(service* svc) {
   service* temp_service = NULL;
   int state = STATE_OK;
   time_t current_time = 0L;
@@ -1412,10 +1327,6 @@ unsigned int check_service_dependencies(
        it != end && it->first == id;
        ++it) {
     servicedependency* temp_dependency(&*it->second);
-
-    /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->dependency_type != dependency_type)
-      continue;
 
     /* find the service we depend on... */
     if ((temp_service = temp_dependency->master_service_ptr) == NULL)
@@ -1456,9 +1367,7 @@ unsigned int check_service_dependencies(
 
     /* immediate dependencies ok at this point - check parent dependencies if necessary */
     if (temp_dependency->inherits_parent == true) {
-      if (check_service_dependencies(
-            temp_service,
-            dependency_type) != DEPENDENCIES_OK)
+      if (check_service_dependencies(temp_service) != DEPENDENCIES_OK)
         return (DEPENDENCIES_FAILED);
     }
   }
@@ -1818,7 +1727,7 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 }
 
 /* checks host dependencies */
-unsigned int check_host_dependencies(host* hst, int dependency_type) {
+unsigned int check_host_dependencies(host* hst) {
   host* temp_host = NULL;
   int state = HOST_UP;
   time_t current_time = 0L;
@@ -1836,10 +1745,6 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
        it != end && it->first == id;
        ++it) {
          hostdependency* temp_dependency(&*it->second);
-
-    /* only check dependencies of the desired type (notification or execution) */
-    if (temp_dependency->dependency_type != dependency_type)
-      continue;
 
     /* find the host we depend on... */
     if ((temp_host = temp_dependency->master_host_ptr) == NULL)
@@ -1876,9 +1781,7 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
 
     /* immediate dependencies ok at this point - check parent dependencies if necessary */
     if (temp_dependency->inherits_parent == true) {
-      if (check_host_dependencies(
-            temp_host,
-            dependency_type) != DEPENDENCIES_OK)
+      if (check_host_dependencies(temp_host) != DEPENDENCIES_OK)
         return (DEPENDENCIES_FAILED);
     }
   }
@@ -3049,7 +2952,7 @@ int process_host_check_result_3x(
   }
 
   /* check to see if the associated host is flapping */
-  check_for_host_flapping(hst, true, true, true);
+  check_for_host_flapping(hst, true, true);
 
   /* reschedule the next check of the host (usually ONLY for scheduled, active checks, unless overridden above) */
   if (reschedule_check == true) {
@@ -3189,9 +3092,7 @@ int check_host_check_viability_3x(
     }
 
     /* check host dependencies for execution */
-    if (check_host_dependencies(
-          hst,
-          EXECUTION_DEPENDENCY) == DEPENDENCIES_FAILED) {
+    if (check_host_dependencies(hst) == DEPENDENCIES_FAILED) {
       preferred_time = current_time + check_interval;
       perform_check = false;
     }

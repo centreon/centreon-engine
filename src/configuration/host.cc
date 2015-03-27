@@ -41,10 +41,7 @@ host::setters const host::_setters[] = {
   { "parents",                      SETTER(std::string const&, _set_parents) },
   { "host_groups",                  SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
-  { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
-  { "contacts",                     SETTER(std::string const&, _set_contacts) },
   { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
-  { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
@@ -66,10 +63,6 @@ host::setters const host::_setters[] = {
   { "high_flap_threshold",          SETTER(unsigned int, _set_high_flap_threshold) },
   { "flap_detection_enabled",       SETTER(bool, _set_flap_detection_enabled) },
   { "flap_detection_options",       SETTER(std::string const&, _set_flap_detection_options) },
-  { "notification_options",         SETTER(std::string const&, _set_notification_options) },
-  { "notifications_enabled",        SETTER(bool, _set_notifications_enabled) },
-  { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
-  { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
@@ -77,27 +70,32 @@ host::setters const host::_setters[] = {
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
 
   // Deprecated.
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
-  { "notes",                        SETTER(std::string const&, _set_notes) },
-  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
+  { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
+  { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
+  { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
+  { "contacts",                     SETTER(std::string const&, _set_contacts) },
+  { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
+  { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
   { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
   { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
-  { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) },
-  { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
+  { "notes",                        SETTER(std::string const&, _set_notes) },
+  { "notes_url",                    SETTER(std::string const&, _set_notes_url) },
+  { "notifications_enabled",        SETTER(bool, _set_notifications_enabled) },
+  { "notification_interval",        SETTER(unsigned int, _set_notification_interval) },
+  { "notification_options",         SETTER(std::string const&, _set_notification_options) },
+  { "notification_period",          SETTER(std::string const&, _set_notification_period) },
+  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
-  { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
-  { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) }
+  { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) }
 };
 
-// XXX: check all default value from xodtemplate_inherit_object_properties !
 // Default values.
 static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
 static unsigned int const   default_check_interval(5);
 static bool const           default_event_handler_enabled(true);
-static unsigned int const   default_first_notification_delay(0);
 static bool const           default_flap_detection_enabled(true);
 static unsigned short const default_flap_detection_options(host::up | host::down | host::unreachable);
 static unsigned int const   default_freshness_threshold(0);
@@ -105,9 +103,6 @@ static unsigned int const   default_high_flap_threshold(0);
 static unsigned short const default_initial_state(HOST_UP);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
-static bool const           default_notifications_enabled(true);
-static unsigned int const   default_notification_interval(30);
-static unsigned short const default_notification_options(host::up | host::down | host::unreachable | host::flapping | host::downtime);
 static bool const           default_obsess_over_host(true);
 static bool const           default_retain_nonstatus_information(true);
 static bool const           default_retain_status_information(true);
@@ -128,7 +123,6 @@ host::host(key_type const& key)
     _check_interval(default_check_interval),
     _check_timeout(default_check_timeout),
     _event_handler_enabled(default_event_handler_enabled),
-    _first_notification_delay(default_first_notification_delay),
     _flap_detection_enabled(default_flap_detection_enabled),
     _flap_detection_options(default_flap_detection_options),
     _freshness_threshold(default_freshness_threshold),
@@ -137,9 +131,6 @@ host::host(key_type const& key)
     _initial_state(default_initial_state),
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
-    _notifications_enabled(default_notifications_enabled),
-    _notification_interval(default_notification_interval),
-    _notification_options(default_notification_options),
     _obsess_over_host(default_obsess_over_host),
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
@@ -180,13 +171,10 @@ host& host::operator=(host const& right) {
     _check_interval = right._check_interval;
     _check_period = right._check_period;
     _check_timeout = right._check_timeout;
-    _contactgroups = right._contactgroups;
-    _contacts = right._contacts;
     _customvariables = right._customvariables;
     _display_name = right._display_name;
     _event_handler = right._event_handler;
     _event_handler_enabled = right._event_handler_enabled;
-    _first_notification_delay = right._first_notification_delay;
     _flap_detection_enabled = right._flap_detection_enabled;
     _flap_detection_options = right._flap_detection_options;
     _freshness_threshold = right._freshness_threshold;
@@ -196,10 +184,6 @@ host& host::operator=(host const& right) {
     _initial_state = right._initial_state;
     _low_flap_threshold = right._low_flap_threshold;
     _max_check_attempts = right._max_check_attempts;
-    _notifications_enabled = right._notifications_enabled;
-    _notification_interval = right._notification_interval;
-    _notification_options = right._notification_options;
-    _notification_period = right._notification_period;
     _obsess_over_host = right._obsess_over_host;
     _parents = right._parents;
     _retain_nonstatus_information = right._retain_nonstatus_information;
@@ -228,13 +212,10 @@ bool host::operator==(host const& right) const throw () {
           && _check_interval == right._check_interval
           && _check_period == right._check_period
           && _check_timeout == right._check_timeout
-          && _contactgroups == right._contactgroups
-          && _contacts == right._contacts
           && std::operator==(_customvariables, right._customvariables)
           && _display_name == right._display_name
           && _event_handler == right._event_handler
           && _event_handler_enabled == right._event_handler_enabled
-          && _first_notification_delay == right._first_notification_delay
           && _flap_detection_enabled == right._flap_detection_enabled
           && _flap_detection_options == right._flap_detection_options
           && _freshness_threshold == right._freshness_threshold
@@ -244,10 +225,6 @@ bool host::operator==(host const& right) const throw () {
           && _initial_state == right._initial_state
           && _low_flap_threshold == right._low_flap_threshold
           && _max_check_attempts == right._max_check_attempts
-          && _notifications_enabled == right._notifications_enabled
-          && _notification_interval == right._notification_interval
-          && _notification_options == right._notification_options
-          && _notification_period == right._notification_period
           && _obsess_over_host == right._obsess_over_host
           && _parents == right._parents
           && _retain_nonstatus_information == right._retain_nonstatus_information
@@ -296,10 +273,6 @@ bool host::operator<(host const& right) const throw () {
     return (_check_period < right._check_period);
   else if (_check_timeout != right._check_timeout)
     return (_check_timeout < right._check_timeout);
-  else if (_contactgroups != right._contactgroups)
-    return (_contactgroups < right._contactgroups);
-  else if (_contacts != right._contacts)
-    return (_contacts < right._contacts);
   else if (_customvariables != right._customvariables)
     return (_customvariables < right._customvariables);
   else if (_display_name != right._display_name)
@@ -308,10 +281,6 @@ bool host::operator<(host const& right) const throw () {
     return (_event_handler < right._event_handler);
   else if (_event_handler_enabled != right._event_handler_enabled)
     return (_event_handler_enabled < right._event_handler_enabled);
-  else if (_first_notification_delay
-           != right._first_notification_delay)
-    return (_first_notification_delay
-            < right._first_notification_delay);
   else if (_flap_detection_enabled != right._flap_detection_enabled)
     return (_flap_detection_enabled < right._flap_detection_enabled);
   else if (_flap_detection_options != right._flap_detection_options)
@@ -328,14 +297,6 @@ bool host::operator<(host const& right) const throw () {
     return (_low_flap_threshold < right._low_flap_threshold);
   else if (_max_check_attempts != right._max_check_attempts)
     return (_max_check_attempts < right._max_check_attempts);
-  else if (_notifications_enabled != right._notifications_enabled)
-    return (_notifications_enabled < right._notifications_enabled);
-  else if (_notification_interval != right._notification_interval)
-    return (_notification_interval < right._notification_interval);
-  else if (_notification_options != right._notification_options)
-    return (_notification_options < right._notification_options);
-  else if (_notification_period != right._notification_period)
-    return (_notification_period < right._notification_period);
   else if (_obsess_over_host != right._obsess_over_host)
     return (_obsess_over_host < right._obsess_over_host);
   else if (_parents != right._parents)
@@ -398,13 +359,10 @@ void host::merge(object const& obj) {
   MRG_OPTION(_check_interval);
   MRG_DEFAULT(_check_period);
   MRG_OPTION(_check_timeout);
-  MRG_INHERIT(_contactgroups);
-  MRG_INHERIT(_contacts);
   MRG_MAP(_customvariables);
   MRG_DEFAULT(_display_name);
   MRG_DEFAULT(_event_handler);
   MRG_OPTION(_event_handler_enabled);
-  MRG_OPTION(_first_notification_delay);
   MRG_OPTION(_flap_detection_enabled);
   MRG_OPTION(_flap_detection_options);
   MRG_OPTION(_freshness_threshold);
@@ -414,10 +372,6 @@ void host::merge(object const& obj) {
   MRG_OPTION(_initial_state);
   MRG_OPTION(_low_flap_threshold);
   MRG_OPTION(_max_check_attempts);
-  MRG_OPTION(_notifications_enabled);
-  MRG_OPTION(_notification_interval);
-  MRG_OPTION(_notification_options);
-  MRG_DEFAULT(_notification_period);
   MRG_OPTION(_obsess_over_host);
   MRG_INHERIT(_parents);
   MRG_OPTION(_retain_nonstatus_information);
@@ -538,25 +492,6 @@ bool host::check_timeout_defined() const throw() {
   return (_check_timeout.is_set());
 }
 
-
-/**
- *  Get contactgroups.
- *
- *  @return The contactgroups.
- */
-list_string const& host::contactgroups() const throw () {
-  return (*_contactgroups);
-}
-
-/**
- *  Get contacts.
- *
- *  @return The contacts.
- */
-list_string const& host::contacts() const throw () {
-  return (*_contacts);
-}
-
 /**
  *  Get customvariables.
  *
@@ -591,15 +526,6 @@ std::string const& host::event_handler() const throw () {
  */
 bool host::event_handler_enabled() const throw () {
   return (_event_handler_enabled);
-}
-
-/**
- *  Get first_notification_delay.
- *
- *  @return The first_notification_delay.
- */
-unsigned int host::first_notification_delay() const throw () {
-  return (_first_notification_delay);
 }
 
 /**
@@ -690,42 +616,6 @@ unsigned int host::low_flap_threshold() const throw () {
  */
 unsigned int host::max_check_attempts() const throw () {
   return (_max_check_attempts);
-}
-
-/**
- *  Get notifications_enabled.
- *
- *  @return The notifications_enabled.
- */
-bool host::notifications_enabled() const throw () {
-  return (_notifications_enabled);
-}
-
-/**
- *  Get notification_interval.
- *
- *  @return The notification_interval.
- */
-unsigned int host::notification_interval() const throw () {
-  return (_notification_interval);
-}
-
-/**
- *  Get notification_options.
- *
- *  @return The notification_options.
- */
-unsigned int host::notification_options() const throw () {
-  return (_notification_options);
-}
-
-/**
- *  Get notification_period.
- *
- *  @return The notification_period.
- */
-std::string const& host::notification_period() const throw () {
-  return (_notification_period);
 }
 
 /**
@@ -923,26 +813,32 @@ bool host::_set_check_timeout(unsigned int value) {
 }
 
 /**
- *  Set contactgroups value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new contactgroups value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool host::_set_contactgroups(std::string const& value) {
-  _contactgroups = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host contactgroup was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set contacts value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new contacts value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool host::_set_contacts(std::string const& value) {
-  _contacts = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host contacts was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1038,21 +934,23 @@ bool host::_set_failure_prediction_options(
        std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "Warning: service failure_prediction_options was ignored";
+    << "Warning: host failure_prediction_options was ignored";
   ++config_warnings;
   return (true);
 }
 
 /**
- *  Set first_notification_delay value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new first_notification_delay value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool host::_set_first_notification_delay(
-       unsigned int value) {
-  _first_notification_delay = value;
+bool host::_set_first_notification_delay(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host first_notification_delay was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1258,78 +1156,62 @@ bool host::_set_notes_url(std::string const& value) {
 }
 
 /**
- *  Set notifications_enabled value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notifications_enabled value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool host::_set_notifications_enabled(bool value) {
-  _notifications_enabled = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host notifications_enabled was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notification_interval value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notification_interval value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool host::_set_notification_interval(
-       unsigned int value) {
-  _notification_interval = value;
+bool host::_set_notification_interval(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host notification_interval was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notification_options value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notification_options value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool host::_set_notification_options(
-       std::string const& value) {
-  unsigned short options(none);
-  std::list<std::string> values;
-  string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
-    string::trim(*it);
-    if (*it == "d" || *it == "down")
-      options |= down;
-    else if (*it == "u" || *it == "unreachable")
-      options |= unreachable;
-    else if (*it == "r" || *it == "recovery")
-      options |= up;
-    else if (*it == "f" || *it == "flapping")
-      options |= flapping;
-    else if (*it == "s" || *it == "downtime")
-      options |= downtime;
-    else if (*it == "n" || *it == "none")
-      options = none;
-    else if (*it == "a" || *it == "all")
-      options = down | unreachable | up | flapping | downtime;
-    else
-      return (false);
-  }
-  _notification_options = options;
+bool host::_set_notification_options(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host notification_options was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set notification_period value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notification_period value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool host::_set_notification_period(
-       std::string const& value) {
-  _notification_period = value;
+bool host::_set_notification_period(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host notification_period was ignored";
+  ++config_warnings;
   return (true);
 }
 

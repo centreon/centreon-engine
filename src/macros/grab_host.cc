@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -231,9 +231,6 @@ struct grab_host_redirection {
     // Max attempt.
     routines[MACRO_MAXHOSTATTEMPTS].first = &get_member_as_string<host, int, &host::max_attempts>;
     routines[MACRO_MAXHOSTATTEMPTS].second = true;
-    // Downtime.
-    routines[MACRO_HOSTDOWNTIME].first = &get_member_as_string<host, int, &host::scheduled_downtime_depth>;
-    routines[MACRO_HOSTDOWNTIME].second = true;
     // Percent state change.
     routines[MACRO_HOSTPERCENTCHANGE].first = &get_double<host, &host::percent_state_change, 2>;
     routines[MACRO_HOSTPERCENTCHANGE].second = true;
@@ -264,12 +261,6 @@ struct grab_host_redirection {
     // Last unreachable.
     routines[MACRO_LASTHOSTUNREACHABLE].first = &get_member_as_string<host, time_t, &host::last_time_unreachable>;
     routines[MACRO_LASTHOSTUNREACHABLE].second = true;
-    // Notification number.
-    routines[MACRO_HOSTNOTIFICATIONNUMBER].first = &get_member_as_string<host, int, &host::current_notification_number>;
-    routines[MACRO_HOSTNOTIFICATIONNUMBER].second = true;
-    // Notification ID.
-    routines[MACRO_HOSTNOTIFICATIONID].first = &get_member_as_string<host, unsigned long, &host::current_notification_id>;
-    routines[MACRO_HOSTNOTIFICATIONID].second = true;
     // Event ID.
     routines[MACRO_HOSTEVENTID].first = &get_member_as_string<host, unsigned long, &host::current_event_id>;
     routines[MACRO_HOSTEVENTID].second = true;
@@ -300,18 +291,6 @@ struct grab_host_redirection {
     // Total services critical.
     routines[MACRO_TOTALHOSTSERVICESCRITICAL].first = &get_host_total_services<MACRO_TOTALHOSTSERVICESCRITICAL>;
     routines[MACRO_TOTALHOSTSERVICESCRITICAL].second = false;
-    // Acknowledgement author.
-    routines[MACRO_HOSTACKAUTHOR].first = &get_macro_copy<host, MACRO_HOSTACKAUTHOR>;
-    routines[MACRO_HOSTACKAUTHOR].second = true;
-    // Acknowledgement author name.
-    routines[MACRO_HOSTACKAUTHORNAME].first = &get_macro_copy<host, MACRO_HOSTACKAUTHORNAME>;
-    routines[MACRO_HOSTACKAUTHORNAME].second = true;
-    // Acknowledgement author alias.
-    routines[MACRO_HOSTACKAUTHORALIAS].first = &get_macro_copy<host, MACRO_HOSTACKAUTHORALIAS>;
-    routines[MACRO_HOSTACKAUTHORALIAS].second = true;
-    // Acknowledgement comment.
-    routines[MACRO_HOSTACKCOMMENT].first = &get_macro_copy<host, MACRO_HOSTACKCOMMENT>;
-    routines[MACRO_HOSTACKCOMMENT].second = true;
   }
 } static const redirector;
 

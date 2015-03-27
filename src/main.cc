@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -53,9 +53,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/nebmods.hh"
-#include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
@@ -265,13 +262,10 @@ int main(int argc, char* argv[]) {
           << "\n"
           << "Checked " << applier.commands().size() << " commands.\n"
           << "Checked " << applier.connectors().size() << " connectors.\n"
-          << "Checked " << applier.contacts().size() << " contacts.\n"
           << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
-          << "Checked " << applier.hostescalations().size() << " host escalations.\n"
           << "Checked " << applier.hostgroups().size() << " host groups.\n"
           << "Checked " << applier.hosts().size() << " hosts.\n"
           << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
-          << "Checked " << applier.serviceescalations().size() << " service escalations.\n"
           << "Checked " << applier.servicegroups().size() << " service groups.\n"
           << "Checked " << applier.services().size() << " services.\n"
           << "Checked " << applier.timeperiods().size() << " time periods.\n"
@@ -379,12 +373,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize status data.
         initialize_status_data();
-
-        // Initialize comment data.
-        initialize_comment_data();
-
-        // Initialize scheduled downtime data.
-        initialize_downtime_data();
 
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);

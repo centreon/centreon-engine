@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -59,26 +59,26 @@ servicedependency::setters const servicedependency::_setters[] = {
   { "dependent_service_description", SETTER(std::string const&, _set_dependent_service_description) },
   { "dependency_period",             SETTER(std::string const&, _set_dependency_period) },
   { "inherits_parent",               SETTER(bool, _set_inherits_parent) },
-  { "execution_failure_options",     SETTER(std::string const&, _set_execution_failure_options) },
-  { "execution_failure_criteria",    SETTER(std::string const&, _set_execution_failure_options) },
+  { "execution_failure_options",     SETTER(std::string const&, _set_failure_options) },
+  { "execution_failure_criteria",    SETTER(std::string const&, _set_failure_options) },
+  { "failure_options",               SETTER(std::string const&, _set_failure_options) },
+
+  // Deprecated.
   { "notification_failure_options",  SETTER(std::string const&, _set_notification_failure_options) },
   { "notification_failure_criteria", SETTER(std::string const&, _set_notification_failure_options) }
 };
 
 // Default values.
-static unsigned short const default_execution_failure_options(servicedependency::none);
+static unsigned short const default_failure_options(servicedependency::none);
 static bool const           default_inherits_parent(false);
-static unsigned short const default_notification_failure_options(servicedependency::none);
 
 /**
  *  Default constructor.
  */
 servicedependency::servicedependency()
   : object(object::servicedependency),
-    _dependency_type(unknown_type),
-    _execution_failure_options(default_execution_failure_options),
-    _inherits_parent(default_inherits_parent),
-    _notification_failure_options(default_notification_failure_options) {}
+    _failure_options(default_failure_options),
+    _inherits_parent(default_inherits_parent) {}
 
 /**
  *  Copy constructor.
@@ -106,16 +106,14 @@ servicedependency& servicedependency::operator=(servicedependency const& right) 
   if (this != &right) {
     object::operator=(right);
     _dependency_period = right._dependency_period;
-    _dependency_type = right._dependency_type;
     _dependent_hostgroups = right._dependent_hostgroups;
     _dependent_hosts = right._dependent_hosts;
     _dependent_servicegroups = right._dependent_servicegroups;
     _dependent_service_description = right._dependent_service_description;
-    _execution_failure_options = right._execution_failure_options;
+    _failure_options = right._failure_options;
     _inherits_parent = right._inherits_parent;
     _hostgroups = right._hostgroups;
     _hosts = right._hosts;
-    _notification_failure_options = right._notification_failure_options;
     _servicegroups = right._servicegroups;
     _service_description = right._service_description;
   }
@@ -132,16 +130,14 @@ servicedependency& servicedependency::operator=(servicedependency const& right) 
 bool servicedependency::operator==(servicedependency const& right) const throw () {
   return (object::operator==(right)
           && _dependency_period == right._dependency_period
-          && _dependency_type == right._dependency_type
           && _dependent_hostgroups == right._dependent_hostgroups
           && _dependent_hosts == right._dependent_hosts
           && _dependent_servicegroups == right._dependent_servicegroups
           && _dependent_service_description == right._dependent_service_description
-          && _execution_failure_options == right._execution_failure_options
+          && _failure_options == right._failure_options
           && _inherits_parent == right._inherits_parent
           && _hostgroups == right._hostgroups
           && _hosts == right._hosts
-          && _notification_failure_options == right._notification_failure_options
           && _servicegroups == right._servicegroups
           && _service_description == right._service_description);
 }
@@ -183,18 +179,11 @@ bool servicedependency::operator<(servicedependency const& right) const {
     return (_dependent_servicegroups < right._dependent_servicegroups);
   else if (_servicegroups != right._servicegroups)
     return (_servicegroups < right._servicegroups);
-  else if (_dependency_type != right._dependency_type)
-    return (_dependency_type < right._dependency_type);
   else if (_dependency_period != right._dependency_period)
     return (_dependency_period < right._dependency_period);
-  else if (_execution_failure_options
-           != right._execution_failure_options)
-    return (_execution_failure_options
-            < right._execution_failure_options);
-  else if (_inherits_parent != right._inherits_parent)
-    return (_inherits_parent < right._inherits_parent);
-  return (_notification_failure_options
-          < right._notification_failure_options);
+  else if (_failure_options != right._failure_options)
+    return (_failure_options < right._failure_options);
+  return (_inherits_parent < right._inherits_parent);
 }
 
 /**
@@ -232,7 +221,7 @@ void servicedependency::check_validity() const {
   }
 
   // With no execution or failure options this dependency is useless.
-  if (!_execution_failure_options && !_notification_failure_options) {
+  if (!_failure_options) {
     ++config_warnings;
     std::ostringstream msg;
     msg << "Warning: Ignoring lame service dependency of ";
@@ -287,11 +276,10 @@ void servicedependency::merge(object const& obj) {
   MRG_INHERIT(_dependent_hosts);
   MRG_INHERIT(_dependent_servicegroups);
   MRG_INHERIT(_dependent_service_description);
-  MRG_OPTION(_execution_failure_options);
+  MRG_OPTION(_failure_options);
   MRG_OPTION(_inherits_parent);
   MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
-  MRG_OPTION(_notification_failure_options);
   MRG_INHERIT(_servicegroups);
   MRG_INHERIT(_service_description);
 }
@@ -330,26 +318,6 @@ void servicedependency::dependency_period(std::string const& period) {
  */
 std::string const& servicedependency::dependency_period() const throw () {
   return (_dependency_period);
-}
-
-/**
- *  Set the dependency type.
- *
- *  @param[in] type Dependency type.
- */
-void servicedependency::dependency_type(
-                          servicedependency::dependency_kind type) throw () {
-  _dependency_type = type;
-  return ;
-}
-
-/**
- *  Get the dependency type.
- *
- *  @return Dependency type.
- */
-servicedependency::dependency_kind servicedependency::dependency_type() const throw () {
-  return (_dependency_type);
 }
 
 /**
@@ -429,19 +397,18 @@ list_string const& servicedependency::dependent_service_description() const thro
  *
  *  @param[in] options New execution failure options.
  */
-void servicedependency::execution_failure_options(
-                          unsigned int options) throw () {
-  _execution_failure_options = options;
+void servicedependency::failure_options(unsigned int options) throw () {
+  _failure_options = options;
   return ;
 }
 
 /**
- *  Get execution_failure_options.
+ *  Get execution failure options.
  *
- *  @return The execution_failure_options.
+ *  @return The execution failure options.
  */
-unsigned int servicedependency::execution_failure_options() const throw () {
-  return (_execution_failure_options);
+unsigned int servicedependency::failure_options() const throw () {
+  return (_failure_options);
 }
 
 /**
@@ -497,26 +464,6 @@ list_string& servicedependency::hosts() throw () {
  */
 list_string const& servicedependency::hosts() const throw () {
   return (*_hosts);
-}
-
-/**
- *  Set the notification failure options.
- *
- *  @param[in] options New notification failure options.
- */
-void servicedependency::notification_failure_options(
-                          unsigned int options) throw () {
-  _notification_failure_options = options;
-  return ;
-}
-
-/**
- *  Get notification_failure_options.
- *
- *  @return The notification_failure_options.
- */
-unsigned int servicedependency::notification_failure_options() const throw () {
-  return (_notification_failure_options);
 }
 
 /**
@@ -617,13 +564,13 @@ bool servicedependency::_set_dependent_service_description(std::string const& va
 }
 
 /**
- *  Set execution_failure_options value.
+ *  Set failure_options value.
  *
- *  @param[in] value The new execution_failure_options value.
+ *  @param[in] value The new failure_options value.
  *
  *  @return True on success, otherwise false.
  */
-bool servicedependency::_set_execution_failure_options(std::string const& value) {
+bool servicedependency::_set_failure_options(std::string const& value) {
   unsigned short options(none);
   std::list<std::string> values;
   string::split(value, values, ',');
@@ -649,7 +596,7 @@ bool servicedependency::_set_execution_failure_options(std::string const& value)
     else
       return (false);
   }
-  _execution_failure_options = options;
+  _failure_options = options;
   return (true);
 }
 
@@ -690,39 +637,19 @@ bool servicedependency::_set_hosts(std::string const& value) {
 }
 
 /**
- *  Set notification_failure_options value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new notification_failure_options value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool servicedependency::_set_notification_failure_options(std::string const& value) {
-  unsigned short options(none);
-  std::list<std::string> values;
-  string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
-    string::trim(*it);
-    if (*it == "o" || *it == "ok")
-      options |= ok;
-    else if (*it == "u" || *it == "unknown")
-      options |= unknown;
-    else if (*it == "w" || *it == "warning")
-      options |= warning;
-    else if (*it == "c" || *it == "critical")
-      options |= critical;
-    else if (*it == "p" || *it == "pending")
-      options |= pending;
-    else if (*it == "n" || *it == "none")
-      options = none;
-    else if (*it == "a" || *it == "all")
-      options = ok | unknown | warning | critical | pending;
-    else
-      return (false);
-  }
-  _notification_failure_options = options;
+bool servicedependency::_set_notification_failure_options(
+                          std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service dependency notification_failure_options"
+    << " variable was ignored";
+  ++config_warnings;
   return (true);
 }
 

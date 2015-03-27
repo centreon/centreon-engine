@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,6 @@
 #  define CCE_BROKER_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/objects/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -34,17 +33,13 @@
 #  define BROKER_HOST_CHECKS                       (1 << 3)
 #  define BROKER_EVENT_HANDLERS                    (1 << 4)
 #  define BROKER_LOGGED_DATA                       (1 << 5)
-#  define BROKER_NOTIFICATIONS                     (1 << 6)
 #  define BROKER_FLAPPING_DATA                     (1 << 7)
-#  define BROKER_COMMENT_DATA                      (1 << 8)
-#  define BROKER_DOWNTIME_DATA                     (1 << 9)
 #  define BROKER_SYSTEM_COMMANDS                   (1 << 10)
 #  define BROKER_OCP_DATA_UNUSED                   (1 << 11) /* Reusable. */
 #  define BROKER_STATUS_DATA                       (1 << 12)
 #  define BROKER_ADAPTIVE_DATA                     (1 << 13)
 #  define BROKER_EXTERNALCOMMAND_DATA              (1 << 14)
 #  define BROKER_RETENTION_DATA                    (1 << 15)
-#  define BROKER_ACKNOWLEDGEMENT_DATA              (1 << 16)
 #  define BROKER_STATECHANGE_DATA                  (1 << 17)
 #  define BROKER_RESERVED18                        (1 << 18)
 #  define BROKER_RESERVED19                        (1 << 19)
@@ -95,14 +90,6 @@
 #  define NEBTYPE_EVENTHANDLER_START               500
 #  define NEBTYPE_EVENTHANDLER_END                 501
 
-/* Notifications. */
-#  define NEBTYPE_NOTIFICATION_START               600
-#  define NEBTYPE_NOTIFICATION_END                 601
-#  define NEBTYPE_CONTACTNOTIFICATION_START        602
-#  define NEBTYPE_CONTACTNOTIFICATION_END          603
-#  define NEBTYPE_CONTACTNOTIFICATIONMETHOD_START  604
-#  define NEBTYPE_CONTACTNOTIFICATIONMETHOD_END    605
-
 /* Service checks. */
 #  define NEBTYPE_SERVICECHECK_INITIATE            700
 #  define NEBTYPE_SERVICECHECK_PROCESSED           701
@@ -118,35 +105,19 @@
 #  define NEBTYPE_HOSTCHECK_ASYNC_PRECHECK         804
 #  define NEBTYPE_HOSTCHECK_SYNC_PRECHECK          805
 
-/* Comments. */
-#  define NEBTYPE_COMMENT_ADD                      900
-#  define NEBTYPE_COMMENT_DELETE                   901
-#  define NEBTYPE_COMMENT_LOAD                     902
-#  define NEBTYPE_COMMENT_UPDATE                   903
-
 /* Flapping. */
 #  define NEBTYPE_FLAPPING_START                   1000
 #  define NEBTYPE_FLAPPING_STOP                    1001
-
-/* Downtimes. */
-#  define NEBTYPE_DOWNTIME_ADD                     1100
-#  define NEBTYPE_DOWNTIME_DELETE                  1101
-#  define NEBTYPE_DOWNTIME_LOAD                    1102
-#  define NEBTYPE_DOWNTIME_START                   1103
-#  define NEBTYPE_DOWNTIME_STOP                    1104
-#  define NEBTYPE_DOWNTIME_UPDATE                  1105
 
 /* Statuses. */
 #  define NEBTYPE_PROGRAMSTATUS_UPDATE             1200
 #  define NEBTYPE_HOSTSTATUS_UPDATE                1201
 #  define NEBTYPE_SERVICESTATUS_UPDATE             1202
-#  define NEBTYPE_CONTACTSTATUS_UPDATE             1203
 
 /* Adaptive modifications. */
 #  define NEBTYPE_ADAPTIVEPROGRAM_UPDATE           1300
 #  define NEBTYPE_ADAPTIVEHOST_UPDATE              1301
 #  define NEBTYPE_ADAPTIVESERVICE_UPDATE           1302
-#  define NEBTYPE_ADAPTIVECONTACT_UPDATE           1303
 
 /* External commands. */
 #  define NEBTYPE_EXTERNALCOMMAND_START            1400
@@ -163,13 +134,6 @@
 #  define NEBTYPE_RETENTIONDATA_STARTSAVE          1602
 #  define NEBTYPE_RETENTIONDATA_ENDSAVE            1603
 
-/* Acknowledgement. */
-#  define NEBTYPE_ACKNOWLEDGEMENT_ADD              1700
-#  define NEBTYPE_ACKNOWLEDGEMENT_DELETE           1701
-#  define NEBTYPE_ACKNOWLEDGEMENT_REMOVE           NEBTYPE_ACKNOWLEDGEMENT_DELETE
-#  define NEBTYPE_ACKNOWLEDGEMENT_LOAD             1702    /* NOT IMPLEMENTED. */
-#  define NEBTYPE_ACKNOWLEDGEMENT_UPDATE           1703
-
 /* State change. */
 #  define NEBTYPE_STATECHANGE_START                1800    /* NOT IMPLEMENTED. */
 #  define NEBTYPE_STATECHANGE_END                  1801
@@ -178,26 +142,6 @@
 #  define NEBTYPE_COMMAND_ADD                      1900
 #  define NEBTYPE_COMMAND_DELETE                   1901
 #  define NEBTYPE_COMMAND_UPDATE                   1902
-
-/* Contacts. */
-#  define NEBTYPE_CONTACT_ADD                      2000
-#  define NEBTYPE_CONTACT_DELETE                   2001
-#  define NEBTYPE_CONTACT_UPDATE                   NEBTYPE_ADAPTIVECONTACT_UPDATE
-
-/* Contact custom variables. */
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_ADD        2100
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE     2101
-#  define NEBTYPE_CONTACTCUSTOMVARIABLE_UPDATE     2102
-
-/* Contact groups. */
-#  define NEBTYPE_CONTACTGROUP_ADD                 2200
-#  define NEBTYPE_CONTACTGROUP_DELETE              2201
-#  define NEBTYPE_CONTACTGROUP_UPDATE              2202
-
-/* Contact group members. */
-#  define NEBTYPE_CONTACTGROUPMEMBER_ADD           2300
-#  define NEBTYPE_CONTACTGROUPMEMBER_DELETE        2301
-#  define NEBTYPE_CONTACTGROUPMEMBER_UPDATE        2302
 
 /* Hosts. */
 #  define NEBTYPE_HOST_ADD                         2400
@@ -213,11 +157,6 @@
 #  define NEBTYPE_HOSTDEPENDENCY_ADD               2600
 #  define NEBTYPE_HOSTDEPENDENCY_DELETE            2601
 #  define NEBTYPE_HOSTDEPENDENCY_UPDATE            2602
-
-/* Hostescalation. */
-#  define NEBTYPE_HOSTESCALATION_ADD               2700
-#  define NEBTYPE_HOSTESCALATION_DELETE            2701
-#  define NEBTYPE_HOSTESCALATION_UPDATE            2702
 
 /* Host groups. */
 #  define NEBTYPE_HOSTGROUP_ADD                    2800
@@ -250,11 +189,6 @@
 #  define NEBTYPE_SERVICEDEPENDENCY_ADD            3400
 #  define NEBTYPE_SERVICEDEPENDENCY_DELETE         3401
 #  define NEBTYPE_SERVICEDEPENDENCY_UPDATE         3402
-
-/* Serviceescalation. */
-#  define NEBTYPE_SERVICEESCALATION_ADD            3500
-#  define NEBTYPE_SERVICEESCALATION_DELETE         3501
-#  define NEBTYPE_SERVICEESCALATION_UPDATE         3502
 
 /* Service group. */
 #  define NEBTYPE_SERVICEGROUP_ADD                 3600
@@ -291,10 +225,6 @@
 #  define NEBATTR_FLAPPING_STOP_NORMAL             1
 #  define NEBATTR_FLAPPING_STOP_DISABLED           2 /* Flapping stopped because flap detection was disabled. */
 
-/* Downtime. */
-#  define NEBATTR_DOWNTIME_STOP_NORMAL             1
-#  define NEBATTR_DOWNTIME_STOP_CANCELLED          2
-
 // Forward declaration.
 struct command_struct;
 struct customvariablesmember_struct;
@@ -305,38 +235,7 @@ struct timeperiod_struct;
 extern "C" {
 #  endif /* C++ */
 
-void           broker_acknowledgement_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 int acknowledgement_type,
-                 void* data,
-                 char* ack_author,
-                 char* ack_data,
-                 int subtype,
-                 int notify_contacts,
-                 int persistent_comment,
-                 struct timeval const* timestamp);
-void           broker_adaptive_contact_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 contact* cntct,
-                 int command_type,
-                 unsigned long modattr,
-                 unsigned long modattrs,
-                 unsigned long modhattr,
-                 unsigned long modhattrs,
-                 unsigned long modsattr,
-                 unsigned long modsattrs,
-                 struct timeval const* timestamp);
 void           broker_adaptive_dependency_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 void* data,
-                 struct timeval const* timestamp);
-void           broker_adaptive_escalation_data(
                  int type,
                  int flags,
                  int attr,
@@ -388,58 +287,6 @@ void           broker_command_data(
                  int attr,
                  command_struct* cmd,
                  struct timeval const* timestamp);
-void           broker_comment_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 int comment_type,
-                 int entry_type,
-                 char const* host_name,
-                 char const* svc_description,
-                 time_t entry_time,
-                 char const* author_name,
-                 char const* comment_data,
-                 int persistent,
-                 int source,
-                 int expires,
-                 time_t expire_time,
-                 unsigned long comment_id,
-                 struct timeval const* timestamp);
-int            broker_contact_notification_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 unsigned int notification_type,
-                 int reason_type,
-                 struct timeval start_time,
-                 struct timeval end_time,
-                 void* data,
-                 contact* cntct,
-                 char* ack_author,
-                 char* ack_data,
-                 int escalated,
-                 struct timeval const* timestamp);
-int            broker_contact_notification_method_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 unsigned int notification_type,
-                 int reason_type,
-                 struct timeval start_time,
-                 struct timeval end_time,
-                 void* data,
-                 contact* cntct,
-                 char const* cmd,
-                 char* ack_author,
-                 char* ack_data,
-                 int escalated,
-                 struct timeval const* timestamp);
-void           broker_contact_status(
-                 int type,
-                 int flags,
-                 int attr,
-                 contact* cntct,
-                 struct timeval const* timestamp);
 void           broker_custom_variable(
                  int type,
                  int flags,
@@ -447,25 +294,6 @@ void           broker_custom_variable(
                  void* data,
                  char const* varname,
                  char const* varvalue,
-                 struct timeval const* timestamp);
-void           broker_downtime_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 int downtime_type,
-                 char const* host_name,
-                 char const* svc_description,
-                 time_t entry_time,
-                 char const* author_name,
-                 char const* comment_data,
-                 time_t start_time,
-                 time_t end_time,
-                 int fixed,
-                 unsigned long triggered_by,
-                 unsigned long duration,
-                 unsigned long recurring_interval,
-                 struct timeperiod_struct* recurring_period,
-                 unsigned long downtime_id,
                  struct timeval const* timestamp);
 int            broker_event_handler(
                  int type,
@@ -558,20 +386,6 @@ void           broker_module_data(
                  int attr,
                  char const* module,
                  char const* args,
-                 struct timeval const* timestamp);
-int            broker_notification_data(
-                 int type,
-                 int flags,
-                 int attr,
-                 unsigned int notification_type,
-                 int reason_type,
-                 struct timeval start_time,
-                 struct timeval end_time,
-                 void* data,
-                 char* ack_author,
-                 char* ack_data,
-                 int escalated,
-                 int contacts_notified,
                  struct timeval const* timestamp);
 void           broker_program_state(
                  int type,

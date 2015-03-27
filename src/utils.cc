@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2012 Icinga Development Team (http://www.icinga.org)
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,8 +45,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/nebmods.hh"
-#include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/utils.hh"
@@ -956,19 +954,9 @@ void cleanup() {
  *  @param[in,out] mac Macros.
  */
 void free_memory(nagios_macros* mac) {
-  // Free memory allocated to comments.
-  free_comment_data();
-
-  // Free memory allocated to downtimes.
-  free_downtime_data();
-
   // Free memory for the high priority event list.
   for (timed_event* this_event(event_list_high); this_event;) {
     timed_event* next_event(this_event->next);
-    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>(this_event->event_data);
-      this_event->event_data = NULL;
-    }
     delete this_event;
     this_event = next_event;
   }
@@ -978,18 +966,11 @@ void free_memory(nagios_macros* mac) {
   // Free memory for the low priority event list.
   for (timed_event* this_event(event_list_low); this_event;) {
     timed_event* next_event(this_event->next);
-    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
-      delete static_cast<unsigned long*>(this_event->event_data);
-      this_event->event_data = NULL;
-    }
     delete this_event;
     this_event = next_event;
   }
   event_list_low = NULL;
   quick_timed_event.clear(hash_timed_event::low);
-
-  // Free any notification list that may have been overlooked.
-  free_notification_list();
 
   /*
   ** Free memory associated with macros. It's ok to only free the
@@ -1000,22 +981,5 @@ void free_memory(nagios_macros* mac) {
   */
   clear_volatile_macros_r(mac);
   free_macrox_names();
-  return;
-}
-
-/* free a notification list that was created */
-void free_notification_list() {
-  notification* temp_notification = NULL;
-  notification* next_notification = NULL;
-
-  temp_notification = notification_list;
-  while (temp_notification != NULL) {
-    next_notification = temp_notification->next;
-    delete temp_notification;
-    temp_notification = next_notification;
-  }
-
-  /* reset notification list pointer */
-  notification_list = NULL;
   return;
 }

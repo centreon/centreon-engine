@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2006      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -46,14 +46,6 @@ int process_service_command(
       time_t entry_time,
       char* args);
 int process_servicegroup_command(
-      int cmd,
-      time_t entry_time,
-      char* args);
-int process_contact_command(
-      int cmd,
-      time_t entry_time,
-      char* args);
-int process_contactgroup_command(
       int cmd,
       time_t entry_time,
       char* args);

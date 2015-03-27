@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2006 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -107,23 +107,6 @@ int update_service_status(service* svc) {
     NEBFLAG_NONE,
     NEBATTR_NONE,
     svc,
-    NULL);
-  return (OK);
-}
-
-/**
- *  Updates contact status info.
- *
- *  @param[in] cntct  Contact.
- *
- *  @return OK.
- */
-int update_contact_status(contact* cntct) {
-  broker_contact_status(
-    NEBTYPE_CONTACTSTATUS_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    cntct,
     NULL);
   return (OK);
 }

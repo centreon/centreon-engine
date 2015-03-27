@@ -212,23 +212,6 @@ static void check_event_status_save() {
 }
 
 /**
- *  Check the event scheduled downtime.
- */
-static void check_event_scheduled_downtime() {
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_SCHEDULED_DOWNTIME;
-  event.event_data = static_cast<void*>(new unsigned long(42));
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_scheduled_downtime.
-  if (event.event_data != NULL)
-    throw (engine_error() << __func__);
-}
-
-/**
  *  Check the event sfreshness check.
  */
 static void check_event_sfreshness_check() {
@@ -238,40 +221,6 @@ static void check_event_sfreshness_check() {
   event.event_type = EVENT_SFRESHNESS_CHECK;
 
   handle_timed_event(&event);
-}
-
-/**
- *  Check the event expire downtime.
- */
-static void check_event_expire_downtime() {
-  // create fake comment.
-  unsigned long downtime_id(42);
-  if (add_downtime(HOST_DOWNTIME,
-                   const_cast<char*>("name"),
-                   NULL,
-                   0,
-                   const_cast<char*>("author"),
-                   const_cast<char*>("comment"),
-                   0,
-                   0,
-                   0,
-                   0,
-                   0,
-                   0,
-                   NULL,
-                   downtime_id) != OK || scheduled_downtime_list == NULL)
-    throw (engine_error() << "add_new comment failed.");
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_EXPIRE_DOWNTIME;
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_expire_downtime.
-  if (scheduled_downtime_list != NULL)
-    throw (engine_error() << __func__);
 }
 
 /**
@@ -321,39 +270,6 @@ static void check_event_reschedule_checks() {
 }
 
 /**
- *  Check the event expire comment.
- */
-static void check_event_expire_comment() {
-  // create fake comment.
-  unsigned long comment_id(42);
-  if (add_comment(HOST_COMMENT,
-                  0,
-                  "name",
-                  NULL,
-                  (time_t)0,
-                  "author",
-                  const_cast<char*>("comment"),
-                  comment_id,
-                  0,
-                  true,
-                  0,
-                  0) != OK || comment_list == NULL)
-    throw (engine_error() << "add_new comment failed.");
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_EXPIRE_COMMENT;
-  event.event_data = reinterpret_cast<void*>(comment_id);
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_expire_comment.
-  if (comment_list != NULL)
-    throw (engine_error() << __func__);
-}
-
-/**
  *  Check the event user function.
  */
 static void check_event_user_function() {
@@ -390,13 +306,10 @@ int main_test(int argc, char** argv) {
   check_event_check_reaper();
   check_event_retention_save();
   check_event_status_save();
-  check_event_scheduled_downtime();
   check_event_sfreshness_check();
-  check_event_expire_downtime();
   check_event_host_check();
   check_event_hfreshness_check();
   check_event_reschedule_checks();
-  check_event_expire_comment();
   check_event_user_function();
 
   return (0);

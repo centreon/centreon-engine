@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -188,9 +188,6 @@ struct grab_service_redirection {
     // Last time critical.
     routines[MACRO_LASTSERVICECRITICAL].first = &get_member_as_string<service, time_t, &service::last_time_critical>;
     routines[MACRO_LASTSERVICECRITICAL].second = true;
-    // Downtime.
-    routines[MACRO_SERVICEDOWNTIME].first = &get_member_as_string<service, int, &service::scheduled_downtime_depth>;
-    routines[MACRO_SERVICEDOWNTIME].second = true;
     // Percent state change.
     routines[MACRO_SERVICEPERCENTCHANGE].first = &get_double<service, &service::percent_state_change, 2>;
     routines[MACRO_SERVICEPERCENTCHANGE].second = true;
@@ -200,12 +197,6 @@ struct grab_service_redirection {
     // Duration in seconds.
     routines[MACRO_SERVICEDURATIONSEC].first = &get_duration_sec<service>;
     routines[MACRO_SERVICEDURATIONSEC].second = true;
-    // Notification number.
-    routines[MACRO_SERVICENOTIFICATIONNUMBER].first = &get_member_as_string<service, int, &service::current_notification_number>;
-    routines[MACRO_SERVICENOTIFICATIONNUMBER].second = true;
-    // Notification ID.
-    routines[MACRO_SERVICENOTIFICATIONID].first = &get_member_as_string<service, unsigned long, &service::current_notification_id>;
-    routines[MACRO_SERVICENOTIFICATIONID].second = true;
     // Event ID.
     routines[MACRO_SERVICEEVENTID].first = &get_member_as_string<service, unsigned long, &service::current_event_id>;
     routines[MACRO_SERVICEEVENTID].second = true;
@@ -221,18 +212,6 @@ struct grab_service_redirection {
     // Group names.
     routines[MACRO_SERVICEGROUPNAMES].first = &get_service_group_names;
     routines[MACRO_SERVICEGROUPNAMES].second = true;
-    // Acknowledgement author.
-    routines[MACRO_SERVICEACKAUTHOR].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHOR>;
-    routines[MACRO_SERVICEACKAUTHOR].second = true;
-    // Acknowledgement author name.
-    routines[MACRO_SERVICEACKAUTHORNAME].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORNAME>;
-    routines[MACRO_SERVICEACKAUTHORNAME].second = true;
-    // Acknowledgement author alias.
-    routines[MACRO_SERVICEACKAUTHORALIAS].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORALIAS>;
-    routines[MACRO_SERVICEACKAUTHORALIAS].second = true;
-    // Acknowledgement comment.
-    routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
-    routines[MACRO_SERVICEACKCOMMENT].second = true;
   }
 } static const redirector;
 

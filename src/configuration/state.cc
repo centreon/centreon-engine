@@ -25,7 +25,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/io/file_entry.hh"
-#include "com/centreon/engine/configuration/downtime.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -59,7 +58,6 @@ state::setters const state::_setters[] = {
   { "debug_verbosity",                             SETTER(unsigned int, debug_verbosity) },
   { "enable_event_handlers",                       SETTER(bool, enable_event_handlers) },
   { "enable_flap_detection",                       SETTER(bool, enable_flap_detection) },
-  { "enable_notifications",                        SETTER(bool, enable_notifications) },
   { "enable_predictive_host_dependency_checks",    SETTER(bool, enable_predictive_host_dependency_checks) },
   { "enable_predictive_service_dependency_checks", SETTER(bool, enable_predictive_service_dependency_checks) },
   { "event_broker_options",                        SETTER(std::string const&, _set_event_broker_options) },
@@ -82,7 +80,6 @@ state::setters const state::_setters[] = {
   { "log_file",                                    SETTER(std::string const&, log_file) },
   { "log_host_retries",                            SETTER(bool, log_host_retries) },
   { "log_initial_states",                          SETTER(bool, log_initial_states) },
-  { "log_notifications",                           SETTER(bool, log_notifications) },
   { "log_passive_checks",                          SETTER(bool, log_passive_checks) },
   { "log_service_retries",                         SETTER(bool, log_service_retries) },
   { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
@@ -93,7 +90,6 @@ state::setters const state::_setters[] = {
   { "max_host_check_spread",                       SETTER(unsigned int, max_host_check_spread) },
   { "max_log_file_size",                           SETTER(unsigned long, max_log_file_size) },
   { "max_service_check_spread",                    SETTER(unsigned int, max_service_check_spread) },
-  { "notification_timeout",                        SETTER(unsigned int, notification_timeout) },
   { "object_cache_file",                           SETTER(std::string const&, object_cache_file) },
   { "obsess_over_hosts",                           SETTER(bool, obsess_over_hosts) },
   { "obsess_over_services",                        SETTER(bool, obsess_over_services) },
@@ -104,8 +100,6 @@ state::setters const state::_setters[] = {
   { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
   { "precached_object_file",                       SETTER(std::string const&, precached_object_file) },
   { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
-  { "retained_contact_host_attribute_mask",        SETTER(unsigned long, retained_contact_host_attribute_mask) },
-  { "retained_contact_service_attribute_mask",     SETTER(unsigned long, retained_contact_service_attribute_mask) },
   { "retained_host_attribute_mask",                SETTER(unsigned long, retained_host_attribute_mask) },
   { "retained_process_host_attribute_mask",        SETTER(unsigned long, retained_process_host_attribute_mask) },
   { "retain_state_information",                    SETTER(bool, retain_state_information) },
@@ -130,8 +124,6 @@ state::setters const state::_setters[] = {
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
   { "use_syslog",                                  SETTER(bool, use_syslog) },
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
-  { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
-  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) },
 
   // Deprecated.
   { "admin_email",                                 SETTER(std::string const&, _set_admin_email) },
@@ -152,6 +144,7 @@ state::setters const state::_setters[] = {
   { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
   { "enable_environment_macros",                   SETTER(bool, _set_enable_environment_macros) },
   { "enable_failure_prediction",                   SETTER(bool, _set_enable_failure_prediction) },
+  { "enable_notifications",                        SETTER(bool, _set_enable_notifications) },
   { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
   { "host_perfdata_command",                       SETTER(std::string const&, _set_host_perfdata_command) },
   { "host_perfdata_file",                          SETTER(std::string const&, _set_host_perfdata_file) },
@@ -161,13 +154,17 @@ state::setters const state::_setters[] = {
   { "host_perfdata_file_template",                 SETTER(std::string const&, _set_host_perfdata_file_template) },
   { "lock_file",                                   SETTER(std::string const&, _set_lock_file) },
   { "log_archive_path",                            SETTER(std::string const&, _set_log_archive_path) },
+  { "log_notifications",                           SETTER(bool, _set_log_notifications) },
   { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
   { "max_check_result_file_age",                   SETTER(unsigned long, max_check_result_file_age) },
   { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
   { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
+  { "notification_timeout",                        SETTER(unsigned int, _set_notification_timeout) },
   { "p1_file",                                     SETTER(std::string const&, _set_p1_file) },
   { "perfdata_timeout",                            SETTER(int, _set_perfdata_timeout) },
   { "process_performance_data",                    SETTER(bool, _set_process_performance_data) },
+  { "retained_contact_host_attribute_mask",        SETTER(unsigned long, _set_retained_contact_host_attribute_mask) },
+  { "retained_contact_service_attribute_mask",     SETTER(unsigned long, _set_retained_contact_service_attribute_mask) },
   { "retained_process_service_attribute_mask",     SETTER(std::string const&, _set_retained_process_service_attribute_mask) },
   { "retained_service_attribute_mask",             SETTER(std::string const&, _set_retained_service_attribute_mask) },
   { "service_perfdata_command",                    SETTER(std::string const&, _set_service_perfdata_command) },
@@ -183,7 +180,9 @@ state::setters const state::_setters[] = {
   { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
   { "use_large_installation_tweaks",               SETTER(bool, _set_use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, _set_use_regexp_matching) },
-  { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) }
+  { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) },
+  { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
+  { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) }
 };
 
 // Default values.
@@ -208,7 +207,6 @@ static unsigned long const             default_debug_level(0);
 static unsigned int const              default_debug_verbosity(1);
 static bool const                      default_enable_event_handlers(true);
 static bool const                      default_enable_flap_detection(false);
-static bool const                      default_enable_notifications(true);
 static bool const                      default_enable_predictive_host_dependency_checks(true);
 static bool const                      default_enable_predictive_service_dependency_checks(true);
 static unsigned long const             default_event_broker_options(std::numeric_limits<unsigned long>::max());
@@ -231,7 +229,6 @@ static bool const                      default_log_external_commands(true);
 static std::string const               default_log_file(DEFAULT_LOG_FILE);
 static bool const                      default_log_host_retries(false);
 static bool const                      default_log_initial_states(false);
-static bool const                      default_log_notifications(true);
 static bool const                      default_log_passive_checks(true);
 static bool const                      default_log_service_retries(false);
 static float const                     default_low_host_flap_threshold(20.0);
@@ -243,7 +240,6 @@ static unsigned int const              default_max_host_check_spread(30);
 static unsigned long const             default_max_log_file_size(0);
 static unsigned int const              default_max_parallel_service_checks(0);
 static unsigned int const              default_max_service_check_spread(30);
-static unsigned int const              default_notification_timeout(30);
 static std::string const               default_object_cache_file("");
 static bool const                      default_obsess_over_hosts(false);
 static bool const                      default_obsess_over_services(false);
@@ -253,8 +249,6 @@ static std::string const               default_ocsp_command("");
 static unsigned int const              default_ocsp_timeout(15);
 static bool const                      default_passive_host_checks_are_soft(false);
 static std::string const               default_precached_object_file(DEFAULT_PRECACHED_OBJECT_FILE);
-static unsigned long const             default_retained_contact_host_attribute_mask(0L);
-static unsigned long const             default_retained_contact_service_attribute_mask(0L);
 static unsigned long const             default_retained_host_attribute_mask(0L);
 static unsigned long const             default_retained_process_host_attribute_mask(0L);
 static bool const                      default_retain_state_information(false);
@@ -327,7 +321,6 @@ state::state()
     _debug_verbosity(default_debug_verbosity),
     _enable_event_handlers(default_enable_event_handlers),
     _enable_flap_detection(default_enable_flap_detection),
-    _enable_notifications(default_enable_notifications),
     _enable_predictive_host_dependency_checks(default_enable_predictive_host_dependency_checks),
     _enable_predictive_service_dependency_checks(default_enable_predictive_service_dependency_checks),
     _event_broker_options(default_event_broker_options),
@@ -350,7 +343,6 @@ state::state()
     _log_file(default_log_file),
     _log_host_retries(default_log_host_retries),
     _log_initial_states(default_log_initial_states),
-    _log_notifications(default_log_notifications),
     _log_passive_checks(default_log_passive_checks),
     _log_service_retries(default_log_service_retries),
     _low_host_flap_threshold(default_low_host_flap_threshold),
@@ -362,7 +354,6 @@ state::state()
     _max_log_file_size(default_max_log_file_size),
     _max_parallel_service_checks(default_max_parallel_service_checks),
     _max_service_check_spread(default_max_service_check_spread),
-    _notification_timeout(default_notification_timeout),
     _object_cache_file(default_object_cache_file),
     _obsess_over_hosts(default_obsess_over_hosts),
     _obsess_over_services(default_obsess_over_services),
@@ -372,8 +363,6 @@ state::state()
     _ocsp_timeout(default_ocsp_timeout),
     _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
     _precached_object_file(default_precached_object_file),
-    _retained_contact_host_attribute_mask(default_retained_contact_host_attribute_mask),
-    _retained_contact_service_attribute_mask(default_retained_contact_service_attribute_mask),
     _retained_host_attribute_mask(default_retained_host_attribute_mask),
     _retained_process_host_attribute_mask(default_retained_process_host_attribute_mask),
     _retain_state_information(default_retain_state_information),
@@ -440,16 +429,12 @@ state& state::operator=(state const& right) {
     _command_check_interval_is_seconds = right._command_check_interval_is_seconds;
     _command_file = right._command_file;
     _connectors = right._connectors;
-    _contactgroups = right._contactgroups;
-    _contacts = right._contacts;
     _date_format = right._date_format;
     _debug_file = right._debug_file;
     _debug_level = right._debug_level;
     _debug_verbosity = right._debug_verbosity;
-    _downtimes = right._downtimes;
     _enable_event_handlers = right._enable_event_handlers;
     _enable_flap_detection = right._enable_flap_detection;
-    _enable_notifications = right._enable_notifications;
     _enable_predictive_host_dependency_checks = right._enable_predictive_host_dependency_checks;
     _enable_predictive_service_dependency_checks = right._enable_predictive_service_dependency_checks;
     _event_broker_options = right._event_broker_options;
@@ -462,7 +447,6 @@ state& state::operator=(state const& right) {
     _high_host_flap_threshold = right._high_host_flap_threshold;
     _high_service_flap_threshold = right._high_service_flap_threshold;
     _hostdependencies = right._hostdependencies;
-    _hostescalations = right._hostescalations;
     _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _host_check_timeout = right._host_check_timeout;
@@ -476,7 +460,6 @@ state& state::operator=(state const& right) {
     _log_file = right._log_file;
     _log_host_retries = right._log_host_retries;
     _log_initial_states = right._log_initial_states;
-    _log_notifications = right._log_notifications;
     _log_passive_checks = right._log_passive_checks;
     _log_service_retries = right._log_service_retries;
     _low_host_flap_threshold = right._low_host_flap_threshold;
@@ -488,7 +471,6 @@ state& state::operator=(state const& right) {
     _max_log_file_size = right._max_log_file_size;
     _max_parallel_service_checks = right._max_parallel_service_checks;
     _max_service_check_spread = right._max_service_check_spread;
-    _notification_timeout = right._notification_timeout;
     _object_cache_file = right._object_cache_file;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
@@ -498,15 +480,12 @@ state& state::operator=(state const& right) {
     _ocsp_timeout = right._ocsp_timeout;
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
     _precached_object_file = right._precached_object_file;
-    _retained_contact_host_attribute_mask = right._retained_contact_host_attribute_mask;
-    _retained_contact_service_attribute_mask = right._retained_contact_service_attribute_mask;
     _retained_host_attribute_mask = right._retained_host_attribute_mask;
     _retained_process_host_attribute_mask = right._retained_process_host_attribute_mask;
     _retain_state_information = right._retain_state_information;
     _retention_scheduling_horizon = right._retention_scheduling_horizon;
     _retention_update_interval = right._retention_update_interval;
     _servicedependencies = right._servicedependencies;
-    _serviceescalations = right._serviceescalations;
     _servicegroups = right._servicegroups;
     _services = right._services;
     _service_check_timeout = right._service_check_timeout;
@@ -558,16 +537,12 @@ bool state::operator==(state const& right) const throw () {
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
           && cmp_set_ptr(_connectors, right._connectors)
-          && cmp_set_ptr(_contactgroups, right._contactgroups)
-          && cmp_set_ptr(_contacts, right._contacts)
           && _date_format == right._date_format
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
           && _debug_verbosity == right._debug_verbosity
-          && cmp_set_ptr(_downtimes, right._downtimes)
           && _enable_event_handlers == right._enable_event_handlers
           && _enable_flap_detection == right._enable_flap_detection
-          && _enable_notifications == right._enable_notifications
           && _enable_predictive_host_dependency_checks == right._enable_predictive_host_dependency_checks
           && _enable_predictive_service_dependency_checks == right._enable_predictive_service_dependency_checks
           && _event_broker_options == right._event_broker_options
@@ -580,7 +555,6 @@ bool state::operator==(state const& right) const throw () {
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
           && cmp_set_ptr(_hostdependencies, right._hostdependencies)
-          && cmp_set_ptr(_hostescalations, right._hostescalations)
           && cmp_set_ptr(_hostgroups, right._hostgroups)
           && cmp_set_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
@@ -594,7 +568,6 @@ bool state::operator==(state const& right) const throw () {
           && _log_file == right._log_file
           && _log_host_retries == right._log_host_retries
           && _log_initial_states == right._log_initial_states
-          && _log_notifications == right._log_notifications
           && _log_passive_checks == right._log_passive_checks
           && _log_service_retries == right._log_service_retries
           && _low_host_flap_threshold == right._low_host_flap_threshold
@@ -606,7 +579,6 @@ bool state::operator==(state const& right) const throw () {
           && _max_log_file_size == right._max_log_file_size
           && _max_parallel_service_checks == right._max_parallel_service_checks
           && _max_service_check_spread == right._max_service_check_spread
-          && _notification_timeout == right._notification_timeout
           && _object_cache_file == right._object_cache_file
           && _obsess_over_hosts == right._obsess_over_hosts
           && _obsess_over_services == right._obsess_over_services
@@ -616,15 +588,12 @@ bool state::operator==(state const& right) const throw () {
           && _ocsp_timeout == right._ocsp_timeout
           && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
           && _precached_object_file == right._precached_object_file
-          && _retained_contact_host_attribute_mask == right._retained_contact_host_attribute_mask
-          && _retained_contact_service_attribute_mask == right._retained_contact_service_attribute_mask
           && _retained_host_attribute_mask == right._retained_host_attribute_mask
           && _retained_process_host_attribute_mask == right._retained_process_host_attribute_mask
           && _retain_state_information == right._retain_state_information
           && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
           && cmp_set_ptr(_servicedependencies, right._servicedependencies)
-          && cmp_set_ptr(_serviceescalations, right._serviceescalations)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
           && cmp_set_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
@@ -1154,129 +1123,6 @@ set_connector::iterator state::connectors_find(
 }
 
 /**
- *  Get all engine contacts.
- *
- *  @return All engine contacts.
- */
-set_contact const& state::contacts() const throw () {
-  return (_contacts);
-}
-
-/**
- *  Get all engine contacts.
- *
- *  @return All engine contacts.
- */
-set_contact& state::contacts() throw () {
-  return (_contacts);
-}
-
-/**
- *  Find a contact by its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-set_contact::const_iterator state::contacts_find(
-                                     contact::key_type const& k) const {
-  shared_ptr<configuration::contact>
-    below_searched(new configuration::contact(k));
-  set_contact::const_iterator
-    it(_contacts.upper_bound(below_searched));
-  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
-    return (it);
-  else if ((it != _contacts.begin())
-           && ((*--it)->contact_name() == k))
-    return (it);
-  return (_contacts.end());
-}
-
-/**
- *  Find a contact by its key.
- *
- *  @param[in] k Contact name.
- *
- *  @return Iterator to the element if found, contacts().end()
- *          otherwise.
- */
-set_contact::iterator state::contacts_find(
-                               contact::key_type const& k) {
-  shared_ptr<configuration::contact>
-    below_searched(new configuration::contact(k));
-  set_contact::iterator
-    it(_contacts.upper_bound(below_searched));
-  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
-    return (it);
-  else if ((it != _contacts.begin())
-           && ((*--it)->contact_name() == k))
-    return (it);
-  return (_contacts.end());
-}
-
-/**
- *  Find a contact group by its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-set_contactgroup::const_iterator state::contactgroups_find(
-                                contactgroup::key_type const& k) const {
-  shared_ptr<configuration::contactgroup>
-    below_searched(new configuration::contactgroup(k));
-  set_contactgroup::const_iterator
-    it(_contactgroups.upper_bound(below_searched));
-  if ((it != _contactgroups.end()) && ((*it)->contactgroup_name() == k))
-    return (it);
-  else if ((it != _contactgroups.begin())
-           && ((*--it)->contactgroup_name() == k))
-    return (it);
-  return (_contactgroups.end());
-}
-
-/**
- *  Find a contact group by its key.
- *
- *  @param[in] k Contact group key.
- *
- *  @return Iterator to the element if found, contactgroups().end()
- *          otherwise.
- */
-set_contactgroup::iterator state::contactgroups_find(
-                                 contactgroup::key_type const& k) {
-  shared_ptr<configuration::contactgroup>
-    below_searched(new configuration::contactgroup(k));
-  set_contactgroup::iterator it(_contactgroups.upper_bound(below_searched));
-  if ((it != _contactgroups.end()) && ((*it)->contactgroup_name() == k))
-    return (it);
-  else if ((it != _contactgroups.begin())
-           && ((*--it)->contactgroup_name() == k))
-    return (it);
-  return (_contactgroups.end());
-}
-
-/**
- *  Get all engine contactgroups.
- *
- *  @return All engine contactgroups.
- */
-set_contactgroup const& state::contactgroups() const throw () {
-  return (_contactgroups);
-}
-
-/**
- *  Get all engine contactgroups.
- *
- *  @return All engine contactgroups.
- */
-set_contactgroup& state::contactgroups() throw () {
-  return (_contactgroups);
-}
-
-/**
  *  Get date_format value.
  *
  *  @return The date_format value.
@@ -1356,15 +1202,6 @@ void state::debug_verbosity(unsigned int value) {
 }
 
 /**
- *  Get the downtime set.
- *
- *  @return Downtime set.
- */
-std::set<shared_ptr<downtime> >& state::downtimes() throw() {
-   return (_downtimes);
-}
-
-/**
  *  Get enable_event_handlers value.
  *
  *  @return The enable_event_handlers value.
@@ -1398,24 +1235,6 @@ bool state::enable_flap_detection() const throw () {
  */
 void state::enable_flap_detection(bool value) {
   _enable_flap_detection = value;
-}
-
-/**
- *  Get enable_notifications value.
- *
- *  @return The enable_notifications value.
- */
-bool state::enable_notifications() const throw () {
-  return (_enable_notifications);
-}
-
-/**
- *  Set enable_notifications value.
- *
- *  @param[in] value The new enable_notifications value.
- */
-void state::enable_notifications(bool value) {
-  _enable_notifications = value;
 }
 
 /**
@@ -1643,24 +1462,6 @@ set_hostdependency const& state::hostdependencies() const throw () {
  */
 set_hostdependency& state::hostdependencies() throw () {
   return (_hostdependencies);
-}
-
-/**
- *  Get all engine hostescalations.
- *
- *  @return All engine hostescalations.
- */
-set_hostescalation const& state::hostescalations() const throw () {
-  return (_hostescalations);
-}
-
-/**
- *  Get all engine hostescalations.
- *
- *  @return All engine hostescalations.
- */
-set_hostescalation& state::hostescalations() throw () {
-  return (_hostescalations);
 }
 
 /**
@@ -1992,24 +1793,6 @@ void state::log_initial_states(bool value) {
 }
 
 /**
- *  Get log_notifications value.
- *
- *  @return The log_notifications value.
- */
-bool state::log_notifications() const throw () {
-  return (_log_notifications);
-}
-
-/**
- *  Set log_notifications value.
- *
- *  @param[in] value The new log_notifications value.
- */
-void state::log_notifications(bool value) {
-  _log_notifications = value;
-}
-
-/**
  *  Get log_passive_checks value.
  *
  *  @return The log_passive_checks value.
@@ -2223,26 +2006,6 @@ void state::max_service_check_spread(unsigned int value) {
 }
 
 /**
- *  Get notification_timeout value.
- *
- *  @return The notification_timeout value.
- */
-unsigned int state::notification_timeout() const throw () {
-  return (_notification_timeout);
-}
-
-/**
- *  Set notification_timeout value.
- *
- *  @param[in] value The new notification_timeout value.
- */
-void state::notification_timeout(unsigned int value) {
-  if (!value)
-    throw (engine_error() << "notification_timeout cannot be 0");
-  _notification_timeout = value;
-}
-
-/**
  *  Get object_cache_file value.
  *
  *  @return The object_cache_file value.
@@ -2428,42 +2191,6 @@ void state::resource_file(std::list<std::string> const& value) {
 }
 
 /**
- *  Get retained_contact_host_attribute_mask value.
- *
- *  @return The retained_contact_host_attribute_mask value.
- */
-unsigned long state::retained_contact_host_attribute_mask() const throw () {
-  return (_retained_contact_host_attribute_mask);
-}
-
-/**
- *  Set retained_contact_host_attribute_mask value.
- *
- *  @param[in] value The new retained_contact_host_attribute_mask value.
- */
-void state::retained_contact_host_attribute_mask(unsigned long value) {
-  _retained_contact_host_attribute_mask = value;
-}
-
-/**
- *  Get retained_contact_service_attribute_mask value.
- *
- *  @return The retained_contact_service_attribute_mask value.
- */
-unsigned long state::retained_contact_service_attribute_mask() const throw () {
-  return (_retained_contact_service_attribute_mask);
-}
-
-/**
- *  Set retained_contact_service_attribute_mask value.
- *
- *  @param[in] value The new retained_contact_service_attribute_mask value.
- */
-void state::retained_contact_service_attribute_mask(unsigned long value) {
-  _retained_contact_service_attribute_mask = value;
-}
-
-/**
  *  Get retained_host_attribute_mask value.
  *
  *  @return The retained_host_attribute_mask value.
@@ -2574,24 +2301,6 @@ set_servicedependency const& state::servicedependencies() const throw () {
  */
 set_servicedependency& state::servicedependencies() throw () {
   return (_servicedependencies);
-}
-
-/**
- *  Get all engine serviceescalations.
- *
- *  @return All engine serviceescalations.
- */
-set_serviceescalation const& state::serviceescalations() const throw () {
-  return (_serviceescalations);
-}
-
-/**
- *  Get all engine serviceescalations.
- *
- *  @return All engine serviceescalations.
- */
-set_serviceescalation& state::serviceescalations() throw () {
-  return (_serviceescalations);
 }
 
 /**
@@ -3489,6 +3198,19 @@ void state::_set_enable_failure_prediction(bool value) {
 }
 
 /**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_enable_notifications(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: enable_notifications variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Set event_broker_options.
  *
  *  @param[in] value The new event_broker_options value.
@@ -3641,6 +3363,19 @@ void state::_set_log_archive_path(std::string const& value) {
 }
 
 /**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_log_notifications(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: log_notifications variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Unused variable log_rotation_method.
  *
  *  @param[in] value Unused.
@@ -3677,6 +3412,19 @@ void state::_set_nagios_user(std::string const& value) {
 }
 
 /**
+ *  Unused variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_notification_timeout(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: notification_timeout variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Unused variable p1_file.
  *
  *  @param[in] value Unused.
@@ -3710,6 +3458,34 @@ void state::_set_process_performance_data(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: process_performance_data variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_retained_contact_host_attribute_mask(
+              unsigned long value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retained_contact_host_attribute_mask variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_retained_contact_service_attribute_mask(
+              unsigned long value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retained_contact_service_attribute_mask variable ignored";
   ++config_warnings;
   return ;
 }

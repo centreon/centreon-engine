@@ -24,8 +24,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/host.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
@@ -68,16 +66,6 @@ bool operator==(
           && obj1.max_attempts == obj2.max_attempts
           && obj1.check_timeout == obj2.check_timeout
           && is_equal(obj1.event_handler, obj2.event_handler)
-          && is_equal(obj1.contact_groups, obj2.contact_groups)
-          && is_equal(obj1.contacts, obj2.contacts)
-          && obj1.notification_interval == obj2.notification_interval
-          && obj1.first_notification_delay == obj2.first_notification_delay
-          && obj1.notify_on_down == obj2.notify_on_down
-          && obj1.notify_on_unreachable == obj2.notify_on_unreachable
-          && obj1.notify_on_recovery == obj2.notify_on_recovery
-          && obj1.notify_on_flapping == obj2.notify_on_flapping
-          && obj1.notify_on_downtime == obj2.notify_on_downtime
-          && is_equal(obj1.notification_period, obj2.notification_period)
           && is_equal(obj1.check_period, obj2.check_period)
           && obj1.flap_detection_enabled == obj2.flap_detection_enabled
           && obj1.low_flap_threshold == obj2.low_flap_threshold
@@ -98,8 +86,6 @@ bool operator==(
           && obj1.obsess_over_host == obj2.obsess_over_host
           && obj1.should_be_drawn == obj2.should_be_drawn
           && is_equal(obj1.custom_variables, obj2.custom_variables)
-          && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
-          && obj1.acknowledgement_type == obj2.acknowledgement_type
           && obj1.check_type == obj2.check_type
           && obj1.current_state == obj2.current_state
           && obj1.last_state == obj2.last_state
@@ -117,9 +103,6 @@ bool operator==(
           && obj1.execution_time == obj2.execution_time
           && obj1.is_executing == obj2.is_executing
           && obj1.check_options == obj2.check_options
-          && obj1.notifications_enabled == obj2.notifications_enabled
-          && obj1.last_host_notification == obj2.last_host_notification
-          && obj1.next_host_notification == obj2.next_host_notification
           && obj1.next_check == obj2.next_check
           && obj1.should_be_scheduled == obj2.should_be_scheduled
           && obj1.last_check == obj2.last_check
@@ -130,19 +113,10 @@ bool operator==(
           && obj1.last_time_unreachable == obj2.last_time_unreachable
           && obj1.has_been_checked == obj2.has_been_checked
           && obj1.is_being_freshened == obj2.is_being_freshened
-          && obj1.notified_on_down == obj2.notified_on_down
-          && obj1.notified_on_unreachable == obj2.notified_on_unreachable
-          && obj1.current_notification_number == obj2.current_notification_number
-          && obj1.no_more_notifications == obj2.no_more_notifications
-          && obj1.current_notification_id == obj2.current_notification_id
-          && obj1.check_flapping_recovery_notification == obj2.check_flapping_recovery_notification
-          && obj1.scheduled_downtime_depth == obj2.scheduled_downtime_depth
-          && obj1.pending_flex_downtime == obj2.pending_flex_downtime
           && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
           && obj1.state_history_index == obj2.state_history_index
           && obj1.last_state_history_update == obj2.last_state_history_update
           && obj1.is_flapping == obj2.is_flapping
-          && obj1.flapping_comment_id == obj2.flapping_comment_id
           && obj1.percent_state_change == obj2.percent_state_change
           && obj1.total_services == obj2.total_services
           && obj1.total_service_check_interval == obj2.total_service_check_interval
@@ -184,9 +158,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   char const* chk_period_str(NULL);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* notif_period_str(NULL);
-  if (obj.notification_period_ptr)
-    notif_period_str = chkstr(obj.notification_period_ptr->name);
   char const* hstgrp_str(NULL);
   if (obj.hostgroups_ptr)
     hstgrp_str = chkstr(static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr)->group_name);
@@ -206,16 +177,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  check_timeout                         " << obj.check_timeout << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
-    "  contact_groups:                       " << chkobj(obj.contact_groups) << "\n"
-    "  contacts:                             " << chkobj(obj.contacts) << "\n"
-    "  notification_interval:                " << obj.notification_interval << "\n"
-    "  first_notification_delay:             " << obj.first_notification_delay << "\n"
-    "  notify_on_down:                       " << obj.notify_on_down << "\n"
-    "  notify_on_unreachable:                " << obj.notify_on_unreachable << "\n"
-    "  notify_on_recovery:                   " << obj.notify_on_recovery << "\n"
-    "  notify_on_flapping:                   " << obj.notify_on_flapping << "\n"
-    "  notify_on_downtime:                   " << obj.notify_on_downtime << "\n"
-    "  notification_period:                  " << chkstr(obj.notification_period) << "\n"
     "  check_period:                         " << chkstr(obj.check_period) << "\n"
     "  flap_detection_enabled:               " << obj.flap_detection_enabled << "\n"
     "  low_flap_threshold:                   " << obj.low_flap_threshold << "\n"
@@ -235,8 +196,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
     "  obsess_over_host:                     " << obj.obsess_over_host << "\n"
     "  should_be_drawn:                      " << obj.should_be_drawn << "\n"
-    "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
-    "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  check_type:                           " << obj.check_type << "\n"
     "  current_state:                        " << obj.current_state << "\n"
     "  last_state:                           " << obj.last_state << "\n"
@@ -254,9 +213,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  execution_time:                       " << obj.execution_time << "\n"
     "  is_executing:                         " << obj.is_executing << "\n"
     "  check_options:                        " << obj.check_options << "\n"
-    "  notifications_enabled:                " << obj.notifications_enabled << "\n"
-    "  last_host_notification:               " << string::ctime(obj.last_host_notification) << "\n"
-    "  next_host_notification:               " << string::ctime(obj.next_host_notification) << "\n"
     "  next_check:                           " << string::ctime(obj.next_check) << "\n"
     "  should_be_scheduled:                  " << obj.should_be_scheduled << "\n"
     "  last_check:                           " << string::ctime(obj.last_check) << "\n"
@@ -267,14 +223,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  last_time_unreachable:                " << string::ctime(obj.last_time_unreachable) << "\n"
     "  has_been_checked:                     " << obj.has_been_checked << "\n"
     "  is_being_freshened:                   " << obj.is_being_freshened << "\n"
-    "  notified_on_down:                     " << obj.notified_on_down << "\n"
-    "  notified_on_unreachable:              " << obj.notified_on_unreachable << "\n"
-    "  current_notification_number:          " << obj.current_notification_number << "\n"
-    "  no_more_notifications:                " << obj.no_more_notifications << "\n"
-    "  current_notification_id:              " << obj.current_notification_id << "\n"
-    "  check_flapping_recovery_notification: " << obj.check_flapping_recovery_notification << "\n"
-    "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
     "  timezone:                             " << chkstr(obj.timezone) << "\n";
 
   os << "  state_history:                        ";
@@ -287,7 +235,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  state_history_index:                  " << obj.state_history_index << "\n"
     "  last_state_history_update:            " << string::ctime(obj.last_state_history_update) << "\n"
     "  is_flapping:                          " << obj.is_flapping << "\n"
-    "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  total_services:                       " << obj.total_services << "\n"
     "  total_service_check_interval:         " << obj.total_service_check_interval << "\n"
@@ -297,7 +244,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
-    "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
     "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n"
     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
     << "}\n";
@@ -317,21 +263,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] retry_interval                Retry check interval.
  *  @param[in] max_attempts                  Max check attempts.
  *  @param[in] check_timeout                 The check timeout.
- *  @param[in] notify_up                     Does this host notify when
- *                                           up ?
- *  @param[in] notify_down                   Does this host notify when
- *                                           down ?
- *  @param[in] notify_unreachable            Does this host notify when
- *                                           unreachable ?
- *  @param[in] notify_flapping               Does this host notify for
- *                                           flapping ?
- *  @param[in] notify_downtime               Does this host notify for
- *                                           downtimes ?
- *  @param[in] notification_interval         Notification interval.
- *  @param[in] first_notification_delay      First notification delay.
- *  @param[in] notification_period           Notification period.
- *  @param[in] notifications_enabled         Whether notifications are
- *                                           enabled for this host.
  *  @param[in] check_command                 Active check command name.
  *  @param[in] checks_enabled                Are active checks enabled ?
  *  @param[in] accept_passive_checks         Can we submit passive check
@@ -379,15 +310,6 @@ host* add_host(
         double retry_interval,
         int max_attempts,
         unsigned int check_timeout,
-        int notify_up,
-        int notify_down,
-        int notify_unreachable,
-        int notify_flapping,
-        int notify_downtime,
-        double notification_interval,
-        double first_notification_delay,
-        char const* notification_period,
-        int notifications_enabled,
         char const* check_command,
         int checks_enabled,
         int accept_passive_checks,
@@ -427,18 +349,6 @@ host* add_host(
       << name << "'";
     return (NULL);
   }
-  if (notification_interval < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid notification_interval value for host '"
-      << name << "'";
-    return (NULL);
-  }
-  if (first_notification_delay < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid first_notification_delay value for host '"
-      << name << "'";
-    return (NULL);
-  }
   if (freshness_threshold < 0) {
     logger(log_config_error, basic)
       << "Error: Invalid freshness_threshold value for host '"
@@ -470,14 +380,11 @@ host* add_host(
       obj->event_handler = string::dup(event_handler);
     if (check_command)
       obj->host_check_command = string::dup(check_command);
-    if (notification_period)
-      obj->notification_period = string::dup(notification_period);
     if (timezone)
       obj->timezone = string::dup(timezone);
 
     // Duplicate non-string vars.
     obj->accept_passive_host_checks = (accept_passive_checks > 0);
-    obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_freshness = (check_freshness > 0);
     obj->check_interval = check_interval;
     obj->check_options = CHECK_OPTION_NONE;
@@ -487,7 +394,6 @@ host* add_host(
     obj->current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_down = (flap_detection_on_down > 0);
     obj->flap_detection_on_unreachable = (flap_detection_on_unreachable > 0);
@@ -500,13 +406,6 @@ host* add_host(
     obj->low_flap_threshold = low_flap_threshold;
     obj->max_attempts = max_attempts;
     obj->modified_attributes = MODATTR_NONE;
-    obj->notification_interval = notification_interval;
-    obj->notifications_enabled = (notifications_enabled > 0);
-    obj->notify_on_down = (notify_down > 0);
-    obj->notify_on_downtime = (notify_downtime > 0);
-    obj->notify_on_flapping = (notify_flapping > 0);
-    obj->notify_on_recovery = (notify_up > 0);
-    obj->notify_on_unreachable = (notify_unreachable > 0);
     obj->obsess_over_host = (obsess_over_host > 0);
     obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
     obj->retain_status_information = (retain_status_information > 0);
@@ -556,75 +455,6 @@ host* add_host(
  */
 int get_host_count() {
   return (state::instance().hosts().size());
-}
-
-/**
- *  Tests whether a contact is a contact for a particular host.
- *
- *  @param[in] hst   Target host.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_contact_for_host(host* hst, contact* cntct) {
-  if (!hst || !cntct)
-    return (false);
-
-  // Search all individual contacts of this host.
-  for (contactsmember* member(hst->contacts);
-       member;
-       member = member->next)
-    if (member->contact_ptr == cntct)
-      return (true);
-
-  // Search all contactgroups of this host.
-  for (contactgroupsmember* member(hst->contact_groups);
-       member;
-       member = member->next)
-    if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-      return (true);
-
-  return (false);
-}
-
-/**
- *  Tests whether or not a contact is an escalated contact for a
- *  particular host.
- *
- *  @param[in] hst   Target host.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_escalated_contact_for_host(host* hst, contact* cntct) {
-  if (!hst || !cntct)
-    return (false);
-
-  std::string id(hst->name);
-  umultimap<std::string, shared_ptr<hostescalation> > const&
-    escalations(state::instance().hostescalations());
-
-  for (umultimap<std::string, shared_ptr<hostescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-         it != end && it->first == id;
-       ++it) {
-    hostescalation* hstescalation(&*it->second);
-    // Search all contacts of this host escalation.
-    for (contactsmember* member(hstescalation->contacts);
-         member;
-         member = member->next)
-      if (member->contact_ptr == cntct)
-        return (true);
-
-    // Search all contactgroups of this host escalation.
-    for (contactgroupsmember* member(hstescalation->contact_groups);
-         member;
-         member = member->next)
-      if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-        return (true);
-  }
-
-  return (false);
 }
 
 /**

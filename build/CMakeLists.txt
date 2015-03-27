@@ -639,7 +639,6 @@ set(
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/macros.cc"
   "${SRC_DIR}/nebmods.cc"
-  "${SRC_DIR}/notifications.cc"
   "${SRC_DIR}/sehandlers.cc"
   "${SRC_DIR}/shared.cc"
   "${SRC_DIR}/statusdata.cc"
@@ -648,8 +647,6 @@ set(
   "${SRC_DIR}/timezone_locker.cc"
   "${SRC_DIR}/timezone_manager.cc"
   "${SRC_DIR}/utils.cc"
-  "${SRC_DIR}/xcddefault.cc"
-  "${SRC_DIR}/xdddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
 
   # Headers.
@@ -669,7 +666,6 @@ set(
   "${INC_DIR}/com/centreon/engine/nebmods.hh"
   "${INC_DIR}/com/centreon/engine/nebmodules.hh"
   "${INC_DIR}/com/centreon/engine/nebstructs.hh"
-  "${INC_DIR}/com/centreon/engine/notifications.hh"
   "${INC_DIR}/com/centreon/engine/opt.hh"
   "${INC_DIR}/com/centreon/engine/sehandlers.hh"
   "${INC_DIR}/com/centreon/engine/shared.hh"
@@ -680,8 +676,6 @@ set(
   "${INC_DIR}/com/centreon/engine/timezone_manager.hh"
   "${INC_DIR}/com/centreon/engine/utils.hh"
   "${INC_DIR}/com/centreon/engine/version.hh"
-  "${INC_DIR}/com/centreon/engine/xcddefault.hh"
-  "${INC_DIR}/com/centreon/engine/xdddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
 

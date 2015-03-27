@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,31 +20,16 @@
 #ifndef CCE_OBJECTS_COMMANDSMEMBER_HH
 #  define CCE_OBJECTS_COMMANDSMEMBER_HH
 
+#  include <ostream>
+
 /* Forward declaration. */
 struct command_struct;
-struct contact_struct;
 
 typedef struct                  commandsmember_struct {
   char*                         cmd;
   command_struct*               command_ptr;
   struct commandsmember_struct* next;
 }                               commandsmember;
-
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* C++ */
-
-commandsmember* add_host_notification_command_to_contact(
-                  contact_struct* cntct,
-                  char const* command_name);
-commandsmember* add_service_notification_command_to_contact(
-                  contact_struct* cntct,
-                  char const* command_name);
-
-#  ifdef __cplusplus
-}
-
-#    include <ostream>
 
 bool          operator==(
                 commandsmember const& obj1,
@@ -54,8 +39,4 @@ bool          operator!=(
                 commandsmember const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, commandsmember const& obj);
 
-#  endif /* C++ */
-
 #endif // !CCE_OBJECTS_COMMANDSMEMBER_HH
-
-

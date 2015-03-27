@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -48,24 +48,9 @@ set(TEST_NAME "parse_and_copy_configuration_command")
 set(TEST_CONF_FILE "command.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_copy_configuration_contactgroup
-set(TEST_NAME "parse_and_copy_configuration_contactgroup")
-set(TEST_CONF_FILE "contactgroup.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_copy_configuration_contact
-set(TEST_NAME "parse_and_copy_configuration_contact")
-set(TEST_CONF_FILE "contact.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_copy_configuration_hostdependency
 set(TEST_NAME "parse_and_copy_configuration_hostdependency")
 set(TEST_CONF_FILE "hostdependency.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_copy_configuration_hostescalation
-set(TEST_NAME "parse_and_copy_configuration_hostescalation")
-set(TEST_CONF_FILE "hostescalation.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_hostgroup
@@ -83,11 +68,6 @@ set(TEST_NAME "parse_and_copy_configuration_servicedependency")
 set(TEST_CONF_FILE "servicedependency.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_copy_configuration_serviceescalation
-set(TEST_NAME "parse_and_copy_configuration_serviceescalation")
-set(TEST_CONF_FILE "serviceescalation.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_copy_configuration_servicegroup
 set(TEST_NAME "parse_and_copy_configuration_servicegroup")
 set(TEST_CONF_FILE "servicegroup.cfg")
@@ -101,9 +81,4 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 # parse_and_copy_configuration_timeperiod
 set(TEST_NAME "parse_and_copy_configuration_timeperiod")
 set(TEST_CONF_FILE "timeperiod.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_copy_configuration_downtime
-set(TEST_NAME "parse_and_copy_configuration_downtime")
-set(TEST_CONF_FILE "downtime.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")

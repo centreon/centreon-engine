@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2014 Merethis
+** Copyright 2012-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,7 +21,6 @@
 #include <time.h>
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/events/timed_event.hh"
-#include "downtime.h"
 #include "nagios.h"
 #include "nebstructs.h"
 
@@ -53,8 +52,6 @@ extern "C" {
   extern int check_service_freshness;
   extern command* command_list;
   extern char* config_file;
-  extern contact* contact_list;
-  extern contactgroup* contactgroup_list;
   extern int currently_running_host_checks;
   extern int currently_running_service_checks;
   extern int enable_event_handlers;
@@ -72,7 +69,6 @@ extern "C" {
   extern unsigned int host_check_timeout;
   extern host* host_list;
   extern hostdependency* hostdependency_list;
-  extern hostescalation* hostescalation_list;
   extern hostgroup* hostgroup_list;
   extern int interval_length;
   extern time_t last_command_check;
@@ -87,7 +83,6 @@ extern "C" {
   extern int service_check_timeout;
   extern service* service_list;
   extern servicedependency* servicedependency_list;
-  extern serviceescalation* serviceescalation_list;
   extern servicegroup* servicegroup_list;
   extern int submit_external_command(char const* cmd, int* buffer_items);
   extern timeperiod* timeperiod_list;
@@ -105,10 +100,10 @@ extern "C" {
       << event_list_high << "\n"
       << "event_list_high_tail: "
       << event_list_high << "\n"
-      << "find_host_comment: "
-      << (void (*)())find_host_comment << "\n"
-      << "find_service_comment: "
-      << (void (*)())find_service_comment << "\n"
+      // << "find_host_comment: "
+      // << (void (*)())find_host_comment << "\n"
+      // << "find_service_comment: "
+      // << (void (*)())find_service_comment << "\n"
       << "get_program_version: "
       << (void (*)())get_program_version << "\n"
       << "host_list: "
@@ -144,18 +139,18 @@ extern "C" {
       << command_list << "\n"
       << "config_file: "
       << config_file << "\n"
-      << "contact_list: "
-      << contact_list << "\n"
-      << "contactgroup_list: "
-      << contactgroup_list << "\n"
+      // << "contact_list: "
+      // << contact_list << "\n"
+      // << "contactgroup_list: "
+      // << contactgroup_list << "\n"
       << "find_command: "
       << (void (*)())find_command << "\n"
-      << "find_downtime: "
-      << (void (*)())find_downtime << "\n"
-      << "find_host_comment: "
-      << (void (*)())find_host_comment << "\n"
-      << "find_service_comment: "
-      << (void (*)())find_service_comment << "\n"
+      // << "find_downtime: "
+      // << (void (*)())find_downtime << "\n"
+      // << "find_host_comment: "
+      // << (void (*)())find_host_comment << "\n"
+      // << "find_service_comment: "
+      // << (void (*)())find_service_comment << "\n"
       << "get_program_modification_date: "
       << (void (*)())get_program_modification_date << "\n"
       << "get_program_version: "
@@ -170,8 +165,8 @@ extern "C" {
       << host_list << "\n"
       << "hostdependency_list: "
       << hostdependency_list << "\n"
-      << "hostescalation_list: "
-      << hostescalation_list << "\n"
+      // << "hostescalation_list: "
+      // << hostescalation_list << "\n"
       << "hostgroup_list: "
       << hostgroup_list << "\n"
       << "my_system: "
@@ -190,8 +185,8 @@ extern "C" {
       << service_list << "\n"
       << "servicedependency_list: "
       << servicedependency_list << "\n"
-      << "serviceescalation_list: "
-      << serviceescalation_list << "\n"
+      // << "serviceescalation_list: "
+      // << serviceescalation_list << "\n"
       << "servicegroup_list: "
       << servicegroup_list << "\n"
       << "strip: "
