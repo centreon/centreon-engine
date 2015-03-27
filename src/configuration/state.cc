@@ -116,7 +116,6 @@ state::setters const state::_setters[] = {
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
-  { "use_check_result_path",                       SETTER(bool, use_check_result_path) },
   { "use_retained_program_state",                  SETTER(bool, use_retained_program_state) },
   { "use_retained_scheduling_info",                SETTER(bool, use_retained_scheduling_info) },
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
@@ -156,7 +155,7 @@ state::setters const state::_setters[] = {
   { "log_archive_path",                            SETTER(std::string const&, _set_log_archive_path) },
   { "log_notifications",                           SETTER(bool, _set_log_notifications) },
   { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
-  { "max_check_result_file_age",                   SETTER(unsigned long, max_check_result_file_age) },
+  { "max_check_result_file_age",                   SETTER(unsigned long, _set_max_check_result_file_age) },
   { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
   { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
   { "notification_timeout",                        SETTER(unsigned int, _set_notification_timeout) },
@@ -177,6 +176,7 @@ state::setters const state::_setters[] = {
   { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
   { "use_aggressive_host_checking",                SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_agressive_host_checking",                 SETTER(bool, _set_use_aggressive_host_checking) },
+  { "use_check_result_path",                       SETTER(bool, _set_use_check_result_path) },
   { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
   { "use_large_installation_tweaks",               SETTER(bool, _set_use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, _set_use_regexp_matching) },
@@ -195,7 +195,6 @@ static unsigned long const             default_cached_host_check_horizon(15);
 static unsigned long const             default_cached_service_check_horizon(15);
 static bool const                      default_check_host_freshness(false);
 static unsigned int const              default_check_reaper_interval(10);
-static std::string const               default_check_result_path(DEFAULT_CHECK_RESULT_PATH);
 static bool const                      default_check_service_freshness(true);
 static int const                       default_command_check_interval(-1);
 static std::string const               default_command_file(DEFAULT_COMMAND_FILE);
@@ -232,7 +231,6 @@ static bool const                      default_log_service_retries(false);
 static float const                     default_low_host_flap_threshold(20.0);
 static float const                     default_low_service_flap_threshold(20.0);
 static unsigned int const              default_max_check_reaper_time(30);
-static unsigned long const             default_max_check_result_file_age(3600);
 static unsigned long const             default_max_debug_file_size(1000000);
 static unsigned int const              default_max_host_check_spread(30);
 static unsigned long const             default_max_log_file_size(0);
@@ -263,7 +261,6 @@ static std::string const               default_status_file(DEFAULT_STATUS_FILE);
 static unsigned int const              default_status_update_interval(60);
 static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
-static bool const                      default_use_check_result_path(false);
 static bool const                      default_use_retained_program_state(true);
 static bool const                      default_use_retained_scheduling_info(false);
 static bool const                      default_use_setpgid(true);
@@ -306,7 +303,6 @@ state::state()
     _cached_service_check_horizon(default_cached_service_check_horizon),
     _check_host_freshness(default_check_host_freshness),
     _check_reaper_interval(default_check_reaper_interval),
-    _check_result_path(default_check_result_path),
     _check_service_freshness(default_check_service_freshness),
     _command_check_interval(default_command_check_interval),
     _command_check_interval_is_seconds(false),
@@ -344,7 +340,6 @@ state::state()
     _low_host_flap_threshold(default_low_host_flap_threshold),
     _low_service_flap_threshold(default_low_service_flap_threshold),
     _max_check_reaper_time(default_max_check_reaper_time),
-    _max_check_result_file_age(default_max_check_result_file_age),
     _max_debug_file_size(default_max_debug_file_size),
     _max_host_check_spread(default_max_host_check_spread),
     _max_log_file_size(default_max_log_file_size),
@@ -375,7 +370,6 @@ state::state()
     _status_update_interval(default_status_update_interval),
     _time_change_threshold(default_time_change_threshold),
     _translate_passive_host_checks(default_translate_passive_host_checks),
-    _use_check_result_path(default_use_check_result_path),
     _use_retained_program_state(default_use_retained_program_state),
     _use_retained_scheduling_info(default_use_retained_scheduling_info),
     _use_setpgid(default_use_setpgid),
@@ -416,7 +410,6 @@ state& state::operator=(state const& right) {
     _cached_service_check_horizon = right._cached_service_check_horizon;
     _check_host_freshness = right._check_host_freshness;
     _check_reaper_interval = right._check_reaper_interval;
-    _check_result_path = right._check_result_path;
     _check_service_freshness = right._check_service_freshness;
     _commands = right._commands;
     _command_check_interval = right._command_check_interval;
@@ -459,7 +452,6 @@ state& state::operator=(state const& right) {
     _low_host_flap_threshold = right._low_host_flap_threshold;
     _low_service_flap_threshold = right._low_service_flap_threshold;
     _max_check_reaper_time = right._max_check_reaper_time;
-    _max_check_result_file_age = right._max_check_result_file_age;
     _max_debug_file_size = right._max_debug_file_size;
     _max_host_check_spread = right._max_host_check_spread;
     _max_log_file_size = right._max_log_file_size;
@@ -495,7 +487,6 @@ state& state::operator=(state const& right) {
     _time_change_threshold = right._time_change_threshold;
     _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
-    _use_check_result_path = right._use_check_result_path;
     _use_retained_program_state = right._use_retained_program_state;
     _use_retained_scheduling_info = right._use_retained_scheduling_info;
     _use_setpgid = right._use_setpgid;
@@ -522,7 +513,6 @@ bool state::operator==(state const& right) const throw () {
           && _cached_service_check_horizon == right._cached_service_check_horizon
           && _check_host_freshness == right._check_host_freshness
           && _check_reaper_interval == right._check_reaper_interval
-          && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
           && cmp_set_ptr(_commands, right._commands)
           && _command_check_interval == right._command_check_interval
@@ -565,7 +555,6 @@ bool state::operator==(state const& right) const throw () {
           && _low_host_flap_threshold == right._low_host_flap_threshold
           && _low_service_flap_threshold == right._low_service_flap_threshold
           && _max_check_reaper_time == right._max_check_reaper_time
-          && _max_check_result_file_age == right._max_check_result_file_age
           && _max_debug_file_size == right._max_debug_file_size
           && _max_host_check_spread == right._max_host_check_spread
           && _max_log_file_size == right._max_log_file_size
@@ -601,7 +590,6 @@ bool state::operator==(state const& right) const throw () {
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
-          && _use_check_result_path == right._use_check_result_path
           && _use_retained_program_state == right._use_retained_program_state
           && _use_retained_scheduling_info == right._use_retained_scheduling_info
           && _use_setpgid == right._use_setpgid
@@ -847,27 +835,6 @@ void state::check_reaper_interval(unsigned int value) {
   if (!value)
     throw (engine_error() << "check_reaper_interval cannot be 0");
   _check_reaper_interval = value;
-}
-
-/**
- *  Get check_result_path value.
- *
- *  @return The check_result_path value.
- */
-std::string const& state::check_result_path() const throw () {
-  return (_check_result_path);
-}
-
-/**
- *  Set check_result_path value.
- *
- *  @param[in] value The new check_result_path value.
- */
-void state::check_result_path(std::string const& value) {
-  logger(log_config_warning, basic)
-    << "Warning: check_result_path is deprecated";
-  _check_result_path = value;
-  ++config_warnings;
 }
 
 /**
@@ -1847,27 +1814,6 @@ void state::max_check_reaper_time(unsigned int value) {
 }
 
 /**
- *  Get max_check_result_file_age value.
- *
- *  @return The max_check_result_file_age value.
- */
-unsigned long state::max_check_result_file_age() const throw () {
-  return (_max_check_result_file_age);
-}
-
-/**
- *  Set max_check_result_file_age value.
- *
- *  @param[in] value The new max_check_result_file_age value.
- */
-void state::max_check_result_file_age(unsigned long value) {
-  logger(log_config_warning, basic)
-    << "Warning: max_check_result_file_age is deprecated";
-  _max_check_result_file_age = value;
-  ++config_warnings;
-}
-
-/**
  *  Get max_debug_file_size value.
  *
  *  @return The max_debug_file_size value.
@@ -2752,24 +2698,6 @@ void state::user(unsigned int key, std::string const& value) {
 }
 
 /**
- *  Get use_check_result_path value.
- *
- *  @return The use_check_result_path value.
- */
-bool state::use_check_result_path() const throw () {
-  return (_use_check_result_path);
-}
-
-/**
- *  Set use_check_result_path value.
- *
- *  @param[in] value The new use_check_result_path value.
- */
-void state::use_check_result_path(bool value) {
-  _use_check_result_path = value;
-}
-
-/**
  *  Get use_retained_program_state value.
  *
  *  @return The use_retained_program_state value.
@@ -3052,12 +2980,16 @@ void state::_set_check_for_updates(std::string const& value) {
 }
 
 /**
- *  Set check_result_path value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new check_result_path value.
+ *  @param[in] value  Unused.
  */
 void state::_set_check_result_path(std::string const& value) {
-  _check_result_path = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: check_result_path variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
@@ -3370,6 +3302,19 @@ void state::_set_log_rotation_method(std::string const& value) {
 }
 
 /**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_max_check_result_file_age(unsigned long value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: max_check_result_file_age variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Unused variable nagios_group.
  *
  *  @param[in] value Unused.
@@ -3669,6 +3614,19 @@ void state::_set_use_aggressive_host_checking(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: use_aggressive_host_checking variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_check_result_path(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_check_result_path variable ignored";
   ++config_warnings;
   return ;
 }

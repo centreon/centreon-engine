@@ -40,7 +40,6 @@ char const*         sigs[] = {
 };
 
 FILE*               debug_file_fp(NULL);
-char*               check_result_path(NULL);
 char*               command_file(NULL);
 char*               config_file(NULL);
 char*               debug_file(NULL);
@@ -185,7 +184,6 @@ unsigned long       logging_options(
                       | logging::log_service_unknown
                       | logging::log_service_critical
                       | logging::log_info_message);
-unsigned long       max_check_result_file_age(3600);
 unsigned long       max_debug_file_size(1000000);
 unsigned long       modified_host_process_attributes(MODATTR_NONE);
 unsigned long       modified_service_process_attributes(MODATTR_NONE);

@@ -114,8 +114,6 @@ namespace               configuration {
     void                check_host_freshness(bool value);
     unsigned int        check_reaper_interval() const throw ();
     void                check_reaper_interval(unsigned int value);
-    std::string const&  check_result_path() const throw ();
-    void                check_result_path(std::string const& value);
     bool                check_service_freshness() const throw ();
     void                check_service_freshness(bool value);
     set_command const&  commands() const throw ();
@@ -218,8 +216,6 @@ namespace               configuration {
     void                low_service_flap_threshold(float value);
     unsigned int        max_check_reaper_time() const throw ();
     void                max_check_reaper_time(unsigned int value);
-    unsigned long       max_check_result_file_age() const throw ();
-    void                max_check_result_file_age(unsigned long value);
     unsigned long       max_debug_file_size() const throw ();
     void                max_debug_file_size(unsigned long value);
     unsigned int        max_host_check_spread() const throw ();
@@ -313,8 +309,6 @@ namespace               configuration {
     void                user(std::vector<std::string> const& value);
     void                user(std::string const& key, std::string const& value);
     void                user(unsigned int key, std::string const& value);
-    bool                use_check_result_path() const throw ();
-    void                use_check_result_path(bool value);
     bool                use_retained_program_state() const throw ();
     void                use_retained_program_state(bool value);
     bool                use_retained_scheduling_info() const throw ();
@@ -371,6 +365,7 @@ namespace               configuration {
     void                _set_log_archive_path(std::string const& value);
     void                _set_log_notifications(bool value);
     void                _set_log_rotation_method(std::string const& value);
+    void                _set_max_check_result_file_age(unsigned long value);
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
     void                _set_notification_timeout(unsigned int value);
@@ -393,6 +388,7 @@ namespace               configuration {
     void                _set_temp_file(std::string const& value);
     void                _set_temp_path(std::string const& value);
     void                _set_use_aggressive_host_checking(bool value);
+    void                _set_use_check_result_path(bool value);
     void                _set_use_embedded_perl_implicitly(std::string const& value);
     void                _set_use_large_installation_tweaks(bool value);
     void                _set_use_regexp_matching(bool value);
@@ -447,7 +443,6 @@ namespace               configuration {
     std::string         _cfg_main;
     bool                _check_host_freshness;
     unsigned int        _check_reaper_interval;
-    std::string         _check_result_path;
     bool                _check_service_freshness;
     set_command         _commands;
     int                 _command_check_interval;
@@ -490,7 +485,6 @@ namespace               configuration {
     float               _low_host_flap_threshold;
     float               _low_service_flap_threshold;
     unsigned int        _max_check_reaper_time;
-    unsigned long       _max_check_result_file_age;
     unsigned long       _max_debug_file_size;
     unsigned int        _max_host_check_spread;
     unsigned long       _max_log_file_size;
@@ -532,7 +526,6 @@ namespace               configuration {
     bool                _translate_passive_host_checks;
     std::vector<std::string>
                         _users;
-    bool                _use_check_result_path;
     bool                _use_retained_program_state;
     bool                _use_retained_scheduling_info;
     bool                _use_setpgid;

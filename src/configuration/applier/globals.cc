@@ -32,7 +32,6 @@ static applier::globals* _instance = NULL;
  *  @param[in] config The new configuration.
  */
 void applier::globals::apply(state& config) {
-  _set_global(::check_result_path, config.check_result_path());
   _set_global(::command_file, config.command_file());
   _set_global(::debug_file, config.debug_file());
   _set_global(::global_host_event_handler, config.global_host_event_handler());
@@ -81,7 +80,6 @@ void applier::globals::apply(state& config) {
   ::low_host_flap_threshold = config.low_host_flap_threshold();
   ::low_service_flap_threshold = config.low_service_flap_threshold();
   ::max_check_reaper_time = config.max_check_reaper_time();
-  ::max_check_result_file_age = config.max_check_result_file_age();
   ::max_debug_file_size = config.max_debug_file_size();
   ::max_host_check_spread = config.max_host_check_spread();
   ::max_parallel_service_checks = config.max_parallel_service_checks();
@@ -146,7 +144,6 @@ applier::globals::globals() {
  *  Destructor.
  */
 applier::globals::~globals() throw() {
-  delete[] ::check_result_path;
   delete[] ::command_file;
   delete[] ::debug_file;
   delete[] ::global_host_event_handler;
@@ -158,7 +155,6 @@ applier::globals::~globals() throw() {
   delete[] ::ocsp_command;
   delete[] ::use_timezone;
 
-  ::check_result_path = NULL;
   ::command_file = NULL;
   ::debug_file = NULL;
   ::global_host_event_handler = NULL;

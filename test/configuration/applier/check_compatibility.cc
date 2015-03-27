@@ -78,7 +78,6 @@ struct                global {
   unsigned long       cached_service_check_horizon;
   bool                check_host_freshness;
   unsigned int        check_reaper_interval;
-  std::string         check_result_path;
   bool                check_service_freshness;
   int                 command_check_interval;
   std::string         command_file;
@@ -115,7 +114,6 @@ struct                global {
   float               low_host_flap_threshold;
   float               low_service_flap_threshold;
   unsigned int        max_check_reaper_time;
-  unsigned long       max_check_result_file_age;
   unsigned long       max_debug_file_size;
   unsigned int        max_host_check_spread;
   unsigned int        max_parallel_service_checks;
@@ -267,7 +265,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(cached_service_check_horizon);
   check_value(check_host_freshness);
   check_value(check_reaper_interval);
-  check_value(check_result_path);
   check_value(check_service_freshness);
   check_value(command_check_interval);
   check_value(command_file);
@@ -304,7 +301,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(low_host_flap_threshold);
   check_value(low_service_flap_threshold);
   check_value(max_check_reaper_time);
-  check_value(max_check_result_file_age);
   check_value(max_debug_file_size);
   check_value(max_host_check_spread);
   check_value(max_parallel_service_checks);
@@ -429,7 +425,6 @@ static global get_globals() {
   g.cached_service_check_horizon = cached_service_check_horizon;
   g.check_host_freshness = check_host_freshness;
   g.check_reaper_interval = check_reaper_interval;
-  g.check_result_path = to_str(check_result_path);
   g.check_service_freshness = check_service_freshness;
   g.command_check_interval = command_check_interval;
   g.command_file = to_str(command_file);
@@ -466,7 +461,6 @@ static global get_globals() {
   g.low_host_flap_threshold = low_host_flap_threshold;
   g.low_service_flap_threshold = low_service_flap_threshold;
   g.max_check_reaper_time = max_check_reaper_time;
-  g.max_check_result_file_age = max_check_result_file_age;
   g.max_debug_file_size = max_debug_file_size;
   g.max_host_check_spread = max_host_check_spread;
   g.max_parallel_service_checks = max_parallel_service_checks;
@@ -642,8 +636,6 @@ static bool oldparser_read_config(
             false);
   if (ret == OK)
     ret = pre_flight_check();
-  if (!check_result_path)
-    check_result_path = string::dup(DEFAULT_CHECK_RESULT_PATH);
   if (!command_file)
     command_file = string::dup(DEFAULT_COMMAND_FILE);
   if (!debug_file)

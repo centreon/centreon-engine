@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,12 +27,8 @@ extern "C" {
 #  endif // C++
 
 int add_check_result_to_list(check_result* new_cr);
-int delete_check_result_file(char const* fname);
 int free_check_result_list();
 int init_check_result(check_result* info);
-int move_check_result_to_queue(char const* checkresult_file);
-int process_check_result_queue(char const* dirname);
-int process_check_result_file(char const* fname);
 check_result* read_check_result();
 
 #  ifdef __cplusplus

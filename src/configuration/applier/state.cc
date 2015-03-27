@@ -697,8 +697,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->cfg_main(new_cfg.cfg_main());
   config->check_host_freshness(new_cfg.check_host_freshness());
   config->check_reaper_interval(new_cfg.check_reaper_interval());
-  if (config->check_result_path() != new_cfg.check_result_path())
-    config->check_result_path(new_cfg.check_result_path());
   config->check_service_freshness(new_cfg.check_service_freshness());
   config->command_check_interval(new_cfg.command_check_interval(),
                                  new_cfg.command_check_interval_is_seconds());
@@ -734,8 +732,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->low_host_flap_threshold(new_cfg.low_host_flap_threshold());
   config->low_service_flap_threshold(new_cfg.low_service_flap_threshold());
   config->max_check_reaper_time(new_cfg.max_check_reaper_time());
-  if (config->max_check_result_file_age() != new_cfg.max_check_result_file_age())
-    config->max_check_result_file_age(new_cfg.max_check_result_file_age());
   config->max_debug_file_size(new_cfg.max_debug_file_size());
   config->max_host_check_spread(new_cfg.max_host_check_spread());
   config->max_log_file_size(new_cfg.max_log_file_size());
@@ -767,7 +763,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->status_update_interval(new_cfg.status_update_interval());
   config->time_change_threshold(new_cfg.time_change_threshold());
   config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
-  config->use_check_result_path(new_cfg.use_check_result_path());
   config->use_retained_program_state(new_cfg.use_retained_program_state());
   config->use_retained_scheduling_info(new_cfg.use_retained_scheduling_info());
   config->use_setpgid(new_cfg.use_setpgid());
