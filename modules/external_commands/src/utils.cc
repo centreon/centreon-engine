@@ -33,7 +33,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/string.hh"
-#include "nagios.h"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -41,6 +40,8 @@ using namespace com::centreon::engine::logging;
 static int   command_file_fd = -1;
 static int   command_file_created = false;
 static FILE* command_file_fp = NULL;
+circular_buffer     external_command_buffer;
+pthread_t           worker_threads[TOTAL_WORKER_THREADS];
 
 /* creates external command file as a named pipe (FIFO) and opens it for reading (non-blocked mode) */
 int open_command_file(void) {

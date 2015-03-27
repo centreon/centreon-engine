@@ -25,6 +25,17 @@
 #  define SKIPLIST_ERROR_MEMORY    2
 #  define SKIPLIST_ERROR_DUPLICATE 3
 
+// Skip lists.
+#  define HOST_SKIPLIST                    0
+#  define SERVICE_SKIPLIST                 1
+#  define COMMAND_SKIPLIST                 2
+#  define TIMEPERIOD_SKIPLIST              3
+#  define HOSTGROUP_SKIPLIST               6
+#  define SERVICEGROUP_SKIPLIST            7
+#  define HOSTDEPENDENCY_SKIPLIST          8
+#  define SERVICEDEPENDENCY_SKIPLIST       9
+#  define NUM_OBJECT_SKIPLISTS             10
+
 typedef struct                skiplistnode_struct {
   void*                       data;
   struct skiplistnode_struct* forward[1]; // this must be the last element of the struct, as we allocate # of elements during runtime
@@ -40,6 +51,8 @@ typedef struct  skiplist_struct {
   int           (*compare_function)(void const*, void const*);
   skiplistnode* head;
 }               skiplist;
+
+extern skiplist* object_skiplists[NUM_OBJECT_SKIPLISTS];
 
 #  ifdef __cplusplus
 extern "C" {

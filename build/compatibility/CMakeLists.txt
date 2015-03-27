@@ -33,11 +33,9 @@ set(
   # Sources.
   "${SRC_DIR}/common.cc"
   "${SRC_DIR}/find.cc"
-  "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/mmap.cc"
   "${SRC_DIR}/sighandlers.cc"
-  "${SRC_DIR}/skiplist.cc"
 
   # Headers.
   "${INC_DIR}/broker.h"
@@ -58,7 +56,6 @@ set(
   "${INC_DIR}/objects.h"
   "${INC_DIR}/shared.h"
   "${INC_DIR}/sighandlers.h"
-  "${INC_DIR}/skiplist.h"
   "${INC_DIR}/sretention.h"
   "${INC_DIR}/statusdata.h"
   "${INC_DIR}/xcddefault.h"

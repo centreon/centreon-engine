@@ -34,7 +34,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
-#include "skiplist.h"
 
 using namespace com::centreon::engine;
 
@@ -101,10 +100,10 @@ int xsddefault_save_status_data() {
     << "save_status_data()";
 
   // Get number of items in the command buffer.
-  pthread_mutex_lock(&external_command_buffer.buffer_lock);
-  used_external_command_buffer_slots = external_command_buffer.items;
-  high_external_command_buffer_slots = external_command_buffer.high;
-  pthread_mutex_unlock(&external_command_buffer.buffer_lock);
+  // pthread_mutex_lock(&external_command_buffer.buffer_lock);
+  // used_external_command_buffer_slots = external_command_buffer.items;
+  // high_external_command_buffer_slots = external_command_buffer.high;
+  // pthread_mutex_unlock(&external_command_buffer.buffer_lock);
 
   // generate check statistics
   generate_check_stats();
@@ -147,9 +146,9 @@ int xsddefault_save_status_data() {
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
-       "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
-       "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
-       "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
+       // "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
+       // "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
+       // "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
        "\tactive_scheduled_host_check_stats="
     << check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[0] << ","
     << check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[1] << ","

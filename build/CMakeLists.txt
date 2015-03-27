@@ -652,7 +652,6 @@ set(
   # Headers.
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
-  "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
   "${INC_DIR}/com/centreon/engine/common.hh"
   "${INC_DIR}/com/centreon/engine/config.hh"
   "${INC_DIR}/com/centreon/engine/diagnostic.hh"

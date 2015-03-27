@@ -36,6 +36,7 @@ set(TEST_BIN_NAME "check_compatibility")
 add_executable(
   "${TEST_BIN_NAME}"
   "${TEST_DIR}/check_compatibility.cc"
+  "${TEST_DIR}/skiplist.cc"
   "${TEST_DIR}/xodtemplate.cc"
   "${TEST_DIR}/xrddefault.cc"
 )
@@ -191,6 +192,7 @@ add_executable(
   "${TEST_BIN_NAME}"
   "${TEST_DIR}/check_scheduler.cc"
   "${TEST_DIR}/events.cc"
+  "${TEST_DIR}/skiplist.cc"
   "${TEST_DIR}/xodtemplate.cc"
 )
 target_link_libraries("${TEST_BIN_NAME}" "cce_core")

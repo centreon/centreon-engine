@@ -26,7 +26,6 @@
 #  include <string>
 #  include <stdio.h>
 #  include "com/centreon/engine/checks.hh"
-#  include "com/centreon/engine/circular_buffer.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/hash_timed_event.hh"
 #  include "com/centreon/engine/events/sched_info.hh"
@@ -34,7 +33,6 @@
 #  include "com/centreon/engine/nebmods.hh"
 #  include "com/centreon/engine/objects.hh"
 #  include "com/centreon/engine/utils.hh"
-#  include "skiplist.h"
 
 #  ifdef __cplusplus
 extern "C" {
@@ -108,12 +106,7 @@ extern servicedependency*        servicedependency_list_tail;
 extern hostdependency*           hostdependency_list;
 extern hostdependency*           hostdependency_list_tail;
 
-extern skiplist*                 object_skiplists[];
-
 extern int                       __nagios_object_structure_version;
-
-extern circular_buffer           external_command_buffer;
-extern pthread_t                 worker_threads[];
 
 extern check_stats               check_statistics[];
 

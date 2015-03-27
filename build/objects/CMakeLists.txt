@@ -50,7 +50,6 @@ set(
   "${INC_DIR}/customvariable.hh"
   "${INC_DIR}/customvariablesmember.hh"
   "${INC_DIR}/daterange.hh"
-  "${INC_DIR}/defines.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/hostdependency.hh"
   "${INC_DIR}/hostgroup.hh"

@@ -1,5 +1,8 @@
 /*
-** Copyright 2012-2014 Merethis
+** Copyright 2007-2008      Ethan Galstad
+** Copyright 2007,2010      Andreas Ericsson
+** Copyright 2010           Max Schubert
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,18 +20,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_COMPATIBILITY_GLOBALS_H
-#  define CCE_COMPATIBILITY_GLOBALS_H
+#ifndef CCE_MOD_EXTCMD_CIRCULAR_BUFFER_HH
+#  define CCE_MOD_EXTCMD_CIRCULAR_BUFFER_HH
 
-#  include "com/centreon/engine/checks.hh"
-#  include "com/centreon/engine/circular_buffer.hh"
+#  include <pthread.h>
 
-// Process options.
-extern int nagios_pid;
-extern int verify_object_relationships;
+typedef struct    circular_buffer_struct {
+  void**          buffer;
+  int             tail;
+  int             head;
+  int             items;
+  int             high;
+  unsigned long   overflow;
+  pthread_mutex_t buffer_lock;
+}                 circular_buffer;
 
-// Retention flags.
-extern unsigned long retained_process_service_attribute_mask;
-extern unsigned long retained_service_attribute_mask;
-
-#endif // !CCE_COMPATIBILITY_GLOBALS_H
+#endif // !CCE_MOD_EXTCMD_CIRCULAR_BUFFER_HH

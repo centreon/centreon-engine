@@ -21,7 +21,6 @@
 
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "nagios.h"
 
 using namespace com::centreon::engine;
 
@@ -55,7 +54,6 @@ char*               ocsp_command(NULL);
 char*               use_timezone(NULL);
 char**              macro_x(NULL);
 check_stats         check_statistics[MAX_CHECK_STATS_TYPES];
-circular_buffer     external_command_buffer;
 command*            command_list(NULL);
 command*            command_list_tail(NULL);
 command*            global_host_event_handler_ptr(NULL);
@@ -92,7 +90,6 @@ int                 use_precached_objects(false);
 int                 verify_circular_paths(true);
 int                 verify_config(false);
 nebcallback*        neb_callback_list[NEBCALLBACK_NUMITEMS];
-pthread_t           worker_threads[TOTAL_WORKER_THREADS];
 sched_info          scheduling_info;
 service*            service_list(NULL);
 service*            service_list_tail(NULL);
@@ -100,7 +97,6 @@ servicedependency*  servicedependency_list(NULL);
 servicedependency*  servicedependency_list_tail(NULL);
 servicegroup*       servicegroup_list(NULL);
 servicegroup*       servicegroup_list_tail(NULL);
-skiplist*           object_skiplists[NUM_OBJECT_SKIPLISTS];
 time_t              event_start(0L);
 time_t              last_command_check(0L);
 time_t              last_command_status_update(0L);
@@ -131,7 +127,7 @@ unsigned int        execute_host_checks(true);
 unsigned int        execute_service_checks(true);
 unsigned int        host_check_timeout(30);
 unsigned int        host_freshness_check_interval(60);
-unsigned int        host_inter_check_delay_method(ICD_SMART);
+unsigned int        host_inter_check_delay_method(2);// XXX ICD_SMART);
 unsigned int        interval_length(60);
 unsigned int        log_event_handlers(true);
 unsigned int        log_external_commands(true);
@@ -152,8 +148,8 @@ unsigned int        retention_scheduling_horizon(900);
 unsigned int        retention_update_interval(60);
 unsigned int        service_check_timeout(60);
 unsigned int        service_freshness_check_interval(60);
-unsigned int        service_inter_check_delay_method(ICD_SMART);
-unsigned int        service_interleave_factor_method(ILF_SMART);
+unsigned int        service_inter_check_delay_method(2);// XXX ICD_SMART);
+unsigned int        service_interleave_factor_method(1);// XXX ILF_SMART);
 unsigned int        soft_state_dependencies(false);
 unsigned int        status_update_interval(60);
 unsigned int        time_change_threshold(900);

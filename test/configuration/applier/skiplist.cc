@@ -23,6 +23,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "skiplist.h"
 
+skiplist* object_skiplists[NUM_OBJECT_SKIPLISTS];
+
 skiplist* skiplist_new(
             int max_levels,
             float level_probability,

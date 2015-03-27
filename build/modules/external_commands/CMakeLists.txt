@@ -40,6 +40,7 @@ add_library(
   # Headers.
   "${INC_DIR}/commands.hh"
   "${INC_DIR}/compatibility.hh"
+  "${INC_DIR}/circular_buffer.hh"
   "${INC_DIR}/processing.hh"
   "${INC_DIR}/utils.hh"
 )

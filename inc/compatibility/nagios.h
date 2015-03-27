@@ -25,7 +25,6 @@
 
 #  include "broker.h"
 #  include "com/centreon/engine/checks.hh"
-#  include "com/centreon/engine/circular_buffer.hh"
 #  include "com/centreon/engine/config.hh"
 #  include "com/centreon/engine/events/defines.hh"
 #  include "com/centreon/engine/flapping.hh"
@@ -52,7 +51,6 @@
 #  define ILF_SMART 1 // Smart interleave.
 
 // Misc.
-#  define COMMAND_WORKER_THREAD 0
 #  define MAX_PLUGIN_OUTPUT_LENGTH -1 // Plugin output length is not caped.
 
 #endif // !CCE_COMPATIBILITY_NAGIOS_H

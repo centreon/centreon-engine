@@ -29,6 +29,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
 #include "chkdiff.hh"
+#include "skiplist.h"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"
 

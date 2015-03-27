@@ -47,15 +47,4 @@
 */
 #  define CURRENT_OBJECT_STRUCTURE_VERSION 307
 
-/* Skip lists. */
-#  define HOST_SKIPLIST                    0
-#  define SERVICE_SKIPLIST                 1
-#  define COMMAND_SKIPLIST                 2
-#  define TIMEPERIOD_SKIPLIST              3
-#  define HOSTGROUP_SKIPLIST               6
-#  define SERVICEGROUP_SKIPLIST            7
-#  define HOSTDEPENDENCY_SKIPLIST          8
-#  define SERVICEDEPENDENCY_SKIPLIST       9
-#  define NUM_OBJECT_SKIPLISTS             10
-
 #endif /* !CCE_OBJECTS_HH */
