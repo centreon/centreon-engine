@@ -348,7 +348,7 @@ service* add_service(
   // Check values.
   if ((max_attempts <= 0)
       || (check_interval < 0)
-      || (retry_interval <= 0)) {
+      || (retry_interval < 0)) {
     logger(log_config_error, basic)
       << "Error: Invalid max_attempts, check_interval or retry_interval"
          " value for service '"

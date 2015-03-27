@@ -198,7 +198,6 @@ void applier::servicedependency::expand_object(
           sdep->dependent_servicegroups().clear();
           sdep->dependent_service_description().clear();
           sdep->dependent_service_description().push_back(it2->second);
-          sdep->failure_options(0);
 
           // Insert new service dependency. We do not need to expand it
           // because no expansion is made on 1->1 dependency.

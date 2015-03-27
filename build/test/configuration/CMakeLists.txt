@@ -48,24 +48,9 @@ set(TEST_NAME "parse_and_copy_configuration_command")
 set(TEST_CONF_FILE "command.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
-# parse_and_copy_configuration_contactgroup
-set(TEST_NAME "parse_and_copy_configuration_contactgroup")
-set(TEST_CONF_FILE "contactgroup.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_copy_configuration_contact
-set(TEST_NAME "parse_and_copy_configuration_contact")
-set(TEST_CONF_FILE "contact.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
 # parse_and_copy_configuration_hostdependency
 set(TEST_NAME "parse_and_copy_configuration_hostdependency")
 set(TEST_CONF_FILE "hostdependency.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_copy_configuration_hostescalation
-set(TEST_NAME "parse_and_copy_configuration_hostescalation")
-set(TEST_CONF_FILE "hostescalation.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_hostgroup
@@ -81,11 +66,6 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 # parse_and_copy_configuration_servicedependency
 set(TEST_NAME "parse_and_copy_configuration_servicedependency")
 set(TEST_CONF_FILE "servicedependency.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
-
-# parse_and_copy_configuration_serviceescalation
-set(TEST_NAME "parse_and_copy_configuration_serviceescalation")
-set(TEST_CONF_FILE "serviceescalation.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_servicegroup

@@ -164,7 +164,6 @@ void applier::hostdependency::expand_object(
           hdep->dependent_hostgroups().clear();
           hdep->dependent_hosts().clear();
           hdep->dependent_hosts().push_back(*it2);
-          hdep->failure_options(0);
 
           // Insert new host dependency. We do not need to expand it
           // because no expansion is made on 1->1 dependency.
