@@ -46,7 +46,6 @@ extern "C" {
   extern int check_external_commands;
   extern int check_host_freshness;
   extern check_result check_result_info;
-  extern check_result* check_result_list;
   extern int check_service_freshness;
   extern command* command_list;
   extern char* config_file;
@@ -225,10 +224,10 @@ extern "C" {
       << "mod_gearman 1.3.8\n"
       << "adjust_host_check_attempt_3x: "
       << (void (*)())adjust_host_check_attempt_3x << "\n"
-      << "check_result_info: "
-      << &check_result_info << "\n"
-      << "check_result_list: "
-      << check_result_list << "\n"
+      // << "check_result_info: "
+      // << &check_result_info << "\n"
+      // << "check_result_list: "
+      // << check_result_list << "\n"
       << "clear_volatile_macros: "
       << (void (*)())clear_volatile_macros << "\n"
       << "currently_running_host_checks: "
@@ -251,8 +250,8 @@ extern "C" {
       << (void (*)())grab_service_macros << "\n"
       << "host_check_timeout: "
       << host_check_timeout << "\n"
-      << "init_check_result: "
-      << (void (*)())init_check_result << "\n"
+      // << "init_check_result: "
+      // << (void (*)())init_check_result << "\n"
       << "is_host_member_of_hostgroup: "
       << (void (*)())is_host_member_of_hostgroup << "\n"
       << "is_service_member_of_servicegroup: "

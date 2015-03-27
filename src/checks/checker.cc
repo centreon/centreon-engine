@@ -39,7 +39,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
-#include "compatibility/check_result.h"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::logging;
@@ -95,16 +94,6 @@ void checker::reap() {
   // Time to start reaping.
   time_t reaper_start_time;
   time(&reaper_start_time);
-
-  // Keep compatibility with old check result list.
-  if (check_result_list) {
-    concurrency::locker lock(&_mut_reap);
-    check_result* cr(NULL);
-    while ((cr = read_check_result())) {
-      _to_reap.push(*cr);
-      delete cr;
-    }
-  }
 
   // Reap check results.
   unsigned int reaped_checks(0);

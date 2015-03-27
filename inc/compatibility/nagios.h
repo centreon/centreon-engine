@@ -24,7 +24,6 @@
 #  define CCE_COMPATIBILITY_NAGIOS_H
 
 #  include "broker.h"
-#  include "check_result.h"
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
 #  include "com/centreon/engine/config.hh"

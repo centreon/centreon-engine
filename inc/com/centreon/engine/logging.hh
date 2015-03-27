@@ -22,6 +22,8 @@
 #  define CCE_LOGGING_HH
 
 #  include <time.h>
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 
 // State Logging Types
 #  define INITIAL_STATES             1

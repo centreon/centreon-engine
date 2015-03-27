@@ -112,11 +112,6 @@ extern skiplist*                 object_skiplists[];
 
 extern int                       __nagios_object_structure_version;
 
-extern check_result              check_result_info;
-extern check_result*             check_result_list;
-
-extern dbuf                      check_result_dbuf;
-
 extern circular_buffer           external_command_buffer;
 extern pthread_t                 worker_threads[];
 

@@ -31,9 +31,4 @@ extern int verify_object_relationships;
 extern unsigned long retained_process_service_attribute_mask;
 extern unsigned long retained_service_attribute_mask;
 
-// Commands execution system.
-extern circular_buffer check_result_buffer;
-extern check_result check_result_info;
-extern check_result* check_result_list;
-
 #endif // !CCE_COMPATIBILITY_GLOBALS_H

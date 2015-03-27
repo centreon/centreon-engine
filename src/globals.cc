@@ -62,7 +62,6 @@ command*            global_host_event_handler_ptr(NULL);
 command*            global_service_event_handler_ptr(NULL);
 command*            ochp_command_ptr(NULL);
 command*            ocsp_command_ptr(NULL);
-dbuf                check_result_dbuf;
 float               high_host_flap_threshold(30.0);
 float               high_service_flap_threshold(30.0);
 float               low_host_flap_threshold(20.0);
