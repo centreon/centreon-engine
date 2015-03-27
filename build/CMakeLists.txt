@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2014 Merethis
+## Copyright 2011-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -699,7 +699,6 @@ add_subdirectory("macros")
 add_subdirectory("modules")
 add_subdirectory("objects")
 add_subdirectory("retention")
-add_subdirectory("scripts")
 
 # Library engine target.
 add_library("cce_core" ${LIBRARY_TYPE} ${FILES})
@@ -841,11 +840,6 @@ else ()
   message(STATUS "    - Build static core library   yes")
 endif ()
 message(STATUS "    - External commands module    enabled")
-if (WITH_WEBSERVICE)
-  message(STATUS "    - Webservice module           enabled")
-else ()
-  message(STATUS "    - Webservice module           disabled")
-endif ()
 if (WITH_TESTING)
   message(STATUS "    - Unit tests                  enabled")
 else ()
