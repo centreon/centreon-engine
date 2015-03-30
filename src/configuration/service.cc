@@ -48,7 +48,6 @@ service::setters const service::_setters[] = {
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
-  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "initial_state",                SETTER(std::string const&, _set_initial_state) },
   { "max_check_attempts",           SETTER(unsigned int, _set_max_check_attempts) },
   { "check_interval",               SETTER(unsigned int, _set_check_interval) },
@@ -66,8 +65,6 @@ service::setters const service::_setters[] = {
   { "high_flap_threshold",          SETTER(unsigned int, _set_high_flap_threshold) },
   { "flap_detection_enabled",       SETTER(bool, _set_flap_detection_enabled) },
   { "flap_detection_options",       SETTER(std::string const&, _set_flap_detection_options) },
-  { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
-  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) },
 
   // Deprecated.
@@ -75,6 +72,8 @@ service::setters const service::_setters[] = {
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
+  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
+  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
   { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
@@ -87,7 +86,8 @@ service::setters const service::_setters[] = {
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+  { "stalking_options",             SETTER(std::string const&, _set_stalking_options) }
 };
 
 // Default values.
@@ -109,7 +109,6 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_obsess_over_service(true);
 static unsigned int const   default_retry_interval(1);
-static unsigned short const default_stalking_options(service::none);
 static unsigned int const   default_check_timeout(0);
 
 /**
@@ -132,8 +131,7 @@ service::service()
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
     _obsess_over_service(default_obsess_over_service),
-    _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {}
+    _retry_interval(default_retry_interval) {}
 
 /**
  *  Copy constructor.
@@ -184,7 +182,6 @@ service& service::operator=(service const& right) {
     _retry_interval = right._retry_interval;
     _servicegroups = right._servicegroups;
     _service_description = right._service_description;
-    _stalking_options = right._stalking_options;
     _timezone = right._timezone;
   }
   return (*this);
@@ -223,7 +220,6 @@ bool service::operator==(service const& right) const throw () {
           && _retry_interval == right._retry_interval
           && _servicegroups == right._servicegroups
           && _service_description == right._service_description
-          && _stalking_options == right._stalking_options
           && _timezone == right._timezone);
 }
 
@@ -296,9 +292,7 @@ bool service::operator<(service const& right) const throw () {
     return (_retry_interval < right._retry_interval);
   else if (_servicegroups != right._servicegroups)
     return (_servicegroups < right._servicegroups);
-  else if (_timezone != right._timezone)
-    return (_timezone < right._timezone);
-  return (_stalking_options < right._stalking_options);
+  return (_timezone < right._timezone);
 }
 
 /**
@@ -367,7 +361,6 @@ void service::merge(object const& obj) {
   MRG_OPTION(_retry_interval);
   MRG_INHERIT(_servicegroups);
   MRG_DEFAULT(_service_description);
-  MRG_OPTION(_stalking_options);
   MRG_OPTION(_timezone);
 }
 
@@ -651,15 +644,6 @@ std::string& service::service_description() throw () {
  */
 std::string const& service::service_description() const throw () {
   return (_service_description);
-}
-
-/**
- *  Get stalking_options.
- *
- *  @return The stalking_options.
- */
-unsigned short service::stalking_options() const throw () {
-  return (_stalking_options);
 }
 
 /**
@@ -1301,37 +1285,17 @@ bool service::_set_service_description(std::string const& value) {
 }
 
 /**
- *  Set stalking_options value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new stalking_options value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_stalking_options(std::string const& value) {
-  unsigned short options(none);
-  std::list<std::string> values;
-  string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
-    string::trim(*it);
-    if (*it == "o" || *it == "ok")
-      options |= ok;
-    else if (*it == "w" || *it == "warning")
-      options |= warning;
-    else if (*it == "u" || *it == "unknown")
-      options |= unknown;
-    else if (*it == "c" || *it == "critical")
-      options |= critical;
-    else if (*it == "n" || *it == "none")
-      options = none;
-    else if (*it == "a" || *it == "all")
-      options = ok | warning | unknown | critical;
-    else
-      return (false);
-  }
-  _stalking_options = options;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service stalking_options was ignored";
+  ++config_warnings;
   return (true);
 }
 

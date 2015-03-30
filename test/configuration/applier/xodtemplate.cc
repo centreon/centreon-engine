@@ -1210,40 +1210,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       }
       temp_service->have_flap_detection_options = true;
     }
-    else if (!strcmp(variable, "stalking_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_service->stalk_on_ok = true;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_service->stalk_on_warning = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_service->stalk_on_unknown = true;
-        else if (!strcmp(temp_ptr, "c")
-                 || !strcmp(temp_ptr, "critical"))
-          temp_service->stalk_on_critical = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_service->stalk_on_ok = false;
-          temp_service->stalk_on_warning = false;
-          temp_service->stalk_on_unknown = false;
-          temp_service->stalk_on_critical = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_service->stalk_on_ok = true;
-          temp_service->stalk_on_warning = true;
-          temp_service->stalk_on_unknown = true;
-          temp_service->stalk_on_critical = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid stalking option '" << temp_ptr
-            << "' in service definition.";
-          return (ERROR);
-        }
-      }
-      temp_service->have_stalking_options = true;
-    }
     else if (!strcmp(variable, "register"))
       temp_service->register_object = (atoi(value) > 0) ? true : false;
     else if (variable[0] == '_') {
@@ -1473,35 +1439,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
       temp_host->have_flap_detection_options = true;
-    }
-    else if (!strcmp(variable, "stalking_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "up"))
-          temp_host->stalk_on_up = true;
-        else if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_host->stalk_on_down = true;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_host->stalk_on_unreachable = true;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_host->stalk_on_up = false;
-          temp_host->stalk_on_down = false;
-          temp_host->stalk_on_unreachable = false;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_host->stalk_on_up = true;
-          temp_host->stalk_on_down = true;
-          temp_host->stalk_on_unreachable = true;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid stalking option '" << temp_ptr
-            << "' in host definition.";
-          result = ERROR;
-        }
-      }
-      temp_host->have_stalking_options = true;
     }
     else if (!strcmp(variable, "obsess_over_host")) {
       temp_host->obsess_over_host = (atoi(value) > 0) ? true : false;
@@ -4110,11 +4047,6 @@ int xodtemplate_duplicate_service(
   new_service->flap_detection_on_unknown = temp_service->flap_detection_on_unknown;
   new_service->flap_detection_on_critical = temp_service->flap_detection_on_critical;
   new_service->have_flap_detection_options = temp_service->have_flap_detection_options;
-  new_service->stalk_on_ok = temp_service->stalk_on_ok;
-  new_service->stalk_on_unknown = temp_service->stalk_on_unknown;
-  new_service->stalk_on_warning = temp_service->stalk_on_warning;
-  new_service->stalk_on_critical = temp_service->stalk_on_critical;
-  new_service->have_stalking_options = temp_service->have_stalking_options;
 
   /* add new service to head of list in memory */
   new_service->next = xodtemplate_service_list;
@@ -4963,14 +4895,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         = template_host->flap_detection_on_unreachable;
       this_host->have_flap_detection_options = true;
     }
-    if (this_host->have_stalking_options == false
-        && template_host->have_stalking_options == true) {
-      this_host->stalk_on_up = template_host->stalk_on_up;
-      this_host->stalk_on_down = template_host->stalk_on_down;
-      this_host->stalk_on_unreachable
-        = template_host->stalk_on_unreachable;
-      this_host->have_stalking_options = true;
-    }
 
     /* apply missing custom variables from template host... */
     for (temp_customvariablesmember = template_host->custom_variables;
@@ -5196,18 +5120,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->flap_detection_on_critical
         = template_service->flap_detection_on_critical;
       this_service->have_flap_detection_options = true;
-    }
-    if (this_service->have_stalking_options == false
-        && template_service->have_stalking_options == true) {
-      this_service->stalk_on_ok
-        = template_service->stalk_on_ok;
-      this_service->stalk_on_unknown
-        = template_service->stalk_on_unknown;
-      this_service->stalk_on_warning
-        = template_service->stalk_on_warning;
-      this_service->stalk_on_critical
-        = template_service->stalk_on_critical;
-      this_service->have_stalking_options = true;
     }
 
     /* apply missing custom variables from template service... */
@@ -6704,9 +6616,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->flap_detection_on_up,
                this_host->flap_detection_on_down,
                this_host->flap_detection_on_unreachable,
-               this_host->stalk_on_up,
-               this_host->stalk_on_down,
-               this_host->stalk_on_unreachable,
                this_host->check_freshness,
                this_host->freshness_threshold,
                true,
@@ -6791,10 +6700,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->flap_detection_on_warning,
                   this_service->flap_detection_on_unknown,
                   this_service->flap_detection_on_critical,
-                  this_service->stalk_on_ok,
-                  this_service->stalk_on_warning,
-                  this_service->stalk_on_unknown,
-                  this_service->stalk_on_critical,
                   this_service->check_freshness,
                   this_service->freshness_threshold,
                   this_service->obsess_over_service,
@@ -7843,17 +7748,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\n");
     fprintf(fp, "\tfreshness_threshold\t%d\n", temp_host->freshness_threshold);
     fprintf(fp, "\tcheck_freshness\t%d\n", temp_host->check_freshness);
-    fprintf(fp, "\tstalking_options\t");
-    x = 0;
-    if (temp_host->stalk_on_up == true)
-      fprintf(fp, "%so", (x++ > 0) ? "," : "");
-    if (temp_host->stalk_on_down == true)
-      fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-    if (temp_host->stalk_on_unreachable == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
     if (temp_host->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_host->timezone);
 
@@ -7927,19 +7821,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\n");
     fprintf(fp, "\tfreshness_threshold\t%d\n", temp_service->freshness_threshold);
     fprintf(fp, "\tcheck_freshness\t%d\n", temp_service->check_freshness);
-    fprintf(fp, "\tstalking_options\t");
-    x = 0;
-    if (temp_service->stalk_on_ok == true)
-      fprintf(fp, "%so", (x++ > 0) ? "," : "");
-    if (temp_service->stalk_on_unknown == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (temp_service->stalk_on_warning == true)
-      fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-    if (temp_service->stalk_on_critical == true)
-      fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
     if (temp_service->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_service->timezone);
 

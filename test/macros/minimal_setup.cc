@@ -51,9 +51,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Flap detection on up
     0,                              // Flap detection on down
     0,                              // Flap detection on unreachable
-    0,                              // Stalk on ok
-    0,                              // Stalk on down
-    0,                              // Stalk on unreachable
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Should be drawn
@@ -87,10 +84,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Flap detection on warning
     0,                              // Flap detection on unknown
     0,                              // Flap detection on critical
-    0,                              // Stalk on ok
-    0,                              // Stalk on warning
-    0,                              // Stalk on unknown
-    0,                              // Stalk on critical
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Obsess over service

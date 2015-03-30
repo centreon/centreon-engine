@@ -72,9 +72,6 @@ bool operator==(
           && obj1.flap_detection_on_up == obj2.flap_detection_on_up
           && obj1.flap_detection_on_down == obj2.flap_detection_on_down
           && obj1.flap_detection_on_unreachable == obj2.flap_detection_on_unreachable
-          && obj1.stalk_on_up == obj2.stalk_on_up
-          && obj1.stalk_on_down == obj2.stalk_on_down
-          && obj1.stalk_on_unreachable == obj2.stalk_on_unreachable
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
           && obj1.checks_enabled == obj2.checks_enabled
@@ -179,9 +176,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  flap_detection_on_up:                 " << obj.flap_detection_on_up << "\n"
     "  flap_detection_on_down:               " << obj.flap_detection_on_down << "\n"
     "  flap_detection_on_unreachable:        " << obj.flap_detection_on_unreachable << "\n"
-    "  stalk_on_up:                          " << obj.stalk_on_up << "\n"
-    "  stalk_on_down:                        " << obj.stalk_on_down << "\n"
-    "  stalk_on_unreachable:                 " << obj.stalk_on_unreachable << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
@@ -269,9 +263,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *                                           for down state ?
  *  @param[in] flap_detection_on_unreachable Is flap detection enabled
  *                                           for unreachable state ?
- *  @param[in] stalk_on_up                   Stalk on up ?
- *  @param[in] stalk_on_down                 Stalk on down ?
- *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
  *  @param[in] check_freshness               Whether or not freshness
  *                                           check is enabled.
  *  @param[in] freshness_threshold           Freshness threshold.
@@ -303,9 +294,6 @@ host* add_host(
         int flap_detection_on_up,
         int flap_detection_on_down,
         int flap_detection_on_unreachable,
-        int stalk_on_up,
-        int stalk_on_down,
-        int stalk_on_unreachable,
         int check_freshness,
         int freshness_threshold,
         int should_be_drawn,
@@ -388,9 +376,6 @@ host* add_host(
     obj->retry_interval = retry_interval;
     obj->should_be_drawn = (should_be_drawn > 0);
     obj->should_be_scheduled = true;
-    obj->stalk_on_down = (stalk_on_down > 0);
-    obj->stalk_on_unreachable = (stalk_on_unreachable > 0);
-    obj->stalk_on_up = (stalk_on_up > 0);
     obj->state_type = HARD_STATE;
 
     // STATE_OK = 0, so we don't need to set state_history (memset

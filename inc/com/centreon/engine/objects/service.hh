@@ -40,10 +40,6 @@ typedef struct                  service_struct {
   double                        retry_interval;
   int                           max_attempts;
   unsigned int                  check_timeout;
-  int                           stalk_on_ok;
-  int                           stalk_on_warning;
-  int                           stalk_on_unknown;
-  int                           stalk_on_critical;
   int                           is_volatile;
   char*                         check_period;
   int                           flap_detection_enabled;
@@ -131,10 +127,6 @@ service* add_service(
            int flap_detection_on_warning,
            int flap_detection_on_unknown,
            int flap_detection_on_critical,
-           int stalk_on_ok,
-           int stalk_on_warning,
-           int stalk_on_unknown,
-           int stalk_on_critical,
            int check_freshness,
            int freshness_threshold,
            int obsess_over_service,

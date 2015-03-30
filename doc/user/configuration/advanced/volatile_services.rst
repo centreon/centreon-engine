@@ -46,10 +46,6 @@ only happen the first time that a service goes into a non-OK state. If
 future checks of the service result in the same non-OK state, no hard
 state change occurs and none of the events mentioned take place again.
 
-.. note::
-   If you are only interested in logging, consider using
-   :ref:`stalking <state_stalking>` options instead.
-
 The Power Of Two
 ================
 

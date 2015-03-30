@@ -95,15 +95,13 @@ public:
   static host* add_generic_host(const char* name = "name") {
     return (add_host(
               name, NULL, "localhost", NULL, 0, 0.0, 0.0, 42, 0, NULL,
-              0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              NULL));
+              0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL));
   }
 
   static service* add_generic_service() {
     return (add_service(
               "name", "description", NULL, 0, 42, 0, 42.0, 0.0, 0, NULL,
-              0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, NULL));
+              0, "command", 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, NULL));
   }
 
 private:

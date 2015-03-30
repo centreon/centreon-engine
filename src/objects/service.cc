@@ -57,10 +57,6 @@ bool operator==(
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
           && obj1.check_timeout == obj2.check_timeout
-          && obj1.stalk_on_ok == obj2.stalk_on_ok
-          && obj1.stalk_on_warning == obj2.stalk_on_warning
-          && obj1.stalk_on_unknown == obj2.stalk_on_unknown
-          && obj1.stalk_on_critical == obj2.stalk_on_critical
           && obj1.is_volatile == obj2.is_volatile
           && is_equal(obj1.check_period, obj2.check_period)
           && obj1.flap_detection_enabled == obj2.flap_detection_enabled
@@ -164,10 +160,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  check_timeout:                        " << obj.check_timeout << "\n"
-    "  stalk_on_ok:                          " << obj.stalk_on_ok << "\n"
-    "  stalk_on_warning:                     " << obj.stalk_on_warning << "\n"
-    "  stalk_on_unknown:                     " << obj.stalk_on_unknown << "\n"
-    "  stalk_on_critical:                    " << obj.stalk_on_critical << "\n"
     "  is_volatile:                          " << obj.is_volatile << "\n"
     "  check_period:                         " << chkstr(obj.check_period) << "\n"
     "  flap_detection_enabled:               " << obj.flap_detection_enabled << "\n"
@@ -266,10 +258,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *                                          for unknown state ?
  *  @param[in] flap_detection_on_critical   Is flap detection enabled
  *                                          for critical state ?
- *  @param[in] stalk_on_ok                  Stalk on ok state ?
- *  @param[in] stalk_on_warning             Stalk on warning state ?
- *  @param[in] stalk_on_unknown             Stalk on unknown state ?
- *  @param[in] stalk_on_critical            Stalk on critical state ?
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
  *  @param[in] obsess_over_service          Should we obsess over
@@ -299,10 +287,6 @@ service* add_service(
            int flap_detection_on_warning,
            int flap_detection_on_unknown,
            int flap_detection_on_critical,
-           int stalk_on_ok,
-           int stalk_on_warning,
-           int stalk_on_unknown,
-           int stalk_on_critical,
            int check_freshness,
            int freshness_threshold,
            int obsess_over_service,
@@ -389,10 +373,6 @@ service* add_service(
     obj->obsess_over_service = (obsess_over_service > 0);
     obj->retry_interval = retry_interval;
     obj->should_be_scheduled = true;
-    obj->stalk_on_critical = (stalk_on_critical > 0);
-    obj->stalk_on_ok = (stalk_on_ok > 0);
-    obj->stalk_on_unknown = (stalk_on_unknown > 0);
-    obj->stalk_on_warning = (stalk_on_warning > 0);
     obj->state_type = HARD_STATE;
 
     // STATE_OK = 0, so we don't need to set state_history (memset

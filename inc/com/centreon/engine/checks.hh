@@ -162,7 +162,6 @@ int handle_async_host_check_result_3x(
 int process_host_check_result_3x(
       host* hst,
       int new_state,
-      char* old_plugin_output,
       int check_options,
       int reschedule_check,
       int use_cached_result,

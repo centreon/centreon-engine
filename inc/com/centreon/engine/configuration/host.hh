@@ -81,7 +81,6 @@ namespace                  configuration {
     list_string&           parents() throw ();
     list_string const&     parents() const throw ();
     unsigned int           retry_interval() const throw ();
-    unsigned int           stalking_options() const throw ();
     std::string const&     timezone() const throw ();
 
   private:
@@ -162,7 +161,6 @@ namespace                  configuration {
     group                  _parents;
     opt<unsigned int>      _retry_interval;
     static setters const   _setters[];
-    opt<unsigned int>      _stalking_options;
     opt<std::string>       _timezone;
   };
 

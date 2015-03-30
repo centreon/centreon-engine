@@ -107,12 +107,6 @@ void applier::host::add_object(
                           & configuration::host::down),
         static_cast<bool>(obj->flap_detection_options()
                           & configuration::host::unreachable),
-        static_cast<bool>(obj->stalking_options()
-                          & configuration::host::up),
-        static_cast<bool>(obj->stalking_options()
-                          & configuration::host::down),
-        static_cast<bool>(obj->stalking_options()
-                          & configuration::host::unreachable),
         obj->check_freshness(),
         obj->freshness_threshold(),
         true, // should_be_drawn, enabled by Nagios
@@ -278,18 +272,6 @@ void applier::host::modify_object(
     h->flap_detection_on_unreachable,
     static_cast<int>(static_cast<bool>(
       obj->flap_detection_options() & configuration::host::unreachable)));
-  modify_if_different(
-    h->stalk_on_up,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::host::up)));
-  modify_if_different(
-    h->stalk_on_down,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::host::down)));
-  modify_if_different(
-    h->stalk_on_unreachable,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::host::unreachable)));
   modify_if_different(
     h->check_freshness,
     static_cast<int>(obj->check_freshness()));

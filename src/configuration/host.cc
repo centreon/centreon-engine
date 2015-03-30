@@ -44,7 +44,6 @@ host::setters const host::_setters[] = {
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "event_handler",                SETTER(std::string const&, _set_event_handler) },
-  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) },
   { "initial_state",                SETTER(std::string const&, _set_initial_state) },
   { "check_interval",               SETTER(unsigned int, _set_check_interval) },
@@ -61,8 +60,6 @@ host::setters const host::_setters[] = {
   { "high_flap_threshold",          SETTER(unsigned int, _set_high_flap_threshold) },
   { "flap_detection_enabled",       SETTER(bool, _set_flap_detection_enabled) },
   { "flap_detection_options",       SETTER(std::string const&, _set_flap_detection_options) },
-  { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
-  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
 
   // Deprecated.
@@ -72,6 +69,8 @@ host::setters const host::_setters[] = {
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
+  { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
+  { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
   { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
@@ -86,6 +85,7 @@ host::setters const host::_setters[] = {
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
   { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+  { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
   { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) }
 };
@@ -104,7 +104,6 @@ static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_obsess_over_host(true);
 static unsigned int const   default_retry_interval(1);
-static unsigned short const default_stalking_options(host::none);
 static unsigned int const   default_check_timeout(0);
 
 /**
@@ -128,8 +127,7 @@ host::host(key_type const& key)
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
     _obsess_over_host(default_obsess_over_host),
-    _retry_interval(default_retry_interval),
-    _stalking_options(default_stalking_options) {}
+    _retry_interval(default_retry_interval) {}
 
 /**
  *  Copy constructor.
@@ -179,7 +177,6 @@ host& host::operator=(host const& right) {
     _obsess_over_host = right._obsess_over_host;
     _parents = right._parents;
     _retry_interval = right._retry_interval;
-    _stalking_options = right._stalking_options;
   }
   return (*this);
 }
@@ -216,8 +213,7 @@ bool host::operator==(host const& right) const throw () {
           && _obsess_over_host == right._obsess_over_host
           && _parents == right._parents
           && _retry_interval == right._retry_interval
-          && _timezone == right._timezone
-          && _stalking_options == right._stalking_options);
+          && _timezone == right._timezone);
 }
 
 /**
@@ -285,9 +281,7 @@ bool host::operator<(host const& right) const throw () {
     return (_parents < right._parents);
   else if (_retry_interval != right._retry_interval)
     return (_retry_interval < right._retry_interval);
-  else if (_timezone != right._timezone)
-    return (_timezone < right._timezone);
-  return (_stalking_options < right._stalking_options);
+  return (_timezone < right._timezone);
 }
 
 /**
@@ -347,7 +341,6 @@ void host::merge(object const& obj) {
   MRG_OPTION(_obsess_over_host);
   MRG_INHERIT(_parents);
   MRG_OPTION(_retry_interval);
-  MRG_OPTION(_stalking_options);
   MRG_OPTION(_timezone);
 }
 
@@ -604,15 +597,6 @@ list_string const& host::parents() const throw () {
  */
 unsigned int host::retry_interval() const throw () {
   return (_retry_interval);
-}
-
-/**
- *  Get stalking_options.
- *
- *  @return The stalking_options.
- */
-unsigned int host::stalking_options() const throw () {
-  return (_stalking_options);
 }
 
 /**
@@ -1237,36 +1221,17 @@ bool host::_set_retry_interval(unsigned int value) {
 }
 
 /**
- *  Set stalking_options value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new stalking_options value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool host::_set_stalking_options(
-       std::string const& value) {
-  unsigned short options(none);
-  std::list<std::string> values;
-  string::split(value, values, ',');
-  for (std::list<std::string>::iterator
-         it(values.begin()), end(values.end());
-       it != end;
-       ++it) {
-    string::trim(*it);
-    if (*it == "o" || *it == "up")
-      options |= up;
-    else if (*it == "d" || *it == "down")
-      options |= down;
-    else if (*it == "u" || *it == "unreachable")
-      options |= unreachable;
-    else if (*it == "n" || *it == "none")
-      options = none;
-    else if (*it == "a" || *it == "all")
-      options = up | down | unreachable;
-    else
-      return (false);
-  }
-  _stalking_options = options;
+bool host::_set_stalking_options(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host stalking_options was ignored";
+  ++config_warnings;
   return (true);
 }
 

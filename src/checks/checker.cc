@@ -811,11 +811,6 @@ void checker::run_sync(
   if (HARD_STATE == hst->state_type)
     hst->last_hard_state = hst->current_state;
 
-  // Save old plugin output for state stalking.
-  char* old_plugin_output(NULL);
-  if (hst->plugin_output)
-    old_plugin_output = string::dup(hst->plugin_output);
-
   // Set the checked flag.
   hst->has_been_checked = true;
 
@@ -860,16 +855,12 @@ void checker::run_sync(
   process_host_check_result_3x(
     hst,
     host_result,
-    old_plugin_output,
     check_options,
     false,
     use_cached_result,
     check_timestamp_horizon);
   if (check_result_code)
     *check_result_code = hst->current_state;
-
-  // Cleanup.
-  delete[] old_plugin_output;
 
   // Synchronous check is done.
   logger(dbg_checks, more)

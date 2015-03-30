@@ -90,7 +90,6 @@ namespace                  configuration {
     list_string const&     servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
-    unsigned short         stalking_options() const throw ();
     void                   timezone(std::string const& tz);
     std::string const&     timezone() const throw ();
     bool                   timezone_defined() const throw ();
@@ -171,7 +170,6 @@ namespace                  configuration {
     group                  _servicegroups;
     std::string            _service_description;
     static setters const   _setters[];
-    opt<unsigned short>    _stalking_options;
     opt<std::string>       _timezone;
  };
 

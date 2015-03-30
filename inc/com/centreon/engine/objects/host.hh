@@ -52,9 +52,6 @@ typedef struct                  host_struct {
   int                           flap_detection_on_up;
   int                           flap_detection_on_down;
   int                           flap_detection_on_unreachable;
-  int                           stalk_on_up;
-  int                           stalk_on_down;
-  int                           stalk_on_unreachable;
   int                           check_freshness;
   int                           freshness_threshold;
   int                           checks_enabled;
@@ -144,9 +141,6 @@ host* add_host(
         int flap_detection_on_up,
         int flap_detection_on_down,
         int flap_detection_on_unreachable,
-        int stalk_on_up,
-        int stalk_on_down,
-        int stalk_on_unreachable,
         int check_freshness,
         int freshness_threshold,
         int should_be_drawn,

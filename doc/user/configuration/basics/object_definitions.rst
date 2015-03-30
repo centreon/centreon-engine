@@ -117,7 +117,6 @@ Definition Format
     notification_period            timeperiod_name
     # notification_options         [d,u,r,f,s]
     # notifications_enabled        [0/1]
-    # stalking_options             [o,d,u]
   }
 
 Example Definition
@@ -277,9 +276,6 @@ notification_options         This directive is used to determine when notificati
                              only be sent out when the host goes DOWN and when it recovers from a DOWN state.
 notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
                              notifications for this host are enabled. Values: 0 = disable host notifications, 1 = enable host notifications.
-stalking_options             This directive determines which host states "stalking" is enabled for. Valid options are a combination of one or more of
-                             the following: o = stalk on UP states, d = stalk on DOWN states, and u = stalk on UNREACHABLE states. More information
-                             on state stalking can be found :ref:`here <state_stalking>`.
 timezone                     Time zone of this host. All times applied to this host (time periods, downtimes, ...) will be affected by this option.
 ============================ =========================================================================================================================
 
@@ -386,7 +382,6 @@ Definition Format
     # notifications_enabled        [0/1]
     contacts                       contacts
     contact_groups                 contact_groups
-    # stalking_options             [o,w,u,c]
   }
 
 Example Definition
@@ -527,9 +522,6 @@ contacts                     This is a list of the short names of the :ref:`cont
 contact_groups               This is a list of the short names of the :ref:`contact groups <obj_def_contactgroup>` that
                              should be notified whenever there are problems (or recoveries) with this service. Multiple contact groups should be
                              separated by commas. You must specify at least one contact or contact group in each service definition.
-stalking_options             This directive determines which service states "stalking" is enabled for. Valid options are a combination of one or more
-                             of the following: o = stalk on OK states, w = stalk on WARNING states, u = stalk on UNKNOWN states, and c = stalk on
-                             CRITICAL states. More information on state stalking can be found :ref:`here <state_stalking>`.
 timezone                     Time zone of this service. All times applied to this service (time periods, downtimes, ...) will be affected by this
                              option.
 ============================ =========================================================================================================================

@@ -134,14 +134,6 @@ void applier::service::add_object(
                       &configuration::service::unknown),
     static_cast<bool>(obj->flap_detection_options()
                       &configuration::service::critical),
-    static_cast<bool>(obj->stalking_options()
-                      &configuration::service::ok),
-    static_cast<bool>(obj->stalking_options()
-                      &configuration::service::warning),
-    static_cast<bool>(obj->stalking_options()
-                      &configuration::service::unknown),
-    static_cast<bool>(obj->stalking_options()
-                      &configuration::service::critical),
     obj->check_freshness(),
     obj->freshness_threshold(),
     obj->obsess_over_service(),
@@ -321,22 +313,6 @@ void applier::service::modify_object(
   modify_if_different(
     s->check_timeout,
     obj->check_timeout());
-  modify_if_different(
-    s->stalk_on_ok,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::service::ok)));
-  modify_if_different(
-    s->stalk_on_warning,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::service::warning)));
-  modify_if_different(
-    s->stalk_on_unknown,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::service::unknown)));
-  modify_if_different(
-    s->stalk_on_critical,
-    static_cast<int>(static_cast<bool>(
-      obj->stalking_options() & configuration::service::critical)));
   modify_if_different(
     s->check_period,
     NULL_IF_EMPTY(obj->check_period()));

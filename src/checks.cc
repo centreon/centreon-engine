@@ -219,8 +219,6 @@ int handle_async_service_check_result(
   int first_host_check_initiated = false;
   int route_result = HOST_UP;
   time_t current_time = 0L;
-  int state_was_logged = false;
-  char* old_plugin_output = NULL;
   char* temp_ptr = NULL;
   objectlist* check_servicelist = NULL;
   objectlist* servicelist_item = NULL;
@@ -316,10 +314,6 @@ int handle_async_service_check_result(
 
   /* save the old service status info */
   temp_service->last_state = temp_service->current_state;
-
-  /* save old plugin output */
-  if (temp_service->plugin_output)
-    old_plugin_output = temp_service->plugin_output;
 
   /* clear the old plugin output and perf data buffers */
   delete[] temp_service->long_plugin_output;
@@ -610,7 +604,6 @@ int handle_async_service_check_result(
 
       /* log the service recovery */
       log_service_event(temp_service);
-      state_was_logged = true;
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
@@ -632,7 +625,6 @@ int handle_async_service_check_result(
 
       /* log the soft recovery */
       log_service_event(temp_service);
-      state_was_logged = true;
 
       /* run the service event handler to handle the soft state change */
       handle_service_event(temp_service);
@@ -822,7 +814,6 @@ int handle_async_service_check_result(
         /* log the problem as a hard state if the host just went down */
         if (hard_state_change == true) {
           log_service_event(temp_service);
-          state_was_logged = true;
 
           /* run the service event handler to handle the hard state */
           handle_service_event(temp_service);
@@ -840,7 +831,6 @@ int handle_async_service_check_result(
 
         /* log the service check retry */
         log_service_event(temp_service);
-        state_was_logged = true;
 
         /* run the service event handler to handle the soft state */
         handle_service_event(temp_service);
@@ -898,18 +888,13 @@ int handle_async_service_check_result(
       temp_service->state_type = HARD_STATE;
 
       /* if we've hard a hard state change... */
-      if (hard_state_change == true) {
-
+      if (hard_state_change == true)
         /* log the service problem (even if host is not up, which is new in 0.0.5) */
         log_service_event(temp_service);
-        state_was_logged = true;
-      }
 
       /* else log the problem (again) if this service is flagged as being volatile */
-      else if (temp_service->is_volatile == true) {
+      else if (temp_service->is_volatile == true)
         log_service_event(temp_service);
-        state_was_logged = true;
-      }
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
@@ -981,33 +966,6 @@ int handle_async_service_check_result(
         CHECK_OPTION_NONE);
   }
 
-  /* if we're stalking this state type and state was not already logged AND the plugin output changed since last check, log it now.. */
-  if (temp_service->state_type == HARD_STATE && state_change == false
-      && state_was_logged == false
-      && compare_strings(
-           old_plugin_output,
-           temp_service->plugin_output)) {
-
-    if ((temp_service->current_state == STATE_OK
-         && temp_service->stalk_on_ok == true))
-      log_service_event(temp_service);
-
-    else
-      if ((temp_service->current_state == STATE_WARNING
-           && temp_service->stalk_on_warning == true))
-	log_service_event(temp_service);
-
-      else
-	if ((temp_service->current_state == STATE_UNKNOWN
-	     && temp_service->stalk_on_unknown == true))
-	  log_service_event(temp_service);
-
-	else
-	  if ((temp_service->current_state == STATE_CRITICAL
-	       && temp_service->stalk_on_critical == true))
-	    log_service_event(temp_service);
-  }
-
   /* send data to event broker */
   broker_service_check(
     NEBTYPE_SERVICECHECK_PROCESSED,
@@ -1041,10 +999,6 @@ int handle_async_service_check_result(
     check_for_service_flapping(temp_service, true);
     check_for_host_flapping(temp_host, true, false);
   }
-
-  /* free allocated memory */
-  delete[] old_plugin_output;
-
 
   /* run async checks of all services we added above */
   /* don't run a check if one is already executing or we can get by with a cached state */
@@ -2152,7 +2106,6 @@ int handle_async_host_check_result_3x(
   time_t current_time;
   int result = STATE_OK;
   int reschedule_check = false;
-  char* old_plugin_output = NULL;
   char* temp_ptr = NULL;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
@@ -2274,10 +2227,6 @@ int handle_async_host_check_result_3x(
   if (temp_host->state_type == HARD_STATE)
     temp_host->last_hard_state = temp_host->current_state;
 
-  /* save old plugin output */
-  if (temp_host->plugin_output)
-    old_plugin_output = temp_host->plugin_output;
-
   /* clear the old plugin output and perf data buffers */
   delete[] temp_host->long_plugin_output;
   delete[] temp_host->perf_data;
@@ -2398,14 +2347,10 @@ int handle_async_host_check_result_3x(
   process_host_check_result_3x(
     temp_host,
     result,
-    old_plugin_output,
     CHECK_OPTION_NONE,
     reschedule_check,
     true,
     config->cached_host_check_horizon());
-
-  /* free memory */
-  delete[] old_plugin_output;
 
   logger(dbg_checks, more)
     << "** Async check result for host '" << temp_host->name
@@ -2447,7 +2392,6 @@ int handle_async_host_check_result_3x(
 int process_host_check_result_3x(
       host* hst,
       int new_state,
-      char* old_plugin_output,
       int check_options,
       int reschedule_check,
       int use_cached_result,
@@ -2900,22 +2844,6 @@ int process_host_check_result_3x(
     << ", Final State=" << hst->current_state;
 
   /******************** POST-PROCESSING STUFF *********************/
-
-  /* if the plugin output differs from previous check and no state change, log the current state/output if state stalking is enabled */
-  if (hst->last_state == hst->current_state
-      && compare_strings(old_plugin_output, hst->plugin_output)) {
-
-    if (hst->current_state == HOST_UP && hst->stalk_on_up == true)
-      log_host_event(hst);
-
-    else if (hst->current_state == HOST_DOWN
-             && hst->stalk_on_down == true)
-      log_host_event(hst);
-
-    else if (hst->current_state == HOST_UNREACHABLE
-             && hst->stalk_on_unreachable == true)
-      log_host_event(hst);
-  }
 
   /* check to see if the associated host is flapping */
   check_for_host_flapping(hst, true, true);
