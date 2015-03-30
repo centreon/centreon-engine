@@ -93,41 +93,6 @@ processed.
             cfg_dir=/etc/centreon-engine/hosts
 =========== =====================================
 
-.. _main_cfg_opt_object_cache_file:
-
-Object Cache File
------------------
-
-This directive is used to specify a file in which a cached copy of
-:ref:`object definitions <object_configuration_overview>`
-should be stored. The cache file is (re)created every time Centreon
-Engine is (re)started. It is intended to speed up config file caching
-and allow you to edit the source
-:ref:`object config files <main_cfg_opt_object_configuration_file>`
-while Centreon Engine is running without affecting the output displayed.
-
-=========== ========================================================
-**Format**  object_cache_file=<file_name>
-**Example** object_cache_file=/var/log/centreon-engine/objects.cache
-=========== ========================================================
-
-.. _main_cfg_opt_precached_object_file:
-
-Precached Object File
----------------------
-
-This directive is used to specify a file in which a pre-processed,
-pre-cached copy of :ref:`object definitions <object_configuration_overview>`
-should be stored. This file can be used to drastically improve startup
-times in large/complex Centreon Engine installations. Read more
-information on how to speed up start times
-:ref:`here <fast_startup_options>`.
-
-=========== ===============================================================
-**Format**  precached_object_file=<file_name>
-**Example** precached_object_file=/var/log/centreon-engine/objects.precache
-=========== ===============================================================
-
 .. _main_cfg_opt_resource_file:
 
 Resource File

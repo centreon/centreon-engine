@@ -86,7 +86,6 @@ state::setters const state::_setters[] = {
   { "max_host_check_spread",                       SETTER(unsigned int, max_host_check_spread) },
   { "max_log_file_size",                           SETTER(unsigned long, max_log_file_size) },
   { "max_service_check_spread",                    SETTER(unsigned int, max_service_check_spread) },
-  { "object_cache_file",                           SETTER(std::string const&, object_cache_file) },
   { "obsess_over_hosts",                           SETTER(bool, obsess_over_hosts) },
   { "obsess_over_services",                        SETTER(bool, obsess_over_services) },
   { "ochp_command",                                SETTER(std::string const&, ochp_command) },
@@ -94,7 +93,6 @@ state::setters const state::_setters[] = {
   { "ocsp_command",                                SETTER(std::string const&, ocsp_command) },
   { "ocsp_timeout",                                SETTER(unsigned int, ocsp_timeout) },
   { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
-  { "precached_object_file",                       SETTER(std::string const&, precached_object_file) },
   { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
   { "retention_update_interval",                   SETTER(unsigned int, retention_update_interval) },
   { "service_check_timeout",                       SETTER(unsigned int, service_check_timeout) },
@@ -153,8 +151,10 @@ state::setters const state::_setters[] = {
   { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
   { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
   { "notification_timeout",                        SETTER(unsigned int, _set_notification_timeout) },
+  { "object_cache_file",                           SETTER(std::string const&, _set_object_cache_file) },
   { "p1_file",                                     SETTER(std::string const&, _set_p1_file) },
   { "perfdata_timeout",                            SETTER(int, _set_perfdata_timeout) },
+  { "precached_object_file",                       SETTER(std::string const&, _set_precached_object_file) },
   { "process_performance_data",                    SETTER(bool, _set_process_performance_data) },
   { "retained_contact_host_attribute_mask",        SETTER(unsigned long, _set_retained_contact_host_attribute_mask) },
   { "retained_contact_service_attribute_mask",     SETTER(unsigned long, _set_retained_contact_service_attribute_mask) },
@@ -234,7 +234,6 @@ static unsigned int const              default_max_host_check_spread(30);
 static unsigned long const             default_max_log_file_size(0);
 static unsigned int const              default_max_parallel_service_checks(0);
 static unsigned int const              default_max_service_check_spread(30);
-static std::string const               default_object_cache_file("");
 static bool const                      default_obsess_over_hosts(false);
 static bool const                      default_obsess_over_services(false);
 static std::string const               default_ochp_command("");
@@ -242,7 +241,6 @@ static unsigned int const              default_ochp_timeout(15);
 static std::string const               default_ocsp_command("");
 static unsigned int const              default_ocsp_timeout(15);
 static bool const                      default_passive_host_checks_are_soft(false);
-static std::string const               default_precached_object_file(DEFAULT_PRECACHED_OBJECT_FILE);
 static unsigned int const              default_retention_update_interval(60);
 static unsigned int const              default_service_check_timeout(60);
 static unsigned int const              default_service_freshness_check_interval(60);
@@ -335,7 +333,6 @@ state::state()
     _max_log_file_size(default_max_log_file_size),
     _max_parallel_service_checks(default_max_parallel_service_checks),
     _max_service_check_spread(default_max_service_check_spread),
-    _object_cache_file(default_object_cache_file),
     _obsess_over_hosts(default_obsess_over_hosts),
     _obsess_over_services(default_obsess_over_services),
     _ochp_command(default_ochp_command),
@@ -343,7 +340,6 @@ state::state()
     _ocsp_command(default_ocsp_command),
     _ocsp_timeout(default_ocsp_timeout),
     _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
-    _precached_object_file(default_precached_object_file),
     _retention_update_interval(default_retention_update_interval),
     _service_check_timeout(default_service_check_timeout),
     _service_freshness_check_interval(default_service_freshness_check_interval),
@@ -439,7 +435,6 @@ state& state::operator=(state const& right) {
     _max_log_file_size = right._max_log_file_size;
     _max_parallel_service_checks = right._max_parallel_service_checks;
     _max_service_check_spread = right._max_service_check_spread;
-    _object_cache_file = right._object_cache_file;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
     _ochp_command = right._ochp_command;
@@ -447,7 +442,6 @@ state& state::operator=(state const& right) {
     _ocsp_command = right._ocsp_command;
     _ocsp_timeout = right._ocsp_timeout;
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
-    _precached_object_file = right._precached_object_file;
     _retention_update_interval = right._retention_update_interval;
     _servicedependencies = right._servicedependencies;
     _servicegroups = right._servicegroups;
@@ -534,7 +528,6 @@ bool state::operator==(state const& right) const throw () {
           && _max_log_file_size == right._max_log_file_size
           && _max_parallel_service_checks == right._max_parallel_service_checks
           && _max_service_check_spread == right._max_service_check_spread
-          && _object_cache_file == right._object_cache_file
           && _obsess_over_hosts == right._obsess_over_hosts
           && _obsess_over_services == right._obsess_over_services
           && _ochp_command == right._ochp_command
@@ -542,7 +535,6 @@ bool state::operator==(state const& right) const throw () {
           && _ocsp_command == right._ocsp_command
           && _ocsp_timeout == right._ocsp_timeout
           && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
-          && _precached_object_file == right._precached_object_file
           && _retention_update_interval == right._retention_update_interval
           && cmp_set_ptr(_servicedependencies, right._servicedependencies)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
@@ -1840,24 +1832,6 @@ void state::max_service_check_spread(unsigned int value) {
 }
 
 /**
- *  Get object_cache_file value.
- *
- *  @return The object_cache_file value.
- */
-std::string const& state::object_cache_file() const throw () {
-  return (_object_cache_file);
-}
-
-/**
- *  Set object_cache_file value.
- *
- *  @param[in] value The new object_cache_file value.
- */
-void state::object_cache_file(std::string const& value) {
-  _object_cache_file = value;
-}
-
-/**
  *  Get obsess_over_hosts value.
  *
  *  @return The obsess_over_hosts value.
@@ -1986,24 +1960,6 @@ bool state::passive_host_checks_are_soft() const throw () {
  */
 void state::passive_host_checks_are_soft(bool value) {
   _passive_host_checks_are_soft = value;
-}
-
-/**
- *  Get precached_object_file value.
- *
- *  @return The precached_object_file value.
- */
-std::string const& state::precached_object_file() const throw () {
-  return (_precached_object_file);
-}
-
-/**
- *  Set precached_object_file value.
- *
- *  @param[in] value The new precached_object_file value.
- */
-void state::precached_object_file(std::string const& value) {
-  _precached_object_file = value;
 }
 
 /**
@@ -3199,6 +3155,19 @@ void state::_set_notification_timeout(unsigned int value) {
 }
 
 /**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_object_cache_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: object_cache_file variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Unused variable p1_file.
  *
  *  @param[in] value Unused.
@@ -3219,6 +3188,19 @@ void state::_set_perfdata_timeout(int value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: perfdata_timeout variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_precached_object_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: precached_object_file variable ignored";
   ++config_warnings;
   return ;
 }

@@ -255,7 +255,6 @@ Macro Name             Service Checks Service Notifications Host Checks Host Not
 `MAINCONFIGFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `STATUSDATAFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RETENTIONDATAFILE`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`OBJECTCACHEFILE`_     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LOGFILE`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RESOURCEFILE`_        **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `COMMANDFILE`_         **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -603,7 +602,6 @@ File Macros
 _`MAINCONFIGFILE`      The location of the :ref:`main config file <main_cfg_opt>`.
 _`STATUSDATAFILE`      The location of the :ref:`status data file <main_cfg_opt_status_file>`.
 _`RETENTIONDATAFILE`   The location of the :ref:`retention data file <main_cfg_opt_state_retention_file>`.
-_`OBJECTCACHEFILE`     The location of the :ref:`object cache file <main_cfg_opt_object_cache_file>`.
 _`LOGFILE`             The location of the :ref:`log file <main_cfg_opt_log_file>`.
 _`RESOURCEFILE`        The location of the :ref:`resource file <main_cfg_opt_resource_file>`.
 _`COMMANDFILE`         The location of the :ref:`command file <main_cfg_opt_external_command_file>`.

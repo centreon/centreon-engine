@@ -735,7 +735,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->max_log_file_size(new_cfg.max_log_file_size());
   config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
   config->max_service_check_spread(new_cfg.max_service_check_spread());
-  config->object_cache_file(new_cfg.object_cache_file());
   config->obsess_over_hosts(new_cfg.obsess_over_hosts());
   config->obsess_over_services(new_cfg.obsess_over_services());
   config->ochp_command(new_cfg.ochp_command());
@@ -743,7 +742,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->ocsp_command(new_cfg.ocsp_command());
   config->ocsp_timeout(new_cfg.ocsp_timeout());
   config->passive_host_checks_are_soft(new_cfg.passive_host_checks_are_soft());
-  config->precached_object_file(new_cfg.precached_object_file());
   config->resource_file(new_cfg.resource_file());
   config->retention_update_interval(new_cfg.retention_update_interval());
   config->service_check_timeout(new_cfg.service_check_timeout());

@@ -96,11 +96,12 @@ int main(int argc, char* argv[]) {
     { "dont-verify-paths",     no_argument, NULL, 'x' },
     { "help",                  no_argument, NULL, 'h' },
     { "license",               no_argument, NULL, 'V' },
-    { "precache-objects",      no_argument, NULL, 'p' },
     { "test-scheduling",       no_argument, NULL, 's' },
-    { "use-precached-objects", no_argument, NULL, 'u' },
     { "verify-config",         no_argument, NULL, 'v' },
     { "version",               no_argument, NULL, 'V' },
+    // Deprecated.
+    { "precache-objects",      no_argument, NULL, 'p' },
+    { "use-precached-objects", no_argument, NULL, 'u' },
     { NULL,                    no_argument, NULL, '\0' }
   };
 #endif // HAVE_GETOPT_H
@@ -158,14 +159,19 @@ int main(int argc, char* argv[]) {
       case 'x': // Don't verify circular paths.
         verify_circular_paths = false;
         break;
-      case 'p': // Precache object config.
-        precache_objects = true;
-        break;
-      case 'u': // Use precached object config.
-        use_precached_objects = true;
-        break;
       case 'D': // Diagnostic.
         diagnose = true;
+        break;
+      case 'p': // Deprecated.
+        logger(logging::log_config_warning, logging::basic)
+          << "Centreon Engine does not recognize the -p (--precache-objects) flag\n"
+          << "anymore. Configuration caching is not requested to get a fast startup.\n";
+        break;
+      case 'u': // Deprecated.
+        logger(logging::log_config_warning, logging::basic)
+          << "Centreon Engine does not recognize the -u (--use-precached-objects)\n"
+          << "flag anymore. Configuration caching is not requested to get a fast\n"
+          << "startup.\n";
         break;
       default:
         error = true;
@@ -174,8 +180,6 @@ int main(int argc, char* argv[]) {
 
     // Invalid argument count.
     if ((argc < 2)
-        // Invalid argument combination.
-        || (precache_objects && !test_scheduling && !verify_config)
         // Main configuration file not on command line.
         || (optind >= argc))
       error = true;
@@ -237,9 +241,6 @@ int main(int argc, char* argv[]) {
         << "                              files.\n"
         << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
         << "                              USE WITH CAUTION !\n"
-        << "  -p, --precache-objects      Precache object configuration - use with\n"
-        << "                              -v or -s options.\n"
-        << "  -u, --use-precached-objects Use precached object config file.\n"
         << "  -D, --diagnose              Generate a diagnostic file.";
       retval = (display_help ? EXIT_SUCCESS : EXIT_FAILURE);
     }
@@ -309,13 +310,9 @@ int main(int argc, char* argv[]) {
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
 
+        // Print scheduling information.
         display_scheduling_info();
-        if (precache_objects)
-          logger(logging::log_info_message, logging::basic)
-            << "\n"
-            << "OBJECT PRECACHING\n"
-            << "-----------------\n"
-            << "Object config files were precached.";
+
         retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {

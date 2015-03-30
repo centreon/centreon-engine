@@ -86,7 +86,6 @@
 # define MACRO_MAINCONFIGFILE                   62
 # define MACRO_STATUSDATAFILE                   63
 # define MACRO_RETENTIONDATAFILE                66
-# define MACRO_OBJECTCACHEFILE                  67
 # define MACRO_LOGFILE                          69
 # define MACRO_RESOURCEFILE                     70
 # define MACRO_COMMANDFILE                      71

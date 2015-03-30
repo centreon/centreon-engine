@@ -440,7 +440,7 @@ extern "C" {
 int read_main_config_file(char const* main_config_file);
 
 /* top-level routine processes all config files */
-int xodtemplate_read_config_data(char const*, int, int, int);
+int xodtemplate_read_config_data(char const*, int);
 /* grabs variables from main config file */
 int xodtemplate_grab_config_info(char const*);
 /* process data in a specific config file */
@@ -576,8 +576,6 @@ int xodtemplate_resolve_objects();
 int xodtemplate_sort_objects();
 int xodtemplate_compare_strings1(char*, char*);
 int xodtemplate_compare_strings2(char*, char*, char*, char*);
-
-int xodtemplate_cache_objects(char*);
 
 int xodtemplate_duplicate_service(xodtemplate_service*,char*);
 int xodtemplate_duplicate_hostdependency(

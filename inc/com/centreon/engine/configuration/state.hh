@@ -222,8 +222,6 @@ namespace               configuration {
     void                max_parallel_service_checks(unsigned int value);
     unsigned int        max_service_check_spread() const throw ();
     void                max_service_check_spread(unsigned int value);
-    std::string const&  object_cache_file() const throw ();
-    void                object_cache_file(std::string const& value);
     bool                obsess_over_hosts() const throw ();
     void                obsess_over_hosts(bool value);
     bool                obsess_over_services() const throw ();
@@ -238,8 +236,6 @@ namespace               configuration {
     void                ocsp_timeout(unsigned int value);
     bool                passive_host_checks_are_soft() const throw ();
     void                passive_host_checks_are_soft(bool value);
-    std::string const&  precached_object_file() const throw ();
-    void                precached_object_file(std::string const& value);
     std::list<std::string> const&
                         resource_file() const throw ();
     void                resource_file(std::list<std::string> const& value);
@@ -355,8 +351,10 @@ namespace               configuration {
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
     void                _set_notification_timeout(unsigned int value);
+    void                _set_object_cache_file(std::string const& value);
     void                _set_p1_file(std::string const& value);
     void                _set_perfdata_timeout(int value);
+    void                _set_precached_object_file(std::string const& value);
     void                _set_process_performance_data(bool value);
     void                _set_resource_file(std::string const& value);
     void                _set_retained_contact_host_attribute_mask(unsigned long value);
@@ -480,7 +478,6 @@ namespace               configuration {
     unsigned long       _max_log_file_size;
     unsigned int        _max_parallel_service_checks;
     unsigned int        _max_service_check_spread;
-    std::string         _object_cache_file;
     bool                _obsess_over_hosts;
     bool                _obsess_over_services;
     std::string         _ochp_command;
@@ -488,7 +485,6 @@ namespace               configuration {
     std::string         _ocsp_command;
     unsigned int        _ocsp_timeout;
     bool                _passive_host_checks_are_soft;
-    std::string         _precached_object_file;
     std::list<std::string>
                         _resource_file;
     unsigned int        _retention_update_interval;

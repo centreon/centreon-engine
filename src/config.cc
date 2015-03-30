@@ -311,9 +311,7 @@ int pre_flight_object_check(int* w, int* e) {
        temp_command;
        temp_command = temp_command->next, ++total_objects) {
     // Check for illegal characters in command name.
-    if ((use_precached_objects == false)
-        && (contains_illegal_object_chars(temp_command->name)
-            == true)) {
+    if ((contains_illegal_object_chars(temp_command->name) == true)) {
       logger(log_verification_error, basic)
         << "Error: The name of command '" << temp_command->name
         << "' contains one or more illegal characters.";
@@ -615,14 +613,12 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check for illegal characters in service description */
-  if (use_precached_objects == false) {
-    if (contains_illegal_object_chars(svc->description) == true) {
-      logger(log_verification_error, basic)
-        << "Error: The description string for service '"
-        << svc->description << "' on host '" << svc->host_name
-        << "' contains one or more illegal characters.";
-      errors++;
-    }
+  if (contains_illegal_object_chars(svc->description) == true) {
+    logger(log_verification_error, basic)
+      << "Error: The description string for service '"
+      << svc->description << "' on host '" << svc->host_name
+      << "' contains one or more illegal characters.";
+    errors++;
   }
 
   if (w != NULL)
@@ -720,13 +716,11 @@ int check_host(host* hst, int* w, int* e) {
   }
 
   /* check for illegal characters in host name */
-  if (use_precached_objects == false) {
-    if (contains_illegal_object_chars(hst->name) == true) {
-      logger(log_verification_error, basic)
-        << "Error: The name of host '" << hst->name
-        << "' contains one or more illegal characters.";
-      errors++;
-    }
+  if (contains_illegal_object_chars(hst->name) == true) {
+    logger(log_verification_error, basic)
+      << "Error: The name of host '" << hst->name
+      << "' contains one or more illegal characters.";
+    errors++;
   }
 
   if (w != NULL)
@@ -776,13 +770,11 @@ int check_servicegroup(servicegroup* sg, int* w, int* e) {
   }
 
   // Check for illegal characters in servicegroup name.
-  if (use_precached_objects == false) {
-    if (contains_illegal_object_chars(sg->group_name) == true) {
-      logger(log_verification_error, basic)
-        << "Error: The name of servicegroup '" << sg->group_name
-        << "' contains one or more illegal characters.";
-      errors++;
-    }
+  if (contains_illegal_object_chars(sg->group_name) == true) {
+    logger(log_verification_error, basic)
+      << "Error: The name of servicegroup '" << sg->group_name
+      << "' contains one or more illegal characters.";
+    errors++;
   }
 
   // Add errors.
@@ -828,13 +820,11 @@ int check_hostgroup(hostgroup* hg, int* w, int* e) {
   }
 
   // Check for illegal characters in hostgroup name.
-  if (use_precached_objects == false) {
-    if (contains_illegal_object_chars(hg->group_name) == true) {
-      logger(log_verification_error, basic)
-        << "Error: The name of hostgroup '" << hg->group_name
-        << "' contains one or more illegal characters.";
-      errors++;
-    }
+  if (contains_illegal_object_chars(hg->group_name) == true) {
+    logger(log_verification_error, basic)
+      << "Error: The name of hostgroup '" << hg->group_name
+      << "' contains one or more illegal characters.";
+    errors++;
   }
 
   // Add errors.
@@ -1009,8 +999,7 @@ int check_timeperiod(timeperiod* tp, int* w, int* e) {
   int errors(0);
 
   // Check for illegal characters in timeperiod name.
-  if ((use_precached_objects == false)
-      && (contains_illegal_object_chars(tp->name) == true)) {
+  if (contains_illegal_object_chars(tp->name) == true) {
     logger(log_verification_error, basic)
       << "Error: The name of time period '" << tp->name
       << "' contains one or more illegal characters.";

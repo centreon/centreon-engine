@@ -79,8 +79,6 @@ extern int                       restarting;
 extern int                       verify_config;
 extern int                       verify_circular_paths;
 extern int                       test_scheduling;
-extern int                       precache_objects;
-extern int                       use_precached_objects;
 
 extern unsigned int              currently_running_service_checks;
 extern unsigned int              currently_running_host_checks;

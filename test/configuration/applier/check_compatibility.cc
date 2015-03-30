@@ -606,11 +606,7 @@ static bool oldparser_read_config(
   init_macros();
   int ret(read_main_config_file(filename.c_str()));
   if (ret == OK)
-    ret = xodtemplate_read_config_data(
-            filename.c_str(),
-            options,
-            false,
-            false);
+    ret = xodtemplate_read_config_data(filename.c_str(), options);
   if (ret == OK)
     ret = pre_flight_check();
   if (!command_file)

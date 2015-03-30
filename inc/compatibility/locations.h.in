@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,14 +47,6 @@
 #  ifndef DEFAULT_CONFIG_FILE
 #    define DEFAULT_CONFIG_FILE           "@PREFIX_CONF@/centengine.cfg"
 #  endif // !DEFAULT_CONFIG_FILE
-
-#  ifndef DEFAULT_OBJECT_CACHE_FILE
-#    define DEFAULT_OBJECT_CACHE_FILE     "@VAR_DIR@/objects.cache"
-#  endif // !DEFAULT_OBJECT_CACHE_FILE
-
-#  ifndef DEFAULT_PRECACHED_OBJECT_FILE
-#    define DEFAULT_PRECACHED_OBJECT_FILE "@VAR_DIR@/objects.precache"
-#  endif // !DEFAULT_PRECACHED_OBJECT_FILE
 
 #  ifndef DEFAULT_EVENT_BROKER_FILE
 #    define DEFAULT_EVENT_BROKER_FILE     "@VAR_DIR@/broker.socket"

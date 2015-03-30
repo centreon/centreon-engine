@@ -95,7 +95,6 @@ applier::macros::~macros() throw() {
   delete[] _mac->x[MACRO_EVENTSTARTTIME];
   delete[] _mac->x[MACRO_LOGFILE];
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  delete[] _mac->x[MACRO_OBJECTCACHEFILE];
   delete[] _mac->x[MACRO_PROCESSSTARTTIME];
   delete[] _mac->x[MACRO_RESOURCEFILE];
   delete[] _mac->x[MACRO_RETENTIONDATAFILE];

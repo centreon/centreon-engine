@@ -78,11 +78,6 @@ static int                            xodtemplate_current_object_type = XODTEMPL
 static int                            xodtemplate_current_config_file = 0;
 static char**                         xodtemplate_config_files = NULL;
 
-static char*                          xodtemplate_cache_file = NULL;
-static char*                          xodtemplate_precache_file = NULL;
-
-static int                            presorted_objects = false;
-
 /*
  * Macro magic used to determine if a service is assigned
  * via hostgroup_name or host_name. Those assigned via host_name
@@ -110,9 +105,7 @@ static char const* xodtemplate_config_file_name(int config_file) {
 /* process all config files - both core and CGIs pass in name of main config file */
 int xodtemplate_read_config_data(
       char const* main_config_file,
-      int options,
-      int cache,
-      int precache) {
+      int options) {
   struct timeval tv[14];
   int result = OK;
 
@@ -145,172 +138,149 @@ int xodtemplate_read_config_data(
   xodtemplate_config_files = new char*[256];
 
   /* are the objects we're reading already pre-sorted? */
-  presorted_objects = false;
-  presorted_objects = (use_precached_objects == true) ? true : false;
   if (test_scheduling == true)
     gettimeofday(&tv[0], NULL);
 
-  /* only process the precached object file as long as we're not regenerating it and we're not verifying the config */
-  if (use_precached_objects == true)
-    result = xodtemplate_process_config_file(
-               xodtemplate_precache_file,
-               options);
-  /* process object config files normally... */
-  else {
-    /* determine the directory of the main config file */
-    char* config_file(string::dup(main_config_file));
-    char* config_base_dir(string::dup(dirname(config_file)));
-    delete[] config_file;
+  /* determine the directory of the main config file */
+  char* config_file(string::dup(main_config_file));
+  char* config_base_dir(string::dup(dirname(config_file)));
+  delete[] config_file;
 
-    /* open the main config file for reading (we need to find all the config files to read) */
-    mmapfile* thefile(mmap_fopen(main_config_file));
-    if (!thefile) {
-      delete[] config_base_dir;
-      delete[] xodtemplate_config_files;
-      xodtemplate_config_files = NULL;
-      printf(
-        "Unable to open main config file '%s'\n",
-        main_config_file);
-      return (ERROR);
-    }
-
-    /* daemon reads all config files/dirs specified in the main config file */
-    /* read in all lines from the main config file */
-    char* input(NULL);
-    while (1) {
-      /* free memory */
-      delete[] input;
-
-      /* get the next line */
-      if ((input = mmap_fgets_multiline(thefile)) == NULL)
-        break;
-
-      /* strip input */
-      strip(input);
-
-      /* skip blank lines and comments */
-      if (input[0] == '#' || input[0] == ';' || input[0] == '\x0')
-        continue;
-
-      char* var(strtok(input, "="));
-      if (!var)
-        continue;
-
-      char* val(strtok(NULL, "\n"));
-      if (!val)
-        continue;
-
-      /* process a single config file */
-      if (!strcmp(var, "xodtemplate_config_file")
-          || !strcmp(var, "cfg_file")) {
-        char* temp_buffer(string::dup(val));
-        if (config_base_dir != NULL && val[0] != '/') {
-          std::ostringstream oss;
-          oss << config_base_dir << '/' << temp_buffer;
-          config_file = string::dup(oss.str());
-          delete[] temp_buffer;
-        }
-        else
-          config_file = temp_buffer;
-
-        /* process the config file... */
-        result = xodtemplate_process_config_file(config_file, options);
-
-        delete[] config_file;
-
-        /* if there was an error processing the config file, break out of loop */
-        if (result == ERROR)
-          break;
-      }
-      /* process all files in a config directory */
-      else if (!strcmp(var, "xodtemplate_config_dir")
-               || !strcmp(var, "cfg_dir")) {
-        char* temp_buffer(string::dup(val));
-        if (config_base_dir != NULL && val[0] != '/') {
-          std::ostringstream oss;
-          oss << config_base_dir << '/' << temp_buffer;
-          config_file = string::dup(oss.str());
-          delete[] temp_buffer;
-        }
-        else
-          config_file = temp_buffer;
-
-        /* strip trailing / if necessary */
-        if (config_file != NULL
-            && config_file[strlen(config_file) - 1] == '/')
-          config_file[strlen(config_file) - 1] = '\x0';
-
-        /* process the config directory... */
-        result = xodtemplate_process_config_dir(config_file, options);
-
-        delete[] config_file;
-
-        /* if there was an error processing the config file, break out of loop */
-        if (result == ERROR)
-          break;
-      }
-    }
-
-    /* free memory and close the file */
+  /* open the main config file for reading (we need to find all the config files to read) */
+  mmapfile* thefile(mmap_fopen(main_config_file));
+  if (!thefile) {
     delete[] config_base_dir;
-    delete[] input;
-    mmap_fclose(thefile);
+    delete[] xodtemplate_config_files;
+    xodtemplate_config_files = NULL;
+    printf(
+           "Unable to open main config file '%s'\n",
+           main_config_file);
+    return (ERROR);
   }
+
+  /* daemon reads all config files/dirs specified in the main config file */
+  /* read in all lines from the main config file */
+  char* input(NULL);
+  while (1) {
+    /* free memory */
+    delete[] input;
+
+    /* get the next line */
+    if ((input = mmap_fgets_multiline(thefile)) == NULL)
+      break;
+
+    /* strip input */
+    strip(input);
+
+    /* skip blank lines and comments */
+    if (input[0] == '#' || input[0] == ';' || input[0] == '\x0')
+      continue;
+
+    char* var(strtok(input, "="));
+    if (!var)
+      continue;
+
+    char* val(strtok(NULL, "\n"));
+    if (!val)
+      continue;
+
+    /* process a single config file */
+    if (!strcmp(var, "xodtemplate_config_file")
+        || !strcmp(var, "cfg_file")) {
+      char* temp_buffer(string::dup(val));
+      if (config_base_dir != NULL && val[0] != '/') {
+        std::ostringstream oss;
+        oss << config_base_dir << '/' << temp_buffer;
+        config_file = string::dup(oss.str());
+        delete[] temp_buffer;
+      }
+      else
+        config_file = temp_buffer;
+
+      /* process the config file... */
+      result = xodtemplate_process_config_file(config_file, options);
+
+      delete[] config_file;
+
+      /* if there was an error processing the config file, break out of loop */
+      if (result == ERROR)
+        break;
+    }
+    /* process all files in a config directory */
+    else if (!strcmp(var, "xodtemplate_config_dir")
+             || !strcmp(var, "cfg_dir")) {
+      char* temp_buffer(string::dup(val));
+      if (config_base_dir != NULL && val[0] != '/') {
+        std::ostringstream oss;
+        oss << config_base_dir << '/' << temp_buffer;
+        config_file = string::dup(oss.str());
+        delete[] temp_buffer;
+      }
+      else
+        config_file = temp_buffer;
+
+      /* strip trailing / if necessary */
+      if (config_file != NULL
+          && config_file[strlen(config_file) - 1] == '/')
+        config_file[strlen(config_file) - 1] = '\x0';
+
+      /* process the config directory... */
+      result = xodtemplate_process_config_dir(config_file, options);
+
+      delete[] config_file;
+
+      /* if there was an error processing the config file, break out of loop */
+      if (result == ERROR)
+        break;
+    }
+  }
+
+  /* free memory and close the file */
+  delete[] config_base_dir;
+  delete[] input;
+  mmap_fclose(thefile);
 
   if (test_scheduling == true)
     gettimeofday(&tv[1], NULL);
 
-  /* only perform intensive operations if we're not using the precached object file */
-  if (use_precached_objects == false) {
-    /* resolve objects definitions */
-    if (result == OK)
-      result = xodtemplate_resolve_objects();
-    if (test_scheduling == true)
-      gettimeofday(&tv[2], NULL);
+  /* resolve objects definitions */
+  if (result == OK)
+    result = xodtemplate_resolve_objects();
+  if (test_scheduling == true)
+    gettimeofday(&tv[2], NULL);
 
-    /* cleanup some additive inheritance stuff... */
-    xodtemplate_clean_additive_strings();
+  /* cleanup some additive inheritance stuff... */
+  xodtemplate_clean_additive_strings();
 
-    /* do the meat and potatoes stuff... */
-    if (result == OK)
-      result = xodtemplate_recombobulate_hostgroups();
-    if (test_scheduling == true)
-      gettimeofday(&tv[4], NULL);
+  /* do the meat and potatoes stuff... */
+  if (result == OK)
+    result = xodtemplate_recombobulate_hostgroups();
+  if (test_scheduling == true)
+    gettimeofday(&tv[4], NULL);
 
-    if (result == OK)
-      result = xodtemplate_duplicate_services();
-    if (test_scheduling == true)
-      gettimeofday(&tv[5], NULL);
+  if (result == OK)
+    result = xodtemplate_duplicate_services();
+  if (test_scheduling == true)
+    gettimeofday(&tv[5], NULL);
 
-    if (result == OK)
-      result = xodtemplate_recombobulate_servicegroups();
-    if (test_scheduling == true)
-      gettimeofday(&tv[6], NULL);
+  if (result == OK)
+    result = xodtemplate_recombobulate_servicegroups();
+  if (test_scheduling == true)
+    gettimeofday(&tv[6], NULL);
 
-    if (result == OK)
-      result = xodtemplate_duplicate_objects();
-    if (test_scheduling == true)
-      gettimeofday(&tv[7], NULL);
+  if (result == OK)
+    result = xodtemplate_duplicate_objects();
+  if (test_scheduling == true)
+    gettimeofday(&tv[7], NULL);
 
-    if (test_scheduling == true)
-      gettimeofday(&tv[8], NULL);
+  if (test_scheduling == true)
+    gettimeofday(&tv[8], NULL);
 
-    /* sort objects */
-    if (result == OK)
-      result = xodtemplate_sort_objects();
-    if (test_scheduling == true)
-      gettimeofday(&tv[10], NULL);
-  }
-
-  if (result == OK) {
-    /* cache object definitions for the CGIs and external apps */
-    if (cache == true)
-      xodtemplate_cache_objects(xodtemplate_cache_file);
-
-    /* precache object definitions for future runs */
-    if (precache == true)
-      xodtemplate_cache_objects(xodtemplate_precache_file);
-  }
+  /* sort objects */
+  if (result == OK)
+    result = xodtemplate_sort_objects();
+  if (test_scheduling == true)
+    gettimeofday(&tv[10], NULL);
 
   if (test_scheduling == true)
     gettimeofday(&tv[11], NULL);
@@ -326,68 +296,44 @@ int xodtemplate_read_config_data(
   if (test_scheduling == true)
     gettimeofday(&tv[13], NULL);
 
-  /* free memory */
-  delete[] xodtemplate_cache_file;
-  delete[] xodtemplate_precache_file;
-
-  xodtemplate_cache_file = NULL;
-  xodtemplate_precache_file = NULL;
-
   if (test_scheduling == true) {
     double runtime[14];
     runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
                           + (double)((tv[1].tv_usec - tv[0].tv_usec)
                                      / 1000.0) / 1000.0);
-    if (use_precached_objects == false) {
-      runtime[1] = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
-                            + (double)((tv[2].tv_usec - tv[1].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[2] = (double)((double)(tv[3].tv_sec - tv[2].tv_sec) +
-			    (double)((tv[3].tv_usec - tv[2].tv_usec)
+    runtime[1] = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
+                          + (double)((tv[2].tv_usec - tv[1].tv_usec)
                                      / 1000.0) / 1000.0);
-      runtime[3] = (double)((double)(tv[4].tv_sec - tv[3].tv_sec)
-			    + (double)((tv[4].tv_usec - tv[3].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[4] = (double)((double)(tv[5].tv_sec - tv[4].tv_sec)
-			    + (double)((tv[5].tv_usec - tv[4].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[5] = (double)((double)(tv[6].tv_sec - tv[5].tv_sec)
-			    + (double)((tv[6].tv_usec - tv[5].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[6] = (double)((double)(tv[7].tv_sec - tv[6].tv_sec)
-			    + (double)((tv[7].tv_usec - tv[6].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[7] = (double)((double)(tv[8].tv_sec - tv[7].tv_sec)
-			    + (double)((tv[8].tv_usec - tv[7].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[8] = (double)((double)(tv[9].tv_sec - tv[8].tv_sec)
-                            + (double)((tv[9].tv_usec - tv[8].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[9] = (double)((double)(tv[10].tv_sec - tv[9].tv_sec)
-			    + (double)((tv[10].tv_usec - tv[9].tv_usec)
-                                       / 1000.0) / 1000.0);
-      runtime[10] = (double)((double)(tv[11].tv_sec - tv[10].tv_sec)
-			     + (double)((tv[11].tv_usec - tv[10].tv_usec)
-                                        / 1000.0) / 1000.0);
-      runtime[11] = (double)((double)(tv[12].tv_sec - tv[11].tv_sec)
-			     + (double)((tv[12].tv_usec - tv[11].tv_usec)
-                                        / 1000.0) / 1000.0);
-    }
-    else {
-      runtime[1] = 0.0;
-      runtime[2] = 0.0;
-      runtime[3] = 0.0;
-      runtime[4] = 0.0;
-      runtime[5] = 0.0;
-      runtime[6] = 0.0;
-      runtime[7] = 0.0;
-      runtime[8] = 0.0;
-      runtime[9] = 0.0;
-      runtime[10] = 0.0;
-      runtime[11] = (double)((double)(tv[12].tv_sec - tv[1].tv_sec)
-			     + (double)((tv[12].tv_usec - tv[1].tv_usec)
-                                        / 1000.0) / 1000.0);
-    }
+    runtime[2] = (double)((double)(tv[3].tv_sec - tv[2].tv_sec) +
+                          (double)((tv[3].tv_usec - tv[2].tv_usec)
+                                   / 1000.0) / 1000.0);
+    runtime[3] = (double)((double)(tv[4].tv_sec - tv[3].tv_sec)
+                          + (double)((tv[4].tv_usec - tv[3].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[4] = (double)((double)(tv[5].tv_sec - tv[4].tv_sec)
+                          + (double)((tv[5].tv_usec - tv[4].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[5] = (double)((double)(tv[6].tv_sec - tv[5].tv_sec)
+                          + (double)((tv[6].tv_usec - tv[5].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[6] = (double)((double)(tv[7].tv_sec - tv[6].tv_sec)
+                          + (double)((tv[7].tv_usec - tv[6].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[7] = (double)((double)(tv[8].tv_sec - tv[7].tv_sec)
+                          + (double)((tv[8].tv_usec - tv[7].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[8] = (double)((double)(tv[9].tv_sec - tv[8].tv_sec)
+                          + (double)((tv[9].tv_usec - tv[8].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[9] = (double)((double)(tv[10].tv_sec - tv[9].tv_sec)
+                          + (double)((tv[10].tv_usec - tv[9].tv_usec)
+                                     / 1000.0) / 1000.0);
+    runtime[10] = (double)((double)(tv[11].tv_sec - tv[10].tv_sec)
+                           + (double)((tv[11].tv_usec - tv[10].tv_usec)
+                                      / 1000.0) / 1000.0);
+    runtime[11] = (double)((double)(tv[12].tv_sec - tv[11].tv_sec)
+                           + (double)((tv[12].tv_usec - tv[11].tv_usec)
+                                      / 1000.0) / 1000.0);
     runtime[12] = (double)((double)(tv[13].tv_sec - tv[12].tv_sec)
 			   + (double)((tv[13].tv_usec - tv[12].tv_usec)
                                       / 1000.0) / 1000.0);
@@ -396,37 +342,23 @@ int xodtemplate_read_config_data(
                                       / 1000.0) / 1000.0);
 
     printf(
-      "Timing information on object configuration processing is listed\n"
-      "below.  You can use this information to see if precaching your\n"
-      "object configuration would be useful.\n\n"
-      "Object Config Source: %s\n\n",
-      (use_precached_objects == true
-       ? "Pre-cached config file"
-       : "Config files (uncached)"));
+      "Timing information on object configuration\n"
+      "processing is listed below.\n\n");
 
-    printf(
-      "OBJECT CONFIG PROCESSING TIMES      (* = "
-      "Potential for precache savings with -u option)\n");
-    printf("----------------------------------\n");
+    printf("OBJECT CONFIG PROCESSING TIMES\n");
+    printf("------------------------------\n");
     printf("Read:                 %.6f sec\n", runtime[0]);
-    printf("Resolve:              %.6f sec  *\n", runtime[1]);
-    printf("Recomb Hostgroups:    %.6f sec  *\n", runtime[3]);
-    printf("Dup Services:         %.6f sec  *\n", runtime[4]);
-    printf("Recomb Servicegroups: %.6f sec  *\n", runtime[5]);
-    printf("Duplicate:            %.6f sec  *\n", runtime[6]);
-    printf("Inherit:              %.6f sec  *\n", runtime[7]);
-    printf("Sort:                 %.6f sec  *\n", runtime[9]);
-    /*		printf("Cache:                %.6f sec\n",runtime[10]);*/
+    printf("Resolve:              %.6f sec\n", runtime[1]);
+    printf("Recomb Hostgroups:    %.6f sec\n", runtime[3]);
+    printf("Dup Services:         %.6f sec\n", runtime[4]);
+    printf("Recomb Servicegroups: %.6f sec\n", runtime[5]);
+    printf("Duplicate:            %.6f sec\n", runtime[6]);
+    printf("Inherit:              %.6f sec\n", runtime[7]);
+    printf("Sort:                 %.6f sec\n", runtime[9]);
     printf("Register:             %.6f sec\n", runtime[11]);
     printf("Free:                 %.6f sec\n", runtime[12]);
     printf("                      ============\n");
     printf("TOTAL:                %.6f sec  ", runtime[13]);
-    if (use_precached_objects == false)
-      printf(
-        "* = %.6f sec (%.2f%%) estimated savings",
-        runtime[13] - runtime[12] - runtime[11] - runtime[0],
-        ((runtime[13] - runtime[12] - runtime[11] - runtime[0])
-         / runtime[13]) * 100.0);
     printf("\n");
     printf("\n\n");
   }
@@ -467,31 +399,12 @@ int xodtemplate_grab_config_info(char const* main_config_file) {
 
     if ((val = strtok(NULL, "\n")) == NULL)
       continue;
-
-    /* cached object file definition (overrides default location) */
-    if (!strcmp(var, "object_cache_file"))
-      xodtemplate_cache_file = string::dup(val);
-
-    /* pre-cached object file definition */
-    if (!strcmp(var, "precached_object_file"))
-      xodtemplate_precache_file = string::dup(val);
   }
 
   /* close the file */
   mmap_fclose(thefile);
 
-  /* default locations */
-  if (xodtemplate_cache_file == NULL)
-    xodtemplate_cache_file = string::dup(DEFAULT_OBJECT_CACHE_FILE);
-  if (xodtemplate_precache_file == NULL)
-    xodtemplate_precache_file
-      = string::dup(DEFAULT_PRECACHED_OBJECT_FILE);
-
   mac = get_global_macros();
-  /* save the object cache file macro */
-  delete[] mac->x[MACRO_OBJECTCACHEFILE];
-  mac->x[MACRO_OBJECTCACHEFILE] = string::dup(xodtemplate_cache_file);
-  strip(mac->x[MACRO_OBJECTCACHEFILE]);
 
   return (OK);
 }
@@ -798,27 +711,12 @@ int xodtemplate_process_config_file(char* filename, int options) {
     new_##type->_config_file = config_file;				\
     new_##type->_start_line = start_line;                               \
 									\
-    /* precached object files are already sorted, so add to tail */	\
-    if (presorted_objects) {                                            \
-									\
-      if (xodtemplate_##type##_list == NULL) {				\
-	xodtemplate_##type##_list = new_##type;				\
-	xodtemplate_##type##_list_tail = xodtemplate_##type##_list;	\
-      } else {								\
-	xodtemplate_##type##_list_tail->next = new_##type;		\
-	xodtemplate_##type##_list_tail = new_##type;			\
-      }									\
+    /* add new object to head of list in memory */			\
+    new_##type->next = xodtemplate_##type##_list;			\
+    xodtemplate_##type##_list = new_##type;				\
       									\
-      /* update current object pointer */				\
-      xodtemplate_current_object = xodtemplate_##type##_list_tail;	\
-    } else {								\
-      /* add new object to head of list in memory */			\
-      new_##type->next = xodtemplate_##type##_list;			\
-      xodtemplate_##type##_list = new_##type;				\
-      									\
-      /* update current object pointer */				\
-      xodtemplate_current_object = xodtemplate_##type##_list;		\
-    }									\
+    /* update current object pointer */				\
+    xodtemplate_current_object = xodtemplate_##type##_list;		\
   } while (0)
 
 /* starts a new object definition */
@@ -934,11 +832,6 @@ int xodtemplate_add_object_property(char* input, int options) {
   xodtemplate_hostdependency* temp_hostdependency = NULL;
   int x = 0;
   int y = 0;
-  int force_skiplists = false;
-
-  /* should some object definitions be added to skiplists immediately? */
-  if (use_precached_objects == true)
-    force_skiplists = true;
 
   /* get variable name */
   variable = string::dup(input);
@@ -995,70 +888,12 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->host_name = string::dup(value);
       temp_service->have_host_name = true;
-
-      /* NOTE: services are added to the skiplist in xodtemplate_duplicate_services(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true
-          && temp_service->host_name != NULL
-          && temp_service->service_description != NULL) {
-        /* add service to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_SERVICE_SKIPLIST],
-                   (void*)temp_service);
-        switch (result) {
-	case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        case SKIPLIST_ERROR_DUPLICATE:
-          logger(log_config_warning, basic)
-            << "Warning: Duplicate definition found for service '"
-            << value << "' (config file '"
-            << xodtemplate_config_file_name(temp_service->_config_file)
-            << "', starting on line "
-            << temp_service->_start_line << ")";
-          result = ERROR;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
     }
     else if (!strcmp(variable, "service_description")
              || !strcmp(variable, "description")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->service_description = string::dup(value);
       temp_service->have_service_description = true;
-
-      /* NOTE: services are added to the skiplist in xodtemplate_duplicate_services(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true
-          && temp_service->host_name != NULL
-          && temp_service->service_description != NULL) {
-        /* add service to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_SERVICE_SKIPLIST],
-                   (void*)temp_service);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        case SKIPLIST_ERROR_DUPLICATE:
-          logger(log_config_warning, basic)
-            << "Warning: Duplicate definition found for service '"
-            << value << "' (config file '"
-            << xodtemplate_config_file_name(temp_service->_config_file)
-            << "', starting on line "
-            << temp_service->_start_line << ")";
-          result = ERROR;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
     }
     else if (!strcmp(variable, "hostgroup")
              || !strcmp(variable, "hostgroups")
@@ -1959,50 +1794,12 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_servicedependency->dependent_host_name = string::dup(value);
       temp_servicedependency->have_dependent_host_name = true;
-
-      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true
-          && temp_servicedependency->dependent_host_name != NULL
-          && temp_servicedependency->dependent_service_description != NULL) {
-        /* add servicedependency to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
-                   (void*)temp_servicedependency);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
     }
     else if (!strcmp(variable, "dependent_description")
              || !strcmp(variable, "dependent_service_description")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_servicedependency->dependent_service_description = string::dup(value);
       temp_servicedependency->have_dependent_service_description = true;
-
-      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true
-          && temp_servicedependency->dependent_host_name != NULL
-          && temp_servicedependency->dependent_service_description != NULL) {
-        /* add servicedependency to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
-                   (void*)temp_servicedependency);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
     }
     else if (!strcmp(variable, "dependency_period")) {
       if (strcmp(value, XODTEMPLATE_NULL))
@@ -2121,23 +1918,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_hostdependency->dependent_host_name = string::dup(value);
       temp_hostdependency->have_dependent_host_name = true;
-
-      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == true) {
-        /* add hostdependency to template skiplist for fast searches */
-        result = skiplist_insert(
-                   xobject_skiplists[X_HOSTDEPENDENCY_SKIPLIST],
-                   (void*)temp_hostdependency);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
     }
     else if (!strcmp(variable, "dependency_period")) {
       if (strcmp(value, XODTEMPLATE_NULL))
@@ -7425,502 +7205,6 @@ int xodtemplate_sort_hostdependencies() {
 }
 
 /******************************************************************/
-/*********************** CACHE FUNCTIONS **************************/
-/******************************************************************/
-
-/* writes cached object definitions for use by web interface */
-int xodtemplate_cache_objects(char* cache_file) {
-  FILE* fp = NULL;
-  int x = 0;
-  xodtemplate_timeperiod* temp_timeperiod = NULL;
-  xodtemplate_daterange* temp_daterange = NULL;
-  xodtemplate_command* temp_command = NULL;
-  xodtemplate_connector* temp_connector = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
-  xodtemplate_host* temp_host = NULL;
-  xodtemplate_service* temp_service = NULL;
-  xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_hostdependency* temp_hostdependency = NULL;
-  xodtemplate_customvariablesmember* temp_customvariablesmember = NULL;
-  time_t current_time = 0L;
-  void* ptr = NULL;
-  static char const* days[7] = {
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday"
-  };
-  static char const* months[12] = {
-    "january",
-    "february",
-    "march",
-    "april",
-    "may",
-    "june",
-    "july",
-    "august",
-    "september",
-    "october",
-    "november",
-    "december"
-  };
-
-  time(&current_time);
-
-  /* open the cache file for writing */
-  fp = fopen(cache_file, "w");
-  if (fp == NULL) {
-    logger(log_config_warning, basic)
-      << "Warning: Could not open object cache file '"
-      << cache_file << "' for writing!";
-    return (ERROR);
-  }
-
-  /* write header to cache file */
-  fprintf(fp, "#############################################\n");
-  fprintf(fp, "#     CENTREON ENGINE OBJECT CACHE FILE     #\n");
-  fprintf(fp, "#                                           #\n");
-  fprintf(fp, "# THIS FILE IS AUTOMATICALLY GENERATED BY   #\n");
-  fprintf(fp, "# CENTREON ENGINE. DO NOT MODIFY THIS FILE! #\n");
-  fprintf(fp, "#                                           #\n");
-  fprintf(fp, "#############################################\n\n");
-  fprintf(fp, "# Created: %s", ctime(&current_time));
-
-
-  /* cache timeperiods */
-  /*for(temp_timeperiod=xodtemplate_timeperiod_list;temp_timeperiod!=NULL;temp_timeperiod=temp_timeperiod->next){ */
-  ptr = NULL;
-  for (temp_timeperiod = (xodtemplate_timeperiod*)skiplist_get_first(xobject_skiplists[X_TIMEPERIOD_SKIPLIST], &ptr);
-       temp_timeperiod != NULL;
-       temp_timeperiod = (xodtemplate_timeperiod*)skiplist_get_next(&ptr)) {
-
-    if (temp_timeperiod->register_object == false)
-      continue;
-    fprintf(fp, "define timeperiod {\n");
-    if (temp_timeperiod->timeperiod_name)
-      fprintf(
-        fp,
-        "\ttimeperiod_name\t%s\n",
-        temp_timeperiod->timeperiod_name);
-    if (temp_timeperiod->alias)
-      fprintf(fp, "\talias\t%s\n", temp_timeperiod->alias);
-    for (x = 0; x < DATERANGE_TYPES; x++) {
-      for (temp_daterange = temp_timeperiod->exceptions[x];
-           temp_daterange != NULL;
-           temp_daterange = temp_daterange->next) {
-
-        /* skip null entries */
-        if (temp_daterange->timeranges == NULL
-            || !strcmp(temp_daterange->timeranges, XODTEMPLATE_NULL))
-          continue;
-
-        switch (temp_daterange->type) {
-        case DATERANGE_CALENDAR_DATE:
-          fprintf(
-            fp,
-            "\t%d-%02d-%02d",
-            temp_daterange->syear,
-            temp_daterange->smon + 1,
-            temp_daterange->smday);
-          if ((temp_daterange->smday != temp_daterange->emday)
-              || (temp_daterange->smon != temp_daterange->emon)
-              || (temp_daterange->syear != temp_daterange->eyear))
-            fprintf(
-              fp,
-              " - %d-%02d-%02d",
-              temp_daterange->eyear,
-              temp_daterange->emon + 1,
-              temp_daterange->emday);
-          if (temp_daterange->skip_interval > 1)
-            fprintf(fp, " / %d", temp_daterange->skip_interval);
-          break;
-
-        case DATERANGE_MONTH_DATE:
-          fprintf(
-            fp,
-            "\t%s %d",
-            months[temp_daterange->smon],
-            temp_daterange->smday);
-          if ((temp_daterange->smon != temp_daterange->emon)
-              || (temp_daterange->smday != temp_daterange->emday)) {
-            fprintf(
-              fp,
-              " - %s %d",
-              months[temp_daterange->emon],
-              temp_daterange->emday);
-            if (temp_daterange->skip_interval > 1)
-              fprintf(fp, " / %d", temp_daterange->skip_interval);
-          }
-          break;
-
-        case DATERANGE_MONTH_DAY:
-          fprintf(fp, "\tday %d", temp_daterange->smday);
-          if (temp_daterange->smday != temp_daterange->emday) {
-            fprintf(fp, " - %d", temp_daterange->emday);
-            if (temp_daterange->skip_interval > 1)
-              fprintf(fp, " / %d", temp_daterange->skip_interval);
-          }
-          break;
-
-        case DATERANGE_MONTH_WEEK_DAY:
-          fprintf(
-            fp,
-            "\t%s %d %s",
-            days[temp_daterange->swday],
-            temp_daterange->swday_offset,
-            months[temp_daterange->smon]);
-          if ((temp_daterange->smon != temp_daterange->emon)
-              || (temp_daterange->swday != temp_daterange->ewday)
-              || (temp_daterange->swday_offset != temp_daterange->ewday_offset)) {
-            fprintf(
-              fp,
-              " - %s %d %s",
-              days[temp_daterange->ewday],
-              temp_daterange->ewday_offset,
-              months[temp_daterange->emon]);
-            if (temp_daterange->skip_interval > 1)
-              fprintf(fp, " / %d", temp_daterange->skip_interval);
-          }
-          break;
-
-        case DATERANGE_WEEK_DAY:
-          fprintf(
-            fp,
-            "\t%s %d",
-            days[temp_daterange->swday],
-            temp_daterange->swday_offset);
-          if ((temp_daterange->swday != temp_daterange->ewday)
-              || (temp_daterange->swday_offset != temp_daterange->ewday_offset)) {
-            fprintf(
-              fp,
-              " - %s %d",
-              days[temp_daterange->ewday],
-              temp_daterange->ewday_offset);
-            if (temp_daterange->skip_interval > 1)
-              fprintf(fp, " / %d", temp_daterange->skip_interval);
-          }
-          break;
-
-        default:
-          break;
-        }
-
-        fprintf(fp, "\t%s\n", temp_daterange->timeranges);
-      }
-    }
-    for (x = 0; x < 7; x++) {
-      /* skip null entries */
-      if (temp_timeperiod->timeranges[x] == NULL
-          || !strcmp(temp_timeperiod->timeranges[x], XODTEMPLATE_NULL))
-        continue;
-
-      fprintf(fp, "\t%s\t%s\n", days[x], temp_timeperiod->timeranges[x]);
-    }
-    if (temp_timeperiod->exclusions)
-      fprintf(fp, "\texclude\t%s\n", temp_timeperiod->exclusions);
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache commands */
-  /*for(temp_command=xodtemplate_command_list;temp_command!=NULL;temp_command=temp_command->next){ */
-  ptr = NULL;
-  for (temp_command = (xodtemplate_command*)skiplist_get_first(xobject_skiplists[X_COMMAND_SKIPLIST], &ptr);
-       temp_command != NULL;
-       temp_command = (xodtemplate_command*)skiplist_get_next(&ptr)) {
-    if (temp_command->register_object == false)
-      continue;
-    fprintf(fp, "define command {\n");
-    if (temp_command->command_name)
-      fprintf(fp, "\tcommand_name\t%s\n", temp_command->command_name);
-    if (temp_command->command_line)
-      fprintf(fp, "\tcommand_line\t%s\n", temp_command->command_line);
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache connectors */
-  /*for(temp_connector=xodtemplate_connector_list;temp_connector!=NULL;temp_connector=temp_connector->next){ */
-  ptr = NULL;
-  for (temp_connector = (xodtemplate_connector*)skiplist_get_first(xobject_skiplists[X_CONNECTOR_SKIPLIST], &ptr);
-       temp_connector != NULL;
-       temp_connector = (xodtemplate_connector*)skiplist_get_next(&ptr)) {
-    if (temp_connector->register_object == false)
-      continue;
-    fprintf(fp, "define connector {\n");
-    if (temp_connector->connector_name)
-      fprintf(fp, "\tcommand_name\t%s\n", temp_connector->connector_name);
-    if (temp_connector->connector_line)
-      fprintf(fp, "\tconnector_line\t%s\n", temp_connector->connector_line);
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache hostgroups */
-  /*for(temp_hostgroup=xodtemplate_hostgroup_list;temp_hostgroup!=NULL;temp_hostgroup=temp_hostgroup->next){ */
-  ptr = NULL;
-  for (temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_first(xobject_skiplists[X_HOSTGROUP_SKIPLIST], &ptr);
-       temp_hostgroup != NULL;
-       temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_next(&ptr)) {
-    if (temp_hostgroup->register_object == false)
-      continue;
-    fprintf(fp, "define hostgroup {\n");
-    if (temp_hostgroup->hostgroup_name)
-      fprintf(fp, "\thostgroup_name\t%s\n", temp_hostgroup->hostgroup_name);
-    if (temp_hostgroup->alias)
-      fprintf(fp, "\talias\t%s\n", temp_hostgroup->alias);
-    if (temp_hostgroup->members)
-      fprintf(fp, "\tmembers\t%s\n", temp_hostgroup->members);
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache servicegroups */
-  /*for(temp_servicegroup=xodtemplate_servicegroup_list;temp_servicegroup!=NULL;temp_servicegroup=temp_servicegroup->next){ */
-  ptr = NULL;
-  for (temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_first(xobject_skiplists[X_SERVICEGROUP_SKIPLIST], &ptr);
-       temp_servicegroup != NULL;
-       temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_next(&ptr)) {
-    if (temp_servicegroup->register_object == false)
-      continue;
-    fprintf(fp, "define servicegroup {\n");
-    if (temp_servicegroup->servicegroup_name)
-      fprintf(
-        fp,
-        "\tservicegroup_name\t%s\n",
-        temp_servicegroup->servicegroup_name);
-    if (temp_servicegroup->alias)
-      fprintf(fp, "\talias\t%s\n", temp_servicegroup->alias);
-    if (temp_servicegroup->members)
-      fprintf(fp, "\tmembers\t%s\n", temp_servicegroup->members);
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache hosts */
-  /*for(temp_host=xodtemplate_host_list;temp_host!=NULL;temp_host=temp_host->next){ */
-  ptr = NULL;
-  for (temp_host = (xodtemplate_host*)skiplist_get_first(xobject_skiplists[X_HOST_SKIPLIST], &ptr);
-       temp_host != NULL;
-       temp_host = (xodtemplate_host*)skiplist_get_next(&ptr)) {
-    if (temp_host->register_object == false)
-      continue;
-    fprintf(fp, "define host {\n");
-    if (temp_host->host_name)
-      fprintf(fp, "\thost_name\t%s\n", temp_host->host_name);
-    if (temp_host->alias)
-      fprintf(fp, "\talias\t%s\n", temp_host->alias);
-    if (temp_host->address)
-      fprintf(fp, "\taddress\t%s\n", temp_host->address);
-    if (temp_host->parents)
-      fprintf(fp, "\tparents\t%s\n", temp_host->parents);
-    if (temp_host->check_period)
-      fprintf(fp, "\tcheck_period\t%s\n", temp_host->check_period);
-    if (temp_host->check_command)
-      fprintf(fp, "\tcheck_command\t%s\n", temp_host->check_command);
-    if (temp_host->event_handler)
-      fprintf(fp, "\tevent_handler\t%s\n", temp_host->event_handler);
-    fprintf(fp, "\tinitial_state\t");
-    if (temp_host->initial_state == HOST_DOWN)
-      fprintf(fp, "d\n");
-    else if (temp_host->initial_state == HOST_UNREACHABLE)
-      fprintf(fp, "u\n");
-    else
-      fprintf(fp, "o\n");
-    fprintf(fp, "\tcheck_interval\t%f\n", temp_host->check_interval);
-    fprintf(fp, "\tretry_interval\t%f\n", temp_host->retry_interval);
-    fprintf(fp, "\tmax_check_attempts\t%d\n", temp_host->max_check_attempts);
-    fprintf(fp, "\tactive_checks_enabled\t%d\n", temp_host->active_checks_enabled);
-    fprintf(fp, "\tobsess_over_host\t%d\n", temp_host->obsess_over_host);
-    fprintf(fp, "\tevent_handler_enabled\t%d\n", temp_host->event_handler_enabled);
-    fprintf(fp, "\tlow_flap_threshold\t%f\n", temp_host->low_flap_threshold);
-    fprintf(fp, "\thigh_flap_threshold\t%f\n", temp_host->high_flap_threshold);
-    fprintf(fp, "\tflap_detection_enabled\t%d\n", temp_host->flap_detection_enabled);
-    fprintf(fp, "\tflap_detection_options\t");
-    x = 0;
-    if (temp_host->flap_detection_on_up == true)
-      fprintf(fp, "%so", (x++ > 0) ? "," : "");
-    if (temp_host->flap_detection_on_down == true)
-      fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-    if (temp_host->flap_detection_on_unreachable == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
-    fprintf(fp, "\tfreshness_threshold\t%d\n", temp_host->freshness_threshold);
-    fprintf(fp, "\tcheck_freshness\t%d\n", temp_host->check_freshness);
-    if (temp_host->timezone)
-      fprintf(fp, "\ttimezone\t%s\n", temp_host->timezone);
-
-    /* custom variables */
-    for (temp_customvariablesmember = temp_host->custom_variables;
-         temp_customvariablesmember != NULL;
-         temp_customvariablesmember = temp_customvariablesmember->next) {
-      if (temp_customvariablesmember->variable_name)
-        fprintf(
-          fp,
-          "\t_%s\t%s\n",
-          temp_customvariablesmember->variable_name,
-          (temp_customvariablesmember->variable_value == NULL
-           ? XODTEMPLATE_NULL
-           : temp_customvariablesmember->variable_value));
-    }
-
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache services */
-  /*for(temp_service=xodtemplate_service_list;temp_service!=NULL;temp_service=temp_service->next){ */
-  ptr = NULL;
-  for (temp_service = (xodtemplate_service*)skiplist_get_first(xobject_skiplists[X_SERVICE_SKIPLIST], &ptr);
-       temp_service != NULL;
-       temp_service = (xodtemplate_service*)skiplist_get_next(&ptr)) {
-    if (temp_service->register_object == false)
-      continue;
-    fprintf(fp, "define service {\n");
-    if (temp_service->host_name)
-      fprintf(fp, "\thost_name\t%s\n", temp_service->host_name);
-    if (temp_service->service_description)
-      fprintf(fp, "\tservice_description\t%s\n", temp_service->service_description);
-    if (temp_service->check_period)
-      fprintf(fp, "\tcheck_period\t%s\n", temp_service->check_period);
-    if (temp_service->check_command)
-      fprintf(fp, "\tcheck_command\t%s\n", temp_service->check_command);
-    if (temp_service->event_handler)
-      fprintf(fp, "\tevent_handler\t%s\n", temp_service->event_handler);
-    fprintf(fp, "\tinitial_state\t");
-    if (temp_service->initial_state == STATE_WARNING)
-      fprintf(fp, "w\n");
-    else if (temp_service->initial_state == STATE_UNKNOWN)
-      fprintf(fp, "u\n");
-    else if (temp_service->initial_state == STATE_CRITICAL)
-      fprintf(fp, "c\n");
-    else
-      fprintf(fp, "o\n");
-    fprintf(fp, "\tcheck_interval\t%f\n", temp_service->check_interval);
-    fprintf(fp, "\tretry_interval\t%f\n", temp_service->retry_interval);
-    fprintf(fp, "\tmax_check_attempts\t%d\n", temp_service->max_check_attempts);
-    fprintf(fp, "\tis_volatile\t%d\n", temp_service->is_volatile);
-    fprintf(fp, "\tactive_checks_enabled\t%d\n", temp_service->active_checks_enabled);
-    fprintf(fp, "\tobsess_over_service\t%d\n", temp_service->obsess_over_service);
-    fprintf(fp, "\tevent_handler_enabled\t%d\n", temp_service->event_handler_enabled);
-    fprintf(fp, "\tlow_flap_threshold\t%f\n", temp_service->low_flap_threshold);
-    fprintf(fp, "\thigh_flap_threshold\t%f\n", temp_service->high_flap_threshold);
-    fprintf(fp, "\tflap_detection_enabled\t%d\n", temp_service->flap_detection_enabled);
-    fprintf(fp, "\tflap_detection_options\t");
-    x = 0;
-    if (temp_service->flap_detection_on_ok == true)
-      fprintf(fp, "%so", (x++ > 0) ? "," : "");
-    if (temp_service->flap_detection_on_warning == true)
-      fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-    if (temp_service->flap_detection_on_unknown == true)
-      fprintf(fp, "%su", (x++ > 0) ? "," : "");
-    if (temp_service->flap_detection_on_critical == true)
-      fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-    if (x == 0)
-      fprintf(fp, "n");
-    fprintf(fp, "\n");
-    fprintf(fp, "\tfreshness_threshold\t%d\n", temp_service->freshness_threshold);
-    fprintf(fp, "\tcheck_freshness\t%d\n", temp_service->check_freshness);
-    if (temp_service->timezone)
-      fprintf(fp, "\ttimezone\t%s\n", temp_service->timezone);
-
-    /* custom variables */
-    for (temp_customvariablesmember = temp_service->custom_variables;
-         temp_customvariablesmember != NULL;
-         temp_customvariablesmember = temp_customvariablesmember->next) {
-      if (temp_customvariablesmember->variable_name)
-        fprintf(
-          fp,
-          "\t_%s\t%s\n",
-          temp_customvariablesmember->variable_name,
-          (temp_customvariablesmember->variable_value == NULL
-           ? XODTEMPLATE_NULL
-           : temp_customvariablesmember->variable_value));
-    }
-
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache service dependencies */
-  /*for(temp_servicedependency=xodtemplate_servicedependency_list;temp_servicedependency!=NULL;temp_servicedependency=temp_servicedependency->next){ */
-  ptr = NULL;
-  for (temp_servicedependency = (xodtemplate_servicedependency*)skiplist_get_first(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST], &ptr);
-       temp_servicedependency != NULL;
-       temp_servicedependency = (xodtemplate_servicedependency*)skiplist_get_next(&ptr)) {
-    if (temp_servicedependency->register_object == false)
-      continue;
-    fprintf(fp, "define servicedependency {\n");
-    if (temp_servicedependency->host_name)
-      fprintf(fp, "\thost_name\t%s\n", temp_servicedependency->host_name);
-    if (temp_servicedependency->service_description)
-      fprintf(fp, "\tservice_description\t%s\n", temp_servicedependency->service_description);
-    if (temp_servicedependency->dependent_host_name)
-      fprintf(fp, "\tdependent_host_name\t%s\n", temp_servicedependency->dependent_host_name);
-    if (temp_servicedependency->dependent_service_description)
-      fprintf(fp, "\tdependent_service_description\t%s\n", temp_servicedependency->dependent_service_description);
-    if (temp_servicedependency->dependency_period)
-      fprintf(fp, "\tdependency_period\t%s\n", temp_servicedependency->dependency_period);
-    fprintf(fp, "\tinherits_parent\t%d\n", temp_servicedependency->inherits_parent);
-    if (temp_servicedependency->have_dependency_options == true) {
-      fprintf(fp, "\tfailure_options\t");
-      x = 0;
-      if (temp_servicedependency->fail_on_ok == true)
-        fprintf(fp, "%so", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_on_unknown == true)
-        fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_on_warning == true)
-        fprintf(fp, "%sw", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_on_critical == true)
-        fprintf(fp, "%sc", (x++ > 0) ? "," : "");
-      if (temp_servicedependency->fail_on_pending == true)
-        fprintf(fp, "%sp", (x++ > 0) ? "," : "");
-      if (x == 0)
-        fprintf(fp, "n");
-      fprintf(fp, "\n");
-    }
-    fprintf(fp, "\t}\n\n");
-  }
-
-  /* cache host dependencies */
-  /*for(temp_hostdependency=xodtemplate_hostdependency_list;temp_hostdependency!=NULL;temp_hostdependency=temp_hostdependency->next){ */
-  ptr = NULL;
-  for (temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_first(xobject_skiplists[X_HOSTDEPENDENCY_SKIPLIST], &ptr);
-       temp_hostdependency != NULL;
-       temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_next(&ptr)) {
-    if (temp_hostdependency->register_object == false)
-      continue;
-    fprintf(fp, "define hostdependency {\n");
-    if (temp_hostdependency->host_name)
-      fprintf(fp, "\thost_name\t%s\n", temp_hostdependency->host_name);
-    if (temp_hostdependency->dependent_host_name)
-      fprintf(fp, "\tdependent_host_name\t%s\n", temp_hostdependency->dependent_host_name);
-    if (temp_hostdependency->dependency_period)
-      fprintf(fp, "\tdependency_period\t%s\n", temp_hostdependency->dependency_period);
-    fprintf(fp, "\tinherits_parent\t%d\n", temp_hostdependency->inherits_parent);
-    if (temp_hostdependency->have_dependency_options == true) {
-      fprintf(fp, "\tfailure_options\t");
-      x = 0;
-      if (temp_hostdependency->fail_on_up == true)
-        fprintf(fp, "%so", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_on_down == true)
-        fprintf(fp, "%sd", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_on_unreachable == true)
-        fprintf(fp, "%su", (x++ > 0) ? "," : "");
-      if (temp_hostdependency->fail_on_pending == true)
-        fprintf(fp, "%sp", (x++ > 0) ? "," : "");
-      if (x == 0)
-        fprintf(fp, "n");
-      fprintf(fp, "\n");
-    }
-    fprintf(fp, "\t}\n\n");
-  }
-
-  fclose(fp);
-
-  return (OK);
-}
-
-/******************************************************************/
 /******************** SKIPLIST FUNCTIONS **************************/
 /******************************************************************/
 
@@ -10559,10 +9843,6 @@ int read_main_config_file(char const* main_config_file) {
     else if(strstr(input,"cfg_file=")==input || strstr(input,"cfg_dir=")==input)
       continue;
     else if(strstr(input,"state_retention_file=")==input)
-      continue;
-    else if(strstr(input,"object_cache_file=")==input)
-      continue;
-    else if(strstr(input,"precached_object_file=")==input)
       continue;
 
     /* we don't know what this variable is... */
