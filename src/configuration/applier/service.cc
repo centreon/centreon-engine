@@ -112,7 +112,6 @@ void applier::service::add_object(
   service_struct* svc(add_service(
     obj->hosts().front().c_str(),
     obj->service_description().c_str(),
-    NULL_IF_EMPTY(obj->display_name()),
     NULL_IF_EMPTY(obj->check_period()),
     obj->initial_state(),
     obj->max_check_attempts(),
@@ -298,9 +297,6 @@ void applier::service::modify_object(
   config->services().insert(obj);
 
   // Modify properties.
-  modify_if_different(
-    s->display_name,
-    NULL_IF_EMPTY(obj->display_name()));
   modify_if_different(
     s->service_check_command,
     NULL_IF_EMPTY(obj->check_command()));

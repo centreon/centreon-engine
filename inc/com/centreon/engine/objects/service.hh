@@ -33,7 +33,6 @@ struct timeperiod_struct;
 typedef struct                  service_struct {
   char*                         host_name;
   char*                         description;
-  char*                         display_name;
   char*                         service_check_command;
   char*                         event_handler;
   int                           initial_state;
@@ -114,7 +113,6 @@ extern "C" {
 service* add_service(
            char const* host_name,
            char const* description,
-           char const* display_name,
            char const* check_period,
            int initial_state,
            int max_attempts,

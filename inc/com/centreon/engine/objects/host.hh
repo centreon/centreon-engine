@@ -33,7 +33,6 @@ struct timeperiod_struct;
 
 typedef struct                  host_struct {
   char*                         name;
-  char*                         display_name;
   char*                         alias;
   char*                         address;
   hostsmember_struct*           parent_hosts;
@@ -127,7 +126,6 @@ extern "C" {
 
 host* add_host(
         char const* name,
-        char const* display_name,
         char const* alias,
         char const* address,
         char const* check_period,

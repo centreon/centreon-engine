@@ -40,7 +40,6 @@ using namespace com::centreon::engine;
 
 // Values that will be set in host.
 #define NAME                    myhost
-#define DISPLAY_NAME            MyHost
 #define ALIAS                   LocalHost
 #define ADDRESS                 127.0.0.1
 #define STATE                   DOWN
@@ -107,8 +106,6 @@ int main_test(int argc, char** argv) {
   // Set host values.
   delete [] host_list->name;
   host_list->name = string::dup(STR(NAME));
-  delete [] host_list->display_name;
-  host_list->display_name = string::dup(STR(DISPLAY_NAME));
   delete [] host_list->alias;
   host_list->alias = string::dup(STR(ALIAS));
   delete [] host_list->address;
@@ -151,7 +148,6 @@ int main_test(int argc, char** argv) {
     bool         is_double;
   } static const macro_values[] = {
     { MACRO_HOSTNAME, STR(NAME), false },
-    { MACRO_HOSTDISPLAYNAME, STR(DISPLAY_NAME), false },
     { MACRO_HOSTALIAS, STR(ALIAS), false },
     { MACRO_HOSTADDRESS, STR(ADDRESS), false },
     { MACRO_HOSTSTATE, STR(STATE), false },

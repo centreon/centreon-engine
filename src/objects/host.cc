@@ -51,7 +51,6 @@ bool operator==(
        host const& obj1,
        host const& obj2) throw () {
   return (is_equal(obj1.name, obj2.name)
-          && is_equal(obj1.display_name, obj2.display_name)
           && is_equal(obj1.alias, obj2.alias)
           && is_equal(obj1.address, obj2.address)
           && is_equal(obj1.parent_hosts, obj2.parent_hosts)
@@ -161,7 +160,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
 
   os << "host {\n"
     "  name:                                 " << chkstr(obj.name) << "\n"
-    "  display_name:                         " << chkstr(obj.display_name) << "\n"
     "  alias:                                " << chkstr(obj.alias) << "\n"
     "  address:                              " << chkstr(obj.address) << "\n"
     "  parent_hosts:                         " << chkobj(obj.parent_hosts) << "\n"
@@ -248,7 +246,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  Add a new host definition.
  *
  *  @param[in] name                          Host name.
- *  @param[in] display_name                  Display name.
  *  @param[in] alias                         Host alias.
  *  @param[in] address                       Host address.
  *  @param[in] check_period                  Check period.
@@ -288,7 +285,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  */
 host* add_host(
         char const* name,
-        char const* display_name,
         char const* alias,
         char const* address,
         char const* check_period,
@@ -357,7 +353,6 @@ host* add_host(
     obj->name = string::dup(name);
     obj->address = string::dup(address);
     obj->alias = string::dup(alias ? alias : name);
-    obj->display_name = string::dup(display_name ? display_name : name);
     if (check_period)
       obj->check_period = string::dup(check_period);
     if (event_handler)

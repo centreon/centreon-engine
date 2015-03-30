@@ -50,8 +50,6 @@ void deleter::host(void* ptr) throw () {
 
   delete[] obj->name;
   obj->name = NULL;
-  delete[] obj->display_name;
-  obj->display_name = NULL;
   delete[] obj->alias;
   obj->alias = NULL;
   delete[] obj->address;

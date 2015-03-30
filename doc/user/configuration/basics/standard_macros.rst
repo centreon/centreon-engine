@@ -55,7 +55,6 @@ Host Macros :sup:`3`
 Macro Name                     Service Checks Service Notifications Host Checks      Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
 ============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
 `HOSTNAME`_                    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTDISPLAYNAME`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTALIAS`_                   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTADDRESS`_                 **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTSTATE`_                   **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -116,7 +115,6 @@ Service Macros
 Macro Name                        Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 `SERVICEDESC`_                    **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEDISPLAYNAME`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICESTATE`_ :sup:`2`          **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICESTATEID`_ :sup:`2`        **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `LASTSERVICESTATE`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
@@ -288,8 +286,6 @@ Host Macros :sup:`3`
 ============================== =========================================================================================================================
 _`HOSTNAME`                    Short name for the host (i.e. "biglinuxbox"). This value is taken from the host_name directive in the
                                :ref:`host definition <obj_def_host>`.
-_`HOSTDISPLAYNAME`             An alternate display name for the host. This value is taken from the display_name directive in the
-                               :ref:`host definition <obj_def_host>`.
 _`HOSTALIAS`                   Long name/description for the host. This value is taken from the alias directive in the
                                :ref:`host definition <obj_def_host>`.
 _`HOSTADDRESS`                 Address of the host. This value is taken from the address directive in the
@@ -381,8 +377,6 @@ Service Macros
 ================================= ======================================================================================================================
 _`SERVICEDESC`                    The long name/description of the service (i.e. "Main Website"). This value is taken from the service_description
                                   directive of the :ref:`service definition <obj_def_service>`.
-_`SERVICEDISPLAYNAME`             An alternate display name for the service. This value is taken from the display_name directive in the
-                                  :ref:`service definition <obj_def_service>`.
 _`SERVICESTATE`                   A string indicating the current state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").
 _`SERVICESTATEID`                 A number that corresponds to the current state of the service: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN.
 _`LASTSERVICESTATE`               A string indicating the last state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").

@@ -186,9 +186,6 @@ struct grab_host_redirection {
     // Name.
     routines[MACRO_HOSTNAME].first = &get_member_as_string<host, char*, &host::name>;
     routines[MACRO_HOSTNAME].second = true;
-    // Display name.
-    routines[MACRO_HOSTDISPLAYNAME].first = &get_member_as_string<host, char*, &host::display_name>;
-    routines[MACRO_HOSTDISPLAYNAME].second = true;
     // Alias.
     routines[MACRO_HOSTALIAS].first = &get_member_as_string<host, char*, &host::alias>;
     routines[MACRO_HOSTALIAS].second = true;

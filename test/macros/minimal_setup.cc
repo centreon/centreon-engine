@@ -33,7 +33,6 @@ void com::centreon::engine::test::minimal_setup() {
   // Add host.
   host* hst(add_host(
     const_cast<char*>("myhost"),    // Name
-    const_cast<char*>("MyHost"),    // Display name
     const_cast<char*>("MyAlias"),   // Alias
     const_cast<char*>("127.0.0.1"), // Address
     NULL,                           // Check period
@@ -70,7 +69,6 @@ void com::centreon::engine::test::minimal_setup() {
   service* svc(add_service(
     const_cast<char*>("myhost"),    // Host name
     const_cast<char*>("myservice"), // Service description
-    const_cast<char*>("MyService"), // Display name
     NULL,                           // Check period
     0,                              // Initial state
     1,                              // Max attempts

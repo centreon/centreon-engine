@@ -86,7 +86,6 @@ void applier::host::add_object(
   host_struct*
     h(add_host(
         obj->host_name().c_str(),
-        NULL_IF_EMPTY(obj->display_name()),
         NULL_IF_EMPTY(obj->alias()),
         NULL_IF_EMPTY(obj->address()),
         NULL_IF_EMPTY(obj->check_period()),
@@ -224,9 +223,6 @@ void applier::host::modify_object(
   config->hosts().insert(obj);
 
   // Modify properties.
-  modify_if_different(
-    h->display_name,
-    NULL_IF_EMPTY(obj->display_name()));
   modify_if_different(
     h->alias,
     (obj->alias().empty() ? obj->host_name() : obj-> alias()).c_str());

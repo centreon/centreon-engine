@@ -39,7 +39,6 @@ service::setters const service::_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
   { "service_description",          SETTER(std::string const&, _set_service_description) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
-  { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "hostgroup",                    SETTER(std::string const&, _set_hostgroups) },
   { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
   { "hostgroup_name",               SETTER(std::string const&, _set_hostgroups) },
@@ -75,6 +74,7 @@ service::setters const service::_setters[] = {
   { "action_url",                   SETTER(std::string const&, _set_action_url) },
   { "contact_groups",               SETTER(std::string const&, _set_contactgroups) },
   { "contacts",                     SETTER(std::string const&, _set_contacts) },
+  { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
   { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
@@ -168,7 +168,6 @@ service& service::operator=(service const& right) {
     _check_period = right._check_period;
     _check_timeout = right._check_timeout;
     _customvariables = right._customvariables;
-    _display_name = right._display_name;
     _event_handler = right._event_handler;
     _event_handler_enabled = right._event_handler_enabled;
     _flap_detection_enabled = right._flap_detection_enabled;
@@ -208,7 +207,6 @@ bool service::operator==(service const& right) const throw () {
           && _check_period == right._check_period
           && _check_timeout == right._check_timeout
           && std::operator==(_customvariables, right._customvariables)
-          && _display_name == right._display_name
           && _event_handler == right._event_handler
           && _event_handler_enabled == right._event_handler_enabled
           && _flap_detection_enabled == right._flap_detection_enabled
@@ -270,8 +268,6 @@ bool service::operator<(service const& right) const throw () {
     return (_check_timeout < right._check_timeout);
   else if (_customvariables != right._customvariables)
     return (_customvariables < right._customvariables);
-  else if (_display_name != right._display_name)
-    return (_display_name < right._display_name);
   else if (_event_handler != right._event_handler)
     return (_event_handler < right._event_handler);
   else if (_event_handler_enabled != right._event_handler_enabled)
@@ -355,7 +351,6 @@ void service::merge(object const& obj) {
   MRG_OPTION(_check_timeout);
   MRG_DEFAULT(_check_period);
   MRG_MAP(_customvariables);
-  MRG_DEFAULT(_display_name);
   MRG_DEFAULT(_event_handler);
   MRG_OPTION(_event_handler_enabled);
   MRG_OPTION(_flap_detection_enabled);
@@ -476,15 +471,6 @@ bool service::check_timeout_defined() const throw() {
  */
 map_customvar const& service::customvariables() const throw () {
   return (_customvariables);
-}
-
-/**
- *  Get display_name.
- *
- *  @return The display_name.
- */
-std::string const& service::display_name() const throw () {
-  return (_display_name);
 }
 
 /**
@@ -845,14 +831,17 @@ bool service::_set_contacts(std::string const& value) {
 }
 
 /**
- *  Set display_name value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new display_name value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_display_name(std::string const& value) {
-  _display_name = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service display_name was ignored";
+  ++config_warnings;
   return (true);
 }
 

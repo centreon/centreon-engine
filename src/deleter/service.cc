@@ -45,8 +45,6 @@ void deleter::service(void* ptr) throw () {
   obj->host_name = NULL;
   delete[] obj->description;
   obj->description = NULL;
-  delete[] obj->display_name;
-  obj->display_name = NULL;
   delete[] obj->service_check_command;
   obj->service_check_command = NULL;
   delete[] obj->event_handler;

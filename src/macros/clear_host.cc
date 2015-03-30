@@ -34,7 +34,6 @@ extern "C" {
 int clear_host_macros_r(nagios_macros* mac) {
   static unsigned int const to_free[] = {
     MACRO_HOSTNAME,
-    MACRO_HOSTDISPLAYNAME,
     MACRO_HOSTALIAS,
     MACRO_HOSTADDRESS,
     MACRO_HOSTSTATE,

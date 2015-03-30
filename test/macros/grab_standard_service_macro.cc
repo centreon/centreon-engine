@@ -40,7 +40,6 @@ using namespace com::centreon::engine;
 
 // Values that will be set in service.
 #define DESCRIPTION myservice
-#define DISPLAY_NAME MyService
 #define OUTPUT my output
 #define LONG_OUTPUT my output can be much longer than this
 #define PERF_DATA this is absolutely not a perfdata string
@@ -84,8 +83,6 @@ int main_test(int argc, char** argv) {
   // Set service values.
   delete [] service_list->description;
   service_list->description = string::dup(STR(DESCRIPTION));
-  delete [] service_list->display_name;
-  service_list->display_name = string::dup(STR(DISPLAY_NAME));
   delete [] service_list->plugin_output;
   service_list->plugin_output = string::dup(STR(OUTPUT));
   delete [] service_list->long_plugin_output;
@@ -146,7 +143,6 @@ int main_test(int argc, char** argv) {
     bool         is_double;
   } static const macro_values[] = {
     { MACRO_SERVICEDESC, STR(DESCRIPTION), false },
-    { MACRO_SERVICEDISPLAYNAME, STR(DISPLAY_NAME), false },
     { MACRO_SERVICEOUTPUT, STR(OUTPUT), false },
     { MACRO_LONGSERVICEOUTPUT, STR(LONG_OUTPUT), false },
     { MACRO_SERVICEPERFDATA, STR(PERF_DATA), false },

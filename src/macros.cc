@@ -753,8 +753,6 @@ int init_macrox_names() {
   add_macrox_name(HOSTCHECKCOMMAND);
   add_macrox_name(MAINCONFIGFILE);
   add_macrox_name(STATUSDATAFILE);
-  add_macrox_name(HOSTDISPLAYNAME);
-  add_macrox_name(SERVICEDISPLAYNAME);
   add_macrox_name(RETENTIONDATAFILE);
   add_macrox_name(OBJECTCACHEFILE);
   add_macrox_name(LOGFILE);

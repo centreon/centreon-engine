@@ -65,7 +65,6 @@ namespace                  configuration {
     unsigned int           check_timeout() const throw();
     bool                   check_timeout_defined() const throw();
     map_customvar const&   customvariables() const throw ();
-    std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
     bool                   event_handler_enabled() const throw ();
     bool                   flap_detection_enabled() const throw ();
@@ -148,7 +147,6 @@ namespace                  configuration {
     std::string            _check_period;
     opt<unsigned int>      _check_timeout;
     map_customvar          _customvariables;
-    std::string            _display_name;
     std::string            _event_handler;
     opt<bool>              _event_handler_enabled;
     opt<bool>              _flap_detection_enabled;

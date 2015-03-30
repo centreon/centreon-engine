@@ -35,7 +35,6 @@ int clear_service_macros_r(nagios_macros* mac) {
   static unsigned int const to_free[] = {
     MACRO_SERVICEDESC,
     MACRO_SERVICEDESC,
-    MACRO_SERVICEDISPLAYNAME,
     MACRO_SERVICEOUTPUT,
     MACRO_LONGSERVICEOUTPUT,
     MACRO_SERVICEPERFDATA,

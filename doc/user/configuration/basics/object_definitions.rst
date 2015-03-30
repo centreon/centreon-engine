@@ -91,7 +91,6 @@ Definition Format
   define host{
     host_name                      host_name
     alias                          alias
-    # display_name                 display_name
     address                        address
     # parents                      host_names
     # hostgroups                   hostgroup_names
@@ -161,8 +160,6 @@ address                      This directive is used to define the address of the
                                 If you do not specify an address directive in a host definition, the name of the host will be used as its address. A
                                 word of caution about doing this, however * if DNS fails, most of your service checks will fail because the plugins
                                 will be unable to resolve the host name.
-display_name                 This directive is used to define an alternate name that should be displayed in the web interface for this host. If not
-                             specified, this defaults to the value you specify for the host_name directive.
 parents                      This directive is used to define a comma-delimited list of short names of the "parent" hosts for this particular host.
                              Parent hosts are typically routers, switches, firewalls, etc. that lie between the monitoring host and a remote hosts. A
                              router, switch, etc. which is closest to the remote host is considered to be that host's "parent". Read the "Determining
@@ -364,7 +361,6 @@ Definition Format
     host_name                      host_name
     # hostgroup_name               hostgroup_name
     service_description            service_description
-    # display_name                 display_name
     # servicegroups                servicegroup_names
     # is_volatile                  [0/1]
     check_command                  command_name
@@ -427,8 +423,6 @@ hostgroup_name               This directive is used to specify the short name(s)
 service_description;         This directive is used to define the description of the service, which may contain spaces, dashes, and colons
                              (semicolons, apostrophes, and quotation marks should be avoided). No two services associated with the same host can have
                              the same description. Services are uniquely identified with their host_name and service_description directives.
-display_name                 This directive is used to define an alternate name that should be displayed in the web interface for this service. If not
-                             specified, this defaults to the value you specify for the service_description directive.
 servicegroups                This directive is used to identify the short name(s) of the :ref:`servicegroup(s) <obj_def_servicegroup>` that the
                              service belongs to. Multiple servicegroups should be separated by commas. This directive may be used as an alternative
                              to using the members directive in :ref:`servicegroup <obj_def_servicegroup>` definitions.

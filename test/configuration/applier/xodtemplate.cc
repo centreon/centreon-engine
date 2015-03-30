@@ -1060,11 +1060,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         }
       }
     }
-    else if (!strcmp(variable, "display_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->display_name = string::dup(value);
-      temp_service->have_display_name = true;
-    }
     else if (!strcmp(variable, "hostgroup")
              || !strcmp(variable, "hostgroups")
              || !strcmp(variable, "hostgroup_name")) {
@@ -1347,11 +1342,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         result = ERROR;
         break;
       }
-    }
-    else if (!strcmp(variable, "display_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->display_name = string::dup(value);
-      temp_host->have_display_name = true;
     }
     else if (!strcmp(variable, "alias"))
       temp_host->alias = string::dup(value);
@@ -4043,8 +4033,6 @@ int xodtemplate_duplicate_service(
   new_service->have_host_name = temp_service->have_host_name;
   new_service->service_description = NULL;
   new_service->have_service_description = temp_service->have_service_description;
-  new_service->display_name = NULL;
-  new_service->have_display_name = temp_service->have_display_name;
   new_service->service_groups = NULL;
   new_service->have_service_groups = temp_service->have_service_groups;
   new_service->check_command = NULL;
@@ -4069,8 +4057,6 @@ int xodtemplate_duplicate_service(
     new_service->name = string::dup(temp_service->name);
   if (temp_service->service_description != NULL)
     new_service->service_description = string::dup(temp_service->service_description);
-  if (temp_service->display_name != NULL)
-    new_service->display_name = string::dup(temp_service->display_name);
   if (temp_service->service_groups != NULL)
     new_service->service_groups = string::dup(temp_service->service_groups);
   if (temp_service->check_command != NULL)
@@ -4849,14 +4835,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
     if (this_host->host_name == NULL
         && template_host->host_name != NULL)
       this_host->host_name = string::dup(template_host->host_name);
-    if (this_host->have_display_name == false
-        && template_host->have_display_name == true) {
-      if (this_host->display_name == NULL
-          && template_host->display_name != NULL)
-        this_host->display_name
-          = string::dup(template_host->display_name);
-      this_host->have_display_name = true;
-    }
     if (this_host->alias == NULL && template_host->alias != NULL)
       this_host->alias = string::dup(template_host->alias);
     if (this_host->address == NULL && template_host->address != NULL)
@@ -5072,14 +5050,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
         this_service->service_description
           = string::dup(template_service->service_description);
       this_service->have_service_description = true;
-    }
-    if (this_service->have_display_name == false
-        && template_service->have_display_name == true) {
-      if (this_service->display_name == NULL
-          && template_service->display_name != NULL)
-        this_service->display_name
-          = string::dup(template_service->display_name);
-      this_service->have_display_name = true;
     }
 
     xodtemplate_get_inherited_string(
@@ -6716,7 +6686,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
   /* add the host definition */
   new_host = add_host(
                this_host->host_name,
-               this_host->display_name,
                this_host->alias,
                (this_host->address == NULL) ? this_host->host_name : this_host->address,
                this_host->check_period,
@@ -6804,7 +6773,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
   new_service = add_service(
                   this_service->host_name,
                   this_service->service_description,
-                  this_service->display_name,
                   this_service->check_period,
                   this_service->initial_state,
                   this_service->max_check_attempts,
@@ -7834,8 +7802,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "define host {\n");
     if (temp_host->host_name)
       fprintf(fp, "\thost_name\t%s\n", temp_host->host_name);
-    if (temp_host->display_name)
-      fprintf(fp, "\tdisplay_name\t%s\n", temp_host->display_name);
     if (temp_host->alias)
       fprintf(fp, "\talias\t%s\n", temp_host->alias);
     if (temp_host->address)
@@ -7921,8 +7887,6 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\thost_name\t%s\n", temp_service->host_name);
     if (temp_service->service_description)
       fprintf(fp, "\tservice_description\t%s\n", temp_service->service_description);
-    if (temp_service->display_name)
-      fprintf(fp, "\tdisplay_name\t%s\n", temp_service->display_name);
     if (temp_service->check_period)
       fprintf(fp, "\tcheck_period\t%s\n", temp_service->check_period);
     if (temp_service->check_command)
@@ -8753,7 +8717,6 @@ int xodtemplate_free_memory() {
     }
 
     next_host = this_host->next;
-    delete[] this_host->display_name;
     delete[] this_host->tmpl;
     delete[] this_host->name;
     delete[] this_host->host_name;
@@ -8786,7 +8749,6 @@ int xodtemplate_free_memory() {
     }
 
     next_service = this_service->next;
-    delete[] this_service->display_name;
     delete[] this_service->tmpl;
     delete[] this_service->name;
     delete[] this_service->hostgroup_name;

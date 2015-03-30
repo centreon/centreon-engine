@@ -50,7 +50,6 @@ bool operator==(
        service const& obj2) throw () {
   return (is_equal(obj1.host_name, obj2.host_name)
           && is_equal(obj1.description, obj2.description)
-          && is_equal(obj1.display_name, obj2.display_name)
           && is_equal(obj1.service_check_command, obj2.service_check_command)
           && is_equal(obj1.event_handler, obj2.event_handler)
           && obj1.initial_state == obj2.initial_state
@@ -158,7 +157,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
   os << "service {\n"
     "  host_name:                            " << chkstr(obj.host_name) << "\n"
     "  description:                          " << chkstr(obj.description) << "\n"
-    "  display_name:                         " << chkstr(obj.display_name) << "\n"
     "  service_check_command:                " << chkstr(obj.service_check_command) << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  initial_state:                        " << obj.initial_state << "\n"
@@ -244,7 +242,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] host_name                    Name of the host this
  *                                          service is running on.
  *  @param[in] description                  Service description.
- *  @param[in] display_name                 Display name.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
@@ -284,7 +281,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
 service* add_service(
            char const* host_name,
            char const* description,
-           char const* display_name,
            char const* check_period,
            int initial_state,
            int max_attempts,
@@ -359,7 +355,6 @@ service* add_service(
     // Duplicate vars.
     obj->host_name = string::dup(host_name);
     obj->description = string::dup(description);
-    obj->display_name = string::dup(display_name ? display_name : description);
     obj->service_check_command = string::dup(check_command);
     if (event_handler)
       obj->event_handler = string::dup(event_handler);

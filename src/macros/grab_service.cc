@@ -122,9 +122,6 @@ struct grab_service_redirection {
     // Description.
     routines[MACRO_SERVICEDESC].first = &get_member_as_string<service, char*, &service::description>;
     routines[MACRO_SERVICEDESC].second = true;
-    // Display name.
-    routines[MACRO_SERVICEDISPLAYNAME].first = &get_member_as_string<service, char*, &service::display_name>;
-    routines[MACRO_SERVICEDISPLAYNAME].second = true;
     // Output.
     routines[MACRO_SERVICEOUTPUT].first = &get_member_as_string<service, char*, &service::plugin_output>;
     routines[MACRO_SERVICEOUTPUT].second = true;
