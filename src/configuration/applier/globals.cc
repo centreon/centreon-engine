@@ -87,10 +87,6 @@ void applier::globals::apply(state& config) {
   ::ochp_timeout = config.ochp_timeout();
   ::ocsp_timeout = config.ocsp_timeout();
   ::passive_host_checks_are_soft = config.passive_host_checks_are_soft();
-  ::retained_host_attribute_mask = config.retained_host_attribute_mask();
-  ::retained_process_host_attribute_mask = config.retained_process_host_attribute_mask();
-  ::retain_state_information = config.retain_state_information();
-  ::retention_scheduling_horizon = config.retention_scheduling_horizon();
   ::retention_update_interval = config.retention_update_interval();
   ::service_check_timeout = config.service_check_timeout();
   ::service_freshness_check_interval = config.service_freshness_check_interval();
@@ -101,8 +97,6 @@ void applier::globals::apply(state& config) {
   ::status_update_interval = config.status_update_interval();
   ::time_change_threshold = config.time_change_threshold();
   ::translate_passive_host_checks = config.translate_passive_host_checks();
-  ::use_retained_program_state = config.use_retained_program_state();
-  ::use_retained_scheduling_info = config.use_retained_scheduling_info();
   ::use_syslog = config.use_syslog();
 }
 

@@ -142,16 +142,8 @@ extern unsigned int log_external_commands;
 extern unsigned int log_passive_checks;
 extern unsigned int log_initial_states;
 extern int log_host_retries;
-extern unsigned int retain_state_information;
 extern unsigned int retention_update_interval;
-extern unsigned int use_retained_program_state;
-extern unsigned int use_retained_scheduling_info;
-extern unsigned int retention_scheduling_horizon;
 extern int additional_freshness_latency;
-extern unsigned long retained_host_attribute_mask;
-/* retained_service_attribute_mask; */
-extern unsigned long retained_process_host_attribute_mask;
-/* retained_process_service_attribute_mask; */
 extern unsigned int obsess_over_services;
 extern unsigned int obsess_over_hosts;
 extern unsigned int translate_passive_host_checks;

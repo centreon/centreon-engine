@@ -243,14 +243,6 @@ namespace               configuration {
     std::list<std::string> const&
                         resource_file() const throw ();
     void                resource_file(std::list<std::string> const& value);
-    unsigned long       retained_host_attribute_mask() const throw ();
-    void                retained_host_attribute_mask(unsigned long value);
-    unsigned long       retained_process_host_attribute_mask() const throw ();
-    void                retained_process_host_attribute_mask(unsigned long value);
-    bool                retain_state_information() const throw ();
-    void                retain_state_information(bool value);
-    unsigned int        retention_scheduling_horizon() const throw ();
-    void                retention_scheduling_horizon(unsigned int value);
     unsigned int        retention_update_interval() const throw ();
     void                retention_update_interval(unsigned int value);
     set_servicedependency const&
@@ -305,10 +297,6 @@ namespace               configuration {
     void                user(std::vector<std::string> const& value);
     void                user(std::string const& key, std::string const& value);
     void                user(unsigned int key, std::string const& value);
-    bool                use_retained_program_state() const throw ();
-    void                use_retained_program_state(bool value);
-    bool                use_retained_scheduling_info() const throw ();
-    void                use_retained_scheduling_info(bool value);
     bool                use_setpgid() const throw ();
     void                use_setpgid(bool value);
     bool                use_syslog() const throw ();
@@ -373,8 +361,12 @@ namespace               configuration {
     void                _set_resource_file(std::string const& value);
     void                _set_retained_contact_host_attribute_mask(unsigned long value);
     void                _set_retained_contact_service_attribute_mask(unsigned long value);
+    void                _set_retained_host_attribute_mask(unsigned long value);
+    void                _set_retained_process_host_attribute_mask(unsigned long value);
     void                _set_retained_process_service_attribute_mask(std::string const& value);
     void                _set_retained_service_attribute_mask(std::string const& value);
+    void                _set_retain_state_information(bool value);
+    void                _set_retention_scheduling_horizon(unsigned int value);
     void                _set_service_inter_check_delay_method(std::string const& value);
     void                _set_service_interleave_factor_method(std::string const& value);
     void                _set_service_perfdata_command(std::string const& value);
@@ -390,6 +382,8 @@ namespace               configuration {
     void                _set_use_embedded_perl_implicitly(std::string const& value);
     void                _set_use_large_installation_tweaks(bool value);
     void                _set_use_regexp_matching(bool value);
+    void                _set_use_retained_program_state(bool value);
+    void                _set_use_retained_scheduling_info(bool value);
     void                _set_use_true_regexp_matching(bool value);
 
     template<typename U, void (state::*ptr)(U)>
@@ -497,10 +491,6 @@ namespace               configuration {
     std::string         _precached_object_file;
     std::list<std::string>
                         _resource_file;
-    unsigned long       _retained_host_attribute_mask;
-    unsigned long       _retained_process_host_attribute_mask;
-    bool                _retain_state_information;
-    unsigned int        _retention_scheduling_horizon;
     unsigned int        _retention_update_interval;
     set_servicedependency
                         _servicedependencies;
@@ -522,8 +512,6 @@ namespace               configuration {
     bool                _translate_passive_host_checks;
     std::vector<std::string>
                         _users;
-    bool                _use_retained_program_state;
-    bool                _use_retained_scheduling_info;
     bool                _use_setpgid;
     bool                _use_syslog;
     std::string         _use_timezone;

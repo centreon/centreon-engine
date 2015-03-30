@@ -173,38 +173,6 @@ The minimum update interval is 1 second.
 **Example** status_update_interval=15
 =========== ================================
 
-.. _main_cfg_opt_notifications:
-
-Notifications Option
---------------------
-
-This option determines whether or not Centreon Engine will send out
-:ref:`notifications <notifications>` when it initially (re)starts. If
-this option is disabled, Centreon Engine will not send out notifications
-for any host or service.
-
-=========== ==========================
-**Format**  enable_notifications=<0/1>
-**Example** enable_notifications=1
-=========== ==========================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the :ref:`use_retained_program_state
-   <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via the web
-   interface. Values are as follows:
-
-    * 0 = Disable notifications
-    * 1 = Enable notifications (default)
-
 .. _main_cfg_opt_event_handler:
 
 Event Handler Option
@@ -224,12 +192,8 @@ host or service event handlers.
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`).
+   If you want to change this option, you'll have to use the appropriate
    :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
@@ -300,27 +264,6 @@ External Command Buffer Slots
    (e.g. :ref:`distributed setups <distributed_monitoring>`),
    you may need to increase this number.
 
-.. _main_cfg_opt_state_retention:
-
-State Retention Option
-----------------------
-
-This option determines whether or not Centreon Engine will retain state
-information for hosts and services between program restarts. If you
-enable this option, you should supply a value for the
-:ref:`state_retention_file <main_cfg_opt_state_retention_file>`
-variable. When enabled, Centreon Engine will save all state information
-for hosts and service before it shuts down (or restarts) and will read
-in previously saved state information when it starts up again.
-
-  * 0 = Don't retain state information
-  * 1 = Retain state information (default)
-
-=========== ==============================
-**Format**  retain_state_information=<0/1>
-**Example** retain_state_information=1
-=========== ==============================
-
 .. _main_cfg_opt_state_retention_file:
 
 State Retention File
@@ -330,10 +273,7 @@ This is the file that Centreon Engine will use for storing status,
 downtime, and comment information before it shuts down. When Centreon
 Engine is restarted it will use the information stored in this file for
 setting the initial states of services and hosts before it starts
-monitoring anything. In order to make Centreon Engine retain state
-information between program restarts, you must enable the
-:ref:`retain_state_information <main_cfg_opt_state_retention>`
-option.
+monitoring anything.
 
 =========== ===========================================================
 **Format**  state_retention_file=<file_name>
@@ -347,98 +287,12 @@ This setting determines how often (in minutes) that Centreon Engine will
 automatically save retention data during normal operation. If you set
 this value to 0, Centreon Engine will not save retention data at regular
 intervals, but it will still save retention data before shutting down or
-restarting. If you have disabled state retention (with the
-:ref:`retain_state_information <main_cfg_opt_state_retention>`
-option), this option has no effect.
+restarting.
 
 =========== ===================================
 **Format**  retention_update_interval=<minutes>
 **Example** retention_update_interval=60
 =========== ===================================
-
-.. _main_cfg_opt_use_retained_program_state:
-
-Use Retained Program State Option
----------------------------------
-
-This setting determines whether or not Centreon Engine will set various
-program-wide state variables based on the values saved in the retention
-file. Some of these program-wide state variables that are normally saved
-across program restarts if state retention is enabled include the
-:ref:`enable_notifications <main_cfg_opt_notifications>`,
-:ref:`enable_flap_detection <main_cfg_opt_flap_detection>`
-and :ref:`enable_event_handlers <main_cfg_opt_event_handler>`
-options. If you do not have :ref:`state retention <main_cfg_opt_state_retention>`
-enabled, this option has no effect.
-
-  * 0 = Don't use retained program state
-  * 1 = Use retained program state (default)
-
-=========== ================================
-**Format**  use_retained_program_state=<0/1>
-**Example** use_retained_program_state=1
-=========== ================================
-
-.. _main_cfg_opt_use_retained_scheduling_info:
-
-Use Retained Scheduling Info Option
------------------------------------
-
-This setting determines whether or not Centreon Engine will retain
-scheduling info (next check times) for hosts and services when it
-restarts. If you are adding a large number (or percentage) of hosts and
-services, I would recommend disabling this option when you first restart
-Centreon Engine, as it can adversely skew the spread of initial
-checks. Otherwise you will probably want to leave it enabled.
-
-  * 0 = Don't use retained scheduling info
-  * 1 = Use retained scheduling info (default)
-
-=========== ==================================
-**Format**  use_retained_scheduling_info=<0/1>
-**Example** use_retained_scheduling_info=1
-=========== ==================================
-
-Retained Host and Service Attribute Masks
------------------------------------------
-
-They are a deprecated and ignered variables.
-
-=========== ========================================
-**Format**  retained_host_attribute_mask=<number>
-            retained_service_attribute_mask=<number>
-=========== ========================================
-
-Retained Process Attribute Masks
---------------------------------
-
-They are a deprecated and ignered variables.
-
-=========== ================================================
-**Format**  retained_process_host_attribute_mask=<number>
-            retained_process_service_attribute_mask=<number>
-=========== ================================================
-
-Retained Contact Attribute Masks
---------------------------------
-
-These options determine which contact attributes are NOT retained across
-program restarts. There are two masks because there are often separate
-host and service contact attributes that can be changed. The values for
-these options are a bitwise AND of values specified by the "MODATTR\_"
-definitions in the include/common.h source code file. By default, all
-process attributes are retained.
-
-=========== ================================================
-**Format**  retained_contact_host_attribute_mask=<number>
-            retained_contact_service_attribute_mask=<number>
-**Example** retained_contact_host_attribute_mask=0
-            retained_contact_service_attribute_mask=0
-=========== ================================================
-
-.. note::
-   This is an advanced feature. You'll need to read the Centreon Engine
-   source code to use this option effectively.
 
 Syslog Logging Option
 ---------------------
@@ -688,9 +542,8 @@ checked) are checked. This option will automatically adjust the
 inter-check delay method" (if necessary) to ensure that the initial
 checks of all services occur within the timeframe you specify. In
 general, this option will not have an affect on service check scheduling
-if scheduling information is being retained using the
-:ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
-option. Default value is 30 (minutes).
+because scheduling information is being retained. Default value is 30
+(minutes).
 
 =========== ==================================
 **Format**  max_service_check_spread=<minutes>
@@ -816,10 +669,8 @@ checked) are checked. This option will automatically adjust the
 :ref:`host inter-check <main_cfg_opt_host_inter_check_delay_method>`
 delay method" (if necessary) to ensure that the initial checks of all
 hosts occur within the timeframe you specify. In general, this option
-will not have an affect on host check scheduling if scheduling
-information is being retained using the
-:ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
-option. Default value is 30 (minutes).
+will not have an affect on host check scheduling because scheduling
+information is being retained. Default value is 30 (minutes).
 
 =========== ===============================
 **Format**  max_host_check_spread=<minutes>
@@ -1075,13 +926,8 @@ be found :ref:`here <flapping_detection>`.
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`).
+   If you want to change, you'll have to use the appropriate
    :ref:`external command <external_commands>` or change it via
    the web interface.
 

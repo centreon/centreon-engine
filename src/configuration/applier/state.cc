@@ -745,10 +745,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->passive_host_checks_are_soft(new_cfg.passive_host_checks_are_soft());
   config->precached_object_file(new_cfg.precached_object_file());
   config->resource_file(new_cfg.resource_file());
-  config->retain_state_information(new_cfg.retain_state_information());
-  config->retained_host_attribute_mask(new_cfg.retained_host_attribute_mask());
-  config->retained_process_host_attribute_mask(new_cfg.retained_process_host_attribute_mask());
-  config->retention_scheduling_horizon(new_cfg.retention_scheduling_horizon());
   config->retention_update_interval(new_cfg.retention_update_interval());
   config->service_check_timeout(new_cfg.service_check_timeout());
   config->service_freshness_check_interval(new_cfg.service_freshness_check_interval());
@@ -761,8 +757,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->status_update_interval(new_cfg.status_update_interval());
   config->time_change_threshold(new_cfg.time_change_threshold());
   config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
-  config->use_retained_program_state(new_cfg.use_retained_program_state());
-  config->use_retained_scheduling_info(new_cfg.use_retained_scheduling_info());
   config->use_setpgid(new_cfg.use_setpgid());
   config->use_syslog(new_cfg.use_syslog());
   config->user(new_cfg.user());

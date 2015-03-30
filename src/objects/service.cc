@@ -75,8 +75,6 @@ bool operator==(
           && obj1.freshness_threshold == obj2.freshness_threshold
           && obj1.event_handler_enabled == obj2.event_handler_enabled
           && obj1.checks_enabled == obj2.checks_enabled
-          && obj1.retain_status_information == obj2.retain_status_information
-          && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
           && obj1.obsess_over_service == obj2.obsess_over_service
           && is_equal(obj1.custom_variables, obj2.custom_variables)
           && obj1.host_problem_at_last_check == obj2.host_problem_at_last_check
@@ -185,8 +183,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
-    "  retain_status_information:            " << obj.retain_status_information << "\n"
-    "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
     "  check_type:                           " << obj.check_type << "\n"
@@ -279,10 +275,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] stalk_on_critical            Stalk on critical state ?
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
- *  @param[in] retain_status_information    Should Engine retain service
- *                                          status information ?
- *  @param[in] retain_nonstatus_information Should Engine retain service
- *                                          non-status information ?
  *  @param[in] obsess_over_service          Should we obsess over
  *                                          service ?
  *  @param[in] timezone                     Service timezone.
@@ -317,8 +309,6 @@ service* add_service(
            int stalk_on_critical,
            int check_freshness,
            int freshness_threshold,
-           int retain_status_information,
-           int retain_nonstatus_information,
            int obsess_over_service,
            char const* timezone) {
   // Make sure we have everything we need.
@@ -402,8 +392,6 @@ service* add_service(
     obj->max_attempts = max_attempts;
     obj->modified_attributes = MODATTR_NONE;
     obj->obsess_over_service = (obsess_over_service > 0);
-    obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
-    obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;
     obj->should_be_scheduled = true;
     obj->stalk_on_critical = (stalk_on_critical > 0);

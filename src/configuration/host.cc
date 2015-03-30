@@ -65,8 +65,6 @@ host::setters const host::_setters[] = {
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
-  { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
 
   // Deprecated.
   { "2d_coords",                    SETTER(std::string const&, _set_coords_2d) },
@@ -86,6 +84,8 @@ host::setters const host::_setters[] = {
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
+  { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
   { "statusmap_image",              SETTER(std::string const&, _set_statusmap_image) },
   { "vrml_image",                   SETTER(std::string const&, _set_vrml_image) }
 };
@@ -103,8 +103,6 @@ static unsigned short const default_initial_state(HOST_UP);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_obsess_over_host(true);
-static bool const           default_retain_nonstatus_information(true);
-static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
 static unsigned short const default_stalking_options(host::none);
 static unsigned int const   default_check_timeout(0);
@@ -130,8 +128,6 @@ host::host(key_type const& key)
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
     _obsess_over_host(default_obsess_over_host),
-    _retain_nonstatus_information(default_retain_nonstatus_information),
-    _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
     _stalking_options(default_stalking_options) {}
 
@@ -183,8 +179,6 @@ host& host::operator=(host const& right) {
     _max_check_attempts = right._max_check_attempts;
     _obsess_over_host = right._obsess_over_host;
     _parents = right._parents;
-    _retain_nonstatus_information = right._retain_nonstatus_information;
-    _retain_status_information = right._retain_status_information;
     _retry_interval = right._retry_interval;
     _stalking_options = right._stalking_options;
   }
@@ -223,8 +217,6 @@ bool host::operator==(host const& right) const throw () {
           && _max_check_attempts == right._max_check_attempts
           && _obsess_over_host == right._obsess_over_host
           && _parents == right._parents
-          && _retain_nonstatus_information == right._retain_nonstatus_information
-          && _retain_status_information == right._retain_status_information
           && _retry_interval == right._retry_interval
           && _timezone == right._timezone
           && _stalking_options == right._stalking_options);
@@ -295,14 +287,6 @@ bool host::operator<(host const& right) const throw () {
     return (_obsess_over_host < right._obsess_over_host);
   else if (_parents != right._parents)
     return (_parents < right._parents);
-  else if (_retain_nonstatus_information
-           != right._retain_nonstatus_information)
-    return (_retain_nonstatus_information
-            < right._retain_nonstatus_information);
-  else if (_retain_status_information
-           != right._retain_status_information)
-    return (_retain_status_information
-            < right._retain_status_information);
   else if (_retry_interval != right._retry_interval)
     return (_retry_interval < right._retry_interval);
   else if (_timezone != right._timezone)
@@ -367,8 +351,6 @@ void host::merge(object const& obj) {
   MRG_OPTION(_max_check_attempts);
   MRG_OPTION(_obsess_over_host);
   MRG_INHERIT(_parents);
-  MRG_OPTION(_retain_nonstatus_information);
-  MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
   MRG_OPTION(_stalking_options);
   MRG_OPTION(_timezone);
@@ -627,24 +609,6 @@ list_string& host::parents() throw () {
  */
 list_string const& host::parents() const throw () {
   return (*_parents);
-}
-
-/**
- *  Get retain_nonstatus_information.
- *
- *  @return The retain_nonstatus_information.
- */
-bool host::retain_nonstatus_information() const throw () {
-  return (_retain_nonstatus_information);
-}
-
-/**
- *  Get retain_status_information.
- *
- *  @return The retain_status_information.
- */
-bool host::retain_status_information() const throw () {
-  return (_retain_status_information);
 }
 
 /**
@@ -1242,27 +1206,32 @@ bool host::_set_process_perf_data(bool value) {
 }
 
 /**
- *  Set retain_nonstatus_information value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new retain_nonstatus_information value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
-bool host::_set_retain_nonstatus_information(
-       bool value) {
-  _retain_nonstatus_information = value;
+bool host::_set_retain_nonstatus_information(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host retain_nonstatus_information was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set retain_status_information value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new retain_status_information value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool host::_set_retain_status_information(bool value) {
-  _retain_status_information = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host retain_status_information was ignored";
+  ++config_warnings;
   return (true);
 }
 

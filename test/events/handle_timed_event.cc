@@ -163,7 +163,6 @@ static void check_event_check_reaper() {
 static void check_event_retention_save() {
   // register broker callback to catch event.
   config->event_broker_options(BROKER_RETENTION_DATA);
-  config->retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_RETENTION_DATA,
                         module_id,
@@ -190,7 +189,6 @@ static void check_event_retention_save() {
 static void check_event_status_save() {
   // register broker callback to catch event.
   config->event_broker_options(BROKER_STATUS_DATA);
-  config->retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_AGGREGATED_STATUS_DATA,
                         module_id,

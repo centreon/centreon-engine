@@ -86,8 +86,6 @@ namespace                  configuration {
     unsigned int           low_flap_threshold() const throw ();
     unsigned int           max_check_attempts() const throw ();
     bool                   obsess_over_service() const throw ();
-    bool                   retain_nonstatus_information() const throw ();
-    bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
     list_string&           servicegroups() throw ();
     list_string const&     servicegroups() const throw ();
@@ -171,8 +169,6 @@ namespace                  configuration {
     opt<unsigned int>      _low_flap_threshold;
     opt<unsigned int>      _max_check_attempts;
     opt<bool>              _obsess_over_service;
-    opt<bool>              _retain_nonstatus_information;
-    opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
     group                  _servicegroups;
     std::string            _service_description;

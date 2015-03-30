@@ -145,8 +145,6 @@ void applier::service::add_object(
                       &configuration::service::critical),
     obj->check_freshness(),
     obj->freshness_threshold(),
-    obj->retain_status_information(),
-    obj->retain_nonstatus_information(),
     obj->obsess_over_service(),
     NULL_IF_EMPTY(obj->timezone())));
   if (!svc)
@@ -383,12 +381,6 @@ void applier::service::modify_object(
   modify_if_different(
     s->checks_enabled,
     static_cast<int>(obj->checks_active()));
-  modify_if_different(
-    s->retain_status_information,
-    static_cast<int>(obj->retain_status_information()));
-  modify_if_different(
-    s->retain_nonstatus_information,
-    static_cast<int>(obj->retain_nonstatus_information()));
   modify_if_different(
     s->obsess_over_service,
     static_cast<int>(obj->obsess_over_service()));

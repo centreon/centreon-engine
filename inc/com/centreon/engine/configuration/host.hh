@@ -81,8 +81,6 @@ namespace                  configuration {
     bool                   obsess_over_host() const throw ();
     list_string&           parents() throw ();
     list_string const&     parents() const throw ();
-    bool                   retain_nonstatus_information() const throw ();
-    bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
     unsigned int           stalking_options() const throw ();
     std::string const&     timezone() const throw ();
@@ -164,8 +162,6 @@ namespace                  configuration {
     opt<unsigned int>      _max_check_attempts;
     opt<bool>              _obsess_over_host;
     group                  _parents;
-    opt<bool>              _retain_nonstatus_information;
-    opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
     static setters const   _setters[];
     opt<unsigned int>      _stalking_options;

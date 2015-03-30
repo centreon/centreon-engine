@@ -58,8 +58,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Check freshness
     0,                              // Freshness threshold
     0,                              // Should be drawn
-    0,                              // Retain status information
-    0,                              // Retain non-status information
     0,                              // Obsess over
     NULL));                         // System timezone
   if (!hst)
@@ -97,8 +95,6 @@ void com::centreon::engine::test::minimal_setup() {
     0,                              // Stalk on critical
     0,                              // Check freshness
     0,                              // Freshness threshold
-    0,                              // Retain status information
-    0,                              // Retain non-status information
     0,                              // Obsess over service
     NULL));                         // System timezone
   if (!svc)

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -65,7 +65,6 @@ static int check_read_state_information(int argc, char** argv) {
   fs.open(path, "w+");
   try {
     config->state_retention_file(path);
-    config->retain_state_information(true);
 
     // register broker callback to catch event.
     config->event_broker_options(BROKER_RETENTION_DATA);

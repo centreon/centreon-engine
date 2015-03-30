@@ -60,8 +60,6 @@ typedef struct                  host_struct {
   int                           freshness_threshold;
   int                           checks_enabled;
   int                           event_handler_enabled;
-  int                           retain_status_information;
-  int                           retain_nonstatus_information;
   int                           obsess_over_host;
   int                           should_be_drawn;
   customvariablesmember_struct* custom_variables;
@@ -154,8 +152,6 @@ host* add_host(
         int check_freshness,
         int freshness_threshold,
         int should_be_drawn,
-        int retain_status_information,
-        int retain_nonstatus_information,
         int obsess_over_host,
         char const* timezone);
 int   get_host_count();

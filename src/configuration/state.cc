@@ -96,10 +96,6 @@ state::setters const state::_setters[] = {
   { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
   { "precached_object_file",                       SETTER(std::string const&, precached_object_file) },
   { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
-  { "retained_host_attribute_mask",                SETTER(unsigned long, retained_host_attribute_mask) },
-  { "retained_process_host_attribute_mask",        SETTER(unsigned long, retained_process_host_attribute_mask) },
-  { "retain_state_information",                    SETTER(bool, retain_state_information) },
-  { "retention_scheduling_horizon",                SETTER(unsigned int, retention_scheduling_horizon) },
   { "retention_update_interval",                   SETTER(unsigned int, retention_update_interval) },
   { "service_check_timeout",                       SETTER(unsigned int, service_check_timeout) },
   { "service_freshness_check_interval",            SETTER(unsigned int, service_freshness_check_interval) },
@@ -114,8 +110,6 @@ state::setters const state::_setters[] = {
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
-  { "use_retained_program_state",                  SETTER(bool, use_retained_program_state) },
-  { "use_retained_scheduling_info",                SETTER(bool, use_retained_scheduling_info) },
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
   { "use_syslog",                                  SETTER(bool, use_syslog) },
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
@@ -164,8 +158,12 @@ state::setters const state::_setters[] = {
   { "process_performance_data",                    SETTER(bool, _set_process_performance_data) },
   { "retained_contact_host_attribute_mask",        SETTER(unsigned long, _set_retained_contact_host_attribute_mask) },
   { "retained_contact_service_attribute_mask",     SETTER(unsigned long, _set_retained_contact_service_attribute_mask) },
+  { "retained_host_attribute_mask",                SETTER(unsigned long, _set_retained_host_attribute_mask) },
+  { "retained_process_host_attribute_mask",        SETTER(unsigned long, _set_retained_process_host_attribute_mask) },
   { "retained_process_service_attribute_mask",     SETTER(std::string const&, _set_retained_process_service_attribute_mask) },
   { "retained_service_attribute_mask",             SETTER(std::string const&, _set_retained_service_attribute_mask) },
+  { "retain_state_information",                    SETTER(bool, _set_retain_state_information) },
+  { "retention_scheduling_horizon",                SETTER(unsigned int, _set_retention_scheduling_horizon) },
   { "service_perfdata_command",                    SETTER(std::string const&, _set_service_perfdata_command) },
   { "service_perfdata_file",                       SETTER(std::string const&, _set_service_perfdata_file) },
   { "service_perfdata_file_mode",                  SETTER(std::string const&, _set_service_perfdata_file_mode) },
@@ -180,6 +178,8 @@ state::setters const state::_setters[] = {
   { "use_embedded_perl_implicitly",                SETTER(std::string const&, _set_use_embedded_perl_implicitly) },
   { "use_large_installation_tweaks",               SETTER(bool, _set_use_large_installation_tweaks) },
   { "use_regexp_matching",                         SETTER(bool, _set_use_regexp_matching) },
+  { "use_retained_program_state",                  SETTER(bool, _set_use_retained_program_state) },
+  { "use_retained_scheduling_info",                SETTER(bool, _set_use_retained_scheduling_info) },
   { "use_true_regexp_matching",                    SETTER(bool, _set_use_true_regexp_matching) },
   { "xcddefault_comment_file",                     SETTER(std::string const&, _set_comment_file) },
   { "xdddefault_downtime_file",                    SETTER(std::string const&, _set_downtime_file) }
@@ -243,10 +243,6 @@ static std::string const               default_ocsp_command("");
 static unsigned int const              default_ocsp_timeout(15);
 static bool const                      default_passive_host_checks_are_soft(false);
 static std::string const               default_precached_object_file(DEFAULT_PRECACHED_OBJECT_FILE);
-static unsigned long const             default_retained_host_attribute_mask(0L);
-static unsigned long const             default_retained_process_host_attribute_mask(0L);
-static bool const                      default_retain_state_information(false);
-static unsigned int const              default_retention_scheduling_horizon(900);
 static unsigned int const              default_retention_update_interval(60);
 static unsigned int const              default_service_check_timeout(60);
 static unsigned int const              default_service_freshness_check_interval(60);
@@ -259,8 +255,6 @@ static std::string const               default_status_file(DEFAULT_STATUS_FILE);
 static unsigned int const              default_status_update_interval(60);
 static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
-static bool const                      default_use_retained_program_state(true);
-static bool const                      default_use_retained_scheduling_info(false);
 static bool const                      default_use_setpgid(true);
 static bool const                      default_use_syslog(true);
 static std::string const               default_use_timezone("");
@@ -350,10 +344,6 @@ state::state()
     _ocsp_timeout(default_ocsp_timeout),
     _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
     _precached_object_file(default_precached_object_file),
-    _retained_host_attribute_mask(default_retained_host_attribute_mask),
-    _retained_process_host_attribute_mask(default_retained_process_host_attribute_mask),
-    _retain_state_information(default_retain_state_information),
-    _retention_scheduling_horizon(default_retention_scheduling_horizon),
     _retention_update_interval(default_retention_update_interval),
     _service_check_timeout(default_service_check_timeout),
     _service_freshness_check_interval(default_service_freshness_check_interval),
@@ -366,8 +356,6 @@ state::state()
     _status_update_interval(default_status_update_interval),
     _time_change_threshold(default_time_change_threshold),
     _translate_passive_host_checks(default_translate_passive_host_checks),
-    _use_retained_program_state(default_use_retained_program_state),
-    _use_retained_scheduling_info(default_use_retained_scheduling_info),
     _use_setpgid(default_use_setpgid),
     _use_syslog(default_use_syslog),
     _use_timezone(default_use_timezone) {
@@ -460,10 +448,6 @@ state& state::operator=(state const& right) {
     _ocsp_timeout = right._ocsp_timeout;
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
     _precached_object_file = right._precached_object_file;
-    _retained_host_attribute_mask = right._retained_host_attribute_mask;
-    _retained_process_host_attribute_mask = right._retained_process_host_attribute_mask;
-    _retain_state_information = right._retain_state_information;
-    _retention_scheduling_horizon = right._retention_scheduling_horizon;
     _retention_update_interval = right._retention_update_interval;
     _servicedependencies = right._servicedependencies;
     _servicegroups = right._servicegroups;
@@ -481,8 +465,6 @@ state& state::operator=(state const& right) {
     _time_change_threshold = right._time_change_threshold;
     _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
-    _use_retained_program_state = right._use_retained_program_state;
-    _use_retained_scheduling_info = right._use_retained_scheduling_info;
     _use_setpgid = right._use_setpgid;
     _use_syslog = right._use_syslog;
     _use_timezone = right._use_timezone;
@@ -561,10 +543,6 @@ bool state::operator==(state const& right) const throw () {
           && _ocsp_timeout == right._ocsp_timeout
           && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
           && _precached_object_file == right._precached_object_file
-          && _retained_host_attribute_mask == right._retained_host_attribute_mask
-          && _retained_process_host_attribute_mask == right._retained_process_host_attribute_mask
-          && _retain_state_information == right._retain_state_information
-          && _retention_scheduling_horizon == right._retention_scheduling_horizon
           && _retention_update_interval == right._retention_update_interval
           && cmp_set_ptr(_servicedependencies, right._servicedependencies)
           && cmp_set_ptr(_servicegroups, right._servicegroups)
@@ -582,8 +560,6 @@ bool state::operator==(state const& right) const throw () {
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
-          && _use_retained_program_state == right._use_retained_program_state
-          && _use_retained_scheduling_info == right._use_retained_scheduling_info
           && _use_setpgid == right._use_setpgid
           && _use_syslog == right._use_syslog
           && _use_timezone == right._use_timezone);
@@ -2049,81 +2025,6 @@ void state::resource_file(std::list<std::string> const& value) {
 }
 
 /**
- *  Get retained_host_attribute_mask value.
- *
- *  @return The retained_host_attribute_mask value.
- */
-unsigned long state::retained_host_attribute_mask() const throw () {
-  return (_retained_host_attribute_mask);
-}
-
-/**
- *  Set retained_host_attribute_mask value.
- *
- *  @param[in] value The new retained_host_attribute_mask value.
- */
-void state::retained_host_attribute_mask(unsigned long value) {
-  _retained_host_attribute_mask = value;
-}
-
-/**
- *  Get retained_process_host_attribute_mask value.
- *
- *  @return The retained_process_host_attribute_mask value.
- */
-unsigned long state::retained_process_host_attribute_mask() const throw () {
-  return (_retained_process_host_attribute_mask);
-}
-
-/**
- *  Set retained_process_host_attribute_mask value.
- *
- *  @param[in] value The new retained_process_host_attribute_mask value.
- */
-void state::retained_process_host_attribute_mask(unsigned long value) {
-  _retained_process_host_attribute_mask = value;
-}
-
-/**
- *  Get retain_state_information value.
- *
- *  @return The retain_state_information value.
- */
-bool state::retain_state_information() const throw () {
-  return (_retain_state_information);
-}
-
-/**
- *  Set retain_state_information value.
- *
- *  @param[in] value The new retain_state_information value.
- */
-void state::retain_state_information(bool value) {
-  _retain_state_information = value;
-}
-
-/**
- *  Get retention_scheduling_horizon value.
- *
- *  @return The retention_scheduling_horizon value.
- */
-unsigned int state::retention_scheduling_horizon() const throw () {
-  return (_retention_scheduling_horizon);
-}
-
-/**
- *  Set retention_scheduling_horizon value.
- *
- *  @param[in] value The new retention_scheduling_horizon value.
- */
-void state::retention_scheduling_horizon(unsigned int value) {
-  if (!value)
-    throw (engine_error()
-           << "retention_scheduling_horizon cannot be 0");
-  _retention_scheduling_horizon = value;
-}
-
-/**
  *  Get retention_update_interval value.
  *
  *  @return The retention_update_interval value.
@@ -2651,42 +2552,6 @@ void state::user(unsigned int key, std::string const& value) {
   if (key >= _users.size())
     _users.resize(key + 1);
   _users[key] = value;
-}
-
-/**
- *  Get use_retained_program_state value.
- *
- *  @return The use_retained_program_state value.
- */
-bool state::use_retained_program_state() const throw () {
-  return (_use_retained_program_state);
-}
-
-/**
- *  Set use_retained_program_state value.
- *
- *  @param[in] value The new use_retained_program_state value.
- */
-void state::use_retained_program_state(bool value) {
-  _use_retained_program_state = value;
-}
-
-/**
- *  Get use_retained_scheduling_info value.
- *
- *  @return The use_retained_scheduling_info value.
- */
-bool state::use_retained_scheduling_info() const throw () {
-  return (_use_retained_scheduling_info);
-}
-
-/**
- *  Set use_retained_scheduling_info value.
- *
- *  @param[in] value The new use_retained_scheduling_info value.
- */
-void state::use_retained_scheduling_info(bool value) {
-  _use_retained_scheduling_info = value;
 }
 
 /**
@@ -3415,6 +3280,32 @@ void state::_set_resource_file(std::string const& value) {
 }
 
 /**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_retained_host_attribute_mask(unsigned long value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retained_host_attribute_mask variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_retained_process_host_attribute_mask(unsigned long value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retained_process_host_attribute_mask variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
  *  Unused variable retained_process_service_attribute_mask.
  *
  *  @param[in] value Unused.
@@ -3436,6 +3327,32 @@ void state::_set_retained_service_attribute_mask(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: retained_service_attribute_mask variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_retain_state_information(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retain_state_information variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_retention_scheduling_horizon(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: retention_scheduling_horizon variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
@@ -3647,6 +3564,32 @@ void state::_set_use_regexp_matching(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: use_regexp_matching variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_retained_program_state(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: use_retained_program_state variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_use_retained_scheduling_info(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: use_retained_scheduling_info variable ignored";
   ++config_warnings;
   return ;
 }

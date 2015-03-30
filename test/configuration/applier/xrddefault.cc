@@ -202,13 +202,6 @@ int xrddefault_save_state_information() {
     return (ERROR);
   }
 
-  /* what attributes should be masked out? */
-  /* NOTE: host/service-specific values may be added in the future, but for now we only have global masks */
-  unsigned long process_host_attribute_mask = retained_process_host_attribute_mask;
-  unsigned long process_service_attribute_mask = retained_process_host_attribute_mask;
-  unsigned long host_attribute_mask = retained_host_attribute_mask;
-  unsigned long service_attribute_mask = retained_host_attribute_mask;
-
   std::ostringstream stream;
   std::streamsize ss(stream.precision());
 
@@ -230,8 +223,8 @@ int xrddefault_save_state_information() {
 
   /* save program state information */
   stream << "program {\n"
-         << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
-         << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
+         << "modified_host_attributes=" << modified_host_process_attributes << "\n"
+         << "modified_service_attributes=" << modified_service_process_attributes << "\n"
          << "enable_event_handlers=" << enable_event_handlers << "\n"
          << "obsess_over_services=" << obsess_over_services << "\n"
          << "obsess_over_hosts=" << obsess_over_hosts << "\n"
@@ -251,7 +244,7 @@ int xrddefault_save_state_information() {
 
     stream << "host {\n"
            << "host_name=" << temp_host->name << "\n"
-           << "modified_attributes=" << (temp_host->modified_attributes & ~host_attribute_mask) << "\n"
+           << "modified_attributes=" << temp_host->modified_attributes << "\n"
            << "check_command=" << (temp_host->host_check_command ? temp_host->host_check_command : "") << "\n"
            << "check_period=" << (temp_host->check_period ? temp_host->check_period : "") << "\n"
            << "event_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
@@ -315,7 +308,7 @@ int xrddefault_save_state_information() {
     stream << "service {\n"
            << "host_name=" << temp_service->host_name << "\n"
            << "service_description=" << temp_service->description << "\n"
-           << "modified_attributes=" << (temp_service->modified_attributes & ~service_attribute_mask) << "\n"
+           << "modified_attributes=" << temp_service->modified_attributes << "\n"
            << "check_command=" << (temp_service->service_check_command ? temp_service->service_check_command : "") << "\n"
            << "check_period=" << (temp_service->check_period ? temp_service->check_period : "") << "\n"
            << "event_handler=" << (temp_service->event_handler ? temp_service->event_handler : "") << "\n"
@@ -444,10 +437,6 @@ int xrddefault_read_state_information() {
   int fixed = FALSE;
   unsigned long triggered_by = 0;
   unsigned long duration = 0L;
-  unsigned long host_attribute_mask = 0L;
-  unsigned long service_attribute_mask = 0L;
-  unsigned long process_host_attribute_mask = 0L;
-  unsigned long process_service_attribute_mask = 0L;
   int was_flapping = FALSE;
   struct timeval tv[2];
   double runtime[2];
@@ -469,13 +458,6 @@ int xrddefault_read_state_information() {
   /* open the retention file for reading */
   if ((thefile = mmap_fopen(xrddefault_retention_file)) == NULL)
     return (ERROR);
-
-  /* what attributes should be masked out? */
-  /* NOTE: host/service-specific values may be added in the future, but for now we only have global masks */
-  process_host_attribute_mask = retained_process_host_attribute_mask;
-  process_service_attribute_mask = retained_process_host_attribute_mask;
-  host_attribute_mask = retained_host_attribute_mask;
-  service_attribute_mask = retained_host_attribute_mask;
 
   /* read all lines in the retention file */
   while (1) {
@@ -506,20 +488,8 @@ int xrddefault_read_state_information() {
       case XRDDEFAULT_INFO_DATA:
         break;
 
-      case XRDDEFAULT_PROGRAMSTATUS_DATA:
-        /* adjust modified attributes if necessary */
-        if (use_retained_program_state == false) {
-          modified_host_process_attributes = MODATTR_NONE;
-          modified_service_process_attributes = MODATTR_NONE;
-        }
-        break;
-
       case XRDDEFAULT_HOSTSTATUS_DATA:
         if (temp_host != NULL) {
-          /* adjust modified attributes if necessary */
-          if (temp_host->retain_nonstatus_information == FALSE)
-            temp_host->modified_attributes = MODATTR_NONE;
-
           /* adjust modified attributes if no custom variables have been changed */
           if (temp_host->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
             for (temp_customvariablesmember = temp_host->custom_variables;
@@ -558,10 +528,6 @@ int xrddefault_read_state_information() {
 
       case XRDDEFAULT_SERVICESTATUS_DATA:
         if (temp_service != NULL) {
-          /* adjust modified attributes if necessary */
-          if (temp_service->retain_nonstatus_information == FALSE)
-            temp_service->modified_attributes = MODATTR_NONE;
-
           /* adjust modified attributes if no custom variables have been changed */
           if (temp_service->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
             for (temp_customvariablesmember = temp_service->custom_variables;
@@ -626,11 +592,7 @@ int xrddefault_read_state_information() {
         if (!strcmp(var, "created")) {
           creation_time = strtoul(val, NULL, 10);
           time(&current_time);
-          if ((current_time - creation_time)
-              < static_cast<time_t>(retention_scheduling_horizon))
-            scheduling_info_is_ok = TRUE;
-          else
-            scheduling_info_is_ok = FALSE;
+          scheduling_info_is_ok = TRUE;
         }
         // Ignore update-related fields.
         else if (!strcmp(var, "version")
@@ -643,74 +605,66 @@ int xrddefault_read_state_information() {
       case XRDDEFAULT_PROGRAMSTATUS_DATA:
         if (!strcmp(var, "modified_host_attributes")) {
           modified_host_process_attributes = strtoul(val, NULL, 10);
-
-          /* mask out attributes we don't want to retain */
-          modified_host_process_attributes &= ~process_host_attribute_mask;
         }
         else if (!strcmp(var, "modified_service_attributes")) {
           modified_service_process_attributes = strtoul(val, NULL, 10);
-
-          /* mask out attributes we don't want to retain */
-          modified_service_process_attributes &= ~process_service_attribute_mask;
         }
-        if (use_retained_program_state == true) {
-          if (!strcmp(var, "enable_event_handlers")) {
-            if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-              config->enable_event_handlers((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "obsess_over_services")) {
-            if (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-              config->obsess_over_services((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "obsess_over_hosts")) {
-            if (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-              config->obsess_over_hosts((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "check_service_freshness")) {
-            if (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-              config->check_service_freshness((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "check_host_freshness")) {
-            if (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-              config->check_host_freshness((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "enable_flap_detection")) {
-            if (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-              config->enable_flap_detection((atoi(val) > 0) ? TRUE : FALSE);
-          }
-          else if (!strcmp(var, "global_host_event_handler")) {
-            if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-              /* make sure the check command still exists... */
-              tempval = string::dup(val);
-              temp_ptr = my_strtok(tempval, "!");
-              temp_command = find_command(temp_ptr);
-              temp_ptr = string::dup(val);
-              delete[] tempval;
+        else if (!strcmp(var, "enable_event_handlers")) {
+          if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
+            config->enable_event_handlers((atoi(val) > 0) ? TRUE : FALSE);
+        }
+        else if (!strcmp(var, "obsess_over_services")) {
+          if (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+            config->obsess_over_services((atoi(val) > 0) ? TRUE : FALSE);
+        }
+        else if (!strcmp(var, "obsess_over_hosts")) {
+          if (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+            config->obsess_over_hosts((atoi(val) > 0) ? TRUE : FALSE);
+        }
+        else if (!strcmp(var, "check_service_freshness")) {
+          if (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
+            config->check_service_freshness((atoi(val) > 0) ? TRUE : FALSE);
+        }
+        else if (!strcmp(var, "check_host_freshness")) {
+          if (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
+            config->check_host_freshness((atoi(val) > 0) ? TRUE : FALSE);
+        }
+        else if (!strcmp(var, "enable_flap_detection")) {
+          if (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
+            config->enable_flap_detection((atoi(val) > 0) ? TRUE : FALSE);
+        }
+        else if (!strcmp(var, "global_host_event_handler")) {
+          if (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+            /* make sure the check command still exists... */
+            tempval = string::dup(val);
+            temp_ptr = my_strtok(tempval, "!");
+            temp_command = find_command(temp_ptr);
+            temp_ptr = string::dup(val);
+            delete[] tempval;
 
-              if (temp_command != NULL && temp_ptr != NULL) {
-                config->global_host_event_handler(temp_ptr);
-              }
+            if (temp_command != NULL && temp_ptr != NULL) {
+              config->global_host_event_handler(temp_ptr);
             }
           }
-          else if (!strcmp(var, "global_service_event_handler")) {
-            if (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-              /* make sure the check command still exists... */
-              tempval = string::dup(val);
-              temp_ptr = my_strtok(tempval, "!");
-              temp_command = find_command(temp_ptr);
-              temp_ptr = string::dup(val);
-              delete[] tempval;
+        }
+        else if (!strcmp(var, "global_service_event_handler")) {
+          if (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+            /* make sure the check command still exists... */
+            tempval = string::dup(val);
+            temp_ptr = my_strtok(tempval, "!");
+            temp_command = find_command(temp_ptr);
+            temp_ptr = string::dup(val);
+            delete[] tempval;
 
-              if (temp_command != NULL && temp_ptr != NULL) {
-                config->global_service_event_handler(temp_ptr);
-              }
+            if (temp_command != NULL && temp_ptr != NULL) {
+              config->global_service_event_handler(temp_ptr);
             }
           }
-          else if (!strcmp(var, "next_event_id"))
-            next_event_id = strtoul(val, NULL, 10);
-          else if (!strcmp(var, "next_problem_id"))
-            next_problem_id = strtoul(val, NULL, 10);
         }
+        else if (!strcmp(var, "next_event_id"))
+          next_event_id = strtoul(val, NULL, 10);
+        else if (!strcmp(var, "next_problem_id"))
+          next_problem_id = strtoul(val, NULL, 10);
         break;
 
       case XRDDEFAULT_HOSTSTATUS_DATA:
@@ -723,200 +677,190 @@ int xrddefault_read_state_information() {
         else {
           if (!strcmp(var, "modified_attributes")) {
             temp_host->modified_attributes = strtoul(val, NULL, 10);
-
-            /* mask out attributes we don't want to retain */
-            temp_host->modified_attributes &= ~host_attribute_mask;
-
-            /* break out */
             break;
           }
-          if (temp_host->retain_status_information == TRUE) {
-            if (!strcmp(var, "has_been_checked"))
-              temp_host->has_been_checked = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "check_execution_time"))
-              temp_host->execution_time = strtod(val, NULL);
-            else if (!strcmp(var, "check_latency"))
-              temp_host->latency = strtod(val, NULL);
-            else if (!strcmp(var, "check_type"))
-              temp_host->check_type = atoi(val);
-            else if (!strcmp(var, "current_state"))
-              temp_host->current_state = atoi(val);
-            else if (!strcmp(var, "last_state"))
-              temp_host->last_state = atoi(val);
-            else if (!strcmp(var, "last_hard_state"))
-              temp_host->last_hard_state = atoi(val);
-            else if (!strcmp(var, "plugin_output")) {
-              delete[] temp_host->plugin_output;
-              temp_host->plugin_output = string::dup(val);
+          else if (!strcmp(var, "has_been_checked"))
+            temp_host->has_been_checked = (atoi(val) > 0) ? TRUE : FALSE;
+          else if (!strcmp(var, "check_execution_time"))
+            temp_host->execution_time = strtod(val, NULL);
+          else if (!strcmp(var, "check_latency"))
+            temp_host->latency = strtod(val, NULL);
+          else if (!strcmp(var, "check_type"))
+            temp_host->check_type = atoi(val);
+          else if (!strcmp(var, "current_state"))
+            temp_host->current_state = atoi(val);
+          else if (!strcmp(var, "last_state"))
+            temp_host->last_state = atoi(val);
+          else if (!strcmp(var, "last_hard_state"))
+            temp_host->last_hard_state = atoi(val);
+          else if (!strcmp(var, "plugin_output")) {
+            delete[] temp_host->plugin_output;
+            temp_host->plugin_output = string::dup(val);
+          }
+          else if (!strcmp(var, "long_plugin_output")) {
+            delete[] temp_host->long_plugin_output;
+            temp_host->long_plugin_output = string::dup(val);
+          }
+          else if (!strcmp(var, "performance_data")) {
+            delete[] temp_host->perf_data;
+            temp_host->perf_data = string::dup(val);
+          }
+          else if (!strcmp(var, "last_check"))
+            temp_host->last_check = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "next_check")) {
+            if (scheduling_info_is_ok == TRUE)
+              temp_host->next_check = strtoul(val, NULL, 10);
+          }
+          else if (!strcmp(var, "check_options")) {
+            if (scheduling_info_is_ok == TRUE)
+              temp_host->check_options = atoi(val);
+          }
+          else if (!strcmp(var, "current_attempt"))
+            temp_host->current_attempt = atoi(val);
+          else if (!strcmp(var, "current_event_id"))
+            temp_host->current_event_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_event_id"))
+            temp_host->last_event_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "current_problem_id"))
+            temp_host->current_problem_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_problem_id"))
+            temp_host->last_problem_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "state_type"))
+            temp_host->state_type = atoi(val);
+          else if (!strcmp(var, "last_state_change"))
+            temp_host->last_state_change = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_hard_state_change"))
+            temp_host->last_hard_state_change = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_up"))
+            temp_host->last_time_up = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_down"))
+            temp_host->last_time_down = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_unreachable"))
+            temp_host->last_time_unreachable = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "is_flapping"))
+            was_flapping = atoi(val);
+          else if (!strcmp(var, "percent_state_change"))
+            temp_host->percent_state_change = strtod(val, NULL);
+          else
+            if (!strcmp(var, "state_history")) {
+              temp_ptr = val;
+              for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
+                if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
+                  temp_host->state_history[x] = atoi(ch);
+                else
+                  break;
+              }
+              temp_host->state_history_index = 0;
             }
-            else if (!strcmp(var, "long_plugin_output")) {
-              delete[] temp_host->long_plugin_output;
-              temp_host->long_plugin_output = string::dup(val);
-            }
-            else if (!strcmp(var, "performance_data")) {
-              delete[] temp_host->perf_data;
-              temp_host->perf_data = string::dup(val);
-            }
-            else if (!strcmp(var, "last_check"))
-              temp_host->last_check = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "next_check")) {
-              if (use_retained_scheduling_info == true
-                  && scheduling_info_is_ok == TRUE)
-                temp_host->next_check = strtoul(val, NULL, 10);
-            }
-            else if (!strcmp(var, "check_options")) {
-              if (use_retained_scheduling_info == true
-                  && scheduling_info_is_ok == TRUE)
-                temp_host->check_options = atoi(val);
-            }
-            else if (!strcmp(var, "current_attempt"))
-              temp_host->current_attempt = atoi(val);
-            else if (!strcmp(var, "current_event_id"))
-              temp_host->current_event_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_event_id"))
-              temp_host->last_event_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "current_problem_id"))
-              temp_host->current_problem_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_problem_id"))
-              temp_host->last_problem_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "state_type"))
-              temp_host->state_type = atoi(val);
-            else if (!strcmp(var, "last_state_change"))
-              temp_host->last_state_change = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_hard_state_change"))
-              temp_host->last_hard_state_change = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_up"))
-              temp_host->last_time_up = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_down"))
-              temp_host->last_time_down = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_unreachable"))
-              temp_host->last_time_unreachable = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "is_flapping"))
-              was_flapping = atoi(val);
-            else if (!strcmp(var, "percent_state_change"))
-              temp_host->percent_state_change = strtod(val, NULL);
             else
-              if (!strcmp(var, "state_history")) {
-                temp_ptr = val;
-                for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
-                  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
-                    temp_host->state_history[x] = atoi(ch);
-                  else
-                    break;
-                }
-                temp_host->state_history_index = 0;
+              found_directive = FALSE;
+
+          /* null-op speeds up logic */
+          if (found_directive == TRUE);
+
+          else if (!strcmp(var, "active_checks_enabled")) {
+            if (temp_host->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
+              temp_host->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+          }
+          else if (!strcmp(var, "event_handler_enabled")) {
+            if (temp_host->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
+              temp_host->event_handler_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+          }
+          else if (!strcmp(var, "flap_detection_enabled")) {
+            if (temp_host->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
+              temp_host->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+          }
+          else if (!strcmp(var, "obsess_over_host")) {
+            if (temp_host->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+              temp_host->obsess_over_host = (atoi(val) > 0) ? TRUE : FALSE;
+          }
+          else if (!strcmp(var, "check_command")) {
+            if (temp_host->modified_attributes & MODATTR_CHECK_COMMAND) {
+              /* make sure the check command still exists... */
+              tempval = string::dup(val);
+              temp_ptr = my_strtok(tempval, "!");
+              temp_command = find_command(temp_ptr);
+              temp_ptr = string::dup(val);
+              delete[] tempval;
+
+              if (temp_command != NULL && temp_ptr != NULL) {
+                delete[] temp_host->host_check_command;
+                temp_host->host_check_command = temp_ptr;
               }
               else
-                found_directive = FALSE;
+                temp_host->modified_attributes -= MODATTR_CHECK_COMMAND;
+            }
           }
-          if (temp_host->retain_nonstatus_information == TRUE) {
-            /* null-op speeds up logic */
-            if (found_directive == TRUE);
+          else if (!strcmp(var, "check_period")) {
+            if (temp_host->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
+              /* make sure the timeperiod still exists... */
+              temp_timeperiod = find_timeperiod(val);
+              temp_ptr = string::dup(val);
 
-            else if (!strcmp(var, "active_checks_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-                temp_host->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "event_handler_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-                temp_host->event_handler_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "flap_detection_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-                temp_host->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "obsess_over_host")) {
-              if (temp_host->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-                temp_host->obsess_over_host = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "check_command")) {
-              if (temp_host->modified_attributes & MODATTR_CHECK_COMMAND) {
-                /* make sure the check command still exists... */
-                tempval = string::dup(val);
-                temp_ptr = my_strtok(tempval, "!");
-                temp_command = find_command(temp_ptr);
-                temp_ptr = string::dup(val);
-                delete[] tempval;
-
-                if (temp_command != NULL && temp_ptr != NULL) {
-                  delete[] temp_host->host_check_command;
-                  temp_host->host_check_command = temp_ptr;
-                }
-                else
-                  temp_host->modified_attributes -= MODATTR_CHECK_COMMAND;
+              if (temp_timeperiod != NULL && temp_ptr != NULL) {
+                delete[] temp_host->check_period;
+                temp_host->check_period = temp_ptr;
               }
+              else
+                temp_host->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
             }
-            else if (!strcmp(var, "check_period")) {
-              if (temp_host->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                temp_timeperiod = find_timeperiod(val);
-                temp_ptr = string::dup(val);
+          }
+          else if (!strcmp(var, "event_handler")) {
+            if (temp_host->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+              /* make sure the check command still exists... */
+              tempval = string::dup(val);
+              temp_ptr = my_strtok(tempval, "!");
+              temp_command = find_command(temp_ptr);
+              temp_ptr = string::dup(val);
+              delete[] tempval;
 
-                if (temp_timeperiod != NULL && temp_ptr != NULL) {
-                  delete[] temp_host->check_period;
-                  temp_host->check_period = temp_ptr;
-                }
-                else
-                  temp_host->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
+              if (temp_command != NULL && temp_ptr != NULL) {
+                delete[] temp_host->event_handler;
+                temp_host->event_handler = temp_ptr;
               }
+              else
+                temp_host->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
             }
-            else if (!strcmp(var, "event_handler")) {
-              if (temp_host->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-                /* make sure the check command still exists... */
-                tempval = string::dup(val);
-                temp_ptr = my_strtok(tempval, "!");
-                temp_command = find_command(temp_ptr);
-                temp_ptr = string::dup(val);
-                delete[] tempval;
+          }
+          else if (!strcmp(var, "normal_check_interval")) {
+            if (temp_host->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
+                && strtod(val, NULL) >= 0)
+              temp_host->check_interval = strtod(val, NULL);
+          }
+          else if (!strcmp(var, "retry_check_interval")) {
+            if (temp_host->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL
+                && strtod(val, NULL) >= 0)
+              temp_host->retry_interval = strtod(val, NULL);
+          }
+          else if (!strcmp(var, "max_attempts")) {
+            if (temp_host->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS
+                && atoi(val) >= 1) {
+              temp_host->max_attempts = atoi(val);
 
-                if (temp_command != NULL && temp_ptr != NULL) {
-                  delete[] temp_host->event_handler;
-                  temp_host->event_handler = temp_ptr;
-                }
-                else
-                  temp_host->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
-              }
+              /* adjust current attempt number if in a hard state */
+              if (temp_host->state_type == HARD_STATE
+                  && temp_host->current_state != HOST_UP
+                  && temp_host->current_attempt > 1)
+                temp_host->current_attempt = temp_host->max_attempts;
             }
-            else if (!strcmp(var, "normal_check_interval")) {
-              if (temp_host->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
-                  && strtod(val, NULL) >= 0)
-                temp_host->check_interval = strtod(val, NULL);
-            }
-            else if (!strcmp(var, "retry_check_interval")) {
-              if (temp_host->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL
-                  && strtod(val, NULL) >= 0)
-                temp_host->retry_interval = strtod(val, NULL);
-            }
-            else if (!strcmp(var, "max_attempts")) {
-              if (temp_host->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS
-                  && atoi(val) >= 1) {
-                temp_host->max_attempts = atoi(val);
+          }
+          /* custom variables */
+          else if (var[0] == '_') {
+            if (temp_host->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
 
-                /* adjust current attempt number if in a hard state */
-                if (temp_host->state_type == HARD_STATE
-                    && temp_host->current_state != HOST_UP
-                    && temp_host->current_attempt > 1)
-                  temp_host->current_attempt = temp_host->max_attempts;
-              }
-            }
-            /* custom variables */
-            else if (var[0] == '_') {
-              if (temp_host->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+              /* get the variable name */
+              customvarname = var + 1;
 
-                /* get the variable name */
-                customvarname = var + 1;
-
-                for (temp_customvariablesmember = temp_host->custom_variables;
-                     temp_customvariablesmember != NULL;
-                     temp_customvariablesmember = temp_customvariablesmember->next) {
-                  if (!strcmp(customvarname, temp_customvariablesmember->variable_name)) {
-                    if ((x = atoi(val)) > 0 && strlen(val) > 3) {
-                      delete[] temp_customvariablesmember->variable_value;
-                      temp_customvariablesmember->variable_value = string::dup(val + 2);
-                      temp_customvariablesmember->has_been_modified = (x > 0) ? TRUE : FALSE;
-                    }
-                    break;
+              for (temp_customvariablesmember = temp_host->custom_variables;
+                   temp_customvariablesmember != NULL;
+                   temp_customvariablesmember = temp_customvariablesmember->next) {
+                if (!strcmp(customvarname, temp_customvariablesmember->variable_name)) {
+                  if ((x = atoi(val)) > 0 && strlen(val) > 3) {
+                    delete[] temp_customvariablesmember->variable_value;
+                    temp_customvariablesmember->variable_value = string::dup(val + 2);
+                    temp_customvariablesmember->has_been_modified = (x > 0) ? TRUE : FALSE;
                   }
+                  break;
                 }
               }
             }
@@ -945,200 +889,192 @@ int xrddefault_read_state_information() {
         else {
           if (!strcmp(var, "modified_attributes")) {
             temp_service->modified_attributes = strtoul(val, NULL, 10);
-
-            /* mask out attributes we don't want to retain */
-            temp_service->modified_attributes &= ~service_attribute_mask;
           }
-          if (temp_service->retain_status_information == TRUE) {
-            if (!strcmp(var, "has_been_checked"))
-              temp_service->has_been_checked = (atoi(val) > 0) ? TRUE : FALSE;
-            else if (!strcmp(var, "check_execution_time"))
-              temp_service->execution_time = strtod(val, NULL);
-            else if (!strcmp(var, "check_latency"))
-              temp_service->latency = strtod(val, NULL);
-            else if (!strcmp(var, "check_type"))
-              temp_service->check_type = atoi(val);
-            else if (!strcmp(var, "current_state"))
-              temp_service->current_state = atoi(val);
-            else if (!strcmp(var, "last_state"))
-              temp_service->last_state = atoi(val);
-            else if (!strcmp(var, "last_hard_state"))
-              temp_service->last_hard_state = atoi(val);
-            else if (!strcmp(var, "current_attempt"))
-              temp_service->current_attempt = atoi(val);
-            else if (!strcmp(var, "current_event_id"))
-              temp_service->current_event_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_event_id"))
-              temp_service->last_event_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "current_problem_id"))
-              temp_service->current_problem_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_problem_id"))
-              temp_service->last_problem_id = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "state_type"))
-              temp_service->state_type = atoi(val);
-            else if (!strcmp(var, "last_state_change"))
-              temp_service->last_state_change = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_hard_state_change"))
-              temp_service->last_hard_state_change = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_ok"))
-              temp_service->last_time_ok = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_warning"))
-              temp_service->last_time_warning = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_unknown"))
-              temp_service->last_time_unknown = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "last_time_critical"))
-              temp_service->last_time_critical = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "plugin_output")) {
-              delete[] temp_service->plugin_output;
-              temp_service->plugin_output = string::dup(val);
+          else if (!strcmp(var, "has_been_checked"))
+            temp_service->has_been_checked = (atoi(val) > 0) ? TRUE : FALSE;
+          else if (!strcmp(var, "check_execution_time"))
+            temp_service->execution_time = strtod(val, NULL);
+          else if (!strcmp(var, "check_latency"))
+            temp_service->latency = strtod(val, NULL);
+          else if (!strcmp(var, "check_type"))
+            temp_service->check_type = atoi(val);
+          else if (!strcmp(var, "current_state"))
+            temp_service->current_state = atoi(val);
+          else if (!strcmp(var, "last_state"))
+            temp_service->last_state = atoi(val);
+          else if (!strcmp(var, "last_hard_state"))
+            temp_service->last_hard_state = atoi(val);
+          else if (!strcmp(var, "current_attempt"))
+            temp_service->current_attempt = atoi(val);
+          else if (!strcmp(var, "current_event_id"))
+            temp_service->current_event_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_event_id"))
+            temp_service->last_event_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "current_problem_id"))
+            temp_service->current_problem_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_problem_id"))
+            temp_service->last_problem_id = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "state_type"))
+            temp_service->state_type = atoi(val);
+          else if (!strcmp(var, "last_state_change"))
+            temp_service->last_state_change = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_hard_state_change"))
+            temp_service->last_hard_state_change = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_ok"))
+            temp_service->last_time_ok = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_warning"))
+            temp_service->last_time_warning = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_unknown"))
+            temp_service->last_time_unknown = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "last_time_critical"))
+            temp_service->last_time_critical = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "plugin_output")) {
+            delete[] temp_service->plugin_output;
+            temp_service->plugin_output = string::dup(val);
+          }
+          else if (!strcmp(var, "long_plugin_output")) {
+            delete[] temp_service->long_plugin_output;
+            temp_service->long_plugin_output = string::dup(val);
+          }
+          else if (!strcmp(var, "performance_data")) {
+            delete[] temp_service->perf_data;
+            temp_service->perf_data = string::dup(val);
+          }
+          else if (!strcmp(var, "last_check"))
+            temp_service->last_check = strtoul(val, NULL, 10);
+          else if (!strcmp(var, "next_check")) {
+            if (scheduling_info_is_ok == TRUE)
+              temp_service->next_check = strtoul(val, NULL, 10);
+          }
+          else if (!strcmp(var, "check_options")) {
+            if (scheduling_info_is_ok == TRUE)
+              temp_service->check_options = atoi(val);
+          }
+          else if (!strcmp(var, "is_flapping"))
+            was_flapping = atoi(val);
+          else if (!strcmp(var, "percent_state_change"))
+            temp_service->percent_state_change = strtod(val, NULL);
+          else
+            if (!strcmp(var, "state_history")) {
+              temp_ptr = val;
+              for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
+                if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
+                  temp_service->state_history[x] = atoi(ch);
+                else
+                  break;
+              }
+              temp_service->state_history_index = 0;
             }
-            else if (!strcmp(var, "long_plugin_output")) {
-              delete[] temp_service->long_plugin_output;
-              temp_service->long_plugin_output = string::dup(val);
-            }
-            else if (!strcmp(var, "performance_data")) {
-              delete[] temp_service->perf_data;
-              temp_service->perf_data = string::dup(val);
-            }
-            else if (!strcmp(var, "last_check"))
-              temp_service->last_check = strtoul(val, NULL, 10);
-            else if (!strcmp(var, "next_check")) {
-              if (use_retained_scheduling_info == true
-                  && scheduling_info_is_ok == TRUE)
-                temp_service->next_check = strtoul(val, NULL, 10);
-            }
-            else if (!strcmp(var, "check_options")) {
-              if (use_retained_scheduling_info == true
-                  && scheduling_info_is_ok == TRUE)
-                temp_service->check_options = atoi(val);
-            }
-            else if (!strcmp(var, "is_flapping"))
-              was_flapping = atoi(val);
-            else if (!strcmp(var, "percent_state_change"))
-              temp_service->percent_state_change = strtod(val, NULL);
             else
-              if (!strcmp(var, "state_history")) {
-                temp_ptr = val;
-                for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
-                  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
-                    temp_service->state_history[x] = atoi(ch);
-                  else
-                    break;
-                }
-                temp_service->state_history_index = 0;
-              }
-              else
-                found_directive = FALSE;
+              found_directive = FALSE;
+        }
+
+        /* null-op speeds up logic */
+        if (found_directive == TRUE);
+
+        else if (!strcmp(var, "active_checks_enabled")) {
+          if (temp_service->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
+            temp_service->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+        }
+        else if (!strcmp(var, "event_handler_enabled")) {
+          if (temp_service->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
+            temp_service->event_handler_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+        }
+        else if (!strcmp(var, "flap_detection_enabled")) {
+          if (temp_service->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
+            temp_service->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+        }
+        else if (!strcmp(var, "obsess_over_service")) {
+          if (temp_service->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
+            temp_service->obsess_over_service = (atoi(val) > 0) ? TRUE : FALSE;
+        }
+        else if (!strcmp(var, "check_command")) {
+          if (temp_service->modified_attributes & MODATTR_CHECK_COMMAND) {
+            /* make sure the check command still exists... */
+            tempval = string::dup(val);
+            temp_ptr = my_strtok(tempval, "!");
+            temp_command = find_command(temp_ptr);
+            temp_ptr = string::dup(val);
+            delete[] tempval;
+
+            if (temp_command != NULL && temp_ptr != NULL) {
+              delete[] temp_service->service_check_command;
+              temp_service->service_check_command = temp_ptr;
+            }
+            else
+              temp_service->modified_attributes -= MODATTR_CHECK_COMMAND;
           }
-          if (temp_service->retain_nonstatus_information == TRUE) {
-            /* null-op speeds up logic */
-            if (found_directive == TRUE);
+        }
+        else if (!strcmp(var, "check_period")) {
+          if (temp_service->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
+            /* make sure the timeperiod still exists... */
+            temp_timeperiod = find_timeperiod(val);
+            temp_ptr = string::dup(val);
 
-            else if (!strcmp(var, "active_checks_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-                temp_service->checks_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+            if (temp_timeperiod != NULL && temp_ptr != NULL) {
+              delete[] temp_service->check_period;
+              temp_service->check_period = temp_ptr;
             }
-            else if (!strcmp(var, "event_handler_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-                temp_service->event_handler_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "flap_detection_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-                temp_service->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "obsess_over_service")) {
-              if (temp_service->modified_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-                temp_service->obsess_over_service = (atoi(val) > 0) ? TRUE : FALSE;
-            }
-            else if (!strcmp(var, "check_command")) {
-              if (temp_service->modified_attributes & MODATTR_CHECK_COMMAND) {
-                /* make sure the check command still exists... */
-                tempval = string::dup(val);
-                temp_ptr = my_strtok(tempval, "!");
-                temp_command = find_command(temp_ptr);
-                temp_ptr = string::dup(val);
-                delete[] tempval;
+            else
+              temp_service->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
+          }
+        }
+        else if (!strcmp(var, "event_handler")) {
+          if (temp_service->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
+            /* make sure the check command still exists... */
+            tempval = string::dup(val);
+            temp_ptr = my_strtok(tempval, "!");
+            temp_command = find_command(temp_ptr);
+            temp_ptr = string::dup(val);
+            delete[] tempval;
 
-                if (temp_command != NULL && temp_ptr != NULL) {
-                  delete[] temp_service->service_check_command;
-                  temp_service->service_check_command = temp_ptr;
+            if (temp_command != NULL && temp_ptr != NULL) {
+              delete[] temp_service->event_handler;
+              temp_service->event_handler = temp_ptr;
+            }
+            else
+              temp_service->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
+          }
+        }
+        else if (!strcmp(var, "normal_check_interval")) {
+          if (temp_service->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
+              && strtod(val, NULL) >= 0)
+            temp_service->check_interval = strtod(val, NULL);
+        }
+        else if (!strcmp(var, "retry_check_interval")) {
+          if (temp_service->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL
+              && strtod(val, NULL) >= 0)
+            temp_service->retry_interval = strtod(val, NULL);
+        }
+        else if (!strcmp(var, "max_attempts")) {
+          if (temp_service->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS
+              && atoi(val) >= 1) {
+            temp_service->max_attempts = atoi(val);
+
+            /* adjust current attempt number if in a hard state */
+            if (temp_service->state_type == HARD_STATE
+                && temp_service->current_state != STATE_OK
+                && temp_service->current_attempt > 1)
+              temp_service->current_attempt = temp_service->max_attempts;
+          }
+        }
+        /* custom variables */
+        else if (var[0] == '_') {
+          if (temp_service->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+
+            /* get the variable name */
+            customvarname = var + 1;
+
+            for (temp_customvariablesmember = temp_service->custom_variables;
+                 temp_customvariablesmember != NULL;
+                 temp_customvariablesmember = temp_customvariablesmember->next) {
+              if (!strcmp(customvarname, temp_customvariablesmember->variable_name)) {
+                if ((x = atoi(val)) > 0 && strlen(val) > 3) {
+                  delete[] temp_customvariablesmember->variable_value;
+                  temp_customvariablesmember->variable_value = string::dup(val + 2);
+                  temp_customvariablesmember->has_been_modified = (x > 0) ? TRUE : FALSE;
                 }
-                else
-                  temp_service->modified_attributes -= MODATTR_CHECK_COMMAND;
-              }
-            }
-            else if (!strcmp(var, "check_period")) {
-              if (temp_service->modified_attributes & MODATTR_CHECK_TIMEPERIOD) {
-                /* make sure the timeperiod still exists... */
-                temp_timeperiod = find_timeperiod(val);
-                temp_ptr = string::dup(val);
-
-                if (temp_timeperiod != NULL && temp_ptr != NULL) {
-                  delete[] temp_service->check_period;
-                  temp_service->check_period = temp_ptr;
-                }
-                else
-                  temp_service->modified_attributes -= MODATTR_CHECK_TIMEPERIOD;
-              }
-            }
-            else if (!strcmp(var, "event_handler")) {
-              if (temp_service->modified_attributes & MODATTR_EVENT_HANDLER_COMMAND) {
-                /* make sure the check command still exists... */
-                tempval = string::dup(val);
-                temp_ptr = my_strtok(tempval, "!");
-                temp_command = find_command(temp_ptr);
-                temp_ptr = string::dup(val);
-                delete[] tempval;
-
-                if (temp_command != NULL && temp_ptr != NULL) {
-                  delete[] temp_service->event_handler;
-                  temp_service->event_handler = temp_ptr;
-                }
-                else
-                  temp_service->modified_attributes -= MODATTR_EVENT_HANDLER_COMMAND;
-              }
-            }
-            else if (!strcmp(var, "normal_check_interval")) {
-              if (temp_service->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
-                  && strtod(val, NULL) >= 0)
-                temp_service->check_interval = strtod(val, NULL);
-            }
-            else if (!strcmp(var, "retry_check_interval")) {
-              if (temp_service->modified_attributes & MODATTR_RETRY_CHECK_INTERVAL
-                  && strtod(val, NULL) >= 0)
-                temp_service->retry_interval = strtod(val, NULL);
-            }
-            else if (!strcmp(var, "max_attempts")) {
-              if (temp_service->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS
-                  && atoi(val) >= 1) {
-                temp_service->max_attempts = atoi(val);
-
-                /* adjust current attempt number if in a hard state */
-                if (temp_service->state_type == HARD_STATE
-                    && temp_service->current_state != STATE_OK
-                    && temp_service->current_attempt > 1)
-                  temp_service->current_attempt = temp_service->max_attempts;
-              }
-            }
-            /* custom variables */
-            else if (var[0] == '_') {
-              if (temp_service->modified_attributes & MODATTR_CUSTOM_VARIABLE) {
-
-                /* get the variable name */
-                customvarname = var + 1;
-
-                for (temp_customvariablesmember = temp_service->custom_variables;
-                     temp_customvariablesmember != NULL;
-                     temp_customvariablesmember = temp_customvariablesmember->next) {
-                  if (!strcmp(customvarname, temp_customvariablesmember->variable_name)) {
-                    if ((x = atoi(val)) > 0 && strlen(val) > 3) {
-                      delete[] temp_customvariablesmember->variable_value;
-                      temp_customvariablesmember->variable_value = string::dup(val + 2);
-                      temp_customvariablesmember->has_been_modified = (x > 0) ? TRUE : FALSE;
-                    }
-                    break;
-                  }
-                }
+                break;
               }
             }
           }

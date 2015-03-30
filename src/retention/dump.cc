@@ -106,7 +106,7 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "last_time_up=" << static_cast<unsigned long>(obj.last_time_up) << "\n"
     "long_plugin_output=" << (obj.long_plugin_output ? obj.long_plugin_output : "") << "\n"
     "max_attempts=" << obj.max_attempts << "\n"
-    "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
+    "modified_attributes=" << obj.modified_attributes << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.check_interval << "\n"
     "obsess_over_host=" << obj.obsess_over_host << "\n"
@@ -168,8 +168,8 @@ std::ostream& dump::program(std::ostream& os) {
     "enable_flap_detection=" << config->enable_flap_detection() << "\n"
     "global_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
     "global_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
-    "modified_host_attributes=" << (modified_host_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
-    "modified_service_attributes=" << (modified_service_process_attributes & ~config->retained_process_host_attribute_mask()) << "\n"
+    "modified_host_attributes=" << modified_host_process_attributes << "\n"
+    "modified_service_attributes=" << modified_service_process_attributes << "\n"
     "next_event_id=" << next_event_id << "\n"
     "next_problem_id=" << next_problem_id << "\n"
     "obsess_over_hosts=" << config->obsess_over_hosts() << "\n"
@@ -186,9 +186,6 @@ std::ostream& dump::program(std::ostream& os) {
  *  @return True on success, otherwise false.
  */
 bool dump::save(std::string const& path) {
-  if (!config->retain_state_information())
-    return (true);
-
   // send data to event broker
   broker_retention_data(
     NEBTYPE_RETENTIONDATA_STARTSAVE,
@@ -267,7 +264,7 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "last_time_warning=" << static_cast<unsigned long>(obj.last_time_warning) << "\n"
     "long_plugin_output=" << (obj.long_plugin_output ? obj.long_plugin_output : "") << "\n"
     "max_attempts=" << obj.max_attempts << "\n"
-    "modified_attributes=" << (obj.modified_attributes & ~config->retained_host_attribute_mask()) << "\n"
+    "modified_attributes=" << obj.modified_attributes << "\n"
     "next_check=" << static_cast<unsigned long>(obj.next_check) << "\n"
     "normal_check_interval=" << obj.check_interval << "\n"
     "obsess_over_service=" << obj.obsess_over_service << "\n"

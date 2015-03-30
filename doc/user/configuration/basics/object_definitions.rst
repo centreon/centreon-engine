@@ -42,13 +42,7 @@ values found in the config files, assuming you have
 :ref:`state retention <main_cfg_opt_state_retention>` enabled on a
 program-wide basis and the value of the directive is changed during
 runtime with an
-:ref:`external command <external_commands>`.  One way
-to get around this problem is to disable the retention of non-status
-information using the retain_nonstatus_information directive in the
-host, service, and contact definitions. Disabling this directive will
-cause Centreon Engine to take the initial values for these directives
-from your config files, rather than from the state retention file when
-it (re)starts.
+:ref:`external command <external_commands>`.
 
 Sample Configuration Files
 ==========================
@@ -117,8 +111,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,d,u]
-    # retain_status_information    [0/1]
-    # retain_nonstatus_information [0/1]
     contacts                       contacts
     contact_groups                 contact_groups
     notification_interval          #
@@ -144,7 +136,6 @@ Example Definition
     retry_interval               1
     max_check_attempts           5
     check_period                 24x7
-    retain_nonstatus_information 0
     contact_groups               router-admins
     notification_interval        30
     notification_period          24x7
@@ -257,14 +248,6 @@ flap_detection_enabled       :ref:`* <obj_def_retentionnotes>` This directive is
 flap_detection_options       This directive is used to determine what host states the
                              :ref:`flap detection logic <flapping_detection>` will use for this host. Valid options are
                              a combination of one or more of the following: o = UP states, d = DOWN states, u = UNREACHABLE states.
-retain_status_information    This directive is used to determine whether or not status-related information about the host is retained across program
-                             restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable status information retention, 1 = enable status information retention.
-retain_nonstatus_information This directive is used to determine whether or not non-status information about the host is retained across program
-                             restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 contacts                     This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be
                              notified whenever there are problems (or recoveries) with this host. Multiple contacts should be separated by commas.
                              Useful if you want notifications to go to just a few people and don't want to configure
@@ -400,8 +383,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,w,c,u]
-    # retain_status_information    [0/1]
-    # retain_nonstatus_information [0/1]
     notification_interval          #
     # first_notification_delay     #
     notification_period            timeperiod_name
@@ -519,14 +500,6 @@ flap_detection_options       This directive is used to determine what service st
                              :ref:`flap detection logic <flapping_detection>` will use for this service. Valid options
                              are a combination of one or more of the following: o = OK states, w = WARNING states, c = CRITICAL states,
                              u = UNKNOWN states.
-retain_status_information    This directive is used to determine whether or not status-related information about the service is retained across
-                             program restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable status information retention, 1 = enable status information retention.
-retain_nonstatus_information This directive is used to determine whether or not non-status information about the service is retained across program
-                             restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 notification_interval        This directive is used to define the number of "time units" to wait before re-notifying a contact that this service is
                              still in a non-OK state. Unless you've changed the
                              :ref:`interval_length <main_cfg_opt_timing_interval_length>`
@@ -657,8 +630,6 @@ Definition Format
     # email                            email_address
     # pager                            pager_number or pager_email_gateway
     # addressx                         additional_contact_address
-    # retain_status_information        [0/1]
-    # retain_nonstatus_information     [0/1]
   }
 
 Example Definition
@@ -745,14 +716,6 @@ addressx                      Address directives are used to define additional "
                               phone numbers, instant messaging addresses, etc. Depending on how you configure your notification commands, they can be
                               used to send out an alert to the contact. Up to six addresses can be defined using these directives (address1 through
                               address6). The $CONTACTADDRESSx$ :ref:`macro <understanding_macros>` will contain this value.
-retain_status_information     This directive is used to determine whether or not status-related information about the contact is retained across
-                              program restarts. This is only useful if you have enabled state retention using the
-                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                              directive. Value: 0 = disable status information retention, 1 = enable status information retention.
-retain_nonstatus_information  This directive is used to determine whether or not non-status information about the contact is retained across program
-                              restarts. This is only useful if you have enabled state retention using the
-                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                              directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 timezone                      Time zone of this contact. All times applied to this host (time periods) will be affected by this option.
 ============================= ========================================================================================================================
 

@@ -69,8 +69,6 @@ service::setters const service::_setters[] = {
   { "flap_detection_options",       SETTER(std::string const&, _set_flap_detection_options) },
   { "stalking_options",             SETTER(std::string const&, _set_stalking_options) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
-  { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
   { "timezone",                     SETTER(std::string const&, _set_timezone) },
 
   // Deprecated.
@@ -87,7 +85,9 @@ service::setters const service::_setters[] = {
   { "notification_options",         SETTER(std::string const&, _set_notification_options) },
   { "notification_period",          SETTER(std::string const&, _set_notification_period) },
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
-  { "process_perf_data",            SETTER(bool, _set_process_perf_data) }
+  { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
+  { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
 };
 
 // Default values.
@@ -108,8 +108,6 @@ static bool const           default_is_volatile(false);
 static unsigned int const   default_low_flap_threshold(0);
 static unsigned int const   default_max_check_attempts(0);
 static bool const           default_obsess_over_service(true);
-static bool const           default_retain_nonstatus_information(true);
-static bool const           default_retain_status_information(true);
 static unsigned int const   default_retry_interval(1);
 static unsigned short const default_stalking_options(service::none);
 static unsigned int const   default_check_timeout(0);
@@ -134,8 +132,6 @@ service::service()
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
     _obsess_over_service(default_obsess_over_service),
-    _retain_nonstatus_information(default_retain_nonstatus_information),
-    _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
     _stalking_options(default_stalking_options) {}
 
@@ -186,8 +182,6 @@ service& service::operator=(service const& right) {
     _low_flap_threshold = right._low_flap_threshold;
     _max_check_attempts = right._max_check_attempts;
     _obsess_over_service = right._obsess_over_service;
-    _retain_nonstatus_information = right._retain_nonstatus_information;
-    _retain_status_information = right._retain_status_information;
     _retry_interval = right._retry_interval;
     _servicegroups = right._servicegroups;
     _service_description = right._service_description;
@@ -228,8 +222,6 @@ bool service::operator==(service const& right) const throw () {
           && _low_flap_threshold == right._low_flap_threshold
           && _max_check_attempts == right._max_check_attempts
           && _obsess_over_service == right._obsess_over_service
-          && _retain_nonstatus_information == right._retain_nonstatus_information
-          && _retain_status_information == right._retain_status_information
           && _retry_interval == right._retry_interval
           && _servicegroups == right._servicegroups
           && _service_description == right._service_description
@@ -304,14 +296,6 @@ bool service::operator<(service const& right) const throw () {
     return (_max_check_attempts < right._max_check_attempts);
   else if (_obsess_over_service != right._obsess_over_service)
     return (_obsess_over_service < right._obsess_over_service);
-  else if (_retain_nonstatus_information
-           != right._retain_nonstatus_information)
-    return (_retain_nonstatus_information
-            < right._retain_nonstatus_information);
-  else if (_retain_status_information
-           != right._retain_status_information)
-    return (_retain_status_information
-            < right._retain_status_information);
   else if (_retry_interval != right._retry_interval)
     return (_retry_interval < right._retry_interval);
   else if (_servicegroups != right._servicegroups)
@@ -385,8 +369,6 @@ void service::merge(object const& obj) {
   MRG_OPTION(_low_flap_threshold);
   MRG_OPTION(_max_check_attempts);
   MRG_OPTION(_obsess_over_service);
-  MRG_OPTION(_retain_nonstatus_information);
-  MRG_OPTION(_retain_status_information);
   MRG_OPTION(_retry_interval);
   MRG_INHERIT(_servicegroups);
   MRG_DEFAULT(_service_description);
@@ -638,24 +620,6 @@ unsigned int service::max_check_attempts() const throw () {
  */
 bool service::obsess_over_service() const throw () {
   return (_obsess_over_service);
-}
-
-/**
- *  Get retain_nonstatus_information.
- *
- *  @return The retain_nonstatus_information.
- */
-bool service::retain_nonstatus_information() const throw () {
-  return (_retain_nonstatus_information);
-}
-
-/**
- *  Get retain_status_information.
- *
- *  @return The retain_status_information.
- */
-bool service::retain_status_information() const throw () {
-  return (_retain_status_information);
 }
 
 /**
@@ -1280,26 +1244,32 @@ bool service::_set_process_perf_data(bool value) {
 }
 
 /**
- *  Set retain_nonstatus_information value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new retain_nonstatus_information value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_retain_nonstatus_information(bool value) {
-  _retain_nonstatus_information = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service retain_nonstatus_information was ignored";
+  ++config_warnings;
   return (true);
 }
 
 /**
- *  Set retain_status_information value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new retain_status_information value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_retain_status_information(bool value) {
-  _retain_status_information = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service retain_status_information was ignored";
+  ++config_warnings;
   return (true);
 }
 

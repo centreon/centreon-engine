@@ -117,8 +117,6 @@ void applier::host::add_object(
         obj->check_freshness(),
         obj->freshness_threshold(),
         true, // should_be_drawn, enabled by Nagios
-        obj->retain_status_information(),
-        obj->retain_nonstatus_information(),
         obj->obsess_over_host(),
         NULL_IF_EMPTY(obj->timezone())));
   if (!h)
@@ -302,12 +300,6 @@ void applier::host::modify_object(
   modify_if_different(
     h->freshness_threshold,
     static_cast<int>(obj->freshness_threshold()));
-  modify_if_different(
-    h->retain_status_information,
-    static_cast<int>(obj->retain_status_information()));
-  modify_if_different(
-    h->retain_nonstatus_information,
-    static_cast<int>(obj->retain_nonstatus_information()));
   modify_if_different(
     h->obsess_over_host,
     static_cast<int>(obj->obsess_over_host()));

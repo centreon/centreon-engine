@@ -124,10 +124,6 @@ struct                global {
   std::string         ocsp_command;
   unsigned int        ocsp_timeout;
   bool                passive_host_checks_are_soft;
-  unsigned long       retained_host_attribute_mask;
-  unsigned long       retained_process_host_attribute_mask;
-  bool                retain_state_information;
-  unsigned int        retention_scheduling_horizon;
   unsigned int        retention_update_interval;
   unsigned int        service_check_timeout;
   unsigned int        service_freshness_check_interval;
@@ -138,8 +134,6 @@ struct                global {
   unsigned int        status_update_interval;
   unsigned int        time_change_threshold;
   bool                translate_passive_host_checks;
-  bool                use_retained_program_state;
-  bool                use_retained_scheduling_info;
   bool                use_syslog;
   std::string         use_timezone;
 };
@@ -309,10 +303,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(ocsp_command);
   check_value(ocsp_timeout);
   check_value(passive_host_checks_are_soft);
-  check_value(retained_host_attribute_mask);
-  check_value(retained_process_host_attribute_mask);
-  check_value(retain_state_information);
-  check_value(retention_scheduling_horizon);
   check_value(retention_update_interval);
   check_value(service_check_timeout);
   check_value(service_freshness_check_interval);
@@ -323,8 +313,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(status_update_interval);
   check_value(time_change_threshold);
   check_value(translate_passive_host_checks);
-  check_value(use_retained_program_state);
-  check_value(use_retained_scheduling_info);
   check_value(use_syslog);
   check_value(use_timezone);
 
@@ -467,10 +455,6 @@ static global get_globals() {
   g.ocsp_command = to_str(ocsp_command);
   g.ocsp_timeout = ocsp_timeout;
   g.passive_host_checks_are_soft = passive_host_checks_are_soft;
-  g.retained_host_attribute_mask = retained_host_attribute_mask;
-  g.retained_process_host_attribute_mask = retained_process_host_attribute_mask;
-  g.retain_state_information = retain_state_information;
-  g.retention_scheduling_horizon = retention_scheduling_horizon;
   g.retention_update_interval = retention_update_interval;
   g.service_check_timeout = service_check_timeout;
   g.service_freshness_check_interval = service_freshness_check_interval;
@@ -481,8 +465,6 @@ static global get_globals() {
   g.status_update_interval = status_update_interval;
   g.time_change_threshold = time_change_threshold;
   g.translate_passive_host_checks = translate_passive_host_checks;
-  g.use_retained_program_state = use_retained_program_state;
-  g.use_retained_scheduling_info = use_retained_scheduling_info;
   g.use_syslog = use_syslog;
   g.use_timezone = to_str(use_timezone);
   return (g);

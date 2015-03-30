@@ -139,18 +139,8 @@ static std::map<std::string, std::string> build_configuration(
   var["log_external_commands"] = obj2str(my_rand(0, 1));
   var["log_passive_checks"] = obj2str(my_rand(0, 1));
   var["log_initial_states"] = obj2str(my_rand(0, 1));
-  var["retain_state_information"] = obj2str(my_rand(0, 1));
   var["retention_update_interval"] = obj2str(my_rand(0));
-  var["use_retained_program_state"] = obj2str(my_rand(0, 1));
-  var["use_retained_scheduling_info"] = obj2str(my_rand(0, 1));
-  var["retention_scheduling_horizon"] = obj2str(my_rand(0));
   var["additional_freshness_latency"] = obj2str(my_rand());
-  var["retained_host_attribute_mask"] = obj2str(my_rand(0));
-  var["retained_service_attribute_mask"] = obj2str(my_rand(0));
-  var["retained_process_host_attribute_mask"] = obj2str(my_rand(0));
-  var["retained_process_service_attribute_mask"] = obj2str(my_rand(0));
-  var["retained_contact_host_attribute_mask"] = obj2str(my_rand(0));
-  var["retained_contact_service_attribute_mask"] = obj2str(my_rand(0));
   var["obsess_over_services"] = obj2str(my_rand(0, 1));
   var["obsess_over_hosts"] = obj2str(my_rand(0, 1));
   var["translate_passive_host_checks"] = obj2str(my_rand(0, 1));
@@ -275,35 +265,11 @@ void test_configuration(
   if (my_conf["log_initial_states"] != obj2str(config->log_initial_states())) {
     throw (engine_error() << "log_initial_states: init with '" << my_conf["log_initial_states"] << "'");
   }
-  if (my_conf["retain_state_information"] != obj2str(config->retain_state_information())) {
-    throw (engine_error() << "retain_state_information: init with '" << my_conf["retain_state_information"] << "'");
-  }
   if (my_conf["retention_update_interval"] != obj2str(config->retention_update_interval())) {
     throw (engine_error() << "retention_update_interval: init with '" << my_conf["retention_update_interval"] << "'");
   }
-  if (my_conf["use_retained_program_state"] != obj2str(config->use_retained_program_state())) {
-    throw (engine_error() << "use_retained_program_state: init with '" << my_conf["use_retained_program_state"] << "'");
-  }
-  if (my_conf["use_retained_scheduling_info"] != obj2str(config->use_retained_scheduling_info())) {
-    throw (engine_error() << "use_retained_scheduling_info: init with '" << my_conf["use_retained_scheduling_info"] << "'");
-  }
-  if (my_conf["retention_scheduling_horizon"] != obj2str(config->retention_scheduling_horizon())) {
-    throw (engine_error() << "retention_scheduling_horizon: init with '" << my_conf["retention_scheduling_horizon"] << "'");
-  }
   if (my_conf["additional_freshness_latency"] != obj2str(config->additional_freshness_latency())) {
     throw (engine_error() << "additional_freshness_latency: init with '" << my_conf["additional_freshness_latency"] << "'");
-  }
-  if (my_conf["retained_host_attribute_mask"] != obj2str(config->retained_host_attribute_mask())) {
-    throw (engine_error() << "retained_host_attribute_mask: init with '" << my_conf["retained_host_attribute_mask"] << "'");
-  }
-  if (my_conf["retained_process_host_attribute_mask"] != obj2str(config->retained_process_host_attribute_mask())) {
-    throw (engine_error() << "retained_process_host_attribute_mask: init with '" << my_conf["retained_process_host_attribute_mask"] << "'");
-  }
-  if (my_conf["retained_contact_host_attribute_mask"] != obj2str(config->retained_contact_host_attribute_mask())) {
-    throw (engine_error() << "retained_contact_host_attribute_mask: init with '" << my_conf["retained_contact_host_attribute_mask"] << "'");
-  }
-  if (my_conf["retained_contact_service_attribute_mask"] != obj2str(config->retained_contact_service_attribute_mask())) {
-    throw (engine_error() << "retained_contact_service_attribute_mask: init with '" << my_conf["retained_contact_service_attribute_mask"] << "'");
   }
   if (my_conf["obsess_over_services"] != obj2str(config->obsess_over_services())) {
     throw (engine_error() << "obsess_over_services: init with '" << my_conf["obsess_over_services"] << "'");

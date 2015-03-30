@@ -36,9 +36,6 @@ using namespace com::centreon::engine::retention;
 void applier::state::apply(
        configuration::state& config,
        retention::state const& state) {
-  if (!config.retain_state_information())
-    return;
-
   // send data to event broker.
   broker_retention_data(
     NEBTYPE_RETENTIONDATA_STARTLOAD,
@@ -48,19 +45,15 @@ void applier::state::apply(
 
   try {
     time_t current_time(time(NULL));
-    bool scheduling_info_is_ok(false);
-    if ((current_time - state.informations().created())
-        < static_cast<time_t>(config.retention_scheduling_horizon()))
-      scheduling_info_is_ok = true;
 
     applier::program app_program;
     app_program.apply(config, state.globals());
 
     applier::host app_hosts;
-    app_hosts.apply(config, state.hosts(), scheduling_info_is_ok);
+    app_hosts.apply(config, state.hosts(), true);
 
     applier::service app_services;
-    app_services.apply(config, state.services(), scheduling_info_is_ok);
+    app_services.apply(config, state.services(), true);
   }
   catch (...) {
     // send data to event broker.

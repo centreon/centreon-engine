@@ -80,8 +80,6 @@ bool operator==(
           && obj1.freshness_threshold == obj2.freshness_threshold
           && obj1.checks_enabled == obj2.checks_enabled
           && obj1.event_handler_enabled == obj2.event_handler_enabled
-          && obj1.retain_status_information == obj2.retain_status_information
-          && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
           && obj1.obsess_over_host == obj2.obsess_over_host
           && obj1.should_be_drawn == obj2.should_be_drawn
           && is_equal(obj1.custom_variables, obj2.custom_variables)
@@ -190,8 +188,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
-    "  retain_status_information:            " << obj.retain_status_information << "\n"
-    "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
     "  obsess_over_host:                     " << obj.obsess_over_host << "\n"
     "  should_be_drawn:                      " << obj.should_be_drawn << "\n"
     "  check_type:                           " << obj.check_type << "\n"
@@ -284,11 +280,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] freshness_threshold           Freshness threshold.
  *  @param[in] should_be_drawn               Whether this host should be
  *                                           drawn.
- *  @param[in] retain_status_information     Should Engine retain status
- *                                           information of this host ?
- *  @param[in] retain_nonstatus_information  Should Engine retain
- *                                           non-status information of
- *                                           this host ?
  *  @param[in] obsess_over_host              Should we obsess over this
  *                                           host ?
  *  @param[in] timezone                      Host timezone.
@@ -322,8 +313,6 @@ host* add_host(
         int check_freshness,
         int freshness_threshold,
         int should_be_drawn,
-        int retain_status_information,
-        int retain_nonstatus_information,
         int obsess_over_host,
         char const* timezone) {
   // Make sure we have the data we need.
@@ -401,8 +390,6 @@ host* add_host(
     obj->max_attempts = max_attempts;
     obj->modified_attributes = MODATTR_NONE;
     obj->obsess_over_host = (obsess_over_host > 0);
-    obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
-    obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;
     obj->should_be_drawn = (should_be_drawn > 0);
     obj->should_be_scheduled = true;

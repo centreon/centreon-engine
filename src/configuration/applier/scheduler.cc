@@ -317,19 +317,15 @@ void applier::scheduler::_apply_misc_event() {
   }
 
   // Remove and add a retention data save event if needed.
-  if ((!_evt_retention_save && config->retain_state_information())
-      || (_evt_retention_save && !config->retain_state_information())
+  if (!_evt_retention_save
       || (_old_retention_update_interval
           != config->retention_update_interval())) {
     _remove_misc_event(_evt_retention_save);
-    if (config->retain_state_information()
-        && config->retention_update_interval() > 0) {
-      unsigned long interval(config->retention_update_interval() * 60);
-      _evt_retention_save = _create_misc_event(
-                              EVENT_RETENTION_SAVE,
-                              now + interval,
-                              interval);
-    }
+    unsigned long interval(config->retention_update_interval() * 60);
+    _evt_retention_save = _create_misc_event(
+                            EVENT_RETENTION_SAVE,
+                            now + interval,
+                            interval);
     _old_retention_update_interval
       = config->retention_update_interval();
   }

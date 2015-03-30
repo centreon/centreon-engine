@@ -172,8 +172,6 @@ typedef struct xodtemplate_host_struct{
   int          stalk_on_down;
   int          stalk_on_unreachable;
   char*        timezone;
-  int          retain_status_information;
-  int          retain_nonstatus_information;
   xodtemplate_customvariablesmember* custom_variables;
 
   int          have_display_name;
@@ -204,8 +202,6 @@ typedef struct xodtemplate_host_struct{
   int          have_notification_interval;
   int          have_first_notification_delay;
   int          have_stalking_options;
-  int          have_retain_status_information;
-  int          have_retain_nonstatus_information;
 
   int          has_been_resolved;
   int          register_object;
@@ -281,8 +277,6 @@ typedef struct xodtemplate_service_struct{
   int          stalk_on_warning;
   int          stalk_on_critical;
   char*        timezone;
-  int          retain_status_information;
-  int          retain_nonstatus_information;
   xodtemplate_customvariablesmember* custom_variables;
 
   int          have_host_name;
@@ -318,8 +312,6 @@ typedef struct xodtemplate_service_struct{
   int          have_notification_interval;
   int          have_first_notification_delay;
   int          have_stalking_options;
-  int          have_retain_status_information;
-  int          have_retain_nonstatus_information;
 
   int          has_been_resolved;
   int          register_object;

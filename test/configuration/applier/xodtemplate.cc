@@ -857,8 +857,6 @@ int xodtemplate_begin_object_definition(
     new_service->flap_detection_on_warning = true;
     new_service->flap_detection_on_unknown = true;
     new_service->flap_detection_on_critical = true;
-    new_service->retain_status_information = true;
-    new_service->retain_nonstatus_information = true;
 
     /* true service, so is not from host group, must be set AFTER have_initial_state */
     xodtemplate_unset_service_is_from_hostgroup(new_service);
@@ -878,8 +876,6 @@ int xodtemplate_begin_object_definition(
     new_host->flap_detection_on_up = true;
     new_host->flap_detection_on_down = true;
     new_host->flap_detection_on_unreachable = true;
-    new_host->retain_status_information = true;
-    new_host->retain_nonstatus_information = true;
   }
   else if (!strcmp(input, "command")) {
     xodtemplate_current_object_type = XODTEMPLATE_COMMAND;
@@ -1253,14 +1249,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       }
       temp_service->have_stalking_options = true;
     }
-    else if (!strcmp(variable, "retain_status_information")) {
-      temp_service->retain_status_information = (atoi(value) > 0) ? true : false;
-      temp_service->have_retain_status_information = true;
-    }
-    else if (!strcmp(variable, "retain_nonstatus_information")) {
-      temp_service->retain_nonstatus_information = (atoi(value) > 0) ? true : false;
-      temp_service->have_retain_nonstatus_information = true;
-    }
     else if (!strcmp(variable, "register"))
       temp_service->register_object = (atoi(value) > 0) ? true : false;
     else if (variable[0] == '_') {
@@ -1528,14 +1516,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "obsess_over_host")) {
       temp_host->obsess_over_host = (atoi(value) > 0) ? true : false;
       temp_host->have_obsess_over_host = true;
-    }
-    else if (!strcmp(variable, "retain_status_information")) {
-      temp_host->retain_status_information = (atoi(value) > 0) ? true : false;
-      temp_host->have_retain_status_information = true;
-    }
-    else if (!strcmp(variable, "retain_nonstatus_information")) {
-      temp_host->retain_nonstatus_information = (atoi(value) > 0) ? true : false;
-      temp_host->have_retain_nonstatus_information = true;
     }
     else if (!strcmp(variable, "register"))
       temp_host->register_object = (atoi(value) > 0) ? true : false;
@@ -4149,10 +4129,6 @@ int xodtemplate_duplicate_service(
   new_service->stalk_on_warning = temp_service->stalk_on_warning;
   new_service->stalk_on_critical = temp_service->stalk_on_critical;
   new_service->have_stalking_options = temp_service->have_stalking_options;
-  new_service->retain_status_information = temp_service->retain_status_information;
-  new_service->have_retain_status_information = temp_service->have_retain_status_information;
-  new_service->retain_nonstatus_information = temp_service->retain_nonstatus_information;
-  new_service->have_retain_nonstatus_information = temp_service->have_retain_nonstatus_information;
 
   /* add new service to head of list in memory */
   new_service->next = xodtemplate_service_list;
@@ -5017,18 +4993,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
         = template_host->stalk_on_unreachable;
       this_host->have_stalking_options = true;
     }
-    if (this_host->have_retain_status_information == false
-        && template_host->have_retain_status_information == true) {
-      this_host->retain_status_information
-        = template_host->retain_status_information;
-      this_host->have_retain_status_information = true;
-    }
-    if (this_host->have_retain_nonstatus_information == false
-        && template_host->have_retain_nonstatus_information == true) {
-      this_host->retain_nonstatus_information
-        = template_host->retain_nonstatus_information;
-      this_host->have_retain_nonstatus_information = true;
-    }
 
     /* apply missing custom variables from template host... */
     for (temp_customvariablesmember = template_host->custom_variables;
@@ -5274,18 +5238,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       this_service->stalk_on_critical
         = template_service->stalk_on_critical;
       this_service->have_stalking_options = true;
-    }
-    if (this_service->have_retain_status_information == false
-        && template_service->have_retain_status_information == true) {
-      this_service->retain_status_information
-        = template_service->retain_status_information;
-      this_service->have_retain_status_information = true;
-    }
-    if (this_service->have_retain_nonstatus_information == false
-        && template_service->have_retain_nonstatus_information == true) {
-      this_service->retain_nonstatus_information
-        = template_service->retain_nonstatus_information;
-      this_service->have_retain_nonstatus_information = true;
     }
 
     /* apply missing custom variables from template service... */
@@ -6789,8 +6741,6 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
                this_host->check_freshness,
                this_host->freshness_threshold,
                true,
-               this_host->retain_status_information,
-               this_host->retain_nonstatus_information,
                this_host->obsess_over_host,
                this_host->timezone);
 
@@ -6879,8 +6829,6 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
                   this_service->stalk_on_critical,
                   this_service->check_freshness,
                   this_service->freshness_threshold,
-                  this_service->retain_status_information,
-                  this_service->retain_nonstatus_information,
                   this_service->obsess_over_service,
                   this_service->timezone);
 
@@ -7942,8 +7890,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\n");
     if (temp_host->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_host->timezone);
-    fprintf(fp, "\tretain_status_information\t%d\n", temp_host->retain_status_information);
-    fprintf(fp, "\tretain_nonstatus_information\t%d\n", temp_host->retain_nonstatus_information);
 
     /* custom variables */
     for (temp_customvariablesmember = temp_host->custom_variables;
@@ -8032,8 +7978,6 @@ int xodtemplate_cache_objects(char* cache_file) {
     fprintf(fp, "\n");
     if (temp_service->timezone)
       fprintf(fp, "\ttimezone\t%s\n", temp_service->timezone);
-    fprintf(fp, "\tretain_status_information\t%d\n", temp_service->retain_status_information);
-    fprintf(fp, "\tretain_nonstatus_information\t%d\n", temp_service->retain_nonstatus_information);
 
     /* custom variables */
     for (temp_customvariablesmember = temp_service->custom_variables;
@@ -10325,17 +10269,6 @@ int read_main_config_file(char const* main_config_file) {
       log_initial_states=(atoi(value)>0)?true:false;
     }
 
-    else if(!strcmp(variable,"retain_state_information")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for retain_state_information")) {}
-        error=true;
-        break;
-      }
-
-      retain_state_information=(atoi(value)>0)?true:false;
-    }
-
     else if(!strcmp(variable,"retention_update_interval")){
       int tmp(atoi(value));
       if(tmp<0){
@@ -10346,54 +10279,9 @@ int read_main_config_file(char const* main_config_file) {
       retention_update_interval=tmp;
     }
 
-    else if(!strcmp(variable,"use_retained_program_state")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for use_retained_program_state")) {}
-        error=true;
-        break;
-      }
-
-      use_retained_program_state=(atoi(value)>0)?true:false;
-    }
-
-    else if(!strcmp(variable,"use_retained_scheduling_info")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for use_retained_scheduling_info")) {}
-        error=true;
-        break;
-      }
-
-      use_retained_scheduling_info=(atoi(value)>0)?true:false;
-    }
-
-    else if(!strcmp(variable,"retention_scheduling_horizon")){
-
-      retention_scheduling_horizon=atoi(value);
-
-      if(retention_scheduling_horizon<=0){
-        if (asprintf(&error_message,"Illegal value for retention_scheduling_horizon")) {}
-        error=true;
-        break;
-      }
-    }
-
     else if(!strcmp(variable,"additional_freshness_latency"))
       additional_freshness_latency=atoi(value);
 
-    else if(!strcmp(variable,"retained_host_attribute_mask"))
-      retained_host_attribute_mask=strtoul(value,NULL,0);
-
-    else if(!strcmp(variable,"retained_service_attribute_mask")) {
-      // retained_service_attribute_mask=strtoul(value,NULL,0);
-    }
-    else if(!strcmp(variable,"retained_process_host_attribute_mask"))
-      retained_process_host_attribute_mask=strtoul(value,NULL,0);
-
-    else if(!strcmp(variable,"retained_process_service_attribute_mask")) {
-      // retained_process_service_attribute_mask=strtoul(value,NULL,0);
-    }
     else if(!strcmp(variable,"obsess_over_services")){
 
       if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){

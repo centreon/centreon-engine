@@ -728,8 +728,7 @@ void init_timing_loop() {
     0);
 
   /* add a retention data save event if needed */
-  if (config->retain_state_information() == true
-      && config->retention_update_interval() > 0)
+  if (config->retention_update_interval() > 0)
     schedule_new_event(
       EVENT_RETENTION_SAVE,
       true,

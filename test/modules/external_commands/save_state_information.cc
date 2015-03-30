@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -55,8 +55,6 @@ static int broker_callback(int callback_type, void* data) {
 static int check_save_state_information(int argc, char** argv) {
   (void)argc;
   (void)argv;
-
-  config->retain_state_information(true);
 
   // register broker callback to catch event.
   config->event_broker_options(BROKER_RETENTION_DATA);

@@ -58,8 +58,6 @@ typedef struct                  service_struct {
   int                           freshness_threshold;
   int                           event_handler_enabled;
   int                           checks_enabled;
-  int                           retain_status_information;
-  int                           retain_nonstatus_information;
   int                           obsess_over_service;
   customvariablesmember_struct* custom_variables;
   int                           host_problem_at_last_check;
@@ -141,8 +139,6 @@ service* add_service(
            int stalk_on_critical,
            int check_freshness,
            int freshness_threshold,
-           int retain_status_information,
-           int retain_nonstatus_information,
            int obsess_over_service,
            char const* timezone);
 int      get_service_count();

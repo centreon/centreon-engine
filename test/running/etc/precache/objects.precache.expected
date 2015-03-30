@@ -153,8 +153,6 @@ define host {
 	notification_interval	60.000000
 	first_notification_delay	0.000000
 	stalking_options	n
-	retain_status_information	1
-	retain_nonstatus_information	1
 	}
 
 define host {
@@ -181,8 +179,6 @@ define host {
 	notification_interval	60.000000
 	first_notification_delay	0.000000
 	stalking_options	n
-	retain_status_information	1
-	retain_nonstatus_information	1
 	}
 
 define service {
@@ -210,8 +206,6 @@ define service {
 	notification_interval	60.000000
 	first_notification_delay	0.000000
 	stalking_options	n
-	retain_status_information	1
-	retain_nonstatus_information	1
 	}
 
 define service {
@@ -239,8 +233,6 @@ define service {
 	notification_interval	60.000000
 	first_notification_delay	0.000000
 	stalking_options	n
-	retain_status_information	1
-	retain_nonstatus_information	1
 	}
 
 define service {
@@ -268,6 +260,4 @@ define service {
 	notification_interval	65.000000
 	first_notification_delay	0.000000
 	stalking_options	n
-	retain_status_information	1
-	retain_nonstatus_information	1
 	}

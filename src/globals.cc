@@ -141,8 +141,6 @@ unsigned int        obsess_over_services(false);
 unsigned int        ochp_timeout(15);
 unsigned int        ocsp_timeout(15);
 unsigned int        passive_host_checks_are_soft(false);
-unsigned int        retain_state_information(false);
-unsigned int        retention_scheduling_horizon(900);
 unsigned int        retention_update_interval(60);
 unsigned int        service_check_timeout(60);
 unsigned int        service_freshness_check_interval(60);
@@ -152,8 +150,6 @@ unsigned int        soft_state_dependencies(false);
 unsigned int        status_update_interval(60);
 unsigned int        time_change_threshold(900);
 unsigned int        translate_passive_host_checks(false);
-unsigned int        use_retained_program_state(true);
-unsigned int        use_retained_scheduling_info(false);
 unsigned int        use_syslog(true);
 unsigned long       cached_host_check_horizon(15);
 unsigned long       cached_service_check_horizon(15);
@@ -182,8 +178,6 @@ unsigned long       modified_host_process_attributes(MODATTR_NONE);
 unsigned long       modified_service_process_attributes(MODATTR_NONE);
 unsigned long       next_event_id(1);
 unsigned long       next_problem_id(0L);
-unsigned long       retained_host_attribute_mask(0);
-unsigned long       retained_process_host_attribute_mask(0);
 unsigned long       syslog_options(
                       logging::log_runtime_error
                       | logging::log_runtime_warning
