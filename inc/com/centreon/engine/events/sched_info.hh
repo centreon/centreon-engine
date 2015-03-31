@@ -1,8 +1,8 @@
 /*
-** Copyright 2007-2008 Ethan Galstad
-** Copyright 2007,2010 Andreas Ericsson
-** Copyright 2010      Max Schubert
-** Copyright 2011-2013 Merethis
+** Copyright 2007-2008      Ethan Galstad
+** Copyright 2007,2010      Andreas Ericsson
+** Copyright 2010           Max Schubert
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -37,18 +37,14 @@ typedef struct  sched_info_struct {
   int           total_scheduled_hosts;
   double        average_services_per_host;
   double        average_scheduled_services_per_host;
-  unsigned long service_check_interval_total;
-  unsigned long host_check_interval_total;
   double        average_service_execution_time;
   double        average_service_check_interval;
   double        average_host_check_interval;
-  double        average_service_inter_check_delay;
-  double        average_host_inter_check_delay;
   double        service_inter_check_delay;
   double        host_inter_check_delay;
   int           service_interleave_factor;
-  int           max_service_check_spread;
-  int           max_host_check_spread;
+  int           service_check_spread;
+  int           host_check_spread;
   time_t        first_service_check;
   time_t        last_service_check;
   time_t        first_host_check;

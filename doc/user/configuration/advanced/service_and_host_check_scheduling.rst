@@ -24,12 +24,10 @@ executed. Those three options are:
   * retry_check_interval
   * check_period
 
-There are also four configuration options in the
+There are also two configuration options in the
 :ref:`main configuration file <main_cfg_opt>` that affect service
 checks. These include:
 
-  * :ref:`service_inter_check_delay_method <main_cfg_opt_service_inter_check_delay_method>`
-  * :ref:`service_interleave_factor <main_cfg_opt_service_interleave_factor>`
   * :ref:`max_concurrent_checks <main_cfg_opt_maximum_concurrent_service_checks>`
   * :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
 
@@ -79,26 +77,23 @@ Inter-Check Delay
 As mentioned before, Centreon Engine attempts to equalize the load
 placed on the machine that is running Centreon Engine by equally spacing
 out initial service checks. The spacing between consecutive service
-checks is called the inter-check delay. By giving a value to the
-:ref:`service_inter_check_delay_method <main_cfg_opt_service_inter_check_delay_method>`
-variable in the main config file, you can modify how this delay is
-calculated. We will discuss how the "smart" calculation works, as this
-is the setting you will want to use for normal operation.
+checks is called the inter-check delay. We will discuss how the
+algorithm implemented in Centreon Engine works ("smart" algorithm
+inherited from Nagios).
 
-When using the "smart" setting of the *service_inter_check_delay_method*
-variable, Centreon Engine will calculate an inter-check delay value by
-using the following calculation:
+Centreon Engine will calculate an inter-check delay value by using the
+following calculation:
 
-  inter-check delay = (average check interval for all services) / (total number of services)
+  service check spread = minimum of all check intervals (normal or retry)
+  inter-check delay = (service check spread) / (total number of services)
 
 Let's take an example. Say you have 1,000 services that each have a
-normal check interval of 5 minutes (obviously some services are going to
-be checked at different intervals, but let's look at an easy
-case...). The total check interal time for all services is 5,000
-(1,000 * 5). That means that the average check interval for each service
-is 5 minutes (5,000 / 1,000). Give that information, we realize that (on
-average) we need to re-check 1,000 services every 5 minutes. This means
-that we should use an inter-check delay of 0.005 minutes (0.3 seconds)
+normal and retry check interval of 5 minutes (obviously some services are
+going to be checked at different intervals, with different normal and
+retry check interval, but let's look at an easy case...). The service
+check spread is therefore of 5 minutes. Given that information, we realize
+that (on average) we need to re-check 1,000 services every 5 minutes. This
+means that we should use an inter-check delay of 0.005 minutes (0.3 seconds)
 when spacing out the initial service checks. By spacing each service
 check out by 0.3 seconds, we can somewhat guarantee that Centreon Engine
 is scheduling and/or executing 3 new service checks every second. By
@@ -119,19 +114,11 @@ SYN attack if there were a lot of open connections on the same port.
 Plus, attempting to equalize the load on hosts is just a nice thing to
 do ...
 
-By giving a value to the
-:ref:`service_interleave_factor <main_cfg_opt_service_interleave_factor>`
-variable in the main config file, you can modify how the interleave
-factor is calculated. We will discuss how the "smart" calculation works,
-as this will probably be the setting you will want to use for normal
-operation. You can, however, use a pre-set interleave factor instead of
-having Centreon Engine calculate one for you. Also of note, if you use
-an interleave factor of 1, service check interleaving is basically
-disabled.
+We will discuss how the algorithm implemented in Centreon Engine works
+("smart" calculation mode inherited from Nagios).
 
-When using the "smart" setting of the *service_interleave_factor*
-variable, Centreon Engine will calculate an interleave factor by using
-the following calculation::
+Centreon Engine will calculate an interleave factor by using the
+following calculation::
 
   interleave factor = ceil(total number of services / total number of hosts)
 
@@ -146,8 +133,7 @@ this will help with minimizing/equalizing the load placed upon remote
 hosts.
 
 The images below depict how service checks are scheduled when they are
-not interleaved (service_interleave_factor=1) and when they are
-interleaved with the service_interleave_factor variable equal to 4.
+not interleaved and when they are interleaved with the factor of 4.
 
 Non-Interleaved Checks
 ----------------------

@@ -67,7 +67,6 @@ state::setters const state::_setters[] = {
   { "high_service_flap_threshold",                 SETTER(float, high_service_flap_threshold) },
   { "host_check_timeout",                          SETTER(unsigned int, host_check_timeout) },
   { "host_freshness_check_interval",               SETTER(unsigned int, host_freshness_check_interval) },
-  { "host_inter_check_delay_method",               SETTER(std::string const&, _set_host_inter_check_delay_method) },
   { "illegal_macro_output_chars",                  SETTER(std::string const&, illegal_output_chars) },
   { "illegal_object_name_chars",                   SETTER(std::string const&, illegal_object_chars) },
   { "interval_length",                             SETTER(unsigned int, interval_length) },
@@ -83,9 +82,7 @@ state::setters const state::_setters[] = {
   { "max_check_result_reaper_time",                SETTER(unsigned int, max_check_reaper_time) },
   { "max_concurrent_checks",                       SETTER(unsigned int, max_parallel_service_checks) },
   { "max_debug_file_size",                         SETTER(unsigned long, max_debug_file_size) },
-  { "max_host_check_spread",                       SETTER(unsigned int, max_host_check_spread) },
   { "max_log_file_size",                           SETTER(unsigned long, max_log_file_size) },
-  { "max_service_check_spread",                    SETTER(unsigned int, max_service_check_spread) },
   { "obsess_over_hosts",                           SETTER(bool, obsess_over_hosts) },
   { "obsess_over_services",                        SETTER(bool, obsess_over_services) },
   { "ochp_command",                                SETTER(std::string const&, ochp_command) },
@@ -137,6 +134,7 @@ state::setters const state::_setters[] = {
   { "execute_host_checks",                         SETTER(bool, _set_execute_host_checks) },
   { "execute_service_checks",                      SETTER(bool, _set_execute_service_checks) },
   { "free_child_process_memory",                   SETTER(std::string const&, _set_free_child_process_memory) },
+  { "host_inter_check_delay_method",               SETTER(std::string const&, _set_host_inter_check_delay_method) },
   { "host_perfdata_command",                       SETTER(std::string const&, _set_host_perfdata_command) },
   { "host_perfdata_file",                          SETTER(std::string const&, _set_host_perfdata_file) },
   { "host_perfdata_file_mode",                     SETTER(std::string const&, _set_host_perfdata_file_mode) },
@@ -148,6 +146,8 @@ state::setters const state::_setters[] = {
   { "log_notifications",                           SETTER(bool, _set_log_notifications) },
   { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
   { "max_check_result_file_age",                   SETTER(unsigned long, _set_max_check_result_file_age) },
+  { "max_host_check_spread",                       SETTER(unsigned int, _set_max_host_check_spread) },
+  { "max_service_check_spread",                    SETTER(unsigned int, _set_max_service_check_spread) },
   { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
   { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
   { "notification_timeout",                        SETTER(unsigned int, _set_notification_timeout) },
@@ -215,7 +215,6 @@ static float const                     default_high_host_flap_threshold(30.0);
 static float const                     default_high_service_flap_threshold(30.0);
 static unsigned int const              default_host_check_timeout(30);
 static unsigned int const              default_host_freshness_check_interval(60);
-static state::inter_check_delay const  default_host_inter_check_delay_method(state::icd_smart);
 static std::string const               default_illegal_object_chars("");
 static std::string const               default_illegal_output_chars("`~$&|'\"<>");
 static unsigned int const              default_interval_length(60);
@@ -230,10 +229,8 @@ static float const                     default_low_host_flap_threshold(20.0);
 static float const                     default_low_service_flap_threshold(20.0);
 static unsigned int const              default_max_check_reaper_time(30);
 static unsigned long const             default_max_debug_file_size(1000000);
-static unsigned int const              default_max_host_check_spread(30);
 static unsigned long const             default_max_log_file_size(0);
 static unsigned int const              default_max_parallel_service_checks(0);
-static unsigned int const              default_max_service_check_spread(30);
 static bool const                      default_obsess_over_hosts(false);
 static bool const                      default_obsess_over_services(false);
 static std::string const               default_ochp_command("");
@@ -244,8 +241,6 @@ static bool const                      default_passive_host_checks_are_soft(fals
 static unsigned int const              default_retention_update_interval(60);
 static unsigned int const              default_service_check_timeout(60);
 static unsigned int const              default_service_freshness_check_interval(60);
-static state::inter_check_delay const  default_service_inter_check_delay_method(state::icd_smart);
-static state::interleave_factor const  default_service_interleave_factor_method(state::ilf_smart);
 static float const                     default_sleep_time(0.5);
 static bool const                      default_soft_state_dependencies(false);
 static std::string const               default_state_retention_file(DEFAULT_RETENTION_FILE);
@@ -314,7 +309,6 @@ state::state()
     _high_service_flap_threshold(default_high_service_flap_threshold),
     _host_check_timeout(default_host_check_timeout),
     _host_freshness_check_interval(default_host_freshness_check_interval),
-    _host_inter_check_delay_method(default_host_inter_check_delay_method),
     _illegal_object_chars(default_illegal_object_chars),
     _illegal_output_chars(default_illegal_output_chars),
     _interval_length(default_interval_length),
@@ -329,10 +323,8 @@ state::state()
     _low_service_flap_threshold(default_low_service_flap_threshold),
     _max_check_reaper_time(default_max_check_reaper_time),
     _max_debug_file_size(default_max_debug_file_size),
-    _max_host_check_spread(default_max_host_check_spread),
     _max_log_file_size(default_max_log_file_size),
     _max_parallel_service_checks(default_max_parallel_service_checks),
-    _max_service_check_spread(default_max_service_check_spread),
     _obsess_over_hosts(default_obsess_over_hosts),
     _obsess_over_services(default_obsess_over_services),
     _ochp_command(default_ochp_command),
@@ -343,8 +335,6 @@ state::state()
     _retention_update_interval(default_retention_update_interval),
     _service_check_timeout(default_service_check_timeout),
     _service_freshness_check_interval(default_service_freshness_check_interval),
-    _service_inter_check_delay_method(default_service_inter_check_delay_method),
-    _service_interleave_factor_method(default_service_interleave_factor_method),
     _sleep_time(default_sleep_time),
     _soft_state_dependencies(default_soft_state_dependencies),
     _state_retention_file(default_state_retention_file),
@@ -416,7 +406,6 @@ state& state::operator=(state const& right) {
     _hosts = right._hosts;
     _host_check_timeout = right._host_check_timeout;
     _host_freshness_check_interval = right._host_freshness_check_interval;
-    _host_inter_check_delay_method = right._host_inter_check_delay_method;
     _illegal_object_chars = right._illegal_object_chars;
     _illegal_output_chars = right._illegal_output_chars;
     _interval_length = right._interval_length;
@@ -431,10 +420,8 @@ state& state::operator=(state const& right) {
     _low_service_flap_threshold = right._low_service_flap_threshold;
     _max_check_reaper_time = right._max_check_reaper_time;
     _max_debug_file_size = right._max_debug_file_size;
-    _max_host_check_spread = right._max_host_check_spread;
     _max_log_file_size = right._max_log_file_size;
     _max_parallel_service_checks = right._max_parallel_service_checks;
-    _max_service_check_spread = right._max_service_check_spread;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
     _ochp_command = right._ochp_command;
@@ -448,8 +435,6 @@ state& state::operator=(state const& right) {
     _services = right._services;
     _service_check_timeout = right._service_check_timeout;
     _service_freshness_check_interval = right._service_freshness_check_interval;
-    _service_inter_check_delay_method = right._service_inter_check_delay_method;
-    _service_interleave_factor_method = right._service_interleave_factor_method;
     _sleep_time = right._sleep_time;
     _soft_state_dependencies = right._soft_state_dependencies;
     _state_retention_file = right._state_retention_file;
@@ -509,7 +494,6 @@ bool state::operator==(state const& right) const throw () {
           && cmp_set_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
-          && _host_inter_check_delay_method == right._host_inter_check_delay_method
           && _illegal_object_chars == right._illegal_object_chars
           && _illegal_output_chars == right._illegal_output_chars
           && _interval_length == right._interval_length
@@ -524,10 +508,8 @@ bool state::operator==(state const& right) const throw () {
           && _low_service_flap_threshold == right._low_service_flap_threshold
           && _max_check_reaper_time == right._max_check_reaper_time
           && _max_debug_file_size == right._max_debug_file_size
-          && _max_host_check_spread == right._max_host_check_spread
           && _max_log_file_size == right._max_log_file_size
           && _max_parallel_service_checks == right._max_parallel_service_checks
-          && _max_service_check_spread == right._max_service_check_spread
           && _obsess_over_hosts == right._obsess_over_hosts
           && _obsess_over_services == right._obsess_over_services
           && _ochp_command == right._ochp_command
@@ -541,8 +523,6 @@ bool state::operator==(state const& right) const throw () {
           && cmp_set_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
-          && _service_inter_check_delay_method == right._service_inter_check_delay_method
-          && _service_interleave_factor_method == right._service_interleave_factor_method
           && _sleep_time == right._sleep_time
           && _soft_state_dependencies == right._soft_state_dependencies
           && _state_retention_file == right._state_retention_file
@@ -1467,24 +1447,6 @@ void state::host_freshness_check_interval(unsigned int value) {
 }
 
 /**
- *  Get host_inter_check_delay_method value.
- *
- *  @return The host_inter_check_delay_method value.
- */
-state::inter_check_delay state::host_inter_check_delay_method() const throw () {
-  return (_host_inter_check_delay_method);
-}
-
-/**
- *  Set host_inter_check_delay_method value.
- *
- *  @param[in] value The new host_inter_check_delay_method value.
- */
-void state::host_inter_check_delay_method(inter_check_delay value) {
-  _host_inter_check_delay_method = value;
-}
-
-/**
  *  Get illegal_object_chars value.
  *
  *  @return The illegal_object_chars value.
@@ -1756,26 +1718,6 @@ void state::max_debug_file_size(unsigned long value) {
 }
 
 /**
- *  Get max_host_check_spread value.
- *
- *  @return The max_host_check_spread value.
- */
-unsigned int state::max_host_check_spread() const throw () {
-  return (_max_host_check_spread);
-}
-
-/**
- *  Set max_host_check_spread value.
- *
- *  @param[in] value The new max_host_check_spread value.
- */
-void state::max_host_check_spread(unsigned int value) {
-  if (!value)
-    throw (engine_error() << "max_host_check_spread cannot be 0");
-  _max_host_check_spread = value;
-}
-
-/**
  *  Get max_log_file_size value.
  *
  *  @return The max_log_file_size value.
@@ -1809,26 +1751,6 @@ unsigned int state::max_parallel_service_checks() const throw () {
  */
 void state::max_parallel_service_checks(unsigned int value) {
   _max_parallel_service_checks = value;
-}
-
-/**
- *  Get max_service_check_spread value.
- *
- *  @return The max_service_check_spread value.
- */
-unsigned int state::max_service_check_spread() const throw () {
-  return (_max_service_check_spread);
-}
-
-/**
- *  Set max_service_check_spread value.
- *
- *  @param[in] value The new max_service_check_spread value.
- */
-void state::max_service_check_spread(unsigned int value) {
-  if (!value)
-    throw (engine_error() << "max_service_check_spread cannot be 0");
-  _max_service_check_spread = value;
 }
 
 /**
@@ -2191,42 +2113,6 @@ void state::service_freshness_check_interval(unsigned int value) {
     throw (engine_error()
            << "service_freshness_check_interval cannot be 0");
   _service_freshness_check_interval = value;
-}
-
-/**
- *  Get service_inter_check_delay_method value.
- *
- *  @return The service_inter_check_delay_method value.
- */
-state::inter_check_delay state::service_inter_check_delay_method() const throw () {
-  return (_service_inter_check_delay_method);
-}
-
-/**
- *  Set service_inter_check_delay_method value.
- *
- *  @param[in] value The new service_inter_check_delay_method value.
- */
-void state::service_inter_check_delay_method(inter_check_delay value) {
-  _service_inter_check_delay_method = value;
-}
-
-/**
- *  Get service_interleave_factor_method value.
- *
- *  @return The service_interleave_factor_method value.
- */
-state::interleave_factor state::service_interleave_factor_method() const throw () {
-  return (_service_interleave_factor_method);
-}
-
-/**
- *  Set service_interleave_factor_method value.
- *
- *  @param[in] value The new service_interleave_factor_method value.
- */
-void state::service_interleave_factor_method(interleave_factor value) {
-  _service_interleave_factor_method = value;
 }
 
 /**
@@ -2953,26 +2839,16 @@ void state::_set_free_child_process_memory(std::string const& value) {
 }
 
 /**
- *  Set host_inter_check_delay_method.
+ *  Deprecated variable.
  *
- *  @param[in] value The new host_inter_check_delay_method value.
+ *  @param[in] value  Unused.
  */
 void state::_set_host_inter_check_delay_method(std::string const& value) {
-  if (value == "n")
-    _host_inter_check_delay_method = icd_none;
-  else if (value == "d")
-    _host_inter_check_delay_method = icd_dumb;
-  else if (value == "s")
-    _host_inter_check_delay_method = icd_smart;
-  else {
-    _host_inter_check_delay_method = icd_user;
-    if (!string::to(value.c_str(), scheduling_info.host_inter_check_delay)
-        || scheduling_info.host_inter_check_delay <= 0.0)
-      throw (engine_error()
-             << "Invalid value for host_inter_check_delay_method, must "
-             << "be one of 'n' (none), 'd' (dumb), 's' (smart) or a "
-             << "stricly positive value (" << value << " provided)");
-  }
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host_inter_check_delay_method variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
@@ -3113,6 +2989,32 @@ void state::_set_max_check_result_file_age(unsigned long value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: max_check_result_file_age variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_max_host_check_spread(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: max_host_check_spread variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_max_service_check_spread(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: max_service_check_spread variable ignored";
   ++config_warnings;
   return ;
 }
@@ -3338,46 +3240,29 @@ void state::_set_retention_scheduling_horizon(unsigned int value) {
 }
 
 /**
- *  Set service_inter_check_delay_method
+ *  Deprecated variable.
  *
- *  @param[in] value The new service_inter_check_delay_method.
+ *  @param[in] value  Unused.
  */
 void state::_set_service_inter_check_delay_method(std::string const& value) {
-  if (value == "n")
-    _service_inter_check_delay_method = icd_none;
-  else if (value == "d")
-    _service_inter_check_delay_method = icd_dumb;
-  else if (value == "s")
-    _service_inter_check_delay_method = icd_smart;
-  else {
-    _service_inter_check_delay_method = icd_user;
-    if (!string::to(value.c_str(), scheduling_info.service_inter_check_delay)
-        || scheduling_info.service_inter_check_delay <= 0.0)
-      throw (engine_error()
-             << "Invalid value for service_inter_check_delay_method, "
-             << "must be one of 'n' (none), 'd' (dumb), 's' (smart) or "
-             << "a strictly positive value (" << value << " provided)");
-  }
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service_inter_check_delay_method variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
- *  Set the service interleave factor method.
+ *  Deprecated variable.
  *
- *  @param[in] value  Either the string "s" (smart calculation method)
- *                    or a number of seconds (interleave interval).
+ *  @param[in] value  Unused.
  */
 void state::_set_service_interleave_factor_method(
               std::string const& value) {
-  if (value == "s")
-    _service_interleave_factor_method = ilf_smart;
-  else {
-    _service_interleave_factor_method = ilf_user;
-    if (!string::to(
-                   value.c_str(),
-                   scheduling_info.service_interleave_factor)
-        || scheduling_info.service_interleave_factor < 1)
-      scheduling_info.service_interleave_factor = 1;
-  }
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service_interleave_factor_method variable ignored";
+  ++config_warnings;
   return ;
 }
 

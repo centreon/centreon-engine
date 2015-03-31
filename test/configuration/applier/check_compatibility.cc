@@ -99,7 +99,6 @@ struct                global {
   float               high_service_flap_threshold;
   unsigned int        host_check_timeout;
   unsigned int        host_freshness_check_interval;
-  int                 host_inter_check_delay_method;
   std::string         illegal_object_chars;
   std::string         illegal_output_chars;
   unsigned int        interval_length;
@@ -114,9 +113,7 @@ struct                global {
   float               low_service_flap_threshold;
   unsigned int        max_check_reaper_time;
   unsigned long       max_debug_file_size;
-  unsigned int        max_host_check_spread;
   unsigned int        max_parallel_service_checks;
-  unsigned int        max_service_check_spread;
   bool                obsess_over_hosts;
   bool                obsess_over_services;
   std::string         ochp_command;
@@ -127,8 +124,6 @@ struct                global {
   unsigned int        retention_update_interval;
   unsigned int        service_check_timeout;
   unsigned int        service_freshness_check_interval;
-  int                 service_inter_check_delay_method;
-  int                 service_interleave_factor_method;
   float               sleep_time;
   bool                soft_state_dependencies;
   unsigned int        status_update_interval;
@@ -278,7 +273,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(high_service_flap_threshold);
   check_value(host_check_timeout);
   check_value(host_freshness_check_interval);
-  check_value(host_inter_check_delay_method);
   check_value(illegal_object_chars);
   check_value(illegal_output_chars);
   check_value(interval_length);
@@ -293,9 +287,7 @@ bool chkdiff(global& g1, global& g2) {
   check_value(low_service_flap_threshold);
   check_value(max_check_reaper_time);
   check_value(max_debug_file_size);
-  check_value(max_host_check_spread);
   check_value(max_parallel_service_checks);
-  check_value(max_service_check_spread);
   check_value(obsess_over_hosts);
   check_value(obsess_over_services);
   check_value(ochp_command);
@@ -306,8 +298,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(retention_update_interval);
   check_value(service_check_timeout);
   check_value(service_freshness_check_interval);
-  check_value(service_inter_check_delay_method);
-  check_value(service_interleave_factor_method);
   check_value(sleep_time);
   check_value(soft_state_dependencies);
   check_value(status_update_interval);
@@ -430,7 +420,6 @@ static global get_globals() {
   g.high_service_flap_threshold = high_service_flap_threshold;
   g.host_check_timeout = host_check_timeout;
   g.host_freshness_check_interval = host_freshness_check_interval;
-  g.host_inter_check_delay_method = host_inter_check_delay_method;
   g.illegal_object_chars = to_str(illegal_object_chars);
   g.illegal_output_chars = to_str(illegal_output_chars);
   g.interval_length = interval_length;
@@ -445,9 +434,7 @@ static global get_globals() {
   g.low_service_flap_threshold = low_service_flap_threshold;
   g.max_check_reaper_time = max_check_reaper_time;
   g.max_debug_file_size = max_debug_file_size;
-  g.max_host_check_spread = max_host_check_spread;
   g.max_parallel_service_checks = max_parallel_service_checks;
-  g.max_service_check_spread = max_service_check_spread;
   g.obsess_over_hosts = obsess_over_hosts;
   g.obsess_over_services = obsess_over_services;
   g.ochp_command = to_str(ochp_command);
@@ -458,8 +445,6 @@ static global get_globals() {
   g.retention_update_interval = retention_update_interval;
   g.service_check_timeout = service_check_timeout;
   g.service_freshness_check_interval = service_freshness_check_interval;
-  g.service_inter_check_delay_method = service_inter_check_delay_method;
-  g.service_interleave_factor_method = service_interleave_factor_method;
   g.sleep_time = sleep_time;
   g.soft_state_dependencies = soft_state_dependencies;
   g.status_update_interval = status_update_interval;

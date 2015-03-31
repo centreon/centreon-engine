@@ -468,79 +468,6 @@ queue should be executed.
    That Centreon Engine will only sleep after it "catches up" with
    queued service checks that have fallen behind.
 
-.. _main_cfg_opt_service_inter_check_delay_method:
-
-Service Inter-Check Delay Method
---------------------------------
-
-This option allows you to control how service checks are initially
-"spread out" in the event queue. Using a "smart" delay calculation (the
-default) will cause Centreon Engine to calculate an average check
-interval and spread initial checks of all services out over that
-interval, thereby helping to eliminate CPU load spikes. Using no delay
-is generally not recommended, as it will cause all service checks to be
-scheduled for execution at the same time. This means that you will
-generally have large CPU spikes when the services are all executed in
-parallel. More information on how to estimate how the inter-check delay
-affects service check scheduling can be found
-:ref:`here <scheduling_service_and_host>`. Values are as follows:
-
-  * n = Don't use any delay - schedule all service checks to run
-    immediately (i.e. at the same time!)
-  * d = Use a "dumb" delay of 1 second between service checks
-  * s = Use a "smart" delay calculation to spread service checks out
-    evenly (default)
-  * x.xx = Use a user-supplied inter-check delay of x.xx seconds
-
-=========== =============================================
-**Format**  service_inter_check_delay_method=<n/d/s/x.xx>
-**Example** service_inter_check_delay_method=s
-=========== =============================================
-
-Maximum Service Check Spread
-----------------------------
-
-This option determines the maximum number of minutes from when Centreon
-Engine starts that all services (that are scheduled to be regularly
-checked) are checked. This option will automatically adjust the
-:ref:`service <main_cfg_opt_service_inter_check_delay_method>`
-inter-check delay method" (if necessary) to ensure that the initial
-checks of all services occur within the timeframe you specify. In
-general, this option will not have an affect on service check scheduling
-because scheduling information is being retained. Default value is 30
-(minutes).
-
-=========== ==================================
-**Format**  max_service_check_spread=<minutes>
-**Example** max_service_check_spread=30
-=========== ==================================
-
-.. _main_cfg_opt_service_interleave_factor:
-
-Service Interleave Factor
--------------------------
-
-This variable determines how service checks are
-interleaved. Interleaving allows for a more even distribution of service
-checks, reduced load on remote hosts, and faster overall detection of
-host problems. Setting this value to 1 is equivalent to not interleaving
-the service checks (this is how versions of Centreon Engine previous to
-0.0.5 worked). Set this value to s (smart) for automatic calculation of
-the interleave factor unless you have a specific reason to change
-it. You should see that the service check results are spread out as they
-begin to appear. More information on how interleaving works can be found
-:ref:`here <scheduling_service_and_host>`.
-
-  * x = A number greater than or equal to 1 that specifies the
-    interleave factor to use. An interleave factor of 1 is equivalent to
-    not interleaving the service checks.
-  * s = Use a "smart" interleave factor calculation (default)
-
-=========== ===============================
-**Format**  service_interleave_factor=<s|x>
-**Example** service_interleave_factor=s
-=========== ===============================
-
 .. _main_cfg_opt_maximum_concurrent_service_checks:
 
 Maximum Concurrent Service Checks
@@ -596,51 +523,6 @@ monitoring logic.
 **Format**  max_check_result_reaper_time=<seconds>
 **Example** max_check_result_reaper_time=30
 =========== ======================================
-
-.. _main_cfg_opt_host_inter_check_delay_method:
-
-Host Inter-Check Delay Method
------------------------------
-
-This option allows you to control how host checks that are scheduled to
-be checked on a regular basis are initially "spread out" in the event
-queue. Using a "smart" delay calculation (the default) will cause
-Centreon Engine to calculate an average check interval and spread
-initial checks of all hosts out over that interval, thereby helping to
-eliminate CPU load spikes. Using no delay is generally not
-recommended. Using no delay will cause all host checks to be scheduled
-for execution at the same time. More information on how to estimate how
-the inter-check delay affects host check scheduling can be found
-:ref:`here <scheduling_service_and_host>`.Values are as follows:
-
-  * n = Don't use any delay - schedule all host checks to run
-    immediately (i.e. at the same time!)
-  * d = Use a "dumb" delay of 1 second between host checks
-  * s = Use a "smart" delay calculation to spread host checks out evenly
-    (default)
-  * x.xx = Use a user-supplied inter-check delay of x.xx seconds
-
-=========== ==========================================
-**Format**  host_inter_check_delay_method=<n/d/s/x.xx>
-**Example** host_inter_check_delay_method=s
-=========== ==========================================
-
-Maximum Host Check Spread
--------------------------
-
-This option determines the maximum number of minutes from when Centreon
-Engine starts that all hosts (that are scheduled to be regularly
-checked) are checked. This option will automatically adjust the
-:ref:`host inter-check <main_cfg_opt_host_inter_check_delay_method>`
-delay method" (if necessary) to ensure that the initial checks of all
-hosts occur within the timeframe you specify. In general, this option
-will not have an affect on host check scheduling because scheduling
-information is being retained. Default value is 30 (minutes).
-
-=========== ===============================
-**Format**  max_host_check_spread=<minutes>
-**Example** max_host_check_spread=30
-=========== ===============================
 
 .. _main_cfg_opt_timing_interval_length:
 

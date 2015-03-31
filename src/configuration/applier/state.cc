@@ -716,7 +716,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->high_service_flap_threshold(new_cfg.high_service_flap_threshold());
   config->host_check_timeout(new_cfg.host_check_timeout());
   config->host_freshness_check_interval(new_cfg.host_freshness_check_interval());
-  config->host_inter_check_delay_method(new_cfg.host_inter_check_delay_method());
   config->illegal_object_chars(new_cfg.illegal_object_chars());
   config->illegal_output_chars(new_cfg.illegal_output_chars());
   config->interval_length(new_cfg.interval_length());
@@ -731,10 +730,8 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->low_service_flap_threshold(new_cfg.low_service_flap_threshold());
   config->max_check_reaper_time(new_cfg.max_check_reaper_time());
   config->max_debug_file_size(new_cfg.max_debug_file_size());
-  config->max_host_check_spread(new_cfg.max_host_check_spread());
   config->max_log_file_size(new_cfg.max_log_file_size());
   config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
-  config->max_service_check_spread(new_cfg.max_service_check_spread());
   config->obsess_over_hosts(new_cfg.obsess_over_hosts());
   config->obsess_over_services(new_cfg.obsess_over_services());
   config->ochp_command(new_cfg.ochp_command());
@@ -746,8 +743,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->retention_update_interval(new_cfg.retention_update_interval());
   config->service_check_timeout(new_cfg.service_check_timeout());
   config->service_freshness_check_interval(new_cfg.service_freshness_check_interval());
-  config->service_inter_check_delay_method(new_cfg.service_inter_check_delay_method());
-  config->service_interleave_factor_method(new_cfg.service_interleave_factor_method());
   config->sleep_time(new_cfg.sleep_time());
   config->soft_state_dependencies(new_cfg.soft_state_dependencies());
   config->state_retention_file(new_cfg.state_retention_file());

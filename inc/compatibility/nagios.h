@@ -40,16 +40,6 @@
 #  include "objects.h"
 #  include "sighandlers.h"
 
-// Inter-check delay calculation types.
-#  define ICD_NONE  0 // No inter-check delay.
-#  define ICD_DUMB  1 // Dumb delay of 1 second.
-#  define ICD_SMART 2 // Smart delay.
-#  define ICD_USER  3 // User-specified delay.
-
-// Interleave factor calculation types.
-#  define ILF_USER  0 // User-specified interleave factor.
-#  define ILF_SMART 1 // Smart interleave.
-
 // Misc.
 #  define MAX_PLUGIN_OUTPUT_LENGTH -1 // Plugin output length is not caped.
 

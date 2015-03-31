@@ -116,9 +116,6 @@ static std::map<std::string, std::string> build_configuration(
     hcd = obj2str(my_rand(0.1f, 10000.0f));
 
   var["command_check_interval"] = obj2str(cmd_check_interval) + (my_rand(0, 1) ? "s" : "");
-  var["service_inter_check_delay_method"] = scd;
-  var["host_inter_check_delay_method"] = hcd;
-  var["service_interleave_factor"] = (my_rand(0, 1) == 0 ? "s" : obj2str(my_rand(1)));
   var["resource_file"] = resource;
   var["log_file"] = "log_file.tmp";
   var["debug_level"] = obj2str(my_rand(0));
@@ -158,8 +155,6 @@ static std::map<std::string, std::string> build_configuration(
   var["soft_state_dependencies"] = obj2str(my_rand(0, 1));
   var["enable_event_handlers"] = obj2str(my_rand(0, 1));
   var["enable_notifications"] = obj2str(my_rand(0, 1));
-  var["max_service_check_spread"] = obj2str(my_rand(1));
-  var["max_host_check_spread"] = obj2str(my_rand(1));
   var["max_concurrent_checks"] = obj2str(my_rand(0));
   var["check_result_reaper_frequency"] = obj2str(my_rand(1));
   var["service_reaper_frequency"] = var["check_result_reaper_frequency"];
@@ -322,12 +317,6 @@ void test_configuration(
   if (my_conf["enable_notifications"] != obj2str(config->enable_notifications())) {
     throw (engine_error() << "enable_notifications: init with '" << my_conf["enable_notifications"] << "'");
   }
-  if (my_conf["max_service_check_spread"] != obj2str(config->max_service_check_spread())) {
-    throw (engine_error() << "max_service_check_spread: init with '" << my_conf["max_service_check_spread"] << "'");
-  }
-  if (my_conf["max_host_check_spread"] != obj2str(config->max_host_check_spread())) {
-    throw (engine_error() << "max_host_check_spread: init with '" << my_conf["max_host_check_spread"] << "'");
-  }
   if (my_conf["max_concurrent_checks"] != obj2str(config->max_parallel_service_checks())) {
     throw (engine_error() << "max_concurrent_checks: init with '" << my_conf["max_concurrent_checks"] << "'");
   }
@@ -424,25 +413,6 @@ void test_configuration(
   if (my_conf["command_check_interval"] != obj2str(config->command_check_interval() / config->interval_length()) &&
       my_conf["command_check_interval"] != obj2str(config->command_check_interval()) + "s") {
     throw (engine_error() << "command_check_interval: init with '" << my_conf["command_check_interval"] << "'");
-  }
-  if (my_conf["service_interleave_factor"] == "s") {
-    if (config->service_interleave_factor_method() != configuration::state::ilf_smart) {
-      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["service_interleave_factor"] << "'");
-    }
-  }
-  else {
-    if (my_conf["service_interleave_factor"] != obj2str(scheduling_info.service_interleave_factor) &&
-	scheduling_info.service_interleave_factor != 1) {
-      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["service_interleave_factor"] << "'");
-    }
-  }
-  if (my_conf["service_inter_check_delay_method"] != check_delay[config->service_inter_check_delay_method()] &&
-      my_conf["service_inter_check_delay_method"] != obj2str(scheduling_info.service_inter_check_delay)) {
-      throw (engine_error() << "service_inter_check_delay_method: init with '" << my_conf["service_inter_check_delay_method"] << "'");
-  }
-  if (my_conf["host_inter_check_delay_method"] != check_delay[config->host_inter_check_delay_method()] &&
-      my_conf["host_inter_check_delay_method"] != obj2str(scheduling_info.host_inter_check_delay)) {
-      throw (engine_error() << "host_inter_check_delay_method: init with '" << my_conf["host_inter_check_delay_method"] << "'");
   }
 
   nagios_macros* mac = get_global_macros();

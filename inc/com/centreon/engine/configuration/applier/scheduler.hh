@@ -59,14 +59,11 @@ namespace                 configuration {
                           ~scheduler() throw ();
       scheduler&          operator=(scheduler const&);
       void                _apply_misc_event();
-      void                _calculate_host_inter_check_delay(
-                            configuration::state::inter_check_delay method);
+      void                _calculate_host_inter_check_delay();
       void                _calculate_host_scheduling_params(
                             configuration::state const& config);
-      void                _calculate_service_inter_check_delay(
-                            configuration::state::inter_check_delay method);
-      void                _calculate_service_interleave_factor(
-                            configuration::state::interleave_factor method);
+      void                _calculate_service_inter_check_delay();
+      void                _calculate_service_interleave_factor();
       void                _calculate_service_scheduling_params(
                             configuration::state const& config);
       timed_event_struct* _create_misc_event(

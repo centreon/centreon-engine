@@ -1428,14 +1428,14 @@ int is_service_result_fresh(
     expiration_time = (time_t)(event_start + freshness_threshold);
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (services never go stale). */
   /* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
-  /* CHANGED 10/07/07 EG - Added max_service_check_spread to expiration time as suggested by Altinity */
   else if (temp_service->checks_enabled == true
            && event_start > temp_service->last_check
            && temp_service->freshness_threshold == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
-                 + (config->max_service_check_spread()
-                    * config->interval_length()));
+                 + std::max(
+                          temp_service->check_interval,
+                          temp_service->retry_interval));
   else
     expiration_time
       = (time_t)(temp_service->last_check + freshness_threshold);
@@ -1833,14 +1833,14 @@ int is_host_result_fresh(
   if (temp_host->has_been_checked == false)
     expiration_time = (time_t)(event_start + freshness_threshold);
   /* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Engine is restarted more frequently that freshness threshold intervals (hosts never go stale). */
-  /* CHANGED 10/07/07 EG - Added max_host_check_spread to expiration time as suggested by Altinity */
   else if (temp_host->checks_enabled == true
            && event_start > temp_host->last_check
            && temp_host->freshness_threshold == 0)
     expiration_time
       = (time_t)(event_start + freshness_threshold
-                 + (config->max_host_check_spread()
-                    * config->interval_length()));
+                 + std::max(
+                          temp_host->check_interval,
+                          temp_host->retry_interval));
   else
     expiration_time
       = (time_t)(temp_host->last_check + freshness_threshold);

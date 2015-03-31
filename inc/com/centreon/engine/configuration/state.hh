@@ -61,26 +61,6 @@ namespace               configuration {
       strict_iso8601    // ISO8601 (YYYY-MM-DDTHH:MM:SS)
     };
 
-    /**
-     *  @enum state::inter_check_delay
-     *  Inter-check delay calculation types
-     */
-    enum                inter_check_delay {
-      icd_none = 0,     // no inter-check delay
-      icd_dumb,         // dumb delay of 1 second
-      icd_smart,        // smart delay
-      icd_user          // user-specified delay
-    };
-
-    /**
-     *  @enum state::interleave_factor
-     *  Interleave factor calculation types
-     */
-    enum                interleave_factor {
-      ilf_user = 0,     // user-specified interleave factor
-      ilf_smart         // smart interleave
-    };
-
                         state();
                         state(state const& right);
                         ~state() throw ();
@@ -184,8 +164,6 @@ namespace               configuration {
     void                host_check_timeout(unsigned int value);
     unsigned int        host_freshness_check_interval() const throw ();
     void                host_freshness_check_interval(unsigned int value);
-    inter_check_delay   host_inter_check_delay_method() const throw ();
-    void                host_inter_check_delay_method(inter_check_delay value);
     std::string const&  illegal_object_chars() const throw ();
     void                illegal_object_chars(std::string const& value);
     std::string const&  illegal_output_chars() const throw ();
@@ -214,14 +192,10 @@ namespace               configuration {
     void                max_check_reaper_time(unsigned int value);
     unsigned long       max_debug_file_size() const throw ();
     void                max_debug_file_size(unsigned long value);
-    unsigned int        max_host_check_spread() const throw ();
-    void                max_host_check_spread(unsigned int value);
     unsigned long       max_log_file_size() const throw ();
     void                max_log_file_size(unsigned long value);
     unsigned int        max_parallel_service_checks() const throw ();
     void                max_parallel_service_checks(unsigned int value);
-    unsigned int        max_service_check_spread() const throw ();
-    void                max_service_check_spread(unsigned int value);
     bool                obsess_over_hosts() const throw ();
     void                obsess_over_hosts(bool value);
     bool                obsess_over_services() const throw ();
@@ -262,10 +236,6 @@ namespace               configuration {
     void                service_check_timeout(unsigned int value);
     unsigned int        service_freshness_check_interval() const throw ();
     void                service_freshness_check_interval(unsigned int value);
-    inter_check_delay   service_inter_check_delay_method() const throw ();
-    void                service_inter_check_delay_method(inter_check_delay value);
-    interleave_factor   service_interleave_factor_method() const throw ();
-    void                service_interleave_factor_method(interleave_factor value);
     float               sleep_time() const throw ();
     void                sleep_time(float value);
     bool                soft_state_dependencies() const throw ();
@@ -348,6 +318,8 @@ namespace               configuration {
     void                _set_log_notifications(bool value);
     void                _set_log_rotation_method(std::string const& value);
     void                _set_max_check_result_file_age(unsigned long value);
+    void                _set_max_host_check_spread(unsigned int value);
+    void                _set_max_service_check_spread(unsigned int value);
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
     void                _set_notification_timeout(unsigned int value);
@@ -459,7 +431,6 @@ namespace               configuration {
     set_host            _hosts;
     unsigned int        _host_check_timeout;
     unsigned int        _host_freshness_check_interval;
-    inter_check_delay   _host_inter_check_delay_method;
     std::string         _illegal_object_chars;
     std::string         _illegal_output_chars;
     unsigned int        _interval_length;
@@ -474,10 +445,8 @@ namespace               configuration {
     float               _low_service_flap_threshold;
     unsigned int        _max_check_reaper_time;
     unsigned long       _max_debug_file_size;
-    unsigned int        _max_host_check_spread;
     unsigned long       _max_log_file_size;
     unsigned int        _max_parallel_service_checks;
-    unsigned int        _max_service_check_spread;
     bool                _obsess_over_hosts;
     bool                _obsess_over_services;
     std::string         _ochp_command;
@@ -494,8 +463,6 @@ namespace               configuration {
     set_service         _services;
     unsigned int        _service_check_timeout;
     unsigned int        _service_freshness_check_interval;
-    inter_check_delay   _service_inter_check_delay_method;
-    interleave_factor   _service_interleave_factor_method;
     static setters const
                         _setters[];
     float               _sleep_time;

@@ -67,7 +67,6 @@ void applier::globals::apply(state& config) {
   ::high_service_flap_threshold = config.high_service_flap_threshold();
   ::host_check_timeout = config.host_check_timeout();
   ::host_freshness_check_interval = config.host_freshness_check_interval();
-  ::host_inter_check_delay_method = config.host_inter_check_delay_method();
   ::interval_length = config.interval_length();
   ::log_event_handlers = config.log_event_handlers();
   ::log_external_commands = config.log_external_commands();
@@ -79,9 +78,7 @@ void applier::globals::apply(state& config) {
   ::low_service_flap_threshold = config.low_service_flap_threshold();
   ::max_check_reaper_time = config.max_check_reaper_time();
   ::max_debug_file_size = config.max_debug_file_size();
-  ::max_host_check_spread = config.max_host_check_spread();
   ::max_parallel_service_checks = config.max_parallel_service_checks();
-  ::max_service_check_spread = config.max_service_check_spread();
   ::obsess_over_hosts = config.obsess_over_hosts();
   ::obsess_over_services = config.obsess_over_services();
   ::ochp_timeout = config.ochp_timeout();
@@ -90,8 +87,6 @@ void applier::globals::apply(state& config) {
   ::retention_update_interval = config.retention_update_interval();
   ::service_check_timeout = config.service_check_timeout();
   ::service_freshness_check_interval = config.service_freshness_check_interval();
-  ::service_inter_check_delay_method = config.service_inter_check_delay_method();
-  ::service_interleave_factor_method = config.service_interleave_factor_method();
   ::sleep_time = config.sleep_time();
   ::soft_state_dependencies = config.soft_state_dependencies();
   ::status_update_interval = config.status_update_interval();
