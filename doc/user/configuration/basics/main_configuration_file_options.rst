@@ -504,26 +504,6 @@ the core of the monitoring logic in Centreon Engine.
 **Example** check_result_reaper_frequency=5
 =========== ====================================================
 
-.. _main_cfg_opt_maximum_check_result_reaper_time:
-
-Maximum Check Result Reaper Time
---------------------------------
-
-This option allows you to control the maximum amount of time in seconds
-that host and service check result "reaper" events are allowed to
-run. "Reaper" events process the results from host and service checks
-that have finished executing. If there are a lot of results to process,
-reaper events may take a long time to finish, which might delay timely
-execution of new host and service checks. This variable allows you to
-limit the amount of time that an individual reaper event will run before
-it hands control back over to Centreon Engine for other portions of the
-monitoring logic.
-
-=========== ======================================
-**Format**  max_check_result_reaper_time=<seconds>
-**Example** max_check_result_reaper_time=30
-=========== ======================================
-
 .. _main_cfg_opt_timing_interval_length:
 
 Timing Interval Length

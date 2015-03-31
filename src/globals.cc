@@ -129,7 +129,6 @@ unsigned int        log_external_commands(true);
 unsigned int        log_initial_states(false);
 unsigned int        log_passive_checks(true);
 unsigned int        log_service_retries(false);
-unsigned int        max_check_reaper_time(30);
 unsigned int        max_parallel_service_checks(0);
 unsigned int        obsess_over_hosts(false);
 unsigned int        obsess_over_services(false);

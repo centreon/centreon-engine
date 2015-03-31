@@ -79,7 +79,6 @@ state::setters const state::_setters[] = {
   { "log_service_retries",                         SETTER(bool, log_service_retries) },
   { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
   { "low_service_flap_threshold",                  SETTER(float, low_service_flap_threshold) },
-  { "max_check_result_reaper_time",                SETTER(unsigned int, max_check_reaper_time) },
   { "max_concurrent_checks",                       SETTER(unsigned int, max_parallel_service_checks) },
   { "max_debug_file_size",                         SETTER(unsigned long, max_debug_file_size) },
   { "max_log_file_size",                           SETTER(unsigned long, max_log_file_size) },
@@ -146,6 +145,7 @@ state::setters const state::_setters[] = {
   { "log_notifications",                           SETTER(bool, _set_log_notifications) },
   { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
   { "max_check_result_file_age",                   SETTER(unsigned long, _set_max_check_result_file_age) },
+  { "max_check_result_reaper_time",                SETTER(unsigned int, _set_max_check_result_reaper_time) },
   { "max_host_check_spread",                       SETTER(unsigned int, _set_max_host_check_spread) },
   { "max_service_check_spread",                    SETTER(unsigned int, _set_max_service_check_spread) },
   { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
@@ -227,7 +227,6 @@ static bool const                      default_log_passive_checks(true);
 static bool const                      default_log_service_retries(false);
 static float const                     default_low_host_flap_threshold(20.0);
 static float const                     default_low_service_flap_threshold(20.0);
-static unsigned int const              default_max_check_reaper_time(30);
 static unsigned long const             default_max_debug_file_size(1000000);
 static unsigned long const             default_max_log_file_size(0);
 static unsigned int const              default_max_parallel_service_checks(0);
@@ -321,7 +320,6 @@ state::state()
     _log_service_retries(default_log_service_retries),
     _low_host_flap_threshold(default_low_host_flap_threshold),
     _low_service_flap_threshold(default_low_service_flap_threshold),
-    _max_check_reaper_time(default_max_check_reaper_time),
     _max_debug_file_size(default_max_debug_file_size),
     _max_log_file_size(default_max_log_file_size),
     _max_parallel_service_checks(default_max_parallel_service_checks),
@@ -418,7 +416,6 @@ state& state::operator=(state const& right) {
     _log_service_retries = right._log_service_retries;
     _low_host_flap_threshold = right._low_host_flap_threshold;
     _low_service_flap_threshold = right._low_service_flap_threshold;
-    _max_check_reaper_time = right._max_check_reaper_time;
     _max_debug_file_size = right._max_debug_file_size;
     _max_log_file_size = right._max_log_file_size;
     _max_parallel_service_checks = right._max_parallel_service_checks;
@@ -506,7 +503,6 @@ bool state::operator==(state const& right) const throw () {
           && _log_service_retries == right._log_service_retries
           && _low_host_flap_threshold == right._low_host_flap_threshold
           && _low_service_flap_threshold == right._low_service_flap_threshold
-          && _max_check_reaper_time == right._max_check_reaper_time
           && _max_debug_file_size == right._max_debug_file_size
           && _max_log_file_size == right._max_log_file_size
           && _max_parallel_service_checks == right._max_parallel_service_checks
@@ -1677,26 +1673,6 @@ void state::low_service_flap_threshold(float value) {
     throw (engine_error() << "low_service_flap_threshold "
            << "must be between 0.0 and 100.0, both excluded");
   _low_service_flap_threshold = value;
-}
-
-/**
- *  Get max_check_reaper_time value.
- *
- *  @return The max_check_reaper_time value.
- */
-unsigned int state::max_check_reaper_time() const throw () {
-  return (_max_check_reaper_time);
-}
-
-/**
- *  Set max_check_reaper_time value.
- *
- *  @param[in] value The new max_check_reaper_time value.
- */
-void state::max_check_reaper_time(unsigned int value) {
-  if (!value)
-    throw (engine_error() << "max_check_reaper_time cannot be 0");
-  _max_check_reaper_time = value;
 }
 
 /**
@@ -2989,6 +2965,19 @@ void state::_set_max_check_result_file_age(unsigned long value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: max_check_result_file_age variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_max_check_result_reaper_time(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: max_check_result_reaper_time variable ignored";
   ++config_warnings;
   return ;
 }

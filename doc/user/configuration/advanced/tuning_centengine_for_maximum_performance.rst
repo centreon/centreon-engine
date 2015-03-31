@@ -23,14 +23,6 @@ Optimization Tips
     by the max reaper time (see below). If your reaper frequency is too
     high (too infrequent), you might see high latencies for host and
     service checks.
-  * Max Reaper Time. The :ref:`max_check_result_reaper_time <main_cfg_opt_maximum_check_result_reaper_time>`
-    variables determines the maximum amount of time the Centreon Engine
-    daemon can spend processing the results of host and service checks
-    before moving on to other things - like executing new host and
-    service checks. Too high of a value can result in large latencies
-    for your host and service checks. Too low of a value can have the
-    same effect. If you're experiencing high latencies, adjust this
-    variable and see what effect it has.
   * Adjust buffer slots. You may need to adjust the value of the
     :ref:`external_command_buffer_slots <main_cfg_opt_external_command_buffer_slots>`
     option.

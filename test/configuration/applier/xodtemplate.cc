@@ -9545,16 +9545,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"max_check_result_reaper_time")){
-
-      max_check_reaper_time=atoi(value);
-      if(max_check_reaper_time<1){
-        if (asprintf(&error_message,"Illegal value for max_check_result_reaper_time")) {}
-        error=true;
-        break;
-      }
-    }
-
     else if(!strcmp(variable,"sleep_time")){
 
       sleep_time=atof(value);

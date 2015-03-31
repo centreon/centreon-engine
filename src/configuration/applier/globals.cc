@@ -76,7 +76,6 @@ void applier::globals::apply(state& config) {
   ::log_service_retries = config.log_service_retries();
   ::low_host_flap_threshold = config.low_host_flap_threshold();
   ::low_service_flap_threshold = config.low_service_flap_threshold();
-  ::max_check_reaper_time = config.max_check_reaper_time();
   ::max_debug_file_size = config.max_debug_file_size();
   ::max_parallel_service_checks = config.max_parallel_service_checks();
   ::obsess_over_hosts = config.obsess_over_hosts();

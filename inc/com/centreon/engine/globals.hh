@@ -161,7 +161,6 @@ extern unsigned int execute_service_checks;
 extern unsigned int execute_host_checks;
 extern unsigned int max_parallel_service_checks;
 extern unsigned int check_reaper_interval;
-extern unsigned int max_check_reaper_time;
 extern float sleep_time;
 extern unsigned int interval_length;
 /* command_check_interval_is_seconds; */

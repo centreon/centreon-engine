@@ -111,7 +111,6 @@ struct                global {
   bool                log_service_retries;
   float               low_host_flap_threshold;
   float               low_service_flap_threshold;
-  unsigned int        max_check_reaper_time;
   unsigned long       max_debug_file_size;
   unsigned int        max_parallel_service_checks;
   bool                obsess_over_hosts;
@@ -285,7 +284,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(log_service_retries);
   check_value(low_host_flap_threshold);
   check_value(low_service_flap_threshold);
-  check_value(max_check_reaper_time);
   check_value(max_debug_file_size);
   check_value(max_parallel_service_checks);
   check_value(obsess_over_hosts);
@@ -432,7 +430,6 @@ static global get_globals() {
   g.log_service_retries = log_service_retries;
   g.low_host_flap_threshold = low_host_flap_threshold;
   g.low_service_flap_threshold = low_service_flap_threshold;
-  g.max_check_reaper_time = max_check_reaper_time;
   g.max_debug_file_size = max_debug_file_size;
   g.max_parallel_service_checks = max_parallel_service_checks;
   g.obsess_over_hosts = obsess_over_hosts;

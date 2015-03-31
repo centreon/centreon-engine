@@ -158,7 +158,6 @@ static std::map<std::string, std::string> build_configuration(
   var["max_concurrent_checks"] = obj2str(my_rand(0));
   var["check_result_reaper_frequency"] = obj2str(my_rand(1));
   var["service_reaper_frequency"] = var["check_result_reaper_frequency"];
-  var["max_check_result_reaper_time"] = obj2str(my_rand(1));
   var["sleep_time"] = obj2str(my_rand(0.1f, 10000.0f));
   var["interval_length"] = obj2str(my_rand(1, 10000));
   var["check_service_freshness"] = obj2str(my_rand(0, 1));
@@ -325,9 +324,6 @@ void test_configuration(
   }
   if (my_conf["service_reaper_frequency"] != obj2str(config->check_reaper_interval())) {
     throw (engine_error() << "service_reaper_frequency: init with '" << my_conf["service_reaper_frequency"] << "'");
-  }
-  if (my_conf["max_check_result_reaper_time"] != obj2str(config->max_check_reaper_time())) {
-    throw (engine_error() << "max_check_result_reaper_time: init with '" << my_conf["max_check_result_reaper_time"] << "'");
   }
   if (my_conf["sleep_time"] != obj2str(config->sleep_time())) {
     throw (engine_error() << "sleep_time: init with '" << my_conf["sleep_time"] << "'");

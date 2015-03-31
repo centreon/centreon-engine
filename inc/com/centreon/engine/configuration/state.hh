@@ -188,8 +188,6 @@ namespace               configuration {
     void                low_host_flap_threshold(float value);
     float               low_service_flap_threshold() const throw ();
     void                low_service_flap_threshold(float value);
-    unsigned int        max_check_reaper_time() const throw ();
-    void                max_check_reaper_time(unsigned int value);
     unsigned long       max_debug_file_size() const throw ();
     void                max_debug_file_size(unsigned long value);
     unsigned long       max_log_file_size() const throw ();
@@ -318,6 +316,7 @@ namespace               configuration {
     void                _set_log_notifications(bool value);
     void                _set_log_rotation_method(std::string const& value);
     void                _set_max_check_result_file_age(unsigned long value);
+    void                _set_max_check_result_reaper_time(unsigned int value);
     void                _set_max_host_check_spread(unsigned int value);
     void                _set_max_service_check_spread(unsigned int value);
     void                _set_nagios_group(std::string const& value);
@@ -443,7 +442,6 @@ namespace               configuration {
     bool                _log_service_retries;
     float               _low_host_flap_threshold;
     float               _low_service_flap_threshold;
-    unsigned int        _max_check_reaper_time;
     unsigned long       _max_debug_file_size;
     unsigned long       _max_log_file_size;
     unsigned int        _max_parallel_service_checks;

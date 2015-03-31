@@ -728,7 +728,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->log_service_retries(new_cfg.log_service_retries());
   config->low_host_flap_threshold(new_cfg.low_host_flap_threshold());
   config->low_service_flap_threshold(new_cfg.low_service_flap_threshold());
-  config->max_check_reaper_time(new_cfg.max_check_reaper_time());
   config->max_debug_file_size(new_cfg.max_debug_file_size());
   config->max_log_file_size(new_cfg.max_log_file_size());
   config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
