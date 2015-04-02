@@ -172,7 +172,6 @@ extern unsigned int host_freshness_check_interval;
 extern unsigned int auto_reschedule_checks;
 extern unsigned int auto_rescheduling_interval;
 extern unsigned int auto_rescheduling_window;
-extern unsigned int status_update_interval;
 extern unsigned int time_change_threshold;
 extern unsigned int enable_flap_detection;
 extern float low_service_flap_threshold;

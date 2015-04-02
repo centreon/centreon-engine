@@ -100,7 +100,6 @@ state::setters const state::_setters[] = {
   { "soft_state_dependencies",                     SETTER(bool, soft_state_dependencies) },
   { "state_retention_file",                        SETTER(std::string const&, state_retention_file) },
   { "status_file",                                 SETTER(std::string const&, status_file) },
-  { "status_update_interval",                      SETTER(unsigned int, status_update_interval) },
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
@@ -170,6 +169,7 @@ state::setters const state::_setters[] = {
   { "service_perfdata_file_processing_command",    SETTER(std::string const&, _set_service_perfdata_file_processing_command) },
   { "service_perfdata_file_processing_interval",   SETTER(unsigned int, _set_service_perfdata_file_processing_interval) },
   { "service_perfdata_file_template",              SETTER(std::string const&, _set_service_perfdata_file_template) },
+  { "status_update_interval",                      SETTER(unsigned int, _set_status_update_interval) },
   { "temp_file",                                   SETTER(std::string const&, _set_temp_file) },
   { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
   { "use_aggressive_host_checking",                SETTER(bool, _set_use_aggressive_host_checking) },
@@ -244,7 +244,6 @@ static float const                     default_sleep_time(0.5);
 static bool const                      default_soft_state_dependencies(false);
 static std::string const               default_state_retention_file(DEFAULT_RETENTION_FILE);
 static std::string const               default_status_file(DEFAULT_STATUS_FILE);
-static unsigned int const              default_status_update_interval(60);
 static unsigned int const              default_time_change_threshold(900);
 static bool const                      default_translate_passive_host_checks(false);
 static bool const                      default_use_setpgid(true);
@@ -337,7 +336,6 @@ state::state()
     _soft_state_dependencies(default_soft_state_dependencies),
     _state_retention_file(default_state_retention_file),
     _status_file(default_status_file),
-    _status_update_interval(default_status_update_interval),
     _time_change_threshold(default_time_change_threshold),
     _translate_passive_host_checks(default_translate_passive_host_checks),
     _use_setpgid(default_use_setpgid),
@@ -436,7 +434,6 @@ state& state::operator=(state const& right) {
     _soft_state_dependencies = right._soft_state_dependencies;
     _state_retention_file = right._state_retention_file;
     _status_file = right._status_file;
-    _status_update_interval = right._status_update_interval;
     _timeperiods = right._timeperiods;
     _time_change_threshold = right._time_change_threshold;
     _translate_passive_host_checks = right._translate_passive_host_checks;
@@ -523,7 +520,6 @@ bool state::operator==(state const& right) const throw () {
           && _soft_state_dependencies == right._soft_state_dependencies
           && _state_retention_file == right._state_retention_file
           && _status_file == right._status_file
-          && _status_update_interval == right._status_update_interval
           && cmp_set_ptr(_timeperiods, right._timeperiods)
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
@@ -2173,28 +2169,6 @@ void state::status_file(std::string const& value) {
 }
 
 /**
- *  Get status_update_interval value.
- *
- *  @return The status_update_interval value.
- */
-unsigned int state::status_update_interval() const throw () {
-  return (_status_update_interval);
-}
-
-/**
- *  Set status_update_interval value.
- *
- *  @param[in] value The new status_update_interval value.
- */
-void state::status_update_interval(unsigned int value) {
-  if (value < 2)
-    throw (engine_error()
-           << "status_update_interval cannot be less than 2 ("
-           << value << " provided)");
-  _status_update_interval = value;
-}
-
-/**
  *  Set a property with new value.
  *
  *  @param[in] key   The property name.
@@ -3332,6 +3306,19 @@ void state::_set_service_perfdata_file_template(
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: service_perfdata_file_template variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_status_update_interval(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: status_update_interval variable ignored";
   ++config_warnings;
   return ;
 }

@@ -167,7 +167,6 @@ static std::map<std::string, std::string> build_configuration(
   var["auto_reschedule_checks"] = obj2str(my_rand(0, 1));
   var["auto_rescheduling_interval"] = obj2str(my_rand(1));
   var["auto_rescheduling_window"] = obj2str(my_rand(1));
-  var["status_update_interval"] = obj2str(my_rand(2));
   var["time_change_threshold"] = obj2str(my_rand(6));
   var["enable_flap_detection"] = obj2str(my_rand(0, 1));
   var["low_service_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
@@ -351,9 +350,6 @@ void test_configuration(
   }
   if (my_conf["auto_rescheduling_window"] != obj2str(config->auto_rescheduling_window())) {
     throw (engine_error() << "auto_rescheduling_window: init with '" << my_conf["auto_rescheduling_window"] << "'");
-  }
-  if (my_conf["status_update_interval"] != obj2str(config->status_update_interval())) {
-    throw (engine_error() << "status_update_interval: init with '" << my_conf["status_update_interval"] << "'");
   }
   if (my_conf["time_change_threshold"] != obj2str(config->time_change_threshold())) {
     throw (engine_error() << "time_change_threshold: init with '" << my_conf["time_change_threshold"] << "'");

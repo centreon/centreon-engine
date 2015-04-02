@@ -184,32 +184,6 @@ static void check_event_retention_save() {
 }
 
 /**
- *  Check the event status save.
- */
-static void check_event_status_save() {
-  // register broker callback to catch event.
-  config->event_broker_options(BROKER_STATUS_DATA);
-  void* module_id = reinterpret_cast<void*>(0x4242);
-  neb_register_callback(NEBCALLBACK_AGGREGATED_STATUS_DATA,
-                        module_id,
-                        0,
-                        &broker_callback);
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_STATUS_SAVE;
-
-  handle_timed_event(&event);
-
-  if (broker_callback(-1, NULL) != NEBTYPE_AGGREGATEDSTATUS_ENDDUMP)
-    throw (engine_error() << __func__);
-
-  // release callback.
-  neb_deregister_module_callbacks(module_id);
-}
-
-/**
  *  Check the event sfreshness check.
  */
 static void check_event_sfreshness_check() {
@@ -303,7 +277,6 @@ int main_test(int argc, char** argv) {
   check_event_program_restart();
   check_event_check_reaper();
   check_event_retention_save();
-  check_event_status_save();
   check_event_sfreshness_check();
   check_event_host_check();
   check_event_hfreshness_check();

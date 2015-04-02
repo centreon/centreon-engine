@@ -119,24 +119,14 @@ Status File
 
 This is the file that Centreon Engine uses to store the current status,
 comment, and downtime information. This file is deleted every time
-Centreon Engine stops and recreated when it starts.
+Centreon Engine stops and recreated when it starts. This file is no
+longer written at regular intervals. Instead it is written in response
+to the SAVE_STATUS_INFORMATION external command.
 
 =========== ===============================================
 **Format**  status_file=<file_name>
 **Example** status_file=/var/log/centreon-engine/status.dat
 =========== ===============================================
-
-Status File Update Interval
----------------------------
-
-This setting determines how often (in seconds) that Centreon Engine will
-update status data in the :ref:`status file <main_cfg_opt_status_file>`.
-The minimum update interval is 1 second.
-
-=========== ================================
-**Format**  status_update_interval=<seconds>
-**Example** status_update_interval=15
-=========== ================================
 
 .. _main_cfg_opt_event_handler:
 

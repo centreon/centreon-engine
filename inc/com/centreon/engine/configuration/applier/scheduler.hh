@@ -102,7 +102,6 @@ namespace                 configuration {
       unsigned int        _old_host_freshness_check_interval;
       unsigned int        _old_retention_update_interval;
       unsigned int        _old_service_freshness_check_interval;
-      unsigned int        _old_status_update_interval;
     };
   }
 }

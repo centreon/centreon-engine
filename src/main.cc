@@ -56,7 +56,6 @@
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
-#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
@@ -368,9 +367,6 @@ int main(int argc, char* argv[]) {
         }
         neb_init_callback_list();
 
-        // Initialize status data.
-        initialize_status_data();
-
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
 
@@ -397,9 +393,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize check statistics.
         init_check_stats();
-
-        // Update all status data (with retained information).
-        update_all_status_data();
 
         // Log initial host and service state.
         log_host_states(INITIAL_STATES, NULL);
@@ -442,9 +435,6 @@ int main(int argc, char* argv[]) {
 
         // Save service and host state information.
         retention::dump::save(::config->state_retention_file());
-
-        // Clean up the status data.
-        cleanup_status_data(true);
 
         // Shutdown stuff.
         if (sigshutdown)

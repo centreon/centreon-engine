@@ -28,41 +28,6 @@
 /****************** TOP-LEVEL OUTPUT FUNCTIONS ********************/
 /******************************************************************/
 
-/* initializes status data at program start */
-int initialize_status_data() {
-  return (xsddefault_initialize_status_data());
-}
-
-/* update all status data (aggregated dump) */
-int update_all_status_data() {
-  int result = OK;
-
-  /* send data to event broker */
-  broker_aggregated_status_data(
-    NEBTYPE_AGGREGATEDSTATUS_STARTDUMP,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    NULL);
-
-  result = xsddefault_save_status_data();
-
-  /* send data to event broker */
-  broker_aggregated_status_data(
-    NEBTYPE_AGGREGATEDSTATUS_ENDDUMP,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    NULL);
-
-  if (result != OK)
-    return (ERROR);
-  return (OK);
-}
-
-/* cleans up status data before program termination */
-int cleanup_status_data(int delete_status_data) {
-  return (xsddefault_cleanup_status_data(delete_status_data));
-}
-
 /**
  *  Updates program status info.
  *

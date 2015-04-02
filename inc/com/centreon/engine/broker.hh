@@ -124,10 +124,6 @@
 #  define NEBTYPE_EXTERNALCOMMAND_END              1401
 #  define NEBTYPE_EXTERNALCOMMAND_CHECK            1402
 
-/* Aggregated statuses. */
-#  define NEBTYPE_AGGREGATEDSTATUS_STARTDUMP       1500
-#  define NEBTYPE_AGGREGATEDSTATUS_ENDDUMP         1501
-
 /* Retention. */
 #  define NEBTYPE_RETENTIONDATA_STARTLOAD          1600
 #  define NEBTYPE_RETENTIONDATA_ENDLOAD            1601

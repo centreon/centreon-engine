@@ -88,7 +88,6 @@ void applier::globals::apply(state& config) {
   ::service_freshness_check_interval = config.service_freshness_check_interval();
   ::sleep_time = config.sleep_time();
   ::soft_state_dependencies = config.soft_state_dependencies();
-  ::status_update_interval = config.status_update_interval();
   ::time_change_threshold = config.time_change_threshold();
   ::translate_passive_host_checks = config.translate_passive_host_checks();
   ::use_syslog = config.use_syslog();

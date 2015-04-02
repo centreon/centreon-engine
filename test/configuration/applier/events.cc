@@ -640,19 +640,6 @@ void init_timing_loop() {
       NULL,
       0);
 
-  /* add a status save event */
-  schedule_new_event(
-    EVENT_STATUS_SAVE,
-    true,
-    current_time + config->status_update_interval(),
-    true,
-    config->status_update_interval(),
-    NULL,
-    true,
-    NULL,
-    NULL,
-    0);
-
   /* add an external command check event if needed */
   if (config->command_check_interval() == -1)
     interval_to_use = (unsigned long)5;

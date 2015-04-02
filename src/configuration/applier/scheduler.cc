@@ -240,8 +240,7 @@ applier::scheduler::scheduler()
     _old_command_check_interval(0),
     _old_host_freshness_check_interval(0),
     _old_retention_update_interval(0),
-    _old_service_freshness_check_interval(0),
-    _old_status_update_interval(0) {
+    _old_service_freshness_check_interval(0) {
   memset(&scheduling_info, 0, sizeof(scheduling_info));
 }
 
@@ -344,18 +343,6 @@ void applier::scheduler::_apply_misc_event() {
             config->service_freshness_check_interval());
     _old_service_freshness_check_interval
       = config->service_freshness_check_interval();
-  }
-
-  // Remove and add a status save event.
-  if (!_evt_status_save
-      || (_old_status_update_interval
-          != config->status_update_interval())) {
-    _remove_misc_event(_evt_status_save);
-    _evt_status_save = _create_misc_event(
-                         EVENT_STATUS_SAVE,
-                         now + config->status_update_interval(),
-                         config->status_update_interval());
-    _old_status_update_interval = config->status_update_interval();
   }
 
   return ;

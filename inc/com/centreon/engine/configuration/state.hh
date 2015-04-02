@@ -242,8 +242,6 @@ namespace               configuration {
     void                state_retention_file(std::string const& value);
     std::string const&  status_file() const throw ();
     void                status_file(std::string const& value);
-    unsigned int        status_update_interval() const throw ();
-    void                status_update_interval(unsigned int value);
     bool                set(char const* key, char const* value);
     set_timeperiod const&
                         timeperiods() const throw ();
@@ -344,6 +342,7 @@ namespace               configuration {
     void                _set_service_perfdata_file_processing_command(std::string const& value);
     void                _set_service_perfdata_file_processing_interval(unsigned int value);
     void                _set_service_perfdata_file_template(std::string const& value);
+    void                _set_status_update_interval(unsigned int value);
     void                _set_temp_file(std::string const& value);
     void                _set_temp_path(std::string const& value);
     void                _set_use_aggressive_host_checking(bool value);
@@ -467,7 +466,6 @@ namespace               configuration {
     bool                _soft_state_dependencies;
     std::string         _state_retention_file;
     std::string         _status_file;
-    unsigned int        _status_update_interval;
     set_timeperiod      _timeperiods;
     unsigned int        _time_change_threshold;
     bool                _translate_passive_host_checks;

@@ -9643,16 +9643,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"status_update_interval")){
-
-      status_update_interval=atoi(value);
-      if(status_update_interval<=1){
-        if (asprintf(&error_message,"Illegal value for status_update_interval")) {}
-        error=true;
-        break;
-      }
-    }
-
     else if(!strcmp(variable,"time_change_threshold")){
 
       time_change_threshold=atoi(value);

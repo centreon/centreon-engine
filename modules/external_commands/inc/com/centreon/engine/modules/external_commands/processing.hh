@@ -47,6 +47,7 @@ namespace         modules {
 
       static void _wrapper_read_state_information();
       static void _wrapper_save_state_information();
+      static void _wrapper_save_status_information();
       static void _wrapper_enable_host_svc_checks(host* hst);
       static void _wrapper_disable_host_svc_checks(host* hst);
       static void _wrapper_enable_service_checks(host* hst);

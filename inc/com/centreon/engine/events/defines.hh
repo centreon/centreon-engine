@@ -28,11 +28,10 @@
 #  define EVENT_PROGRAM_RESTART    3   // program restart
 #  define EVENT_CHECK_REAPER       4   // reaps results from host and service checks
 #  define EVENT_RETENTION_SAVE     5   // save (dump) retention data
-#  define EVENT_STATUS_SAVE        6   // save (dump) status data
-#  define EVENT_SFRESHNESS_CHECK   7   // checks service result "freshness"
-#  define EVENT_HOST_CHECK         8   // active host check
-#  define EVENT_HFRESHNESS_CHECK   9   // checks host result "freshness"
-#  define EVENT_RESCHEDULE_CHECKS  10  // adjust scheduling of host and service checks
+#  define EVENT_SFRESHNESS_CHECK   6   // checks service result "freshness"
+#  define EVENT_HOST_CHECK         7   // active host check
+#  define EVENT_HFRESHNESS_CHECK   8   // checks host result "freshness"
+#  define EVENT_RESCHEDULE_CHECKS  9   // adjust scheduling of host and service checks
 #  define EVENT_SLEEP              98  // asynchronous sleep event that occurs when event queues are empty
 #  define EVENT_USER_FUNCTION      99  // USER-defined function (modules)
 

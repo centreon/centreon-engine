@@ -28,6 +28,7 @@
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
+#include "com/centreon/engine/xsddefault.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -53,6 +54,9 @@ processing::processing() {
   _lst_command["READ_STATE_INFORMATION"] =
     command_info(CMD_READ_STATE_INFORMATION,
                  &_redirector<&_wrapper_read_state_information>);
+  _lst_command["SAVE_STATUS_INFORMATION"] =
+    command_info(CMD_SAVE_STATUS_INFORMATION,
+                 &_redirector<&_wrapper_save_status_information>);
   _lst_command["ENABLE_EVENT_HANDLERS"] =
     command_info(CMD_ENABLE_EVENT_HANDLERS,
                  &_redirector<&start_using_event_handlers>);
@@ -385,6 +389,13 @@ void processing::_wrapper_read_state_information() {
 
 void processing::_wrapper_save_state_information() {
   retention::dump::save(config->state_retention_file());
+}
+
+void processing::_wrapper_save_status_information() {
+  if (xsddefault_initialize_status_data() == OK)
+    xsddefault_save_status_data();
+  xsddefault_cleanup_status_data(false);
+  return ;
 }
 
 void processing::_wrapper_disable_host_svc_checks(host* hst) {

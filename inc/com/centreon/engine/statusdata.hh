@@ -28,12 +28,6 @@
 extern "C" {
 #  endif // C++
 
-// initializes status data at program start
-int initialize_status_data();
-// updates all status data
-int update_all_status_data();
- // cleans up status data at program termination
-int cleanup_status_data(int delete_status_data);
 // updates program status data
 int update_program_status();
 // updates host status data

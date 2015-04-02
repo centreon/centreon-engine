@@ -151,21 +151,6 @@ static void _exec_event_retention_save(timed_event* event) {
 }
 
 /**
- *  Execute status save.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_status_save(timed_event* event) {
-  (void)event;
-  logger(dbg_events, basic)
-    << "** Status Data Save Event";
-
-  // save all status data (program, host, and service).
-  update_all_status_data();
-  return;
-}
-
-/**
  *  Execute sfreshness check.
  *
  *  @param[in] event The event to execute.
@@ -571,7 +556,6 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_program_restart,
     &_exec_event_check_reaper,
     &_exec_event_retention_save,
-    &_exec_event_status_save,
     &_exec_event_sfreshness_check,
     &_exec_event_host_check,
     &_exec_event_hfreshness_check,
@@ -840,7 +824,6 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_PROGRAM_RESTART",
     "EVENT_CHECK_REAPER",
     "EVENT_RETENTION_SAVE",
-    "EVENT_STATUS_SAVE",
     "EVENT_SFRESHNESS_CHECK",
     "EVENT_HOST_CHECK",
     "EVENT_HFRESHNESS_CHECK",

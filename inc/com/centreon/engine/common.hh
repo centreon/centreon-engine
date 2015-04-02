@@ -49,6 +49,7 @@
 #  define CMD_PROCESS_SERVICE_CHECK_RESULT                    30
 #  define CMD_SAVE_STATE_INFORMATION                          31
 #  define CMD_READ_STATE_INFORMATION                          32
+#  define CMD_SAVE_STATUS_INFORMATION                         33
 #  define CMD_ENABLE_EVENT_HANDLERS                           41
 #  define CMD_DISABLE_EVENT_HANDLERS                          42
 #  define CMD_ENABLE_HOST_EVENT_HANDLER                       43
