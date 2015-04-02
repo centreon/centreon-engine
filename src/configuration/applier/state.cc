@@ -747,7 +747,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->state_retention_file(new_cfg.state_retention_file());
   config->status_file(new_cfg.status_file());
   config->time_change_threshold(new_cfg.time_change_threshold());
-  config->translate_passive_host_checks(new_cfg.translate_passive_host_checks());
   config->use_setpgid(new_cfg.use_setpgid());
   config->use_syslog(new_cfg.use_syslog());
   config->user(new_cfg.user());

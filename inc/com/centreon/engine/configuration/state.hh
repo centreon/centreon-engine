@@ -252,8 +252,6 @@ namespace               configuration {
                         timeperiods_find(timeperiod::key_type const& k);
     unsigned int        time_change_threshold() const throw ();
     void                time_change_threshold(unsigned int value);
-    bool                translate_passive_host_checks() const throw ();
-    void                translate_passive_host_checks(bool value);
     std::vector<std::string> const&
                         user() const throw ();
     void                user(std::vector<std::string> const& value);
@@ -345,6 +343,7 @@ namespace               configuration {
     void                _set_status_update_interval(unsigned int value);
     void                _set_temp_file(std::string const& value);
     void                _set_temp_path(std::string const& value);
+    void                _set_translate_passive_host_checks(bool value);
     void                _set_use_aggressive_host_checking(bool value);
     void                _set_use_check_result_path(bool value);
     void                _set_use_embedded_perl_implicitly(std::string const& value);
@@ -468,7 +467,6 @@ namespace               configuration {
     std::string         _status_file;
     set_timeperiod      _timeperiods;
     unsigned int        _time_change_threshold;
-    bool                _translate_passive_host_checks;
     std::vector<std::string>
                         _users;
     bool                _use_setpgid;

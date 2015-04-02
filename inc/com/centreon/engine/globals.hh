@@ -144,7 +144,6 @@ extern unsigned int retention_update_interval;
 extern int additional_freshness_latency;
 extern unsigned int obsess_over_services;
 extern unsigned int obsess_over_hosts;
-extern unsigned int translate_passive_host_checks;
 extern unsigned int passive_host_checks_are_soft;
 extern unsigned int service_check_timeout;
 extern unsigned int host_check_timeout;

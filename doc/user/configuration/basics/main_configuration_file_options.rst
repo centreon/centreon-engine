@@ -574,26 +574,6 @@ option is enabled. Default is 180 seconds (3 minutes).
    versions. Enabling the auto-rescheduling option can degrade
    performance - rather than increase it - if used improperly!
 
-.. _main_cfg_opt_translate_passive_host_checks:
-
-Translate Passive Host Checks Option
-------------------------------------
-
-This option determines whether or not Centreon Engine will translate
-DOWN/UNREACHABLE passive host check results to their "correct" state
-from the viewpoint of the local Centreon Engine instance. This can be
-very useful in distributed and failover monitoring installations. More
-information on passive check state translation can be found
-:ref:`here <passive_host_state_translation>`.
-
-  * 0 = Disable check translation (default)
-  * 1 = Enable check translation
-
-=========== ===================================
-**Format**  translate_passive_host_checks=<0/1>
-**Example** translate_passive_host_checks=1
-=========== ===================================
-
 .. _main_cfg_opt_passive_host_checks_are_soft:
 
 Passive Host Checks Are SOFT Option

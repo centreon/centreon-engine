@@ -140,7 +140,6 @@ unsigned int        service_check_timeout(60);
 unsigned int        service_freshness_check_interval(60);
 unsigned int        soft_state_dependencies(false);
 unsigned int        time_change_threshold(900);
-unsigned int        translate_passive_host_checks(false);
 unsigned int        use_syslog(true);
 unsigned long       cached_host_check_horizon(15);
 unsigned long       cached_service_check_horizon(15);

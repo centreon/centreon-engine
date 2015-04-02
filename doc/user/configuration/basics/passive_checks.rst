@@ -131,32 +131,6 @@ where...
    results for hosts that had not been configured before it was last
    (re)started.
 
-Passive Checks and Host States
-==============================
-
-Unlike with active host checks, Centreon Engine does not (by default)
-attempt to determine whether or host is DOWN or UNREACHABLE with passive
-checks. Rather, Centreon Engine takes the passive check result to be the
-actual state the host is in and doesn't try to determine the host's
-actual state using the
-:ref:`reachability logic <status_and_reachability_network>`.
-This can cause problems if you are submitting passive checks from a
-remote host or you have a
-:ref:`distributed monitoring setup <distributed_monitoring>`
-where the parent/child host relationships are different.
-
-You can tell Centreon Engine to translate DOWN/UNREACHABLE passive check
-result states to their "proper" state by using the
-:ref:`translate_passive_host_checks <main_cfg_opt_translate_passive_host_checks>`
-variable. More information on how this works can be found
-:ref:`here <passive_host_state_translation>`.
-
-.. note::
-   Passive host checks are normally treated as
-   :ref:`HARD states <state_types>`, unless the
-   :ref:`passive_host_checks_are_soft <main_cfg_opt_passive_host_checks_are_soft>`
-   option is enabled.
-
 Submitting Passive Check Results From Remote Hosts
 ==================================================
 

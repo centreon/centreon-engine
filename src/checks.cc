@@ -2544,11 +2544,8 @@ int process_host_check_result_3x(
       }
 
       /* make a determination of the host's state */
-      /* translate host state between DOWN/UNREACHABLE (only for passive checks if enabled) */
       hst->current_state = new_state;
-      if (hst->check_type == HOST_CHECK_ACTIVE
-          || config->translate_passive_host_checks() == true)
-        hst->current_state = determine_host_reachability(hst);
+      hst->current_state = determine_host_reachability(hst);
 
       /* reschedule the next check if the host state changed */
       if (hst->last_state != hst->current_state
@@ -2678,11 +2675,8 @@ int process_host_check_result_3x(
           /* set the state */
           hst->current_state = new_state;
 
-          /* translate host state between DOWN/UNREACHABLE for passive checks (if enabled) */
           /* make a determination of the host's state */
-          if (config->translate_passive_host_checks() == true)
-            hst->current_state = determine_host_reachability(hst);
-
+          hst->current_state = determine_host_reachability(hst);
         }
 
         /* propagate checks to immediate children if they are not UNREACHABLE */
@@ -2728,11 +2722,8 @@ int process_host_check_result_3x(
         }
 
         /* make a (in some cases) preliminary determination of the host's state */
-        /* translate host state between DOWN/UNREACHABLE (for passive checks only if enabled) */
         hst->current_state = new_state;
-        if (hst->check_type == HOST_CHECK_ACTIVE
-            || config->translate_passive_host_checks() == true)
-          hst->current_state = determine_host_reachability(hst);
+        hst->current_state = determine_host_reachability(hst);
 
         /* reschedule a check of the host */
         reschedule_check = true;

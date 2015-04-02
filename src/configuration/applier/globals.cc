@@ -89,7 +89,6 @@ void applier::globals::apply(state& config) {
   ::sleep_time = config.sleep_time();
   ::soft_state_dependencies = config.soft_state_dependencies();
   ::time_change_threshold = config.time_change_threshold();
-  ::translate_passive_host_checks = config.translate_passive_host_checks();
   ::use_syslog = config.use_syslog();
 }
 

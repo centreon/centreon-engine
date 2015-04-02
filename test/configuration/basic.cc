@@ -140,7 +140,6 @@ static std::map<std::string, std::string> build_configuration(
   var["additional_freshness_latency"] = obj2str(my_rand());
   var["obsess_over_services"] = obj2str(my_rand(0, 1));
   var["obsess_over_hosts"] = obj2str(my_rand(0, 1));
-  var["translate_passive_host_checks"] = obj2str(my_rand(0, 1));
   var["passive_host_checks_are_soft"] = obj2str(my_rand(0, 1));
   var["service_check_timeout"] = obj2str(my_rand(1));
   var["host_check_timeout"] = obj2str(my_rand(1));
@@ -269,9 +268,6 @@ void test_configuration(
   }
   if (my_conf["obsess_over_hosts"] != obj2str(config->obsess_over_hosts())) {
     throw (engine_error() << "obsess_over_hosts: init with '" << my_conf["obsess_over_hosts"] << "'");
-  }
-  if (my_conf["translate_passive_host_checks"] != obj2str(config->translate_passive_host_checks())) {
-    throw (engine_error() << "translate_passive_host_checks: init with '" << my_conf["translate_passive_host_checks"] << "'");
   }
   if (my_conf["passive_host_checks_are_soft"] != obj2str(config->passive_host_checks_are_soft())) {
     throw (engine_error() << "passive_host_checks_are_soft: init with '" << my_conf["passive_host_checks_are_soft"] << "'");

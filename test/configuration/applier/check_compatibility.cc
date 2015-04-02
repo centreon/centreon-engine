@@ -126,7 +126,6 @@ struct                global {
   float               sleep_time;
   bool                soft_state_dependencies;
   unsigned int        time_change_threshold;
-  bool                translate_passive_host_checks;
   bool                use_syslog;
   std::string         use_timezone;
 };
@@ -298,7 +297,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(sleep_time);
   check_value(soft_state_dependencies);
   check_value(time_change_threshold);
-  check_value(translate_passive_host_checks);
   check_value(use_syslog);
   check_value(use_timezone);
 
@@ -443,7 +441,6 @@ static global get_globals() {
   g.sleep_time = sleep_time;
   g.soft_state_dependencies = soft_state_dependencies;
   g.time_change_threshold = time_change_threshold;
-  g.translate_passive_host_checks = translate_passive_host_checks;
   g.use_syslog = use_syslog;
   g.use_timezone = to_str(use_timezone);
   return (g);

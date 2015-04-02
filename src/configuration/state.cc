@@ -102,7 +102,6 @@ state::setters const state::_setters[] = {
   { "status_file",                                 SETTER(std::string const&, status_file) },
   { "time_change_threshold",                       SETTER(unsigned int, time_change_threshold) },
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
-  { "translate_passive_host_checks",               SETTER(bool, translate_passive_host_checks) },
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
   { "use_syslog",                                  SETTER(bool, use_syslog) },
   { "use_timezone",                                SETTER(std::string const&, use_timezone) },
@@ -172,6 +171,7 @@ state::setters const state::_setters[] = {
   { "status_update_interval",                      SETTER(unsigned int, _set_status_update_interval) },
   { "temp_file",                                   SETTER(std::string const&, _set_temp_file) },
   { "temp_path",                                   SETTER(std::string const&, _set_temp_path) },
+  { "translate_passive_host_checks",               SETTER(bool, _set_translate_passive_host_checks) },
   { "use_aggressive_host_checking",                SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_agressive_host_checking",                 SETTER(bool, _set_use_aggressive_host_checking) },
   { "use_check_result_path",                       SETTER(bool, _set_use_check_result_path) },
@@ -245,7 +245,6 @@ static bool const                      default_soft_state_dependencies(false);
 static std::string const               default_state_retention_file(DEFAULT_RETENTION_FILE);
 static std::string const               default_status_file(DEFAULT_STATUS_FILE);
 static unsigned int const              default_time_change_threshold(900);
-static bool const                      default_translate_passive_host_checks(false);
 static bool const                      default_use_setpgid(true);
 static bool const                      default_use_syslog(true);
 static std::string const               default_use_timezone("");
@@ -337,7 +336,6 @@ state::state()
     _state_retention_file(default_state_retention_file),
     _status_file(default_status_file),
     _time_change_threshold(default_time_change_threshold),
-    _translate_passive_host_checks(default_translate_passive_host_checks),
     _use_setpgid(default_use_setpgid),
     _use_syslog(default_use_syslog),
     _use_timezone(default_use_timezone) {
@@ -436,7 +434,6 @@ state& state::operator=(state const& right) {
     _status_file = right._status_file;
     _timeperiods = right._timeperiods;
     _time_change_threshold = right._time_change_threshold;
-    _translate_passive_host_checks = right._translate_passive_host_checks;
     _users = right._users;
     _use_setpgid = right._use_setpgid;
     _use_syslog = right._use_syslog;
@@ -522,7 +519,6 @@ bool state::operator==(state const& right) const throw () {
           && _status_file == right._status_file
           && cmp_set_ptr(_timeperiods, right._timeperiods)
           && _time_change_threshold == right._time_change_threshold
-          && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
           && _use_setpgid == right._use_setpgid
           && _use_syslog == right._use_syslog
@@ -2275,24 +2271,6 @@ void state::time_change_threshold(unsigned int value) {
 }
 
 /**
- *  Get translate_passive_host_checks value.
- *
- *  @return The translate_passive_host_checks value.
- */
-bool state::translate_passive_host_checks() const throw () {
-  return (_translate_passive_host_checks);
-}
-
-/**
- *  Set translate_passive_host_checks value.
- *
- *  @param[in] value The new translate_passive_host_checks value.
- */
-void state::translate_passive_host_checks(bool value) {
-  _translate_passive_host_checks = value;
-}
-
-/**
  *  Get user resources.
  *
  *  @return The users resources list.
@@ -3345,6 +3323,19 @@ void state::_set_temp_path(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: temp_path variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_translate_passive_host_checks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: translate_passive_host_checks variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
