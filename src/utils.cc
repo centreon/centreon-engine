@@ -368,7 +368,6 @@ int free_check_result(check_result* info) {
 
   delete[] info->host_name;
   delete[] info->service_description;
-  delete[] info->output_file;
   delete[] info->output;
 
   return (OK);

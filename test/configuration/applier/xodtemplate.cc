@@ -372,7 +372,6 @@ int xodtemplate_grab_config_info(char const* main_config_file) {
   char* var = NULL;
   char* val = NULL;
   mmapfile* thefile = NULL;
-  nagios_macros* mac;
 
   /* open the main config file for reading */
   if ((thefile = mmap_fopen(main_config_file)) == NULL)
@@ -403,8 +402,6 @@ int xodtemplate_grab_config_info(char const* main_config_file) {
 
   /* close the file */
   mmap_fclose(thefile);
-
-  mac = get_global_macros();
 
   return (OK);
 }
@@ -9171,8 +9168,6 @@ int read_main_config_file(char const* main_config_file) {
   int command_check_interval_is_seconds=false;
   char *modptr=NULL;
   char *argptr=NULL;
-  DIR *tmpdir=NULL;
-
 
   /* open the config file for reading */
   if((thefile=mmap_fopen(main_config_file))==NULL){

@@ -382,6 +382,7 @@ int process_passive_service_check(
   gettimeofday(&tv, NULL);
 
   check_result result;
+  memset(&result, 0, sizeof(result));
   result.object_check_type = SERVICE_CHECK;
   result.host_name = string::dup(real_host_name);
   result.service_description = string::dup(svc_description);
@@ -389,9 +390,6 @@ int process_passive_service_check(
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
   result.reschedule_check = false;
-  result.output_file = NULL;
-  result.output_file_fp = NULL;
-  result.output_file_fd = -1;
   result.latency = (double)((double)(tv.tv_sec - check_time)
 			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
   result.start_time.tv_sec = check_time;
@@ -493,6 +491,7 @@ int process_passive_host_check(
   gettimeofday(&tv, NULL);
 
   check_result result;
+  memset(&result, 0, sizeof(result));
   result.object_check_type = HOST_CHECK;
   result.host_name = string::dup(real_host_name);
   result.service_description = NULL;
@@ -500,9 +499,6 @@ int process_passive_host_check(
   result.check_options = CHECK_OPTION_NONE;
   result.scheduled_check = false;
   result.reschedule_check = false;
-  result.output_file = NULL;
-  result.output_file_fp = NULL;
-  result.output_file_fd = -1;
   result.latency = (double)((double)(tv.tv_sec - check_time)
 			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
   result.start_time.tv_sec = check_time;

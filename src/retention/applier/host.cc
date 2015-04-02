@@ -41,15 +41,16 @@ void applier::host::apply(
        configuration::state const& config,
        list_host const& lst,
        bool scheduling_info_is_ok) {
+  (void)config;
   for (list_host::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
     try {
       host_struct& hst(find_host((*it)->host_name()));
-      _update(config, **it, hst, scheduling_info_is_ok);
+      _update(**it, hst, scheduling_info_is_ok);
     }
     catch (...) {
-      // ignore exception for the retention.
+      // Ignore exceptions from the retention.
     }
   }
 }
@@ -57,20 +58,17 @@ void applier::host::apply(
 /**
  *  Update internal host base on host retention.
  *
- *  @param[in]      config                The global configuration.
  *  @param[in]      state                 The host retention state.
  *  @param[in, out] obj                   The host to update.
  *  @param[in]      scheduling_info_is_ok True if the retention is
  *                                        not outdated.
  */
 void applier::host::_update(
-       configuration::state const& config,
-       retention::host const& state,
-       host_struct& obj,
-       bool scheduling_info_is_ok) {
+                      retention::host const& state,
+                      host_struct& obj,
+                      bool scheduling_info_is_ok) {
   if (state.modified_attributes().is_set())
     obj.modified_attributes = *state.modified_attributes();
-
   if (state.has_been_checked().is_set())
     obj.has_been_checked = *state.has_been_checked();
   if (state.check_execution_time().is_set())

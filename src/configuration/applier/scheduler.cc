@@ -467,7 +467,7 @@ void applier::scheduler::_calculate_host_scheduling_params(
     scheduling_info.host_check_spread = 0.0;
   else
     scheduling_info.host_check_spread
-      = host_check_spread * config.interval_length();
+      = static_cast<int>(host_check_spread * config.interval_length());
   _calculate_host_inter_check_delay();
 
   return ;
@@ -606,7 +606,8 @@ void applier::scheduler::_calculate_service_scheduling_params(
     scheduling_info.service_check_spread = 0.0;
   else
     scheduling_info.service_check_spread
-      = service_check_spread * config.interval_length();
+      = static_cast<int>(service_check_spread
+                         * config.interval_length());
   _calculate_service_inter_check_delay();
   _calculate_service_interleave_factor();
 

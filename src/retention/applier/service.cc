@@ -38,9 +38,10 @@ using namespace com::centreon::engine::retention;
  *                                   outdated.
  */
 void applier::service::apply(
-       configuration::state const& config,
-       list_service const& lst,
-       bool scheduling_info_is_ok) {
+                         configuration::state const& config,
+                         list_service const& lst,
+                         bool scheduling_info_is_ok) {
+  (void)config;
   for (list_service::const_iterator it(lst.begin()), end(lst.end());
        it != end;
        ++it) {
@@ -48,10 +49,10 @@ void applier::service::apply(
       service_struct& svc(find_service(
                             (*it)->host_name(),
                             (*it)->service_description()));
-      _update(config, **it, svc, scheduling_info_is_ok);
+      _update(**it, svc, scheduling_info_is_ok);
     }
     catch (...) {
-      // ignore exception for the retention.
+      // Ignore exceptions from the retention.
     }
   }
 }
@@ -59,20 +60,17 @@ void applier::service::apply(
 /**
  *  Update internal service base on service retention.
  *
- *  @param[in]      config                The global configuration.
  *  @param[in]      state                 The service retention state.
  *  @param[in, out] obj                   The service to update.
  *  @param[in]      scheduling_info_is_ok True if the retention is
  *                                        not outdated.
  */
 void applier::service::_update(
-       configuration::state const& config,
        retention::service const& state,
        service_struct& obj,
        bool scheduling_info_is_ok) {
   if (state.modified_attributes().is_set())
     obj.modified_attributes = *state.modified_attributes();
-
   if (state.has_been_checked().is_set())
     obj.has_been_checked = *state.has_been_checked();
   if (state.check_execution_time().is_set())

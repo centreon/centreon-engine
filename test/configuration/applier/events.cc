@@ -224,9 +224,10 @@ void init_timing_loop() {
   if ((service_check_spread > 0.0)
       && (service_check_spread < 366.0 * 24 * 60 * 60))
     scheduling_info.service_check_spread
-      = service_check_spread * config->interval_length();
+      = static_cast<int>(service_check_spread
+                         * config->interval_length());
   else
-    service_check_spread = 0.0;
+    scheduling_info.service_check_spread = 0;
 
   /* be smart and calculate the best delay to use to minimize local load... */
   if (scheduling_info.total_scheduled_services > 0) {
@@ -440,9 +441,9 @@ void init_timing_loop() {
   if ((host_check_spread > 0.0)
       && (host_check_spread < 366.0 * 24 * 60 * 60))
     scheduling_info.host_check_spread
-      = host_check_spread * config->interval_length();
+      = static_cast<int>(host_check_spread * config->interval_length());
   else
-    scheduling_info.host_check_spread = 0.0;
+    scheduling_info.host_check_spread = 0;
 
   /* be smart and calculate the best delay to use to minimize local load... */
   if (scheduling_info.total_scheduled_hosts > 0) {

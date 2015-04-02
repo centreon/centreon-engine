@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -44,7 +44,6 @@ namespace   retention {
 
     private:
       void  _update(
-              configuration::state const& config,
               retention::service const& state,
               service_struct& obj,
               bool scheduling_info_is_ok);

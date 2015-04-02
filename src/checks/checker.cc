@@ -364,6 +364,7 @@ void checker::run(
 
   // Init check result info.
   check_result check_result_info;
+  memset(&check_result_info, 0, sizeof(check_result_info));
   check_result_info.object_check_type = HOST_CHECK;
   check_result_info.check_type = HOST_CHECK_ACTIVE;
   check_result_info.check_options = check_options;
@@ -375,9 +376,6 @@ void checker::run(
   check_result_info.exited_ok = true;
   check_result_info.return_code = STATE_OK;
   check_result_info.output = NULL;
-  check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = NULL;
-  check_result_info.output_file = NULL;
   check_result_info.host_name = string::dup(hst->name);
   check_result_info.service_description = NULL;
   check_result_info.latency = latency;
@@ -602,6 +600,7 @@ void checker::run(
 
   // Init check result info.
   check_result check_result_info;
+  memset(&check_result_info, 0, sizeof(check_result_info));
   check_result_info.object_check_type = SERVICE_CHECK;
   check_result_info.check_type = SERVICE_CHECK_ACTIVE;
   check_result_info.check_options = check_options;
@@ -613,9 +612,6 @@ void checker::run(
   check_result_info.exited_ok = true;
   check_result_info.return_code = STATE_OK;
   check_result_info.output = NULL;
-  check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = NULL;
-  check_result_info.output_file = NULL;
   check_result_info.host_name = string::dup(svc->host_name);
   check_result_info.service_description = string::dup(svc->description);
   check_result_info.latency = latency;
@@ -934,6 +930,7 @@ void checker::finished(commands::result const& res) throw () {
 
   // Find check result.
   check_result result;
+  memset(&result, 0, sizeof(result));
 
   // Update check result.
   result.finish_time.tv_sec = res.end_time.to_seconds();

@@ -36,6 +36,8 @@ using namespace com::centreon::engine::retention;
 void applier::program::apply(
        configuration::state& config,
        retention::program const& obj) {
+  (void)config;
+
   // XXX: don't use globals, replace it by config!
 
   if (obj.modified_host_attributes().is_set())

@@ -411,8 +411,6 @@ int xrddefault_read_state_information() {
   mmapfile* thefile;
   char* host_name = NULL;
   char* service_description = NULL;
-  char* author = NULL;
-  char* comment_data = NULL;
   unsigned int data_type = XRDDEFAULT_NO_DATA;
   unsigned int x = 0;
   host* temp_host = NULL;
@@ -425,18 +423,8 @@ int xrddefault_read_state_information() {
   char* val = NULL;
   char* tempval = NULL;
   char* ch = NULL;
-  int persistent = FALSE;
-  int expires = FALSE;
-  time_t expire_time = 0L;
-  time_t entry_time = 0L;
-  time_t creation_time;
   time_t current_time;
   int scheduling_info_is_ok = FALSE;
-  time_t start_time = 0L;
-  time_t end_time = 0L;
-  int fixed = FALSE;
-  unsigned long triggered_by = 0;
-  unsigned long duration = 0L;
   int was_flapping = FALSE;
   struct timeval tv[2];
   double runtime[2];
@@ -590,7 +578,6 @@ int xrddefault_read_state_information() {
       switch (data_type) {
       case XRDDEFAULT_INFO_DATA:
         if (!strcmp(var, "created")) {
-          creation_time = strtoul(val, NULL, 10);
           time(&current_time);
           scheduling_info_is_ok = TRUE;
         }

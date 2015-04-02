@@ -385,6 +385,7 @@ int grab_standard_hostgroup_macro_r(
   unsigned int temp_len = 0;
   unsigned int init_len = 0;
 
+  (void)mac;
   if (temp_hostgroup == NULL || output == NULL)
     return (ERROR);
 
@@ -464,6 +465,7 @@ int grab_standard_servicegroup_macro_r(
   unsigned int temp_len = 0;
   unsigned int init_len = 0;
 
+  (void)mac;
   if (temp_servicegroup == NULL || output == NULL)
     return (ERROR);
 

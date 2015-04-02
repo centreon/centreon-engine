@@ -34,9 +34,9 @@ using namespace com::centreon::engine::retention;
  *  @param[in]      state  The retention informations.
  */
 void applier::state::apply(
-       configuration::state& config,
-       retention::state const& state) {
-  // send data to event broker.
+                       configuration::state& config,
+                       retention::state const& state) {
+  // Send data to event broker.
   broker_retention_data(
     NEBTYPE_RETENTIONDATA_STARTLOAD,
     NEBFLAG_NONE,
@@ -44,8 +44,6 @@ void applier::state::apply(
     NULL);
 
   try {
-    time_t current_time(time(NULL));
-
     applier::program app_program;
     app_program.apply(config, state.globals());
 
@@ -56,19 +54,21 @@ void applier::state::apply(
     app_services.apply(config, state.services(), true);
   }
   catch (...) {
-    // send data to event broker.
+    // Send data to event broker.
     broker_retention_data(
       NEBTYPE_RETENTIONDATA_ENDLOAD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       NULL);
-    throw;
+    throw ;
   }
 
-  // send data to event broker.
+  // Send data to event broker.
   broker_retention_data(
     NEBTYPE_RETENTIONDATA_ENDLOAD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
     NULL);
+
+  return ;
 }
