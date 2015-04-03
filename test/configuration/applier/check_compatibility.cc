@@ -72,9 +72,6 @@ struct                global {
                       save_timeperiods;
 
   int                 additional_freshness_latency;
-  bool                auto_reschedule_checks;
-  unsigned int        auto_rescheduling_interval;
-  unsigned int        auto_rescheduling_window;
   unsigned long       cached_host_check_horizon;
   unsigned long       cached_service_check_horizon;
   bool                check_host_freshness;
@@ -243,9 +240,6 @@ bool chkdiff(global& g1, global& g2) {
   bool ret(true);
 
   check_value(additional_freshness_latency);
-  check_value(auto_reschedule_checks);
-  check_value(auto_rescheduling_interval);
-  check_value(auto_rescheduling_window);
   check_value(cached_host_check_horizon);
   check_value(cached_service_check_horizon);
   check_value(check_host_freshness);
@@ -387,9 +381,6 @@ static global get_globals() {
   app_state.timeperiods().clear();
 
   g.additional_freshness_latency = additional_freshness_latency;
-  g.auto_reschedule_checks = auto_reschedule_checks;
-  g.auto_rescheduling_interval = auto_rescheduling_interval;
-  g.auto_rescheduling_window = auto_rescheduling_window;
   g.cached_host_check_horizon = cached_host_check_horizon;
   g.cached_service_check_horizon = cached_service_check_horizon;
   g.check_host_freshness = check_host_freshness;

@@ -69,12 +69,6 @@ namespace               configuration {
     bool                operator!=(state const& right) const throw ();
     int                 additional_freshness_latency() const throw ();
     void                additional_freshness_latency(int value);
-    bool                auto_reschedule_checks() const throw ();
-    void                auto_reschedule_checks(bool value);
-    unsigned int        auto_rescheduling_interval() const throw ();
-    void                auto_rescheduling_interval(unsigned int value);
-    unsigned int        auto_rescheduling_window() const throw ();
-    void                auto_rescheduling_window(unsigned int value);
     std::list<std::string> const&
                         broker_module() const throw ();
     void                broker_module(std::list<std::string> const& value);
@@ -277,6 +271,9 @@ namespace               configuration {
     void                _set_aggregate_status_updates(std::string const& value);
     void                _set_allow_empty_hostgroup_assignment(bool value);
     void                _set_auth_file(std::string const& value);
+    void                _set_auto_reschedule_checks(bool value);
+    void                _set_auto_rescheduling_interval(unsigned int value);
+    void                _set_auto_rescheduling_window(unsigned int value);
     void                _set_bare_update_check(std::string const& value);
     void                _set_broker_module(std::string const& value);
     void                _set_cfg_dir(std::string const& value);
@@ -387,9 +384,6 @@ namespace               configuration {
     };
 
     int                 _additional_freshness_latency;
-    bool                _auto_reschedule_checks;
-    unsigned int        _auto_rescheduling_interval;
-    unsigned int        _auto_rescheduling_window;
     std::list<std::string>
                         _broker_module;
     std::string         _broker_module_directory;

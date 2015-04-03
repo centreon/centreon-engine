@@ -21,6 +21,7 @@
 */
 
 #include <cmath>
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/events/sched_info.hh"
 #include "com/centreon/engine/globals.hh"
@@ -61,7 +62,8 @@ void adjust_check_scheduling() {
   // determine our adjustment window.
   time_t current_time(time(NULL));
   time_t first_window_time(current_time);
-  time_t last_window_time(first_window_time + config->auto_rescheduling_window());
+  time_t last_window_time(first_window_time
+                          + configuration::applier::scheduler::auto_rescheduling_interval);
 
   // get current scheduling data.
   for (timed_event* tmp(event_list_low); tmp; tmp = tmp->next) {
@@ -123,16 +125,18 @@ void adjust_check_scheduling() {
   if (total_checks == 0 || adjust_scheduling == false)
     return;
 
-  if ((unsigned long)total_check_exec_time > config->auto_rescheduling_window()) {
+  if ((unsigned long)total_check_exec_time
+      > configuration::applier::scheduler::auto_rescheduling_interval) {
     inter_check_delay = 0.0;
     exec_time_factor
-      = (double)((double)config->auto_rescheduling_window()
-                 / total_check_exec_time);
+      = configuration::applier::scheduler::auto_rescheduling_interval
+        / static_cast<double>(total_check_exec_time);
   }
   else {
     inter_check_delay
-      = (double)((((double)config->auto_rescheduling_window())
-                  - total_check_exec_time) / (double)(total_checks * 1.0));
+      = (configuration::applier::scheduler::auto_rescheduling_interval
+         - total_check_exec_time)
+        / static_cast<double>(total_checks * 1.0);
     exec_time_factor = 1.0;
   }
 

@@ -9601,36 +9601,6 @@ int read_main_config_file(char const* main_config_file) {
         break;
       }
     }
-    else if(!strcmp(variable,"auto_reschedule_checks")){
-
-      if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-        if (asprintf(&error_message,"Illegal value for auto_reschedule_checks")) {}
-        error=true;
-        break;
-      }
-
-      auto_reschedule_checks=(atoi(value)>0)?true:false;
-    }
-
-    else if(!strcmp(variable,"auto_rescheduling_interval")){
-
-      auto_rescheduling_interval=atoi(value);
-      if(auto_rescheduling_interval<=0){
-        if (asprintf(&error_message,"Illegal value for auto_rescheduling_interval")) {}
-        error=true;
-        break;
-      }
-    }
-
-    else if(!strcmp(variable,"auto_rescheduling_window")){
-
-      auto_rescheduling_window=atoi(value);
-      if(auto_rescheduling_window<=0){
-        if (asprintf(&error_message,"Illegal value for auto_rescheduling_window")) {}
-        error=true;
-        break;
-      }
-    }
 
     else if(!strcmp(variable,"time_change_threshold")){
 

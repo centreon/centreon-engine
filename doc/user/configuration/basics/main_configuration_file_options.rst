@@ -515,65 +515,6 @@ check, how often to re-notify a contact, etc.
    minute). I have not really tested other values for this variable, so
    proceed at your own risk if you decide to do so!
 
-.. _main_cfg_opt_auto_rescheduling:
-
-Auto-Rescheduling Option
-------------------------
-
-This option determines whether or not Centreon Engine will attempt to
-automatically reschedule active host and service checks to "smooth" them
-out over time. This can help to balance the load on the monitoring
-server, as it will attempt to keep the time between consecutive checks
-consistent, at the expense of executing checks on a more rigid schedule.
-
-=========== ============================
-**Format**  auto_reschedule_checks=<0/1>
-**Example** auto_reschedule_checks=1
-=========== ============================
-
-.. note::
-   This is an experimental feature and may be removed in future
-   versions. Enabling this option can degrade performance - rather than
-   increase it - if used improperly!
-
-Auto-Rescheduling Interval
---------------------------
-
-This option determines how often (in seconds) Centreon Engine will
-attempt to automatically reschedule checks. This option only has an
-effect if the :ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
-option is enabled. Default is 30 seconds.
-
-=========== ====================================
-**Format**  auto_rescheduling_interval=<seconds>
-**Example** auto_rescheduling_interval=30
-=========== ====================================
-
-.. note::
-   This is an experimental feature and may be removed in future
-   versions. Enabling the auto-rescheduling option can degrade
-   performance - rather than increase it - if used improperly!
-
-Auto-Rescheduling Window
-------------------------
-
-This option determines the "window" of time (in seconds) that Centreon
-Engine will look at when automatically rescheduling checks. Only host
-and service checks that occur in the next X seconds (determined by this
-variable) will be rescheduled. This option only has an effect if the
-:ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
-option is enabled. Default is 180 seconds (3 minutes).
-
-=========== ==================================
-**Format**  auto_rescheduling_window=<seconds>
-**Example** auto_rescheduling_window=180
-=========== ==================================
-
-.. note::
-   This is an experimental feature and may be removed in future
-   versions. Enabling the auto-rescheduling option can degrade
-   performance - rather than increase it - if used improperly!
-
 .. _main_cfg_opt_passive_host_checks_are_soft:
 
 Passive Host Checks Are SOFT Option

@@ -163,9 +163,6 @@ static std::map<std::string, std::string> build_configuration(
   var["check_host_freshness"] = obj2str(my_rand(0, 1));
   var["service_freshness_check_interval"] = obj2str(my_rand(1));
   var["host_freshness_check_interval"] = obj2str(my_rand(1));
-  var["auto_reschedule_checks"] = obj2str(my_rand(0, 1));
-  var["auto_rescheduling_interval"] = obj2str(my_rand(1));
-  var["auto_rescheduling_window"] = obj2str(my_rand(1));
   var["time_change_threshold"] = obj2str(my_rand(6));
   var["enable_flap_detection"] = obj2str(my_rand(0, 1));
   var["low_service_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
@@ -337,15 +334,6 @@ void test_configuration(
   }
   if (my_conf["host_freshness_check_interval"] != obj2str(config->host_freshness_check_interval())) {
     throw (engine_error() << "host_freshness_check_interval: init with '" << my_conf["host_freshness_check_interval"] << "'");
-  }
-  if (my_conf["auto_reschedule_checks"] != obj2str(config->auto_reschedule_checks())) {
-    throw (engine_error() << "auto_reschedule_checks: init with '" << my_conf["auto_reschedule_checks"] << "'");
-  }
-  if (my_conf["auto_rescheduling_interval"] != obj2str(config->auto_rescheduling_interval())) {
-    throw (engine_error() << "auto_rescheduling_interval: init with '" << my_conf["auto_rescheduling_interval"] << "'");
-  }
-  if (my_conf["auto_rescheduling_window"] != obj2str(config->auto_rescheduling_window())) {
-    throw (engine_error() << "auto_rescheduling_window: init with '" << my_conf["auto_rescheduling_window"] << "'");
   }
   if (my_conf["time_change_threshold"] != obj2str(config->time_change_threshold())) {
     throw (engine_error() << "time_change_threshold: init with '" << my_conf["time_change_threshold"] << "'");

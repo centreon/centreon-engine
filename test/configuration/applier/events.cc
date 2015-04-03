@@ -21,6 +21,7 @@
 #include <sys/time.h>
 #include <cfloat>
 #include <cmath>
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -586,18 +587,18 @@ void init_timing_loop() {
   /******** SCHEDULE MISC EVENTS ********/
 
   /* add a host and service check rescheduling event */
-  if (config->auto_reschedule_checks() == true)
-    schedule_new_event(
-      EVENT_RESCHEDULE_CHECKS,
-      true,
-      current_time + config->auto_rescheduling_interval(),
-      true,
-      config->auto_rescheduling_interval(),
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
+  schedule_new_event(
+    EVENT_RESCHEDULE_CHECKS,
+    true,
+    current_time
+    + configuration::applier::scheduler::auto_rescheduling_interval,
+    true,
+    configuration::applier::scheduler::auto_rescheduling_interval,
+    NULL,
+    true,
+    NULL,
+    NULL,
+    0);
 
   /* add a check result reaper event */
   schedule_new_event(

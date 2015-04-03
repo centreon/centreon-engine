@@ -43,6 +43,8 @@ namespace                 configuration {
      */
     class                 scheduler {
     public:
+      static int const    auto_rescheduling_interval = 5 * 60;
+
       void                apply(
                             state& config,
                             difference<set_host> const& diff_hosts,
@@ -96,7 +98,6 @@ namespace                 configuration {
       timed_event_struct* _evt_retention_save;
       timed_event_struct* _evt_sfreshness_check;
       timed_event_struct* _evt_status_save;
-      unsigned int        _old_auto_rescheduling_interval;
       unsigned int        _old_check_reaper_interval;
       int                 _old_command_check_interval;
       unsigned int        _old_host_freshness_check_interval;

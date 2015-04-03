@@ -36,9 +36,9 @@ using namespace com::centreon::engine::logging;
 
 state::setters const state::_setters[] = {
   { "additional_freshness_latency",                SETTER(int, additional_freshness_latency) },
-  { "auto_reschedule_checks",                      SETTER(bool, auto_reschedule_checks) },
-  { "auto_rescheduling_interval",                  SETTER(unsigned int, auto_rescheduling_interval) },
-  { "auto_rescheduling_window",                    SETTER(unsigned int, auto_rescheduling_window) },
+  { "auto_reschedule_checks",                      SETTER(bool, _set_auto_reschedule_checks) },
+  { "auto_rescheduling_interval",                  SETTER(unsigned int, _set_auto_rescheduling_interval) },
+  { "auto_rescheduling_window",                    SETTER(unsigned int, _set_auto_rescheduling_window) },
   { "broker_module_directory",                     SETTER(std::string const&, broker_module_directory) },
   { "broker_module",                               SETTER(std::string const&, _set_broker_module) },
   { "cached_host_check_horizon",                   SETTER(unsigned long, cached_host_check_horizon) },
@@ -187,9 +187,6 @@ state::setters const state::_setters[] = {
 
 // Default values.
 static int const                       default_additional_freshness_latency(15);
-static bool const                      default_auto_reschedule_checks(false);
-static unsigned int const              default_auto_rescheduling_interval(30);
-static unsigned int const              default_auto_rescheduling_window(180);
 static std::string const               default_broker_module_directory("");
 static unsigned long const             default_cached_host_check_horizon(15);
 static unsigned long const             default_cached_service_check_horizon(15);
@@ -278,9 +275,6 @@ static bool cmp_set_ptr(
  */
 state::state()
   : _additional_freshness_latency(default_additional_freshness_latency),
-    _auto_reschedule_checks(default_auto_reschedule_checks),
-    _auto_rescheduling_interval(default_auto_rescheduling_interval),
-    _auto_rescheduling_window(default_auto_rescheduling_window),
     _cached_host_check_horizon(default_cached_host_check_horizon),
     _cached_service_check_horizon(default_cached_service_check_horizon),
     _check_host_freshness(default_check_host_freshness),
@@ -366,9 +360,6 @@ state::~state() throw () {}
 state& state::operator=(state const& right) {
   if (this != &right) {
     _additional_freshness_latency = right._additional_freshness_latency;
-    _auto_reschedule_checks = right._auto_reschedule_checks;
-    _auto_rescheduling_interval = right._auto_rescheduling_interval;
-    _auto_rescheduling_window = right._auto_rescheduling_window;
     _broker_module_directory = right._broker_module_directory;
     _cached_host_check_horizon = right._cached_host_check_horizon;
     _cached_service_check_horizon = right._cached_service_check_horizon;
@@ -451,9 +442,6 @@ state& state::operator=(state const& right) {
  */
 bool state::operator==(state const& right) const throw () {
   return (_additional_freshness_latency == right._additional_freshness_latency
-          && _auto_reschedule_checks == right._auto_reschedule_checks
-          && _auto_rescheduling_interval == right._auto_rescheduling_interval
-          && _auto_rescheduling_window == right._auto_rescheduling_window
           && _broker_module_directory == right._broker_module_directory
           && _cached_host_check_horizon == right._cached_host_check_horizon
           && _cached_service_check_horizon == right._cached_service_check_horizon
@@ -555,67 +543,9 @@ void state::additional_freshness_latency(int value) {
 }
 
 /**
- *  Get auto_reschedule_checks value.
- *
- *  @return The auto_reschedule_checks value.
- */
-bool state::auto_reschedule_checks() const throw () {
-  return (_auto_reschedule_checks);
-}
-
-/**
- *  Set auto_reschedule_checks value.
- *
- *  @param[in] value The new auto_reschedule_checks value.
- */
-void state::auto_reschedule_checks(bool value) {
-  _auto_reschedule_checks = value;
-}
-
-/**
- *  Get auto_rescheduling_interval value.
- *
- *  @return The auto_rescheduling_interval value.
- */
-unsigned int state::auto_rescheduling_interval() const throw () {
-  return (_auto_rescheduling_interval);
-}
-
-/**
- *  Set auto_rescheduling_interval value.
- *
- *  @param[in] value The new auto_rescheduling_interval value.
- */
-void state::auto_rescheduling_interval(unsigned int value) {
-  if (!value)
-    throw (engine_error() << "auto_rescheduling_interval cannot be 0");
-  _auto_rescheduling_interval = value;
-}
-
-/**
- *  Get auto_rescheduling_window value.
- *
- *  @return The auto_rescheduling_window value.
- */
-unsigned int state::auto_rescheduling_window() const throw () {
-  return (_auto_rescheduling_window);
-}
-
-/**
- *  Set auto_rescheduling_window value.
- *
- *  @param[in] value The new auto_rescheduling_window value.
- */
-void state::auto_rescheduling_window(unsigned int value) {
-  if (!value)
-    throw (engine_error() << "auto_rescheduling_window cannot be 0");
-  _auto_rescheduling_window = value;
-}
-
-/**
  *  Get broker_module value.
  *
- *  @return The auto_rescheduling_window value.
+ *  @return The list of broker modules.
  */
 std::list<std::string> const& state::broker_module() const throw () {
   return (_broker_module);
@@ -2466,6 +2396,45 @@ void state::_set_auth_file(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: auth_file variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_auto_reschedule_checks(bool value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: auto_reschedule_checks variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_auto_rescheduling_interval(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: auto_rescheduling_interval variable ignored";
+  ++config_warnings;
+  return ;
+}
+
+/**
+ *  Deprecated variable.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_auto_rescheduling_window(unsigned int value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: auto_rescheduling_window variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

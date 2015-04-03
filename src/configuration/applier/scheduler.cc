@@ -235,7 +235,6 @@ applier::scheduler::scheduler()
     _evt_retention_save(NULL),
     _evt_sfreshness_check(NULL),
     _evt_status_save(NULL),
-    _old_auto_rescheduling_interval(0),
     _old_check_reaper_interval(0),
     _old_command_check_interval(0),
     _old_host_freshness_check_interval(0),
@@ -299,20 +298,13 @@ void applier::scheduler::_apply_misc_event() {
       = config->host_freshness_check_interval();
   }
 
-  // Remove and add a host and service check rescheduling event.
-  if ((!_evt_reschedule_checks && config->auto_reschedule_checks())
-      || (_evt_reschedule_checks && !config->auto_reschedule_checks())
-      || (_old_auto_rescheduling_interval
-          != ::config->auto_rescheduling_interval())) {
-    _remove_misc_event(_evt_reschedule_checks);
-    if (config->auto_reschedule_checks())
-      _evt_reschedule_checks
-        = _create_misc_event(
-            EVENT_RESCHEDULE_CHECKS,
-            now + config->auto_rescheduling_interval(),
-            config->auto_rescheduling_interval());
-    _old_auto_rescheduling_interval
-      = config->auto_rescheduling_interval();
+  // Add a host and service check rescheduling event if necessary.
+  if (!_evt_reschedule_checks) {
+    _evt_reschedule_checks
+      = _create_misc_event(
+          EVENT_RESCHEDULE_CHECKS,
+          now + auto_rescheduling_interval,
+          auto_rescheduling_interval);
   }
 
   // Remove and add a retention data save event if needed.

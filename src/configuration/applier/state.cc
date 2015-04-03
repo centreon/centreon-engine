@@ -689,9 +689,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
 
   // Set new values.
   config->additional_freshness_latency(new_cfg.additional_freshness_latency());
-  config->auto_reschedule_checks(new_cfg.auto_reschedule_checks());
-  config->auto_rescheduling_interval(new_cfg.auto_rescheduling_interval());
-  config->auto_rescheduling_window(new_cfg.auto_rescheduling_window());
   config->cached_host_check_horizon(new_cfg.cached_host_check_horizon());
   config->cached_service_check_horizon(new_cfg.cached_service_check_horizon());
   config->cfg_main(new_cfg.cfg_main());

@@ -44,9 +44,6 @@ void applier::globals::apply(state& config) {
   _set_global(::use_timezone, config.use_timezone());
 
   ::additional_freshness_latency = config.additional_freshness_latency();
-  ::auto_reschedule_checks = config.auto_reschedule_checks();
-  ::auto_rescheduling_interval = config.auto_rescheduling_interval();
-  ::auto_rescheduling_window = config.auto_rescheduling_window();
   ::cached_host_check_horizon = config.cached_host_check_horizon();
   ::cached_service_check_horizon = config.cached_service_check_horizon();
   ::check_host_freshness = config.check_host_freshness();
