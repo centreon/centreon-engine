@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -32,14 +32,12 @@ add_library(
 
   # Sources.
   "${SRC_DIR}/commands.cc"
-  "${SRC_DIR}/compatibility.cc"
   "${SRC_DIR}/main.cc"
   "${SRC_DIR}/processing.cc"
   "${SRC_DIR}/utils.cc"
 
   # Headers.
   "${INC_DIR}/commands.hh"
-  "${INC_DIR}/compatibility.hh"
   "${INC_DIR}/circular_buffer.hh"
   "${INC_DIR}/processing.hh"
   "${INC_DIR}/utils.hh"

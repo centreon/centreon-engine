@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2011 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2011      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -162,60 +162,6 @@ void strip(char* buffer) {
     buffer[len - x] = '\x0';
   }
   return;
-}
-
-/**************************************************
- *************** HASH FUNCTIONS *******************
- **************************************************/
-
-/* dual hash function */
-int hashfunc(char const* name1, char const* name2, int hashslots) {
-  unsigned int result(0);
-
-  if (name1)
-    for (unsigned int i(0), end(strlen(name1)); i < end; ++i)
-      result += name1[i];
-
-  if (name2)
-    for (unsigned int i(0), end(strlen(name2)); i < end; ++i)
-      result += name2[i];
-
-  return (result % hashslots);
-}
-
-/* dual hash data comparison */
-int compare_hashdata(
-      char const* val1a,
-      char const* val1b,
-      char const* val2a,
-      char const* val2b) {
-  int result = 0;
-
-  /* NOTE: If hash calculation changes, update the compare_strings() function! */
-
-  /* check first name */
-  if (val1a == NULL && val2a == NULL)
-    result = 0;
-  else if (val1a == NULL)
-    result = 1;
-  else if (val2a == NULL)
-    result = -1;
-  else
-    result = strcmp(val1a, val2a);
-
-  /* check second name if necessary */
-  if (result == 0) {
-    if (val1b == NULL && val2b == NULL)
-      result = 0;
-    else if (val1b == NULL)
-      result = 1;
-    else if (val2b == NULL)
-      result = -1;
-    else
-      result = strcmp(val1b, val2b);
-  }
-
-  return (result);
 }
 
 /* get days, hours, minutes, and seconds from a raw time_t format or total seconds */

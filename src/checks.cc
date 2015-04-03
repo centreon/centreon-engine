@@ -126,11 +126,6 @@ int run_scheduled_service_check(
         svc->check_period_ptr,
         svc->timezone);
 
-      // logit(NSLOG_RUNTIME_WARNING,true,"Warning: Service '%s' on host '%s' timeperiod check failed...\n",svc->description,svc->host_name);
-      // logit(NSLOG_RUNTIME_WARNING,true,"Current time: %s",ctime(&current_time));
-      // logit(NSLOG_RUNTIME_WARNING,true,"Preferred time: %s",ctime(&preferred_time));
-      // logit(NSLOG_RUNTIME_WARNING,true,"Next valid time: %s",ctime(&next_valid_time));
-
       // The service could not be rescheduled properly
       // so set the next check time for next week.
       if (time_is_valid == false

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -64,121 +64,6 @@ static struct {
   { NSLOG_SERVICE_WARNING,  "WARNING"  },
   { NSLOG_SERVICE_CRITICAL, "CRITICAL" }
 };
-
-/**
- *  The main logging function.
- *  This function has been DEPRECATED.
- *
- *  @param[in] type    Logging types.
- *  @param[in] display Unused.
- *  @param[in] fmt     A format who described the output.
- *  @param[in] ...     Describe the variable argument list here.
- */
-void logit(int type, int display, char const* fmt, ...) {
-  (void)display;
-
-  char buffer[BUFFER_SIZE];
-  va_list ap;
-
-  va_start(ap, fmt);
-  if (vsnprintf(buffer, sizeof(buffer), fmt, ap) > 0) {
-    logger(type, basic) << buffer;
-  }
-  va_end(ap);
-  return;
-}
-
-/**
- *  The main debug logging function.
- *  This function has been DEPRECATED.
- *
- *  @param[in] type      Logging types.
- *  @param[in] verbosity Verbosity level.
- *  @param[in] fmt       A format who described the output.
- *  @param[in] ...       Describe the variable argument list here.
- *
- *  @return Return true.
- */
-int log_debug_info(
-      int type,
-      unsigned int verbosity,
-      char const* fmt,
-      ...) {
-  char buffer[BUFFER_SIZE];
-  va_list ap;
-
-  va_start(ap, fmt);
-  if (vsnprintf(buffer, sizeof(buffer), fmt, ap) > 0) {
-    timeval now;
-    if (gettimeofday(&now, NULL) == -1) {
-      now.tv_sec = 0;
-      now.tv_usec = 0;
-    }
-
-    if (verbosity > most) {
-      verbosity = most;
-    }
-
-    logger(static_cast<unsigned long long>(type) << 32, verbosity)
-      << "[" << now.tv_sec << "." << now.tv_usec << "] "
-      << "[" << type << "." << verbosity << "] "
-      << "[pid=" << getpid() << "] " << buffer;
-  }
-  va_end(ap);
-  return (OK);
-}
-
-/**
- *  Write message into all type of logging objects.
- *  This function has been DEPRECATED.
- *
- *  @param[in] buffer    The message to log.
- *  @param[in] type      Logging types.
- *
- *  @return Return true.
- */
-int write_to_all_logs(char const* buffer, unsigned long type) {
-  if (buffer != NULL) {
-    logger(type, basic) << buffer;
-  }
-  return (OK);
-}
-
-/**
- *  Write message into all type of logging objects.
- *  This function has been DEPRECATED.
- *
- *  @param[in] buffer    The message to log.
- *  @param[in] type      Logging types.
- *  @param[in] timestamp Unused.
- *
- *  @return Return true.
- */
-int write_to_log(
-      char const* buffer,
-      unsigned long type,
-      time_t* timestamp) {
-  (void)timestamp;
-
-  if (buffer)
-    logger(type, basic) << buffer;
-  return (OK);
-}
-
-/**
- *  Write message into all type of logging objects.
- *  This function has been DEPRECATED.
- *
- *  @param[in] buffer    The message to log.
- *  @param[in] type      Logging types.
- *
- *  @return Return true.
- */
-int write_to_syslog(char const* buffer, unsigned long type) {
-  if (buffer)
-    logger(type, basic) << buffer;
-  return (OK);
-}
 
 /**
  *  Log service event information.
@@ -315,41 +200,5 @@ int log_service_states(unsigned int type, time_t* timestamp) {
       << svc->description << ";" << state << ";" << state_type
       << ";" << svc->current_attempt << ";" << output;
   }
-  return (OK);
-}
-
-/**
- *  Write the log version into log objects.
- *  This function has been DEPRECATED.
- *
- *  @param[in] timestamp Unused.
- *
- *  @return Return true on success.
- */
-int write_log_file_info(time_t* timestamp) {
-  (void)timestamp;
-
-  logger(log_process_info, basic)
-    <<  "LOG VERSION: " << LOG_VERSION_2;
-  return (OK);
-}
-
-/**
- *  Do nothing.
- *  This function has been DEPRECATED.
- *
- *  @return Return true on success.
- */
-int open_debug_log() {
-  return (OK);
-}
-
-/**
- *  Do nothing.
- *  This function has been DEPRECATED.
- *
- *  @return Return true on success.
- */
-int close_debug_log() {
   return (OK);
 }

@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2011 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2011      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -34,17 +34,6 @@ extern "C" {
 char* my_strtok(char const* buffer, char const* tokens);
 char* my_strsep(char** stringp, char const* delim);
 void strip(char* buffer);
-int hashfunc(char const* name1, char const* name2, int hashslots);
-int compare_hashdata(
-      char const* val1a,
-      char const* val1b,
-      char const* val2a,
-      const char* val2b);
-void get_datetime_string(
-       time_t const* raw_time,
-       char* buffer,
-       int buffer_length,
-       int type);
 void get_time_breakdown(
        unsigned long raw_time,
        int* days,

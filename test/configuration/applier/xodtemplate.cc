@@ -9171,7 +9171,9 @@ int read_main_config_file(char const* main_config_file) {
 
   /* open the config file for reading */
   if((thefile=mmap_fopen(main_config_file))==NULL){
-    logit(NSLOG_CONFIG_ERROR,true,"Error: Cannot open main configuration file '%s' for reading!",main_config_file);
+    logger(log_config_error, basic)
+      << "Error: Cannot open main configuration file '"
+      << main_config_file << "' for reading!";
     return ERROR;
   }
 
@@ -9710,7 +9712,7 @@ int read_main_config_file(char const* main_config_file) {
 
   /* adjust timezone values */
   if(use_timezone!=NULL)
-    set_environment_var("TZ",use_timezone,1);
+    setenv("TZ",use_timezone,1);
   tzset();
 
   /* adjust command check interval */
@@ -9719,7 +9721,9 @@ int read_main_config_file(char const* main_config_file) {
 
   /* handle errors */
   if(error==true){
-    logit(NSLOG_CONFIG_ERROR,true,"Error in configuration file '%s' - Line %d (%s)",main_config_file,current_line,(error_message==NULL)?"NULL":error_message);
+    logger(log_config_error, basic) << "Error in configuration file '"
+      << main_config_file << "' - Line " << current_line << " ("
+      << (error_message ? error_message : "NULL") << ")";
     return ERROR;
   }
 

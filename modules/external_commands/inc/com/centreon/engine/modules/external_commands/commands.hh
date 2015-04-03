@@ -22,7 +22,6 @@
 #  define CCE_MOD_EXTCMD_COMMANDS_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/modules/external_commands/compatibility.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
