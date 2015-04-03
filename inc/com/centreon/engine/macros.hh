@@ -44,11 +44,6 @@ int grab_custom_macro_value(
       char const* arg1,
       char const* arg2,
       char** output);
-int grab_datetime_macro(
-      int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output);
 int grab_standard_hostgroup_macro(
       int macro_type,
       hostgroup* temp_hostgroup,

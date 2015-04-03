@@ -101,7 +101,6 @@ static std::map<std::string, std::string> build_configuration(
                                             std::string const& resource) {
   std::map<std::string, std::string> var;
 
-  std::string date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
   std::string check_delay[] = { "n", "d", "s", "" };
 
   int cmd_check_interval = my_rand(-1, 10000);
@@ -169,7 +168,6 @@ static std::map<std::string, std::string> build_configuration(
   var["high_service_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
   var["low_host_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
   var["high_host_flap_threshold"] = obj2str(my_rand(0.1f, 99.0f));
-  var["date_format"] = date_format[my_rand(0, 3)];
   var["use_timezone"] = "US/Mountain";
   var["event_broker_options"] = obj2str(my_rand(1));
   var["illegal_object_name_chars"] = "`~!$%^&*|'\"<>?,()";
@@ -212,12 +210,8 @@ void test_configuration(
        std::map<std::string, std::string>& my_conf) {
   config->parse(filename);
 
-  std::string date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
   std::string check_delay[] = { "n", "d", "s", "" };
 
-  if (my_conf["date_format"] != date_format[config->date_format()]) {
-    throw (engine_error() << "date_format: init with '" << my_conf["date_format"] << "'");
-  }
   if (my_conf["debug_level"] != obj2str(config->debug_level())) {
     throw (engine_error() << "debug_level: init with '" << my_conf["debug_level"] << "'");
   }

@@ -697,7 +697,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->check_service_freshness(new_cfg.check_service_freshness());
   config->command_check_interval(new_cfg.command_check_interval(),
                                  new_cfg.command_check_interval_is_seconds());
-  config->date_format(new_cfg.date_format());
   config->debug_file(new_cfg.debug_file());
   config->debug_level(new_cfg.debug_level());
   config->debug_verbosity(new_cfg.debug_verbosity());

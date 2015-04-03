@@ -50,17 +50,6 @@ namespace               configuration {
    */
   class                 state {
   public:
-    /**
-     *  @enum state::date_format
-     *  Date format types
-     */
-    enum                date_type {
-      us = 0,           // U.S. (MM-DD-YYYY HH:MM:SS)
-      euro,             // European (DD-MM-YYYY HH:MM:SS)
-      iso8601,          // ISO8601 (YYYY-MM-DD HH:MM:SS)
-      strict_iso8601    // ISO8601 (YYYY-MM-DDTHH:MM:SS)
-    };
-
                         state();
                         state(state const& right);
                         ~state() throw ();
@@ -109,8 +98,6 @@ namespace               configuration {
                         connectors_find(connector::key_type const& k) const;
     set_connector::iterator
                         connectors_find(connector::key_type const& k);
-    date_type           date_format() const throw ();
-    void                date_format(date_type value);
     std::string const&  debug_file() const throw ();
     void                debug_file(std::string const& value);
     unsigned long       debug_level() const throw ();
@@ -402,7 +389,6 @@ namespace               configuration {
     bool                _command_check_interval_is_seconds;
     std::string         _command_file;
     set_connector       _connectors;
-    date_type           _date_format;
     std::string         _debug_file;
     unsigned long       _debug_level;
     unsigned int        _debug_verbosity;

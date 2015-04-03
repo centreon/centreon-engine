@@ -237,10 +237,6 @@ Date/Time Macros
 ========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 Macro Name                Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
 ========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`LONGDATETIME`_           **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SHORTDATETIME`_          **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`DATE`_                   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TIME`_                   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TIMET`_                  **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `ISVALIDTIME`_ :sup:`9`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `NEXTVALIDTIME`_ :sup:`9` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -572,11 +568,6 @@ Date/Time Macros
 ----------------
 
 ========================= ===============================================================================================================================
-_`LONGDATETIME`           Current date/time stamp (i.e. Fri Oct 13 00:30:28 CDT 2000). Format of date is determined by
-                          :ref:`date_format <main_cfg_opt_date_format>` directive.
-_`SHORTDATETIME`          Current date/time stamp (i.e. 10-13-2000 00:30:28). Format of date is determined by
-                          :ref:`date_format <main_cfg_opt_date_format>` directive.
-_`DATE`                   Date stamp (i.e. 10-13-2000). Format of date is determined by :ref:`date_format <main_cfg_opt_date_format>` directive.
 _`TIME`                   Current time stamp (i.e. 00:30:28).
 _`TIMET`                  Current time stamp in time_t format (seconds since the UNIX epoch).
 _`ISVALIDTIME` :sup:`9`   This is a special on-demand macro that returns a 1 or 0 depending on whether or not a particular time is valid within a

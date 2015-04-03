@@ -1053,30 +1053,6 @@ freshness checking can be found
 **Example** additional_freshness_latency=15
 =========== ================================
 
-.. _main_cfg_opt_date_format:
-
-Date Format
------------
-
-This option allows you to specify what kind of date/time format Centreon
-Engine should use in the web interface and date/time
-:ref:`macros <understanding_macros>`. Possible options
-(along with example output) include:
-
-============== =================== ===================
-Option         Output Format       Sample Output
-============== =================== ===================
-us             MM/DD/YYYY HH:MM:SS 06/30/2002 03:15:00
-euro           DD/MM/YYYY HH:MM:SS 30/06/2002 03:15:00
-iso8601        YYYY-MM-DD HH:MM:SS 2002-06-30 03:15:00
-strict-iso8601 YYYY-MM-DDTHH:MM:SS 2002-06-30T03:15:00
-============== =================== ===================
-
-=========== ====================
-**Format**  date_format=<option>
-**Example** date_format=us
-=========== ====================
-
 Timezone Option
 ---------------
 

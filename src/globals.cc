@@ -110,7 +110,6 @@ unsigned int        check_reaper_interval(10);
 unsigned int        check_service_freshness(true);
 unsigned int        currently_running_host_checks(0);
 unsigned int        currently_running_service_checks(0);
-unsigned int        date_format(DATE_FORMAT_US);
 unsigned int        debug_level(0);
 unsigned int        debug_verbosity(1);
 unsigned int        enable_event_handlers(true);

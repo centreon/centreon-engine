@@ -50,7 +50,6 @@ state::setters const state::_setters[] = {
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
   { "command_check_interval",                      SETTER(std::string const&, _set_command_check_interval) },
   { "command_file",                                SETTER(std::string const&, command_file) },
-  { "date_format",                                 SETTER(std::string const&, _set_date_format) },
   { "debug_file",                                  SETTER(std::string const&, debug_file) },
   { "debug_level",                                 SETTER(unsigned long, debug_level) },
   { "debug_verbosity",                             SETTER(unsigned int, debug_verbosity) },
@@ -121,6 +120,7 @@ state::setters const state::_setters[] = {
   { "child_processes_fork_twice",                  SETTER(std::string const&, _set_child_processes_fork_twice) },
   { "comment_file",                                SETTER(std::string const&, _set_comment_file) },
   { "daemon_dumps_core",                           SETTER(std::string const&, _set_daemon_dumps_core) },
+  { "date_format",                                 SETTER(std::string const&, _set_date_format) },
   { "downtime_file",                               SETTER(std::string const&, _set_downtime_file) },
   { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
   { "enable_environment_macros",                   SETTER(bool, _set_enable_environment_macros) },
@@ -195,7 +195,6 @@ static unsigned int const              default_check_reaper_interval(10);
 static bool const                      default_check_service_freshness(true);
 static int const                       default_command_check_interval(-1);
 static std::string const               default_command_file(DEFAULT_COMMAND_FILE);
-static state::date_type const          default_date_format(state::us);
 static std::string const               default_debug_file(DEFAULT_DEBUG_FILE);
 static unsigned long const             default_debug_level(0);
 static unsigned int const              default_debug_verbosity(1);
@@ -283,7 +282,6 @@ state::state()
     _command_check_interval(default_command_check_interval),
     _command_check_interval_is_seconds(false),
     _command_file(default_command_file),
-    _date_format(default_date_format),
     _debug_file(default_debug_file),
     _debug_level(default_debug_level),
     _debug_verbosity(default_debug_verbosity),
@@ -371,7 +369,6 @@ state& state::operator=(state const& right) {
     _command_check_interval_is_seconds = right._command_check_interval_is_seconds;
     _command_file = right._command_file;
     _connectors = right._connectors;
-    _date_format = right._date_format;
     _debug_file = right._debug_file;
     _debug_level = right._debug_level;
     _debug_verbosity = right._debug_verbosity;
@@ -453,7 +450,6 @@ bool state::operator==(state const& right) const throw () {
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
           && cmp_set_ptr(_connectors, right._connectors)
-          && _date_format == right._date_format
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
           && _debug_verbosity == right._debug_verbosity
@@ -901,24 +897,6 @@ set_connector::iterator state::connectors_find(
            && ((*--it)->connector_name() == k))
     return (it);
   return (_connectors.end());
-}
-
-/**
- *  Get date_format value.
- *
- *  @return The date_format value.
- */
-state::date_type state::date_format() const throw () {
-  return (_date_format);
-}
-
-/**
- *  Set date_format value.
- *
- *  @param[in] value The new date_format value.
- */
-void state::date_format(date_type value) {
-  _date_format = value;
 }
 
 /**
@@ -2606,19 +2584,16 @@ void state::_set_daemon_dumps_core(std::string const& value) {
 }
 
 /**
- *  Set date format.
+ *  Deprecated variable.
  *
- *  @param[in] value The new date format.
+ *  @param[in] value  Unused.
  */
 void state::_set_date_format(std::string const& value) {
-  if (value == "euro")
-    _date_format = euro;
-  else if (value == "iso8601")
-    _date_format = iso8601;
-  else if (value == "strict-iso8601")
-    _date_format = strict_iso8601;
-  else
-    _date_format = us;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: date_format variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

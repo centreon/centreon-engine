@@ -79,7 +79,6 @@ struct                global {
   bool                check_service_freshness;
   int                 command_check_interval;
   std::string         command_file;
-  int                 date_format;
   std::string         debug_file;
   // unsigned long       debug_level;
   unsigned int        debug_verbosity;
@@ -247,7 +246,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(check_service_freshness);
   check_value(command_check_interval);
   check_value(command_file);
-  check_value(date_format);
   check_value(debug_file);
   // check_value(debug_level);
   check_value(debug_verbosity);
@@ -388,7 +386,6 @@ static global get_globals() {
   g.check_service_freshness = check_service_freshness;
   g.command_check_interval = command_check_interval;
   g.command_file = to_str(command_file);
-  g.date_format = date_format;
   g.debug_file = to_str(debug_file);
   // g.debug_level = debug_level;
   g.debug_verbosity = debug_verbosity;

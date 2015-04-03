@@ -9656,18 +9656,6 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"date_format")){
-
-      if(!strcmp(value,"euro"))
-        date_format=DATE_FORMAT_EURO;
-      else if(!strcmp(value,"iso8601"))
-        date_format=DATE_FORMAT_ISO8601;
-      else if(!strcmp(value,"strict-iso8601"))
-        date_format=DATE_FORMAT_STRICT_ISO8601;
-      else
-        date_format=DATE_FORMAT_US;
-    }
-
     else if(!strcmp(variable,"use_timezone")){
       delete[] use_timezone;
       use_timezone=(char *)string::dup(value);

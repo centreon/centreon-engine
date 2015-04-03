@@ -666,10 +666,6 @@ struct grab_value_redirection {
 
     // Date/Time macros.
     static unsigned int const datetime_ids[] = {
-      MACRO_LONGDATETIME,
-      MACRO_SHORTDATETIME,
-      MACRO_DATE,
-      MACRO_TIME,
       MACRO_TIMET,
       MACRO_ISVALIDTIME,
       MACRO_NEXTVALIDTIME

@@ -174,7 +174,6 @@ extern float low_service_flap_threshold;
 extern float high_service_flap_threshold;
 extern float low_host_flap_threshold;
 extern float high_host_flap_threshold;
-extern unsigned int date_format;
 extern char* use_timezone;
 extern unsigned long event_broker_options;
 extern char* illegal_object_chars;

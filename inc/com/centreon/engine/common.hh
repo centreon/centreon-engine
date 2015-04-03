@@ -166,12 +166,6 @@
 #  define SHORT_TIME      3
 #  define HTTP_DATE_TIME  4 /* Time formatted for use in HTTP headers. */
 
-/* Date formats. */
-#  define DATE_FORMAT_US             0 /* U.S. (MM-DD-YYYY HH:MM:SS) */
-#  define DATE_FORMAT_EURO           1 /* European (DD-MM-YYYY HH:MM:SS) */
-#  define DATE_FORMAT_ISO8601        2 /* ISO8601 (YYYY-MM-DD HH:MM:SS) */
-#  define DATE_FORMAT_STRICT_ISO8601 3 /* ISO8601 (YYYY-MM-DDTHH:MM:SS) */
-
 /* Misc definitions. */
 #  define MAX_FILENAME_LENGTH          256 /* Max length of path/filename that Engine will process. */
 #  define MAX_INPUT_BUFFER            1024 /* Size in bytes of max. input buffer (for reading files, misc stuff). */

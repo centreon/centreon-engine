@@ -290,46 +290,6 @@ int grab_datetime_macro_r(
   ** a heavy API refactoring for what I believe to be very little gain.
   */
   switch (macro_type) {
-  case MACRO_LONGDATETIME:
-    if (*output == NULL)
-      *output = new char[MAX_DATETIME_LENGTH];
-    get_datetime_string(
-      &current_time,
-      *output,
-      MAX_DATETIME_LENGTH,
-      LONG_DATE_TIME);
-    break;
-
-  case MACRO_SHORTDATETIME:
-    if (*output == NULL)
-      *output = new char[MAX_DATETIME_LENGTH];
-    get_datetime_string(
-      &current_time,
-      *output,
-      MAX_DATETIME_LENGTH,
-      SHORT_DATE_TIME);
-    break;
-
-  case MACRO_DATE:
-    if (*output == NULL)
-      *output = new char[MAX_DATETIME_LENGTH];
-    get_datetime_string(
-      &current_time,
-      *output,
-      MAX_DATETIME_LENGTH,
-      SHORT_DATE);
-    break;
-
-  case MACRO_TIME:
-    if (*output == NULL)
-      *output = new char[MAX_DATETIME_LENGTH];
-    get_datetime_string(
-      &current_time,
-      *output,
-      MAX_DATETIME_LENGTH,
-      SHORT_TIME);
-    break;
-
   case MACRO_TIMET:
     string::setstr(*output, current_time);
     break;
@@ -359,19 +319,6 @@ int grab_datetime_macro_r(
     return (ERROR);
   }
   return (OK);
-}
-
-int grab_datetime_macro(
-      int macro_type,
-      char const* arg1,
-      char const* arg2,
-      char** output) {
-  return (grab_datetime_macro_r(
-            get_global_macros(),
-            macro_type,
-            arg1,
-            arg2,
-            output));
 }
 
 /* computes a hostgroup macro */
@@ -712,10 +659,6 @@ int init_macrox_names() {
   add_macrox_name(SERVICESTATEID);
   add_macrox_name(SERVICEATTEMPT);
   add_macrox_name(SERVICEISVOLATILE);
-  add_macrox_name(LONGDATETIME);
-  add_macrox_name(SHORTDATETIME);
-  add_macrox_name(DATE);
-  add_macrox_name(TIME);
   add_macrox_name(TIMET);
   add_macrox_name(LASTHOSTCHECK);
   add_macrox_name(LASTSERVICECHECK);
