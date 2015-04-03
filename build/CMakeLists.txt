@@ -602,10 +602,6 @@ else ()
   set(LIBRARY_TYPE STATIC)
 endif ()
 
-# Configure files.
-configure_file("${INC_DIR}/compatibility/common.h.in"
-  "${INC_DIR}/compatibility/common.h")
-
 # Locations definitions
 add_definitions(-DDEFAULT_STATUS_FILE="${VAR_DIR}/status.dat")
 add_definitions(-DDEFAULT_LOG_FILE="${VAR_DIR}/centengine.log")

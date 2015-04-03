@@ -31,15 +31,12 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/common.cc"
   "${SRC_DIR}/find.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/mmap.cc"
-  "${SRC_DIR}/sighandlers.cc"
 
   # Headers.
   "${INC_DIR}/broker.h"
-  "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"
   "${INC_DIR}/find.hh"
   "${INC_DIR}/locations.h"
@@ -55,7 +52,6 @@ set(
   "${INC_DIR}/netutils.h"
   "${INC_DIR}/objects.h"
   "${INC_DIR}/shared.h"
-  "${INC_DIR}/sighandlers.h"
   "${INC_DIR}/sretention.h"
   "${INC_DIR}/statusdata.h"
   "${INC_DIR}/xcddefault.h"

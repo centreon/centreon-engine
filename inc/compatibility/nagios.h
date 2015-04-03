@@ -38,7 +38,6 @@
 #  include "nebcallbacks.h"
 #  include "nebstructs.h"
 #  include "objects.h"
-#  include "sighandlers.h"
 
 // Misc.
 #  define MAX_PLUGIN_OUTPUT_LENGTH -1 // Plugin output length is not caped.
