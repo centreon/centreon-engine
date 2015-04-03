@@ -36,40 +36,7 @@
 extern "C" {
 #  endif // C++
 
-int grab_hostgroup_macros(hostgroup* hg);
-int grab_servicegroup_macros(servicegroup* sg);
-
-int grab_custom_macro_value(
-      char* macro_name,
-      char const* arg1,
-      char const* arg2,
-      char** output);
-int grab_standard_hostgroup_macro(
-      int macro_type,
-      hostgroup* temp_hostgroup,
-      char** output);
-int grab_standard_service_macro(
-      int macro_type,
-      service* temp_service,
-      char** output,
-      int* free_macro);
-int grab_standard_servicegroup_macro(
-      int macro_type,
-      servicegroup* temp_servicegroup,
-      char** output);
-int grab_custom_object_macro(
-      char* macro_name,
-      customvariablesmember* vars,
-      char** output);
-
-// Thread-safe version of the above.
-int grab_hostgroup_macros_r(
-      nagios_macros* mac,
-      hostgroup* hg);
-int grab_servicegroup_macros_r(
-      nagios_macros* mac,
-      servicegroup* sg);
-
+// Macro generation functions.
 int grab_custom_macro_value_r(
       nagios_macros* mac,
       char* macro_name,
@@ -110,12 +77,7 @@ int free_macrox_names();
 
 void copy_constant_macros(char** dest);
 
-/* clear macros */
-int clear_argv_macros();
-int clear_volatile_macros();
-int clear_summary_macros();
-
-/* thread-safe version of the above */
+// Clear macros.
 int clear_argv_macros_r(nagios_macros* mac);
 int clear_volatile_macros_r(nagios_macros* mac);
 int clear_summary_macros_r(nagios_macros* mac);

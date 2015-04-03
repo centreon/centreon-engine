@@ -33,44 +33,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /******************************************************************/
-/********************** MACRO GRAB FUNCTIONS **********************/
-/******************************************************************/
-
-/* grab hostgroup macros */
-int grab_hostgroup_macros_r(nagios_macros* mac, hostgroup* hg) {
-  /* clear hostgroup macros */
-  clear_hostgroup_macros_r(mac);
-
-  /* save the hostgroup pointer for later */
-  mac->hostgroup_ptr = hg;
-
-  if (hg == NULL)
-    return (ERROR);
-  return (OK);
-}
-
-int grab_hostgroup_macros(hostgroup* hg) {
-  return (grab_hostgroup_macros_r(get_global_macros(), hg));
-}
-
-/* grab macros that are specific to a particular servicegroup */
-int grab_servicegroup_macros_r(nagios_macros* mac, servicegroup* sg) {
-  /* clear servicegroup macros */
-  clear_servicegroup_macros_r(mac);
-
-  /* save the pointer for later */
-  mac->servicegroup_ptr = sg;
-
-  if (sg == NULL)
-    return (ERROR);
-  return (OK);
-}
-
-int grab_servicegroup_macros(servicegroup* sg) {
-  return (grab_servicegroup_macros_r(get_global_macros(), sg));
-}
-
-/******************************************************************/
 /******************* MACRO GENERATION FUNCTIONS *******************/
 /******************************************************************/
 
@@ -232,19 +194,6 @@ int grab_custom_macro_value_r(
   return (result);
 }
 
-int grab_custom_macro_value(
-      char* macro_name,
-      char const* arg1,
-      char const* arg2,
-      char** output) {
-  return (grab_custom_macro_value_r(
-            get_global_macros(),
-            macro_name,
-            arg1,
-            arg2,
-            output));
-}
-
 /* calculates a date/time macro */
 int grab_datetime_macro_r(
       nagios_macros* mac,
@@ -390,17 +339,6 @@ int grab_standard_hostgroup_macro_r(
   return (OK);
 }
 
-int grab_standard_hostgroup_macro(
-      int macro_type,
-      hostgroup* temp_hostgroup,
-      char** output) {
-  return (grab_standard_hostgroup_macro_r(
-            get_global_macros(),
-            macro_type,
-            temp_hostgroup,
-            output));
-}
-
 /* computes a servicegroup macro */
 int grab_standard_servicegroup_macro_r(
       nagios_macros* mac,
@@ -487,17 +425,6 @@ int grab_standard_servicegroup_macro_r(
   return (OK);
 }
 
-int grab_standard_servicegroup_macro(
-      int macro_type,
-      servicegroup* temp_servicegroup,
-      char** output) {
-  return (grab_standard_servicegroup_macro_r(
-            get_global_macros(),
-            macro_type,
-            temp_servicegroup,
-            output));
-}
-
 /* computes a custom object macro */
 int grab_custom_object_macro_r(
       nagios_macros* mac,
@@ -528,17 +455,6 @@ int grab_custom_object_macro_r(
     }
   }
   return (result);
-}
-
-int grab_custom_object_macro(
-      char* macro_name,
-      customvariablesmember* vars,
-      char** output) {
-  return (grab_custom_object_macro_r(
-            get_global_macros(),
-            macro_name,
-            vars,
-            output));
 }
 
 /******************************************************************/
@@ -781,10 +697,6 @@ int clear_argv_macros_r(nagios_macros* mac) {
   return (OK);
 }
 
-int clear_argv_macros() {
-  return (clear_argv_macros_r(get_global_macros()));
-}
-
 /*
  * copies non-volatile macros from global macro_x to **dest, which
  * must be large enough to hold at least MACRO_X_COUNT entries.
@@ -869,10 +781,6 @@ int clear_volatile_macros_r(nagios_macros* mac) {
   return (OK);
 }
 
-int clear_volatile_macros() {
-  return (clear_volatile_macros_r(get_global_macros()));
-}
-
 /* clear summary macros */
 int clear_summary_macros_r(nagios_macros* mac) {
   unsigned int x;
@@ -885,8 +793,4 @@ int clear_summary_macros_r(nagios_macros* mac) {
   }
 
   return (OK);
-}
-
-int clear_summary_macros() {
-  return (clear_summary_macros_r(get_global_macros()));
 }
