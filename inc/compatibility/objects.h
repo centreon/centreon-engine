@@ -38,7 +38,6 @@
 #  include "com/centreon/engine/objects/timeperiod.hh"
 #  include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #  include "com/centreon/engine/objects/timerange.hh"
-#  include "common.h"
 #  include "config.h"
 #  include "find.hh"
 

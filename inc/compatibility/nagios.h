@@ -30,7 +30,6 @@
 #  include "com/centreon/engine/flapping.hh"
 #  include "com/centreon/engine/sehandlers.hh"
 #  include "com/centreon/engine/utils.hh"
-#  include "common.h"
 #  include "config.h"
 #  include "locations.h"
 #  include "logging.h"

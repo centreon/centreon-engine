@@ -42,6 +42,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "mmap.h"
 #include "nagios.h"
 #include "skiplist.h"
 #include "xodtemplate.hh"
