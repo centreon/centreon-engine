@@ -51,18 +51,18 @@ static struct {
   unsigned long id;
   char const* str;
 } tab_host_states[] = {
-  { NSLOG_HOST_UP,          "UP"          },
-  { NSLOG_HOST_DOWN,        "DOWN"        },
-  { NSLOG_HOST_UNREACHABLE, "UNREACHABLE" }
+  { log_host_up,          "UP"          },
+  { log_host_down,        "DOWN"        },
+  { log_host_unreachable, "UNREACHABLE" }
 };
 
 static struct {
   unsigned long id;
   char const* str;
 } tab_service_states[] = {
-  { NSLOG_SERVICE_OK,       "OK"       },
-  { NSLOG_SERVICE_WARNING,  "WARNING"  },
-  { NSLOG_SERVICE_CRITICAL, "CRITICAL" }
+  { log_service_ok,       "OK"       },
+  { log_service_warning,  "WARNING"  },
+  { log_service_critical, "CRITICAL" }
 };
 
 /**
@@ -81,7 +81,7 @@ int log_service_event(service const* svc) {
   if (!svc->host_ptr || !svc->host_name || !svc->description)
     return (ERROR);
 
-  unsigned long log_options(NSLOG_SERVICE_UNKNOWN);
+  unsigned long log_options(log_service_unknown);
   char const* state("UNKNOWN");
   if (svc->current_state >= 0
       && (unsigned int)svc->current_state
@@ -111,7 +111,7 @@ int log_host_event(host const* hst) {
   if (!hst || !hst->name)
     return (ERROR);
 
-  unsigned long log_options(NSLOG_HOST_UP);
+  unsigned long log_options(log_host_up);
   char const* state("UP");
   if (hst->current_state > 0
       && (unsigned int)hst->current_state

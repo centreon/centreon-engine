@@ -29,55 +29,6 @@
 #  define INITIAL_STATES             1
 #  define CURRENT_STATES             2
 
-// Logging Types
-#  define NSLOG_RUNTIME_ERROR        1
-#  define NSLOG_RUNTIME_WARNING      2
-
-#  define NSLOG_VERIFICATION_ERROR   4
-#  define NSLOG_VERIFICATION_WARNING 8
-
-#  define NSLOG_CONFIG_ERROR         16
-#  define NSLOG_CONFIG_WARNING       32
-
-#  define NSLOG_PROCESS_INFO         64
-#  define NSLOG_EVENT_HANDLER        128
-#  define NSLOG_EXTERNAL_COMMAND     512
-
-#  define NSLOG_HOST_UP              1024
-#  define NSLOG_HOST_DOWN            2048
-#  define NSLOG_HOST_UNREACHABLE     4096
-
-#  define NSLOG_SERVICE_OK           8192
-#  define NSLOG_SERVICE_UNKNOWN      16384
-#  define NSLOG_SERVICE_WARNING      32768
-#  define NSLOG_SERVICE_CRITICAL     65536
-
-#  define NSLOG_PASSIVE_CHECK        131072
-
-#  define NSLOG_INFO_MESSAGE         262144
-
-// Debugging Levels
-#  define DEBUGL_ALL                 (unsigned int)-1
-#  define DEBUGL_NONE                0
-#  define DEBUGL_FUNCTIONS           1
-#  define DEBUGL_CONFIG              2
-#  define DEBUGL_PROCESS             4
-#  define DEBUGL_STATUSDATA          4
-#  define DEBUGL_RETENTIONDATA       4
-#  define DEBUGL_EVENTS              8
-#  define DEBUGL_CHECKS              16
-#  define DEBUGL_IPC                 16
-#  define DEBUGL_FLAPPING            16
-#  define DEBUGL_EVENTHANDLERS       16
-#  define DEBUGL_EVENTBROKER         64
-#  define DEBUGL_EXTERNALCOMMANDS    128
-#  define DEBUGL_COMMANDS            256
-#  define DEBUGL_MACROS              2048
-
-#  define DEBUGV_BASIC               0
-#  define DEBUGV_MORE                1
-#  define DEBUGV_MOST                2
-
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++
