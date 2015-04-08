@@ -125,8 +125,9 @@ void adjust_check_scheduling() {
   if (total_checks == 0 || adjust_scheduling == false)
     return;
 
-  if ((unsigned long)total_check_exec_time
-      > configuration::applier::scheduler::auto_rescheduling_interval) {
+  if (total_check_exec_time
+      > static_cast<double>(
+          configuration::applier::scheduler::auto_rescheduling_interval)) {
     inter_check_delay = 0.0;
     exec_time_factor
       = configuration::applier::scheduler::auto_rescheduling_interval

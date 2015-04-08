@@ -443,7 +443,7 @@ void applier::scheduler::_calculate_host_scheduling_params(
   // Compute additional scheduling parameters.
   if ((host_check_spread < 0.0)
       || (host_check_spread > 366.0 * 24 * 60 * 60))
-    scheduling_info.host_check_spread = 0.0;
+    scheduling_info.host_check_spread = 0;
   else
     scheduling_info.host_check_spread
       = static_cast<int>(host_check_spread * config.interval_length());
@@ -582,7 +582,7 @@ void applier::scheduler::_calculate_service_scheduling_params(
   // Compute additional scheduling parameters.
   if ((service_check_spread < 0.0)
       || (service_check_spread > 366.0 * 24 * 60 * 60))
-    scheduling_info.service_check_spread = 0.0;
+    scheduling_info.service_check_spread = 0;
   else
     scheduling_info.service_check_spread
       = static_cast<int>(service_check_spread
