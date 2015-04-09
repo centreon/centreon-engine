@@ -170,8 +170,8 @@ namespace               configuration {
     void                date_format(date_type value);
     std::string const&  debug_file() const throw ();
     void                debug_file(std::string const& value);
-    unsigned long       debug_level() const throw ();
-    void                debug_level(unsigned long value);
+    unsigned long long  debug_level() const throw ();
+    void                debug_level(unsigned long long value);
     unsigned int        debug_verbosity() const throw ();
     void                debug_verbosity(unsigned int value);
     std::set<shared_ptr<downtime> >&
@@ -507,7 +507,7 @@ namespace               configuration {
     set_contact         _contacts;
     date_type           _date_format;
     std::string         _debug_file;
-    unsigned long       _debug_level;
+    unsigned long long  _debug_level;
     unsigned int        _debug_verbosity;
     std::set<shared_ptr<downtime> >
                         _downtimes;

@@ -62,7 +62,7 @@ namespace                configuration {
 
       com::centreon::logging::file*
                          _debug;
-      unsigned long      _debug_level;
+      unsigned long long _debug_level;
       unsigned long      _debug_max_size;
       unsigned int       _debug_verbosity;
       com::centreon::logging::file*

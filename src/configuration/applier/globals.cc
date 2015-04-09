@@ -60,7 +60,7 @@ void applier::globals::apply(state& config) {
   ::check_service_freshness = config.check_service_freshness();
   ::command_check_interval = config.command_check_interval();
   ::date_format = config.date_format();
-  ::debug_level = config.debug_level();
+  ::debug_level = config.debug_level() >> 32;
   ::debug_verbosity = config.debug_verbosity();
   ::enable_environment_macros = config.enable_environment_macros();
   ::enable_event_handlers = config.enable_event_handlers();
