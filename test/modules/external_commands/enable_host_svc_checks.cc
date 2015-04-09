@@ -49,8 +49,6 @@ static int check_enable_host_svc_checks(int argc, char** argv) {
   char const* cmd("[1317196300] ENABLE_HOST_SVC_CHECKS;name");
   process_external_command(cmd);
 
-  if (scheduled_downtime_list)
-    throw (engine_error() << "enable_host_svc_checks failed.");
   return (0);
 }
 

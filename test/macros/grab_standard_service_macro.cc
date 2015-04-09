@@ -40,7 +40,6 @@ using namespace com::centreon::engine;
 
 // Values that will be set in service.
 #define DESCRIPTION myservice
-#define DISPLAY_NAME MyService
 #define OUTPUT my output
 #define LONG_OUTPUT my output can be much longer than this
 #define PERF_DATA this is absolutely not a perfdata string
@@ -62,19 +61,12 @@ using namespace com::centreon::engine;
 #define LAST_WARNING 132569874
 #define LAST_UNKNOWN 102565478
 #define LAST_CRITICAL 15478632
-#define DOWNTIME 3
 #define PERCENT_CHANGE 42.26
-#define NOTIFICATION_NUMBER 7
-#define NOTIFICATION_ID 432
 #define EVENT_ID 2348972
 #define LAST_EVENT_ID 21384723
 #define PROBLEM_ID 123900
 #define LAST_PROBLEM_ID 927834
 #define GROUP_NAMES STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
-#define ACK_AUTHOR mkermagoret@merethis.com
-#define ACK_AUTHOR_NAME Matthieu Kermagoret
-#define ACK_AUTHOR_ALIAS mk
-#define ACK_COMMENT Acknowledgement comment
 
 /**
  *  Check that the grab_standard_service_macro function works properly.
@@ -91,8 +83,6 @@ int main_test(int argc, char** argv) {
   // Set service values.
   delete [] service_list->description;
   service_list->description = string::dup(STR(DESCRIPTION));
-  delete [] service_list->display_name;
-  service_list->display_name = string::dup(STR(DISPLAY_NAME));
   delete [] service_list->plugin_output;
   service_list->plugin_output = string::dup(STR(OUTPUT));
   delete [] service_list->long_plugin_output;
@@ -116,10 +106,7 @@ int main_test(int argc, char** argv) {
   service_list->last_time_warning = LAST_WARNING;
   service_list->last_time_unknown = LAST_UNKNOWN;
   service_list->last_time_critical = LAST_CRITICAL;
-  service_list->scheduled_downtime_depth = DOWNTIME;
   service_list->percent_state_change = PERCENT_CHANGE;
-  service_list->current_notification_number = NOTIFICATION_NUMBER;
-  service_list->current_notification_id = NOTIFICATION_ID;
   service_list->current_event_id = EVENT_ID;
   service_list->last_event_id = LAST_EVENT_ID;
   service_list->current_problem_id = PROBLEM_ID;
@@ -148,10 +135,6 @@ int main_test(int argc, char** argv) {
   // Macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  mac.x[MACRO_SERVICEACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
-  mac.x[MACRO_SERVICEACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
-  mac.x[MACRO_SERVICEACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
-  mac.x[MACRO_SERVICEACKCOMMENT] = string::dup(STR(ACK_COMMENT));
 
   // Macro values table.
   struct {
@@ -160,7 +143,6 @@ int main_test(int argc, char** argv) {
     bool         is_double;
   } static const macro_values[] = {
     { MACRO_SERVICEDESC, STR(DESCRIPTION), false },
-    { MACRO_SERVICEDISPLAYNAME, STR(DISPLAY_NAME), false },
     { MACRO_SERVICEOUTPUT, STR(OUTPUT), false },
     { MACRO_LONGSERVICEOUTPUT, STR(LONG_OUTPUT), false },
     { MACRO_SERVICEPERFDATA, STR(PERF_DATA), false },
@@ -182,19 +164,12 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTSERVICEWARNING, STR(LAST_WARNING), false },
     { MACRO_LASTSERVICEUNKNOWN, STR(LAST_UNKNOWN), false },
     { MACRO_LASTSERVICECRITICAL, STR(LAST_CRITICAL), false },
-    { MACRO_SERVICEDOWNTIME, STR(DOWNTIME), false },
     { MACRO_SERVICEPERCENTCHANGE, STR(PERCENT_CHANGE), true },
-    { MACRO_SERVICENOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false },
-    { MACRO_SERVICENOTIFICATIONID, STR(NOTIFICATION_ID), false },
     { MACRO_SERVICEEVENTID, STR(EVENT_ID), false },
     { MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false },
     { MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false },
-    { MACRO_SERVICEACKAUTHOR, STR(ACK_AUTHOR), false },
-    { MACRO_SERVICEACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
-    { MACRO_SERVICEACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false },
-    { MACRO_SERVICEACKCOMMENT, STR(ACK_COMMENT), false }
+    { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false }
   };
 
   // Compare macros with expected values.
@@ -237,11 +212,6 @@ int main_test(int argc, char** argv) {
         std::cout << macro_values[i].macro_id << std::endl;
     }
   }
-
-  delete [] mac.x[MACRO_SERVICEACKAUTHOR];
-  delete [] mac.x[MACRO_SERVICEACKAUTHORNAME];
-  delete [] mac.x[MACRO_SERVICEACKAUTHORALIAS];
-  delete [] mac.x[MACRO_SERVICEACKCOMMENT];
 
   return (retval);
 }

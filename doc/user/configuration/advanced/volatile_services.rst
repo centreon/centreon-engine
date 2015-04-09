@@ -46,10 +46,6 @@ only happen the first time that a service goes into a non-OK state. If
 future checks of the service result in the same non-OK state, no hard
 state change occurs and none of the events mentioned take place again.
 
-.. note::
-   If you are only interested in logging, consider using
-   :ref:`stalking <state_stalking>` options instead.
-
 The Power Of Two
 ================
 
@@ -75,8 +71,6 @@ Centreon Engine Configuration:
   * Set the active_checks_enabled directive in the service definition
     to 0. This prevents Centreon Engine from actively checking the
     service.
-  * Set the passive_checks_enabled directive in the service definition
-    to 1. This enables passive checks for the service.
   * Set this is_volatile directive in the service definition to 1.
 
 PortSentry Configuration
@@ -122,4 +116,3 @@ the future?
     state and send notifications to contacts
 
 Pretty neat, huh?
-

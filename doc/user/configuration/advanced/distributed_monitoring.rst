@@ -226,8 +226,8 @@ server. It is setup as follows:
     recommended)
   * The central server has :ref:`active service checks <main_cfg_opt_service_check_execution>`
     disabled (optional, but recommended - see notes below)
-  * The central server has :ref:`external command checks <main_cfg_opt_external_command_check>`
-    enabled (required)
+  * The central server has :ref:`the external commands module <modules_external_commands>`
+    loaded (required)
   * The central server has :ref:`passive service checks <main_cfg_opt_passive_service_check_acceptance>`
     enabled (required) There are three other very important things that
     you need to keep in mind when configuring the central server:
@@ -384,4 +384,3 @@ service check results (see documentation above). In order to make sure
 passive host check results are up to date, you'll want to enable
 :ref:`freshness checking <freshness_checks>` for hosts
 (similiar to what is described above for services).
-

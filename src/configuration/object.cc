@@ -17,18 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/configuration/downtime.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
-#include "com/centreon/engine/configuration/contactgroup.hh"
-#include "com/centreon/engine/configuration/contact.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
-#include "com/centreon/engine/configuration/hostescalation.hh"
 #include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
-#include "com/centreon/engine/configuration/serviceescalation.hh"
 #include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
@@ -126,32 +121,20 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::service());
   else if (type_name == "host")
     obj = object_ptr(new configuration::host());
-  else if (type_name == "contact")
-    obj = object_ptr(new configuration::contact());
-  else if (type_name == "contactgroup")
-    obj = object_ptr(new configuration::contactgroup());
   else if (type_name == "servicegroup")
     obj = object_ptr(new configuration::servicegroup());
   else if (type_name == "hostgroup")
     obj = object_ptr(new configuration::hostgroup());
   else if (type_name == "servicedependency")
     obj = object_ptr(new configuration::servicedependency());
-  else if (type_name == "serviceescalation")
-    obj = object_ptr(new configuration::serviceescalation());
   else if (type_name == "hostdependency")
     obj = object_ptr(new configuration::hostdependency());
-  else if (type_name == "hostescalation")
-    obj = object_ptr(new configuration::hostescalation());
   else if (type_name == "command")
     obj = object_ptr(new configuration::command());
   else if (type_name == "timeperiod")
     obj = object_ptr(new configuration::timeperiod());
   else if (type_name == "connector")
     obj = object_ptr(new configuration::connector());
-  else if (type_name == "hostdowntime")
-    obj = object_ptr(new configuration::downtime(configuration::downtime::host));
-  else if (type_name == "servicedowntime")
-    obj = object_ptr(new configuration::downtime(configuration::downtime::service));
   return (obj);
 }
 
@@ -254,18 +237,13 @@ std::string const& object::type_name() const throw () {
   static std::string const tab[] = {
     "command",
     "connector",
-    "contact",
-    "contactgroup",
     "host",
     "hostdependency",
-    "hostescalation",
     "hostgroup",
     "service",
     "servicedependency",
-    "serviceescalation",
     "servicegroup",
-    "timeperiod",
-    "downtime"
+    "timeperiod"
   };
   return (tab[_type]);
 }

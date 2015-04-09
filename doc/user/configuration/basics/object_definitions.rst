@@ -42,13 +42,7 @@ values found in the config files, assuming you have
 :ref:`state retention <main_cfg_opt_state_retention>` enabled on a
 program-wide basis and the value of the directive is changed during
 runtime with an
-:ref:`external command <main_cfg_opt_external_command_check>`.  One way
-to get around this problem is to disable the retention of non-status
-information using the retain_nonstatus_information directive in the
-host, service, and contact definitions. Disabling this directive will
-cause Centreon Engine to take the initial values for these directives
-from your config files, rather than from the state retention file when
-it (re)starts.
+:ref:`external command <external_commands>`.
 
 Sample Configuration Files
 ==========================
@@ -97,7 +91,6 @@ Definition Format
   define host{
     host_name                      host_name
     alias                          alias
-    # display_name                 display_name
     address                        address
     # parents                      host_names
     # hostgroups                   hostgroup_names
@@ -107,7 +100,6 @@ Definition Format
     # check_interval               #
     # retry_interval               #
     # active_checks_enabled        [0/1]
-    # passive_checks_enabled       [0/1]
     check_period                   timeperiod_name
     # obsess_over_host             [0/1]
     # check_freshness              [0/1]
@@ -118,9 +110,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,d,u]
-    # process_perf_data            [0/1]
-    # retain_status_information    [0/1]
-    # retain_nonstatus_information [0/1]
     contacts                       contacts
     contact_groups                 contact_groups
     notification_interval          #
@@ -128,7 +117,6 @@ Definition Format
     notification_period            timeperiod_name
     # notification_options         [d,u,r,f,s]
     # notifications_enabled        [0/1]
-    # stalking_options             [o,d,u]
   }
 
 Example Definition
@@ -146,8 +134,6 @@ Example Definition
     retry_interval               1
     max_check_attempts           5
     check_period                 24x7
-    process_perf_data            0
-    retain_nonstatus_information 0
     contact_groups               router-admins
     notification_interval        30
     notification_period          24x7
@@ -173,8 +159,6 @@ address                      This directive is used to define the address of the
                                 If you do not specify an address directive in a host definition, the name of the host will be used as its address. A
                                 word of caution about doing this, however * if DNS fails, most of your service checks will fail because the plugins
                                 will be unable to resolve the host name.
-display_name                 This directive is used to define an alternate name that should be displayed in the web interface for this host. If not
-                             specified, this defaults to the value you specify for the host_name directive.
 parents                      This directive is used to define a comma-delimited list of short names of the "parent" hosts for this particular host.
                              Parent hosts are typically routers, switches, firewalls, etc. that lie between the monitoring host and a remote hosts. A
                              router, switch, etc. which is closest to the remote host is considered to be that host's "parent". Read the "Determining
@@ -194,8 +178,14 @@ check_command                This directive is used to specify the short name of
                              argument blank, the host will not be actively checked. Thus, Centreon Engine will likely always assume the host is up (it
                              may show up as being in a "PENDING" state in the web interface). This is useful if you are monitoring printers or other
                              devices that are frequently turned off. The maximum amount of time that the notification command can run is controlled by
-                             the :ref:`host_check_timeout <main_cfg_opt_host_check_timeout>`
+                             either the host's check_timeout option or the global :ref:`host_check_timeout <main_cfg_opt_host_check_timeout>`
                              option.
+check_timeout                This is the maximum number of seconds that Centreon Engine will allow host checks to run. If checks exceed this limit,
+                             they are killed and a DOWN state is returned. A timeout error will also be logged. There is often widespread confusion as
+                             to what this option really does. It is meant to be used as a last ditch mechanism to kill off plugins which are
+                             misbehaving and not exiting in a timely manner. It should be set to something reasonable (like 10 seconds), so that each
+                             host check normally finishes executing within this time limit. If a host check runs longer than this limit, Centreon
+                             Engine will kill it off thinking it is a runaway processes.
 initial_state                By default Centreon Engine will assume that all hosts are in UP states when it starts. You can override the initial state
                              for a host by using this directive. Valid options are: o = UP, d = DOWN, and u = UNREACHABLE.
 max_check_attempts           This directive is used to define the number of times that Centreon Engine will retry the host check command if it returns
@@ -219,8 +209,6 @@ retry_interval               This directive is used to define the number of "tim
 active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active
                              checks (either regularly scheduled or on-demand) of this host are enabled. Values: 0 = disable active host checks,
                              1 = enable active host checks (default).
-passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive
-                             checks are enabled for this host. Values: 0 = disable passive host checks, 1 = enable passive host checks (default).
 check_period                 This directive is used to specify the short name of the
                              :ref:`time period <obj_def_timeperiod>` during which active checks of this host can be made.
 obsess_over_host             :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the
@@ -256,17 +244,6 @@ flap_detection_enabled       :ref:`* <obj_def_retentionnotes>` This directive is
 flap_detection_options       This directive is used to determine what host states the
                              :ref:`flap detection logic <flapping_detection>` will use for this host. Valid options are
                              a combination of one or more of the following: o = UP states, d = DOWN states, u = UNREACHABLE states.
-process_perf_data            :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
-                             processing of performance data is enabled for this host. Values: 0 = disable performance data processing, 1 = enable
-                             performance data processing.
-retain_status_information    This directive is used to determine whether or not status-related information about the host is retained across program
-                             restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable status information retention, 1 = enable status information retention.
-retain_nonstatus_information This directive is used to determine whether or not non-status information about the host is retained across program
-                             restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 contacts                     This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be
                              notified whenever there are problems (or recoveries) with this host. Multiple contacts should be separated by commas.
                              Useful if you want notifications to go to just a few people and don't want to configure
@@ -299,9 +276,7 @@ notification_options         This directive is used to determine when notificati
                              only be sent out when the host goes DOWN and when it recovers from a DOWN state.
 notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
                              notifications for this host are enabled. Values: 0 = disable host notifications, 1 = enable host notifications.
-stalking_options             This directive determines which host states "stalking" is enabled for. Valid options are a combination of one or more of
-                             the following: o = stalk on UP states, d = stalk on DOWN states, and u = stalk on UNREACHABLE states. More information
-                             on state stalking can be found :ref:`here <state_stalking>`.
+timezone                     Time zone of this host. All times applied to this host (time periods, downtimes, ...) will be affected by this option.
 ============================ =========================================================================================================================
 
 .. _obj_def_hostgroup:
@@ -382,7 +357,6 @@ Definition Format
     host_name                      host_name
     # hostgroup_name               hostgroup_name
     service_description            service_description
-    # display_name                 display_name
     # servicegroups                servicegroup_names
     # is_volatile                  [0/1]
     check_command                  command_name
@@ -391,7 +365,6 @@ Definition Format
     check_interval                 #
     retry_interval                 #
     # active_checks_enabled        [0/1]
-    # passive_checks_enabled       [0/1]
     check_period                   timeperiod_name
     # obsess_over_service          [0/1]
     # check_freshness              [0/1]
@@ -402,9 +375,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,w,c,u]
-    # process_perf_data            [0/1]
-    # retain_status_information    [0/1]
-    # retain_nonstatus_information [0/1]
     notification_interval          #
     # first_notification_delay     #
     notification_period            timeperiod_name
@@ -412,7 +382,6 @@ Definition Format
     # notifications_enabled        [0/1]
     contacts                       contacts
     contact_groups                 contact_groups
-    # stalking_options             [o,w,u,c]
   }
 
 Example Definition
@@ -440,7 +409,8 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================ =========================================================================================================================
-host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is                                   associated with. Multiple hosts should be separated by commas.
+host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is
+                             associated with. Multiple hosts should be separated by commas.
 hostgroup_name               This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>` that the service
                              "runs" on or is associated with.
                              Multiple hostgroups should be separated by commas. The hostgroup_name may be used instead of, or in addition to, the
@@ -448,8 +418,6 @@ hostgroup_name               This directive is used to specify the short name(s)
 service_description;         This directive is used to define the description of the service, which may contain spaces, dashes, and colons
                              (semicolons, apostrophes, and quotation marks should be avoided). No two services associated with the same host can have
                              the same description. Services are uniquely identified with their host_name and service_description directives.
-display_name                 This directive is used to define an alternate name that should be displayed in the web interface for this service. If not
-                             specified, this defaults to the value you specify for the service_description directive.
 servicegroups                This directive is used to identify the short name(s) of the :ref:`servicegroup(s) <obj_def_servicegroup>` that the
                              service belongs to. Multiple servicegroups should be separated by commas. This directive may be used as an alternative
                              to using the members directive in :ref:`servicegroup <obj_def_servicegroup>` definitions.
@@ -458,7 +426,14 @@ is_volatile                  This directive is used to denote whether the servic
                              Value: 0 = service is not volatile, 1 = service is volatile.
 check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>` that Centreon Engine will run in
                              order to check the status of the service. The maximum amount of time that the service check command can run is controlled
-                             by the :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>` option.
+                             by either the service's check_timeout option or the global :ref:`service_check_timeout <main_cfg_opt_service_check_timeout>`
+                             option.
+check_timeout                This is the maximum number of seconds that Centreon Engine will allow service checks to run. If checks exceed this limit,
+                             they are killed and a CRITICAL state is returned. A timeout error will also be logged. There is often widespread confusion
+                             as to what this option really does. It is meant to be used as a last ditch mechanism to kill off plugins which are
+                             misbehaving and not exiting in a timely manner. It should be set to something reasonably (like 10 seconds), so that each
+                             service check normally finishes executing within this time limit. If a service check runs longer than this limit, Centreon
+                             Engine will kill it off thinking it is a runaway processes.
 initial_state                By default Centreon Engine will assume that all services are in OK states when it starts. You can override the initial
                              state for a service by using this directive. Valid options are: o = OK, w = WARNING, u = UNKNOWN, and c = CRITICAL.
 max_check_attempts           This directive is used to define the number of times that Centreon Engine will retry the service check command if it
@@ -479,8 +454,6 @@ retry_interval               This directive is used to define the number of "tim
                              documentation.
 active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active checks of this service are
                              enabled. Values: 0 = disable active service checks, 1 = enable active service checks (default).
-passive_checks_enabled       :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not passive checks of this service are
-                             enabled. Values: 0 = disable passive service checks, 1 = enable passive service checks (default).
 check_period                 This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>` during which active
                              checks of this service can be made.
 obsess_over_service          :ref:`* <obj_def_retentionnotes>` This directive determines whether or not checks for the service will be "obsessed"
@@ -516,17 +489,6 @@ flap_detection_options       This directive is used to determine what service st
                              :ref:`flap detection logic <flapping_detection>` will use for this service. Valid options
                              are a combination of one or more of the following: o = OK states, w = WARNING states, c = CRITICAL states,
                              u = UNKNOWN states.
-process_perf_data            :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not the
-                             processing of performance data is enabled for this service. Values: 0 = disable performance data processing,
-                             1 = enable performance data processing.
-retain_status_information    This directive is used to determine whether or not status-related information about the service is retained across
-                             program restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable status information retention, 1 = enable status information retention.
-retain_nonstatus_information This directive is used to determine whether or not non-status information about the service is retained across program
-                             restarts. This is only useful if you have enabled state retention using the
-                             :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                             directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
 notification_interval        This directive is used to define the number of "time units" to wait before re-notifying a contact that this service is
                              still in a non-OK state. Unless you've changed the
                              :ref:`interval_length <main_cfg_opt_timing_interval_length>`
@@ -560,9 +522,8 @@ contacts                     This is a list of the short names of the :ref:`cont
 contact_groups               This is a list of the short names of the :ref:`contact groups <obj_def_contactgroup>` that
                              should be notified whenever there are problems (or recoveries) with this service. Multiple contact groups should be
                              separated by commas. You must specify at least one contact or contact group in each service definition.
-stalking_options             This directive determines which service states "stalking" is enabled for. Valid options are a combination of one or more
-                             of the following: o = stalk on OK states, w = stalk on WARNING states, u = stalk on UNKNOWN states, and c = stalk on
-                             CRITICAL states. More information on state stalking can be found :ref:`here <state_stalking>`.
+timezone                     Time zone of this service. All times applied to this service (time periods, downtimes, ...) will be affected by this
+                             option.
 ============================ =========================================================================================================================
 
 .. _obj_def_servicegroup:
@@ -655,9 +616,6 @@ Definition Format
     # email                            email_address
     # pager                            pager_number or pager_email_gateway
     # addressx                         additional_contact_address
-    # can_submit_commands              [0/1]
-    # retain_status_information        [0/1]
-    # retain_nonstatus_information     [0/1]
   }
 
 Example Definition
@@ -680,7 +638,6 @@ Example Definition
     pager                         555-5555@pagergateway.localhost.localdomain
     address1                      xxxxx.xyyy@icq.com
     address2                      555-555-5555
-    can_submit_commands           1
   }
 
 Directive Descriptions
@@ -745,17 +702,7 @@ addressx                      Address directives are used to define additional "
                               phone numbers, instant messaging addresses, etc. Depending on how you configure your notification commands, they can be
                               used to send out an alert to the contact. Up to six addresses can be defined using these directives (address1 through
                               address6). The $CONTACTADDRESSx$ :ref:`macro <understanding_macros>` will contain this value.
-can_submit_commands           This directive is used to determine whether or not the contact can submit
-                              :ref:`external commands <external_commands>` to Centreon Engine. Values: 0 = don't allow contact to submit
-                              commands, 1 = allow contact to submit commands.
-retain_status_information     This directive is used to determine whether or not status-related information about the contact is retained across
-                              program restarts. This is only useful if you have enabled state retention using the
-                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                              directive. Value: 0 = disable status information retention, 1 = enable status information retention.
-retain_nonstatus_information  This directive is used to determine whether or not non-status information about the contact is retained across program
-                              restarts. This is only useful if you have enabled state retention using the
-                              :ref:`retain_state_information <main_cfg_opt_state_retention>`
-                              directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
+timezone                      Time zone of this contact. All times applied to this host (time periods) will be affected by this option.
 ============================= ========================================================================================================================
 
 .. _obj_def_contactgroup:

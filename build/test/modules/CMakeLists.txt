@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -19,6 +19,3 @@
 
 # Subdirectory.
 add_subdirectory("external_commands")
-if (WITH_WEBSERVICE)
-  add_subdirectory("webservice")
-endif ()

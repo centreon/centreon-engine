@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -42,25 +42,20 @@ namespace                         retention {
     bool                          operator!=(service const& right) const throw ();
     bool                          set(char const* key, char const* value);
 
-    opt<int> const&               acknowledgement_type() const throw ();
     opt<bool> const&              active_checks_enabled() const throw ();
     opt<std::string> const&       check_command() const throw ();
     opt<double> const&            check_execution_time() const throw ();
-    opt<int> const&               check_flapping_recovery_notification() const throw ();
     opt<double> const&            check_latency() const throw ();
     opt<int> const&               check_options() const throw ();
     opt<std::string> const&       check_period() const throw ();
     opt<int> const&               check_type() const throw ();
     opt<int> const&               current_attempt() const throw ();
     opt<unsigned long> const&     current_event_id() const throw ();
-    opt<unsigned long> const&     current_notification_id() const throw ();
-    opt<int> const&               current_notification_number() const throw ();
     opt<unsigned long> const&     current_problem_id() const throw ();
     opt<int> const&               current_state() const throw ();
     map_customvar const&          customvariables() const throw ();
     opt<std::string> const&       event_handler() const throw ();
     opt<bool> const&              event_handler_enabled() const throw ();
-    opt<bool> const&              failure_prediction_enabled() const throw ();
     opt<bool> const&              flap_detection_enabled() const throw ();
     opt<bool> const&              has_been_checked() const throw ();
     std::string const&            host_name() const throw ();
@@ -69,7 +64,6 @@ namespace                         retention {
     opt<unsigned long> const&     last_event_id() const throw ();
     opt<time_t> const&            last_hard_state() const throw ();
     opt<time_t> const&            last_hard_state_change() const throw ();
-    opt<time_t> const&            last_notification() const throw ();
     opt<unsigned long> const&     last_problem_id() const throw ();
     opt<time_t> const&            last_state() const throw ();
     opt<time_t> const&            last_state_change() const throw ();
@@ -82,17 +76,10 @@ namespace                         retention {
     opt<unsigned long> const&     modified_attributes() const throw ();
     opt<time_t> const&            next_check() const throw ();
     opt<unsigned int> const&      normal_check_interval() const throw ();
-    opt<std::string> const&       notification_period() const throw ();
-    opt<bool> const&              notifications_enabled() const throw ();
-    opt<bool> const&              notified_on_critical() const throw ();
-    opt<bool> const&              notified_on_unknown() const throw ();
-    opt<bool> const&              notified_on_warning() const throw ();
     opt<int> const&               obsess_over_service() const throw ();
-    opt<bool> const&              passive_checks_enabled() const throw ();
     opt<double> const&            percent_state_change() const throw ();
     opt<std::string> const&       performance_data() const throw ();
     opt<std::string> const&       plugin_output() const throw ();
-    opt<bool> const&              problem_has_been_acknowledged() const throw ();
     opt<unsigned int> const&      retry_check_interval() const throw ();
     std::string const&            service_description() const throw ();
     opt<std::vector<int> > const& state_history() const throw ();
@@ -160,25 +147,20 @@ namespace                         retention {
     bool                          _set_state_history(std::string const& value);
     bool                          _set_state_type(int value);
 
-    opt<int>                      _acknowledgement_type;
     opt<bool>                     _active_checks_enabled;
     opt<std::string>              _check_command;
     opt<double>                   _check_execution_time;
-    opt<int>                      _check_flapping_recovery_notification;
     opt<double>                   _check_latency;
     opt<int>                      _check_options;
     opt<std::string>              _check_period;
     opt<int>                      _check_type;
     opt<int>                      _current_attempt;
     opt<unsigned long>            _current_event_id;
-    opt<unsigned long>            _current_notification_id;
-    opt<int>                      _current_notification_number;
     opt<unsigned long>            _current_problem_id;
     opt<int>                      _current_state;
     map_customvar                 _customvariables;
     opt<std::string>              _event_handler;
     opt<bool>                     _event_handler_enabled;
-    opt<bool>                     _failure_prediction_enabled;
     opt<bool>                     _flap_detection_enabled;
     opt<bool>                     _has_been_checked;
     std::string                   _host_name;
@@ -187,7 +169,6 @@ namespace                         retention {
     opt<unsigned long>            _last_event_id;
     opt<time_t>                   _last_hard_state;
     opt<time_t>                   _last_hard_state_change;
-    opt<time_t>                   _last_notification;
     opt<unsigned long>            _last_problem_id;
     opt<time_t>                   _last_state;
     opt<time_t>                   _last_state_change;
@@ -201,17 +182,10 @@ namespace                         retention {
     opt<time_t>                   _next_check;
     setters const*                _next_setter;
     opt<unsigned int>             _normal_check_interval;
-    opt<std::string>              _notification_period;
-    opt<bool>                     _notifications_enabled;
-    opt<bool>                     _notified_on_critical;
-    opt<bool>                     _notified_on_unknown;
-    opt<bool>                     _notified_on_warning;
     opt<int>                      _obsess_over_service;
-    opt<bool>                     _passive_checks_enabled;
     opt<double>                   _percent_state_change;
     opt<std::string>              _performance_data;
     opt<std::string>              _plugin_output;
-    opt<bool>                     _problem_has_been_acknowledged;
     opt<unsigned int>             _retry_check_interval;
     std::string                   _service_description;
     static setters const          _setters[];

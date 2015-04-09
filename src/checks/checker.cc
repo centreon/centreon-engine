@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,7 +39,6 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
-#include "compatibility/check_result.h"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::logging;
@@ -95,21 +94,6 @@ void checker::reap() {
   // Time to start reaping.
   time_t reaper_start_time;
   time(&reaper_start_time);
-
-  if (config->use_check_result_path()) {
-    std::string const& path(config->check_result_path());
-    process_check_result_queue(path.c_str());
-  }
-
-  // Keep compatibility with old check result list.
-  if (check_result_list) {
-    concurrency::locker lock(&_mut_reap);
-    check_result* cr(NULL);
-    while ((cr = read_check_result())) {
-      _to_reap.push(*cr);
-      delete cr;
-    }
-  }
 
   // Reap check results.
   unsigned int reaped_checks(0);
@@ -204,17 +188,6 @@ void checker::reap() {
 
       // Cleanup.
       free_check_result(&result);
-
-      // Check if reaping has timed out.
-      time_t current_time;
-      time(&current_time);
-      if ((current_time - reaper_start_time)
-          > static_cast<time_t>(config->max_check_reaper_time())) {
-        logger(dbg_checks, basic)
-          << "Breaking out of check result reaper: "
-          << "max reaper time exceeded";
-        break;
-      }
 
       // Caught signal, need to break.
       if (sigshutdown) {
@@ -379,8 +352,7 @@ void checker::run(
   // Time to start command.
   gettimeofday(&start_time, NULL);
 
-  // Set check time for on-demand checks, so they're
-  // not incorrectly detected as being orphaned.
+  // Set check time for on-demand checks.
   if (!scheduled_check)
     hst->next_check = start_time.tv_sec;
 
@@ -392,6 +364,7 @@ void checker::run(
 
   // Init check result info.
   check_result check_result_info;
+  memset(&check_result_info, 0, sizeof(check_result_info));
   check_result_info.object_check_type = HOST_CHECK;
   check_result_info.check_type = HOST_CHECK_ACTIVE;
   check_result_info.check_options = check_options;
@@ -403,9 +376,6 @@ void checker::run(
   check_result_info.exited_ok = true;
   check_result_info.return_code = STATE_OK;
   check_result_info.output = NULL;
-  check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = NULL;
-  check_result_info.output_file = NULL;
   check_result_info.host_name = string::dup(hst->name);
   check_result_info.service_description = NULL;
   check_result_info.latency = latency;
@@ -630,6 +600,7 @@ void checker::run(
 
   // Init check result info.
   check_result check_result_info;
+  memset(&check_result_info, 0, sizeof(check_result_info));
   check_result_info.object_check_type = SERVICE_CHECK;
   check_result_info.check_type = SERVICE_CHECK_ACTIVE;
   check_result_info.check_options = check_options;
@@ -641,9 +612,6 @@ void checker::run(
   check_result_info.exited_ok = true;
   check_result_info.return_code = STATE_OK;
   check_result_info.output = NULL;
-  check_result_info.output_file_fd = -1;
-  check_result_info.output_file_fp = NULL;
-  check_result_info.output_file = NULL;
   check_result_info.host_name = string::dup(svc->host_name);
   check_result_info.service_description = string::dup(svc->description);
   check_result_info.latency = latency;
@@ -828,11 +796,6 @@ void checker::run_sync(
   if (HARD_STATE == hst->state_type)
     hst->last_hard_state = hst->current_state;
 
-  // Save old plugin output for state stalking.
-  char* old_plugin_output(NULL);
-  if (hst->plugin_output)
-    old_plugin_output = string::dup(hst->plugin_output);
-
   // Set the checked flag.
   hst->has_been_checked = true;
 
@@ -877,16 +840,12 @@ void checker::run_sync(
   process_host_check_result_3x(
     hst,
     host_result,
-    old_plugin_output,
     check_options,
     false,
     use_cached_result,
     check_timestamp_horizon);
   if (check_result_code)
     *check_result_code = hst->current_state;
-
-  // Cleanup.
-  delete[] old_plugin_output;
 
   // Synchronous check is done.
   logger(dbg_checks, more)
@@ -971,6 +930,7 @@ void checker::finished(commands::result const& res) throw () {
 
   // Find check result.
   check_result result;
+  memset(&result, 0, sizeof(result));
 
   // Update check result.
   result.finish_time.tv_sec = res.end_time.to_seconds();
@@ -1234,15 +1194,9 @@ int checker::_execute_sync(host* hst) {
     for (char* ptr = hst->plugin_output; (ptr = strchr(ptr, ';')); *ptr = ':')
       ;
 
-  // If we're not doing aggressive host checking, let WARNING
-  // states indicate the host is up (fake the result to be STATE_OK).
-  if (!config->use_aggressive_host_checking()
-      && (res.exit_code == STATE_WARNING))
-    res.exit_code = STATE_OK;
-
   // Get host state from plugin exit code.
   int return_result(
-        (res.exit_code == STATE_OK)
+        ((res.exit_code == STATE_OK) || (res.exit_code == STATE_WARNING))
         ? HOST_UP
         : HOST_DOWN);
 

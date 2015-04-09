@@ -58,7 +58,7 @@ replace the command in Centreon Engine with the shell script.
 Performance Data Processing
 ===========================
 
-As explained in the :ref:`performance data section <user_configuration_advanced_performance_data>`
+As explained in the :ref:`performance data section <performance_data>`
 Centreon Engine understand the performance data format used by
 Nagios-compatible plugins. Nagios provided a system to process these
 performance data based on command execution. It was cumbersome to

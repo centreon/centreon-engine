@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -30,9 +30,6 @@ set(
   ${FILES}
 
   # Sources.
-  "${SRC_DIR}/comment.cc"
-  "${SRC_DIR}/contact.cc"
-  "${SRC_DIR}/downtime.cc"
   "${SRC_DIR}/dump.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/info.cc"
@@ -43,9 +40,6 @@ set(
   "${SRC_DIR}/state.cc"
 
   # Headers.
-  "${INC_DIR}/comment.hh"
-  "${INC_DIR}/contact.hh"
-  "${INC_DIR}/downtime.hh"
   "${INC_DIR}/dump.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/info.hh"

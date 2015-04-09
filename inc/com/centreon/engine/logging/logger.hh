@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -52,8 +52,6 @@ namespace logging {
     log_service_critical     = 65536ull,
     log_passive_check        = 131072ull,
     log_info_message         = 262144ull,
-    log_host_notification    = 524288ull,
-    log_service_notification = 1048576ull,
     log_all                  = 2096895ull,
 
     dbg_functions            = (1ull << 32),
@@ -66,12 +64,9 @@ namespace logging {
     dbg_ipc                  = (16ull << 32),
     dbg_flapping             = (16ull << 32),
     dbg_eventhandlers        = (16ull << 32),
-    dbg_notifications        = (32ull << 32),
     dbg_eventbroker          = (64ull << 32),
     dbg_external_command     = (128ull << 32),
     dbg_commands             = (256ull << 32),
-    dbg_downtime             = (512ull << 32),
-    dbg_comments             = (1024ull << 32),
     dbg_macros               = (2048ull << 32),
     dbg_all                  = (4095ull << 32),
 

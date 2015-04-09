@@ -40,7 +40,6 @@ using namespace com::centreon::engine;
 
 // Values that will be set in host.
 #define NAME                    myhost
-#define DISPLAY_NAME            MyHost
 #define ALIAS                   LocalHost
 #define ADDRESS                 127.0.0.1
 #define STATE                   DOWN
@@ -55,7 +54,6 @@ using namespace com::centreon::engine;
 #define CHECK_COMMAND           check_this host
 #define ATTEMPT                 5
 #define MAX_ATTEMPTS            7
-#define DOWNTIME                2
 #define PERCENT_CHANGE          25.72
 #define EXECUTION_TIME          14.27
 #define LATENCY                 74.91
@@ -64,8 +62,6 @@ using namespace com::centreon::engine;
 #define LAST_UP                 121567890
 #define LAST_DOWN               187456321
 #define LAST_UNREACHABLE        115678925
-#define NOTIFICATION_NUMBER     42
-#define NOTIFICATION_ID         123456
 #define EVENT_ID                6547985
 #define LAST_EVENT_ID           1253887
 #define PROBLEM_ID              447786
@@ -76,10 +72,6 @@ using namespace com::centreon::engine;
 #define TOTAL_SERVICES_WARNING  0
 #define TOTAL_SERVICES_UNKNOWN  0
 #define TOTAL_SERVICES_CRITICAL 0
-#define ACK_AUTHOR              mkermagoret
-#define ACK_AUTHOR_NAME         Matthieu Kermagoret
-#define ACK_AUTHOR_ALIAS        mk
-#define ACK_COMMENT             hello world
 
 /**
  *  Check that the grab_standard_host_macro function works properly.
@@ -114,8 +106,6 @@ int main_test(int argc, char** argv) {
   // Set host values.
   delete [] host_list->name;
   host_list->name = string::dup(STR(NAME));
-  delete [] host_list->display_name;
-  host_list->display_name = string::dup(STR(DISPLAY_NAME));
   delete [] host_list->alias;
   host_list->alias = string::dup(STR(ALIAS));
   delete [] host_list->address;
@@ -134,7 +124,6 @@ int main_test(int argc, char** argv) {
   host_list->host_check_command = string::dup(STR(CHECK_COMMAND));
   host_list->current_attempt = ATTEMPT;
   host_list->max_attempts = MAX_ATTEMPTS;
-  host_list->scheduled_downtime_depth = DOWNTIME;
   host_list->percent_state_change = PERCENT_CHANGE;
   host_list->execution_time = EXECUTION_TIME;
   host_list->latency = LATENCY;
@@ -143,8 +132,6 @@ int main_test(int argc, char** argv) {
   host_list->last_time_up = LAST_UP;
   host_list->last_time_down = LAST_DOWN;
   host_list->last_time_unreachable = LAST_UNREACHABLE;
-  host_list->current_notification_number = NOTIFICATION_NUMBER;
-  host_list->current_notification_id = NOTIFICATION_ID;
   host_list->current_event_id = EVENT_ID;
   host_list->last_event_id = LAST_EVENT_ID;
   host_list->current_problem_id = PROBLEM_ID;
@@ -153,10 +140,6 @@ int main_test(int argc, char** argv) {
   // macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  mac.x[MACRO_HOSTACKAUTHOR] = string::dup(STR(ACK_AUTHOR));
-  mac.x[MACRO_HOSTACKAUTHORNAME] = string::dup(STR(ACK_AUTHOR_NAME));
-  mac.x[MACRO_HOSTACKAUTHORALIAS] = string::dup(STR(ACK_AUTHOR_ALIAS));
-  mac.x[MACRO_HOSTACKCOMMENT] = string::dup(STR(ACK_COMMENT));
 
   // Macro values table.
   struct {
@@ -165,7 +148,6 @@ int main_test(int argc, char** argv) {
     bool         is_double;
   } static const macro_values[] = {
     { MACRO_HOSTNAME, STR(NAME), false },
-    { MACRO_HOSTDISPLAYNAME, STR(DISPLAY_NAME), false },
     { MACRO_HOSTALIAS, STR(ALIAS), false },
     { MACRO_HOSTADDRESS, STR(ADDRESS), false },
     { MACRO_HOSTSTATE, STR(STATE), false },
@@ -180,7 +162,6 @@ int main_test(int argc, char** argv) {
     { MACRO_HOSTCHECKCOMMAND, STR(CHECK_COMMAND), false },
     { MACRO_HOSTATTEMPT, STR(ATTEMPT), false },
     { MACRO_MAXHOSTATTEMPTS, STR(MAX_ATTEMPTS), false },
-    { MACRO_HOSTDOWNTIME, STR(DOWNTIME), false },
     { MACRO_HOSTPERCENTCHANGE, STR(PERCENT_CHANGE), true },
     { MACRO_HOSTEXECUTIONTIME, STR(EXECUTION_TIME), true },
     { MACRO_HOSTLATENCY, STR(LATENCY), true },
@@ -189,8 +170,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTHOSTUP, STR(LAST_UP), false },
     { MACRO_LASTHOSTDOWN, STR(LAST_DOWN), false },
     { MACRO_LASTHOSTUNREACHABLE, STR(LAST_UNREACHABLE), false },
-    { MACRO_HOSTNOTIFICATIONNUMBER, STR(NOTIFICATION_NUMBER), false },
-    { MACRO_HOSTNOTIFICATIONID, STR(NOTIFICATION_ID), false },
     { MACRO_HOSTEVENTID, STR(EVENT_ID), false },
     { MACRO_LASTHOSTEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_HOSTPROBLEMID, STR(PROBLEM_ID), false },
@@ -200,11 +179,7 @@ int main_test(int argc, char** argv) {
     { MACRO_TOTALHOSTSERVICESOK, STR(TOTAL_SERVICES_OK), false },
     { MACRO_TOTALHOSTSERVICESWARNING, STR(TOTAL_SERVICES_WARNING), false },
     { MACRO_TOTALHOSTSERVICESUNKNOWN, STR(TOTAL_SERVICES_UNKNOWN), false },
-    { MACRO_TOTALHOSTSERVICESCRITICAL, STR(TOTAL_SERVICES_CRITICAL), false },
-    { MACRO_HOSTACKAUTHOR, STR(ACK_AUTHOR), false },
-    { MACRO_HOSTACKAUTHORNAME, STR(ACK_AUTHOR_NAME), false },
-    { MACRO_HOSTACKAUTHORALIAS, STR(ACK_AUTHOR_ALIAS), false },
-    { MACRO_HOSTACKCOMMENT, STR(ACK_COMMENT), false }
+    { MACRO_TOTALHOSTSERVICESCRITICAL, STR(TOTAL_SERVICES_CRITICAL), false }
   };
 
   // Compare macros with expected values.
@@ -251,11 +226,6 @@ int main_test(int argc, char** argv) {
   delete [] mac.x[MACRO_TOTALHOSTSERVICESWARNING];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESUNKNOWN];
   delete [] mac.x[MACRO_TOTALHOSTSERVICESCRITICAL];
-
-  delete [] mac.x[MACRO_HOSTACKAUTHOR];
-  delete [] mac.x[MACRO_HOSTACKAUTHORNAME];
-  delete [] mac.x[MACRO_HOSTACKAUTHORALIAS];
-  delete [] mac.x[MACRO_HOSTACKCOMMENT];
 
   return (retval);
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,8 +50,7 @@ using namespace com::centreon::engine::string;
 bool operator==(
        hostdependency const& obj1,
        hostdependency const& obj2) throw () {
-  return (obj1.dependency_type == obj2.dependency_type
-          && is_equal(obj1.dependent_host_name, obj2.dependent_host_name)
+  return (is_equal(obj1.dependent_host_name, obj2.dependent_host_name)
           && is_equal(obj1.host_name, obj2.host_name)
           && is_equal(obj1.dependency_period, obj2.dependency_period)
           && obj1.inherits_parent == obj2.inherits_parent
@@ -91,8 +90,6 @@ bool operator<(
   CMP_CSTR(obj1.dependent_host_name, obj2.dependent_host_name)
   else
     CMP_CSTR(obj1.host_name, obj2.host_name)
-  else if (obj1.dependency_type != obj2.dependency_type)
-    return (obj1.dependency_type < obj2.dependency_type);
   else
     CMP_CSTR(obj1.dependency_period, obj2.dependency_period)
   else if (obj1.inherits_parent != obj2.inherits_parent)
@@ -130,7 +127,6 @@ std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
     master_hst_str = obj.master_host_ptr->name;
 
   os << "hostdependency {\n"
-    "  dependency_type:        " << obj.dependency_type << "\n"
     "  dependent_host_name:    " << chkstr(obj.dependent_host_name) << "\n"
     "  host_name:              " << chkstr(obj.host_name) << "\n"
     "  dependency_period:      " << chkstr(obj.dependency_period) << "\n"
@@ -153,7 +149,6 @@ std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
  *
  *  @param[in] dependent_host_name Dependant host name.
  *  @param[in] host_name           Host name.
- *  @param[in] dependency_type     Dependency type.
  *  @param[in] inherits_parent     Do we inherits from parent ?
  *  @param[in] fail_on_up          Does dependency fail on up ?
  *  @param[in] fail_on_down        Does dependency fail on down ?
@@ -166,7 +161,6 @@ std::ostream& operator<<(std::ostream& os, hostdependency const& obj) {
 hostdependency* add_host_dependency(
                   char const* dependent_host_name,
                   char const* host_name,
-                  int dependency_type,
                   int inherits_parent,
                   int fail_on_up,
                   int fail_on_down,
@@ -193,7 +187,6 @@ hostdependency* add_host_dependency(
     obj->host_name = string::dup(host_name);
     if (dependency_period)
       obj->dependency_period = string::dup(dependency_period);
-    obj->dependency_type = (dependency_type == EXECUTION_DEPENDENCY ? EXECUTION_DEPENDENCY : NOTIFICATION_DEPENDENCY);
     obj->fail_on_down = (fail_on_down == 1);
     obj->fail_on_pending = (fail_on_pending == 1);
     obj->fail_on_unreachable = (fail_on_unreachable == 1);
@@ -227,22 +220,15 @@ hostdependency* add_host_dependency(
 /**
  *  Checks to see if there exists a circular dependency for a host.
  *
- *  @param[in] root_dep        Root dependency.
- *  @param[in] dep             Dependency.
- *  @param[in] dependency_type Dependency type.
+ *  @param[in] root_dep  Root dependency.
+ *  @param[in] dep       Dependency.
  *
- *  @return true if circular path was found, false otherwise.
+ *  @return True if circular path was found, false otherwise.
  */
 int check_for_circular_hostdependency_path(
       hostdependency* root_dep,
-      hostdependency* dep,
-      int dependency_type) {
+      hostdependency* dep) {
   if (!root_dep || !dep)
-    return (false);
-
-  // This is not the proper dependency type.
-  if ((root_dep->dependency_type != dependency_type)
-      || (dep->dependency_type != dependency_type))
     return (false);
 
   // Don't go into a loop, don't bother checking anymore if we know this
@@ -268,12 +254,6 @@ int check_for_circular_hostdependency_path(
     }
   }
 
-  // Notification dependencies are ok at this point as long as they
-  // don't inherit.
-  if ((dependency_type == NOTIFICATION_DEPENDENCY)
-      && (dep->inherits_parent == false))
-    return (false);
-
   // Check all parent dependencies.
   for (hostdependency* temp_hd(hostdependency_list);
        temp_hd;
@@ -282,13 +262,9 @@ int check_for_circular_hostdependency_path(
     if (dep->master_host_ptr != temp_hd->dependent_host_ptr)
       continue;
 
-    if (check_for_circular_hostdependency_path(
-          root_dep,
-          temp_hd,
-          dependency_type) == true)
+    if (check_for_circular_hostdependency_path(root_dep, temp_hd))
       return (true);
   }
 
   return (false);
 }
-

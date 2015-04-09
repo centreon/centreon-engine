@@ -16,7 +16,6 @@ Advanced
    on_call_rotations
    monitoring_service_and_host_clusters
    host_and_service_dependencies
-   state_stalking
    performance_data
    scheduled_downtime
    adaptive_monitoring
@@ -30,6 +29,5 @@ Advanced
    determining_status_and_reachability_of_network_hosts
    fast_startup_options
    known_issues
-   large_installation_tweaks
    security_considerations
    centengine_plugin_api

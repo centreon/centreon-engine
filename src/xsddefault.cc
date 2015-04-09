@@ -1,7 +1,7 @@
 /*
 ** Copyright 2000-2009 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,11 +32,8 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
-#include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/xsddefault.hh"
-#include "skiplist.h"
 
 using namespace com::centreon::engine;
 
@@ -102,13 +99,11 @@ int xsddefault_save_status_data() {
   logger(logging::dbg_functions, logging::basic)
     << "save_status_data()";
 
-  // get number of items in the command buffer
-  if (config->check_external_commands()) {
-    pthread_mutex_lock(&external_command_buffer.buffer_lock);
-    used_external_command_buffer_slots = external_command_buffer.items;
-    high_external_command_buffer_slots = external_command_buffer.high;
-    pthread_mutex_unlock(&external_command_buffer.buffer_lock);
-  }
+  // Get number of items in the command buffer.
+  // pthread_mutex_lock(&external_command_buffer.buffer_lock);
+  // used_external_command_buffer_slots = external_command_buffer.items;
+  // high_external_command_buffer_slots = external_command_buffer.high;
+  // pthread_mutex_unlock(&external_command_buffer.buffer_lock);
 
   // generate check statistics
   generate_check_stats();
@@ -139,28 +134,19 @@ int xsddefault_save_status_data() {
        "\tnagios_pid=" << static_cast<unsigned int>(getpid()) << "\n"
        "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
        "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
-       "\tenable_notifications=" << config->enable_notifications() << "\n"
-       "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
-       "\tpassive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
-       "\tactive_host_checks_enabled=" << config->execute_host_checks() << "\n"
-       "\tpassive_host_checks_enabled=" << config->accept_passive_host_checks() << "\n"
        "\tenable_event_handlers=" << config->enable_event_handlers() << "\n"
        "\tobsess_over_services=" << config->obsess_over_services() << "\n"
        "\tobsess_over_hosts=" << config->obsess_over_hosts() << "\n"
        "\tcheck_service_freshness=" << config->check_service_freshness() << "\n"
        "\tcheck_host_freshness=" << config->check_host_freshness() << "\n"
        "\tenable_flap_detection=" << config->enable_flap_detection() << "\n"
-       "\tenable_failure_prediction=" << config->enable_failure_prediction() << "\n"
        "\tglobal_host_event_handler=" << config->global_host_event_handler().c_str() << "\n"
        "\tglobal_service_event_handler=" << config->global_service_event_handler().c_str() << "\n"
-       "\tnext_comment_id=" << next_comment_id << "\n"
-       "\tnext_downtime_id=" << next_downtime_id << "\n"
        "\tnext_event_id=" << next_event_id << "\n"
        "\tnext_problem_id=" << next_problem_id << "\n"
-       "\tnext_notification_id=" << next_notification_id << "\n"
-       "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
-       "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
-       "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
+       // "\ttotal_external_command_buffer_slots=" << config->external_command_buffer_slots() << "\n"
+       // "\tused_external_command_buffer_slots=" << used_external_command_buffer_slots << "\n"
+       // "\thigh_external_command_buffer_slots=" << high_external_command_buffer_slots << "\n"
        "\tactive_scheduled_host_check_stats="
     << check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[0] << ","
     << check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[1] << ","
@@ -215,7 +201,6 @@ int xsddefault_save_status_data() {
          "\tmodified_attributes=" << hst->modified_attributes << "\n"
          "\tcheck_command=" << (hst->host_check_command ? hst->host_check_command : "") << "\n"
          "\tcheck_period=" << (hst->check_period ? hst->check_period : "") << "\n"
-         "\tnotification_period=" << (hst->notification_period ? hst->notification_period : "") << "\n"
          "\tcheck_interval=" << hst->check_interval << "\n"
          "\tretry_interval=" << hst->retry_interval << "\n"
          "\tevent_handler=" << (hst->event_handler ? hst->event_handler : "") << "\n"
@@ -244,24 +229,13 @@ int xsddefault_save_status_data() {
          "\tlast_time_up=" << static_cast<unsigned long>(hst->last_time_up) << "\n"
          "\tlast_time_down=" << static_cast<unsigned long>(hst->last_time_down) << "\n"
          "\tlast_time_unreachable=" << static_cast<unsigned long>(hst->last_time_unreachable) << "\n"
-         "\tlast_notification=" << static_cast<unsigned long>(hst->last_host_notification) << "\n"
-         "\tnext_notification=" << static_cast<unsigned long>(hst->next_host_notification) << "\n"
-         "\tno_more_notifications=" << hst->no_more_notifications << "\n"
-         "\tcurrent_notification_number=" << hst->current_notification_number << "\n"
-         "\tcurrent_notification_id=" << hst->current_notification_id << "\n"
-         "\tnotifications_enabled=" << hst->notifications_enabled << "\n"
-         "\tproblem_has_been_acknowledged=" << hst->problem_has_been_acknowledged << "\n"
-         "\tacknowledgement_type=" << hst->acknowledgement_type << "\n"
          "\tactive_checks_enabled=" << hst->checks_enabled << "\n"
-         "\tpassive_checks_enabled=" << hst->accept_passive_host_checks << "\n"
          "\tevent_handler_enabled=" << hst->event_handler_enabled << "\n"
          "\tflap_detection_enabled=" << hst->flap_detection_enabled << "\n"
-         "\tfailure_prediction_enabled=" << hst->failure_prediction_enabled << "\n"
          "\tobsess_over_host=" << hst->obsess_over_host << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << hst->is_flapping << "\n"
-         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << hst->percent_state_change << "\n"
-         "\tscheduled_downtime_depth=" << hst->scheduled_downtime_depth << "\n";
+         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << hst->percent_state_change << "\n";
 
     // custom variables
     for (customvariablesmember* cvarm = hst->custom_variables; cvarm; cvarm = cvarm->next) {
@@ -281,7 +255,6 @@ int xsddefault_save_status_data() {
          "\tmodified_attributes=" << svc->modified_attributes << "\n"
          "\tcheck_command=" << (svc->service_check_command ? svc->service_check_command : "") << "\n"
          "\tcheck_period=" << (svc->check_period ? svc->check_period : "") << "\n"
-         "\tnotification_period=" << (svc->notification_period ? svc->notification_period : "") << "\n"
          "\tcheck_interval=" << svc->check_interval << "\n"
          "\tretry_interval=" << svc->retry_interval << "\n"
          "\tevent_handler=" << (svc->event_handler ? svc->event_handler : "") << "\n"
@@ -311,24 +284,13 @@ int xsddefault_save_status_data() {
          "\tlast_check=" << static_cast<unsigned long>(svc->last_check) << "\n"
          "\tnext_check=" << static_cast<unsigned long>(svc->next_check) << "\n"
          "\tcheck_options=" << svc->check_options << "\n"
-         "\tcurrent_notification_number=" << svc->current_notification_number << "\n"
-         "\tcurrent_notification_id=" << svc->current_notification_id << "\n"
-         "\tlast_notification=" << static_cast<unsigned long>(svc->last_notification) << "\n"
-         "\tnext_notification=" << static_cast<unsigned long>(svc->next_notification) << "\n"
-         "\tno_more_notifications=" << svc->no_more_notifications << "\n"
-         "\tnotifications_enabled=" << svc->notifications_enabled << "\n"
          "\tactive_checks_enabled=" << svc->checks_enabled << "\n"
-         "\tpassive_checks_enabled=" << svc->accept_passive_service_checks << "\n"
          "\tevent_handler_enabled=" << svc->event_handler_enabled << "\n"
-         "\tproblem_has_been_acknowledged=" << svc->problem_has_been_acknowledged << "\n"
-         "\tacknowledgement_type=" << svc->acknowledgement_type << "\n"
          "\tflap_detection_enabled=" << svc->flap_detection_enabled << "\n"
-         "\tfailure_prediction_enabled=" << svc->failure_prediction_enabled << "\n"
          "\tobsess_over_service=" << svc->obsess_over_service << "\n"
          "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
          "\tis_flapping=" << svc->is_flapping << "\n"
-         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << svc->percent_state_change << "\n"
-         "\tscheduled_downtime_depth=" << svc->scheduled_downtime_depth << "\n";
+         "\tpercent_state_change=" << std::setprecision(2) << std::fixed << svc->percent_state_change << "\n";
 
     // custom variables
     for (customvariablesmember* cvarm = svc->custom_variables; cvarm; cvarm = cvarm->next) {
@@ -337,73 +299,6 @@ int xsddefault_save_status_data() {
                << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
     }
     stream << "\t}\n\n";
-  }
-
-  // save contact status data
-  for (contact* cntct = contact_list; cntct; cntct = cntct->next) {
-    stream
-      << "contactstatus {\n"
-         "\tcontact_name=" << cntct->name << "\n"
-         "\tmodified_attributes=" << cntct->modified_attributes << "\n"
-         "\tmodified_host_attributes=" << cntct->modified_host_attributes << "\n"
-         "\tmodified_service_attributes=" << cntct->modified_service_attributes << "\n"
-         "\thost_notification_period=" << (cntct->host_notification_period ? cntct->host_notification_period : "") << "\n"
-         "\tservice_notification_period=" << (cntct->service_notification_period ? cntct->service_notification_period : "") << "\n"
-         "\tlast_host_notification=" << static_cast<unsigned long>(cntct->last_host_notification) << "\n"
-         "\tlast_service_notification=" << static_cast<unsigned long>(cntct->last_service_notification) << "\n"
-         "\thost_notifications_enabled=" << cntct->host_notifications_enabled << "\n"
-         "\tservice_notifications_enabled=" << cntct->service_notifications_enabled << "\n";
-    // custom variables
-    for (customvariablesmember* cvarm = cntct->custom_variables; cvarm; cvarm = cvarm->next) {
-      if (cvarm->variable_name)
-        stream << "\t_" << cvarm->variable_name << "=" << cvarm->has_been_modified << ";"
-               << (cvarm->variable_value ? cvarm->variable_value : "") << "\n";
-    }
-    stream << "\t}\n\n";
-  }
-
-  // save all comments
-  for (comment* com = comment_list; com; com = com->next) {
-    if (com->comment_type == HOST_COMMENT)
-      stream << "hostcomment {\n";
-    else
-      stream << "servicecomment {\n";
-    stream << "\thost_name=" << com->host_name << "\n";
-    if (com->comment_type == SERVICE_COMMENT)
-      stream << "\tservice_description=" << com->service_description << "\n";
-    stream
-      << "\tentry_type=" << com->entry_type << "\n"
-         "\tcomment_id=" << com->comment_id << "\n"
-         "\tsource=" << com->source << "\n"
-         "\tpersistent=" << com->persistent << "\n"
-         "\tentry_time=" << static_cast<unsigned long>(com->entry_time) << "\n"
-         "\texpires=" << com->expires << "\n"
-         "\texpire_time=" << static_cast<unsigned long>(com->expire_time) << "\n"
-         "\tauthor=" << com->author << "\n"
-         "\tcomment_data=" << com->comment_data << "\n"
-         "\t}\n\n";
-  }
-
-  // save all downtime
-  for (scheduled_downtime* dt = scheduled_downtime_list; dt; dt = dt->next) {
-    if (dt->type == HOST_DOWNTIME)
-      stream << "hostdowntime {\n";
-    else
-      stream << "servicedowntime {\n";
-    stream << "\thost_name=" << dt->host_name << "\n";
-    if (dt->type == SERVICE_DOWNTIME)
-      stream << "\tservice_description=" << dt->service_description << "\n";
-    stream
-      << "\tdowntime_id=" << dt->downtime_id << "\n"
-         "\tentry_time=" << static_cast<unsigned long>(dt->entry_time) << "\n"
-         "\tstart_time=" << static_cast<unsigned long>(dt->start_time) << "\n"
-         "\tend_time=" << static_cast<unsigned long>(dt->end_time) << "\n"
-         "\ttriggered_by=" << dt->triggered_by << "\n"
-         "\tfixed=" << dt->fixed << "\n"
-         "\tduration=" << dt->duration << "\n"
-         "\tauthor=" << dt->author << "\n"
-         "\tcomment=" << dt->comment << "\n"
-         "\t}\n\n";
   }
 
   // Write data in buffer.

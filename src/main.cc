@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -53,13 +53,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/nebmods.hh"
-#include "com/centreon/engine/notifications.hh"
-#include "com/centreon/engine/objects/comment.hh"
-#include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/retention/dump.hh"
 #include "com/centreon/engine/retention/parser.hh"
 #include "com/centreon/engine/retention/state.hh"
-#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
@@ -99,11 +95,12 @@ int main(int argc, char* argv[]) {
     { "dont-verify-paths",     no_argument, NULL, 'x' },
     { "help",                  no_argument, NULL, 'h' },
     { "license",               no_argument, NULL, 'V' },
-    { "precache-objects",      no_argument, NULL, 'p' },
     { "test-scheduling",       no_argument, NULL, 's' },
-    { "use-precached-objects", no_argument, NULL, 'u' },
     { "verify-config",         no_argument, NULL, 'v' },
     { "version",               no_argument, NULL, 'V' },
+    // Deprecated.
+    { "precache-objects",      no_argument, NULL, 'p' },
+    { "use-precached-objects", no_argument, NULL, 'u' },
     { NULL,                    no_argument, NULL, '\0' }
   };
 #endif // HAVE_GETOPT_H
@@ -161,14 +158,19 @@ int main(int argc, char* argv[]) {
       case 'x': // Don't verify circular paths.
         verify_circular_paths = false;
         break;
-      case 'p': // Precache object config.
-        precache_objects = true;
-        break;
-      case 'u': // Use precached object config.
-        use_precached_objects = true;
-        break;
       case 'D': // Diagnostic.
         diagnose = true;
+        break;
+      case 'p': // Deprecated.
+        logger(logging::log_config_warning, logging::basic)
+          << "Centreon Engine does not recognize the -p (--precache-objects) flag\n"
+          << "anymore. Configuration caching is not requested to get a fast startup.\n";
+        break;
+      case 'u': // Deprecated.
+        logger(logging::log_config_warning, logging::basic)
+          << "Centreon Engine does not recognize the -u (--use-precached-objects)\n"
+          << "flag anymore. Configuration caching is not requested to get a fast\n"
+          << "startup.\n";
         break;
       default:
         error = true;
@@ -177,8 +179,6 @@ int main(int argc, char* argv[]) {
 
     // Invalid argument count.
     if ((argc < 2)
-        // Invalid argument combination.
-        || (precache_objects && !test_scheduling && !verify_config)
         // Main configuration file not on command line.
         || (optind >= argc))
       error = true;
@@ -240,9 +240,6 @@ int main(int argc, char* argv[]) {
         << "                              files.\n"
         << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
         << "                              USE WITH CAUTION !\n"
-        << "  -p, --precache-objects      Precache object configuration - use with\n"
-        << "                              -v or -s options.\n"
-        << "  -u, --use-precached-objects Use precached object config file.\n"
         << "  -D, --diagnose              Generate a diagnostic file.";
       retval = (display_help ? EXIT_SUCCESS : EXIT_FAILURE);
     }
@@ -265,13 +262,10 @@ int main(int argc, char* argv[]) {
           << "\n"
           << "Checked " << applier.commands().size() << " commands.\n"
           << "Checked " << applier.connectors().size() << " connectors.\n"
-          << "Checked " << applier.contacts().size() << " contacts.\n"
           << "Checked " << applier.hostdependencies().size() << " host dependencies.\n"
-          << "Checked " << applier.hostescalations().size() << " host escalations.\n"
           << "Checked " << applier.hostgroups().size() << " host groups.\n"
           << "Checked " << applier.hosts().size() << " hosts.\n"
           << "Checked " << applier.servicedependencies().size() << " service dependencies.\n"
-          << "Checked " << applier.serviceescalations().size() << " service escalations.\n"
           << "Checked " << applier.servicegroups().size() << " service groups.\n"
           << "Checked " << applier.services().size() << " services.\n"
           << "Checked " << applier.timeperiods().size() << " time periods.\n"
@@ -315,13 +309,9 @@ int main(int argc, char* argv[]) {
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
 
+        // Print scheduling information.
         display_scheduling_info();
-        if (precache_objects)
-          logger(logging::log_info_message, logging::basic)
-            << "\n"
-            << "OBJECT PRECACHING\n"
-            << "-----------------\n"
-            << "Object config files were precached.";
+
         retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {
@@ -377,15 +367,6 @@ int main(int argc, char* argv[]) {
         }
         neb_init_callback_list();
 
-        // Initialize status data.
-        initialize_status_data();
-
-        // Initialize comment data.
-        initialize_comment_data();
-
-        // Initialize scheduled downtime data.
-        initialize_downtime_data();
-
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
 
@@ -412,9 +393,6 @@ int main(int argc, char* argv[]) {
 
         // Initialize check statistics.
         init_check_stats();
-
-        // Update all status data (with retained information).
-        update_all_status_data();
 
         // Log initial host and service state.
         log_host_states(INITIAL_STATES, NULL);
@@ -457,9 +435,6 @@ int main(int argc, char* argv[]) {
 
         // Save service and host state information.
         retention::dump::save(::config->state_retention_file());
-
-        // Clean up the status data.
-        cleanup_status_data(true);
 
         // Shutdown stuff.
         if (sigshutdown)

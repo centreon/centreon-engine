@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,8 +24,6 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
-#include "com/centreon/engine/objects/contactgroupsmember.hh"
-#include "com/centreon/engine/objects/contactsmember.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/tool.hh"
@@ -52,7 +50,6 @@ bool operator==(
        service const& obj2) throw () {
   return (is_equal(obj1.host_name, obj2.host_name)
           && is_equal(obj1.description, obj2.description)
-          && is_equal(obj1.display_name, obj2.display_name)
           && is_equal(obj1.service_check_command, obj2.service_check_command)
           && is_equal(obj1.event_handler, obj2.event_handler)
           && obj1.initial_state == obj2.initial_state
@@ -60,23 +57,7 @@ bool operator==(
           && obj1.retry_interval == obj2.retry_interval
           && obj1.max_attempts == obj2.max_attempts
           && obj1.check_timeout == obj2.check_timeout
-          && obj1.parallelize == obj2.parallelize
-          && is_equal(obj1.contact_groups, obj2.contact_groups)
-          && is_equal(obj1.contacts, obj2.contacts)
-          && obj1.notification_interval == obj2.notification_interval
-          && obj1.first_notification_delay == obj2.first_notification_delay
-          && obj1.notify_on_unknown == obj2.notify_on_unknown
-          && obj1.notify_on_warning == obj2.notify_on_warning
-          && obj1.notify_on_critical == obj2.notify_on_critical
-          && obj1.notify_on_recovery == obj2.notify_on_recovery
-          && obj1.notify_on_flapping == obj2.notify_on_flapping
-          && obj1.notify_on_downtime == obj2.notify_on_downtime
-          && obj1.stalk_on_ok == obj2.stalk_on_ok
-          && obj1.stalk_on_warning == obj2.stalk_on_warning
-          && obj1.stalk_on_unknown == obj2.stalk_on_unknown
-          && obj1.stalk_on_critical == obj2.stalk_on_critical
           && obj1.is_volatile == obj2.is_volatile
-          && is_equal(obj1.notification_period, obj2.notification_period)
           && is_equal(obj1.check_period, obj2.check_period)
           && obj1.flap_detection_enabled == obj2.flap_detection_enabled
           && obj1.low_flap_threshold == obj2.low_flap_threshold
@@ -87,18 +68,10 @@ bool operator==(
           && obj1.flap_detection_on_critical == obj2.flap_detection_on_critical
           && obj1.check_freshness == obj2.check_freshness
           && obj1.freshness_threshold == obj2.freshness_threshold
-          && obj1.accept_passive_service_checks == obj2.accept_passive_service_checks
           && obj1.event_handler_enabled == obj2.event_handler_enabled
           && obj1.checks_enabled == obj2.checks_enabled
-          && obj1.retain_status_information == obj2.retain_status_information
-          && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
-          && obj1.notifications_enabled == obj2.notifications_enabled
           && obj1.obsess_over_service == obj2.obsess_over_service
-          && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
-          && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
           && is_equal(obj1.custom_variables, obj2.custom_variables)
-          && obj1.problem_has_been_acknowledged == obj2.problem_has_been_acknowledged
-          && obj1.acknowledgement_type == obj2.acknowledgement_type
           && obj1.host_problem_at_last_check == obj2.host_problem_at_last_check
           && obj1.check_type == obj2.check_type
           && obj1.current_state == obj2.current_state
@@ -116,10 +89,6 @@ bool operator==(
           && obj1.last_event_id == obj2.last_event_id
           && obj1.current_problem_id == obj2.current_problem_id
           && obj1.last_problem_id == obj2.last_problem_id
-          && obj1.last_notification == obj2.last_notification
-          && obj1.next_notification == obj2.next_notification
-          && obj1.no_more_notifications == obj2.no_more_notifications
-          && obj1.check_flapping_recovery_notification == obj2.check_flapping_recovery_notification
           && obj1.last_state_change == obj2.last_state_change
           && obj1.last_hard_state_change == obj2.last_hard_state_change
           && obj1.last_time_ok == obj2.last_time_ok
@@ -128,21 +97,13 @@ bool operator==(
           && obj1.last_time_critical == obj2.last_time_critical
           && obj1.has_been_checked == obj2.has_been_checked
           && obj1.is_being_freshened == obj2.is_being_freshened
-          && obj1.notified_on_unknown == obj2.notified_on_unknown
-          && obj1.notified_on_warning == obj2.notified_on_warning
-          && obj1.notified_on_critical == obj2.notified_on_critical
-          && obj1.current_notification_number == obj2.current_notification_number
-          && obj1.current_notification_id == obj2.current_notification_id
           && obj1.latency == obj2.latency
           && obj1.execution_time == obj2.execution_time
           && obj1.is_executing == obj2.is_executing
           && obj1.check_options == obj2.check_options
-          && obj1.scheduled_downtime_depth == obj2.scheduled_downtime_depth
-          && obj1.pending_flex_downtime == obj2.pending_flex_downtime
           && is_equal(obj1.state_history, obj2.state_history, MAX_STATE_HISTORY_ENTRIES)
           && obj1.state_history_index == obj2.state_history_index
           && obj1.is_flapping == obj2.is_flapping
-          && obj1.flapping_comment_id == obj2.flapping_comment_id
           && obj1.percent_state_change == obj2.percent_state_change
           && obj1.modified_attributes == obj2.modified_attributes
           && is_equal(obj1.event_handler_args, obj2.event_handler_args)
@@ -185,9 +146,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
   char const* chk_period_str(NULL);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* notif_period_str(NULL);
-  if (obj.notification_period_ptr)
-    notif_period_str = chkstr(obj.notification_period_ptr->name);
   char const* svcgrp_str(NULL);
   if (obj.servicegroups_ptr)
     svcgrp_str = chkstr(static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)->group_name);
@@ -195,7 +153,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
   os << "service {\n"
     "  host_name:                            " << chkstr(obj.host_name) << "\n"
     "  description:                          " << chkstr(obj.description) << "\n"
-    "  display_name:                         " << chkstr(obj.display_name) << "\n"
     "  service_check_command:                " << chkstr(obj.service_check_command) << "\n"
     "  event_handler:                        " << chkstr(obj.event_handler) << "\n"
     "  initial_state:                        " << obj.initial_state << "\n"
@@ -203,23 +160,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  retry_interval:                       " << obj.retry_interval << "\n"
     "  max_attempts:                         " << obj.max_attempts << "\n"
     "  check_timeout:                        " << obj.check_timeout << "\n"
-    "  parallelize:                          " << obj.parallelize << "\n"
-    "  contact_groups:                       " << chkobj(obj.contact_groups) << "\n"
-    "  contacts:                             " << chkobj(obj.contacts) << "\n"
-    "  notification_interval:                " << obj.notification_interval << "\n"
-    "  first_notification_delay:             " << obj.first_notification_delay << "\n"
-    "  notify_on_unknown:                    " << obj.notify_on_unknown << "\n"
-    "  notify_on_warning:                    " << obj.notify_on_warning << "\n"
-    "  notify_on_critical:                   " << obj.notify_on_critical << "\n"
-    "  notify_on_recovery:                   " << obj.notify_on_recovery << "\n"
-    "  notify_on_flapping:                   " << obj.notify_on_flapping << "\n"
-    "  notify_on_downtime:                   " << obj.notify_on_downtime << "\n"
-    "  stalk_on_ok:                          " << obj.stalk_on_ok << "\n"
-    "  stalk_on_warning:                     " << obj.stalk_on_warning << "\n"
-    "  stalk_on_unknown:                     " << obj.stalk_on_unknown << "\n"
-    "  stalk_on_critical:                    " << obj.stalk_on_critical << "\n"
     "  is_volatile:                          " << obj.is_volatile << "\n"
-    "  notification_period:                  " << chkstr(obj.notification_period) << "\n"
     "  check_period:                         " << chkstr(obj.check_period) << "\n"
     "  flap_detection_enabled:               " << obj.flap_detection_enabled << "\n"
     "  low_flap_threshold:                   " << obj.low_flap_threshold << "\n"
@@ -230,17 +171,9 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  flap_detection_on_critical:           " << obj.flap_detection_on_critical << "\n"
     "  check_freshness:                      " << obj.check_freshness << "\n"
     "  freshness_threshold:                  " << obj.freshness_threshold << "\n"
-    "  accept_passive_service_checks:        " << obj.accept_passive_service_checks << "\n"
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
     "  checks_enabled:                       " << obj.checks_enabled << "\n"
-    "  retain_status_information:            " << obj.retain_status_information << "\n"
-    "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
-    "  notifications_enabled:                " << obj.notifications_enabled << "\n"
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
-    "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
-    "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
-    "  problem_has_been_acknowledged:        " << obj.problem_has_been_acknowledged << "\n"
-    "  acknowledgement_type:                 " << obj.acknowledgement_type << "\n"
     "  host_problem_at_last_check:           " << obj.host_problem_at_last_check << "\n"
     "  check_type:                           " << obj.check_type << "\n"
     "  current_state:                        " << obj.current_state << "\n"
@@ -258,10 +191,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  last_event_id:                        " << obj.last_event_id << "\n"
     "  current_problem_id:                   " << obj.current_problem_id << "\n"
     "  last_problem_id:                      " << obj.last_problem_id << "\n"
-    "  last_notification:                    " << string::ctime(obj.last_notification) << "\n"
-    "  next_notification:                    " << string::ctime(obj.next_notification) << "\n"
-    "  no_more_notifications:                " << obj.no_more_notifications << "\n"
-    "  check_flapping_recovery_notification: " << obj.check_flapping_recovery_notification << "\n"
     "  last_state_change:                    " << string::ctime(obj.last_state_change) << "\n"
     "  last_hard_state_change:               " << string::ctime(obj.last_hard_state_change) << "\n"
     "  last_time_ok:                         " << string::ctime(obj.last_time_ok) << "\n"
@@ -270,17 +199,10 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  last_time_critical:                   " << string::ctime(obj.last_time_critical) << "\n"
     "  has_been_checked:                     " << obj.has_been_checked << "\n"
     "  is_being_freshened:                   " << obj.is_being_freshened << "\n"
-    "  notified_on_unknown:                  " << obj.notified_on_unknown << "\n"
-    "  notified_on_warning:                  " << obj.notified_on_warning << "\n"
-    "  notified_on_critical:                 " << obj.notified_on_critical << "\n"
-    "  current_notification_number:          " << obj.current_notification_number << "\n"
-    "  current_notification_id:              " << obj.current_notification_id << "\n"
     "  latency:                              " << obj.latency << "\n"
     "  execution_time:                       " << obj.execution_time << "\n"
     "  is_executing:                         " << obj.is_executing << "\n"
     "  check_options:                        " << obj.check_options << "\n"
-    "  scheduled_downtime_depth:             " << obj.scheduled_downtime_depth << "\n"
-    "  pending_flex_downtime:                " << obj.pending_flex_downtime << "\n"
     "  timezone:                             " << chkstr(obj.timezone) << "\n";
 
   os << "  state_history:                        ";
@@ -292,7 +214,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
   os <<
     "  state_history_index:                  " << obj.state_history_index << "\n"
     "  is_flapping:                          " << obj.is_flapping << "\n"
-    "  flapping_comment_id:                  " << obj.flapping_comment_id << "\n"
     "  percent_state_change:                 " << obj.percent_state_change << "\n"
     "  modified_attributes:                  " << obj.modified_attributes << "\n"
     "  host_ptr:                             " << chkstr(hst_str) << "\n"
@@ -301,7 +222,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_command_args:                   " << chkstr(obj.check_command_args) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
-    "  notification_period_ptr:              " << chkstr(notif_period_str) << "\n"
     "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n"
     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
     << "}\n";
@@ -314,35 +234,12 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] host_name                    Name of the host this
  *                                          service is running on.
  *  @param[in] description                  Service description.
- *  @param[in] display_name                 Display name.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
  *  @param[in] max_attempts                 Max check attempts.
  *  @param[in] check_timeout                Check timeout.
- *  @param[in] parallelize                  Can active checks be
- *                                          parallelized ?
- *  @param[in] accept_passive_checks        Does this service accept
- *                                          check result submission ?
  *  @param[in] check_interval               Normal check interval.
  *  @param[in] retry_interval               Retry check interval.
- *  @param[in] notification_interval        Notification interval.
- *  @param[in] first_notification_delay     First notification delay.
- *  @param[in] notification_period          Notification timeperiod
- *                                          name.
- *  @param[in] notify_recovery              Does this service notify
- *                                          when recovering ?
- *  @param[in] notify_unknown               Does this service notify in
- *                                          unknown state ?
- *  @param[in] notify_warning               Does this service notify in
- *                                          warning state ?
- *  @param[in] notify_critical              Does this service notify in
- *                                          critical state ?
- *  @param[in] notify_flapping              Does this service notify
- *                                          when flapping ?
- *  @param[in] notify_downtime              Does this service notify on
- *                                          downtime ?
- *  @param[in] notifications_enabled        Are notifications enabled
- *                                          for this service ?
  *  @param[in] is_volatile                  Is this service volatile ?
  *  @param[in] event_handler                Event handler command name.
  *  @param[in] event_handler_enabled        Whether or not event handler
@@ -361,19 +258,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *                                          for unknown state ?
  *  @param[in] flap_detection_on_critical   Is flap detection enabled
  *                                          for critical state ?
- *  @param[in] stalk_on_ok                  Stalk on ok state ?
- *  @param[in] stalk_on_warning             Stalk on warning state ?
- *  @param[in] stalk_on_unknown             Stalk on unknown state ?
- *  @param[in] stalk_on_critical            Stalk on critical state ?
- *  @param[in] failure_prediction_enabled   Whether failure prediction
- *                                          should be enabled or not.
- *  @param[in] failure_prediction_options   Failure prediction options.
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
- *  @param[in] retain_status_information    Should Engine retain service
- *                                          status information ?
- *  @param[in] retain_nonstatus_information Should Engine retain service
- *                                          non-status information ?
  *  @param[in] obsess_over_service          Should we obsess over
  *                                          service ?
  *  @param[in] timezone                     Service timezone.
@@ -383,25 +269,12 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
 service* add_service(
            char const* host_name,
            char const* description,
-           char const* display_name,
            char const* check_period,
            int initial_state,
            int max_attempts,
            unsigned int check_timeout,
-           int parallelize,
-           int accept_passive_checks,
            double check_interval,
            double retry_interval,
-           double notification_interval,
-           double first_notification_delay,
-           char const* notification_period,
-           int notify_recovery,
-           int notify_unknown,
-           int notify_warning,
-           int notify_critical,
-           int notify_flapping,
-           int notify_downtime,
-           int notifications_enabled,
            int is_volatile,
            char const* event_handler,
            int event_handler_enabled,
@@ -414,16 +287,8 @@ service* add_service(
            int flap_detection_on_warning,
            int flap_detection_on_unknown,
            int flap_detection_on_critical,
-           int stalk_on_ok,
-           int stalk_on_warning,
-           int stalk_on_unknown,
-           int stalk_on_critical,
-           int failure_prediction_enabled,
-           char const* failure_prediction_options,
            int check_freshness,
            int freshness_threshold,
-           int retain_status_information,
-           int retain_nonstatus_information,
            int obsess_over_service,
            char const* timezone) {
   // Make sure we have everything we need.
@@ -448,17 +313,10 @@ service* add_service(
   // Check values.
   if ((max_attempts <= 0)
       || (check_interval < 0)
-      || (retry_interval <= 0)
-      || (notification_interval < 0)) {
+      || (retry_interval < 0)) {
     logger(log_config_error, basic)
-      << "Error: Invalid max_attempts, check_interval, retry_interval"
-         ", or notification_interval value for service '"
-      << description << "' on host '" << host_name << "'";
-    return (NULL);
-  }
-  if (first_notification_delay < 0) {
-    logger(log_config_error, basic)
-      << "Error: Invalid first_notification_delay value for service '"
+      << "Error: Invalid max_attempts, check_interval or retry_interval"
+         " value for service '"
       << description << "' on host '" << host_name << "'";
     return (NULL);
   }
@@ -481,21 +339,14 @@ service* add_service(
     // Duplicate vars.
     obj->host_name = string::dup(host_name);
     obj->description = string::dup(description);
-    obj->display_name = string::dup(display_name ? display_name : description);
     obj->service_check_command = string::dup(check_command);
     if (event_handler)
       obj->event_handler = string::dup(event_handler);
-    if (notification_period)
-      obj->notification_period = string::dup(notification_period);
     if (check_period)
       obj->check_period = string::dup(check_period);
-    if (failure_prediction_options)
-      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (timezone)
       obj->timezone = string::dup(timezone);
 
-    obj->accept_passive_service_checks = (accept_passive_checks > 0);
-    obj->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     obj->check_freshness = (check_freshness > 0);
     obj->check_interval = check_interval;
     obj->check_options = CHECK_OPTION_NONE;
@@ -505,8 +356,6 @@ service* add_service(
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->failure_prediction_enabled = (failure_prediction_enabled > 0);
-    obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);
     obj->flap_detection_on_ok = (flap_detection_on_ok > 0);
@@ -521,24 +370,9 @@ service* add_service(
     obj->low_flap_threshold = low_flap_threshold;
     obj->max_attempts = max_attempts;
     obj->modified_attributes = MODATTR_NONE;
-    obj->notification_interval = notification_interval;
-    obj->notifications_enabled = (notifications_enabled > 0);
-    obj->notify_on_critical = (notify_critical > 0);
-    obj->notify_on_downtime = (notify_downtime > 0);
-    obj->notify_on_flapping = (notify_flapping > 0);
-    obj->notify_on_recovery = (notify_recovery > 0);
-    obj->notify_on_unknown = (notify_unknown > 0);
-    obj->notify_on_warning = (notify_warning > 0);
     obj->obsess_over_service = (obsess_over_service > 0);
-    obj->parallelize = (parallelize > 0);
-    obj->retain_nonstatus_information = (retain_nonstatus_information > 0);
-    obj->retain_status_information = (retain_status_information > 0);
     obj->retry_interval = retry_interval;
     obj->should_be_scheduled = true;
-    obj->stalk_on_critical = (stalk_on_critical > 0);
-    obj->stalk_on_ok = (stalk_on_ok > 0);
-    obj->stalk_on_unknown = (stalk_on_unknown > 0);
-    obj->stalk_on_warning = (stalk_on_warning > 0);
     obj->state_type = HARD_STATE;
 
     // STATE_OK = 0, so we don't need to set state_history (memset
@@ -579,76 +413,6 @@ service* add_service(
  */
 int get_service_count() {
   return (state::instance().services().size());
-}
-
-/**
- *  Tests whether a contact is a contact for a particular service.
- *
- *  @param[in] svc   Target service.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_contact_for_service(service* svc, contact* cntct) {
-  if (!svc || !cntct)
-    return (false);
-
-  // Search all individual contacts of this service.
-  for (contactsmember* member(svc->contacts);
-       member;
-       member = member->next)
-    if (member->contact_ptr == cntct)
-      return (true);
-
-  // Search all contactgroups of this service.
-  for (contactgroupsmember* member(svc->contact_groups);
-       member;
-       member = member->next)
-    if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-      return (true);
-
-  return (false);
-}
-
-/**
- *  Tests whether or not a contact is an escalated contact for a
- *  particular service.
- *
- *  @param[in] svc   Target service.
- *  @param[in] cntct Target contact.
- *
- *  @return true or false.
- */
-int is_escalated_contact_for_service(service* svc, contact* cntct) {
-  if (!svc || !cntct)
-    return (false);
-
-  std::pair<std::string, std::string>
-    id(std::make_pair(svc->host_name, svc->description));
-  umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> > const&
-    escalations(state::instance().serviceescalations());
-
-  for (umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation> >::const_iterator
-         it(escalations.find(id)), end(escalations.end());
-       it != end && it->first == id;
-       ++it) {
-    serviceescalation* svcescalation(&*it->second);
-    // Search all contacts of this service escalation.
-    for (contactsmember* member(svcescalation->contacts);
-         member;
-         member = member->next)
-      if (member->contact_ptr == cntct)
-        return (true);
-
-    // Search all contactgroups of this service escalation.
-    for (contactgroupsmember* member(svcescalation->contact_groups);
-         member;
-         member = member->next)
-      if (is_contact_member_of_contactgroup(member->group_ptr, cntct))
-        return (true);
-  }
-
-  return (false);
 }
 
 /**

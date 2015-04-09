@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,7 +19,9 @@
 */
 
 #include <sys/time.h>
+#include <cfloat>
 #include <cmath>
+#include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/statusdata.hh"
@@ -40,9 +42,12 @@ void init_timing_loop() {
   int is_valid_time = 0;
   time_t next_valid_time = 0L;
   int schedule_check = 0;
-  double max_inter_check_delay = 0.0;
   struct timeval tv[9];
   double runtime[9];
+  unsigned long service_check_interval_total = 0;
+  unsigned long host_check_interval_total = 0;
+  double service_check_spread = DBL_MAX;
+  double host_check_spread = DBL_MAX;
 
   logger(dbg_functions, basic)
     << "init_timing_loop()";
@@ -59,10 +64,6 @@ void init_timing_loop() {
   scheduling_info.average_services_per_host = 0.0;
   scheduling_info.average_scheduled_services_per_host = 0.0;
   scheduling_info.average_service_execution_time = 0.0;
-  scheduling_info.service_check_interval_total = 0;
-  scheduling_info.average_service_inter_check_delay = 0.0;
-  scheduling_info.host_check_interval_total = 0;
-  scheduling_info.average_host_inter_check_delay = 0.0;
 
   if (test_scheduling == true)
     gettimeofday(&tv[0], NULL);
@@ -101,7 +102,7 @@ void init_timing_loop() {
       scheduling_info.total_scheduled_services++;
 
       /* used later in inter-check delay calculations */
-      scheduling_info.service_check_interval_total
+      service_check_interval_total
         += static_cast<unsigned long>(temp_service->check_interval);
 
       /* calculate rolling average execution time (available from retained state information) */
@@ -110,6 +111,13 @@ void init_timing_loop() {
                      * (scheduling_info.total_scheduled_services - 1))
                     + temp_service->execution_time)
                    / (double)scheduling_info.total_scheduled_services);
+
+      /* set service check spread */
+      if (temp_service->check_interval < service_check_spread)
+        service_check_spread = temp_service->check_interval;
+      if ((temp_service->retry_interval < service_check_spread)
+          && (temp_service->retry_interval > 0.0))
+        service_check_spread = temp_service->retry_interval;
     }
     else {
       temp_service->should_be_scheduled = false;
@@ -159,8 +167,15 @@ void init_timing_loop() {
     if (schedule_check == true) {
       scheduling_info.total_scheduled_hosts++;
 
+      /* set host check spread */
+      if (temp_host->check_interval < host_check_spread)
+        host_check_spread = temp_host->check_interval;
+      if ((temp_host->retry_interval < host_check_spread)
+          && (temp_host->retry_interval > 0.0))
+        host_check_spread = temp_host->retry_interval;
+
       /* this is used later in inter-check delay calculations */
-      scheduling_info.host_check_interval_total
+      host_check_interval_total
         += static_cast<unsigned long>(temp_host->check_interval);
     }
     else {
@@ -190,16 +205,14 @@ void init_timing_loop() {
   }
 
   /* adjust the check interval total to correspond to the interval length */
-  scheduling_info.service_check_interval_total
-    = scheduling_info.service_check_interval_total
-    * config->interval_length();
+  service_check_interval_total *= config->interval_length();
 
   /* calculate the average check interval for services */
   if (scheduling_info.total_scheduled_services == 0)
     scheduling_info.average_service_check_interval = 0;
   else {
     scheduling_info.average_service_check_interval
-      = (double)((double)scheduling_info.service_check_interval_total
+      = (double)((double)service_check_interval_total
                  / (double)scheduling_info.total_scheduled_services);
   }
 
@@ -208,87 +221,49 @@ void init_timing_loop() {
   logger(dbg_events, most)
     << "Determining service scheduling parameters...";
 
-  /* default max service check spread (in minutes) */
-  scheduling_info.max_service_check_spread
-    = config->max_service_check_spread();
+  /* service check spread */
+  if ((service_check_spread > 0.0)
+      && (service_check_spread < 366.0 * 24 * 60 * 60))
+    scheduling_info.service_check_spread
+      = static_cast<int>(service_check_spread
+                         * config->interval_length());
+  else
+    scheduling_info.service_check_spread = 0;
 
-  /* how should we determine the service inter-check delay to use? */
-  switch (config->service_inter_check_delay_method()) {
-
-  case configuration::state::icd_none:
-    /* don't spread checks out - useful for testing parallelization code */
+  /* be smart and calculate the best delay to use to minimize local load... */
+  if (scheduling_info.total_scheduled_services > 0) {
+    /* calculate max inter check delay and see if we should use that instead */
+    scheduling_info.service_inter_check_delay
+      = scheduling_info.service_check_spread
+        / (double)scheduling_info.total_scheduled_services;
+  }
+  else
     scheduling_info.service_inter_check_delay = 0.0;
-    break;
 
-  case configuration::state::icd_dumb:
-    /* be dumb and just schedule checks 1 second apart */
-    scheduling_info.service_inter_check_delay = 1.0;
-    break;
+  logger(dbg_events, more)
+    << "Total scheduled service checks:  "
+    << scheduling_info.total_scheduled_services;
+  logger(dbg_events, more)
+    << com::centreon::logging::setprecision(2)
+    << "Average service check interval:  "
+    << scheduling_info.average_service_check_interval << " sec";
+  logger(dbg_events, more)
+    << com::centreon::logging::setprecision(2)
+    << "Service inter-check delay:       "
+    << scheduling_info.service_inter_check_delay << " sec";
 
-  case configuration::state::icd_user:
-    /* the user specified a delay, so don't try to calculate one */
-    break;
+  scheduling_info.service_interleave_factor
+    = (int)(ceil(scheduling_info.average_scheduled_services_per_host));
 
-  case configuration::state::icd_smart:
-  default:
-    /* be smart and calculate the best delay to use to minimize local load... */
-    if (scheduling_info.total_scheduled_services > 0
-        && scheduling_info.service_check_interval_total > 0) {
-
-      /* calculate the average inter check delay (in seconds) needed to evenly space the service checks out */
-      scheduling_info.average_service_inter_check_delay
-        = (double)(scheduling_info.average_service_check_interval
-                   / (double)scheduling_info.total_scheduled_services);
-
-      /* set the global inter check delay value */
-      scheduling_info.service_inter_check_delay
-        = scheduling_info.average_service_inter_check_delay;
-
-      /* calculate max inter check delay and see if we should use that instead */
-      max_inter_check_delay
-        = (double)((scheduling_info.max_service_check_spread * 60.0)
-                   / (double)scheduling_info.total_scheduled_services);
-      if (scheduling_info.service_inter_check_delay > max_inter_check_delay)
-        scheduling_info.service_inter_check_delay = max_inter_check_delay;
-    }
-    else
-      scheduling_info.service_inter_check_delay = 0.0;
-
-    logger(dbg_events, more)
-      << "Total scheduled service checks:  "
-      << scheduling_info.total_scheduled_services;
-    logger(dbg_events, more)
-      << com::centreon::logging::setprecision(2)
-      << "Average service check interval:  "
-      << scheduling_info.average_service_check_interval << " sec";
-    logger(dbg_events, more)
-      << com::centreon::logging::setprecision(2)
-      << "Service inter-check delay:       "
-      << scheduling_info.service_inter_check_delay << " sec";
-  }
-
-  /* how should we determine the service interleave factor? */
-  switch (config->service_interleave_factor_method()) {
-
-  case configuration::state::ilf_user:
-    /* the user supplied a value, so don't do any calculation */
-    break;
-
-  case configuration::state::ilf_smart:
-  default:
-    scheduling_info.service_interleave_factor
-      = (int)(ceil(scheduling_info.average_scheduled_services_per_host));
-
-    logger(dbg_events, more)
-      << "Total scheduled service checks: "
-      << scheduling_info.total_scheduled_services;
-    logger(dbg_events, more)
-      << "Total hosts:                    "
-      << scheduling_info.total_hosts;
-    logger(dbg_events, more)
-      << "Service Interleave factor:      "
-      << scheduling_info.service_interleave_factor;
-  }
+  logger(dbg_events, more)
+    << "Total scheduled service checks: "
+    << scheduling_info.total_scheduled_services;
+  logger(dbg_events, more)
+    << "Total hosts:                    "
+    << scheduling_info.total_hosts;
+  logger(dbg_events, more)
+    << "Service Interleave factor:      "
+    << scheduling_info.service_interleave_factor;
 
   /* calculate number of service interleave blocks */
   if (scheduling_info.service_interleave_factor == 0)
@@ -463,75 +438,44 @@ void init_timing_loop() {
   scheduling_info.first_host_check = (time_t)0L;
   scheduling_info.last_host_check = (time_t)0L;
 
-  /* default max host check spread (in minutes) */
-  scheduling_info.max_host_check_spread
-    = config->max_host_check_spread();
+  /* host check spread */
+  if ((host_check_spread > 0.0)
+      && (host_check_spread < 366.0 * 24 * 60 * 60))
+    scheduling_info.host_check_spread
+      = static_cast<int>(host_check_spread * config->interval_length());
+  else
+    scheduling_info.host_check_spread = 0;
 
-  /* how should we determine the host inter-check delay to use? */
-  switch (config->host_inter_check_delay_method()) {
-  case configuration::state::icd_none:
-    /* don't spread checks out */
-    scheduling_info.host_inter_check_delay = 0.0;
-    break;
+  /* be smart and calculate the best delay to use to minimize local load... */
+  if (scheduling_info.total_scheduled_hosts > 0) {
 
-  case configuration::state::icd_dumb:
-    /* be dumb and just schedule checks 1 second apart */
-    scheduling_info.host_inter_check_delay = 1.0;
-    break;
+    /* adjust the check interval total to correspond to the interval length */
+    host_check_interval_total *= config->interval_length();
 
-  case configuration::state::icd_user:
-    /* the user specified a delay, so don't try to calculate one */
-    break;
+    /* calculate the average check interval for hosts */
+    scheduling_info.average_host_check_interval
+      = host_check_interval_total
+        / (double)scheduling_info.total_scheduled_hosts;
 
-  case configuration::state::icd_smart:
-  default:
-    /* be smart and calculate the best delay to use to minimize local load... */
-    if (scheduling_info.total_scheduled_hosts > 0
-        && scheduling_info.host_check_interval_total > 0) {
-
-      /* adjust the check interval total to correspond to the interval length */
-      scheduling_info.host_check_interval_total
-	= scheduling_info.host_check_interval_total * config->interval_length();
-
-      /* calculate the average check interval for hosts */
-      scheduling_info.average_host_check_interval
-        = (double)((double)scheduling_info.host_check_interval_total
-                   / (double)scheduling_info.total_scheduled_hosts);
-
-      /* calculate the average inter check delay (in seconds) needed to evenly space the host checks out */
-      scheduling_info.average_host_inter_check_delay
-	= (double)(scheduling_info.average_host_check_interval
-                   / (double)scheduling_info.total_scheduled_hosts);
-
-      /* set the global inter check delay value */
-      scheduling_info.host_inter_check_delay
-        = scheduling_info.average_host_inter_check_delay;
-
-      /* calculate max inter check delay and see if we should use that instead */
-      max_inter_check_delay
-        = (double)((scheduling_info.max_host_check_spread * 60.0)
-                   / (double)scheduling_info.total_scheduled_hosts);
-      if (scheduling_info.host_inter_check_delay > max_inter_check_delay)
-        scheduling_info.host_inter_check_delay = max_inter_check_delay;
-    }
-    else
-      scheduling_info.host_inter_check_delay = 0.0;
-
-    logger(dbg_events, most)
-      << "Total scheduled host checks:  "
-      << scheduling_info.total_scheduled_hosts;
-    logger(dbg_events, most)
-      << "Host check interval total:    "
-      << scheduling_info.host_check_interval_total;
-    logger(dbg_events, most)
-      << com::centreon::logging::setprecision(2)
-      << "Average host check interval:  "
-      << scheduling_info.average_host_check_interval << " sec";
-    logger(dbg_events, most)
-      << com::centreon::logging::setprecision(2)
-      << "Host inter-check delay:       "
-      << scheduling_info.host_inter_check_delay << " sec";
+    /* calculate max inter check delay and see if we should use that instead */
+    scheduling_info.host_inter_check_delay
+      = scheduling_info.host_check_spread
+        / (double)scheduling_info.total_scheduled_hosts;
   }
+  else
+    scheduling_info.host_inter_check_delay = 0.0;
+
+  logger(dbg_events, most)
+    << "Total scheduled host checks:  "
+    << scheduling_info.total_scheduled_hosts;
+  logger(dbg_events, most)
+    << com::centreon::logging::setprecision(2)
+    << "Average host check interval:  "
+    << scheduling_info.average_host_check_interval << " sec";
+  logger(dbg_events, most)
+    << com::centreon::logging::setprecision(2)
+    << "Host inter-check delay:       "
+    << scheduling_info.host_inter_check_delay << " sec";
 
   if (test_scheduling == true)
     gettimeofday(&tv[6], NULL);
@@ -643,18 +587,18 @@ void init_timing_loop() {
   /******** SCHEDULE MISC EVENTS ********/
 
   /* add a host and service check rescheduling event */
-  if (config->auto_reschedule_checks() == true)
-    schedule_new_event(
-      EVENT_RESCHEDULE_CHECKS,
-      true,
-      current_time + config->auto_rescheduling_interval(),
-      true,
-      config->auto_rescheduling_interval(),
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
+  schedule_new_event(
+    EVENT_RESCHEDULE_CHECKS,
+    true,
+    current_time
+    + configuration::applier::scheduler::auto_rescheduling_interval,
+    true,
+    configuration::applier::scheduler::auto_rescheduling_interval,
+    NULL,
+    true,
+    NULL,
+    NULL,
+    0);
 
   /* add a check result reaper event */
   schedule_new_event(
@@ -668,21 +612,6 @@ void init_timing_loop() {
     NULL,
     NULL,
     0);
-
-  /* add an orphaned check event */
-  if (config->check_orphaned_services() == true
-      || config->check_orphaned_hosts() == true)
-    schedule_new_event(
-      EVENT_ORPHAN_CHECK,
-      true,
-      current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
-      true,
-      DEFAULT_ORPHAN_CHECK_INTERVAL,
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
 
   /* add a service result "freshness" check event */
   if (config->check_service_freshness() == true)
@@ -712,41 +641,25 @@ void init_timing_loop() {
       NULL,
       0);
 
-  /* add a status save event */
+  /* add an external command check event if needed */
+  if (config->command_check_interval() == -1)
+    interval_to_use = (unsigned long)5;
+  else
+    interval_to_use = (unsigned long)config->command_check_interval();
   schedule_new_event(
-    EVENT_STATUS_SAVE,
+    EVENT_COMMAND_CHECK,
     true,
-    current_time + config->status_update_interval(),
+    current_time + interval_to_use,
     true,
-    config->status_update_interval(),
+    interval_to_use,
     NULL,
     true,
     NULL,
     NULL,
     0);
 
-  /* add an external command check event if needed */
-  if (config->check_external_commands() == true) {
-    if (config->command_check_interval() == -1)
-      interval_to_use = (unsigned long)5;
-    else
-      interval_to_use = (unsigned long)config->command_check_interval();
-    schedule_new_event(
-      EVENT_COMMAND_CHECK,
-      true,
-      current_time + interval_to_use,
-      true,
-      interval_to_use,
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
-  }
-
   /* add a retention data save event if needed */
-  if (config->retain_state_information() == true
-      && config->retention_update_interval() > 0)
+  if (config->retention_update_interval() > 0)
     schedule_new_event(
       EVENT_RETENTION_SAVE,
       true,

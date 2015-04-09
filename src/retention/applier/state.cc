@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,9 +20,6 @@
 #include <ctime>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/retention/applier/comment.hh"
-#include "com/centreon/engine/retention/applier/contact.hh"
-#include "com/centreon/engine/retention/applier/downtime.hh"
 #include "com/centreon/engine/retention/applier/host.hh"
 #include "com/centreon/engine/retention/applier/program.hh"
 #include "com/centreon/engine/retention/applier/service.hh"
@@ -37,12 +34,9 @@ using namespace com::centreon::engine::retention;
  *  @param[in]      state  The retention informations.
  */
 void applier::state::apply(
-       configuration::state& config,
-       retention::state const& state) {
-  if (!config.retain_state_information())
-    return;
-
-  // send data to event broker.
+                       configuration::state& config,
+                       retention::state const& state) {
+  // Send data to event broker.
   broker_retention_data(
     NEBTYPE_RETENTIONDATA_STARTLOAD,
     NEBFLAG_NONE,
@@ -50,44 +44,31 @@ void applier::state::apply(
     NULL);
 
   try {
-    time_t current_time(time(NULL));
-    bool scheduling_info_is_ok(false);
-    if ((current_time - state.informations().created())
-        < static_cast<time_t>(config.retention_scheduling_horizon()))
-      scheduling_info_is_ok = true;
-
     applier::program app_program;
     app_program.apply(config, state.globals());
 
-    applier::comment app_comments;
-    app_comments.apply(state.comments());
-
-    applier::downtime app_downtimes;
-    app_downtimes.apply(state.downtimes());
-
-    applier::contact app_contacts;
-    app_contacts.apply(config, state.contacts());
-
     applier::host app_hosts;
-    app_hosts.apply(config, state.hosts(), scheduling_info_is_ok);
+    app_hosts.apply(config, state.hosts(), true);
 
     applier::service app_services;
-    app_services.apply(config, state.services(), scheduling_info_is_ok);
+    app_services.apply(config, state.services(), true);
   }
   catch (...) {
-    // send data to event broker.
+    // Send data to event broker.
     broker_retention_data(
       NEBTYPE_RETENTIONDATA_ENDLOAD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       NULL);
-    throw;
+    throw ;
   }
 
-  // send data to event broker.
+  // Send data to event broker.
   broker_retention_data(
     NEBTYPE_RETENTIONDATA_ENDLOAD,
     NEBFLAG_NONE,
     NEBATTR_NONE,
     NULL);
+
+  return ;
 }

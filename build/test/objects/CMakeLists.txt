@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -61,10 +61,6 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactsmember")
 set(TEST_NAME "daterange_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "daterange")
 
-# downtime_dump
-set(TEST_NAME "downtime_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "downtime")
-
 # hostdependency_dump
 set(TEST_NAME "hostdependency_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostdependency")
@@ -116,5 +112,3 @@ add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timeperiodexclusion")
 # timerange_dump
 set(TEST_NAME "timerange_dump")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timerange")
-
-

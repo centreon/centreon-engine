@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -49,31 +49,6 @@ int main_test(int argc, char* argv[]) {
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
-  else if (type == "comment") {
-    comment obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contactgroup") {
-    contactgroup obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contactgroupsmember") {
-    contactgroupsmember obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contact") {
-    contact obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "contactsmember") {
-    contactsmember obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
   else if (type == "customvariablesmember") {
     customvariablesmember obj;
     memset(&obj, 0, sizeof(obj));
@@ -84,18 +59,8 @@ int main_test(int argc, char* argv[]) {
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
-  else if (type == "downtime") {
-    scheduled_downtime obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
   else if (type == "hostdependency") {
     hostdependency obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "hostescalation") {
-    hostescalation obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
@@ -116,11 +81,6 @@ int main_test(int argc, char* argv[]) {
   }
   else if (type == "servicedependency") {
     servicedependency obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "serviceescalation") {
-    serviceescalation obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }

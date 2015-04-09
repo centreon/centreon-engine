@@ -2,7 +2,7 @@
 ** Copyright 2007-2008 Ethan Galstad
 ** Copyright 2007,2010 Andreas Ericsson
 ** Copyright 2010      Max Schubert
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -136,24 +136,6 @@ static void _exec_event_check_reaper(timed_event* event) {
 }
 
 /**
- *  Execute orphan check.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_orphan_check(timed_event* event) {
-  (void)event;
-  logger(dbg_events, basic)
-    << "** Orphaned Host and Service Check Event";
-
-  // check for orphaned hosts and services.
-  if (config->check_orphaned_hosts())
-    check_for_orphaned_hosts();
-  if (config->check_orphaned_services())
-    check_for_orphaned_services();
-  return;
-}
-
-/**
  *  Execute retention save.
  *
  *  @param[in] event The event to execute.
@@ -169,39 +151,6 @@ static void _exec_event_retention_save(timed_event* event) {
 }
 
 /**
- *  Execute status save.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_status_save(timed_event* event) {
-  (void)event;
-  logger(dbg_events, basic)
-    << "** Status Data Save Event";
-
-  // save all status data (program, host, and service).
-  update_all_status_data();
-  return;
-}
-
-/**
- *  Execute scheduled downtime.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_scheduled_downtime(timed_event* event) {
-  logger(dbg_events, basic)
-    << "** Scheduled Downtime Event";
-
-  // process scheduled downtime info.
-  if (event->event_data) {
-    handle_scheduled_downtime_by_id(*(unsigned long*)event->event_data);
-    delete static_cast<unsigned long*>(event->event_data);
-    event->event_data = NULL;
-  }
-  return;
-}
-
-/**
  *  Execute sfreshness check.
  *
  *  @param[in] event The event to execute.
@@ -213,21 +162,6 @@ static void _exec_event_sfreshness_check(timed_event* event) {
 
   // check service result freshness.
   check_service_result_freshness();
-  return;
-}
-
-/**
- *  Execute expire downtime.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_expire_downtime(timed_event* event) {
-  (void)event;
-  logger(dbg_events, basic)
-    << "** Expire Downtime Event";
-
-  // check for expired scheduled downtime entries.
-  check_for_expired_downtime();
   return;
 }
 
@@ -282,20 +216,6 @@ static void _exec_event_reschedule_checks(timed_event* event) {
 
   // adjust scheduling of host and service checks.
   adjust_check_scheduling();
-  return;
-}
-
-/**
- *  Execute expire comment.
- *
- *  @param[in] event The event to execute.
- */
-static void _exec_event_expire_comment(timed_event* event) {
-  logger(dbg_events, basic)
-    << "** Expire Comment Event";
-
-  // check for expired comment.
-  check_for_expired_comment((unsigned long)event->event_data);
   return;
 }
 
@@ -545,11 +465,6 @@ void compensate_for_system_time_change(
       last_time,
       current_time,
       time_difference,
-      &svc->last_notification);
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
       &svc->last_check);
     adjust_timestamp_for_time_change(
       last_time,
@@ -567,23 +482,12 @@ void compensate_for_system_time_change(
       time_difference,
       &svc->last_hard_state_change);
 
-    // recalculate next re-notification time.
-    svc->next_notification
-      = get_next_service_notification_time(
-          svc,
-          svc->last_notification);
-
     // Update the status data.
     update_service_status(svc);
   }
 
   // adjust host timestamps.
   for (host* hst(host_list); hst; hst = hst->next) {
-    adjust_timestamp_for_time_change(
-      last_time,
-      current_time,
-      time_difference,
-      &hst->last_host_notification);
     adjust_timestamp_for_time_change(
       last_time,
       current_time,
@@ -609,12 +513,6 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       &hst->last_state_history_update);
-
-    // recalculate next re-notification time.
-    hst->next_host_notification
-      = get_next_host_notification_time(
-          hst,
-          hst->last_host_notification);
 
     // Update the status data.
     update_host_status(hst);
@@ -657,16 +555,11 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_program_shutdown,
     &_exec_event_program_restart,
     &_exec_event_check_reaper,
-    &_exec_event_orphan_check,
     &_exec_event_retention_save,
-    &_exec_event_status_save,
-    &_exec_event_scheduled_downtime,
     &_exec_event_sfreshness_check,
-    &_exec_event_expire_downtime,
     &_exec_event_host_check,
     &_exec_event_hfreshness_check,
     &_exec_event_reschedule_checks,
-    &_exec_event_expire_comment,
     NULL
   };
 
@@ -930,16 +823,11 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_PROGRAM_SHUTDOWN",
     "EVENT_PROGRAM_RESTART",
     "EVENT_CHECK_REAPER",
-    "EVENT_ORPHAN_CHECK",
     "EVENT_RETENTION_SAVE",
-    "EVENT_STATUS_SAVE",
-    "EVENT_SCHEDULED_DOWNTIME",
     "EVENT_SFRESHNESS_CHECK",
-    "EVENT_EXPIRE_DOWNTIME",
     "EVENT_HOST_CHECK",
     "EVENT_HFRESHNESS_CHECK",
-    "EVENT_RESCHEDULE_CHECKS",
-    "EVENT_EXPIRE_COMMENT"
+    "EVENT_RESCHEDULE_CHECKS"
   };
 
   if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
@@ -977,14 +865,6 @@ bool operator==(
     service& svc2(*(service*)obj2.event_data);
     if (strcmp(svc1.host_name, svc2.host_name)
         || strcmp(svc1.description, svc2.description))
-      return (false);
-  }
-  else if (is_not_null
-           && (obj1.event_type == EVENT_SCHEDULED_DOWNTIME
-               || obj1.event_type == EVENT_EXPIRE_COMMENT)) {
-    unsigned long id1(*(unsigned long*)obj1.event_data);
-    unsigned long id2(*(unsigned long*)obj2.event_data);
-    if (id1 != id2)
       return (false);
   }
   else if (obj1.event_data != obj2.event_data)
@@ -1041,11 +921,6 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
     service& svc(*(service*)obj.event_data);
     os << "  event_data:                 "
        << svc.host_name << ", " << svc.description << "\n";
-  }
-  else if (obj.event_type == EVENT_SCHEDULED_DOWNTIME
-           || obj.event_type == EVENT_EXPIRE_COMMENT) {
-    unsigned long id(*(unsigned long*)obj.event_data);
-    os << "  event_data:                 " << id << "\n";
   }
   else
     os << "  event_data:                 " << obj.event_data << "\n";

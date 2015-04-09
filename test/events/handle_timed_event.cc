@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -158,24 +158,11 @@ static void check_event_check_reaper() {
 }
 
 /**
- *  Check the event orphan check.
- */
-static void check_event_orphan_check() {
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_ORPHAN_CHECK;
-
-  handle_timed_event(&event);
-}
-
-/**
  *  Check the event retention save.
  */
 static void check_event_retention_save() {
   // register broker callback to catch event.
   config->event_broker_options(BROKER_RETENTION_DATA);
-  config->retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_RETENTION_DATA,
                         module_id,
@@ -197,50 +184,6 @@ static void check_event_retention_save() {
 }
 
 /**
- *  Check the event status save.
- */
-static void check_event_status_save() {
-  // register broker callback to catch event.
-  config->event_broker_options(BROKER_STATUS_DATA);
-  config->retain_state_information(true);
-  void* module_id = reinterpret_cast<void*>(0x4242);
-  neb_register_callback(NEBCALLBACK_AGGREGATED_STATUS_DATA,
-                        module_id,
-                        0,
-                        &broker_callback);
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_STATUS_SAVE;
-
-  handle_timed_event(&event);
-
-  if (broker_callback(-1, NULL) != NEBTYPE_AGGREGATEDSTATUS_ENDDUMP)
-    throw (engine_error() << __func__);
-
-  // release callback.
-  neb_deregister_module_callbacks(module_id);
-}
-
-/**
- *  Check the event scheduled downtime.
- */
-static void check_event_scheduled_downtime() {
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_SCHEDULED_DOWNTIME;
-  event.event_data = static_cast<void*>(new unsigned long(42));
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_scheduled_downtime.
-  if (event.event_data != NULL)
-    throw (engine_error() << __func__);
-}
-
-/**
  *  Check the event sfreshness check.
  */
 static void check_event_sfreshness_check() {
@@ -250,40 +193,6 @@ static void check_event_sfreshness_check() {
   event.event_type = EVENT_SFRESHNESS_CHECK;
 
   handle_timed_event(&event);
-}
-
-/**
- *  Check the event expire downtime.
- */
-static void check_event_expire_downtime() {
-  // create fake comment.
-  unsigned long downtime_id(42);
-  if (add_downtime(HOST_DOWNTIME,
-                   const_cast<char*>("name"),
-                   NULL,
-                   0,
-                   const_cast<char*>("author"),
-                   const_cast<char*>("comment"),
-                   0,
-                   0,
-                   0,
-                   0,
-                   0,
-                   0,
-                   NULL,
-                   downtime_id) != OK || scheduled_downtime_list == NULL)
-    throw (engine_error() << "add_new comment failed.");
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_EXPIRE_DOWNTIME;
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_expire_downtime.
-  if (scheduled_downtime_list != NULL)
-    throw (engine_error() << __func__);
 }
 
 /**
@@ -333,39 +242,6 @@ static void check_event_reschedule_checks() {
 }
 
 /**
- *  Check the event expire comment.
- */
-static void check_event_expire_comment() {
-  // create fake comment.
-  unsigned long comment_id(42);
-  if (add_comment(HOST_COMMENT,
-                  0,
-                  "name",
-                  NULL,
-                  (time_t)0,
-                  "author",
-                  const_cast<char*>("comment"),
-                  comment_id,
-                  0,
-                  true,
-                  0,
-                  0) != OK || comment_list == NULL)
-    throw (engine_error() << "add_new comment failed.");
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_EXPIRE_COMMENT;
-  event.event_data = reinterpret_cast<void*>(comment_id);
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_expire_comment.
-  if (comment_list != NULL)
-    throw (engine_error() << __func__);
-}
-
-/**
  *  Check the event user function.
  */
 static void check_event_user_function() {
@@ -400,16 +276,11 @@ int main_test(int argc, char** argv) {
   check_event_program_shutdown();
   check_event_program_restart();
   check_event_check_reaper();
-  check_event_orphan_check();
   check_event_retention_save();
-  check_event_status_save();
-  check_event_scheduled_downtime();
   check_event_sfreshness_check();
-  check_event_expire_downtime();
   check_event_host_check();
   check_event_hfreshness_check();
   check_event_reschedule_checks();
-  check_event_expire_comment();
   check_event_user_function();
 
   return (0);

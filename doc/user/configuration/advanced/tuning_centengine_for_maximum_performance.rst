@@ -15,20 +15,6 @@ optimizing Centreon Engine...
 Optimization Tips
 =================
 
-  * Use large installation tweaks. Enabling the
-    :ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
-    option may provide you with better performance. Read more about what
-    this option does :ref:`here <main_cfg_opt_large_installation_tweaks>`.
-  * Disable environment macros. Macros are normally made available to
-    check, notification, event handler, etc. commands as environment
-    variables. This can be a problem in a large Centreon Engine
-    installation, as it consumes some additional memory and (more
-    importantly) more CPU. If your scripts don't need to access the
-    macros as environment variables (e.g. you pass all necessary macros
-    on the command line), you don't need this feature. You can prevent
-    macros from being made available as environment variables by using
-    the :ref:`enable_environment_macros <main_cfg_opt_environment_macros>`
-    option.
   * Check Result Reaper Frequency. The
     :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
     variable determines how often Centreon Engine should check for host
@@ -37,14 +23,6 @@ Optimization Tips
     by the max reaper time (see below). If your reaper frequency is too
     high (too infrequent), you might see high latencies for host and
     service checks.
-  * Max Reaper Time. The :ref:`max_check_result_reaper_time <main_cfg_opt_maximum_check_result_reaper_time>`
-    variables determines the maximum amount of time the Centreon Engine
-    daemon can spend processing the results of host and service checks
-    before moving on to other things - like executing new host and
-    service checks. Too high of a value can result in large latencies
-    for your host and service checks. Too low of a value can have the
-    same effect. If you're experiencing high latencies, adjust this
-    variable and see what effect it has.
   * Adjust buffer slots. You may need to adjust the value of the
     :ref:`external_command_buffer_slots <main_cfg_opt_external_command_buffer_slots>`
     option.
@@ -120,19 +98,6 @@ Optimization Tips
     need to schedule regular checks of your hosts (see above). More
     information on cached checks can be found
     :ref:`here <cached_checks>`.
-  * Don't use agressive host checking. Unless you're having problems
-    with Centreon Engine recognizing host recoveries, I would recommend
-    not enabling the
-    :ref:`use_aggressive_host_checking <main_cfg_opt_aggressive_host_checking>`
-    option. With this option turned off host checks will execute much
-    faster, resulting in speedier processing of service check
-    results. However, host recoveries can be missed under certain
-    circumstances when this it turned off. For example, if a host
-    recovers and all of the services associated with that host stay in
-    non-OK states (and don't "wobble" between different non-OK states),
-    Centreon Engine may miss the fact that the host has recovered. A few
-    people may need to enable this option, but the majority don't and I
-    would recommendnot using it unless you find it necessary...
   * External command optimizations. If you're processing a lot of
     external commands (i.e. passive checks in a
     :ref:`distributed setup <distributed_monitoring>`, you'll probably

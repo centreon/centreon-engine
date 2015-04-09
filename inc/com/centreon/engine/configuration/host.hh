@@ -39,8 +39,7 @@ namespace                  configuration {
       up = (1 << 0),
       down = (1 << 1),
       unreachable = (1 << 2),
-      flapping = (1 << 3),
-      downtime = (1 << 4)
+      flapping = (1 << 3)
     };
     typedef std::string    key_type;
 
@@ -59,20 +58,15 @@ namespace                  configuration {
     std::string const&     address() const throw ();
     std::string const&     alias() const throw ();
     bool                   checks_active() const throw ();
-    bool                   checks_passive() const throw ();
     std::string const&     check_command() const throw ();
     bool                   check_freshness() const throw ();
     unsigned int           check_interval() const throw ();
     std::string const&     check_period() const throw ();
-    list_string const&     contactgroups() const throw ();
-    list_string const&     contacts() const throw ();
     unsigned int           check_timeout() const throw();
     bool                   check_timeout_defined() const throw();
     map_customvar const&   customvariables() const throw ();
-    std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();
     bool                   event_handler_enabled() const throw ();
-    unsigned int           first_notification_delay() const throw ();
     bool                   flap_detection_enabled() const throw ();
     unsigned int           flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
@@ -83,17 +77,10 @@ namespace                  configuration {
     unsigned int           initial_state() const throw ();
     unsigned int           low_flap_threshold() const throw ();
     unsigned int           max_check_attempts() const throw ();
-    bool                   notifications_enabled() const throw ();
-    unsigned int           notification_interval() const throw ();
-    unsigned int           notification_options() const throw ();
-    std::string const&     notification_period() const throw ();
     bool                   obsess_over_host() const throw ();
     list_string&           parents() throw ();
     list_string const&     parents() const throw ();
-    bool                   retain_nonstatus_information() const throw ();
-    bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
-    unsigned int           stalking_options() const throw ();
     std::string const&     timezone() const throw ();
 
   private:
@@ -153,19 +140,14 @@ namespace                  configuration {
     std::string            _address;
     std::string            _alias;
     opt<bool>              _checks_active;
-    opt<bool>              _checks_passive;
     std::string            _check_command;
     opt<bool>              _check_freshness;
     opt<unsigned int>      _check_interval;
     std::string            _check_period;
-    group                  _contactgroups;
-    group                  _contacts;
     opt<unsigned int>      _check_timeout;
     map_customvar          _customvariables;
-    std::string            _display_name;
     std::string            _event_handler;
     opt<bool>              _event_handler_enabled;
-    opt<unsigned int>      _first_notification_delay;
     opt<bool>              _flap_detection_enabled;
     opt<unsigned int>      _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
@@ -175,17 +157,10 @@ namespace                  configuration {
     opt<unsigned int>      _initial_state;
     opt<unsigned int>      _low_flap_threshold;
     opt<unsigned int>      _max_check_attempts;
-    opt<bool>              _notifications_enabled;
-    opt<unsigned int>      _notification_interval;
-    opt<unsigned int>      _notification_options;
-    std::string            _notification_period;
     opt<bool>              _obsess_over_host;
     group                  _parents;
-    opt<bool>              _retain_nonstatus_information;
-    opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
     static setters const   _setters[];
-    opt<unsigned int>      _stalking_options;
     opt<std::string>       _timezone;
   };
 

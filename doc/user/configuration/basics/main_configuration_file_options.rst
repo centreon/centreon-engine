@@ -93,41 +93,6 @@ processed.
             cfg_dir=/etc/centreon-engine/hosts
 =========== =====================================
 
-.. _main_cfg_opt_object_cache_file:
-
-Object Cache File
------------------
-
-This directive is used to specify a file in which a cached copy of
-:ref:`object definitions <object_configuration_overview>`
-should be stored. The cache file is (re)created every time Centreon
-Engine is (re)started. It is intended to speed up config file caching
-and allow you to edit the source
-:ref:`object config files <main_cfg_opt_object_configuration_file>`
-while Centreon Engine is running without affecting the output displayed.
-
-=========== ========================================================
-**Format**  object_cache_file=<file_name>
-**Example** object_cache_file=/var/log/centreon-engine/objects.cache
-=========== ========================================================
-
-.. _main_cfg_opt_precached_object_file:
-
-Precached Object File
----------------------
-
-This directive is used to specify a file in which a pre-processed,
-pre-cached copy of :ref:`object definitions <object_configuration_overview>`
-should be stored. This file can be used to drastically improve startup
-times in large/complex Centreon Engine installations. Read more
-information on how to speed up start times
-:ref:`here <fast_startup_options>`.
-
-=========== ===============================================================
-**Format**  precached_object_file=<file_name>
-**Example** precached_object_file=/var/log/centreon-engine/objects.precache
-=========== ===============================================================
-
 .. _main_cfg_opt_resource_file:
 
 Resource File
@@ -154,193 +119,14 @@ Status File
 
 This is the file that Centreon Engine uses to store the current status,
 comment, and downtime information. This file is deleted every time
-Centreon Engine stops and recreated when it starts.
+Centreon Engine stops and recreated when it starts. This file is no
+longer written at regular intervals. Instead it is written in response
+to the SAVE_STATUS_INFORMATION external command.
 
 =========== ===============================================
 **Format**  status_file=<file_name>
 **Example** status_file=/var/log/centreon-engine/status.dat
 =========== ===============================================
-
-Status File Update Interval
----------------------------
-
-This setting determines how often (in seconds) that Centreon Engine will
-update status data in the :ref:`status file <main_cfg_opt_status_file>`.
-The minimum update interval is 1 second.
-
-=========== ================================
-**Format**  status_update_interval=<seconds>
-**Example** status_update_interval=15
-=========== ================================
-
-.. _main_cfg_opt_notifications:
-
-Notifications Option
---------------------
-
-This option determines whether or not Centreon Engine will send out
-:ref:`notifications <notifications>` when it initially (re)starts. If
-this option is disabled, Centreon Engine will not send out notifications
-for any host or service.
-
-=========== ==========================
-**Format**  enable_notifications=<0/1>
-**Example** enable_notifications=1
-=========== ==========================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the :ref:`use_retained_program_state
-   <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via the web
-   interface. Values are as follows:
-
-    * 0 = Disable notifications
-    * 1 = Enable notifications (default)
-
-.. _main_cfg_opt_service_check_execution:
-
-Service Check Execution Option
-------------------------------
-
-This option determines whether or not Centreon Engine will execute
-service checks when it initially (re)starts. If this option is disabled,
-Centreon Engine will not actively execute any service checks and will
-remain in a sort of "sleep" mode (it can still accept
-:ref:`passive checks <passive_checks>` unless you've
-:ref:`disabled them <main_cfg_opt_passive_service_check_acceptance>`).
-This option is most often used when configuring backup monitoring
-servers, as described in the documentation on
-:ref:`redundancy <redundant_and_failover_monitoring>`,
-or when setting up a :ref:`distributed <distributed_monitoring>`
-monitoring environment.
-
-=========== ============================
-**Format**  execute_service_checks=<0/1>
-**Example** execute_service_checks=1
-=========== ============================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the :ref:`use_retained_program_state
-   <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't execute service checks
-    * 1 = Execute service checks (default)
-
-.. _main_cfg_opt_passive_service_check_acceptance:
-
-Passive Service Check Acceptance Option
----------------------------------------
-
-This option determines whether or not Centreon Engine will accept
-:ref:`passive service checks <passive_checks>` when it initially
-(re)starts. If this option is disabled, Centreon Engine will not accept
-any passive service checks.
-
-=========== ===================================
-**Format**  accept_passive_service_checks=<0/1>
-**Example** accept_passive_service_checks=1
-=========== ===================================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the :ref:`use_retained_program_state
-   <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't accept passive service checks
-    * 1 = Accept passive service checks (default)
-
-Host Check Execution Option
----------------------------
-
-This option determines whether or not Centreon Engine will execute
-on-demand and regularly scheduled host checks when it initially
-(re)starts. If this option is disabled, Centreon Engine will not
-actively execute any host checks, although it can still accept
-:ref:`passive host checks <passive_checks>` unless you've
-:ref:`disabled them <main_cfg_opt_passive_host_check_acceptance>`).
-This option is most often used when configuring backup monitoring
-servers, as described in the documentation on
-:ref:`redundancy <redundant_and_failover_monitoring>`,
-or when setting up a :ref:`distributed <distributed_monitoring>`
-monitoring environment.
-
-=========== =====================================
-**Format**  execute_host_checks=<0/1>
-**Example** execute_host_checks=1
-=========== =====================================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't execute host checks
-    * 1 = Execute host checks (default)
-
-.. _main_cfg_opt_passive_host_check_acceptance:
-
-Passive Host Check Acceptance Option
-------------------------------------
-
-This option determines whether or not Centreon Engine will accept
-:ref:`passive host checks <passive_checks>` when it initially
-(re)starts. If this option is disabled, Centreon Engine will not accept
-any passive host checks.
-
-=========== ================================
-**Format**  accept_passive_host_checks=<0/1>
-**Example** accept_passive_host_checks=1
-=========== ================================
-
-.. note::
-   If you have :ref:`state retention <main_cfg_opt_state_retention>`
-   enabled, Centreon Engine will ignore this setting when it (re)starts
-   and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
-   :ref:`external command <external_commands>` or change it via
-   the web interface. Values are as follows:
-
-    * 0 = Don't accept passive host checks
-    * 1 = Accept passive host checks (default)
 
 .. _main_cfg_opt_event_handler:
 
@@ -361,35 +147,13 @@ host or service event handlers.
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`).
+   If you want to change this option, you'll have to use the appropriate
    :ref:`external command <external_commands>` or change it via
    the web interface. Values are as follows:
 
     * 0 = Disable event handlers
     * 1 = Enable event handlers (default)
-
-.. _main_cfg_opt_external_command_check:
-
-External Command Check Option
------------------------------
-
-This option determines whether or not Centreon Engine will check the
-:ref:`command file <main_cfg_opt_external_command_file>`
-for commands that should be executed. More information on external
-commands can be found :ref:`here <external_commands>`.
-
-  * 0 = Don't check external commands
-  * 1 = Check external commands (default)
-
-=========== =============================
-**Format**  check_external_commands=<0/1>
-**Example** check_external_commands=1
-=========== =============================
 
 .. _main_cfg_opt_external_command_check_interval:
 
@@ -455,27 +219,6 @@ External Command Buffer Slots
    (e.g. :ref:`distributed setups <distributed_monitoring>`),
    you may need to increase this number.
 
-.. _main_cfg_opt_state_retention:
-
-State Retention Option
-----------------------
-
-This option determines whether or not Centreon Engine will retain state
-information for hosts and services between program restarts. If you
-enable this option, you should supply a value for the
-:ref:`state_retention_file <main_cfg_opt_state_retention_file>`
-variable. When enabled, Centreon Engine will save all state information
-for hosts and service before it shuts down (or restarts) and will read
-in previously saved state information when it starts up again.
-
-  * 0 = Don't retain state information
-  * 1 = Retain state information (default)
-
-=========== ==============================
-**Format**  retain_state_information=<0/1>
-**Example** retain_state_information=1
-=========== ==============================
-
 .. _main_cfg_opt_state_retention_file:
 
 State Retention File
@@ -485,10 +228,7 @@ This is the file that Centreon Engine will use for storing status,
 downtime, and comment information before it shuts down. When Centreon
 Engine is restarted it will use the information stored in this file for
 setting the initial states of services and hosts before it starts
-monitoring anything. In order to make Centreon Engine retain state
-information between program restarts, you must enable the
-:ref:`retain_state_information <main_cfg_opt_state_retention>`
-option.
+monitoring anything.
 
 =========== ===========================================================
 **Format**  state_retention_file=<file_name>
@@ -502,100 +242,12 @@ This setting determines how often (in minutes) that Centreon Engine will
 automatically save retention data during normal operation. If you set
 this value to 0, Centreon Engine will not save retention data at regular
 intervals, but it will still save retention data before shutting down or
-restarting. If you have disabled state retention (with the
-:ref:`retain_state_information <main_cfg_opt_state_retention>`
-option), this option has no effect.
+restarting.
 
 =========== ===================================
 **Format**  retention_update_interval=<minutes>
 **Example** retention_update_interval=60
 =========== ===================================
-
-.. _main_cfg_opt_use_retained_program_state:
-
-Use Retained Program State Option
----------------------------------
-
-This setting determines whether or not Centreon Engine will set various
-program-wide state variables based on the values saved in the retention
-file. Some of these program-wide state variables that are normally saved
-across program restarts if state retention is enabled include the
-:ref:`enable_notifications <main_cfg_opt_notifications>`,
-:ref:`enable_flap_detection <main_cfg_opt_flap_detection>`,
-:ref:`enable_event_handlers <main_cfg_opt_event_handler>`,
-:ref:`execute_service_checks <main_cfg_opt_service_check_execution>`,
-and :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
-options. If you do not have :ref:`state retention <main_cfg_opt_state_retention>`
-enabled, this option has no effect.
-
-  * 0 = Don't use retained program state
-  * 1 = Use retained program state (default)
-
-=========== ================================
-**Format**  use_retained_program_state=<0/1>
-**Example** use_retained_program_state=1
-=========== ================================
-
-.. _main_cfg_opt_use_retained_scheduling_info:
-
-Use Retained Scheduling Info Option
------------------------------------
-
-This setting determines whether or not Centreon Engine will retain
-scheduling info (next check times) for hosts and services when it
-restarts. If you are adding a large number (or percentage) of hosts and
-services, I would recommend disabling this option when you first restart
-Centreon Engine, as it can adversely skew the spread of initial
-checks. Otherwise you will probably want to leave it enabled.
-
-  * 0 = Don't use retained scheduling info
-  * 1 = Use retained scheduling info (default)
-
-=========== ==================================
-**Format**  use_retained_scheduling_info=<0/1>
-**Example** use_retained_scheduling_info=1
-=========== ==================================
-
-Retained Host and Service Attribute Masks
------------------------------------------
-
-They are a deprecated and ignered variables.
-
-=========== ========================================
-**Format**  retained_host_attribute_mask=<number>
-            retained_service_attribute_mask=<number>
-=========== ========================================
-
-Retained Process Attribute Masks
---------------------------------
-
-They are a deprecated and ignered variables.
-
-=========== ================================================
-**Format**  retained_process_host_attribute_mask=<number>
-            retained_process_service_attribute_mask=<number>
-=========== ================================================
-
-Retained Contact Attribute Masks
---------------------------------
-
-These options determine which contact attributes are NOT retained across
-program restarts. There are two masks because there are often separate
-host and service contact attributes that can be changed. The values for
-these options are a bitwise AND of values specified by the "MODATTR\_"
-definitions in the include/common.h source code file. By default, all
-process attributes are retained.
-
-=========== ================================================
-**Format**  retained_contact_host_attribute_mask=<number>
-            retained_contact_service_attribute_mask=<number>
-**Example** retained_contact_host_attribute_mask=0
-            retained_contact_service_attribute_mask=0
-=========== ================================================
-
-.. note::
-   This is an advanced feature. You'll need to read the Centreon Engine
-   source code to use this option effectively.
 
 Syslog Logging Option
 ---------------------
@@ -806,80 +458,6 @@ queue should be executed.
    That Centreon Engine will only sleep after it "catches up" with
    queued service checks that have fallen behind.
 
-.. _main_cfg_opt_service_inter_check_delay_method:
-
-Service Inter-Check Delay Method
---------------------------------
-
-This option allows you to control how service checks are initially
-"spread out" in the event queue. Using a "smart" delay calculation (the
-default) will cause Centreon Engine to calculate an average check
-interval and spread initial checks of all services out over that
-interval, thereby helping to eliminate CPU load spikes. Using no delay
-is generally not recommended, as it will cause all service checks to be
-scheduled for execution at the same time. This means that you will
-generally have large CPU spikes when the services are all executed in
-parallel. More information on how to estimate how the inter-check delay
-affects service check scheduling can be found
-:ref:`here <scheduling_service_and_host>`. Values are as follows:
-
-  * n = Don't use any delay - schedule all service checks to run
-    immediately (i.e. at the same time!)
-  * d = Use a "dumb" delay of 1 second between service checks
-  * s = Use a "smart" delay calculation to spread service checks out
-    evenly (default)
-  * x.xx = Use a user-supplied inter-check delay of x.xx seconds
-
-=========== =============================================
-**Format**  service_inter_check_delay_method=<n/d/s/x.xx>
-**Example** service_inter_check_delay_method=s
-=========== =============================================
-
-Maximum Service Check Spread
-----------------------------
-
-This option determines the maximum number of minutes from when Centreon
-Engine starts that all services (that are scheduled to be regularly
-checked) are checked. This option will automatically adjust the
-:ref:`service <main_cfg_opt_service_inter_check_delay_method>`
-inter-check delay method" (if necessary) to ensure that the initial
-checks of all services occur within the timeframe you specify. In
-general, this option will not have an affect on service check scheduling
-if scheduling information is being retained using the
-:ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
-option. Default value is 30 (minutes).
-
-=========== ==================================
-**Format**  max_service_check_spread=<minutes>
-**Example** max_service_check_spread=30
-=========== ==================================
-
-.. _main_cfg_opt_service_interleave_factor:
-
-Service Interleave Factor
--------------------------
-
-This variable determines how service checks are
-interleaved. Interleaving allows for a more even distribution of service
-checks, reduced load on remote hosts, and faster overall detection of
-host problems. Setting this value to 1 is equivalent to not interleaving
-the service checks (this is how versions of Centreon Engine previous to
-0.0.5 worked). Set this value to s (smart) for automatic calculation of
-the interleave factor unless you have a specific reason to change
-it. You should see that the service check results are spread out as they
-begin to appear. More information on how interleaving works can be found
-:ref:`here <scheduling_service_and_host>`.
-
-  * x = A number greater than or equal to 1 that specifies the
-    interleave factor to use. An interleave factor of 1 is equivalent to
-    not interleaving the service checks.
-  * s = Use a "smart" interleave factor calculation (default)
-
-=========== ===============================
-**Format**  service_interleave_factor=<s|x>
-**Example** service_interleave_factor=s
-=========== ===============================
-
 .. _main_cfg_opt_maximum_concurrent_service_checks:
 
 Maximum Concurrent Service Checks
@@ -916,122 +494,6 @@ the core of the monitoring logic in Centreon Engine.
 **Example** check_result_reaper_frequency=5
 =========== ====================================================
 
-.. _main_cfg_opt_maximum_check_result_reaper_time:
-
-Maximum Check Result Reaper Time
---------------------------------
-
-This option allows you to control the maximum amount of time in seconds
-that host and service check result "reaper" events are allowed to
-run. "Reaper" events process the results from host and service checks
-that have finished executing. If there are a lot of results to process,
-reaper events may take a long time to finish, which might delay timely
-execution of new host and service checks. This variable allows you to
-limit the amount of time that an individual reaper event will run before
-it hands control back over to Centreon Engine for other portions of the
-monitoring logic.
-
-=========== ======================================
-**Format**  max_check_result_reaper_time=<seconds>
-**Example** max_check_result_reaper_time=30
-=========== ======================================
-
-Use Check Result Path
----------------------
-
-This option enable or disable compatibility mode to use check result
-path.
-
-=========== ===========================
-**Format**  use_check_result_path=<0/1>
-**Example** use_check_result_path=0
-=========== ===========================
-
-Check Result Path
------------------
-
-This options determines which directory Nagios will use to temporarily
-store host and service check results before they are processed. This
-directory should not be used to store any other files, as Nagios will
-periodically clean this directory of old file (see the
-max_check_result_file_age option for more information).
-
-=========== ========================
-**Format**  check_result_path=<path>
-**Example** check_result_path=/tmp
-=========== ========================
-
-.. note::
-   This options is deprecated.
-
-.. _main_cfg_max_check_result_file_age:
-
-Max Check Result File Age
--------------------------
-
-This options determines the maximum age in seconds that Nagios will
-consider check result files found in the check_result_path directory to
-be valid. Check result files that are older that this threshold will be
-deleted by Nagios and the check results they contain will not be
-processed. By using a value of zero (0) with this option, Nagios will
-process all check result files - even if they're older than your
-hardware :-).
-
-=========== ===================================
-**Format**  max_check_result_file_age=<seconds>
-**Example** max_check_result_file_age=3600
-=========== ===================================
-
-.. note::
-   This options is deprecated.
-
-.. _main_cfg_opt_host_inter_check_delay_method:
-
-Host Inter-Check Delay Method
------------------------------
-
-This option allows you to control how host checks that are scheduled to
-be checked on a regular basis are initially "spread out" in the event
-queue. Using a "smart" delay calculation (the default) will cause
-Centreon Engine to calculate an average check interval and spread
-initial checks of all hosts out over that interval, thereby helping to
-eliminate CPU load spikes. Using no delay is generally not
-recommended. Using no delay will cause all host checks to be scheduled
-for execution at the same time. More information on how to estimate how
-the inter-check delay affects host check scheduling can be found
-:ref:`here <scheduling_service_and_host>`.Values are as follows:
-
-  * n = Don't use any delay - schedule all host checks to run
-    immediately (i.e. at the same time!)
-  * d = Use a "dumb" delay of 1 second between host checks
-  * s = Use a "smart" delay calculation to spread host checks out evenly
-    (default)
-  * x.xx = Use a user-supplied inter-check delay of x.xx seconds
-
-=========== ==========================================
-**Format**  host_inter_check_delay_method=<n/d/s/x.xx>
-**Example** host_inter_check_delay_method=s
-=========== ==========================================
-
-Maximum Host Check Spread
--------------------------
-
-This option determines the maximum number of minutes from when Centreon
-Engine starts that all hosts (that are scheduled to be regularly
-checked) are checked. This option will automatically adjust the
-:ref:`host inter-check <main_cfg_opt_host_inter_check_delay_method>`
-delay method" (if necessary) to ensure that the initial checks of all
-hosts occur within the timeframe you specify. In general, this option
-will not have an affect on host check scheduling if scheduling
-information is being retained using the
-:ref:`use_retained_scheduling_info <main_cfg_opt_use_retained_scheduling_info>`
-option. Default value is 30 (minutes).
-
-=========== ===============================
-**Format**  max_host_check_spread=<minutes>
-**Example** max_host_check_spread=30
-=========== ===============================
-
 .. _main_cfg_opt_timing_interval_length:
 
 Timing Interval Length
@@ -1052,106 +514,6 @@ check, how often to re-notify a contact, etc.
    value" of 1 in the object configuration file will mean 60 seconds (1
    minute). I have not really tested other values for this variable, so
    proceed at your own risk if you decide to do so!
-
-.. _main_cfg_opt_auto_rescheduling:
-
-Auto-Rescheduling Option
-------------------------
-
-This option determines whether or not Centreon Engine will attempt to
-automatically reschedule active host and service checks to "smooth" them
-out over time. This can help to balance the load on the monitoring
-server, as it will attempt to keep the time between consecutive checks
-consistent, at the expense of executing checks on a more rigid schedule.
-
-=========== ============================
-**Format**  auto_reschedule_checks=<0/1>
-**Example** auto_reschedule_checks=1
-=========== ============================
-
-.. note::
-   This is an experimental feature and may be removed in future
-   versions. Enabling this option can degrade performance - rather than
-   increase it - if used improperly!
-
-Auto-Rescheduling Interval
---------------------------
-
-This option determines how often (in seconds) Centreon Engine will
-attempt to automatically reschedule checks. This option only has an
-effect if the :ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
-option is enabled. Default is 30 seconds.
-
-=========== ====================================
-**Format**  auto_rescheduling_interval=<seconds>
-**Example** auto_rescheduling_interval=30
-=========== ====================================
-
-.. note::
-   This is an experimental feature and may be removed in future
-   versions. Enabling the auto-rescheduling option can degrade
-   performance - rather than increase it - if used improperly!
-
-Auto-Rescheduling Window
-------------------------
-
-This option determines the "window" of time (in seconds) that Centreon
-Engine will look at when automatically rescheduling checks. Only host
-and service checks that occur in the next X seconds (determined by this
-variable) will be rescheduled. This option only has an effect if the
-:ref:`auto_reschedule_checks <main_cfg_opt_auto_rescheduling>`
-option is enabled. Default is 180 seconds (3 minutes).
-
-=========== ==================================
-**Format**  auto_rescheduling_window=<seconds>
-**Example** auto_rescheduling_window=180
-=========== ==================================
-
-.. note::
-   This is an experimental feature and may be removed in future
-   versions. Enabling the auto-rescheduling option can degrade
-   performance - rather than increase it - if used improperly!
-
-.. _main_cfg_opt_aggressive_host_checking:
-
-Aggressive Host Checking Option
--------------------------------
-
-Centreon Engine tries to be smart about how and when it checks the
-status of hosts. In general, disabling this option will allow Centreon
-Engine to make some smarter decisions and check hosts a bit
-faster. Enabling this option will increase the amount of time required
-to check hosts, but may improve reliability a bit. Unless you have
-problems with Centreon Engine not recognizing that a host recovered, I
-would suggest not enabling this option.
-
-  * 0 = Don't use aggressive host checking (default)
-  * 1 = Use aggressive host checking
-
-=========== ==================================
-**Format**  use_aggressive_host_checking=<0/1>
-**Example** use_aggressive_host_checking=0
-=========== ==================================
-
-.. _main_cfg_opt_translate_passive_host_checks:
-
-Translate Passive Host Checks Option
-------------------------------------
-
-This option determines whether or not Centreon Engine will translate
-DOWN/UNREACHABLE passive host check results to their "correct" state
-from the viewpoint of the local Centreon Engine instance. This can be
-very useful in distributed and failover monitoring installations. More
-information on passive check state translation can be found
-:ref:`here <passive_host_state_translation>`.
-
-  * 0 = Disable check translation (default)
-  * 1 = Enable check translation
-
-=========== ===================================
-**Format**  translate_passive_host_checks=<0/1>
-**Example** translate_passive_host_checks=1
-=========== ===================================
 
 .. _main_cfg_opt_passive_host_checks_are_soft:
 
@@ -1254,24 +616,6 @@ service check caching. More information on cached checks can be found
 **Example** cached_service_check_horizon=15
 =========== ======================================
 
-.. _main_cfg_opt_large_installation_tweaks:
-
-Large Installation Tweaks Option
---------------------------------
-
-This option determines whether or not the Centreon Engine daemon will
-take several shortcuts to improve performance. These shortcuts result in
-the loss of a few features, but larger installations will likely see a
-lot of benefit from doing so.
-
-  * 0 = Don't use tweaks (default)
-  * 1 = Use tweaks
-
-=========== ===================================
-**Format**  use_large_installation_tweaks=<0/1>
-**Example** use_large_installation_tweaks=0
-=========== ===================================
-
 .. _main_cfg_opt_use_setpgid:
 
 Use Setpgid
@@ -1295,27 +639,6 @@ For maximum performance, this option must be disable.
 **Format**  use_setpgid=<0/1>
 **Example** use_setpgid=1
 =========== =================
-
-.. _main_cfg_opt_environment_macros:
-
-Environment Macros Option
--------------------------
-
-This option determines whether or not the Centreon Engine daemon will
-make all standard :ref:`macros <standard_macros>` available as
-environment variables to your check, notification, event hander,
-etc. commands. In large Centreon Engine installations this can be
-problematic because it takes additional memory and (more importantly)
-CPU to compute the values of all macros and make them available to the
-environment.
-
-  * 0 = Don't make macros available as environment variables
-  * 1 = Make macros available as environment variables (default)
-
-=========== ===============================
-**Format**  enable_environment_macros=<0/1>
-**Example** enable_environment_macros=0
-=========== ===============================
 
 .. _main_cfg_opt_flap_detection:
 
@@ -1341,13 +664,8 @@ be found :ref:`here <flapping_detection>`.
    If you have :ref:`state retention <main_cfg_opt_state_retention>`
    enabled, Centreon Engine will ignore this setting when it (re)starts
    and use the last known setting for this option (as stored in the
-   :ref:`state retention file <main_cfg_opt_state_retention_file>`),
-   unless you disable the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   option. If you want to change this option when state retention is
-   active (and the
-   :ref:`use_retained_program_state <main_cfg_opt_use_retained_program_state>`
-   is enabled), you'll have to use the appropriate
+   :ref:`state retention file <main_cfg_opt_state_retention_file>`).
+   If you want to change, you'll have to use the appropriate
    :ref:`external command <external_commands>` or change it via
    the web interface.
 
@@ -1648,56 +966,6 @@ is enabled.
 **Example** ochp_command=obsessive_host_handler
 =========== ===================================
 
-Orphaned Service Check Option
------------------------------
-
-This option allows you to enable or disable checks for orphaned service
-checks. Orphaned service checks are checks which have been executed and
-have been removed from the event queue, but have not had any results
-reported in a long time. Since no results have come back in for the
-service, it is not rescheduled in the event queue. This can cause
-service checks to stop being executed. Normally it is very rare for this
-to happen - it might happen if an external user or process killed off
-the process that was being used to execute a service check. If this
-option is enabled and Centreon Engine finds that results for a
-particular service check have not come back, it will log an error
-message and reschedule the service check. If you start seeing service
-checks that never seem to get rescheduled, enable this option and see if
-you notice any log messages about orphaned services.
-
-  * 0 = Don't check for orphaned service checks
-  * 1 = Check for orphaned service checks (default)
-
-=========== =================================
-**Format**  check_for_orphaned_services=<0/1>
-**Example** check_for_orphaned_services=1
-=========== =================================
-
-Orphaned Host Check Option
---------------------------
-
-This option allows you to enable or disable checks for orphaned hoste
-checks. Orphaned host checks are checks which have been executed and
-have been removed from the event queue, but have not had any results
-reported in a long time. Since no results have come back in for the
-host, it is not rescheduled in the event queue. This can cause host
-checks to stop being executed. Normally it is very rare for this to
-happen - it might happen if an external user or process killed off the
-process that was being used to execute a host check. If this option is
-enabled and Centreon Engine finds that results for a particular host
-check have not come back, it will log an error message and reschedule
-the host check. If you start seeing host checks that never seem to get
-rescheduled, enable this option and see if you notice any log messages
-about orphaned hosts.
-
-  * 0 = Don't check for orphaned host checks
-  * 1 = Check for orphaned host checks (default)
-
-=========== ==============================
-**Format**  check_for_orphaned_hosts=<0/1>
-**Example** check_for_orphaned_hosts=1
-=========== ==============================
-
 .. _main_cfg_opt_service_freshness_checking:
 
 Service Freshness Checking Option
@@ -1785,30 +1053,6 @@ freshness checking can be found
 **Example** additional_freshness_latency=15
 =========== ================================
 
-.. _main_cfg_opt_date_format:
-
-Date Format
------------
-
-This option allows you to specify what kind of date/time format Centreon
-Engine should use in the web interface and date/time
-:ref:`macros <understanding_macros>`. Possible options
-(along with example output) include:
-
-============== =================== ===================
-Option         Output Format       Sample Output
-============== =================== ===================
-us             MM/DD/YYYY HH:MM:SS 06/30/2002 03:15:00
-euro           DD/MM/YYYY HH:MM:SS 30/06/2002 03:15:00
-iso8601        YYYY-MM-DD HH:MM:SS 2002-06-30 03:15:00
-strict-iso8601 YYYY-MM-DDTHH:MM:SS 2002-06-30T03:15:00
-============== =================== ===================
-
-=========== ====================
-**Format**  date_format=<option>
-**Example** date_format=us
-=========== ====================
-
 Timezone Option
 ---------------
 
@@ -1858,47 +1102,6 @@ macros are stripped of the characters you specify::
 **Format**  illegal_macro_output_chars=<chars...>
 **Example** illegal_macro_output_chars=`~$^&"\|'<>
 =========== ======================================
-
-.. _main_cfg_opt_regular_expression_matching:
-
-Regular Expression Matching Option
-----------------------------------
-
-This option determines whether or not various directives in your
-:ref:`object definitions <object_configuration_overview>` will be
-processed as regular expressions. More information on how this works can
-be found :ref:`here <obj_def_tricks>`.
-
-  * 0 = Don't use regular expression matching (default)
-  * 1 = Use regular expression matching
-
-=========== =========================
-**Format**  use_regexp_matching=<0/1>
-**Example** use_regexp_matching=0
-=========== =========================
-
-.. _main_cfg_opt_true_regular_expression_matching:
-
-True Regular Expression Matching Option
----------------------------------------
-
-If you've enabled regular expression matching of various object
-directives using the :ref:`use_regexp_matching <main_cfg_opt_regular_expression_matching>`
-option, this option will determine when object directives are treated as
-regular expressions. If this option is disabled (the default),
-directives will only be treated as regular expressions if they contain
-\*, ?, +, or \\.. If this option is enabled, all appropriate directives
-will be treated as regular expression - be careful when enabling this!
-More information on how this works can be found
-:ref:`here <obj_def_tricks>`.
-
-  * 0 = Don't use true regular expression matching (default)
-  * 1 = Use true regular expression matching
-
-=========== ==============================
-**Format**  use_true_regexp_matching=<0/1>
-**Example** use_true_regexp_matching=0
-=========== ==============================
 
 Event Broker Options
 --------------------

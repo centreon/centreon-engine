@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,16 +27,11 @@
 #  define EVENT_PROGRAM_SHUTDOWN   2   // program shutdown
 #  define EVENT_PROGRAM_RESTART    3   // program restart
 #  define EVENT_CHECK_REAPER       4   // reaps results from host and service checks
-#  define EVENT_ORPHAN_CHECK       5   // checks for orphaned hosts and services
-#  define EVENT_RETENTION_SAVE     6   // save (dump) retention data
-#  define EVENT_STATUS_SAVE        7   // save (dump) status data
-#  define EVENT_SCHEDULED_DOWNTIME 8   // scheduled host or service downtime
-#  define EVENT_SFRESHNESS_CHECK   9  // checks service result "freshness"
-#  define EVENT_EXPIRE_DOWNTIME    10  // checks for (and removes) expired scheduled downtime
-#  define EVENT_HOST_CHECK         11  // active host check
-#  define EVENT_HFRESHNESS_CHECK   12  // checks host result "freshness"
-#  define EVENT_RESCHEDULE_CHECKS  13  // adjust scheduling of host and service checks
-#  define EVENT_EXPIRE_COMMENT     14  // removes expired comments
+#  define EVENT_RETENTION_SAVE     5   // save (dump) retention data
+#  define EVENT_SFRESHNESS_CHECK   6   // checks service result "freshness"
+#  define EVENT_HOST_CHECK         7   // active host check
+#  define EVENT_HFRESHNESS_CHECK   8   // checks host result "freshness"
+#  define EVENT_RESCHEDULE_CHECKS  9   // adjust scheduling of host and service checks
 #  define EVENT_SLEEP              98  // asynchronous sleep event that occurs when event queues are empty
 #  define EVENT_USER_FUNCTION      99  // USER-defined function (modules)
 

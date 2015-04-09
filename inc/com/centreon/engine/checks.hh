@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2006      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,6 @@
 #  define CCE_CHECKS_HH
 
 #  include <sys/time.h>
-#  include "com/centreon/engine/objects/contact.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
@@ -43,9 +42,6 @@ typedef struct                check_result_struct {
   int                         check_options;
   int                         scheduled_check;      // was this a scheduled or an on-demand check?
   int                         reschedule_check;     // should we reschedule the next check
-  char*                       output_file;          // what file is the output stored in?
-  FILE*                       output_file_fp;
-  int                         output_file_fd;
   double                      latency;
   struct timeval              start_time;           // time the service check was initiated
   struct timeval              finish_time;          // time the service check was completed
@@ -103,11 +99,7 @@ void schedule_host_check(
 // Monitoring/Event Handler Functions
 
 // checks service dependencies
-unsigned int check_service_dependencies(
-               service* svc,
-               int dependency_type);
-// checks for orphaned services
-void check_for_orphaned_services();
+unsigned int check_service_dependencies(service* svc);
 // checks the "freshness" of service check results
 void check_service_result_freshness();
 // determines if a service's check results are fresh
@@ -116,11 +108,7 @@ int is_service_result_fresh(
       time_t current_time,
       int log_this);
 // checks host dependencie
-unsigned int check_host_dependencies(
-               host* hst,
-               int dependency_type);
-// checks for orphaned hosts
-void check_for_orphaned_hosts();
+unsigned int check_host_dependencies(host* hst);
 // checks the "freshness" of host check results
 void check_host_result_freshness();
 // determines if a host's check results are fresh
@@ -171,7 +159,6 @@ int handle_async_host_check_result_3x(
 int process_host_check_result_3x(
       host* hst,
       int new_state,
-      char* old_plugin_output,
       int check_options,
       int reschedule_check,
       int use_cached_result,

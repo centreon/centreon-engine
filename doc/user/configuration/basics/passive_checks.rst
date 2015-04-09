@@ -70,25 +70,6 @@ The processing of active and passive check results is essentially
 identical. This allows for seamless integration of status information
 from external applications with Centreon Engine.
 
-Enabling Passive Checks
-=======================
-
-In order to enable passive checks in Centreon Engine, you'll need to do
-the following:
-
-  * Set :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
-    directive to 1.
-  * Set the passive_checks_enabled directive in your host and service
-    definitions to 1.
-
-If you want to disable processing of passive checks on a global basis,
-set the :ref:`accept_passive_service_checks <main_cfg_opt_passive_service_check_acceptance>`
-directive to 0.
-
-If you would like to disable passive checks for just a few hosts or
-services, use the passive_checks_enabled directive in the host and/or
-service definitions to do so.
-
 Submitting Passive Service Check Results
 ========================================
 
@@ -150,32 +131,6 @@ where...
    results for hosts that had not been configured before it was last
    (re)started.
 
-Passive Checks and Host States
-==============================
-
-Unlike with active host checks, Centreon Engine does not (by default)
-attempt to determine whether or host is DOWN or UNREACHABLE with passive
-checks. Rather, Centreon Engine takes the passive check result to be the
-actual state the host is in and doesn't try to determine the host's
-actual state using the
-:ref:`reachability logic <status_and_reachability_network>`.
-This can cause problems if you are submitting passive checks from a
-remote host or you have a
-:ref:`distributed monitoring setup <distributed_monitoring>`
-where the parent/child host relationships are different.
-
-You can tell Centreon Engine to translate DOWN/UNREACHABLE passive check
-result states to their "proper" state by using the
-:ref:`translate_passive_host_checks <main_cfg_opt_translate_passive_host_checks>`
-variable. More information on how this works can be found
-:ref:`here <passive_host_state_translation>`.
-
-.. note::
-   Passive host checks are normally treated as
-   :ref:`HARD states <state_types>`, unless the
-   :ref:`passive_host_checks_are_soft <main_cfg_opt_passive_host_checks_are_soft>`
-   option is enabled.
-
 Submitting Passive Check Results From Remote Hosts
 ==================================================
 
@@ -196,4 +151,3 @@ validation on the results being submitted, and then write the check
 results directly into the external command file (as described
 above). More information on the NSCA addon can be found
 :ref:`here <addons_nsca>`.
-

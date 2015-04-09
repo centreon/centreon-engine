@@ -55,7 +55,6 @@ Host Macros :sup:`3`
 Macro Name                     Service Checks Service Notifications Host Checks      Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
 ============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
 `HOSTNAME`_                    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTDISPLAYNAME`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTALIAS`_                   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTADDRESS`_                 **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTSTATE`_                   **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -116,7 +115,6 @@ Service Macros
 Macro Name                        Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 `SERVICEDESC`_                    **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEDISPLAYNAME`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICESTATE`_ :sup:`2`          **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICESTATEID`_ :sup:`2`        **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `LASTSERVICESTATE`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
@@ -239,10 +237,6 @@ Date/Time Macros
 ========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 Macro Name                Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
 ========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`LONGDATETIME`_           **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SHORTDATETIME`_          **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`DATE`_                   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TIME`_                   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TIMET`_                  **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `ISVALIDTIME`_ :sup:`9`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `NEXTVALIDTIME`_ :sup:`9` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -257,7 +251,6 @@ Macro Name             Service Checks Service Notifications Host Checks Host Not
 `MAINCONFIGFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `STATUSDATAFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RETENTIONDATAFILE`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`OBJECTCACHEFILE`_     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LOGFILE`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `RESOURCEFILE`_        **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `COMMANDFILE`_         **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -287,8 +280,6 @@ Host Macros :sup:`3`
 
 ============================== =========================================================================================================================
 _`HOSTNAME`                    Short name for the host (i.e. "biglinuxbox"). This value is taken from the host_name directive in the
-                               :ref:`host definition <obj_def_host>`.
-_`HOSTDISPLAYNAME`             An alternate display name for the host. This value is taken from the display_name directive in the
                                :ref:`host definition <obj_def_host>`.
 _`HOSTALIAS`                   Long name/description for the host. This value is taken from the alias directive in the
                                :ref:`host definition <obj_def_host>`.
@@ -381,8 +372,6 @@ Service Macros
 ================================= ======================================================================================================================
 _`SERVICEDESC`                    The long name/description of the service (i.e. "Main Website"). This value is taken from the service_description
                                   directive of the :ref:`service definition <obj_def_service>`.
-_`SERVICEDISPLAYNAME`             An alternate display name for the service. This value is taken from the display_name directive in the
-                                  :ref:`service definition <obj_def_service>`.
 _`SERVICESTATE`                   A string indicating the current state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").
 _`SERVICESTATEID`                 A number that corresponds to the current state of the service: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN.
 _`LASTSERVICESTATE`               A string indicating the last state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").
@@ -579,11 +568,6 @@ Date/Time Macros
 ----------------
 
 ========================= ===============================================================================================================================
-_`LONGDATETIME`           Current date/time stamp (i.e. Fri Oct 13 00:30:28 CDT 2000). Format of date is determined by
-                          :ref:`date_format <main_cfg_opt_date_format>` directive.
-_`SHORTDATETIME`          Current date/time stamp (i.e. 10-13-2000 00:30:28). Format of date is determined by
-                          :ref:`date_format <main_cfg_opt_date_format>` directive.
-_`DATE`                   Date stamp (i.e. 10-13-2000). Format of date is determined by :ref:`date_format <main_cfg_opt_date_format>` directive.
 _`TIME`                   Current time stamp (i.e. 00:30:28).
 _`TIMET`                  Current time stamp in time_t format (seconds since the UNIX epoch).
 _`ISVALIDTIME` :sup:`9`   This is a special on-demand macro that returns a 1 or 0 depending on whether or not a particular time is valid within a
@@ -609,7 +593,6 @@ File Macros
 _`MAINCONFIGFILE`      The location of the :ref:`main config file <main_cfg_opt>`.
 _`STATUSDATAFILE`      The location of the :ref:`status data file <main_cfg_opt_status_file>`.
 _`RETENTIONDATAFILE`   The location of the :ref:`retention data file <main_cfg_opt_state_retention_file>`.
-_`OBJECTCACHEFILE`     The location of the :ref:`object cache file <main_cfg_opt_object_cache_file>`.
 _`LOGFILE`             The location of the :ref:`log file <main_cfg_opt_log_file>`.
 _`RESOURCEFILE`        The location of the :ref:`resource file <main_cfg_opt_resource_file>`.
 _`COMMANDFILE`         The location of the :ref:`command file <main_cfg_opt_external_command_file>`.
@@ -680,7 +663,3 @@ Notes
   * :sup:`9` These macro are only available as on-demand macros -
     e.g. you must supply an additional argument with them in order to
     use them. These macros are not available as environment variables.
-  * :sup:`10` Summary macros are not available as environment
-    variables if the
-    :ref:`use_large_installation_tweaks <main_cfg_opt_large_installation_tweaks>`
-    option is enabled, as they are quite CPU-intensive to calculate.

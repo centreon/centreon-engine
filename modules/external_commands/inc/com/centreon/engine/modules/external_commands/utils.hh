@@ -21,10 +21,17 @@
 #  define CCE_MOD_EXTCMD_UTILS_HH
 
 #  include <time.h>
+#  include "com/centreon/engine/modules/external_commands/circular_buffer.hh"
+
+#  define COMMAND_WORKER_THREAD 0
+#  define TOTAL_WORKER_THREADS 1
 
 #  ifdef __cplusplus
 extern "C" {
 #  endif // C++
+
+extern circular_buffer           external_command_buffer;
+extern pthread_t                 worker_threads[];
 
 int open_command_file();  // creates the external command file as a named pipe (FIFO) and opens it for reading
 int close_command_file(); // closes and deletes the external command file (FIFO)

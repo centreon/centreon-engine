@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -34,7 +34,6 @@ extern "C" {
 int clear_host_macros_r(nagios_macros* mac) {
   static unsigned int const to_free[] = {
     MACRO_HOSTNAME,
-    MACRO_HOSTDISPLAYNAME,
     MACRO_HOSTALIAS,
     MACRO_HOSTADDRESS,
     MACRO_HOSTSTATE,
@@ -47,7 +46,6 @@ int clear_host_macros_r(nagios_macros* mac) {
     MACRO_HOSTCHECKCOMMAND,
     MACRO_HOSTATTEMPT,
     MACRO_MAXHOSTATTEMPTS,
-    MACRO_HOSTDOWNTIME,
     MACRO_HOSTPERCENTCHANGE,
     MACRO_HOSTDURATIONSEC,
     MACRO_HOSTDURATION,
@@ -58,8 +56,6 @@ int clear_host_macros_r(nagios_macros* mac) {
     MACRO_LASTHOSTUP,
     MACRO_LASTHOSTDOWN,
     MACRO_LASTHOSTUNREACHABLE,
-    MACRO_HOSTNOTIFICATIONNUMBER,
-    MACRO_HOSTNOTIFICATIONID,
     MACRO_HOSTEVENTID,
     MACRO_LASTHOSTEVENTID,
     MACRO_HOSTACTIONURL,

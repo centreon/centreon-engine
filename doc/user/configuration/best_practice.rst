@@ -42,14 +42,6 @@ Enable cached check to incresed performance.
 Optimization
 ============
 
-Large installation enable some optimization enable it.
-
-  * use_large_installation_tweaks=1
-
-Environment macros have a poor performance disable it.
-
-  * enable_environment_macros=0
-
 Centreon-Engine allow to improve performance without
 using setpgid (see the documentation!).
 

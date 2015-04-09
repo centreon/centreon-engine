@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,97 +36,55 @@ using namespace com::centreon::engine::retention;
 void applier::program::apply(
        configuration::state& config,
        retention::program const& obj) {
+  (void)config;
+
   // XXX: don't use globals, replace it by config!
 
-  if (obj.modified_host_attributes().is_set()) {
+  if (obj.modified_host_attributes().is_set())
     modified_host_process_attributes = *obj.modified_host_attributes();
-    // mask out attributes we don't want to retain.
-    modified_host_process_attributes &= ~config.retained_process_host_attribute_mask();
-  }
 
-  if (obj.modified_service_attributes().is_set()) {
+  if (obj.modified_service_attributes().is_set())
     modified_service_process_attributes = *obj.modified_service_attributes();
-    // mask out attributes we don't want to retain.
-    modified_service_process_attributes &= ~config.retained_process_host_attribute_mask();
-  }
 
-  if (config.use_retained_program_state()) {
-    if (obj.enable_notifications().is_set()
-        && (modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED))
-      enable_notifications = *obj.enable_notifications();
+  if (obj.enable_event_handlers().is_set()
+      && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED))
+    enable_event_handlers = *obj.enable_event_handlers();
 
-    if (obj.active_service_checks_enabled().is_set()
-        && (modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
-      execute_service_checks = *obj.active_service_checks_enabled();
+  if (obj.obsess_over_services().is_set()
+      && (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED))
+    obsess_over_services = *obj.obsess_over_services();
 
-    if (obj.passive_service_checks_enabled().is_set()
-        && (modified_service_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED))
-      accept_passive_service_checks = *obj.passive_service_checks_enabled();
+  if (obj.obsess_over_hosts().is_set()
+      && (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED))
+    obsess_over_hosts = *obj.obsess_over_hosts();
 
-    if (obj.active_host_checks_enabled().is_set()
-        && (modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED))
-      execute_host_checks = *obj.active_host_checks_enabled();
+  if (obj.check_service_freshness().is_set()
+      && (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED))
+    check_service_freshness = *obj.check_service_freshness();
 
-    if (obj.passive_host_checks_enabled().is_set()
-        && (modified_host_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED))
-      accept_passive_host_checks = *obj.passive_host_checks_enabled();
+  if (obj.check_host_freshness().is_set()
+      && (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED))
+    check_host_freshness = *obj.check_host_freshness();
 
-    if (obj.enable_event_handlers().is_set()
-        && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED))
-      enable_event_handlers = *obj.enable_event_handlers();
+  if (obj.enable_flap_detection().is_set()
+      && (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED))
+    enable_flap_detection = *obj.enable_flap_detection();
 
-    if (obj.obsess_over_services().is_set()
-        && (modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED))
-      obsess_over_services = *obj.obsess_over_services();
+  if (obj.global_host_event_handler().is_set()
+      && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)
+      && utils::is_command_exist(*obj.global_host_event_handler()))
+    string::setstr(global_host_event_handler, *obj.global_host_event_handler());
 
-    if (obj.obsess_over_hosts().is_set()
-        && (modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED))
-      obsess_over_hosts = *obj.obsess_over_hosts();
+  if (obj.global_service_event_handler().is_set()
+      && (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)
+      && utils::is_command_exist(*obj.global_service_event_handler()))
+    string::setstr(global_service_event_handler, *obj.global_service_event_handler());
 
-    if (obj.check_service_freshness().is_set()
-        && (modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED))
-      check_service_freshness = *obj.check_service_freshness();
+  if (obj.next_event_id().is_set())
+    next_event_id = *obj.next_event_id();
 
-    if (obj.check_host_freshness().is_set()
-        && (modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED))
-      check_host_freshness = *obj.check_host_freshness();
+  if (obj.next_problem_id().is_set())
+    next_problem_id = *obj.next_problem_id();
 
-    if (obj.enable_flap_detection().is_set()
-        && (modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED))
-      enable_flap_detection = *obj.enable_flap_detection();
-
-    if (obj.enable_failure_prediction().is_set()
-        && (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED))
-      enable_failure_prediction = *obj.enable_failure_prediction();
-
-    if (obj.global_host_event_handler().is_set()
-        && (modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)
-        && utils::is_command_exist(*obj.global_host_event_handler()))
-      string::setstr(global_host_event_handler, *obj.global_host_event_handler());
-
-    if (obj.global_service_event_handler().is_set()
-        && (modified_service_process_attributes & MODATTR_EVENT_HANDLER_COMMAND)
-        && utils::is_command_exist(*obj.global_service_event_handler()))
-      string::setstr(global_service_event_handler, *obj.global_service_event_handler());
-
-    if (obj.next_comment_id().is_set())
-      next_comment_id = *obj.next_comment_id();
-
-    if (obj.next_downtime_id().is_set())
-      next_downtime_id = *obj.next_downtime_id();
-
-    if (obj.next_event_id().is_set())
-      next_event_id = *obj.next_event_id();
-
-    if (obj.next_problem_id().is_set())
-      next_problem_id = *obj.next_problem_id();
-
-    if (obj.next_notification_id().is_set())
-      next_notification_id = *obj.next_notification_id();
-  }
-
-  if (!config.use_retained_program_state()) {
-    modified_host_process_attributes = MODATTR_NONE;
-    modified_service_process_attributes = MODATTR_NONE;
-  }
+  return ;
 }

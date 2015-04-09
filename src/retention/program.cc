@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -31,24 +31,24 @@ program::setters const program::_setters[] = {
   { "check_host_freshness",           SETTER(bool, _set_check_host_freshness) },
   { "check_service_freshness",        SETTER(bool, _set_check_service_freshness) },
   { "enable_event_handlers",          SETTER(bool, _set_enable_event_handlers) },
-  { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
   { "enable_flap_detection",          SETTER(bool, _set_enable_flap_detection) },
-  { "enable_notifications",           SETTER(bool, _set_enable_notifications) },
   { "global_host_event_handler",      SETTER(std::string const&, _set_global_host_event_handler) },
   { "global_service_event_handler",   SETTER(std::string const&, _set_global_service_event_handler) },
   { "modified_host_attributes",       SETTER(unsigned long, _set_modified_host_attributes) },
   { "modified_service_attributes",    SETTER(unsigned long, _set_modified_service_attributes) },
-  { "next_comment_id",                SETTER(unsigned long, _set_next_comment_id) },
-  { "next_downtime_id",               SETTER(unsigned long, _set_next_downtime_id) },
   { "next_event_id",                  SETTER(unsigned long, _set_next_event_id) },
-  { "next_notification_id",           SETTER(unsigned long, _set_next_notification_id) },
   { "next_problem_id",                SETTER(unsigned long, _set_next_problem_id) },
   { "obsess_over_hosts",              SETTER(bool, _set_obsess_over_hosts) },
   { "obsess_over_services",           SETTER(bool, _set_obsess_over_services) },
-  { "passive_host_checks_enabled",    SETTER(bool, _set_passive_host_checks_enabled) },
-  { "passive_service_checks_enabled", SETTER(bool, _set_passive_service_checks_enabled) },
 
   // Deprecated.
+  { "enable_failure_prediction",      SETTER(bool, _set_enable_failure_prediction) },
+  { "enable_notifications",           SETTER(bool, _set_enable_notifications) },
+  { "next_comment_id",                SETTER(unsigned long, _set_next_comment_id) },
+  { "next_downtime_id",               SETTER(unsigned long, _set_next_downtime_id) },
+  { "next_notification_id",           SETTER(unsigned long, _set_next_notification_id) },
+  { "passive_host_checks_enabled",    SETTER(bool, _set_passive_host_checks_enabled) },
+  { "passive_service_checks_enabled", SETTER(bool, _set_passive_service_checks_enabled) },
   { "process_performance_data",       SETTER(bool, _set_process_performance_data) }
 };
 
@@ -87,22 +87,15 @@ program& program::operator=(program const& right) {
     _check_host_freshness = right._check_host_freshness;
     _check_service_freshness = right._check_service_freshness;
     _enable_event_handlers = right._enable_event_handlers;
-    _enable_failure_prediction = right._enable_failure_prediction;
     _enable_flap_detection = right._enable_flap_detection;
-    _enable_notifications = right._enable_notifications;
     _global_host_event_handler = right._global_host_event_handler;
     _global_service_event_handler = right._global_service_event_handler;
     _modified_host_attributes = right._modified_host_attributes;
     _modified_service_attributes = right._modified_service_attributes;
-    _next_comment_id = right._next_comment_id;
-    _next_downtime_id = right._next_downtime_id;
     _next_event_id = right._next_event_id;
-    _next_notification_id = right._next_notification_id;
     _next_problem_id = right._next_problem_id;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
-    _passive_host_checks_enabled = right._passive_host_checks_enabled;
-    _passive_service_checks_enabled = right._passive_service_checks_enabled;
   }
   return (*this);
 }
@@ -121,22 +114,15 @@ bool program::operator==(program const& right) const throw () {
           && _check_host_freshness == right._check_host_freshness
           && _check_service_freshness == right._check_service_freshness
           && _enable_event_handlers == right._enable_event_handlers
-          && _enable_failure_prediction == right._enable_failure_prediction
           && _enable_flap_detection == right._enable_flap_detection
-          && _enable_notifications == right._enable_notifications
           && _global_host_event_handler == right._global_host_event_handler
           && _global_service_event_handler == right._global_service_event_handler
           && _modified_host_attributes == right._modified_host_attributes
           && _modified_service_attributes == right._modified_service_attributes
-          && _next_comment_id == right._next_comment_id
-          && _next_downtime_id == right._next_downtime_id
           && _next_event_id == right._next_event_id
-          && _next_notification_id == right._next_notification_id
           && _next_problem_id == right._next_problem_id
           && _obsess_over_hosts == right._obsess_over_hosts
-          && _obsess_over_services == right._obsess_over_services
-          && _passive_host_checks_enabled == right._passive_host_checks_enabled
-          && _passive_service_checks_enabled == right._passive_service_checks_enabled);
+          && _obsess_over_services == right._obsess_over_services);
 }
 
 /**
@@ -213,30 +199,12 @@ opt<bool> const& program::enable_event_handlers() const throw () {
 }
 
 /**
- *  Get enable_failure_prediction.
- *
- *  @return The enable_failure_prediction.
- */
-opt<bool> const& program::enable_failure_prediction() const throw () {
-  return (_enable_failure_prediction);
-}
-
-/**
  *  Get enable_flap_detection.
  *
  *  @return The enable_flap_detection.
  */
 opt<bool> const& program::enable_flap_detection() const throw () {
   return (_enable_flap_detection);
-}
-
-/**
- *  Get enable_notifications.
- *
- *  @return The enable_notifications.
- */
-opt<bool> const& program::enable_notifications() const throw () {
-  return (_enable_notifications);
 }
 
 /**
@@ -276,39 +244,12 @@ opt<unsigned long> const& program::modified_service_attributes() const throw () 
 }
 
 /**
- *  Get next_comment_id.
- *
- *  @return The next_comment_id.
- */
-opt<unsigned long> const& program::next_comment_id() const throw () {
-  return (_next_comment_id);
-}
-
-/**
- *  Get next_downtime_id.
- *
- *  @return The next_downtime_id.
- */
-opt<unsigned long> const& program::next_downtime_id() const throw () {
-  return (_next_downtime_id);
-}
-
-/**
  *  Get next_event_id.
  *
  *  @return The next_event_id.
  */
 opt<unsigned long> const& program::next_event_id() const throw () {
   return (_next_event_id);
-}
-
-/**
- *  Get next_notification_id.
- *
- *  @return The next_notification_id.
- */
-opt<unsigned long> const& program::next_notification_id() const throw () {
-  return (_next_notification_id);
 }
 
 /**
@@ -336,24 +277,6 @@ opt<bool> const& program::obsess_over_hosts() const throw () {
  */
 opt<bool> const& program::obsess_over_services() const throw () {
   return (_obsess_over_services);
-}
-
-/**
- *  Get passive_host_checks_enabled.
- *
- *  @return The passive_host_checks_enabled.
- */
-opt<bool> const& program::passive_host_checks_enabled() const throw () {
-  return (_passive_host_checks_enabled);
-}
-
-/**
- *  Get passive_service_checks_enabled.
- *
- *  @return The passive_service_checks_enabled.
- */
-opt<bool> const& program::passive_service_checks_enabled() const throw () {
-  return (_passive_service_checks_enabled);
 }
 
 /**
@@ -407,12 +330,12 @@ bool program::_set_enable_event_handlers(bool value) {
 }
 
 /**
- *  Set enable_failure_prediction.
+ *  Deprecated variable.
  *
- *  @param[in] value The new enable_failure_prediction.
+ *  @param[in] value  Unused.
  */
 bool program::_set_enable_failure_prediction(bool value) {
-  _enable_failure_prediction = value;
+  (void)value;
   return (true);
 }
 
@@ -427,12 +350,14 @@ bool program::_set_enable_flap_detection(bool value) {
 }
 
 /**
- *  Set enable_notifications.
+ *  Deprecated variable.
  *
- *  @param[in] value The new enable_notifications.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_enable_notifications(bool value) {
-  _enable_notifications = value;
+  (void)value;
   return (true);
 }
 
@@ -477,22 +402,24 @@ bool program::_set_modified_service_attributes(unsigned long value) {
 }
 
 /**
- *  Set next_comment_id.
+ *  Deprecated variable.
  *
- *  @param[in] value The new next_comment_id.
+ *  @param[in] value  Unused.
  */
 bool program::_set_next_comment_id(unsigned long value) {
-  _next_comment_id = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set next_downtime_id.
+ *  Deprecated variable.
  *
- *  @param[in] value The new next_downtime_id.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_next_downtime_id(unsigned long value) {
-  _next_downtime_id = value;
+  (void)value;
   return (true);
 }
 
@@ -507,12 +434,14 @@ bool program::_set_next_event_id(unsigned long value) {
 }
 
 /**
- *  Set next_notification_id.
+ *  Deprecated variable.
  *
- *  @param[in] value The new next_notification_id.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_next_notification_id(unsigned long value) {
-  _next_notification_id = value;
+  (void)value;
   return (true);
 }
 
@@ -547,22 +476,26 @@ bool program::_set_obsess_over_services(bool value) {
 }
 
 /**
- *  Set passive_host_checks_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new passive_host_checks_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_passive_host_checks_enabled(bool value) {
-  _passive_host_checks_enabled = value;
+  (void)value;
   return (true);
 }
 
 /**
- *  Set passive_service_checks_enabled.
+ *  Deprecated variable.
  *
- *  @param[in] value The new passive_service_checks_enabled.
+ *  @param[in] value  Unused.
+ *
+ *  @return True.
  */
 bool program::_set_passive_service_checks_enabled(bool value) {
-  _passive_service_checks_enabled = value;
+  (void)value;
   return (true);
 }
 

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -52,11 +52,11 @@ static int check_process_file(int argc, char** argv) {
                   std::ios_base::trunc | std::ios_base::out);
   if (!file.is_open())
     throw (engine_error() << "cannot create temporary file");
-  file << "[1317196300] ENABLE_NOTIFICATIONS" << std::endl;
+  file << "[1317196300] ENABLE_EVENT_HANDLERS" << std::endl;
   file.close();
 
   // Send external command.
-  config->enable_notifications(false);
+  config->enable_event_handlers(false);
   std::string cmd("[1317196300] PROCESS_FILE;");
   cmd.append(tmp);
   cmd.append(";0\n");
@@ -64,7 +64,7 @@ static int check_process_file(int argc, char** argv) {
 
   // Cleanup.
   io::file_stream::remove(tmp);
-  if (!config->enable_notifications())
+  if (!config->enable_event_handlers())
     throw (engine_error() << "process_file failed");
 
   return (0);

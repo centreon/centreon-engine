@@ -1,6 +1,8 @@
 /*
-** Copyright 2000-2007 Ethan Galstad
-** Copyright 2011-2015 Merethis
+** Copyright 2007-2008      Ethan Galstad
+** Copyright 2007,2010      Andreas Ericsson
+** Copyright 2010           Max Schubert
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,25 +20,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_STATUSDATA_HH
-#  define CCE_STATUSDATA_HH
+#ifndef CCE_MOD_EXTCMD_CIRCULAR_BUFFER_HH
+#  define CCE_MOD_EXTCMD_CIRCULAR_BUFFER_HH
 
-#  include "com/centreon/engine/objects/host.hh"
-#  include "com/centreon/engine/objects/service.hh"
+#  include <pthread.h>
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif // C++
+typedef struct    circular_buffer_struct {
+  void**          buffer;
+  int             tail;
+  int             head;
+  int             items;
+  int             high;
+  unsigned long   overflow;
+  pthread_mutex_t buffer_lock;
+}                 circular_buffer;
 
-// updates program status data
-int update_program_status();
-// updates host status data
-int update_host_status(host* hst);
-// updates service status data
-int update_service_status(service* svc);
-
-#  ifdef __cplusplus
-}
-#  endif // C++
-
-#endif // !CCE_STATUSDATA_HH
+#endif // !CCE_MOD_EXTCMD_CIRCULAR_BUFFER_HH

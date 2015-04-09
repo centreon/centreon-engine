@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -47,32 +47,11 @@ namespace         modules {
 
       static void _wrapper_read_state_information();
       static void _wrapper_save_state_information();
-      static void _wrapper_enable_host_and_child_notifications(host* hst);
-      static void _wrapper_disable_host_and_child_notifications(host* hst);
-      static void _wrapper_enable_all_notifications_beyond_host(host* hst);
-      static void _wrapper_disable_all_notifications_beyond_host(host* hst);
-      static void _wrapper_enable_host_svc_notifications(host* hst);
-      static void _wrapper_disable_host_svc_notifications(host* hst);
+      static void _wrapper_save_status_information();
       static void _wrapper_enable_host_svc_checks(host* hst);
       static void _wrapper_disable_host_svc_checks(host* hst);
-      static void _wrapper_set_host_notification_number(
-                    host* hst,
-                    char* args);
-      static void _wrapper_send_custom_host_notification(
-                    host* hst,
-                    char* args);
-      static void _wrapper_enable_service_notifications(host* hst);
-      static void _wrapper_disable_service_notifications(host* hst);
       static void _wrapper_enable_service_checks(host* hst);
       static void _wrapper_disable_service_checks(host* hst);
-      static void _wrapper_enable_passive_service_checks(host* hst);
-      static void _wrapper_disable_passive_service_checks(host* hst);
-      static void _wrapper_set_service_notification_number(
-                    service* svc,
-                    char* args);
-      static void _wrapper_send_custom_service_notification(
-                    service* svc,
-                    char* args);
 
       template <void (*fptr)()>
       static void _redirector(
@@ -247,41 +226,6 @@ namespace         modules {
           (*fptr)(hst);
           last_host = hst;
         }
-      }
-
-      template <void (*fptr)(contact*)>
-      static void _redirector_contact(
-                    int id,
-                    time_t entry_time,
-                    char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* name(my_strtok(args, ";"));
-        contact* cntc(::find_contact(name));
-        if (!cntc)
-          return ;
-        (*fptr)(cntc);
-      }
-
-      template <void (*fptr)(contact*)>
-      static void _redirector_contactgroup(
-                    int id,
-                    time_t entry_time,
-                    char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* group_name(my_strtok(args, ";"));
-        contactgroup* group(::find_contactgroup(group_name));
-        if (!group)
-          return ;
-
-        for (contactsmember* member(group->members);
-             member;
-             member = member->next)
-          if (member->contact_ptr)
-            (*fptr)(member->contact_ptr);
       }
 
       umap<std::string, command_info> _lst_command;

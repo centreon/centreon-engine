@@ -48,25 +48,3 @@ Router-D as UNREACHABLE, when it is really DOWN based on its
 viewpoint. Similarly, the DOWN/UNREACHABLE states (from the viewpoint of
 Centreon Engine-A) for Router-C and Router-D should be flipped from the
 viewpoint of Centreon Engine-B.
-
-.. note::
-   There may be some situations where you do not want Centreon Engine to
-   translate DOWN/UNREACHABLE states from remote sources to their
-   "correct" state from the viewpoint of the local Centreon Engine
-   instance. For example, in distributed monitoring environments you may
-   want the central Centreon Engine instance to know how distributed
-   instances see their respective portions of the network.
-
-Enabling State Translation
-==========================
-
-By default, Centreon Engine will not automatically translate
-DOWN/UNREACHABLE states from passive check results. You will need to
-enable this feature if you need and want it.
-
-The automatic translation of passive host check states is controlled by
-the :ref:`translate_passive_host_checks <main_cfg_opt_translate_passive_host_checks>`
-variable. Enable it and Centreon Engine will automatically translate
-DOWN and UNREACHABLE states from remote sources to their correct state
-for the local instance of Centreon Engine.
-

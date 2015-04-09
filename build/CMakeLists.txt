@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2014 Merethis
+## Copyright 2011-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -602,10 +602,6 @@ else ()
   set(LIBRARY_TYPE STATIC)
 endif ()
 
-# Configure files.
-configure_file("${INC_DIR}/compatibility/common.h.in"
-  "${INC_DIR}/compatibility/common.h")
-
 # Locations definitions
 add_definitions(-DDEFAULT_STATUS_FILE="${VAR_DIR}/status.dat")
 add_definitions(-DDEFAULT_LOG_FILE="${VAR_DIR}/centengine.log")
@@ -639,7 +635,6 @@ set(
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/macros.cc"
   "${SRC_DIR}/nebmods.cc"
-  "${SRC_DIR}/notifications.cc"
   "${SRC_DIR}/sehandlers.cc"
   "${SRC_DIR}/shared.cc"
   "${SRC_DIR}/statusdata.cc"
@@ -648,14 +643,11 @@ set(
   "${SRC_DIR}/timezone_locker.cc"
   "${SRC_DIR}/timezone_manager.cc"
   "${SRC_DIR}/utils.cc"
-  "${SRC_DIR}/xcddefault.cc"
-  "${SRC_DIR}/xdddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
 
   # Headers.
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
-  "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
   "${INC_DIR}/com/centreon/engine/common.hh"
   "${INC_DIR}/com/centreon/engine/config.hh"
   "${INC_DIR}/com/centreon/engine/diagnostic.hh"
@@ -669,7 +661,6 @@ set(
   "${INC_DIR}/com/centreon/engine/nebmods.hh"
   "${INC_DIR}/com/centreon/engine/nebmodules.hh"
   "${INC_DIR}/com/centreon/engine/nebstructs.hh"
-  "${INC_DIR}/com/centreon/engine/notifications.hh"
   "${INC_DIR}/com/centreon/engine/opt.hh"
   "${INC_DIR}/com/centreon/engine/sehandlers.hh"
   "${INC_DIR}/com/centreon/engine/shared.hh"
@@ -680,8 +671,6 @@ set(
   "${INC_DIR}/com/centreon/engine/timezone_manager.hh"
   "${INC_DIR}/com/centreon/engine/utils.hh"
   "${INC_DIR}/com/centreon/engine/version.hh"
-  "${INC_DIR}/com/centreon/engine/xcddefault.hh"
-  "${INC_DIR}/com/centreon/engine/xdddefault.hh"
   "${INC_DIR}/com/centreon/engine/xsddefault.hh"
 )
 
@@ -699,7 +688,6 @@ add_subdirectory("macros")
 add_subdirectory("modules")
 add_subdirectory("objects")
 add_subdirectory("retention")
-add_subdirectory("scripts")
 
 # Library engine target.
 add_library("cce_core" ${LIBRARY_TYPE} ${FILES})
@@ -841,11 +829,6 @@ else ()
   message(STATUS "    - Build static core library   yes")
 endif ()
 message(STATUS "    - External commands module    enabled")
-if (WITH_WEBSERVICE)
-  message(STATUS "    - Webservice module           enabled")
-else ()
-  message(STATUS "    - Webservice module           disabled")
-endif ()
 if (WITH_TESTING)
   message(STATUS "    - Unit tests                  enabled")
 else ()

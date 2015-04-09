@@ -21,8 +21,8 @@ Enabling External Commands
 In order to have Centreon Engine process external commands, make sure
 you do the following:
 
-  * enable external command checking with the
-    :ref:`check_external_commands <main_cfg_opt_external_command_check>`
+  * load the external command module as explained
+    :ref:`here <modules_external_commands>`
     option
   * set the frequency of command checks with the
     :ref:`command_check_interval <main_cfg_opt_external_command_check_interval>`
@@ -70,4 +70,3 @@ what command is being submitted to Centreon Engine.
 A full listing of external commands that can be used (along with
 examples of how to use them) can be found online at the following
 `URL <http://www.nagios.org/developerinfo/externalcommands/>`_
-

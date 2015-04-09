@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/library.hh"
-#include "common.h"
 #include "nebmodules.h"
 
 using namespace com::centreon;

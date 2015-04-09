@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2007 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2007      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -36,11 +36,8 @@
 #  define NEBCALLBACK_LOG_DATA                           9
 #  define NEBCALLBACK_SYSTEM_COMMAND_DATA               10
 #  define NEBCALLBACK_EVENT_HANDLER_DATA                11
-#  define NEBCALLBACK_NOTIFICATION_DATA                 12
 #  define NEBCALLBACK_SERVICE_CHECK_DATA                13
 #  define NEBCALLBACK_HOST_CHECK_DATA                   14
-#  define NEBCALLBACK_COMMENT_DATA                      15
-#  define NEBCALLBACK_DOWNTIME_DATA                     16
 #  define NEBCALLBACK_FLAPPING_DATA                     17
 #  define NEBCALLBACK_PROGRAM_STATUS_DATA               18
 #  define NEBCALLBACK_HOST_STATUS_DATA                  19
@@ -51,12 +48,7 @@
 #  define NEBCALLBACK_EXTERNAL_COMMAND_DATA             24
 #  define NEBCALLBACK_AGGREGATED_STATUS_DATA            25
 #  define NEBCALLBACK_RETENTION_DATA                    26
-#  define NEBCALLBACK_CONTACT_NOTIFICATION_DATA         27
-#  define NEBCALLBACK_CONTACT_NOTIFICATION_METHOD_DATA  28
-#  define NEBCALLBACK_ACKNOWLEDGEMENT_DATA              29
 #  define NEBCALLBACK_STATE_CHANGE_DATA                 30
-#  define NEBCALLBACK_CONTACT_STATUS_DATA               31
-#  define NEBCALLBACK_ADAPTIVE_CONTACT_DATA             32
 #  define NEBCALLBACK_COMMAND_DATA                      33
 #  define NEBCALLBACK_CUSTOM_VARIABLE_DATA              34
 #  define NEBCALLBACK_GROUP_DATA                        35
@@ -65,7 +57,6 @@
 #  define NEBCALLBACK_RELATION_DATA                     38
 
 #  define NEBCALLBACK_ADAPTIVE_DEPENDENCY_DATA          39
-#  define NEBCALLBACK_ADAPTIVE_ESCALATION_DATA          40
 #  define NEBCALLBACK_ADAPTIVE_TIMEPERIOD_DATA          41
 
 #  define NEBCALLBACK_NUMITEMS                          42 /* Total number of callback types we have. */

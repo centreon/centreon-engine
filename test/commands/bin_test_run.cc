@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -51,14 +51,6 @@ int main(int argc, char* argv[]) {
   // Check a classic return.
   if (!strcmp(argv[1], "--timeout=off"))
     return (STATE_OK);
-
-  // Check macros argument are ok.
-  if (!strcmp(argv[1], "--check_macros")) {
-    char const* arg = getenv("NAGIOS_ARG1");
-    if (arg != NULL && !strcmp(arg, "default_arg"))
-      return (STATE_OK);
-    return (STATE_CRITICAL);
-  }
 
   return (STATE_UNKNOWN);
 }

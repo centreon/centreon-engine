@@ -89,8 +89,8 @@ The slave host (host E) has its initial
 directive disabled, thereby preventing it from sending out any host or
 service notifications. You also want to make sure that the slave host
 has its
-:ref:`check_external_commands <main_cfg_opt_external_command_check>`
-directive enabled. That was easy enough...
+:ref:`external commands module <modules_external_commands>`
+loaded. That was easy enough...
 
 Initial Configuration
 ^^^^^^^^^^^^^^^^^^^^^
@@ -350,8 +350,8 @@ and :ref:`enable_notifications <main_cfg_opt_notifications>`
 directives. This will prevent the slave host from monitoring hosts and
 services and sending out notifications while the Centreon Engine process
 on the master host is still up and running. Make sure you also have the
-:ref:`check_external_commands <main_cfg_opt_external_command_check>`
-directive enabled on the slave host.
+:ref:`external commands module <modules_external_commands>`
+loaded on the slave host.
 
 Master Process Check
 ^^^^^^^^^^^^^^^^^^^^

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,8 +32,6 @@
 CCE_BEGIN()
 
 namespace               commands {
-  class environment;
-
   /**
    *  @class raw raw.hh
    *  @brief Raw is a specific implementation of command.
@@ -66,27 +64,6 @@ namespace               commands {
     void                data_is_available(process& p) throw ();
     void                data_is_available_err(process& p) throw ();
     void                finished(process& p) throw ();
-    static void         _build_argv_macro_environment(
-                          nagios_macros const& macros,
-                          environment& env);
-    static void         _build_contact_address_environment(
-                          nagios_macros const& macros,
-                          environment& env);
-    static void         _build_custom_contact_macro_environment(
-                          nagios_macros& macros,
-                          environment& env);
-    static void         _build_custom_host_macro_environment(
-                          nagios_macros& macros,
-                          environment& env);
-    static void         _build_custom_service_macro_environment(
-                          nagios_macros& macros,
-                          environment& env);
-    static void         _build_environment_macros(
-                          nagios_macros& macros,
-                          environment& env);
-    static void         _build_macrosx_environment(
-                          nagios_macros& macros,
-                          environment& env);
     process*            _get_free_process();
 
     concurrency::mutex  _lock;

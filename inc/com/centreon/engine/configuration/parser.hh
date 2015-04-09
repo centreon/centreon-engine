@@ -24,14 +24,11 @@
 #  include <string>
 #  include "com/centreon/engine/configuration/command.hh"
 #  include "com/centreon/engine/configuration/connector.hh"
-#  include "com/centreon/engine/configuration/contact.hh"
 #  include "com/centreon/engine/configuration/file_info.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
-#  include "com/centreon/engine/configuration/hostescalation.hh"
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/configuration/object.hh"
 #  include "com/centreon/engine/configuration/servicedependency.hh"
-#  include "com/centreon/engine/configuration/serviceescalation.hh"
 #  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
@@ -46,19 +43,13 @@ namespace              configuration {
     enum               read_options {
       read_commands = (1 << 0),
       read_connector = (1 << 1),
-      read_contact = (1 << 2),
-      read_contactgroup = (1 << 3),
-      read_host = (1 << 4),
-      read_hostdependency = (1 << 5),
-      read_hostescalation = (1 << 6),
-      read_hostgroup = (1 << 7),
-      read_hostgroupescalation = (1 << 8),
-      read_service = (1 << 9),
-      read_servicedependency = (1 << 10),
-      read_serviceescalation = (1 << 11),
-      read_servicegroup = (1 << 12),
-      read_timeperiod = (1 << 13),
-      read_downtime = (1 << 14),
+      read_host = (1 << 2),
+      read_hostdependency = (1 << 3),
+      read_hostgroup = (1 << 4),
+      read_service = (1 << 5),
+      read_servicedependency = (1 << 6),
+      read_servicegroup = (1 << 7),
+      read_timeperiod = (1 << 8),
       read_all = (~0)
     };
 
