@@ -68,7 +68,7 @@ state::setters const state::_setters[] = {
   { "daemon_dumps_core",                           SETTER(std::string const&, _set_daemon_dumps_core) },
   { "date_format",                                 SETTER(std::string const&, _set_date_format) },
   { "debug_file",                                  SETTER(std::string const&, debug_file) },
-  { "debug_level",                                 SETTER(unsigned long, debug_level) },
+  { "debug_level",                                 SETTER(unsigned long long, debug_level) },
   { "debug_verbosity",                             SETTER(unsigned int, debug_verbosity) },
   { "downtime_file",                               SETTER(std::string const&, _set_downtime_file) },
   { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
@@ -206,7 +206,7 @@ static int const                       default_command_check_interval(-1);
 static std::string const               default_command_file(DEFAULT_COMMAND_FILE);
 static state::date_type const          default_date_format(state::us);
 static std::string const               default_debug_file(DEFAULT_DEBUG_FILE);
-static unsigned long const             default_debug_level(0);
+static unsigned long long const        default_debug_level(0);
 static unsigned int const              default_debug_verbosity(1);
 static bool const                      default_enable_environment_macros(false);
 static bool const                      default_enable_event_handlers(true);
@@ -1512,7 +1512,7 @@ void state::debug_file(std::string const& value) {
  *
  *  @return The debug_level value.
  */
-unsigned long state::debug_level() const throw () {
+unsigned long long state::debug_level() const throw () {
   return (_debug_level);
 }
 
@@ -1521,9 +1521,9 @@ unsigned long state::debug_level() const throw () {
  *
  *  @param[in] value The new debug_level value.
  */
-void state::debug_level(unsigned long value) {
+void state::debug_level(unsigned long long value) {
   if (value == std::numeric_limits<unsigned long>::max())
-    _debug_level = static_cast<unsigned long>(all);
+    _debug_level = static_cast<unsigned long long>(all);
   else
     _debug_level = value;
 }
