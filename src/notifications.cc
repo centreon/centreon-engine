@@ -669,9 +669,11 @@ int check_service_notification_viability(
     return (ERROR);
   }
 
-  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT *****/
+  /***** RECOVERY NOTIFICATIONS ARE GOOD TO GO AT THIS POINT IF ANY OTHER NOTIFICATION WAS SENT *****/
   if (svc->current_state == STATE_OK)
-    return (OK);
+    return ((svc->current_notification_number > 0)
+            ? ERROR
+            : OK);
 
   /* don't notify contacts about this service problem again if the notification interval is set to 0 */
   if (svc->no_more_notifications == true) {
