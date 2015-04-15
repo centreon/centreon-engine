@@ -528,10 +528,6 @@ int init_object_skiplists() {
     = skiplist_new(10, 0.5, false, false, skiplist_compare_command);
   object_skiplists[TIMEPERIOD_SKIPLIST]
     = skiplist_new(10, 0.5, false, false, skiplist_compare_timeperiod);
-  object_skiplists[HOSTGROUP_SKIPLIST]
-    = skiplist_new(10, 0.5, false, false, skiplist_compare_hostgroup);
-  object_skiplists[SERVICEGROUP_SKIPLIST]
-    = skiplist_new(10, 0.5, false, false, skiplist_compare_servicegroup);
   object_skiplists[HOSTDEPENDENCY_SKIPLIST]
     = skiplist_new(15, 0.5, true, false, skiplist_compare_hostdependency);
   object_skiplists[SERVICEDEPENDENCY_SKIPLIST]
@@ -605,30 +601,6 @@ int skiplist_compare_hostdependency(void const* a, void const* b) {
 }
 
 /**
- *  Compare two host groups.
- *
- *  @param[in] a Uncasted host group #1.
- *  @param[in] b Uncasted host group #2.
- *
- *  @return Similar to strcmp.
- */
-int skiplist_compare_hostgroup(void const* a, void const* b) {
-  hostgroup const* oa(static_cast<hostgroup const*>(a));
-  hostgroup const* ob(static_cast<hostgroup const*>(b));
-  if (!oa && !ob)
-    return (0);
-  if (!oa)
-    return (1);
-  if (!ob)
-    return (-1);
-  return (skiplist_compare_text(
-            oa->group_name,
-            NULL,
-            ob->group_name,
-            NULL));
-}
-
-/**
  *  Compare two services.
  *
  *  @param[in] a Uncasted service #1.
@@ -674,30 +646,6 @@ int skiplist_compare_servicedependency(void const* a, void const* b) {
             oa->dependent_service_description,
             ob->dependent_host_name,
             ob->dependent_service_description));
-}
-
-/**
- *  Compare two service groups.
- *
- *  @param[in] a Uncasted service group #1.
- *  @param[in] b Uncasted service group #2.
- *
- *  @return Similar to strcmp.
- */
-int skiplist_compare_servicegroup(void const* a, void const* b) {
-  servicegroup const* oa(static_cast<servicegroup const*>(a));
-  servicegroup const* ob(static_cast<servicegroup const*>(b));
-  if (!oa && !ob)
-    return (0);
-  if (!oa)
-    return (1);
-  if (!ob)
-    return (-1);
-  return (skiplist_compare_text(
-            oa->group_name,
-            NULL,
-            ob->group_name,
-            NULL));
 }
 
 /**

@@ -131,26 +131,6 @@ namespace         modules {
         (*fptr)(hst, args + strlen(name) + 1);
       }
 
-      template <void (*fptr)(host*)>
-      static void _redirector_hostgroup(
-                    int id,
-                    time_t entry_time,
-                    char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* group_name(my_strtok(args, ";"));
-        hostgroup* group(::find_hostgroup(group_name));
-        if (!group)
-          return ;
-
-        for (hostsmember* member = group->members;
-             member != NULL;
-             member = member->next)
-          if (member->host_ptr)
-            (*fptr)(member->host_ptr);
-      }
-
       template <void (*fptr)(service*)>
       static void _redirector_service(
                     int id,
@@ -181,51 +161,6 @@ namespace         modules {
         if (!svc)
           return ;
         (*fptr)(svc, args + strlen(name) + strlen(description) + 2);
-      }
-
-      template <void (*fptr)(service*)>
-      static void _redirector_servicegroup(
-                    int id,
-                    time_t entry_time,
-                    char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* group_name(my_strtok(args, ";"));
-        servicegroup* group(::find_servicegroup(group_name));
-        if (!group)
-          return ;
-
-        for (servicesmember* member = group->members;
-             member != NULL;
-             member = member->next)
-          if (member->service_ptr)
-            (*fptr)(member->service_ptr);
-      }
-
-      template <void (*fptr)(host*)>
-      static void _redirector_servicegroup(
-                    int id,
-                    time_t entry_time,
-                    char* args) {
-        (void)id;
-        (void)entry_time;
-
-        char* group_name(my_strtok(args, ";"));
-        servicegroup* group(::find_servicegroup(group_name));
-        if (!group)
-          return ;
-
-        host* last_host(NULL);
-        for (servicesmember* member = group->members;
-             member != NULL;
-             member = member->next) {
-          host* hst(::find_host(member->host_name));
-          if (!hst || hst == last_host)
-            continue ;
-          (*fptr)(hst);
-          last_host = hst;
-        }
       }
 
       umap<std::string, command_info> _lst_command;

@@ -53,8 +53,6 @@ using namespace com::centreon::engine::logging;
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list = NULL;
 static xodtemplate_command*           xodtemplate_command_list = NULL;
 static xodtemplate_connector*         xodtemplate_connector_list = NULL;
-static xodtemplate_hostgroup*         xodtemplate_hostgroup_list = NULL;
-static xodtemplate_servicegroup*      xodtemplate_servicegroup_list = NULL;
 static xodtemplate_servicedependency* xodtemplate_servicedependency_list = NULL;
 static xodtemplate_host*              xodtemplate_host_list = NULL;
 static xodtemplate_service*           xodtemplate_service_list = NULL;
@@ -63,8 +61,6 @@ static xodtemplate_hostdependency*    xodtemplate_hostdependency_list = NULL;
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list_tail = NULL;
 static xodtemplate_command*           xodtemplate_command_list_tail = NULL;
 static xodtemplate_connector*         xodtemplate_connector_list_tail = NULL;
-static xodtemplate_hostgroup*         xodtemplate_hostgroup_list_tail = NULL;
-static xodtemplate_servicegroup*      xodtemplate_servicegroup_list_tail = NULL;
 static xodtemplate_servicedependency* xodtemplate_servicedependency_list_tail = NULL;
 static xodtemplate_host*              xodtemplate_host_list_tail = NULL;
 static xodtemplate_service*           xodtemplate_service_list_tail = NULL;
@@ -78,19 +74,6 @@ static int                            xodtemplate_current_object_type = XODTEMPL
 
 static int                            xodtemplate_current_config_file = 0;
 static char**                         xodtemplate_config_files = NULL;
-
-/*
- * Macro magic used to determine if a service is assigned
- * via hostgroup_name or host_name. Those assigned via host_name
- * take precedence.
- */
-#define X_SERVICE_IS_FROM_HOSTGROUP      (1 << 1)       /* flag to know if service come from a hostgroup def, apply on srv->have_initial_state */
-#define xodtemplate_set_service_is_from_hostgroup(srv) \
-  srv->have_initial_state |= X_SERVICE_IS_FROM_HOSTGROUP
-#define xodtemplate_unset_service_is_from_hostgroup(srv) \
-  srv->have_initial_state &= ~X_SERVICE_IS_FROM_HOSTGROUP
-#define xodtemplate_is_service_is_from_hostgroup(srv) \
-  ((srv->have_initial_state & X_SERVICE_IS_FROM_HOSTGROUP) != 0)
 
 /* returns the name of a numbered config file */
 static char const* xodtemplate_config_file_name(int config_file) {
@@ -121,8 +104,6 @@ int xodtemplate_read_config_data(
   /* initialize variables */
   xodtemplate_timeperiod_list = NULL;
   xodtemplate_command_list = NULL;
-  xodtemplate_hostgroup_list = NULL;
-  xodtemplate_servicegroup_list = NULL;
   xodtemplate_servicedependency_list = NULL;
   xodtemplate_host_list = NULL;
   xodtemplate_service_list = NULL;
@@ -255,19 +236,9 @@ int xodtemplate_read_config_data(
 
   /* do the meat and potatoes stuff... */
   if (result == OK)
-    result = xodtemplate_recombobulate_hostgroups();
-  if (test_scheduling == true)
-    gettimeofday(&tv[4], NULL);
-
-  if (result == OK)
     result = xodtemplate_duplicate_services();
   if (test_scheduling == true)
     gettimeofday(&tv[5], NULL);
-
-  if (result == OK)
-    result = xodtemplate_recombobulate_servicegroups();
-  if (test_scheduling == true)
-    gettimeofday(&tv[6], NULL);
 
   if (result == OK)
     result = xodtemplate_duplicate_objects();
@@ -350,9 +321,7 @@ int xodtemplate_read_config_data(
     printf("------------------------------\n");
     printf("Read:                 %.6f sec\n", runtime[0]);
     printf("Resolve:              %.6f sec\n", runtime[1]);
-    printf("Recomb Hostgroups:    %.6f sec\n", runtime[3]);
     printf("Dup Services:         %.6f sec\n", runtime[4]);
-    printf("Recomb Servicegroups: %.6f sec\n", runtime[5]);
     printf("Duplicate:            %.6f sec\n", runtime[6]);
     printf("Inherit:              %.6f sec\n", runtime[7]);
     printf("Sort:                 %.6f sec\n", runtime[9]);
@@ -576,8 +545,6 @@ int xodtemplate_process_config_file(char* filename, int options) {
       if (strcmp(input, "timeperiod")
           && strcmp(input, "command")
           && strcmp(input, "host")
-          && strcmp(input, "hostgroup")
-          && strcmp(input, "servicegroup")
           && strcmp(input, "service")
           && strcmp(input, "servicedependency")
           && strcmp(input, "hostdependency")
@@ -729,8 +696,6 @@ int xodtemplate_begin_object_definition(
   xodtemplate_timeperiod* new_timeperiod = NULL;
   xodtemplate_command* new_command = NULL;
   xodtemplate_connector* new_connector = NULL;
-  xodtemplate_hostgroup* new_hostgroup = NULL;
-  xodtemplate_servicegroup* new_servicegroup = NULL;
   xodtemplate_servicedependency* new_servicedependency = NULL;
   xodtemplate_host* new_host = NULL;
   xodtemplate_service* new_service = NULL;
@@ -753,9 +718,6 @@ int xodtemplate_begin_object_definition(
     new_service->flap_detection_on_warning = true;
     new_service->flap_detection_on_unknown = true;
     new_service->flap_detection_on_critical = true;
-
-    /* true service, so is not from host group, must be set AFTER have_initial_state */
-    xodtemplate_unset_service_is_from_hostgroup(new_service);
   }
   else if (!strcmp(input, "host")) {
     xodtemplate_current_object_type = XODTEMPLATE_HOST;
@@ -780,14 +742,6 @@ int xodtemplate_begin_object_definition(
   else if (!strcmp(input, "timeperiod")) {
     xodtemplate_current_object_type = XODTEMPLATE_TIMEPERIOD;
     xod_begin_def(timeperiod);
-  }
-  else if (!strcmp(input, "hostgroup")) {
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTGROUP;
-    xod_begin_def(hostgroup);
-  }
-  else if (!strcmp(input, "servicegroup")) {
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEGROUP;
-    xod_begin_def(servicegroup);
   }
   else if (!strcmp(input, "servicedependency")) {
     xodtemplate_current_object_type = XODTEMPLATE_SERVICEDEPENDENCY;
@@ -822,8 +776,6 @@ int xodtemplate_add_object_property(char* input, int options) {
   xodtemplate_timeperiod* temp_timeperiod = NULL;
   xodtemplate_command* temp_command = NULL;
   xodtemplate_connector* temp_connector = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
@@ -892,19 +844,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->service_description = string::dup(value);
       temp_service->have_service_description = true;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->hostgroup_name = string::dup(value);
-      temp_service->have_hostgroup_name = true;
-    }
-    else if (!strcmp(variable, "service_groups")
-             || !strcmp(variable, "servicegroups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->service_groups = string::dup(value);
-      temp_service->have_service_groups = true;
     }
     else if (!strcmp(variable, "check_command")) {
       if (strcmp(value, XODTEMPLATE_NULL)) {
@@ -1150,12 +1089,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_host->parents = string::dup(value);
       temp_host->have_parents = true;
-    }
-    else if (!strcmp(variable, "host_groups")
-	     || !strcmp(variable, "hostgroups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_host->host_groups = string::dup(value);
-      temp_host->have_host_groups = true;
     }
     else if (!strcmp(variable, "check_command")) {
       if (strcmp(value, XODTEMPLATE_NULL))
@@ -1505,213 +1438,6 @@ int xodtemplate_add_object_property(char* input, int options) {
     }
     break;
 
-  case XODTEMPLATE_HOSTGROUP:
-    temp_hostgroup = (xodtemplate_hostgroup*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_hostgroup->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_hostgroup->name = string::dup(value);
-
-      /* add hostgroup to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_HOSTGROUP_SKIPLIST],
-                 (void*)temp_hostgroup);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for hostgroup '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_hostgroup->_config_file)
-          << "', starting on line " << temp_hostgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "hostgroup_name")) {
-      temp_hostgroup->hostgroup_name = string::dup(value);
-
-      /* add hostgroup to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_skiplists[X_HOSTGROUP_SKIPLIST],
-                 (void*)temp_hostgroup);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for hostgroup '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_hostgroup->_config_file)
-          << "', starting on line " << temp_hostgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_hostgroup->alias = string::dup(value);
-    else if (!strcmp(variable, "members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_hostgroup->members == NULL)
-          temp_hostgroup->members = string::dup(value);
-        else {
-          temp_hostgroup->members
-            = resize_string(
-                temp_hostgroup->members,
-                strlen(temp_hostgroup->members) + strlen(value) + 2);
-          strcat(temp_hostgroup->members, ",");
-          strcat(temp_hostgroup->members, value);
-        }
-        if (temp_hostgroup->members == NULL)
-          result = ERROR;
-      }
-      temp_hostgroup->have_members = true;
-    }
-    else if (!strcmp(variable, "hostgroup_members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_hostgroup->hostgroup_members == NULL)
-          temp_hostgroup->hostgroup_members = string::dup(value);
-        else {
-          temp_hostgroup->hostgroup_members
-            = resize_string(
-                temp_hostgroup->hostgroup_members,
-                strlen(temp_hostgroup->hostgroup_members) + strlen(value) + 2);
-          strcat(temp_hostgroup->hostgroup_members, ",");
-          strcat(temp_hostgroup->hostgroup_members, value);
-        }
-        if (temp_hostgroup->hostgroup_members == NULL)
-          result = ERROR;
-      }
-      temp_hostgroup->have_hostgroup_members = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_hostgroup->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid hostgroup object directive '" << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
-  case XODTEMPLATE_SERVICEGROUP:
-    temp_servicegroup = (xodtemplate_servicegroup*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_servicegroup->tmpl = string::dup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_servicegroup->name = string::dup(value);
-
-      /* add servicegroup to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_template_skiplists[X_SERVICEGROUP_SKIPLIST],
-                 (void*)temp_servicegroup);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for servicegroup '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-          << "', starting on line " << temp_servicegroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "servicegroup_name")) {
-      temp_servicegroup->servicegroup_name = string::dup(value);
-
-      /* add servicegroup to template skiplist for fast searches */
-      result = skiplist_insert(
-                 xobject_skiplists[X_SERVICEGROUP_SKIPLIST],
-                 (void*)temp_servicegroup);
-      switch (result) {
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for servicegroup '"
-          << value << "' (config file '"
-          << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-          << "', starting on line " << temp_servicegroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_servicegroup->alias = string::dup(value);
-    else if (!strcmp(variable, "members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_servicegroup->members == NULL)
-          temp_servicegroup->members = string::dup(value);
-        else {
-          temp_servicegroup->members
-            = resize_string(
-                temp_servicegroup->members,
-                strlen(temp_servicegroup->members) + strlen(value) + 2);
-          strcat(temp_servicegroup->members, ",");
-          strcat(temp_servicegroup->members, value);
-        }
-        if (temp_servicegroup->members == NULL)
-          result = ERROR;
-      }
-      temp_servicegroup->have_members = true;
-    }
-    else if (!strcmp(variable, "servicegroup_members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_servicegroup->servicegroup_members == NULL)
-          temp_servicegroup->servicegroup_members = string::dup(value);
-        else {
-          temp_servicegroup->servicegroup_members
-	    = resize_string(
-                temp_servicegroup->servicegroup_members,
-                strlen(temp_servicegroup-> servicegroup_members) + strlen(value) + 2);
-          strcat(temp_servicegroup->servicegroup_members, ",");
-          strcat(temp_servicegroup->servicegroup_members, value);
-        }
-        if (temp_servicegroup->servicegroup_members == NULL)
-          result = ERROR;
-      }
-      temp_servicegroup->have_servicegroup_members = true;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_servicegroup->register_object = (atoi(value) > 0) ? true : false;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid servicegroup object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
   case XODTEMPLATE_SERVICEDEPENDENCY:
     temp_servicedependency
       = (xodtemplate_servicedependency*)xodtemplate_current_object;
@@ -1744,20 +1470,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         break;
       }
     }
-    else if (!strcmp(variable, "servicegroup")
-             || !strcmp(variable, "servicegroups")
-             || !strcmp(variable, "servicegroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->servicegroup_name = string::dup(value);
-      temp_servicedependency->have_servicegroup_name = true;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->hostgroup_name = string::dup(value);
-      temp_servicedependency->have_hostgroup_name = true;
-    }
     else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")
              || !strcmp(variable, "master_host")
              || !strcmp(variable, "master_host_name")) {
@@ -1772,20 +1484,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_servicedependency->service_description = string::dup(value);
       temp_servicedependency->have_service_description = true;
-    }
-    else if (!strcmp(variable, "dependent_servicegroup")
-             || !strcmp(variable, "dependent_servicegroups")
-             || !strcmp(variable, "dependent_servicegroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependent_servicegroup_name = string::dup(value);
-      temp_servicedependency->have_dependent_servicegroup_name = true;
-    }
-    else if (!strcmp(variable, "dependent_hostgroup")
-             || !strcmp(variable, "dependent_hostgroups")
-             || !strcmp(variable, "dependent_hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependent_hostgroup_name = string::dup(value);
-      temp_servicedependency->have_dependent_hostgroup_name = true;
     }
     else if (!strcmp(variable, "dependent_host")
              || !strcmp(variable, "dependent_host_name")) {
@@ -1889,13 +1587,6 @@ int xodtemplate_add_object_property(char* input, int options) {
         break;
       }
     }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostdependency->hostgroup_name = string::dup(value);
-      temp_hostdependency->have_hostgroup_name = true;
-    }
     else if (!strcmp(variable, "host")
              || !strcmp(variable, "host_name")
              || !strcmp(variable, "master_host")
@@ -1903,13 +1594,6 @@ int xodtemplate_add_object_property(char* input, int options) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_hostdependency->host_name = string::dup(value);
       temp_hostdependency->have_host_name = true;
-    }
-    else if (!strcmp(variable, "dependent_hostgroup")
-             || !strcmp(variable, "dependent_hostgroups")
-             || !strcmp(variable, "dependent_hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostdependency->dependent_hostgroup_name = string::dup(value);
-      temp_hostdependency->have_dependent_hostgroup_name = true;
     }
     else if (!strcmp(variable, "dependent_host")
              || !strcmp(variable, "dependent_host_name")) {
@@ -2832,60 +2516,37 @@ int xodtemplate_duplicate_services() {
   int result = OK;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_memberlist* temp_memberlist = NULL;
-  xodtemplate_memberlist* temp_rejectlist = NULL;
   xodtemplate_memberlist* this_memberlist = NULL;
   char* host_name = NULL;
   int first_item = false;
 
-  /****** DUPLICATE SERVICE DEFINITIONS WITH ONE OR MORE HOSTGROUP AND/OR HOST NAMES ******/
+  /****** DUPLICATE SERVICE DEFINITIONS WITH ONE OR MORE HOST NAMES ******/
   for (temp_service = xodtemplate_service_list;
        temp_service != NULL;
        temp_service = temp_service->next) {
 
     /* skip service definitions without enough data */
-    if (temp_service->hostgroup_name == NULL
-        && temp_service->host_name == NULL)
+    if (temp_service->host_name == NULL)
       continue;
-
-    if (temp_service->hostgroup_name != NULL) {
-      if (xodtemplate_expand_hostgroups(
-            &temp_memberlist,
-            &temp_rejectlist,
-            temp_service->hostgroup_name,
-            temp_service->_config_file,
-            temp_service->_start_line) == ERROR) {
-        return (ERROR);
-      }
-      else {
-        xodtemplate_free_memberlist(&temp_rejectlist);
-        if (temp_memberlist != NULL)
-          xodtemplate_free_memberlist(&temp_memberlist);
-        else {
-          continue ;
-        }
-      }
-    }
 
     /* skip services that shouldn't be registered */
     if (temp_service->register_object == false)
       continue;
 
     /* get list of hosts */
-    temp_memberlist = xodtemplate_expand_hostgroups_and_hosts(
-                        temp_service->hostgroup_name,
+    temp_memberlist = xodtemplate_expand_hosts(
                         temp_service->host_name,
                         temp_service->_config_file,
                         temp_service->_start_line);
     if (temp_memberlist == NULL) {
       logger(log_config_error, basic)
-        << "Error: Could not expand hostgroups and/or hosts specified in "
-        "service (config file '"
+        << "Error: Could not expand hosts specified in service (config file '"
         << xodtemplate_config_file_name(temp_service->_config_file)
-        << "', starting on line " << temp_service->_start_line <<")";
+        << "', starting on line " << temp_service->_start_line << ")";
       return (ERROR);
     }
 
-    /* add a copy of the service for every host in the hostgroup/host name list */
+    /* add a copy of the service for every host in the host name list */
     first_item = true;
     for (this_memberlist = temp_memberlist;
 	 this_memberlist != NULL;
@@ -2935,10 +2596,6 @@ int xodtemplate_duplicate_services() {
         || temp_service->service_description == NULL)
       continue;
 
-    if (xodtemplate_is_service_is_from_hostgroup(temp_service)) {
-      continue;
-    }
-
     result = skiplist_insert(
                xobject_skiplists[X_SERVICE_SKIPLIST],
                (void*)temp_service);
@@ -2963,7 +2620,6 @@ int xodtemplate_duplicate_services() {
     }
   }
 
-  /* second loop for host group service definition */
   /* add services to skiplist for fast searches */
   for (temp_service = xodtemplate_service_list;
        temp_service != NULL;
@@ -2977,12 +2633,6 @@ int xodtemplate_duplicate_services() {
     if (temp_service->host_name == NULL
         || temp_service->service_description == NULL)
       continue;
-
-    if (!xodtemplate_is_service_is_from_hostgroup(temp_service)) {
-      continue;
-    }
-    /*The flag X_SERVICE_IS_FROM_HOSTGROUP is set, unset it */
-    xodtemplate_unset_service_is_from_hostgroup(temp_service);
 
     result = skiplist_insert(
                xobject_skiplists[X_SERVICE_SKIPLIST],
@@ -3026,33 +2676,29 @@ int xodtemplate_duplicate_objects() {
   xodtemplate_memberlist* temp_dependentservice = NULL;
   char* service_descriptions = NULL;
   int first_item = false;
-  int same_host_servicedependency = false;
 
   /*************************************/
   /* SERVICES ARE DUPLICATED ELSEWHERE */
   /*************************************/
 
-  /****** DUPLICATE HOST DEPENDENCY DEFINITIONS WITH MULTIPLE HOSTGROUP AND/OR HOST NAMES (MASTER AND DEPENDENT) ******/
+  /****** DUPLICATE HOST DEPENDENCY DEFINITIONS WITH MULTIPLE HOST NAMES (MASTER AND DEPENDENT) ******/
   for (temp_hostdependency = xodtemplate_hostdependency_list;
        temp_hostdependency != NULL;
        temp_hostdependency = temp_hostdependency->next) {
 
     /* skip host dependencies without enough data */
-    if (temp_hostdependency->hostgroup_name == NULL
-        && temp_hostdependency->dependent_hostgroup_name == NULL
-        && temp_hostdependency->host_name == NULL
+    if (temp_hostdependency->host_name == NULL
         && temp_hostdependency->dependent_host_name == NULL)
       continue;
 
     /* get list of master host names */
-    master_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                        temp_hostdependency->hostgroup_name,
+    master_hostlist = xodtemplate_expand_hosts(
                         temp_hostdependency->host_name,
                         temp_hostdependency->_config_file,
                         temp_hostdependency->_start_line);
     if (master_hostlist == NULL) {
       logger(log_config_error, basic)
-        << "Error: Could not expand master hostgroups and/or hosts "
+        << "Error: Could not expand master hosts "
         "specified in host dependency (config file '"
         << xodtemplate_config_file_name(temp_hostdependency->_config_file)
         << "', starting on line " << temp_hostdependency->_start_line
@@ -3061,14 +2707,13 @@ int xodtemplate_duplicate_objects() {
     }
 
     /* get list of dependent host names */
-    dependent_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                           temp_hostdependency->dependent_hostgroup_name,
+    dependent_hostlist = xodtemplate_expand_hosts(
                            temp_hostdependency->dependent_host_name,
                            temp_hostdependency->_config_file,
                            temp_hostdependency->_start_line);
     if (dependent_hostlist == NULL) {
       logger(log_config_error, basic)
-        << "Error: Could not expand dependent hostgroups and/or hosts "
+        << "Error: Could not expand dependent hosts "
         "specified in host dependency (config file '"
         << xodtemplate_config_file_name(temp_hostdependency->_config_file)
         << "', starting on line " << temp_hostdependency->_start_line
@@ -3119,7 +2764,7 @@ int xodtemplate_duplicate_objects() {
     xodtemplate_free_memberlist(&dependent_hostlist);
   }
 
-  /****** PROCESS SERVICE DEPENDENCIES WITH MASTER SERVICEGROUPS *****/
+  /****** PROCESS SERVICE DEPENDENCY MASTER HOSTS/SERVICES *****/
   for (temp_servicedependency = xodtemplate_servicedependency_list;
        temp_servicedependency != NULL;
        temp_servicedependency = temp_servicedependency->next) {
@@ -3128,137 +2773,24 @@ int xodtemplate_duplicate_objects() {
     if (temp_servicedependency->register_object == 0)
       continue;
 
-    /* expand master servicegroups into a list of services */
-    if (temp_servicedependency->servicegroup_name) {
-      master_servicelist = xodtemplate_expand_servicegroups_and_services(
-                             temp_servicedependency->servicegroup_name,
-                             NULL,
-                             NULL,
-                             temp_servicedependency->_config_file,
-                             temp_servicedependency->_start_line);
-      if (master_servicelist == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not expand master servicegroups "
-          "specified in service dependency (config file '"
-          << xodtemplate_config_file_name(temp_servicedependency->_config_file)
-          << "', starting on line "
-          << temp_servicedependency->_start_line << ")";
-        return (ERROR);
-      }
-
-      /* if dependency also has master host, hostgroup, and/or service, we must split that off to another definition */
-      if (temp_servicedependency->host_name != NULL
-          || temp_servicedependency->hostgroup_name != NULL
-          || temp_servicedependency->service_description != NULL) {
-
-        /* duplicate everything except master servicegroup */
-        xodtemplate_duplicate_servicedependency(
-          temp_servicedependency,
-          temp_servicedependency->host_name,
-          temp_servicedependency->service_description,
-          temp_servicedependency->hostgroup_name,
-          NULL,
-          temp_servicedependency->dependent_host_name,
-          temp_servicedependency->dependent_service_description,
-          temp_servicedependency->dependent_hostgroup_name,
-          temp_servicedependency->dependent_servicegroup_name);
-
-        /* clear values in this definition */
-        temp_servicedependency->have_host_name = false;
-        temp_servicedependency->have_service_description = false;
-        temp_servicedependency->have_hostgroup_name = false;
-        delete[] temp_servicedependency->host_name;
-        delete[] temp_servicedependency->service_description;
-        delete[] temp_servicedependency->hostgroup_name;
-        temp_servicedependency->host_name = NULL;
-        temp_servicedependency->service_description = NULL;
-        temp_servicedependency->hostgroup_name = NULL;
-      }
-
-      /* duplicate service dependency entries */
-      first_item = true;
-      for (temp_masterservice = master_servicelist;
-           temp_masterservice != NULL;
-           temp_masterservice = temp_masterservice->next) {
-
-        /* just in case */
-        if (temp_masterservice->name1 == NULL
-            || temp_masterservice->name2 == NULL)
-          continue;
-
-        /* if this is the first duplication, use the existing entry */
-        if (first_item == true) {
-
-          delete[] temp_servicedependency->host_name;
-          temp_servicedependency->host_name
-            = string::dup(temp_masterservice->name1);
-
-          delete[] temp_servicedependency->service_description;
-          temp_servicedependency->service_description
-            = string::dup(temp_masterservice->name2);
-
-          /* clear the master servicegroup */
-          temp_servicedependency->have_servicegroup_name = false;
-          delete[] temp_servicedependency->servicegroup_name;
-          temp_servicedependency->servicegroup_name = NULL;
-
-          first_item = false;
-          continue;
-        }
-
-        /* duplicate service dependency definition */
-        result = xodtemplate_duplicate_servicedependency(
-                   temp_servicedependency,
-                   temp_masterservice->name1,
-                   temp_masterservice->name2,
-                   NULL,
-                   NULL,
-                   temp_servicedependency->dependent_host_name,
-                   temp_servicedependency->dependent_service_description,
-                   temp_servicedependency->dependent_hostgroup_name,
-                   temp_servicedependency->dependent_servicegroup_name);
-        /* exit on error */
-        if (result == ERROR) {
-          xodtemplate_free_memberlist(&master_servicelist);
-          return (ERROR);
-        }
-      }
-
-      /* free memory we used for service list */
-      xodtemplate_free_memberlist(&master_servicelist);
-    }
-  }
-
-  /****** PROCESS SERVICE DEPENDENCY MASTER HOSTS/HOSTGROUPS/SERVICES *****/
-  for (temp_servicedependency = xodtemplate_servicedependency_list;
-       temp_servicedependency != NULL;
-       temp_servicedependency = temp_servicedependency->next) {
-
-    /* skip templates */
-    if (temp_servicedependency->register_object == 0)
-      continue;
-
-    /* expand master hosts/hostgroups into a list of host names */
-    if (temp_servicedependency->host_name != NULL
-        || temp_servicedependency->hostgroup_name != NULL) {
+    /* expand master hosts into a list of host names */
+    if (temp_servicedependency->host_name != NULL) {
 
 #ifdef DEBUG_SERVICE_DEPENDENCIES
       printf(
-        "1a) H: %s  HG: %s  SD: %s\n",
+        "1a) H: %s  SD: %s\n",
         temp_servicedependency->host_name,
-        temp_servicedependency->hostgroup_name,
         temp_servicedependency->service_description);
 #endif
 
-      master_hostlist = xodtemplate_expand_hostgroups_and_hosts(
-                          temp_servicedependency->hostgroup_name,
+      master_hostlist = xodtemplate_expand_hosts(
                           temp_servicedependency->host_name,
                           temp_servicedependency->_config_file,
                           temp_servicedependency->_start_line);
       if (master_hostlist == NULL) {
         logger(log_config_error, basic)
-          << "Error: Could not expand master hostgroups and/or hosts specified "
-          "in service dependency (config file '"
+          << "Error: Could not expand master hosts specified "
+             "in service dependency (config file '"
           << xodtemplate_config_file_name(temp_servicedependency->_config_file)
           << "', starting on line "
           << temp_servicedependency->_start_line << ")";
@@ -3276,8 +2808,7 @@ int xodtemplate_duplicate_objects() {
 	   temp_masterhost != NULL;
            temp_masterhost = temp_masterhost->next) {
 
-        master_servicelist = xodtemplate_expand_servicegroups_and_services(
-                               NULL,
+        master_servicelist = xodtemplate_expand_services(
                                temp_masterhost->name1,
                                service_descriptions,
                                temp_servicedependency->_config_file,
@@ -3322,12 +2853,8 @@ int xodtemplate_duplicate_objects() {
                      temp_servicedependency,
                      temp_masterhost->name1,
                      temp_masterservice->name2,
-                     NULL,
-                     NULL,
                      temp_servicedependency->dependent_host_name,
-                     temp_servicedependency->dependent_service_description,
-                     temp_servicedependency->dependent_hostgroup_name,
-                     temp_servicedependency->dependent_servicegroup_name);
+                     temp_servicedependency->dependent_service_description);
           /* exit on error */
           if (result == ERROR) {
             xodtemplate_free_memberlist(&master_hostlist);
@@ -3349,179 +2876,7 @@ int xodtemplate_duplicate_objects() {
     }
   }
 
-
-#ifdef DEBUG_SERVICE_DEPENDENCIES
-  for (temp_servicedependency = xodtemplate_servicedependency_list;
-       temp_servicedependency != NULL;
-       temp_servicedependency = temp_servicedependency->next) {
-    printf(
-      "1**) H: %s  HG: %s  SG: %s  SD: %s  DH: %s  DHG: %s  DSG: %s  DSD: %s\n",
-      temp_servicedependency->host_name,
-      temp_servicedependency->hostgroup_name,
-      temp_servicedependency->servicegroup_name,
-      temp_servicedependency->service_description,
-      temp_servicedependency->dependent_host_name,
-      temp_servicedependency->dependent_hostgroup_name,
-      temp_servicedependency->dependent_servicegroup_name,
-      temp_servicedependency->dependent_service_description);
-  }
-  printf("\n");
-#endif
-
-  /****** PROCESS SERVICE DEPENDENCIES WITH DEPENDENT SERVICEGROUPS *****/
-  for (temp_servicedependency = xodtemplate_servicedependency_list;
-       temp_servicedependency != NULL;
-       temp_servicedependency = temp_servicedependency->next) {
-
-    /* skip templates */
-    if (temp_servicedependency->register_object == 0)
-      continue;
-
-    /* expand dependent servicegroups into a list of services */
-    if (temp_servicedependency->dependent_servicegroup_name) {
-      dependent_servicelist
-        = xodtemplate_expand_servicegroups_and_services(
-            temp_servicedependency->dependent_servicegroup_name,
-            NULL,
-            NULL,
-            temp_servicedependency->_config_file,
-            temp_servicedependency->_start_line);
-      if (dependent_servicelist == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not expand dependent servicegroups "
-          "specified in service dependency (config file '"
-          << xodtemplate_config_file_name(temp_servicedependency->_config_file)
-          << "', starting on line "
-          << temp_servicedependency->_start_line << ")";
-        return (ERROR);
-      }
-
-      /* if dependency also has dependent host, hostgroup, and/or service, we must split that off to another definition */
-      if (temp_servicedependency->dependent_host_name != NULL
-          || temp_servicedependency->dependent_hostgroup_name != NULL
-          || temp_servicedependency->dependent_service_description != NULL) {
-
-        /* duplicate everything except dependent servicegroup */
-        xodtemplate_duplicate_servicedependency(
-          temp_servicedependency,
-          temp_servicedependency->host_name,
-          temp_servicedependency->service_description,
-          temp_servicedependency->hostgroup_name,
-          temp_servicedependency->servicegroup_name,
-          temp_servicedependency->dependent_host_name,
-          temp_servicedependency->dependent_service_description,
-          temp_servicedependency->dependent_hostgroup_name,
-          NULL);
-
-        /* clear values in this definition */
-        temp_servicedependency->have_dependent_host_name = false;
-        temp_servicedependency->have_dependent_service_description = false;
-        temp_servicedependency->have_dependent_hostgroup_name = false;
-        delete[] temp_servicedependency->dependent_host_name;
-        delete[] temp_servicedependency->dependent_service_description;
-        delete[] temp_servicedependency->dependent_hostgroup_name;
-        temp_servicedependency->dependent_host_name = NULL;
-        temp_servicedependency->dependent_service_description = NULL;
-        temp_servicedependency->dependent_hostgroup_name = NULL;
-      }
-
-      /* Detected same host servicegroups dependencies */
-      same_host_servicedependency = false;
-      if (temp_servicedependency->host_name == NULL
-          && temp_servicedependency->hostgroup_name == NULL)
-        same_host_servicedependency = true;
-
-      /* duplicate service dependency entries */
-      first_item = true;
-      for (temp_dependentservice = dependent_servicelist;
-           temp_dependentservice != NULL;
-           temp_dependentservice = temp_dependentservice->next) {
-
-        /* just in case */
-        if (temp_dependentservice->name1 == NULL
-            || temp_dependentservice->name2 == NULL)
-          continue;
-
-        /* if this is the first duplication, use the existing entry */
-        if (first_item == true) {
-
-          delete[] temp_servicedependency->dependent_host_name;
-          temp_servicedependency->dependent_host_name
-            = string::dup(temp_dependentservice->name1);
-
-          delete[] temp_servicedependency->dependent_service_description;
-          temp_servicedependency->dependent_service_description
-            = string::dup(temp_dependentservice->name2);
-
-          /* Same host servicegroups dependencies: Use dependentservice host_name for master host_name */
-          if (same_host_servicedependency == true)
-            temp_servicedependency->host_name
-              = string::dup(temp_dependentservice->name1);
-
-          /* clear the dependent servicegroup */
-          temp_servicedependency->have_dependent_servicegroup_name = false;
-          delete[] temp_servicedependency->dependent_servicegroup_name;
-          temp_servicedependency->dependent_servicegroup_name = NULL;
-
-          first_item = false;
-          continue;
-        }
-
-        /* duplicate service dependency definition */
-        /* Same host servicegroups dependencies: Use dependentservice host_name for master host_name instead of undefined (not yet) master host_name */
-        if (same_host_servicedependency == true)
-          result = xodtemplate_duplicate_servicedependency(
-                     temp_servicedependency,
-                     temp_dependentservice->name1,
-                     temp_servicedependency->service_description,
-                     NULL,
-                     NULL,
-                     temp_dependentservice->name1,
-                     temp_dependentservice->name2,
-                     NULL,
-                     NULL);
-        else
-          result = xodtemplate_duplicate_servicedependency(
-                     temp_servicedependency,
-                     temp_servicedependency->host_name,
-                     temp_servicedependency->service_description,
-                     NULL,
-                     NULL,
-                     temp_dependentservice->name1,
-                     temp_dependentservice->name2,
-                     NULL,
-                     NULL);
-        /* exit on error */
-        if (result == ERROR) {
-          xodtemplate_free_memberlist(&dependent_servicelist);
-          return (ERROR);
-        }
-      }
-
-      /* free memory we used for service list */
-      xodtemplate_free_memberlist(&dependent_servicelist);
-    }
-  }
-
-#ifdef DEBUG_SERVICE_DEPENDENCIES
-  printf("\n");
-  for (temp_servicedependency = xodtemplate_servicedependency_list;
-       temp_servicedependency != NULL;
-       temp_servicedependency = temp_servicedependency->next) {
-    printf(
-      "2**) H: %s  HG: %s  SG: %s  SD: %s  DH: %s  DHG: %s  DSG: %s  DSD: %s\n",
-      temp_servicedependency->host_name,
-      temp_servicedependency->hostgroup_name,
-      temp_servicedependency->servicegroup_name,
-      temp_servicedependency->service_description,
-      temp_servicedependency->dependent_host_name,
-      temp_servicedependency->dependent_hostgroup_name,
-      temp_servicedependency->dependent_servicegroup_name,
-      temp_servicedependency->dependent_service_description);
-  }
-#endif
-
-  /****** PROCESS SERVICE DEPENDENCY DEPENDENT HOSTS/HOSTGROUPS/SERVICES *****/
+  /****** PROCESS SERVICE DEPENDENCY DEPENDENT HOSTS/SERVICES *****/
   for (temp_servicedependency = xodtemplate_servicedependency_list;
        temp_servicedependency != NULL;
        temp_servicedependency = temp_servicedependency->next) {
@@ -3531,27 +2886,24 @@ int xodtemplate_duplicate_objects() {
       continue;
 
     /* ADDED 02/04/2007 - special case for "same host" dependencies */
-    if (temp_servicedependency->dependent_host_name == NULL
-        && temp_servicedependency->dependent_hostgroup_name == NULL) {
+    if (temp_servicedependency->dependent_host_name == NULL) {
       if (temp_servicedependency->host_name)
         temp_servicedependency->dependent_host_name
           = string::dup(temp_servicedependency->host_name);
     }
 
-    /* expand dependent hosts/hostgroups into a list of host names */
-    if (temp_servicedependency->dependent_host_name != NULL
-        || temp_servicedependency->dependent_hostgroup_name != NULL) {
+    /* expand dependent hosts into a list of host names */
+    if (temp_servicedependency->dependent_host_name != NULL) {
 
       dependent_hostlist
-        = xodtemplate_expand_hostgroups_and_hosts(
-            temp_servicedependency->dependent_hostgroup_name,
+        = xodtemplate_expand_hosts(
             temp_servicedependency->dependent_host_name,
             temp_servicedependency->_config_file,
             temp_servicedependency->_start_line);
       if (dependent_hostlist == NULL) {
         logger(log_config_error, basic)
-          << "Error: Could not expand dependent hostgroups and/or "
-          "hosts specified in service dependency (config file '"
+          << "Error: Could not expand dependent hosts "
+             "specified in service dependency (config file '"
           << xodtemplate_config_file_name(temp_servicedependency->_config_file)
           << "', starting on line "
           << temp_servicedependency->_start_line << ")";
@@ -3570,8 +2922,7 @@ int xodtemplate_duplicate_objects() {
            temp_dependenthost = temp_dependenthost->next) {
 
         dependent_servicelist
-          = xodtemplate_expand_servicegroups_and_services(
-              NULL,
+          = xodtemplate_expand_services(
               temp_dependenthost->name1,
               service_descriptions,
               temp_servicedependency->_config_file,
@@ -3616,12 +2967,8 @@ int xodtemplate_duplicate_objects() {
                      temp_servicedependency,
                      temp_servicedependency->host_name,
                      temp_servicedependency->service_description,
-                     NULL,
-                     NULL,
                      temp_dependentservice->name1,
-                     temp_dependentservice->name2,
-                     NULL,
-                     NULL);
+                     temp_dependentservice->name2);
           /* exit on error */
           if (result == ERROR) {
             xodtemplate_free_memberlist(&dependent_servicelist);
@@ -3738,18 +3085,12 @@ int xodtemplate_duplicate_service(
   new_service->register_object = temp_service->register_object;
   new_service->_config_file = temp_service->_config_file;
   new_service->_start_line = temp_service->_start_line;
-  /*tag service apply on host group */
-  xodtemplate_set_service_is_from_hostgroup(new_service);
 
   /* string defaults */
-  new_service->hostgroup_name = NULL;
-  new_service->have_hostgroup_name = temp_service->have_hostgroup_name;
   new_service->host_name = NULL;
   new_service->have_host_name = temp_service->have_host_name;
   new_service->service_description = NULL;
   new_service->have_service_description = temp_service->have_service_description;
-  new_service->service_groups = NULL;
-  new_service->have_service_groups = temp_service->have_service_groups;
   new_service->check_command = NULL;
   new_service->have_check_command = temp_service->have_check_command;
   new_service->check_period = NULL;
@@ -3760,10 +3101,7 @@ int xodtemplate_duplicate_service(
   new_service->have_timezone = temp_service->have_timezone;
   new_service->custom_variables = NULL;
 
-  /* make sure hostgroup member in new service definition is NULL */
-  new_service->hostgroup_name = NULL;
-
-  /* allocate memory for and copy string members of service definition (host name provided, DO NOT duplicate hostgroup member!) */
+  /* allocate memory for and copy string members of service definition (host name provided) */
   if (temp_service->host_name != NULL)
     new_service->host_name = string::dup(host_name);
   if (temp_service->tmpl != NULL)
@@ -3772,8 +3110,6 @@ int xodtemplate_duplicate_service(
     new_service->name = string::dup(temp_service->name);
   if (temp_service->service_description != NULL)
     new_service->service_description = string::dup(temp_service->service_description);
-  if (temp_service->service_groups != NULL)
-    new_service->service_groups = string::dup(temp_service->service_groups);
   if (temp_service->check_command != NULL)
     new_service->check_command = string::dup(temp_service->check_command);
   if (temp_service->check_period != NULL)
@@ -3852,10 +3188,6 @@ int xodtemplate_duplicate_hostdependency(
   new_hostdependency->_start_line = temp_hostdependency->_start_line;
 
   /* string defaults */
-  new_hostdependency->hostgroup_name = NULL;
-  new_hostdependency->have_hostgroup_name = false;
-  new_hostdependency->dependent_hostgroup_name = NULL;
-  new_hostdependency->have_dependent_hostgroup_name = false;
   new_hostdependency->host_name = NULL;
   new_hostdependency->have_host_name = temp_hostdependency->have_host_name;
   new_hostdependency->dependent_host_name = NULL;
@@ -3897,12 +3229,8 @@ int xodtemplate_duplicate_servicedependency(
       xodtemplate_servicedependency* temp_servicedependency,
       char* master_host_name,
       char* master_service_description,
-      char* master_hostgroup_name,
-      char* master_servicegroup_name,
       char* dependent_host_name,
-      char* dependent_service_description,
-      char* dependent_hostgroup_name,
-      char* dependent_servicegroup_name) {
+      char* dependent_service_description) {
   xodtemplate_servicedependency* new_servicedependency = NULL;
 
   /* allocate memory for a new service dependency definition */
@@ -3921,19 +3249,11 @@ int xodtemplate_duplicate_servicedependency(
   new_servicedependency->have_host_name = (master_host_name) ? true : false;
   new_servicedependency->service_description = NULL;
   new_servicedependency->have_service_description = (master_service_description) ? true : false;
-  new_servicedependency->hostgroup_name = NULL;
-  new_servicedependency->have_hostgroup_name = (master_hostgroup_name) ? true : false;
-  new_servicedependency->servicegroup_name = NULL;
-  new_servicedependency->have_servicegroup_name = (master_servicegroup_name) ? true : false;
 
   new_servicedependency->dependent_host_name = NULL;
   new_servicedependency->have_dependent_host_name = (dependent_host_name) ? true : false;
   new_servicedependency->dependent_service_description = NULL;
   new_servicedependency->have_dependent_service_description = (dependent_service_description) ? true : false;
-  new_servicedependency->dependent_hostgroup_name = NULL;
-  new_servicedependency->have_dependent_hostgroup_name = (dependent_hostgroup_name) ? true : false;
-  new_servicedependency->dependent_servicegroup_name = NULL;
-  new_servicedependency->have_dependent_servicegroup_name = (dependent_servicegroup_name) ? true : false;
 
   new_servicedependency->dependency_period = NULL;
   new_servicedependency->have_dependency_period = temp_servicedependency->have_dependency_period;
@@ -3945,18 +3265,10 @@ int xodtemplate_duplicate_servicedependency(
     new_servicedependency->host_name = string::dup(master_host_name);
   if (master_service_description != NULL)
     new_servicedependency->service_description = string::dup(master_service_description);
-  if (master_hostgroup_name != NULL)
-    new_servicedependency->hostgroup_name = string::dup(master_hostgroup_name);
-  if (master_servicegroup_name != NULL)
-    new_servicedependency->servicegroup_name = string::dup(master_servicegroup_name);
   if (dependent_host_name != NULL)
     new_servicedependency->dependent_host_name = string::dup(dependent_host_name);
   if (dependent_service_description != NULL)
     new_servicedependency->dependent_service_description = string::dup(dependent_service_description);
-  if (dependent_hostgroup_name != NULL)
-    new_servicedependency->dependent_hostgroup_name = string::dup(dependent_hostgroup_name);
-  if (dependent_servicegroup_name != NULL)
-    new_servicedependency->dependent_servicegroup_name = string::dup(dependent_servicegroup_name);
 
   if (temp_servicedependency->dependency_period != NULL)
     new_servicedependency->dependency_period = string::dup(temp_servicedependency->dependency_period);
@@ -3990,8 +3302,6 @@ int xodtemplate_duplicate_servicedependency(
 int xodtemplate_resolve_objects() {
   xodtemplate_timeperiod* temp_timeperiod = NULL;
   xodtemplate_command* temp_command = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
@@ -4010,22 +3320,6 @@ int xodtemplate_resolve_objects() {
        temp_command != NULL;
        temp_command = temp_command->next) {
     if (xodtemplate_resolve_command(temp_command) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all hostgroup objects */
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next) {
-    if (xodtemplate_resolve_hostgroup(temp_hostgroup) == ERROR)
-      return (ERROR);
-  }
-
-  /* resolve all servicegroup objects */
-  for (temp_servicegroup = xodtemplate_servicegroup_list;
-       temp_servicegroup != NULL;
-       temp_servicegroup = temp_servicegroup->next) {
-    if (xodtemplate_resolve_servicegroup(temp_servicegroup) == ERROR)
       return (ERROR);
   }
 
@@ -4244,142 +3538,6 @@ int xodtemplate_resolve_command(xodtemplate_command* this_command) {
   return (OK);
 }
 
-/* resolves a hostgroup object */
-int xodtemplate_resolve_hostgroup(
-      xodtemplate_hostgroup* this_hostgroup) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_hostgroup* template_hostgroup = NULL;
-
-  /* return if this hostgroup has already been resolved */
-  if (this_hostgroup->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_hostgroup->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_hostgroup->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_hostgroup->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_hostgroup = xodtemplate_find_hostgroup(temp_ptr);
-    if (template_hostgroup == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in "
-        "hostgroup definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_hostgroup->_config_file)
-        << "', starting on line " << this_hostgroup->_start_line
-        << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template hostgroup... */
-    xodtemplate_resolve_hostgroup(template_hostgroup);
-
-    /* apply missing properties from template hostgroup... */
-    if (this_hostgroup->hostgroup_name == NULL
-        && template_hostgroup->hostgroup_name != NULL)
-      this_hostgroup->hostgroup_name
-        = string::dup(template_hostgroup->hostgroup_name);
-    if (this_hostgroup->alias == NULL
-        && template_hostgroup->alias != NULL)
-      this_hostgroup->alias = string::dup(template_hostgroup->alias);
-
-    xodtemplate_get_inherited_string(
-      &template_hostgroup->have_members,
-      &template_hostgroup->members,
-      &this_hostgroup->have_members,
-      &this_hostgroup->members);
-    xodtemplate_get_inherited_string(
-      &template_hostgroup->have_hostgroup_members,
-      &template_hostgroup->hostgroup_members,
-      &this_hostgroup->have_hostgroup_members,
-      &this_hostgroup->hostgroup_members);
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
-/* resolves a servicegroup object */
-int xodtemplate_resolve_servicegroup(
-      xodtemplate_servicegroup* this_servicegroup) {
-  char* temp_ptr = NULL;
-  char* template_names = NULL;
-  char* template_name_ptr = NULL;
-  xodtemplate_servicegroup* template_servicegroup = NULL;
-
-  /* return if this servicegroup has already been resolved */
-  if (this_servicegroup->has_been_resolved == true)
-    return (OK);
-
-  /* set the resolved flag */
-  this_servicegroup->has_been_resolved = true;
-
-  /* return if we have no template */
-  if (this_servicegroup->tmpl == NULL)
-    return (OK);
-
-  template_names = string::dup(this_servicegroup->tmpl);
-
-  /* apply all templates */
-  template_name_ptr = template_names;
-  for (temp_ptr = my_strsep(&template_name_ptr, ",");
-       temp_ptr != NULL;
-       temp_ptr = my_strsep(&template_name_ptr, ",")) {
-
-    template_servicegroup = xodtemplate_find_servicegroup(temp_ptr);
-    if (template_servicegroup == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Template '" << temp_ptr << "' specified in "
-        "servicegroup definition could not be not found (config file '"
-        << xodtemplate_config_file_name(this_servicegroup->_config_file)
-        << "', starting on line " << this_servicegroup->_start_line
-        << ")";
-      delete[] template_names;
-      return (ERROR);
-    }
-
-    /* resolve the template servicegroup... */
-    xodtemplate_resolve_servicegroup(template_servicegroup);
-
-    /* apply missing properties from template servicegroup... */
-    if (this_servicegroup->servicegroup_name == NULL
-        && template_servicegroup->servicegroup_name != NULL)
-      this_servicegroup->servicegroup_name
-        = string::dup(template_servicegroup->servicegroup_name);
-    if (this_servicegroup->alias == NULL
-        && template_servicegroup->alias != NULL)
-      this_servicegroup->alias = string::dup(template_servicegroup->alias);
-
-    xodtemplate_get_inherited_string(
-      &template_servicegroup->have_members,
-      &template_servicegroup->members,
-      &this_servicegroup->have_members,
-      &this_servicegroup->members);
-    xodtemplate_get_inherited_string(
-      &template_servicegroup->have_servicegroup_members,
-      &template_servicegroup->servicegroup_members,
-      &this_servicegroup->have_servicegroup_members,
-      &this_servicegroup->servicegroup_members);
-  }
-
-  delete[] template_names;
-
-  return (OK);
-}
-
 /* resolves a servicedependency object */
 int xodtemplate_resolve_servicedependency(
       xodtemplate_servicedependency* this_servicedependency) {
@@ -4424,16 +3582,6 @@ int xodtemplate_resolve_servicedependency(
 
     /* apply missing properties from template servicedependency... */
     xodtemplate_get_inherited_string(
-      &template_servicedependency->have_servicegroup_name,
-      &template_servicedependency->servicegroup_name,
-      &this_servicedependency->have_servicegroup_name,
-      &this_servicedependency->servicegroup_name);
-    xodtemplate_get_inherited_string(
-      &template_servicedependency->have_hostgroup_name,
-      &template_servicedependency->hostgroup_name,
-      &this_servicedependency->have_hostgroup_name,
-      &this_servicedependency->hostgroup_name);
-    xodtemplate_get_inherited_string(
       &template_servicedependency->have_host_name,
       &template_servicedependency->host_name,
       &this_servicedependency->have_host_name,
@@ -4443,16 +3591,6 @@ int xodtemplate_resolve_servicedependency(
       &template_servicedependency->service_description,
       &this_servicedependency->have_service_description,
       &this_servicedependency->service_description);
-    xodtemplate_get_inherited_string(
-      &template_servicedependency->have_dependent_servicegroup_name,
-      &template_servicedependency->dependent_servicegroup_name,
-      &this_servicedependency->have_dependent_servicegroup_name,
-      &this_servicedependency->dependent_servicegroup_name);
-    xodtemplate_get_inherited_string(
-      &template_servicedependency->have_dependent_hostgroup_name,
-      &template_servicedependency->dependent_hostgroup_name,
-      &this_servicedependency->have_dependent_hostgroup_name,
-      &this_servicedependency->dependent_hostgroup_name);
     xodtemplate_get_inherited_string(
       &template_servicedependency->have_dependent_host_name,
       &template_servicedependency->dependent_host_name,
@@ -4555,11 +3693,6 @@ int xodtemplate_resolve_host(xodtemplate_host* this_host) {
       &template_host->parents,
       &this_host->have_parents,
       &this_host->parents);
-    xodtemplate_get_inherited_string(
-      &template_host->have_host_groups,
-      &template_host->host_groups,
-      &this_host->have_host_groups,
-      &this_host->host_groups);
 
     if (this_host->have_check_command == false
         && template_host->have_check_command == true) {
@@ -4759,16 +3892,6 @@ int xodtemplate_resolve_service(xodtemplate_service* this_service) {
       &template_service->host_name,
       &this_service->have_host_name,
       &this_service->host_name);
-    xodtemplate_get_inherited_string(
-      &template_service->have_hostgroup_name,
-      &template_service->hostgroup_name,
-      &this_service->have_hostgroup_name,
-      &this_service->hostgroup_name);
-    xodtemplate_get_inherited_string(
-      &template_service->have_service_groups,
-      &template_service->service_groups,
-      &this_service->have_service_groups,
-      &this_service->service_groups);
 
     if (template_service->have_check_command == true) {
       if (template_service->have_important_check_command == true) {
@@ -4982,16 +4105,6 @@ int xodtemplate_resolve_hostdependency(
       &template_hostdependency->dependent_host_name,
       &this_hostdependency->have_dependent_host_name,
       &this_hostdependency->dependent_host_name);
-    xodtemplate_get_inherited_string(
-      &template_hostdependency->have_hostgroup_name,
-      &template_hostdependency->hostgroup_name,
-      &this_hostdependency->have_hostgroup_name,
-      &this_hostdependency->hostgroup_name);
-    xodtemplate_get_inherited_string(
-      &template_hostdependency->have_dependent_hostgroup_name,
-      &template_hostdependency->dependent_hostgroup_name,
-      &this_hostdependency->have_dependent_hostgroup_name,
-      &this_hostdependency->dependent_hostgroup_name);
 
     if (this_hostdependency->have_dependency_period == false
         && template_hostdependency->have_dependency_period == true) {
@@ -5027,546 +4140,6 @@ int xodtemplate_resolve_hostdependency(
 }
 
 /******************************************************************/
-/*************** OBJECT RECOMBOBULATION FUNCTIONS *****************/
-/******************************************************************/
-
-/* recombobulates hostgroup definitions */
-int xodtemplate_recombobulate_hostgroups() {
-  xodtemplate_host* temp_host = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_memberlist* temp_memberlist = NULL;
-  xodtemplate_memberlist* this_memberlist = NULL;
-  char* hostgroup_names = NULL;
-  char* temp_ptr = NULL;
-  char* new_members = NULL;
-
-#ifdef DEBUG
-  printf("** PRE-EXPANSION 1\n");
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next) {
-    printf("HOSTGROUP [%s]\n", temp_hostgroup->hostgroup_name);
-    printf("H MEMBERS: %s\n", temp_hostgroup->members);
-    printf("G MEMBERS: %s\n", temp_hostgroup->hostgroup_members);
-    printf("\n");
-  }
-#endif
-
-  /* This should happen before we expand hostgroup members, to avoid duplicate host memberships 01/07/2006 EG */
-  /* process all hosts that have hostgroup directives */
-  for (temp_host = xodtemplate_host_list;
-       temp_host != NULL;
-       temp_host = temp_host->next) {
-
-    /* skip hosts without hostgroup directives or host names */
-    if (temp_host->host_groups == NULL || temp_host->host_name == NULL)
-      continue;
-
-    /* skip hosts that shouldn't be registered */
-    if (temp_host->register_object == false)
-      continue;
-
-    /* preprocess the hostgroup list, to change "grp1,grp2,grp3,!grp2" into "grp1,grp3" */
-    /* 10/18/07 EG an empty return value means an error occured */
-    if ((hostgroup_names = xodtemplate_process_hostgroup_names(
-                             temp_host->host_groups,
-                             temp_host->_config_file,
-                             temp_host->_start_line)) == NULL)
-      return (ERROR);
-
-    /* process the list of hostgroups */
-    for (temp_ptr = strtok(hostgroup_names, ",");
-	 temp_ptr != NULL;
-         temp_ptr = strtok(NULL, ",")) {
-
-      /* strip trailing spaces */
-      strip(temp_ptr);
-
-      /* find the hostgroup */
-      temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
-      if (temp_hostgroup == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not find hostgroup '" << temp_ptr
-          << "' specified in host '" << temp_host->host_name
-          << "' definition (config file '"
-          << xodtemplate_config_file_name(temp_host->_config_file)
-          << "', starting on line " << temp_host->_start_line << ")";
-        delete[] hostgroup_names;
-        return (ERROR);
-      }
-
-      /* add this list to the hostgroup members directive */
-      if (temp_hostgroup->members == NULL)
-        temp_hostgroup->members = string::dup(temp_host->host_name);
-      else {
-        new_members = resize_string(
-                        temp_hostgroup->members,
-                        strlen(temp_hostgroup->members) +
-                        strlen(temp_host->host_name) + 2);
-        temp_hostgroup->members = new_members;
-        strcat(temp_hostgroup->members, ",");
-        strcat(temp_hostgroup->members, temp_host->host_name);
-      }
-    }
-
-    /* free memory */
-    delete[] hostgroup_names;
-    hostgroup_names = NULL;
-  }
-
-#ifdef DEBUG
-  printf("** POST-EXPANSION 1\n");
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next) {
-    printf("HOSTGROUP [%s]\n", temp_hostgroup->hostgroup_name);
-    printf("H MEMBERS: %s\n", temp_hostgroup->members);
-    printf("G MEMBERS: %s\n", temp_hostgroup->hostgroup_members);
-    printf("\n");
-  }
-#endif
-
-  /* expand subgroup membership recursively */
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next)
-    xodtemplate_recombobulate_hostgroup_subgroups(temp_hostgroup, NULL);
-
-  /* expand members of all hostgroups - this could be done in xodtemplate_register_hostgroup(), but we can save the CGIs some work if we do it here */
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next) {
-
-    if (temp_hostgroup->members == NULL
-        && temp_hostgroup->hostgroup_members == NULL)
-      continue;
-
-    /* skip hostgroups that shouldn't be registered */
-    if (temp_hostgroup->register_object == false)
-      continue;
-
-    /* get list of hosts in the hostgroup */
-    temp_memberlist = xodtemplate_expand_hostgroups_and_hosts(
-                        NULL,
-                        temp_hostgroup->members,
-                        temp_hostgroup->_config_file,
-                        temp_hostgroup->_start_line);
-
-    /* add all members to the host group */
-    if (temp_memberlist == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not expand members specified in hostgroup "
-        "(config file '"
-        << xodtemplate_config_file_name(temp_hostgroup->_config_file)
-        << "', starting on line " << temp_hostgroup->_start_line << ")";
-      return (ERROR);
-    }
-    delete[] temp_hostgroup->members;
-    temp_hostgroup->members = NULL;
-    for (this_memberlist = temp_memberlist;
-	 this_memberlist != NULL;
-         this_memberlist = this_memberlist->next) {
-
-      /* add this host to the hostgroup members directive */
-      if (temp_hostgroup->members == NULL)
-        temp_hostgroup->members = string::dup(this_memberlist->name1);
-      else {
-        new_members = resize_string(
-                        temp_hostgroup->members,
-                        strlen(temp_hostgroup->members)
-                        + strlen(this_memberlist->name1) + 2);
-        temp_hostgroup->members = new_members;
-        strcat(temp_hostgroup->members, ",");
-        strcat(temp_hostgroup->members, this_memberlist->name1);
-      }
-    }
-    xodtemplate_free_memberlist(&temp_memberlist);
-  }
-
-#ifdef DEBUG
-  printf("** POST-EXPANSION 2\n");
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next) {
-    printf("HOSTGROUP [%s]\n", temp_hostgroup->hostgroup_name);
-    printf("H MEMBERS: %s\n", temp_hostgroup->members);
-    printf("G MEMBERS: %s\n", temp_hostgroup->hostgroup_members);
-    printf("\n");
-  }
-#endif
-
-  return (OK);
-}
-
-int xodtemplate_recombobulate_hostgroup_subgroups(
-      xodtemplate_hostgroup* temp_hostgroup,
-      char** members) {
-
-
-  if (temp_hostgroup == NULL)
-    return (ERROR);
-
-  /* resolve subgroup memberships first */
-  if (temp_hostgroup->hostgroup_members != NULL) {
-
-    /* save members, null pointer so we don't recurse into infinite hell */
-    char* orig_hgmembers(temp_hostgroup->hostgroup_members);
-    temp_hostgroup->hostgroup_members = NULL;
-
-    /* make new working copy of members */
-    char* hgmembers(string::dup(orig_hgmembers));
-
-    char* buf(NULL);
-    char* ptr(hgmembers);
-    while ((buf = ptr) != NULL) {
-
-      /* get next member for next run */
-      ptr = strchr(ptr, ',');
-      if (ptr) {
-        ptr[0] = '\x0';
-        ptr++;
-      }
-
-      strip(buf);
-
-      /* find subgroup and recurse */
-      xodtemplate_hostgroup* sub_group(NULL);
-      if ((sub_group = xodtemplate_find_real_hostgroup(buf)) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not find member group '" << buf
-          << "' specified in hostgroup (config file '"
-          << xodtemplate_config_file_name(temp_hostgroup->_config_file)
-          << "', starting on line " << temp_hostgroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-
-      char* newmembers(NULL);
-      xodtemplate_recombobulate_hostgroup_subgroups(
-        sub_group,
-        &newmembers);
-
-      /* add new (sub) members */
-      if (newmembers != NULL) {
-        if (temp_hostgroup->members == NULL)
-          temp_hostgroup->members = string::dup(newmembers);
-        else {
-          temp_hostgroup->members = resize_string(
-                                      temp_hostgroup->members,
-                                      strlen(temp_hostgroup->members)
-                                      + strlen(newmembers) + 2);
-          strcat(temp_hostgroup->members, ",");
-          strcat(temp_hostgroup->members, newmembers);
-        }
-      }
-    }
-
-    /* free memory */
-    delete[] hgmembers;
-    hgmembers = NULL;
-
-    /* restore group members */
-    temp_hostgroup->hostgroup_members = orig_hgmembers;
-  }
-
-  /* return host members */
-  if (members != NULL)
-    *members = temp_hostgroup->members;
-
-  return (OK);
-}
-
-/* recombobulates servicegroup definitions */
-/***** THIS NEEDS TO BE CALLED AFTER OBJECTS (SERVICES) ARE RESOLVED AND DUPLICATED *****/
-int xodtemplate_recombobulate_servicegroups() {
-  xodtemplate_service* temp_service = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
-  xodtemplate_memberlist* temp_memberlist = NULL;
-  xodtemplate_memberlist* this_memberlist = NULL;
-  char* servicegroup_names = NULL;
-  char* member_names = NULL;
-  char* host_name = NULL;
-  char* service_description = NULL;
-  char* temp_ptr = NULL;
-  char* temp_ptr2 = NULL;
-  char* new_members = NULL;
-
-  /* This should happen before we expand servicegroup members, to avoid duplicate service memberships 01/07/2006 EG */
-  /* process all services that have servicegroup directives */
-  for (temp_service = xodtemplate_service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
-
-    /* skip services without servicegroup directives or service names */
-    if (temp_service->service_groups == NULL
-        || temp_service->host_name == NULL
-        || temp_service->service_description == NULL)
-      continue;
-
-    /* skip services that shouldn't be registered */
-    if (temp_service->register_object == false)
-      continue;
-
-    /* preprocess the servicegroup list, to change "grp1,grp2,grp3,!grp2" into "grp1,grp3" */
-    /* 10/19/07 EG an empry return value means an error occured */
-    if ((servicegroup_names = xodtemplate_process_servicegroup_names(
-                                temp_service->service_groups,
-                                temp_service->_config_file,
-                                temp_service->_start_line)) == NULL)
-      return (ERROR);
-
-    /* process the list of servicegroups */
-    for (temp_ptr = strtok(servicegroup_names, ",");
-	 temp_ptr != NULL;
-         temp_ptr = strtok(NULL, ",")) {
-
-      /* strip trailing spaces */
-      strip(temp_ptr);
-
-      /* find the servicegroup */
-      temp_servicegroup = xodtemplate_find_real_servicegroup(temp_ptr);
-      if (temp_servicegroup == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not find servicegroup '" << temp_ptr
-          << "' specified in service '"
-          << temp_service->service_description << "' on host '"
-          << temp_service->host_name << "' definition (config file '"
-          << xodtemplate_config_file_name(temp_service->_config_file)
-          << "', starting on line " << temp_service->_start_line << ")";
-        delete[] servicegroup_names;
-        return (ERROR);
-      }
-
-      /* add this list to the servicegroup members directive */
-      if (temp_servicegroup->members == NULL) {
-        temp_servicegroup->members
-          = new char[strlen(temp_service->host_name)
-                     + strlen(temp_service->service_description) + 2];
-        strcpy(temp_servicegroup->members, temp_service->host_name);
-        strcat(temp_servicegroup->members, ",");
-        strcat(temp_servicegroup->members, temp_service->service_description);
-      }
-      else {
-        new_members = resize_string(
-                        temp_servicegroup->members,
-                        strlen(temp_servicegroup->members)
-                        + strlen(temp_service->host_name)
-                        + strlen(temp_service->service_description) + 3);
-        temp_servicegroup->members = new_members;
-        strcat(temp_servicegroup->members, ",");
-        strcat(temp_servicegroup->members, temp_service->host_name);
-        strcat(temp_servicegroup->members, ",");
-        strcat(
-          temp_servicegroup->members,
-          temp_service->service_description);
-      }
-    }
-
-    /* free servicegroup names */
-    delete[] servicegroup_names;
-    servicegroup_names = NULL;
-  }
-
-  /* expand subgroup membership recursively */
-  for (temp_servicegroup = xodtemplate_servicegroup_list;
-       temp_servicegroup != NULL;
-       temp_servicegroup = temp_servicegroup->next)
-    xodtemplate_recombobulate_servicegroup_subgroups(
-      temp_servicegroup,
-      NULL);
-
-  /* expand members of all servicegroups - this could be done in xodtemplate_register_servicegroup(), but we can save the CGIs some work if we do it here */
-  for (temp_servicegroup = xodtemplate_servicegroup_list;
-       temp_servicegroup != NULL;
-       temp_servicegroup = temp_servicegroup->next) {
-
-    if (temp_servicegroup->members == NULL)
-      continue;
-
-    /* skip servicegroups that shouldn't be registered */
-    if (temp_servicegroup->register_object == false)
-      continue;
-
-    member_names = temp_servicegroup->members;
-    temp_servicegroup->members = NULL;
-
-    for (temp_ptr = member_names;
-	 temp_ptr != NULL;
-         temp_ptr = strchr(temp_ptr + 1, ',')) {
-
-      /* this is the host name */
-      if (host_name == NULL)
-        host_name
-          = string::dup((temp_ptr[0] == ',') ? temp_ptr + 1 : temp_ptr);
-
-      /* this is the service description */
-      else {
-        service_description = string::dup(temp_ptr + 1);
-
-        /* strsep and strtok cannot be used, as they're used in expand_servicegroups...() */
-        temp_ptr2 = strchr(host_name, ',');
-        if (temp_ptr2)
-          temp_ptr2[0] = '\x0';
-        temp_ptr2 = strchr(service_description, ',');
-        if (temp_ptr2)
-          temp_ptr2[0] = '\x0';
-
-        /* strip trailing spaces */
-        strip(host_name);
-        strip(service_description);
-
-        /* get list of services in the servicegroup */
-        temp_memberlist = xodtemplate_expand_servicegroups_and_services(
-                            NULL,
-                            host_name,
-                            service_description,
-                            temp_servicegroup->_config_file,
-                            temp_servicegroup->_start_line);
-
-        /* add all members to the service group */
-        if (temp_memberlist == NULL) {
-          logger(log_config_error, basic)
-            << "Error: Could not expand member services specified in "
-            "servicegroup (config file '"
-            << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-            << "', starting on line " << temp_servicegroup->_start_line << ")";
-          delete[] member_names;
-          delete[] host_name;
-          delete[] service_description;
-          return (ERROR);
-        }
-
-        for (this_memberlist = temp_memberlist;
-	     this_memberlist != NULL;
-             this_memberlist = this_memberlist->next) {
-
-          /* add this service to the servicegroup members directive */
-          if (temp_servicegroup->members == NULL) {
-            temp_servicegroup->members
-              = new char[strlen(this_memberlist->name1)
-                         + strlen(this_memberlist->name2) + 2];
-            strcpy(temp_servicegroup->members, this_memberlist->name1);
-            strcat(temp_servicegroup->members, ",");
-            strcat(temp_servicegroup->members, this_memberlist->name2);
-          }
-          else {
-            new_members = resize_string(
-                            temp_servicegroup->members,
-                            strlen(temp_servicegroup->members)
-                            + strlen(this_memberlist->name1)
-                            + strlen(this_memberlist->name2) + 3);
-            temp_servicegroup->members = new_members;
-            strcat(temp_servicegroup->members, ",");
-            strcat(temp_servicegroup->members, this_memberlist->name1);
-            strcat(temp_servicegroup->members, ",");
-            strcat(temp_servicegroup->members, this_memberlist->name2);
-          }
-        }
-        xodtemplate_free_memberlist(&temp_memberlist);
-
-        delete[] host_name;
-        delete[] service_description;
-
-        host_name = NULL;
-        service_description = NULL;
-      }
-    }
-
-    delete[] member_names;
-    member_names = NULL;
-
-    /* error if there were an odd number of items specified (unmatched host/service pair) */
-    if (host_name != NULL) {
-      logger(log_config_error, basic)
-        << "Error: Servicegroup members must be specified in "
-        "<host_name>,<service_description> pairs (config file '"
-        << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-        << "', starting on line " << temp_servicegroup->_start_line
-        << ")";
-      delete[] host_name;
-      return (ERROR);
-    }
-  }
-
-  return (OK);
-}
-
-int xodtemplate_recombobulate_servicegroup_subgroups(
-      xodtemplate_servicegroup* temp_servicegroup,
-      char** members) {
-  if (temp_servicegroup == NULL)
-    return (ERROR);
-
-  /* resolve subgroup memberships first */
-  if (temp_servicegroup->servicegroup_members != NULL) {
-
-    /* save members, null pointer so we don't recurse into infinite hell */
-    char* orig_sgmembers(temp_servicegroup->servicegroup_members);
-    temp_servicegroup->servicegroup_members = NULL;
-
-    /* make new working copy of members */
-    char* sgmembers(string::dup(orig_sgmembers));
-
-    char* buf(NULL);
-    char* ptr(sgmembers);
-    while ((buf = ptr) != NULL) {
-
-      /* get next member for next run */
-      ptr = strchr(ptr, ',');
-      if (ptr) {
-        ptr[0] = '\x0';
-        ptr++;
-      }
-
-      strip(buf);
-
-      /* find subgroup and recurse */
-      xodtemplate_servicegroup* sub_group(NULL);
-      if ((sub_group = xodtemplate_find_real_servicegroup(buf)) == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not find member group '" << buf
-          << "' specified in servicegroup (config file '"
-          << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-          << "', starting on line " << temp_servicegroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-      char* newmembers(NULL);
-      xodtemplate_recombobulate_servicegroup_subgroups(
-        sub_group,
-        &newmembers);
-
-      /* add new (sub) members */
-      if (newmembers != NULL) {
-        if (temp_servicegroup->members == NULL)
-          temp_servicegroup->members = string::dup(newmembers);
-        else {
-          temp_servicegroup->members = resize_string(
-                                         temp_servicegroup->members,
-                                         strlen(temp_servicegroup->members)
-                                         + strlen(newmembers) + 2);
-          strcat(temp_servicegroup->members, ",");
-          strcat(temp_servicegroup->members, newmembers);
-        }
-      }
-    }
-
-    /* free memory */
-    delete[] sgmembers;
-    sgmembers = NULL;
-
-    /* restore group members */
-    temp_servicegroup->servicegroup_members = orig_sgmembers;
-  }
-
-  /* return service members */
-  if (members != NULL)
-    *members = temp_servicegroup->members;
-
-  return (OK);
-}
-
-/******************************************************************/
 /******************* OBJECT SEARCH FUNCTIONS **********************/
 /******************************************************************/
 
@@ -5594,58 +4167,6 @@ xodtemplate_command* xodtemplate_find_command(char* name) {
                                   xobject_template_skiplists[X_COMMAND_SKIPLIST],
                                   &temp_command,
                                   NULL));
-}
-
-/* finds a specific hostgroup object */
-xodtemplate_hostgroup* xodtemplate_find_hostgroup(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_hostgroup temp_hostgroup;
-  temp_hostgroup.name = name;
-  return ((xodtemplate_hostgroup*)skiplist_find_first(
-                                    xobject_template_skiplists[X_HOSTGROUP_SKIPLIST],
-                                    &temp_hostgroup,
-                                    NULL));
-}
-
-/* finds a specific hostgroup object by its REAL name, not its TEMPLATE name */
-xodtemplate_hostgroup* xodtemplate_find_real_hostgroup(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_hostgroup temp_hostgroup;
-  temp_hostgroup.hostgroup_name = name;
-  return ((xodtemplate_hostgroup*)skiplist_find_first(
-                                    xobject_skiplists[X_HOSTGROUP_SKIPLIST],
-                                    &temp_hostgroup,
-                                    NULL));
-}
-
-/* finds a specific servicegroup object */
-xodtemplate_servicegroup* xodtemplate_find_servicegroup(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_servicegroup temp_servicegroup;
-  temp_servicegroup.name = name;
-  return ((xodtemplate_servicegroup*)skiplist_find_first(
-                                       xobject_template_skiplists[X_SERVICEGROUP_SKIPLIST],
-                                       &temp_servicegroup,
-                                       NULL));
-}
-
-/* finds a specific servicegroup object by its REAL name, not its TEMPLATE name */
-xodtemplate_servicegroup* xodtemplate_find_real_servicegroup(char* name) {
-  if (name == NULL)
-    return (NULL);
-
-  xodtemplate_servicegroup temp_servicegroup;
-  temp_servicegroup.servicegroup_name = name;
-  return ((xodtemplate_servicegroup*)skiplist_find_first(
-                                       xobject_skiplists[X_SERVICEGROUP_SKIPLIST],
-                                       &temp_servicegroup,
-                                       NULL));
 }
 
 /* finds a specific servicedependency object */
@@ -5773,26 +4294,6 @@ int xodtemplate_register_objects() {
        temp_command;
        temp_command = (xodtemplate_command*)skiplist_get_next(&ptr)) {
     if (xodtemplate_register_command(temp_command) == ERROR)
-      return (ERROR);
-  }
-
-  /* register hostgroups */
-  ptr = NULL;
-  xodtemplate_hostgroup* temp_hostgroup(NULL);
-  for (temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_first(xobject_skiplists[X_HOSTGROUP_SKIPLIST], &ptr);
-       temp_hostgroup;
-       temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_next(&ptr)) {
-    if (xodtemplate_register_hostgroup(temp_hostgroup) == ERROR)
-      return (ERROR);
-  }
-
-  /* register servicegroups */
-  ptr = NULL;
-  xodtemplate_servicegroup* temp_servicegroup(NULL);
-  for (temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_first(xobject_skiplists[X_SERVICEGROUP_SKIPLIST], &ptr);
-       temp_servicegroup;
-       temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_next(&ptr)) {
-    if (xodtemplate_register_servicegroup(temp_servicegroup) == ERROR)
       return (ERROR);
   }
 
@@ -6202,112 +4703,6 @@ int xodtemplate_register_connector(xodtemplate_connector* this_connector) {
   return (OK);
 }
 
-/* registers a hostgroup definition */
-int xodtemplate_register_hostgroup(
-      xodtemplate_hostgroup* this_hostgroup) {
-  /* bail out if we shouldn't register this object */
-  if (this_hostgroup->register_object == false)
-    return (OK);
-
-  /* add the  host group */
-  hostgroup* new_hostgroup
-    = add_hostgroup(
-        this_hostgroup->hostgroup_name,
-        this_hostgroup->alias);
-
-  /* return with an error if we couldn't add the hostgroup */
-  if (new_hostgroup == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register hostgroup (config file '"
-      << xodtemplate_config_file_name(this_hostgroup->_config_file)
-      << "', starting on line " << this_hostgroup->_start_line
-      << ")";
-    return (ERROR);
-  }
-
-  if (this_hostgroup->members != NULL) {
-    for (char* host_name(strtok(this_hostgroup->members, ","));
-         host_name != NULL;
-	 host_name = strtok(NULL, ",")) {
-      strip(host_name);
-      hostsmember* new_hostsmember
-        = add_host_to_hostgroup(new_hostgroup, host_name);
-      if (new_hostsmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add host '" << host_name
-          << "' to hostgroup (config file '"
-          << xodtemplate_config_file_name(this_hostgroup->_config_file)
-          << "', starting on line " << this_hostgroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  return (OK);
-}
-
-/* registers a servicegroup definition */
-int xodtemplate_register_servicegroup(
-      xodtemplate_servicegroup* this_servicegroup) {
-  /* bail out if we shouldn't register this object */
-  if (this_servicegroup->register_object == false)
-    return (OK);
-
-  /* add the  service group */
-  servicegroup* new_servicegroup
-    = add_servicegroup(
-        this_servicegroup->servicegroup_name,
-        this_servicegroup->alias);
-
-  /* return with an error if we couldn't add the servicegroup */
-  if (new_servicegroup == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register servicegroup (config file '"
-      << xodtemplate_config_file_name(this_servicegroup->_config_file)
-      << "', starting on line " << this_servicegroup->_start_line
-      << ")";
-    return (ERROR);
-  }
-
-  if (this_servicegroup->members != NULL) {
-    for (char* host_name(strtok(this_servicegroup->members, ","));
-         host_name != NULL;
-	 host_name = strtok(NULL, ",")) {
-      strip(host_name);
-      char* svc_description(strtok(NULL, ","));
-      if (svc_description == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Missing service name in servicegroup definition "
-          "(config file '"
-          << xodtemplate_config_file_name(this_servicegroup->_config_file)
-          << "', starting on line " << this_servicegroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-      strip(svc_description);
-
-      servicesmember* new_servicesmember
-        = add_service_to_servicegroup(
-            new_servicegroup,
-            host_name,
-            svc_description);
-      if (new_servicesmember == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not add service '" << svc_description
-          << "' on host '" << host_name << "' to servicegroup "
-          "(config file '"
-          << xodtemplate_config_file_name(this_servicegroup->_config_file)
-          << "', starting on line " << this_servicegroup->_start_line
-          << ")";
-        return (ERROR);
-      }
-    }
-  }
-
-  return (OK);
-}
-
 /* registers a servicedependency definition */
 int xodtemplate_register_servicedependency(
       xodtemplate_servicedependency* this_servicedependency) {
@@ -6567,14 +4962,6 @@ int xodtemplate_sort_objects() {
   if (xodtemplate_sort_connectors() == ERROR)
     return (ERROR);
 
-  /* sort hostgroups */
-  if (xodtemplate_sort_hostgroups() == ERROR)
-    return (ERROR);
-
-  /* sort servicegroups */
-  if (xodtemplate_sort_servicegroups() == ERROR)
-    return (ERROR);
-
   /* sort hosts */
   if (xodtemplate_sort_hosts() == ERROR)
     return (ERROR);
@@ -6777,114 +5164,6 @@ int xodtemplate_sort_connectors() {
 
   /* list is now sorted */
   xodtemplate_connector_list = new_connector_list;
-
-  return (OK);
-}
-
-/* sort hostgroups by name */
-int xodtemplate_sort_hostgroups() {
-  xodtemplate_hostgroup* new_hostgroup_list = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_hostgroup* last_hostgroup = NULL;
-  xodtemplate_hostgroup* temp_hostgroup_orig = NULL;
-  xodtemplate_hostgroup* next_hostgroup_orig = NULL;
-
-  /* sort all existing hostgroups */
-  for (temp_hostgroup_orig = xodtemplate_hostgroup_list;
-       temp_hostgroup_orig != NULL;
-       temp_hostgroup_orig = next_hostgroup_orig) {
-
-    next_hostgroup_orig = temp_hostgroup_orig->next;
-
-    /* add hostgroup to new list, sorted by hostgroup name */
-    last_hostgroup = new_hostgroup_list;
-    for (temp_hostgroup = new_hostgroup_list;
-	 temp_hostgroup != NULL;
-         temp_hostgroup = temp_hostgroup->next) {
-
-      if (xodtemplate_compare_strings1(
-            temp_hostgroup_orig->hostgroup_name,
-            temp_hostgroup->hostgroup_name) <= 0)
-        break;
-      else
-        last_hostgroup = temp_hostgroup;
-    }
-
-    /* first item added to new sorted list */
-    if (new_hostgroup_list == NULL) {
-      temp_hostgroup_orig->next = NULL;
-      new_hostgroup_list = temp_hostgroup_orig;
-    }
-
-    /* item goes at head of new sorted list */
-    else if (temp_hostgroup == new_hostgroup_list) {
-      temp_hostgroup_orig->next = new_hostgroup_list;
-      new_hostgroup_list = temp_hostgroup_orig;
-    }
-
-    /* item goes in middle or at end of new sorted list */
-    else {
-      temp_hostgroup_orig->next = temp_hostgroup;
-      last_hostgroup->next = temp_hostgroup_orig;
-    }
-  }
-
-  /* list is now sorted */
-  xodtemplate_hostgroup_list = new_hostgroup_list;
-
-  return (OK);
-}
-
-/* sort servicegroups by name */
-int xodtemplate_sort_servicegroups() {
-  xodtemplate_servicegroup* new_servicegroup_list = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
-  xodtemplate_servicegroup* last_servicegroup = NULL;
-  xodtemplate_servicegroup* temp_servicegroup_orig = NULL;
-  xodtemplate_servicegroup* next_servicegroup_orig = NULL;
-
-  /* sort all existing servicegroups */
-  for (temp_servicegroup_orig = xodtemplate_servicegroup_list;
-       temp_servicegroup_orig != NULL;
-       temp_servicegroup_orig = next_servicegroup_orig) {
-
-    next_servicegroup_orig = temp_servicegroup_orig->next;
-
-    /* add servicegroup to new list, sorted by servicegroup name */
-    last_servicegroup = new_servicegroup_list;
-    for (temp_servicegroup = new_servicegroup_list;
-         temp_servicegroup != NULL;
-         temp_servicegroup = temp_servicegroup->next) {
-
-      if (xodtemplate_compare_strings1(
-            temp_servicegroup_orig->servicegroup_name,
-            temp_servicegroup->servicegroup_name) <= 0)
-        break;
-      else
-        last_servicegroup = temp_servicegroup;
-    }
-
-    /* first item added to new sorted list */
-    if (new_servicegroup_list == NULL) {
-      temp_servicegroup_orig->next = NULL;
-      new_servicegroup_list = temp_servicegroup_orig;
-    }
-
-    /* item goes at head of new sorted list */
-    else if (temp_servicegroup == new_servicegroup_list) {
-      temp_servicegroup_orig->next = new_servicegroup_list;
-      new_servicegroup_list = temp_servicegroup_orig;
-    }
-
-    /* item goes in middle or at end of new sorted list */
-    else {
-      temp_servicegroup_orig->next = temp_servicegroup;
-      last_servicegroup->next = temp_servicegroup_orig;
-    }
-  }
-
-  /* list is now sorted */
-  xodtemplate_servicegroup_list = new_servicegroup_list;
 
   return (OK);
 }
@@ -7242,20 +5521,6 @@ int xodtemplate_init_xobject_skiplists() {
         false,
         false,
         xodtemplate_skiplist_compare_timeperiod_template);
-  xobject_template_skiplists[X_HOSTGROUP_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_hostgroup_template);
-  xobject_template_skiplists[X_SERVICEGROUP_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_servicegroup_template);
   xobject_template_skiplists[X_HOSTDEPENDENCY_SKIPLIST]
     = skiplist_new(
         16,
@@ -7305,20 +5570,6 @@ int xodtemplate_init_xobject_skiplists() {
         false,
         false,
         xodtemplate_skiplist_compare_timeperiod);
-  xobject_skiplists[X_HOSTGROUP_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_hostgroup);
-  xobject_skiplists[X_SERVICEGROUP_SKIPLIST]
-    = skiplist_new(
-        10,
-        0.5,
-        false,
-        false,
-        xodtemplate_skiplist_compare_servicegroup);
   /* allow dups in the following lists... */
   xobject_skiplists[X_HOSTDEPENDENCY_SKIPLIST]
     = skiplist_new(
@@ -7562,86 +5813,6 @@ int xodtemplate_skiplist_compare_connector(
             NULL));
 }
 
-int xodtemplate_skiplist_compare_hostgroup_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_hostgroup const* oa
-    = static_cast<xodtemplate_hostgroup const*>(a);
-  xodtemplate_hostgroup const* ob
-    = static_cast<xodtemplate_hostgroup const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_hostgroup(
-      void const* a,
-      void const* b) {
-  xodtemplate_hostgroup const* oa
-    = static_cast<xodtemplate_hostgroup const*>(a);
-  xodtemplate_hostgroup const* ob
-    = static_cast<xodtemplate_hostgroup const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(
-            oa->hostgroup_name,
-            NULL,
-            ob->hostgroup_name,
-            NULL));
-}
-
-int xodtemplate_skiplist_compare_servicegroup_template(
-      void const* a,
-      void const* b) {
-  xodtemplate_servicegroup const* oa
-    = static_cast<xodtemplate_servicegroup const*>(a);
-  xodtemplate_servicegroup const* ob
-    = static_cast<xodtemplate_servicegroup const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
-}
-
-int xodtemplate_skiplist_compare_servicegroup(
-      void const* a,
-      void const* b) {
-  xodtemplate_servicegroup const* oa
-    = static_cast<xodtemplate_servicegroup const*>(a);
-  xodtemplate_servicegroup const* ob
-    = static_cast<xodtemplate_servicegroup const*>(b);
-
-  if (oa == NULL && ob == NULL)
-    return (0);
-  if (oa == NULL)
-    return (1);
-  if (ob == NULL)
-    return (-1);
-
-  return (skiplist_compare_text(
-            oa->servicegroup_name,
-            NULL,
-            ob->servicegroup_name,
-            NULL));
-}
-
 int xodtemplate_skiplist_compare_hostdependency_template(
       void const* a,
       void const* b) {
@@ -7756,10 +5927,6 @@ int xodtemplate_free_memory() {
   xodtemplate_command* next_command = NULL;
   xodtemplate_connector* this_connector = NULL;
   xodtemplate_connector* next_connector = NULL;
-  xodtemplate_hostgroup* this_hostgroup = NULL;
-  xodtemplate_hostgroup* next_hostgroup = NULL;
-  xodtemplate_servicegroup* this_servicegroup = NULL;
-  xodtemplate_servicegroup* next_servicegroup = NULL;
   xodtemplate_servicedependency* this_servicedependency = NULL;
   xodtemplate_servicedependency* next_servicedependency = NULL;
   xodtemplate_host* this_host = NULL;
@@ -7811,38 +5978,6 @@ int xodtemplate_free_memory() {
   xodtemplate_connector_list = NULL;
   xodtemplate_connector_list_tail = NULL;
 
-  /* free memory allocated to hostgroup list */
-  for (this_hostgroup = xodtemplate_hostgroup_list;
-       this_hostgroup != NULL;
-       this_hostgroup = next_hostgroup) {
-    next_hostgroup = this_hostgroup->next;
-    delete[] this_hostgroup->tmpl;
-    delete[] this_hostgroup->name;
-    delete[] this_hostgroup->hostgroup_name;
-    delete[] this_hostgroup->alias;
-    delete[] this_hostgroup->members;
-    delete[] this_hostgroup->hostgroup_members;
-    delete this_hostgroup;
-  }
-  xodtemplate_hostgroup_list = NULL;
-  xodtemplate_hostgroup_list_tail = NULL;
-
-  /* free memory allocated to servicegroup list */
-  for (this_servicegroup = xodtemplate_servicegroup_list;
-       this_servicegroup != NULL;
-       this_servicegroup = next_servicegroup) {
-    next_servicegroup = this_servicegroup->next;
-    delete[] this_servicegroup->tmpl;
-    delete[] this_servicegroup->name;
-    delete[] this_servicegroup->servicegroup_name;
-    delete[] this_servicegroup->alias;
-    delete[] this_servicegroup->members;
-    delete[] this_servicegroup->servicegroup_members;
-    delete this_servicegroup;
-  }
-  xodtemplate_servicegroup_list = NULL;
-  xodtemplate_servicegroup_list_tail = NULL;
-
   /* free memory allocated to servicedependency list */
   for (this_servicedependency = xodtemplate_servicedependency_list;
        this_servicedependency != NULL;
@@ -7850,12 +5985,8 @@ int xodtemplate_free_memory() {
     next_servicedependency = this_servicedependency->next;
     delete[] this_servicedependency->tmpl;
     delete[] this_servicedependency->name;
-    delete[] this_servicedependency->servicegroup_name;
-    delete[] this_servicedependency->hostgroup_name;
     delete[] this_servicedependency->host_name;
     delete[] this_servicedependency->service_description;
-    delete[] this_servicedependency->dependent_servicegroup_name;
-    delete[] this_servicedependency->dependent_hostgroup_name;
     delete[] this_servicedependency->dependent_host_name;
     delete[] this_servicedependency->dependent_service_description;
     delete[] this_servicedependency->dependency_period;
@@ -7886,7 +6017,6 @@ int xodtemplate_free_memory() {
     delete[] this_host->alias;
     delete[] this_host->address;
     delete[] this_host->parents;
-    delete[] this_host->host_groups;
     delete[] this_host->check_command;
     delete[] this_host->check_period;
     delete[] this_host->event_handler;
@@ -7914,10 +6044,8 @@ int xodtemplate_free_memory() {
     next_service = this_service->next;
     delete[] this_service->tmpl;
     delete[] this_service->name;
-    delete[] this_service->hostgroup_name;
     delete[] this_service->host_name;
     delete[] this_service->service_description;
-    delete[] this_service->service_groups;
     delete[] this_service->check_command;
     delete[] this_service->check_period;
     delete[] this_service->event_handler;
@@ -7934,8 +6062,6 @@ int xodtemplate_free_memory() {
     next_hostdependency = this_hostdependency->next;
     delete[] this_hostdependency->tmpl;
     delete[] this_hostdependency->name;
-    delete[] this_hostdependency->hostgroup_name;
-    delete[] this_hostdependency->dependent_hostgroup_name;
     delete[] this_hostdependency->host_name;
     delete[] this_hostdependency->dependent_host_name;
     delete[] this_hostdependency->dependency_period;
@@ -8059,188 +6185,19 @@ void xodtemplate_remove_memberlist_item(
 /********************** UTILITY FUNCTIONS *************************/
 /******************************************************************/
 
-/* expands a comma-delimited list of hostgroups and/or hosts to member host names */
-xodtemplate_memberlist* xodtemplate_expand_hostgroups_and_hosts(
-                          char* hostgroups,
+/* expands hosts */
+xodtemplate_memberlist* xodtemplate_expand_hosts(
                           char* hosts,
                           int _config_file,
                           int _start_line) {
-  xodtemplate_memberlist* temp_list = NULL;
-  xodtemplate_memberlist* reject_list = NULL;
-  xodtemplate_memberlist* list_ptr = NULL;
-  xodtemplate_memberlist* reject_ptr = NULL;
-  int result = OK;
-
-  /* process list of hostgroups... */
-  if (hostgroups != NULL) {
-
-    /* expand host */
-    result = xodtemplate_expand_hostgroups(
-               &temp_list,
-               &reject_list,
-               hostgroups,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-  }
-
-  /* process host names */
-  if (hosts != NULL) {
-    /* expand hosts */
-    result = xodtemplate_expand_hosts(
-               &temp_list,
-               &reject_list,
-               hosts,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-  }
-
-#ifdef TESTING
-  printf("->PRIOR TO CLEANUP\n");
-  printf("   REJECT LIST:\n");
-  for (list_ptr = reject_list;
-       list_ptr != NULL;
-       list_ptr = list_ptr->next)
-    printf("      '%s'\n", list_ptr->name1);
-  printf("   ACCEPT LIST:\n");
-  for (list_ptr = temp_list;
-       list_ptr != NULL;
-       list_ptr = list_ptr->next)
-    printf("      '%s'\n", list_ptr->name1);
-#endif
-
-  /* remove rejects (if any) from the list (no duplicate entries exist in either list) */
-  /* NOTE: rejects from this list also affect hosts generated from processing hostgroup names (see above) */
-  for (reject_ptr = reject_list;
-       reject_ptr != NULL;
-       reject_ptr = reject_ptr->next) {
-    for (list_ptr = temp_list;
-         list_ptr != NULL;
-         list_ptr = list_ptr->next) {
-      if (!strcmp(reject_ptr->name1, list_ptr->name1)) {
-        xodtemplate_remove_memberlist_item(list_ptr, &temp_list);
-        break;
-      }
-    }
-  }
-  xodtemplate_free_memberlist(&reject_list);
-  reject_list = NULL;
-  return (temp_list);
-}
-
-/* expands hostgroups */
-int xodtemplate_expand_hostgroups(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* hostgroups,
-      int _config_file,
-      int _start_line) {
-  char* hostgroup_names = NULL;
-  char* temp_ptr = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL || hostgroups == NULL)
-    return (ERROR);
-
-  /* allocate memory for hostgroup name list */
-  hostgroup_names = string::dup(hostgroups);
-
-  for (temp_ptr = strtok(hostgroup_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all hostgroups */
-    if (!strcmp(temp_ptr, "*")) {
-      found_match = true;
-
-      for (temp_hostgroup = xodtemplate_hostgroup_list;
-           temp_hostgroup != NULL;
-           temp_hostgroup = temp_hostgroup->next) {
-
-        /* dont' add hostgroups that shouldn't be registered */
-        if (temp_hostgroup->register_object == false)
-          continue;
-
-        /* add hostgroup to list */
-        xodtemplate_add_hostgroup_members_to_memberlist(
-          list,
-          temp_hostgroup,
-          _config_file,
-          _start_line);
-      }
-    }
-    /* else this is just a single hostgroup... */
-    else {
-      /* this hostgroup should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the hostgroup */
-      temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
-      if (temp_hostgroup != NULL) {
-        found_match = true;
-
-        /* add hostgroup members to proper list */
-        xodtemplate_add_hostgroup_members_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_hostgroup,
-          _config_file,
-          _start_line);
-      }
-    }
-
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any hostgroup matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] hostgroup_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* expands hosts */
-int xodtemplate_expand_hosts(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* hosts,
-      int _config_file,
-      int _start_line) {
+  xodtemplate_memberlist* list = NULL;
   char* host_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_host* temp_host = NULL;
   int found_match = true;
-  int reject_item = false;
 
-  if (list == NULL || hosts == NULL)
-    return (ERROR);
+  if (hosts == NULL)
+    return (NULL);
 
   host_names = string::dup(hosts);
 
@@ -8249,7 +6206,6 @@ int xodtemplate_expand_hosts(
        temp_ptr;
        temp_ptr = strtok(NULL, ",")) {
     found_match = false;
-    reject_item = false;
 
     /* strip trailing spaces */
     strip(temp_ptr);
@@ -8270,7 +6226,7 @@ int xodtemplate_expand_hosts(
 
         /* add host to list */
         xodtemplate_add_member_to_memberlist(
-          list,
+          &list,
           temp_host->host_name,
           NULL);
       }
@@ -8279,12 +6235,6 @@ int xodtemplate_expand_hosts(
     /* else this is just a single host... */
     else {
 
-      /* this host should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
       /* find the host */
       temp_host = xodtemplate_find_real_host(temp_ptr);
       if (temp_host != NULL) {
@@ -8292,7 +6242,7 @@ int xodtemplate_expand_hosts(
 
         /* add host to list */
         xodtemplate_add_member_to_memberlist(
-          (reject_item == true ? reject_list : list),
+          &list,
           temp_ptr,
           NULL);
       }
@@ -8311,242 +6261,31 @@ int xodtemplate_expand_hosts(
   /* free memory */
   delete[] host_names;
 
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
+  if (found_match == false) {
+    xodtemplate_free_memberlist(&list);
+    return (NULL);
+  }
+  else
+    return (list);
 }
 
-/* adds members of a hostgroups to the list of expanded (accepted) or rejected hosts */
-int xodtemplate_add_hostgroup_members_to_memberlist(
-      xodtemplate_memberlist** list,
-      xodtemplate_hostgroup* temp_hostgroup,
-      int _config_file,
-      int _start_line) {
-  char* group_members = NULL;
-  char* member_name = NULL;
-  char* member_ptr = NULL;
-
-  (void)_config_file;
-  (void)_start_line;
-
-  if (list == NULL || temp_hostgroup == NULL)
-    return (ERROR);
-
-  /* if we have no members, just return. Empty hostgroups are ok */
-  if (temp_hostgroup->members == NULL) {
-    return (OK);
-  }
-
-  /* save a copy of the members */
-  group_members = string::dup(temp_hostgroup->members);
-
-  /* process all hosts that belong to the hostgroup */
-  /* NOTE: members of the group have already have been expanded by xodtemplate_recombobulate_hostgroups(), so we don't need to do it here */
-  member_ptr = group_members;
-  for (member_name = my_strsep(&member_ptr, ",");
-       member_name != NULL;
-       member_name = my_strsep(&member_ptr, ",")) {
-
-    /* strip trailing spaces from member name */
-    strip(member_name);
-
-    /* add host to the list */
-    xodtemplate_add_member_to_memberlist(list, member_name, NULL);
-  }
-
-  delete[] group_members;
-
-  return (OK);
-}
-
-/* expands a comma-delimited list of servicegroups and/or service descriptions */
-xodtemplate_memberlist* xodtemplate_expand_servicegroups_and_services(
-                          char* servicegroups,
+/* expands services (host name is not expanded) */
+xodtemplate_memberlist* xodtemplate_expand_services(
                           char* host_name,
                           char* services,
                           int _config_file,
                           int _start_line) {
-  xodtemplate_memberlist* temp_list = NULL;
-  xodtemplate_memberlist* reject_list = NULL;
-  xodtemplate_memberlist* list_ptr = NULL;
-  xodtemplate_memberlist* reject_ptr = NULL;
-  int result = OK;
-
-  /* process list of servicegroups... */
-  if (servicegroups != NULL) {
-
-    /* expand servicegroups */
-    result = xodtemplate_expand_servicegroups(
-               &temp_list,
-               &reject_list,
-               servicegroups,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-  }
-
-  /* process service names */
-  if (host_name != NULL && services != NULL) {
-
-    /* expand services */
-    result = xodtemplate_expand_services(
-               &temp_list,
-               &reject_list,
-               host_name,
-               services,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-  }
-
-  /* remove rejects (if any) from the list (no duplicate entries exist in either list) */
-  /* NOTE: rejects from this list also affect hosts generated from processing hostgroup names (see above) */
-  for (reject_ptr = reject_list;
-       reject_ptr != NULL;
-       reject_ptr = reject_ptr->next) {
-    for (list_ptr = temp_list;
-         list_ptr != NULL;
-         list_ptr = list_ptr->next) {
-      if (!strcmp(reject_ptr->name1, list_ptr->name1)
-          && !strcmp(reject_ptr->name2, list_ptr->name2)) {
-        xodtemplate_remove_memberlist_item(list_ptr, &temp_list);
-        break;
-      }
-    }
-  }
-  xodtemplate_free_memberlist(&reject_list);
-  reject_list = NULL;
-
-  return (temp_list);
-}
-
-/* expands servicegroups */
-int xodtemplate_expand_servicegroups(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* servicegroups,
-      int _config_file,
-      int _start_line) {
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
-  char* servicegroup_names = NULL;
-  char* temp_ptr = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL)
-    return (ERROR);
-  if (servicegroups == NULL)
-    return (OK);
-
-  /* allocate memory for servicegroup name list */
-  servicegroup_names = string::dup(servicegroups);
-
-  /* expand each servicegroup */
-  for (temp_ptr = strtok(servicegroup_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all servicegroups */
-    if (!strcmp(temp_ptr, "*")) {
-
-      found_match = true;
-
-      for (temp_servicegroup = xodtemplate_servicegroup_list;
-           temp_servicegroup != NULL;
-           temp_servicegroup = temp_servicegroup->next) {
-
-        /* dont' add servicegroups that shouldn't be registered */
-        if (temp_servicegroup->register_object == false)
-          continue;
-
-        /* add servicegroup to list */
-        xodtemplate_add_servicegroup_members_to_memberlist(
-          list,
-          temp_servicegroup,
-          _config_file,
-          _start_line);
-      }
-    }
-
-    /* else this is just a single servicegroup... */
-    else {
-
-      /* this servicegroup should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the servicegroup */
-      if ((temp_servicegroup = xodtemplate_find_real_servicegroup(temp_ptr)) != NULL) {
-
-        found_match = true;
-
-        /* add servicegroup members to list */
-        xodtemplate_add_servicegroup_members_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_servicegroup,
-          _config_file,
-          _start_line);
-      }
-    }
-
-    /* we didn't find a matching servicegroup */
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any servicegroup matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] servicegroup_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* expands services (host name is not expanded) */
-int xodtemplate_expand_services(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* host_name,
-      char* services,
-      int _config_file,
-      int _start_line) {
+  xodtemplate_memberlist* list = NULL;
   char* service_names = NULL;
   char* temp_ptr = NULL;
   xodtemplate_service* temp_service = NULL;
   int found_match = true;
-  int reject_item = false;
 
-  if (list == NULL)
-    return (ERROR);
   if (host_name == NULL || services == NULL)
-    return (OK);
+    return (NULL);
 
   if ((service_names = string::dup(services)) == NULL)
-    return (ERROR);
+    return (NULL);
 
   /* expand each service description */
   for (temp_ptr = strtok(service_names, ",");
@@ -8554,7 +6293,6 @@ int xodtemplate_expand_services(
        temp_ptr = strtok(NULL, ",")) {
 
     found_match = false;
-    reject_item = false;
 
     /* strip trailing spaces */
     strip(temp_ptr);
@@ -8581,7 +6319,7 @@ int xodtemplate_expand_services(
 
         /* add service to the list */
         xodtemplate_add_member_to_memberlist(
-          list,
+          &list,
           host_name,
           temp_service->service_description);
       }
@@ -8589,12 +6327,6 @@ int xodtemplate_expand_services(
 
     /* else this is just a single service... */
     else {
-
-      /* this service should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
 
       /* find the service */
       if ((temp_service = xodtemplate_find_real_service(
@@ -8605,14 +6337,14 @@ int xodtemplate_expand_services(
 
         /* add service to the list */
         xodtemplate_add_member_to_memberlist(
-          (reject_item == true ? reject_list : list),
+          &list,
           host_name,
           temp_service->service_description);
       }
     }
 
     /* we didn't find a match */
-    if (found_match == false && reject_item == false) {
+    if (found_match == false) {
       logger(log_config_error, basic)
         << "Error: Could not find a service matching host name '"
         << host_name << "' and description '" << temp_ptr
@@ -8623,389 +6355,12 @@ int xodtemplate_expand_services(
     }
   }
 
-  if (found_match == false && reject_item == false)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* adds members of a servicegroups to the list of expanded services */
-int xodtemplate_add_servicegroup_members_to_memberlist(
-      xodtemplate_memberlist** list,
-      xodtemplate_servicegroup* temp_servicegroup,
-      int _config_file,
-      int _start_line) {
-  char* group_members = NULL;
-  char* member_name = NULL;
-  char* host_name = NULL;
-  char* member_ptr = NULL;
-
-  (void)_config_file;
-  (void)_start_line;
-
-  if (list == NULL || temp_servicegroup == NULL)
-    return (ERROR);
-
-  /* if we have no members, just return. Empty servicegroups are ok */
-  if (temp_servicegroup->members == NULL) {
-    return (OK);
+  if (found_match == false) {
+    xodtemplate_free_memberlist(&list);
+    return (NULL);
   }
-
-  /* save a copy of the members */
-  group_members = string::dup(temp_servicegroup->members);
-
-  /* process all services that belong to the servicegroup */
-  /* NOTE: members of the group have already have been expanded by xodtemplate_recombobulate_servicegroups(), so we don't need to do it here */
-  member_ptr = group_members;
-  for (member_name = my_strsep(&member_ptr, ",");
-       member_name != NULL;
-       member_name = my_strsep(&member_ptr, ",")) {
-
-    /* strip trailing spaces from member name */
-    strip(member_name);
-
-    /* host name */
-    if (host_name == NULL) {
-      host_name = string::dup(member_name);
-    }
-
-    /* service description */
-    else {
-
-      /* add service to the list */
-      xodtemplate_add_member_to_memberlist(
-        list,
-        host_name,
-        member_name);
-
-      delete[] host_name;
-      host_name = NULL;
-    }
-  }
-
-  delete[] group_members;
-
-  return (OK);
-}
-
-/* returns a comma-delimited list of hostgroup names */
-char* xodtemplate_process_hostgroup_names(
-        char* hostgroups,
-        int _config_file,
-        int _start_line) {
-  xodtemplate_memberlist* temp_list = NULL;
-  xodtemplate_memberlist* reject_list = NULL;
-  xodtemplate_memberlist* list_ptr = NULL;
-  xodtemplate_memberlist* reject_ptr = NULL;
-  xodtemplate_memberlist* this_list = NULL;
-  char* buf = NULL;
-  int result = OK;
-
-  /* process list of hostgroups... */
-  if (hostgroups != NULL) {
-
-    /* split group names into two lists */
-    result = xodtemplate_get_hostgroup_names(
-               &temp_list,
-               &reject_list,
-               hostgroups,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-
-    /* remove rejects (if any) from the list (no duplicate entries exist in either list) */
-    for (reject_ptr = reject_list;
-	 reject_ptr != NULL;
-         reject_ptr = reject_ptr->next) {
-      for (list_ptr = temp_list;
-           list_ptr != NULL;
-           list_ptr = list_ptr->next) {
-        if (!strcmp(reject_ptr->name1, list_ptr->name1)) {
-          xodtemplate_remove_memberlist_item(list_ptr, &temp_list);
-          break;
-        }
-      }
-    }
-
-    xodtemplate_free_memberlist(&reject_list);
-    reject_list = NULL;
-  }
-
-  /* generate the list of group members */
-  for (this_list = temp_list;
-       this_list != NULL;
-       this_list = this_list->next) {
-    if (buf == NULL) {
-      buf = new char[strlen(this_list->name1) + 1];
-      strcpy(buf, this_list->name1);
-    }
-    else {
-      buf = resize_string(
-              buf,
-              strlen(buf) + strlen(this_list->name1) + 2);
-      strcat(buf, ",");
-      strcat(buf, this_list->name1);
-    }
-  }
-
-  xodtemplate_free_memberlist(&temp_list);
-
-  return (buf);
-}
-
-/* return a list of hostgroup names */
-int xodtemplate_get_hostgroup_names(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* hostgroups,
-      int _config_file,
-      int _start_line) {
-  char* hostgroup_names = NULL;
-  char* temp_ptr = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL || hostgroups == NULL)
-    return (ERROR);
-
-  /* allocate memory for hostgroup name list */
-  hostgroup_names = string::dup(hostgroups);
-
-  for (temp_ptr = strtok(hostgroup_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all hostgroups */
-    if (!strcmp(temp_ptr, "*")) {
-
-      found_match = true;
-
-      for (temp_hostgroup = xodtemplate_hostgroup_list;
-           temp_hostgroup != NULL;
-           temp_hostgroup = temp_hostgroup->next) {
-
-        /* dont' add hostgroups that shouldn't be registered */
-        if (temp_hostgroup->register_object == false)
-          continue;
-
-        /* add hostgroup to list */
-        xodtemplate_add_member_to_memberlist(
-          list,
-          temp_hostgroup->hostgroup_name,
-          NULL);
-      }
-    }
-
-    /* else this is just a single hostgroup... */
-    else {
-
-      /* this hostgroup should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the hostgroup */
-      temp_hostgroup = xodtemplate_find_real_hostgroup(temp_ptr);
-      if (temp_hostgroup != NULL) {
-        found_match = true;
-
-        /* add hostgroup members to proper list */
-        xodtemplate_add_member_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_hostgroup->hostgroup_name,
-          NULL);
-      }
-    }
-
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any hostgroup matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] hostgroup_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
-}
-
-/* returns a comma-delimited list of servicegroup names */
-char* xodtemplate_process_servicegroup_names(
-        char* servicegroups,
-        int _config_file,
-        int _start_line) {
-  xodtemplate_memberlist* temp_list = NULL;
-  xodtemplate_memberlist* reject_list = NULL;
-  xodtemplate_memberlist* list_ptr = NULL;
-  xodtemplate_memberlist* reject_ptr = NULL;
-  xodtemplate_memberlist* this_list = NULL;
-  char* buf = NULL;
-  int result = OK;
-
-  /* process list of servicegroups... */
-  if (servicegroups != NULL) {
-
-    /* split group names into two lists */
-    result = xodtemplate_get_servicegroup_names(
-               &temp_list,
-               &reject_list,
-               servicegroups,
-               _config_file,
-               _start_line);
-    if (result != OK) {
-      xodtemplate_free_memberlist(&temp_list);
-      xodtemplate_free_memberlist(&reject_list);
-      return (NULL);
-    }
-
-    /* remove rejects (if any) from the list (no duplicate entries exist in either list) */
-    for (reject_ptr = reject_list;
-         reject_ptr != NULL;
-         reject_ptr = reject_ptr->next) {
-      for (list_ptr = temp_list;
-           list_ptr != NULL;
-           list_ptr = list_ptr->next) {
-        if (!strcmp(reject_ptr->name1, list_ptr->name1)) {
-          xodtemplate_remove_memberlist_item(list_ptr, &temp_list);
-          break;
-        }
-      }
-    }
-
-    xodtemplate_free_memberlist(&reject_list);
-    reject_list = NULL;
-  }
-
-  /* generate the list of group members */
-  for (this_list = temp_list;
-       this_list != NULL;
-       this_list = this_list->next) {
-    if (buf == NULL) {
-      buf = new char[strlen(this_list->name1) + 1];
-      strcpy(buf, this_list->name1);
-    }
-    else {
-      buf = resize_string(
-              buf,
-              strlen(buf) + strlen(this_list->name1) + 2);
-      strcat(buf, ",");
-      strcat(buf, this_list->name1);
-    }
-  }
-
-  xodtemplate_free_memberlist(&temp_list);
-
-  return (buf);
-}
-
-/* return a list of servicegroup names */
-int xodtemplate_get_servicegroup_names(
-      xodtemplate_memberlist** list,
-      xodtemplate_memberlist** reject_list,
-      char* servicegroups,
-      int _config_file,
-      int _start_line) {
-  char* servicegroup_names = NULL;
-  char* temp_ptr = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
-  int found_match = true;
-  int reject_item = false;
-
-  if (list == NULL || servicegroups == NULL)
-    return (ERROR);
-
-  /* allocate memory for servicegroup name list */
-  servicegroup_names = string::dup(servicegroups);
-
-  for (temp_ptr = strtok(servicegroup_names, ",");
-       temp_ptr != NULL;
-       temp_ptr = strtok(NULL, ",")) {
-
-    found_match = false;
-    reject_item = false;
-
-    /* strip trailing spaces */
-    strip(temp_ptr);
-
-    /* return a list of all servicegroups */
-    if (!strcmp(temp_ptr, "*")) {
-
-      found_match = true;
-
-      for (temp_servicegroup = xodtemplate_servicegroup_list;
-           temp_servicegroup != NULL;
-           temp_servicegroup = temp_servicegroup->next) {
-
-        /* dont' add servicegroups that shouldn't be registered */
-        if (temp_servicegroup->register_object == false)
-          continue;
-
-        /* add servicegroup to list */
-        xodtemplate_add_member_to_memberlist(
-          list,
-          temp_servicegroup->servicegroup_name,
-          NULL);
-      }
-    }
-
-    /* else this is just a single servicegroup... */
-    else {
-
-      /* this servicegroup should be excluded (rejected) */
-      if (temp_ptr[0] == '!') {
-        reject_item = true;
-        temp_ptr++;
-      }
-
-      /* find the servicegroup */
-      temp_servicegroup = xodtemplate_find_real_servicegroup(temp_ptr);
-      if (temp_servicegroup != NULL) {
-
-        found_match = true;
-
-        /* add servicegroup members to proper list */
-        xodtemplate_add_member_to_memberlist(
-          (reject_item == true ? reject_list : list),
-          temp_servicegroup->servicegroup_name,
-          NULL);
-      }
-    }
-
-    if (found_match == false) {
-      logger(log_config_error, basic)
-        << "Error: Could not find any servicegroup matching '"
-        << temp_ptr << "' (config file '"
-        << xodtemplate_config_file_name(_config_file)
-        << "', starting on line " << _start_line << ")";
-      break;
-    }
-  }
-
-  /* free memory */
-  delete[] servicegroup_names;
-
-  if (found_match == false)
-    return (ERROR);
-
-  return (OK);
+  else
+    return (list);
 }
 
 /******************************************************************/
@@ -9077,47 +6432,19 @@ int xodtemplate_clean_additive_string(char** str) {
 /* cleans strings which may contain additive inheritance directives */
 /* NOTE: this must be done after objects are resolved */
 int xodtemplate_clean_additive_strings() {
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
   xodtemplate_servicedependency* temp_servicedependency = NULL;
   xodtemplate_host* temp_host = NULL;
   xodtemplate_service* temp_service = NULL;
   xodtemplate_hostdependency* temp_hostdependency = NULL;
-
-  /* resolve all hostgroup objects */
-  for (temp_hostgroup = xodtemplate_hostgroup_list;
-       temp_hostgroup != NULL;
-       temp_hostgroup = temp_hostgroup->next) {
-    xodtemplate_clean_additive_string(&temp_hostgroup->members);
-    xodtemplate_clean_additive_string(
-      &temp_hostgroup->hostgroup_members);
-  }
-
-  /* resolve all servicegroup objects */
-  for (temp_servicegroup = xodtemplate_servicegroup_list;
-       temp_servicegroup != NULL;
-       temp_servicegroup = temp_servicegroup->next) {
-    xodtemplate_clean_additive_string(&temp_servicegroup->members);
-    xodtemplate_clean_additive_string(
-      &temp_servicegroup->servicegroup_members);
-  }
 
   /* resolve all servicedependency objects */
   for (temp_servicedependency = xodtemplate_servicedependency_list;
        temp_servicedependency != NULL;
        temp_servicedependency = temp_servicedependency->next) {
     xodtemplate_clean_additive_string(
-      &temp_servicedependency->servicegroup_name);
-    xodtemplate_clean_additive_string(
-      &temp_servicedependency->hostgroup_name);
-    xodtemplate_clean_additive_string(
       &temp_servicedependency->host_name);
     xodtemplate_clean_additive_string(
       &temp_servicedependency->service_description);
-    xodtemplate_clean_additive_string(
-      &temp_servicedependency->dependent_servicegroup_name);
-    xodtemplate_clean_additive_string(
-      &temp_servicedependency->dependent_hostgroup_name);
     xodtemplate_clean_additive_string(
       &temp_servicedependency->dependent_host_name);
     xodtemplate_clean_additive_string(
@@ -9127,19 +6454,14 @@ int xodtemplate_clean_additive_strings() {
   /* clean all host objects */
   for (temp_host = xodtemplate_host_list;
        temp_host != NULL;
-       temp_host = temp_host->next) {
+       temp_host = temp_host->next)
     xodtemplate_clean_additive_string(&temp_host->parents);
-    xodtemplate_clean_additive_string(&temp_host->host_groups);
-  }
 
   /* clean all service objects */
   for (temp_service = xodtemplate_service_list;
        temp_service != NULL;
-       temp_service = temp_service->next) {
+       temp_service = temp_service->next)
     xodtemplate_clean_additive_string(&temp_service->host_name);
-    xodtemplate_clean_additive_string(&temp_service->hostgroup_name);
-    xodtemplate_clean_additive_string(&temp_service->service_groups);
-  }
 
   /* resolve all hostdependency objects */
   for (temp_hostdependency = xodtemplate_hostdependency_list;
@@ -9148,10 +6470,6 @@ int xodtemplate_clean_additive_strings() {
     xodtemplate_clean_additive_string(&temp_hostdependency->host_name);
     xodtemplate_clean_additive_string(
       &temp_hostdependency->dependent_host_name);
-    xodtemplate_clean_additive_string(
-      &temp_hostdependency->hostgroup_name);
-    xodtemplate_clean_additive_string(
-      &temp_hostdependency->dependent_hostgroup_name);
   }
 
   return (OK);

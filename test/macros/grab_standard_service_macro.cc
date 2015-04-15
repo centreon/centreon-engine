@@ -33,11 +33,6 @@ using namespace com::centreon::engine;
 #define XSTR(x) #x
 #define STR(x) XSTR(x)
 
-// Group names.
-#define GROUP1 group1
-#define GROUP2 group2
-#define GROUP3 group3
-
 // Values that will be set in service.
 #define DESCRIPTION myservice
 #define OUTPUT my output
@@ -66,7 +61,6 @@ using namespace com::centreon::engine;
 #define LAST_EVENT_ID 21384723
 #define PROBLEM_ID 123900
 #define LAST_PROBLEM_ID 927834
-#define GROUP_NAMES STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
 
 /**
  *  Check that the grab_standard_service_macro function works properly.
@@ -112,26 +106,6 @@ int main_test(int argc, char** argv) {
   service_list->current_problem_id = PROBLEM_ID;
   service_list->last_problem_id = LAST_PROBLEM_ID;
 
-  // Add service groups and link them to service.
-  servicegroup* sg1(add_servicegroup(const_cast<char*>(STR(GROUP1)),
-    NULL));
-  servicegroup* sg2(add_servicegroup(const_cast<char*>(STR(GROUP2)),
-    NULL));
-  servicegroup* sg3(add_servicegroup(const_cast<char*>(STR(GROUP3)),
-    NULL));
-  add_service_to_servicegroup(sg1,
-    service_list->host_ptr->name,
-    service_list->description);
-  add_service_to_servicegroup(sg2,
-    service_list->host_ptr->name,
-    service_list->description);
-  add_service_to_servicegroup(sg3,
-    service_list->host_ptr->name,
-    service_list->description);
-  add_object_to_objectlist(&service_list->servicegroups_ptr, sg3);
-  add_object_to_objectlist(&service_list->servicegroups_ptr, sg2);
-  add_object_to_objectlist(&service_list->servicegroups_ptr, sg1);
-
   // Macro object.
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
@@ -168,8 +142,7 @@ int main_test(int argc, char** argv) {
     { MACRO_SERVICEEVENTID, STR(EVENT_ID), false },
     { MACRO_LASTSERVICEEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_SERVICEPROBLEMID, STR(PROBLEM_ID), false },
-    { MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_SERVICEGROUPNAMES, GROUP_NAMES, false }
+    { MACRO_LASTSERVICEPROBLEMID, STR(LAST_PROBLEM_ID), false }
   };
 
   // Compare macros with expected values.

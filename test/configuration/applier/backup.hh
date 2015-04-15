@@ -37,10 +37,8 @@ public:
     _connectors = state.connectors();
     _hosts = state.hosts();
     _hostdependencies = state.hostdependencies();
-    _hostgroups = state.hostgroups();
     _services = state.services();
     _servicedependencies = state.servicedependencies();
-    _servicegroups = state.servicegroups();
     _timeperiods = state.timeperiods();
   }
                backup(backup const& right) {
@@ -55,10 +53,8 @@ public:
       _connectors = right._connectors;
       _hosts = right._hosts;
       _hostdependencies = right._hostdependencies;
-      _hostgroups = right._hostgroups;
       _services = right._services;
       _servicedependencies = right._servicedependencies;
-      _servicegroups = right._servicegroups;
       _timeperiods = right._timeperiods;
     }
     return (*this);
@@ -81,14 +77,10 @@ public:
       throw (engine_error() << "hosts are not equal");
     if (!compare_with_true_contents(_hostdependencies, state.hostdependencies()))
       throw (engine_error() << "hostdependencies are not equal");
-    if (!compare_with_true_contents(_hostgroups, state.hostgroups()))
-      throw (engine_error() << "hostgroups are not equal");
     if (!compare_with_true_contents(_services, state.services()))
       throw (engine_error() << "services are not equal");
     if (!compare_with_true_contents(_servicedependencies, state.servicedependencies()))
       throw (engine_error() << "servicedependencies are not equal");
-    if (!compare_with_true_contents(_servicegroups, state.servicegroups()))
-      throw (engine_error() << "servicegroups are not equal");
     if (!compare_with_true_contents(_timeperiods, state.timeperiods()))
       throw (engine_error() << "timeperiods are not equal");
   }
@@ -96,10 +88,8 @@ public:
     ::command_list = NULL;
     ::host_list = NULL;
     ::hostdependency_list = NULL;
-    ::hostgroup_list = NULL;
     ::service_list = NULL;
     ::servicedependency_list = NULL;
-    ::servicegroup_list = NULL;
     ::timeperiod_list = NULL;
   }
 
@@ -114,14 +104,10 @@ private:
                _hosts;
   umultimap<std::string, cc::shared_ptr<hostdependency_struct> >
                _hostdependencies;
-  umap<std::string, cc::shared_ptr<hostgroup_struct> >
-               _hostgroups;
   umap<std::pair<std::string, std::string>, cc::shared_ptr<service_struct> >
                _services;
   umultimap<std::pair<std::string, std::string>, cc::shared_ptr<servicedependency_struct> >
                _servicedependencies;
-  umap<std::string, cc::shared_ptr<servicegroup_struct> >
-               _servicegroups;
   umap<std::string, cc::shared_ptr<timeperiod_struct> >
                _timeperiods;
 };

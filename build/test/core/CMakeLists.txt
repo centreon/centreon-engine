@@ -140,28 +140,6 @@ set_tests_properties(
   PROPERTIES WILL_SUCCESS TRUE
 )
 
-# Empty host group.
-set(TEST_NAME "running_engine_empty_hostgroup")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_hostgroup.cfg"
-)
-
-# Empty service group.
-set(TEST_NAME "running_engine_empty_servicegroup")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg"
-)
-
-# Invalid contactgroup on contact.
-set(TEST_NAME "invalid_contactgroup_on_contact")
-add_test(
-  "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/invalid_contactgroup_on_contact.cfg"
-)
-set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-
 # broker_module with only path to module.
 set(TEST_NAME "running_engine_broker_module_without_args")
 add_test(

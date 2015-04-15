@@ -46,10 +46,8 @@ struct                global {
   command*            commands;
   host*               hosts;
   hostdependency*     hostdependencies;
-  hostgroup*          hostgroups;
   service*            services;
   servicedependency*  servicedependencies;
-  servicegroup*       servicegroups;
   timeperiod*         timeperiods;
 
   umap<std::string, shared_ptr<command> >
@@ -60,14 +58,10 @@ struct                global {
                       save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
                       save_hostdependencies;
-  umap<std::string, shared_ptr<hostgroup> >
-                      save_hostgroups;
   umap<std::pair<std::string, std::string>, shared_ptr<service> >
                       save_services;
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
                       save_servicedependencies;
-  umap<std::string, shared_ptr<servicegroup> >
-                      save_servicegroups;
   umap<std::string, shared_ptr<timeperiod> >
                       save_timeperiods;
 
@@ -186,34 +180,6 @@ static void sort_it_rev(T*& l) {
 }
 
 /**
- *  Sort a list.
- */
-static void sort_it(servicesmember*& l) {
-  servicesmember* remaining(l);
-  servicesmember** new_root(&l);
-  *new_root = NULL;
-  while (remaining) {
-    servicesmember** min(&remaining);
-    for (servicesmember** cur(&((*min)->next));
-         *cur;
-         cur = &((*cur)->next)) {
-      int host_less_than(strcmp((*cur)->host_name, (*min)->host_name));
-      if ((host_less_than < 0)
-          || (!host_less_than
-              && (strcmp(
-                    (*cur)->service_description,
-                    (*min)->service_description) < 0)))
-        min = cur;
-    }
-    *new_root = *min;
-    *min = (*min)->next;
-    new_root = &((*new_root)->next);
-    *new_root = NULL;
-  }
-  return ;
-}
-
-/**
  *  Remove duplicate members of a list.
  */
 template <typename T>
@@ -304,8 +270,6 @@ bool chkdiff(global& g1, global& g2) {
   remove_duplicates(g2.hostdependencies);
   if (!chkdiff(g1.hostdependencies, g2.hostdependencies))
     ret = false;
-  if (!chkdiff(g1.hostgroups, g2.hostgroups))
-    ret = false;
   reset_next_check(g1.services);
   reset_next_check(g2.services);
   for (service_struct* s(g1.services); s; s = s->next)
@@ -317,16 +281,6 @@ bool chkdiff(global& g1, global& g2) {
   sort_it(g2.servicedependencies);
   remove_duplicates(g2.servicedependencies);
   if (!chkdiff(g1.servicedependencies, g2.servicedependencies))
-    ret = false;
-  for (servicegroup_struct* sg1(g1.servicegroups);
-       sg1;
-       sg1 = sg1->next)
-    sort_it(sg1->members);
-  for (servicegroup_struct* sg2(g2.servicegroups);
-       sg2;
-       sg2 = sg2->next)
-    sort_it(sg2->members);
-  if (!chkdiff(g1.servicegroups, g2.servicegroups))
     ret = false;
   if (!chkdiff(g1.timeperiods, g2.timeperiods))
     ret = false;
@@ -346,14 +300,10 @@ static global get_globals() {
   host_list = NULL;
   g.hostdependencies = hostdependency_list;
   hostdependency_list = NULL;
-  g.hostgroups = hostgroup_list;
-  hostgroup_list = NULL;
   g.services = service_list;
   service_list = NULL;
   g.servicedependencies = servicedependency_list;
   servicedependency_list = NULL;
-  g.servicegroups = servicegroup_list;
-  servicegroup_list = NULL;
   g.timeperiods = timeperiod_list;
   timeperiod_list = NULL;
 
@@ -367,14 +317,10 @@ static global get_globals() {
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();
   app_state.hostdependencies().clear();
-  g.save_hostgroups = app_state.hostgroups();
-  app_state.hostgroups().clear();
   g.save_services = app_state.services();
   app_state.services().clear();
   g.save_servicedependencies = app_state.servicedependencies();
   app_state.servicedependencies().clear();
-  g.save_servicegroups = app_state.servicegroups();
-  app_state.servicegroups().clear();
   g.save_timeperiods = app_state.timeperiods();
   app_state.timeperiods().clear();
 
@@ -432,73 +378,6 @@ static global get_globals() {
   g.use_syslog = use_syslog;
   g.use_timezone = to_str(use_timezone);
   return (g);
-}
-
-/**
- *  Check for host member.
- *
- *  @param[in] lst The object list to check.
- *  @param[in] obj The object to check.
- */
-static bool member_is_already_in_list(
-              hostsmember const* lst,
-              hostsmember const* obj) {
-  for (hostsmember const* m(lst); m && m != obj; m = m->next)
-    if (!strcmp(m->host_name, obj->host_name))
-      return (true);
-  return (false);
-}
-
-/**
- *  Check for service member.
- *
- *  @param[in] lst The object list to check.
- *  @param[in] obj The object to check.
- */
-static bool member_is_already_in_list(
-              servicesmember const* lst,
-              servicesmember const* obj) {
-  for (servicesmember const* m(lst); m && m != obj; m = m->next)
-    if (!strcmp(m->host_name, obj->host_name)
-        && !strcmp(m->service_description, obj->service_description))
-      return (true);
-  return (false);
-}
-
-/**
- *  Remove duplicate members.
- *
- *  @param[in] lst     The object list to check.
- *  @param[in] deleter The deleter to delete duplicate members.
- */
-template<typename T>
-static void remove_duplicate_members(
-              T* lst,
-              void (*deleter)(void*)) {
-  T* last(lst);
-  for (T* m(lst); m; m = m->next) {
-    if (member_is_already_in_list(lst, m)) {
-      last->next = m->next;
-      m->next = 0;
-      deleter(m);
-      m = last;
-    }
-    last = m;
-  }
-}
-
-/**
- *  Remove duplicate members for all objects.
- *
- *  @param[in] lst     The object list to check.
- *  @param[in] deleter The deleter to delete duplicate members.
- */
-template<typename T>
-static void remove_duplicate_members_for_object(
-              T const* lst,
-              void (*deleter)(void*)) {
-  for (T const* obj(lst); obj; obj = obj->next)
-    remove_duplicate_members(obj->members, deleter);
 }
 
 /**
@@ -580,13 +459,6 @@ static bool oldparser_read_config(
   if (!illegal_output_chars)
     illegal_output_chars = string::dup("`~$&|'\"<>");
   if (ret == OK) {
-    remove_duplicate_members_for_object(
-      hostgroup_list,
-      &deleter::hostsmember);
-    remove_duplicate_members_for_object(
-      servicegroup_list,
-      &deleter::servicesmember);
-
     xrddefault_read_state_information();
     g = get_globals();
   }

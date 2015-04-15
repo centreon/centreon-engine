@@ -21,10 +21,8 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/host.hh"
-#include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/service.hh"
-#include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
@@ -103,16 +101,6 @@ public:
   void               id(configuration::object const& obj) {
     _obj = *static_cast<configuration::service const*>(&obj);
     _all_hosts = _obj.hosts();
-    for (list_string::const_iterator
-           it(_obj.hostgroups().begin()), end(_obj.hostgroups().end());
-         it != end;
-         ++it) {
-      hostgroup_struct* hg(find_hostgroup(it->c_str()));
-      if (!hg)
-        throw (engine_error() << "invalid service: hostgroup not found!");
-      for (hostsmember_struct* m(hg->members); m; m = m->next)
-        _all_hosts.push_back(m->host_name);
-    }
   }
 
   bool               find_into_config() {
@@ -183,42 +171,18 @@ static configuration::state deep_copy(configuration::state const& s) {
   deep_copy<configuration::set_hostdependency, configuration::hostdependency>(
     s.hostdependencies(),
     c.hostdependencies());
-  deep_copy<configuration::set_hostgroup, configuration::hostgroup>(
-    s.hostgroups(),
-    c.hostgroups());
   deep_copy<configuration::set_host, configuration::host>(
     s.hosts(),
     c.hosts());
   deep_copy<configuration::set_servicedependency, configuration::servicedependency>(
     s.servicedependencies(),
     c.servicedependencies());
-  deep_copy<configuration::set_servicegroup, configuration::servicegroup>(
-    s.servicegroups(),
-    c.servicegroups());
   deep_copy<configuration::set_service, configuration::service>(
     s.services(),
     c.services());
   deep_copy<configuration::set_timeperiod, configuration::timeperiod>(
     s.timeperiods(),
     c.timeperiods());
-
-  // Clean groups.
-  for (configuration::set_hostgroup::iterator
-         it(c.hostgroups().begin()),
-         end(c.hostgroups().end());
-       it != end;
-       ++it) {
-    (*it)->set_resolved(false);
-    (*it)->resolved_members().clear();
-  }
-  for (configuration::set_servicegroup::iterator
-         it(c.servicegroups().begin()),
-         end(c.servicegroups().end());
-       it != end;
-       ++it) {
-    (*it)->set_resolved(false);
-    (*it)->resolved_members().clear();
-  }
 
   return (c);
 }
@@ -238,84 +202,6 @@ static void remove_dependency_for_host(
        it != end;
        ++it)
     (*it)->parents().remove(hst.host_name());
-  for (configuration::set_hostgroup::iterator
-         it(cfg.hostgroups().begin()),
-         end(cfg.hostgroups().end());
-       it != end;
-       ++it)
-    (*it)->members().remove(hst.host_name());
-  return ;
-}
-
-/**
- *  Remove host dependency for remove hostgroup.
- *
- *  @param[in,out] config The configuration to update.
- *  @param[in]     grp    The group to remove.
- */
-static void remove_dependency_for_hostgroup(
-              configuration::state& config,
-              configuration::hostgroup const& grp) {
-  for (configuration::set_host::iterator
-         it(config.hosts().begin()), end(config.hosts().end());
-       it != end;
-       ++it)
-    (*it)->hostgroups().remove(grp.hostgroup_name());
-  return ;
-}
-
-/**
- *  Remove service dependency for service removal.
- *
- *  @param[in,out] cfg The configuration to update.
- *  @param[in]     svc Service that will be removed.
- */
-static void remove_dependency_for_service(
-              configuration::state& cfg,
-              configuration::service const& svc) {
-  for (configuration::set_servicegroup::iterator
-         it(cfg.servicegroups().begin()),
-         end(cfg.servicegroups().end());
-       it != end;
-       ++it)
-    for (std::list<std::string>::iterator
-           it_m((*it)->members().begin()),
-           end_m((*it)->members().end());
-         it_m != end_m; ) {
-      std::list<std::string>::iterator
-        it_next(it_m);
-      ++it_next;
-      if (it_next == end_m)
-        throw (engine_error()
-               << "processing invalid service group member list");
-      if ((*it_m == svc.hosts().front())
-          && (*it_next == svc.service_description())) {
-        std::list<std::string>::iterator
-          to_delete(it_m);
-        ++(++it_m);
-        (*it)->members().erase(it_next);
-        (*it)->members().erase(to_delete);
-      }
-      else
-        ++(++it_m);
-    }
-  return ;
-}
-
-/**
- *  Remove service dependency for remove servicegroup.
- *
- *  @param[in,out] config The configuration to update.
- *  @param[in]     grp    The group to remove.
- */
-static void remove_dependency_for_servicegroup(
-              configuration::state& config,
-              configuration::servicegroup const& grp) {
-  for (configuration::set_service::iterator
-         it(config.services().begin()), end(config.services().end());
-       it != end;
-       ++it)
-    (*it)->servicegroups().remove(grp.servicegroup_name());
   return ;
 }
 
@@ -418,44 +304,12 @@ int main_test(int argc, char* argv[]) {
       configuration::host,
       &configuration::state::hosts>(config, chk_host, remove_dependency_for_host);
   }
-  else if (type == "hostgroup") {
-    chk_generic<
-      configuration::hostgroup,
-      &configuration::hostgroup::hostgroup_name,
-      configuration::set_hostgroup,
-      &configuration::state::hostgroups,
-      hostgroup_struct,
-      &find_hostgroup> chk_hostgroup;
-    check_remove_objects<
-      configuration::set_hostgroup,
-      configuration::hostgroup,
-      &configuration::state::hostgroups>(config, chk_hostgroup, remove_dependency_for_hostgroup);
-  }
   else if (type == "service") {
-    config.servicegroups().clear();
-    for (configuration::set_service::iterator
-           it(config.services().begin()), end(config.services().end());
-         it != end;
-         ++it)
-      (*it)->parse("servicegroups", "null");
     chk_service chk_service;
     check_remove_objects<
       configuration::set_service,
       configuration::service,
-      &configuration::state::services>(config, chk_service, remove_dependency_for_service);
-  }
-  else if (type == "servicegroup") {
-    chk_generic<
-      configuration::servicegroup,
-      &configuration::servicegroup::servicegroup_name,
-      configuration::set_servicegroup,
-      &configuration::state::servicegroups,
-      servicegroup_struct,
-      &find_servicegroup> chk_servicegroup;
-    check_remove_objects<
-      configuration::set_servicegroup,
-      configuration::servicegroup,
-      &configuration::state::servicegroups>(config, chk_servicegroup, remove_dependency_for_servicegroup);
+      &configuration::state::services>(config, chk_service);
   }
   else if (type == "timeperiod") {
     chk_generic<

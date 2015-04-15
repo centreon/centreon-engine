@@ -64,11 +64,6 @@ int main_test(int argc, char* argv[]) {
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }
-  else if (type == "hostgroup") {
-    hostgroup obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
   else if (type == "host") {
     host obj;
     memset(&obj, 0, sizeof(obj));
@@ -81,11 +76,6 @@ int main_test(int argc, char* argv[]) {
   }
   else if (type == "servicedependency") {
     servicedependency obj;
-    memset(&obj, 0, sizeof(obj));
-    oss << obj;
-  }
-  else if (type == "servicegroup") {
-    servicegroup obj;
     memset(&obj, 0, sizeof(obj));
     oss << obj;
   }

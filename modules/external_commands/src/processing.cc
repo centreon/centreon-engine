@@ -171,20 +171,6 @@ processing::processing() {
     command_info(CMD_CHANGE_HOST_MODATTR,
                  &_redirector<&cmd_change_object_int_var>);
 
-  // hostgroup-related commands.
-  _lst_command["ENABLE_HOSTGROUP_HOST_CHECKS"] =
-    command_info(CMD_ENABLE_HOSTGROUP_HOST_CHECKS,
-                 &_redirector_hostgroup<&enable_host_checks>);
-  _lst_command["DISABLE_HOSTGROUP_HOST_CHECKS"] =
-    command_info(CMD_DISABLE_HOSTGROUP_HOST_CHECKS,
-                 &_redirector_hostgroup<&disable_host_checks>);
-  _lst_command["ENABLE_HOSTGROUP_SVC_CHECKS"] =
-    command_info(CMD_ENABLE_HOSTGROUP_SVC_CHECKS,
-                 &_redirector_hostgroup<&_wrapper_enable_service_checks>);
-  _lst_command["DISABLE_HOSTGROUP_SVC_CHECKS"] =
-    command_info(CMD_DISABLE_HOSTGROUP_SVC_CHECKS,
-                 &_redirector_hostgroup<&_wrapper_disable_service_checks>);
-
   // service-related commands.
   _lst_command["SCHEDULE_SVC_CHECK"] =
     command_info(CMD_SCHEDULE_SVC_CHECK,
@@ -246,20 +232,6 @@ processing::processing() {
   _lst_command["CHANGE_SVC_MODATTR"] =
     command_info(CMD_CHANGE_SVC_MODATTR,
                  &_redirector<&cmd_change_object_int_var>);
-
-  // servicegroup-related commands.
-  _lst_command["ENABLE_SERVICEGROUP_HOST_CHECKS"] =
-    command_info(CMD_ENABLE_SERVICEGROUP_HOST_CHECKS,
-                 &_redirector_servicegroup<&enable_host_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_HOST_CHECKS"] =
-    command_info(CMD_DISABLE_SERVICEGROUP_HOST_CHECKS,
-                 &_redirector_servicegroup<&disable_host_checks>);
-  _lst_command["ENABLE_SERVICEGROUP_SVC_CHECKS"] =
-    command_info(CMD_ENABLE_SERVICEGROUP_SVC_CHECKS,
-                 &_redirector_servicegroup<&enable_service_checks>);
-  _lst_command["DISABLE_SERVICEGROUP_SVC_CHECKS"] =
-    command_info(CMD_DISABLE_SERVICEGROUP_SVC_CHECKS,
-                 &_redirector_servicegroup<&disable_service_checks>);
 
   // misc commands.
   _lst_command["PROCESS_FILE"] =

@@ -51,14 +51,10 @@ struct         global {
                save_hosts;
   umultimap<std::string, shared_ptr<hostdependency> >
                save_hostdependencies;
-  umap<std::string, shared_ptr<hostgroup> >
-               save_hostgroups;
   umap<std::pair<std::string, std::string>, shared_ptr<service> >
                save_services;
   umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency> >
                save_servicedependencies;
-  umap<std::string, shared_ptr<servicegroup> >
-               save_servicegroups;
   umap<std::string, shared_ptr<timeperiod> >
                save_timeperiods;
 };
@@ -70,10 +66,8 @@ static void clear(global& g) {
   command_list = NULL;
   host_list = NULL;
   hostdependency_list = NULL;
-  hostgroup_list = NULL;
   service_list = NULL;
   servicedependency_list = NULL;
-  servicegroup_list = NULL;
   timeperiod_list = NULL;
 
   configuration::applier::state&
@@ -86,14 +80,10 @@ static void clear(global& g) {
   app_state.hosts().clear();
   g.save_hostdependencies = app_state.hostdependencies();
   app_state.hostdependencies().clear();
-  g.save_hostgroups = app_state.hostgroups();
-  app_state.hostgroups().clear();
   g.save_services = app_state.services();
   app_state.services().clear();
   g.save_servicedependencies = app_state.servicedependencies();
   app_state.servicedependencies().clear();
-  g.save_servicegroups = app_state.servicegroups();
-  app_state.servicegroups().clear();
   g.save_timeperiods = app_state.timeperiods();
   app_state.timeperiods().clear();
 }

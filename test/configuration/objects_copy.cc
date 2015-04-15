@@ -20,11 +20,9 @@
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
-#include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
-#include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
@@ -87,12 +85,6 @@ int main_test(int argc, char* argv[]) {
       configuration::set_hostdependency,
       &configuration::state::hostdependencies>(fe.path());
   }
-  else if (type == "hostgroup") {
-    check_objects<
-      configuration::hostgroup,
-      configuration::set_hostgroup,
-      &configuration::state::hostgroups>(fe.path());
-  }
   else if (type == "host") {
     check_objects<
       configuration::host,
@@ -104,12 +96,6 @@ int main_test(int argc, char* argv[]) {
       configuration::servicedependency,
       configuration::set_servicedependency,
       &configuration::state::servicedependencies>(fe.path());
-  }
-  else if (type == "servicegroup") {
-    check_objects<
-      configuration::servicegroup,
-      configuration::set_servicegroup,
-      &configuration::state::servicegroups>(fe.path());
   }
   else if (type == "service") {
     check_objects<

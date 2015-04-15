@@ -33,11 +33,6 @@ using namespace com::centreon::engine;
 #define XSTR(x) #x
 #define STR(x) XSTR(x)
 
-// Group names.
-#define GROUP1 group1
-#define GROUP2 group2
-#define GROUP3 group3
-
 // Values that will be set in host.
 #define NAME                    myhost
 #define ALIAS                   LocalHost
@@ -66,7 +61,6 @@ using namespace com::centreon::engine;
 #define LAST_EVENT_ID           1253887
 #define PROBLEM_ID              447786
 #define LAST_PROBLEM_ID         44597587
-#define GROUP_NAMES             STR(GROUP1) "," STR(GROUP2) "," STR(GROUP3)
 #define TOTAL_SERVICES          1
 #define TOTAL_SERVICES_OK       1
 #define TOTAL_SERVICES_WARNING  0
@@ -88,20 +82,6 @@ int main_test(int argc, char** argv) {
   // Service must be OK.
   service_list->current_state = 0;
   service_list->last_hard_state = 0;
-
-  // Add host groups and link them to host.
-  hostgroup* hg1(add_hostgroup(const_cast<char*>(STR(GROUP1)),
-    NULL));
-  hostgroup* hg2(add_hostgroup(const_cast<char*>(STR(GROUP2)),
-    NULL));
-  hostgroup* hg3(add_hostgroup(const_cast<char*>(STR(GROUP3)),
-    NULL));
-  add_host_to_hostgroup(hg1, host_list->name);
-  add_host_to_hostgroup(hg2, host_list->name);
-  add_host_to_hostgroup(hg3, host_list->name);
-  add_object_to_objectlist(&host_list->hostgroups_ptr, hg3);
-  add_object_to_objectlist(&host_list->hostgroups_ptr, hg2);
-  add_object_to_objectlist(&host_list->hostgroups_ptr, hg1);
 
   // Set host values.
   delete [] host_list->name;
@@ -174,7 +154,6 @@ int main_test(int argc, char** argv) {
     { MACRO_LASTHOSTEVENTID, STR(LAST_EVENT_ID), false },
     { MACRO_HOSTPROBLEMID, STR(PROBLEM_ID), false },
     { MACRO_LASTHOSTPROBLEMID, STR(LAST_PROBLEM_ID), false },
-    { MACRO_HOSTGROUPNAMES, GROUP_NAMES, false },
     { MACRO_TOTALHOSTSERVICES, STR(TOTAL_SERVICES), false },
     { MACRO_TOTALHOSTSERVICESOK, STR(TOTAL_SERVICES_OK), false },
     { MACRO_TOTALHOSTSERVICESWARNING, STR(TOTAL_SERVICES_WARNING), false },

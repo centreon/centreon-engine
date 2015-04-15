@@ -30,11 +30,9 @@
 #  define XODTEMPLATE_TIMEPERIOD            1
 #  define XODTEMPLATE_COMMAND               2
 #  define XODTEMPLATE_HOST                  3
-#  define XODTEMPLATE_HOSTGROUP             4
 #  define XODTEMPLATE_SERVICE               5
 #  define XODTEMPLATE_SERVICEDEPENDENCY     6
 #  define XODTEMPLATE_HOSTDEPENDENCY        7
-#  define XODTEMPLATE_SERVICEGROUP          8
 #  define XODTEMPLATE_CONNECTOR             9
 
 // Skip lists.
@@ -42,8 +40,6 @@
 #  define X_SERVICE_SKIPLIST                1
 #  define X_COMMAND_SKIPLIST                2
 #  define X_TIMEPERIOD_SKIPLIST             3
-#  define X_HOSTGROUP_SKIPLIST              4
-#  define X_SERVICEGROUP_SKIPLIST           5
 #  define X_HOSTDEPENDENCY_SKIPLIST         6
 #  define X_SERVICEDEPENDENCY_SKIPLIST      7
 #  define X_CONNECTOR_SKIPLIST              8
@@ -139,7 +135,6 @@ typedef struct xodtemplate_host_struct{
   char*        alias;
   char*        address;
   char*        parents;
-  char*        host_groups;
   char*        check_command;
   char*        check_period;
   unsigned int check_timeout;
@@ -171,7 +166,6 @@ typedef struct xodtemplate_host_struct{
   xodtemplate_customvariablesmember* custom_variables;
 
   int          have_parents;
-  int          have_host_groups;
   int          have_check_command;
   int          have_check_period;
   int          have_check_timeout;
@@ -203,27 +197,6 @@ typedef struct xodtemplate_host_struct{
 }              xodtemplate_host;
 
 
-/* HOSTGROUP TEMPLATE STRUCTURE */
-typedef struct xodtemplate_hostgroup_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        hostgroup_name;
-  char*        alias;
-  char*        members;
-  char*        hostgroup_members;
-
-  int          have_members;
-  int          have_hostgroup_members;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_hostgroup_struct* next;
-}              xodtemplate_hostgroup;
-
-
 /* SERVICE TEMPLATE STRUCTURE */
 typedef struct xodtemplate_service_struct{
   char*        tmpl;
@@ -233,8 +206,6 @@ typedef struct xodtemplate_service_struct{
 
   char*        host_name;
   char*        service_description;
-  char*        hostgroup_name;
-  char*        service_groups;
   char*        check_command;
   int          initial_state;
   int          max_check_attempts;
@@ -270,8 +241,6 @@ typedef struct xodtemplate_service_struct{
 
   int          have_host_name;
   int          have_service_description;
-  int          have_hostgroup_name;
-  int          have_service_groups;
   int          have_check_command;
   int          have_important_check_command;
   int          have_check_period;
@@ -306,27 +275,6 @@ typedef struct xodtemplate_service_struct{
 }              xodtemplate_service;
 
 
-/* SERVICEGROUP TEMPLATE STRUCTURE */
-typedef struct xodtemplate_servicegroup_struct{
-  char*        tmpl;
-  char*        name;
-  int          _config_file;
-  int          _start_line;
-
-  char*        servicegroup_name;
-  char*        alias;
-  char*        members;
-  char*        servicegroup_members;
-
-  int          have_members;
-  int          have_servicegroup_members;
-
-  int          has_been_resolved;
-  int          register_object;
-  struct xodtemplate_servicegroup_struct* next;
-}              xodtemplate_servicegroup;
-
-
 /* SERVICEDEPENDENCY TEMPLATE STRUCTURE */
 typedef struct xodtemplate_servicedependency_struct{
   char*        tmpl;
@@ -338,10 +286,6 @@ typedef struct xodtemplate_servicedependency_struct{
   char*        service_description;
   char*        dependent_host_name;
   char*        dependent_service_description;
-  char*        servicegroup_name;
-  char*        hostgroup_name;
-  char*        dependent_servicegroup_name;
-  char*        dependent_hostgroup_name;
   char*        dependency_period;
   int          inherits_parent;
   int          fail_on_ok;
@@ -354,10 +298,6 @@ typedef struct xodtemplate_servicedependency_struct{
   int          have_service_description;
   int          have_dependent_host_name;
   int          have_dependent_service_description;
-  int          have_servicegroup_name;
-  int          have_hostgroup_name;
-  int          have_dependent_servicegroup_name;
-  int          have_dependent_hostgroup_name;
   int          have_dependency_period;
 
   int          have_inherits_parent;
@@ -378,8 +318,6 @@ typedef struct xodtemplate_hostdependency_struct{
 
   char*        host_name;
   char*        dependent_host_name;
-  char*        hostgroup_name;
-  char*        dependent_hostgroup_name;
   char*        dependency_period;
   int          inherits_parent;
   int          fail_on_up;
@@ -389,8 +327,6 @@ typedef struct xodtemplate_hostdependency_struct{
 
   int          have_host_name;
   int          have_dependent_host_name;
-  int          have_hostgroup_name;
-  int          have_dependent_hostgroup_name;
   int          have_dependency_period;
 
   int          have_inherits_parent;
@@ -448,69 +384,15 @@ int xodtemplate_process_config_file(char*, int);
 /* process all files in a specific config directory */
 int xodtemplate_process_config_dir(char*, int);
 
-xodtemplate_memberlist* xodtemplate_expand_hostgroups_and_hosts(
+xodtemplate_memberlist* xodtemplate_expand_hosts(
+                          char*,
+                          int,
+                          int);
+xodtemplate_memberlist* xodtemplate_expand_services(
                           char*,
                           char*,
                           int,
                           int);
-int xodtemplate_expand_hostgroups(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
-int xodtemplate_expand_hosts(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
-int xodtemplate_add_hostgroup_members_to_memberlist(
-      xodtemplate_memberlist**,
-      xodtemplate_hostgroup*,
-      int,
-      int);
-
-xodtemplate_memberlist* xodtemplate_expand_servicegroups_and_services(
-                          char*,
-                          char*,
-                          char*,
-                          int,
-                          int);
-int xodtemplate_expand_servicegroups(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
-int xodtemplate_expand_services(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      char*,
-      int,
-      int);
-int xodtemplate_add_servicegroup_members_to_memberlist(
-      xodtemplate_memberlist**,
-      xodtemplate_servicegroup*,
-      int,
-      int);
-
-char* xodtemplate_process_hostgroup_names(char*, int, int);
-int xodtemplate_get_hostgroup_names(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
-
-char* xodtemplate_process_servicegroup_names(char*, int, int);
-int xodtemplate_get_servicegroup_names(
-      xodtemplate_memberlist**,
-      xodtemplate_memberlist**,
-      char*,
-      int,
-      int);
 
 int xodtemplate_add_member_to_memberlist(
       xodtemplate_memberlist**,
@@ -587,25 +469,10 @@ int xodtemplate_duplicate_servicedependency(
       char*,
       char*,
       char*,
-      char*,
-      char*,
-      char*,
-      char*,
       char*);
-
-int xodtemplate_recombobulate_hostgroups();
-int xodtemplate_recombobulate_hostgroup_subgroups(
-      xodtemplate_hostgroup*,
-      char **);
-int xodtemplate_recombobulate_servicegroups();
-int xodtemplate_recombobulate_servicegroup_subgroups(
-      xodtemplate_servicegroup*,
-      char **);
 
 int xodtemplate_resolve_timeperiod(xodtemplate_timeperiod*);
 int xodtemplate_resolve_command(xodtemplate_command*);
-int xodtemplate_resolve_hostgroup(xodtemplate_hostgroup*);
-int xodtemplate_resolve_servicegroup(xodtemplate_servicegroup*);
 int xodtemplate_resolve_servicedependency(xodtemplate_servicedependency*);
 int xodtemplate_resolve_host(xodtemplate_host*);
 int xodtemplate_resolve_service(xodtemplate_service*);
@@ -614,8 +481,6 @@ int xodtemplate_resolve_hostdependency(xodtemplate_hostdependency*);
 int xodtemplate_sort_timeperiods();
 int xodtemplate_sort_commands();
 int xodtemplate_sort_connectors();
-int xodtemplate_sort_hostgroups();
-int xodtemplate_sort_servicegroups();
 int xodtemplate_sort_hosts();
 int xodtemplate_sort_services();
 int xodtemplate_sort_servicedependencies();
@@ -624,10 +489,6 @@ int xodtemplate_sort_hostdependencies();
 xodtemplate_timeperiod* xodtemplate_find_timeperiod(char*);
 xodtemplate_command* xodtemplate_find_command(char*);
 xodtemplate_connector* xodtemplate_find_connector(char*);
-xodtemplate_hostgroup* xodtemplate_find_hostgroup(char*);
-xodtemplate_hostgroup* xodtemplate_find_real_hostgroup(char*);
-xodtemplate_servicegroup* xodtemplate_find_servicegroup(char*);
-xodtemplate_servicegroup* xodtemplate_find_real_servicegroup(char*);
 xodtemplate_servicedependency* xodtemplate_find_servicedependency(char*);
 xodtemplate_host* xodtemplate_find_host(char*);
 xodtemplate_host* xodtemplate_find_real_host(char*);
@@ -646,8 +507,6 @@ int xodtemplate_get_time_ranges(char*, unsigned long*, unsigned long*);
 
 int xodtemplate_register_command(xodtemplate_command*);
 int xodtemplate_register_connector(xodtemplate_connector *);
-int xodtemplate_register_hostgroup(xodtemplate_hostgroup*);
-int xodtemplate_register_servicegroup(xodtemplate_servicegroup*);
 int xodtemplate_register_servicedependency(xodtemplate_servicedependency*);
 int xodtemplate_register_host(xodtemplate_host*);
 int xodtemplate_register_service(xodtemplate_service*);
@@ -677,12 +536,6 @@ int xodtemplate_skiplist_compare_command_template(
 int xodtemplate_skiplist_compare_timeperiod_template(
       void const* a,
       void const* b);
-int xodtemplate_skiplist_compare_hostgroup_template(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_servicegroup_template(
-      void const* a,
-      void const* b);
 int xodtemplate_skiplist_compare_hostdependency_template(
       void const* a,
       void const* b);
@@ -694,12 +547,6 @@ int xodtemplate_skiplist_compare_host(
       void const* a,
       void const* b);
 int xodtemplate_skiplist_compare_service(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_hostgroup(
-      void const* a,
-      void const* b);
-int xodtemplate_skiplist_compare_servicegroup(
       void const* a,
       void const* b);
 int xodtemplate_skiplist_compare_command(
