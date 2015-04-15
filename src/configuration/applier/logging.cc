@@ -215,7 +215,10 @@ void applier::logging::_add_syslog() {
  */
 void applier::logging::_add_log_file(state const& config) {
   _del_log_file();
-  _log = new com::centreon::logging::file(config.log_file());
+  _log = new com::centreon::logging::file(
+                                       config.log_file(),
+                                       true,
+                                       config.log_pid());
   com::centreon::logging::engine::instance().add(
                                                _log,
                                                engine::logging::log_all,
