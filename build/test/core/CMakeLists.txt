@@ -371,6 +371,18 @@ add_test(
   "${TEST_DIR}/running/etc/precache/objects.precache.expected"
 )
 
+# log without pid
+set(TEST_NAME "running_log_without_pid")
+add_executable(
+  "${TEST_NAME}"
+  "${TEST_DIR}/running/log_without_pid.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test(
+  "${TEST_NAME}"
+  "${TEST_NAME}"
+  "${TEST_DIR}/running/etc/log_without_pid/main.cfg"
+)
+
 set(TEST_DIR "${TEST_DIR}/core")
 
 ## get_next_valid_time
