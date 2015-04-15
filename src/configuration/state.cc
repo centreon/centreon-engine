@@ -76,7 +76,6 @@ state::setters const state::_setters[] = {
   { "log_initial_states",                          SETTER(bool, log_initial_states) },
   { "log_passive_checks",                          SETTER(bool, log_passive_checks) },
   { "log_pid",                                     SETTER(bool, log_pid) },
-  { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
   { "log_service_retries",                         SETTER(bool, log_service_retries) },
   { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
   { "low_service_flap_threshold",                  SETTER(float, low_service_flap_threshold) },
