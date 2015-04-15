@@ -154,6 +154,8 @@ namespace               configuration {
     void                log_initial_states(bool value);
     bool                log_passive_checks() const throw ();
     void                log_passive_checks(bool value);
+    bool                log_pid() const throw();
+    void                log_pid(bool value);
     bool                log_service_retries() const throw ();
     void                log_service_retries(bool value);
     float               low_host_flap_threshold() const throw ();
@@ -400,6 +402,7 @@ namespace               configuration {
     bool                _log_host_retries;
     bool                _log_initial_states;
     bool                _log_passive_checks;
+    bool                _log_pid;
     bool                _log_service_retries;
     float               _low_host_flap_threshold;
     float               _low_service_flap_threshold;

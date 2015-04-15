@@ -75,6 +75,8 @@ state::setters const state::_setters[] = {
   { "log_host_retries",                            SETTER(bool, log_host_retries) },
   { "log_initial_states",                          SETTER(bool, log_initial_states) },
   { "log_passive_checks",                          SETTER(bool, log_passive_checks) },
+  { "log_pid",                                     SETTER(bool, log_pid) },
+  { "log_rotation_method",                         SETTER(std::string const&, _set_log_rotation_method) },
   { "log_service_retries",                         SETTER(bool, log_service_retries) },
   { "low_host_flap_threshold",                     SETTER(float, low_host_flap_threshold) },
   { "low_service_flap_threshold",                  SETTER(float, low_service_flap_threshold) },
@@ -220,6 +222,7 @@ static std::string const               default_log_file(DEFAULT_LOG_FILE);
 static bool const                      default_log_host_retries(false);
 static bool const                      default_log_initial_states(false);
 static bool const                      default_log_passive_checks(true);
+static bool const                      default_log_pid(true);
 static bool const                      default_log_service_retries(false);
 static float const                     default_low_host_flap_threshold(20.0);
 static float const                     default_low_service_flap_threshold(20.0);
@@ -307,6 +310,7 @@ state::state()
     _log_host_retries(default_log_host_retries),
     _log_initial_states(default_log_initial_states),
     _log_passive_checks(default_log_passive_checks),
+    _log_pid(default_log_pid),
     _log_service_retries(default_log_service_retries),
     _low_host_flap_threshold(default_low_host_flap_threshold),
     _low_service_flap_threshold(default_low_service_flap_threshold),
@@ -396,6 +400,7 @@ state& state::operator=(state const& right) {
     _log_host_retries = right._log_host_retries;
     _log_initial_states = right._log_initial_states;
     _log_passive_checks = right._log_passive_checks;
+    _log_pid = right._log_pid;
     _log_service_retries = right._log_service_retries;
     _low_host_flap_threshold = right._low_host_flap_threshold;
     _low_service_flap_threshold = right._low_service_flap_threshold;
@@ -475,6 +480,7 @@ bool state::operator==(state const& right) const throw () {
           && _log_host_retries == right._log_host_retries
           && _log_initial_states == right._log_initial_states
           && _log_passive_checks == right._log_passive_checks
+          && _log_pid == right._log_pid
           && _log_service_retries == right._log_service_retries
           && _low_host_flap_threshold == right._low_host_flap_threshold
           && _low_service_flap_threshold == right._low_service_flap_threshold
@@ -1448,6 +1454,24 @@ bool state::log_passive_checks() const throw () {
  */
 void state::log_passive_checks(bool value) {
   _log_passive_checks = value;
+}
+
+/**
+ *  Get log pid value.
+ *
+ *  @return  Log pid value.
+ */
+bool state::log_pid() const throw() {
+  return (_log_pid);
+}
+
+/**
+ *  Set the log pid value.
+ *
+ *  @param[in] value  The new log pid value.
+ */
+void state::log_pid(bool value) {
+  _log_pid = value;
 }
 
 /**
