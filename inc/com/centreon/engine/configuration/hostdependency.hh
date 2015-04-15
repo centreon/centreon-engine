@@ -56,15 +56,11 @@ namespace                  configuration {
 
     void                   dependency_period(std::string const& period);
     std::string const&     dependency_period() const throw ();
-    list_string&           dependent_hostgroups() throw ();
-    list_string const&     dependent_hostgroups() const throw ();
     list_string&           dependent_hosts() throw ();
     list_string const&     dependent_hosts() const throw ();
     void                   failure_options(
                              unsigned int options) throw ();
     unsigned int           failure_options() const throw ();
-    list_string&           hostgroups() throw ();
-    list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     void                   inherits_parent(bool inherit) throw ();
@@ -86,10 +82,8 @@ namespace                  configuration {
     bool                   _set_notification_failure_options(std::string const& value);
 
     std::string            _dependency_period;
-    group                  _dependent_hostgroups;
     group                  _dependent_hosts;
     opt<unsigned int>      _failure_options;
-    group                  _hostgroups;
     group                  _hosts;
     opt<bool>              _inherits_parent;
     static setters const   _setters[];

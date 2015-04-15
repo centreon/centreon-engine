@@ -38,8 +38,6 @@ host::setters const host::_setters[] = {
   { "alias",                        SETTER(std::string const&, _set_alias) },
   { "address",                      SETTER(std::string const&, _set_address) },
   { "parents",                      SETTER(std::string const&, _set_parents) },
-  { "host_groups",                  SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
   { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
@@ -73,6 +71,8 @@ host::setters const host::_setters[] = {
   { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
   { "gd2_image",                    SETTER(std::string const&, _set_statusmap_image) },
+  { "host_groups",                  SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
   { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
   { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
@@ -169,7 +169,6 @@ host& host::operator=(host const& right) {
     _flap_detection_options = right._flap_detection_options;
     _freshness_threshold = right._freshness_threshold;
     _high_flap_threshold = right._high_flap_threshold;
-    _hostgroups = right._hostgroups;
     _host_name = right._host_name;
     _initial_state = right._initial_state;
     _low_flap_threshold = right._low_flap_threshold;
@@ -205,7 +204,6 @@ bool host::operator==(host const& right) const throw () {
           && _flap_detection_options == right._flap_detection_options
           && _freshness_threshold == right._freshness_threshold
           && _high_flap_threshold == right._high_flap_threshold
-          && _hostgroups == right._hostgroups
           && _host_name == right._host_name
           && _initial_state == right._initial_state
           && _low_flap_threshold == right._low_flap_threshold
@@ -267,8 +265,6 @@ bool host::operator<(host const& right) const throw () {
     return (_freshness_threshold < right._freshness_threshold);
   else if (_high_flap_threshold != right._high_flap_threshold)
     return (_high_flap_threshold < right._high_flap_threshold);
-  else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
   else if (_initial_state != right._initial_state)
     return (_initial_state < right._initial_state);
   else if (_low_flap_threshold != right._low_flap_threshold)
@@ -333,7 +329,6 @@ void host::merge(object const& obj) {
   MRG_OPTION(_flap_detection_options);
   MRG_OPTION(_freshness_threshold);
   MRG_OPTION(_high_flap_threshold);
-  MRG_INHERIT(_hostgroups);
   MRG_DEFAULT(_host_name);
   MRG_OPTION(_initial_state);
   MRG_OPTION(_low_flap_threshold);
@@ -507,24 +502,6 @@ unsigned int host::freshness_threshold() const throw () {
  */
 unsigned int host::high_flap_threshold() const throw () {
   return (_high_flap_threshold);
-}
-
-/**
- *  Get host groups.
- *
- *  @return The host groups.
- */
-list_string& host::hostgroups() throw () {
-  return (*_hostgroups);
-}
-
-/**
- *  Get hostgroups.
- *
- *  @return The hostgroups.
- */
-list_string const& host::hostgroups() const throw () {
-  return (*_hostgroups);
 }
 
 /**
@@ -961,14 +938,17 @@ bool host::_set_host_name(std::string const& value) {
 }
 
 /**
- *  Set hostgroups value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new hostgroups value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool host::_set_hostgroups(std::string const& value) {
-  _hostgroups = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host hostgroups was ignored";
+  ++config_warnings;
   return (true);
 }
 

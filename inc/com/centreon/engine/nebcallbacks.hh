@@ -51,8 +51,6 @@
 #  define NEBCALLBACK_STATE_CHANGE_DATA                 30
 #  define NEBCALLBACK_COMMAND_DATA                      33
 #  define NEBCALLBACK_CUSTOM_VARIABLE_DATA              34
-#  define NEBCALLBACK_GROUP_DATA                        35
-#  define NEBCALLBACK_GROUP_MEMBER_DATA                 36
 #  define NEBCALLBACK_MODULE_DATA                       37
 #  define NEBCALLBACK_RELATION_DATA                     38
 

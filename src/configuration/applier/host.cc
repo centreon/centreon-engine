@@ -146,43 +146,17 @@ void applier::host::add_object(
 /**
  *  @brief Expand a host.
  *
- *  During expansion, the host will be added to its host groups. These
- *  will be modified in the state.
+ *  Host configuration objects do not need expansion. Therefore this
+ *  method does nothing.
  *
- *  @param[in]      obj Host to expand.
- *  @param[int,out] s   Configuration state.
+ *  @param[in] obj  Unused.
+ *  @param[in] s    Unused.
  */
 void applier::host::expand_object(
                       shared_ptr<configuration::host> obj,
                       configuration::state& s) {
-  // Browse host groups.
-  for (list_string::const_iterator
-         it(obj->hostgroups().begin()),
-         end(obj->hostgroups().end());
-       it != end;
-       ++it) {
-    // Find host group.
-    std::set<shared_ptr<configuration::hostgroup> >::iterator
-      it_group(s.hostgroups_find(*it));
-    if (it_group == s.hostgroups().end())
-      throw (engine_error() << "Could not add host '"
-             << obj->host_name() << "' to non-existing host group '"
-             << *it << "'");
-
-    // Remove host group from state.
-    shared_ptr<configuration::hostgroup> backup(*it_group);
-    s.hostgroups().erase(it_group);
-
-    // Add host to group members.
-    backup->members().push_back(obj->host_name());
-
-    // Reinsert host group.
-    s.hostgroups().insert(backup);
-  }
-
-  // We do not need to reinsert the host in the set, as no modification
-  // was applied on the host.
-
+  (void)obj;
+  (void)s;
   return ;
 }
 
@@ -413,9 +387,6 @@ void applier::host::resolve_object(
 
   // Remove service backlinks.
   deleter::listmember(it->second->services, &deleter::servicesmember);
-
-  // Remove host group links.
-  deleter::listmember(it->second->hostgroups_ptr, &deleter::objectlist);
 
   // Reset host counters.
   it->second->total_services = 0;

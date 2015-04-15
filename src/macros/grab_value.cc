@@ -38,124 +38,36 @@ using namespace com::centreon::engine::logging;
 /**
  *  Get host macro.
  *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer must be freed by
- *                         caller.
+ *  @param[out] mac         Macro object.
+ *  @param[in]  macro_type  Macro to get.
+ *  @param[in]  host_name   Host name.
+ *  @param[in]  unused      Unused.
+ *  @param[out] output      Output buffer.
+ *  @param[out] free_macro  Set to true if output buffer must be freed
+ *                          by caller.
  *
  *  @return OK on success.
  */
 static int handle_host_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             char const* host_name,
+             char const* unused,
              char** output,
              int* free_macro) {
+  (void)unused;
+
+  // Find the host for on-demand macros or use saved host pointer.
   int retval;
-  if (arg2 == NULL) {
-    // Find the host for on-demand macros
-    // or use saved host pointer.
-    host* hst(arg1 ? find_host(arg1) : mac->host_ptr);
-    if (hst)
-      // Get the host macro value.
-      retval = grab_standard_host_macro_r(
-                 mac,
-                 macro_type,
-                 hst,
-                 output,
-                 free_macro);
-    else
-      retval = ERROR;
-  }
-  // A host macro with a hostgroup name and delimiter.
-  else {
-    hostgroup* hg(find_hostgroup(arg1));
-    if (hg) {
-      size_t delimiter_len(strlen(arg2));
-
-      // Concatenate macro values for all hostgroup members.
-      for (hostsmember* temp_hostsmember = hg->members;
-           temp_hostsmember != NULL;
-           temp_hostsmember = temp_hostsmember->next) {
-        host* hst(temp_hostsmember->host_ptr);
-        if (hst) {
-          // Get the macro value for this host.
-          char* buffer(NULL);
-          int free_sub_macro(false);
-          grab_standard_host_macro_r(
-            mac,
-            macro_type,
-            hst,
-            &buffer,
-            &free_sub_macro);
-          if (buffer) {
-            // Add macro value to already running macro.
-            if (*output == NULL)
-              *output = string::dup(buffer);
-            else {
-              *output
-                = resize_string(
-                    *output,
-                    strlen(*output) + strlen(buffer) + delimiter_len + 1);
-              strcat(*output, arg2);
-              strcat(*output, buffer);
-            }
-            if (free_sub_macro == true)
-              delete[] buffer;
-            *free_macro = true;
-          }
-        }
-      }
-      retval = OK;
-    }
-    else
-      retval = ERROR;
-  }
-  return (retval);
-}
-
-/**
- *  Get hostgroup macro.
- *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer must be freed by
- *                         caller.
- *
- *  @return OK on success.
- */
-static int handle_hostgroup_macro(
-             nagios_macros* mac,
-             int macro_type,
-             char const* arg1,
-             char const* arg2,
-             char** output,
-             int* free_macro) {
-  (void)arg2;
-
-  // Return value.
-  int retval;
-
-  // Use the saved hostgroup pointer
-  // or find the hostgroup for on-demand macros.
-  hostgroup* hg(arg1 ? find_hostgroup(arg1) : mac->hostgroup_ptr);
-  if (hg) {
-    // Get the hostgroup macro value.
-    retval = grab_standard_hostgroup_macro_r(
+  host* hst(host_name ? find_host(host_name) : mac->host_ptr);
+  if (hst)
+    // Get the host macro value.
+    retval = grab_standard_host_macro_r(
                mac,
                macro_type,
-               hg,
-               output);
-    if (OK == retval)
-      *free_macro = true;
-  }
+               hst,
+               output,
+               free_macro);
   else
     retval = ERROR;
   return (retval);
@@ -164,27 +76,28 @@ static int handle_hostgroup_macro(
 /**
  *  Get service macro.
  *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if macro must be freed by caller.
+ *  @param[out] mac                  Macro object.
+ *  @param[in]  macro_type           Macro to get.
+ *  @param[in]  host_name            Host name.
+ *  @param[in]  service_description  Service description.
+ *  @param[out] output               Output buffer.
+ *  @param[out] free_macro           Set to true if macro must be freed
+ *                                   by caller.
  *
  *  @return OK on success.
  */
 static int handle_service_macro(
              nagios_macros* mac,
              int macro_type,
-             char const* arg1,
-             char const* arg2,
+             char const* host_name,
+             char const* service_description,
              char** output,
              int* free_macro) {
   // Return value.
   int retval;
 
   // Use saved service pointer.
-  if (!arg1 && !arg2) {
+  if (!host_name && !service_description) {
     if (!mac->service_ptr)
       retval = ERROR;
     else
@@ -195,14 +108,16 @@ static int handle_service_macro(
                  output,
                  free_macro);
   }
-  // Else and ondemand macro...
+  // Else ondemand macro...
   else {
-    // If first arg is blank, it means use the current host name.
-    if (!arg1 || (arg1[0] == '\0')) {
-      if (!mac->host_ptr)
+    // If host name is blank, it means use the current host name.
+    if (!host_name || (host_name[0] == '\0')) {
+      if (!mac->host_ptr || !mac->host_ptr->name)
         retval = ERROR;
-      else if (arg2) {
-        service* svc(find_service(mac->host_ptr->name, arg2));
+      else if (service_description) {
+        service* svc(find_service(
+                       mac->host_ptr->name,
+                       service_description));
         if (!svc)
           retval = ERROR;
         else
@@ -217,10 +132,12 @@ static int handle_service_macro(
       else
         retval = ERROR;
     }
-    else if (arg1 && arg2) {
+    else if (host_name && service_description) {
       // On-demand macro with both host and service name.
-      service* svc(find_service(arg1, arg2));
-      if (svc)
+      service* svc(find_service(host_name, service_description));
+      if (!svc)
+        retval = ERROR;
+      else
         // Get the service macro value.
         retval = grab_standard_service_macro_r(
                    mac,
@@ -228,103 +145,10 @@ static int handle_service_macro(
                    svc,
                    output,
                    free_macro);
-      // Else we have a service macro with a
-      // servicegroup name and a delimiter...
-      else {
-        servicegroup* sg(find_servicegroup(arg1));
-        if (!sg)
-          retval = ERROR;
-        else {
-          size_t delimiter_len(strlen(arg2));
-
-          // Concatenate macro values for all servicegroup members.
-          for (servicesmember* temp_servicesmember = sg->members;
-               temp_servicesmember != NULL;
-               temp_servicesmember = temp_servicesmember->next) {
-            svc = temp_servicesmember->service_ptr;
-            if (svc) {
-              // Get the macro value for this service.
-              char* buffer(NULL);
-              int free_sub_macro(false);
-              grab_standard_service_macro_r(
-                mac,
-                macro_type,
-                svc,
-                &buffer,
-                &free_sub_macro);
-              if (buffer) {
-                // Add macro value to already running macro.
-                if (*output == NULL)
-                  *output = string::dup(buffer);
-                else {
-                  *output = resize_string(
-                              *output,
-                              strlen(*output)
-                              + strlen(buffer)
-                              + delimiter_len
-                              + 1);
-                  strcat(*output, arg2);
-                  strcat(*output, buffer);
-                }
-                if (free_sub_macro != false) {
-                  delete[] buffer;
-                  buffer = NULL;
-                }
-              }
-            }
-          }
-          *free_macro = true;
-          retval = OK;
-        }
-      }
     }
     else
       retval = ERROR;
   }
-  return (retval);
-}
-
-/**
- *  Get servicegroup macro.
- *
- *  @param[out] mac        Macro object.
- *  @param[in]  macro_type Macro to get.
- *  @param[in]  arg1       Argument 1.
- *  @param[in]  arg2       Argument 2.
- *  @param[out] output     Output buffer.
- *  @param[out] free_macro Set to true if output buffer must be freed by
- *                         caller.
- *
- *  @return OK on success.
- */
-static int handle_servicegroup_macro(
-             nagios_macros* mac,
-             int macro_type,
-             char const* arg1,
-             char const* arg2,
-             char** output,
-             int* free_macro) {
-  (void)arg2;
-
-  // Return value.
-  int retval;
-
-  // Use the saved servicegroup pointer
-  // or find the servicegroup for on-demand macros.
-  servicegroup* sg(arg1 ? find_servicegroup(arg1) : mac->servicegroup_ptr);
-  if (!sg)
-    retval = ERROR;
-  else {
-    // Get the servicegroup macro value.
-    retval = grab_standard_servicegroup_macro_r(
-               mac,
-               macro_type,
-               sg,
-               output);
-    if (OK == retval)
-      *free_macro = true;
-  }
-
   return (retval);
 }
 
@@ -578,7 +402,6 @@ struct grab_value_redirection {
       MACRO_LONGHOSTOUTPUT,
       MACRO_HOSTEVENTID,
       MACRO_LASTHOSTEVENTID,
-      MACRO_HOSTGROUPNAMES,
       MACRO_MAXHOSTATTEMPTS,
       MACRO_TOTALHOSTSERVICES,
       MACRO_TOTALHOSTSERVICESOK,
@@ -594,20 +417,6 @@ struct grab_value_redirection {
          i < sizeof(host_ids) / sizeof(*host_ids);
          ++i)
       routines[host_ids[i]] = &handle_host_macro;
-
-    // Hostgroup macros.
-    static unsigned int const hostgroup_ids[] = {
-      MACRO_HOSTGROUPNAME,
-      MACRO_HOSTGROUPALIAS,
-      MACRO_HOSTGROUPNOTES,
-      MACRO_HOSTGROUPNOTESURL,
-      MACRO_HOSTGROUPACTIONURL,
-      MACRO_HOSTGROUPMEMBERS
-    };
-    for (unsigned int i = 0;
-         i < sizeof(hostgroup_ids) / sizeof(*hostgroup_ids);
-         ++i)
-      routines[hostgroup_ids[i]] = &handle_hostgroup_macro;
 
     // Service macros.
     static unsigned int const service_ids[] = {
@@ -637,7 +446,6 @@ struct grab_value_redirection {
       MACRO_LONGSERVICEOUTPUT,
       MACRO_SERVICEEVENTID,
       MACRO_LASTSERVICEEVENTID,
-      MACRO_SERVICEGROUPNAMES,
       MACRO_MAXSERVICEATTEMPTS,
       MACRO_SERVICEISVOLATILE,
       MACRO_SERVICEPROBLEMID,
@@ -649,20 +457,6 @@ struct grab_value_redirection {
          i < sizeof(service_ids) / sizeof(*service_ids);
          ++i)
       routines[service_ids[i]] = &handle_service_macro;
-
-    // Servicegroup macros.
-    static unsigned int const servicegroup_ids[] = {
-      MACRO_SERVICEGROUPNAME,
-      MACRO_SERVICEGROUPALIAS,
-      MACRO_SERVICEGROUPNOTES,
-      MACRO_SERVICEGROUPNOTESURL,
-      MACRO_SERVICEGROUPACTIONURL,
-      MACRO_SERVICEGROUPMEMBERS
-    };
-    for (unsigned int i = 0;
-         i < sizeof(servicegroup_ids) / sizeof(*servicegroup_ids);
-         ++i)
-      routines[servicegroup_ids[i]] = &handle_servicegroup_macro;
 
     // Date/Time macros.
     static unsigned int const datetime_ids[] = {
@@ -764,7 +558,7 @@ int grab_macro_value_r(
     ptr[0] = '\x0';
     ptr++;
 
-    /* save the first argument - host name, hostgroup name, etc. */
+    /* save the first argument - host name, etc. */
     arg[0] = ptr;
 
     /* try and find a second argument */

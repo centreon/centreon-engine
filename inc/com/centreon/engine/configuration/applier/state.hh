@@ -33,10 +33,8 @@
 struct command_struct;
 struct host_struct;
 struct hostdependency_struct;
-struct hostgroup_struct;
 struct service_struct;
 struct servicedependency_struct;
-struct servicegroup_struct;
 struct timeperiod_struct;
 struct scheduled_downtime_struct;
 
@@ -104,14 +102,6 @@ namespace           configuration {
                     hostdependencies_find(configuration::hostdependency::key_type const& k) const;
       umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
                     hostdependencies_find(configuration::hostdependency::key_type const& k);
-      umap<std::string, shared_ptr<hostgroup_struct> > const&
-                    hostgroups() const throw ();
-      umap<std::string, shared_ptr<hostgroup_struct> >&
-                    hostgroups() throw ();
-      umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
-                    hostgroups_find(configuration::hostgroup::key_type const& k) const;
-      umap<std::string, shared_ptr<hostgroup_struct> >::iterator
-                    hostgroups_find(configuration::hostgroup::key_type const& k);
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> > const&
                     services() const throw ();
       umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >&
@@ -128,14 +118,6 @@ namespace           configuration {
                     servicedependencies_find(configuration::servicedependency::key_type const& k) const;
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >::iterator
                     servicedependencies_find(configuration::servicedependency::key_type const& k);
-      umap<std::string, shared_ptr<servicegroup_struct> > const&
-                    servicegroups() const throw ();
-      umap<std::string, shared_ptr<servicegroup_struct> >&
-                    servicegroups() throw ();
-      umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
-                    servicegroups_find(configuration::servicegroup::key_type const& k) const;
-      umap<std::string, shared_ptr<servicegroup_struct> >::iterator
-                    servicegroups_find(configuration::servicegroup::key_type const& k);
       umap<std::string, shared_ptr<timeperiod_struct> > const&
                     timeperiods() const throw ();
       umap<std::string, shared_ptr<timeperiod_struct> >&
@@ -192,8 +174,6 @@ namespace           configuration {
                     _hosts;
       umultimap<std::string, shared_ptr<hostdependency_struct> >
                     _hostdependencies;
-      umap<std::string, shared_ptr<hostgroup_struct> >
-                    _hostgroups;
       concurrency::mutex
                     _lock;
       processing_state
@@ -202,8 +182,6 @@ namespace           configuration {
                     _services;
       umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_struct> >
                     _servicedependencies;
-      umap<std::string, shared_ptr<servicegroup_struct> >
-                    _servicegroups;
       umap<std::string, shared_ptr<timeperiod_struct> >
                     _timeperiods;
     };

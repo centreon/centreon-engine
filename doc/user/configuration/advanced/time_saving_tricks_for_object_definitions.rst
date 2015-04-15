@@ -10,18 +10,16 @@ This documentation attempts to explain how you can exploit the
 (somewhat) hidden features of
 :ref:`template-based object definitions <obj_def>` to
 save your sanity. How so, you ask?  Several types of objects allow you
-to specify multiple host names and/or hostgroup names in definitions,
-allowing you to "copy" the object defintion to multiple hosts or
-services. I'll cover each type of object that supports these features
-seperately. For starters, the object types which support this
-time-saving feature are as follows:
+to specify multiple host names in definitions, allowing you to "copy"
+the object defintion to multiple hosts or services. I'll cover each
+type of object that supports these features seperately. For starters,
+the object types which support this time-saving feature are as follows:
 
   * :ref:`Services <obj_def_tricks_service>`
   * :ref:`Service escalations <obj_def_tricks_service_escalation>`
   * :ref:`Service dependencies <obj_def_tricks_service_dependency>`
   * :ref:`Host escalations <obj_def_tricks_host_escalation>`
   * :ref:`Host dependencies <obj_def_tricks_host_dependency>`
-  * :ref:`Hostgroups <obj_def_tricks_hostgroups>`
 
 Object types that are not listed above (i.e. timeperiods, commands,
 etc.) do not support the features I'm about to describe.
@@ -45,22 +43,6 @@ notification period, etc.)::
     other service directives ...
   }
 
-All Hosts In Multiple Hostgroups: If you want to create identical
-services that are assigned to all hosts in one or more hostgroups, you
-can do so by creating a single service definition. How? The
-hostgroup_name directive allows you to specify the name of one or more
-hostgroups that the service should be created for. The definition below
-would create a service called SOMESERVICE on all hosts that are members
-of hostgroups HOSTGROUP1 through HOSTGROUPN. All the instances of the
-SOMESERVICE service would be identical (i.e. have the same check
-command, max check attempts, notification period, etc.)::
-
-  define service{
-    hostgroup_name      HOSTGROUP1,HOSTGROUP2,...,HOSTGROUPN
-    service_description SOMESERVICE
-    other service directives ...
-  }
-
 All Hosts: If you want to create identical services that are assigned to
 all hosts that are defined in your configuration files, you can use a
 wildcard in the host_name directive. The definition below would create a
@@ -71,18 +53,6 @@ notification period, etc.)::
 
   define service{
     host_name           *
-    service_description SOMESERVICE
-    other service directives ...
-  }
-
-Excluding Hosts: If you want to create identical services on numerous
-hosts or hostgroups, but would like to exclude some hosts from the
-definition, this can be accomplished by preceding the host or hostgroup
-with a ! symbol::
-
-  define service{
-    host_name           HOST1,HOST2,!HOST3,!HOST4,...,HOSTN
-    hostgroup_name      HOSTGROUP1,HOSTGROUP2,!HOSTGROUP3,!HOSTGROUP4,...,HOSTGROUPN
     service_description SOMESERVICE
     other service directives ...
   }
@@ -107,21 +77,6 @@ groups, notification interval, etc.)::
     other escalation directives ...
   }
 
-All Hosts In Multiple Hostgroups: If you want to create service
-escalations for services of the same name/description that are assigned
-to all hosts in in one or more hostgroups, you can do use the
-hostgroup_name directive. The definition below would create a service
-escalation for services called SOMESERVICE on all hosts that are members
-of hostgroups HOSTGROUP1 through HOSTGROUPN. All the instances of the
-service escalation would be identical (i.e. have the same contact
-groups, notification interval, etc.)::
-
-  define serviceescalation{
-    hostgroup_name      HOSTGROUP1,HOSTGROUP2,...,HOSTGROUPN
-    service_description SOMESERVICE
-    other escalation directives ...
-  }
-
 All Hosts: If you want to create identical service escalations for
 services of the same name/description that are assigned to all hosts
 that are defined in your configuration files, you can use a wildcard in
@@ -133,18 +88,6 @@ notification interval, etc.)::
 
   define serviceescalation{
     host_name           *
-    service_description SOMESERVICE
-    other escalation directives ...
-  }
-
-Excluding Hosts: If you want to create identical services escalations
-for services on numerous hosts or hostgroups, but would like to exclude
-some hosts from the definition, this can be accomplished by preceding
-the host or hostgroup with a ! symbol::
-
-  define serviceescalation{
-    host_name           HOST1,HOST2,!HOST3,!HOST4,...,HOSTN
-    hostgroup_name      HOSTGROUP1,HOSTGROUP2,!HOSTGROUP3,!HOSTGROUP4,...,HOSTGROUPN
     service_description SOMESERVICE
     other escalation directives ...
   }
@@ -183,19 +126,6 @@ notification interval, etc.)::
     other escalation directives ...
   }
 
-All Services In Multiple Servicegroups: If you want to create service
-escalations for all services that belong in one or more servicegroups,
-you can do use the servicegroup_name directive. The definition below
-would create service escalations for all services that are members of
-servicegroups SERVICEGROUP1 through SERVICEGROUPN. All the instances of
-the service escalation would be identical (i.e. have the same contact
-groups, notification interval, etc.)::
-
-  define serviceescalation{
-    servicegroup_name SERVICEGROUP1,SERVICEGROUP2,...,SERVICEGROUPN
-    other escalation directives ...
-  }
-
 .. _obj_def_tricks_service_dependency:
 
 Service Dependency Definitions
@@ -215,26 +145,6 @@ criteria, etc.)::
     host_name                     HOST1,HOST2
     service_description           SERVICE1
     dependent_host_name           HOST3,HOST4
-    dependent_service_description SERVICE2
-    other dependency directives ...
-  }
-
-All Hosts In Multiple Hostgroups: If you want to create service
-dependencies for services of the same name/description that are assigned
-to all hosts in in one or more hostgroups, you can do use the
-hostgroup_name and/or dependent_hostgroup_name directives. In the
-example below, service SERVICE2 on all hosts in hostgroups HOSTGROUP3
-and HOSTGROUP4 would be dependent on service SERVICE1 on all hosts in
-hostgroups HOSTGROUP1 and HOSTGROUP2. Assuming there were five hosts in
-each of the hostgroups, this definition would be equivalent to creating
-100 single service dependency definitions! All the instances of the
-service dependency would be identical except for the host names
-(i.e. have the same notification failure criteria, etc.)::
-
-  define servicedependency{
-    hostgroup_name                HOSTGROUP1,HOSTGROUP2
-    service_description           SERVICE1
-    dependent_hostgroup_name      HOSTGROUP3,HOSTGROUP4
     dependent_service_description SERVICE2
     other dependency directives ...
   }
@@ -268,26 +178,14 @@ dependent_service_description directives as follows::
     other dependency directives ...
   }
 
-All Services In Multiple Servicegroups: If you want to create service
-dependencies for all services that belong in one or more servicegroups,
-you can do use the servicegroup_name and/or dependent_servicegroup_name
-directive as follows::
-
-  define servicedependency{
-    servicegroup_name           SERVICEGROUP1,SERVICEGROUP2,...,SERVICEGROUPN
-    dependent_servicegroup_name SERVICEGROUP3,SERVICEGROUP4,...SERVICEGROUPN
-    other dependency directives ...
-  }
-
 Same Host Dependencies: If you want to create service dependencies for
 multiple services that are dependent on services on the same host, leave
-the dependent_host_name and dependent_hostgroup_name directives
-empty. The example below assumes that hosts HOST1 and HOST2 have at
-least the following four services associated with them: SERVICE1,
-SERVICE2, SERVICE3, and SERVICE4. In this example, SERVICE3 and SERVICE4
-on HOST1 will be dependent on both SERVICE1 and SERVICE2 on
-HOST1. Similiarly, SERVICE3 and SERVICE4 on HOST2 will be dependent on
-both SERVICE1 and SERVICE2 on HOST2::
+the dependent_host_name directive empty. The example below assumes that
+hosts HOST1 and HOST2 have at least the following four services
+associated with them: SERVICE1, SERVICE2, SERVICE3, and SERVICE4. In
+this example, SERVICE3 and SERVICE4 on HOST1 will be dependent on both
+SERVICE1 and SERVICE2 on HOST1. Similiarly, SERVICE3 and SERVICE4 on
+HOST2 will be dependent on both SERVICE1 and SERVICE2 on HOST2::
 
   define servicedependency{
     host_name                     HOST1,HOST2
@@ -313,19 +211,6 @@ HOSTN. All the instances of the host escalation would be identical
     other escalation directives ...
   }
 
-All Hosts In Multiple Hostgroups: If you want to create host escalations
-for all hosts in in one or more hostgroups, you can do use the
-hostgroup_name directive. The definition below would create a host
-escalation on all hosts that are members of hostgroups HOSTGROUP1
-through HOSTGROUPN. All the instances of the host escalation would be
-identical (i.e. have the same contact groups, notification interval,
-etc.)::
-
-  define hostescalation{
-    hostgroup_name HOSTGROUP1,HOSTGROUP2,...,HOSTGROUPN
-    other escalation directives ...
-  }
-
 All Hosts: If you want to create identical host escalations for all
 hosts that are defined in your configuration files, you can use a
 wildcard in the host_name directive. The definition below would create a
@@ -335,17 +220,6 @@ files. All the instances of the host escalation would be identical
 
   define hostescalation{
     host_name *
-    other escalation directives ...
-  }
-
-Excluding Hosts: If you want to create identical host escalations on
-numerous hosts or hostgroups, but would like to exclude some hosts from
-the definition, this can be accomplished by preceding the host or
-hostgroup with a ! symbol::
-
-  define hostescalation{
-    host_name      HOST1,HOST2,!HOST3,!HOST4,...,HOSTN
-    hostgroup_name HOSTGROUP1,HOSTGROUP2,!HOSTGROUP3,!HOSTGROUP4,...,HOSTGROUPN
     other escalation directives ...
   }
 
@@ -367,35 +241,4 @@ host names (i.e. have the same notification failure criteria, etc.)::
     host_name           HOST1,HOST2
     dependent_host_name HOST3,HOST4,HOST5
     other dependency directives ...
-  }
-
-All Hosts In Multiple Hostgroups: If you want to create host escalations
-for all hosts in in one or more hostgroups, you can do use the
-hostgroup_name and /or dependent_hostgroup_name directives. In the
-example below, all hosts in hostgroups HOSTGROUP3 and HOSTGROUP4 would
-be dependent on all hosts in hostgroups HOSTGROUP1 and HOSTGROUP2. All
-the instances of the host dependencies would be identical except for
-host names (i.e. have the same notification failure criteria, etc.)::
-
-  define hostdependency{
-    hostgroup_name           HOSTGROUP1,HOSTGROUP2
-    dependent_hostgroup_name HOSTGROUP3,HOSTGROUP4
-    other dependency directives ...
-  }
-
-.. _obj_def_tricks_hostgroups:
-
-Hostgroups
-==========
-
-All Hosts: If you want to create a hostgroup that has all hosts that are
-defined in your configuration files as members, you can use a wildcard
-in the members directive. The definition below would create a hostgroup
-called HOSTGROUP1 that has all hosts that are defined in your
-configuration files as members::
-
-  define hostgroup{
-    hostgroup_name HOSTGROUP1
-    members        *
-    other hostgroup directives ...
   }

@@ -22,7 +22,6 @@
 #include <utility>
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/clear_service.hh"
-#include "com/centreon/engine/macros/clear_servicegroup.hh"
 #include "com/centreon/engine/macros/defines.hh"
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_service.hh"
@@ -56,33 +55,6 @@ static char* get_service_check_type(service& svc, nagios_macros* mac) {
             (SERVICE_CHECK_PASSIVE == svc.check_type
              ? "PASSIVE"
              : "ACTIVE")));
-}
-
-/**
- *  Extract service group names.
- *
- *  @param[in] svc Target service.
- *  @param[in] mac Unused.
- *
- *  @return List of names of groups associated with this service.
- */
-static char* get_service_group_names(service& svc, nagios_macros* mac) {
-  (void)mac;
-
-  // Find all servicegroups this service is associated with.
-  std::string buf;
-  for (objectlist* temp_objectlist = svc.servicegroups_ptr;
-       temp_objectlist != NULL;
-       temp_objectlist = temp_objectlist->next) {
-    servicegroup* temp_servicegroup(
-      static_cast<servicegroup*>(temp_objectlist->object_ptr));
-    if (temp_servicegroup) {
-      if (!buf.empty())
-        buf.append(",");
-      buf.append(temp_servicegroup->group_name);
-    }
-  }
-  return (string::dup(buf));
 }
 
 /**
@@ -206,9 +178,6 @@ struct grab_service_redirection {
     // Last problem ID.
     routines[MACRO_LASTSERVICEPROBLEMID].first = &get_member_as_string<service, unsigned long, &service::last_problem_id>;
     routines[MACRO_LASTSERVICEPROBLEMID].second = true;
-    // Group names.
-    routines[MACRO_SERVICEGROUPNAMES].first = &get_service_group_names;
-    routines[MACRO_SERVICEGROUPNAMES].second = true;
   }
 } static const redirector;
 
@@ -304,19 +273,12 @@ int grab_standard_service_macro(
 int grab_service_macros_r(nagios_macros* mac, service* svc) {
   // Clear service-related macros.
   clear_service_macros_r(mac);
-  clear_servicegroup_macros_r(mac);
 
   // Save pointer for later.
   mac->service_ptr = svc;
-  mac->servicegroup_ptr = NULL;
 
   if (svc == NULL)
     return (ERROR);
-
-  // Save first/primary servicegroup pointer for later.
-  if (svc->servicegroups_ptr)
-    mac->servicegroup_ptr
-      = static_cast<servicegroup*>(svc->servicegroups_ptr->object_ptr);
 
   return (OK);
 }

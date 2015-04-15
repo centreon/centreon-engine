@@ -60,7 +60,7 @@ This directive is used to specify an
 :ref:`object configuration file <object_configuration_overview>`
 containing object definitions that Centreon Engine should use for
 monitoring. Object configuration files contain definitions for hosts,
-host groups, contacts, contact groups, services, commands, etc. You can
+contacts, contact groups, services, commands, etc. You can
 seperate your configuration information into several files and specify
 multiple cfg_file= statements to have each of them processed.
 

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -28,9 +28,7 @@ set(
 
   # Sources.
   "${SRC_DIR}/clear_host.cc"
-  "${SRC_DIR}/clear_hostgroup.cc"
   "${SRC_DIR}/clear_service.cc"
-  "${SRC_DIR}/clear_servicegroup.cc"
   "${SRC_DIR}/grab_host.cc"
   "${SRC_DIR}/grab_service.cc"
   "${SRC_DIR}/grab_value.cc"
@@ -40,9 +38,7 @@ set(
   # Headers.
   "${INC_DIR}/defines.hh"
   "${INC_DIR}/clear_host.hh"
-  "${INC_DIR}/clear_hostgroup.hh"
   "${INC_DIR}/clear_service.hh"
-  "${INC_DIR}/clear_servicegroup.hh"
   "${INC_DIR}/grab.hh"
   "${INC_DIR}/grab_host.hh"
   "${INC_DIR}/grab_service.hh"

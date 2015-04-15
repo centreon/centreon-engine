@@ -46,7 +46,6 @@ void deleter::host(void* ptr) throw () {
   listmember(obj->child_hosts, &hostsmember);
   listmember(obj->services, &servicesmember);
   listmember(obj->custom_variables, &customvariablesmember);
-  listmember(obj->hostgroups_ptr, &objectlist);
 
   delete[] obj->name;
   obj->name = NULL;

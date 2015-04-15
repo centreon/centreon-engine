@@ -40,15 +40,9 @@ using namespace com::centreon::engine::logging;
 int grab_custom_macro_value_r(
       nagios_macros* mac,
       char* macro_name,
-      char const* arg1,
-      char const* arg2,
+      char const* host_name,
+      char const* service_description,
       char** output) {
-  hostgroup* temp_hostgroup = NULL;
-  hostsmember* temp_hostsmember = NULL;
-  servicegroup* temp_servicegroup = NULL;
-  servicesmember* temp_servicesmember = NULL;
-  int delimiter_len = 0;
-  char* temp_buffer = NULL;
   int result = OK;
 
   if (macro_name == NULL || output == NULL)
@@ -57,71 +51,28 @@ int grab_custom_macro_value_r(
   /***** CUSTOM HOST MACRO *****/
   if (strstr(macro_name, "_HOST") == macro_name) {
     host* temp_host(NULL);
-    /* a standard host macro */
-    if (arg2 == NULL) {
-      /* find the host for on-demand macros */
-      if (arg1) {
-        if ((temp_host = find_host(arg1)) == NULL)
-          return (ERROR);
-      }
-      /* else use saved host pointer */
-      else if ((temp_host = mac->host_ptr) == NULL)
+    /* find the host for on-demand macros */
+    if (host_name) {
+      if ((temp_host = find_host(host_name)) == NULL)
         return (ERROR);
-
-      /* get the host macro value */
-      result = grab_custom_object_macro_r(
-                 mac,
-                 macro_name + 5,
-                 temp_host->custom_variables,
-                 output);
     }
-    /* a host macro with a hostgroup name and delimiter */
-    else {
-      if ((temp_hostgroup = find_hostgroup(arg1)) == NULL)
-        return (ERROR);
+    /* else use saved host pointer */
+    else if ((temp_host = mac->host_ptr) == NULL)
+      return (ERROR);
 
-      delimiter_len = strlen(arg2);
-
-      /* concatenate macro values for all hostgroup members */
-      for (temp_hostsmember = temp_hostgroup->members;
-           temp_hostsmember != NULL;
-           temp_hostsmember = temp_hostsmember->next) {
-
-        if ((temp_host = temp_hostsmember->host_ptr) == NULL)
-          continue;
-
-        /* get the macro value for this host */
-        grab_custom_macro_value_r(
-          mac,
-          macro_name,
-          temp_host->name,
-          NULL,
-          &temp_buffer);
-
-        if (temp_buffer == NULL)
-          continue;
-
-        /* add macro value to already running macro */
-        if (*output == NULL)
-          *output = string::dup(temp_buffer);
-        else {
-          *output = resize_string(
-                      *output,
-                      strlen(*output) + strlen(temp_buffer) + delimiter_len + 1);
-          strcat(*output, arg2);
-          strcat(*output, temp_buffer);
-        }
-        delete[] temp_buffer;
-        temp_buffer = NULL;
-      }
-    }
+    /* get the host macro value */
+    result = grab_custom_object_macro_r(
+               mac,
+               macro_name + 5,
+               temp_host->custom_variables,
+               output);
   }
   /***** CUSTOM SERVICE MACRO *****/
   else if (strstr(macro_name, "_SERVICE") == macro_name) {
     service* temp_service(NULL);
 
     /* use saved service pointer */
-    if (arg1 == NULL && arg2 == NULL) {
+    if (host_name == NULL && service_description == NULL) {
       if ((temp_service = mac->service_ptr) == NULL)
         return (ERROR);
 
@@ -134,59 +85,21 @@ int grab_custom_macro_value_r(
     }
     /* else and ondemand macro... */
     else {
-      /* if first arg is blank, it means use the current host name */
+      /* if host name is blank, it means use the current host name */
       if (mac->host_ptr == NULL)
         return (ERROR);
       if ((temp_service = find_service(
                             mac->host_ptr ? mac->host_ptr->name : NULL,
-                            arg2))) {
-        /* get the service macro value */
-        result = grab_custom_object_macro_r(
-                   mac,
-                   macro_name + 8,
-                   temp_service->custom_variables,
-                   output);
-      }
-      /* else we have a service macro with a servicegroup name and a delimiter... */
-      else {
-        if ((temp_servicegroup = find_servicegroup(arg1)) == NULL)
-          return (ERROR);
+                            service_description))
+          == NULL)
+        return (ERROR);
 
-        delimiter_len = strlen(arg2);
-
-        /* concatenate macro values for all servicegroup members */
-        for (temp_servicesmember = temp_servicegroup->members;
-             temp_servicesmember != NULL;
-             temp_servicesmember = temp_servicesmember->next) {
-
-          if ((temp_service = temp_servicesmember->service_ptr) == NULL)
-            continue;
-
-          /* get the macro value for this service */
-          grab_custom_macro_value_r(
-            mac,
-            macro_name,
-            temp_service->host_name,
-            temp_service->description,
-            &temp_buffer);
-
-          if (temp_buffer == NULL)
-            continue;
-
-          /* add macro value to already running macro */
-          if (*output == NULL)
-            *output = string::dup(temp_buffer);
-          else {
-            *output = resize_string(
-                        *output,
-                        strlen(*output) + strlen(temp_buffer) + delimiter_len + 1);
-            strcat(*output, arg2);
-            strcat(*output, temp_buffer);
-          }
-          delete[] temp_buffer;
-          temp_buffer = NULL;
-        }
-      }
+      /* get the service macro value */
+      result = grab_custom_object_macro_r(
+                 mac,
+                 macro_name + 8,
+                 temp_service->custom_variables,
+                 output);
     }
   }
   else
@@ -267,161 +180,6 @@ int grab_datetime_macro_r(
   default:
     return (ERROR);
   }
-  return (OK);
-}
-
-/* computes a hostgroup macro */
-int grab_standard_hostgroup_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      hostgroup* temp_hostgroup,
-      char** output) {
-  hostsmember* temp_hostsmember = NULL;
-  char* temp_buffer = NULL;
-  unsigned int temp_len = 0;
-  unsigned int init_len = 0;
-
-  (void)mac;
-  if (temp_hostgroup == NULL || output == NULL)
-    return (ERROR);
-
-  /* get the macro value */
-  switch (macro_type) {
-  case MACRO_HOSTGROUPNAME:
-    *output = string::dup(temp_hostgroup->group_name);
-    break;
-
-  case MACRO_HOSTGROUPALIAS:
-    if (temp_hostgroup->alias)
-      *output = string::dup(temp_hostgroup->alias);
-    break;
-
-  case MACRO_HOSTGROUPMEMBERS:
-    /* make the calculations for total string length */
-    for (temp_hostsmember = temp_hostgroup->members;
-         temp_hostsmember != NULL;
-         temp_hostsmember = temp_hostsmember->next) {
-      if (temp_hostsmember->host_name == NULL)
-        continue;
-      if (temp_len == 0)
-        temp_len += strlen(temp_hostsmember->host_name) + 1;
-      else
-        temp_len += strlen(temp_hostsmember->host_name) + 2;
-    }
-    /* allocate or reallocate the memory buffer */
-    if (*output == NULL)
-      *output = new char[temp_len];
-    else {
-      init_len = strlen(*output);
-      temp_len += init_len;
-      *output = resize_string(*output, temp_len);
-    }
-    /* now fill in the string with the member names */
-    for (temp_hostsmember = temp_hostgroup->members;
-         temp_hostsmember != NULL;
-         temp_hostsmember = temp_hostsmember->next) {
-      if (temp_hostsmember->host_name == NULL)
-        continue;
-      temp_buffer = *output + init_len;
-      if (init_len == 0)      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
-        init_len += sprintf(temp_buffer, "%s", temp_hostsmember->host_name);
-      else
-        init_len += sprintf(temp_buffer, ",%s", temp_hostsmember->host_name);
-    }
-    break;
-
-  default:
-    logger(dbg_macros, basic)
-      << "UNHANDLED HOSTGROUP MACRO #" << macro_type << "! THIS IS A BUG!";
-    return (ERROR);
-  }
-
-  return (OK);
-}
-
-/* computes a servicegroup macro */
-int grab_standard_servicegroup_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      servicegroup* temp_servicegroup,
-      char** output) {
-  servicesmember* temp_servicesmember = NULL;
-  char* temp_buffer = NULL;
-  unsigned int temp_len = 0;
-  unsigned int init_len = 0;
-
-  (void)mac;
-  if (temp_servicegroup == NULL || output == NULL)
-    return (ERROR);
-
-  /* get the macro value */
-  switch (macro_type) {
-  case MACRO_SERVICEGROUPNAME:
-    *output = string::dup(temp_servicegroup->group_name);
-    break;
-
-  case MACRO_SERVICEGROUPALIAS:
-    if (temp_servicegroup->alias)
-      *output = string::dup(temp_servicegroup->alias);
-    break;
-
-  case MACRO_SERVICEGROUPMEMBERS:
-    /* make the calculations for total string length */
-    for (temp_servicesmember = temp_servicegroup->members;
-         temp_servicesmember != NULL;
-         temp_servicesmember = temp_servicesmember->next) {
-      if (temp_servicesmember->host_name == NULL
-          || temp_servicesmember->service_description == NULL)
-        continue;
-      if (temp_len == 0) {
-        temp_len +=
-          strlen(temp_servicesmember->host_name) +
-          strlen(temp_servicesmember->service_description) + 2;
-      }
-      else {
-        temp_len +=
-          strlen(temp_servicesmember->host_name) +
-          strlen(temp_servicesmember->service_description) + 3;
-      }
-    }
-    /* allocate or reallocate the memory buffer */
-    if (*output == NULL)
-      *output = new char[temp_len];
-    else {
-      init_len = strlen(*output);
-      temp_len += init_len;
-      *output = resize_string(*output, temp_len);
-    }
-    /* now fill in the string with the group members */
-    for (temp_servicesmember = temp_servicegroup->members;
-         temp_servicesmember != NULL;
-         temp_servicesmember = temp_servicesmember->next) {
-      if (temp_servicesmember->host_name == NULL
-          || temp_servicesmember->service_description == NULL)
-        continue;
-      temp_buffer = *output + init_len;
-      if (init_len == 0)      /* If our buffer didn't contain anything, we just need to write "%s,%s" */
-        init_len += sprintf(
-                      temp_buffer,
-                      "%s,%s",
-                      temp_servicesmember->host_name,
-                      temp_servicesmember->service_description);
-      else                    /* Now we need to write ",%s,%s" */
-        init_len += sprintf(
-                      temp_buffer,
-                      ",%s,%s",
-                      temp_servicesmember->host_name,
-                      temp_servicesmember->service_description);
-    }
-    break;
-
-  default:
-    logger(dbg_macros, basic)
-      << "UNHANDLED SERVICEGROUP MACRO #" << macro_type
-      << "! THIS IS A BUG!";
-    return (ERROR);
-  }
-
   return (OK);
 }
 
@@ -599,10 +357,6 @@ int init_macrox_names() {
   add_macrox_name(SERVICESTATETYPE);
   add_macrox_name(HOSTPERCENTCHANGE);
   add_macrox_name(SERVICEPERCENTCHANGE);
-  add_macrox_name(HOSTGROUPNAME);
-  add_macrox_name(HOSTGROUPALIAS);
-  add_macrox_name(SERVICEGROUPNAME);
-  add_macrox_name(SERVICEGROUPALIAS);
   add_macrox_name(LASTSERVICEOK);
   add_macrox_name(LASTSERVICEWARNING);
   add_macrox_name(LASTSERVICEUNKNOWN);
@@ -643,8 +397,6 @@ int init_macrox_names() {
   add_macrox_name(LASTHOSTEVENTID);
   add_macrox_name(SERVICEEVENTID);
   add_macrox_name(LASTSERVICEEVENTID);
-  add_macrox_name(HOSTGROUPNAMES);
-  add_macrox_name(SERVICEGROUPNAMES);
   add_macrox_name(MAXHOSTATTEMPTS);
   add_macrox_name(MAXSERVICEATTEMPTS);
   add_macrox_name(TOTALHOSTSERVICES);
@@ -652,8 +404,6 @@ int init_macrox_names() {
   add_macrox_name(TOTALHOSTSERVICESWARNING);
   add_macrox_name(TOTALHOSTSERVICESUNKNOWN);
   add_macrox_name(TOTALHOSTSERVICESCRITICAL);
-  add_macrox_name(HOSTGROUPMEMBERS);
-  add_macrox_name(SERVICEGROUPMEMBERS);
   add_macrox_name(EVENTSTARTTIME);
   add_macrox_name(HOSTPROBLEMID);
   add_macrox_name(LASTHOSTPROBLEMID);
@@ -745,9 +495,7 @@ int clear_volatile_macros_r(nagios_macros* mac) {
 
   /* clear macro pointers */
   mac->host_ptr = NULL;
-  mac->hostgroup_ptr = NULL;
   mac->service_ptr = NULL;
-  mac->servicegroup_ptr = NULL;
 
   /* clear on-demand macro */
   delete[] mac->ondemand;

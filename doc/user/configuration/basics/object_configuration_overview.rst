@@ -10,9 +10,7 @@ Objects are all the elements that are involved in the monitoring and
 notification logic. Types of objects include:
 
   * Services
-  * Service Groups
   * Hosts
-  * Host Groups
   * Contacts
   * Contact Groups
   * Commands
@@ -71,11 +69,6 @@ monitoring logic. Important attributes of hosts are as follows:
     :ref:`network reachability <status_and_reachability_network>`
     logic.
 
-:ref:`Host Groups <obj_def_hostgroup>` are groups of one or more
-hosts. Host groups can make it easier to (1) view the status of related
-hosts in the Centreon Engine web interface and (2) simplify your
-configuration through the use of :ref:`object tricks <obj_def_tricks>`.
-
 .. image:: /_static/images/objects-hosts.png
    :align: center
 
@@ -85,12 +78,6 @@ monitoring logic. Services are associated with hosts and can be:
   * Attributes of a host (CPU load, disk usage, uptime, etc.)
   * Services provided by the host (HTTP, POP3, FTP, SSH, etc.)
   * Other things associated with the host (DNS records, etc.)
-
-:ref:`Services Groups <obj_def_servicegroup>` are groups of one or more
-services. Service groups can make it easier to (1) view the status of
-related services in the Centreon Engine web interface and (2) simplify
-your configuration through the use of
-:ref:`object tricks <obj_def_tricks>`.
 
 .. image:: /_static/images/objects-services.png
    :align: center

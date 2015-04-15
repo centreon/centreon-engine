@@ -33,16 +33,10 @@ using namespace com::centreon::engine::logging;
   &object::setter<hostdependency, type, &hostdependency::method>::generic
 
 hostdependency::setters const hostdependency::_setters[] = {
-  { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",                SETTER(std::string const&, _set_hostgroups) },
   { "host",                          SETTER(std::string const&, _set_hosts) },
   { "host_name",                     SETTER(std::string const&, _set_hosts) },
   { "master_host",                   SETTER(std::string const&, _set_hosts) },
   { "master_host_name",              SETTER(std::string const&, _set_hosts) },
-  { "dependent_hostgroup",           SETTER(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_hostgroups",          SETTER(std::string const&, _set_dependent_hostgroups) },
-  { "dependent_hostgroup_name",      SETTER(std::string const&, _set_dependent_hostgroups) },
   { "dependent_host",                SETTER(std::string const&, _set_dependent_hosts) },
   { "dependent_host_name",           SETTER(std::string const&, _set_dependent_hosts) },
   { "inherits_parent",               SETTER(bool, _set_inherits_parent) },
@@ -51,6 +45,12 @@ hostdependency::setters const hostdependency::_setters[] = {
   { "failure_options",               SETTER(std::string const&, _set_failure_options) },
 
   // Deprecated.
+  { "dependent_hostgroup",           SETTER(std::string const&, _set_dependent_hostgroups) },
+  { "dependent_hostgroups",          SETTER(std::string const&, _set_dependent_hostgroups) },
+  { "dependent_hostgroup_name",      SETTER(std::string const&, _set_dependent_hostgroups) },
+  { "hostgroup",                     SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroups",                    SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroup_name",                SETTER(std::string const&, _set_hostgroups) },
   { "notification_failure_options",  SETTER(std::string const&, _set_notification_failure_options) },
   { "notification_failure_criteria", SETTER(std::string const&, _set_notification_failure_options) }
 };
@@ -93,10 +93,8 @@ hostdependency& hostdependency::operator=(hostdependency const& right) {
   if (this != &right) {
     object::operator=(right);
     _dependency_period = right._dependency_period;
-    _dependent_hostgroups = right._dependent_hostgroups;
     _dependent_hosts = right._dependent_hosts;
     _failure_options = right._failure_options;
-    _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _inherits_parent = right._inherits_parent;
   }
@@ -113,10 +111,8 @@ hostdependency& hostdependency::operator=(hostdependency const& right) {
 bool hostdependency::operator==(hostdependency const& right) const throw () {
   return (object::operator==(right)
           && _dependency_period == right._dependency_period
-          && _dependent_hostgroups == right._dependent_hostgroups
           && _dependent_hosts == right._dependent_hosts
           && _failure_options == right._failure_options
-          && _hostgroups == right._hostgroups
           && _hosts == right._hosts
           && _inherits_parent == right._inherits_parent);
 }
@@ -144,10 +140,6 @@ bool hostdependency::operator<(hostdependency const& right) const {
     return (_dependent_hosts < right._dependent_hosts);
   else if (_hosts != right._hosts)
     return (_hosts < right._hosts);
-  else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
-  else if (_dependent_hostgroups != right._dependent_hostgroups)
-    return (_dependent_hostgroups < right._dependent_hostgroups);
   else if (_dependency_period != right._dependency_period)
     return (_dependency_period < right._dependency_period);
   else if (_failure_options != right._failure_options)
@@ -161,25 +153,20 @@ bool hostdependency::operator<(hostdependency const& right) const {
  *  If the object is not valid, an exception is thrown.
  */
 void hostdependency::check_validity() const {
-  if (_hosts->empty() && _hostgroups->empty())
+  if (_hosts->empty())
     throw (engine_error() << "Host dependency is not attached to any "
-           << "host or host group (properties 'host_name' or "
-           << "'hostgroup_name', respectively)");
-  if (_dependent_hosts->empty() && _dependent_hostgroups->empty())
+           << "host (property 'host_name')");
+  if (_dependent_hosts->empty())
     throw (engine_error() << "Host dependency is not attached to any "
-           << "dependent host or dependent host group (properties "
-           << "'dependent_host_name' or 'dependent_hostgroup_name', "
-           << "respectively)");
+           << "dependent host (property 'dependent_host_name')");
 
   if (!_failure_options) {
     ++config_warnings;
-    std::string host_name = !_hosts->empty() ?
-                              _hosts->front() : _hostgroups->front();
-    std::string dependend_host_name = !_dependent_hosts->empty() ?
-                  _dependent_hosts->front() : _dependent_hostgroups->front();
+    std::string host_name(_hosts->front());
+    std::string dependend_host_name(_dependent_hosts->front());
     logger(log_config_warning, basic)
-      << "Warning: Ignoring lame host dependency of '"
-      << dependend_host_name << "' on host/hostgroups '"
+      << "Warning: Ignoring lame host dependency of host '"
+      << dependend_host_name << "' on host '"
       << host_name << "'.";
   }
 
@@ -207,10 +194,8 @@ void hostdependency::merge(object const& obj) {
   hostdependency const& tmpl(static_cast<hostdependency const&>(obj));
 
   MRG_DEFAULT(_dependency_period);
-  MRG_INHERIT(_dependent_hostgroups);
   MRG_INHERIT(_dependent_hosts);
   MRG_OPTION(_failure_options);
-  MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
   MRG_OPTION(_inherits_parent);
 }
@@ -252,24 +237,6 @@ std::string const& hostdependency::dependency_period() const throw () {
 }
 
 /**
- *  Get dependent host groups.
- *
- *  @return Dependent host groups.
- */
-list_string& hostdependency::dependent_hostgroups() throw () {
-  return (*_dependent_hostgroups);
-}
-
-/**
- *  Get dependent_hostgroups.
- *
- *  @return The dependent_hostgroups.
- */
-list_string const& hostdependency::dependent_hostgroups() const throw () {
-  return (*_dependent_hostgroups);
-}
-
-/**
  *  Get dependent hosts.
  *
  *  @return The dependent hosts.
@@ -304,24 +271,6 @@ void hostdependency::failure_options(unsigned int options) throw () {
  */
 unsigned int hostdependency::failure_options() const throw () {
   return (_failure_options);
-}
-
-/**
- *  Get host groups.
- *
- *  @return The host groups.
- */
-list_string& hostdependency::hostgroups() throw () {
-  return (*_hostgroups);
-}
-
-/**
- *  Get hostgroups.
- *
- *  @return The hostgroups.
- */
-list_string const& hostdependency::hostgroups() const throw () {
-  return (*_hostgroups);
 }
 
 /**
@@ -374,14 +323,17 @@ bool hostdependency::_set_dependency_period(std::string const& value) {
 }
 
 /**
- *  Set dependent_hostgroups value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new dependent_hostgroups value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool hostdependency::_set_dependent_hostgroups(std::string const& value) {
-  _dependent_hostgroups = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host dependency hostgroups was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -433,14 +385,17 @@ bool hostdependency::_set_failure_options(std::string const& value) {
 }
 
 /**
- *  Set hostgroups value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new hostgroups value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool hostdependency::_set_hostgroups(std::string const& value) {
-  _hostgroups = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: host dependency hostgroups was ignored";
+  ++config_warnings;
   return (true);
 }
 

@@ -130,41 +130,6 @@ Examples of on-demand host and service macros follow::
   $SERVICESTATEID:novellserver:DS Database$ <--- On-demand service macro
   $SERVICESTATEID::CPU Load$                <--- On-demand service macro with blank host name field
 
-On-demand macros are also available for hostgroup, servicegroup,
-contact, and contactgroup macros. For example::
-
-  $CONTACTEMAIL:john$                <--- On-demand contact macro
-  $CONTACTGROUPMEMBERS:linux-admins$ <--- On-demand contactgroup macro
-  $HOSTGROUPALIAS:linux-servers$     <--- On-demand hostgroup macro
-  $SERVICEGROUPALIAS:DNS-Cluster$    <--- On-demand servicegroup macro
-
-On-Demand Group Macros
-======================
-
-You can obtain the values of a macro across all contacts, hosts, or
-services in a specific group by using a special format for your
-on-demand macro declaration. You do this by referencing a specific host
-group, service group, or contact group name in an on-demand macro, like
-so::
-
-  * **HOSTMACRONAME:** hostgroup_name:delimiter
-  * **SERVICEMACRONAME:**servicegroup_name:delimiter
-  * **CONTACTMACRONAME:**contactgroup_name:delimiter
-
-Replace HOSTMACRONAME, SERVICEMACRONAME, and CONTACTMACRONAME with the
-name of one of the standard host, service, or contact macros found
-:ref:`here <standard_macros>`. The delimiter you specify is used to
-separate macro values for each group member.
-
-For example, the following macro will return a comma-separated list of
-host state ids for hosts that are members of the hg1 hostgroup::
-
-  $HOSTSTATEID:hg1:,$
-
-This macro definition will return something that looks like this::
-
-  0,2,1,1,0,0,2
-
 Custom Variable Macros
 ======================
 

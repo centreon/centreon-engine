@@ -202,27 +202,6 @@ typedef struct   nebstruct_flapping_struct {
   void*          object_ptr;
 }                nebstruct_flapping_data;
 
-/* Group structure. */
-typedef struct   nebstruct_group_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  void*          object_ptr;
-}                nebstruct_group_data;
-
-/* Group member structure. */
-typedef struct   nebstruct_group_member_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  void*          object_ptr;
-  void*          group_ptr;
-}                nebstruct_group_member_data;
-
 /* Host check structure. */
 typedef struct   nebstruct_host_check_struct {
   int            type;

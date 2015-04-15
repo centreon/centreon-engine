@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,6 @@
 
 /* Forward declaration. */
 struct host_struct;
-struct hostgroup_struct;
 
 typedef struct               hostsmember_struct {
   char*                      host_name;
@@ -37,9 +36,6 @@ extern "C" {
 hostsmember* add_child_link_to_host(
                host_struct* hst,
                host_struct* child_ptr);
-hostsmember* add_host_to_hostgroup(
-               hostgroup_struct* temp_hostgroup,
-               char const* host_name);
 hostsmember* add_parent_host_to_host(
                host_struct* hst,
                char const* host_name);
@@ -60,5 +56,3 @@ std::ostream& operator<<(std::ostream& os, hostsmember const& obj);
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOSTSMEMBER_HH
-
-

@@ -34,24 +34,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 /**
- *  Check if the service group name matches the configuration object.
- */
-class         servicegroup_name_comparator {
-public:
-              servicegroup_name_comparator(
-                std::string const& servicegroup_name) {
-    _servicegroup_name = servicegroup_name;
-  }
-
-  bool        operator()(shared_ptr<configuration::servicegroup> sg) {
-    return (_servicegroup_name == sg->servicegroup_name());
-  }
-
-private:
-  std::string _servicegroup_name;
-};
-
-/**
  *  Default constructor.
  */
 applier::service::service() {}
@@ -95,10 +77,6 @@ void applier::service::add_object(
     throw (engine_error() << "Could not create service '"
            << obj->service_description()
            << "' with multiple hosts defined");
-  else if (!obj->hostgroups().empty())
-    throw (engine_error() << "Could not create service '"
-           << obj->service_description()
-           << "' with multiple host groups defined");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -171,10 +149,7 @@ void applier::service::expand_object(
                          shared_ptr<configuration::service> obj,
                          configuration::state& s) {
   // Either expand service instance.
-  if ((obj->hosts().size() == 1) && obj->hostgroups().empty()) {
-    // Expand memberships.
-    _expand_service_memberships(obj, s);
-
+  if (obj->hosts().size() == 1) {
     // Inherits special vars.
     _inherits_special_vars(obj, s);
   }
@@ -191,42 +166,6 @@ void applier::service::expand_object(
          ++it)
       target_hosts.insert(*it);
 
-    // Host group members.
-    for (list_string::const_iterator
-           it(obj->hostgroups().begin()),
-           end(obj->hostgroups().end());
-         it != end;
-         ++it) {
-      // Find host group.
-      set_hostgroup::iterator
-        it2(s.hostgroups().begin()),
-        end2(s.hostgroups().end());
-      while (it2 != end2) {
-        if (*it == (*it2)->hostgroup_name())
-          break ;
-        ++it2;
-      }
-      if (it2 == end2)
-        throw (engine_error() << "Could not find host group '"
-               << *it << "' on which to apply service '"
-               << obj->service_description() << "'");
-
-      // Check host group and user configuration.
-      if ((*it2)->resolved_members().empty())
-        logger(logging::log_config_warning, logging::basic)
-          << "Could not expand host group '"
-          << *it << "' specified in service '"
-          << obj->service_description() << "'";
-
-      // Add host group members.
-      for (set_string::const_iterator
-             it3((*it2)->resolved_members().begin()),
-             end3((*it2)->resolved_members().end());
-           it3 != end3;
-           ++it3)
-        target_hosts.insert(*it3);
-    }
-
     // Remove current service.
     s.services().erase(obj);
 
@@ -239,7 +178,6 @@ void applier::service::expand_object(
       // Create service instance.
       shared_ptr<configuration::service>
         svc(new configuration::service(*obj));
-      svc->hostgroups().clear();
       svc->hosts().clear();
       svc->hosts().push_back(*it);
 
@@ -475,11 +413,6 @@ void applier::service::resolve_object(
            << obj->service_description() << "' of host '"
            << obj->hosts().front() << "'");
 
-  // Remove service group links.
-  deleter::listmember(
-    it->second->servicegroups_ptr,
-    &deleter::objectlist);
-
   // Find host and adjust its counters.
   umap<std::string, shared_ptr<host_struct> >::iterator
     hst(applier::state::instance().hosts_find(it->second->host_name));
@@ -494,48 +427,6 @@ void applier::service::resolve_object(
       throw (engine_error() << "Cannot resolve service '"
              << obj->service_description() << "' of host '"
              << obj->hosts().front() << "'");
-
-  return ;
-}
-
-/**
- *  Expand service instance memberships.
- *
- *  @param[in]  obj Target service.
- *  @param[out] s   Configuration state.
- */
-void applier::service::_expand_service_memberships(
-                         shared_ptr<configuration::service> obj,
-                         configuration::state& s) {
-  // Browse service groups.
-  for (list_string::const_iterator
-         it(obj->servicegroups().begin()),
-         end(obj->servicegroups().end());
-       it != end;
-       ++it) {
-    // Find service group.
-    std::set<shared_ptr<configuration::servicegroup> >::iterator
-      it_group(std::find_if(
-                      s.servicegroups().begin(),
-                      s.servicegroups().end(),
-                      servicegroup_name_comparator(*it)));
-    if (it_group == s.servicegroups().end())
-      throw (engine_error() << "Could not add service '"
-             << obj->service_description() << "' of host '"
-             << obj->hosts().front()
-             << "' to non-existing service group '" << *it << "'");
-
-    // Remove service group from state.
-    shared_ptr<configuration::servicegroup> backup(*it_group);
-    s.servicegroups().erase(it_group);
-
-    // Add service to service members.
-    backup->members().push_back(obj->hosts().front());
-    backup->members().push_back(obj->service_description());
-
-    // Reinsert service group.
-    s.servicegroups().insert(backup);
-  }
 
   return ;
 }

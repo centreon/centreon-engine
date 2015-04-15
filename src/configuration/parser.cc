@@ -31,10 +31,8 @@ parser::store parser::_store[] = {
   &parser::_store_into_map<connector, &connector::connector_name>,
   &parser::_store_into_map<host, &host::host_name>,
   &parser::_store_into_list,
-  &parser::_store_into_map<hostgroup, &hostgroup::hostgroup_name>,
   &parser::_store_into_list,
   &parser::_store_into_list,
-  &parser::_store_into_map<servicegroup, &servicegroup::servicegroup_name>,
   &parser::_store_into_map<timeperiod, &timeperiod::timeperiod_name>
 };
 
@@ -79,10 +77,8 @@ void parser::parse(std::string const& path, state& config) {
   _insert(_map_objects[object::command], config.commands());
   _insert(_map_objects[object::connector], config.connectors());
   _insert(_lst_objects[object::hostdependency], config.hostdependencies());
-  _insert(_map_objects[object::hostgroup], config.hostgroups());
   _insert(_map_objects[object::host], config.hosts());
   _insert(_lst_objects[object::servicedependency], config.servicedependencies());
-  _insert(_map_objects[object::servicegroup], config.servicegroups());
   _insert(_lst_objects[object::service], config.services());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
 
@@ -160,41 +156,6 @@ file_info const& parser::_get_file_info(object* obj) const {
   }
   throw (engine_error() << "Parsing failed: Object not "
                            "found into the file information cache");
-}
-
-/**
- *  Build the hosts list with hostgroups.
- *
- *  @param[in]     hostgroups The hostgroups.
- *  @param[in,out] hosts      The host list to fill.
- */
-void parser::_get_hosts_by_hostgroups(
-       hostgroup_ptr const& hostgroups,
-       list_host& hosts) {
-  _get_objects_by_list_name(hostgroups->members(), _map_objects[object::host], hosts);
-  _get_hosts_by_hostgroups_name(hostgroups->hostgroup_members(), hosts);
-}
-
-/**
- *  Build the hosts list with list of hostgroups.
- *
- *  @param[in]     hostgroups The hostgroups list.
- *  @param[in,out] hosts      The host list to fill.
- */
-void parser::_get_hosts_by_hostgroups_name(
-       list_string const& lst_group,
-       list_host& hosts) {
-  map_object& gl_hostgroups(_map_objects[object::hostgroup]);
-  for (list_string::const_iterator
-         it(lst_group.begin()), end(lst_group.end());
-       it != end;
-       ++it) {
-    map_object::iterator it_hostgroups(gl_hostgroups.find(*it));
-    if (it_hostgroups != gl_hostgroups.end()) {
-      hostgroup_ptr obj(it_hostgroups->second);
-      _get_hosts_by_hostgroups(obj, hosts);
-    }
-  }
 }
 
 /**
@@ -369,7 +330,9 @@ void parser::_parse_object_definitions(std::string const& path) {
             || (type == "hostdowntime")
             || (type == "servicedowntime")
             || (type == "contact")
-            || (type == "contactgroup")) {
+            || (type == "contactgroup")
+            || (type == "hostgroup")
+            || (type == "servicegroup")) {
           logger(logging::log_config_warning, logging::basic)
             << "Warning: " << type << " object is ignored";
           parse_object = false;

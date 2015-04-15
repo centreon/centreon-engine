@@ -73,16 +73,11 @@ void applier::servicedependency::add_object(
                                    shared_ptr<configuration::servicedependency> obj) {
   // Check service dependency.
   if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
       || (obj->service_description().size() != 1)
-      || !obj->servicegroups().empty()
       || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()
-      || (obj->dependent_service_description().size() != 1)
-      || !obj->dependent_servicegroups().empty())
+      || (obj->dependent_service_description().size() != 1))
     throw (engine_error() << "Could not create service "
-           << "dependency with multiple (dependent) hosts / host groups "
-           << "/ services / service groups");
+           << "dependency with multiple (dependent) hosts / services");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -139,22 +134,15 @@ void applier::servicedependency::expand_object(
                                    configuration::state& s) {
   // Check service dependency.
   if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
       || (obj->service_description().size() != 1)
-      || !obj->servicegroups().empty()
       || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()
-      || (obj->dependent_service_description().size() != 1)
-      || !obj->dependent_servicegroups().empty()) {
+      || (obj->dependent_service_description().size() != 1)) {
     // Expand depended services.
     std::set<std::pair<std::string, std::string> >
       depended_services;
     _expand_services(
       obj->hosts(),
-      obj->hostgroups(),
       obj->service_description(),
-      obj->servicegroups(),
-      s,
       depended_services);
 
     // Expand dependent services.
@@ -162,10 +150,7 @@ void applier::servicedependency::expand_object(
       dependent_services;
     _expand_services(
       obj->dependent_hosts(),
-      obj->dependent_hostgroups(),
       obj->dependent_service_description(),
-      obj->dependent_servicegroups(),
-      s,
       dependent_services);
 
     // Remove current service dependency.
@@ -186,16 +171,12 @@ void applier::servicedependency::expand_object(
           // Create service dependency instance.
           shared_ptr<configuration::servicedependency>
             sdep(new configuration::servicedependency(*obj));
-          sdep->hostgroups().clear();
           sdep->hosts().clear();
           sdep->hosts().push_back(it1->first);
-          sdep->servicegroups().clear();
           sdep->service_description().clear();
           sdep->service_description().push_back(it1->second);
-          sdep->dependent_hostgroups().clear();
           sdep->dependent_hosts().clear();
           sdep->dependent_hosts().push_back(it2->first);
-          sdep->dependent_servicegroups().clear();
           sdep->dependent_service_description().clear();
           sdep->dependent_service_description().push_back(it2->second);
 
@@ -296,19 +277,13 @@ void applier::servicedependency::resolve_object(
 /**
  *  Expand services.
  *
- *  @param[in]     hst      Hosts.
- *  @param[in]     hg       Host groups.
- *  @param[in]     svc      Service descriptions.
- *  @param[in]     sg       Service groups.
- *  @param[in,out] s        Configuration state.
- *  @param[out]    expanded Expanded services.
+ *  @param[in]  hst       Hosts.
+ *  @param[in]  svc       Service descriptions.
+ *  @param[out] expanded  Expanded services.
  */
 void applier::servicedependency::_expand_services(
        std::list<std::string> const& hst,
-       std::list<std::string> const& hg,
        std::list<std::string> const& svc,
-       std::list<std::string> const& sg,
-       configuration::state& s,
        std::set<std::pair<std::string, std::string> >& expanded) {
   // Expanded hosts.
   std::set<std::string> all_hosts;
@@ -320,34 +295,6 @@ void applier::servicedependency::_expand_services(
        it != end;
        ++it)
     all_hosts.insert(*it);
-
-  // Host groups.
-  for (std::list<std::string>::const_iterator
-         it(hg.begin()),
-         end(hg.end());
-       it != end;
-       ++it) {
-    // Find host group.
-    std::set<shared_ptr<configuration::hostgroup> >::iterator
-      it_group(s.hostgroups().begin()),
-      end_group(s.hostgroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->hostgroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
-      throw (engine_error() << "Could not resolve host group '"
-             << *it << "'");
-
-    // Add host group members.
-    for (std::set<std::string>::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
-         it_member != end_member;
-         ++it_member)
-      all_hosts.insert(*it_member);
-  }
 
   // Hosts * services.
   for (std::set<std::string>::const_iterator
@@ -361,34 +308,6 @@ void applier::servicedependency::_expand_services(
          it_service != end_service;
          ++it_service)
       expanded.insert(std::make_pair(*it_host, *it_service));
-
-  // Service groups.
-  for (std::list<std::string>::const_iterator
-         it(sg.begin()),
-         end(sg.end());
-       it != end;
-       ++it) {
-    // Find service group.
-    std::set<shared_ptr<configuration::servicegroup> >::iterator
-      it_group(s.servicegroups().begin()),
-      end_group(s.servicegroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->servicegroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
-      throw (engine_error() << "Could not resolve service group '"
-             << *it << "'");
-
-    // Add service group members.
-    for (std::set<std::pair<std::string, std::string> >::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
-         it_member != end_member;
-         ++it_member)
-      expanded.insert(*it_member);
-  }
 
   return ;
 }

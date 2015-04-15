@@ -101,7 +101,6 @@ typedef struct                  host_struct {
   command_struct*               event_handler_ptr;
   command_struct*               check_command_ptr;
   timeperiod_struct*            check_period_ptr;
-  objectlist_struct*            hostgroups_ptr;
   struct host_struct*           next;
   struct host_struct*           nexthash;
 }                               host;

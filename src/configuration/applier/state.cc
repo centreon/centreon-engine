@@ -26,13 +26,11 @@
 #include "com/centreon/engine/configuration/applier/globals.hh"
 #include "com/centreon/engine/configuration/applier/host.hh"
 #include "com/centreon/engine/configuration/applier/hostdependency.hh"
-#include "com/centreon/engine/configuration/applier/hostgroup.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/configuration/applier/scheduler.hh"
 #include "com/centreon/engine/configuration/applier/service.hh"
 #include "com/centreon/engine/configuration/applier/servicedependency.hh"
-#include "com/centreon/engine/configuration/applier/servicegroup.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/timeperiod.hh"
 #include "com/centreon/engine/configuration/command.hh"
@@ -382,48 +380,6 @@ umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator applier::st
 }
 
 /**
- *  Get the current hostgroups.
- *
- *  @return The current hostgroups.
- */
-umap<std::string, shared_ptr<hostgroup_struct> > const& applier::state::hostgroups() const throw () {
-  return (_hostgroups);
-}
-
-/**
- *  Get the current hostgroups.
- *
- *  @return The current hostgroups.
- */
-umap<std::string, shared_ptr<hostgroup_struct> >& applier::state::hostgroups() throw () {
-  return (_hostgroups);
-}
-
-/**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) const {
-  return (_hostgroups.find(k));
-}
-
-/**
- *  Find a host group from its key.
- *
- *  @param[in] k Host group name.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<hostgroup_struct> >::iterator applier::state::hostgroups_find(configuration::hostgroup::key_type const& k) {
-  return (_hostgroups.find(k));
-}
-
-/**
  *  Get the current services.
  *
  *  @return The current services.
@@ -543,48 +499,6 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<servicedependency_stru
     ++p.first;
   }
   return ((p.first == p.second) ? _servicedependencies.end() : p.first);
-}
-
-/**
- *  Get the current servicegroups.
- *
- *  @return The current servicegroups.
- */
-umap<std::string, shared_ptr<servicegroup_struct> > const& applier::state::servicegroups() const throw () {
-  return (_servicegroups);
-}
-
-/**
- *  Get the current servicegroups.
- *
- *  @return The current servicegroups.
- */
-umap<std::string, shared_ptr<servicegroup_struct> >& applier::state::servicegroups() throw () {
-  return (_servicegroups);
-}
-
-/**
- *  Find a service group from its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) const {
-  return (_servicegroups.find(k));
-}
-
-/**
- *  Find a service group from its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-umap<std::string, shared_ptr<servicegroup_struct> >::iterator applier::state::servicegroups_find(configuration::servicegroup::key_type const& k) {
-  return (_servicegroups.find(k));
 }
 
 /**
@@ -1024,20 +938,10 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.hosts());
 
-  // Expand hostgroups.
-  _expand<configuration::hostgroup, applier::hostgroup>(
-    new_cfg,
-    new_cfg.hostgroups());
-
   // Expand services.
   _expand<configuration::service, applier::service>(
     new_cfg,
     new_cfg.services());
-
-  // Expand servicegroups.
-  _expand<configuration::servicegroup, applier::servicegroup>(
-    new_cfg,
-    new_cfg.servicegroups());
 
   // Expand hostdependencies.
   _expand<configuration::hostdependency, applier::hostdependency>(
@@ -1077,23 +981,11 @@ void applier::state::_processing(
     config->hosts(),
     new_cfg.hosts());
 
-  // Build difference for hostgroups.
-  difference<set_hostgroup> diff_hostgroups;
-  diff_hostgroups.parse(
-    config->hostgroups(),
-    new_cfg.hostgroups());
-
   // Build difference for services.
   difference<set_service> diff_services;
   diff_services.parse(
     config->services(),
     new_cfg.services());
-
-  // Build difference for servicegroups.
-  difference<set_servicegroup> diff_servicegroups;
-  diff_servicegroups.parse(
-    config->servicegroups(),
-    new_cfg.servicegroups());
 
   // Build difference for hostdependencies.
   difference<set_hostdependency> diff_hostdependencies;
@@ -1153,27 +1045,19 @@ void applier::state::_processing(
     _resolve<configuration::command, applier::command>(
       config->commands());
 
-    // Apply hosts and hostgroups.
+    // Apply hosts.
     _apply<configuration::host, applier::host>(
       diff_hosts);
-    _apply<configuration::hostgroup, applier::hostgroup>(
-      diff_hostgroups);
 
-    // Apply services and servicegroups.
+    // Apply services.
     _apply<configuration::service, applier::service>(
       diff_services);
-    _apply<configuration::servicegroup, applier::servicegroup>(
-      diff_servicegroups);
 
-    // Resolve hosts, services, host groups and service groups.
+    // Resolve hosts and services.
     _resolve<configuration::host, applier::host>(
       config->hosts());
-    _resolve<configuration::hostgroup, applier::hostgroup>(
-      config->hostgroups());
     _resolve<configuration::service, applier::service>(
       config->services());
-    _resolve<configuration::servicegroup, applier::servicegroup>(
-      config->servicegroups());
 
     // Apply host dependencies.
     _apply<configuration::hostdependency, applier::hostdependency>(

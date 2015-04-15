@@ -44,8 +44,6 @@
 #  define BROKER_RESERVED18                        (1 << 18)
 #  define BROKER_RESERVED19                        (1 << 19)
 #  define BROKER_CUSTOMVARIABLE_DATA               (1 << 20)
-#  define BROKER_GROUP_DATA                        (1 << 21)
-#  define BROKER_GROUP_MEMBER_DATA                 (1 << 22)
 #  define BROKER_MODULE_DATA                       (1 << 23)
 #  define BROKER_RELATION_DATA                     (1 << 24)
 #  define BROKER_COMMAND_DATA                      (1 << 25)
@@ -154,15 +152,6 @@
 #  define NEBTYPE_HOSTDEPENDENCY_DELETE            2601
 #  define NEBTYPE_HOSTDEPENDENCY_UPDATE            2602
 
-/* Host groups. */
-#  define NEBTYPE_HOSTGROUP_ADD                    2800
-#  define NEBTYPE_HOSTGROUP_DELETE                 2801
-#  define NEBTYPE_HOSTGROUP_UPDATE                 2802
-
-/* Host group members. */
-#  define NEBTYPE_HOSTGROUPMEMBER_ADD              2900
-#  define NEBTYPE_HOSTGROUPMEMBER_DELETE           2901
-
 /* Modules. */
 #  define NEBTYPE_MODULE_ADD                       3000
 #  define NEBTYPE_MODULE_DELETE                    3000
@@ -185,15 +174,6 @@
 #  define NEBTYPE_SERVICEDEPENDENCY_ADD            3400
 #  define NEBTYPE_SERVICEDEPENDENCY_DELETE         3401
 #  define NEBTYPE_SERVICEDEPENDENCY_UPDATE         3402
-
-/* Service group. */
-#  define NEBTYPE_SERVICEGROUP_ADD                 3600
-#  define NEBTYPE_SERVICEGROUP_DELETE              3601
-#  define NEBTYPE_SERVICEGROUP_UPDATE              3602
-
-/*  Service group members. */
-#  define NEBTYPE_SERVICEGROUPMEMBER_ADD           3700
-#  define NEBTYPE_SERVICEGROUPMEMBER_DELETE        3701
 
 /* Timeperiod. */
 #  define NEBTYPE_TIMEPERIOD_ADD                   3800
@@ -327,19 +307,6 @@ void           broker_flapping_data(
                  double percent_change,
                  double high_threshold,
                  double low_threshold,
-                 struct timeval const* timestamp);
-void           broker_group(
-                 int type,
-                 int flags,
-                 int attr,
-                 void* data,
-                 struct timeval const* timestamp);
-void           broker_group_member(
-                 int type,
-                 int flags,
-                 int attr,
-                 void* object,
-                 void* group,
                  struct timeval const* timestamp);
 int            broker_host_check(
                  int type,

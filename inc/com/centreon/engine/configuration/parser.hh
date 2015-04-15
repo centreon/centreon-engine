@@ -45,11 +45,9 @@ namespace              configuration {
       read_connector = (1 << 1),
       read_host = (1 << 2),
       read_hostdependency = (1 << 3),
-      read_hostgroup = (1 << 4),
-      read_service = (1 << 5),
-      read_servicedependency = (1 << 6),
-      read_servicegroup = (1 << 7),
-      read_timeperiod = (1 << 8),
+      read_service = (1 << 4),
+      read_servicedependency = (1 << 5),
+      read_timeperiod = (1 << 6),
       read_all = (~0)
     };
 
@@ -68,12 +66,6 @@ namespace              configuration {
                          std::list<std::string> const& lst,
                          void (parser::*pfunc)(std::string const&));
     file_info const&   _get_file_info(object* obj) const;
-    void               _get_hosts_by_hostgroups(
-                         hostgroup_ptr const& hostgroups,
-                         list_host& hosts);
-    void               _get_hosts_by_hostgroups_name(
-                         list_string const& lst_group,
-                         list_host& hosts);
     template<typename T>
     void               _get_objects_by_list_name(
                          list_string const& lst,

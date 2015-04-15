@@ -74,8 +74,6 @@ Macro Name                     Service Checks Service Notifications Host Checks 
 `HOSTDURATIONSEC`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTDOWNTIME`_                **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `HOSTPERCENTCHANGE`_           **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTGROUPNAME`_               **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTGROUPNAMES`_              **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LASTHOSTCHECK`_               **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LASTHOSTSTATECHANGE`_         **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `LASTHOSTUP`_                  **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
@@ -95,16 +93,6 @@ Macro Name                     Service Checks Service Notifications Host Checks 
 `TOTALHOSTSERVICESUNKNOWN`_    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TOTALHOSTSERVICESCRITICAL`_   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
-
-Host Group Macros
------------------
-
-============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                     Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`HOSTGROUPALIAS`_ :sup:`5`     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTGROUPMEMBERS`_ :sup:`5`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 .. _user_configuration_macros_service:
 
@@ -133,8 +121,6 @@ Macro Name                        Service Checks Service Notifications Host Chec
 `SERVICEDURATIONSEC`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICEDOWNTIME`_                **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICEPERCENTCHANGE`_           **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEGROUPNAME`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEGROUPNAMES`_              **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `LASTSERVICECHECK`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `LASTSERVICESTATECHANGE`_         **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `LASTSERVICEOK`_                  **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
@@ -149,16 +135,6 @@ Macro Name                        Service Checks Service Notifications Host Chec
 `SERVICEACKAUTHORNAME`_ :sup:`8`  No             **Yes**               No          No                 No                              No                           No                No
 `SERVICEACKAUTHORALIAS`_ :sup:`8` No             **Yes**               No          No                 No                              No                           No                No
 `SERVICEACKCOMMENT`_ :sup:`8`     No             **Yes**               No          No                 No                              No                           No                No
-================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-
-Service Group Macros
---------------------
-
-================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                        Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`SERVICEGROUPALIAS`_ :sup:`6`     **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SERVICEGROUPMEMBERS`_ :sup:`6`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 Contact Macros
@@ -322,10 +298,6 @@ _`HOSTDOWNTIME`                A number indicating the current "downtime depth" 
                                currently in a period of downtime, this value will be zero.
 _`HOSTPERCENTCHANGE`           A (floating point) number indicating the percent state change the host has undergone. Percent state change is used by the
                                :ref:`flap detection <flapping_detection>` algorithm.
-_`HOSTGROUPNAME`               The short name of the hostgroup that this host belongs to. This value is taken from the hostgroup_name directive in the
-                               :ref:`hostgroup definition <obj_def_hostgroup>`. If the host
-                               belongs to more than one hostgroup this macro will contain the name of just one of them.
-_`HOSTGROUPNAMES`              A comma separated list of the short names of all the hostgroups that this host belongs to.
 _`LASTHOSTCHECK`               This is a timestamp in time_t format (seconds since the UNIX epoch) indicating the time at which a check of the host was
                                last performed.
 _`LASTHOSTSTATECHANGE`         This is a timestamp in time_t format (seconds since the UNIX epoch) indicating the time the host last changed state.
@@ -353,17 +325,6 @@ _`TOTALHOSTSERVICESOK`         The total number of services associated with the 
 _`TOTALHOSTSERVICESWARNING`    The total number of services associated with the host that are in a WARNING state.
 _`TOTALHOSTSERVICESUNKNOWN`    The total number of services associated with the host that are in an UNKNOWN state.
 _`TOTALHOSTSERVICESCRITICAL`   The total number of services associated with the host that are in a CRITICAL state.
-============================== =========================================================================================================================
-
-Host Group Macros
------------------
-
-============================== =========================================================================================================================
-_`HOSTGROUPALIAS` :sup:`5`     The long name / alias of either 1) the hostgroup name passed as an on-demand macro argument or 2) the primary hostgroup
-                               associated with the current host (if not used in the context of an on-demand macro). This value is taken from the alias
-                               directive in the :ref:`hostgroup definition <obj_def_hostgroup>`.
-_`HOSTGROUPMEMBERS` :sup:`5`   A comma-separated list of all hosts that belong to either 1) the hostgroup name passed as an on-demand macro argument or
-                               2) the primary hostgroup associated with the current host (if not used in the context of an on-demand macro).
 ============================== =========================================================================================================================
 
 Service Macros
@@ -410,11 +371,6 @@ _`SERVICEDOWNTIME`                A number indicating the current "downtime dept
                                   currently in a period of downtime, this value will be zero.
 _`SERVICEPERCENTCHANGE`           A (floating point) number indicating the percent state change the service has undergone. Percent state change is used
                                   by the :ref:`flap detection <flapping_detection>` algorithm.
-_`SERVICEGROUPNAME`               The short name of the servicegroup that this service belongs to. This value is taken from the servicegroup_name
-                                  directive in the :ref:`servicegroup <obj_def_servicegroup>`
-                                  definition". If the service belongs to more than one servicegroup this macro will contain the name of just one of
-                                  them.
-_`SERVICEGROUPNAMES`              A comma separated list of the short names of all the servicegroups that this service belongs to.
 _`LASTSERVICECHECK`               This is a timestamp in time_t format (seconds since the UNIX epoch) indicating the time at which a check of the
                                   service was last performed.
 _`LASTSERVICESTATECHANGE`         This is a timestamp in time_t format (seconds since the UNIX epoch) indicating the time the service last changed
@@ -440,18 +396,6 @@ _`SERVICEACKAUTHORALIAS` :sup:`8` A string containing the alias of the contact (
                                   valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
 _`SERVICEACKCOMMENT` :sup:`8`     A string containing the acknowledgement comment that was entered by the user who acknowledged the service problem.
                                   This macro is only valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-================================= ======================================================================================================================
-
-Service Group Macros
---------------------
-
-================================= ======================================================================================================================
-_`SERVICEGROUPALIAS` :sup:`6`     The long name / alias of either 1) the servicegroup name passed as an on-demand macro argument or 2) the primary
-                                  servicegroup associated with the current service (if not used in the context of an on-demand macro). This value is
-                                  taken from the alias directive in the :ref:`servicegroup <obj_def_servicegroup>` definition".
-_`SERVICEGROUPMEMBERS` :sup:`6`   A comma-separated list of all services that belong to either 1) the servicegroup name passed as an on-demand macro
-                                  argument or 2) the primary servicegroup associated with the current service (if not used in the context of an
-                                  on-demand macro).
 ================================= ======================================================================================================================
 
 Contact Macros
@@ -632,22 +576,6 @@ Notes
     notification commands, the totals are filtered to reflect only those
     hosts and services for which the contact is authorized (i.e. hosts
     and services they are configured to receive notifications for).
-  * :sup:`5` These macros are normally associated with the
-    first/primary hostgroup associated with the current host. They could
-    therefore be considered host macros in many cases. However, these
-    macros are not available as on-demand host macros. Instead, they can
-    be used as on-demand hostgroup macros when you pass the name of a
-    hostgroup to the macro. For example: $HOSTGROUPMEMBERS:hg1$ would
-    return a comma-delimited list of all (host) members of the hostgroup
-    hg1.
-  * :sup:`6` These macros are normally associated with the
-    first/primary servicegroup associated with the current service. They
-    could therefore be considered service macros in many cases. However,
-    these macros are not available as on-demand service macros. Instead,
-    they can be used as on-demand servicegroup macros when you pass the
-    name of a servicegroup to the macro. For example:
-    $SERVICEGROUPMEMBERS:sg1$ would return a comma-delimited list of all
-    (service) members of the servicegroup sg1.
   * :sup:`7` These macros are normally associated with the
     first/primary contactgroup associated with the current contact. They
     could therefore be considered contact macros in many cases. However,

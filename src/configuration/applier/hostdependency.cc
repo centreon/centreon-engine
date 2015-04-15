@@ -70,11 +70,9 @@ void applier::hostdependency::add_object(
                                 shared_ptr<configuration::hostdependency> obj) {
   // Check host dependency.
   if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty())
+      || (obj->dependent_hosts().size() != 1))
     throw (engine_error() << "Could not create host dependency "
-           "with multiple (dependent) host / host groups");
+           "with multiple (dependent) host");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
@@ -121,23 +119,17 @@ void applier::hostdependency::expand_object(
                                 configuration::state& s) {
   // Expand host dependency instances.
   if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()) {
+      || (obj->dependent_hosts().size() != 1)) {
     // Expanded depended hosts.
     std::set<std::string> depended_hosts;
     _expand_hosts(
       obj->hosts(),
-      obj->hostgroups(),
-      s,
       depended_hosts);
 
     // Expanded dependent hosts.
     std::set<std::string> dependent_hosts;
     _expand_hosts(
       obj->dependent_hosts(),
-      obj->dependent_hostgroups(),
-      s,
       dependent_hosts);
 
     // Remove current host dependency.
@@ -158,10 +150,8 @@ void applier::hostdependency::expand_object(
           // Create host dependency instance.
           shared_ptr<configuration::hostdependency>
             hdep(new configuration::hostdependency(*obj));
-          hdep->hostgroups().clear();
           hdep->hosts().clear();
           hdep->hosts().push_back(*it1);
-          hdep->dependent_hostgroups().clear();
           hdep->dependent_hosts().clear();
           hdep->dependent_hosts().push_back(*it2);
 
@@ -262,15 +252,11 @@ void applier::hostdependency::resolve_object(
 /**
  *  Expand hosts.
  *
- *  @param[in]     hosts      Host list.
- *  @param[in]     hostgroups Host group list.
- *  @param[in,out] s          Configuration being applied.
- *  @param[out]    expanded   Expanded hosts.
+ *  @param[in]  hosts     Host list.
+ *  @param[out] expanded  Expanded hosts.
  */
 void applier::hostdependency::_expand_hosts(
                                 std::list<std::string> const& hosts,
-                                std::list<std::string> const& hostgroups,
-                                configuration::state& s,
                                 std::set<std::string>& expanded) {
   // Copy hosts.
   for (std::list<std::string>::const_iterator
@@ -279,35 +265,6 @@ void applier::hostdependency::_expand_hosts(
        it != end;
        ++it)
     expanded.insert(*it);
-
-  // Browse host groups.
-  for (std::list<std::string>::const_iterator
-         it(hostgroups.begin()),
-         end(hostgroups.end());
-       it != end;
-       ++it) {
-    // Find host group.
-    set_hostgroup::iterator
-      it_group(s.hostgroups().begin()),
-      end_group(s.hostgroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->hostgroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
-      throw (engine_error()
-             << "Could not expand non-existing host group '"
-             << *it << "'");
-
-    // Add host group members.
-    for (std::set<std::string>::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
-         it_member != end_member;
-         ++it_member)
-      expanded.insert(*it_member);
-  }
 
   return ;
 }

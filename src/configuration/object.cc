@@ -20,11 +20,9 @@
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/configuration/connector.hh"
 #include "com/centreon/engine/configuration/hostdependency.hh"
-#include "com/centreon/engine/configuration/hostgroup.hh"
 #include "com/centreon/engine/configuration/host.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/configuration/servicedependency.hh"
-#include "com/centreon/engine/configuration/servicegroup.hh"
 #include "com/centreon/engine/configuration/service.hh"
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
@@ -121,10 +119,6 @@ object_ptr object::create(std::string const& type_name) {
     obj = object_ptr(new configuration::service());
   else if (type_name == "host")
     obj = object_ptr(new configuration::host());
-  else if (type_name == "servicegroup")
-    obj = object_ptr(new configuration::servicegroup());
-  else if (type_name == "hostgroup")
-    obj = object_ptr(new configuration::hostgroup());
   else if (type_name == "servicedependency")
     obj = object_ptr(new configuration::servicedependency());
   else if (type_name == "hostdependency")
@@ -239,10 +233,8 @@ std::string const& object::type_name() const throw () {
     "connector",
     "host",
     "hostdependency",
-    "hostgroup",
     "service",
     "servicedependency",
-    "servicegroup",
     "timeperiod"
   };
   return (tab[_type]);

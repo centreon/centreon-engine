@@ -31,7 +31,6 @@ set(
   "${SRC_DIR}/connector.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/hostdependency.cc"
-  "${SRC_DIR}/hostgroup.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/macros.cc"
@@ -40,7 +39,6 @@ set(
   "${SRC_DIR}/scheduler.cc"
   "${SRC_DIR}/service.cc"
   "${SRC_DIR}/servicedependency.cc"
-  "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/state.cc"
   "${SRC_DIR}/timeperiod.cc"
 
@@ -50,7 +48,6 @@ set(
   "${INC_DIR}/difference.hh"
   "${INC_DIR}/host.hh"
   "${INC_DIR}/hostdependency.hh"
-  "${INC_DIR}/hostgroup.hh"
   "${INC_DIR}/globals.hh"
   "${INC_DIR}/logging.hh"
   "${INC_DIR}/macros.hh"
@@ -59,7 +56,6 @@ set(
   "${INC_DIR}/scheduler.hh"
   "${INC_DIR}/service.hh"
   "${INC_DIR}/servicedependency.hh"
-  "${INC_DIR}/servicegroup.hh"
   "${INC_DIR}/state.hh"
   "${INC_DIR}/timeperiod.hh"
 

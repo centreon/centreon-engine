@@ -305,24 +305,24 @@ standard (non-custom) variables that contain string values. Take the
 following example::
 
   define host{
-    hostgroups all-servers
+    parents    some-router
     name       generichosttemplate
     register   0
   }
 
   define host{
     host_name  linuxserver1
-    hostgroups +linux-servers,web-servers
+    parents    +linux-server,web-server
     use        generichosttemplate
   }
 
 In this case, the host linuxserver1 will append the value of its local
-hostgroups variable to that from generichosttemplate. The resulting
+parents variable to that from generichosttemplate. The resulting
 effective definition of linuxserver1 is the following::
 
   define host{
     host_name  linuxserver1
-    hostgroups all-servers,linux-servers,web-servers
+    parents    some-router,linux-server,web-server
   }
 
 Implied Inheritance
@@ -514,4 +514,3 @@ things work in complex inheritance situations like this. :-)
 
 .. image:: /_static/images/multiple-templates2.png
    :align: center
-

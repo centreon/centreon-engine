@@ -56,9 +56,7 @@ Object Types
 ============
 
   * :ref:`Host definitions <obj_def_host>`
-  * :ref:`Host group definitions <obj_def_hostgroup>`
   * :ref:`Service definitions <obj_def_service>`
-  * :ref:`Service group definitions <obj_def_servicegroup>`
   * :ref:`Contact definitions <obj_def_contact>`
   * :ref:`Contact group definitions <obj_def_contactgroup>`
   * :ref:`Time period definitions <obj_def_timeperiod>`
@@ -93,7 +91,6 @@ Definition Format
     alias                          alias
     address                        address
     # parents                      host_names
-    # hostgroups                   hostgroup_names
     # check_command                command_name
     # initial_state                [o,d,u]
     max_check_attempts             #
@@ -144,9 +141,9 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================ =========================================================================================================================
-host_name                    This directive is used to define a short name used to identify the host. It is used in host group and service definitions
-                             to reference this particular host. Hosts can have multiple services (which are monitored) associated with them. When used
-                             properly, the $HOSTNAME$ :ref:`macro <understanding_macros>` will contain this short name.
+host_name                    This directive is used to define a short name used to identify the host. It is used in service (and other objects)
+                             definitions to reference this particular host. Hosts can have multiple services (which are monitored) associated with
+                             them. When used properly, the $HOSTNAME$ :ref:`macro <understanding_macros>` will contain this short name.
 alias                        This directive is used to define a longer name or description used to identify the host. It is provided in order to allow
                              you to more easily identify a particular host. When used properly, the $HOSTALIAS$
                              :ref:`macro <understanding_macros>` will contain this alias/description.
@@ -168,10 +165,6 @@ parents                      This directive is used to define a comma-delimited 
                              be on the local network and will not have a parent host. Leave this value blank if the host does not have a parent host
                              (i.e. it is on the same segment as the Centreon Engine host). The order in which you specify parent hosts has no effect
                              on how things are monitored.
-hostgroups                   This directive is used to identify the short name(s) of the
-                             :ref:`hostgroup(s) <obj_def_hostgroup>` that the host belongs to. Multiple hostgroups
-                             should be separated by commas. This directive may be used as an alternative to (or in addition to) using the members
-                             directive in :ref:`hostgroup <obj_def_hostgroup>` definitions.
 check_command                This directive is used to specify the short name of the :ref:`command <obj_def_command>`
                              that should be used to check if the host is up or down. Typically, this command would try and ping the host to see if it
                              is "alive". The command must return a status of OK (0) or Centreon Engine will assume the host is down. If you leave this
@@ -279,57 +272,6 @@ notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is
 timezone                     Time zone of this host. All times applied to this host (time periods, downtimes, ...) will be affected by this option.
 ============================ =========================================================================================================================
 
-.. _obj_def_hostgroup:
-
-Host Group Definition
----------------------
-
-Description
-^^^^^^^^^^^
-
-A host group definition is used to group one or more hosts together for
-simplifying configuration with :ref:`object tricks <obj_def_tricks>`.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #).
-
-::
-
-  define hostgroup{
-    hostgroup_name      hostgroup_name
-    alias               alias
-    # members           hosts
-    # hostgroup_members hostgroups
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define hostgroup{
-    hostgroup_name novell-servers
-    alias          Novell Servers
-    members        netware1,netware2,netware3,netware4
-  }
-
-Directive Descriptions
-^^^^^^^^^^^^^^^^^^^^^^
-
-================= ====================================================================================================================================
-hostgroup_name    This directive is used to define a short name used to identify the host group.
-alias             This directive is used to define is a longer name or description used to identify the host group. It is provided in order to allow
-                  you to more easily identify a particular host group.
-members           This is a list of the short names of :ref:`hosts <obj_def_host>` that should be included in this group. Multiple host names should
-                  be separated by commas. This directive may be used as an alternative to (or in addition to) the hostgroups directive in
-                  :ref:`host definitions <obj_def_host>`.
-hostgroup_members This optional directive can be used to include hosts from other "sub" host groups in this host group. Specify a comma-delimited list
-                  of short names of other host groups whose members should be included in this group.
-================= ====================================================================================================================================
-
 .. _obj_def_service:
 
 Service Definition
@@ -355,9 +297,7 @@ Definition Format
 
   define service{
     host_name                      host_name
-    # hostgroup_name               hostgroup_name
     service_description            service_description
-    # servicegroups                servicegroup_names
     # is_volatile                  [0/1]
     check_command                  command_name
     # initial_state                [o,w,u,c]
@@ -411,16 +351,9 @@ Directive Descriptions
 ============================ =========================================================================================================================
 host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is
                              associated with. Multiple hosts should be separated by commas.
-hostgroup_name               This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>` that the service
-                             "runs" on or is associated with.
-                             Multiple hostgroups should be separated by commas. The hostgroup_name may be used instead of, or in addition to, the
-                             host_name directive.
 service_description;         This directive is used to define the description of the service, which may contain spaces, dashes, and colons
                              (semicolons, apostrophes, and quotation marks should be avoided). No two services associated with the same host can have
                              the same description. Services are uniquely identified with their host_name and service_description directives.
-servicegroups                This directive is used to identify the short name(s) of the :ref:`servicegroup(s) <obj_def_servicegroup>` that the
-                             service belongs to. Multiple servicegroups should be separated by commas. This directive may be used as an alternative
-                             to using the members directive in :ref:`servicegroup <obj_def_servicegroup>` definitions.
 is_volatile                  This directive is used to denote whether the service is "volatile". Services are normally not volatile. More information
                              on volatile service and how they differ from normal services can be found :ref:`here <volatile_services>`.
                              Value: 0 = service is not volatile, 1 = service is volatile.
@@ -525,60 +458,6 @@ contact_groups               This is a list of the short names of the :ref:`cont
 timezone                     Time zone of this service. All times applied to this service (time periods, downtimes, ...) will be affected by this
                              option.
 ============================ =========================================================================================================================
-
-.. _obj_def_servicegroup:
-
-Service Group Definition
-------------------------
-
-Description
-^^^^^^^^^^^
-
-A service group definition is used to group one or more services
-together for simplifying configuration with
-:ref:`object tricks <obj_def_tricks>`.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #).
-
-::
-
-  define servicegroup{
-    servicegroup_name      servicegroup_name
-    alias                  alias
-    # members              services
-    # servicegroup_members servicegroups
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define servicegroup{
-    servicegroup_name dbservices
-    alias             Database Services
-    members           ms1,SQL Server,ms1,SQL Server Agent,ms1,SQL DTC
-  }
-
-Directive Descriptions
-^^^^^^^^^^^^^^^^^^^^^^
-
-==================== =================================================================================================================================
-servicegroup_name    This directive is used to define a short name used to identify the service group.
-alias                This directive is used to define is a longer name or description used to identify the service group. It is provided in order to
-                     allow you to more easily identify a particular service group.
-members              This is a list of the descriptions of :ref:`services <obj_def_service>` (and the names of their
-                     corresponding hosts) that should be included in this group. Host and service names should be separated by commas. This directive
-                     may be used as an alternative to the servicegroups directive in :ref:`service <obj_def_service>`
-                     definitions". The format of the member directive is as follows (note that a host name must precede a service
-                     name/description):members=<host1>,<service1>,<host2>,<service2>,...,<hostn>,<servicen>
-servicegroup_members This optional directive can be used to include services from other "sub" service groups in this service group. Specify a
-                     comma-delimited list of short names of other service groups whose members should be included in this group.
-==================== =================================================================================================================================
 
 .. _obj_def_contact:
 
@@ -1006,10 +885,8 @@ Definition Format
 
   define servicedependency{
     dependent_host_name                host_name
-    # dependent_hostgroup_name         hostgroup_name
     dependent_service_description      service_description
     host_name                          host_name
-    # hostgroup_name                   hostgroup_name
     service_description                service_description
     # inherits_parent                  [0/1]
     # execution_failure_criteria       [o,w,u,c,p,n]
@@ -1037,18 +914,10 @@ Directive Descriptions
 ============================= ========================================================================================================================
 dependent_host_name           This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>`
                               that the dependent service "runs" on or is associated with. Multiple hosts should be separated by commas.
-dependent_hostgroup_name      This directive is used to specify the short name(s) of the
-                              :ref:`hostgroup(s) <obj_def_hostgroup>` that the dependent service "runs" on or is
-                              associated with. Multiple hostgroups should be separated by commas. The dependent_hostgroup may be used instead of, or
-                              in addition to, the dependent_host directive.
 dependent_service_description This directive is used to identify the description of the dependent :ref:`service <obj_def_service>`.
 host_name                     This directive is used to identify the short name(s) of the
                               :ref:`host(s) <obj_def_host>` that the service that is being depended upon (also referred
                               to as the master service) "runs" on or is associated with. Multiple hosts should be separated by commas.
-hostgroup_name                This directive is used to identify the short name(s) of the
-                              :ref:`hostgroup(s) <obj_def_host>` that the service that is being depended upon (also
-                              referred to as the master service) "runs" on or is associated with. Multiple hostgroups should be separated by
-                              commas. The hostgroup_name may be used instead of, or in addition to, the host_name directive.
 service_description           This directive is used to identify the description of the :ref:`service <obj_def_service>`
                               that is being depended upon (also referred to as the master service).
 inherits_parent               This directive indicates whether or not the dependency inherits dependencies of the service that is being depended upon
@@ -1098,7 +967,6 @@ Definition Format
 
   define serviceescalation{
     host_name                  host_name
-    # hostgroup_name           hostgroup_name
     service_description        service_description
     contacts                   contacts
     contact_groups             contactgroup_name
@@ -1129,9 +997,6 @@ Descriptions Directive Descriptions
 ===================== ================================================================================================================================
 host_name             This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>` that the
                       :ref:`service <obj_def_service>` escalation should apply to or is associated with.
-hostgroup_name        This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>`
-                      that the service escalation should apply to or is associated with. Multiple hostgroups should be separated by commas. The
-                      hostgroup_name may be used instead of, or in addition to, the host_name directive.
 service_description   This directive is used to identify the description of the :ref:`service <obj_def_service>` the
                       escalation should apply to.
 first_notification    This directive is a number that identifies the first notification for which this escalation is effective. For instance, if you
@@ -1193,9 +1058,7 @@ Definition Format
 
   define hostdependency{
     dependent_host_name             host_name
-    # dependent_hostgroup_name      hostgroup_name
     host_name                       host_name
-    # hostgroup_name                hostgroup_name
     # inherits_parent               [0/1]
     # execution_failure_criteria    [o,d,u,p,n]
     # notification_failure_criteria [o,d,u,p,n]
@@ -1219,14 +1082,8 @@ Directive Descriptions
 ============================= ========================================================================================================================
 dependent_host_name           This directive is used to identify the short name(s) of the dependent
                               :ref:`host(s) <obj_def_host>`. Multiple hosts should be separated by commas.
-dependent_hostgroup_name      This directive is used to identify the short name(s) of the dependent
-                              :ref:`hostgroup(s) <obj_def_host>`. Multiple hostgroups should be separated by commas. The
-                              dependent_hostgroup_name may be used instead of, or in addition to, the dependent_host_name directive.
 host_name                     This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>`
                               that is being depended upon (also referred to as the master host). Multiple hosts should be separated by commas.
-hostgroup_name                This directive is used to identify the short name(s) of the :ref:`hostgroup(s) <obj_def_host>`
-                              that is being depended upon (also referred to as the master host). Multiple hostgroups should be separated by commas.
-                              The hostgroup_name may be used instead of, or in addition to, the host_name directive.
 inherits_parent               This directive indicates whether or not the dependency inherits dependencies of the host that is being depended upon
                               (also referred to as the master host). In other words, if the master host is dependent upon other hosts and any one of
                               those dependencies fail, this dependency will also fail.
@@ -1272,7 +1129,6 @@ Definition Format
 
   define hostescalation{
     host_name                  host_name
-    # hostgroup_name           hostgroup_name
     contacts                   contacts
     contact_groups             contactgroup_name
     first_notification         #
@@ -1301,10 +1157,6 @@ Directive Descriptions
 ===================== ================================================================================================================================
 host_name             This directive is used to identify the short name of the :ref:`host <obj_def_host>` that the
                       escalation should apply to.
-hostgroup_name        This directive is used to identify the short name(s) of the
-                      :ref:`hostgroup(s) <obj_def_hostgroup>` that the escalation should apply to. Multiple hostgroups
-                      should be separated by commas. If this is used, the escalation will apply to all hosts that are members of the specified
-                      hostgroup(s).
 first_notification    This directive is a number that identifies the first notification for which this escalation is effective. For instance, if you
                       set this value to 3, this escalation will only be used if the host is down or unreachable long enough for a third notification
                       to go out.

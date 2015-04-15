@@ -384,7 +384,6 @@ state& state::operator=(state const& right) {
     _high_host_flap_threshold = right._high_host_flap_threshold;
     _high_service_flap_threshold = right._high_service_flap_threshold;
     _hostdependencies = right._hostdependencies;
-    _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _host_check_timeout = right._host_check_timeout;
     _host_freshness_check_interval = right._host_freshness_check_interval;
@@ -412,7 +411,6 @@ state& state::operator=(state const& right) {
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
     _retention_update_interval = right._retention_update_interval;
     _servicedependencies = right._servicedependencies;
-    _servicegroups = right._servicegroups;
     _services = right._services;
     _service_check_timeout = right._service_check_timeout;
     _service_freshness_check_interval = right._service_freshness_check_interval;
@@ -465,7 +463,6 @@ bool state::operator==(state const& right) const throw () {
           && _high_host_flap_threshold == right._high_host_flap_threshold
           && _high_service_flap_threshold == right._high_service_flap_threshold
           && cmp_set_ptr(_hostdependencies, right._hostdependencies)
-          && cmp_set_ptr(_hostgroups, right._hostgroups)
           && cmp_set_ptr(_hosts, right._hosts)
           && _host_check_timeout == right._host_check_timeout
           && _host_freshness_check_interval == right._host_freshness_check_interval
@@ -493,7 +490,6 @@ bool state::operator==(state const& right) const throw () {
           && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
           && _retention_update_interval == right._retention_update_interval
           && cmp_set_ptr(_servicedependencies, right._servicedependencies)
-          && cmp_set_ptr(_servicegroups, right._servicegroups)
           && cmp_set_ptr(_services, right._services)
           && _service_check_timeout == right._service_check_timeout
           && _service_freshness_check_interval == right._service_freshness_check_interval
@@ -1188,67 +1184,6 @@ set_hostdependency& state::hostdependencies() throw () {
 }
 
 /**
- *  Get all engine hostgroups.
- *
- *  @return All engine hostgroups.
- */
-set_hostgroup const& state::hostgroups() const throw () {
-  return (_hostgroups);
-}
-
-/**
- *  Get all engine hostgroups.
- *
- *  @return All engine hostgroups.
- */
-set_hostgroup& state::hostgroups() throw () {
-  return (_hostgroups);
-}
-
-/**
- *  Find a host group by its key.
- *
- *  @param[in] k Host group key.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-set_hostgroup::const_iterator state::hostgroups_find(
-                                hostgroup::key_type const& k) const {
-  shared_ptr<configuration::hostgroup>
-    below_searched(new configuration::hostgroup(k));
-  set_hostgroup::const_iterator
-    it(_hostgroups.upper_bound(below_searched));
-  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
-    return (it);
-  else if ((it != _hostgroups.begin())
-           && ((*--it)->hostgroup_name() == k))
-    return (it);
-  return (_hostgroups.end());
-}
-
-/**
- *  Find a host group by its key.
- *
- *  @param[in] k Host group key.
- *
- *  @return Iterator to the element if found, hostgroups().end()
- *          otherwise.
- */
-set_hostgroup::iterator state::hostgroups_find(
-                                 hostgroup::key_type const& k) {
-  shared_ptr<configuration::hostgroup>
-    below_searched(new configuration::hostgroup(k));
-  set_hostgroup::iterator it(_hostgroups.upper_bound(below_searched));
-  if ((it != _hostgroups.end()) && ((*it)->hostgroup_name() == k))
-    return (it);
-  else if ((it != _hostgroups.begin())
-           && ((*--it)->hostgroup_name() == k))
-    return (it);
-  return (_hostgroups.end());
-}
-
-/**
  *  Get all engine hosts.
  *
  *  @return All engine hosts.
@@ -1814,68 +1749,6 @@ set_servicedependency const& state::servicedependencies() const throw () {
  */
 set_servicedependency& state::servicedependencies() throw () {
   return (_servicedependencies);
-}
-
-/**
- *  Get all engine servicegroups.
- *
- *  @return All engine servicegroups.
- */
-set_servicegroup const& state::servicegroups() const throw () {
-  return (_servicegroups);
-}
-
-/**
- *  Get all engine servicegroups.
- *
- *  @return All engine servicegroups.
- */
-set_servicegroup& state::servicegroups() throw () {
-  return (_servicegroups);
-}
-
-/**
- *  Get service group by its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-set_servicegroup::const_iterator state::servicegroups_find(
-                                   servicegroup::key_type const& k) const {
-  shared_ptr<configuration::servicegroup>
-    below_searched(new configuration::servicegroup(k));
-  set_servicegroup::const_iterator
-    it(_servicegroups.upper_bound(below_searched));
-  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
-    return (it);
-  else if ((it != _servicegroups.begin())
-           && ((*--it)->servicegroup_name() == k))
-    return (it);
-  return (_servicegroups.end());
-}
-
-/**
- *  Get service group by its key.
- *
- *  @param[in] k Service group name.
- *
- *  @return Iterator to the element if found, servicegroups().end()
- *          otherwise.
- */
-set_servicegroup::iterator state::servicegroups_find(
-                             servicegroup::key_type const& k) {
-  shared_ptr<configuration::servicegroup>
-    below_searched(new configuration::servicegroup(k));
-  set_servicegroup::iterator
-    it(_servicegroups.upper_bound(below_searched));
-  if ((it != _servicegroups.end()) && ((*it)->servicegroup_name() == k))
-    return (it);
-  else if ((it != _servicegroups.begin())
-           && ((*--it)->servicegroup_name() == k))
-    return (it);
-  return (_servicegroups.end());
 }
 
 /**

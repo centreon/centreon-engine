@@ -22,7 +22,6 @@
 #include <utility>
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/clear_host.hh"
-#include "com/centreon/engine/macros/clear_hostgroup.hh"
 #include "com/centreon/engine/macros/defines.hh"
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
@@ -108,33 +107,6 @@ static char* get_host_check_type(host& hst, nagios_macros* mac) {
            (HOST_CHECK_PASSIVE == hst.check_type
             ? "PASSIVE"
             : "ACTIVE")));
-}
-
-/**
- *  Extract host group names.
- *
- *  @param[in] hst Host object.
- *  @param[in] mac Unused.
- *
- *  @return Newly allocated string with group names.
- */
-static char* get_host_group_names(host& hst, nagios_macros* mac) {
-  (void)mac;
-
-  std::string buf;
-  // Find all hostgroups this host is associated with.
-  for (objectlist* temp_objectlist = hst.hostgroups_ptr;
-       temp_objectlist != NULL;
-       temp_objectlist = temp_objectlist->next) {
-    hostgroup* temp_hostgroup(
-      static_cast<hostgroup*>(temp_objectlist->object_ptr));
-    if (temp_hostgroup) {
-      if (!buf.empty())
-        buf.append(",");
-      buf.append(temp_hostgroup->group_name);
-    }
-  }
-  return (string::dup(buf));
 }
 
 /**
@@ -270,9 +242,6 @@ struct grab_host_redirection {
     // Last problem ID.
     routines[MACRO_LASTHOSTPROBLEMID].first = &get_member_as_string<host, unsigned long, &host::last_problem_id>;
     routines[MACRO_LASTHOSTPROBLEMID].second = true;
-    // Group names.
-    routines[MACRO_HOSTGROUPNAMES].first = &get_host_group_names;
-    routines[MACRO_HOSTGROUPNAMES].second = true;
     // Total services.
     routines[MACRO_TOTALHOSTSERVICES].first = &get_host_total_services<MACRO_TOTALHOSTSERVICES>;
     routines[MACRO_TOTALHOSTSERVICES].second = false;
@@ -382,19 +351,12 @@ int grab_standard_host_macro(
 int grab_host_macros_r(nagios_macros* mac, host* hst) {
   // Clear host-related macros.
   clear_host_macros_r(mac);
-  clear_hostgroup_macros_r(mac);
 
   // Save pointer to host.
   mac->host_ptr = hst;
-  mac->hostgroup_ptr = NULL;
 
   if (hst == NULL)
     return (ERROR);
-
-  // Save pointer to host's first/primary hostgroup.
-  if (hst->hostgroups_ptr)
-    mac->hostgroup_ptr
-      = static_cast<hostgroup*>(hst->hostgroups_ptr->object_ptr);
 
   return (OK);
 }

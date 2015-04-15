@@ -20,9 +20,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/objects/host.hh"
-#include "com/centreon/engine/objects/hostgroup.hh"
 #include "com/centreon/engine/objects/service.hh"
-#include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "find.hh"
@@ -74,24 +72,6 @@ host* find_host(char const* name) {
 }
 
 /**
- *  Find a hostgroup from the list in memory.
- *
- *  @param[in] name Host group name.
- *
- *  @return Host group object if found, NULL otherwise.
- */
-hostgroup* find_hostgroup(char const* name) {
-  if (!name)
-    return (NULL);
-
-  umap<std::string, shared_ptr<hostgroup_struct> >::const_iterator
-    it(state::instance().hostgroups().find(name));
-  if (it != state::instance().hostgroups().end())
-    return (it->second.get());
-  return (NULL);
-}
-
-/**
  *  Given a host/service name, find the service in the list in memory.
  *
  *  @param[in] host_name Host name.
@@ -107,24 +87,6 @@ service* find_service(char const* host_name, char const* svc_desc) {
     it(state::instance().services().find(std::make_pair(host_name, svc_desc)));
   if (it != state::instance().services().end())
     return (&(*it->second));
-  return (NULL);
-}
-
-/**
- *  Find a servicegroup from the list in memory.
- *
- *  @param[in] name Service group name.
- *
- *  @return Service group object if found, NULL otherwise.
- */
-servicegroup* find_servicegroup(char const* name) {
-  if (!name)
-    return (NULL);
-
-  umap<std::string, shared_ptr<servicegroup_struct> >::const_iterator
-    it(state::instance().servicegroups().find(name));
-  if (it != state::instance().servicegroups().end())
-    return (it->second.get());
   return (NULL);
 }
 

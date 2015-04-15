@@ -151,9 +151,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   char const* chk_period_str(NULL);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* hstgrp_str(NULL);
-  if (obj.hostgroups_ptr)
-    hstgrp_str = chkstr(static_cast<hostgroup const*>(obj.hostgroups_ptr->object_ptr)->group_name);
 
   os << "host {\n"
     "  name:                                 " << chkstr(obj.name) << "\n"
@@ -230,7 +227,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  event_handler_ptr:                    " << chkstr(evt_str) << "\n"
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
-    "  hostgroups_ptr:                       " << chkstr(hstgrp_str) << "\n"
     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
     << "}\n";
   return (os);

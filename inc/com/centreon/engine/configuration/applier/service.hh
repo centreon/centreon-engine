@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,9 +50,6 @@ namespace             configuration {
                         shared_ptr<configuration::service> obj);
 
     private:
-      void            _expand_service_memberships(
-                        shared_ptr<configuration::service> obj,
-                        configuration::state& s);
       void            _inherits_special_vars(
                         shared_ptr<configuration::service> obj,
                         configuration::state& s);

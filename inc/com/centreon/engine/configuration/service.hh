@@ -76,8 +76,6 @@ namespace                  configuration {
     unsigned short         flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
     unsigned int           high_flap_threshold() const throw ();
-    list_string&           hostgroups() throw ();
-    list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
     unsigned int           initial_state() const throw ();
@@ -86,8 +84,6 @@ namespace                  configuration {
     unsigned int           max_check_attempts() const throw ();
     bool                   obsess_over_service() const throw ();
     unsigned int           retry_interval() const throw ();
-    list_string&           servicegroups() throw ();
-    list_string const&     servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
     void                   timezone(std::string const& tz);
@@ -159,7 +155,6 @@ namespace                  configuration {
     opt<unsigned short>    _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
     opt<unsigned int>      _high_flap_threshold;
-    group                  _hostgroups;
     group                  _hosts;
     opt<unsigned int>      _initial_state;
     opt<bool>              _is_volatile;
@@ -167,7 +162,6 @@ namespace                  configuration {
     opt<unsigned int>      _max_check_attempts;
     opt<bool>              _obsess_over_service;
     opt<unsigned int>      _retry_interval;
-    group                  _servicegroups;
     std::string            _service_description;
     static setters const   _setters[];
     opt<std::string>       _timezone;

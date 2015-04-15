@@ -28,10 +28,8 @@
 #  include "com/centreon/engine/configuration/connector.hh"
 #  include "com/centreon/engine/configuration/host.hh"
 #  include "com/centreon/engine/configuration/hostdependency.hh"
-#  include "com/centreon/engine/configuration/hostgroup.hh"
 #  include "com/centreon/engine/configuration/service.hh"
 #  include "com/centreon/engine/configuration/servicedependency.hh"
-#  include "com/centreon/engine/configuration/servicegroup.hh"
 #  include "com/centreon/engine/configuration/timeperiod.hh"
 #  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -129,13 +127,6 @@ namespace               configuration {
     set_hostdependency const&
                         hostdependencies() const throw ();
     set_hostdependency& hostdependencies() throw ();
-    set_hostgroup const&
-                        hostgroups() const throw ();
-    set_hostgroup&      hostgroups() throw ();
-    set_hostgroup::const_iterator
-                        hostgroups_find(hostgroup::key_type const& k) const;
-    set_hostgroup::iterator
-                        hostgroups_find(hostgroup::key_type const& k);
     set_host const&     hosts() const throw ();
     set_host&           hosts() throw ();
     set_host::const_iterator
@@ -198,13 +189,6 @@ namespace               configuration {
                         servicedependencies() const throw ();
     set_servicedependency&
                         servicedependencies() throw ();
-    set_servicegroup const&
-                        servicegroups() const throw ();
-    set_servicegroup&   servicegroups() throw ();
-    set_servicegroup::const_iterator
-                        servicegroups_find(servicegroup::key_type const& k) const;
-    set_servicegroup::iterator
-                        servicegroups_find(servicegroup::key_type const& k);
     set_service const&  services() const throw ();
     set_service&        services() throw ();
     set_service::const_iterator
@@ -404,7 +388,6 @@ namespace               configuration {
     float               _high_host_flap_threshold;
     float               _high_service_flap_threshold;
     set_hostdependency  _hostdependencies;
-    set_hostgroup       _hostgroups;
     set_host            _hosts;
     unsigned int        _host_check_timeout;
     unsigned int        _host_freshness_check_interval;
@@ -435,7 +418,6 @@ namespace               configuration {
     unsigned int        _retention_update_interval;
     set_servicedependency
                         _servicedependencies;
-    set_servicegroup    _servicegroups;
     set_service         _services;
     unsigned int        _service_check_timeout;
     unsigned int        _service_freshness_check_interval;

@@ -22,9 +22,7 @@
 #  define CCE_MACROS_HH
 
 #  include "com/centreon/engine/macros/clear_host.hh"
-#  include "com/centreon/engine/macros/clear_hostgroup.hh"
 #  include "com/centreon/engine/macros/clear_service.hh"
-#  include "com/centreon/engine/macros/clear_servicegroup.hh"
 #  include "com/centreon/engine/macros/defines.hh"
 #  include "com/centreon/engine/macros/grab_host.hh"
 #  include "com/centreon/engine/macros/grab_service.hh"
@@ -40,24 +38,14 @@ extern "C" {
 int grab_custom_macro_value_r(
       nagios_macros* mac,
       char* macro_name,
-      char const* arg1,
-      char const* arg2,
+      char const* host_name,
+      char const* service_description,
       char** output);
 int grab_datetime_macro_r(
       nagios_macros* mac,
       int macro_type,
       char const* arg1,
       char const* arg2,
-      char** output);
-int grab_standard_hostgroup_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      hostgroup* temp_hostgroup,
-      char** output);
-int grab_standard_servicegroup_macro_r(
-      nagios_macros* mac,
-      int macro_type,
-      servicegroup* temp_servicegroup,
       char** output);
 int grab_custom_object_macro_r(
       nagios_macros* mac,

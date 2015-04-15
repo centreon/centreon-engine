@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,7 +20,6 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/deleter/hostsmember.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/objects/hostgroup.hh"
 #include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
@@ -124,70 +123,6 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
 }
 
 /**
- *  Add a new host to a host group.
- *
- *  @param[in] temp_hostgroup Host group object.
- *  @param[in] host_name      Host name.
- *
- *  @return Host group membership.
- */
-hostsmember* add_host_to_hostgroup(
-               hostgroup* grp,
-               char const* host_name) {
-  // Make sure we have the data we need.
-  if (!grp || !host_name || !host_name[0]) {
-    logger(log_config_error, basic)
-      << "Error: Hostgroup or group member is NULL";
-    return (NULL);
-  }
-
-  // Allocate memory for a new member.
-  hostsmember* obj(new hostsmember);
-  memset(obj, 0, sizeof(*obj));
-
-  try {
-    // Duplicate vars.
-    obj->host_name = string::dup(host_name);
-
-    // Add the new member to the member list, sorted by host name.
-    hostsmember* last(grp->members);
-    hostsmember* temp;
-    for (temp = grp->members; temp; temp = temp->next) {
-      if (strcmp(obj->host_name, temp->host_name) < 0) {
-        obj->next = temp;
-        if (temp == grp->members)
-          grp->members = obj;
-        else
-          last->next = obj;
-        break;
-      }
-      else
-        last = temp;
-    }
-    if (!grp->members)
-      grp->members = obj;
-    else if (!temp)
-      last->next = obj;
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_group_member(
-      NEBTYPE_HOSTGROUPMEMBER_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj,
-      grp,
-      &tv);
-  }
-  catch (...) {
-    deleter::hostsmember(obj);
-    obj = NULL;
-  }
-
-  return (obj);
-}
-
-/**
  *  Add parent to host.
  *
  *  @param[in] hst       Child host.
@@ -235,4 +170,3 @@ hostsmember* add_parent_host_to_host(
 
   return (obj);
 }
-

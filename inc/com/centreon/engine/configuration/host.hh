@@ -71,8 +71,6 @@ namespace                  configuration {
     unsigned int           flap_detection_options() const throw ();
     unsigned int           freshness_threshold() const throw ();
     unsigned int           high_flap_threshold() const throw ();
-    list_string&           hostgroups() throw ();
-    list_string const&     hostgroups() const throw ();
     std::string const&     host_name() const throw ();
     unsigned int           initial_state() const throw ();
     unsigned int           low_flap_threshold() const throw ();
@@ -152,7 +150,6 @@ namespace                  configuration {
     opt<unsigned int>      _flap_detection_options;
     opt<unsigned int>      _freshness_threshold;
     opt<unsigned int>      _high_flap_threshold;
-    group                  _hostgroups;
     std::string            _host_name;
     opt<unsigned int>      _initial_state;
     opt<unsigned int>      _low_flap_threshold;

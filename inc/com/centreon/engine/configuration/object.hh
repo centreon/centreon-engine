@@ -43,10 +43,8 @@ namespace                  configuration {
       connector,
       host,
       hostdependency,
-      hostgroup,
       service,
       servicedependency,
-      servicegroup,
       timeperiod
     };
 

@@ -39,11 +39,6 @@ service::setters const service::_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
   { "service_description",          SETTER(std::string const&, _set_service_description) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
-  { "hostgroup",                    SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
-  { "hostgroup_name",               SETTER(std::string const&, _set_hostgroups) },
-  { "service_groups",               SETTER(std::string const&, _set_servicegroups) },
-  { "servicegroups",                SETTER(std::string const&, _set_servicegroups) },
   { "check_command",                SETTER(std::string const&, _set_check_command) },
   { "check_period",                 SETTER(std::string const&, _set_check_period) },
   { "check_timeout",                SETTER(unsigned int, _set_check_timeout) },
@@ -75,6 +70,11 @@ service::setters const service::_setters[] = {
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "failure_prediction_options",   SETTER(std::string const&, _set_failure_prediction_options) },
   { "first_notification_delay",     SETTER(unsigned int, _set_first_notification_delay) },
+  { "hostgroup",                    SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroups",                   SETTER(std::string const&, _set_hostgroups) },
+  { "hostgroup_name",               SETTER(std::string const&, _set_hostgroups) },
+  { "service_groups",               SETTER(std::string const&, _set_servicegroups) },
+  { "servicegroups",                SETTER(std::string const&, _set_servicegroups) },
   { "icon_image",                   SETTER(std::string const&, _set_icon_image) },
   { "icon_image_alt",               SETTER(std::string const&, _set_icon_image_alt) },
   { "notes",                        SETTER(std::string const&, _set_notes) },
@@ -172,7 +172,6 @@ service& service::operator=(service const& right) {
     _flap_detection_options = right._flap_detection_options;
     _freshness_threshold = right._freshness_threshold;
     _high_flap_threshold = right._high_flap_threshold;
-    _hostgroups = right._hostgroups;
     _hosts = right._hosts;
     _initial_state = right._initial_state;
     _is_volatile = right._is_volatile;
@@ -180,7 +179,6 @@ service& service::operator=(service const& right) {
     _max_check_attempts = right._max_check_attempts;
     _obsess_over_service = right._obsess_over_service;
     _retry_interval = right._retry_interval;
-    _servicegroups = right._servicegroups;
     _service_description = right._service_description;
     _timezone = right._timezone;
   }
@@ -210,7 +208,6 @@ bool service::operator==(service const& right) const throw () {
           && _flap_detection_options == right._flap_detection_options
           && _freshness_threshold == right._freshness_threshold
           && _high_flap_threshold == right._high_flap_threshold
-          && _hostgroups == right._hostgroups
           && _hosts == right._hosts
           && _initial_state == right._initial_state
           && _is_volatile == right._is_volatile
@@ -218,7 +215,6 @@ bool service::operator==(service const& right) const throw () {
           && _max_check_attempts == right._max_check_attempts
           && _obsess_over_service == right._obsess_over_service
           && _retry_interval == right._retry_interval
-          && _servicegroups == right._servicegroups
           && _service_description == right._service_description
           && _timezone == right._timezone);
 }
@@ -276,8 +272,6 @@ bool service::operator<(service const& right) const throw () {
     return (_freshness_threshold < right._freshness_threshold);
   else if (_high_flap_threshold != right._high_flap_threshold)
     return (_high_flap_threshold < right._high_flap_threshold);
-  else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
   else if (_initial_state != right._initial_state)
     return (_initial_state < right._initial_state);
   else if (_is_volatile != right._is_volatile)
@@ -290,8 +284,6 @@ bool service::operator<(service const& right) const throw () {
     return (_obsess_over_service < right._obsess_over_service);
   else if (_retry_interval != right._retry_interval)
     return (_retry_interval < right._retry_interval);
-  else if (_servicegroups != right._servicegroups)
-    return (_servicegroups < right._servicegroups);
   return (_timezone < right._timezone);
 }
 
@@ -304,10 +296,9 @@ void service::check_validity() const {
   if (_service_description.empty())
     throw (engine_error() << "Service has no description (property "
            << "'service_description')");
-  if (_hosts->empty() && _hostgroups->empty())
+  if (_hosts->empty())
     throw (engine_error() << "Service '" << _service_description
-           << "' is not attached to any host or host group (properties "
-           << "'host_name' or 'hostgroup_name', respectively)");
+           << "' is not attached to any host (property 'host_name')");
   if (_check_command.empty())
     throw (engine_error() << "Service '" << _service_description
            << "' has no check command (property 'check_command')");
@@ -351,7 +342,6 @@ void service::merge(object const& obj) {
   MRG_OPTION(_flap_detection_options);
   MRG_OPTION(_freshness_threshold);
   MRG_OPTION(_high_flap_threshold);
-  MRG_INHERIT(_hostgroups);
   MRG_INHERIT(_hosts);
   MRG_OPTION(_initial_state);
   MRG_OPTION(_is_volatile);
@@ -359,7 +349,6 @@ void service::merge(object const& obj) {
   MRG_OPTION(_max_check_attempts);
   MRG_OPTION(_obsess_over_service);
   MRG_OPTION(_retry_interval);
-  MRG_INHERIT(_servicegroups);
   MRG_DEFAULT(_service_description);
   MRG_OPTION(_timezone);
 }
@@ -521,24 +510,6 @@ unsigned int service::high_flap_threshold() const throw () {
 }
 
 /**
- *  Get hostgroups.
- *
- *  @return The hostgroups.
- */
-list_string& service::hostgroups() throw () {
-  return (*_hostgroups);
-}
-
-/**
- *  Get hostgroups.
- *
- *  @return The hostgroups.
- */
-list_string const& service::hostgroups() const throw () {
-  return (*_hostgroups);
-}
-
-/**
  *  Get hosts.
  *
  *  @return The hosts.
@@ -608,24 +579,6 @@ bool service::obsess_over_service() const throw () {
  */
 unsigned int service::retry_interval() const throw () {
   return (_retry_interval);
-}
-
-/**
- *  Get service groups.
- *
- *  @return The service groups.
- */
-list_string& service::servicegroups() throw () {
-  return (*_servicegroups);
-}
-
-/**
- *  Get servicegroups.
- *
- *  @return The servicegroups.
- */
-list_string const& service::servicegroups() const throw () {
-  return (*_servicegroups);
 }
 
 /**
@@ -970,14 +923,17 @@ bool service::_set_high_flap_threshold(unsigned int value) {
 }
 
 /**
- *  Set hostgroups value.
+ *  Deprecated variable.
  *
- *  @param[in] value The new hostgroups value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_hostgroups(std::string const& value) {
-  _hostgroups = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service hostgroups was ignored";
+  ++config_warnings;
   return (true);
 }
 
@@ -1261,14 +1217,17 @@ bool service::_set_retry_interval(unsigned int value) {
 }
 
 /**
- *  Set servicegroups value.
+ *  Deprecated variables.
  *
- *  @param[in] value The new servicegroups value.
+ *  @param[in] value  Unused.
  *
- *  @return True on success, otherwise false.
+ *  @return True.
  */
 bool service::_set_servicegroups(std::string const& value) {
-  _servicegroups = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: service servicegroups was ignored";
+  ++config_warnings;
   return (true);
 }
 

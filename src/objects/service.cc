@@ -146,9 +146,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
   char const* chk_period_str(NULL);
   if (obj.check_period_ptr)
     chk_period_str = chkstr(obj.check_period_ptr->name);
-  char const* svcgrp_str(NULL);
-  if (obj.servicegroups_ptr)
-    svcgrp_str = chkstr(static_cast<servicegroup const*>(obj.servicegroups_ptr->object_ptr)->group_name);
 
   os << "service {\n"
     "  host_name:                            " << chkstr(obj.host_name) << "\n"
@@ -222,7 +219,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  check_command_ptr:                    " << chkstr(cmd_str) << "\n"
     "  check_command_args:                   " << chkstr(obj.check_command_args) << "\n"
     "  check_period_ptr:                     " << chkstr(chk_period_str) << "\n"
-    "  servicegroups_ptr:                    " << chkstr(svcgrp_str) << "\n"
     << (obj.custom_variables ? chkobj(obj.custom_variables) : "")
     << "}\n";
   return (os);

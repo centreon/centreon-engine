@@ -97,7 +97,6 @@ typedef struct                  service_struct {
   command_struct*               check_command_ptr;
   char*                         check_command_args;
   timeperiod_struct*            check_period_ptr;
-  objectlist_struct*            servicegroups_ptr;
   struct service_struct*        next;
   struct service_struct*        nexthash;
 }                               service;

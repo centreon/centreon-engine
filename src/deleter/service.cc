@@ -39,7 +39,6 @@ void deleter::service(void* ptr) throw () {
   service_struct* obj(static_cast<service_struct*>(ptr));
 
   listmember(obj->custom_variables, &customvariablesmember);
-  listmember(obj->servicegroups_ptr, &objectlist);
 
   delete[] obj->host_name;
   obj->host_name = NULL;
