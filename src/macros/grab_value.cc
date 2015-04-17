@@ -240,52 +240,31 @@ static int handle_summary_macro(
   if (!mac->x[MACRO_TOTALHOSTSUP]) {
     // Get host totals.
     unsigned int host_problems(0);
-    unsigned int host_problems_unhandled(0);
     unsigned int hosts_down(0);
-    unsigned int hosts_down_unhandled(0);
     unsigned int hosts_unreachable(0);
-    unsigned int hosts_unreachable_unhandled(0);
     unsigned int hosts_up(0);
     for (host* temp_host = host_list;
          temp_host != NULL;
          temp_host = temp_host->next) {
-      bool problem(true);
       if ((temp_host->current_state == HOST_UP)
           && (temp_host->has_been_checked == true))
         hosts_up++;
-      else if (temp_host->current_state == HOST_DOWN) {
-        if (temp_host->checks_enabled == false)
-          problem = false;
-        if (problem)
-          hosts_down_unhandled++;
+      else if (temp_host->current_state == HOST_DOWN)
         hosts_down++;
-      }
-      else if (temp_host->current_state == HOST_UNREACHABLE) {
-        if (temp_host->checks_enabled == false)
-          problem = false;
-        if (problem)
-          hosts_down_unhandled++;
+      else if (temp_host->current_state == HOST_UNREACHABLE)
         hosts_unreachable++;
-      }
     }
     host_problems = hosts_down + hosts_unreachable;
-    host_problems_unhandled
-      = hosts_down_unhandled + hosts_unreachable_unhandled;
 
     // Get service totals.
     unsigned int service_problems(0);
-    unsigned int service_problems_unhandled(0);
     unsigned int services_critical(0);
-    unsigned int services_critical_unhandled(0);
     unsigned int services_ok(0);
     unsigned int services_unknown(0);
-    unsigned int services_unknown_unhandled(0);
     unsigned int services_warning(0);
-    unsigned int services_warning_unhandled(0);
     for (service* temp_service = service_list;
          temp_service != NULL;
          temp_service = temp_service->next) {
-      bool problem(true);
       if (temp_service->current_state == STATE_OK
           && temp_service->has_been_checked == true)
         services_ok++;
@@ -294,63 +273,37 @@ static int handle_summary_macro(
         if (temp_host != NULL
             && (temp_host->current_state == HOST_DOWN
                 || temp_host->current_state == HOST_UNREACHABLE))
-          problem = false;
-        if (temp_service->checks_enabled == false)
-          problem = false;
-        if (problem)
-          services_warning_unhandled++;
-        services_warning++;
+          services_warning++;
       }
       else if (temp_service->current_state == STATE_UNKNOWN) {
         host* temp_host(find_host(temp_service->host_name));
         if (temp_host != NULL
             && (temp_host->current_state == HOST_DOWN
                 || temp_host->current_state == HOST_UNREACHABLE))
-          problem = false;
-        if (temp_service->checks_enabled == false)
-          problem = false;
-        if (problem)
-          services_unknown_unhandled++;
-        services_unknown++;
+          services_unknown++;
       }
       else if (temp_service->current_state == STATE_CRITICAL) {
         host* temp_host(find_host(temp_service->host_name));
         if (temp_host != NULL
             && (temp_host->current_state == HOST_DOWN
                 || temp_host->current_state == HOST_UNREACHABLE))
-          problem = false;
-        if (temp_service->checks_enabled == false)
-          problem = false;
-        if (problem)
-          services_critical_unhandled++;
-        services_critical++;
+          services_critical++;
       }
     }
     service_problems
       = services_warning + services_critical + services_unknown;
-    service_problems_unhandled
-      = services_warning_unhandled
-      + services_critical_unhandled
-      + services_unknown_unhandled;
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
     string::setstr(mac->x[MACRO_TOTALHOSTSUP], hosts_up);
     string::setstr(mac->x[MACRO_TOTALHOSTSDOWN], hosts_down);
     string::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLE], hosts_unreachable);
-    string::setstr(mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED], hosts_down_unhandled);
-    string::setstr(mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED], hosts_unreachable_unhandled);
     string::setstr(mac->x[MACRO_TOTALHOSTPROBLEMS], host_problems);
-    string::setstr(mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED], host_problems_unhandled);
     string::setstr(mac->x[MACRO_TOTALSERVICESOK], services_ok);
     string::setstr(mac->x[MACRO_TOTALSERVICESWARNING], services_warning);
     string::setstr(mac->x[MACRO_TOTALSERVICESCRITICAL], services_critical);
     string::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWN], services_unknown);
-    string::setstr(mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED], services_warning_unhandled);
-    string::setstr(mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED], services_critical_unhandled);
-    string::setstr(mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED], services_unknown_unhandled);
     string::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMS], service_problems);
-    string::setstr(mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED], service_problems_unhandled);
   }
 
   // Return only the macro the user requested.
@@ -490,19 +443,12 @@ struct grab_value_redirection {
       MACRO_TOTALHOSTSUP,
       MACRO_TOTALHOSTSDOWN,
       MACRO_TOTALHOSTSUNREACHABLE,
-      MACRO_TOTALHOSTSDOWNUNHANDLED,
-      MACRO_TOTALHOSTSUNREACHABLEUNHANDLED,
       MACRO_TOTALHOSTPROBLEMS,
-      MACRO_TOTALHOSTPROBLEMSUNHANDLED,
       MACRO_TOTALSERVICESOK,
       MACRO_TOTALSERVICESWARNING,
       MACRO_TOTALSERVICESCRITICAL,
       MACRO_TOTALSERVICESUNKNOWN,
-      MACRO_TOTALSERVICESWARNINGUNHANDLED,
-      MACRO_TOTALSERVICESCRITICALUNHANDLED,
-      MACRO_TOTALSERVICESUNKNOWNUNHANDLED,
-      MACRO_TOTALSERVICEPROBLEMS,
-      MACRO_TOTALSERVICEPROBLEMSUNHANDLED
+      MACRO_TOTALSERVICEPROBLEMS
     };
     for (unsigned int i = 0;
          i < sizeof(summary_ids) / sizeof(*summary_ids);

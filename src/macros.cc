@@ -375,19 +375,12 @@ int init_macrox_names() {
   add_macrox_name(TOTALHOSTSUP);
   add_macrox_name(TOTALHOSTSDOWN);
   add_macrox_name(TOTALHOSTSUNREACHABLE);
-  add_macrox_name(TOTALHOSTSDOWNUNHANDLED);
-  add_macrox_name(TOTALHOSTSUNREACHABLEUNHANDLED);
   add_macrox_name(TOTALHOSTPROBLEMS);
-  add_macrox_name(TOTALHOSTPROBLEMSUNHANDLED);
   add_macrox_name(TOTALSERVICESOK);
   add_macrox_name(TOTALSERVICESWARNING);
   add_macrox_name(TOTALSERVICESCRITICAL);
   add_macrox_name(TOTALSERVICESUNKNOWN);
-  add_macrox_name(TOTALSERVICESWARNINGUNHANDLED);
-  add_macrox_name(TOTALSERVICESCRITICALUNHANDLED);
-  add_macrox_name(TOTALSERVICESUNKNOWNUNHANDLED);
   add_macrox_name(TOTALSERVICEPROBLEMS);
-  add_macrox_name(TOTALSERVICEPROBLEMSUNHANDLED);
   add_macrox_name(PROCESSSTARTTIME);
   add_macrox_name(HOSTCHECKTYPE);
   add_macrox_name(SERVICECHECKTYPE);
@@ -534,7 +527,7 @@ int clear_summary_macros_r(nagios_macros* mac) {
   unsigned int x;
 
   for (x = MACRO_TOTALHOSTSUP;
-       x <= MACRO_TOTALSERVICEPROBLEMSUNHANDLED;
+       x <= MACRO_TOTALSERVICEPROBLEMS;
        x++) {
     delete[] mac->x[x];
     mac->x[x] = NULL;
