@@ -56,8 +56,7 @@ check runs in a child process that was fork()ed from the main Centreon
 Engine daemon. When the service check has completed, the child process
 will inform the main Centreon Engine process (its parent) of the check
 results. The main Centreon Engine process then handles the check results
-and takes appropriate action (running event handlers, sending
-notifications, etc.).
+and takes appropriate action (running event handlers, etc.).
 
 On-demand service checks are also run in parallel if needed. As
 mentioned earlier, Centreon Engine can forgo the actual execution of an
@@ -90,14 +89,13 @@ When Centreon Engine checks the status of services, it will be able to
 detect when a service changes between OK, WARNING, UNKNOWN, and CRITICAL
 states and take appropriate action. These state changes result in
 different :ref:`state types <state_types>` (HARD or SOFT), which can
-trigger :ref:`event handlers <event_handlers>` to be run and
-:ref:`notifications <notifications>` to be sent out. Service state
+trigger :ref:`event handlers <event_handlers>` to be run. Service state
 changes can also trigger on-demand :ref:`host checks <host_checks>`.
 Detecting and dealing with state changes is what Centreon Engine is all
 about.
 
 When services change state too frequently they are considered to be
 "flapping". Centreon Engine can detect when services start flapping, and
-can suppress notifications until flapping stops and the service's state
+internally flag services until flapping stops and the service's state
 stabilizes. More information on the flap detection logic can be found
 :ref:`here <flapping_detection>`.

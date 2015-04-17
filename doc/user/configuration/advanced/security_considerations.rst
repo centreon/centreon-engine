@@ -24,8 +24,8 @@ use of shared SSH keys in order to monitor remote systems.
 
 If an intruder has the ability to submit check results or external
 commands to the Centreon Engine daemon, they have the potential to
-submit bogus monitoring data, drive you nuts you with bogus
-notifications, or cause event handler scripts to be triggered. If you
+submit bogus monitoring data, drive you nuts you with bogus service
+check result, or cause event handler scripts to be triggered. If you
 have event handler scripts that restart services, cycle power, etc. this
 could be particularly problematic.
 
@@ -75,7 +75,7 @@ Make sure that only the centengine user is able to read/write in the
 check result path. If users other than centengine (or root) are able to
 write to this directory, they could send fake host/service check results
 to the Centreon Engine daemon. This could result in annoyances (bogus
-notifications) or security problems (event handlers being kicked off).
+check results) or security problems (event handlers being kicked off).
 
 Lock Down The External Command File
 -----------------------------------
@@ -106,7 +106,7 @@ Use the
 :ref:`illegal_macro_output_chars <main_cfg_opt_illegal_macro_output_characters>`
 directive to strip dangerous characters from the $HOSTOUTPUT$,
 $SERVICEOUTPUT$, $HOSTPERFDATA$, and $SERVICEPERFDATA$ macros before
-they're used in notifications, etc. Dangerous characters can be anything
+they're used in event handlers, etc. Dangerous characters can be anything
 that might be interpreted by the shell, thereby opening a security
 hole. An example of this is the presence of backtick (`) characters in
 the $HOSTOUTPUT$, $SERVICEOUTPUT$, $HOSTPERFDATA$, and/or

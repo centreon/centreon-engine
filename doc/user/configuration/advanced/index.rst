@@ -10,14 +10,10 @@ Advanced
    volatile_services
    service_and_host_freshness_checks
    distributed_monitoring
-   redundant_and_failover_network_monitoring
    detection_and_handling_of_state_flapping
-   notification_escalations
-   on_call_rotations
    monitoring_service_and_host_clusters
    host_and_service_dependencies
    performance_data
-   scheduled_downtime
    adaptive_monitoring
    predictive_dependency_checks
    cached_checks

@@ -124,5 +124,4 @@ If Centreon Engine detects that the service results are stale, it will
 run the no-backup-report command as an active service check. This causes
 the check_dummy plugin to be executed, which returns a critical state to
 Centreon Engine. The service will then go into to a critical state (if
-it isn't already there) and someone will probably get notified of the
-problem.
+it isn't already there).

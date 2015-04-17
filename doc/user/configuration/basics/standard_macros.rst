@@ -8,15 +8,13 @@ Macro Validity
 
 Although macros can be used in all commands you define, not all macros
 may be "valid" in a particular type of command. For example, some macros
-may only be valid during service notification commands, whereas other
-may only be valid during host check commands. There are ten types of
-commands that Centreon Engine recognizes and treats differently. They
-are as follows:
+may only be valid during service event handlers, whereas other may only
+be valid during host check commands. There are ten types of commands
+that Centreon Engine recognizes and treats differently. They are as
+follows:
 
   * Service checks
-  * Service notifications
   * Host checks
-  * Host notifications
   * Service :ref:`event handlers <event_handlers>` and/or a global
     service event handler
   * Host :ref:`event handlers <event_handlers>` and/or a global host
@@ -25,8 +23,6 @@ are as follows:
     command
   * :ref:`OCHP <main_cfg_opt_obsessive_compulsive_host_processor_command>`
     command
-  * Service :ref:`performance data <performance_data>` commands
-  * Host :ref:`performance data <performance_data>` commands
 
 The tables below list all macros currently available in Centreon Engine,
 along with a brief description of each and the types of commands in
@@ -51,202 +47,139 @@ No      The macro is not available
 Host Macros :sup:`3`
 --------------------
 
-============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
-Macro Name                     Service Checks Service Notifications Host Checks      Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
-`HOSTNAME`_                    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTALIAS`_                   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTADDRESS`_                 **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTSTATE`_                   **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTSTATEID`_                 **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTSTATE`_               **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTSTATEID`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTSTATETYPE`_               **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTATTEMPT`_                 **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`MAXHOSTATTEMPTS`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTEVENTID`_                 **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTEVENTID`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTPROBLEMID`_               **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTPROBLEMID`_           **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTLATENCY`_                 **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTEXECUTIONTIME`_           **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTDURATION`_                **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTDURATIONSEC`_             **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTDOWNTIME`_                **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTPERCENTCHANGE`_           **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTCHECK`_               **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTSTATECHANGE`_         **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTUP`_                  **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTDOWN`_                **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LASTHOSTUNREACHABLE`_         **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTOUTPUT`_                  **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LONGHOSTOUTPUT`_              **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTPERFDATA`_                **Yes**        **Yes**               **Yes** :sup:`1` **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTCHECKCOMMAND`_            **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTACKAUTHOR`_ :sup:`8`      No             No                    No               **Yes**            No                              No                           No                No
-`HOSTACKAUTHORNAME`_ :sup:`8`  No             No                    No               **Yes**            No                              No                           No                No
-`HOSTACKAUTHORALIAS`_ :sup:`8` No             No                    No               **Yes**            No                              No                           No                No
-`HOSTACKCOMMENT`_ :sup:`8`     No             No                    No               **Yes**            No                              No                           No                No
-`TOTALHOSTSERVICES`_           **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSERVICESOK`_         **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSERVICESWARNING`_    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSERVICESUNKNOWN`_    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSERVICESCRITICAL`_   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
+============================== ============== ================ =============================== ============================
+Macro Name                     Service Checks Host Checks      Service Event Handlers and OCSP Host Event Handlers and OCHP
+============================== ============== ================ =============================== ============================
+`HOSTNAME`_                    **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTALIAS`_                   **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTADDRESS`_                 **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTSTATE`_                   **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`HOSTSTATEID`_                 **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`LASTHOSTSTATE`_               **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTSTATEID`_             **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTSTATETYPE`_               **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`HOSTATTEMPT`_                 **Yes**        **Yes**          **Yes**                         **Yes**
+`MAXHOSTATTEMPTS`_             **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTEVENTID`_                 **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTEVENTID`_             **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTPROBLEMID`_               **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTPROBLEMID`_           **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTLATENCY`_                 **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTEXECUTIONTIME`_           **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`HOSTDURATION`_                **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTDURATIONSEC`_             **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTPERCENTCHANGE`_           **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTCHECK`_               **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTSTATECHANGE`_         **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTUP`_                  **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTDOWN`_                **Yes**        **Yes**          **Yes**                         **Yes**
+`LASTHOSTUNREACHABLE`_         **Yes**        **Yes**          **Yes**                         **Yes**
+`HOSTOUTPUT`_                  **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`LONGHOSTOUTPUT`_              **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`HOSTPERFDATA`_                **Yes**        **Yes** :sup:`1` **Yes**                         **Yes**
+`HOSTCHECKCOMMAND`_            **Yes**        **Yes**          **Yes**                         **Yes**
+`TOTALHOSTSERVICES`_           **Yes**        **Yes**          **Yes**                         **Yes**
+`TOTALHOSTSERVICESOK`_         **Yes**        **Yes**          **Yes**                         **Yes**
+`TOTALHOSTSERVICESWARNING`_    **Yes**        **Yes**          **Yes**                         **Yes**
+`TOTALHOSTSERVICESUNKNOWN`_    **Yes**        **Yes**          **Yes**                         **Yes**
+`TOTALHOSTSERVICESCRITICAL`_   **Yes**        **Yes**          **Yes**                         **Yes**
+============================== ============== ================ =============================== ============================
 
 .. _user_configuration_macros_service:
 
 Service Macros
 --------------
 
-================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                        Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`SERVICEDESC`_                    **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICESTATE`_ :sup:`2`          **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICESTATEID`_ :sup:`2`        **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICESTATE`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICESTATEID`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICESTATETYPE`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEATTEMPT`_                 **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`MAXSERVICEATTEMPTS`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEISVOLATILE`_              **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEEVENTID`_                 **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICEEVENTID`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEPROBLEMID`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICEPROBLEMID`_           **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICELATENCY`_                 **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEEXECUTIONTIME`_ :sup:`2`  **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEDURATION`_                **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEDURATIONSEC`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEDOWNTIME`_                **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEPERCENTCHANGE`_           **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICECHECK`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICESTATECHANGE`_         **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICEOK`_                  **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICEWARNING`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICEUNKNOWN`_             **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LASTSERVICECRITICAL`_            **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEOUTPUT`_ :sup:`2`         **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`LONGSERVICEOUTPUT`_ :sup:`2`     **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEPERFDATA`_ :sup:`2`       **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICECHECKCOMMAND`_            **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
-`SERVICEACKAUTHOR`_ :sup:`8`      No             **Yes**               No          No                 No                              No                           No                No
-`SERVICEACKAUTHORNAME`_ :sup:`8`  No             **Yes**               No          No                 No                              No                           No                No
-`SERVICEACKAUTHORALIAS`_ :sup:`8` No             **Yes**               No          No                 No                              No                           No                No
-`SERVICEACKCOMMENT`_ :sup:`8`     No             **Yes**               No          No                 No                              No                           No                No
-================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-
-Contact Macros
---------------
-
-================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name         Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`CONTACTNAME`_     No             **Yes**               No          **Yes**            No                              No                           No                No
-`CONTACTALIAS`_    No             **Yes**               No          **Yes**            No                              No                           No                No
-`CONTACTEMAIL`_    No             **Yes**               No          **Yes**            No                              No                           No                No
-`CONTACTPAGER`_    No             **Yes**               No          **Yes**            No                              No                           No                No
-`CONTACTADDRESSn`_ No             **Yes**               No          **Yes**            No                              No                           No                No
-================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-
-Contact Group Macros
---------------------
-
-=============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                      Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-=============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`CONTACTGROUPALIAS`_ :sup:`7`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`CONTACTGROUPMEMBERS`_ :sup:`7` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-=============================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
+================================= ============== =========== =============================== ============================
+Macro Name                        Service Checks Host Checks Service Event Handlers and OCSP Host Event Handlers and OCHP
+================================= ============== =========== =============================== ============================
+`SERVICEDESC`_                    **Yes**        No          **Yes**                         No
+`SERVICESTATE`_ :sup:`2`          **Yes**        No          **Yes**                         No
+`SERVICESTATEID`_ :sup:`2`        **Yes**        No          **Yes**                         No
+`LASTSERVICESTATE`_               **Yes**        No          **Yes**                         No
+`LASTSERVICESTATEID`_             **Yes**        No          **Yes**                         No
+`SERVICESTATETYPE`_               **Yes**        No          **Yes**                         No
+`SERVICEATTEMPT`_                 **Yes**        No          **Yes**                         No
+`MAXSERVICEATTEMPTS`_             **Yes**        No          **Yes**                         No
+`SERVICEISVOLATILE`_              **Yes**        No          **Yes**                         No
+`SERVICEEVENTID`_                 **Yes**        No          **Yes**                         No
+`LASTSERVICEEVENTID`_             **Yes**        No          **Yes**                         No
+`SERVICEPROBLEMID`_               **Yes**        No          **Yes**                         No
+`LASTSERVICEPROBLEMID`_           **Yes**        No          **Yes**                         No
+`SERVICELATENCY`_                 **Yes**        No          **Yes**                         No
+`SERVICEEXECUTIONTIME`_ :sup:`2`  **Yes**        No          **Yes**                         No
+`SERVICEDURATION`_                **Yes**        No          **Yes**                         No
+`SERVICEDURATIONSEC`_             **Yes**        No          **Yes**                         No
+`SERVICEPERCENTCHANGE`_           **Yes**        No          **Yes**                         No
+`LASTSERVICECHECK`_               **Yes**        No          **Yes**                         No
+`LASTSERVICESTATECHANGE`_         **Yes**        No          **Yes**                         No
+`LASTSERVICEOK`_                  **Yes**        No          **Yes**                         No
+`LASTSERVICEWARNING`_             **Yes**        No          **Yes**                         No
+`LASTSERVICEUNKNOWN`_             **Yes**        No          **Yes**                         No
+`LASTSERVICECRITICAL`_            **Yes**        No          **Yes**                         No
+`SERVICEOUTPUT`_ :sup:`2`         **Yes**        No          **Yes**                         No
+`LONGSERVICEOUTPUT`_ :sup:`2`     **Yes**        No          **Yes**                         No
+`SERVICEPERFDATA`_ :sup:`2`       **Yes**        No          **Yes**                         No
+`SERVICECHECKCOMMAND`_            **Yes**        No          **Yes**                         No
+================================= ============== =========== =============================== ============================
 
 .. _macros_summary:
 
 Summary Macros
 --------------
 
-=========================================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                                  Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-=========================================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`TOTALHOSTSUP`_ :sup:`10`                   **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSDOWN`_ :sup:`10`                 **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSUNREACHABLE`_ :sup:`10`          **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSDOWNUNHANDLED`_ :sup:`10`        **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTSUNREACHABLEUNHANDLED`_ :sup:`10` **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTPROBLEMS`_ :sup:`10`              **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALHOSTPROBLEMSUNHANDLED`_               **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESOK`_ :sup:`10`                **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESWARNING`_ :sup:`10`           **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESCRITICAL`_ :sup:`10`          **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESUNKNOWN`_ :sup:`10`           **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESWARNINGUNHANDLED`_ :sup:`10`  **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESCRITICALUNHANDLED`_ :sup:`10` **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICESUNKNOWNUNHANDLED`_ :sup:`10`  **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICEPROBLEMS`_ :sup:`10`           **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-`TOTALSERVICEPROBLEMSUNHANDLED`_ :sup:`10`  **Yes**        **Yes** :sup:`4`      **Yes**     **Yes** :sup:`4`   **Yes**                         **Yes**                      **Yes**           **Yes**
-=========================================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-
-.. _user_configuration_macros_notification:
-
-Notification Macros
--------------------
-
-============================ ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                   Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-============================ ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`NOTIFICATIONTYPE`_          No             **Yes**               No          **Yes**            No                              No                           No                No
-`NOTIFICATIONRECIPIENTS`_    No             **Yes**               No          **Yes**            No                              No                           No                No
-`NOTIFICATIONISESCALATED`_   No             **Yes**               No          **Yes**            No                              No                           No                No
-`NOTIFICATIONAUTHOR`_        No             **Yes**               No          **Yes**            No                              No                           No                No
-`NOTIFICATIONAUTHORNAME`_    No             **Yes**               No          **Yes**            No                              No                           No                No
-`NOTIFICATIONAUTHORALIAS`_   No             **Yes**               No          **Yes**            No                              No                           No                No
-`NOTIFICATIONCOMMENT`_       No             **Yes**               No          **Yes**            No                              No                           No                No
-`HOSTNOTIFICATIONNUMBER`_    No             **Yes**               No          **Yes**            No                              No                           No                No
-`HOSTNOTIFICATIONID`_        No             **Yes**               No          **Yes**            No                              No                           No                No
-`SERVICENOTIFICATIONNUMBER`_ No             **Yes**               No          **Yes**            No                              No                           No                No
-`SERVICENOTIFICATIONID`_     No             **Yes**               No          **Yes**            No                              No                           No                No
-============================ ============== ===================== =========== ================== =============================== ============================ ================= ==============
+=========================================== ============== =========== =============================== ============================
+Macro Name                                  Service Checks Host Checks Service Event Handlers and OCSP Host Event Handlers and OCHP
+=========================================== ============== =========== =============================== ============================
+`TOTALHOSTSUP`_ :sup:`5`                    **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALHOSTSDOWN`_ :sup:`5`                  **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALHOSTSUNREACHABLE`_ :sup:`5`           **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALHOSTPROBLEMS`_ :sup:`5`               **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALSERVICESOK`_ :sup:`5`                 **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALSERVICESWARNING`_ :sup:`5`            **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALSERVICESCRITICAL`_ :sup:`5`           **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALSERVICESUNKNOWN`_ :sup:`5`            **Yes**        **Yes**     **Yes**                         **Yes**
+`TOTALSERVICEPROBLEMS`_ :sup:`5`            **Yes**        **Yes**     **Yes**                         **Yes**
+=========================================== ============== =========== =============================== ============================
 
 Date/Time Macros
 ----------------
 
-========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name                Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`TIMET`_                  **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`ISVALIDTIME`_ :sup:`9`   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`NEXTVALIDTIME`_ :sup:`9` **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-========================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
+========================= ============== =========== =============================== ============================
+Macro Name                Service Checks Host Checks Service Event Handlers and OCSP Host Event Handlers and OCHP
+========================= ============== =========== =============================== ============================
+`TIMET`_                  **Yes**        **Yes**     **Yes**                         **Yes**
+`ISVALIDTIME`_ :sup:`4`   **Yes**        **Yes**     **Yes**                         **Yes**
+`NEXTVALIDTIME`_ :sup:`4` **Yes**        **Yes**     **Yes**                         **Yes**
+========================= ============== =========== =============================== ============================
 
 File Macros
 -----------
 
-====================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name             Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-====================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`MAINCONFIGFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`STATUSDATAFILE`_      **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`RETENTIONDATAFILE`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`LOGFILE`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`RESOURCEFILE`_        **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`COMMANDFILE`_         **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`HOSTPERFDATAFILE`_    **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`SERVICEPERFDATAFILE`_ **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-====================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
+====================== ============== =========== =============================== ============================
+Macro Name             Service Checks Host Checks Service Event Handlers and OCSP Host Event Handlers and OCHP
+====================== ============== =========== =============================== ============================
+`MAINCONFIGFILE`_      **Yes**        **Yes**     **Yes**                         **Yes**
+`STATUSDATAFILE`_      **Yes**        **Yes**     **Yes**                         **Yes**
+`RETENTIONDATAFILE`_   **Yes**        **Yes**     **Yes**                         **Yes**
+`LOGFILE`_             **Yes**        **Yes**     **Yes**                         **Yes**
+`RESOURCEFILE`_        **Yes**        **Yes**     **Yes**                         **Yes**
+`COMMANDFILE`_         **Yes**        **Yes**     **Yes**                         **Yes**
+====================== ============== =========== =============================== ============================
 
 .. _user_configuration_macros_misc:
 
 Misc Macros
 -----------
 
-=================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-Macro Name          Service Checks Service Notifications Host Checks Host Notifications Service Event Handlers and OCSP Host Event Handlers and OCHP Service Perf Data Host Perf Data
-=================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
-`PROCESSSTARTTIME`_ **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`EVENTSTARTTIME`_   **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`ARGn`_             **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-`USERn`_            **Yes**        **Yes**               **Yes**     **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
-=================== ============== ===================== =========== ================== =============================== ============================ ================= ==============
+=================== ============== =========== =============================== ============================
+Macro Name          Service Checks Host Checks Service Event Handlers and OCSP Host Event Handlers and OCHP
+=================== ============== =========== =============================== ============================
+`PROCESSSTARTTIME`_ **Yes**        **Yes**     **Yes**                         **Yes**
+`EVENTSTARTTIME`_   **Yes**        **Yes**     **Yes**                         **Yes**
+`ARGn`_             **Yes**        **Yes**     **Yes**                         **Yes**
+`USERn`_            **Yes**        **Yes**     **Yes**                         **Yes**
+=================== ============== =========== =============================== ============================
 
 Macro Descriptions
 ==================
@@ -293,9 +226,6 @@ _`HOSTEXECUTIONTIME`           A (floating point) number indicating the number o
 _`HOSTDURATION`                A string indicating the amount of time that the host has spent in its current state. Format is "XXh YYm ZZs", indicating
                                hours, minutes and seconds.
 _`HOSTDURATIONSEC`             A number indicating the number of seconds that the host has spent in its current state.
-_`HOSTDOWNTIME`                A number indicating the current "downtime depth" for the host. If this host is currently in a period of
-                               :ref:`scheduled downtime <scheduled_downtime>`, the value will be greater than zero. If the host is not
-                               currently in a period of downtime, this value will be zero.
 _`HOSTPERCENTCHANGE`           A (floating point) number indicating the percent state change the host has undergone. Percent state change is used by the
                                :ref:`flap detection <flapping_detection>` algorithm.
 _`LASTHOSTCHECK`               This is a timestamp in time_t format (seconds since the UNIX epoch) indicating the time at which a check of the host was
@@ -312,14 +242,6 @@ _`LONGHOSTOUTPUT`              The full text output (aside from the first line) 
 _`HOSTPERFDATA`                This macro contains any :ref:`performance data <performance_data>` that may have been returned by the last host
                                check.
 _`HOSTCHECKCOMMAND`            This macro contains the name of the command (along with any arguments passed to it) used to perform the host check.
-_`HOSTACKAUTHOR` :sup:`8`      A string containing the name of the user who acknowledged the host problem. This macro is only valid in notifications
-                               where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`HOSTACKAUTHORNAME` :sup:`8`  A string containing the short name of the contact (if applicable) who acknowledged the host problem. This macro is only
-                               valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`HOSTACKAUTHORALIAS` :sup:`8` A string containing the alias of the contact (if applicable) who acknowledged the host problem. This macro is only valid
-                               in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`HOSTACKCOMMENT` :sup:`8`     A string containing the acknowledgement comment that was entered by the user who acknowledged the host problem. This
-                               macro is only valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
 _`TOTALHOSTSERVICES`           The total number of services associated with the host.
 _`TOTALHOSTSERVICESOK`         The total number of services associated with the host that are in an OK state.
 _`TOTALHOSTSERVICESWARNING`    The total number of services associated with the host that are in a WARNING state.
@@ -366,9 +288,6 @@ _`SERVICEEXECUTIONTIME`           A (floating point) number indicating the numbe
 _`SERVICEDURATION`                A string indicating the amount of time that the service has spent in its current state. Format is "XXh YYm ZZs",
                                   indicating hours, minutes and seconds.
 _`SERVICEDURATIONSEC`             A number indicating the number of seconds that the service has spent in its current state.
-_`SERVICEDOWNTIME`                A number indicating the current "downtime depth" for the service. If this service is currently in a period of
-                                  :ref:`scheduled downtime <scheduled_downtime>`, the value will be greater than zero. If the service is not
-                                  currently in a period of downtime, this value will be zero.
 _`SERVICEPERCENTCHANGE`           A (floating point) number indicating the percent state change the service has undergone. Percent state change is used
                                   by the :ref:`flap detection <flapping_detection>` algorithm.
 _`LASTSERVICECHECK`               This is a timestamp in time_t format (seconds since the UNIX epoch) indicating the time at which a check of the
@@ -388,48 +307,7 @@ _`LONGSERVICEOUTPUT`              The full text output (aside from the first lin
 _`SERVICEPERFDATA`                This macro contains any :ref:`performance data <performance_data>` that may have been returned by the last
                                   service check.
 _`SERVICECHECKCOMMAND`            This macro contains the name of the command (along with any arguments passed to it) used to perform the service check.
-_`SERVICEACKAUTHOR` :sup:`8`      A string containing the name of the user who acknowledged the service problem. This macro is only valid in
-                                  notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`SERVICEACKAUTHORNAME` :sup:`8`  A string containing the short name of the contact (if applicable) who acknowledged the service problem. This macro is
-                                  only valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`SERVICEACKAUTHORALIAS` :sup:`8` A string containing the alias of the contact (if applicable) who acknowledged the service problem. This macro is only
-                                  valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
-_`SERVICEACKCOMMENT` :sup:`8`     A string containing the acknowledgement comment that was entered by the user who acknowledged the service problem.
-                                  This macro is only valid in notifications where the $NOTIFICATIONTYPE$ macro is set to "ACKNOWLEDGEMENT".
 ================================= ======================================================================================================================
-
-Contact Macros
---------------
-
-==================== ===================================================================================================================================
-_`CONTACTNAME`       Short name for the contact (i.e. "jdoe") that is being notified of a host or service problem. This value is taken from the
-                     contact_name directive in the :ref:`contact definition <obj_def_contact>`.
-_`CONTACTALIAS`      Long name/description for the contact (i.e. "John Doe") being notified. This value is taken from the alias directive in the
-                     :ref:`contact definition <obj_def_contact>`.
-_`CONTACTEMAIL`      Email address of the contact being notified. This value is taken from the email directive in the
-                     :ref:`contact definition <obj_def_contact>`.
-_`CONTACTPAGER`      Pager number/address of the contact being notified. This value is taken from the pager directive in the
-                     :ref:`contact definition <obj_def_contact>`.
-_`CONTACTADDRESSn`   Address of the contact being notified. Each contact can have six different addresses (in addition to email address and pager
-                     number). The macros for these addresses are $CONTACTADDRESS1$ - $CONTACTADDRESS6$. This value is taken from the addressx directive
-                     in the :ref:`contact definition <obj_def_contact>`.
-_`CONTACTGROUPNAME`  The short name of the contactgroup that this contact is a member of. This value is taken from the contactgroup_name directive in
-                     the :ref:`contactgroup definition <obj_def_contactgroup>`. If the contact belongs to more than one contactgroup this macro will
-                     contain the name of just one of them.
-_`CONTACTGROUPNAMES` A comma separated list of the short names of all the contactgroups that this contact is a member of.
-==================== ===================================================================================================================================
-
-Contact Group Macros
---------------------
-
-=============================== =========================================================================================================================
-_`CONTACTGROUPALIAS` :sup:`7`   The long name / alias of either 1) the contactgroup name passed as an on-demand macro argument or 2) the primary
-                                contactgroup associated with the current contact (if not used in the context of an on-demand macro). This value is taken
-                                from the alias directive in the :ref:`contactgroup definition <obj_def_contactgroup>`.
-_`CONTACTGROUPMEMBERS` :sup:`7` A comma-separated list of all contacts that belong to either 1) the contactgroup name passed as an on-demand macro
-                                argument or 2) the primary contactgroup associated with the current contact (if not used in the context of an
-                                on-demand macro).
-=============================== =========================================================================================================================
 
 Summary Macros
 --------------
@@ -438,75 +316,13 @@ Summary Macros
 _`TOTALHOSTSUP`                   This macro reflects the total number of hosts that are currently in an UP state.
 _`TOTALHOSTSDOWN`                 This macro reflects the total number of hosts that are currently in a DOWN state.
 _`TOTALHOSTSUNREACHABLE`          This macro reflects the total number of hosts that are currently in an UNREACHABLE state.
-_`TOTALHOSTSDOWNUNHANDLED`        This macro reflects the total number of hosts that are currently in a DOWN state that are not currently being
-                                  "handled". Unhandled host problems are those that are not acknowledged, are not currently in scheduled downtime, and
-                                  for which checks are currently enabled.
-_`TOTALHOSTSUNREACHABLEUNHANDLED` This macro reflects the total number of hosts that are currently in an UNREACHABLE state that are not currently being
-                                  "handled". Unhandled host problems are those that are not acknowledged, are not currently in scheduled downtime, and
-                                  for which checks are currently enabled.
 _`TOTALHOSTPROBLEMS`              This macro reflects the total number of hosts that are currently either in a DOWN or an UNREACHABLE state.
-_`TOTALHOSTPROBLEMSUNHANDLED`     This macro reflects the total number of hosts that are currently either in a DOWN or an UNREACHABLE state that are not
-                                  currently being "handled". Unhandled host problems are those that are not acknowledged, are not currently in scheduled
-                                  downtime, and for which checks are currently enabled.
 _`TOTALSERVICESOK`                This macro reflects the total number of services that are currently in an OK state.
 _`TOTALSERVICESWARNING`           This macro reflects the total number of services that are currently in a WARNING state.
 _`TOTALSERVICESCRITICAL`          This macro reflects the total number of services that are currently in a CRITICAL state.
 _`TOTALSERVICESUNKNOWN`           This macro reflects the total number of services that are currently in an UNKNOWN state.
-_`TOTALSERVICESWARNINGUNHANDLED`  This macro reflects the total number of services that are currently in a WARNING state that are not currently being
-                                  "handled". Unhandled services problems are those that are not acknowledged, are not currently in scheduled downtime,
-                                  and for which checks are currently enabled.
-_`TOTALSERVICESCRITICALUNHANDLED` This macro reflects the total number of services that are currently in a CRITICAL state that are not currently being
-                                  "handled". Unhandled services problems are those that are not acknowledged, are not currently in scheduled downtime,
-                                  and for which checks are currently enabled.
-_`TOTALSERVICESUNKNOWNUNHANDLED`  This macro reflects the total number of services that are currently in an UNKNOWN state that are not currently being
-                                  "handled". Unhandled services problems are those that are not acknowledged, are not currently in scheduled downtime,
-                                  and for which checks are currently enabled.
 _`TOTALSERVICEPROBLEMS`           This macro reflects the total number of services that are currently either in a WARNING, CRITICAL, or UNKNOWN state.
-_`TOTALSERVICEPROBLEMSUNHANDLED`  This macro reflects the total number of services that are currently either in a WARNING, CRITICAL, or UNKNOWN state
-                                  that are not currently being "handled". Unhandled services problems are those that are not acknowledged, are not
-                                  currently in scheduled downtime, and for which checks are currently enabled.
 ================================= =======================================================================================================================
-
-Notification Macros
--------------------
-
-============================ ============================================================================================================================
-_`NOTIFICATIONTYPE`          A string identifying the type of notification that is being sent ("PROBLEM", "RECOVERY", "ACKNOWLEDGEMENT", "FLAPPINGSTART",
-                             "FLAPPINGSTOP", "FLAPPINGDISABLED", "DOWNTIMESTART", "DOWNTIMEEND", or "DOWNTIMECANCELLED").
-_`NOTIFICATIONRECIPIENTS`    A comma-separated list of the short names of all contacts that are being notified about the host or service.
-_`NOTIFICATIONISESCALATED`   An integer indicating whether this was sent to normal contacts for the host or service or if it was escalated. 0 = Normal
-                             (non-escalated) notification , 1 = Escalated notification.
-_`NOTIFICATIONAUTHOR`        A string containing the name of the user who authored the notification. If the $NOTIFICATIONTYPE$ macro is set to
-                             "DOWNTIMESTART" or "DOWNTIMEEND", this will be the name of the user who scheduled downtime for the host or service. If the
-                             $NOTIFICATIONTYPE$ macro is "ACKNOWLEDGEMENT", this will be the name of the user who acknowledged the host or service
-                             problem. If the $NOTIFICATIONTYPE$ macro is "CUSTOM", this will be name of the user who initated the custom host or service
-                             notification.
-_`NOTIFICATIONAUTHORNAME`    A string containing the short name of the contact (if applicable) specified in the $NOTIFICATIONAUTHOR$ macro.
-_`NOTIFICATIONAUTHORALIAS`   A string containing the alias of the contact (if applicable) specified in the $NOTIFICATIONAUTHOR$ macro.
-_`NOTIFICATIONCOMMENT`       A string containing the comment that was entered by the notification author. If the $NOTIFICATIONTYPE$ macro is set to
-                             "DOWNTIMESTART" or "DOWNTIMEEND", this will be the comment entered by the user who scheduled downtime for the host or
-                             service. If the $NOTIFICATIONTYPE$ macro is "ACKNOWLEDGEMENT", this will be the comment entered by the user who acknowledged
-                             the host or service problem. If the $NOTIFICATIONTYPE$ macro is "CUSTOM", this will be comment entered by the user who
-                             initated the custom host or service notification.
-_`HOSTNOTIFICATIONNUMBER`    The current notification number for the host. The notification number increases by one (1) each time a new notification is
-                             sent out for the host (except for acknowledgements). The notification number is reset to 0 when the host recovers (after the
-                             recovery notification has gone out). Acknowledgements do not cause the notification number to increase, nor do notifications
-                             dealing with flap detection or scheduled downtime.
-_`HOSTNOTIFICATIONID`        A unique number identifying a host notification. Notification ID numbers are unique across both hosts and service
-                             notifications, so you could potentially use this unique number as a primary key in a notification database. Notification ID
-                             numbers should remain unique across restarts of the Centreon Engine process, so long as you have state retention enabled. The
-                             notification ID number is incremented by one (1) each time a new host notification is sent out, and regardless of how many
-                             contacts are notified.
-_`SERVICENOTIFICATIONNUMBER` The current notification number for the service. The notification number increases by one (1) each time a new notification
-                             is sent out for the service (except for acknowledgements). The notification number is reset to 0 when the service recovers
-                             (after the recovery notification has gone out). Acknowledgements do not cause the notification number to increase, nor do
-                             notifications dealing with flap detection or scheduled downtime.
-_`SERVICENOTIFICATIONID`     A unique number identifying a service notification. Notification ID numbers are unique across both hosts and service
-                             notifications, so you could potentially use this unique number as a primary key in a notification database. Notification ID
-                             numbers should remain unique across restarts of the Centreon Engine process, so long as you have state retention enabled.
-                             The notification ID number is incremented by one (1) each time a new service notification is sent out, and regardless of how
-                             many contacts are notified.
-============================ ============================================================================================================================
 
 Date/Time Macros
 ----------------
@@ -514,14 +330,14 @@ Date/Time Macros
 ========================= ===============================================================================================================================
 _`TIME`                   Current time stamp (i.e. 00:30:28).
 _`TIMET`                  Current time stamp in time_t format (seconds since the UNIX epoch).
-_`ISVALIDTIME` :sup:`9`   This is a special on-demand macro that returns a 1 or 0 depending on whether or not a particular time is valid within a
+_`ISVALIDTIME` :sup:`4`   This is a special on-demand macro that returns a 1 or 0 depending on whether or not a particular time is valid within a
                           specified timeperiod. There are two ways of using this macro:
 
                             * $ISVALIDTIME:24x7$ will be set to "1" if the current time is valid within the "24x7" timeperiod. If not, it will be set to
                               "0".
                             * $ISVALIDTIME:24x7:timestamp$ will be set to "1" if the time specified by the "timestamp" argument (which must be in time_t
                               format) is valid within the "24x7" timeperiod. If not, it will be set to "0".
-_`NEXTVALIDTIME` :sup:`9` This is a special on-demand macro that returns the next valid time (in time_t format) for a specified timeperiod. There are two
+_`NEXTVALIDTIME` :sup:`4` This is a special on-demand macro that returns the next valid time (in time_t format) for a specified timeperiod. There are two
                           ways of using this macro:
 
                             * $NEXTVALIDTIME:24x7$ will return the next valid time from and including the current time in the "24x7" timeperiod.
@@ -540,8 +356,6 @@ _`RETENTIONDATAFILE`   The location of the :ref:`retention data file <main_cfg_o
 _`LOGFILE`             The location of the :ref:`log file <main_cfg_opt_log_file>`.
 _`RESOURCEFILE`        The location of the :ref:`resource file <main_cfg_opt_resource_file>`.
 _`COMMANDFILE`         The location of the :ref:`command file <main_cfg_opt_external_command_file>`.
-_`HOSTPERFDATAFILE`    The location of the host performance data file (if defined).
-_`SERVICEPERFDATAFILE` The location of the service performance data file (if defined).
 ====================== ==================================================================================================================================
 
 Misc Macros
@@ -554,8 +368,8 @@ _`PROCESSSTARTTIME` Time stamp in time_t format (seconds since the UNIX epoch) i
 _`EVENTSTARTTIME`   Time stamp in time_t format (seconds since the UNIX epoch) indicating when the Centreon Engine process starting process events
                     (checks, etc.). You can determine the number of seconds that it took for Centreon Engine to startup by subtracting $PROCESSSTARTTIME$
                     from $EVENTSTARTTIME$.
-_`ARGn`             The nth argument passed to the command (notification, event handler, service check, etc.). Centreon Engine supports up to 32 argument
-                    macros ($ARG1$ through $ARG32$).
+_`ARGn`             The nth argument passed to the command (event handler, service check, etc.). Centreon Engine supports up to 32 argument macros
+                    ($ARG1$ through $ARG32$).
 _`USERn`            The nth user-definable macro. User macros can be defined in one or more :ref:`resource files <main_cfg_opt_resource_file>`.
                     Centreon Engine supports up to 256 user macros ($USER1$ through $USER256$).
 =================== =====================================================================================================================================
@@ -570,24 +384,9 @@ Notes
     associated with when that service is being checked (i.e. they make
     no sense, as they haven't been determined yet).
   * :sup:`3` When host macros are used in service-related commands
-    (i.e. service notifications, event handlers, etc) they refer to they
-    host that they service is associated with.
-  * :sup:`4` When host and service summary macros are used in
-    notification commands, the totals are filtered to reflect only those
-    hosts and services for which the contact is authorized (i.e. hosts
-    and services they are configured to receive notifications for).
-  * :sup:`7` These macros are normally associated with the
-    first/primary contactgroup associated with the current contact. They
-    could therefore be considered contact macros in many cases. However,
-    these macros are not available as on-demand contact macros. Instead,
-    they can be used as on-demand contactgroup macros when you pass the
-    name of a contactgroup to the macro. For example:
-    $CONTACTGROUPMEMBERS:cg1$ would return a comma-delimited list of all
-    (contact) members of the contactgroup cg1.
-  * :sup:`8` These acknowledgement macros are deprecated. Use the
-    more generic $NOTIFICATIONAUTHOR$, $NOTIFICATIONAUTHORNAME$,
-    $NOTIFICATIONAUTHORALIAS$ or $NOTIFICATIONAUTHORCOMMENT$ macros
-    instead.
-  * :sup:`9` These macro are only available as on-demand macros -
+    (i.e. service event handlers, etc) they refer to they host that
+    they service is associated with.
+  * :sup:`4` These macro are only available as on-demand macros -
     e.g. you must supply an additional argument with them in order to
     use them. These macros are not available as environment variables.
+  * :sup:`5` Summary macros are quite CPU-intensive to calculate.

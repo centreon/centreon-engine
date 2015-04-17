@@ -103,7 +103,7 @@ and services, so even if cached check results prove to unreliably
 represent their true value, Centreon Engine will only work with
 incorrect information for a short period of time. Even short periods of
 unreliable status information can prove to be a nuisance for admins, as
-they may receive notifications about problems which no longer exist.
+they may receive information about problems which no longer exist.
 
 There is no standard cached check horizon or cache hit rate that will be
 acceptable to every Centreon Engine users. Some people will want a short
@@ -188,4 +188,3 @@ cached check horizon variables appropriately for your
 situation. Continue to monitor the MRTG graphs over time to see how
 changing the horizon variables affected cached check statistics. Rinse
 and repeat as necessary.
-

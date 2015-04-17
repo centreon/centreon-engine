@@ -47,8 +47,7 @@ have five separate service definitions (probably using the check_dns
 plugin). For host clusters, make sure you have configured appropriate
 host definitions for each member of the cluster (you'll also have to
 define at least one service to be monitored for each of the
-hosts). Important: You're going to want to disable notifications for the
-individual cluster elements (host or service definitions).
+hosts).
 
 Monitoring the overall cluster can be done by using the previously
 cached results of cluster elements. Although you could re-check all
@@ -58,9 +57,7 @@ are the results cached? Cached results for cluster elements can be found
 in the :ref:`status file <main_cfg_opt_status_file>` (assuming you are
 monitoring each element). The check_cluster plugin is designed
 specifically for checking cached host and service states in the status
-file. Important: Although you didn't enable notifications for individual
-elements of the cluster, you will want them enabled for the overall
-cluster status check.
+file.
 
 Using the check_cluster Plugin
 ==============================
@@ -121,8 +118,7 @@ clusters. Obviously, the main difference is that the cluster members are
 hosts and not services. In order to monitor the status of a host
 cluster, you must define a service that uses the check_cluster
 plugin. The service should not be associated with any of the hosts in
-the cluster, as this will cause problems with notifications for the
-cluster if that host goes down. A good idea might be to associate the
+the cluster. A good idea might be to associate the
 service with the host that Centreon Engine is running on. After all, if
 the host that Centreon Engine is running on goes down, then Centreon
 Engine isn't running anymore, so there isn't anything you can do as far
@@ -156,13 +152,4 @@ will fill those on-demand macros in with the current host state IDs
 (numerical values, rather than text strings) of the individual members
 of the cluster.
 
-That's it! Centreon Engine will periodically check the status of the
-host cluster and send notifications to you when its status is degraded
-(assuming you've enabled notification for the service). Note that for
-thehost definitions of each cluster member, you will most likely want to
-disable notifications when the host goes down . Remeber that you don't
-care as much about the status of any individual host as you do the
-overall status of the cluster. Depending on your network layout and what
-you're trying to accomplish, you may wish to leave notifications for
-unreachable states enabled for the host definitions.
-
+That's it!

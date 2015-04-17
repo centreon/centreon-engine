@@ -13,7 +13,7 @@ Event handlers are optional system commands (scripts or executables)
 that are run whenever a host or service state change occurs.
 
 An obvious use for event handlers is the ability for Centreon Engine to
-proactively fix problems before anyone is notified. Some other uses for
+proactively fix problems before anyone notice them. Some other uses for
 event handlers include:
 
   * Restarting a failed service
@@ -84,9 +84,6 @@ Event Handler Execution Order
 
 As already mentioned, global host and service event handlers are
 executed immediately before host- or service-specific event handlers.
-
-Event handlers are executed for HARD problem and recovery states
-immediately after notifications are sent out.
 
 Writing Event Handler Commands
 ==============================
@@ -185,17 +182,16 @@ Now, let's actually write the event handler script (this is the
         # Is this a "soft" or a "hard" state?
         case "$2" in
           # We're in a "soft" state, meaning that Centreon Engine is in the middle of retrying the
-          # check before it turns into a "hard" state and contacts get notified...
+          # check before it turns into a "hard" state...
           SOFT)
             # What check attempt are we on? We don't want to restart the web server on the first
             # check, because it may just be a fluke!
             case "$3" in
               # Wait until the check has been tried 3 times before restarting the web server.
               # If the check fails on the 4th time (after we restart the web server), the state
-              # type will turn to "hard" and contacts will be notified of the problem.
+              # type will turn to "hard".
               # Hopefully this will restart the web server successfully, so the 4th check will
-              # result in a "soft" recovery. If that happens no one gets notified because we
-              # fixed the problem!
+              # result in a "soft" recovery.
               3)
                 echo -n "Restarting HTTP service (3rd soft critical state)..."
                 # Call the init script to restart the HTTPD server
@@ -206,8 +202,6 @@ Now, let's actually write the event handler script (this is the
           # The HTTP service somehow managed to turn into a hard error without getting fixed.
             # It should have been restarted by the code above, but for some reason it didn't.
             # Let's give it one last try, shall we?
-            # Note: Contacts have already been notified of a problem with the service at this
-            # point (unless you disabled notifications for this service)
         HARD)
           echo -n "Restarting HTTP service..."
             # Call the init script to restart the HTTPD server

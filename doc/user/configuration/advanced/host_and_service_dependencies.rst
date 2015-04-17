@@ -23,8 +23,8 @@ There are a few things you should know about service dependencies:
   * Service dependencies are not inherited (unless specifically
     configured to)
   * Service dependencies can be used to cause service check execution
-    and service notifications to be suppressed under different
-    circumstances (OK, WARNING, UNKNOWN, and/or CRITICAL states)
+    to be suppressed under different circumstances (OK, WARNING, UNKNOWN,
+    and/or CRITICAL states)
   * Service dependencies might only be valid during specific
     :ref:`timeperiods <timeperiods>`
 
@@ -35,8 +35,8 @@ First, the basics. You create service dependencies by adding
 :ref:`service dependency <obj_def_service_dependency>`
 definitions" in your :ref:`object config file(s) <object_configuration_overview>`.
 In each definition you specify the dependent service, the service you
-are depending on, and the criteria (if any) that cause the execution and
-notification dependencies to fail (these are described later).
+are depending on, and the criteria (if any) that cause the execution
+dependency to fail (these are described later).
 
 You can create several dependencies for a given service, but you must
 add a separate service dependency definition for each dependency you
@@ -45,9 +45,9 @@ create.
 Example Service Dependencies
 ============================
 
-The image below shows an example logical layout of service notification
-and execution dependencies. Different services are dependent on other
-services for notifications and check execution.
+The image below shows an example logical layout of execution
+dependencies. Different services are dependent on other services
+for check execution.
 
 .. image:: /_static/images/service-dependencies.png
    :align: center
@@ -60,17 +60,7 @@ would be defined as follows::
     service_description           Service D
     dependent_host_name           Host C
     dependent_service_description Service F
-    execution_failure_criteria    o
-    notification_failure_criteria w,u
-  }
-
-  define servicedependency{
-    host_name                     Host B
-    service_description           Service E
-    dependent_host_name           Host C
-    dependent_service_description Service F
-    execution_failure_criteria    n
-    notification_failure_criteria w,u,c
+    failure_criteria              o
   }
 
   define servicedependency{
@@ -78,8 +68,7 @@ would be defined as follows::
     service_description           Service C
     dependent_host_name           Host C
     dependent_service_description Service F
-    execution_failure_criteria    w
-    notification_failure_criteria c
+    failure_criteria              w
   }
 
 The other dependency definitions shown in the image above would be
@@ -90,8 +79,7 @@ defined as follows::
     service_description           Service A
     dependent_host_name           Host B
     dependent_service_description Service D
-    execution_failure_criteria    u
-    notification_failure_criteria n
+    failure_criteria              u
   }
 
   define servicedependency{
@@ -99,35 +87,23 @@ defined as follows::
     service_description           Service B
     dependent_host_name           Host B
     dependent_service_description Service E
-    execution_failure_criteria    w,u
-    notification_failure_criteria c
-  }
-
-  define servicedependency{
-    host_name                     Host B
-    service_description           Service C
-    dependent_host_name           Host B
-    dependent_service_description Service E
-    execution_failure_criteria    n
-    notification_failure_criteria w,u,c
+    failure_criteria              w,u
   }
 
 How Service Dependencies Are Tested
 ===================================
 
-Before Centreon Engine executes a service check or sends notifications
-out for a service, it will check to see if the service has any
-dependencies. If it doesn't have any dependencies, the check is executed
-or the notification is sent out as it normally would be. If the service
+Before Centreon Engine executes a check for a service, it will check to
+see if the service has any dependencies. If it doesn't have any
+dependencies, the check is executed as it normally would be. If the service
 does have one or more dependencies, Centreon Engine will check each
 dependency entry as follows::
 
   * Centreon Engine gets the current status of the service that is being
     depended upon.
   * Centreon Engine compares the current status of the service that is
-    being depended upon against either the execution or notification
-    failure options in the dependency definition (whichever one is
-    relevant at the time).
+    being depended upon against either the execution failure options in
+    the dependency definition (whichever one is relevant at the time).
   * If the current status of the service that is being depended upon
     matches one of the failure options, the dependency is said to have
     failed and Centreon Engine will break out of the dependency check
@@ -172,35 +148,16 @@ if Service B is in a WARNING or UNKNOWN state. If this was the case, the
 service check would not be performed and the check would be scheduled
 for (potential) execution at a later time.
 
-Notification Dependencies
-=========================
-
-If all of the notification dependency tests for the service passed,
-Centreon Engine will send notifications out for the service as it
-normally would. If even just one of the notification dependencies for a
-service fails, Centreon Engine will temporarily repress notifications
-for that (dependent) service. At some point in the future the
-notification dependency tests for the service may all pass. If this
-happens, Centreon Engine will start sending out notifications again as
-it normally would for the service. More information on the notification
-logic can be found :ref:`here <notifications>`.
-
-In the example above, Service F would have failed notification
-dependencies if Service C is in a CRITICAL state, and/or Service D is in
-a WARNING or UNKNOWN state, and/or if Service E is in a WARNING,
-UNKNOWN, or CRITICAL state. If this were the case, notifications for the
-service would not be sent out.
-
 Dependency Inheritance
 ======================
 
 As mentioned before, service dependencies are not inherited by
 default. In the example above you can see that Service F is dependent on
-Service E. However, it does not automatically inherit Service E's
-dependencies on Service B and Service C. In order to make Service F
-dependent on Service C we had to add another service dependency
-definition. There is no dependency definition for Service B, so Service
-F is not dependent on Service B.
+Service D. However, it does not automatically inherit Service D's
+dependencies on Service A. In order to make Service F dependent on Service
+A we had to add another service dependency definition. There is no
+dependency definition for Service A, so Service F is not dependent on
+Service A.
 
 If you do wish to make service dependencies inheritable, you must use
 the inherits_parent directive in the
@@ -223,8 +180,7 @@ definition for services D and F to look like this::
     service_description           Service D
     dependent_host_name           Host C
     dependent_service_description Service F
-    execution_failure_criteria    o
-    notification_failure_criteria n
+    failure_criteria              o
     inherits_parent               1
   }
 
@@ -259,9 +215,9 @@ Here are the basics about host dependencies:
   * A host can be dependent on one or more other host
   * Host dependencies are not inherited (unless specifically configured
     to)
-  * Host dependencies can be used to cause host check execution and host
-    notifications to be suppressed under different circumstances (UP,
-    DOWN, and/or UNREACHABLE states)
+  * Host dependencies can be used to cause host check execution to be
+    suppressed under different circumstances (UP, DOWN, and/or
+    UNREACHABLE states)
   * Host dependencies might only be valid during specific
     :ref:`timeperiods <timeperiods>`
 
@@ -269,8 +225,8 @@ Example Host Dependencies
 =========================
 
 The image below shows an example of the logical layout of host
-notification dependencies. Different hosts are dependent on other hosts
-for notifications.
+execution dependencies. Different hosts are dependent on other hosts
+for execution.
 
 .. image:: /_static/images/host-dependencies.png
    :align: center
@@ -281,13 +237,13 @@ defined as follows::
   define hostdependency{
     host_name                     Host A
     dependent_host_name           Host C
-    notification_failure_criteria d
+    failure_criteria              d
   }
 
   define hostdependency{
     host_name                     Host B
     dependent_host_name           Host C
-    notification_failure_criteria d,u
+    failure_criteria              d,u
   }
 
 As with service dependencies, host dependencies are not inherited. In
@@ -295,13 +251,11 @@ the example image you can see that Host C does not inherit the host
 dependencies of Host B. In order for Host C to be dependent on Host A, a
 new host dependency definition must be defined.
 
-Host notification dependencies work in a similiar manner to service
-notification dependencies. If all of the notification dependency tests
-for the host pass, Centreon Engine will send notifications out for the
-host as it normally would. If even just one of the notification
+Host dependencies work in a similiar manner to service dependencies. If
+all of the dependency tests for the host pass, Centreon Engine will run
+the check for the host as it normally would. If even just one of the
 dependencies for a host fails, Centreon Engine will temporarily repress
-notifications for that (dependent) host. At some point in the future the
-notification dependency tests for the host may all pass. If this
-happens, Centreon Engine will start sending out notifications again as
-it normally would for the host. More information on the notification
-logic can be found :ref:`here <notifications>`.
+executions for that (dependent) host. At some point in the future the
+dependency tests for the host may all pass. If this happens, Centreon
+Engine will start executing host checks again as it normally would for
+the host.

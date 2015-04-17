@@ -6,17 +6,13 @@ Object Configuration Overview
 What Are Objects?
 =================
 
-Objects are all the elements that are involved in the monitoring and
-notification logic. Types of objects include:
+Objects are all the elements that are involved in the monitoring logic.
+Types of objects include:
 
   * Services
   * Hosts
-  * Contacts
-  * Contact Groups
   * Commands
   * Time Periods
-  * Notification Escalations
-  * Notification and Execution Dependencies
 
 More information on what objects are and how they relate to each other
 can be found below.
@@ -82,24 +78,9 @@ monitoring logic. Services are associated with hosts and can be:
 .. image:: /_static/images/objects-services.png
    :align: center
 
-:ref:`Contacts <obj_def_contact>` are people involved in the
-notification process:
-
-  * Contacts have one or more notification methods (cellphone, pager,
-    email, instant messaging, etc.)
-  * Contacts receive notifications for hosts and service they are
-    responsible for :ref:`Contacts Groups <obj_def_contactgroup>` are
-    groups of one or more contacts. Contact groups can make it easier to
-    define all the people who get notified when certain host or service
-    problems occur.
-
-.. image:: /_static/images/objects-contacts.png
-   :align: center
-
 :ref:`Timeperiods <obj_def_timeperiod>` are are used to control:
 
   * When hosts and services can be monitored
-  * When contacts can receive notifications
 
 Information on how timeperiods work can be found
 :ref:`here <timeperiods>`.
@@ -111,7 +92,6 @@ Information on how timeperiods work can be found
 programs, scripts, etc. it should execute to perform:
 
   * Host and service checks
-  * Notifications
   * Event handlers
   * and more...
 

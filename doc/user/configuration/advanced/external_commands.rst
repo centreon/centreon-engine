@@ -49,9 +49,7 @@ Using External Commands
 
 External commands can be used to accomplish a variety of things while
 Centreon Engine is running. Example of what can be done include
-temporarily disabling notifications for services and hosts, temporarily
-disabling service checks, forcing immediate service checks, adding
-comments to hosts and services, etc.
+forcing immediate service checks, etc.
 
 Command Format
 ==============

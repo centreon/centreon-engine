@@ -15,8 +15,7 @@ components:
 There are two state types in Centreon Engine - SOFT states and HARD
 states. These state types are a crucial part of the monitoring logic, as
 they are used to determine when :ref:`event handlers <event_handlers>`
-are executed and when :ref:`notifications <notifications>` are
-initially sent out.
+are executed.
 
 This document describes the difference between SOFT and HARD states, how
 they occur, and what happens when they occur.
@@ -92,7 +91,6 @@ changes:
 
   * The HARD state is logged.
   * Event handlers are executed to handle the HARD state.
-  * Contacts are notifified of the host or service problem or recovery.
 
 The :ref:`HOSTSTATETYPE <user_configuration_macros_host>` or
 :ref:`SERVICESTATETYPE <user_configuration_macros_service>` macros will
@@ -105,8 +103,8 @@ Example
 =======
 
 Here's an example of how state types are determined, when state changes
-occur, and when event handlers and notifications are sent out. The table
-below shows consecutive checks of a service over time. The service has a
+occur, and when event handlers executed. The table below shows
+consecutive checks of a service over time. The service has a
 max_check_attempts value of 3.
 
 ==== ===== ======== ========== ============ ============================================
@@ -119,26 +117,20 @@ Time Check State    State Type State Change Notes
                                             state. Event handlers execute.
 3    3     CRITICAL HARD       Yes          Max check attempts has been reached,
                                             so service goes into a HARD state. Event
-                                            handlers execute and a problem
-                                            notification is sent out. Check is reset
-                                            to 1 immediately after this happens.
+                                            handlers execute. Check is reset to 1
+                                            immediately after this happens.
 4    1     WARNING  HARD       Yes          Service changes to a HARD WARNING state.
-                                            Event handlers execute and a problem
-                                            notification is sent out.
+                                            Event handlers execute.
 5    1     WARNING  HARD       No           Service stabilizes in a HARD problem
-                                            state. Depending on what the notification
-                                            interval for the service is, another
-                                            notification might be sent out.
+                                            state.
 6    1     OK       HARD       Yes          Service experiences a HARD recovery. Event
-                                            handlers execute and a recovery notification
-                                            is sent out.
+                                            handlers execute.
 7    1     OK       HARD       No           Service is still OK.
 8    1     UNKNOWN  OFT        Yes          Service is detected as changing to a SOFT
                                             non-OK state. Event handlers execute.
 9    2     OK       SOFT       Yes          Service experiences a SOFT recovery. Event
-                                            handlers execute, but notification are not
-                                            sent, as this wasn't a "real" problem. State
-                                            type is set HARD and check is reset to 1
-                                            immediately after this happens.
+                                            handlers execute. State type is set HARD
+                                            and check is reset to 1 immediately after
+                                            this happens.
 10   1     OK       HARD       No           Service stabilizes in an OK state.
 ==== ===== ======== ========== ============ ============================================

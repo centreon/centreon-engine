@@ -48,10 +48,9 @@ each cluster of hosts (however you define that), there is one
 distributed server that runs Centreon Engine and monitors the services
 on the hosts in the cluster. A distributed server is usually a
 bare-bones installation of Centreon Engine. It doesn't have to have the
-web interface installed, send out notifications, run event handler
-scripts, or do anything other than execute service checks if you don't
-want it to. More detailed information on configuring a distributed
-server comes later...
+web interface installed, run event handler scripts, or do anything
+other than execute service checks if you don't want it to. More
+detailed information on configuring a distributed server comes later...
 
 The purpose of the central server is to simply listen for service check
 results from one or more distributed servers. Even though services are
@@ -60,9 +59,8 @@ checks are only performed in dire circumstances, so lets just say that
 the central server only accepts passive check for now. Since the central
 server is obtaining :ref:`passive service check <passive_checks>`
 results from one or more distributed servers, it serves as the focal
-point for all monitoring logic (i.e. it sends out notifications, runs
-event handler scripts, determines host states, has the web interface
-installed, etc).
+point for all monitoring logic (i.e. it runs event handler scripts,
+determines host states, has the web interface installed, etc).
 
 Obtaining Service Check Information From Distributed Monitors
 =============================================================
@@ -96,18 +94,13 @@ Distributed Server Configuration
 
 So how exactly is Centreon Engine configured on a distributed server?
 Basically, its just a bare-bones installation. You don't need to install
-the web interface or have notifications sent out from the server, as
-this will all be handled by the central server.
+the web interface, as this will all be handled by the central server.
 
 Key configuration changes:
 
   * Only those services and hosts which are being monitored directly by
     the distributed server are defined in the
     :ref:`object configuration file <object_configuration_overview>`.
-  * The distributed server has its
-    :ref:`enable_notifications <main_cfg_opt_notifications>`
-    directive set to 0. This will prevent any notifications from being
-    sent out by the server.
   * The distributed server is configured to
     :ref:`obsess over services <main_cfg_opt_obsess_over_services>`.
   * The distributed server has an
@@ -220,9 +213,6 @@ central is configured as you would normally configure a standalone
 server. It is setup as follows:
 
   * The central server has the web interface installed (optional, but
-    recommended)
-  * The central server has its :ref:`enable_notifications <main_cfg_opt_notifications>`
-    directive set to 1. This will enable notifications. (optional, but
     recommended)
   * The central server has :ref:`active service checks <main_cfg_opt_service_check_execution>`
     disabled (optional, but recommended - see notes below)
@@ -338,8 +328,7 @@ services. Here's what the definition would look like::
 
 When Centreon Engine detects that the service results are stale and runs
 the service-is-stale command, the check_dummy plugin is executed and the
-service will go into a critical state. This would likely cause
-notifications to be sent out, so you'll know that there's a problem.
+service will go into a critical state.
 
 Performing Host Checks
 ======================

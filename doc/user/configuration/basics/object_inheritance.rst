@@ -63,7 +63,6 @@ definitions (not all required variables have been supplied)::
   define host{
     host_name            bighost1
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   5
     name                 hosttemplate1
   }
@@ -83,17 +82,16 @@ definition of host bighost2 would be equivalent to this definition::
   define host{
     host_name            bighost2
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   3
   }
 
-You can see that the check_command and notification_options variables
-were inherited from the template object (where host bighost1 was
-defined). However, the host_name and max_check_attempts variables were
-not inherited from the template object because they were defined
-locally. Remember, locally defined variables override variables that
-would normally be inherited from a template object. That should be a
-fairly easy concept to understand.
+You can see that the check_command variable was inherited from the
+template object (where host bighost1 was defined). However, the
+host_name and max_check_attempts variables were not inherited from
+the template object because they were defined locally. Remember,
+locally defined variables override variables that would normally be
+inherited from a template object. That should be a fairly easy
+concept to understand.
 
 .. note::
    If you would like local string variables to be appended to inherited
@@ -109,7 +107,6 @@ template objects. Take the following example::
   define host{
     host_name            bighost1
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   5
     name                 hosttemplate1
   }
@@ -135,21 +132,18 @@ to the following::
   define host{
     host_name            bighost1
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   5
   }
 
   define host{
     host_name            bighost2
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   3
   }
 
   define host{
     host_name            bighost3
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   3
   }
 
@@ -170,7 +164,6 @@ the following example::
 
   define host{
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   5
     name                 generichosttemplate
     register             0
@@ -205,7 +198,6 @@ host definitions would be equivalent to specifying the following::
     host_name            bighost1
     address              192.168.1.3
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   5
   }
 
@@ -213,7 +205,6 @@ host definitions would be equivalent to specifying the following::
     host_name            bighost2
     address              192.168.1.4
     check_command        check-host-alive
-    notification_options d,u,r
     max_check_attempts   5
   }
 
@@ -228,8 +219,8 @@ Custom Object
 Variables
 
 Any :ref:`custom object variables <custom_object_variables>`
-that you define in your host, service, or contact definition templates
-will be inherited just like other standard variables. Take the following
+that you define in your host or service definition templates will be
+inherited just like other standard variables. Take the following
 example::
 
   define host{
@@ -260,9 +251,9 @@ bighost1 that looks like this::
 Cancelling Inheritance of String Values
 =======================================
 
-In some cases you may not want your host, service, or contact
-definitions to inherit values of string variables from the templates
-they reference. If this is the case, you can specify "null" (without
+In some cases you may not want your host or service definitions to
+inherit values of string variables from the templates they
+reference. If this is the case, you can specify "null" (without
 quotes) as the value of the variable that you do not want to
 inherit. Take the following example::
 
@@ -323,69 +314,6 @@ effective definition of linuxserver1 is the following::
   define host{
     host_name  linuxserver1
     parents    some-router,linux-server,web-server
-  }
-
-Implied Inheritance
-===================
-
-Normally you have to either explicitly specify the value of a required
-variable in an object definition or inherit it from a template. There
-are a few exceptions to this rule, where Centreon Engine will assume
-that you want to use a value that instead comes from a related
-object. For example, the values of some service variables will be copied
-from the host the service is associated with if you don't otherwise
-specify them.
-
-The following table lists the object variables that will be implicitly
-inherited from related objects if you don't explicitly specify their
-value in your object definition or inherit them from a template.
-
-=================== ===================== ==========================================================
-Object Type         Object Variable       Implied Source
-=================== ===================== ==========================================================
-Services            contact_groups        contact_groups in the associated host definition
-Services            notification_interval notification_interval in the associated host definition
-Services            notification_period   notification_period in the associated host definition
-Host Escalations    contact_groups        contact_groups in the associated host definition
-Host Escalations    notification_interval notification_interval in the associated host definition
-Host Escalations    escalation_period     notification_period in the associated host definition
-Service Escalations contact_groups        contact_groups in the associated service definition
-Service Escalations notification_interval notification_interval in the associated service definition
-Service Escalations escalation_period     notification_period in the associated service definition
-=================== ===================== ==========================================================
-
-Implied/Additive Inheritance in Escalations
-===========================================
-
-Service and host escalation definitions can make use of a special rule
-that combines the features of implied and additive inheritance. If
-escalations 1) do not inherit the values of their contact_groups or
-contacts directives from another escalation template and 2) their
-contact_groups or contacts directives begin with a plus sign (+), then
-the values of their corresponding host or service definition's
-contact_groups or contacts directives will be used in the additive
-inheritance logic.
-
-Here's an example::
-
-  define host{
-    name           linux-server
-    contact_groups linux-admins
-    ...
-  }
-
-  define hostescalation{
-    host_name      linux-server
-    contact_groups +management
-    ...
-  }
-
-This is a much simpler equivalent to::
-
-  define hostescalation{
-    host_name      linux-server
-    contact_groups linux-admins,management
-    ...
   }
 
 Important values
@@ -454,7 +382,6 @@ configurations, as shown below::
   define host{
     name                 development-server
     check_interval       15
-    notification_options d,u,r
     ...
     register             0
   }
@@ -481,7 +408,6 @@ inheritance, the effective definition of devweb1 would be as follows::
     host_name             devweb1
     active_checks_enabled 1
     check_interval        10
-    notification_options  d,u,r
     ...
   }
 

@@ -13,7 +13,7 @@ Addons are available for:
   * Managing the config files through a web interface
   * Monitoring remote hosts (NIX, Windows ...)
   * Submitting passive checks from remote hosts
-  * Simplifying/extending the notification logic
+  * Providing a notification logic
   * ...and much more
 
 You can find many addons for Centreon Engine by visiting:

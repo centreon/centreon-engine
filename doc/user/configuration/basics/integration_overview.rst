@@ -30,8 +30,8 @@ the docs on:
   * :ref:`Passive Checks <passive_checks>`
   * :ref:`External Commands <external_commands>`
 
-To send status, performance, or notification information from Centreon
-Engine to external applications, check out the docs on:
+To send status or performance information from Centreon Engine to
+external applications, check out the docs on:
 
   * :ref:`Event Handlers <event_handlers>`
   * :ref:`OCSP <main_cfg_opt_obsessive_compulsive_service_processor_command>`
@@ -39,7 +39,6 @@ Engine to external applications, check out the docs on:
     :ref:`OCHP <main_cfg_opt_obsessive_compulsive_host_processor_command>`
     Commands
   * :ref:`Performance Data <performance_data>`
-  * :ref:`Notifications <notifications>`
 
 Integration Examples
 

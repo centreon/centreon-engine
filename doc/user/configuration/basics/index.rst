@@ -17,9 +17,6 @@ Basics
    passive_checks
    host_checks
    service_checks
-   notifications
    state_types
    integration_overview
    addons
-
-

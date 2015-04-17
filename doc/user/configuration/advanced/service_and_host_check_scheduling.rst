@@ -269,9 +269,8 @@ at a frequency determined by the *retry_interval* option.
 
 If Centreon Engine rechecks the service *max_attempts* times and it is
 still in a non-OK state, Centreon Engine will put the service into a
-"hard" state, send out notifications to contacts (if applicable), and
-start rescheduling future checks of the service at a frequency
-determined by the *check_interval* option.
+"hard" state, and start rescheduling future checks of the service at a
+frequency determined by the *check_interval* option.
 
 As always, there are exceptions to the rules. When a service check
 results is in a non-OK state, Centreon Engine will check the host that
@@ -334,8 +333,8 @@ that are scheduled at a frequency specified by the
 :ref:`check_result_reaper_frequency <main_cfg_opt_check_result_reaper_frequency>`
 option in the main config file. Check result reaper events do the work
 of gathering and processing service check results. They serve as the
-core logic for Centreon Engine, kicking off host checks, event handlers
-and notifications as necessary.
+core logic for Centreon Engine, kicking off host checks, and event
+handlers as necessary.
 
 For the example here, a service has been scheduled to be executed at
 time **A**. However, Centreon Engine got behind in its event queue, so

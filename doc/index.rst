@@ -20,8 +20,6 @@ Some of the many features of Centreon Engine include:
   * ability to define network host hierarchy using "parent" hosts,
     allowing detection of and distinction between hosts that are down and
     those that are unreachable.
-  * contact notifications when service or host problems occur and get
-    resolved (via email, page, or user-defined method).
   * ability to define event handlers to be run during service or host
     events for proactive problem resolution.
   * support for implementing redundant monitoring hosts.

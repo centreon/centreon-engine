@@ -7,17 +7,15 @@ Introduction
 ============
 
 Host and service :ref:`dependencies <host_and_service_dependencies>` can
-be defined to allow you greater control over when checks are executed
-and when notifications are sent out. As dependencies are used to control
-basic aspects of the monitoring process, it is crucial to ensure that
-status information used in the dependency logic is as up to date as
-possible.
+be defined to allow you greater control over when checks are executed.
+As dependencies are used to control basic aspects of the monitoring
+process, it is crucial to ensure that status information used in the
+dependency logic is as up to date as possible.
 
 Centreon Engine allows you to enable predictive dependency checks for
 hosts and services to ensure that the dependency logic will have the
 most up-to-date status information when it comes to making decisions
-about whether to send out notifications or allow active checks of a host
-or service.
+about whether to allow active checks of a host or service.
 
 How Do Predictive Checks Work?
 ==============================
@@ -35,14 +33,14 @@ Switch3). This is a normal function of the
 logic.
 
 You will also notice that Switch2 is depending on Monitor1 and File1 for
-either notifications or check execution (which one is unimportant in
-this example). If predictive host dependency checks are enabled,
-Centreon Engine will launch parallel checks of Monitor1 and File1 at the
-same time it launches checks of Switch2's immediate parents and
-children. Centreon Engine does this because it knows that it will have
-to test the dependency logic in the near future (e.g. for purposes of
-notification) and it wants to make sure it has the most current status
-information for the hosts that take part in the dependency.
+check execution (which one is unimportant in this example). If predictive
+host dependency checks are enabled, Centreon Engine will launch parallel
+checks of Monitor1 and File1 at the same time it launches checks of
+Switch2's immediate parents and children. Centreon Engine does this
+because it knows that it will have to test the dependency logic in the
+near future (e.g. for purposes of check scheduling) and it wants to make
+sure it has the most current status information for the hosts that take
+part in the dependency.
 
 .. image:: /_static/images/predictive-dependency-checks.png
    :align: center
@@ -82,4 +80,3 @@ checks can provide you with performance improvements by allowing
 Centreon Engine to forgo running an actual host or service check if it
 can use a relatively recent check result instead. More information on
 cached checks can be found :ref:`here <cached_checks>`.
-

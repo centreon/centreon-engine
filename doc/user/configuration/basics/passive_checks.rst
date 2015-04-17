@@ -62,9 +62,6 @@ Here's how passive checks work in more detail...
   * Centreon Engine will periodically execute a :ref:`check result reaper event <main_cfg_opt_check_result_reaper_frequency>`
     and scan the check result queue. Each service check result that is
     found in the queue is processed in the same manner
-  * regardless of whether the check was active or passive. Centreon
-    Engine may send out notifications, log alerts, etc. depending on the
-    check result information.
 
 The processing of active and passive check results is essentially
 identical. This allows for seamless integration of status information

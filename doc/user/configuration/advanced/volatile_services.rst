@@ -32,11 +32,6 @@ ways. Each time they are checked when they are in a
 non-OK state (i.e. no state change has occurred)...
 
   * The non-OK service state is logged
-  * Contacts are notified about the problem (if that's
-    :ref:`what should be done <notifications>`).
-    .. note::
-
-       Notification intervals are ignored for volatile services.
   * The :ref:`event handler <event_handlers>` for the service is run (if
     one has been defined)
 
@@ -113,6 +108,6 @@ the future?
   * Centreon Engine will read the external command file and see the
     passive service check submitted by PortSentry
   * Centreon Engine will put the Port Scans service in a hard CRITICAL
-    state and send notifications to contacts
+    state
 
 Pretty neat, huh?

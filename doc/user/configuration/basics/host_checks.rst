@@ -79,8 +79,7 @@ runs in a child process that was fork()ed from the main Centreon Engine
 daemon. When the host check has completed, the child process will inform
 the main Centreon Engine process (its parent) of the check results. The
 main Centreon Engine process then handles the check results and takes
-appropriate action (running event handlers, sending notifications,
-etc.).
+appropriate action (running event handlers, etc.).
 
 On-demand host checks are also run in parallel if needed. As mentioned
 earlier, Centreon Engine can forgo the actual execution of an on-demand
@@ -167,14 +166,13 @@ rebooted. When Centreon Engine checks the status of hosts, it will be
 able to detect when a host changes between UP, DOWN, and UNREACHABLE
 states and take appropriate action. These state changes result in
 different :ref:`state types <state_types>` (HARD or SOFT), which can
-trigger :ref:`event handlers <event_handlers>` to be run and
-:ref:`notifications <notifications>` to be sent out. Detecting and
-dealing with state changes is what Centreon Engine is all about.
+trigger :ref:`event handlers <event_handlers>` to be run. Detecting
+and dealing with state changes is what Centreon Engine is all about.
 
 When hosts change state too frequently they are considered to be
 "flapping". A good example of a flapping host would be server that keeps
 spontaneously rebooting as soon as the operating system loads. That's
 always a fun scenario to have to deal with. Centreon Engine can detect
-when hosts start flapping, and can suppress notifications until flapping
-stops and the host's state stabilizes. More information on the flap
-detection logic can be found :ref:`here <flapping_detection>`.
+when hosts start flapping, and can flag internally the host until
+flapping stops and the host's state stabilizes. More information on the
+flap detection logic can be found :ref:`here <flapping_detection>`.

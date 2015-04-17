@@ -46,9 +46,9 @@ Object
 
 Definition Files
 
-Object definition files are used to define hosts, services, hostgroups,
-contacts, contactgroups, commands, etc. This is where you define all the
-things you want monitor and how you want to monitor them.
+Object definition files are used to define hosts, services, commands,
+etc. This is where you define all the things you want monitor and how
+you want to monitor them.
 
 You can specify one or more object definition files by using the
 :ref:`cfg_file <main_cfg_opt_object_configuration_file>` and/or

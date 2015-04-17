@@ -8,10 +8,9 @@ Introduction
 
 Centreon Engine supports optional detection of hosts and services that
 are "flapping". Flapping occurs when a service or host changes state too
-frequently, resulting in a storm of problem and recovery
-notifications. Flapping can be indicative of configuration problems
-(i.e. thresholds set too low), troublesome services, or real network
-problems.
+frequently, resulting in a storm of problems. Flapping can be indicative
+of configuration problems (i.e. thresholds set too low), troublesome
+services, or real network problems.
 
 How Flap Detection Works
 ========================
@@ -179,10 +178,6 @@ will:
   * Log a message indicating that the service or host is flapping.
   * Add a non-persistent comment to the host or service indicating that
     it is flapping.
-  * Send a "flapping start" notification for the host or service to
-    appropriate contacts.
-  * Suppress other notifications for the service or host (this is one of
-    the filters in the :ref:`notification logic <notifications>`).
 
 When a service or host stops flapping, Centreon Engine will:
 
@@ -190,11 +185,6 @@ When a service or host stops flapping, Centreon Engine will:
     flapping.
   * Delete the comment that was originally added to the service or host
     when it started flapping.
-  * Send a "flapping stop" notification for the host or service to
-    appropriate contacts.
-  * Remove the block on notifications for the service or host
-    (notifications will still be bound to the normal
-    :ref:`notification logic <notifications>`).
 
 Enabling Flap Detection
 =======================
@@ -214,4 +204,3 @@ directive to 0.
 If you would like to disable flap detection for just a few hosts or
 services, use the flap_detection_enabled directive in the host and/or
 service definitions to do so.
-

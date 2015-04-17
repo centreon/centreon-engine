@@ -30,8 +30,8 @@ offer shortcuts for otherwise tedious configuration tasks.
 Retention Notes
 ===============
 
-It is important to point out that several directives in host, service,
-and contact definitions may not be picked up by Centreon Engine when you
+It is important to point out that several directives in host and
+service definitions may not be picked up by Centreon Engine when you
 change them in your configuration files. Object directives that can
 exhibit this behavior are marked with an asterisk
 (:ref:`* <obj_def_retentionnotes>`).
@@ -57,15 +57,11 @@ Object Types
 
   * :ref:`Host definitions <obj_def_host>`
   * :ref:`Service definitions <obj_def_service>`
-  * :ref:`Contact definitions <obj_def_contact>`
-  * :ref:`Contact group definitions <obj_def_contactgroup>`
   * :ref:`Time period definitions <obj_def_timeperiod>`
   * :ref:`Command definitions <obj_def_command>`
   * :ref:`Connector definitions <obj_def_connector>`
   * :ref:`Service dependency definitions <obj_def_service_dependency>`
-  * :ref:`Service escalation definitions <obj_def_service_escalation>`
   * :ref:`Host dependency definitions <obj_def_host_dependency>`
-  * :ref:`Host escalation definitions <obj_def_host_escalation>`
 
 .. _obj_def_host:
 
@@ -107,13 +103,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,d,u]
-    contacts                       contacts
-    contact_groups                 contact_groups
-    notification_interval          #
-    # first_notification_delay     #
-    notification_period            timeperiod_name
-    # notification_options         [d,u,r,f,s]
-    # notifications_enabled        [0/1]
   }
 
 Example Definition
@@ -131,10 +120,6 @@ Example Definition
     retry_interval               1
     max_check_attempts           5
     check_period                 24x7
-    contact_groups               router-admins
-    notification_interval        30
-    notification_period          24x7
-    notification_options         d,u,r
   }
 
 Directive Descriptions
@@ -170,7 +155,7 @@ check_command                This directive is used to specify the short name of
                              is "alive". The command must return a status of OK (0) or Centreon Engine will assume the host is down. If you leave this
                              argument blank, the host will not be actively checked. Thus, Centreon Engine will likely always assume the host is up (it
                              may show up as being in a "PENDING" state in the web interface). This is useful if you are monitoring printers or other
-                             devices that are frequently turned off. The maximum amount of time that the notification command can run is controlled by
+                             devices that are frequently turned off. The maximum amount of time that the check command can run is controlled by
                              either the host's check_timeout option or the global :ref:`host_check_timeout <main_cfg_opt_host_check_timeout>`
                              option.
 check_timeout                This is the maximum number of seconds that Centreon Engine will allow host checks to run. If checks exceed this limit,
@@ -237,39 +222,7 @@ flap_detection_enabled       :ref:`* <obj_def_retentionnotes>` This directive is
 flap_detection_options       This directive is used to determine what host states the
                              :ref:`flap detection logic <flapping_detection>` will use for this host. Valid options are
                              a combination of one or more of the following: o = UP states, d = DOWN states, u = UNREACHABLE states.
-contacts                     This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be
-                             notified whenever there are problems (or recoveries) with this host. Multiple contacts should be separated by commas.
-                             Useful if you want notifications to go to just a few people and don't want to configure
-                             :ref:`contact groups <obj_def_contactgroup>`. You must specify at least one contact or
-                             contact group in each host definition.
-contact_groups               This is a list of the short names of the :ref:`contact groups <obj_def_contactgroup>` that
-                             should be notified whenever there are problems (or recoveries) with this host. Multiple contact groups should be
-                             separated by commas. You must specify at least one contact or contact group in each host definition.
-notification_interval        This directive is used to define the number of "time units" to wait before re-notifying a contact that this service is
-                             still down or unreachable. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
-                             not re-notify contacts about problems for this host - only one problem notification will be sent out.
-first_notification_delay     This directive is used to define the number of "time units" to wait before sending out the first problem notification
-                             when this host enters a non-UP state. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
-                             start sending out notifications immediately.
-notification_period          This directive is used to specify the short name of the
-                             :ref:`time period <obj_def_timeperiod>` during which notifications of events for this host
-                             can be sent out to contacts. If a host goes down, becomes unreachable, or recoveries during a time which is not covered
-                             by the time period, no notifications will be sent out.
-notification_options         This directive is used to determine when notifications for the host should be sent out. Valid options are a combination
-                             of one or more of the following: d = send notifications on a DOWN state, u = send notifications on an UNREACHABLE state,
-                             r = send notifications on recoveries (OK state), f = send notifications when the host starts and stops
-                             :ref:`flapping <flapping_detection>`, and s = send notifications when
-                             :ref:`scheduled downtime <scheduled_downtime>` starts and ends. If you specify n (none) as an option, no host
-                             notifications will be sent out. If you do not specify any notification options, Centreon Engine will assume that you
-                             want notifications to be sent out for all possible states. Example: If you specify d,r in this field, notifications will
-                             only be sent out when the host goes DOWN and when it recovers from a DOWN state.
-notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
-                             notifications for this host are enabled. Values: 0 = disable host notifications, 1 = enable host notifications.
-timezone                     Time zone of this host. All times applied to this host (time periods, downtimes, ...) will be affected by this option.
+timezone                     Time zone of this host. All times applied to this host (check period, ...) will be affected by this option.
 ============================ =========================================================================================================================
 
 .. _obj_def_service:
@@ -315,13 +268,6 @@ Definition Format
     # high_flap_threshold          #
     # flap_detection_enabled       [0/1]
     # flap_detection_options       [o,w,c,u]
-    notification_interval          #
-    # first_notification_delay     #
-    notification_period            timeperiod_name
-    # notification_options         [w,u,c,r,f,s]
-    # notifications_enabled        [0/1]
-    contacts                       contacts
-    contact_groups                 contact_groups
   }
 
 Example Definition
@@ -337,10 +283,6 @@ Example Definition
     check_interval        5
     retry_interval        3
     check_period          24x7
-    notification_interval 30
-    notification_period   24x7
-    notification_options  w,c,r
-    contact_groups        linux-admins
   }
 
 
@@ -422,219 +364,8 @@ flap_detection_options       This directive is used to determine what service st
                              :ref:`flap detection logic <flapping_detection>` will use for this service. Valid options
                              are a combination of one or more of the following: o = OK states, w = WARNING states, c = CRITICAL states,
                              u = UNKNOWN states.
-notification_interval        This directive is used to define the number of "time units" to wait before re-notifying a contact that this service is
-                             still in a non-OK state. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
-                             not re-notify contacts about problems for this service - only one problem notification will be sent out.
-first_notification_delay     This directive is used to define the number of "time units" to wait before sending out the first problem notification
-                             when this service enters a non-OK state. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
-                             start sending out notifications immediately.
-notification_period          This directive is used to specify the short name of the
-                             :ref:`time period <obj_def_timeperiod>` during which notifications of events for this
-                             service can be sent out to contacts. No service notifications will be sent out during times which is not covered by the
-                             time period.
-notification_options         This directive is used to determine when notifications for the service should be sent out. Valid options are a
-                             combination of one or more of the following: w = send notifications on a WARNING state, u = send notifications on an
-                             UNKNOWN state, c = send notifications on a CRITICAL state, r = send notifications on recoveries (OK state), f = send
-                             notifications when the service starts and stops :ref:`flapping <flapping_detection>`,
-                             and s = send notifications when :ref:`scheduled downtime <scheduled_downtime>` starts and ends. If you specify n
-                             (none) as an option, no service notifications will be sent out. If you do not specify any notification options, Centreon
-                             Engine will assume that you want notifications to be sent out for all possible states. Example: If you specify w,r in
-                             this field, notifications will only be sent out when the service goes into a WARNING state and when it recovers from a
-                             WARNING state.
-notifications_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not
-                             notifications for this service are enabled. Values: 0 = disable service notifications, 1 = enable service notifications.
-contacts                     This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be
-                             notified whenever there are problems (or recoveries) with this service. Multiple contacts should be separated by commas.
-                             Useful if you want notifications to go to just a few people and don't want to configure
-                             :ref:`contact groups <obj_def_contactgroup>`. You must specify at least one contact or
-                             contact group in each service definition.
-contact_groups               This is a list of the short names of the :ref:`contact groups <obj_def_contactgroup>` that
-                             should be notified whenever there are problems (or recoveries) with this service. Multiple contact groups should be
-                             separated by commas. You must specify at least one contact or contact group in each service definition.
-timezone                     Time zone of this service. All times applied to this service (time periods, downtimes, ...) will be affected by this
-                             option.
+timezone                     Time zone of this service. All times applied to this service (check period, ...) will be affected by this option.
 ============================ =========================================================================================================================
-
-.. _obj_def_contact:
-
-Contact Definition
-------------------
-
-Description
-^^^^^^^^^^^
-
-A contact definition is used to identify someone who should be contacted
-in the event of a problem on your network.
-
-The different arguments to a contact definition are described below.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #).
-
-::
-
-  define contact{
-    contact_name                       contact_name
-    # alias                            alias
-    contactgroups                      contactgroup_names
-    host_notifications_enabled         [0/1]
-    service_notifications_enabled      [0/1]
-    host_notification_period           timeperiod_name
-    service_notification_period        timeperiod_name
-    host_notification_options          [d,u,r,f,s,n]
-    service_notification_options       [w,u,c,r,f,s,n]
-    host_notification_commands         command_name
-    service_notification_commands      command_name
-    # email                            email_address
-    # pager                            pager_number or pager_email_gateway
-    # addressx                         additional_contact_address
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define contact{
-    contact_name                  jdoe
-    alias                         John Doe
-    host_notifications_enabled    1
-    service_notifications_enabled 1
-    service_notification_period   24x7
-    host_notification_period      24x7
-    service_notification_options  w,u,c,r
-    host_notification_options     d,u,r
-    service_notification_commands notify-by-email
-    host_notification_commands    host-notify-by-email
-    email                         jdoe@localhost.localdomain
-    pager                         555-5555@pagergateway.localhost.localdomain
-    address1                      xxxxx.xyyy@icq.com
-    address2                      555-555-5555
-  }
-
-Directive Descriptions
-^^^^^^^^^^^^^^^^^^^^^^
-
-============================= ========================================================================================================================
-contact_name                  This directive is used to define a short name used to identify the contact. It is referenced in
-                              :ref:`contact group <obj_def_contactgroup>` definitions. Under the right circumstances, the
-                              $CONTACTNAME$ :ref:`macro <understanding_macros>` will contain this value.
-alias                         This directive is used to define a longer name or description for the contact. Under the rights circumstances, the
-                              $CONTACTALIAS$ :ref:`macro <understanding_macros>` will contain this value. If not specified, the
-                              contact_name will be used as the alias.
-contactgroups                 This directive is used to identify the short name(s) of the
-                              :ref:`contactgroup(s) <obj_def_contactgroup>` that the contact belongs to. Multiple
-                              contactgroups should be separated by commas. This directive may be used as an alternative to (or in addition to) using
-                              the members directive in :ref:`contactgroup <obj_def_contactgroup>` definitions.
-host_notifications_enabled    This directive is used to determine whether or not the contact will receive notifications about host problems and
-                              recoveries. Values: 0 = don't send notifications, 1 = send notifications.
-service_notifications_enabled This directive is used to determine whether or not the contact will receive notifications about service problems and
-                              recoveries. Values: 0 = don't send notifications, 1 = send notifications.
-host_notification_period      This directive is used to specify the short name of the
-                              :ref:`time period <obj_def_timeperiod>` during which the contact can be notified about host
-                              problems or recoveries. You can think of this as an "on call" time for host notifications for the contact. Read the
-                              documentation on :ref:`time periods <timeperiods>` for more information on how this works and potential problems that
-                              may result from improper use.
-service_notification_period   This directive is used to specify the short name of the
-                              :ref:`time period <obj_def_timeperiod>` during which the contact can be notified about
-                              service problems or recoveries. You can think of this as an "on call" time for service notifications for the contact.
-                              Read the documentation on :ref:`time periods <timeperiods>` for more information on how this works and potential
-                              problems that may result from improper use.
-host_notification_commands    This directive is used to define a list of the short names of the
-                              :ref:`commands <obj_def_command>` used to notify the contact of a host problem or recovery.
-                              Multiple notification commands should be separated by commas. All notification commands are executed when the contact
-                              needs to be notified. The maximum amount of time that a notification command can run is controlled by the
-                              :ref:`notification_timeout <main_cfg_opt_notification_timeout>`
-                              option.
-host_notification_options     This directive is used to define the host states for which notifications can be sent out to this contact. Valid options
-                              are a combination of one or more of the following: d = notify on DOWN host states, u = notify on UNREACHABLE host
-                              states, r = notify on host recoveries (UP states), f = notify when the host starts and stops
-                              :ref:`flapping <flapping_detection>`, and s = send notifications when host or service
-                              :ref:`scheduled downtime <scheduled_downtime>` starts and ends. If you specify n (none) as an option, the
-                              contact will not receive any type of host notifications.
-service_notification_options  This directive is used to define the service states for which notifications can be sent out to this contact. Valid
-                              options are a combination of one or more of the following: w = notify on WARNING service states, u = notify on UNKNOWN
-                              service states, c = notify on CRITICAL service states, r = notify on service recoveries (OK states), and f = notify when
-                              the service starts and stops :ref:`flapping <flapping_detection>`. If you specify n
-                              (none) as an option, the contact will not receive any type of service notifications.
-service_notification_commands This directive is used to define a list of the short names of the
-                              :ref:`commands <obj_def_command>` used to notify the contact of a service problem or
-                              recovery. Multiple notification commands should be separated by commas. All notification commands are executed when the
-                              contact needs to be notified. The maximum amount of time that a notification command can run is controlled by the
-                              :ref:`notification_timeout <main_cfg_opt_notification_timeout>`
-                              option.
-email                         This directive is used to define an email address for the contact. Depending on how you configure your notification
-                              commands, it can be used to send out an alert email to the contact. Under the right circumstances, the $CONTACTEMAIL$
-                              :ref:`macro <understanding_macros>` will contain this value.
-pager                         This directive is used to define a pager number for the contact. It can also be an email address to a pager gateway
-                              (i.e. pagejoe@pagenet.com). Depending on how you configure your notification
-                              commands, it can be used to send out an alert page to the contact. Under the right circumstances, the $CONTACTPAGER$
-                              :ref:`macro <understanding_macros>` will contain this value.
-addressx                      Address directives are used to define additional "addresses" for the contact. These addresses can be anything - cell
-                              phone numbers, instant messaging addresses, etc. Depending on how you configure your notification commands, they can be
-                              used to send out an alert to the contact. Up to six addresses can be defined using these directives (address1 through
-                              address6). The $CONTACTADDRESSx$ :ref:`macro <understanding_macros>` will contain this value.
-timezone                      Time zone of this contact. All times applied to this host (time periods) will be affected by this option.
-============================= ========================================================================================================================
-
-.. _obj_def_contactgroup:
-
-Contact Group Definition
-------------------------
-
-Description
-^^^^^^^^^^^
-
-A contact group definition is used to group one or more
-:ref:`contacts <obj_def_contact>` together for the purpose of sending
-out alert/recovery :ref:`notifications <notifications>`.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #).
-
-::
-
-  define contactgroup{
-    contactgroup_name      contactgroup_name
-    alias                  alias
-    # members              contacts
-    # contactgroup_members contactgroups
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define contactgroup{
-    contactgroup_name novell-admins
-    alias             Novell Administrators
-    members           jdoe,rtobert,tzach
-  }
-
-Directive Descriptions
-^^^^^^^^^^^^^^^^^^^^^^
-
-==================== =================================================================================================================================
-contactgroup_name    This directive is a short name used to identify the contact group.
-alias                This directive is used to define a longer name or description used to identify the contact group.
-members              This optional directive is used to define a list of the short names of
-                     :ref:`contacts <obj_def_contact>` that should be included in this group. Multiple contact names
-                     should be separated by commas. This directive may be used as an alternative to (or in addition to) using the contactgroups
-                     directive in :ref:`contact <obj_def_contact>` definitions.
-contactgroup_members This optional directive can be used to include contacts from other "sub" contact groups in this contact group. Specify a
-                     comma-delimited list of short names of other contact groups whose members should be included in this group.
-==================== =================================================================================================================================
 
 .. _obj_def_timeperiod:
 
@@ -645,11 +376,11 @@ Description
 ^^^^^^^^^^^
 
 A time period is a list of times during various days that are considered
-to be "valid" times for notifications and service checks. It consists of
-time ranges for each day of the week that "rotate" once the week has
-come to an end. Different types of exceptions to the normal weekly time
-are supported, including: specific weekdays, days of generic months,
-days of specific months, and calendar dates.
+to be "valid" times for service checks. It consists of time ranges for
+each day of the week that "rotate" once the week has come to an end.
+Different types of exceptions to the normal weekly time are supported,
+including: specific weekdays, days of generic months, days of specific
+months, and calendar dates.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -750,9 +481,8 @@ Description
 ^^^^^^^^^^^
 
 A command definition is just that. It defines a command. Commands that
-can be defined include service checks, service notifications, service
-event handlers, host checks, host notifications, and host event
-handlers. Command definitions can contain
+can be defined include service checks, service event handlers, host
+checks, and host event handlers. Command definitions can contain
 :ref:`macros <understanding_macros>`, but you must make sure that you
 include only those macros that are "valid" for the circumstances when
 the command will be used. More information on what macros are available
@@ -788,11 +518,10 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============ =========================================================================================================================================
-command_name This directive is the short name used to identify the command. It is referenced in :ref:`contact <obj_def_contact>`,
-             :ref:`host <obj_def_host>`, and :ref:`service <obj_def_service>` definitions (in notification, check, and event handler directives),
-             among other places.
+command_name This directive is the short name used to identify the command. It is referenced in :ref:`host <obj_def_host>`, and
+             :ref:`service <obj_def_service>` definitions (in check, and event handler directives), among other places.
 command_line This directive is used to define what is actually executed by Centreon Engine when the command is used for service or host checks,
-             notifications, or :ref:`event handlers <event_handlers>`. Before the command line is executed, all valid
+             or :ref:`event handlers <event_handlers>`. Before the command line is executed, all valid
              :ref:`macros <understanding_macros>` are replaced with their respective values. See the documentation on macros for
              determining when you can use different macros. Note that the command line is not surrounded in quotes. Also, if you want to pass a dollar
              sign ($)on the command line, you have to escape it with another dollar sign.
@@ -867,11 +596,11 @@ Description
 ^^^^^^^^^^^
 
 Service dependencies are an advanced feature of Centreon Engine that
-allow you to suppress notifications and active checks of services based
-on the status of one or more other services. Service dependencies are
-optional and are mainly targeted at advanced users who have complicated
-monitoring setups. More information on how service dependencies work
-(read this!) can be found :ref:`here <host_and_service_dependencies>`.
+allow you to suppress active checks of services based on the status of
+one or more other services. Service dependencies are optional and are
+mainly targeted at advanced users who have complicated monitoring
+setups. More information on how service dependencies work (read this!)
+can be found :ref:`here <host_and_service_dependencies>`.
 
 Definition Format
 ^^^^^^^^^^^^^^^^^
@@ -889,8 +618,7 @@ Definition Format
     host_name                          host_name
     service_description                service_description
     # inherits_parent                  [0/1]
-    # execution_failure_criteria       [o,w,u,c,p,n]
-    # notification_failure_criteria    [o,w,u,c,p,n]
+    # failure_criteria                 [o,w,u,c,p,n]
     # dependency_period                timeperiod_name
   }
 
@@ -904,8 +632,7 @@ Example Definition
     service_description           Apache Web Server
     dependent_host_name           WWW1
     dependent_service_description Main Web Site
-    execution_failure_criteria    n
-    notification_failure_criteria w,u,c
+    failure_criteria              w,u,c
   }
 
 Directive Descriptions
@@ -923,7 +650,7 @@ service_description           This directive is used to identify the description
 inherits_parent               This directive indicates whether or not the dependency inherits dependencies of the service that is being depended upon
                               (also referred to as the master service). In other words, if the master service is dependent upon other services and any
                               one of those dependencies fail, this dependency will also fail.
-execution_failure_criteria    This directive is used to specify the criteria that determine when the dependent service should not be actively checked.
+failure_criteria              This directive is used to specify the criteria that determine when the dependent service should not be actively checked.
                               If the master service is in one of the failure states we specify, the dependent service will not be actively checked.
                               Valid options are a combination of one or more of the following (multiple options are separated with commas): o = fail
                               on an OK state, w = fail on a WARNING state, u = fail on an UNKNOWN state, c = fail on a CRITICAL state, and p = fail on
@@ -931,107 +658,10 @@ execution_failure_criteria    This directive is used to specify the criteria tha
                               dependency will never fail and checks of the dependent service will always be actively checked (if other conditions
                               allow for it to be). Example: If you specify o,c,u in this field, the dependent service will not be actively checked if
                               the master service is in either an OK, a CRITICAL, or an UNKNOWN state.
-notification_failure_criteria This directive is used to define the criteria that determine when notifications for the dependent service should not be
-                              sent out. If the master service is in one of the failure states we specify, notifications for the dependent service
-                              will not be sent to contacts. Valid options are a combination of one or more of the following: o = fail on an OK
-                              state, w = fail on a WARNING state, u = fail on an UNKNOWN state, c = fail on a CRITICAL state, and p = fail on a
-                              pending state (e.g. the service has not yet been checked). If you specify n (none) as an option, the notification
-                              dependency will never fail and notifications for the dependent service will always be sent out. Example: If you specify
-                              w in this field, the notifications for the dependent service will not be sent out if the master service is in a WARNING
-                              state.
 dependency_period             This directive is used to specify the short name of the
                               :ref:`time period <obj_def_timeperiod>` during which this dependency is valid. If this
                               directive is not specified, the dependency is considered to be valid during all times.
 ============================= ========================================================================================================================
-
-.. _obj_def_service_escalation:
-
-Service Escalation Definition
------------------------------
-
-Description
-^^^^^^^^^^^
-
-Service escalations are completely optional and are used to escalate
-notifications for a particular service. More information on how
-notification escalations work can be found
-:ref:`here <notification_escalations>`.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #).
-
-::
-
-  define serviceescalation{
-    host_name                  host_name
-    service_description        service_description
-    contacts                   contacts
-    contact_groups             contactgroup_name
-    first_notification         #
-    last_notification          #
-    notification_interval      #
-    # escalation_period        timeperiod_name
-    # escalation_options       [w,u,c,r]
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define serviceescalation{
-    host_name             nt-3
-    service_description   Processor Load
-    first_notification    4
-    last_notification     0
-    notification_interval 30
-    contact_groups        all-nt-admins,themanagers
-  }
-
-Descriptions Directive Descriptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-===================== ================================================================================================================================
-host_name             This directive is used to identify the short name(s) of the :ref:`host(s) <obj_def_host>` that the
-                      :ref:`service <obj_def_service>` escalation should apply to or is associated with.
-service_description   This directive is used to identify the description of the :ref:`service <obj_def_service>` the
-                      escalation should apply to.
-first_notification    This directive is a number that identifies the first notification for which this escalation is effective. For instance, if you
-                      set this value to 3, this escalation will only be used if the service is in a non-OK state long enough for a third notification
-                      to go out.
-last_notification     This directive is a number that identifies the last notification for which this escalation is effective. For instance, if you
-                      set this value to 5, this escalation will not be used if more than five notifications are sent out for the service. Setting this
-                      value to 0 means to keep using this escalation entry forever (no matter how many notifications go out).
-contacts              This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be notified
-                      whenever there are problems (or recoveries) with this service. Multiple contacts should be separated by commas. Useful if you
-                      want notifications to go to just a few people and don't want to configure
-                      :ref:`contact groups <obj_def_contactgroup>`. You must specify at least one contact or contact
-                      group in each service escalation definition.
-contact_groups        This directive is used to identify the short name of the
-                      :ref:`contact group <obj_def_contactgroup>` that should be notified when the service notification
-                      is escalated. Multiple contact groups should be separated by commas. You must specify at least one contact or contact group in
-                      each service escalation definition.
-notification_interval This directive is used to determine the interval at which notifications should be made while this escalation is valid. If you
-                      specify a value of 0 for the interval, Centreon Engine will send the first notification when this escalation definition is
-                      valid, but will then prevent any more problem notifications from being sent out for the host. Notifications are sent out again
-                      until the host recovers. This is useful if you want to stop having notifications sent out after a certain amount of time.
-                      .. note::
-
-                         If multiple escalation entries for a host overlap for one or more notification ranges, the smallest notification interval
-                         from all escalation entries is used.
-escalation_period     This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>`
-                      during which this escalation is valid. If this directive is not specified, the escalation is considered to be valid during all
-                      times.
-escalation_options    This directive is used to define the criteria that determine when this service escalation is used. The escalation is used only
-                      if the service is in one of the states specified in this directive. If this directive is not specified in a service escalation,
-                      the escalation is considered to be valid during all service states. Valid options are a combination of one or more of the
-                      following: r = escalate on an OK (recovery) state, w = escalate on a WARNING state, u = escalate on an UNKNOWN state, and
-                      c = escalate on a CRITICAL state. Example: If you specify w in this field, the escalation will only be used if the service is
-                      in a WARNING state.
-===================== ================================================================================================================================
 
 .. _obj_def_host_dependency:
 
@@ -1042,7 +672,7 @@ Description
 ^^^^^^^^^^^
 
 Host dependencies are an advanced feature of Centreon Engine that allow
-you to suppress notifications for hosts based on the status of one or
+you to suppress active checks of hosts based on the status of one or
 more other hosts. Host dependencies are optional and are mainly targeted
 at advanced users who have complicated monitoring setups. More
 information on how host dependencies work (read this!) can be found
@@ -1060,8 +690,7 @@ Definition Format
     dependent_host_name             host_name
     host_name                       host_name
     # inherits_parent               [0/1]
-    # execution_failure_criteria    [o,d,u,p,n]
-    # notification_failure_criteria [o,d,u,p,n]
+    # failure_criteria              [o,d,u,p,n]
     # dependency_period             timeperiod_name
   }
 
@@ -1073,7 +702,7 @@ Example Definition
   define hostdependency{
     host_name                     WWW1
     dependent_host_name           DBASE1
-    notification_failure_criteria d,u
+    failure_criteria              d,u
   }
 
 Directive Descriptions
@@ -1087,105 +716,14 @@ host_name                     This directive is used to identify the short name(
 inherits_parent               This directive indicates whether or not the dependency inherits dependencies of the host that is being depended upon
                               (also referred to as the master host). In other words, if the master host is dependent upon other hosts and any one of
                               those dependencies fail, this dependency will also fail.
-execution_failure_criteria    This directive is used to specify the criteria that determine when the dependent host should not be actively checked. If
+failure_criteria              This directive is used to specify the criteria that determine when the dependent host should not be actively checked. If
                               the master host is in one of the failure states we specify, the dependent host will not be actively checked. Valid
                               options are a combination of one or more of the following (multiple options are separated with commas): o = fail on an
                               UP state, d = fail on a DOWN state, u = fail on an UNREACHABLE state, and p = fail on a pending state (e.g. the host has
                               not yet been checked). If you specify n (none) as an option, the execution dependency will never fail and the dependent
                               host will always be actively checked (if other conditions allow for it to be). Example: If you specify u,d in this
                               field, the dependent host will not be actively checked if the master host is in either an UNREACHABLE or DOWN state.
-notification_failure_criteria This directive is used to define the criteria that determine when notifications for the dependent host should not be
-                              sent out. If the master host is in one of the failure states we specify, notifications for the dependent host will not
-                              be sent to contacts. Valid options are a combination of one or more of the following: o = fail on an UP state, d = fail
-                              on a DOWN state, u = fail on an UNREACHABLE state, and p = fail on a pending state (e.g. the host has not yet been
-                              checked). If you specify n (none) as an option, the notification dependency will never fail and notifications for the
-                              dependent host will always be sent out. Example: If you specify d in this field, the notifications for the dependent
-                              host will not be sent out if the master host is in a DOWN state.
 dependency_period             This directive is used to specify the short name of the
                               :ref:`time period <obj_def_timeperiod>` during which this dependency is valid. If this
                               directive is not specified, the dependency is considered to be valid during all times.
 ============================= ========================================================================================================================
-
-.. _obj_def_host_escalation:
-
-Host Escalation Definition
---------------------------
-
-Description
-^^^^^^^^^^^
-
-Host escalations are completely optional and are used to escalate
-notifications for a particular host. More information on how
-notification escalations work can be found
-:ref:`here <notification_escalations>`.
-
-Definition Format
-^^^^^^^^^^^^^^^^^
-
-.. note::
-   Optional directives are comment (line start with #).
-
-::
-
-  define hostescalation{
-    host_name                  host_name
-    contacts                   contacts
-    contact_groups             contactgroup_name
-    first_notification         #
-    last_notification          #
-    notification_interval      #
-    # escalation_period        timeperiod_name
-    # escalation_options       [d,u,r]
-  }
-
-Example Definition
-^^^^^^^^^^^^^^^^^^
-
-::
-
-  define hostescalation{
-    host_name             router-34
-    first_notification    5
-    last_notification     8
-    notification_interval 60
-    contact_groups        all-router-admins
-  }
-
-Directive Descriptions
-^^^^^^^^^^^^^^^^^^^^^^
-
-===================== ================================================================================================================================
-host_name             This directive is used to identify the short name of the :ref:`host <obj_def_host>` that the
-                      escalation should apply to.
-first_notification    This directive is a number that identifies the first notification for which this escalation is effective. For instance, if you
-                      set this value to 3, this escalation will only be used if the host is down or unreachable long enough for a third notification
-                      to go out.
-last_notification     This directive is a number that identifies the last notification for which this escalation is effective. For instance, if you
-                      set this value to 5, this escalation will not be used if more than five notifications are sent out for the host. Setting this
-                      value to 0 means to keep using this escalation entry forever (no matter how many notifications go out).
-contacts              This is a list of the short names of the :ref:`contacts <obj_def_contact>` that should be notified
-                      whenever there are problems (or recoveries) with this host. Multiple contacts should be separated by commas. Useful if you want
-                      notifications to go to just a few people and don't want to configure
-                      :ref:`contact <obj_def_contactgroup>` groups". You must specify at least one contact or contact
-                      group in each host escalation definition.
-contact_groups        This directive is used to identify the short name of the
-                      :ref:`contact group <obj_def_contactgroup>` that should be notified when the host notification is
-                      escalated. Multiple contact groups should be separated by commas. You must specify at least one contact or contact group in
-                      each host escalation definition.
-notification_interval This directive is used to determine the interval at which notifications should be made while this escalation is valid. If you
-                      specify a value of 0 for the interval, Centreon Engine will send the first notification when this escalation definition is
-                      valid, but will then prevent any more problem notifications from being sent out for the host. Notifications are sent out again
-                      until the host recovers. This is useful if you want to stop having notifications sent out after a certain amount of time.
-                      .. note::
-
-                         If multiple escalation entries for a host overlap for one or more notification ranges, the smallest notification interval
-                         from all escalation entries is used.
-escalation_period     This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>`
-                      during which this escalation is valid. If this directive is not specified, the escalation is considered to be valid during all
-                      times.
-escalation_options    This directive is used to define the criteria that determine when this host escalation is used. The escalation is used only if
-                      the host is in one of the states specified in this directive. If this directive is not specified in a host escalation, the
-                      escalation is considered to be valid during all host states. Valid options are a combination of one or more of the following:
-                      r = escalate on an UP (recovery) state, d = escalate on a DOWN state, and u = escalate on an UNREACHABLE state. Example: If you
-                      specify d in this field, the escalation will only be used if the host is in a DOWN state.
-===================== ================================================================================================================================

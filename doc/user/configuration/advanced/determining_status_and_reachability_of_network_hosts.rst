@@ -136,19 +136,3 @@ them. Router1 is DOWN and is blocking the path to those other
 hosts. Those hosts might be running fine, or they might be offline -
 Centreon Engine doesn't know because it can't reach them. Hence Centreon
 Engine considers them to be UNREACHABLE instead of DOWN.
-
-Unreachable States and Notifications
-====================================
-
-By default, Centreon Engine will notify contacts about both DOWN and
-UNREACHABLE host states. As an admin/tech, you might not want to get
-notifications about hosts that are UNREACHABLE. You know your network
-structure, and if Centreon Engine notifies you that your router/firewall
-is down, you know that everything behind it is unreachable.
-
-If you want to spare yourself from a flood of UNREACHABLE notifications
-during network outages, you can exclude the unreachable (u) option from
-the notification_options directive in your :ref:`host <obj_def_host>`
-definitions and/or the host_notification_options directive in your
-:ref:`contact <obj_def_contact>` definitions.
-

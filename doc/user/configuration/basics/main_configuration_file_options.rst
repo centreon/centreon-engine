@@ -60,9 +60,9 @@ This directive is used to specify an
 :ref:`object configuration file <object_configuration_overview>`
 containing object definitions that Centreon Engine should use for
 monitoring. Object configuration files contain definitions for hosts,
-contacts, contact groups, services, commands, etc. You can
-seperate your configuration information into several files and specify
-multiple cfg_file= statements to have each of them processed.
+services, commands, etc. You can seperate your configuration
+information into several files and specify multiple cfg_file=
+statements to have each of them processed.
 
 =========== ==========================================
 **Format**  cfg_file=<file_name>
@@ -117,11 +117,10 @@ Engine distribution for an example of how to define $USERn$ macros.
 Status File
 -----------
 
-This is the file that Centreon Engine uses to store the current status,
-comment, and downtime information. This file is deleted every time
-Centreon Engine stops and recreated when it starts. This file is no
-longer written at regular intervals. Instead it is written in response
-to the SAVE_STATUS_INFORMATION external command.
+This is the file that Centreon Engine uses to store the current status
+information. This file is no longer written at regular intervals.
+Instead it is written in response to the SAVE_STATUS_INFORMATION
+external command.
 
 =========== ===============================================
 **Format**  status_file=<file_name>
@@ -224,11 +223,10 @@ External Command Buffer Slots
 State Retention File
 --------------------
 
-This is the file that Centreon Engine will use for storing status,
-downtime, and comment information before it shuts down. When Centreon
-Engine is restarted it will use the information stored in this file for
-setting the initial states of services and hosts before it starts
-monitoring anything.
+This is the file that Centreon Engine will use for storing status
+information before it shuts down. When Centreon Engine is restarted
+it will use the information stored in this file for setting the initial
+states of services and hosts before it starts monitoring anything.
 
 =========== ===========================================================
 **Format**  state_retention_file=<file_name>
@@ -262,22 +260,6 @@ facility on your local host. Values are as follows:
 **Format**  use_syslog=<0/1>
 **Example** use_syslog=1
 =========== ================
-
-Notification Logging Option
----------------------------
-
-This variable determines whether or not notification messages are
-logged. If you have a lot of contacts or regular service failures your
-log file will grow relatively quickly. Use this option to keep contact
-notifications from being logged.
-
-  * 0 = Don't log notifications
-  * 1 = Log notifications
-
-=========== =======================
-**Format**  log_notifications=<0/1>
-**Example** log_notifications=1
-=========== =======================
 
 .. _main_cfg_opt_service_check_retry_logging:
 
@@ -500,9 +482,8 @@ Timing Interval Length
 ----------------------
 
 This is the number of seconds per "unit interval" used for timing in the
-scheduling queue, re-notifications, etc. "Units intervals" are used in
-the object configuration file to determine how often to run a service
-check, how often to re-notify a contact, etc.
+scheduling queue, etc. "Units intervals" are used in the object
+configuration file to determine how often to run a service check, etc.
 
 =========== =========================
 **Format**  interval_length=<seconds>
@@ -647,13 +628,12 @@ Flap Detection Option
 
 This option determines whether or not Centreon Engine will try and
 detect hosts and services that are "flapping". Flapping occurs when a
-host or service changes between states too frequently, resulting in a
-barrage of notifications being sent out. When Centreon Engine detects
-that a host or service is flapping, it will temporarily suppress
-notifications for that host/service until it stops flapping. Flap
-detection is very experimental at this point, so use this feature with
-caution! More information on how flap detection and handling works can
-be found :ref:`here <flapping_detection>`.
+host or service changes between states too frequently. When Centreon
+Engine detects that a host or service is flapping, it will internally
+flag it as being flapping until it stops flapping. Flap detection is
+very experimental at this point, so use this feature with caution!
+More information on how flap detection and handling works can be
+found :ref:`here <flapping_detection>`.
 
 =========== ===========================
 **Format**  enable_flap_detection=<0/1>
@@ -821,28 +801,6 @@ will kill it off thinking it is a runaway processes.
 **Example** event_handler_timeout=60
 =========== ===============================
 
-.. _main_cfg_opt_notification_timeout:
-
-Notification Timeout
---------------------
-
-This is the maximum number of seconds that Centreon Engine will allow
-notification commands to be run. If a notification command exceeds this
-time limit it will be killed and a warning will be logged.
-
-There is often widespread confusion as to what this option really
-does. It is meant to be used as a last ditch mechanism to kill off
-commands which are misbehaving and not exiting in a timely manner. It
-should be set to something high (like 60 seconds or more), so that each
-notification command finishes executing within this time limit. If a
-notification command runs longer than this limit, Centreon Engine will
-kill it off thinking it is a runaway processes.
-
-=========== ==============================
-**Format**  notification_timeout=<seconds>
-**Example** notification_timeout=60
-=========== ==============================
-
 .. _main_cfg_opt_obsessive_compulsive_service_processor_timeout:
 
 Obsessive Compulsive Service Processor Timeout
@@ -900,10 +858,8 @@ Obsessive Compulsive Service Processor Command
 ----------------------------------------------
 
 This option allows you to specify a command to be run after every
-service check, which can be useful in
-:ref:`distributed monitoring <distributed_monitoring>`. This
-command is executed after any :ref:`event handler <event_handlers>`
-or :ref:`notification <notifications>` commands. The command argument is
+service check. This command is executed after any
+:ref:`event handler <event_handlers>`. The command argument is
 the short name of a :ref:`command definition <obj_def_command>`
 that you define in your object configuration file. The maximum amount of
 time that this command can run is controlled by the
@@ -947,9 +903,8 @@ Obsessive Compulsive Host Processor Command
 -------------------------------------------
 
 This option allows you to specify a command to be run after every host
-check, which can be useful in :ref:`distributed monitoring <distributed_monitoring>`.
-This command is executed after any :ref:`event handler <event_handlers>`
-or :ref:`notification <notifications>` commands. The command argument is
+check. This command is executed after any
+:ref:`event handler <event_handlers>`. The command argument is
 the short name of a :ref:`command definition <obj_def_command>`
 that you define in your object configuration file. The maximum amount of
 time that this command can run is controlled by the
@@ -1074,8 +1029,7 @@ This option allows you to specify illegal characters that cannot be used
 in host names, service descriptions, or names of other object
 types. Centreon Engine will allow you to use most characters in object
 definitions, but I recommend not using the characters shown in the
-example above. Doing may give you problems in the web interface,
-notification commands, etc.
+example above. Doing may result in security issues.
 
 =========== =============================================
 **Format**  illegal_object_name_chars=<chars...>
@@ -1089,10 +1043,10 @@ Illegal Macro Output Characters
 
 This option allows you to specify illegal characters that should be
 stripped from :ref:`macros <understanding_macros>` before being used in
-notifications, event handlers, and other commands. This DOES NOT affect
-macros used in service or host check commands. You can choose to not
-strip out the characters shown in the example above, but I recommend you
-do not do this. Some of these characters are interpreted by the shell
+event handlers and other commands. This DOES NOT affect macros used in
+service or host check commands. You can choose to not strip out the
+characters shown in the example above, but I recommend you do not do
+this. Some of these characters are interpreted by the shell
 (i.e. the backtick) and can lead to security problems. The following
 macros are stripped of the characters you specify::
 
@@ -1184,7 +1138,6 @@ a logical OR of the values below.
   * 4 = Process information
   * 8 = Scheduled event information
   * 16 = Host/service check information
-  * 32 = Notification information
   * 64 = Event broker information
 
 =========== ===============

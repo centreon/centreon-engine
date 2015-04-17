@@ -17,11 +17,7 @@ Macro Substitution - How Macros Work
 Before Centreon Engine executes a command, it will replace any macros it
 finds in the command definition with their corresponding values. This
 macro substitution occurs for all types of commands that Centreon Engine
-executes - host and service checks, notifications, event handlers, etc.
-
-Certain macros may themselves contain other macros. These include the
-$HOSTNOTES$, $HOSTNOTESURL$, $HOSTACTIONURL$, $SERVICENOTES$,
-$SERVICENOTESURL$, and $SERVICEACTIONURL$ macros.
+executes - host and service checks, event handlers, etc.
 
 Example 1: Host Address Macro
 =============================
@@ -126,7 +122,6 @@ these are separated by a colon (:) as well.
 
 Examples of on-demand host and service macros follow::
 
-  $HOSTDOWNTIME:myhost$                     <--- On-demand host macro
   $SERVICESTATEID:novellserver:DS Database$ <--- On-demand service macro
   $SERVICESTATEID::CPU Load$                <--- On-demand service macro with blank host name field
 
@@ -134,12 +129,11 @@ Custom Variable Macros
 ======================
 
 Any :ref:`custom object variables <custom_object_variables>`
-that you define in host, service, or contact definitions are also
-available as macros. Custom variable macros are named as follows:
+that you define in host or service definitions are also available as
+macros. Custom variable macros are named as follows:
 
   * $_HOSTvarname$
   * $_SERVICEvarname$
-  * $_CONTACTvarname$
 
 Take the following host definition with a custom variable called
 "_MACADDRESS"::

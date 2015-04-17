@@ -27,8 +27,8 @@ service it will execute a plugin and pass it information about what
 needs to be checked. The plugin will then check the operational state of
 the host or service and report the results back to the Centreon Engine
 daemon. Centreon Engine will process the results of the host or service
-check and take appropriate action as necessary (e.g. send notifications,
-run event handlers, etc).
+check and take appropriate action as necessary (e.g. run event handlers,
+etc).
 
 More information on how plugins work can be found
 :ref:`here <exploit_plugins>`.
@@ -60,4 +60,3 @@ segment. On-demand checks also occur in the
 :ref:`predictive dependency check <predictive_dependency_checks>`
 logic in order to ensure Centreon Engine has the most accurate status
 information.
-
