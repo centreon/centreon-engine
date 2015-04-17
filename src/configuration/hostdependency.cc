@@ -43,6 +43,7 @@ hostdependency::setters const hostdependency::_setters[] = {
   { "execution_failure_options",     SETTER(std::string const&, _set_failure_options) },
   { "execution_failure_criteria",    SETTER(std::string const&, _set_failure_options) },
   { "failure_options",               SETTER(std::string const&, _set_failure_options) },
+  { "failure_criteria",              SETTER(std::string const&, _set_failure_options) },
 
   // Deprecated.
   { "dependent_hostgroup",           SETTER(std::string const&, _set_dependent_hostgroups) },
