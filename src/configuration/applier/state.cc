@@ -609,8 +609,7 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->check_host_freshness(new_cfg.check_host_freshness());
   config->check_reaper_interval(new_cfg.check_reaper_interval());
   config->check_service_freshness(new_cfg.check_service_freshness());
-  config->command_check_interval(new_cfg.command_check_interval(),
-                                 new_cfg.command_check_interval_is_seconds());
+  config->command_check_interval(new_cfg.command_check_interval());
   config->debug_file(new_cfg.debug_file());
   config->debug_level(new_cfg.debug_level());
   config->debug_verbosity(new_cfg.debug_verbosity());
@@ -628,7 +627,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->host_freshness_check_interval(new_cfg.host_freshness_check_interval());
   config->illegal_object_chars(new_cfg.illegal_object_chars());
   config->illegal_output_chars(new_cfg.illegal_output_chars());
-  config->interval_length(new_cfg.interval_length());
   config->log_event_handlers(new_cfg.log_event_handlers());
   config->log_external_commands(new_cfg.log_external_commands());
   config->log_file(new_cfg.log_file());

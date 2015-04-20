@@ -255,8 +255,9 @@ void checker::run(
   logger(dbg_checks, basic)
     << "** Running async check of host '" << hst->name << "'...";
 
-  unsigned int timeout = hst->check_timeout ? hst->check_timeout :
-                                              config->host_check_timeout();
+  unsigned int timeout(hst->check_timeout
+                       ? hst->check_timeout
+                       : config->host_check_timeout().get());
 
   // Check if the host is viable now.
   if (check_host_check_viability_3x(
@@ -510,8 +511,9 @@ void checker::run(
     << "** Running async check of service '" << svc->description
     << "' on host '" << svc->host_name << "'...";
 
-  unsigned int timeout = svc->check_timeout ? svc->check_timeout :
-                                              config->service_check_timeout();
+  unsigned int timeout(svc->check_timeout
+                       ? svc->check_timeout
+                       : config->service_check_timeout().get());
 
   // Check if the service is viable now.
   if (check_service_check_viability(
@@ -548,9 +550,7 @@ void checker::run(
   // Service check was cancel by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
     if (preferred_time != NULL)
-      *preferred_time += static_cast<time_t>(
-                           svc->check_interval
-                           * config->interval_length());
+      *preferred_time += static_cast<time_t>(svc->check_interval);
     throw (engine_error()
            << "Some broker module cancelled check of service '"
            << svc->description << "' on host '" << svc->host_name);
@@ -731,8 +731,9 @@ void checker::run_sync(
            << "Attempt to run synchronous active check on host '"
            << hst->name << "' with no check command");
 
-  unsigned int timeout = hst->check_timeout ? hst->check_timeout :
-                                              config->host_check_timeout();
+  unsigned int timeout(hst->check_timeout
+                       ? hst->check_timeout
+                       : config->host_check_timeout().get());
 
   logger(dbg_checks, basic)
     << "** Run sync check of host '" << hst->name << "'...";
@@ -968,8 +969,9 @@ int checker::_execute_sync(host* hst) {
            << "Attempt to run synchronous active check on host '"
            << hst->name << "' with no check command");
 
-  unsigned int timeout = hst->check_timeout ? hst->check_timeout :
-                                              config->host_check_timeout();
+  unsigned int timeout(hst->check_timeout
+                       ? hst->check_timeout
+                       : config->host_check_timeout().get());
 
   logger(dbg_checks, basic)
     << "** Executing sync check of host '" << hst->name << "'...";

@@ -159,18 +159,15 @@ host or service event handlers.
 External Command Check Interval
 -------------------------------
 
-If you specify a number with an "s" appended to it (i.e. 30s), this is
-the number of seconds to wait between external command checks. If you
-leave off the "s", this is the number of "time units" to wait between
-external command checks. Unless you've changed the
-:ref:`interval_length <main_cfg_opt_timing_interval_length>` value (as
-defined below) from the default value of 60, this number will mean
-minutes.
+This is the amount of time to wait between external command checks. The
+default time time unit is the second (if you do not specify any suffix)
+but some other suffixes are known such as "m" for minutes, "h" for
+hours and "d" for days.
 
-=========== ===============================
-**Format**  command_check_interval=<xxx>[s]
+=========== =====================================
+**Format**  command_check_interval=<xxx>[s,m,h,d]
 **Example** command_check_interval=1
-=========== ===============================
+=========== =====================================
 
 .. note::
    By setting this value to -1, Centreon Engine will check for external
@@ -475,26 +472,6 @@ the core of the monitoring logic in Centreon Engine.
 **Format**  check_result_reaper_frequency=<frequency_in_seconds>
 **Example** check_result_reaper_frequency=5
 =========== ====================================================
-
-.. _main_cfg_opt_timing_interval_length:
-
-Timing Interval Length
-----------------------
-
-This is the number of seconds per "unit interval" used for timing in the
-scheduling queue, etc. "Units intervals" are used in the object
-configuration file to determine how often to run a service check, etc.
-
-=========== =========================
-**Format**  interval_length=<seconds>
-**Example** interval_length=60
-=========== =========================
-
-.. note::
-   The default value for this is set to 60, which means that a "unit
-   value" of 1 in the object configuration file will mean 60 seconds (1
-   minute). I have not really tested other values for this variable, so
-   proceed at your own risk if you decide to do so!
 
 .. _main_cfg_opt_passive_host_checks_are_soft:
 
@@ -945,17 +922,19 @@ can be found :ref:`here <freshness_checks>`.
 Service Freshness Check Interval
 --------------------------------
 
-This setting determines how often (in seconds) Centreon Engine will
-periodically check the "freshness" of service check results. If you have
-disabled service freshness checking (with the
+This setting determines how often Centreon Engine will periodically check
+the "freshness" of service check results. If you have disabled service
+freshness checking (with the
 :ref:`check_service_freshness <main_cfg_opt_service_freshness_checking>`
 option), this option has no effect. More information on freshness
-checking can be found :ref:`here <freshness_checks>`.
+checking can be found :ref:`here <freshness_checks>`. The default time
+unit is the second (if you specify no prefix) but other prefixes are
+known, such as "m" for minutes, "h" for hours and "d" for days.
 
-=========== ==========================================
-**Format**  service_freshness_check_interval=<seconds>
+=========== ==================================================
+**Format**  service_freshness_check_interval=<number>[s,m,h,d]
 **Example** service_freshness_check_interval=60
-=========== ==========================================
+=========== ==================================================
 
 .. _main_cfg_opt_host_freshness_checking:
 
@@ -981,18 +960,20 @@ be found :ref:`here <freshness_checks>`.
 Host Freshness Check Interval
 -----------------------------
 
-This setting determines how often (in seconds) Centreon Engine will
-periodically check the "freshness" of host check results. If you have
-disabled host freshness checking (with the
+This setting determines how often Centreon Engine will periodically
+check the "freshness" of host check results. If you have disabled
+host freshness checking (with the
 :ref:`check_host_freshness <main_cfg_opt_host_freshness_checking>`
 option), this option has no effect. More information on freshness
-checking can be found
-:ref:`here <freshness_checks>`.
+checking can be found :ref:`here <freshness_checks>`. The default
+time unit is the second (if you specify no prefix) but other
+prefixes are known, such as "m" for minutes, "h" for hours and "d"
+for days.
 
-=========== =======================================
-**Format**  host_freshness_check_interval=<seconds>
+=========== ===============================================
+**Format**  host_freshness_check_interval=<number>[s,m,h,d]
 **Example** host_freshness_check_interval=60
-=========== =======================================
+=========== ===============================================
 
 Additional Freshness Threshold Latency Option
 ---------------------------------------------

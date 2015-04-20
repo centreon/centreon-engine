@@ -27,9 +27,6 @@ using namespace com::centreon::engine;
  *  Setup a minimal Centreon Engine setup.
  */
 void com::centreon::engine::test::minimal_setup() {
-    // Interval length is 1 second.
-  config->interval_length(1);
-
   // Add host.
   host* hst(add_host(
     const_cast<char*>("myhost"),    // Name

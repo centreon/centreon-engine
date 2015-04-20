@@ -62,4 +62,3 @@ namespace              configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_GROUP_HH
-

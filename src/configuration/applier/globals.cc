@@ -63,7 +63,6 @@ void applier::globals::apply(state& config) {
   ::high_service_flap_threshold = config.high_service_flap_threshold();
   ::host_check_timeout = config.host_check_timeout();
   ::host_freshness_check_interval = config.host_freshness_check_interval();
-  ::interval_length = config.interval_length();
   ::log_event_handlers = config.log_event_handlers();
   ::log_external_commands = config.log_external_commands();
   ::log_host_retries = config.log_host_retries();

@@ -543,7 +543,7 @@ add_executable(
 target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 set_property(TARGET "${TEST_BIN_NAME}" PROPERTY ENABLE_EXPORTS "1")
 
-set(TEST_NAME "check_command_interval_without_seconds")
+set(TEST_NAME "check_command_interval_with_minutes")
 set(TEST_CONF_FILE "check_command_interval.cfg")
 set(TEST_EXPECTED_COMMAND_INTERVAL_VALUE 300)
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}" "${TEST_EXPECTED_COMMAND_INTERVAL_VALUE}")

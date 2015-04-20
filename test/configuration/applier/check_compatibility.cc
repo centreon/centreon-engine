@@ -91,7 +91,6 @@ struct                global {
   unsigned int        host_freshness_check_interval;
   std::string         illegal_object_chars;
   std::string         illegal_output_chars;
-  unsigned int        interval_length;
   bool                log_event_handlers;
   bool                log_external_commands;
   //  std::string         log_file;
@@ -230,7 +229,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(host_freshness_check_interval);
   check_value(illegal_object_chars);
   check_value(illegal_output_chars);
-  check_value(interval_length);
   check_value(log_event_handlers);
   check_value(log_external_commands);
   // check_value(log_file);
@@ -350,7 +348,6 @@ static global get_globals() {
   g.host_freshness_check_interval = host_freshness_check_interval;
   g.illegal_object_chars = to_str(illegal_object_chars);
   g.illegal_output_chars = to_str(illegal_output_chars);
-  g.interval_length = interval_length;
   g.log_event_handlers = log_event_handlers;
   g.log_external_commands = log_external_commands;
   // g.log_file = to_str(log_file);

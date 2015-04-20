@@ -204,9 +204,6 @@ void init_timing_loop() {
                  / (double)scheduling_info.total_hosts);
   }
 
-  /* adjust the check interval total to correspond to the interval length */
-  service_check_interval_total *= config->interval_length();
-
   /* calculate the average check interval for services */
   if (scheduling_info.total_scheduled_services == 0)
     scheduling_info.average_service_check_interval = 0;
@@ -225,8 +222,7 @@ void init_timing_loop() {
   if ((service_check_spread > 0.0)
       && (service_check_spread < 366.0 * 24 * 60 * 60))
     scheduling_info.service_check_spread
-      = static_cast<int>(service_check_spread
-                         * config->interval_length());
+      = static_cast<int>(service_check_spread);
   else
     scheduling_info.service_check_spread = 0;
 
@@ -442,16 +438,12 @@ void init_timing_loop() {
   if ((host_check_spread > 0.0)
       && (host_check_spread < 366.0 * 24 * 60 * 60))
     scheduling_info.host_check_spread
-      = static_cast<int>(host_check_spread * config->interval_length());
+      = static_cast<int>(host_check_spread);
   else
     scheduling_info.host_check_spread = 0;
 
   /* be smart and calculate the best delay to use to minimize local load... */
   if (scheduling_info.total_scheduled_hosts > 0) {
-
-    /* adjust the check interval total to correspond to the interval length */
-    host_check_interval_total *= config->interval_length();
-
     /* calculate the average check interval for hosts */
     scheduling_info.average_host_check_interval
       = host_check_interval_total

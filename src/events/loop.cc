@@ -304,13 +304,11 @@ void loop::_dispatching() {
                 && (temp_service->current_state != STATE_OK))
               temp_service->next_check
                 = (time_t)(temp_service->next_check
-                           + (temp_service->retry_interval
-                              * config->interval_length()));
+                           + temp_service->retry_interval);
             else
               temp_service->next_check
                 = (time_t)(temp_service->next_check
-                           + (temp_service->check_interval
-                              * config->interval_length()));
+                           + temp_service->check_interval);
           }
           temp_event->run_time = temp_service->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
@@ -345,13 +343,11 @@ void loop::_dispatching() {
               && (temp_host->current_state != STATE_OK))
             temp_host->next_check
               = (time_t)(temp_host->next_check
-                         + (temp_host->retry_interval
-                            * config->interval_length()));
+                         + temp_host->retry_interval);
           else
             temp_host->next_check
               = (time_t)(temp_host->next_check
-                         + (temp_host->check_interval
-                            * config->interval_length()));
+                         + temp_host->check_interval);
           temp_event->run_time = temp_host->next_check;
           reschedule_event(temp_event, &event_list_low, &event_list_low_tail);
           update_host_status(temp_host);

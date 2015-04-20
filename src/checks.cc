@@ -117,7 +117,7 @@ int run_scheduled_service_check(
       /* determine next time we should check the service if needed */
       /* if service has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
-        preferred_time = current_time + static_cast<time_t>(svc->check_interval <= 0 ? 300 : svc->check_interval * config->interval_length());
+        preferred_time = current_time + static_cast<time_t>(svc->check_interval <= 0 ? 300 : svc->check_interval);
 
       /* make sure we rescheduled the next service check at a valid time */
       get_next_valid_time(
@@ -569,7 +569,7 @@ int handle_async_service_check_result(
         if ((state_change == false
              || state_changes_use_cached_state == true)
             && temp_host->has_been_checked == true
-            && (static_cast<unsigned long>(current_time - temp_host->last_check) <= config->cached_host_check_horizon())) {
+            && ((current_time - temp_host->last_check) <= config->cached_host_check_horizon())) {
           logger(dbg_checks, more)
             << "* Using cached host state: " << temp_host->current_state;
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
@@ -643,8 +643,7 @@ int handle_async_service_check_result(
     if (reschedule_check == true)
       next_service_check
         = (time_t)(temp_service->last_check
-                   + (temp_service->check_interval
-                      * config->interval_length()));
+                   + temp_service->check_interval);
   }
 
   /*******************************************/
@@ -668,7 +667,7 @@ int handle_async_service_check_result(
       if ((state_change == false
            || state_changes_use_cached_state == true)
           && temp_host->has_been_checked == true
-          && (static_cast<unsigned long>(current_time - temp_host->last_check) <= config->cached_host_check_horizon())) {
+          && ((current_time - temp_host->last_check) <= config->cached_host_check_horizon())) {
         // Use current host state as route result.
         route_result = temp_host->current_state;
         logger(dbg_checks, more)
@@ -803,8 +802,7 @@ int handle_async_service_check_result(
         if (reschedule_check == true)
           next_service_check
             = (time_t)(temp_service->last_check
-                       + (temp_service->check_interval
-                          * config->interval_length()));
+                       + temp_service->check_interval);
 
         /* log the problem as a hard state if the host just went down */
         if (hard_state_change == true) {
@@ -833,8 +831,7 @@ int handle_async_service_check_result(
         if (reschedule_check == true)
           next_service_check
             = (time_t)(temp_service->last_check
-                       + (temp_service->retry_interval
-                          * config->interval_length()));
+                       + temp_service->retry_interval);
       }
 
       /* perform dependency checks on the second to last check of the service */
@@ -909,8 +906,7 @@ int handle_async_service_check_result(
       if (reschedule_check == true)
         next_service_check
           = (time_t)(temp_service->last_check
-                     + (temp_service->check_interval
-                        * config->interval_length()));
+                     + temp_service->check_interval);
     }
 
 
@@ -972,8 +968,9 @@ int handle_async_service_check_result(
     NULL,
     temp_service->latency,
     temp_service->execution_time,
-    temp_service->check_timeout ? temp_service->check_timeout :
-                                  config->service_check_timeout(),
+    temp_service->check_timeout
+    ? temp_service->check_timeout :
+    config->service_check_timeout().get(),
     queued_check_result->early_timeout,
     queued_check_result->return_code,
     NULL,
@@ -1004,7 +1001,7 @@ int handle_async_service_check_result(
     temp_service = (service*)servicelist_item->object_ptr;
 
     /* we can get by with a cached state, so don't check the service */
-    if (static_cast<unsigned long>(current_time - temp_service->last_check) <= config->cached_service_check_horizon()) {
+    if ((current_time - temp_service->last_check) <= config->cached_service_check_horizon()) {
       run_async_check = false;
 
       /* update check statistics */
@@ -1188,9 +1185,9 @@ int check_service_check_viability(
 
   /* get the check interval to use if we need to reschedule the check */
   if (svc->state_type == SOFT_STATE && svc->current_state != STATE_OK)
-    check_interval = static_cast<int>(svc->retry_interval * config->interval_length());
+    check_interval = static_cast<int>(svc->retry_interval);
   else
-    check_interval = static_cast<int>(svc->check_interval * config->interval_length());
+    check_interval = static_cast<int>(svc->check_interval);
 
   /* get the current time */
   time(&current_time);
@@ -1402,11 +1399,13 @@ int is_service_result_fresh(
   if (temp_service->freshness_threshold == 0) {
     if (temp_service->state_type == HARD_STATE
         || temp_service->current_state == STATE_OK)
-      freshness_threshold = static_cast<int>((temp_service->check_interval * config->interval_length())
-					     + temp_service->latency + config->additional_freshness_latency());
+      freshness_threshold = static_cast<int>(temp_service->check_interval
+					     + temp_service->latency
+                                             + config->additional_freshness_latency());
     else
-      freshness_threshold = static_cast<int>((temp_service->retry_interval * config->interval_length())
-					     + temp_service->latency + config->additional_freshness_latency());
+      freshness_threshold = static_cast<int>(temp_service->retry_interval
+					     + temp_service->latency
+                                             + config->additional_freshness_latency());
   }
   else
     freshness_threshold = temp_service->freshness_threshold;
@@ -1812,7 +1811,7 @@ int is_host_result_fresh(
     else
       interval = temp_host->retry_interval;
     freshness_threshold
-      = static_cast<int>((interval * config->interval_length())
+      = static_cast<int>(interval
                          + temp_host->latency
                          + config->additional_freshness_latency());
   }
@@ -2008,10 +2007,10 @@ int run_scheduled_host_check_3x(
       /* determine next time we should check the host if needed */
       /* if host has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
-        preferred_time
-          = current_time + static_cast<time_t>((hst->check_interval <= 0)
-                                               ? 300
-                                               : (hst->check_interval * config->interval_length()));
+        preferred_time = current_time + static_cast<time_t>(
+                                          (hst->check_interval <= 0)
+                                          ? 300
+                                          : hst->check_interval);
 
       /* make sure we rescheduled the next host check at a valid time */
       get_next_valid_time(
@@ -2371,8 +2370,9 @@ int handle_async_host_check_result_3x(
     temp_host->host_check_command,
     temp_host->latency,
     temp_host->execution_time,
-    temp_host->check_timeout ? temp_host->check_timeout :
-                               config->host_check_timeout(),
+    temp_host->check_timeout
+    ? temp_host->check_timeout
+    : config->host_check_timeout().get(),
     queued_check_result->early_timeout,
     queued_check_result->return_code,
     NULL,
@@ -2421,9 +2421,7 @@ int process_host_check_result_3x(
 
   /* default next check time */
   next_check
-    = (unsigned long)(current_time +
-                      (hst->check_interval
-                       * config->interval_length()));
+    = (unsigned long)(current_time + hst->check_interval);
 
   /* we have to adjust current attempt # for passive checks, as it isn't done elsewhere */
   if (hst->check_type == HOST_CHECK_PASSIVE
@@ -2466,9 +2464,7 @@ int process_host_check_result_3x(
       /* reschedule the next check of the host at the normal interval */
       reschedule_check = true;
       next_check
-        = (unsigned long)(current_time
-                          + (hst->check_interval
-                             * config->interval_length()));
+        = (unsigned long)(current_time + hst->check_interval);
 
       /* propagate checks to immediate parents if they are not already UP */
       /* we do this because a parent host (or grandparent) may have recovered somewhere and we should catch the recovery as soon as possible */
@@ -2551,16 +2547,12 @@ int process_host_check_result_3x(
         /* schedule a re-check of the host at the retry interval because we can't determine its final state yet... */
         if (hst->state_type == SOFT_STATE)
           next_check
-            = (unsigned long)(current_time
-                              + (hst->retry_interval
-                                 * config->interval_length()));
+            = (unsigned long)(current_time + hst->retry_interval);
 
         /* host has maxed out on retries (or was previously in a hard problem state), so reschedule the next check at the normal interval */
         else
           next_check
-            = (unsigned long)(current_time
-                              + (hst->check_interval
-                               * config->interval_length()));
+            = (unsigned long)(current_time + hst->check_interval);
       }
     }
   }
@@ -2586,9 +2578,7 @@ int process_host_check_result_3x(
       /* reschedule the next check at the normal interval */
       if (reschedule_check == true)
         next_check
-          = (unsigned long)(current_time
-                            + (hst->check_interval
-                               * config->interval_length()));
+          = (unsigned long)(current_time + hst->check_interval);
     }
     /***** HOST IS NOW DOWN/UNREACHABLE *****/
     else {
@@ -2607,9 +2597,7 @@ int process_host_check_result_3x(
         /* host has maxed out on retries, so reschedule the next check at the normal interval */
         reschedule_check = true;
         next_check
-          = (unsigned long)(current_time
-                            + (hst->check_interval
-                               * config->interval_length()));
+          = (unsigned long)(current_time + hst->check_interval);
 
         /* we need to run SYNCHRONOUS checks of all parent hosts to accurately determine the state of this host */
         /* this is extremely inefficient (reminiscent of Nagios 2.x logic), but there's no other good way around it */
@@ -2727,16 +2715,12 @@ int process_host_check_result_3x(
         if (hst->check_type == HOST_CHECK_ACTIVE
             || config->passive_host_checks_are_soft() == true)
           next_check
-            = (unsigned long)(current_time
-                              + (hst->retry_interval
-                                 * config->interval_length()));
+            = (unsigned long)(current_time + hst->retry_interval);
 
         /* schedule a re-check of the host at the normal interval */
         else
           next_check
-            = (unsigned long)(current_time
-                              + (hst->check_interval
-                                 * config->interval_length()));
+            = (unsigned long)(current_time + hst->check_interval);
 
         /* propagate checks to immediate parents if they are UP */
         /* we do this because a parent host (or grandparent) may have gone down and blocked our route */
@@ -2937,10 +2921,10 @@ int check_host_check_viability_3x(
   /* get the check interval to use if we need to reschedule the check */
   if (hst->state_type == SOFT_STATE && hst->current_state != HOST_UP)
     check_interval
-      = static_cast<int>(hst->retry_interval * config->interval_length());
+      = static_cast<int>(hst->retry_interval);
   else
     check_interval
-      = static_cast<int>(hst->check_interval * config->interval_length());
+      = static_cast<int>(hst->check_interval);
 
   /* make sure check interval is positive - otherwise use 5 minutes out for next check */
   if (check_interval <= 0)

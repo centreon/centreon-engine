@@ -209,8 +209,7 @@ void check_for_host_flapping(host* hst, int update, int actual_check) {
   /* period to wait for updating archived state info if we have no state change */
   if (hst->total_service_check_interval && hst->total_services)
     wait_threshold
-      = static_cast<unsigned long>((hst->total_service_check_interval
-                                    * config->interval_length())
+      = static_cast<unsigned long>(hst->total_service_check_interval
                                    / hst->total_services);
   else
     wait_threshold = 300;

@@ -173,17 +173,13 @@ max_check_attempts           This directive is used to define the number of time
 
                                 If you do not want to check the status of the host, you must still set this to a minimum value of 1. To bypass the
                                 host check, just leave the check_command option blank.
-check_interval               This directive is used to define the number of "time units" between regularly scheduled checks of the host. Unless you've
-                             changed the :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
-retry_interval               This directive is used to define the number of "time units" to wait before scheduling a re-check of the hosts. Hosts are
-                             rescheduled at the retry interval when they have changed to a non-UP state. Once the host has been retried
-                             max_check_attempts times without a change in its status, it will revert to being scheduled at its "normal" rate as
-                             defined by the check_interval value. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>`
-                             directive from the default value of 60, this number will mean minutes. More information on this value can be found in the
-                             :ref:`check scheduling <scheduling_service_and_host>` documentation.
+check_interval               This directive is used to define the amount of time between regularly scheduled checks of the host. The default time
+                             unit is the second (if you does not specify any suffix) but some suffixes are known, such as "m" for minutes, "h" for
+                             hours and "d" for days.
+retry_interval               This directive is used to define the amount of time to wait before scheduling a re-check of the hosts (respects the
+                             same format than check_interval above). Hosts are rescheduled at the retry interval when they have changed to a non-UP
+                             state. Once the host has been retried max_check_attempts times without a change in its status, it will revert to being
+                             scheduled at its "normal" rate as defined by the check_interval value.
 active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active
                              checks (either regularly scheduled or on-demand) of this host are enabled. Values: 0 = disable active host checks,
                              1 = enable active host checks (default).
@@ -314,19 +310,14 @@ initial_state                By default Centreon Engine will assume that all ser
 max_check_attempts           This directive is used to define the number of times that Centreon Engine will retry the service check command if it
                              returns any state other than an OK state. Setting this value to 1 will cause Centreon Engine to generate an alert without
                              retrying the service check again.
-check_interval               This directive is used to define the number of "time units" to wait before scheduling the next "regular" check of the
-                             service. "Regular" checks are those that occur when the service is in an OK state or when the service is in a non-OK
-                             state, but has already been rechecked max_check_attempts number of times. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>` directive from the default value of 60, this number will
-                             mean minutes. More information on this value can be found in the :ref:`check scheduling <scheduling_service_and_host>`
-                             documentation.
-retry_interval               This directive is used to define the number of "time units" to wait before scheduling a re-check of the service. Services
-                             are rescheduled at the retry interval when they have changed to a non-OK state. Once the service has been retried
-                             max_check_attempts times without a change in its status, it will revert to being scheduled at its "normal" rate as
-                             defined by the check_interval value. Unless you've changed the
-                             :ref:`interval_length <main_cfg_opt_timing_interval_length>` directive from the default value of 60, this number will
-                             mean minutes. More information on this value can be found in the :ref:`check scheduling <scheduling_service_and_host>`
-                             documentation.
+check_interval               This directive is used to define the amount of time to wait before scheduling the next "regular" check of the service.
+                             "Regular" checks are those that occur when the service is in an OK state or when the service is in a non-OK
+                             state, but has already been rechecked max_check_attempts number of times. The default time unit is the second (if you
+                             does not specify any suffix) but some suffixes are known, such as "m" for minutes, "h" for hours and "d" for days.
+retry_interval               This directive is used to define the amount of time to wait before scheduling a re-check of the service (respects the
+                             same format than check_interval above). Services are rescheduled at the retry interval when they have changed to a
+                             non-OK state. Once the service has been retried max_check_attempts times without a change in its status, it will revert
+                             to being scheduled at its "normal" rate as defined by the check_interval value.
 active_checks_enabled        :ref:`* <obj_def_retentionnotes>` This directive is used to determine whether or not active checks of this service are
                              enabled. Values: 0 = disable active service checks, 1 = enable active service checks (default).
 check_period                 This directive is used to specify the short name of the :ref:`time period <obj_def_timeperiod>` during which active

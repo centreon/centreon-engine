@@ -52,6 +52,8 @@ void applier::scheduler::apply(
        configuration::state& config,
        difference<set_host> const& diff_hosts,
        difference<set_service> const& diff_services) {
+  (void)config;
+
   // Remove and create misc event.
   _apply_misc_event();
 
@@ -141,8 +143,8 @@ void applier::scheduler::apply(
     memset(&scheduling_info, 0, sizeof(scheduling_info));
 
     // Calculate scheduling parameters.
-    _calculate_host_scheduling_params(config);
-    _calculate_service_scheduling_params(config);
+    _calculate_host_scheduling_params();
+    _calculate_service_scheduling_params();
 
     // Get and schedule new hosts.
     {
@@ -369,12 +371,10 @@ void applier::scheduler::_calculate_host_inter_check_delay() {
 }
 
 /**
- *
- *
- *  @param[in] config The configuration to use.
+ *  Compute host scheduling parameters (check spread, average check
+ *  interval, ...).
  */
-void applier::scheduler::_calculate_host_scheduling_params(
-       configuration::state const& config) {
+void applier::scheduler::_calculate_host_scheduling_params() {
   logger(dbg_events, most)
     << "Determining host scheduling parameters...";
 
@@ -431,7 +431,6 @@ void applier::scheduler::_calculate_host_scheduling_params(
   }
 
   // Compute statistics.
-  host_check_interval_total *= config.interval_length();
   if (scheduling_info.total_scheduled_hosts) {
     scheduling_info.average_host_check_interval
       = host_check_interval_total
@@ -446,7 +445,7 @@ void applier::scheduler::_calculate_host_scheduling_params(
     scheduling_info.host_check_spread = 0;
   else
     scheduling_info.host_check_spread
-      = static_cast<int>(host_check_spread * config.interval_length());
+      = static_cast<int>(host_check_spread);
   _calculate_host_inter_check_delay();
 
   return ;
@@ -495,12 +494,10 @@ void applier::scheduler::_calculate_service_interleave_factor() {
 }
 
 /**
- *
- *
- *  @param[in] config The configuration to use.
+ *  Compute service scheduling parameters (check spread, average check
+ *  interval, interleave factor, ...).
  */
-void applier::scheduler::_calculate_service_scheduling_params(
-       configuration::state const& config) {
+void applier::scheduler::_calculate_service_scheduling_params() {
   logger(dbg_events, most)
     << "Determining service scheduling parameters...";
 
@@ -559,7 +556,6 @@ void applier::scheduler::_calculate_service_scheduling_params(
   }
 
   // Compute statistics.
-  service_check_interval_total *= config.interval_length();
   if (scheduling_info.total_hosts) {
     scheduling_info.average_services_per_host
       = scheduling_info.total_services
@@ -585,8 +581,7 @@ void applier::scheduler::_calculate_service_scheduling_params(
     scheduling_info.service_check_spread = 0;
   else
     scheduling_info.service_check_spread
-      = static_cast<int>(service_check_spread
-                         * config.interval_length());
+      = static_cast<int>(service_check_spread);
   _calculate_service_inter_check_delay();
   _calculate_service_interleave_factor();
 

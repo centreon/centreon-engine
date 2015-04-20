@@ -6484,7 +6484,6 @@ int read_main_config_file(char const* main_config_file) {
   mmapfile *thefile=NULL;
   int current_line=0;
   int error=false;
-  int command_check_interval_is_seconds=false;
   char *modptr=NULL;
   char *argptr=NULL;
 
@@ -6860,19 +6859,8 @@ int read_main_config_file(char const* main_config_file) {
       }
     }
 
-    else if(!strcmp(variable,"interval_length")){
-
-      interval_length=atoi(value);
-      if(interval_length<1){
-        if (asprintf(&error_message,"Illegal value for interval_length")) {}
-        error=true;
-        break;
-      }
-    }
-
     else if(!strcmp(variable,"command_check_interval")){
 
-      command_check_interval_is_seconds=(strstr(value,"s"))?true:false;
       command_check_interval=atoi(value);
       if(command_check_interval<-1 || command_check_interval==0){
         if (asprintf(&error_message,"Illegal value for command_check_interval")) {}
@@ -7033,10 +7021,6 @@ int read_main_config_file(char const* main_config_file) {
   if(use_timezone!=NULL)
     setenv("TZ",use_timezone,1);
   tzset();
-
-  /* adjust command check interval */
-  if(command_check_interval_is_seconds==false && command_check_interval!=-1)
-    command_check_interval*=interval_length;
 
   /* handle errors */
   if(error==true){

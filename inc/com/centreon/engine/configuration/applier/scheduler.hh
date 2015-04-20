@@ -62,12 +62,10 @@ namespace                 configuration {
       scheduler&          operator=(scheduler const&);
       void                _apply_misc_event();
       void                _calculate_host_inter_check_delay();
-      void                _calculate_host_scheduling_params(
-                            configuration::state const& config);
+      void                _calculate_host_scheduling_params();
       void                _calculate_service_inter_check_delay();
       void                _calculate_service_interleave_factor();
-      void                _calculate_service_scheduling_params(
-                            configuration::state const& config);
+      void                _calculate_service_scheduling_params();
       timed_event_struct* _create_misc_event(
                             int type,
                             time_t start,

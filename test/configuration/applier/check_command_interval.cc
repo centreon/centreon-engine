@@ -82,7 +82,8 @@ static bool newparser_read_config(
  */
 int main_test(int argc, char** argv) {
   if (argc != 3)
-    throw (engine_error() << "usage: " << argv[0] << " file.cfg" << " expected_value");
+    throw (engine_error() << "usage: " << argv[0] << " file.cfg"
+           << " expected_value");
 
   unsigned int options(configuration::parser::read_all);
   int expected_value = atoi(argv[2]);
@@ -91,7 +92,9 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "new parser can't parse " << argv[1]);
 
   if (::command_check_interval != expected_value)
-    throw (engine_error() << "value found " << ::command_check_interval << "was not the expected value");
+    throw (engine_error() << "value found "
+           << ::command_check_interval
+           << " was not the expected value");
 
   return (0);
 }
