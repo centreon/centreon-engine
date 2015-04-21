@@ -473,25 +473,6 @@ the core of the monitoring logic in Centreon Engine.
 **Example** check_result_reaper_frequency=5
 =========== ====================================================
 
-.. _main_cfg_opt_passive_host_checks_are_soft:
-
-Passive Host Checks Are SOFT Option
------------------------------------
-
-This option determines whether or not Centreon Engine will treat
-:ref:`passive host checks <passive_checks>` as HARD states or SOFT
-states. By default, a passive host check result will put a host into a
-:ref:`HARD state type <state_types>`. You can change this behavior by
-enabling this option.
-
-  * 0 = Passive host checks are HARD (default)
-  * 1 = Passive host checks are SOFT
-
-=========== ==================================
-**Format**  passive_host_checks_are_soft=<0/1>
-**Example** passive_host_checks_are_soft=1
-=========== ==================================
-
 .. _main_cfg_opt_predictive_host_dependency_checks:
 
 Predictive Host Dependency Checks Option

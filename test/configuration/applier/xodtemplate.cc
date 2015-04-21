@@ -6746,9 +6746,6 @@ int read_main_config_file(char const* main_config_file) {
       obsess_over_hosts=(atoi(value)>0)?true:false;
     }
 
-    else if(!strcmp(variable,"passive_host_checks_are_soft"))
-      passive_host_checks_are_soft=(atoi(value)>0)?true:false;
-
     else if(!strcmp(variable,"service_check_timeout")){
 
       service_check_timeout=atoi(value);

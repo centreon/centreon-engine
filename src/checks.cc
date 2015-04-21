@@ -2424,8 +2424,7 @@ int process_host_check_result_3x(
     = (unsigned long)(current_time + hst->check_interval);
 
   /* we have to adjust current attempt # for passive checks, as it isn't done elsewhere */
-  if (hst->check_type == HOST_CHECK_PASSIVE
-      && config->passive_host_checks_are_soft() == true)
+  if (hst->check_type == HOST_CHECK_PASSIVE)
     adjust_host_check_attempt_3x(hst, false);
 
   /* log passive checks - we need to do this here, as some my bypass external commands by getting dropped in checkresults dir */
@@ -2446,15 +2445,6 @@ int process_host_check_result_3x(
 
       /* set the current state */
       hst->current_state = HOST_UP;
-
-      /* set the state type */
-      /* set state type to HARD for passive checks and active checks that were previously in a HARD STATE */
-      if (hst->state_type == HARD_STATE
-          || (hst->check_type == HOST_CHECK_PASSIVE
-              && config->passive_host_checks_are_soft() == false))
-        hst->state_type = HARD_STATE;
-      else
-        hst->state_type = SOFT_STATE;
 
       logger(dbg_checks, more)
         << "Host experienced a "
@@ -2508,31 +2498,18 @@ int process_host_check_result_3x(
       logger(dbg_checks, more)
         << "Host is still DOWN/UNREACHABLE.";
 
-      /* passive checks are treated as HARD states by default... */
-      if (hst->check_type == HOST_CHECK_PASSIVE
-          && config->passive_host_checks_are_soft() == false) {
-
-        /* set the state type */
-        hst->state_type = HARD_STATE;
-
-        /* reset the current attempt */
-        hst->current_attempt = 1;
-      }
-
       /* active checks and passive checks (treated as SOFT states) */
-      else {
 
-        /* set the state type */
-        /* we've maxed out on the retries */
-        if (hst->current_attempt == hst->max_attempts)
-          hst->state_type = HARD_STATE;
-        /* the host was in a hard problem state before, so it still is now */
-        else if (hst->current_attempt == 1)
-          hst->state_type = HARD_STATE;
-        /* the host is in a soft state and the check will be retried */
-        else
-          hst->state_type = SOFT_STATE;
-      }
+      /* set the state type */
+      /* we've maxed out on the retries */
+      if (hst->current_attempt == hst->max_attempts)
+        hst->state_type = HARD_STATE;
+      /* the host was in a hard problem state before, so it still is now */
+      else if (hst->current_attempt == 1)
+        hst->state_type = HARD_STATE;
+      /* the host is in a soft state and the check will be retried */
+      else
+        hst->state_type = SOFT_STATE;
 
       /* make a determination of the host's state */
       hst->current_state = new_state;
@@ -2686,23 +2663,8 @@ int process_host_check_result_3x(
       /***** MAX ATTEMPTS > 1 *****/
       else {
 
-        /* active and (in some cases) passive check results are treated as SOFT states */
-        if (hst->check_type == HOST_CHECK_ACTIVE
-            || config->passive_host_checks_are_soft() == true) {
-
-          /* set the state type */
-          hst->state_type = SOFT_STATE;
-        }
-
-        /* by default, passive check results are treated as HARD states */
-        else {
-
-          /* set the state type */
-          hst->state_type = HARD_STATE;
-
-          /* reset the current attempt */
-          hst->current_attempt = 1;
-        }
+        /* active and passive check results are treated as SOFT states */
+        hst->state_type = SOFT_STATE;
 
         /* make a (in some cases) preliminary determination of the host's state */
         hst->current_state = new_state;
@@ -2712,8 +2674,7 @@ int process_host_check_result_3x(
         reschedule_check = true;
 
         /* schedule a re-check of the host at the retry interval because we can't determine its final state yet... */
-        if (hst->check_type == HOST_CHECK_ACTIVE
-            || config->passive_host_checks_are_soft() == true)
+        if (hst->check_type == HOST_CHECK_ACTIVE)
           next_check
             = (unsigned long)(current_time + hst->retry_interval);
 

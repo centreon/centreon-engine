@@ -85,7 +85,6 @@ state::setters const state::_setters[] = {
   { "ochp_timeout",                                SETTER(duration const&, ochp_timeout) },
   { "ocsp_command",                                SETTER(std::string const&, ocsp_command) },
   { "ocsp_timeout",                                SETTER(duration const&, ocsp_timeout) },
-  { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
   { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
   { "retention_update_interval",                   SETTER(duration const&, retention_update_interval) },
   { "service_check_timeout",                       SETTER(duration const&, service_check_timeout) },
@@ -152,6 +151,7 @@ char const* const state::_deprecated[][2] = {
   { "notification_timeout",                        deprecated::notification_msg },
   { "object_cache_file",                           deprecated::engine_performance_msg },
   { "p1_file",                                     deprecated::embedded_perl_msg },
+  { "passive_host_checks_are_soft",                deprecated::passive_host_checks_msg },
   { "perfdata_timeout",                            deprecated::perfdata_msg },
   { "precached_object_file",                       deprecated::engine_performance_msg },
   { "process_performance_data",                    deprecated::perfdata_msg },
@@ -174,7 +174,7 @@ char const* const state::_deprecated[][2] = {
   { "status_update_interval",                      deprecated::status_file_usage_msg },
   { "temp_file",                                   deprecated::default_msg },
   { "temp_path",                                   deprecated::default_msg },
-  // XXX { "translate_passive_host_checks",               SETTER(bool, _set_translate_passive_host_checks) },
+  { "translate_passive_host_checks",               deprecated::default_msg },
   { "use_aggressive_host_checking",                deprecated::default_msg },
   { "use_agressive_host_checking",                 deprecated::default_msg },
   { "use_check_result_path",                       deprecated::check_result_path_msg },
@@ -235,7 +235,6 @@ static std::string const               default_ochp_command("");
 static long const                      default_ochp_timeout(15);
 static std::string const               default_ocsp_command("");
 static long const                      default_ocsp_timeout(15);
-static bool const                      default_passive_host_checks_are_soft(false);
 static long const                      default_retention_update_interval(3600);
 static long const                      default_service_check_timeout(60);
 static long const                      default_service_freshness_check_interval(60);
@@ -321,7 +320,6 @@ state::state()
     _ochp_timeout(default_ochp_timeout),
     _ocsp_command(default_ocsp_command),
     _ocsp_timeout(default_ocsp_timeout),
-    _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
     _retention_update_interval(default_retention_update_interval),
     _service_check_timeout(default_service_check_timeout),
     _service_freshness_check_interval(default_service_freshness_check_interval),
@@ -409,7 +407,6 @@ state& state::operator=(state const& other) {
     _ochp_timeout = other._ochp_timeout;
     _ocsp_command = other._ocsp_command;
     _ocsp_timeout = other._ocsp_timeout;
-    _passive_host_checks_are_soft = other._passive_host_checks_are_soft;
     _retention_update_interval = other._retention_update_interval;
     _servicedependencies = other._servicedependencies;
     _services = other._services;
@@ -487,7 +484,6 @@ bool state::operator==(state const& other) const {
           && _ochp_timeout == other._ochp_timeout
           && _ocsp_command == other._ocsp_command
           && _ocsp_timeout == other._ocsp_timeout
-          && _passive_host_checks_are_soft == other._passive_host_checks_are_soft
           && _retention_update_interval == other._retention_update_interval
           && cmp_set_ptr(_servicedependencies, other._servicedependencies)
           && cmp_set_ptr(_services, other._services)
@@ -1656,24 +1652,6 @@ void state::ocsp_timeout(duration const& value) {
            << "ocsp_timeout cannot be equal to or less than 0");
   _ocsp_timeout = value;
   return ;
-}
-
-/**
- *  Get passive_host_checks_are_soft value.
- *
- *  @return The passive_host_checks_are_soft value.
- */
-bool state::passive_host_checks_are_soft() const throw () {
-  return (_passive_host_checks_are_soft);
-}
-
-/**
- *  Set passive_host_checks_are_soft value.
- *
- *  @param[in] value The new passive_host_checks_are_soft value.
- */
-void state::passive_host_checks_are_soft(bool value) {
-  _passive_host_checks_are_soft = value;
 }
 
 /**

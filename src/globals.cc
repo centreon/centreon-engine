@@ -125,7 +125,6 @@ unsigned int        obsess_over_hosts(false);
 unsigned int        obsess_over_services(false);
 unsigned int        ochp_timeout(15);
 unsigned int        ocsp_timeout(15);
-unsigned int        passive_host_checks_are_soft(false);
 unsigned int        retention_update_interval(3600);
 unsigned int        service_check_timeout(60);
 unsigned int        service_freshness_check_interval(60);

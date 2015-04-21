@@ -108,7 +108,6 @@ struct                global {
   unsigned int        ochp_timeout;
   std::string         ocsp_command;
   unsigned int        ocsp_timeout;
-  bool                passive_host_checks_are_soft;
   unsigned int        retention_update_interval;
   unsigned int        service_check_timeout;
   unsigned int        service_freshness_check_interval;
@@ -246,7 +245,6 @@ bool chkdiff(global& g1, global& g2) {
   check_value(ochp_timeout);
   check_value(ocsp_command);
   check_value(ocsp_timeout);
-  check_value(passive_host_checks_are_soft);
   check_value(retention_update_interval);
   check_value(service_check_timeout);
   check_value(service_freshness_check_interval);
@@ -365,7 +363,6 @@ static global get_globals() {
   g.ochp_timeout = ochp_timeout;
   g.ocsp_command = to_str(ocsp_command);
   g.ocsp_timeout = ocsp_timeout;
-  g.passive_host_checks_are_soft = passive_host_checks_are_soft;
   g.retention_update_interval = retention_update_interval;
   g.service_check_timeout = service_check_timeout;
   g.service_freshness_check_interval = service_freshness_check_interval;

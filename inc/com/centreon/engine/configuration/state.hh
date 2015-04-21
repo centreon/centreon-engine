@@ -167,8 +167,6 @@ namespace                           configuration {
     void                            ocsp_command(std::string const& value);
     duration const&                 ocsp_timeout() const throw ();
     void                            ocsp_timeout(duration const& value);
-    bool                            passive_host_checks_are_soft() const throw ();
-    void                            passive_host_checks_are_soft(bool value);
     std::list<std::string> const&   resource_file() const throw ();
     void                            resource_file(std::list<std::string> const& value);
     duration const&                 retention_update_interval() const throw ();
@@ -328,7 +326,6 @@ namespace                           configuration {
     duration                        _ochp_timeout;
     std::string                     _ocsp_command;
     duration                        _ocsp_timeout;
-    bool                            _passive_host_checks_are_soft;
     std::list<std::string>          _resource_file;
     duration                        _retention_update_interval;
     set_servicedependency           _servicedependencies;

@@ -82,9 +82,8 @@ Hard states occur for hosts and services in the following situations:
   * When a host or service recovers from a hard error state. This is
     considered to be a hard recovery.
   * When a :ref:`passive host check <passive_checks>` is
-    received. Passive host checks are treated as HARD unless the
-    :ref:`passive_host_checks_are_soft <main_cfg_opt_passive_host_checks_are_soft>`
-    option is enabled.
+    received. Passive host checks are treated as SOFT just like active
+    checks.
 
 The following things occur when hosts or services experience HARD state
 changes:

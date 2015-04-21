@@ -77,7 +77,6 @@ void applier::globals::apply(state& config) {
   ::obsess_over_services = config.obsess_over_services();
   ::ochp_timeout = config.ochp_timeout();
   ::ocsp_timeout = config.ocsp_timeout();
-  ::passive_host_checks_are_soft = config.passive_host_checks_are_soft();
   ::retention_update_interval = config.retention_update_interval();
   ::service_check_timeout = config.service_check_timeout();
   ::service_freshness_check_interval = config.service_freshness_check_interval();
