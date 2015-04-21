@@ -93,7 +93,7 @@ void applier::service::add_object(
     NULL_IF_EMPTY(obj->check_period()),
     obj->initial_state(),
     obj->max_check_attempts(),
-    obj->check_timeout_defined() ? obj->check_timeout() : 0,
+    (obj->check_timeout() >= 0) ? obj->check_timeout().get() : 0,
     obj->check_interval(),
     obj->retry_interval(),
     obj->is_volatile(),
@@ -250,7 +250,7 @@ void applier::service::modify_object(
     static_cast<int>(obj->max_check_attempts()));
   modify_if_different(
     s->check_timeout,
-    obj->check_timeout());
+    obj->check_timeout().get());
   modify_if_different(
     s->check_period,
     NULL_IF_EMPTY(obj->check_period()));

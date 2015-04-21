@@ -41,11 +41,11 @@ CCE_BEGIN()
 
 namespace                           configuration {
   /**
-   *  @class state state.hh
-   *  @brief Simple configuration state class.
+   *  @class state state.hh "com/centreon/engine/configuration/state.hh"
+   *  @brief Global state class.
    *
-   *  Simple configuration state class used by Centreon Engine
-   *  to manage configuration data.
+   *  Configuration state class used by Centreon Engine to manage the
+   *  entire configuration data.
    */
   class                             state {
   public:

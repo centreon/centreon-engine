@@ -93,7 +93,7 @@ void applier::host::add_object(
         obj->check_interval(),
         obj->retry_interval(),
         obj->max_check_attempts(),
-        obj->check_timeout_defined() ? obj->check_timeout() : 0,
+        (obj->check_timeout() >= 0) ? obj->check_timeout().get() : 0,
         NULL_IF_EMPTY(obj->check_command()),
         obj->checks_active(),
         NULL_IF_EMPTY(obj->event_handler()),
@@ -212,7 +212,7 @@ void applier::host::modify_object(
     static_cast<int>(obj->max_check_attempts()));
   modify_if_different(
     h->check_timeout,
-    obj->check_timeout());
+    obj->check_timeout().get());
   modify_if_different(
     h->host_check_command,
     NULL_IF_EMPTY(obj->check_command()));

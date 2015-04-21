@@ -39,7 +39,7 @@ typedef struct                  service_struct {
   double                        check_interval;
   double                        retry_interval;
   int                           max_attempts;
-  unsigned int                  check_timeout;
+  long                          check_timeout;
   int                           is_volatile;
   char*                         check_period;
   int                           flap_detection_enabled;

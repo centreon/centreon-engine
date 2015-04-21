@@ -708,8 +708,8 @@ int xodtemplate_begin_object_definition(
     new_service->initial_state = STATE_OK;
     new_service->max_check_attempts = -2;
     new_service->check_timeout = 0;
-    new_service->check_interval = 5.0;
-    new_service->retry_interval = 1.0;
+    new_service->check_interval = 300.0;
+    new_service->retry_interval = 60.0;
     new_service->active_checks_enabled = true;
     new_service->obsess_over_service = true;
     new_service->event_handler_enabled = true;
@@ -723,8 +723,8 @@ int xodtemplate_begin_object_definition(
     xodtemplate_current_object_type = XODTEMPLATE_HOST;
     xod_begin_def(host);
 
-    new_host->check_interval = 5.0;
-    new_host->retry_interval = 1.0;
+    new_host->check_interval = 300.0;
+    new_host->retry_interval = 60.0;
     new_host->active_checks_enabled = true;
     new_host->obsess_over_host = true;
     new_host->max_check_attempts = -2;
@@ -2620,43 +2620,43 @@ int xodtemplate_duplicate_services() {
     }
   }
 
-  /* add services to skiplist for fast searches */
-  for (temp_service = xodtemplate_service_list;
-       temp_service != NULL;
-       temp_service = temp_service->next) {
+  // /* add services to skiplist for fast searches */
+  // for (temp_service = xodtemplate_service_list;
+  //      temp_service != NULL;
+  //      temp_service = temp_service->next) {
 
-    /* skip services that shouldn't be registered */
-    if (temp_service->register_object == false)
-      continue;
+  //   /* skip services that shouldn't be registered */
+  //   if (temp_service->register_object == false)
+  //     continue;
 
-    /* skip service definitions without enough data */
-    if (temp_service->host_name == NULL
-        || temp_service->service_description == NULL)
-      continue;
+  //   /* skip service definitions without enough data */
+  //   if (temp_service->host_name == NULL
+  //       || temp_service->service_description == NULL)
+  //     continue;
 
-    result = skiplist_insert(
-               xobject_skiplists[X_SERVICE_SKIPLIST],
-               (void*)temp_service);
-    switch (result) {
-    case SKIPLIST_OK:
-      result = OK;
-      break;
+  //   result = skiplist_insert(
+  //              xobject_skiplists[X_SERVICE_SKIPLIST],
+  //              (void*)temp_service);
+  //   switch (result) {
+  //   case SKIPLIST_OK:
+  //     result = OK;
+  //     break;
 
-    case SKIPLIST_ERROR_DUPLICATE:
-      logger(log_config_warning, basic)
-        << "Warning: Duplicate definition found for service '"
-        << temp_service->service_description << "' on host '"
-        << temp_service->host_name << "' (config file '"
-        << xodtemplate_config_file_name(temp_service->_config_file)
-        << "', starting on line " << temp_service->_start_line << ")";
-      result = ERROR;
-      break;
+  //   case SKIPLIST_ERROR_DUPLICATE:
+  //     logger(log_config_warning, basic)
+  //       << "Warning: Duplicate definition found for service '"
+  //       << temp_service->service_description << "' on host '"
+  //       << temp_service->host_name << "' (config file '"
+  //       << xodtemplate_config_file_name(temp_service->_config_file)
+  //       << "', starting on line " << temp_service->_start_line << ")";
+  //     result = ERROR;
+  //     break;
 
-    default:
-      result = ERROR;
-      break;
-    }
-  }
+  //   default:
+  //     result = ERROR;
+  //     break;
+  //   }
+  // }
 
   return (OK);
 }

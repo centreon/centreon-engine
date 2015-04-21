@@ -146,8 +146,6 @@ namespace std {
   } while (false)
 #  define MRG_DEFAULT(prop) \
   if (prop.empty()) prop = tmpl.prop
-#  define MRG_IMPORTANT(prop) \
-  if (prop.empty() || tmpl.prop##_is_important) prop = tmpl.prop
 #  define MRG_INHERIT(prop) \
   do { \
     if (!prop.is_set()) \

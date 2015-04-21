@@ -45,7 +45,7 @@ typedef struct                  host_struct {
   int                           max_attempts;
   char*                         event_handler;
   char*                         check_period;
-  unsigned int                  check_timeout;
+  long                          check_timeout;
   int                           flap_detection_enabled;
   double                        low_flap_threshold;
   double                        high_flap_threshold;

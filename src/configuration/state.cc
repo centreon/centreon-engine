@@ -20,6 +20,7 @@
 #include <limits>
 #include "compatibility/locations.h"
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/deprecated.hh"
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -101,138 +102,90 @@ state::setters const state::_setters[] = {
   { "use_timezone",                                SETTER(std::string const&, use_timezone) }
 };
 
-static char const* const auto_reschedule_msg         =  "         Centreon Engine embeds an intelligent scheduling engine\n"
-                                                        "         which automatically reschedule tasks as its running to smooth\n"
-                                                        "         local and remote load\n";
-static char const* const check_acceptance_msg        =  "         Active checks cannot be disabled globally and passive checks\n"
-                                                        "         are always accepted when submitted.\n";
-static char const* const check_result_path_msg       =  "         Centreon Engine uses in-memory data structure to feed the\n"
-                                                        "         check execution loop with check results. This is far more\n"
-                                                        "         efficient than using on-disk files. If you wish to feed\n"
-                                                        "         Centreon Engine with your own check result, use the external\n"
-                                                        "         command module.\n";
-static char const* const default_msg                 =  "         This feature is not available in Centreon Engine.\n";
-static char const* const embedded_perl_msg           =  "         Centreon Engine does not have any Perl interpreter embedded.\n"
-                                                        "         It instead relies on external software to provide fast Perl\n"
-                                                        "         script execution (using precompilation). An example of such\n"
-                                                        "         software is Centreon Connector Perl.\n";
-static char const* const engine_performance_msg      =  "         Centreon Engine is just that powerful that it does not need\n"
-                                                        "         this feature.\n";
-static char const* const external_command_msg        =  "         External commands are handled by a module. If you do not\n"
-                                                        "         wish to check for external commands, do not load the module.\n";
-static char const* const groups_msg                  =  "         Groups are not supported. As a consequence all related\n"
-                                                        "         configuration properties were removed along with host groups,\n"
-                                                        "         service groups and contact groups objects. You should use\n"
-                                                        "         Centreon to easily configure your monitoring infrastructure\n"
-                                                        "         (among other cool features).\n";
-static char const* const interval_length_msg         =  "         Time units cannot be set globally. All properties that\n"
-                                                        "         configure a duration (*_interval, *_timeout, ...) can be set\n"
-                                                        "         using suffixes. Known suffixes are 's' for seconds (the default\n"
-                                                        "         if omitted), 'm' for minutes, 'h' for hours and 'd' for days.\n";
-static char const* const log_msg                     =  "         Log rotation should be handled by external software (such as\n"
-                                                        "         logrotate, for which Centreon Engine provides a sample script).\n";
-static char const* const notification_msg            =  "         Centreon Engine does not have any notification engine. As\n"
-                                                        "         a consequence all related configuration properties were\n"
-                                                        "         removed along with as contacts, contact groups, escalations,\n"
-                                                        "         acknowledgements and scheduled downtime objects. You should\n"
-                                                        "         use Centreon Broker and its notification module if you\n"
-                                                        "         wish to send notifications.\n";
-static char const* const perfdata_msg                =  "         Performance data are not processed by Centreon Engine.\n"
-                                                        "         In a Centreon environment, graphs are generated by Centreon\n"
-                                                        "         Broker and vizualized using Centreon.\n";
-static char const* const retention_usage_msg         =  "         All runtime data used by Centreon Engine is dumped to the\n"
-                                                        "         retention file at regular intervals and at shutdown. The\n"
-                                                        "         content of the file is read back when starting. All this is\n"
-                                                        "         done automatically and do not need cumbersome configuration.\n";
-static char const* const startup_script_msg          =  "         This feature should be handled by the startup script.\n"
-                                                        "         Check it out and modify it to suite your needs.\n";
-static char const* const status_file_usage_msg       =  "         The status file contains all objects statuses and is\n"
-                                                        "         written only in response to the SAVE_STATUS_INFORMATION\n"
-                                                        "         external command.\n";
 char const* const state::_deprecated[][2] = {
-  { "accept_passive_host_checks",                  check_acceptance_msg },
-  { "accept_passive_service_checks",               check_acceptance_msg },
-  { "admin_email",                                 notification_msg },
-  { "admin_pager",                                 notification_msg },
-  { "aggregate_status_updates",                    status_file_usage_msg },
-  { "allow_empty_hostgroup_assignment",            groups_msg },
-  { "auth_file",                                   startup_script_msg },
-  { "auto_reschedule_checks",                      auto_reschedule_msg },
-  { "auto_rescheduling_interval",                  auto_reschedule_msg },
-  { "auto_rescheduling_window",                    auto_reschedule_msg },
-  { "bare_update_check",                           default_msg },
-  { "check_external_commands",                     external_command_msg },
-  { "check_for_orphaned_hosts",                    default_msg },
-  { "check_for_orphaned_services",                 default_msg },
-  { "check_for_updates",                           default_msg },
-  { "check_result_path",                           check_result_path_msg },
-  { "child_processes_fork_twice",                  engine_performance_msg },
-  { "comment_file",                                status_file_usage_msg },
-  { "daemon_dumps_core",                           startup_script_msg },
-  { "date_format",                                 default_msg },
-  { "downtime_file",                               status_file_usage_msg },
-  { "enable_embedded_perl",                        embedded_perl_msg },
-  { "enable_environment_macros",                   default_msg },
-  { "enable_failure_prediction",                   default_msg },
-  { "enable_notifications",                        notification_msg },
-  { "execute_host_checks",                         check_acceptance_msg },
-  { "execute_service_checks",                      check_acceptance_msg },
-  { "free_child_process_memory",                   engine_performance_msg },
-  { "host_inter_check_delay_method",               auto_reschedule_msg },
-  { "host_perfdata_command",                       perfdata_msg },
-  { "host_perfdata_file",                          perfdata_msg },
-  { "host_perfdata_file_mode",                     perfdata_msg },
-  { "host_perfdata_file_processing_command",       perfdata_msg },
-  { "host_perfdata_file_processing_interval",      perfdata_msg },
-  { "host_perfdata_file_template",                 perfdata_msg },
-  { "interval_length",                             interval_length_msg },
-  { "lock_file",                                   startup_script_msg },
-  { "log_archive_path",                            log_msg },
-  { "log_notifications",                           notification_msg },
-  { "log_rotation_method",                         log_msg },
-  { "max_check_result_file_age",                   check_result_path_msg },
-  { "max_check_result_reaper_time",                check_result_path_msg },
-  { "max_host_check_spread",                       auto_reschedule_msg },
-  { "max_service_check_spread",                    auto_reschedule_msg },
-  { "nagios_group",                                startup_script_msg },
-  { "nagios_user",                                 startup_script_msg },
-  { "notification_timeout",                        notification_msg },
-  { "object_cache_file",                           engine_performance_msg },
-  { "p1_file",                                     embedded_perl_msg },
-  { "perfdata_timeout",                            perfdata_msg },
-  { "precached_object_file",                       engine_performance_msg },
-  { "process_performance_data",                    perfdata_msg },
-  { "retained_contact_host_attribute_mask",        retention_usage_msg },
-  { "retained_contact_service_attribute_mask",     retention_usage_msg },
-  { "retained_host_attribute_mask",                retention_usage_msg },
-  { "retained_process_host_attribute_mask",        retention_usage_msg },
-  { "retained_process_service_attribute_mask",     retention_usage_msg },
-  { "retained_service_attribute_mask",             retention_usage_msg },
-  { "retain_state_information",                    retention_usage_msg },
-  { "retention_scheduling_horizon",                auto_reschedule_msg },
-  { "service_inter_check_delay_method",            auto_reschedule_msg },
-  { "service_interleave_factor",                   auto_reschedule_msg },
-  { "service_perfdata_command",                    perfdata_msg },
-  { "service_perfdata_file",                       perfdata_msg },
-  { "service_perfdata_file_mode",                  perfdata_msg },
-  { "service_perfdata_file_processing_command",    perfdata_msg },
-  { "service_perfdata_file_processing_interval",   perfdata_msg },
-  { "service_perfdata_file_template",              perfdata_msg },
-  { "status_update_interval",                      status_file_usage_msg },
-  { "temp_file",                                   default_msg },
-  { "temp_path",                                   default_msg },
+  { "accept_passive_host_checks",                  deprecated::check_acceptance_msg },
+  { "accept_passive_service_checks",               deprecated::check_acceptance_msg },
+  { "admin_email",                                 deprecated::notification_msg },
+  { "admin_pager",                                 deprecated::notification_msg },
+  { "aggregate_status_updates",                    deprecated::status_file_usage_msg },
+  { "allow_empty_hostgroup_assignment",            deprecated::groups_msg },
+  { "auth_file",                                   deprecated::startup_script_msg },
+  { "auto_reschedule_checks",                      deprecated::auto_reschedule_msg },
+  { "auto_rescheduling_interval",                  deprecated::auto_reschedule_msg },
+  { "auto_rescheduling_window",                    deprecated::auto_reschedule_msg },
+  { "bare_update_check",                           deprecated::default_msg },
+  { "check_external_commands",                     deprecated::external_command_msg },
+  { "check_for_orphaned_hosts",                    deprecated::default_msg },
+  { "check_for_orphaned_services",                 deprecated::default_msg },
+  { "check_for_updates",                           deprecated::default_msg },
+  { "check_result_path",                           deprecated::check_result_path_msg },
+  { "child_processes_fork_twice",                  deprecated::engine_performance_msg },
+  { "comment_file",                                deprecated::status_file_usage_msg },
+  { "daemon_dumps_core",                           deprecated::startup_script_msg },
+  { "date_format",                                 deprecated::default_msg },
+  { "downtime_file",                               deprecated::status_file_usage_msg },
+  { "enable_embedded_perl",                        deprecated::embedded_perl_msg },
+  { "enable_environment_macros",                   deprecated::default_msg },
+  { "enable_failure_prediction",                   deprecated::default_msg },
+  { "enable_notifications",                        deprecated::notification_msg },
+  { "execute_host_checks",                         deprecated::check_acceptance_msg },
+  { "execute_service_checks",                      deprecated::check_acceptance_msg },
+  { "free_child_process_memory",                   deprecated::engine_performance_msg },
+  { "host_inter_check_delay_method",               deprecated::auto_reschedule_msg },
+  { "host_perfdata_command",                       deprecated::perfdata_msg },
+  { "host_perfdata_file",                          deprecated::perfdata_msg },
+  { "host_perfdata_file_mode",                     deprecated::perfdata_msg },
+  { "host_perfdata_file_processing_command",       deprecated::perfdata_msg },
+  { "host_perfdata_file_processing_interval",      deprecated::perfdata_msg },
+  { "host_perfdata_file_template",                 deprecated::perfdata_msg },
+  { "interval_length",                             deprecated::interval_length_msg },
+  { "lock_file",                                   deprecated::startup_script_msg },
+  { "log_archive_path",                            deprecated::log_msg },
+  { "log_notifications",                           deprecated::notification_msg },
+  { "log_rotation_method",                         deprecated::log_msg },
+  { "max_check_result_file_age",                   deprecated::check_result_path_msg },
+  { "max_check_result_reaper_time",                deprecated::check_result_path_msg },
+  { "max_host_check_spread",                       deprecated::auto_reschedule_msg },
+  { "max_service_check_spread",                    deprecated::auto_reschedule_msg },
+  { "nagios_group",                                deprecated::startup_script_msg },
+  { "nagios_user",                                 deprecated::startup_script_msg },
+  { "notification_timeout",                        deprecated::notification_msg },
+  { "object_cache_file",                           deprecated::engine_performance_msg },
+  { "p1_file",                                     deprecated::embedded_perl_msg },
+  { "perfdata_timeout",                            deprecated::perfdata_msg },
+  { "precached_object_file",                       deprecated::engine_performance_msg },
+  { "process_performance_data",                    deprecated::perfdata_msg },
+  { "retained_contact_host_attribute_mask",        deprecated::retention_usage_msg },
+  { "retained_contact_service_attribute_mask",     deprecated::retention_usage_msg },
+  { "retained_host_attribute_mask",                deprecated::retention_usage_msg },
+  { "retained_process_host_attribute_mask",        deprecated::retention_usage_msg },
+  { "retained_process_service_attribute_mask",     deprecated::retention_usage_msg },
+  { "retained_service_attribute_mask",             deprecated::retention_usage_msg },
+  { "retain_state_information",                    deprecated::retention_usage_msg },
+  { "retention_scheduling_horizon",                deprecated::auto_reschedule_msg },
+  { "service_inter_check_delay_method",            deprecated::auto_reschedule_msg },
+  { "service_interleave_factor",                   deprecated::auto_reschedule_msg },
+  { "service_perfdata_command",                    deprecated::perfdata_msg },
+  { "service_perfdata_file",                       deprecated::perfdata_msg },
+  { "service_perfdata_file_mode",                  deprecated::perfdata_msg },
+  { "service_perfdata_file_processing_command",    deprecated::perfdata_msg },
+  { "service_perfdata_file_processing_interval",   deprecated::perfdata_msg },
+  { "service_perfdata_file_template",              deprecated::perfdata_msg },
+  { "status_update_interval",                      deprecated::status_file_usage_msg },
+  { "temp_file",                                   deprecated::default_msg },
+  { "temp_path",                                   deprecated::default_msg },
   // XXX { "translate_passive_host_checks",               SETTER(bool, _set_translate_passive_host_checks) },
-  { "use_aggressive_host_checking",                default_msg },
-  { "use_agressive_host_checking",                 default_msg },
-  { "use_check_result_path",                       check_result_path_msg },
-  { "use_embedded_perl_implicitly",                embedded_perl_msg },
-  { "use_large_installation_tweaks",               engine_performance_msg },
-  { "use_regexp_matching",                         default_msg },
-  { "use_retained_program_state",                  retention_usage_msg },
-  { "use_retained_scheduling_info",                retention_usage_msg },
-  { "use_true_regexp_matching",                    default_msg },
-  { "xcddefault_comment_file",                     status_file_usage_msg },
-  { "xdddefault_downtime_file",                    status_file_usage_msg }
+  { "use_aggressive_host_checking",                deprecated::default_msg },
+  { "use_agressive_host_checking",                 deprecated::default_msg },
+  { "use_check_result_path",                       deprecated::check_result_path_msg },
+  { "use_embedded_perl_implicitly",                deprecated::embedded_perl_msg },
+  { "use_large_installation_tweaks",               deprecated::engine_performance_msg },
+  { "use_regexp_matching",                         deprecated::default_msg },
+  { "use_retained_program_state",                  deprecated::retention_usage_msg },
+  { "use_retained_scheduling_info",                deprecated::retention_usage_msg },
+  { "use_true_regexp_matching",                    deprecated::default_msg },
+  { "xcddefault_comment_file",                     deprecated::status_file_usage_msg },
+  { "xdddefault_downtime_file",                    deprecated::status_file_usage_msg }
 };
 
 // Default values.
@@ -283,7 +236,7 @@ static long const                      default_ochp_timeout(15);
 static std::string const               default_ocsp_command("");
 static long const                      default_ocsp_timeout(15);
 static bool const                      default_passive_host_checks_are_soft(false);
-static long const                      default_retention_update_interval(60);
+static long const                      default_retention_update_interval(3600);
 static long const                      default_service_check_timeout(60);
 static long const                      default_service_freshness_check_interval(60);
 static float const                     default_sleep_time(0.1);
