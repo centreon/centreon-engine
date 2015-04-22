@@ -246,34 +246,33 @@ int get_raw_command_line_r(
 /******************** SIGNAL HANDLER FUNCTIONS ********************/
 /******************************************************************/
 
-/* trap signals so we can exit gracefully */
+/**
+ *  Trap some common signals so we can exit gracefully.
+ */
 void setup_sighandler() {
-  /* remove buffering from stderr, stdin, and stdout */
+  // Remove buffering from stderr, stdin, and stdout.
   setbuf(stdin, (char*)NULL);
   setbuf(stdout, (char*)NULL);
   setbuf(stderr, (char*)NULL);
 
-  /* initialize signal handling */
+  // Initialize signal handling.
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sighandler);
   signal(SIGHUP, sighandler);
-  return;
+
+  return ;
 }
 
-/* handle signals */
+/**
+ *  Handle signals.
+ *
+ *  @param[in] sig  Signal number.
+ */
 void sighandler(int sig) {
-  caught_signal = true;
-
-  if (sig < 0)
-    sig = -sig;
-
-  int const sigs_size(sizeof(sigs) / sizeof(sigs[0]) - 1);
-  sig_id = sig % sigs_size;
-
-  /* we received a SIGHUP */
-  if (sig_id == SIGHUP)
+  // We received a SIGHUP.
+  if (sig == SIGHUP)
     sighup = true;
-  /* else begin shutting down... */
+  // Else begin shutting down...
   else
     sigshutdown = true;
   return;

@@ -416,7 +416,7 @@ int main(int argc, char* argv[]) {
 
         if (sigshutdown)
           logger(logging::log_process_info, logging::basic)
-            << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
+            << "Caught some termination signal, shutting down ...";
 
         // Send program data to broker.
         broker_program_state(
@@ -435,11 +435,24 @@ int main(int argc, char* argv[]) {
         retention::dump::save(::config->state_retention_file());
 
         // Shutdown stuff.
-        if (sigshutdown)
+        if (sigshutdown) {
           logger(logging::log_process_info, logging::basic)
             << "Successfully shutdown ... (PID=" << getpid() << ")";
-
-        retval = EXIT_SUCCESS;
+          if (sigrestart) {
+            logger(logging::log_process_info, logging::basic)
+              << "Attempting to restart...";
+            execvp(argv[0], argv);
+            execvp("centengine", argv);
+            logger(logging::log_runtime_error, logging::basic)
+              << "Restart failed, neither original path nor"
+              << "'centengine' allowed a succesful execution";
+            retval = EXIT_FAILURE;
+          }
+          else
+            retval = EXIT_SUCCESS;
+        }
+        else
+          retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {
         // Log.

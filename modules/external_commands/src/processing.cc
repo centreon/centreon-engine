@@ -48,6 +48,12 @@ processing::processing() {
   _lst_command["RESTART_PROCESS"] =
     command_info(CMD_RESTART_PROCESS,
                  &_redirector<&cmd_signal_process>);
+  _lst_command["RELOAD_PROGRAM"] =
+    command_info(CMD_RELOAD_PROCESS,
+                 &_redirector<&cmd_signal_process>);
+  _lst_command["RELOAD_PROCESS"] =
+    command_info(CMD_RELOAD_PROCESS,
+                 &_redirector<&cmd_signal_process>);
   _lst_command["SAVE_STATE_INFORMATION"] =
     command_info(CMD_SAVE_STATE_INFORMATION,
                  &_redirector<&_wrapper_save_state_information>);

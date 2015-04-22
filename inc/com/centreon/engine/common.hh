@@ -101,6 +101,7 @@
 #  define CMD_CHANGE_RETRY_HOST_CHECK_INTERVAL               158
 #  define CMD_CHANGE_HOST_MODATTR                            165
 #  define CMD_CHANGE_SVC_MODATTR                             166
+#  define CMD_RELOAD_PROCESS                                 200
 #  define CMD_CUSTOM_COMMAND                                 999
 
 /* Service check types. */

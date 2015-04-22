@@ -52,6 +52,20 @@ add_executable("${TEST_NAME}"
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
+# Test calling reload_program.
+set(TEST_NAME "modules_external_commands_reload_program")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/reload_program.cc")
+target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+# Test calling reload_process.
+set(TEST_NAME "modules_external_commands_reload_process")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/reload_process.cc")
+target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
 # Test calling save_state_information.
 set(TEST_NAME "modules_external_commands_save_state_information")
 add_executable("${TEST_NAME}"

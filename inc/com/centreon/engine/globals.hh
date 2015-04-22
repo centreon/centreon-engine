@@ -65,16 +65,9 @@ extern unsigned long             modified_service_process_attributes;
 extern unsigned long             next_event_id;
 extern unsigned long             next_problem_id;
 
-extern int                       sighup;
-extern int                       sigshutdown;
-extern int                       sigrestart;
-
-extern char const*               sigs[35];
-
-extern int                       caught_signal;
-extern int                       sig_id;
-
-extern int                       restarting;
+extern bool                      sighup;
+extern bool                      sigshutdown;
+extern bool                      sigrestart;
 
 extern int                       verify_config;
 extern int                       verify_circular_paths;

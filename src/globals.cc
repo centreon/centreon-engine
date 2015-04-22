@@ -28,16 +28,6 @@ configuration::state* config(NULL);
 events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
 
-char const*         sigs[] = {
-  "EXIT", "HUP", "INT", "QUIT", "ILL",
-  "TRAP", "ABRT", "BUS", "FPE", "KILL",
-  "USR1", "SEGV", "USR2", "PIPE", "ALRM",
-  "TERM", "STKFLT", "CHLD", "CONT", "STOP",
-  "TSTP", "TTIN", "TTOU", "URG", "XCPU",
-  "XFSZ", "VTALRM", "PROF", "WINCH", "IO",
-  "PWR", "UNUSED", "ZERR", "DEBUG", NULL
-};
-
 FILE*               debug_file_fp(NULL);
 char*               command_file(NULL);
 char*               config_file(NULL);
@@ -71,17 +61,14 @@ hostdependency*     hostdependency_list(NULL);
 hostdependency*     hostdependency_list_tail(NULL);
 int                 __nagios_object_structure_version(CURRENT_OBJECT_STRUCTURE_VERSION);
 int                 additional_freshness_latency(15);
-int                 caught_signal(false);
 int                 command_check_interval(-1);
 int                 config_errors(0);
 int                 config_warnings(0);
 int                 external_command_buffer_slots(4096);
 int                 log_host_retries(false);
-int                 restarting(false);
-int                 sig_id(0);
-int                 sighup(true);
-int                 sigrestart(false);
-int                 sigshutdown(false);
+bool                sighup(true);
+bool                sigrestart(false);
+bool                sigshutdown(false);
 int                 test_scheduling(false);
 int                 verify_circular_paths(true);
 int                 verify_config(false);

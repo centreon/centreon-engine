@@ -85,38 +85,61 @@ static void _exec_event_command_check(timed_event* event) {
 /**
  *  Execute program shutdown.
  *
- *  @param[in] event The event to execute.
+ *  @param[in] event  Unused.
  */
 static void _exec_event_program_shutdown(timed_event* event) {
   (void)event;
   logger(dbg_events, basic)
     << "** Program Shutdown Event";
 
-  // set the shutdown flag.
+  // Will shutdown process.
   sigshutdown = true;
 
-  // log the shutdown.
+  // Log the shutdown.
   logger(log_process_info, basic)
     << "PROGRAM_SHUTDOWN event encountered, shutting down...";
+
   return;
 }
 
 /**
  *  Execute program restart.
  *
- *  @param[in] event The event to execute.
+ *  @param[in] event  Unused.
  */
 static void _exec_event_program_restart(timed_event* event) {
   (void)event;
   logger(dbg_events, basic)
     << "** Program Restart Event";
 
-  // reload configuration.
+  // Will restart process.
+  sigshutdown = true;
+  sigrestart = true;
+
+  // Log the restart.
+  logger(log_process_info, basic)
+    << "PROGRAM_RESTART event encountered, shutting down...";
+
+  return ;
+}
+
+/**
+ *  Execute program reload.
+ *
+ *  @param[in] event  Unused.
+ */
+static void _exec_event_program_reload(timed_event* event) {
+  (void)event;
+  logger(dbg_events, basic)
+    << "** Program Reload Event";
+
+  // Will reload configuration.
   sighup = true;
 
-  // log the restart.
+  // Log the reload.
   logger(log_process_info, basic)
-    << "PROGRAM_RESTART event encountered, restarting...";
+    << "PROGRAM_RELOAD event encountered, reloading configuration...";
+
   return;
 }
 
@@ -560,6 +583,7 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_host_check,
     &_exec_event_hfreshness_check,
     &_exec_event_reschedule_checks,
+    &_exec_event_program_reload,
     NULL
   };
 
@@ -827,7 +851,8 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_SFRESHNESS_CHECK",
     "EVENT_HOST_CHECK",
     "EVENT_HFRESHNESS_CHECK",
-    "EVENT_RESCHEDULE_CHECKS"
+    "EVENT_RESCHEDULE_CHECKS",
+    "EVENT_PROGRAM_RELOAD"
   };
 
   if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
