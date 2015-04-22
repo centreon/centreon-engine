@@ -28,6 +28,7 @@ set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+set(CONF_DIR "${PROJECT_SOURCE_DIR}/conf")
 include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
 
@@ -144,7 +145,7 @@ endif ()
 #
 
 # Enable or disable installation.
-option(WITH_CREATE_FILES "Create centreon-engine files." ON)
+option(WITH_CREATE_FILES "Create Centreon Engine files." ON)
 set(CREATE_FILES "${WITH_CREATE_FILES}")
 
 # Main directory.
@@ -389,13 +390,10 @@ endif ()
 # Locations definitions
 add_definitions(-DDEFAULT_STATUS_FILE="${VAR_DIR}/status.dat")
 add_definitions(-DDEFAULT_LOG_FILE="${VAR_DIR}/centengine.log")
-add_definitions(-DDEFAULT_LOG_ARCHIVE_PATH="${LOG_ARCHIVE_DIR}")
 add_definitions(-DDEFAULT_DEBUG_FILE="${VAR_DIR}/centengine.debug")
 add_definitions(-DDEFAULT_RETENTION_FILE="${VAR_DIR}/retention.dat")
 add_definitions(-DDEFAULT_COMMAND_FILE="${RW_DIR}/centengine.cmd")
 add_definitions(-DDEFAULT_CONFIG_FILE="${PREFIX_CONF}/centengine.cfg")
-add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${VAR_DIR}/objects.cache")
-add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 
 # Add specific linker flags for Mac OS to build correctly shared libraries.
 if (APPLE)
@@ -461,7 +459,6 @@ set(
 # Subdirectories with core features.
 add_subdirectory("broker")
 add_subdirectory("checks")
-add_subdirectory("conf")
 add_subdirectory("configuration")
 add_subdirectory("commands")
 add_subdirectory("compatibility")
@@ -550,7 +547,7 @@ if (CREATE_FILES)
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${CMAKE_INSTALL_PREFIX}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_BIN}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/objects\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}/centreon.d\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_INC}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_LIB}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}\")
@@ -567,8 +564,6 @@ if (CREATE_FILES)
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/centengine.log\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/centengine.debug\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/retention.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.cache\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.precache\")
   ")
 endif ()
 
@@ -579,6 +574,13 @@ install(DIRECTORY "${INC_DIR}/"
   FILES_MATCHING PATTERN "*.hh"
   PATTERN "${INC_DIR}/compatibility/" EXCLUDE
 )
+
+# Install configuration file.
+configure_file("${CONF_DIR}/centengine.cfg.in"
+  "${CONF_DIR}/centengine.cfg")
+install(FILES "${CONF_DIR}/centengine.cfg"
+  DESTINATION "${PREFIX_CONF}"
+  COMPONENT "runtime")
 
 #
 # Packaging.
