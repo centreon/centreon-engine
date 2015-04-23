@@ -520,7 +520,7 @@ command_line This directive is used to define what is actually executed by Centr
 
                 You may not include a semicolon (;) in the command_line directive, because everything after it will be ignored as a config file
                 comment. You can work around this limitation by setting one of the :ref:`$USER$ <user_configuration_macros_misc>` macros in your
-                :ref:`resource file <main_cfg_opt_resource_file>` to a semicolon and then referencing the appropriate $USER$ macro in the
+                main configuration file to a semicolon and then referencing the appropriate $USER$ macro in the
                 command_line directive in place of the semicolon.If you want to pass arguments to commands during runtime, you can use
                 :ref:`$ARGn$ macros <user_configuration_macros_misc>` in the command_line directive of the command definition and then separate
                 individual arguments from the command name (and from each other) using bang (!) characters in the object definition directive

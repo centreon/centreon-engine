@@ -6551,17 +6551,7 @@ int read_main_config_file(char const* main_config_file) {
 
     /* process the variable/value */
 
-    if(!strcmp(variable,"resource_file")){
-
-      /* save the macro */
-      delete[] macro_x[MACRO_RESOURCEFILE];
-      macro_x[MACRO_RESOURCEFILE]=(char *)string::dup(value);
-
-      /* process the resource file */
-      // read_resource_file(value);
-    }
-
-    else if(!strcmp(variable,"log_file")){
+    if(!strcmp(variable,"log_file")){
 
       if(strlen(value)>MAX_FILENAME_LENGTH-1){
         if (asprintf(&error_message,"Log file is too long")) {}

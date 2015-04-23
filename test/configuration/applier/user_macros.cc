@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/parser.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -28,85 +29,78 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-static std::string write_config_file(std::string const& resource_file) {
+/**
+ *  Write a configuration file that contains user-defined macros.
+ *
+ *  @return Path to the generated file.
+ */
+static std::string write_config_file() {
   std::string filename(io::file_stream::temp_path());
-
   io::file_stream fs;
   fs.open(filename, "w");
-  std::string data("resource_file=" + resource_file + "\n");
+  std::string data;
+  {
+    std::ostringstream oss;
+    for (int i(1); i <= MAX_USER_MACROS; ++i)
+      oss << "$USER" << i << "$=resource_" << i << "\n";
+    data = oss.str();
+  }
   fs.write(data.c_str(), data.size());
   fs.close();
   return (filename);
 }
-
-static std::string write_resource_file() {
-  std::ostringstream oss;
-  for (unsigned int i(0); i < MAX_USER_MACROS - 1; ++i)
-    oss << "$USER" << (i + 1) << "$=resource_" << (i + 1) << "\n";
-
-  std::string filename(io::file_stream::temp_path());
-
-  io::file_stream fs;
-  fs.open(filename, "w");
-  std::string const& data(oss.str());
-  fs.write(data.c_str(), data.size());
-  fs.close();
-  return (filename);
-}
-
 
 /**
  *  Check if the configuration parser and applier works properly
  *  for the user macros.
  *
- *  @return 0 on success.
+ *  @return EXIT_SUCCESS on success.
  */
 int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  std::string resource_file(write_resource_file());
-  std::string config_file(write_config_file(resource_file));
+  // Generate config file.
+  std::string config_file(write_config_file());
 
   try {
+    // Parse and apply configuration on objects.
     configuration::state cfg;
-
-    // tricks to bypass create log file.
-    cfg.log_file("");
-
+    cfg.log_file(""); // Trick to bypass log file creation.
     configuration::parser p;
     p.parse(config_file, cfg);
-
     configuration::applier::state::instance().apply(cfg);
 
+    // Check that macros exist and have proper content.
     std::vector<std::string> const& users(cfg.user());
-    for (unsigned int i(0); i < MAX_USER_MACROS - 1; ++i) {
-      if (!macro_user[i] || macro_user[i] != users[i])
-        throw (engine_error() << "apply configuration resources "
-               "failed: global macro_user[" << i << "] is not equal "
-               "to configuration::state::user[" << i << "]");
+    for (int i(0); i < MAX_USER_MACROS; ++i) {
+      if (!macro_user[i] || (macro_user[i] != users[i]))
+        throw (engine_error()
+               << "user-defined macros application failed: "
+                  "global macro_user[" << i << "] is not equal "
+                  "to configuration::state::user[" << i << "] "
+               << "($USER" << i + 1 << "$)");
       std::ostringstream oss;
       oss << "resource_" << (i + 1);
       if (users[i] != oss.str())
-        throw (engine_error() << "parse configuration resources "
-               "failed: invalid data into configuration::state::user["
-               << i << "]: value = '" << users[i] << "'");
+        throw (engine_error() << "user-defined macros parsing failed: "
+                  "invalid data into configuration::state::user["
+               << i << "]: got '" << users[i] << "', expected '"
+               << oss.str() << "' ($USER" << i + 1 << "$)");
     }
   }
   catch (...) {
     io::file_stream::remove(config_file);
-    io::file_stream::remove(resource_file);
-    throw;
+    throw ;
   }
   io::file_stream::remove(config_file);
-  io::file_stream::remove(resource_file);
   return (0);
 }
 
 /**
  *  Init unit test.
  */
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }

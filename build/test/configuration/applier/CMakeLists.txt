@@ -23,9 +23,15 @@ set(TEST_DIR "${TEST_DIR}/applier")
 ## check compatibility configuration path.
 set(CONF_DIR "${TEST_DIR}/etc")
 
-# parse_and_apply_configuration_resource
-set(TEST_NAME "parse_and_apply_configuration_resource")
-add_executable("${TEST_NAME}" "${TEST_DIR}/resource.cc")
+# parse_and_apply_configuration_user_macros
+set(TEST_NAME "parse_and_apply_configuration_user_macros")
+add_executable("${TEST_NAME}" "${TEST_DIR}/user_macros.cc")
+target_link_libraries("${TEST_NAME}" "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+# parse_and_apply_configuration_include
+set(TEST_NAME "parse_and_apply_configuration_include")
+add_executable("${TEST_NAME}" "${TEST_DIR}/include.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 

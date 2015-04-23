@@ -39,6 +39,7 @@ namespace                    configuration {
     extern char const* const notification_msg;
     extern char const* const passive_host_checks_msg;
     extern char const* const perfdata_msg;
+    extern char const* const resource_file_msg;
     extern char const* const retention_usage_msg;
     extern char const* const startup_script_msg;
     extern char const* const status_file_usage_msg;

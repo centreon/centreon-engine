@@ -67,6 +67,8 @@ namespace                           configuration {
     void                            cached_service_check_horizon(duration const& value);
     std::list<std::string> const&   cfg_dir() const throw ();
     std::list<std::string> const&   cfg_file() const throw ();
+    std::list<std::string>&         cfg_include() throw ();
+    std::list<std::string> const&   cfg_include() const throw ();
     std::string const&              cfg_main() const throw ();
     void                            cfg_main(std::string const& value);
     bool                            check_host_freshness() const throw ();
@@ -167,8 +169,6 @@ namespace                           configuration {
     void                            ocsp_command(std::string const& value);
     duration const&                 ocsp_timeout() const throw ();
     void                            ocsp_timeout(duration const& value);
-    std::list<std::string> const&   resource_file() const throw ();
-    void                            resource_file(std::list<std::string> const& value);
     duration const&                 retention_update_interval() const throw ();
     void                            retention_update_interval(duration const& value);
     set_servicedependency const&    servicedependencies() const throw ();
@@ -269,8 +269,8 @@ namespace                           configuration {
     void                            _set_broker_module(std::string const& value);
     void                            _set_cfg_dir(std::string const& value);
     void                            _set_cfg_file(std::string const& value);
+    void                            _set_cfg_include(std::string const& value);
     void                            _set_event_broker_options(std::string const& value);
-    void                            _set_resource_file(std::string const& value);
 
     duration                        _additional_freshness_latency;
     std::list<std::string>          _broker_module;
@@ -279,6 +279,7 @@ namespace                           configuration {
     duration                        _cached_service_check_horizon;
     std::list<std::string>          _cfg_dir;
     std::list<std::string>          _cfg_file;
+    std::list<std::string>          _cfg_include;
     std::string                     _cfg_main;
     bool                            _check_host_freshness;
     duration                        _check_reaper_interval;
@@ -326,7 +327,6 @@ namespace                           configuration {
     duration                        _ochp_timeout;
     std::string                     _ocsp_command;
     duration                        _ocsp_timeout;
-    std::list<std::string>          _resource_file;
     duration                        _retention_update_interval;
     set_servicedependency           _servicedependencies;
     set_service                     _services;

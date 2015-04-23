@@ -39,8 +39,6 @@ void applier::macros::apply(state& config) {
   _set_macro(MACRO_COMMANDFILE, config.command_file());
   _set_macro(MACRO_LOGFILE, config.log_file());
   _set_macro(MACRO_MAINCONFIGFILE, config.cfg_main());
-  if (config.resource_file().size() > 0)
-    _set_macro(MACRO_RESOURCEFILE, config.resource_file().front());
   _set_macro(MACRO_STATUSDATAFILE, config.status_file());
 
   std::vector<std::string> const& users(config.user());
@@ -96,7 +94,6 @@ applier::macros::~macros() throw() {
   delete[] _mac->x[MACRO_LOGFILE];
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   delete[] _mac->x[MACRO_PROCESSSTARTTIME];
-  delete[] _mac->x[MACRO_RESOURCEFILE];
   delete[] _mac->x[MACRO_RETENTIONDATAFILE];
   delete[] _mac->x[MACRO_STATUSDATAFILE];
 

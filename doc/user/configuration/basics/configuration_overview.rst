@@ -30,17 +30,6 @@ want to get started in your configuration adventures.
 Documentation for the main configuration file can be found
 :ref:`here <main_cfg_opt>`.
 
-Resource File(s)
-================
-
-Resource files can be used to store user-defined macros. The main point
-of having resource files is to use them to store sensitive configuration
-information (like passwords).
-
-You can specify one or more optional resource files by using the
-:ref:`resource_file <main_cfg_opt_resource_file>` directive in your main
-configuration file.
-
 Object
 ======
 

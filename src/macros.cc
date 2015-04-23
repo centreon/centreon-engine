@@ -370,7 +370,6 @@ int init_macrox_names() {
   add_macrox_name(STATUSDATAFILE);
   add_macrox_name(RETENTIONDATAFILE);
   add_macrox_name(LOGFILE);
-  add_macrox_name(RESOURCEFILE);
   add_macrox_name(COMMANDFILE);
   add_macrox_name(TOTALHOSTSUP);
   add_macrox_name(TOTALHOSTSDOWN);
@@ -451,7 +450,6 @@ void copy_constant_macros(char** dest) {
   cp_macro(STATUSDATAFILE);
   cp_macro(RETENTIONDATAFILE);
   cp_macro(LOGFILE);
-  cp_macro(RESOURCEFILE);
   cp_macro(COMMANDFILE);
   cp_macro(PROCESSSTARTTIME);
   cp_macro(EVENTSTARTTIME);
@@ -472,7 +470,6 @@ int clear_volatile_macros_r(nagios_macros* mac) {
     case MACRO_STATUSDATAFILE:
     case MACRO_RETENTIONDATAFILE:
     case MACRO_LOGFILE:
-    case MACRO_RESOURCEFILE:
     case MACRO_COMMANDFILE:
     case MACRO_PROCESSSTARTTIME:
     case MACRO_EVENTSTARTTIME:

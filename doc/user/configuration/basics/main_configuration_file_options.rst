@@ -93,25 +93,6 @@ processed.
             cfg_dir=/etc/centreon-engine/hosts
 =========== =====================================
 
-.. _main_cfg_opt_resource_file:
-
-Resource File
--------------
-
-This is used to specify an optional resource file that can contain
-$USERn$ :ref:`macro <understanding_macros>` definitions. $USERn$ macros
-are useful for storing usernames, passwords, and items commonly used in
-command definitions (like directory paths). You can include multiple
-resource files by adding multiple resource_file statements to the main
-config file - Centreon Engine will process them all. See the sample
-resource.cfg file in the ``sample-config/`` subdirectory of the Centreon
-Engine distribution for an example of how to define $USERn$ macros.
-
-=========== ===============================================
-**Format**  resource_file=<file_name>
-**Example** resource_file=/etc/centreon-engine/resource.cfg
-=========== ===============================================
-
 .. _main_cfg_opt_status_file:
 
 Status File

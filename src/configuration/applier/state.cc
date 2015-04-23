@@ -645,7 +645,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->ochp_timeout(new_cfg.ochp_timeout());
   config->ocsp_command(new_cfg.ocsp_command());
   config->ocsp_timeout(new_cfg.ocsp_timeout());
-  config->resource_file(new_cfg.resource_file());
   config->retention_update_interval(new_cfg.retention_update_interval());
   config->service_check_timeout(new_cfg.service_check_timeout());
   config->service_freshness_check_interval(new_cfg.service_freshness_check_interval());

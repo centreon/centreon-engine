@@ -163,7 +163,6 @@ Macro Name             Service Checks Host Checks Service Event Handlers and OCS
 `STATUSDATAFILE`_      **Yes**        **Yes**     **Yes**                         **Yes**
 `RETENTIONDATAFILE`_   **Yes**        **Yes**     **Yes**                         **Yes**
 `LOGFILE`_             **Yes**        **Yes**     **Yes**                         **Yes**
-`RESOURCEFILE`_        **Yes**        **Yes**     **Yes**                         **Yes**
 `COMMANDFILE`_         **Yes**        **Yes**     **Yes**                         **Yes**
 ====================== ============== =========== =============================== ============================
 
@@ -354,7 +353,6 @@ _`MAINCONFIGFILE`      The location of the :ref:`main config file <main_cfg_opt>
 _`STATUSDATAFILE`      The location of the :ref:`status data file <main_cfg_opt_status_file>`.
 _`RETENTIONDATAFILE`   The location of the :ref:`retention data file <main_cfg_opt_state_retention_file>`.
 _`LOGFILE`             The location of the :ref:`log file <main_cfg_opt_log_file>`.
-_`RESOURCEFILE`        The location of the :ref:`resource file <main_cfg_opt_resource_file>`.
 _`COMMANDFILE`         The location of the :ref:`command file <main_cfg_opt_external_command_file>`.
 ====================== ==================================================================================================================================
 
@@ -370,8 +368,7 @@ _`EVENTSTARTTIME`   Time stamp in time_t format (seconds since the UNIX epoch) i
                     from $EVENTSTARTTIME$.
 _`ARGn`             The nth argument passed to the command (event handler, service check, etc.). Centreon Engine supports up to 32 argument macros
                     ($ARG1$ through $ARG32$).
-_`USERn`            The nth user-definable macro. User macros can be defined in one or more :ref:`resource files <main_cfg_opt_resource_file>`.
-                    Centreon Engine supports up to 256 user macros ($USER1$ through $USER256$).
+_`USERn`            The nth user-definable macro.
 =================== =====================================================================================================================================
 
 Notes

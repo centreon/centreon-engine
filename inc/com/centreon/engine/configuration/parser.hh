@@ -83,10 +83,12 @@ namespace              configuration {
                          std::set<shared_ptr<T> >& to);
     std::string const& _map_object_type(
                          map_object const& objects) const throw ();
-    void               _parse_directory_configuration(std::string const& path);
-    void               _parse_global_configuration(std::string const& path);
+    void               _parse_directory_configuration(
+                         std::string const& path);
+    void               _parse_global_configuration(
+                         std::string const& path,
+                         bool is_main_file);
     void               _parse_object_definitions(std::string const& path);
-    void               _parse_resource_file(std::string const& path);
     void               _resolve_template();
     void               _store_into_list(object_ptr obj);
     template<typename T, std::string const& (T::*ptr)() const throw ()>

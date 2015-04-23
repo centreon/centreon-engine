@@ -32,6 +32,21 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
 
+/**
+ *  Use for user-defined macros.
+ *
+ *  @param[out] obj       Configuration state.
+ *  @param[in]  variable  Variable name.
+ *  @param[in]  value     Variable value.
+ */
+static bool set_user_helper(
+              state& obj,
+              char const* variable,
+              char const* value) {
+  obj.user(variable, value);
+  return (true);
+}
+
 #define SETTER(type, method) \
   &state::setter<type, &state::method>::generic
 
@@ -43,6 +58,7 @@ state::setters const state::_setters[] = {
   { "cached_service_check_horizon",                SETTER(duration const&, cached_service_check_horizon) },
   { "cfg_dir",                                     SETTER(std::string const&, _set_cfg_dir) },
   { "cfg_file",                                    SETTER(std::string const&, _set_cfg_file) },
+  { "cfg_include",                                 SETTER(std::string const&, _set_cfg_include) },
   { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
   { "check_result_reaper_frequency",               SETTER(duration const&, check_reaper_interval) },
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
@@ -85,7 +101,6 @@ state::setters const state::_setters[] = {
   { "ochp_timeout",                                SETTER(duration const&, ochp_timeout) },
   { "ocsp_command",                                SETTER(std::string const&, ocsp_command) },
   { "ocsp_timeout",                                SETTER(duration const&, ocsp_timeout) },
-  { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
   { "retention_update_interval",                   SETTER(duration const&, retention_update_interval) },
   { "service_check_timeout",                       SETTER(duration const&, service_check_timeout) },
   { "service_freshness_check_interval",            SETTER(duration const&, service_freshness_check_interval) },
@@ -98,7 +113,263 @@ state::setters const state::_setters[] = {
   { "timezone",                                    SETTER(std::string const&, use_timezone) },
   { "use_setpgid",                                 SETTER(bool, use_setpgid) },
   { "use_syslog",                                  SETTER(bool, use_syslog) },
-  { "use_timezone",                                SETTER(std::string const&, use_timezone) }
+  { "use_timezone",                                SETTER(std::string const&, use_timezone) },
+  { "$USER1$",                                     &set_user_helper },
+  { "$USER2$",                                     &set_user_helper },
+  { "$USER3$",                                     &set_user_helper },
+  { "$USER4$",                                     &set_user_helper },
+  { "$USER5$",                                     &set_user_helper },
+  { "$USER6$",                                     &set_user_helper },
+  { "$USER7$",                                     &set_user_helper },
+  { "$USER8$",                                     &set_user_helper },
+  { "$USER9$",                                     &set_user_helper },
+  { "$USER10$",                                    &set_user_helper },
+  { "$USER11$",                                    &set_user_helper },
+  { "$USER12$",                                    &set_user_helper },
+  { "$USER13$",                                    &set_user_helper },
+  { "$USER14$",                                    &set_user_helper },
+  { "$USER15$",                                    &set_user_helper },
+  { "$USER16$",                                    &set_user_helper },
+  { "$USER17$",                                    &set_user_helper },
+  { "$USER18$",                                    &set_user_helper },
+  { "$USER19$",                                    &set_user_helper },
+  { "$USER20$",                                    &set_user_helper },
+  { "$USER21$",                                    &set_user_helper },
+  { "$USER22$",                                    &set_user_helper },
+  { "$USER23$",                                    &set_user_helper },
+  { "$USER24$",                                    &set_user_helper },
+  { "$USER25$",                                    &set_user_helper },
+  { "$USER26$",                                    &set_user_helper },
+  { "$USER27$",                                    &set_user_helper },
+  { "$USER28$",                                    &set_user_helper },
+  { "$USER29$",                                    &set_user_helper },
+  { "$USER30$",                                    &set_user_helper },
+  { "$USER31$",                                    &set_user_helper },
+  { "$USER32$",                                    &set_user_helper },
+  { "$USER33$",                                    &set_user_helper },
+  { "$USER34$",                                    &set_user_helper },
+  { "$USER35$",                                    &set_user_helper },
+  { "$USER36$",                                    &set_user_helper },
+  { "$USER37$",                                    &set_user_helper },
+  { "$USER38$",                                    &set_user_helper },
+  { "$USER39$",                                    &set_user_helper },
+  { "$USER40$",                                    &set_user_helper },
+  { "$USER41$",                                    &set_user_helper },
+  { "$USER42$",                                    &set_user_helper },
+  { "$USER43$",                                    &set_user_helper },
+  { "$USER44$",                                    &set_user_helper },
+  { "$USER45$",                                    &set_user_helper },
+  { "$USER46$",                                    &set_user_helper },
+  { "$USER47$",                                    &set_user_helper },
+  { "$USER48$",                                    &set_user_helper },
+  { "$USER49$",                                    &set_user_helper },
+  { "$USER50$",                                    &set_user_helper },
+  { "$USER51$",                                    &set_user_helper },
+  { "$USER52$",                                    &set_user_helper },
+  { "$USER53$",                                    &set_user_helper },
+  { "$USER54$",                                    &set_user_helper },
+  { "$USER55$",                                    &set_user_helper },
+  { "$USER56$",                                    &set_user_helper },
+  { "$USER57$",                                    &set_user_helper },
+  { "$USER58$",                                    &set_user_helper },
+  { "$USER59$",                                    &set_user_helper },
+  { "$USER60$",                                    &set_user_helper },
+  { "$USER61$",                                    &set_user_helper },
+  { "$USER62$",                                    &set_user_helper },
+  { "$USER63$",                                    &set_user_helper },
+  { "$USER64$",                                    &set_user_helper },
+  { "$USER65$",                                    &set_user_helper },
+  { "$USER66$",                                    &set_user_helper },
+  { "$USER67$",                                    &set_user_helper },
+  { "$USER68$",                                    &set_user_helper },
+  { "$USER69$",                                    &set_user_helper },
+  { "$USER70$",                                    &set_user_helper },
+  { "$USER71$",                                    &set_user_helper },
+  { "$USER72$",                                    &set_user_helper },
+  { "$USER73$",                                    &set_user_helper },
+  { "$USER74$",                                    &set_user_helper },
+  { "$USER75$",                                    &set_user_helper },
+  { "$USER76$",                                    &set_user_helper },
+  { "$USER77$",                                    &set_user_helper },
+  { "$USER78$",                                    &set_user_helper },
+  { "$USER79$",                                    &set_user_helper },
+  { "$USER80$",                                    &set_user_helper },
+  { "$USER81$",                                    &set_user_helper },
+  { "$USER82$",                                    &set_user_helper },
+  { "$USER83$",                                    &set_user_helper },
+  { "$USER84$",                                    &set_user_helper },
+  { "$USER85$",                                    &set_user_helper },
+  { "$USER86$",                                    &set_user_helper },
+  { "$USER87$",                                    &set_user_helper },
+  { "$USER88$",                                    &set_user_helper },
+  { "$USER89$",                                    &set_user_helper },
+  { "$USER90$",                                    &set_user_helper },
+  { "$USER91$",                                    &set_user_helper },
+  { "$USER92$",                                    &set_user_helper },
+  { "$USER93$",                                    &set_user_helper },
+  { "$USER94$",                                    &set_user_helper },
+  { "$USER95$",                                    &set_user_helper },
+  { "$USER96$",                                    &set_user_helper },
+  { "$USER97$",                                    &set_user_helper },
+  { "$USER98$",                                    &set_user_helper },
+  { "$USER99$",                                    &set_user_helper },
+  { "$USER100$",                                   &set_user_helper },
+  { "$USER101$",                                   &set_user_helper },
+  { "$USER102$",                                   &set_user_helper },
+  { "$USER103$",                                   &set_user_helper },
+  { "$USER104$",                                   &set_user_helper },
+  { "$USER105$",                                   &set_user_helper },
+  { "$USER106$",                                   &set_user_helper },
+  { "$USER107$",                                   &set_user_helper },
+  { "$USER108$",                                   &set_user_helper },
+  { "$USER109$",                                   &set_user_helper },
+  { "$USER110$",                                   &set_user_helper },
+  { "$USER111$",                                   &set_user_helper },
+  { "$USER112$",                                   &set_user_helper },
+  { "$USER113$",                                   &set_user_helper },
+  { "$USER114$",                                   &set_user_helper },
+  { "$USER115$",                                   &set_user_helper },
+  { "$USER116$",                                   &set_user_helper },
+  { "$USER117$",                                   &set_user_helper },
+  { "$USER118$",                                   &set_user_helper },
+  { "$USER119$",                                   &set_user_helper },
+  { "$USER120$",                                   &set_user_helper },
+  { "$USER121$",                                   &set_user_helper },
+  { "$USER122$",                                   &set_user_helper },
+  { "$USER123$",                                   &set_user_helper },
+  { "$USER124$",                                   &set_user_helper },
+  { "$USER125$",                                   &set_user_helper },
+  { "$USER126$",                                   &set_user_helper },
+  { "$USER127$",                                   &set_user_helper },
+  { "$USER128$",                                   &set_user_helper },
+  { "$USER129$",                                   &set_user_helper },
+  { "$USER130$",                                   &set_user_helper },
+  { "$USER131$",                                   &set_user_helper },
+  { "$USER132$",                                   &set_user_helper },
+  { "$USER133$",                                   &set_user_helper },
+  { "$USER134$",                                   &set_user_helper },
+  { "$USER135$",                                   &set_user_helper },
+  { "$USER136$",                                   &set_user_helper },
+  { "$USER137$",                                   &set_user_helper },
+  { "$USER138$",                                   &set_user_helper },
+  { "$USER139$",                                   &set_user_helper },
+  { "$USER140$",                                   &set_user_helper },
+  { "$USER141$",                                   &set_user_helper },
+  { "$USER142$",                                   &set_user_helper },
+  { "$USER143$",                                   &set_user_helper },
+  { "$USER144$",                                   &set_user_helper },
+  { "$USER145$",                                   &set_user_helper },
+  { "$USER146$",                                   &set_user_helper },
+  { "$USER147$",                                   &set_user_helper },
+  { "$USER148$",                                   &set_user_helper },
+  { "$USER149$",                                   &set_user_helper },
+  { "$USER150$",                                   &set_user_helper },
+  { "$USER151$",                                   &set_user_helper },
+  { "$USER152$",                                   &set_user_helper },
+  { "$USER153$",                                   &set_user_helper },
+  { "$USER154$",                                   &set_user_helper },
+  { "$USER155$",                                   &set_user_helper },
+  { "$USER156$",                                   &set_user_helper },
+  { "$USER157$",                                   &set_user_helper },
+  { "$USER158$",                                   &set_user_helper },
+  { "$USER159$",                                   &set_user_helper },
+  { "$USER160$",                                   &set_user_helper },
+  { "$USER161$",                                   &set_user_helper },
+  { "$USER162$",                                   &set_user_helper },
+  { "$USER163$",                                   &set_user_helper },
+  { "$USER164$",                                   &set_user_helper },
+  { "$USER165$",                                   &set_user_helper },
+  { "$USER166$",                                   &set_user_helper },
+  { "$USER167$",                                   &set_user_helper },
+  { "$USER168$",                                   &set_user_helper },
+  { "$USER169$",                                   &set_user_helper },
+  { "$USER170$",                                   &set_user_helper },
+  { "$USER171$",                                   &set_user_helper },
+  { "$USER172$",                                   &set_user_helper },
+  { "$USER173$",                                   &set_user_helper },
+  { "$USER174$",                                   &set_user_helper },
+  { "$USER175$",                                   &set_user_helper },
+  { "$USER176$",                                   &set_user_helper },
+  { "$USER177$",                                   &set_user_helper },
+  { "$USER178$",                                   &set_user_helper },
+  { "$USER179$",                                   &set_user_helper },
+  { "$USER180$",                                   &set_user_helper },
+  { "$USER181$",                                   &set_user_helper },
+  { "$USER182$",                                   &set_user_helper },
+  { "$USER183$",                                   &set_user_helper },
+  { "$USER184$",                                   &set_user_helper },
+  { "$USER185$",                                   &set_user_helper },
+  { "$USER186$",                                   &set_user_helper },
+  { "$USER187$",                                   &set_user_helper },
+  { "$USER188$",                                   &set_user_helper },
+  { "$USER189$",                                   &set_user_helper },
+  { "$USER190$",                                   &set_user_helper },
+  { "$USER191$",                                   &set_user_helper },
+  { "$USER192$",                                   &set_user_helper },
+  { "$USER193$",                                   &set_user_helper },
+  { "$USER194$",                                   &set_user_helper },
+  { "$USER195$",                                   &set_user_helper },
+  { "$USER196$",                                   &set_user_helper },
+  { "$USER197$",                                   &set_user_helper },
+  { "$USER198$",                                   &set_user_helper },
+  { "$USER199$",                                   &set_user_helper },
+  { "$USER200$",                                   &set_user_helper },
+  { "$USER201$",                                   &set_user_helper },
+  { "$USER202$",                                   &set_user_helper },
+  { "$USER203$",                                   &set_user_helper },
+  { "$USER204$",                                   &set_user_helper },
+  { "$USER205$",                                   &set_user_helper },
+  { "$USER206$",                                   &set_user_helper },
+  { "$USER207$",                                   &set_user_helper },
+  { "$USER208$",                                   &set_user_helper },
+  { "$USER209$",                                   &set_user_helper },
+  { "$USER210$",                                   &set_user_helper },
+  { "$USER211$",                                   &set_user_helper },
+  { "$USER212$",                                   &set_user_helper },
+  { "$USER213$",                                   &set_user_helper },
+  { "$USER214$",                                   &set_user_helper },
+  { "$USER215$",                                   &set_user_helper },
+  { "$USER216$",                                   &set_user_helper },
+  { "$USER217$",                                   &set_user_helper },
+  { "$USER218$",                                   &set_user_helper },
+  { "$USER219$",                                   &set_user_helper },
+  { "$USER220$",                                   &set_user_helper },
+  { "$USER221$",                                   &set_user_helper },
+  { "$USER222$",                                   &set_user_helper },
+  { "$USER223$",                                   &set_user_helper },
+  { "$USER224$",                                   &set_user_helper },
+  { "$USER225$",                                   &set_user_helper },
+  { "$USER226$",                                   &set_user_helper },
+  { "$USER227$",                                   &set_user_helper },
+  { "$USER228$",                                   &set_user_helper },
+  { "$USER229$",                                   &set_user_helper },
+  { "$USER230$",                                   &set_user_helper },
+  { "$USER231$",                                   &set_user_helper },
+  { "$USER232$",                                   &set_user_helper },
+  { "$USER233$",                                   &set_user_helper },
+  { "$USER234$",                                   &set_user_helper },
+  { "$USER235$",                                   &set_user_helper },
+  { "$USER236$",                                   &set_user_helper },
+  { "$USER237$",                                   &set_user_helper },
+  { "$USER238$",                                   &set_user_helper },
+  { "$USER239$",                                   &set_user_helper },
+  { "$USER240$",                                   &set_user_helper },
+  { "$USER241$",                                   &set_user_helper },
+  { "$USER242$",                                   &set_user_helper },
+  { "$USER243$",                                   &set_user_helper },
+  { "$USER244$",                                   &set_user_helper },
+  { "$USER245$",                                   &set_user_helper },
+  { "$USER246$",                                   &set_user_helper },
+  { "$USER247$",                                   &set_user_helper },
+  { "$USER248$",                                   &set_user_helper },
+  { "$USER249$",                                   &set_user_helper },
+  { "$USER250$",                                   &set_user_helper },
+  { "$USER251$",                                   &set_user_helper },
+  { "$USER252$",                                   &set_user_helper },
+  { "$USER253$",                                   &set_user_helper },
+  { "$USER254$",                                   &set_user_helper },
+  { "$USER255$",                                   &set_user_helper },
+  { "$USER256$",                                   &set_user_helper }
 };
 
 char const* const state::_deprecated[][2] = {
@@ -155,6 +426,7 @@ char const* const state::_deprecated[][2] = {
   { "perfdata_timeout",                            deprecated::perfdata_msg },
   { "precached_object_file",                       deprecated::engine_performance_msg },
   { "process_performance_data",                    deprecated::perfdata_msg },
+  { "resource_file",                               deprecated::resource_file_msg },
   { "retained_contact_host_attribute_mask",        deprecated::retention_usage_msg },
   { "retained_contact_service_attribute_mask",     deprecated::retention_usage_msg },
   { "retained_host_attribute_mask",                deprecated::retention_usage_msg },
@@ -626,8 +898,25 @@ std::list<std::string> const& state::cfg_dir() const throw () {
  *  @return The cfg_file value.
  */
 std::list<std::string> const& state::cfg_file() const throw () {
-
   return (_cfg_file);
+}
+
+/**
+ *  Get included configuration files.
+ *
+ *  @return List of included configuration files.
+ */
+std::list<std::string>& state::cfg_include() throw () {
+  return (_cfg_include);
+}
+
+/**
+ *  Get included configuration files.
+ *
+ *  @return List of included configuration files.
+ */
+std::list<std::string> const& state::cfg_include() const throw () {
+  return (_cfg_include);
 }
 
 /**
@@ -1655,24 +1944,6 @@ void state::ocsp_timeout(duration const& value) {
 }
 
 /**
- *  Get resource_file value.
- *
- *  @return The resource_file value.
- */
-std::list<std::string> const& state::resource_file() const throw () {
-  return (_resource_file);
-}
-
-/**
- *  Set resource_file value.
- *
- *  @param[in] value The new resource_file value.
- */
-void state::resource_file(std::list<std::string> const& value) {
-  _resource_file = value;
-}
-
-/**
  *  Get retention_update_interval value.
  *
  *  @return The retention_update_interval value.
@@ -2177,6 +2448,22 @@ void state::_set_cfg_file(std::string const& value) {
 }
 
 /**
+ *  Set included file.
+ *
+ *  @param[in] value  An included configuration file.
+ */
+void state::_set_cfg_include(std::string const& value) {
+  if (value.empty() || value[0] == '/')
+    _cfg_include.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _cfg_include.push_back(base_name + "/" + value);
+  }
+  return ;
+}
+
+/**
  *  Set event_broker_options.
  *
  *  @param[in] value The new event_broker_options value.
@@ -2187,19 +2474,4 @@ void state::_set_event_broker_options(std::string const& value) {
   else
     _event_broker_options = BROKER_EVERYTHING;
   return ;
-}
-
-/**
- *  Set resource_file.
- *
- *  @param[in] value The new resource_file.
- */
-void state::_set_resource_file(std::string const& value) {
-  if (value.empty() || value[0] == '/')
-    _resource_file.push_back(value);
-  else {
-    io::file_entry fe(_cfg_main);
-    std::string base_name(fe.directory_name());
-    _resource_file.push_back(base_name + "/" + value);
-  }
 }

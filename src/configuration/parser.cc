@@ -60,14 +60,25 @@ parser::~parser() throw () {}
 void parser::parse(std::string const& path, state& config) {
   _config = &config;
 
-  // parse the global configuration file.
-  _parse_global_configuration(path);
+  // Parse the global configuration file.
+  _parse_global_configuration(path, true);
 
-  // parse configuration files.
+  // Parse included files.
+  while (!config.cfg_include().empty()) {
+    std::list<std::string> included;
+    included.swap(config.cfg_include());
+    for (std::list<std::string>::const_iterator
+           it(included.begin()),
+           end(included.end());
+         it != end;
+         ++it)
+      _parse_global_configuration(*it, false);
+  }
+
+  // Parse objects files.
   _apply(config.cfg_file(), &parser::_parse_object_definitions);
-  // parse resource files.
-  _apply(config.resource_file(), &parser::_parse_resource_file);
-  // parse configuration directories.
+
+  // Parse objects configuration directories.
   _apply(config.cfg_dir(), &parser::_parse_directory_configuration);
 
   // Apply template.
@@ -249,32 +260,48 @@ void parser::_parse_directory_configuration(std::string const& path) {
 /**
  *  Parse the global configuration file.
  *
- *  @param[in] path The configuration path.
+ *  @param[in] path          The configuration path.
+ *  @param[in] is_main_file  True if this is the main configuration
+ *                           file, false if it is included.
  */
-void parser::_parse_global_configuration(std::string const& path) {
+void parser::_parse_global_configuration(
+               std::string const& path,
+               bool is_main_file) {
+  // Log message.
   logger(logging::log_info_message, logging::most)
-    << "Reading main configuration file '" << path << "'.";
+    << "Reading " << (is_main_file ? "main" : "included")
+    << " configuration file '" << path << "'.";
 
+  // Open file.
   std::ifstream stream(path.c_str(), std::ios::binary);
   if (!stream.is_open())
-    throw (engine_error() << "Parsing of global "
-           "configuration failed: Can't open file '" << path << "'");
+    throw (engine_error() << "Parsing of "
+           << (is_main_file ? "main" : "included")
+           << " configuration file failed: Can't open file '" << path << "'");
 
-  _config->cfg_main(path);
+  // Set main file.
+  if (is_main_file)
+    _config->cfg_main(path);
 
+  // Set current line and current file.
   _current_line = 0;
   _current_path = path;
 
+  // Process file.
   std::string input;
   while (string::get_next_line(stream, input, _current_line)) {
     char const* key;
     char const* value;
     if (!string::split(input, &key, &value, '=')
         || !_config->set(key, value))
-      throw (engine_error() << "Parsing of global "
-                "configuration failed in file '" << path << "' on line "
-             << _current_line << ": Invalid line '" << input << "'");
+      throw (engine_error() << "Parsing of "
+             << (is_main_file ? "main" : "included")
+             << " configuration file failed in file '" << path
+             << "' on line " << _current_line << ": Invalid line '"
+             << input << "'");
   }
+
+  return ;
 }
 
 /**
@@ -367,43 +394,6 @@ void parser::_parse_object_definitions(std::string const& path) {
           _add_object(obj);
       }
       obj.clear();
-    }
-  }
-}
-
-/**
- *  Parse the resource file.
- *
- *  @param[in] path The resource file path.
- */
-void parser::_parse_resource_file(std::string const& path) {
-  logger(logging::log_info_message, logging::most)
-    << "Reading resource file '" << path << "'";
-
-  std::ifstream stream(path.c_str(), std::ios::binary);
-  if (!stream.is_open())
-    throw (engine_error() << "Parsing of resource file failed: "
-           << "can't open file '" << path << "'");
-
-  _current_line = 0;
-  _current_path = path;
-
-  std::string input;
-  while (string::get_next_line(stream, input, _current_line)) {
-    try {
-      std::string key;
-      std::string value;
-      if (!string::split(input, key, value, '='))
-        throw (engine_error() << "Parsing of resource file '"
-               << _current_path << "' failed on line " << _current_line
-               << ": Invalid line '" << input << "'");
-      _config->user(key, value);
-    }
-    catch (std::exception const& e) {
-      (void)e;
-      throw (engine_error() << "Parsing of resource file '"
-             << _current_path << "' failed on line " << _current_line
-             << ": Invalid line '" << input << "'");
     }
   }
 }
