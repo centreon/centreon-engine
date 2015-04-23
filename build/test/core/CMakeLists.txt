@@ -222,8 +222,9 @@ configure_file(
 set(TEST_NAME "running_host_check_with_no_check_cmd")
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINE_RUNNER}" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg" "5"
+  "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg"
 )
+set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
 # Active check of service with no command.
 set(

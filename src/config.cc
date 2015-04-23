@@ -508,7 +508,6 @@ int check_service(service* svc, int* w, int* e) {
   host* temp_host = find_host(svc->host_name);
 
   /* we couldn't find an associated host! */
-
   if (!temp_host) {
     logger(log_verification_error, basic)
       << "Error: Host '" << svc->host_name << "' specified in service "
@@ -547,24 +546,26 @@ int check_service(service* svc, int* w, int* e) {
   }
 
   /* check the service check_command */
-  char* buf = string::dup(svc->service_check_command);
+  if (svc->service_check_command) {
+    char* buf = string::dup(svc->service_check_command);
 
-  /* get the command name, leave any arguments behind */
-  char* temp_command_name = my_strtok(buf, "!");
+    /* get the command name, leave any arguments behind */
+    char* temp_command_name = my_strtok(buf, "!");
 
-  command* temp_command = find_command(temp_command_name);
-  if (temp_command == NULL) {
-    logger(log_verification_error, basic)
-      << "Error: Service check command '" << temp_command_name
-      << "' specified in service '" << svc->description
-      << "' for host '" << svc->host_name << "' not defined anywhere!";
-    errors++;
+    command* temp_command = find_command(temp_command_name);
+    if (temp_command == NULL) {
+      logger(log_verification_error, basic)
+        << "Error: Service check command '" << temp_command_name
+        << "' specified in service '" << svc->description
+        << "' for host '" << svc->host_name << "' not defined anywhere!";
+      errors++;
+    }
+
+    delete[] buf;
+
+    /* save the pointer to the check command for later */
+    svc->check_command_ptr = temp_command;
   }
-
-  delete[] buf;
-
-  /* save the pointer to the check command for later */
-  svc->check_command_ptr = temp_command;
 
   /* verify service check timeperiod */
   if (svc->check_period == NULL) {

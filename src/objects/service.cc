@@ -299,12 +299,6 @@ service* add_service(
       << description << "' is not set";
     return (NULL);
   }
-  else if (!check_command || !check_command[0]) {
-    logger(log_config_error, basic)
-      << "Error: Check command of service '" << description
-      << "' on host '" << host_name << "' is not set";
-    return (NULL);
-  }
 
   // Check values.
   if ((max_attempts <= 0)

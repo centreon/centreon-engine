@@ -289,9 +289,19 @@ bool host::operator<(host const& other) const throw () {
 void host::check_validity() const {
   if (_host_name.empty())
     throw (engine_error() << "Host has no name (property 'host_name')");
-  if (_address.empty())
+  else if (_address.empty())
     throw (engine_error() << "Host '" << _host_name
            << "' has no address (property 'address')");
+  else if (_check_command.empty()) {
+    if (_checks_active)
+      throw (engine_error() << "Host '" << _host_name
+             << "' has active checks enabled but does not have its "
+             << "check command defined");
+    else if (_check_freshness)
+      throw (engine_error() << "Host '" << _host_name
+             << "' has frehness checks enabled but does not have its "
+             << "check command defined");
+  }
   return ;
 }
 

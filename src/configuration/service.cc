@@ -290,9 +290,19 @@ void service::check_validity() const {
   if (_service_description.empty())
     throw (engine_error() << "Service has no description (property "
            << "'service_description')");
-  if (_hosts->empty())
+  else if (_hosts->empty())
     throw (engine_error() << "Service '" << _service_description
            << "' is not attached to any host (property 'host_name')");
+  else if (_check_command.empty()) {
+    if (_checks_active)
+      throw (engine_error() << "Service '" << _service_description
+             << "' has active checks enabled but does not have its "
+             << "check command defined");
+    else if (_check_freshness)
+      throw (engine_error() << "Service '" << _service_description
+             << "' has freshness checks enabled but does not have its "
+             << "check command defined");
+  }
   return ;
 }
 
