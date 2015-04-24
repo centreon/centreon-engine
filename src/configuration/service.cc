@@ -331,6 +331,7 @@ void service::merge(object const& obj) {
   service const& tmpl(static_cast<service const&>(obj));
 
   MRG_OPTION(_checks_active);
+  MRG_DEFAULT(_check_command);
   MRG_OPTION(_check_freshness);
   MRG_OPTION(_check_interval);
   MRG_OPTION(_check_timeout);
