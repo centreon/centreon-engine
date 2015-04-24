@@ -163,8 +163,6 @@ characters:
   * :ref:`HOSTOUTPUT <user_configuration_macros_host>`
   * :ref:`LONGHOSTOUTPUT <user_configuration_macros_host>`
   * :ref:`HOSTPERFDATA <user_configuration_macros_host>`
-  * :ref:`HOSTACKAUTHOR <user_configuration_macros_host>`
-  * :ref:`HOSTACKCOMMENT <user_configuration_macros_host>`
   * :ref:`SERVICEOUTPUT <user_configuration_macros_service>`
   * :ref:`LONGSERVICEOUTPUT <user_configuration_macros_service>`
   * :ref:`SERVICEPERFDATA <user_configuration_macros_service>`
@@ -174,21 +172,6 @@ characters:
 Additionally, any macros that contain
 :ref:`custom variables <custom_object_variables>` are stripped for
 safety and security.
-
-Macros as Environment Variables
-===============================
-
-Most macros are made available as environment variables for easy
-reference by scripts or commands that are executed by Centreon
-Engine. For purposes of security and sanity,
-:ref:`USERn <user_configuration_macros_misc>` and "on-demand" host and
-service macros are not made available as environment variables.
-
-Environment variables that contain standard macros are named the same as
-their corresponding macro names (listed :ref:`here <standard_macros>`),
-with NAGIOS\_ prepended to their names. For example, the
-:ref:`HOSTNAME <user_configuration_macros_host>` macro would be
-available as an environment variable named NAGIOS_HOSTNAME.
 
 Available Macros
 ================
