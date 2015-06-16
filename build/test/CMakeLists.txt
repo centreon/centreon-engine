@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -24,6 +24,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 configure_file("${TEST_DIR}/paths.hh.in" "${TEST_DIR}/paths.hh")
 
 # Subdirectory.
+add_subdirectory("bench")
 add_subdirectory("broker")
 add_subdirectory("checks")
 add_subdirectory("commands")

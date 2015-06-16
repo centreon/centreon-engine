@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,5 +25,6 @@
 #  define CENTENGINEWS_BINARY "@CENTENGINEWS_BINARY@"
 #  define EXTERNALCMD_MODULE "@EXTERNALCMD_MODULE@"
 #  define TEST_DIR "@PROJECT_SOURCE_DIR@/test"
+#  define PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@"
 
 #endif // !TEST_PATHS_HH
