@@ -390,27 +390,3 @@ int submit_external_command(char const* cmd, int* buffer_items) {
 
   return (result);
 }
-
-/* submits a raw external command (without timestamp) for processing */
-// XXX: submit_raw_external_command not used.
-int submit_raw_external_command(char const* cmd, time_t* ts, int* buffer_items) {
-  int result = OK;
-  time_t timestamp;
-
-  if (cmd == NULL)
-    return (ERROR);
-
-  /* get the time */
-  if (ts != NULL)
-    timestamp = *ts;
-  else
-    time(&timestamp);
-
-  /* create the command string */
-  std::ostringstream oss;
-  oss << '[' << timestamp << "] " << cmd;
-
-  /* submit the command */
-  result = submit_external_command(oss.str().c_str(), buffer_items);
-  return (result);
-}
