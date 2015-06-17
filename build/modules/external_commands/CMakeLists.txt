@@ -32,6 +32,7 @@ add_library(
 
   # Sources.
   "${SRC_DIR}/commands.cc"
+  "${SRC_DIR}/internal.cc"
   "${SRC_DIR}/main.cc"
   "${SRC_DIR}/processing.cc"
   "${SRC_DIR}/utils.cc"
@@ -39,6 +40,7 @@ add_library(
   # Headers.
   "${INC_DIR}/commands.hh"
   "${INC_DIR}/circular_buffer.hh"
+  "${INC_DIR}/internal.hh"
   "${INC_DIR}/processing.hh"
   "${INC_DIR}/utils.hh"
 )

@@ -18,6 +18,7 @@
 */
 
 #include <cstdlib>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,9 +31,10 @@
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::modules::external_command;
+using namespace com::centreon::engine::modules::external_commands;
 
 processing::processing() {
   // process commands.
@@ -192,10 +194,12 @@ processing::processing() {
                  &_redirector_service<&disable_service_checks>);
   _lst_command["PROCESS_SERVICE_CHECK_RESULT"] =
     command_info(CMD_PROCESS_SERVICE_CHECK_RESULT,
-                 &_redirector<&cmd_process_service_check_result>);
+                 &_redirector<&cmd_process_service_check_result>,
+                 true);
   _lst_command["PROCESS_HOST_CHECK_RESULT"] =
     command_info(CMD_PROCESS_HOST_CHECK_RESULT,
-                 &_redirector<&cmd_process_host_check_result>);
+                 &_redirector<&cmd_process_host_check_result>,
+                 true);
   _lst_command["ENABLE_SVC_EVENT_HANDLER"] =
     command_info(CMD_ENABLE_SVC_EVENT_HANDLER,
                  &_redirector_service<&enable_service_event_handler>);
@@ -289,24 +293,28 @@ bool processing::execute(char const* cmd) const {
   char* args(command + start);
   int command_id(CMD_CUSTOM_COMMAND);
 
-  umap<std::string, command_info>::const_iterator
-    it(_lst_command.find(command_name));
-  if (it != _lst_command.end())
-    command_id = it->second.id;
-  else if (command_name[0] != '_') {
-    logger(log_external_command | log_runtime_warning, basic)
-      << "Warning: Unrecognized external command -> " << command_name;
-    delete[] command;
-    return (false);
+  umap<std::string, command_info>::const_iterator it;
+  {
+    concurrency::locker lock(&_mutex);
+    it = _lst_command.find(command_name);
+    if (it != _lst_command.end())
+      command_id = it->second.id;
+    else if (command_name[0] != '_') {
+      lock.unlock();
+      logger(log_external_command | log_runtime_warning, basic)
+        << "Warning: Unrecognized external command -> " << command_name;
+      delete[] command;
+      return (false);
+    }
+
+    // Update statistics for external commands.
+    update_check_stats(EXTERNAL_COMMAND_STATS, time(NULL));
   }
 
-  // update statistics for external commands.
-  update_check_stats(EXTERNAL_COMMAND_STATS, time(NULL));
-
-  // log the external command.
+  // Log the external command.
   if (command_id == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_id == CMD_PROCESS_HOST_CHECK_RESULT) {
-    // passive checks are logged in checks.c.
+    // Passive checks are logged in checks.c.
     if (config->log_passive_checks())
       logger(log_passive_check, basic)
         << "EXTERNAL COMMAND: " << command_name << ';' << args;
@@ -320,7 +328,7 @@ bool processing::execute(char const* cmd) const {
     << "\nCommand entry time: " << entry_time
     << "\nCommand arguments: " << args;
 
-  // send data to event broker.
+  // Send data to event broker.
   broker_external_command(
     NEBTYPE_EXTERNALCOMMAND_START,
     NEBFLAG_NONE,
@@ -331,10 +339,13 @@ bool processing::execute(char const* cmd) const {
     args,
     NULL);
 
-  if (it != _lst_command.end())
-    (*it->second.func)(command_id, entry_time, args);
+  {
+    concurrency::locker lock(&_mutex);
+    if (it != _lst_command.end())
+      (*it->second.func)(command_id, entry_time, args);
+  }
 
-  // send data to event broker.
+  // Send data to event broker.
   broker_external_command(
     NEBTYPE_EXTERNALCOMMAND_END,
     NEBFLAG_NONE,
@@ -347,6 +358,23 @@ bool processing::execute(char const* cmd) const {
 
   delete[] command;
   return (true);
+}
+
+/**
+ *  Check if a command is thread-safe.
+ *
+ *  @param[in] cmd  Command to check.
+ *
+ *  @return True if command is thread-safe.
+ */
+bool processing::is_thread_safe(char const* cmd) const {
+  char const* ptr(cmd + strspn(cmd, "[]0123456789 "));
+  std::string short_cmd(ptr, strcspn(ptr, ";"));
+  umap<std::string, command_info>::const_iterator it;
+  concurrency::locker lock(&_mutex);
+  it = _lst_command.find(short_cmd);
+  return ((it != _lst_command.end())
+          && (it->second.thread_safe));
 }
 
 void processing::_wrapper_read_state_information() {
