@@ -20,29 +20,40 @@
 #ifndef CCE_MOD_EXTCMD_PROCESSING_HH
 #  define CCE_MOD_EXTCMD_PROCESSING_HH
 
+#  include <cstring>
 #  include <map>
 #  include <string>
+#  include "com/centreon/concurrency/mutex.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/service.hh"
 #  include "com/centreon/unordered_hash.hh"
+#  include "find.hh"
 
 CCE_BEGIN()
 
 namespace         modules {
-  namespace       external_command {
+  namespace       external_commands {
     class         processing {
     public:
                   processing();
                   ~processing() throw ();
       bool        execute(char const* cmd) const;
+      bool        is_thread_safe(char const* cmd) const;
 
     private:
       struct      command_info {
                   command_info(
                     int _id = 0,
-                    void (*_func)(int, time_t, char*) = NULL)
-                    : id(_id), func(_func) {}
+                    void (*_func)(int, time_t, char*) = NULL,
+                    bool is_thread_safe = false)
+                    : id(_id),
+                      func(_func),
+                      thread_safe(is_thread_safe) {}
                   ~command_info() throw () {}
         int       id;
         void (*   func)(int id, time_t entry_time, char* args);
+        bool      thread_safe;
       };
 
       static void _wrapper_read_state_information();
@@ -285,6 +296,7 @@ namespace         modules {
       }
 
       umap<std::string, command_info> _lst_command;
+      mutable concurrency::mutex      _mutex;
     };
   }
 }

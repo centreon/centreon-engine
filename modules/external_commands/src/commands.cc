@@ -30,6 +30,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/internal.hh"
 #include "com/centreon/engine/modules/external_commands/processing.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/notifications.hh"
@@ -157,8 +158,7 @@ int process_external_commands_from_file(
 
 /* external command processor */
 int process_external_command(char const* cmd) {
-  static modules::external_command::processing process;
-  process.execute(cmd);
+  modules::external_commands::gl_processor.execute(cmd);
   return (OK);
 }
 
