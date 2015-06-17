@@ -45,11 +45,6 @@ int service_check_callback(int type, void* arg) {
     scd(static_cast<nebstruct_service_check_data*>(arg));
   if (scd && scd->type == NEBTYPE_SERVICECHECK_PROCESSED) {
     ++received_passive_checks;
-    logger(
-      com::centreon::engine::logging::log_process_info,
-      com::centreon::engine::logging::basic)
-      << "BENCH: passive check " << received_passive_checks
-      << "/" << expected_passive_checks;
     if (received_passive_checks == expected_passive_checks)
       exit(0);
   }

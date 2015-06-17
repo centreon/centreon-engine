@@ -152,9 +152,7 @@ int main(int argc, char* argv[]) {
                     << (random() % 100) + i << ";" << random() % 4
                     << ";output\n";
         std::ofstream ofs;
-        ofs.open(
-              cfg_files.command_file().c_str(),
-              std::ios_base::out | std::ios_base::app);
+        ofs.open(cfg_files.command_file().c_str());
         if (ofs.good()) {
           ofs << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;1;"
               << (random() % 100) + 1 << ";" << random() % 4
