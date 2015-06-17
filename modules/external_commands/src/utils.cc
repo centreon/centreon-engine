@@ -31,6 +31,7 @@
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/external_commands/internal.hh"
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/string.hh"
 
@@ -322,26 +323,40 @@ void* command_file_worker_thread(void* arg) {
       clearerr(command_file_fp);
 
       /* read and process the next command in the file */
-      while (fgets(input_buffer, (int)(sizeof(input_buffer) - 1), command_file_fp) != NULL) {
-        /* submit the external command for processing (retry if buffer is full) */
-        while ((result = submit_external_command(input_buffer, &buffer_items)) == ERROR
-               && buffer_items == config->external_command_buffer_slots()) {
+      while (fgets(
+               input_buffer,
+               (int)(sizeof(input_buffer) - 1),
+               command_file_fp)
+             != NULL) {
+        // Check if command is thread-safe (for immediate execution).
+        if (modules::external_commands::gl_processor.is_thread_safe(
+                                                       input_buffer))
+          modules::external_commands::gl_processor.execute(
+                                                     input_buffer);
+        // Submit the external command for processing
+        // (retry if buffer is full).
+        else {
+          while ((result = submit_external_command(
+                             input_buffer,
+                             &buffer_items))
+                 == ERROR
+                 && buffer_items == config->external_command_buffer_slots()) {
+            // Wait a bit.
+            tv.tv_sec = 0;
+            tv.tv_usec = 250000;
+            select(0, NULL, NULL, NULL, &tv);
 
-          /* wait a bit */
-          tv.tv_sec = 0;
-          tv.tv_usec = 250000;
-          select(0, NULL, NULL, NULL, &tv);
+            // Should we shutdown?
+            pthread_testcancel();
+          }
 
-          /* should we shutdown? */
+          // Bail if the circular buffer is full.
+          if (buffer_items == config->external_command_buffer_slots())
+            break ;
+
+          // Should we shutdown?
           pthread_testcancel();
         }
-
-        /* bail if the circular buffer is full */
-        if (buffer_items == config->external_command_buffer_slots())
-          break;
-
-        /* should we shutdown? */
-        pthread_testcancel();
       }
     }
   }
