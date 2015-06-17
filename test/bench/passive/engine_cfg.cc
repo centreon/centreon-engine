@@ -70,14 +70,16 @@ engine_cfg::engine_cfg(
   // Write main file.
   {
     std::ostringstream oss;
-    oss << "log_file=/tmp/centengine.log\n"
-        << "command_check_interval=-1\n"
-        << "command_file=" << command_file() << "\n"
-        << "state_retention_file=\n"
-        << "cfg_file=" << object_file << "\n"
-        << "broker_module=" << PROJECT_SOURCE_DIR << "/build/test/bench/bench_passive_module.so "
-        << expected_passive << "\n"
-        << additional;
+    oss
+      << "log_file=/dev/null\n"
+      // << "log_file=/tmp/centengine.log\n"
+      << "command_check_interval=1\n"
+      << "command_file=" << command_file() << "\n"
+      << "state_retention_file=\n"
+      << "cfg_file=" << object_file << "\n"
+      << "broker_module=" << PROJECT_SOURCE_DIR << "/build/test/bench/bench_passive_module.so "
+      << expected_passive << "\n"
+      << additional;
     _write_file(main_file(), oss.str());
     _generated.push_back(main_file());
   }
