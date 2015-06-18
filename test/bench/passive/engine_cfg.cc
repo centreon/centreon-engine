@@ -43,12 +43,20 @@ engine_cfg::engine_cfg(
   std::string object_file(_directory);
   object_file.append("/objects.cfg");
   {
-    // Host.
+    // Command.
     std::ostringstream oss;
+    oss << "define command{\n"
+        << "  command_name default_command\n"
+        << "  command_line /bin/true\n"
+        << "}\n";
+
+    // Host.
     oss << "define host{\n"
         << "  host_name 1\n"
         << "  address localhost\n"
         << "  active_checks_enabled 0\n"
+        << "  max_check_attempts 1\n"
+        << "  check_command default_command\n"
         << "}\n";
 
     // Services.
@@ -57,6 +65,10 @@ engine_cfg::engine_cfg(
           << "  service_description " << i + 1 << "\n"
           << "  host_name 1\n"
           << "  active_checks_enabled 0\n"
+          << "  check_command default_command\n"
+          << "  max_check_attempts 1\n"
+          << "  check_interval 1\n"
+          << "  retry_interval 1\n"
           << "}\n";
 
     // Write objects file.
@@ -73,7 +85,8 @@ engine_cfg::engine_cfg(
     oss
       << "log_file=/dev/null\n"
       // << "log_file=/tmp/centengine.log\n"
-      << "command_check_interval=1\n"
+      << "cached_host_check_horizon=1\n"
+      << "command_check_interval=-1\n"
       << "command_file=" << command_file() << "\n"
       << "state_retention_file=\n"
       << "cfg_file=" << object_file << "\n"
