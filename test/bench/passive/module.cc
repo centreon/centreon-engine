@@ -43,7 +43,9 @@ int service_check_callback(int type, void* arg) {
   (void)type;
   nebstruct_service_check_data*
     scd(static_cast<nebstruct_service_check_data*>(arg));
-  if (scd && scd->type == NEBTYPE_SERVICECHECK_PROCESSED) {
+  if (scd
+      && (scd->type == NEBTYPE_SERVICECHECK_PROCESSED)
+      && (scd->check_type == 1)) {
     ++received_passive_checks;
     if (received_passive_checks == expected_passive_checks)
       exit(0);

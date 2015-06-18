@@ -31,10 +31,22 @@
  *
  *  @param[in] additional        Additional configuration directives.
  *  @param[in] expected_passive  Expected passive checks.
+ *  @param[in] active_hosts      Number of active hosts to generate.
+ *  @param[in] active_services   Number of active services to generate.
+ *  @param[in] passive_hosts     Number of passive hosts to generate.
+ *  @param[in] passive_services  Number of passive services to generate.
+ *  @param[in] auto_delete       True if generated configuration should
+ *                               be deleted at object destruction.
  */
 engine_cfg::engine_cfg(
               std::string const& additional,
-              int expected_passive) {
+              int expected_passive,
+              int active_hosts,
+              int active_services,
+              int passive_hosts,
+              int passive_services,
+              bool auto_delete)
+  : _auto_delete(auto_delete) {
   // Create directory.
   _directory = tmpnam(NULL);
   ::mkdir(_directory.c_str(), 0777);
@@ -50,21 +62,36 @@ engine_cfg::engine_cfg(
         << "  command_line /bin/true\n"
         << "}\n";
 
-    // Host.
-    oss << "define host{\n"
-        << "  host_name 1\n"
-        << "  address localhost\n"
-        << "  active_checks_enabled 0\n"
-        << "  max_check_attempts 1\n"
-        << "  check_command default_command\n"
-        << "}\n";
+    // Hosts.
+    for (int i(0), limit(active_hosts + passive_hosts);
+         i < limit;
+         ++i)
+      oss << "define host{\n"
+          << "  host_name " << i + 1 << "\n"
+          << "  address localhost\n"
+          << "  active_checks_enabled " << ((i < passive_hosts) ? "0" : "1") << "\n"
+          << "  max_check_attempts 1\n"
+          << "  check_command default_command\n"
+          << "}\n";
 
-    // Services.
-    for (int i(0); i < 100; ++i)
+    // Passive services.
+    for (int i(0); i < passive_services; ++i)
       oss << "define service{\n"
           << "  service_description " << i + 1 << "\n"
-          << "  host_name 1\n"
+          << "  host_name " << i * (passive_hosts / passive_services) + 1 << "\n"
           << "  active_checks_enabled 0\n"
+          << "  check_command default_command\n"
+          << "  max_check_attempts 1\n"
+          << "  check_interval 1\n"
+          << "  retry_interval 1\n"
+          << "}\n";
+
+    // Active services.
+    for (int i(0); i < active_services; ++i)
+      oss << "define service {\n"
+          << "  service_description " << i + passive_services + 1 << "\n"
+          << "  host_name " << i * (active_hosts / active_services) + passive_hosts + 1 << "\n"
+          << "  active_checks_enabled 1\n"
           << "  check_command default_command\n"
           << "  max_check_attempts 1\n"
           << "  check_interval 1\n"
@@ -89,6 +116,8 @@ engine_cfg::engine_cfg(
       << "command_check_interval=-1\n"
       << "command_file=" << command_file() << "\n"
       << "state_retention_file=\n"
+      << "sleep_time=0.02\n"
+      << "interval_length=10\n"
       << "cfg_file=" << object_file << "\n"
       << "broker_module=" << PROJECT_SOURCE_DIR << "/build/test/bench/bench_passive_module.so "
       << expected_passive << "\n"
@@ -102,7 +131,7 @@ engine_cfg::engine_cfg(
  *  Remove generated configuration files.
  */
 engine_cfg::~engine_cfg() {
-  if (!_directory.empty()) {
+  if (!_directory.empty() && _auto_delete) {
     for (std::list<std::string>::const_iterator
            it(_generated.begin()),
            end(_generated.end());
@@ -122,6 +151,15 @@ std::string engine_cfg::command_file() const {
   std::string retval(_directory);
   retval.append("/centengine.cmd");
   return (retval);
+}
+
+/**
+ *  Get the directory in which configuration files were generated.
+ *
+ *  @return Directory in which configuration files were generated.
+ */
+std::string engine_cfg::directory() const {
+  return (_directory);
 }
 
 /**

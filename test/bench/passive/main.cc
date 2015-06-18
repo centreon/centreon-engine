@@ -45,17 +45,29 @@ int main(int argc, char* argv[]) {
 #ifdef HAVE_GETOPT_H
   int option_index(0);
   static struct option const long_options[] = {
-    { "help", no_argument, NULL, 'h' },
+    // Common options.
+    { "help", no_argument, NULL, '?' },
+    { "mode", required_argument, NULL, 'M' },
+    { "activehosts", required_argument, NULL, 'h' },
+    { "activeservices", required_argument, NULL, 's' },
+    { "passivehosts", required_argument, NULL, 'H' },
+    { "passiveservices", required_argument, NULL, 'S' },
+    // Benchmark and command options.
+    { "count", required_argument, NULL, 'c' },
+    // Benchmark options.
     { "engine", required_argument, NULL, 'e' },
     { "module", required_argument, NULL, 'm' },
-    { "count", required_argument, NULL, 'c' },
     { NULL, no_argument, NULL, '\0' }
   };
 #endif // HAVE_GETOPT_H
-  bool help(false);
+  int activehosts(0);
+  int activeservices(0);
+  int passivehosts(1);
+  int passiveservices(100);
+  std::string mode;
+  int count(1000);
   std::string engine("/usr/sbin/centengine");
   std::string module("/usr/lib64/centreon-engine/externalcmd.so");
-  int count(1000);
 
   // Process command line arguments.
   int c;
@@ -63,15 +75,33 @@ int main(int argc, char* argv[]) {
   while ((c = getopt_long(
                 argc,
                 argv,
-                "+he:m:c:",
+                "+?h:M:s:H:S:c:e:m:",
                 long_options,
                 &option_index)) != -1) {
 #else
-  while ((c = getopt(argc, argv, "+he:m:c:")) != -1) {
+  while ((c = getopt(argc, argv, "+?h:M:s:H:S:c:e:m:")) != -1) {
 #endif // HAVE_GETOPT_H
     switch (c) {
+    case '?':
+      mode.clear();
+      break ;
+    case 'M':
+      mode = optarg;
+      break ;
     case 'h':
-      help = true;
+      activehosts = strtol(optarg, NULL, 0);
+      break ;
+    case 's':
+      activeservices = strtol(optarg, NULL, 0);
+      break ;
+    case 'H':
+      passivehosts = strtol(optarg, NULL, 0);
+      break ;
+    case 'S':
+      passiveservices = strtol(optarg, NULL, 0);
+      break ;
+    case 'c':
+      count = strtol(optarg, NULL, 0);
       break ;
     case 'e':
       engine = optarg;
@@ -79,46 +109,32 @@ int main(int argc, char* argv[]) {
     case 'm':
       module = optarg;
       break ;
-    case 'c':
-      count = strtol(optarg, NULL, 0);
-      break ;
     }
   }
 
   // Banner.
-  std::cout << "---------------------------------------------\n"
-            << "Centreon Engine passive checks benchmark tool\n"
-            << "---------------------------------------------\n"
-            << "\n";
-
-  // Print help.
-  if (help) {
-    std::cout
-      << "  -h --help    Print this help.\n"
-      << "  -e --engine  Centreon Engine binary (default is " << engine << ")\n"
-      << "  -m --module  Centreon Engine external command module (default is " << module << ")\n"
-      << "  -c --count   Number of passive check results to send (default is " << count << ")\n"
-      << "\n"
-      << "This benchmarking tool aims to mesure the time needed by\n"
-      << "Centreon Engine to process some amount of passive service\n"
-      << "checks provided through external commands. This tool will\n"
-      << "create a temporary configuration folder containing 1 host\n"
-      << "and 100 services. It will then run Centreon Engine and\n"
-      << "provide randomly check results for the services. When\n"
-      << "finished, it will wait for Centreon Engine termination and\n"
-      << "print the total number of external command processed along\n"
-      << "with the average number of passive check results processed\n"
-      << "per second.\n";
+  if (mode != "commands") {
+    std::cout << "---------------------------------------------\n"
+              << "Centreon Engine passive checks benchmark tool\n"
+              << "---------------------------------------------\n"
+              << "\n";
   }
+
   // Perform benchmark.
-  else {
+  if (mode == "benchmark") {
     // Generate configuration files.
     std::cout << "Generating configuration files...               ";
     std::cout.flush();
     std::string additional("broker_module=");
     additional.append(module);
     additional.append("\n");
-    engine_cfg cfg_files(additional, count);
+    engine_cfg cfg_files(
+                 additional,
+                 count,
+                 activehosts,
+                 activeservices,
+                 passivehosts,
+                 passiveservices);
     std::cout << "Done\n";
 
     // Launch Centreon Engine.
@@ -133,7 +149,7 @@ int main(int argc, char* argv[]) {
     centengine.enable_stream(com::centreon::process::err, false);
     centengine.exec(cmdline);
     sleep(3);
-    time_t start_time(time(NULL));
+    time_t start_time(time(NULL));  // Perform benchmark.
     std::cout << "Done\n";
 
     // Send external commands.
@@ -181,6 +197,65 @@ int main(int argc, char* argv[]) {
                                                ? (end_time - start_time)
                                                : 1)
               << "\n";
+  }
+  // Generate configuration files.
+  else if (mode == "configuration") {
+    std::string additional("broker_module=");
+    additional.append(module);
+    additional.append("\n");
+    engine_cfg cfg_files(
+                 additional,
+                 count,
+                 activehosts,
+                 activeservices,
+                 passivehosts,
+                 passiveservices,
+                 false);
+    std::cout << "Configuration files generated in "
+              << cfg_files.directory();
+  }
+  // Generate external commands.
+  else if (mode == "commands") {
+  }
+  // Print help.
+  else {
+    std::cout
+      << "Common options\n"
+      << "  -? --help             Print this help.\n"
+      << "  -M --mode             This tool has multiple modes : 'benchmark'\n"
+      << "                        which compute the time needed to process some\n"
+      << "                        count of passive check results, 'configuration'\n"
+      << "                        which generate configuration files compatible\n"
+      << "                        with the latest mode 'commands' which print on\n"
+      << "                        standard output passive check results.\n"
+      << "  -h --activehosts      Number of active hosts in the configuration (default is "
+      << activehosts << ").\n"
+      << "  -s --activeservices   Number of active services in the configuration (default is "
+      << activeservices << ").\n"
+      << "  -H --passivehosts     Number of passive hosts in the configuration. (default is "
+      << passivehosts << ").\n"
+      << "  -S --passiveservices  Number of passive services in the configuration (default is "
+      << passiveservices << ").\n"
+      << "Command and benchmark options\n"
+      << "  -c --count            Number of passive check results to send (default is "
+      << count << ")\n"
+      << "Benchmark options\n"
+      << "  -e --engine           Centreon Engine binary (default is "
+      << engine << ")\n"
+      << "  -m --module           Centreon Engine external command module (default is "
+      << module << ")\n"
+      << "\n"
+      << "This benchmarking tool aims to mesure the time needed by\n"
+      << "Centreon Engine to process some amount of passive service\n"
+      << "checks provided through external commands. This tool has\n"
+      << "multiple mode. First one is 'benchmark' which computes time\n"
+      << "needed to process some count of passive check results. This\n"
+      << "mode automatically generate configuration files and write\n"
+      << "external commands. The 'configuration' mode will only generate\n"
+      << "configuration files on a temporary folder which path will be\n"
+      << "printed. The latest mode 'command' print on the standard output\n"
+      << "some count of external commands compatible with a configuration\n"
+      << "file generated with the same parameters.\n";
   }
 
   // Unload Clib.

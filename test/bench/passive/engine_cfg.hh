@@ -34,9 +34,15 @@ class         engine_cfg {
 public:
               engine_cfg(
                 std::string const& additional,
-                int expected_passive);
+                int expected_passive,
+                int active_hosts,
+                int active_services,
+                int passive_hosts,
+                int passive_services,
+                bool auto_delete = true);
               ~engine_cfg();
   std::string command_file() const;
+  std::string directory() const;
   std::string main_file() const;
 
 private:
@@ -46,6 +52,7 @@ private:
                 std::string const& target,
                 std::string const& content);
 
+  bool        _auto_delete;
   std::string _directory;
   std::list<std::string>
               _generated;
