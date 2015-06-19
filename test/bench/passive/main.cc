@@ -157,24 +157,21 @@ int main(int argc, char* argv[]) {
       time_t now(time(NULL));
       // Send a little bit more external commands as writing and reading
       // to the same pipe is not thread safe.
-      for (int i(0), limit(count * 105 / 100); i < limit; ++i) {
-        if (!(i % 1000)) {
-          std::cout << "\rSending passive check results...                "
-                    << i << "/" << count;
-          std::cout.flush();
+      std::ofstream ofs;
+      ofs.open(cfg_files.command_file().c_str());
+      if (ofs.good()) {
+        for (int i(0), limit(count * 105 / 100); i < limit; ++i) {
+          if (!(i % 1000)) {
+            std::cout << "\rSending passive check results...                "
+                      << i << "/" << count;
+            std::cout.flush();
+          }
+          ofs << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;"
+              << (random() % passivehosts) + 1 << ";"
+              << (random() % passiveservices) + 1 << ";"
+              << random() % 4 << ";output\n";
         }
-        std::ostringstream externalcmd;
-        externalcmd << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;1;"
-                    << (random() % 100) + i << ";" << random() % 4
-                    << ";output\n";
-        std::ofstream ofs;
-        ofs.open(cfg_files.command_file().c_str());
-        if (ofs.good()) {
-          ofs << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;1;"
-              << (random() % 100) + 1 << ";" << random() % 4
-              << ";output\n";
-          ofs.close();
-        }
+        ofs.close();
       }
     }
     std::cout << "\rSending passive check results...                Done               \n";
@@ -216,6 +213,12 @@ int main(int argc, char* argv[]) {
   }
   // Generate external commands.
   else if (mode == "commands") {
+    time_t now(time(NULL));
+    for (int i(0), limit(count * 105 / 100); i < limit; ++i)
+      std::cout << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;"
+                << (random() % passivehosts) + 1 << ";"
+                << (random() % passiveservices) + 1 << ";"
+                << random() % 4 << ";output\n";
   }
   // Print help.
   else {
