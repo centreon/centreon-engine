@@ -52,7 +52,6 @@ int main(int argc, char* argv[]) {
     { "activeservices", required_argument, NULL, 's' },
     { "passivehosts", required_argument, NULL, 'H' },
     { "passiveservices", required_argument, NULL, 'S' },
-    // Benchmark and command options.
     { "count", required_argument, NULL, 'c' },
     // Benchmark options.
     { "engine", required_argument, NULL, 'e' },
@@ -210,7 +209,7 @@ int main(int argc, char* argv[]) {
                  passiveservices,
                  false);
     std::cout << "Configuration files generated in "
-              << cfg_files.directory();
+              << cfg_files.directory() << "\n";
   }
   // Generate external commands.
   else if (mode == "commands") {
@@ -241,7 +240,6 @@ int main(int argc, char* argv[]) {
       << passivehosts << ").\n"
       << "  -S --passiveservices  Number of passive services in the configuration (default is "
       << passiveservices << ").\n"
-      << "Command and benchmark options\n"
       << "  -c --count            Number of passive check results to send (default is "
       << count << ")\n"
       << "Benchmark options\n"
