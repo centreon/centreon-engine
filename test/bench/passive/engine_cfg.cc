@@ -112,7 +112,7 @@ engine_cfg::engine_cfg(
     oss
       << "log_file=/dev/null\n"
       // << "log_file=/tmp/centengine.log\n"
-      << "cached_host_check_horizon=1\n"
+      << "cached_host_check_horizon=0\n"
       << "command_check_interval=-1\n"
       << "command_file=" << command_file() << "\n"
       << "state_retention_file=\n"
