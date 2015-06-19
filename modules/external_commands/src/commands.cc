@@ -467,42 +467,58 @@ void cmd_signal_process(int cmd, char* args) {
     0);
 }
 
-/* processes results of an external service check */
+/**
+ *  Processes results of an external service check.
+ *
+ *  @param[in]     cmd         Command ID.
+ *  @param[in]     check_time  Check time.
+ *  @param[in,out] args        Command arguments.
+ *
+ *  @return OK on success.
+ */
 int cmd_process_service_check_result(
       int cmd,
       time_t check_time,
       char* args) {
   (void)cmd;
 
-  /* get the host name */
-  char const* host_name(my_strtok(args, ";"));
-  if (!host_name)
+  if (!args)
     return (ERROR);
+  char* delimiter;
 
-  /* get the service description */
-  char const* svc_description(my_strtok(NULL, ";"));
-  if (!svc_description)
+  // Get the host name.
+  char* host_name(args);
+
+  // Get the service description.
+  delimiter = strchr(host_name, ';');
+  if (!delimiter)
     return (ERROR);
+  *delimiter = '\0';
+  ++delimiter;
+  char* svc_description(delimiter);
 
-  /* get the service check return code */
-  char const* temp_ptr(my_strtok(NULL, ";"));
-  if (!temp_ptr)
+  // Get the service check return code and output.
+  delimiter = strchr(svc_description, ';');
+  if (!delimiter)
     return (ERROR);
-  int return_code(atoi(temp_ptr));
-
-  /* get the plugin output (may be empty) */
-  char const* output(my_strtok(NULL, "\n"));
-  if (!output)
+  *delimiter = '\0';
+  ++delimiter;
+  char const* output(strchr(delimiter, ';'));
+  if (output) {
+    *const_cast<char*>(output) = '\0';
+    ++output;
+  }
+  else
     output = "";
+  int return_code(strtol(delimiter, NULL, 0));
 
-  /* submit the passive check result */
-  int result = process_passive_service_check(
-                 check_time,
-                 host_name,
-                 svc_description,
-                 return_code,
-                 output);
-  return (result);
+  // Submit the passive check result.
+  return (process_passive_service_check(
+            check_time,
+            host_name,
+            svc_description,
+            return_code,
+            output));
 }
 
 /* submits a passive service check result for later processing */
@@ -531,7 +547,7 @@ int process_passive_service_check(
     for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
       if (!strcmp(host_name, temp_host->address)) {
         real_host_name = temp_host->name;
-        break;
+        break ;
       }
     }
   }
@@ -599,37 +615,48 @@ int process_passive_service_check(
   return (OK);
 }
 
-/* process passive host check result */
+/**
+ *  Processes results of an external host check.
+ *
+ *  @param[in]     cmd         Command ID.
+ *  @param[in]     check_time  Check time.
+ *  @param[in,out] args        Command arguments.
+ *
+ *  @return OK on success.
+ */
 int cmd_process_host_check_result(
       int cmd,
       time_t check_time,
       char* args) {
   (void)cmd;
 
-  /* get the host name */
-  char const* host_name(my_strtok(args, ";"));
-  if (!host_name)
+  if (!args)
     return (ERROR);
 
-  /* get the host check return code */
-  char const* temp_ptr(my_strtok(NULL, ";"));
-  if (!temp_ptr)
-    return (ERROR);
-  int return_code(atoi(temp_ptr));
+  // Get the host name.
+  char* host_name(args);
 
-  /* get the plugin output (may be empty) */
-  char const* output(my_strtok(NULL, "\n"));
-  if (!output)
+  // Get the host check return code and output.
+  char* delimiter(strchr(host_name, ';'));
+  if (!delimiter)
+    return (ERROR);
+  *delimiter = '\0';
+  ++delimiter;
+  char const* output(strchr(delimiter, ';'));
+  if (output) {
+    *const_cast<char*>(output) = '\0';
+    ++output;
+  }
+  else
     output = "";
+  int return_code(strtol(delimiter, NULL, 0));
 
-  /* submit the check result */
-  int result = process_passive_host_check(
-                 check_time,
-                 host_name,
-                 return_code,
-                 output);
-
-  return (result);
+  // Submit the check result.
+  return (process_passive_host_check(
+            check_time,
+            host_name,
+            return_code,
+            output));
 }
 
 /* process passive host check result */
