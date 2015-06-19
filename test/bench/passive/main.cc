@@ -148,7 +148,8 @@ int main(int argc, char* argv[]) {
     centengine.enable_stream(com::centreon::process::out, false);
     centengine.enable_stream(com::centreon::process::err, false);
     centengine.exec(cmdline);
-    sleep(3);
+    while (access(cfg_files.command_file().c_str(), F_OK))
+      sleep(1);
     time_t start_time(time(NULL));  // Perform benchmark.
     std::cout << "Done\n";
 
@@ -166,10 +167,10 @@ int main(int argc, char* argv[]) {
                       << i << "/" << count;
             std::cout.flush();
           }
+          int service_id(random() % passiveservices + 1);
           ofs << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;"
-              << (random() % passivehosts) + 1 << ";"
-              << (random() % passiveservices) + 1 << ";"
-              << random() % 4 << ";output\n";
+              << (service_id - 1) / (passiveservices / passivehosts) + 1 << ";"
+              << service_id << ";" << random() % 4 << ";output\n";
         }
         ofs.close();
       }
@@ -214,11 +215,12 @@ int main(int argc, char* argv[]) {
   // Generate external commands.
   else if (mode == "commands") {
     time_t now(time(NULL));
-    for (int i(0), limit(count * 105 / 100); i < limit; ++i)
+    for (int i(0), limit(count * 105 / 100); i < limit; ++i) {
+      int service_id(random() % passiveservices + 1);
       std::cout << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;"
-                << (random() % passivehosts) + 1 << ";"
-                << (random() % passiveservices) + 1 << ";"
-                << random() % 4 << ";output\n";
+                << (service_id - 1) / (passiveservices / passivehosts) + 1 << ";"
+                << service_id << ";" << random() % 4 << ";output\n";
+    }
   }
   // Print help.
   else {
