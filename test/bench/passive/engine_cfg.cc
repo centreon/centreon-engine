@@ -78,7 +78,7 @@ engine_cfg::engine_cfg(
     for (int i(0); i < passive_services; ++i)
       oss << "define service{\n"
           << "  service_description " << i + 1 << "\n"
-          << "  host_name " << i * (passive_hosts / passive_services) + 1 << "\n"
+          << "  host_name " << i / (passive_services / passive_hosts) + 1 << "\n"
           << "  active_checks_enabled 0\n"
           << "  check_command default_command\n"
           << "  max_check_attempts 1\n"
@@ -90,7 +90,7 @@ engine_cfg::engine_cfg(
     for (int i(0); i < active_services; ++i)
       oss << "define service {\n"
           << "  service_description " << i + passive_services + 1 << "\n"
-          << "  host_name " << i * (active_hosts / active_services) + passive_hosts + 1 << "\n"
+          << "  host_name " << i / (active_services / active_hosts) + passive_hosts + 1 << "\n"
           << "  active_checks_enabled 1\n"
           << "  check_command default_command\n"
           << "  max_check_attempts 1\n"
@@ -112,6 +112,10 @@ engine_cfg::engine_cfg(
     oss
       << "log_file=/dev/null\n"
       // << "log_file=/tmp/centengine.log\n"
+      // << "debug_file=/tmp/centengine.debug\n"
+      // << "max_debug_file_size=10000000000\n"
+      // << "debug_level=-1\n"
+      // << "debug_verbosity=2\n"
       << "cached_host_check_horizon=0\n"
       << "command_check_interval=-1\n"
       << "command_file=" << command_file() << "\n"
