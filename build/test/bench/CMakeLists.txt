@@ -31,7 +31,7 @@ if (WITH_BENCH)
     "${TEST_DIR}/bench/passive/engine_cfg.cc"
     "${TEST_DIR}/bench/passive/main.cc")
   target_link_libraries("centengine_bench_passive" ${CLIB_LIBRARIES})
-  install("centengine_bench_passive"
+  install(TARGETS "centengine_bench_passive"
     DESTINATION "${PREFIX_BIN}"
     COMPONENT "bench")
 
