@@ -174,6 +174,7 @@ int main(int argc, char* argv[]) {
         ofs.close();
       }
     }
+    time_t send_time(time(NULL));
     std::cout << "\rSending passive check results...                Done               \n";
 
     // Wait for Centreon Engine.
@@ -185,10 +186,17 @@ int main(int argc, char* argv[]) {
 
     // Print results.
     std::cout << "\n"
-              << "  Total passive check results processed         "
+              << "  Total passive check results                   "
               << count << "\n"
-              << "  Total time in seconds                         "
+	      << "  Total send time in seconds                    "
+	      << send_time - start_time << "\n"
+              << "  Total processing time in seconds              "
               << end_time - start_time << "\n"
+	      << "  Average check results sent per second         "
+	      << static_cast<double>(count) / ((send_time != start_time)
+					       ? (send_time - start_time)
+					       : 1)
+	      << "\n"
               << "  Average check results processed per second    "
               << static_cast<double>(count) / ((end_time != start_time)
                                                ? (end_time - start_time)
