@@ -503,12 +503,7 @@ target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
 get_property(CENTENGINESTATS_BINARY TARGET "centenginestats" PROPERTY LOCATION)
 
 # Unit test.
-option(WITH_TESTING "Build unit tests." OFF)
-if (WITH_TESTING)
-  set(CTEST_TESTING_TIMEOUT 20)
-  include(CTest)
-  add_subdirectory("test")
-endif ()
+add_subdirectory("test")
 
 #
 # Install stuff.
