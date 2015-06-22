@@ -122,10 +122,21 @@ engine_cfg::engine_cfg(
       << "state_retention_file=\n"
       << "sleep_time=0.02\n"
       << "interval_length=10\n"
-      << "cfg_file=" << object_file << "\n"
-      << "broker_module=" << PROJECT_SOURCE_DIR << "/build/test/bench/bench_passive_module.so "
-      << expected_passive << "\n"
-      << additional;
+      << "cfg_file=" << object_file << "\n";
+    if (expected_passive) {
+      static char const* const potential_modules[] = {
+	PROJECT_SOURCE_DIR "/build/test/bench/bench_passive_module.so",
+	"/usr/lib64/nagios/bench_passive_module.so",
+	"/usr/lib/nagios/bench_passive_module.so",
+	NULL
+      };
+      for (int i(0); potential_modules[i]; ++i)
+	if (!access(potential_modules[i], F_OK))
+	  oss
+	    << "broker_module=" << potential_modules[i] << " "
+	    << expected_passive << "\n";
+    }
+    oss << additional;
     _write_file(main_file(), oss.str());
     _generated.push_back(main_file());
   }
