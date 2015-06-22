@@ -23,10 +23,16 @@ if (WITH_BENCH)
     "${TEST_DIR}/bench/passive/module.cc")
   set_target_properties("bench_passive_module"
     PROPERTIES PREFIX "")
+  install(TARGETS "bench_passive_module"
+    DESTINATION "${PREFIX_LIB}"
+    COMPONENT "bench")
 
-  add_executable("bench_passive"
+  add_executable("centengine_bench_passive"
     "${TEST_DIR}/bench/passive/engine_cfg.cc"
     "${TEST_DIR}/bench/passive/main.cc")
-  target_link_libraries("bench_passive" ${CLIB_LIBRARIES})
+  target_link_libraries("centengine_bench_passive" ${CLIB_LIBRARIES})
+  install("centengine_bench_passive"
+    DESTINATION "${PREFIX_BIN}"
+    COMPONENT "bench")
 
 endif ()
