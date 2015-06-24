@@ -24,8 +24,10 @@
 # available options.
 
 log_file=@VAR_DIR@/centengine.log
-cfg_dir=@PREFIX_CONF@/centreon.d
 command_file=@RW_DIR@/centengine.cmd
 state_retention_file=@VAR_DIR@/retention.dat
 status_file=@VAR_DIR@/status.dat
 broker_module=@PREFIX_LIB@/externalcmd.so
+
+cfg_include_dir=@PREFIX_CONF@/conf.d
+cfg_dir=@PREFIX_CONF@/objects.d
