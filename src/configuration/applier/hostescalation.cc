@@ -270,7 +270,10 @@ void applier::hostescalation::resolve_object(
            << "host escalation");
 
   // Resolve host escalation.
-  if (!check_hostescalation(it->second.get(), NULL, NULL))
+  if (!check_hostescalation(
+        it->second.get(),
+        &config_warnings,
+        &config_errors))
     throw (engine_error() << "Cannot resolve host escalation");
 
   return ;

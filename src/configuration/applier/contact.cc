@@ -498,7 +498,7 @@ void applier::contact::resolve_object(
     &deleter::objectlist);
 
   // Resolve contact.
-  if (!check_contact(it->second.get(), NULL, NULL))
+  if (!check_contact(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve contact '"
            << obj->contact_name() << "'");
 

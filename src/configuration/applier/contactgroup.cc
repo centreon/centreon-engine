@@ -254,7 +254,7 @@ void applier::contactgroup::resolve_object(
            << "contact group '" << obj->contactgroup_name() << "'");
 
   // Resolve contact group.
-  if (!check_contactgroup(it->second.get(), NULL, NULL))
+  if (!check_contactgroup(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Error: Cannot resolve contact group "
            << obj->contactgroup_name() << "'");
 

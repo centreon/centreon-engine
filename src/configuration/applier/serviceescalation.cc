@@ -288,7 +288,10 @@ void applier::serviceescalation::resolve_object(
     throw (engine_error() << "Cannot resolve service escalation");
 
   // Check service escalation.
-  if (!check_serviceescalation(it->second.get(), NULL, NULL))
+  if (!check_serviceescalation(
+        it->second.get(),
+        &config_warnings,
+        &config_errors))
     throw (engine_error() << "Cannot resolve service escalation");
 
   return ;

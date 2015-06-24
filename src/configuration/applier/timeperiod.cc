@@ -249,7 +249,7 @@ void applier::timeperiod::resolve_object(
            << "time period '" << obj->timeperiod_name() << "'");
 
   // Resolve time period.
-  if (!check_timeperiod(it->second.get(), NULL, NULL))
+  if (!check_timeperiod(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve time period '"
            << obj->timeperiod_name() << "'");
 
