@@ -393,7 +393,7 @@ void applier::host::resolve_object(
   it->second->total_service_check_interval = 0;
 
   // Resolve host.
-  if (!check_host(it->second.get(), NULL, NULL))
+  if (!check_host(it->second.get(), &config_warnings, &config_errors))
     throw (engine_error() << "Cannot resolve host '"
            << obj->host_name() << "'");
 
