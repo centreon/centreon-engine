@@ -74,11 +74,10 @@ void parser::parse(std::string const& path, state& config) {
          ++it)
       _parse_global_configuration(*it, false);
   }
+  _apply(config.cfg_include_dir(), &parser::_parse_global_directory);
 
   // Parse objects files.
   _apply(config.cfg_file(), &parser::_parse_object_definitions);
-
-  // Parse objects configuration directories.
   _apply(config.cfg_dir(), &parser::_parse_directory_configuration);
 
   // Apply template.
@@ -301,6 +300,23 @@ void parser::_parse_global_configuration(
              << input << "'");
   }
 
+  return ;
+}
+
+/**
+ *  Parse global configuration directory.
+ *
+ *  @param[in] path  Global configuration directory.
+ */
+void parser::_parse_global_directory(std::string const& path) {
+  directory_entry dir(path);
+  std::list<file_entry> const& lst(dir.entry_list("*.cfg"));
+  for (std::list<file_entry>::const_iterator
+	 it(lst.begin()),
+	 end(lst.end());
+       it != end;
+       ++it)
+    _parse_global_configuration(it->path(), false);
   return ;
 }
 

@@ -59,6 +59,7 @@ state::setters const state::_setters[] = {
   { "cfg_dir",                                     SETTER(std::string const&, _set_cfg_dir) },
   { "cfg_file",                                    SETTER(std::string const&, _set_cfg_file) },
   { "cfg_include",                                 SETTER(std::string const&, _set_cfg_include) },
+  { "cfg_include_dir",                             SETTER(std::string const&, _set_cfg_include_dir) },
   { "check_host_freshness",                        SETTER(bool, check_host_freshness) },
   { "check_result_reaper_frequency",               SETTER(duration const&, check_reaper_interval) },
   { "check_service_freshness",                     SETTER(bool, check_service_freshness) },
@@ -917,6 +918,15 @@ std::list<std::string>& state::cfg_include() throw () {
  */
 std::list<std::string> const& state::cfg_include() const throw () {
   return (_cfg_include);
+}
+
+/**
+ *  Get included configuration directories.
+ *
+ *  @return List of included configuration directories.
+ */
+std::list<std::string> const& state::cfg_include_dir() const throw () {
+  return (_cfg_include_dir);
 }
 
 /**
@@ -2418,9 +2428,9 @@ void state::_set_broker_module(std::string const& value) {
 }
 
 /**
- *  Add configuration directory.
+ *  Add object configuration directory.
  *
- *  @param[in] value The new configuration directory.
+ *  @param[in] value  A new object configuration directory.
  */
 void state::_set_cfg_dir(std::string const& value) {
   if (value.empty() || value[0] == '/')
@@ -2433,9 +2443,9 @@ void state::_set_cfg_dir(std::string const& value) {
 }
 
 /**
- *  Add configuration file.
+ *  Add object configuration file.
  *
- *  @param[in] value The new configuration file.
+ *  @param[in] value  A new object configuration file.
  */
 void state::_set_cfg_file(std::string const& value) {
   if (value.empty() || value[0] == '/')
@@ -2448,9 +2458,9 @@ void state::_set_cfg_file(std::string const& value) {
 }
 
 /**
- *  Set included file.
+ *  Set global included file.
  *
- *  @param[in] value  An included configuration file.
+ *  @param[in] value  An included global configuration file.
  */
 void state::_set_cfg_include(std::string const& value) {
   if (value.empty() || value[0] == '/')
@@ -2459,6 +2469,22 @@ void state::_set_cfg_include(std::string const& value) {
     io::file_entry fe(_cfg_main);
     std::string base_name(fe.directory_name());
     _cfg_include.push_back(base_name + "/" + value);
+  }
+  return ;
+}
+
+/**
+ *  Add global included directory.
+ *
+ *  @param[in] value  An included global configuration directory.
+ */
+void state::_set_cfg_include_dir(std::string const& value) {
+  if (value.empty() || value[0] == '/')
+    _cfg_include_dir.push_back(value);
+  else {
+    io::file_entry fe(_cfg_main);
+    std::string base_name(fe.directory_name());
+    _cfg_include_dir.push_back(base_name + "/" + value);
   }
   return ;
 }

@@ -69,6 +69,7 @@ namespace                           configuration {
     std::list<std::string> const&   cfg_file() const throw ();
     std::list<std::string>&         cfg_include() throw ();
     std::list<std::string> const&   cfg_include() const throw ();
+    std::list<std::string> const&   cfg_include_dir() const throw ();
     std::string const&              cfg_main() const throw ();
     void                            cfg_main(std::string const& value);
     bool                            check_host_freshness() const throw ();
@@ -270,6 +271,7 @@ namespace                           configuration {
     void                            _set_cfg_dir(std::string const& value);
     void                            _set_cfg_file(std::string const& value);
     void                            _set_cfg_include(std::string const& value);
+    void                            _set_cfg_include_dir(std::string const& value);
     void                            _set_event_broker_options(std::string const& value);
 
     duration                        _additional_freshness_latency;
@@ -280,6 +282,7 @@ namespace                           configuration {
     std::list<std::string>          _cfg_dir;
     std::list<std::string>          _cfg_file;
     std::list<std::string>          _cfg_include;
+    std::list<std::string>          _cfg_include_dir;
     std::string                     _cfg_main;
     bool                            _check_host_freshness;
     duration                        _check_reaper_interval;

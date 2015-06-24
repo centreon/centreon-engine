@@ -88,6 +88,7 @@ namespace              configuration {
     void               _parse_global_configuration(
                          std::string const& path,
                          bool is_main_file);
+    void               _parse_global_directory(std::string const& path);
     void               _parse_object_definitions(std::string const& path);
     void               _resolve_template();
     void               _store_into_list(object_ptr obj);
