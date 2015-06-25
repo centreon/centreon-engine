@@ -285,14 +285,8 @@ int check_service(service* svc, int* w, int* e) {
     svc->check_command_ptr = temp_command;
   }
 
-  /* verify service check timeperiod */
-  if (svc->check_period == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "' has no check time period defined!";
-    warnings++;
-  }
-  else {
+  // Verify service check timeperiod.
+  if (svc->check_period != NULL) {
     timeperiod* temp_timeperiod = find_timeperiod(svc->check_period);
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
@@ -303,7 +297,7 @@ int check_service(service* svc, int* w, int* e) {
       errors++;
     }
 
-    /* save the pointer to the check timeperiod for later */
+    // Save the pointer to the check timeperiod for later.
     svc->check_period_ptr = temp_timeperiod;
   }
 
