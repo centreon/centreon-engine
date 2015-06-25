@@ -34,6 +34,7 @@
 #include "com/centreon/shared_ptr.hh"
 #include "compatibility/locations.h"
 #include "chkdiff.hh"
+#include "config.hh"
 #include "skiplist.h"
 #include "test/unittest.hh"
 #include "xodtemplate.hh"

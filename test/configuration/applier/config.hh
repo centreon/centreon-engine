@@ -18,26 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_CONFIG_HH
-#  define CCE_CONFIG_HH
+#ifndef TEST_CONFIG_HH
+#  define TEST_CONFIG_HH
 
-#  include "com/centreon/engine/objects.hh"
+// Try and verify the configuration data.
+int pre_flight_check();
+// Verify object relationships and settings.
+int pre_flight_object_check(int* w, int* e);
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif // C++
-
-// Detects circular dependencies and paths.
-int pre_flight_circular_check(int* w, int* e);
-
-int check_service(service* svc, int* w, int* e);
-int check_host(host* hst, int* w, int* e);
-int check_servicedependency(servicedependency* sd, int* w, int* e);
-int check_hostdependency(hostdependency* hd, int* w, int* e);
-int check_timeperiod(timeperiod* tp, int* w, int* e);
-
-#  ifdef __cplusplus
-}
-#  endif // C++
-
-#endif // !CCE_CONFIG_HH
+#endif // !TEST_CONFIG_HH
