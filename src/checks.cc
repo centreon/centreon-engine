@@ -2218,8 +2218,6 @@ int handle_async_host_check_result_3x(
 
   /* save the old host state */
   temp_host->last_state = temp_host->current_state;
-  if (temp_host->state_type == HARD_STATE)
-    temp_host->last_hard_state = temp_host->current_state;
 
   /* clear the old plugin output and perf data buffers */
   delete[] temp_host->long_plugin_output;
@@ -2758,6 +2756,8 @@ int process_host_check_result_3x(
       }
     }
   }
+  if (hst->state_type == HARD_STATE)
+    hst->last_hard_state = hst->current_state;
 
   logger(dbg_checks, more)
     << "Pre-handle_host_state() Host: " << hst->name
