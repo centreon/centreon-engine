@@ -126,8 +126,8 @@ engine_cfg::engine_cfg(
     if (expected_passive) {
       static char const* const potential_modules[] = {
 	PROJECT_SOURCE_DIR "/build/test/bench/bench_passive_module.so",
-	"/usr/lib64/nagios/bench_passive_module.so",
-	"/usr/lib/nagios/bench_passive_module.so",
+	"/usr/lib64/centreon-engine/bench_passive_module.so",
+	"/usr/lib/centreon-engine/bench_passive_module.so",
 	NULL
       };
       for (int i(0); potential_modules[i]; ++i)
