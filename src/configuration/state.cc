@@ -517,7 +517,7 @@ static std::string const               default_state_retention_file(DEFAULT_RETE
 static std::string const               default_status_file(DEFAULT_STATUS_FILE);
 static long const                      default_time_change_threshold(900);
 static bool const                      default_use_setpgid(true);
-static bool const                      default_use_syslog(true);
+static bool const                      default_use_syslog(false);
 static std::string const               default_use_timezone("");
 
 /**
