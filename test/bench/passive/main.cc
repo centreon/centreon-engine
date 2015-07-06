@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <csignal>
 #include <cstdlib>
 #include <fstream>
 #ifdef HAVE_GETOPT_H
@@ -40,6 +41,7 @@ int main(int argc, char* argv[]) {
   // Initialization.
   com::centreon::clib::load();
   srandom(getpid());
+  signal(SIGPIPE, SIG_IGN);
 
   // Options.
 #ifdef HAVE_GETOPT_H
@@ -160,12 +162,17 @@ int main(int argc, char* argv[]) {
       std::ofstream ofs;
       ofs.open(cfg_files.command_file().c_str());
       if (ofs.good()) {
+        int slice(count / 100 + 1);
         for (int i(0), limit(count * 105 / 100); i < limit; ++i) {
-          if (!(i % 1000)) {
+          if (!(i % 10000)) {
             std::cout << "\rSending passive check results...                "
                       << i << "/" << count;
             std::cout.flush();
           }
+          if (!(i % slice))
+            sleep(1);
+          if (centengine.wait(0))
+            break ;
           int service_id(random() % passiveservices + 1);
           ofs << "[" << now << "] PROCESS_SERVICE_CHECK_RESULT;"
               << (service_id - 1) / (passiveservices / passivehosts) + 1 << ";"
