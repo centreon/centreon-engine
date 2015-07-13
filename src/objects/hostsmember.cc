@@ -63,6 +63,22 @@ bool operator!=(
 }
 
 /**
+ *  Less-than operator.
+ *
+ *  @param[in] obj1  The first object to compare.
+ *  @param[in] obj2  The second object to compare.
+ *
+ *  @return True if obj1 is strictly less than obj2.
+ */
+bool operator<(
+       hostsmember const& obj1,
+       hostsmember const& obj2) throw () {
+  if (!obj1.host_name || !obj2.host_name)
+    return (obj1.host_name < obj2.host_name);
+  return (strcmp(obj1.host_name, obj2.host_name) < 0);
+}
+
+/**
  *  Dump hostsmember content into the stream.
  *
  *  @param[out] os  The output stream.

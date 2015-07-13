@@ -51,6 +51,9 @@ bool          operator==(
 bool          operator!=(
                 hostsmember const& obj1,
                 hostsmember const& obj2) throw ();
+bool          operator<(
+                hostsmember const& obj1,
+                hostsmember const& obj2) throw ();
 std::ostream& operator<<(std::ostream& os, hostsmember const& obj);
 
 #  endif /* C++ */

@@ -135,6 +135,11 @@ set(TEST_NAME "parse_and_apply_configuration_timeperiod_template")
 set(TEST_CONF_FILE "main_timeperiod_template.cfg")
 add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
+# parse_and_apply_configuration_additive_inheritance
+set(TEST_NAME "parse_and_apply_configuration_additive_inheritance")
+set(TEST_CONF_FILE "main_additive_inheritance.cfg")
+add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+
 ## parse configuration and remove objects.
 
 # check remove objects.

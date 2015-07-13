@@ -259,6 +259,10 @@ bool chkdiff(global& g1, global& g2) {
     ret = false;
   reset_next_check(g1.hosts);
   reset_next_check(g2.hosts);
+  for (host_struct* h(g1.hosts); h; h = h->next)
+    sort_it(h->parent_hosts);
+  for (host_struct* h(g2.hosts); h; h = h->next)
+    sort_it(h->parent_hosts);
   if (!chkdiff(g1.hosts, g2.hosts))
     ret = false;
   sort_it(g1.hostdependencies);
