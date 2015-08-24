@@ -1033,7 +1033,9 @@ int handle_host_state(host* hst) {
   if (state_change == true) {
 
     /* update last state change times */
-    hst->last_state_change = current_time;
+    if (hst->state_type == SOFT_STATE
+        || hst->last_state != hst->current_state)
+      hst->last_state_change = current_time;
     if (hst->state_type == HARD_STATE)
       hst->last_hard_state_change = current_time;
 
