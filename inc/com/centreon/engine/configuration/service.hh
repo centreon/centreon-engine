@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -76,7 +76,9 @@ namespace                  configuration {
     list_string&           contactgroups() throw ();
     list_string const&     contactgroups() const throw ();
     bool                   contactgroups_defined() const throw ();
+    list_string&           contacts() throw ();
     list_string const&     contacts() const throw ();
+    bool                   contacts_defined() const throw ();
     map_customvar const&   customvariables() const throw ();
     std::string const&     display_name() const throw ();
     std::string const&     event_handler() const throw ();

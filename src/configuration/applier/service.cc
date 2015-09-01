@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -723,7 +723,8 @@ void applier::service::_inherits_special_vars(
                          shared_ptr<configuration::service> obj,
                          configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj->contactgroups_defined()
+  if (!obj->contacts_defined()
+      || !obj->contactgroups_defined()
       || !obj->notification_interval_defined()
       || !obj->notification_period_defined()) {
     // Remove service from state (it will be modified
@@ -746,6 +747,8 @@ void applier::service::_inherits_special_vars(
              << obj->hosts().front() << "' does not exist");
 
     // Inherits variables.
+    if (!obj->contacts_defined())
+      obj->contacts() = (*it)->contacts();
     if (!obj->contactgroups_defined())
       obj->contactgroups() = (*it)->contactgroups();
     if (!obj->notification_interval_defined())

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -608,8 +608,26 @@ bool service::contactgroups_defined() const throw () {
  *
  *  @return The contacts.
  */
+list_string& service::contacts() throw () {
+  return (*_contacts);
+}
+
+/**
+ *  Get contacts.
+ *
+ *  @return The contacts.
+ */
 list_string const& service::contacts() const throw () {
   return (*_contacts);
+}
+
+/**
+ *  Check if contacts were defined.
+ *
+ *  @return True if contacts were defined.
+ */
+bool service::contacts_defined() const throw () {
+  return (_contacts.is_set());
 }
 
 /**
