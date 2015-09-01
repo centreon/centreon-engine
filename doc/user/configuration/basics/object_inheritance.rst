@@ -343,12 +343,15 @@ value in your object definition or inherit them from a template.
 =================== ===================== ==========================================================
 Object Type         Object Variable       Implied Source
 =================== ===================== ==========================================================
+Services            contacts              contacts in the associated host definition
 Services            contact_groups        contact_groups in the associated host definition
 Services            notification_interval notification_interval in the associated host definition
 Services            notification_period   notification_period in the associated host definition
+Host Escalations    contacts              contacts in the associated host definition
 Host Escalations    contact_groups        contact_groups in the associated host definition
 Host Escalations    notification_interval notification_interval in the associated host definition
 Host Escalations    escalation_period     notification_period in the associated host definition
+Service Escalations contacts              contacts in the associated service definition
 Service Escalations contact_groups        contact_groups in the associated service definition
 Service Escalations notification_interval notification_interval in the associated service definition
 Service Escalations escalation_period     notification_period in the associated service definition
@@ -514,4 +517,3 @@ things work in complex inheritance situations like this. :-)
 
 .. image:: /_static/images/multiple-templates2.png
    :align: center
-
