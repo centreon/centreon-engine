@@ -328,7 +328,7 @@ int handle_async_service_check_result(
 
     temp_service->plugin_output
       = string::dup("(Service check did not exit properly)");
-    temp_service->current_state = STATE_CRITICAL;
+    temp_service->current_state = STATE_UNKNOWN;
   }
 
   /* make sure the return code is within bounds */
@@ -356,7 +356,7 @@ int handle_async_service_check_result(
 	<< ')';
 
     string::setstr(temp_service->plugin_output, oss.str());
-    temp_service->current_state = STATE_CRITICAL;
+    temp_service->current_state = STATE_UNKNOWN;
   }
 
   /* else the return code is okay... */
@@ -2282,7 +2282,7 @@ int handle_async_host_check_result_3x(
       temp_host->long_plugin_output = NULL;
       temp_host->perf_data = NULL;
 
-      result = STATE_CRITICAL;
+      result = STATE_UNKNOWN;
     }
 
     /* make sure the return code is within bounds */
@@ -2310,7 +2310,7 @@ int handle_async_host_check_result_3x(
       delete[] temp_host->perf_data;
       temp_host->perf_data = NULL;
 
-      result = STATE_CRITICAL;
+      result = STATE_UNKNOWN;
     }
 
     /* a NULL host check command means we should assume the host is UP */

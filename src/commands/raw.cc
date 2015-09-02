@@ -195,12 +195,12 @@ void raw::run(
   res.exit_status = p.exit_status();
 
   if (res.exit_status == process::timeout) {
-    res.exit_code = STATE_CRITICAL;
+    res.exit_code = STATE_UNKNOWN;
     res.output = "(Process Timeout)";
   }
-  else if (res.exit_status == process::crash)
-    res.exit_code = STATE_CRITICAL;
-  else if (res.exit_code < -1 || res.exit_code > 3)
+  else if ((res.exit_status == process::crash)
+           || (res.exit_code < -1)
+           || (res.exit_code > 3))
     res.exit_code = STATE_UNKNOWN;
 
   logger(dbg_commands, basic)
@@ -295,12 +295,12 @@ void raw::finished(process& p) throw () {
     res.exit_status = p.exit_status();
 
     if (res.exit_status == process::timeout) {
-      res.exit_code = STATE_CRITICAL;
+      res.exit_code = STATE_UNKNOWN;
       res.output = "(Process Timeout)";
     }
-    else if (res.exit_status == process::crash)
-      res.exit_code = STATE_CRITICAL;
-    else if (res.exit_code < -1 || res.exit_code > 3)
+    else if ((res.exit_status == process::crash)
+             || (res.exit_code < -1)
+             || (res.exit_code > 3))
       res.exit_code = STATE_UNKNOWN;
 
     logger(dbg_commands, basic)
