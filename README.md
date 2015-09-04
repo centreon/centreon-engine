@@ -10,12 +10,12 @@ and is endorsed by the [Centreon company](https://www.centreon.com).
 
 The full Centreon Engine documentation is available online
 [here](http://documentation.centreon.com/docs/centreon-engine/en/). It
-is generated from ReST files located in the ./doc/ directory of Centreon
+is generated from ReST files located in the *./doc/* directory of Centreon
 Engine sources.
 
 The documentation extensively covers all aspects of Centreon Engine such
 as installation, compilation, configuration, use and more. It is the
-reference guide the software. This README is only provided as a quick
+reference guide the software. This *README* is only provided as a quick
 introduction.
 
 ## Installing from binaries ##
@@ -24,7 +24,7 @@ introduction.
 software suite. If this is your first installation you would probably
 want to [install it entirely](https://documentation.centreon.com/docs/centreon/en/2.6.x/installation/index.html).
 
-Centreon ([the company behind the Centreon software suite](http://www.centreon.com])
+Centreon ([the company behind the Centreon software suite](http://www.centreon.com))
 provides binary packages for RedHat / CentOS. They are available either
 as part of the [Centreon Entreprise Server distribution](https://www.centreon.com/en/products/centreon-enterprise-server/)
 or as individual packages on [our RPM repository](https://documentation.centreon.com/docs/centreon/en/2.6.x/installation/from_packages.html).
