@@ -10,13 +10,13 @@ and is endorsed by the [Centreon company](https://www.centreon.com).
 
 The full Centreon Engine documentation is available online
 [here](http://documentation.centreon.com/docs/centreon-engine/en/). It
-is generated from ReST files located in the *./doc/* directory of Centreon
-Engine sources.
+is generated from ReST files located in the *./doc/* directory of
+Centreon Engine sources.
 
 The documentation extensively covers all aspects of Centreon Engine such
 as installation, compilation, configuration, use and more. It is the
-reference guide the software. This *README* is only provided as a quick
-introduction.
+reference guide of the software. This *README* is only provided as a
+quick introduction.
 
 ## Installing from binaries ##
 
@@ -34,13 +34,13 @@ Centreon Engine.
 
     $# yum install centreon-engine
 
-## Fetching the sources ##
+## Fetching sources ##
 
 The reference repository is hosted at [GitHub](https://github.com/centreon/centreon-engine).
 Beware that the repository hosts in-developement sources and that it
 might not work at all.
 
-Stable releases are available as gziped tarballs on [Centreon's download site](https://download.centreon.com/).
+Stable releases are available as gziped tarballs on [Centreon's download site](https://download.centreon.com).
 
 ## Compilation (quickstart) ##
 
@@ -60,12 +60,12 @@ directory and launch the CMake command. This will look for required
 dependencies and print a summary of the compilation parameters if
 everything went fine.
 
-    $> cd centreon-broker/build
+    $> cd centreon-engine/build
     $> cmake .
     ...
 
-Now launch the compilation using the *make* command and then install it
-by running *make install* as priviledged user.
+Now launch the compilation using the *make* command and then install the
+software by running *make install* as priviledged user.
 
     $> make -j 4
     ...
