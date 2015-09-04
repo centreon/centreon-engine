@@ -32,7 +32,7 @@ or as individual packages on [our RPM repository](https://documentation.centreon
 Once the repository installed a simple command will be needed to install
 Centreon Engine.
 
-  $# yum install centreon-engine
+    $# yum install centreon-engine
 
 ## Fetching the sources ##
 
@@ -60,15 +60,44 @@ directory and launch the CMake command. This will look for required
 dependencies and print a summary of the compilation parameters if
 everything went fine.
 
-  $> cd centreon-broker/build
-  $> cmake .
-  ...
+    $> cd centreon-broker/build
+    $> cmake .
+    ...
 
 Now launch the compilation using the *make* command and then install it
 by running *make install* as priviledged user.
 
-  $> make -j 4
-  ...
-  $# make install
+    $> make -j 4
+    ...
+    $# make install
 
 You're done !
+
+## Bug reports ##
+
+The best way to report a bug is to open an issue in GitHub's
+[issue tracker](https://github.com/centreon/centreon-engine/issues/).
+
+For a quick resolution your message should contain :
+
+* the problem description
+* precise steps on how to reproduce the issue (if you're using Centreon
+  web UI tell us where you click)
+* the expected behavior
+* the Centreon product**s** version**s**
+* the operating system you're using (name and version)
+* if possible configuration, log and debug files
+
+## Contributing ##
+
+Contributions are much welcome ! If possible provide them as
+pull-requests on GitHub. If not, patches will do but describe against
+which vesion/commit they apply.
+
+For any question or remark feel free to send a mail to the project
+maintainer : Matthieu Kermagoret (mkermagoret@centreon.com).
+
+## Feature requests ##
+
+Features can be requested in the
+[issue tracker](https://github.com/centreon/centreon-engine/issues/).
