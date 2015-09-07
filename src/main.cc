@@ -240,7 +240,12 @@ int main(int argc, char* argv[]) {
         << "                              files.\n"
         << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
         << "                              USE WITH CAUTION !\n"
-        << "  -D, --diagnose              Generate a diagnostic file.";
+        << "  -D, --diagnose              Generate a diagnostic file.\n"
+        << "\n"
+        << "Online:\n"
+        << "  Website                     https://www.centreon.com\n"
+        << "  Reference documentation     https://documentation.centreon.com/docs/centreon-engine/en/latest/\n"
+        << "  Sources                     https://github.com/centreon/centreon-engine";
       retval = (display_help ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     // We're just verifying the configuration.
