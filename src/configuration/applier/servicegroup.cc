@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -74,13 +74,8 @@ void applier::servicegroup::add_object(
   logger(logging::dbg_config, logging::more)
     << "Creating new servicegroup '" << obj->servicegroup_name() << "'";
 
-  if (obj->resolved_members().empty()) {
-    ++config_warnings;
-    logger(logging::log_config_warning, logging::basic)
-      << "Warning: Specified service group '"
-      << obj->servicegroup_name() << "' has no members";
+  if (obj->resolved_members().empty())
     return ;
-  }
 
   // Add service group to the global configuration set.
   config->servicegroups().insert(obj);

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -77,12 +77,8 @@ void applier::contactgroup::add_object(
     << "Creating new contactgroup '"
     << obj->contactgroup_name() << "'.";
 
-  if (obj->resolved_members().empty()) {
-    ++config_warnings;
-    logger(logging::log_config_warning, logging::basic)
-      << "Warning: Specified contact group '"
-      << obj->contactgroup_name() << "' has no members";
-  }
+  if (obj->resolved_members().empty())
+    return ;
 
   // Add contact group to the global configuration set.
   config->contactgroups().insert(obj);
