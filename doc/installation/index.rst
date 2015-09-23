@@ -4,8 +4,8 @@
 Installation
 ############
 
-Merethis recommends using its official packages from the Centreon
-Entreprise Server (CES) repository. Most of Merethis' endorsed
+Centreon recommends using its official packages from the Centreon
+Entreprise Server (CES) repository. Most of Centreon' endorsed
 software are available as RPM packages.
 
 Alternatively, you can build and install your own version of this
@@ -15,7 +15,7 @@ software by following the :ref:`user_installation_using_sources`.
 Using packages
 **************
 
-Merethis provides RPM for its products through Centreon Entreprise
+Centreon provides RPM for its products through Centreon Entreprise
 Server (CES). Open source products are freely available from our
 repository.
 
@@ -34,19 +34,19 @@ CentOS 5
 
 Run the following command as privileged user ::
 
-  $ wget http://yum.centreon.com/standard/2.2/noarch/RPMS/ces-release-2.2-4.noarch.rpm                                                                                                                         
-  $ yum install --nogpgcheck ces-release-2.2-4.noarch.rpm                                                                                                                                                      
-  $ rm -f ces-release-2.2-4.noarch.rpm                                                                                                                                                                         
-  $ yum clean all 
+  $ wget http://yum.centreon.com/standard/2.2/noarch/RPMS/ces-release-2.2-4.noarch.rpm
+  $ yum install --nogpgcheck ces-release-2.2-4.noarch.rpm
+  $ rm -f ces-release-2.2-4.noarch.rpm
+  $ yum clean all
 
 CentOS 6
 --------
 
 Run the following commands as privileged user ::
 
-  $ wget http://yum.centreon.com/standard/3.0/stable/noarch/RPMS/ces-release-3.0-1.noarch.rpm                                                                                                                  
-  $ yum install --nogpgcheck ces-release-3.0-1.noarch.rpm                                                                                                                                                      
-  $ rm -f ces-release-3.0-1.noarch.rpm                                                                                                                                                                         
+  $ wget http://yum.centreon.com/standard/3.0/stable/noarch/RPMS/ces-release-3.0-1.noarch.rpm
+  $ yum install --nogpgcheck ces-release-3.0-1.noarch.rpm
+  $ rm -f ces-release-3.0-1.noarch.rpm
   $ yum clean all
 
 Install
@@ -56,7 +56,7 @@ Run the following commands as privileged user ::
 
   $ yum install centreon-engine
 
-All dependencies are automatically installed from Merethis repositories.
+All dependencies are automatically installed from Centreon repositories.
 
 .. _user_installation_using_sources:
 
@@ -69,7 +69,7 @@ dependencies:
 
   * a C++ compilation environment.
   * CMake **(>= 2.8)**, a cross-platform build system.
-  * Centreon Clib **(>= 1.2)**, The centreon Core library.
+  * Centreon Clib **(>= 1.4)**, The centreon core library.
 
 To build the optional web service module, you will need the following
 external dependencies:
@@ -80,7 +80,6 @@ external dependencies:
   * SSL toolkit implementing SSL v2/v3 and TLS protocols with
     full-strength cryptography world-wide.
   * xerces-c toolkit to parse XML configuration files.
-
 
 This program is compatible only with Unix-like platforms (Linux,
 FreeBSD, Solaris, ...).
@@ -118,10 +117,10 @@ Software                    Package Name        Description
 C++ compilation environment gcc gcc-c++ make    Mandatory tools to compile.
 CMake **(>= 2.8)**          cmake               Read the build script and
                                                 prepare sources for compilation.
-Centreon Clib  **(>= 1.2)** centreon-clib-devel Core library used by Centreon
+Centreon Clib  **(>= 1.4)** centreon-clib-devel Core library used by Centreon
 =========================== =================== ================================
 
-Optional packages was need for use web service module:
+Optional packages needed to use the webservice module:
 
 =========================== =================== ================================
 Software                    Package Name        Description
@@ -139,7 +138,7 @@ xerces-c                    xerces-c-devel      Used for parsing XML
 
    $ yum install gcc gcc-c++ make
 
-#. Install Merethis repository
+#. Install Centreon repository
 
    You need to install Centreon Entreprise Server (CES) repos file as
    explained :ref:`user_installation_packages_prerequisites` to use some
@@ -177,7 +176,7 @@ Software                    Package Name      Description
 C++ compilation environment build-essential   Mandatory tools to compile.
 CMake **(>= 2.8)**          cmake             Read the build script and
                                               prepare sources for compilation.
-Centreon Clib **(>= 1.2)**  centreon-clib-dev Core library used by Centreon
+Centreon Clib **(>= 1.4)**  centreon-clib-dev Core library used by Centreon
                                               Connector.
 =========================== ================= ================================
 
@@ -223,7 +222,7 @@ Software                    Package Name        Description
 C++ compilation environment gcc gcc-c++ make    Mandatory tools to compile.
 CMake **(>= 2.8)**          cmake               Read the build script and
                                                 prepare sources for compilation.
-Centreon Clib **(>= 1.2)**  centreon-clib-devel Core library used by Centreon
+Centreon Clib **(>= 1.4)**  centreon-clib-devel Core library used by Centreon
                                                 Connector.
 =========================== =================== ================================
 
@@ -253,7 +252,7 @@ xerces-c                    libxerces-c-devel   Used for parsing XML
 
      $ zypper install zlib1g-dev libssl-dev libxerces-c-dev
 
-#. Install gSOAP from merethis server ::
+#. Install gSOAP from Centreon server ::
 
      $ ARCH=`uname -m`
      $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/libgsoap-2.8.4-1.1.${ARCH}.rpm
@@ -269,11 +268,11 @@ Build
 Get sources
 -----------
 
-Centreon Engine can be checked out from Merethis's git server at
-http://git.centreon.com/centreon-engine. On a Linux box with git
+Centreon Engine can be checked out from GitHub at
+https://github.com/centreon/centreon-engine. On a Linux box with git
 installed this is just a matter of ::
 
-  $ git clone http://git.centreon.com/centreon-engine
+  $ git clone https://github.com/centreon/centreon-engine
 
 Or You can get the latest Centreon Engine's sources from its
 `download website <http://www.centreon.com/Content-Download/download-centreon-engine-centreon>`_
@@ -300,6 +299,7 @@ Here's the list of variables available and their description:
 ============================== ================================================ ============================================
 Variable                       Description                                      Default value
 ============================== ================================================ ============================================
+WITH_BENCH                     Build benchmarking tools.                        OFF
 WITH_CENTREON_CLIB_INCLUDE_DIR Set the directory path of centreon-clib include. auto detection
 WITH_CENTREON_CLIB_LIBRARIES   Set the centreon-clib library to use.            auto detection
 WITH_CENTREON_CLIB_LIBRARY_DIR Set the centreon-clib library directory (don't   auto detection
