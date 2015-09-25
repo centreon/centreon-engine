@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -184,10 +184,6 @@ void serviceescalation::check_validity() const {
              << "any host or host group (properties 'host_name' or "
              << "'hostgroup_name', respectively)");
   }
-  if (_contacts->empty() && _contactgroups->empty())
-    throw (engine_error() << "Service escalation is not attached to "
-           << "any contact or contact group (properties 'contacts' or "
-           << "'contact_groups', respectively)");
   return ;
 }
 

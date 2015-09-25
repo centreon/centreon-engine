@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -166,10 +166,6 @@ void hostescalation::check_validity() const {
     throw (engine_error() << "Host escalation is not attached to any "
            << "host or host group (properties 'host_name' or "
            << "'hostgroup_name', respectively)");
-  if (_contacts->empty() && _contactgroups->empty())
-    throw (engine_error() << "Host escalation is not attached to any "
-           << "contact or contact group (properties 'contacts' or "
-           << "'contact_groups', respectively)");
   return ;
 }
 
