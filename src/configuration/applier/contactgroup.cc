@@ -77,9 +77,6 @@ void applier::contactgroup::add_object(
     << "Creating new contactgroup '"
     << obj->contactgroup_name() << "'.";
 
-  if (obj->resolved_members().empty())
-    return ;
-
   // Add contact group to the global configuration set.
   config->contactgroups().insert(obj);
 

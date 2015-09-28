@@ -73,9 +73,6 @@ void applier::hostgroup::add_object(
   logger(logging::dbg_config, logging::more)
     << "Creating new hostgroup '" << obj->hostgroup_name() << "'.";
 
-  if (obj->resolved_members().empty())
-    return ;
-
   // Add host group to the global configuration state.
   config->hostgroups().insert(obj);
 

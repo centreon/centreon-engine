@@ -74,9 +74,6 @@ void applier::servicegroup::add_object(
   logger(logging::dbg_config, logging::more)
     << "Creating new servicegroup '" << obj->servicegroup_name() << "'";
 
-  if (obj->resolved_members().empty())
-    return ;
-
   // Add service group to the global configuration set.
   config->servicegroups().insert(obj);
 
