@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2008      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -744,15 +744,6 @@ int check_service(service* svc, int* w, int* e) {
     temp_contactgroupsmember->group_ptr = temp_contactgroup;
   }
 
-  /* check to see if there is at least one contact/group */
-  if (svc->contacts == NULL && svc->contact_groups == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "' has no default contacts or "
-      "contactgroups defined!";
-    warnings++;
-  }
-
   /* verify service check timeperiod */
   if (svc->check_period == NULL) {
     logger(log_verification_error, basic)
@@ -959,14 +950,6 @@ int check_host(host* hst, int* w, int* e) {
 
     /* save the contact group pointer for later */
     temp_contactgroupsmember->group_ptr = temp_contactgroup;
-  }
-
-  /* check to see if there is at least one contact/group */
-  if (hst->contacts == NULL && hst->contact_groups == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Host '" << hst->name << "' has no default contacts "
-      "or contactgroups defined!";
-    warnings++;
   }
 
   /* check notification timeperiod */
