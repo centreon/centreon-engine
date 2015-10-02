@@ -71,16 +71,6 @@ dependencies:
   * CMake **(>= 2.8)**, a cross-platform build system.
   * Centreon Clib **(>= 1.4)**, The centreon core library.
 
-To build the optional web service module, you will need the following
-external dependencies:
-
-  * gSOAP **(>= 2.7)** toolkit for SOAP Web Services and XML-Based
-    Applications.
-  * zlib used for data compression.
-  * SSL toolkit implementing SSL v2/v3 and TLS protocols with
-    full-strength cryptography world-wide.
-  * xerces-c toolkit to parse XML configuration files.
-
 This program is compatible only with Unix-like platforms (Linux,
 FreeBSD, Solaris, ...).
 
@@ -120,20 +110,6 @@ CMake **(>= 2.8)**          cmake               Read the build script and
 Centreon Clib  **(>= 1.4)** centreon-clib-devel Core library used by Centreon
 =========================== =================== ================================
 
-Optional packages needed to use the webservice module:
-
-=========================== =================== ================================
-Software                    Package Name        Description
-=========================== =================== ================================
-gSOAP **(>= 2.7)**          gsoap gsoap-devel   SOAP Web Services and XML-Based
-                                                Applications.
-Zlib                        zlib-devel          Used for data compression.
-SSL                         openssl-devel       Implementing SSL and TLS
-                                                protocols.
-xerces-c                    xerces-c-devel      Used for parsing XML
-                                                configuration files.
-=========================== =================== ================================
-
 #. Install basic compilation tools ::
 
    $ yum install gcc gcc-c++ make
@@ -151,14 +127,6 @@ xerces-c                    xerces-c-devel      Used for parsing XML
 #. Install Centreon Clib
 
    See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
-
-#. Install optional tools ::
-
-   $ yum install zlib-devel openssl-devel xerces-c-devel
-
-#. Install gSOAP ::
-
-   $ yum install gsoap gsoap-devel
 
 Debian/Ubuntu
 -------------
@@ -180,20 +148,6 @@ Centreon Clib **(>= 1.4)**  centreon-clib-dev Core library used by Centreon
                                               Connector.
 =========================== ================= ================================
 
-Optional packages was need for use web service module:
-
-=========================== =================== ================================
-Software                    Package Name        Description
-=========================== =================== ================================
-gSOAP **(>= 2.7)**          gsoap               SOAP Web Services and XML-Based
-                                                Applications.
-Zlib                        zlib1g-dev          Used for data compression.
-SSL                         libssl-dev          Implementing SSL and TLS
-                                                protocols.
-xerces-c                    libxerces-c-dev     Used for parsing XML
-                                                configuration files.
-=========================== =================== ================================
-
 #. Install compilation tools ::
 
      $ apt-get install build-essential cmake
@@ -201,10 +155,6 @@ xerces-c                    libxerces-c-dev     Used for parsing XML
 #. Install Centreon Clib
 
    See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
-
-#. Install optional tools ::
-
-     $ apt-get install gsoap zlib1g-dev libssl-dev libxerces-c-dev
 
 OpenSUSE
 --------
@@ -226,20 +176,6 @@ Centreon Clib **(>= 1.4)**  centreon-clib-devel Core library used by Centreon
                                                 Connector.
 =========================== =================== ================================
 
-Optional packages was need for use web service module:
-
-=========================== =================== ================================
-Software                    Package Name        Description
-=========================== =================== ================================
-gSOAP **(>= 2.7)**          not available.      SOAP Web Services and XML-Based
-                                                Applications.
-Zlib                        zlib-devel          Used for data compression.
-SSL                         libopenssl-devel    Implementing SSL and TLS
-                                                protocols.
-xerces-c                    libxerces-c-devel   Used for parsing XML
-                                                configuration files.
-=========================== =================== ================================
-
 #. Install compilation tools ::
 
      $ zypper install gcc gcc-c++ make cmake
@@ -247,18 +183,6 @@ xerces-c                    libxerces-c-devel   Used for parsing XML
 #. Install Centreon Clib
 
    See the Centreon Clib :ref:`documentation <centreon-clib:centreon_clib_install>`.
-
-#. Install optional tools ::
-
-     $ zypper install zlib1g-dev libssl-dev libxerces-c-dev
-
-#. Install gSOAP from Centreon server ::
-
-     $ ARCH=`uname -m`
-     $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/libgsoap-2.8.4-1.1.${ARCH}.rpm
-     $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/libgsoap-devel-2.8.4-1.1.${ARCH}.rpm
-     $ wget http://download.centreon.com/RPMs/opensuse/${ARCH}/gsoap-devel-2.8.4-1.1.${ARCH}.rpm
-     $ rpm -Uvh libgsoap-2.8.4-1.1.${ARCH}.rpm libgsoap-devel-2.8.4-1.1.${ARCH}.rpm gsoap-devel-2.8.4-1.1.${ARCH}.rpm
 
 .. _user_installation_using_sources_build:
 
@@ -327,19 +251,12 @@ WITH_PREFIX_LIB                Define specific directory for Centreon Engine    
 WITH_RW_DIR                    Use for files to need read/write access.         ``${WITH_VAR_DIR}/rw``
 WITH_SAMPLE_CONFIG             Install sample configuration files.              ON
 WITH_SHARED_LIB                Build shared library for the core library.       OFF
-WITH_SSL                       Enable or disable SSL support in web service.    OFF
 WITH_STARTUP_DIR               Define the startup directory.                    Generaly in ``/etc/init.d`` or ``/etc/init``
 WITH_STARTUP_SCRIPT            Generate and install startup script.             auto
 WITH_TESTING                   Build unit test.                                 OFF
 WITH_USER                      Set the user for Centreon Engine installation.   root
 WITH_VAR_DIR                   Define specific directory for temporary Centreon ``${WITH_PREFIX}/var``
                                Engine files.
-WITH_WEBSERVICE                Enable or disable web service option.            OFF
-WITH_XERCESC_INCLUDE_DIR       Set the directory path of xerces-c include.      auto detection
-WITH_XERCESC_LIBRARIES         Set the xerces-c library to use.                 auto detection
-WITH_XERCESC_LIBRARY_DIR       Set the xercess-c library directory (don't use   auto detection
-                               it if you use WITH_XERCESC_LIBRARIES).
-WITH_ZLIB                      Enable or disable compression in web service.    ON
 ============================== ================================================ ============================================
 
 Example ::
@@ -357,8 +274,7 @@ Example ::
      -DWITH_STARTUP_DIR=/etc/init.d \
      -DWITH_PKGCONFIG_SCRIPT=1 \
      -DWITH_PKGCONFIG_DIR=/usr/lib/pkgconfig \
-     -DWITH_TESTING=0 \
-     -DWITH_WEBSERVICE=0 .
+     -DWITH_TESTING=0
 
 At this step, the software will check for existence and usability of the
 rerequisites. If one cannot be found, an appropriate error message will
@@ -400,10 +316,8 @@ File                                             Description
 ================================================ =========================================
 ``${WITH_PREFIX_BIN}/centengine``                Centreon Engine daemon.
 ``${WITH_PREFIX_BIN}/centenginestats``           Centreon Engine statistic.
-``${WITH_PREFIX_BIN}/centenginews``              Centreon Engine Web Service command line.
 ``${WITH_PREFIX_CONF}/``                         Centreon Engine sample configuration.
 ``${WITH_PREFIX_LIB}/externalcmd.so``            External commands module.
-``${WITH_PREFIX_LIB}/webservice.so``             Webservice module.
 ``${WITH_STARTUP_DIR}/centengine.conf``          Startup script for ubuntu.
 ``${WITH_STARTUP_DIR}/centengine``               Startup script for other os.
 ``${WITH_PREFIX_INC}/include/centreon-engine/``  All devel Centreon Engine's include.
