@@ -120,7 +120,9 @@ namespace                  configuration {
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
     unsigned short         stalking_options() const throw ();
+    void                   timezone(std::string const& time_zone);
     std::string const&     timezone() const throw ();
+    bool                   timezone_defined() const throw ();
 
   private:
     struct                 setters {
@@ -214,7 +216,7 @@ namespace                  configuration {
     std::string            _service_description;
     static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
-    std::string            _timezone;
+    opt<std::string>       _timezone;
  };
 
   typedef shared_ptr<service>    service_ptr;

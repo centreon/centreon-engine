@@ -485,7 +485,7 @@ void host::merge(object const& obj) {
   MRG_OPTION(_retry_interval);
   MRG_OPTION(_stalking_options);
   MRG_DEFAULT(_statusmap_image);
-  MRG_DEFAULT(_timezone);
+  MRG_OPTION(_timezone);
   MRG_DEFAULT(_vrml_image);
 }
 

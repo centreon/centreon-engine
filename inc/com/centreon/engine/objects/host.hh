@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_HOST_HH
 #  define CCE_OBJECTS_HOST_HH
 
+#  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
 
@@ -160,6 +161,7 @@ typedef struct                  host_struct {
 struct                          host_other_properties {
   time_t                        initial_notif_time;
   bool                          should_reschedule_current_check;
+  std::string                   timezone;
 };
 
 /* Hash structures. */
@@ -263,5 +265,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_HOST_HH
-
-

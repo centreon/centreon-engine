@@ -286,7 +286,7 @@ void contact::merge(object const& obj) {
   MRG_OPTION(_service_notification_options);
   MRG_DEFAULT(_service_notification_period);
   MRG_OPTION(_service_notifications_enabled);
-  MRG_DEFAULT(_timezone);
+  MRG_OPTION(_timezone);
 }
 
 /**

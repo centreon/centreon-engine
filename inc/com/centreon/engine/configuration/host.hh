@@ -208,7 +208,7 @@ namespace                  configuration {
     static setters const   _setters[];
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;
-    std::string            _timezone;
+    opt<std::string>       _timezone;
     std::string            _vrml_image;
   };
 

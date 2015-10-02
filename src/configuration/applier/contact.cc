@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -152,6 +152,7 @@ void applier::contact::add_object(
   if (!c)
     throw (engine_error() << "Could not register contact '"
            << obj->contact_name() << "'");
+  contact_other_props[obj->contact_name()].timezone = obj->timezone();
 
   // Add all the host notification commands.
   for (list_string::const_iterator
@@ -347,6 +348,7 @@ void applier::contact::modify_object(
   modify_if_different(
     c->retain_nonstatus_information,
     static_cast<int>(obj->retain_nonstatus_information()));
+  contact_other_props[obj->contact_name()].timezone = obj->timezone();
 
   // Host notification commands.
   if (obj->host_notification_commands()
@@ -464,6 +466,7 @@ void applier::contact::remove_object(
       &tv);
 
     // Erase contact object (this will effectively delete the object).
+    contact_other_props.erase(obj->contact_name());
     applier::state::instance().contacts().erase(it);
   }
 

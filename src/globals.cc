@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2009 Ethan Galstad
-** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2009      Ethan Galstad
+** Copyright 2009-2010      Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,6 +29,7 @@ configuration::state* config(NULL);
 events::hash_timed_event quick_timed_event;
 std::map<std::string, host_other_properties> host_other_props;
 std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
+std::map<std::string, contact_other_properties> contact_other_props;
 
 char const*         sigs[] = {
   "EXIT", "HUP", "INT", "QUIT", "ILL",

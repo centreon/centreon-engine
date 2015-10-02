@@ -485,7 +485,7 @@ void service::merge(object const& obj) {
   MRG_INHERIT(_servicegroups);
   MRG_DEFAULT(_service_description);
   MRG_OPTION(_stalking_options);
-  MRG_DEFAULT(_timezone);
+  MRG_OPTION(_timezone);
 }
 
 /**
@@ -989,12 +989,31 @@ unsigned short service::stalking_options() const throw () {
 }
 
 /**
+ *  Set service timezone.
+ *
+ *  @param[in] time_zone  New service timezone.
+ */
+void service::timezone(std::string const& time_zone) {
+  _timezone = time_zone;
+  return ;
+}
+
+/**
  *  Get service timezone.
  *
  *  @return This service timezone.
  */
 std::string const& service::timezone() const throw () {
   return (_timezone);
+}
+
+/**
+ *  Check if service timezone has been defined.
+ *
+ *  @return True if service timezone is already defined.
+ */
+bool service::timezone_defined() const throw () {
+  return (_timezone.is_set());
 }
 
 /**

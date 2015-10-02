@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_SERVICE_HH
 #  define CCE_OBJECTS_SERVICE_HH
 
+#  include <string>
 #  include <time.h>
 #  include "com/centreon/engine/common.hh"
 
@@ -149,6 +150,7 @@ typedef struct                  service_struct {
 /* Other SERVICE structure. */
 struct                          service_other_properties {
   time_t                        initial_notif_time;
+  std::string                   timezone;
 };
 
 #  ifdef __cplusplus
@@ -241,5 +243,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_SERVICE_HH
-
-

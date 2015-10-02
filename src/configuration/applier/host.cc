@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -158,6 +158,7 @@ void applier::host::add_object(
            << obj->host_name() << "'");
   host_other_props[obj->host_name()].initial_notif_time = 0;
   host_other_props[obj->host_name()].should_reschedule_current_check = false;
+  host_other_props[obj->host_name()].timezone = obj->timezone();
 
   // Contacts.
   for (list_string::const_iterator
@@ -421,6 +422,7 @@ void applier::host::modify_object(
   modify_if_different(
     h->obsess_over_host,
     static_cast<int>(obj->obsess_over_host()));
+  host_other_props[obj->host_name()].timezone = obj->timezone();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

@@ -119,7 +119,7 @@ namespace                  configuration {
     opt<unsigned int>      _service_notification_options;
     std::string            _service_notification_period;
     opt<bool>              _service_notifications_enabled;
-    std::string            _timezone;
+    opt<std::string>       _timezone;
     static setters const   _setters[];
   };
 

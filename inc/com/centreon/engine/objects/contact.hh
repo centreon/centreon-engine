@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_CONTACT_HH
 #  define CCE_OBJECTS_CONTACT_HH
 
+#  include <string>
 #  include <time.h>
 
 /* Max number of custom addresses a contact can have. */
@@ -70,6 +71,11 @@ typedef struct                  contact_struct {
   struct contact_struct*        next;
   struct contact_struct*        nexthash;
 }                               contact;
+
+/* Other CONTACT structure. */
+struct                          contact_other_properties {
+  std::string                   timezone;
+};
 
 #  ifdef __cplusplus
 extern "C" {
@@ -125,5 +131,3 @@ CCE_END()
 #  endif /* C++ */
 
 #endif // !CCE_OBJECTS_CONTACT_HH
-
-
