@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -31,6 +31,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/logging/logger.hh"
 
@@ -534,6 +535,7 @@ void applier::scheduler::_calculate_host_scheduling_params(
     if (!hst.check_interval || !hst.checks_enabled)
       schedule_check = false;
     else {
+      timezone_locker lock(get_host_timezone(hst.name));
       if (check_time_against_period(
             now,
             hst.check_period_ptr) == ERROR) {
@@ -688,11 +690,19 @@ void applier::scheduler::_calculate_service_scheduling_params(
     if (!svc.check_interval || !svc.checks_enabled)
       schedule_check = false;
 
-    if (check_time_against_period(now, svc.check_period_ptr) == ERROR) {
-      time_t next_valid_time(0);
-      get_next_valid_time(now, &next_valid_time, svc.check_period_ptr);
-      if (now == next_valid_time)
-        schedule_check = false;
+    {
+      timezone_locker
+        lock(get_service_timezone(svc.host_name, svc.description));
+      if (check_time_against_period(now, svc.check_period_ptr)
+          == ERROR) {
+        time_t next_valid_time(0);
+        get_next_valid_time(
+          now,
+          &next_valid_time,
+          svc.check_period_ptr);
+        if (now == next_valid_time)
+          schedule_check = false;
+      }
     }
 
     if (schedule_check) {
@@ -885,16 +895,19 @@ void applier::scheduler::_schedule_host_checks(
       << "Preferred Check Time: " << hst.next_check
       << " --> " << my_ctime(&hst.next_check);
 
-    // make sure the host can actually be scheduled at this time.
-    if (check_time_against_period(
+    // Make sure the host can actually be scheduled at this time.
+    {
+      timezone_locker lock(get_host_timezone(hst.name));
+      if (check_time_against_period(
+            hst.next_check,
+            hst.check_period_ptr) == ERROR) {
+        time_t next_valid_time(0);
+        get_next_valid_time(
           hst.next_check,
-          hst.check_period_ptr) == ERROR) {
-      time_t next_valid_time(0);
-      get_next_valid_time(
-        hst.next_check,
-        &next_valid_time,
-        hst.check_period_ptr);
-      hst.next_check = next_valid_time;
+          &next_valid_time,
+          hst.check_period_ptr);
+        hst.next_check = next_valid_time;
+      }
     }
 
     logger(dbg_events, most)
@@ -1004,16 +1017,20 @@ void applier::scheduler::_schedule_service_checks(
         = (time_t)(now
              + mult_factor * scheduling_info.service_inter_check_delay);
 
-      // make sure the service can actually be scheduled when we want.
-      if (check_time_against_period(
+      // Make sure the service can actually be scheduled when we want.
+      {
+        timezone_locker
+          lock(get_service_timezone(svc.host_name, svc.description));
+        if (check_time_against_period(
+              svc.next_check,
+              svc.check_period_ptr) == ERROR) {
+          time_t next_valid_time(0);
+          get_next_valid_time(
             svc.next_check,
-            svc.check_period_ptr) == ERROR) {
-        time_t next_valid_time(0);
-        get_next_valid_time(
-          svc.next_check,
-          &next_valid_time,
-          svc.check_period_ptr);
-        svc.next_check = next_valid_time;
+            &next_valid_time,
+            svc.check_period_ptr);
+          svc.next_check = next_valid_time;
+        }
       }
 
       if (!scheduling_info.first_service_check

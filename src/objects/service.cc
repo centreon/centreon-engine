@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -697,6 +697,22 @@ service& engine::find_service(
     throw (engine_error() << "Service '" << service_description
            << "' on host '" << host_name << "' was not found");
   return (*it->second);
+}
+
+/**
+ *  Get service timezone.
+ *
+ *  @param[in] hst  Host name.
+ *  @param[in] svc  Service description.
+ *
+ *  @return Service timezone.
+ */
+char const* engine::get_service_timezone(
+                      char const* hst,
+                      char const* svc) {
+  return (service_other_props[std::make_pair<std::string, std::string>(
+                                     hst,
+                                     svc)].timezone.c_str());
 }
 
 /**

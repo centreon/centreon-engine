@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -842,6 +842,17 @@ host& engine::find_host(std::string const& name) {
   if (it == state::instance().hosts().end())
     throw (engine_error() << "Host '" << name << "' was not found");
   return (*it->second);
+}
+
+/**
+ *  Get host timezone.
+ *
+ *  @param[in] name  Host name.
+ *
+ *  @return Host timezone.
+ */
+char const* engine::get_host_timezone(char const* name) {
+  return (host_other_props[name].timezone.c_str());
 }
 
 /**

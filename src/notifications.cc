@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,6 +29,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon;
@@ -410,36 +411,39 @@ int check_service_notification_viability(
   if (temp_period == NULL)
     temp_period = svc->host_ptr->notification_period_ptr;
 
-  /* see if the service can have notifications sent out at this time */
-  if (check_time_against_period(current_time, temp_period) == ERROR) {
-
-    logger(dbg_notifications, more)
-      << "This service shouldn't have notifications sent out "
-      "at this time.";
-
-    /* calculate the next acceptable notification time, once the next valid time range arrives... */
-    if (type == NOTIFICATION_NORMAL) {
-
-      get_next_valid_time(
-        current_time,
-        &timeperiod_start,
-        svc->notification_period_ptr);
-
-      /* looks like there are no valid notification times defined, so schedule the next one far into the future (one year)... */
-      if (timeperiod_start == (time_t)0)
-        svc->next_notification
-          = (time_t)(current_time + (60 * 60 * 24 * 365));
-
-      /* else use the next valid notification time */
-      else
-        svc->next_notification = timeperiod_start;
-
+  // See if the service can have notifications sent out at this time.
+  {
+    timezone_locker lock(get_service_timezone(
+                           svc->host_name,
+                           svc->description));
+    if (check_time_against_period(current_time, temp_period) == ERROR) {
       logger(dbg_notifications, more)
-        << "Next possible notification time: "
-        << my_ctime(&svc->next_notification);
-    }
+        << "This service shouldn't have notifications sent out "
+        "at this time.";
 
-    return (ERROR);
+      // Calculate the next acceptable notification time,
+      // once the next valid time range arrives...
+      if (type == NOTIFICATION_NORMAL) {
+        get_next_valid_time(
+          current_time,
+          &timeperiod_start,
+          svc->notification_period_ptr);
+
+        // Looks like there are no valid notification times defined, so
+        // schedule the next one far into the future (one year)...
+        if (timeperiod_start == (time_t)0)
+          svc->next_notification
+            = (time_t)(current_time + (60 * 60 * 24 * 365));
+        // Else use the next valid notification time.
+        else
+          svc->next_notification = timeperiod_start;
+        logger(dbg_notifications, more)
+          << "Next possible notification time: "
+          << my_ctime(&svc->next_notification);
+      }
+
+      return (ERROR);
+    }
   }
 
   /* are notifications temporarily disabled for this service? */
@@ -734,12 +738,16 @@ int check_contact_service_notification_viability(
     return (ERROR);
   }
 
-  /* see if the contact can be notified at this time */
-  if (check_time_against_period
-      (time(NULL), cntct->service_notification_period_ptr) == ERROR) {
-    logger(dbg_notifications, most)
-      << "This contact shouldn't be notified at this time.";
-    return (ERROR);
+  // See if the contact can be notified at this time.
+  {
+    timezone_locker lock(get_contact_timezone(cntct->name));
+    if (check_time_against_period(
+          time(NULL),
+          cntct->service_notification_period_ptr) == ERROR) {
+      logger(dbg_notifications, most)
+        << "This contact shouldn't be notified at this time.";
+      return (ERROR);
+    }
   }
 
   /*********************************************/
@@ -1642,37 +1650,38 @@ int check_host_notification_viability(
     return (ERROR);
   }
 
-  /* see if the host can have notifications sent out at this time */
-  if (check_time_against_period
-      (current_time, hst->notification_period_ptr) == ERROR) {
-
-    logger(dbg_notifications, more)
-      << "This host shouldn't have notifications sent out at "
-      "this time.";
-
-    /* if this is a normal notification, calculate the next acceptable notification time, once the next valid time range arrives... */
-    if (type == NOTIFICATION_NORMAL) {
-
-      get_next_valid_time(
-        current_time,
-        &timeperiod_start,
-        hst->notification_period_ptr);
-
-      /* it looks like there is no notification time defined, so schedule next one far into the future (one year)... */
-      if (timeperiod_start == (time_t)0)
-        hst->next_host_notification
-          = (time_t)(current_time + (60 * 60 * 24 * 365));
-
-      /* else use the next valid notification time */
-      else
-        hst->next_host_notification = timeperiod_start;
-
+  // See if the host can have notifications sent out at this time.
+  {
+    timezone_locker lock(get_host_timezone(hst->name));
+    if (check_time_against_period(
+          current_time,
+          hst->notification_period_ptr) == ERROR) {
       logger(dbg_notifications, more)
-        << "Next possible notification time: "
-        << my_ctime(&hst->next_host_notification);
-    }
+        << "This host shouldn't have notifications sent out at "
+           "this time.";
 
-    return (ERROR);
+      // If this is a normal notification, calculate the next acceptable
+      // notification time, once the next valid time range arrives...
+      if (type == NOTIFICATION_NORMAL) {
+        get_next_valid_time(
+          current_time,
+          &timeperiod_start,
+          hst->notification_period_ptr);
+
+        // It looks like there is no notification time defined, so
+        // schedule next one far into the future (one year)...
+        if (timeperiod_start == (time_t)0)
+          hst->next_host_notification
+            = (time_t)(current_time + (60 * 60 * 24 * 365));
+        // Else use the next valid notification time.
+        else
+          hst->next_host_notification = timeperiod_start;
+        logger(dbg_notifications, more)
+          << "Next possible notification time: "
+          << my_ctime(&hst->next_host_notification);
+      }
+      return (ERROR);
+    }
   }
 
   /* are notifications temporarily disabled for this host? */
@@ -1924,13 +1933,16 @@ int check_contact_host_notification_viability(
     return (ERROR);
   }
 
-  /* see if the contact can be notified at this time */
-  if (check_time_against_period(
-        time(NULL),
-        cntct->host_notification_period_ptr) == ERROR) {
-    logger(dbg_notifications, most)
-      << "This contact shouldn't be notified at this time.";
-    return (ERROR);
+  // See if the contact can be notified at this time.
+  {
+    timezone_locker lock(get_contact_timezone(cntct->name));
+    if (check_time_against_period(
+          time(NULL),
+          cntct->host_notification_period_ptr) == ERROR) {
+      logger(dbg_notifications, most)
+        << "This contact shouldn't be notified at this time.";
+      return (ERROR);
+    }
   }
 
   /*********************************************/

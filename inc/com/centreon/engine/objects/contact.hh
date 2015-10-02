@@ -124,6 +124,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj);
 CCE_BEGIN()
 
 contact&      find_contact(std::string const& name);
+char const*   get_contact_timezone(char const* name);
 bool          is_contact_exist(std::string const& name) throw ();
 
 CCE_END()
