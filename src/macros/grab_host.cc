@@ -29,6 +29,7 @@
 #include "com/centreon/engine/macros/misc.hh"
 #include "com/centreon/engine/objects/objectlist.hh"
 #include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/objects/hostsmember.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
 
@@ -170,6 +171,42 @@ template <unsigned int macro_id>
 static char* get_host_total_services(host& hst, nagios_macros* mac) {
   generate_host_total_services(hst, mac);
   return (mac->x[macro_id]);
+}
+
+/**
+ *  Get the parents of a host.
+ *
+ *  @param[in] hst Host object.
+ *  @param[in] mac Macro array.
+ *
+ *  @return Newly allocated string with requested value in plain text.
+ */
+static char* get_host_parents(host& hst, nagios_macros* mac) {
+  std::string retval;
+  for (hostsmember* it = hst.parent_hosts; it != NULL; it = it->next) {
+    if (!retval.empty())
+      retval.append(it->host_name);
+    retval.append(",");
+  }
+  return (string::dup(retval.c_str()));
+}
+
+/**
+ *  Get the children of a host.
+ *
+ *  @param[in] hst Host object.
+ *  @param[in] mac Macro array.
+ *
+ *  @return Newly allocated string with requested value in plain text.
+ */
+static char* get_host_children(host& hst, nagios_macros* mac) {
+  std::string retval;
+  for (hostsmember* it = hst.child_hosts; it != NULL; it = it->next) {
+    if (!retval.empty())
+      retval.append(it->host_name);
+    retval.append(",");
+  }
+  return (string::dup(retval.c_str()));
 }
 
 /**************************************
@@ -321,6 +358,12 @@ struct grab_host_redirection {
     // Acknowledgement comment.
     routines[MACRO_HOSTACKCOMMENT].first = &get_macro_copy<host, MACRO_HOSTACKCOMMENT>;
     routines[MACRO_HOSTACKCOMMENT].second = true;
+    // Host parents.
+    routines[MACRO_HOSTPARENTS].first = &get_host_parents;
+    routines[MACRO_HOSTPARENTS].second = true;
+    // Host children.
+    routines[MACRO_HOSTCHILDREN].first = &get_host_children;
+    routines[MACRO_HOSTCHILDREN].second = true;
   }
 } static const redirector;
 

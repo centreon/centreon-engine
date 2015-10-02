@@ -790,7 +790,9 @@ struct grab_value_redirection {
       MACRO_HOSTPROBLEMID,
       MACRO_LASTHOSTPROBLEMID,
       MACRO_LASTHOSTSTATE,
-      MACRO_LASTHOSTSTATEID
+      MACRO_LASTHOSTSTATEID,
+      MACRO_HOSTPARENTS,
+      MACRO_HOSTCHILDREN
     };
     for (unsigned int i = 0;
          i < sizeof(host_ids) / sizeof(*host_ids);

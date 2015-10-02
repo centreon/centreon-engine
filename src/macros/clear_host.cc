@@ -72,7 +72,9 @@ int clear_host_macros_r(nagios_macros* mac) {
     MACRO_TOTALHOSTSERVICESUNKNOWN,
     MACRO_TOTALHOSTSERVICESCRITICAL,
     MACRO_HOSTPROBLEMID,
-    MACRO_LASTHOSTPROBLEMID
+    MACRO_LASTHOSTPROBLEMID,
+    MACRO_HOSTPARENTS,
+    MACRO_HOSTCHILDREN
   };
   for (unsigned int i = 0;
        i < sizeof(to_free) / sizeof(*to_free);

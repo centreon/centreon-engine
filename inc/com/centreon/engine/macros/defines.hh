@@ -190,6 +190,8 @@
 # define MACRO_LASTHOSTSTATEID                  150
 # define MACRO_LASTSERVICESTATE                 151
 # define MACRO_LASTSERVICESTATEID               152
+# define MACRO_HOSTPARENTS                      153
+# define MACRO_HOSTCHILDREN                     154
 
 // Macro Cleaning Options
 # define STRIP_ILLEGAL_MACRO_CHARS              1
