@@ -347,6 +347,7 @@ Services            contacts              contacts in the associated host defini
 Services            contact_groups        contact_groups in the associated host definition
 Services            notification_interval notification_interval in the associated host definition
 Services            notification_period   notification_period in the associated host definition
+Services            timezone              timezone in the associated host definition
 Host Escalations    contacts              contacts in the associated host definition
 Host Escalations    contact_groups        contact_groups in the associated host definition
 Host Escalations    notification_interval notification_interval in the associated host definition
