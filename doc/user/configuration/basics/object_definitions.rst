@@ -345,7 +345,8 @@ statusmap_image              This variable is used to define the name of an imag
 3d_coords                    This variable is used to define coordinates to use when drawing the host. Coordinates can be positive or negative real
                              numbers. The origin for drawing is (0.0,0.0,0.0). For reference, the size of the host cubes drawn is 0.5 units on each
                              side (text takes a little more space). The coordinates you specify here are used as the center of the host cube.
-timezone                     Timezone in which the host resides. This will affect its check and notification periods.
+timezone                     Timezone in which the host resides. This will affect its check and notification periods. The timezone must be formatted
+                             using the POSIX TZ variable format. That is for most users this will look like *:America/New_York* (notice the colon).
 ============================ =========================================================================================================================
 
 .. _obj_def_hostgroup:
@@ -634,7 +635,8 @@ icon_image                   This variable is used to define the name of a GIF, 
 icon_image_alt               This variable is used to define an optional string that is used in the ALT tag of the image specified by the
                              <icon_image> argument.
 timezone                     Timezone in which the service resides. This will affect its check and notification periods. Services use the timezone
-                             of their host if none is set in their definition.
+                             of their host if none is set in their definition. The timezone must be formatted using the POSIX TZ variable format.
+                             That is for most users this will look like *:America/New_York* (notice the colon).
 ============================ =========================================================================================================================
 
 .. _obj_def_servicegroup:
@@ -837,7 +839,9 @@ retain_nonstatus_information  This directive is used to determine whether or not
                               restarts. This is only useful if you have enabled state retention using the
                               :ref:`retain_state_information <main_cfg_opt_state_retention>`
                               directive. Value: 0 = disable non-status information retention, 1 = enable non-status information retention.
-timezone                      Timezone in which the contact resides. This will affect its check and notification periods.
+timezone                      Timezone in which the contact resides. This will affect its check and notification periods. The timezone must be
+                              formatted using the POSIX TZ variable format. That is for most users this will look like *:America/New_York* (notice
+                              the colon).
 ============================= ========================================================================================================================
 
 .. _obj_def_contactgroup:
