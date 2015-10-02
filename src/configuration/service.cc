@@ -84,7 +84,8 @@ service::setters const service::_setters[] = {
   { "process_perf_data",            SETTER(bool, _set_process_perf_data) },
   { "failure_prediction_enabled",   SETTER(bool, _set_failure_prediction_enabled) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+  { "timezone",                     SETTER(std::string const&, _set_timezone) }
 };
 
 // Default values.
@@ -156,11 +157,10 @@ service::service()
 /**
  *  Copy constructor.
  *
- *  @param[in] right The service to copy.
+ *  @param[in] other  The service to copy.
  */
-service::service(service const& right)
-  : object(right) {
-  operator=(right);
+service::service(service const& other) : object(other) {
+  operator=(other);
 }
 
 /**
@@ -169,220 +169,224 @@ service::service(service const& right)
 service::~service() throw () {}
 
 /**
- *  Copy constructor.
+ *  Assignment operator.
  *
- *  @param[in] right The service to copy.
+ *  @param[in] other  The service to copy.
  *
  *  @return This service.
  */
-service& service::operator=(service const& right) {
-  if (this != &right) {
-    object::operator=(right);
-    _action_url = right._action_url;
-    _checks_active = right._checks_active;
-    _checks_passive = right._checks_passive;
-    _check_command = right._check_command;
-    _check_command_is_important = right._check_command_is_important;
-    _check_freshness = right._check_freshness;
-    _check_interval = right._check_interval;
-    _check_period = right._check_period;
-    _contactgroups = right._contactgroups;
-    _contacts = right._contacts;
-    _customvariables = right._customvariables;
-    _display_name = right._display_name;
-    _event_handler = right._event_handler;
-    _event_handler_enabled = right._event_handler_enabled;
-    _first_notification_delay = right._first_notification_delay;
-    _flap_detection_enabled = right._flap_detection_enabled;
-    _flap_detection_options = right._flap_detection_options;
-    _freshness_threshold = right._freshness_threshold;
-    _high_flap_threshold = right._high_flap_threshold;
-    _hostgroups = right._hostgroups;
-    _hosts = right._hosts;
-    _icon_image = right._icon_image;
-    _icon_image_alt = right._icon_image_alt;
-    _initial_state = right._initial_state;
-    _is_volatile = right._is_volatile;
-    _low_flap_threshold = right._low_flap_threshold;
-    _max_check_attempts = right._max_check_attempts;
-    _notes = right._notes;
-    _notes_url = right._notes_url;
-    _notifications_enabled = right._notifications_enabled;
-    _notification_interval = right._notification_interval;
-    _notification_options = right._notification_options;
-    _notification_period = right._notification_period;
-    _obsess_over_service = right._obsess_over_service;
-    _process_perf_data = right._process_perf_data;
-    _retain_nonstatus_information = right._retain_nonstatus_information;
-    _retain_status_information = right._retain_status_information;
-    _retry_interval = right._retry_interval;
-    _servicegroups = right._servicegroups;
-    _service_description = right._service_description;
-    _stalking_options = right._stalking_options;
+service& service::operator=(service const& other) {
+  if (this != &other) {
+    object::operator=(other);
+    _action_url = other._action_url;
+    _checks_active = other._checks_active;
+    _checks_passive = other._checks_passive;
+    _check_command = other._check_command;
+    _check_command_is_important = other._check_command_is_important;
+    _check_freshness = other._check_freshness;
+    _check_interval = other._check_interval;
+    _check_period = other._check_period;
+    _contactgroups = other._contactgroups;
+    _contacts = other._contacts;
+    _customvariables = other._customvariables;
+    _display_name = other._display_name;
+    _event_handler = other._event_handler;
+    _event_handler_enabled = other._event_handler_enabled;
+    _first_notification_delay = other._first_notification_delay;
+    _flap_detection_enabled = other._flap_detection_enabled;
+    _flap_detection_options = other._flap_detection_options;
+    _freshness_threshold = other._freshness_threshold;
+    _high_flap_threshold = other._high_flap_threshold;
+    _hostgroups = other._hostgroups;
+    _hosts = other._hosts;
+    _icon_image = other._icon_image;
+    _icon_image_alt = other._icon_image_alt;
+    _initial_state = other._initial_state;
+    _is_volatile = other._is_volatile;
+    _low_flap_threshold = other._low_flap_threshold;
+    _max_check_attempts = other._max_check_attempts;
+    _notes = other._notes;
+    _notes_url = other._notes_url;
+    _notifications_enabled = other._notifications_enabled;
+    _notification_interval = other._notification_interval;
+    _notification_options = other._notification_options;
+    _notification_period = other._notification_period;
+    _obsess_over_service = other._obsess_over_service;
+    _process_perf_data = other._process_perf_data;
+    _retain_nonstatus_information = other._retain_nonstatus_information;
+    _retain_status_information = other._retain_status_information;
+    _retry_interval = other._retry_interval;
+    _servicegroups = other._servicegroups;
+    _service_description = other._service_description;
+    _stalking_options = other._stalking_options;
+    _timezone = other._timezone;
   }
   return (*this);
 }
 
 /**
- *  Equal operator.
+ *  Equality operator.
  *
- *  @param[in] right The service to compare.
+ *  @param[in] other  The service to compare.
  *
  *  @return True if is the same service, otherwise false.
  */
-bool service::operator==(service const& right) const throw () {
-  return (object::operator==(right)
-          && _action_url == right._action_url
-          && _checks_active == right._checks_active
-          && _checks_passive == right._checks_passive
-          && _check_command == right._check_command
-          && _check_command_is_important == right._check_command_is_important
-          && _check_freshness == right._check_freshness
-          && _check_interval == right._check_interval
-          && _check_period == right._check_period
-          && _contactgroups == right._contactgroups
-          && _contacts == right._contacts
-          && std::operator==(_customvariables, right._customvariables)
-          && _display_name == right._display_name
-          && _event_handler == right._event_handler
-          && _event_handler_enabled == right._event_handler_enabled
-          && _first_notification_delay == right._first_notification_delay
-          && _flap_detection_enabled == right._flap_detection_enabled
-          && _flap_detection_options == right._flap_detection_options
-          && _freshness_threshold == right._freshness_threshold
-          && _high_flap_threshold == right._high_flap_threshold
-          && _hostgroups == right._hostgroups
-          && _hosts == right._hosts
-          && _icon_image == right._icon_image
-          && _icon_image_alt == right._icon_image_alt
-          && _initial_state == right._initial_state
-          && _is_volatile == right._is_volatile
-          && _low_flap_threshold == right._low_flap_threshold
-          && _max_check_attempts == right._max_check_attempts
-          && _notes == right._notes
-          && _notes_url == right._notes_url
-          && _notifications_enabled == right._notifications_enabled
-          && _notification_interval == right._notification_interval
-          && _notification_options == right._notification_options
-          && _notification_period == right._notification_period
-          && _obsess_over_service == right._obsess_over_service
-          && _process_perf_data == right._process_perf_data
-          && _retain_nonstatus_information == right._retain_nonstatus_information
-          && _retain_status_information == right._retain_status_information
-          && _retry_interval == right._retry_interval
-          && _servicegroups == right._servicegroups
-          && _service_description == right._service_description
-          && _stalking_options == right._stalking_options);
+bool service::operator==(service const& other) const throw () {
+  return (object::operator==(other)
+          && _action_url == other._action_url
+          && _checks_active == other._checks_active
+          && _checks_passive == other._checks_passive
+          && _check_command == other._check_command
+          && _check_command_is_important == other._check_command_is_important
+          && _check_freshness == other._check_freshness
+          && _check_interval == other._check_interval
+          && _check_period == other._check_period
+          && _contactgroups == other._contactgroups
+          && _contacts == other._contacts
+          && std::operator==(_customvariables, other._customvariables)
+          && _display_name == other._display_name
+          && _event_handler == other._event_handler
+          && _event_handler_enabled == other._event_handler_enabled
+          && _first_notification_delay == other._first_notification_delay
+          && _flap_detection_enabled == other._flap_detection_enabled
+          && _flap_detection_options == other._flap_detection_options
+          && _freshness_threshold == other._freshness_threshold
+          && _high_flap_threshold == other._high_flap_threshold
+          && _hostgroups == other._hostgroups
+          && _hosts == other._hosts
+          && _icon_image == other._icon_image
+          && _icon_image_alt == other._icon_image_alt
+          && _initial_state == other._initial_state
+          && _is_volatile == other._is_volatile
+          && _low_flap_threshold == other._low_flap_threshold
+          && _max_check_attempts == other._max_check_attempts
+          && _notes == other._notes
+          && _notes_url == other._notes_url
+          && _notifications_enabled == other._notifications_enabled
+          && _notification_interval == other._notification_interval
+          && _notification_options == other._notification_options
+          && _notification_period == other._notification_period
+          && _obsess_over_service == other._obsess_over_service
+          && _process_perf_data == other._process_perf_data
+          && _retain_nonstatus_information == other._retain_nonstatus_information
+          && _retain_status_information == other._retain_status_information
+          && _retry_interval == other._retry_interval
+          && _servicegroups == other._servicegroups
+          && _service_description == other._service_description
+          && _stalking_options == other._stalking_options
+          && _timezone == other._timezone);
 }
 
 /**
- *  Equal operator.
+ *  Inequality operator.
  *
- *  @param[in] right The service to compare.
+ *  @param[in] other  The service to compare.
  *
  *  @return True if is not the same service, otherwise false.
  */
-bool service::operator!=(service const& right) const throw () {
-  return (!operator==(right));
+bool service::operator!=(service const& other) const throw () {
+  return (!operator==(other));
 }
 
 /**
  *  Less-than operator.
  *
- *  @param[in] right Object to compare to.
+ *  @param[in] other  Object to compare to.
  *
  *  @return True if this object is less than right.
  */
-bool service::operator<(service const& right) const throw () {
-  if (_hosts != right._hosts)
-    return (_hosts < right._hosts);
-  else if (_service_description != right._service_description)
-    return (_service_description < right._service_description);
-  else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
-  else if (_checks_active != right._checks_active)
-    return (_checks_active < right._checks_active);
-  else if (_checks_passive != right._checks_passive)
-    return (_checks_passive < right._checks_passive);
-  else if (_check_command != right._check_command)
-    return (_check_command < right._check_command);
+bool service::operator<(service const& other) const throw () {
+  if (_hosts != other._hosts)
+    return (_hosts < other._hosts);
+  else if (_service_description != other._service_description)
+    return (_service_description < other._service_description);
+  else if (_action_url != other._action_url)
+    return (_action_url < other._action_url);
+  else if (_checks_active != other._checks_active)
+    return (_checks_active < other._checks_active);
+  else if (_checks_passive != other._checks_passive)
+    return (_checks_passive < other._checks_passive);
+  else if (_check_command != other._check_command)
+    return (_check_command < other._check_command);
   else if (_check_command_is_important
-           != right._check_command_is_important)
+           != other._check_command_is_important)
     return (_check_command_is_important
-            < right._check_command_is_important);
-  else if (_check_freshness != right._check_freshness)
-    return (_check_freshness < right._check_freshness);
-  else if (_check_interval != right._check_interval)
-    return (_check_interval < right._check_interval);
-  else if (_check_period != right._check_period)
-    return (_check_period < right._check_period);
-  else if (_contactgroups != right._contactgroups)
-    return (_contactgroups < right._contactgroups);
-  else if (_contacts != right._contacts)
-    return (_contacts < right._contacts);
-  else if (_customvariables != right._customvariables)
-    return (_customvariables < right._customvariables);
-  else if (_display_name != right._display_name)
-    return (_display_name < right._display_name);
-  else if (_event_handler != right._event_handler)
-    return (_event_handler < right._event_handler);
-  else if (_event_handler_enabled != right._event_handler_enabled)
-    return (_event_handler_enabled < right._event_handler_enabled);
+            < other._check_command_is_important);
+  else if (_check_freshness != other._check_freshness)
+    return (_check_freshness < other._check_freshness);
+  else if (_check_interval != other._check_interval)
+    return (_check_interval < other._check_interval);
+  else if (_check_period != other._check_period)
+    return (_check_period < other._check_period);
+  else if (_contactgroups != other._contactgroups)
+    return (_contactgroups < other._contactgroups);
+  else if (_contacts != other._contacts)
+    return (_contacts < other._contacts);
+  else if (_customvariables != other._customvariables)
+    return (_customvariables < other._customvariables);
+  else if (_display_name != other._display_name)
+    return (_display_name < other._display_name);
+  else if (_event_handler != other._event_handler)
+    return (_event_handler < other._event_handler);
+  else if (_event_handler_enabled != other._event_handler_enabled)
+    return (_event_handler_enabled < other._event_handler_enabled);
   else if (_first_notification_delay
-           != right._first_notification_delay)
+           != other._first_notification_delay)
     return (_first_notification_delay
-            < right._first_notification_delay);
-  else if (_flap_detection_enabled != right._flap_detection_enabled)
-    return (_flap_detection_enabled < right._flap_detection_enabled);
-  else if (_flap_detection_options != right._flap_detection_options)
-    return (_flap_detection_options < right._flap_detection_options);
-  else if (_freshness_threshold != right._freshness_threshold)
-    return (_freshness_threshold < right._freshness_threshold);
-  else if (_high_flap_threshold != right._high_flap_threshold)
-    return (_high_flap_threshold < right._high_flap_threshold);
-  else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
-  else if (_icon_image != right._icon_image)
-    return (_icon_image < right._icon_image);
-  else if (_icon_image_alt != right._icon_image_alt)
-    return (_icon_image_alt < right._icon_image_alt);
-  else if (_initial_state != right._initial_state)
-    return (_initial_state < right._initial_state);
-  else if (_is_volatile != right._is_volatile)
-    return (_is_volatile < right._is_volatile);
-  else if (_low_flap_threshold != right._low_flap_threshold)
-    return (_low_flap_threshold < right._low_flap_threshold);
-  else if (_max_check_attempts != right._max_check_attempts)
-    return (_max_check_attempts < right._max_check_attempts);
-  else if (_notes != right._notes)
-    return (_notes < right._notes);
-  else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
-  else if (_notifications_enabled != right._notifications_enabled)
-    return (_notifications_enabled < right._notifications_enabled);
-  else if (_notification_interval != right._notification_interval)
-    return (_notification_interval < right._notification_interval);
-  else if (_notification_options != right._notification_options)
-    return (_notification_options < right._notification_options);
-  else if (_notification_period != right._notification_period)
-    return (_notification_period < right._notification_period);
-  else if (_obsess_over_service != right._obsess_over_service)
-    return (_obsess_over_service < right._obsess_over_service);
-  else if (_process_perf_data != right._process_perf_data)
-    return (_process_perf_data < right._process_perf_data);
+            < other._first_notification_delay);
+  else if (_flap_detection_enabled != other._flap_detection_enabled)
+    return (_flap_detection_enabled < other._flap_detection_enabled);
+  else if (_flap_detection_options != other._flap_detection_options)
+    return (_flap_detection_options < other._flap_detection_options);
+  else if (_freshness_threshold != other._freshness_threshold)
+    return (_freshness_threshold < other._freshness_threshold);
+  else if (_high_flap_threshold != other._high_flap_threshold)
+    return (_high_flap_threshold < other._high_flap_threshold);
+  else if (_hostgroups != other._hostgroups)
+    return (_hostgroups < other._hostgroups);
+  else if (_icon_image != other._icon_image)
+    return (_icon_image < other._icon_image);
+  else if (_icon_image_alt != other._icon_image_alt)
+    return (_icon_image_alt < other._icon_image_alt);
+  else if (_initial_state != other._initial_state)
+    return (_initial_state < other._initial_state);
+  else if (_is_volatile != other._is_volatile)
+    return (_is_volatile < other._is_volatile);
+  else if (_low_flap_threshold != other._low_flap_threshold)
+    return (_low_flap_threshold < other._low_flap_threshold);
+  else if (_max_check_attempts != other._max_check_attempts)
+    return (_max_check_attempts < other._max_check_attempts);
+  else if (_notes != other._notes)
+    return (_notes < other._notes);
+  else if (_notes_url != other._notes_url)
+    return (_notes_url < other._notes_url);
+  else if (_notifications_enabled != other._notifications_enabled)
+    return (_notifications_enabled < other._notifications_enabled);
+  else if (_notification_interval != other._notification_interval)
+    return (_notification_interval < other._notification_interval);
+  else if (_notification_options != other._notification_options)
+    return (_notification_options < other._notification_options);
+  else if (_notification_period != other._notification_period)
+    return (_notification_period < other._notification_period);
+  else if (_obsess_over_service != other._obsess_over_service)
+    return (_obsess_over_service < other._obsess_over_service);
+  else if (_process_perf_data != other._process_perf_data)
+    return (_process_perf_data < other._process_perf_data);
   else if (_retain_nonstatus_information
-           != right._retain_nonstatus_information)
+           != other._retain_nonstatus_information)
     return (_retain_nonstatus_information
-            < right._retain_nonstatus_information);
+            < other._retain_nonstatus_information);
   else if (_retain_status_information
-           != right._retain_status_information)
+           != other._retain_status_information)
     return (_retain_status_information
-            < right._retain_status_information);
-  else if (_retry_interval != right._retry_interval)
-    return (_retry_interval < right._retry_interval);
-  else if (_servicegroups != right._servicegroups)
-    return (_servicegroups < right._servicegroups);
-  return (_stalking_options < right._stalking_options);
+            < other._retain_status_information);
+  else if (_retry_interval != other._retry_interval)
+    return (_retry_interval < other._retry_interval);
+  else if (_servicegroups != other._servicegroups)
+    return (_servicegroups < other._servicegroups);
+  else if (_stalking_options != other._stalking_options)
+    return (_stalking_options < other._stalking_options);
+  return (_timezone < other._timezone);
 }
 
 /**
@@ -481,6 +485,7 @@ void service::merge(object const& obj) {
   MRG_INHERIT(_servicegroups);
   MRG_DEFAULT(_service_description);
   MRG_OPTION(_stalking_options);
+  MRG_DEFAULT(_timezone);
 }
 
 /**
@@ -981,6 +986,15 @@ std::string const& service::service_description() const throw () {
  */
 unsigned short service::stalking_options() const throw () {
   return (_stalking_options);
+}
+
+/**
+ *  Get service timezone.
+ *
+ *  @return This service timezone.
+ */
+std::string const& service::timezone() const throw () {
+  return (_timezone);
 }
 
 /**
@@ -1588,5 +1602,17 @@ bool service::_set_stalking_options(std::string const& value) {
       return (false);
   }
   _stalking_options = options;
+  return (true);
+}
+
+/**
+ *  Set service timezone.
+ *
+ *  @param[in] value  The new timezone.
+ *
+ *  @return True.
+ */
+bool service::_set_timezone(std::string const& value) {
+  _timezone = value;
   return (true);
 }

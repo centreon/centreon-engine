@@ -50,15 +50,15 @@ namespace                  configuration {
                            key_type;
 
                            service();
-                           service(service const& right);
+                           service(service const& other);
                            ~service() throw ();
-    service&               operator=(service const& right);
+    service&               operator=(service const& other);
     bool                   operator==(
-                             service const& right) const throw ();
+                             service const& other) const throw ();
     bool                   operator!=(
-                             service const& right) const throw ();
+                             service const& other) const throw ();
     bool                   operator<(
-                             service const& right) const throw ();
+                             service const& other) const throw ();
     void                   check_validity() const;
     key_type               key() const;
     void                   merge(configuration::serviceextinfo const& obj);
@@ -120,6 +120,7 @@ namespace                  configuration {
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
     unsigned short         stalking_options() const throw ();
+    std::string const&     timezone() const throw ();
 
   private:
     struct                 setters {
@@ -169,6 +170,7 @@ namespace                  configuration {
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
     bool                   _set_stalking_options(std::string const& value);
+    bool                   _set_timezone(std::string const& value);
 
     std::string            _action_url;
     opt<bool>              _checks_active;
@@ -212,6 +214,7 @@ namespace                  configuration {
     std::string            _service_description;
     static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
+    std::string            _timezone;
  };
 
   typedef shared_ptr<service>    service_ptr;
