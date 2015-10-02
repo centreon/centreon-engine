@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -329,6 +329,18 @@ contact& engine::find_contact(std::string const& name) {
   if (it == state::instance().contacts().end())
     throw (engine_error() << "Contact '" << name << "' was not found");
   return (*it->second);
+}
+
+/**
+ *  Get contact timezone.
+ *
+ *  @param[in] name  Contact name.
+ *
+ *  @return Contact timezone.
+ */
+char const* engine::get_contact_timezone(char const* name) {
+  std::string const& timezone(contact_other_props[name].timezone);
+  return (timezone.empty() ? NULL : timezone.c_str());
 }
 
 /**

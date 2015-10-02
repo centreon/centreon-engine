@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,6 +45,7 @@
 #include "com/centreon/engine/sehandlers.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/utils.hh"
 
 #define MAX_CMD_ARGS 4096
@@ -123,48 +124,37 @@ int run_scheduled_service_check(
       if (current_time >= preferred_time)
         preferred_time = current_time + static_cast<time_t>(svc->check_interval <= 0 ? 300 : svc->check_interval * config->interval_length());
 
-      /* make sure we rescheduled the next service check at a valid time */
-      get_next_valid_time(
-        preferred_time,
-        &next_valid_time,
-        svc->check_period_ptr);
+      // Make sure we rescheduled the next service check at a valid time.
+      {
+        timezone_locker
+          lock(get_service_timezone(svc->host_name, svc->description));
+        get_next_valid_time(
+          preferred_time,
+          &next_valid_time,
+          svc->check_period_ptr);
 
-      // logit(NSLOG_RUNTIME_WARNING,true,"Warning: Service '%s' on host '%s' timeperiod check failed...\n",svc->description,svc->host_name);
-      // logit(NSLOG_RUNTIME_WARNING,true,"Current time: %s",ctime(&current_time));
-      // logit(NSLOG_RUNTIME_WARNING,true,"Preferred time: %s",ctime(&preferred_time));
-      // logit(NSLOG_RUNTIME_WARNING,true,"Next valid time: %s",ctime(&next_valid_time));
-
-      /* the service could not be rescheduled properly - set the next check time for next week */
-      /*if(time_is_valid==false && next_valid_time==preferred_time){ */
-      /* UPDATED 08/12/09 EG to reflect proper timeperod check logic */
-      if (time_is_valid == false
-          && check_time_against_period(
-               next_valid_time,
-               svc->check_period_ptr) == ERROR) {
-        /*
-	  svc->next_check=(time_t)(next_valid_time+(60*60*24*365));
-	  svc->should_be_scheduled=false;
-	*/
-        svc->next_check = (time_t)(next_valid_time + (60 * 60 * 24 * 7));
-
-        logger(log_runtime_warning, basic)
-          << "Warning: Check of service '" << svc->description
-          << "' on host '" << svc->host_name << "' could not be "
-          "rescheduled properly.  Scheduling check for next week...";
-
-        logger(dbg_checks, more)
-          << "Unable to find any valid times to reschedule the next "
-          "service check!";
-      }
-
-      /* this service could be rescheduled... */
-      else {
-        svc->next_check = next_valid_time;
-        svc->should_be_scheduled = true;
-
-        logger(dbg_checks, more)
-          << "Rescheduled next service check for "
-          << my_ctime(&next_valid_time);
+        // The service could not be rescheduled properly.
+        // Set the next check time for next week.
+        if (!time_is_valid && check_time_against_period(
+                                next_valid_time,
+                                svc->check_period_ptr) == ERROR) {
+          svc->next_check = (time_t)(next_valid_time + (60 * 60 * 24 * 7));
+          logger(log_runtime_warning, basic)
+            << "Warning: Check of service '" << svc->description
+            << "' on host '" << svc->host_name << "' could not be "
+               "rescheduled properly. Scheduling check for next week...";
+          logger(dbg_checks, more)
+            << "Unable to find any valid times to reschedule the next "
+               "service check!";
+        }
+        // This service could be rescheduled...
+        else {
+          svc->next_check = next_valid_time;
+          svc->should_be_scheduled = true;
+          logger(dbg_checks, more)
+            << "Rescheduled next service check for "
+            << my_ctime(&next_valid_time);
+        }
       }
     }
 
@@ -1101,13 +1091,18 @@ int handle_async_service_check_result(
     if (current_time > temp_service->next_check)
       temp_service->next_check = current_time;
 
-    /* make sure we rescheduled the next service check at a valid time */
-    preferred_time = temp_service->next_check;
-    get_next_valid_time(
-      preferred_time,
-      &next_valid_time,
-      temp_service->check_period_ptr);
-    temp_service->next_check = next_valid_time;
+    // Make sure we rescheduled the next service check at a valid time.
+    {
+      timezone_locker lock(get_service_timezone(
+                             temp_service->host_name,
+                             temp_service->description));
+      preferred_time = temp_service->next_check;
+      get_next_valid_time(
+        preferred_time,
+        &next_valid_time,
+        temp_service->check_period_ptr);
+      temp_service->next_check = next_valid_time;
+    }
 
     /* services with non-recurring intervals do not get rescheduled */
     if (temp_service->check_interval == 0)
@@ -1406,18 +1401,23 @@ int check_service_check_viability(
       logger(dbg_checks, most)
         << "Active checks of the service are currently disabled.";
     }
-    /* make sure this is a valid time to check the service */
-    if (check_time_against_period(
-          (unsigned long)current_time,
-          svc->check_period_ptr) == ERROR) {
-      preferred_time = current_time;
-      if (time_is_valid)
-        *time_is_valid = false;
-      perform_check = false;
 
-      logger(dbg_checks, most)
-        << "This is not a valid time for this service to be actively "
-        "checked.";
+    // Make sure this is a valid time to check the service.
+    {
+      timezone_locker lock(get_service_timezone(
+                             svc->host_name,
+                             svc->description));
+      if (check_time_against_period(
+            (unsigned long)current_time,
+            svc->check_period_ptr) == ERROR) {
+        preferred_time = current_time;
+        if (time_is_valid)
+          *time_is_valid = false;
+        perform_check = false;
+        logger(dbg_checks, most)
+          << "This is not a valid time for this service to be actively "
+             "checked.";
+      }
     }
 
     /* check service dependencies for execution */
@@ -1612,11 +1612,16 @@ void check_service_result_freshness() {
     if (temp_service->is_being_freshened == true)
       continue;
 
-    /* see if the time is right... */
-    if (check_time_against_period(
-          current_time,
-          temp_service->check_period_ptr) == ERROR)
-      continue;
+    // See if the time is right...
+    {
+      timezone_locker lock(get_service_timezone(
+                             temp_service->host_name,
+                             temp_service->description));
+      if (check_time_against_period(
+            current_time,
+            temp_service->check_period_ptr) == ERROR)
+        continue ;
+    }
 
     /* EXCEPTION */
     /* don't check freshness of services without regular check intervals if we're using auto-freshness threshold */
@@ -2096,11 +2101,14 @@ void check_host_result_freshness() {
     if (temp_host->is_being_freshened == true)
       continue;
 
-    /* see if the time is right... */
-    if (check_time_against_period(
-          current_time,
-          temp_host->check_period_ptr) == ERROR)
-      continue;
+    // See if the time is right...
+    {
+      timezone_locker lock(get_host_timezone(temp_host->name));
+      if (check_time_against_period(
+            current_time,
+            temp_host->check_period_ptr) == ERROR)
+        continue ;
+    }
 
     /* the results for the last check of this host are stale */
     if (is_host_result_fresh(temp_host, current_time, true) == false) {
@@ -2347,11 +2355,14 @@ int run_scheduled_host_check_3x(
                                                ? 300
                                                : (hst->check_interval * config->interval_length()));
 
-      /* make sure we rescheduled the next host check at a valid time */
-      get_next_valid_time(
-        preferred_time,
-        &next_valid_time,
-        hst->check_period_ptr);
+      // Make sure we rescheduled the next host check at a valid time.
+      {
+        timezone_locker lock(get_host_timezone(hst->name));
+        get_next_valid_time(
+          preferred_time,
+          &next_valid_time,
+          hst->check_period_ptr);
+      }
 
       /* the host could not be rescheduled properly - set the next check time for next week */
       if (time_is_valid == false && next_valid_time == preferred_time) {
@@ -3240,13 +3251,16 @@ int process_host_check_result_3x(
     else
       hst->next_check = next_check;
 
-    /* make sure we rescheduled the next service check at a valid time */
-    preferred_time = hst->next_check;
-    get_next_valid_time(
-      preferred_time,
-      &next_valid_time,
-      hst->check_period_ptr);
-    hst->next_check = next_valid_time;
+    // Make sure we rescheduled the next service check at a valid time.
+    {
+      timezone_locker lock(get_host_timezone(hst->name));
+      preferred_time = hst->next_check;
+      get_next_valid_time(
+        preferred_time,
+        &next_valid_time,
+        hst->check_period_ptr);
+      hst->next_check = next_valid_time;
+    }
 
     /* hosts with non-recurring intervals do not get rescheduled if we're in a HARD or UP state */
     if (hst->check_interval == 0
@@ -3347,14 +3361,18 @@ int check_host_check_viability_3x(
       preferred_time = current_time + check_interval;
       perform_check = false;
     }
-    /* make sure this is a valid time to check the host */
-    if (check_time_against_period(
-          static_cast<unsigned long>(current_time),
-          hst->check_period_ptr) == ERROR) {
-      preferred_time = current_time;
-      if (time_is_valid)
-	*time_is_valid = false;
-      perform_check = false;
+
+    // Make sure this is a valid time to check the host.
+    {
+      timezone_locker lock(get_host_timezone(hst->name));
+      if (check_time_against_period(
+            static_cast<unsigned long>(current_time),
+            hst->check_period_ptr) == ERROR) {
+        preferred_time = current_time;
+        if (time_is_valid)
+          *time_is_valid = false;
+        perform_check = false;
+      }
     }
 
     /* check host dependencies for execution */

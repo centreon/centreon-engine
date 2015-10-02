@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -62,6 +62,7 @@
 #include "com/centreon/engine/retention/state.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timezone_manager.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/io/directory_entry.hh"
@@ -112,6 +113,7 @@ int main(int argc, char* argv[]) {
   com::centreon::clib::load();
   com::centreon::logging::engine::load();
   config = new configuration::state;
+  com::centreon::engine::timezone_manager::load();
   com::centreon::engine::commands::set::load();
   com::centreon::engine::configuration::applier::state::load();
   com::centreon::engine::checks::checker::load();
@@ -505,6 +507,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::checks::checker::unload();
   delete config;
   config = NULL;
+  com::centreon::engine::timezone_manager::unload();
   com::centreon::logging::engine::unload();
   com::centreon::clib::unload();
 

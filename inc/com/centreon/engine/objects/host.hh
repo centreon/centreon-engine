@@ -258,6 +258,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj);
 CCE_BEGIN()
 
 host&         find_host(std::string const& name);
+char const*   get_host_timezone(char const* name);
 bool          is_host_exist(std::string const& name) throw ();
 
 CCE_END()

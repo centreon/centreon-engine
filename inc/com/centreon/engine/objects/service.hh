@@ -235,6 +235,7 @@ CCE_BEGIN()
 service&      find_service(
                 std::string const& host_name,
                 std::string const& service_description);
+char const*   get_service_timezone(char const* hst, char const* svc);
 bool          is_service_exist(
                 std::pair<std::string, std::string> const& id);
 

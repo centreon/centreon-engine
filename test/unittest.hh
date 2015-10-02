@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -34,6 +34,7 @@
 #  include "com/centreon/engine/globals.hh"
 #  include "com/centreon/engine/logging/logger.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/engine/timezone_manager.hh"
 #  include "com/centreon/logging/backend.hh"
 #  include "com/centreon/logging/engine.hh"
 #  include "com/centreon/logging/file.hh"
@@ -127,6 +128,7 @@ private:
            com::centreon::engine::logging::log_all,
            com::centreon::engine::logging::most);
       config = new configuration::state;
+      timezone_manager::load();
       commands::set::load();
       configuration::applier::state::load();
       checks::checker::load();
