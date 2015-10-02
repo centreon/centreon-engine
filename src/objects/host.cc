@@ -852,7 +852,8 @@ host& engine::find_host(std::string const& name) {
  *  @return Host timezone.
  */
 char const* engine::get_host_timezone(char const* name) {
-  return (host_other_props[name].timezone.c_str());
+  std::string const& timezone(host_other_props[name].timezone);
+  return (timezone.empty() ? NULL : timezone.c_str());
 }
 
 /**

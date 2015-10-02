@@ -339,7 +339,8 @@ contact& engine::find_contact(std::string const& name) {
  *  @return Contact timezone.
  */
 char const* engine::get_contact_timezone(char const* name) {
-  return (contact_other_props[name].timezone.c_str());
+  std::string const& timezone(contact_other_props[name].timezone);
+  return (timezone.empty() ? NULL : timezone.c_str());
 }
 
 /**

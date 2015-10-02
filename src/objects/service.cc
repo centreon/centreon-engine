@@ -710,9 +710,11 @@ service& engine::find_service(
 char const* engine::get_service_timezone(
                       char const* hst,
                       char const* svc) {
-  return (service_other_props[std::make_pair<std::string, std::string>(
-                                     hst,
-                                     svc)].timezone.c_str());
+  std::string const& timezone(service_other_props[
+                                std::make_pair<std::string, std::string>(
+                                  hst,
+                                  svc)].timezone);
+  return (timezone.empty() ? NULL : timezone.c_str());
 }
 
 /**
