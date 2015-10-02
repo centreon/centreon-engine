@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -49,12 +49,12 @@ namespace                  configuration {
     typedef std::string    key_type;
 
                            host(key_type const& key = "");
-                           host(host const& right);
+                           host(host const& other);
                            ~host() throw ();
-    host&                  operator=(host const& right);
-    bool                   operator==(host const& right) const throw ();
-    bool                   operator!=(host const& right) const throw ();
-    bool                   operator<(host const& right) const throw ();
+    host&                  operator=(host const& other);
+    bool                   operator==(host const& other) const throw ();
+    bool                   operator!=(host const& other) const throw ();
+    bool                   operator<(host const& other) const throw ();
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(configuration::hostextinfo const& obj);
@@ -108,6 +108,7 @@ namespace                  configuration {
     unsigned int           retry_interval() const throw ();
     unsigned int           stalking_options() const throw ();
     std::string const&     statusmap_image() const throw ();
+    std::string const&     timezone() const throw ();
     std::string const&     vrml_image() const throw ();
 
   private:
@@ -160,6 +161,7 @@ namespace                  configuration {
     bool                   _set_retry_interval(unsigned int value);
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_statusmap_image(std::string const& value);
+    bool                   _set_timezone(std::string const& value);
     bool                   _set_vrml_image(std::string const& value);
 
     std::string            _action_url;
@@ -206,6 +208,7 @@ namespace                  configuration {
     static setters const   _setters[];
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;
+    std::string            _timezone;
     std::string            _vrml_image;
   };
 
@@ -217,4 +220,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_HOST_HH
-

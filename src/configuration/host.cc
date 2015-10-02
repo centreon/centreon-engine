@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -84,7 +84,8 @@ host::setters const host::_setters[] = {
   { "3d_coords",                    SETTER(std::string const&, _set_coords_3d) },
   { "obsess_over_host",             SETTER(bool, _set_obsess_over_host) },
   { "retain_status_information",    SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information", SETTER(bool, _set_retain_nonstatus_information) },
+  { "timezone",                     SETTER(std::string const&, _set_timezone) }
 };
 
 // XXX: check all default value from xodtemplate_inherit_object_properties !
@@ -148,11 +149,10 @@ host::host(key_type const& key)
 /**
  *  Copy constructor.
  *
- *  @param[in] right The host to copy.
+ *  @param[in] other  The host to copy.
  */
-host::host(host const& right)
-  : object(right) {
-  operator=(right);
+host::host(host const& other) : object(other) {
+  operator=(other);
 }
 
 /**
@@ -161,230 +161,234 @@ host::host(host const& right)
 host::~host() throw () {}
 
 /**
- *  Copy constructor.
+ *  Assignment operator.
  *
- *  @param[in] right The host to copy.
+ *  @param[in] other  The host to copy.
  *
  *  @return This host.
  */
-host& host::operator=(host const& right) {
-  if (this != &right) {
-    object::operator=(right);
-    _action_url = right._action_url;
-    _address = right._address;
-    _alias = right._alias;
-    _checks_active = right._checks_active;
-    _checks_passive = right._checks_passive;
-    _check_command = right._check_command;
-    _check_freshness = right._check_freshness;
-    _check_interval = right._check_interval;
-    _check_period = right._check_period;
-    _contactgroups = right._contactgroups;
-    _contacts = right._contacts;
-    _coords_2d = right._coords_2d;
-    _coords_3d = right._coords_3d;
-    _customvariables = right._customvariables;
-    _display_name = right._display_name;
-    _event_handler = right._event_handler;
-    _event_handler_enabled = right._event_handler_enabled;
-    _first_notification_delay = right._first_notification_delay;
-    _flap_detection_enabled = right._flap_detection_enabled;
-    _flap_detection_options = right._flap_detection_options;
-    _freshness_threshold = right._freshness_threshold;
-    _high_flap_threshold = right._high_flap_threshold;
-    _hostgroups = right._hostgroups;
-    _host_name = right._host_name;
-    _icon_image = right._icon_image;
-    _icon_image_alt = right._icon_image_alt;
-    _initial_state = right._initial_state;
-    _low_flap_threshold = right._low_flap_threshold;
-    _max_check_attempts = right._max_check_attempts;
-    _notes = right._notes;
-    _notes_url = right._notes_url;
-    _notifications_enabled = right._notifications_enabled;
-    _notification_interval = right._notification_interval;
-    _notification_options = right._notification_options;
-    _notification_period = right._notification_period;
-    _obsess_over_host = right._obsess_over_host;
-    _parents = right._parents;
-    _process_perf_data = right._process_perf_data;
-    _retain_nonstatus_information = right._retain_nonstatus_information;
-    _retain_status_information = right._retain_status_information;
-    _retry_interval = right._retry_interval;
-    _stalking_options = right._stalking_options;
-    _statusmap_image = right._statusmap_image;
-    _vrml_image = right._vrml_image;
+host& host::operator=(host const& other) {
+  if (this != &other) {
+    object::operator=(other);
+    _action_url = other._action_url;
+    _address = other._address;
+    _alias = other._alias;
+    _checks_active = other._checks_active;
+    _checks_passive = other._checks_passive;
+    _check_command = other._check_command;
+    _check_freshness = other._check_freshness;
+    _check_interval = other._check_interval;
+    _check_period = other._check_period;
+    _contactgroups = other._contactgroups;
+    _contacts = other._contacts;
+    _coords_2d = other._coords_2d;
+    _coords_3d = other._coords_3d;
+    _customvariables = other._customvariables;
+    _display_name = other._display_name;
+    _event_handler = other._event_handler;
+    _event_handler_enabled = other._event_handler_enabled;
+    _first_notification_delay = other._first_notification_delay;
+    _flap_detection_enabled = other._flap_detection_enabled;
+    _flap_detection_options = other._flap_detection_options;
+    _freshness_threshold = other._freshness_threshold;
+    _high_flap_threshold = other._high_flap_threshold;
+    _hostgroups = other._hostgroups;
+    _host_name = other._host_name;
+    _icon_image = other._icon_image;
+    _icon_image_alt = other._icon_image_alt;
+    _initial_state = other._initial_state;
+    _low_flap_threshold = other._low_flap_threshold;
+    _max_check_attempts = other._max_check_attempts;
+    _notes = other._notes;
+    _notes_url = other._notes_url;
+    _notifications_enabled = other._notifications_enabled;
+    _notification_interval = other._notification_interval;
+    _notification_options = other._notification_options;
+    _notification_period = other._notification_period;
+    _obsess_over_host = other._obsess_over_host;
+    _parents = other._parents;
+    _process_perf_data = other._process_perf_data;
+    _retain_nonstatus_information = other._retain_nonstatus_information;
+    _retain_status_information = other._retain_status_information;
+    _retry_interval = other._retry_interval;
+    _stalking_options = other._stalking_options;
+    _statusmap_image = other._statusmap_image;
+    _timezone = other._timezone;
+    _vrml_image = other._vrml_image;
   }
   return (*this);
 }
 
 /**
- *  Equal operator.
+ *  Equality operator.
  *
- *  @param[in] right The host to compare.
+ *  @param[in] other  The host to compare.
  *
- *  @return True if is the same host, otherwise false.
+ *  @return True if this object and other object are equal.
  */
-bool host::operator==(host const& right) const throw () {
-  return (object::operator==(right)
-          && _action_url == right._action_url
-          && _address == right._address
-          && _alias == right._alias
-          && _checks_active == right._checks_active
-          && _checks_passive == right._checks_passive
-          && _check_command == right._check_command
-          && _check_freshness == right._check_freshness
-          && _check_interval == right._check_interval
-          && _check_period == right._check_period
-          && _contactgroups == right._contactgroups
-          && _contacts == right._contacts
-          && _coords_2d == right._coords_2d
-          && _coords_3d == right._coords_3d
-          && std::operator==(_customvariables, right._customvariables)
-          && _display_name == right._display_name
-          && _event_handler == right._event_handler
-          && _event_handler_enabled == right._event_handler_enabled
-          && _first_notification_delay == right._first_notification_delay
-          && _flap_detection_enabled == right._flap_detection_enabled
-          && _flap_detection_options == right._flap_detection_options
-          && _freshness_threshold == right._freshness_threshold
-          && _high_flap_threshold == right._high_flap_threshold
-          && _hostgroups == right._hostgroups
-          && _host_name == right._host_name
-          && _icon_image == right._icon_image
-          && _icon_image_alt == right._icon_image_alt
-          && _initial_state == right._initial_state
-          && _low_flap_threshold == right._low_flap_threshold
-          && _max_check_attempts == right._max_check_attempts
-          && _notes == right._notes
-          && _notes_url == right._notes_url
-          && _notifications_enabled == right._notifications_enabled
-          && _notification_interval == right._notification_interval
-          && _notification_options == right._notification_options
-          && _notification_period == right._notification_period
-          && _obsess_over_host == right._obsess_over_host
-          && _parents == right._parents
-          && _process_perf_data == right._process_perf_data
-          && _retain_nonstatus_information == right._retain_nonstatus_information
-          && _retain_status_information == right._retain_status_information
-          && _retry_interval == right._retry_interval
-          && _stalking_options == right._stalking_options
-          && _statusmap_image == right._statusmap_image
-          && _vrml_image == right._vrml_image);
+bool host::operator==(host const& other) const throw () {
+  return (object::operator==(other)
+          && _action_url == other._action_url
+          && _address == other._address
+          && _alias == other._alias
+          && _checks_active == other._checks_active
+          && _checks_passive == other._checks_passive
+          && _check_command == other._check_command
+          && _check_freshness == other._check_freshness
+          && _check_interval == other._check_interval
+          && _check_period == other._check_period
+          && _contactgroups == other._contactgroups
+          && _contacts == other._contacts
+          && _coords_2d == other._coords_2d
+          && _coords_3d == other._coords_3d
+          && std::operator==(_customvariables, other._customvariables)
+          && _display_name == other._display_name
+          && _event_handler == other._event_handler
+          && _event_handler_enabled == other._event_handler_enabled
+          && _first_notification_delay == other._first_notification_delay
+          && _flap_detection_enabled == other._flap_detection_enabled
+          && _flap_detection_options == other._flap_detection_options
+          && _freshness_threshold == other._freshness_threshold
+          && _high_flap_threshold == other._high_flap_threshold
+          && _hostgroups == other._hostgroups
+          && _host_name == other._host_name
+          && _icon_image == other._icon_image
+          && _icon_image_alt == other._icon_image_alt
+          && _initial_state == other._initial_state
+          && _low_flap_threshold == other._low_flap_threshold
+          && _max_check_attempts == other._max_check_attempts
+          && _notes == other._notes
+          && _notes_url == other._notes_url
+          && _notifications_enabled == other._notifications_enabled
+          && _notification_interval == other._notification_interval
+          && _notification_options == other._notification_options
+          && _notification_period == other._notification_period
+          && _obsess_over_host == other._obsess_over_host
+          && _parents == other._parents
+          && _process_perf_data == other._process_perf_data
+          && _retain_nonstatus_information == other._retain_nonstatus_information
+          && _retain_status_information == other._retain_status_information
+          && _retry_interval == other._retry_interval
+          && _stalking_options == other._stalking_options
+          && _statusmap_image == other._statusmap_image
+          && _timezone == other._timezone
+          && _vrml_image == other._vrml_image);
 }
 
 /**
- *  Equal operator.
+ *  Inequality operator.
  *
- *  @param[in] right The host to compare.
+ *  @param[in] other  The host to compare.
  *
  *  @return True if is not the same host, otherwise false.
  */
-bool host::operator!=(host const& right) const throw () {
-  return (!operator==(right));
+bool host::operator!=(host const& other) const throw () {
+  return (!operator==(other));
 }
 
 /**
  *  Less-than operator.
  *
- *  @param[in] right Object to compare to.
+ *  @param[in] other  Object to compare to.
  *
  *  @return True if this object is less than right.
  */
-bool host::operator<(host const& right) const throw () {
-  if (_host_name != right._host_name)
-    return (_host_name < right._host_name);
-  else if (_action_url != right._action_url)
-    return (_action_url < right._action_url);
-  else if (_address != right._address)
-    return (_address < right._address);
-  else if (_alias != right._alias)
-    return (_alias < right._alias);
-  else if (_checks_active != right._checks_active)
-    return (_checks_active < right._checks_active);
-  else if (_checks_passive != right._checks_passive)
-    return (_checks_passive < right._checks_passive);
-  else if (_check_command != right._check_command)
-    return (_check_command < right._check_command);
-  else if (_check_freshness != right._check_freshness)
-    return (_check_freshness < right._check_freshness);
-  else if (_check_interval != right._check_interval)
-    return (_check_interval < right._check_interval);
-  else if (_check_period != right._check_period)
-    return (_check_period < right._check_period);
-  else if (_contactgroups != right._contactgroups)
-    return (_contactgroups < right._contactgroups);
-  else if (_contacts != right._contacts)
-    return (_contacts < right._contacts);
-  else if (_coords_2d != right._coords_2d)
-    return (_coords_2d < right._coords_2d);
-  else if (_coords_3d != right._coords_3d)
-    return (_coords_3d < right._coords_3d);
-  else if (_customvariables != right._customvariables)
-    return (_customvariables < right._customvariables);
-  else if (_display_name != right._display_name)
-    return (_display_name < right._display_name);
-  else if (_event_handler != right._event_handler)
-    return (_event_handler < right._event_handler);
-  else if (_event_handler_enabled != right._event_handler_enabled)
-    return (_event_handler_enabled < right._event_handler_enabled);
+bool host::operator<(host const& other) const throw () {
+  if (_host_name != other._host_name)
+    return (_host_name < other._host_name);
+  else if (_action_url != other._action_url)
+    return (_action_url < other._action_url);
+  else if (_address != other._address)
+    return (_address < other._address);
+  else if (_alias != other._alias)
+    return (_alias < other._alias);
+  else if (_checks_active != other._checks_active)
+    return (_checks_active < other._checks_active);
+  else if (_checks_passive != other._checks_passive)
+    return (_checks_passive < other._checks_passive);
+  else if (_check_command != other._check_command)
+    return (_check_command < other._check_command);
+  else if (_check_freshness != other._check_freshness)
+    return (_check_freshness < other._check_freshness);
+  else if (_check_interval != other._check_interval)
+    return (_check_interval < other._check_interval);
+  else if (_check_period != other._check_period)
+    return (_check_period < other._check_period);
+  else if (_contactgroups != other._contactgroups)
+    return (_contactgroups < other._contactgroups);
+  else if (_contacts != other._contacts)
+    return (_contacts < other._contacts);
+  else if (_coords_2d != other._coords_2d)
+    return (_coords_2d < other._coords_2d);
+  else if (_coords_3d != other._coords_3d)
+    return (_coords_3d < other._coords_3d);
+  else if (_customvariables != other._customvariables)
+    return (_customvariables < other._customvariables);
+  else if (_display_name != other._display_name)
+    return (_display_name < other._display_name);
+  else if (_event_handler != other._event_handler)
+    return (_event_handler < other._event_handler);
+  else if (_event_handler_enabled != other._event_handler_enabled)
+    return (_event_handler_enabled < other._event_handler_enabled);
   else if (_first_notification_delay
-           != right._first_notification_delay)
+           != other._first_notification_delay)
     return (_first_notification_delay
-            < right._first_notification_delay);
-  else if (_flap_detection_enabled != right._flap_detection_enabled)
-    return (_flap_detection_enabled < right._flap_detection_enabled);
-  else if (_flap_detection_options != right._flap_detection_options)
-    return (_flap_detection_options < right._flap_detection_options);
-  else if (_freshness_threshold != right._freshness_threshold)
-    return (_freshness_threshold < right._freshness_threshold);
-  else if (_high_flap_threshold != right._high_flap_threshold)
-    return (_high_flap_threshold < right._high_flap_threshold);
-  else if (_hostgroups != right._hostgroups)
-    return (_hostgroups < right._hostgroups);
-  else if (_icon_image != right._icon_image)
-    return (_icon_image < right._icon_image);
-  else if (_icon_image_alt != right._icon_image_alt)
-    return (_icon_image_alt < right._icon_image_alt);
-  else if (_initial_state != right._initial_state)
-    return (_initial_state < right._initial_state);
-  else if (_low_flap_threshold != right._low_flap_threshold)
-    return (_low_flap_threshold < right._low_flap_threshold);
-  else if (_max_check_attempts != right._max_check_attempts)
-    return (_max_check_attempts < right._max_check_attempts);
-  else if (_notes != right._notes)
-    return (_notes < right._notes);
-  else if (_notes_url != right._notes_url)
-    return (_notes_url < right._notes_url);
-  else if (_notifications_enabled != right._notifications_enabled)
-    return (_notifications_enabled < right._notifications_enabled);
-  else if (_notification_interval != right._notification_interval)
-    return (_notification_interval < right._notification_interval);
-  else if (_notification_options != right._notification_options)
-    return (_notification_options < right._notification_options);
-  else if (_notification_period != right._notification_period)
-    return (_notification_period < right._notification_period);
-  else if (_obsess_over_host != right._obsess_over_host)
-    return (_obsess_over_host < right._obsess_over_host);
-  else if (_parents != right._parents)
-    return (_parents < right._parents);
-  else if (_process_perf_data != right._process_perf_data)
-    return (_process_perf_data < right._process_perf_data);
+            < other._first_notification_delay);
+  else if (_flap_detection_enabled != other._flap_detection_enabled)
+    return (_flap_detection_enabled < other._flap_detection_enabled);
+  else if (_flap_detection_options != other._flap_detection_options)
+    return (_flap_detection_options < other._flap_detection_options);
+  else if (_freshness_threshold != other._freshness_threshold)
+    return (_freshness_threshold < other._freshness_threshold);
+  else if (_high_flap_threshold != other._high_flap_threshold)
+    return (_high_flap_threshold < other._high_flap_threshold);
+  else if (_hostgroups != other._hostgroups)
+    return (_hostgroups < other._hostgroups);
+  else if (_icon_image != other._icon_image)
+    return (_icon_image < other._icon_image);
+  else if (_icon_image_alt != other._icon_image_alt)
+    return (_icon_image_alt < other._icon_image_alt);
+  else if (_initial_state != other._initial_state)
+    return (_initial_state < other._initial_state);
+  else if (_low_flap_threshold != other._low_flap_threshold)
+    return (_low_flap_threshold < other._low_flap_threshold);
+  else if (_max_check_attempts != other._max_check_attempts)
+    return (_max_check_attempts < other._max_check_attempts);
+  else if (_notes != other._notes)
+    return (_notes < other._notes);
+  else if (_notes_url != other._notes_url)
+    return (_notes_url < other._notes_url);
+  else if (_notifications_enabled != other._notifications_enabled)
+    return (_notifications_enabled < other._notifications_enabled);
+  else if (_notification_interval != other._notification_interval)
+    return (_notification_interval < other._notification_interval);
+  else if (_notification_options != other._notification_options)
+    return (_notification_options < other._notification_options);
+  else if (_notification_period != other._notification_period)
+    return (_notification_period < other._notification_period);
+  else if (_obsess_over_host != other._obsess_over_host)
+    return (_obsess_over_host < other._obsess_over_host);
+  else if (_parents != other._parents)
+    return (_parents < other._parents);
+  else if (_process_perf_data != other._process_perf_data)
+    return (_process_perf_data < other._process_perf_data);
   else if (_retain_nonstatus_information
-           != right._retain_nonstatus_information)
+           != other._retain_nonstatus_information)
     return (_retain_nonstatus_information
-            < right._retain_nonstatus_information);
+            < other._retain_nonstatus_information);
   else if (_retain_status_information
-           != right._retain_status_information)
+           != other._retain_status_information)
     return (_retain_status_information
-            < right._retain_status_information);
-  else if (_retry_interval != right._retry_interval)
-    return (_retry_interval < right._retry_interval);
-  else if (_stalking_options != right._stalking_options)
-    return (_stalking_options < right._stalking_options);
-  else if (_statusmap_image != right._statusmap_image)
-    return (_statusmap_image < right._statusmap_image);
-  return (_vrml_image < right._vrml_image);
+            < other._retain_status_information);
+  else if (_retry_interval != other._retry_interval)
+    return (_retry_interval < other._retry_interval);
+  else if (_stalking_options != other._stalking_options)
+    return (_stalking_options < other._stalking_options);
+  else if (_statusmap_image != other._statusmap_image)
+    return (_statusmap_image < other._statusmap_image);
+  else if (_timezone != other._timezone)
+    return (_timezone < other._timezone);
+  return (_vrml_image < other._vrml_image);
 }
 
 /**
@@ -481,6 +485,7 @@ void host::merge(object const& obj) {
   MRG_OPTION(_retry_interval);
   MRG_OPTION(_stalking_options);
   MRG_DEFAULT(_statusmap_image);
+  MRG_DEFAULT(_timezone);
   MRG_DEFAULT(_vrml_image);
 }
 
@@ -926,6 +931,15 @@ unsigned int host::stalking_options() const throw () {
  */
 std::string const& host::statusmap_image() const throw () {
   return (_statusmap_image);
+}
+
+/**
+ *  Get timezone.
+ *
+ *  @return The timezone.
+ */
+std::string const& host::timezone() const throw () {
+  return (_timezone);
 }
 
 /**
@@ -1588,6 +1602,18 @@ bool host::_set_stalking_options(
 bool host::_set_statusmap_image(
        std::string const& value) {
   _statusmap_image = value;
+  return (true);
+}
+
+/**
+ *  Set timezone value.
+ *
+ *  @param[in] value  The new timezone.
+ *
+ *  @return True on success, false otherwise.
+ */
+bool host::_set_timezone(std::string const& value) {
+  _timezone = value;
   return (true);
 }
 
