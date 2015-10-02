@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -39,15 +39,15 @@ namespace                  configuration {
     typedef std::string    key_type;
 
                            contact(key_type const& key = "");
-                           contact(contact const& right);
+                           contact(contact const& other);
                            ~contact() throw ();
-    contact&               operator=(contact const& right);
+    contact&               operator=(contact const& other);
     bool                   operator==(
-                             contact const& right) const throw ();
+                             contact const& other) const throw ();
     bool                   operator!=(
-                             contact const& right) const throw ();
+                             contact const& other) const throw ();
     bool                   operator<(
-                             contact const& right) const throw ();
+                             contact const& other) const throw ();
     void                   check_validity() const;
     key_type const&        key() const throw ();
     void                   merge(object const& obj);
@@ -72,6 +72,7 @@ namespace                  configuration {
     unsigned int           service_notification_options() const throw ();
     std::string const&     service_notification_period() const throw ();
     bool                   service_notifications_enabled() const throw ();
+    std::string const&     timezone() const throw ();
 
   private:
     struct                 setters {
@@ -98,6 +99,7 @@ namespace                  configuration {
     bool                   _set_service_notification_options(std::string const& value);
     bool                   _set_service_notification_period(std::string const& value);
     bool                   _set_service_notifications_enabled(bool value);
+    bool                   _set_timezone(std::string const& value);
 
     tab_string             _address;
     std::string            _alias;
@@ -117,6 +119,7 @@ namespace                  configuration {
     opt<unsigned int>      _service_notification_options;
     std::string            _service_notification_period;
     opt<bool>              _service_notifications_enabled;
+    std::string            _timezone;
     static setters const   _setters[];
   };
 
@@ -127,4 +130,3 @@ namespace                  configuration {
 CCE_END()
 
 #endif // !CCE_CONFIGURATION_CONTACT_HH
-

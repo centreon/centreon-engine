@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -48,7 +48,8 @@ contact::setters const contact::_setters[] = {
   { "service_notifications_enabled", SETTER(bool, _set_service_notifications_enabled) },
   { "can_submit_commands",           SETTER(bool, _set_can_submit_commands) },
   { "retain_status_information",     SETTER(bool, _set_retain_status_information) },
-  { "retain_nonstatus_information",  SETTER(bool, _set_retain_nonstatus_information) }
+  { "retain_nonstatus_information",  SETTER(bool, _set_retain_nonstatus_information) },
+  { "timezone",                      SETTER(std::string const&, _set_timezone) }
 };
 
 // Default values.
@@ -83,11 +84,10 @@ contact::contact(key_type const& key)
 /**
  *  Copy constructor.
  *
- *  @param[in] right The contact to copy.
+ *  @param[in] other  The contact to copy.
  */
-contact::contact(contact const& right)
-  : object(right) {
-  operator=(right);
+contact::contact(contact const& other) : object(other) {
+  operator=(other);
 }
 
 /**
@@ -98,137 +98,142 @@ contact::~contact() throw () {}
 /**
  *  Copy constructor.
  *
- *  @param[in] right The contact to copy.
+ *  @param[in] other  The contact to copy.
  *
  *  @return This contact.
  */
-contact& contact::operator=(contact const& right) {
-  if (this != &right) {
-    object::operator=(right);
-    _address = right._address;
-    _alias = right._alias;
-    _can_submit_commands = right._can_submit_commands;
-    _contactgroups = right._contactgroups;
-    _contact_name = right._contact_name;
-    _customvariables = right._customvariables;
-    _email = right._email;
-    _host_notifications_enabled = right._host_notifications_enabled;
-    _host_notification_commands = right._host_notification_commands;
-    _host_notification_options = right._host_notification_options;
-    _host_notification_period = right._host_notification_period;
-    _retain_nonstatus_information = right._retain_nonstatus_information;
-    _retain_status_information = right._retain_status_information;
-    _pager = right._pager;
-    _service_notification_commands = right._service_notification_commands;
-    _service_notification_options = right._service_notification_options;
-    _service_notification_period = right._service_notification_period;
-    _service_notifications_enabled = right._service_notifications_enabled;
+contact& contact::operator=(contact const& other) {
+  if (this != &other) {
+    object::operator=(other);
+    _address = other._address;
+    _alias = other._alias;
+    _can_submit_commands = other._can_submit_commands;
+    _contactgroups = other._contactgroups;
+    _contact_name = other._contact_name;
+    _customvariables = other._customvariables;
+    _email = other._email;
+    _host_notifications_enabled = other._host_notifications_enabled;
+    _host_notification_commands = other._host_notification_commands;
+    _host_notification_options = other._host_notification_options;
+    _host_notification_period = other._host_notification_period;
+    _retain_nonstatus_information = other._retain_nonstatus_information;
+    _retain_status_information = other._retain_status_information;
+    _pager = other._pager;
+    _service_notification_commands = other._service_notification_commands;
+    _service_notification_options = other._service_notification_options;
+    _service_notification_period = other._service_notification_period;
+    _service_notifications_enabled = other._service_notifications_enabled;
+    _timezone = other._timezone;
   }
   return (*this);
 }
 
 /**
- *  Equal operator.
+ *  Equality operator.
  *
- *  @param[in] right The contact to compare.
+ *  @param[in] other  The contact to compare.
  *
  *  @return True if is the same contact, otherwise false.
  */
-bool contact::operator==(contact const& right) const throw () {
-  return (object::operator==(right)
-          && _address == right._address
-          && _alias == right._alias
-          && _can_submit_commands == right._can_submit_commands
-          && _contactgroups == right._contactgroups
-          && _contact_name == right._contact_name
-          && std::operator==(_customvariables, right._customvariables)
-          && _email == right._email
-          && _host_notifications_enabled == right._host_notifications_enabled
-          && _host_notification_commands == right._host_notification_commands
-          && _host_notification_options == right._host_notification_options
-          && _host_notification_period == right._host_notification_period
-          && _retain_nonstatus_information == right._retain_nonstatus_information
-          && _retain_status_information == right._retain_status_information
-          && _pager == right._pager
-          && _service_notification_commands == right._service_notification_commands
-          && _service_notification_options == right._service_notification_options
-          && _service_notification_period == right._service_notification_period
-          && _service_notifications_enabled == right._service_notifications_enabled);
+bool contact::operator==(contact const& other) const throw () {
+  return (object::operator==(other)
+          && _address == other._address
+          && _alias == other._alias
+          && _can_submit_commands == other._can_submit_commands
+          && _contactgroups == other._contactgroups
+          && _contact_name == other._contact_name
+          && std::operator==(_customvariables, other._customvariables)
+          && _email == other._email
+          && _host_notifications_enabled == other._host_notifications_enabled
+          && _host_notification_commands == other._host_notification_commands
+          && _host_notification_options == other._host_notification_options
+          && _host_notification_period == other._host_notification_period
+          && _retain_nonstatus_information == other._retain_nonstatus_information
+          && _retain_status_information == other._retain_status_information
+          && _pager == other._pager
+          && _service_notification_commands == other._service_notification_commands
+          && _service_notification_options == other._service_notification_options
+          && _service_notification_period == other._service_notification_period
+          && _service_notifications_enabled == other._service_notifications_enabled
+          && _timezone == other._timezone);
 }
 
 /**
- *  Equal operator.
+ *  Ineqality operator.
  *
- *  @param[in] right The contact to compare.
+ *  @param[in] other  The contact to compare.
  *
  *  @return True if is not the same contact, otherwise false.
  */
-bool contact::operator!=(contact const& right) const throw () {
-  return (!operator==(right));
+bool contact::operator!=(contact const& other) const throw () {
+  return (!operator==(other));
 }
 
 /**
  *  Less-than operator.
  *
- *  @param[in] right Object to compare to.
+ *  @param[in] other  Object to compare to.
  *
- *  @return True if this object is less than right.
+ *  @return True if this object is less than other.
  */
-bool contact::operator<(contact const& right) const throw () {
-  if (_contact_name != right._contact_name)
-    return (_contact_name < right._contact_name);
-  else if (_address != right._address)
-    return (_address < right._address);
-  else if (_alias != right._alias)
-    return (_alias < right._alias);
-  else if (_can_submit_commands != right._can_submit_commands)
-    return (_can_submit_commands < right._can_submit_commands);
-  else if (_contactgroups != right._contactgroups)
-    return (_contactgroups < right._contactgroups);
-  else if (_customvariables != right._customvariables)
-    return (_customvariables < right._customvariables);
-  else if (_email != right._email)
-    return (_email < right._email);
+bool contact::operator<(contact const& other) const throw () {
+  if (_contact_name != other._contact_name)
+    return (_contact_name < other._contact_name);
+  else if (_address != other._address)
+    return (_address < other._address);
+  else if (_alias != other._alias)
+    return (_alias < other._alias);
+  else if (_can_submit_commands != other._can_submit_commands)
+    return (_can_submit_commands < other._can_submit_commands);
+  else if (_contactgroups != other._contactgroups)
+    return (_contactgroups < other._contactgroups);
+  else if (_customvariables != other._customvariables)
+    return (_customvariables < other._customvariables);
+  else if (_email != other._email)
+    return (_email < other._email);
   else if (_host_notifications_enabled
-           != right._host_notifications_enabled)
+           != other._host_notifications_enabled)
     return (_host_notifications_enabled
-            < right._host_notifications_enabled);
+            < other._host_notifications_enabled);
   else if (_host_notification_commands
-           != right._host_notification_commands)
+           != other._host_notification_commands)
     return (_host_notification_commands
-            < right._host_notification_commands);
+            < other._host_notification_commands);
   else if (_host_notification_options
-           != right._host_notification_options)
+           != other._host_notification_options)
     return (_host_notification_options
-            < right._host_notification_options);
+            < other._host_notification_options);
   else if (_host_notification_period
-           != right._host_notification_period)
+           != other._host_notification_period)
     return (_host_notification_period
-            < right._host_notification_period);
+            < other._host_notification_period);
   else if (_retain_nonstatus_information
-           != right._retain_nonstatus_information)
+           != other._retain_nonstatus_information)
     return (_retain_nonstatus_information
-            < right._retain_nonstatus_information);
+            < other._retain_nonstatus_information);
   else if (_retain_status_information
-           != right._retain_status_information)
+           != other._retain_status_information)
     return (_retain_status_information
-            < right._retain_status_information);
-  else if (_pager != right._pager)
-    return (_pager < right._pager);
+            < other._retain_status_information);
+  else if (_pager != other._pager)
+    return (_pager < other._pager);
   else if (_service_notification_commands
-           != right._service_notification_commands)
+           != other._service_notification_commands)
     return (_service_notification_commands
-            < right._service_notification_commands);
+            < other._service_notification_commands);
   else if (_service_notification_options
-           != right._service_notification_options)
+           != other._service_notification_options)
     return (_service_notification_options
-            < right._service_notification_options);
+            < other._service_notification_options);
   else if (_service_notification_period
-           != right._service_notification_period)
+           != other._service_notification_period)
     return (_service_notification_period
-            < right._service_notification_period);
-  return (_service_notifications_enabled
-          < right._service_notifications_enabled);
+            < other._service_notification_period);
+  else if (_service_notifications_enabled
+           != other._service_notifications_enabled)
+    return (_service_notifications_enabled
+            < other._service_notifications_enabled);
+  return (_timezone < other._timezone);
 }
 
 /**
@@ -281,6 +286,7 @@ void contact::merge(object const& obj) {
   MRG_OPTION(_service_notification_options);
   MRG_DEFAULT(_service_notification_period);
   MRG_OPTION(_service_notifications_enabled);
+  MRG_DEFAULT(_timezone);
 }
 
 /**
@@ -475,6 +481,15 @@ std::string const& contact::service_notification_period() const throw () {
  */
 bool contact::service_notifications_enabled() const throw () {
   return (_service_notifications_enabled);
+}
+
+/**
+ *  Get contact timezone.
+ *
+ *  @return This contact timezone.
+ */
+std::string const& contact::timezone() const throw () {
+  return (_timezone);
 }
 
 /**
@@ -745,5 +760,17 @@ bool contact::_set_service_notification_period(std::string const& value) {
  */
 bool contact::_set_service_notifications_enabled(bool value) {
   _service_notifications_enabled = value;
+  return (true);
+}
+
+/**
+ *  Set contact timezone.
+ *
+ *  @param[in] value  New contact timezone.
+ *
+ *  @return True.
+ */
+bool contact::_set_timezone(std::string const& value) {
+  _timezone = value;
   return (true);
 }
