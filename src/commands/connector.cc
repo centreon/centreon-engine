@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -638,7 +638,7 @@ void connector::_recv_query_execute(char const* data) {
     result res;
     res.command_id = command_id;
     res.end_time = timestamp::now();
-    res.exit_code = STATE_CRITICAL;
+    res.exit_code = STATE_UNKNOWN;
     res.exit_status = process::normal;
     res.start_time = info->start_time;
 

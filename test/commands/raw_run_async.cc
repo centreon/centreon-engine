@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -77,7 +77,7 @@ static bool run_with_timeout() {
   // Check result.
   result const& res = wait_proc.get_result();
   return (!((res.command_id != id)
-            || (res.exit_code != STATE_CRITICAL)
+            || (res.exit_code != STATE_UNKNOWN)
             || (res.exit_status != process::timeout)
             || (res.output != "(Process Timeout)")));
 }

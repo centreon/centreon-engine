@@ -60,7 +60,7 @@ extern "C" {
     sighandler_helper(
       HOST_TIMEOUT_OUTPUT,
       sizeof(HOST_TIMEOUT_OUTPUT) - 1,
-      STATE_CRITICAL);
+      STATE_UNKNOWN);
     return;
   }
 
@@ -71,7 +71,7 @@ extern "C" {
    */
   void my_system_sighandler(int sig) {
     (void)sig;
-    sighandler_helper(NULL, 0, STATE_CRITICAL);
+    sighandler_helper(NULL, 0, STATE_UNKNOWN);
     return;
   }
 
