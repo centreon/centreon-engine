@@ -492,7 +492,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   endif ()
 endif ()
 set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
-get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 
 # Link centengine with required libraries.
 target_link_libraries("centengine" "cce_core")
@@ -500,7 +499,6 @@ target_link_libraries("centengine" "cce_core")
 # centenginestats target.
 add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
 target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
-get_property(CENTENGINESTATS_BINARY TARGET "centenginestats" PROPERTY LOCATION)
 
 # Unit test.
 enable_testing()

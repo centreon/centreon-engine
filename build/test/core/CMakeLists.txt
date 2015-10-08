@@ -101,7 +101,7 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "running_stats_no_config_file")
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINESTATS_BINARY}" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg"
+  "${centenginestats}" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -109,7 +109,7 @@ set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 set(TEST_NAME "running_stats_no_status_file")
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINESTATS_BINARY}" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg"
+  "${centenginestats}" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -125,15 +125,15 @@ add_executable(
 target_link_libraries("${CENTENGINE_RUNNER}" "cce_core")
 
 # Help flag.
-add_test("running_engine_help" "${CENTENGINE_BINARY}" "-h")
+add_test("running_engine_help" "centengine" "-h")
 
 # License flag.
-add_test("running_engine_license" "${CENTENGINE_BINARY}" "-V")
+add_test("running_engine_license" "centengine" "-V")
 
 # Without any service.
 add_test(
   "running_engine_no_service"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/no_service.cfg"
+  "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg"
 )
 set_tests_properties(
   "running_engine_no_service"
@@ -144,7 +144,7 @@ set_tests_properties(
 set(TEST_NAME "running_engine_broker_module_without_args")
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg"
+  "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg"
 )
 
 # Check that all symbols required by modules are present.
@@ -189,7 +189,7 @@ configure_file(
 )
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/modules_symbols.cfg"
+  "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg"
 )
 # Check that the webservice module can be loaded.
 if (WITH_WEBSERVICE)
@@ -206,7 +206,7 @@ broker_module=${MODULE_PATH} ${MODULE_ARGS}"
     "${TEST_DIR}/running/etc/modules_webservice.cfg")
   add_test(
     "${TEST_NAME}"
-    "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/modules_webservice.cfg"
+    "centengine" "${TEST_DIR}/running/etc/modules_webservice.cfg"
   )
 endif ()
 
@@ -222,7 +222,7 @@ configure_file(
 set(TEST_NAME "running_host_check_with_no_check_cmd")
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg"
+  "centengine" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -238,7 +238,7 @@ configure_file(
 set(TEST_NAME "running_service_check_with_no_check_cmd")
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg"
+  "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -258,7 +258,7 @@ configure_file(
 )
 add_test(
   "${TEST_NAME}"
-  "${CENTENGINE_BINARY}" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
+  "centengine" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
 )
 # log without pid
 set(TEST_NAME "running_log_without_pid")

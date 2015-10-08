@@ -21,7 +21,9 @@
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 
 include_directories("${PROJECT_SOURCE_DIR}")
-configure_file("${TEST_DIR}/paths.hh.in" "${TEST_DIR}/paths.hh")
+configure_file("${TEST_DIR}/paths.hh.in.in" "${TEST_DIR}/paths.hh.in")
+file(GENERATE OUTPUT "${TEST_DIR}/paths.hh"
+  INPUT "${TEST_DIR}/paths.hh.in")
 
 # Subdirectory.
 add_subdirectory("bench")
