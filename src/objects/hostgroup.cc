@@ -210,3 +210,16 @@ bool engine::is_hostgroup_exist(std::string const& name) throw () {
     it(state::instance().hostgroups().find(name));
   return (it != state::instance().hostgroups().end());
 }
+
+/**
+ *  Get the id of the hostgroup.
+ *
+ *  @param[in] name  The name of the hostgroup.
+ *
+ *  @return  The id of the hostgroupd, or zero if not found.
+ */
+unsigned int engine::get_hostgroup_id(char const* name) {
+  std::map<std::string, hostgroup_other_properties>::const_iterator
+    found(hostgroup_other_props.find(name));
+  return (found != hostgroup_other_props.end() ? found->second.hostgroup_id : 0);
+}

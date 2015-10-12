@@ -235,3 +235,16 @@ bool engine::is_servicegroup_exist(std::string const& name) throw () {
     it(state::instance().servicegroups().find(name));
   return (it != state::instance().servicegroups().end());
 }
+
+/**
+ *  Get the id of the servicegroup.
+ *
+ *  @param[in] name  The name of the servicegroup.
+ *
+ *  @return  The id of the servicegroup, or zero if not found.
+ */
+unsigned int engine::get_servicegroup_id(char const* name) {
+  std::map<std::string, servicegroup_other_properties>::const_iterator
+    found(servicegroup_other_props.find(name));
+  return (found != servicegroup_other_props.end() ? found->second.servicegroup_id : 0);
+}
