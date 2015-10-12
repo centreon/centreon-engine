@@ -36,6 +36,8 @@ using namespace com::centreon::engine::logging;
 
 host::setters const host::_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_host_name) },
+  { "host_id",                      SETTER(unsigned int, _set_host_id)},
+  { "_HOST_ID",                      SETTER(unsigned int, _set_host_id)},
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "alias",                        SETTER(std::string const&, _set_alias) },
   { "address",                      SETTER(std::string const&, _set_address) },
@@ -132,6 +134,7 @@ host::host(key_type const& key)
     _flap_detection_options(default_flap_detection_options),
     _freshness_threshold(default_freshness_threshold),
     _high_flap_threshold(default_high_flap_threshold),
+    _host_id(0),
     _host_name(key),
     _initial_state(default_initial_state),
     _low_flap_threshold(default_low_flap_threshold),
@@ -193,6 +196,7 @@ host& host::operator=(host const& other) {
     _freshness_threshold = other._freshness_threshold;
     _high_flap_threshold = other._high_flap_threshold;
     _hostgroups = other._hostgroups;
+    _host_id = other._host_id;
     _host_name = other._host_name;
     _icon_image = other._icon_image;
     _icon_image_alt = other._icon_image_alt;
@@ -251,6 +255,7 @@ bool host::operator==(host const& other) const throw () {
           && _freshness_threshold == other._freshness_threshold
           && _high_flap_threshold == other._high_flap_threshold
           && _hostgroups == other._hostgroups
+          && _host_id == other._host_id
           && _host_name == other._host_name
           && _icon_image == other._icon_image
           && _icon_image_alt == other._icon_image_alt
@@ -294,7 +299,9 @@ bool host::operator!=(host const& other) const throw () {
  *  @return True if this object is less than right.
  */
 bool host::operator<(host const& other) const throw () {
-  if (_host_name != other._host_name)
+  if (_host_id != other._host_id)
+    return (_host_id < other._host_id);
+  else if (_host_name != other._host_name)
     return (_host_name < other._host_name);
   else if (_action_url != other._action_url)
     return (_action_url < other._action_url);
@@ -397,6 +404,8 @@ bool host::operator<(host const& other) const throw () {
  *  If the object is not valid, an exception is thrown.
  */
 void host::check_validity() const {
+  if (_host_id == 0)
+    throw (engine_error() << "Host has no id (property 'host_id')");
   if (_host_name.empty())
     throw (engine_error() << "Host has no name (property 'host_name')");
   if (_address.empty())
@@ -503,7 +512,7 @@ bool host::parse(char const* key, char const* value) {
        ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (key[0] == '_') {
+  if (key[0] == '_' && strcmp(key, "_HOST_ID") != 0) {
     _customvariables[key + 1] = value;
     return (true);
   }
@@ -742,6 +751,15 @@ list_string& host::hostgroups() throw () {
  */
 list_string const& host::hostgroups() const throw () {
   return (*_hostgroups);
+}
+
+/**
+ *  Get host id.
+ *
+ *  @return  The host id.
+ */
+unsigned int host::host_id() const throw() {
+  return (_host_id);
 }
 
 /**
@@ -1287,6 +1305,18 @@ bool host::_set_freshness_threshold(unsigned int value) {
  */
 bool host::_set_high_flap_threshold(unsigned int value) {
   _high_flap_threshold = value;
+  return (true);
+}
+
+/**
+ *  Set host_id value.
+ *
+ *  @param[in] value The new host_id value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool host::_set_host_id(unsigned int value) {
+  _host_id = value;
   return (true);
 }
 

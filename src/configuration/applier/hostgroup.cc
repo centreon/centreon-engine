@@ -76,6 +76,10 @@ void applier::hostgroup::add_object(
   // Add host group to the global configuration state.
   config->hostgroups().insert(obj);
 
+  // Add hostgroup id to the other props.
+  hostgroup_other_props[obj->hostgroup_name()].hostgroup_id
+    = obj->hostgroup_id();
+
   // Create host group.
   hostgroup_struct* hg(add_hostgroup(
                          obj->hostgroup_name().c_str(),
@@ -166,6 +170,7 @@ void applier::hostgroup::modify_object(
   modify_if_different(
     hg->notes_url,
     NULL_IF_EMPTY(obj->notes_url()));
+  hostgroup_other_props[obj->hostgroup_name()].hostgroup_id = obj->hostgroup_id();
 
   // Were members modified ?
   if (obj->resolved_members() != old_cfg->resolved_members()) {
@@ -242,6 +247,7 @@ void applier::hostgroup::remove_object(
       &tv);
 
     // Erase host group object (will effectively delete the object).
+    hostgroup_other_props.erase(obj->hostgroup_name());
     applier::state::instance().hostgroups().erase(it);
   }
 

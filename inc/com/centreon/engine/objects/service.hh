@@ -151,6 +151,7 @@ typedef struct                  service_struct {
 struct                          service_other_properties {
   time_t                        initial_notif_time;
   std::string                   timezone;
+  unsigned int                  service_id;
 };
 
 #  ifdef __cplusplus
@@ -238,6 +239,7 @@ service&      find_service(
 char const*   get_service_timezone(char const* hst, char const* svc);
 bool          is_service_exist(
                 std::pair<std::string, std::string> const& id);
+unsigned int  get_service_id(char const* host, char const* svc);
 
 CCE_END()
 

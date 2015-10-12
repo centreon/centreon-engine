@@ -35,6 +35,11 @@ typedef struct             hostgroup_struct {
   struct hostgroup_struct* nexthash;
 }                          hostgroup;
 
+/* Other HOSTGROUP structure. */
+struct                      hostgroup_other_properties {
+  unsigned int              hostgroup_id;
+};
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* C++ */

@@ -868,3 +868,16 @@ bool engine::is_host_exist(std::string const& name) throw () {
     it(state::instance().hosts().find(name));
   return (it != state::instance().hosts().end());
 }
+
+/**
+ *  Get the id associated with a host.
+ *
+ *  @param[in] name  The name of the host.
+ *
+ *  @return  The host id or 0.
+ */
+unsigned int engine::get_host_id(char const* name) {
+  std::map<std::string, host_other_properties>::const_iterator
+    found = host_other_props.find(name);
+  return (found != host_other_props.end() ? found->second.host_id : 0);
+}

@@ -27,6 +27,7 @@ using namespace com::centreon::engine::configuration;
   &object::setter<hostgroup, type, &hostgroup::method>::generic
 
 hostgroup::setters const hostgroup::_setters[] = {
+  { "hostgroup_id",      SETTER(unsigned int, _set_hostgroup_id) },
   { "hostgroup_name",    SETTER(std::string const&, _set_hostgroup_name) },
   { "alias",             SETTER(std::string const&, _set_alias) },
   { "members",           SETTER(std::string const&, _set_members) },
@@ -43,6 +44,7 @@ hostgroup::setters const hostgroup::_setters[] = {
  */
 hostgroup::hostgroup(key_type const& key)
   : object(object::hostgroup),
+    _hostgroup_id(0),
     _hostgroup_name(key),
     _resolved(false) {}
 
@@ -73,6 +75,7 @@ hostgroup& hostgroup::operator=(hostgroup const& right) {
     object::operator=(right);
     _action_url = right._action_url;
     _alias = right._alias;
+    _hostgroup_id = right._hostgroup_id;
     _hostgroup_members = right._hostgroup_members;
     _hostgroup_name = right._hostgroup_name;
     _members = right._members;
@@ -95,6 +98,7 @@ bool hostgroup::operator==(hostgroup const& right) const throw () {
   return (object::operator==(right)
           && _action_url == right._action_url
           && _alias == right._alias
+          && _hostgroup_id == right._hostgroup_id
           && _hostgroup_members == right._hostgroup_members
           && _hostgroup_name == right._hostgroup_name
           && _members == right._members
@@ -123,6 +127,8 @@ bool hostgroup::operator!=(hostgroup const& right) const throw () {
  *  @return True if this object is less than right.
  */
 bool hostgroup::operator<(hostgroup const& right) const throw () {
+  if (_hostgroup_id != right._hostgroup_id)
+    return (_hostgroup_id < right._hostgroup_id);
   if (_hostgroup_name != right._hostgroup_name)
     return (_hostgroup_name < right._hostgroup_name);
   else if (_action_url != right._action_url)
@@ -215,6 +221,15 @@ std::string const& hostgroup::action_url() const throw () {
  */
 std::string const& hostgroup::alias() const throw () {
   return (_alias);
+}
+
+/**
+ *  Get hostgroup id.
+ *
+ *  @return  The hostgroup id.
+ */
+unsigned int hostgroup::hostgroup_id() const throw() {
+  return (_hostgroup_id);
 }
 
 /**
@@ -321,6 +336,18 @@ bool hostgroup::_set_action_url(std::string const& value) {
  */
 bool hostgroup::_set_alias(std::string const& value) {
   _alias = value;
+  return (true);
+}
+
+/**
+ *  Set hostgroup_id value.
+ *
+ *  @param[in] value  The new hostgroup_id value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool hostgroup::_set_hostgroup_id(unsigned int value) {
+  _hostgroup_id = value;
   return (true);
 }
 

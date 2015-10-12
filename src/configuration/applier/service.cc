@@ -185,6 +185,9 @@ void applier::service::add_object(
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].timezone = obj->timezone();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].service_id = obj->service_id();
 
   // Add contacts.
   for (list_string::const_iterator
@@ -498,6 +501,10 @@ void applier::service::modify_object(
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].timezone = obj->timezone();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].service_id = obj->service_id();
+
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

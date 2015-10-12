@@ -730,3 +730,17 @@ bool engine::is_service_exist(
     it(state::instance().services().find(id));
   return (it != state::instance().services().end());
 }
+
+/**
+ * Get the service id of a service.
+ *
+ *  @param[in] host  The host.
+ *  @param[in] svc   The service.
+ *
+ *  @return  The service id or 0.
+ */
+unsigned int engine::get_service_id(char const* host, char const* svc) {
+  std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
+    found = service_other_props.find(std::make_pair(std::string(host), std::string(svc)));
+  return (found != service_other_props.end() ? found->second.service_id : 0);
+}

@@ -39,6 +39,8 @@ service::setters const service::_setters[] = {
   { "hosts",                        SETTER(std::string const&, _set_hosts) },
   { "host_name",                    SETTER(std::string const&, _set_hosts) },
   { "service_description",          SETTER(std::string const&, _set_service_description) },
+  { "service_id",                   SETTER(unsigned int, _set_service_id) },
+  { "_SERVICE_ID",                  SETTER(unsigned int, _set_service_id) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "hostgroup",                    SETTER(std::string const&, _set_hostgroups) },
@@ -152,6 +154,7 @@ service::service()
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
+    _service_id(0),
     _stalking_options(default_stalking_options) {}
 
 /**
@@ -218,6 +221,7 @@ service& service::operator=(service const& other) {
     _retry_interval = other._retry_interval;
     _servicegroups = other._servicegroups;
     _service_description = other._service_description;
+    _service_id = other._service_id;
     _stalking_options = other._stalking_options;
     _timezone = other._timezone;
   }
@@ -273,6 +277,7 @@ bool service::operator==(service const& other) const throw () {
           && _retry_interval == other._retry_interval
           && _servicegroups == other._servicegroups
           && _service_description == other._service_description
+          && _service_id == other._service_id
           && _stalking_options == other._stalking_options
           && _timezone == other._timezone);
 }
@@ -298,6 +303,8 @@ bool service::operator!=(service const& other) const throw () {
 bool service::operator<(service const& other) const throw () {
   if (_hosts != other._hosts)
     return (_hosts < other._hosts);
+  else if (_service_id != other._service_id)
+    return (_service_id < other._service_id);
   else if (_service_description != other._service_description)
     return (_service_description < other._service_description);
   else if (_action_url != other._action_url)
@@ -395,6 +402,8 @@ bool service::operator<(service const& other) const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void service::check_validity() const {
+  if (_service_id == 0)
+    throw (engine_error() << "Service has no id (property 'service_id')");
   if (_service_description.empty())
     throw (engine_error() << "Service has no description (property "
            << "'service_description')");
@@ -502,7 +511,7 @@ bool service::parse(char const* key, char const* value) {
        ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (key[0] == '_') {
+  if (key[0] == '_' && strcmp(key, "_SERVICE_ID") != 0) {
     _customvariables[key + 1] = value;
     return (true);
   }
@@ -977,6 +986,15 @@ std::string& service::service_description() throw () {
  */
 std::string const& service::service_description() const throw () {
   return (_service_description);
+}
+
+/**
+ *  Get the service id.
+ *
+ *  @return  The service id.
+ */
+unsigned int service::service_id() const throw() {
+  return (_service_id);
 }
 
 /**
@@ -1587,6 +1605,17 @@ bool service::_set_servicegroups(std::string const& value) {
 bool service::_set_service_description(std::string const& value) {
   _service_description = value;
   return (true);
+}
+
+/**
+ *  Set service_id value.
+ *
+ *  @param[in] value The new service_id value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool service::_set_service_id(unsigned int value) {
+  _service_id = value;
 }
 
 /**

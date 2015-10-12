@@ -159,6 +159,7 @@ void applier::host::add_object(
   host_other_props[obj->host_name()].initial_notif_time = 0;
   host_other_props[obj->host_name()].should_reschedule_current_check = false;
   host_other_props[obj->host_name()].timezone = obj->timezone();
+  host_other_props[obj->host_name()].host_id = obj->host_id();
 
   // Contacts.
   for (list_string::const_iterator
@@ -423,6 +424,7 @@ void applier::host::modify_object(
     h->obsess_over_host,
     static_cast<int>(obj->obsess_over_host()));
   host_other_props[obj->host_name()].timezone = obj->timezone();
+  host_other_props[obj->host_name()].host_id = obj->host_id();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

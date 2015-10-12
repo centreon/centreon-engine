@@ -119,6 +119,7 @@ namespace                  configuration {
     list_string const&     servicegroups() const throw ();
     std::string&           service_description() throw ();
     std::string const&     service_description() const throw ();
+    unsigned int           service_id() const throw();
     unsigned short         stalking_options() const throw ();
     void                   timezone(std::string const& time_zone);
     std::string const&     timezone() const throw ();
@@ -171,6 +172,7 @@ namespace                  configuration {
     bool                   _set_retry_interval(unsigned int value);
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
+    bool                   _set_service_id(unsigned int value);
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_timezone(std::string const& value);
 
@@ -214,6 +216,7 @@ namespace                  configuration {
     opt<unsigned int>      _retry_interval;
     group                  _servicegroups;
     std::string            _service_description;
+    unsigned int           _service_id;
     static setters const   _setters[];
     opt<unsigned short>    _stalking_options;
     opt<std::string>       _timezone;

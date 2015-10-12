@@ -57,6 +57,7 @@ namespace                   configuration {
     list_string const&      members() const throw ();
     std::string const&      notes() const throw ();
     std::string const&      notes_url() const throw ();
+    unsigned int            servicegroup_id() const throw();
     list_string const&      servicegroup_members() const throw ();
     std::string const&      servicegroup_name() const throw ();
 
@@ -75,6 +76,7 @@ namespace                   configuration {
     bool                    _set_members(std::string const& value);
     bool                    _set_notes(std::string const& value);
     bool                    _set_notes_url(std::string const& value);
+    bool                    _set_servicegroup_id(unsigned int value);
     bool                    _set_servicegroup_members(std::string const& value);
     bool                    _set_servicegroup_name(std::string const& value);
 
@@ -85,6 +87,7 @@ namespace                   configuration {
     std::string             _notes_url;
     mutable bool            _resolved;
     mutable set_pair_string _resolved_members;
+    unsigned int            _servicegroup_id;
     group                   _servicegroup_members;
     std::string             _servicegroup_name;
     static setters const    _setters[];

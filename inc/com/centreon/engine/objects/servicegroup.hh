@@ -36,6 +36,11 @@ typedef struct                servicegroup_struct {
   struct servicegroup_struct* nexthash;
 }                             servicegroup;
 
+/* Other HOSTGROUP structure. */
+struct                        servicegroup_other_properties {
+  unsigned int                servicegroup_id;
+};
+
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* C++ */

@@ -27,6 +27,7 @@ using namespace com::centreon::engine::configuration;
   &object::setter<servicegroup, type, &servicegroup::method>::generic
 
 servicegroup::setters const servicegroup::_setters[] = {
+  { "servicegroup_id",      SETTER(unsigned int, _set_servicegroup_id) },
   { "servicegroup_name",    SETTER(std::string const&, _set_servicegroup_name) },
   { "alias",                SETTER(std::string const&, _set_alias) },
   { "members",              SETTER(std::string const&, _set_members) },
@@ -45,6 +46,7 @@ servicegroup::setters const servicegroup::_setters[] = {
 servicegroup::servicegroup(key_type const& key)
   : object(object::servicegroup),
     _resolved(false),
+    _servicegroup_id(0),
     _servicegroup_name(key) {}
 
 /**
@@ -79,6 +81,7 @@ servicegroup& servicegroup::operator=(servicegroup const& right) {
     _notes_url = right._notes_url;
     _resolved = right._resolved;
     _resolved_members = right._resolved_members;
+    _servicegroup_id = right._servicegroup_id;
     _servicegroup_members = right._servicegroup_members;
     _servicegroup_name = right._servicegroup_name;
   }
@@ -101,6 +104,7 @@ bool servicegroup::operator==(servicegroup const& right) const throw () {
           && _notes_url == right._notes_url
           && _resolved == right._resolved
           && _resolved_members == right._resolved_members
+          && _servicegroup_id == right._servicegroup_id
           && _servicegroup_members == right._servicegroup_members
           && _servicegroup_name == right._servicegroup_name);
 }
@@ -124,7 +128,9 @@ bool servicegroup::operator!=(servicegroup const& right) const throw () {
  *  @return True if this object is less than right.
  */
 bool servicegroup::operator<(servicegroup const& right) const throw () {
-  if (_servicegroup_name != right._servicegroup_name)
+  if (_servicegroup_id != right._servicegroup_id)
+    return (_servicegroup_id < right._servicegroup_id);
+  else if (_servicegroup_name != right._servicegroup_name)
     return (_servicegroup_name < right._servicegroup_name);
   else if (_action_url != right._action_url)
     return (_action_url < right._action_url);
@@ -254,6 +260,15 @@ std::string const& servicegroup::notes_url() const throw () {
 }
 
 /**
+ *  Get servicegroup id.
+ *
+ *  @return  The service groupd id.
+ */
+unsigned int servicegroup::servicegroup_id() const throw() {
+  return (_servicegroup_id);
+}
+
+/**
  *  Get servicegroup_members.
  *
  *  @return The servicegroup_members.
@@ -357,6 +372,18 @@ bool servicegroup::_set_notes(std::string const& value) {
  */
 bool servicegroup::_set_notes_url(std::string const& value) {
   _notes_url = value;
+  return (true);
+}
+
+/**
+ *  Set servicegroup_id value.
+ *
+ *  @param[in] value The new servicegroup_id value.
+ *
+ *  @return True on success, otherwise false.
+ */
+bool servicegroup::_set_servicegroup_id(unsigned int value) {
+  _servicegroup_id = value;
   return (true);
 }
 

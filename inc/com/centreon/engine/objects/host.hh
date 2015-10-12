@@ -162,6 +162,7 @@ struct                          host_other_properties {
   time_t                        initial_notif_time;
   bool                          should_reschedule_current_check;
   std::string                   timezone;
+  unsigned int                  host_id;
 };
 
 /* Hash structures. */
@@ -260,6 +261,7 @@ CCE_BEGIN()
 host&         find_host(std::string const& name);
 char const*   get_host_timezone(char const* name);
 bool          is_host_exist(std::string const& name) throw ();
+unsigned int  get_host_id(char const* name);
 
 CCE_END()
 
