@@ -66,6 +66,7 @@ set(
   "${INC_DIR}/netutils.h"
   "${INC_DIR}/objects.h"
   "${INC_DIR}/perfdata.h"
+  "${INC_DIR}/protoapi.h"
   "${INC_DIR}/shared.h"
   "${INC_DIR}/sighandlers.h"
   "${INC_DIR}/skiplist.h"
