@@ -89,6 +89,7 @@ namespace                        configuration {
     duration const&              retry_interval() const throw ();
     std::string&                 service_description() throw ();
     std::string const&           service_description() const throw ();
+    unsigned int                 service_id() const throw();
     void                         timezone(std::string const& tz);
     std::string const&           timezone() const throw ();
     bool                         timezone_defined() const throw ();
@@ -119,6 +120,7 @@ namespace                        configuration {
     bool                         _set_obsess_over_service(bool value);
     bool                         _set_retry_interval(std::string const& value);
     bool                         _set_service_description(std::string const& value);
+    bool                         _set_service_id(unsigned int value);
     bool                         _set_timezone(std::string const& value);
 
     opt<bool>                    _checks_active;
@@ -142,6 +144,7 @@ namespace                        configuration {
     opt<bool>                    _obsess_over_service;
     opt<duration>                _retry_interval;
     std::string                  _service_description;
+    unsigned int                 _service_id;
     opt<std::string>             _timezone;
 
     static setters const         _setters[];

@@ -87,8 +87,11 @@ void applier::service::add_object(
   config->services().insert(obj);
 
   // Create service.
+  // XXX: Manage host_id.
   service_struct* svc(add_service(
+    0,
     obj->hosts().front().c_str(),
+    obj->service_id(),
     obj->service_description().c_str(),
     NULL_IF_EMPTY(obj->check_period()),
     obj->initial_state(),
@@ -227,6 +230,7 @@ void applier::service::modify_object(
   config->services().insert(obj);
 
   // Modify properties.
+  s->id = obj->service_id();
   modify_if_different(
     s->service_check_command,
     NULL_IF_EMPTY(obj->check_command()));

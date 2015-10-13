@@ -32,6 +32,7 @@ struct servicesmember_struct;
 struct timeperiod_struct;
 
 typedef struct                  host_struct {
+  unsigned int                  id;
   char*                         name;
   char*                         alias;
   char*                         address;
@@ -121,6 +122,7 @@ extern "C" {
 #  endif /* C++ */
 
 host* add_host(
+        unsigned int id,
         char const* name,
         char const* alias,
         char const* address,

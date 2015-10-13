@@ -227,8 +227,10 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
 /**
  *  Add a new service to the list in memory.
  *
+ *  @param[in] host_id                      The host id.
  *  @param[in] host_name                    Name of the host this
  *                                          service is running on.
+ *  @param[in] service_id                   The service id.
  *  @param[in] description                  Service description.
  *  @param[in] check_period                 Check timeperiod name.
  *  @param[in] initial_state                Initial service state.
@@ -263,7 +265,9 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @return New service.
  */
 service* add_service(
+           unsigned int host_id,
            char const* host_name,
+           unsigned int service_id,
            char const* description,
            char const* check_period,
            int initial_state,
@@ -327,7 +331,9 @@ service* add_service(
 
   try {
     // Duplicate vars.
+    obj->host_id = host_id;
     obj->host_name = string::dup(host_name);
+    obj->id = service_id;
     obj->description = string::dup(description);
     obj->service_check_command = string::dup(check_command);
     if (event_handler)

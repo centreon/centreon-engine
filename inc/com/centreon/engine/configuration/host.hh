@@ -77,6 +77,7 @@ namespace                     configuration {
     unsigned int              flap_detection_options() const throw ();
     unsigned int              freshness_threshold() const throw ();
     unsigned int              high_flap_threshold() const throw ();
+    unsigned int              host_id() const throw();
     std::string const&        host_name() const throw ();
     unsigned int              initial_state() const throw ();
     unsigned int              low_flap_threshold() const throw ();
@@ -107,6 +108,7 @@ namespace                     configuration {
     bool                      _set_flap_detection_options(std::string const& value);
     bool                      _set_freshness_threshold(unsigned int value);
     bool                      _set_high_flap_threshold(unsigned int value);
+    bool                      _set_host_id(unsigned int value);
     bool                      _set_host_name(std::string const& value);
     bool                      _set_initial_state(std::string const& value);
     bool                      _set_low_flap_threshold(unsigned int value);
@@ -131,6 +133,7 @@ namespace                     configuration {
     opt<unsigned int>         _flap_detection_options;
     opt<unsigned int>         _freshness_threshold;
     opt<unsigned int>         _high_flap_threshold;
+    unsigned int              _host_id;
     std::string               _host_name;
     opt<unsigned int>         _initial_state;
     opt<unsigned int>         _low_flap_threshold;

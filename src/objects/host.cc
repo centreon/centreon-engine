@@ -235,6 +235,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
 /**
  *  Add a new host definition.
  *
+ *  @param[in] host_id                       Host id.
  *  @param[in] name                          Host name.
  *  @param[in] alias                         Host alias.
  *  @param[in] address                       Host address.
@@ -271,6 +272,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @return New host.
  */
 host* add_host(
+        unsigned int host_id,
         char const* name,
         char const* alias,
         char const* address,
@@ -334,6 +336,7 @@ host* add_host(
 
   try {
     // Duplicate string vars.
+    obj->id = host_id;
     obj->name = string::dup(name);
     obj->address = string::dup(address);
     obj->alias = string::dup(alias ? alias : name);

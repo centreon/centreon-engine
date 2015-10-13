@@ -31,7 +31,9 @@ struct objectlist_struct;
 struct timeperiod_struct;
 
 typedef struct                  service_struct {
+  unsigned int                  host_id;
   char*                         host_name;
+  unsigned int                  id;
   char*                         description;
   char*                         service_check_command;
   char*                         event_handler;
@@ -106,7 +108,9 @@ extern "C" {
 #  endif /* C++ */
 
 service* add_service(
+           unsigned int host_id,
            char const* host_name,
+           unsigned int id,
            char const* description,
            char const* check_period,
            int initial_state,
