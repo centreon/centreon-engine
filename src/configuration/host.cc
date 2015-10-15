@@ -404,8 +404,6 @@ bool host::operator<(host const& other) const throw () {
  *  If the object is not valid, an exception is thrown.
  */
 void host::check_validity() const {
-  if (_host_id == 0)
-    throw (engine_error() << "Host has no id (property 'host_id')");
   if (_host_name.empty())
     throw (engine_error() << "Host has no name (property 'host_name')");
   if (_address.empty())

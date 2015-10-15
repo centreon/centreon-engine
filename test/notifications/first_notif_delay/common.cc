@@ -192,7 +192,7 @@ int engine::first_notif_delay_default_setup(std::string const& path) {
   svc->contacts->contact_ptr = cntct;
 
   // Add command.
-  std::string cmd_str("/usr/bin/touch " + path);
+  std::string cmd_str("/usr/bin/env touch " + path);
   command* cmd(add_command("mycommand", cmd_str.c_str()));
   retval |= (NULL == add_host_notification_command_to_contact(
     cntct,

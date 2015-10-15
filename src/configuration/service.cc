@@ -402,8 +402,6 @@ bool service::operator<(service const& other) const throw () {
  *  @return True if is a valid object, otherwise false.
  */
 void service::check_validity() const {
-  if (_service_id == 0)
-    throw (engine_error() << "Service has no id (property 'service_id')");
   if (_service_description.empty())
     throw (engine_error() << "Service has no description (property "
            << "'service_description')");

@@ -54,6 +54,7 @@ int main_test(int argc, char** argv) {
     service_list->last_hard_state = 2;
     service_list->state_type = HARD_STATE;
     service_list->notified_on_critical = 1;
+    service_list->current_notification_number = 1;
     service_list->notify_on_recovery = 1;
     contact_list->notify_on_service_recovery = 1;
 
