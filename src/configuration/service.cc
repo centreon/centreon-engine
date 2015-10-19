@@ -1614,6 +1614,7 @@ bool service::_set_service_description(std::string const& value) {
  */
 bool service::_set_service_id(unsigned int value) {
   _service_id = value;
+  return (true);
 }
 
 /**
