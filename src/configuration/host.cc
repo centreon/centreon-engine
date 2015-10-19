@@ -37,7 +37,7 @@ using namespace com::centreon::engine::logging;
 host::setters const host::_setters[] = {
   { "host_name",                    SETTER(std::string const&, _set_host_name) },
   { "host_id",                      SETTER(unsigned int, _set_host_id)},
-  { "_HOST_ID",                      SETTER(unsigned int, _set_host_id)},
+  { "_HOST_ID",                     SETTER(unsigned int, _set_host_id)},
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "alias",                        SETTER(std::string const&, _set_alias) },
   { "address",                      SETTER(std::string const&, _set_address) },
@@ -510,7 +510,7 @@ bool host::parse(char const* key, char const* value) {
        ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (key[0] == '_' && strcmp(key, "_HOST_ID") != 0) {
+  if (key[0] == '_') {
     _customvariables[key + 1] = value;
     return (true);
   }

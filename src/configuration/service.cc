@@ -509,7 +509,7 @@ bool service::parse(char const* key, char const* value) {
        ++i)
     if (!strcmp(_setters[i].name, key))
       return ((_setters[i].func)(*this, value));
-  if (key[0] == '_' && strcmp(key, "_SERVICE_ID") != 0) {
+  if (key[0] == '_') {
     _customvariables[key + 1] = value;
     return (true);
   }
