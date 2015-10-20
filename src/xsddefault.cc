@@ -1,7 +1,7 @@
 /*
-** Copyright 2000-2009 Ethan Galstad
-** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 2000-2009      Ethan Galstad
+** Copyright 2009           Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -137,9 +137,9 @@ int xsddefault_save_status_data() {
        "\tmodified_host_attributes=" << modified_host_process_attributes << "\n"
        "\tmodified_service_attributes=" << modified_service_process_attributes << "\n"
        "\tnagios_pid=" << static_cast<unsigned int>(getpid()) << "\n"
-       "\tprogram_start=" << static_cast<unsigned long>(program_start) << "\n"
-       "\tlast_command_check=" << static_cast<unsigned long>(last_command_check) << "\n"
-       "\tlast_log_rotation=" << static_cast<unsigned long>(last_log_rotation) << "\n"
+       "\tprogram_start=" << static_cast<long long>(program_start) << "\n"
+       "\tlast_command_check=" << static_cast<long long>(last_command_check) << "\n"
+       "\tlast_log_rotation=" << static_cast<long long>(last_log_rotation) << "\n"
        "\tenable_notifications=" << config->enable_notifications() << "\n"
        "\tactive_service_checks_enabled=" << config->execute_service_checks() << "\n"
        "\tpassive_service_checks_enabled=" << config->accept_passive_service_checks() << "\n"
