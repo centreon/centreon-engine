@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -132,7 +132,6 @@ service& service::operator=(service const& right) {
     _customvariables = right._customvariables;
     _event_handler = right._event_handler;
     _event_handler_enabled = right._event_handler_enabled;
-    _failure_prediction_enabled = right._failure_prediction_enabled;
     _flap_detection_enabled = right._flap_detection_enabled;
     _has_been_checked = right._has_been_checked;
     _host_name = right._host_name;
@@ -202,7 +201,6 @@ bool service::operator==(service const& right) const throw () {
           && std::operator==(_customvariables, right._customvariables)
           && _event_handler == right._event_handler
           && _event_handler_enabled == right._event_handler_enabled
-          && _failure_prediction_enabled == right._failure_prediction_enabled
           && _flap_detection_enabled == right._flap_detection_enabled
           && _has_been_checked == right._has_been_checked
           && _host_name == right._host_name
@@ -456,15 +454,6 @@ map_customvar const& service::customvariables() const throw () {
  */
 opt<bool> const& service::event_handler_enabled() const throw () {
   return (_event_handler_enabled);
-}
-
-/**
- *  Get failure_prediction_enabled.
- *
- *  @return The failure_prediction_enabled.
- */
-opt<bool> const& service::failure_prediction_enabled() const throw () {
-  return (_failure_prediction_enabled);
 }
 
 /**
@@ -971,12 +960,12 @@ bool service::_set_event_handler_enabled(bool value) {
 }
 
 /**
- *  Set failure_prediction_enabled.
+ *  Deprecated.
  *
- *  @param[in] value The new failure_prediction_enabled.
+ *  @param[in] value  Unused.
  */
 bool service::_set_failure_prediction_enabled(bool value) {
-  _failure_prediction_enabled = value;
+  (void)value;
   return (true);
 }
 
@@ -1367,4 +1356,3 @@ bool service::_set_state_type(int value) {
   _state_type = value;
   return (true);
 }
-

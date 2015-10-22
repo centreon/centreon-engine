@@ -94,8 +94,6 @@ bool operator==(
           && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
           && obj1.notifications_enabled == obj2.notifications_enabled
           && obj1.obsess_over_service == obj2.obsess_over_service
-          && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
-          && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
           && is_equal(obj1.notes, obj2.notes)
           && is_equal(obj1.notes_url, obj2.notes_url)
           && is_equal(obj1.action_url, obj2.action_url)
@@ -241,8 +239,6 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
     "  notifications_enabled:                " << obj.notifications_enabled << "\n"
     "  obsess_over_service:                  " << obj.obsess_over_service << "\n"
-    "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
-    "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
     "  notes:                                " << chkstr(obj.notes) << "\n"
     "  notes_url:                            " << chkstr(obj.notes_url) << "\n"
     "  action_url:                           " << chkstr(obj.action_url) << "\n"
@@ -375,9 +371,8 @@ std::ostream& operator<<(std::ostream& os, service const& obj) {
  *  @param[in] process_perfdata             Whether or not service
  *                                          performance data should be
  *                                          processed.
- *  @param[in] failure_prediction_enabled   Whether failure prediction
- *                                          should be enabled or not.
- *  @param[in] failure_prediction_options   Failure prediction options.
+ *  @param[in] failure_prediction_enabled   Deprecated.
+ *  @param[in] failure_prediction_options   Deprecated.
  *  @param[in] check_freshness              Enable freshness check ?
  *  @param[in] freshness_threshold          Freshness threshold.
  *  @param[in] notes                        Notes.
@@ -444,6 +439,9 @@ service* add_service(
            int retain_status_information,
            int retain_nonstatus_information,
            int obsess_over_service) {
+  (void)failure_prediction_enabled;
+  (void)failure_prediction_options;
+
   // Make sure we have everything we need.
   if (!description || !description[0]) {
     logger(log_config_error, basic)
@@ -507,8 +505,6 @@ service* add_service(
       obj->notification_period = string::dup(notification_period);
     if (check_period)
       obj->check_period = string::dup(check_period);
-    if (failure_prediction_options)
-      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (notes)
       obj->notes = string::dup(notes);
     if (notes_url)
@@ -530,7 +526,6 @@ service* add_service(
     obj->current_attempt = (initial_state == STATE_OK) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->failure_prediction_enabled = (failure_prediction_enabled > 0);
     obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_critical = (flap_detection_on_critical > 0);

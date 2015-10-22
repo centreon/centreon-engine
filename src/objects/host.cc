@@ -95,8 +95,6 @@ bool operator==(
           && obj1.event_handler_enabled == obj2.event_handler_enabled
           && obj1.retain_status_information == obj2.retain_status_information
           && obj1.retain_nonstatus_information == obj2.retain_nonstatus_information
-          && obj1.failure_prediction_enabled == obj2.failure_prediction_enabled
-          && is_equal(obj1.failure_prediction_options, obj2.failure_prediction_options)
           && obj1.obsess_over_host == obj2.obsess_over_host
           && is_equal(obj1.notes, obj2.notes)
           && is_equal(obj1.notes_url, obj2.notes_url)
@@ -248,8 +246,6 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
     "  event_handler_enabled:                " << obj.event_handler_enabled << "\n"
     "  retain_status_information:            " << obj.retain_status_information << "\n"
     "  retain_nonstatus_information:         " << obj.retain_nonstatus_information << "\n"
-    "  failure_prediction_enabled:           " << obj.failure_prediction_enabled << "\n"
-    "  failure_prediction_options:           " << chkstr(obj.failure_prediction_options) << "\n"
     "  obsess_over_host:                     " << obj.obsess_over_host << "\n"
     "  notes:                                " << chkstr(obj.notes) << "\n"
     "  notes_url:                            " << chkstr(obj.notes_url) << "\n"
@@ -383,8 +379,8 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
  *  @param[in] stalk_on_unreachable          Stalk on unreachable ?
  *  @param[in] process_perfdata              Should host perfdata be
  *                                           processed ?
- *  @param[in] failure_prediction_enabled    Whether or not failure
- *                                           prediction is enabled.
+ *  @param[in] failure_prediction_enabled    Deprecated.
+ *  @param[in] failure_prediction_options    Deprecated.
  *  @param[in] check_freshness               Whether or not freshness
  *                                           check is enabled.
  *  @param[in] freshness_threshold           Freshness threshold.
@@ -470,6 +466,9 @@ host* add_host(
         int retain_status_information,
         int retain_nonstatus_information,
         int obsess_over_host) {
+  (void)failure_prediction_enabled;
+  (void)failure_prediction_options;
+
   // Make sure we have the data we need.
   if (!name || !name[0] || !address || !address[0]) {
     logger(log_config_error, basic)
@@ -531,8 +530,6 @@ host* add_host(
       obj->check_period = string::dup(check_period);
     if (event_handler)
       obj->event_handler = string::dup(event_handler);
-    if (failure_prediction_options)
-      obj->failure_prediction_options = string::dup(failure_prediction_options);
     if (check_command)
       obj->host_check_command = string::dup(check_command);
     if (icon_image)
@@ -561,7 +558,6 @@ host* add_host(
     obj->current_attempt = (initial_state == HOST_UP) ? 1 : max_attempts;
     obj->current_state = initial_state;
     obj->event_handler_enabled = (event_handler_enabled > 0);
-    obj->failure_prediction_enabled = (failure_prediction_enabled > 0);
     obj->first_notification_delay = first_notification_delay;
     obj->flap_detection_enabled = (flap_detection_enabled > 0);
     obj->flap_detection_on_down = (flap_detection_on_down > 0);

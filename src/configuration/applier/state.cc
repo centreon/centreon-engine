@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -1041,7 +1041,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->debug_verbosity(new_cfg.debug_verbosity());
   config->enable_environment_macros(new_cfg.enable_environment_macros());
   config->enable_event_handlers(new_cfg.enable_event_handlers());
-  config->enable_failure_prediction(new_cfg.enable_failure_prediction());
   config->enable_flap_detection(new_cfg.enable_flap_detection());
   config->enable_notifications(new_cfg.enable_notifications());
   config->enable_predictive_host_dependency_checks(new_cfg.enable_predictive_host_dependency_checks());

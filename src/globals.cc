@@ -151,7 +151,7 @@ unsigned int        debug_level(0);
 unsigned int        debug_verbosity(1);
 unsigned int        enable_environment_macros(false);
 unsigned int        enable_event_handlers(true);
-unsigned int        enable_failure_prediction(true);
+unsigned int        enable_failure_prediction(false);
 unsigned int        enable_flap_detection(false);
 unsigned int        enable_notifications(true);
 unsigned int        enable_predictive_host_dependency_checks(true);

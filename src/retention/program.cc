@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -85,7 +85,6 @@ program& program::operator=(program const& right) {
     _check_host_freshness = right._check_host_freshness;
     _check_service_freshness = right._check_service_freshness;
     _enable_event_handlers = right._enable_event_handlers;
-    _enable_failure_prediction = right._enable_failure_prediction;
     _enable_flap_detection = right._enable_flap_detection;
     _enable_notifications = right._enable_notifications;
     _global_host_event_handler = right._global_host_event_handler;
@@ -120,7 +119,6 @@ bool program::operator==(program const& right) const throw () {
           && _check_host_freshness == right._check_host_freshness
           && _check_service_freshness == right._check_service_freshness
           && _enable_event_handlers == right._enable_event_handlers
-          && _enable_failure_prediction == right._enable_failure_prediction
           && _enable_flap_detection == right._enable_flap_detection
           && _enable_notifications == right._enable_notifications
           && _global_host_event_handler == right._global_host_event_handler
@@ -210,15 +208,6 @@ opt<bool> const& program::check_service_freshness() const throw () {
  */
 opt<bool> const& program::enable_event_handlers() const throw () {
   return (_enable_event_handlers);
-}
-
-/**
- *  Get enable_failure_prediction.
- *
- *  @return The enable_failure_prediction.
- */
-opt<bool> const& program::enable_failure_prediction() const throw () {
-  return (_enable_failure_prediction);
 }
 
 /**
@@ -416,12 +405,12 @@ bool program::_set_enable_event_handlers(bool value) {
 }
 
 /**
- *  Set enable_failure_prediction.
+ *  Deprecated.
  *
- *  @param[in] value The new enable_failure_prediction.
+ *  @param[in] value  Unused.
  */
 bool program::_set_enable_failure_prediction(bool value) {
-  _enable_failure_prediction = value;
+  (void)value;
   return (true);
 }
 

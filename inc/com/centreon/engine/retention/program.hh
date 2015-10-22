@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -44,7 +44,6 @@ namespace                     retention {
     opt<bool> const&          check_host_freshness() const throw ();
     opt<bool> const&          check_service_freshness() const throw ();
     opt<bool> const&          enable_event_handlers() const throw ();
-    opt<bool> const&          enable_failure_prediction() const throw ();
     opt<bool> const&          enable_flap_detection() const throw ();
     opt<bool> const&          enable_notifications() const throw ();
     opt<std::string> const&   global_host_event_handler() const throw ();
@@ -96,7 +95,6 @@ namespace                     retention {
     opt<bool>                 _check_host_freshness;
     opt<bool>                 _check_service_freshness;
     opt<bool>                 _enable_event_handlers;
-    opt<bool>                 _enable_failure_prediction;
     opt<bool>                 _enable_flap_detection;
     opt<bool>                 _enable_notifications;
     opt<std::string>          _global_host_event_handler;
@@ -122,4 +120,3 @@ namespace                     retention {
 CCE_END()
 
 #endif // !CCE_RETENTION_PROGRAM_HH
-

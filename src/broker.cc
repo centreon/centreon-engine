@@ -1427,8 +1427,7 @@ void broker_program_status(
     = config->accept_passive_host_checks();
   ds.event_handlers_enabled = config->enable_event_handlers();
   ds.flap_detection_enabled = config->enable_flap_detection();
-  ds.failure_prediction_enabled
-    = config->enable_failure_prediction();
+  ds.failure_prediction_enabled = false;
   ds.process_performance_data = config->process_performance_data();
   ds.obsess_over_hosts = config->obsess_over_hosts();
   ds.obsess_over_services = config->obsess_over_services();

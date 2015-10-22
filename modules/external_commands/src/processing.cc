@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -34,6 +34,11 @@ using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules::external_commands;
+
+// Dummy command.
+void dummy_command() {
+  return ;
+}
 
 processing::processing() {
   // process commands.
@@ -78,10 +83,10 @@ processing::processing() {
   //                &_redirector<&>);
   _lst_command["ENABLE_FAILURE_PREDICTION"] =
     command_info(CMD_ENABLE_FAILURE_PREDICTION,
-                 &_redirector<&enable_all_failure_prediction>);
+                 &_redirector<&dummy_command>);
   _lst_command["DISABLE_FAILURE_PREDICTION"] =
     command_info(CMD_DISABLE_FAILURE_PREDICTION,
-                 &_redirector<&disable_all_failure_prediction>);
+                 &_redirector<&dummy_command>);
   _lst_command["ENABLE_PERFORMANCE_DATA"] =
     command_info(CMD_ENABLE_PERFORMANCE_DATA,
                  &_redirector<&enable_performance_data>);

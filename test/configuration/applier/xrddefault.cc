@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2009           Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -247,7 +247,6 @@ int xrddefault_save_state_information() {
          << "check_service_freshness=" << check_service_freshness << "\n"
          << "check_host_freshness=" << check_host_freshness << "\n"
          << "enable_flap_detection=" << enable_flap_detection << "\n"
-         << "enable_failure_prediction=" << enable_failure_prediction << "\n"
          << "process_performance_data=" << process_performance_data << "\n"
          << "global_host_event_handler=" << global_host_event_handler << "\n"
          << "global_service_event_handler=" << global_service_event_handler << "\n"
@@ -309,7 +308,6 @@ int xrddefault_save_state_information() {
            << "passive_checks_enabled=" << temp_host->accept_passive_host_checks << "\n"
            << "event_handler_enabled=" << temp_host->event_handler_enabled << "\n"
            << "flap_detection_enabled=" << temp_host->flap_detection_enabled << "\n"
-           << "failure_prediction_enabled=" << temp_host->failure_prediction_enabled << "\n"
            << "process_performance_data=" << temp_host->process_performance_data << "\n"
            << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
            << "is_flapping=" << temp_host->is_flapping << "\n"
@@ -388,7 +386,6 @@ int xrddefault_save_state_information() {
            << "problem_has_been_acknowledged=" << temp_service->problem_has_been_acknowledged << "\n"
            << "acknowledgement_type=" << temp_service->acknowledgement_type << "\n"
            << "flap_detection_enabled=" << temp_service->flap_detection_enabled << "\n"
-           << "failure_prediction_enabled=" << temp_service->failure_prediction_enabled << "\n"
            << "process_performance_data=" << temp_service->process_performance_data << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "is_flapping=" << temp_service->is_flapping << "\n"
@@ -1049,8 +1046,7 @@ int xrddefault_read_state_information() {
               config->enable_flap_detection((atoi(val) > 0) ? TRUE : FALSE);
           }
           else if (!strcmp(var, "enable_failure_prediction")) {
-            if (modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-              config->enable_failure_prediction((atoi(val) > 0) ? TRUE : FALSE);
+            // Deprecated.
           }
           else if (!strcmp(var, "process_performance_data")) {
             if (modified_host_process_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
@@ -1234,8 +1230,7 @@ int xrddefault_read_state_information() {
                 temp_host->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
             }
             else if (!strcmp(var, "failure_prediction_enabled")) {
-              if (temp_host->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-                temp_host->failure_prediction_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+              // Deprecated.
             }
             else if (!strcmp(var, "process_performance_data")) {
               if (temp_host->modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
@@ -1503,8 +1498,7 @@ int xrddefault_read_state_information() {
                 temp_service->flap_detection_enabled = (atoi(val) > 0) ? TRUE : FALSE;
             }
             else if (!strcmp(var, "failure_prediction_enabled")) {
-              if (temp_service->modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-                temp_service->failure_prediction_enabled = (atoi(val) > 0) ? TRUE : FALSE;
+              // Deprecated.
             }
             else if (!strcmp(var, "process_performance_data")) {
               if (temp_service->modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)

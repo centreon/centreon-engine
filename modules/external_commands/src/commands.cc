@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2008      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -3735,66 +3735,6 @@ void disable_host_freshness_checks(void) {
     NULL);
 
   /* update the status log with the program info */
-  update_program_status(false);
-}
-
-/* enable failure prediction on a program-wide basis */
-void enable_all_failure_prediction(void) {
-  unsigned long attr(MODATTR_FAILURE_PREDICTION_ENABLED);
-
-  /* bail out if we're already set... */
-  if (config->enable_failure_prediction())
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-  modified_service_process_attributes |= attr;
-
-  config->enable_failure_prediction(true);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  /* update the status log */
-  update_program_status(false);
-}
-
-/* disable failure prediction on a program-wide basis */
-void disable_all_failure_prediction(void) {
-  unsigned long attr(MODATTR_FAILURE_PREDICTION_ENABLED);
-
-  /* bail out if we're already set... */
-  if (config->enable_failure_prediction() == false)
-    return;
-
-  /* set the attribute modified flag */
-  modified_host_process_attributes |= attr;
-  modified_service_process_attributes |= attr;
-
-  config->enable_failure_prediction(false);
-
-  /* send data to event broker */
-  broker_adaptive_program_data(
-    NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-    NEBFLAG_NONE,
-    NEBATTR_NONE,
-    CMD_NONE,
-    attr,
-    modified_host_process_attributes,
-    attr,
-    modified_service_process_attributes,
-    NULL);
-
-  /* update the status log */
   update_program_status(false);
 }
 

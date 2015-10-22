@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -74,7 +74,7 @@ state::setters const state::_setters[] = {
   { "enable_embedded_perl",                        SETTER(std::string const&, _set_enable_embedded_perl) },
   { "enable_environment_macros",                   SETTER(bool, enable_environment_macros) },
   { "enable_event_handlers",                       SETTER(bool, enable_event_handlers) },
-  { "enable_failure_prediction",                   SETTER(bool, enable_failure_prediction) },
+  { "enable_failure_prediction",                   SETTER(std::string const&, _set_enable_failure_prediction) },
   { "enable_flap_detection",                       SETTER(bool, enable_flap_detection) },
   { "enable_notifications",                        SETTER(bool, enable_notifications) },
   { "enable_predictive_host_dependency_checks",    SETTER(bool, enable_predictive_host_dependency_checks) },
@@ -211,7 +211,6 @@ static unsigned long long const        default_debug_level(0);
 static unsigned int const              default_debug_verbosity(1);
 static bool const                      default_enable_environment_macros(false);
 static bool const                      default_enable_event_handlers(true);
-static bool const                      default_enable_failure_prediction(true);
 static bool const                      default_enable_flap_detection(false);
 static bool const                      default_enable_notifications(true);
 static bool const                      default_enable_predictive_host_dependency_checks(true);
@@ -351,7 +350,6 @@ state::state()
     _debug_verbosity(default_debug_verbosity),
     _enable_environment_macros(default_enable_environment_macros),
     _enable_event_handlers(default_enable_event_handlers),
-    _enable_failure_prediction(default_enable_failure_prediction),
     _enable_flap_detection(default_enable_flap_detection),
     _enable_notifications(default_enable_notifications),
     _enable_predictive_host_dependency_checks(default_enable_predictive_host_dependency_checks),
@@ -493,7 +491,6 @@ state& state::operator=(state const& right) {
     _debug_verbosity = right._debug_verbosity;
     _enable_environment_macros = right._enable_environment_macros;
     _enable_event_handlers = right._enable_event_handlers;
-    _enable_failure_prediction = right._enable_failure_prediction;
     _enable_flap_detection = right._enable_flap_detection;
     _enable_notifications = right._enable_notifications;
     _enable_predictive_host_dependency_checks = right._enable_predictive_host_dependency_checks;
@@ -637,7 +634,6 @@ bool state::operator==(state const& right) const throw () {
           && _debug_verbosity == right._debug_verbosity
           && _enable_environment_macros == right._enable_environment_macros
           && _enable_event_handlers == right._enable_event_handlers
-          && _enable_failure_prediction == right._enable_failure_prediction
           && _enable_flap_detection == right._enable_flap_detection
           && _enable_notifications == right._enable_notifications
           && _enable_predictive_host_dependency_checks == right._enable_predictive_host_dependency_checks
@@ -1588,24 +1584,6 @@ bool state::enable_event_handlers() const throw () {
  */
 void state::enable_event_handlers(bool value) {
   _enable_event_handlers = value;
-}
-
-/**
- *  Get enable_failure_prediction value.
- *
- *  @return The enable_failure_prediction value.
- */
-bool state::enable_failure_prediction() const throw () {
-  return (_enable_failure_prediction);
-}
-
-/**
- *  Set enable_failure_prediction value.
- *
- *  @param[in] value The new enable_failure_prediction value.
- */
-void state::enable_failure_prediction(bool value) {
-  _enable_failure_prediction = value;
 }
 
 /**
@@ -3950,6 +3928,19 @@ void state::_set_enable_embedded_perl(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: enable_embedded_perl variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable enable_failure_prediction.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_enable_failure_prediction(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: enable_failure_prediction variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**

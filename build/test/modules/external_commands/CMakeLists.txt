@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -112,20 +112,6 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 set(TEST_NAME "modules_external_commands_flush_pending_commands")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/flush_pending_commands.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling enable_failure_prediction.
-set(TEST_NAME "modules_external_commands_enable_failure_prediction")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/enable_failure_prediction.cc")
-target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
-# Test calling disable_failure_prediction.
-set(TEST_NAME "modules_external_commands_disable_failure_prediction")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/disable_failure_prediction.cc")
 target_link_libraries("${TEST_NAME}" "externalcmd" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 

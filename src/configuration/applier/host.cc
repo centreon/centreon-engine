@@ -131,7 +131,7 @@ void applier::host::add_object(
         static_cast<bool>(obj->stalking_options()
                           & configuration::host::unreachable),
         obj->process_perf_data(),
-        true, // failure_prediction_enabled, enabled by Nagios
+        false, // failure_prediction_enabled
         NULL, // failure_prediction_options
         obj->check_freshness(),
         obj->freshness_threshold(),

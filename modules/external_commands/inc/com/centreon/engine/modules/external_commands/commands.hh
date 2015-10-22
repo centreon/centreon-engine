@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2006      Ethan Galstad
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -104,8 +104,6 @@ void enable_service_freshness_checks(void);                                // en
 void disable_service_freshness_checks(void);                               // disable service freshness checks
 void enable_host_freshness_checks(void);                                   // enable host freshness checks
 void disable_host_freshness_checks(void);                                  // disable host freshness checks
-void enable_all_failure_prediction(void);                                  // enables failure prediction on a program-wide basis
-void disable_all_failure_prediction(void);                                 // disables failure prediction on a program-wide basis
 void enable_performance_data(void);                                        // enables processing of performance data on a program-wide basis
 void disable_performance_data(void);                                       // disables processing of performance data on a program-wide basis
 void start_obsessing_over_service(service* svc);                           // start obsessing about specific service check results

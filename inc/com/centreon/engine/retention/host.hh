@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -60,7 +60,6 @@ namespace                         retention {
     map_customvar const&          customvariables() const throw ();
     opt<std::string> const&       event_handler() const throw ();
     opt<bool> const&              event_handler_enabled() const throw ();
-    opt<bool> const&              failure_prediction_enabled() const throw ();
     opt<bool> const&              flap_detection_enabled() const throw ();
     opt<bool> const&              has_been_checked() const throw ();
     std::string const&            host_name() const throw ();
@@ -173,7 +172,6 @@ namespace                         retention {
     map_customvar                 _customvariables;
     opt<std::string>              _event_handler;
     opt<bool>                     _event_handler_enabled;
-    opt<bool>                     _failure_prediction_enabled;
     opt<bool>                     _flap_detection_enabled;
     opt<bool>                     _has_been_checked;
     std::string                   _host_name;
@@ -218,4 +216,3 @@ namespace                         retention {
 CCE_END()
 
 #endif // !CCE_RETENTION_HOST_HH
-

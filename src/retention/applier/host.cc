@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -175,10 +175,6 @@ void applier::host::_update(
     if (state.flap_detection_enabled().is_set()
         && (obj.modified_attributes & MODATTR_FLAP_DETECTION_ENABLED))
       obj.flap_detection_enabled = *state.flap_detection_enabled();
-
-    if (state.failure_prediction_enabled().is_set()
-        && (obj.modified_attributes & MODATTR_FAILURE_PREDICTION_ENABLED))
-      obj.failure_prediction_enabled = *state.failure_prediction_enabled();
 
     if (state.process_performance_data().is_set()
         && (obj.modified_attributes & MODATTR_PERFORMANCE_DATA_ENABLED))
