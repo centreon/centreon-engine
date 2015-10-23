@@ -299,9 +299,9 @@ bool host::operator!=(host const& other) const throw () {
  *  @return True if this object is less than right.
  */
 bool host::operator<(host const& other) const throw () {
-  if (_host_id != other._host_id)
-    return (_host_id < other._host_id);
-  else if (_host_name != other._host_name)
+  // host_name has to be first in this operator.
+  // The configuration diff mechanism relies on this.
+  if (_host_name != other._host_name)
     return (_host_name < other._host_name);
   else if (_action_url != other._action_url)
     return (_action_url < other._action_url);
@@ -349,6 +349,8 @@ bool host::operator<(host const& other) const throw () {
     return (_freshness_threshold < other._freshness_threshold);
   else if (_high_flap_threshold != other._high_flap_threshold)
     return (_high_flap_threshold < other._high_flap_threshold);
+  else if (_host_id != other._host_id)
+    return (_host_id < other._host_id);
   else if (_hostgroups != other._hostgroups)
     return (_hostgroups < other._hostgroups);
   else if (_icon_image != other._icon_image)

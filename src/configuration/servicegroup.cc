@@ -128,12 +128,14 @@ bool servicegroup::operator!=(servicegroup const& right) const throw () {
  *  @return True if this object is less than right.
  */
 bool servicegroup::operator<(servicegroup const& right) const throw () {
-  if (_servicegroup_id != right._servicegroup_id)
-    return (_servicegroup_id < right._servicegroup_id);
-  else if (_servicegroup_name != right._servicegroup_name)
+  // servicegroup_name has to be first in this operator.
+  // The configuration diff mechanism relies on this.
+  if (_servicegroup_name != right._servicegroup_name)
     return (_servicegroup_name < right._servicegroup_name);
   else if (_action_url != right._action_url)
     return (_action_url < right._action_url);
+  else if (_servicegroup_id != right._servicegroup_id)
+    return (_servicegroup_id < right._servicegroup_id);
   else if (_notes != right._notes)
     return (_notes < right._notes);
   else if (_notes_url != right._notes_url)

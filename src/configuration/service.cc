@@ -301,10 +301,10 @@ bool service::operator!=(service const& other) const throw () {
  *  @return True if this object is less than right.
  */
 bool service::operator<(service const& other) const throw () {
+  // hosts and service_description have to be first in this operator.
+  // The configuration diff mechanism relies on this.
   if (_hosts != other._hosts)
     return (_hosts < other._hosts);
-  else if (_service_id != other._service_id)
-    return (_service_id < other._service_id);
   else if (_service_description != other._service_description)
     return (_service_description < other._service_description);
   else if (_action_url != other._action_url)
@@ -389,6 +389,8 @@ bool service::operator<(service const& other) const throw () {
             < other._retain_status_information);
   else if (_retry_interval != other._retry_interval)
     return (_retry_interval < other._retry_interval);
+  else if (_service_id != other._service_id)
+    return (_service_id < other._service_id);
   else if (_servicegroups != other._servicegroups)
     return (_servicegroups < other._servicegroups);
   else if (_stalking_options != other._stalking_options)
