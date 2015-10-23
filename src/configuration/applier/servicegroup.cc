@@ -92,6 +92,15 @@ void applier::servicegroup::add_object(
     throw (engine_error() << "Could not register service group '"
            << obj->servicegroup_name() << "'");
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_SERVICEGROUP_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    sg,
+    &tv);
+
   // Apply resolved services on servicegroup.
   for (set_pair_string::const_iterator
          it(obj->resolved_members().begin()),

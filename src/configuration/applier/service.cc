@@ -226,6 +226,18 @@ void applier::service::add_object(
              << obj->service_description() << "' of host '"
              << obj->hosts().front() << "'");
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_service_data(
+    NEBTYPE_SERVICE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return ;
 }
 

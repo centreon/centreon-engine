@@ -142,15 +142,6 @@ servicegroup* add_servicegroup(
     // Add  new items to the list.
     obj->next = servicegroup_list;
     servicegroup_list = obj.get();
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_group(
-      NEBTYPE_SERVICEGROUP_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj.get(),
-      &tv);
   }
   catch (...) {
     obj.clear();

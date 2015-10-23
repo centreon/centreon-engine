@@ -204,6 +204,18 @@ void applier::host::add_object(
       throw (engine_error() << "Could not add parent '"
              << *it << "' to host '" << obj->host_name() << "'");
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_host_data(
+    NEBTYPE_HOST_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    h,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return ;
 }
 

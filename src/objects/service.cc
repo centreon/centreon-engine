@@ -573,18 +573,6 @@ service* add_service(
     // Add new items to the list.
     obj->next = service_list;
     service_list = obj.get();
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_service_data(
-      NEBTYPE_SERVICE_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj.get(),
-      CMD_NONE,
-      MODATTR_ALL,
-      MODATTR_ALL,
-      &tv);
   }
   catch (...) {
     obj.clear();

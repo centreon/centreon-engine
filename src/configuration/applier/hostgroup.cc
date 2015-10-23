@@ -91,6 +91,15 @@ void applier::hostgroup::add_object(
     throw (engine_error() << "Could not register host group '"
            << obj->hostgroup_name() << "'");
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_HOSTGROUP_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hg,
+    &tv);
+
   // Apply resolved hosts on hostgroup.
   for (set_string::const_iterator
          it(obj->resolved_members().begin()),

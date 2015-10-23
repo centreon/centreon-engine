@@ -608,18 +608,6 @@ host* add_host(
     // Add new items to the list.
     obj->next = host_list;
     host_list = obj.get();
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_adaptive_host_data(
-      NEBTYPE_HOST_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj.get(),
-      CMD_NONE,
-      MODATTR_ALL,
-      MODATTR_ALL,
-      &tv);
   }
   catch (...) {
     obj.clear();

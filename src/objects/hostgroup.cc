@@ -142,15 +142,6 @@ hostgroup* add_hostgroup(
     // Add new items to the list.
     obj->next = hostgroup_list;
     hostgroup_list = obj.get();
-
-    // Notify event broker.
-    timeval tv(get_broker_timestamp(NULL));
-    broker_group(
-      NEBTYPE_HOSTGROUP_ADD,
-      NEBFLAG_NONE,
-      NEBATTR_NONE,
-      obj.get(),
-      &tv);
   }
   catch (...) {
     obj.clear();
