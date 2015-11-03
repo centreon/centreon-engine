@@ -179,6 +179,12 @@ namespace           configuration {
                     timeperiods_find(configuration::timeperiod::key_type const& k) const;
       umap<std::string, shared_ptr<timeperiod_struct> >::iterator
                     timeperiods_find(configuration::timeperiod::key_type const& k);
+      umap<std::string, std::string>&
+                    user_macros();
+      umap<std::string, std::string> const&
+                    user_macros() const;
+      umap<std::string, std::string>::const_iterator
+                    user_macros_find(std::string const& key) const;
       void          try_lock();
 
     private:
@@ -249,6 +255,8 @@ namespace           configuration {
                     _servicegroups;
       umap<std::string, shared_ptr<timeperiod_struct> >
                     _timeperiods;
+      umap<std::string, std::string>
+                    _user_macros;
     };
   }
 }

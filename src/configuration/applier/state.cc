@@ -936,6 +936,35 @@ umap<std::string, shared_ptr<timeperiod_struct> >::iterator applier::state::time
 }
 
 /**
+ *  Return the user macros.
+ *
+ *  @return  The user macros.
+ */
+umap<std::string, std::string>& applier::state::user_macros() {
+  return (_user_macros);
+}
+
+/**
+ *  Return the user macros, immutable.
+ *
+ *  @return  The user macros, immutable.
+ */
+umap<std::string, std::string> const& applier::state::user_macros() const {
+  return (_user_macros);
+}
+
+/**
+ *  Find a user macro.
+ *
+ *  @param[in] key  The key.
+ *
+ *  @return  Iterator to user macros.
+ */
+umap<std::string, std::string>::const_iterator applier::state::user_macros_find(std::string const& key) const {
+  return (_user_macros.find(key));
+}
+
+/**
  *  Try to lock.
  */
 void applier::state::try_lock() {

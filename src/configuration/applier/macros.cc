@@ -18,6 +18,7 @@
 */
 
 #include <cstring>
+#include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/configuration/applier/macros.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,11 +32,34 @@ using namespace com::centreon::engine::configuration;
 static applier::macros* _instance = NULL;
 
 /**
+ *  @brief Is the key of this user macro old-style?
+ *
+ *  i.e USERn where n is a number.
+ *
+ *  @param[in] key   The key.
+ *  @param[out] val  The parsed value n, if applicable.
+ *
+ *  @return  True if the key is old-style and has been parsed succesfully.
+ */
+static bool is_old_style_user_macro(std::string const& key, unsigned int& val) {
+  if (::strncmp(key.c_str(), "USER", ::strlen("USER")) != 0)
+    return (false);
+
+  std::string rest = key.substr(4);
+  // Super strict validation.
+  for (size_t i = 0; i < rest.size(); ++i)
+    if (rest[i] < '0' || rest[i] > '9')
+      return (false);
+  string::to(rest.c_str(), val);
+  return (true);
+}
+
+/**
  *  Apply new configuration.
  *
  *  @param[in] config The new configuration.
  */
-void applier::macros::apply(state& config) {
+void applier::macros::apply(configuration::state& config) {
   _set_macro(MACRO_ADMINEMAIL, config.admin_email());
   _set_macro(MACRO_ADMINPAGER, config.admin_pager());
   _set_macro(MACRO_COMMANDFILE, config.command_file());
@@ -47,9 +71,18 @@ void applier::macros::apply(state& config) {
   _set_macro(MACRO_HOSTPERFDATAFILE, config.host_perfdata_file());
   _set_macro(MACRO_SERVICEPERFDATAFILE, config.service_perfdata_file());
 
-  std::vector<std::string> const& users(config.user());
-  for (unsigned int i(0), end(users.size()); i < end; ++i)
-    _set_macros_user(i, users[i]);
+  umap<std::string, std::string> const& users(config.user());
+  applier::state::instance().user_macros() = users;
+  // Save old style user macros into old style structures.
+  for (umap<std::string, std::string>::const_iterator
+         it = users.begin(),
+         end = users.end();
+       it != end;
+       ++it) {
+    unsigned int val;
+    if (is_old_style_user_macro(it->first, val))
+      _set_macros_user(val - 1, it->second);
+  }
 }
 
 /**

@@ -72,6 +72,13 @@ namespace                 string {
     return (buf);
   }
 
+  template<typename T>
+  std::string             from(T value) {
+    std::ostringstream oss;
+    oss << value;
+    return (oss.str());
+  }
+
   inline char const*      setstr(char*& buf, char const* value = NULL) {
     delete[] buf;
     return ((buf = string::dup(value)));

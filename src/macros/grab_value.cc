@@ -25,6 +25,7 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/unordered_hash.hh"
+#include "com/centreon/engine/configuration/applier/state.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -1197,6 +1198,14 @@ int grab_macro_value_r(
                arg[0],
                arg[1],
                output);
+  }
+  else if (
+    configuration::applier::state::instance().user_macros().find(macro_name)
+      != configuration::applier::state::instance().user_macros().end()) {
+    /*** New style user macros ***/
+    *output = ::strdup(configuration::applier::state::instance()
+                         .user_macros_find(macro_name)->second.c_str());
+    result = true;
   }
   /* no macro matched... */
   else {

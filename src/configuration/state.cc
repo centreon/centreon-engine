@@ -432,9 +432,7 @@ state::state()
     _use_setpgid(default_use_setpgid),
     _use_syslog(default_use_syslog),
     _use_timezone(default_use_timezone),
-    _use_true_regexp_matching(default_use_true_regexp_matching) {
-  _users.resize(10);
-}
+    _use_true_regexp_matching(default_use_true_regexp_matching) {}
 
 /**
  *  Copy constructor.
@@ -3511,7 +3509,7 @@ void state::translate_passive_host_checks(bool value) {
  *
  *  @return The users resources list.
  */
-std::vector<std::string> const& state::user() const throw () {
+umap<std::string, std::string> const& state::user() const throw () {
   return (_users);
 }
 
@@ -3520,7 +3518,7 @@ std::vector<std::string> const& state::user() const throw () {
  *
  *  @param[in] value The new users list.
  */
-void state::user(std::vector<std::string> const& value) {
+void state::user(umap<std::string, std::string> const& value) {
   _users = value;
 }
 
@@ -3531,21 +3529,12 @@ void state::user(std::vector<std::string> const& value) {
  *  @param[in] value The user value.
  */
 void state::user(std::string const& key, std::string const& value) {
-  std::size_t pos(key.find("$USER"));
-  if (pos != 0)
+  if (key.size() < 3 || key[0] != '$' || key[key.size() - 1] != '$')
     throw (engine_error() << "Invalid user key '" << key << "'");
-  std::string tmp(key.substr(5));
-
-  pos = tmp.size();
-  if (!pos || tmp[pos - 1] != '$')
-    throw (engine_error() << "Invalid user key '" << key << "'");
-  tmp.erase(pos - 1);
-
-  unsigned int idx;
-  if (!string::to(tmp.c_str(), idx) || !idx || idx > MAX_USER_MACROS)
-    throw (engine_error() << "Invalid user key '" << key << "'");
-
-  user(idx - 1, value);
+  std::string new_key = key;
+  new_key.erase(new_key.begin(), new_key.begin() + 1);
+  new_key.erase(new_key.end() - 1, new_key.end());
+  _users[new_key] = value;
 }
 
 /**
@@ -3555,9 +3544,7 @@ void state::user(std::string const& key, std::string const& value) {
  *  @param[in] value The user value.
  */
 void state::user(unsigned int key, std::string const& value) {
-  if (key >= _users.size())
-    _users.resize(key + 1);
-  _users[key] = value;
+  _users[string::from(key)] = value;
 }
 
 /**

@@ -25,6 +25,8 @@
 #include "com/centreon/io/file_stream.hh"
 #include "test/unittest.hh"
 
+#include <iostream>
+
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
@@ -79,18 +81,19 @@ int main_test(int argc, char** argv) {
 
     configuration::applier::state::instance().apply(cfg);
 
-    std::vector<std::string> const& users(cfg.user());
+    umap<std::string, std::string> users(cfg.user());
     for (unsigned int i(0); i < MAX_USER_MACROS - 1; ++i) {
-      if (!macro_user[i] || macro_user[i] != users[i])
+      std::string key = std::string("USER") + string::from(i + 1);
+      if (!macro_user[i] || macro_user[i] != users[key])
         throw (engine_error() << "apply configuration resources "
                "failed: global macro_user[" << i << "] is not equal "
                "to configuration::state::user[" << i << "]");
       std::ostringstream oss;
       oss << "resource_" << (i + 1);
-      if (users[i] != oss.str())
+      if (users[key] != oss.str())
         throw (engine_error() << "parse configuration resources "
                "failed: invalid data into configuration::state::user["
-               << i << "]: value = '" << users[i] << "'");
+               << i << "]: value = '" << users[key] << "'");
     }
   }
   catch (...) {
