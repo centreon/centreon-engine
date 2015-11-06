@@ -101,7 +101,7 @@ int                 log_host_retries(false);
 int                 precache_objects(false);
 int                 restarting(false);
 int                 sig_id(0);
-int                 sighup(true);
+int                 sighup(false);
 int                 sigrestart(false);
 int                 sigshutdown(false);
 int                 test_scheduling(false);
