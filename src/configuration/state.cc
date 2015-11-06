@@ -267,7 +267,7 @@ static unsigned long const             default_retained_contact_host_attribute_m
 static unsigned long const             default_retained_contact_service_attribute_mask(0L);
 static unsigned long const             default_retained_host_attribute_mask(0L);
 static unsigned long const             default_retained_process_host_attribute_mask(0L);
-static bool const                      default_retain_state_information(false);
+static bool const                      default_retain_state_information(true);
 static unsigned int const              default_retention_scheduling_horizon(900);
 static unsigned int const              default_retention_update_interval(60);
 static unsigned int const              default_service_check_timeout(60);
