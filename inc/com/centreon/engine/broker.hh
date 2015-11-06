@@ -231,7 +231,7 @@
 
 /* Modules. */
 #  define NEBTYPE_MODULE_ADD                       3000
-#  define NEBTYPE_MODULE_DELETE                    3000
+#  define NEBTYPE_MODULE_DELETE                    3001
 
 /* Parents. */
 #  define NEBTYPE_PARENT_ADD                       3100
