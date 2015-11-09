@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,6 +45,7 @@ hostdependency::setters const hostdependency::_setters[] = {
   { "dependent_hostgroup_name",      SETTER(std::string const&, _set_dependent_hostgroups) },
   { "dependent_host",                SETTER(std::string const&, _set_dependent_hosts) },
   { "dependent_host_name",           SETTER(std::string const&, _set_dependent_hosts) },
+  { "dependency_period",             SETTER(std::string const&, _set_dependency_period) },
   { "inherits_parent",               SETTER(bool, _set_inherits_parent) },
   { "notification_failure_options",  SETTER(std::string const&, _set_notification_failure_options) },
   { "notification_failure_criteria", SETTER(std::string const&, _set_notification_failure_options) },
