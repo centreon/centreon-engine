@@ -252,7 +252,8 @@ WITH_RW_DIR                    Use for files to need read/write access.         
 WITH_SAMPLE_CONFIG             Install sample configuration files.              ON
 WITH_SHARED_LIB                Build shared library for the core library.       OFF
 WITH_STARTUP_DIR               Define the startup directory.                    Generaly in ``/etc/init.d`` or ``/etc/init``
-WITH_STARTUP_SCRIPT            Generate and install startup script.             auto
+WITH_STARTUP_SCRIPT            Generate and install startup script. Choices     auto
+                               are 'auto', 'sysv' and 'upstart'.
 WITH_TESTING                   Build unit test.                                 OFF
 WITH_USER                      Set the user for Centreon Engine installation.   root
 WITH_VAR_DIR                   Define specific directory for temporary Centreon ``${WITH_PREFIX}/var``
