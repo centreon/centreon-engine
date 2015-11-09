@@ -550,6 +550,7 @@ void applier::scheduler::_calculate_host_scheduling_params(
     }
 
     if (schedule_check) {
+      hst.should_be_scheduled = true;
       ++scheduling_info.total_scheduled_hosts;
       scheduling_info.host_check_interval_total
         += static_cast<unsigned long>(hst.check_interval);
@@ -706,6 +707,7 @@ void applier::scheduler::_calculate_service_scheduling_params(
     }
 
     if (schedule_check) {
+      svc.should_be_scheduled = true;
       ++scheduling_info.total_scheduled_services;
       scheduling_info.service_check_interval_total
         += static_cast<unsigned long>(svc.check_interval);

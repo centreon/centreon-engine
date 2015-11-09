@@ -395,11 +395,7 @@ int check_service_notification_viability(
   }
 
   /* find the host this service is associated with */
-  if ((temp_host = (host*)svc->host_ptr) == NULL)
-    return (ERROR);
-
-  /* if we couldn't find the host, return an error */
-  if (temp_host == NULL) {
+  if ((temp_host = (host*)svc->host_ptr) == NULL) {
     logger(dbg_notifications, more)
       << "Couldn't find the host associated with this service, "
       "so we won't send a notification.";
