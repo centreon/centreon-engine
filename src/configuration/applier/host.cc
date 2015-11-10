@@ -495,6 +495,21 @@ void applier::host::modify_object(
   // Parents.
   if (obj->parents() != obj_old->parents()) {
     // Delete old parents.
+    {
+      timeval tv(get_broker_timestamp(NULL));
+      for (hostsmember* p(h->parent_hosts);
+           p;
+           p = p->next)
+        broker_relation_data(
+          NEBTYPE_PARENT_DELETE,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          p->host_ptr,
+          NULL,
+          h,
+          NULL,
+          &tv);
+    }
     deleter::listmember(h->parent_hosts, &deleter::hostsmember);
 
     // Create parents.
