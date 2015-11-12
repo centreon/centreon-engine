@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -61,14 +61,12 @@ namespace                 configuration {
       void                _apply_misc_event();
       void                _calculate_host_inter_check_delay(
                             configuration::state::inter_check_delay method);
-      void                _calculate_host_scheduling_params(
-                            configuration::state const& config);
+      void                _calculate_host_scheduling_params();
       void                _calculate_service_inter_check_delay(
                             configuration::state::inter_check_delay method);
       void                _calculate_service_interleave_factor(
                             configuration::state::interleave_factor method);
-      void                _calculate_service_scheduling_params(
-                            configuration::state const& config);
+      void                _calculate_service_scheduling_params();
       timed_event_struct* _create_misc_event(
                             int type,
                             time_t start,
@@ -92,6 +90,7 @@ namespace                 configuration {
       void                _unschedule_service_checks(
                             std::vector<service_struct*> const& services);
 
+      state*              _config;
       timed_event_struct* _evt_check_reaper;
       timed_event_struct* _evt_command_check;
       timed_event_struct* _evt_hfreshness_check;
