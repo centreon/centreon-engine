@@ -2752,6 +2752,13 @@ void acknowledge_host_problem(
   if (hst->current_state == HOST_UP)
     return;
 
+  /* set the acknowledgement flag */
+  hst->problem_has_been_acknowledged = true;
+
+  /* set the acknowledgement type */
+  hst->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
+    ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
+
   /* send data to event broker */
   broker_acknowledgement_data(
     NEBTYPE_ACKNOWLEDGEMENT_ADD,
@@ -2774,13 +2781,6 @@ void acknowledge_host_problem(
       ack_author,
       ack_data,
       NOTIFICATION_OPTION_NONE);
-
-  /* set the acknowledgement flag */
-  hst->problem_has_been_acknowledged = true;
-
-  /* set the acknowledgement type */
-  hst->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
-    ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
 
   /* update the status log with the host info */
   update_host_status(hst, false);
@@ -2814,6 +2814,13 @@ void acknowledge_service_problem(
   if (svc->current_state == STATE_OK)
     return;
 
+  /* set the acknowledgement flag */
+  svc->problem_has_been_acknowledged = true;
+
+  /* set the acknowledgement type */
+  svc->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
+    ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
+
   /* send data to event broker */
   broker_acknowledgement_data(
     NEBTYPE_ACKNOWLEDGEMENT_ADD,
@@ -2836,13 +2843,6 @@ void acknowledge_service_problem(
       ack_author,
       ack_data,
       NOTIFICATION_OPTION_NONE);
-
-  /* set the acknowledgement flag */
-  svc->problem_has_been_acknowledged = true;
-
-  /* set the acknowledgement type */
-  svc->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
-    ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
 
   /* update the status log with the service info */
   update_service_status(svc, false);
