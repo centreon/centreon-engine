@@ -67,6 +67,9 @@ void loop::run() {
   logger(dbg_functions, basic)
     << "events::loop::run()";
 
+  logger(log_info_message, basic)
+     << "Configuration loaded, main loop starting.";
+
   // Initialize some time members.
   time(&_last_time);
   _last_status_update = 0L;
@@ -160,6 +163,8 @@ void loop::_dispatching() {
       else {
         _reload_configuration.wait();
         _reload_running = false;
+        logger(log_info_message, basic)
+           << "Configuration reloaded, main loop continuing.";
       }
     }
 
