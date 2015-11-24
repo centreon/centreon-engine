@@ -118,8 +118,12 @@ int my_system_r(
     = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
   *exectime = (res.end_time - res.start_time).to_seconds();
   *early_timeout = res.exit_status == process::timeout;
-  if (output && max_output_length > 0)
-    *output = engine::string::dup(res.output.substr(0, max_output_length - 1));
+  if (output) {
+    if (max_output_length > 0)
+      *output = engine::string::dup(res.output.substr(0, max_output_length - 1));
+    else
+      *output = engine::string::dup(res.output);
+  }
   int result(res.exit_code);
 
   logger(dbg_commands, more)
