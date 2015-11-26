@@ -194,6 +194,7 @@
 # define MACRO_HOSTCHILDREN                     154
 # define MACRO_HOSTTIMEZONE                     155
 # define MACRO_SERVICETIMEZONE                  156
+# define MACRO_CONTACTTIMEZONE                  157
 
 // Macro Cleaning Options
 # define STRIP_ILLEGAL_MACRO_CHARS              1

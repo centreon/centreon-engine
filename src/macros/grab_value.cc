@@ -885,7 +885,8 @@ struct grab_value_redirection {
       MACRO_CONTACTALIAS,
       MACRO_CONTACTEMAIL,
       MACRO_CONTACTPAGER,
-      MACRO_CONTACTGROUPNAMES
+      MACRO_CONTACTGROUPNAMES,
+      MACRO_CONTACTTIMEZONE
     };
     for (unsigned int i = 0;
          i < sizeof(contact_ids) / sizeof(*contact_ids);
