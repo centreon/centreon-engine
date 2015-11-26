@@ -793,7 +793,8 @@ struct grab_value_redirection {
       MACRO_LASTHOSTSTATE,
       MACRO_LASTHOSTSTATEID,
       MACRO_HOSTPARENTS,
-      MACRO_HOSTCHILDREN
+      MACRO_HOSTCHILDREN,
+      MACRO_HOSTTIMEZONE
     };
     for (unsigned int i = 0;
          i < sizeof(host_ids) / sizeof(*host_ids);
@@ -856,7 +857,8 @@ struct grab_value_redirection {
       MACRO_SERVICEPROBLEMID,
       MACRO_LASTSERVICEPROBLEMID,
       MACRO_LASTSERVICESTATE,
-      MACRO_LASTSERVICESTATEID
+      MACRO_LASTSERVICESTATEID,
+      MACRO_SERVICETIMEZONE
     };
     for (unsigned int i = 0;
          i < sizeof(service_ids) / sizeof(*service_ids);

@@ -108,6 +108,20 @@ static char* get_service_state(service& svc, nagios_macros* mac) {
   return (string::dup(state));
 }
 
+/**
+ *  Get the timezone of a service.
+ *
+ *  @param[in] svc Service object.
+ *  @param[in] mac Macro array.
+ *
+ *  @return Newly allocated string with requested value in plain text.
+ */
+static char* get_service_macro_timezone(service& svc, nagios_macros* mac) {
+  (void)mac;
+  return (string::dup(get_service_timezone(svc.host_name, svc.description)));
+}
+
+
 /**************************************
 *                                     *
 *         Redirection Object          *
@@ -242,6 +256,12 @@ struct grab_service_redirection {
     // Acknowledgement comment.
     routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
     routines[MACRO_SERVICEACKCOMMENT].second = true;
+    // Acknowledgement comment.
+    routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
+    routines[MACRO_SERVICEACKCOMMENT].second = true;
+    // Acknowledgement comment.
+    routines[MACRO_SERVICETIMEZONE].first = &get_service_macro_timezone;
+    routines[MACRO_SERVICETIMEZONE].second = true;
   }
 } static const redirector;
 
