@@ -188,7 +188,7 @@ void init_timing_loop() {
   /* adjust the check interval total to correspond to the interval length */
   scheduling_info.service_check_interval_total
     = scheduling_info.service_check_interval_total
-    * config->interval_length();
+    * ::interval_length;
 
   /* calculate the average check interval for services */
   if (scheduling_info.total_scheduled_services == 0)
@@ -206,10 +206,10 @@ void init_timing_loop() {
 
   /* default max service check spread (in minutes) */
   scheduling_info.max_service_check_spread
-    = config->max_service_check_spread();
+    = ::max_service_check_spread;
 
   /* how should we determine the service inter-check delay to use? */
-  switch (config->service_inter_check_delay_method()) {
+  switch (::service_inter_check_delay_method) {
 
   case configuration::state::icd_none:
     /* don't spread checks out - useful for testing parallelization code */
@@ -264,7 +264,7 @@ void init_timing_loop() {
   }
 
   /* how should we determine the service interleave factor? */
-  switch (config->service_interleave_factor_method()) {
+  switch (::service_interleave_factor_method) {
 
   case configuration::state::ilf_user:
     /* the user supplied a value, so don't do any calculation */
@@ -460,10 +460,10 @@ void init_timing_loop() {
 
   /* default max host check spread (in minutes) */
   scheduling_info.max_host_check_spread
-    = config->max_host_check_spread();
+    = ::max_host_check_spread;
 
   /* how should we determine the host inter-check delay to use? */
-  switch (config->host_inter_check_delay_method()) {
+  switch (::host_inter_check_delay_method) {
   case configuration::state::icd_none:
     /* don't spread checks out */
     scheduling_info.host_inter_check_delay = 0.0;
@@ -486,7 +486,7 @@ void init_timing_loop() {
 
       /* adjust the check interval total to correspond to the interval length */
       scheduling_info.host_check_interval_total
-	= scheduling_info.host_check_interval_total * config->interval_length();
+  = scheduling_info.host_check_interval_total * ::interval_length;
 
       /* calculate the average check interval for hosts */
       scheduling_info.average_host_check_interval
@@ -635,83 +635,13 @@ void init_timing_loop() {
 
   /******** SCHEDULE MISC EVENTS ********/
 
-  /* add a host and service check rescheduling event */
-  if (config->auto_reschedule_checks() == true)
-    schedule_new_event(
-      EVENT_RESCHEDULE_CHECKS,
-      true,
-      current_time + config->auto_rescheduling_interval(),
-      true,
-      config->auto_rescheduling_interval(),
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
-
   /* add a check result reaper event */
   schedule_new_event(
     EVENT_CHECK_REAPER,
     true,
-    current_time + config->check_reaper_interval(),
+    current_time + ::check_reaper_interval,
     true,
-    config->check_reaper_interval(),
-    NULL,
-    true,
-    NULL,
-    NULL,
-    0);
-
-  /* add an orphaned check event */
-  if (config->check_orphaned_services() == true
-      || config->check_orphaned_hosts() == true)
-    schedule_new_event(
-      EVENT_ORPHAN_CHECK,
-      true,
-      current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
-      true,
-      DEFAULT_ORPHAN_CHECK_INTERVAL,
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
-
-  /* add a service result "freshness" check event */
-  if (config->check_service_freshness() == true)
-    schedule_new_event(
-      EVENT_SFRESHNESS_CHECK,
-      true,
-      current_time + config->service_freshness_check_interval(),
-      true,
-      config->service_freshness_check_interval(),
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
-
-  /* add a host result "freshness" check event */
-  if (config->check_host_freshness() == true)
-    schedule_new_event(
-      EVENT_HFRESHNESS_CHECK,
-      true,
-      current_time + config->host_freshness_check_interval(),
-      true,
-      config->host_freshness_check_interval(),
-      NULL,
-      true,
-      NULL,
-      NULL,
-      0);
-
-  /* add a status save event */
-  schedule_new_event(
-    EVENT_STATUS_SAVE,
-    true,
-    current_time + config->status_update_interval(),
-    true,
-    config->status_update_interval(),
+    ::check_reaper_interval,
     NULL,
     true,
     NULL,
@@ -719,11 +649,11 @@ void init_timing_loop() {
     0);
 
   /* add an external command check event if needed */
-  if (config->check_external_commands() == true) {
-    if (config->command_check_interval() == -1)
+  if (::check_external_commands == true) {
+    if (::command_check_interval == -1)
       interval_to_use = (unsigned long)5;
     else
-      interval_to_use = (unsigned long)config->command_check_interval();
+      interval_to_use = (unsigned long)::command_check_interval;
     schedule_new_event(
       EVENT_COMMAND_CHECK,
       true,
@@ -737,20 +667,90 @@ void init_timing_loop() {
       0);
   }
 
-  /* add a retention data save event if needed */
-  if (config->retain_state_information() == true
-      && config->retention_update_interval() > 0)
+  /* add a host result "freshness" check event */
+  if (::check_host_freshness == true)
     schedule_new_event(
-      EVENT_RETENTION_SAVE,
+      EVENT_HFRESHNESS_CHECK,
       true,
-      current_time + (config->retention_update_interval() * 60),
+      current_time + ::host_freshness_check_interval,
       true,
-      (config->retention_update_interval() * 60),
+      ::host_freshness_check_interval,
       NULL,
       true,
       NULL,
       NULL,
       0);
+
+  /* add an orphaned check event */
+  if (::check_orphaned_services == true
+      || ::check_orphaned_hosts == true)
+    schedule_new_event(
+      EVENT_ORPHAN_CHECK,
+      true,
+      current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
+      true,
+      DEFAULT_ORPHAN_CHECK_INTERVAL,
+      NULL,
+      true,
+      NULL,
+      NULL,
+      0);
+
+  /* add a host and service check rescheduling event */
+  if (::auto_reschedule_checks == true)
+    schedule_new_event(
+      EVENT_RESCHEDULE_CHECKS,
+      true,
+      current_time + ::auto_rescheduling_interval,
+      true,
+      ::auto_rescheduling_interval,
+      NULL,
+      true,
+      NULL,
+      NULL,
+      0);
+
+  /* add a retention data save event if needed */
+  if (::retain_state_information == true
+      && ::retention_update_interval > 0)
+    schedule_new_event(
+      EVENT_RETENTION_SAVE,
+      true,
+      current_time + (::retention_update_interval * 60),
+      true,
+      (::retention_update_interval * 60),
+      NULL,
+      true,
+      NULL,
+      NULL,
+      0);
+
+  /* add a service result "freshness" check event */
+  if (::check_service_freshness == true)
+    schedule_new_event(
+      EVENT_SFRESHNESS_CHECK,
+      true,
+      current_time + ::service_freshness_check_interval,
+      true,
+      ::service_freshness_check_interval,
+      NULL,
+      true,
+      NULL,
+      NULL,
+      0);
+
+  /* add a status save event */
+  schedule_new_event(
+    EVENT_STATUS_SAVE,
+    true,
+    current_time + ::status_update_interval,
+    true,
+    ::status_update_interval,
+    NULL,
+    true,
+    NULL,
+    NULL,
+    0);
 
   if (test_scheduling == true) {
     runtime[0]
