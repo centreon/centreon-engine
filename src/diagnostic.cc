@@ -178,9 +178,14 @@ void diagnostic::generate(
   logger(logging::log_info_message, logging::basic)
     << "Diagnostic: Parsing configuration file '" << cfg_file << "'";
   configuration::state conf;
-  {
+  try {
     configuration::parser parsr;
     parsr.parse(cfg_file, conf);
+  }
+  catch (std::exception const& e) {
+    logger(logging::log_runtime_error, logging::basic)
+      << "Diagnostic: configuraion file '" << cfg_file
+      << "' parsing failed: " << e.what();
   }
 
   // Create temporary configuration directory.
