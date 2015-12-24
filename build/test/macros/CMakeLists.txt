@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -29,7 +29,8 @@ add_executable(
   "${TEST_DIR}/minimal_setup.hh"
 )
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
+
 # Grab standard service macro.
 set(TEST_NAME "macros_grab_standard_service_macro")
 add_executable(
@@ -39,4 +40,4 @@ add_executable(
   "${TEST_DIR}/minimal_setup.hh"
 )
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")

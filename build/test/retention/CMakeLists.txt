@@ -27,25 +27,25 @@ add_subdirectory("applier")
 set(TEST_NAME "retention_host")
 add_executable("${TEST_NAME}" "${TEST_DIR}/host.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 ## info.
 set(TEST_NAME "retention_info")
 add_executable("${TEST_NAME}" "${TEST_DIR}/info.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 ## program.
 set(TEST_NAME "retention_program")
 add_executable("${TEST_NAME}" "${TEST_DIR}/program.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 ## service.
 set(TEST_NAME "retention_service")
 add_executable("${TEST_NAME}" "${TEST_DIR}/service.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 ## retention_dump.
 set(TEST_BIN_NAME "retention_dump")
@@ -54,20 +54,20 @@ target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
 # header_dump
 set(TEST_NAME "retention_header_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "header")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "header")
 
 # host_dump
 set(TEST_NAME "retention_host_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "host")
 
 # info_dump
 set(TEST_NAME "retention_info_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "info")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "info")
 
 # program_dump
 set(TEST_NAME "retention_program_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "program")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "program")
 
 # service_dump
 set(TEST_NAME "retention_service_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "service")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "service")

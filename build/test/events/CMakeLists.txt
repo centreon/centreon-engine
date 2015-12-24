@@ -1,5 +1,5 @@
 ##
-## Copyright 2011-2013 Merethis
+## Copyright 2011-2013,2015 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -24,5 +24,4 @@ set(TEST_DIR "${TEST_DIR}/events")
 set(TEST_NAME "events_handle_timed_event")
 add_executable("${TEST_NAME}" "${TEST_DIR}/handle_timed_event.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")

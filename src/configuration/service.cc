@@ -295,8 +295,8 @@ bool service::operator<(service const& other) const throw () {
  */
 void service::check_validity() const {
   if (_service_id == 0)
-    throw (engine_error() << "Service has no id (property 'service_id')");
-  if (_service_description.empty())
+    throw (engine_error() << "Service has no ID (property 'service_id')");
+  else if (_service_description.empty())
     throw (engine_error() << "Service has no description (property "
            << "'service_description')");
   else if (_hosts->empty())

@@ -27,13 +27,13 @@ add_subdirectory("applier")
 # set(TEST_NAME "configuration_basic")
 # add_executable("${TEST_NAME}" "${TEST_DIR}/basic.cc")
 # target_link_libraries("${TEST_NAME}" "cce_core")
-# add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
+# add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}" "test.cfg")
 
 # # Parsing test.
 # set(TEST_NAME "configuration_parsing")
 # add_executable("${TEST_NAME}" "${TEST_DIR}/parsing.cc")
 # target_link_libraries("${TEST_NAME}" "cce_core")
-# add_test("${TEST_NAME}" "${TEST_NAME}")
+# add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Objects copy.
 set(TEST_BIN_NAME "configuration_objects_copy")
@@ -46,39 +46,39 @@ set(CONF_DIR "${TEST_DIR}/etc")
 # parse_and_copy_configuration_command
 set(TEST_NAME "parse_and_copy_configuration_command")
 set(TEST_CONF_FILE "command.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_hostdependency
 set(TEST_NAME "parse_and_copy_configuration_hostdependency")
 set(TEST_CONF_FILE "hostdependency.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_hostgroup
 set(TEST_NAME "parse_and_copy_configuration_hostgroup")
 set(TEST_CONF_FILE "hostgroup.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_host
 set(TEST_NAME "parse_and_copy_configuration_host")
 set(TEST_CONF_FILE "host.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_servicedependency
 set(TEST_NAME "parse_and_copy_configuration_servicedependency")
 set(TEST_CONF_FILE "servicedependency.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_servicegroup
 set(TEST_NAME "parse_and_copy_configuration_servicegroup")
 set(TEST_CONF_FILE "servicegroup.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_service
 set(TEST_NAME "parse_and_copy_configuration_service")
 set(TEST_CONF_FILE "service.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
 
 # parse_and_copy_configuration_timeperiod
 set(TEST_NAME "parse_and_copy_configuration_timeperiod")
 set(TEST_CONF_FILE "timeperiod.cfg")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "${CONF_DIR}/${TEST_CONF_FILE}")

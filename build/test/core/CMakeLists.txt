@@ -25,7 +25,7 @@
 set(TEST_NAME "error_insert_integer")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_integer.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Unsigned integer insertion.
 set(TEST_NAME "error_insert_unsigned_integer")
@@ -34,19 +34,19 @@ add_executable(
   "${TEST_DIR}/error/insert_unsigned_integer.cc"
 )
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Long insertion.
 set(TEST_NAME "error_insert_long")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_long.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Long long insertion.
 set(TEST_NAME "error_insert_long_long")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_long_long.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Unsigned long long insertion.
 set(TEST_NAME "error_insert_unsigned_long_long")
@@ -55,43 +55,43 @@ add_executable(
   "${TEST_DIR}/error/insert_unsigned_long_long.cc"
 )
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Char insertion.
 set(TEST_NAME "error_insert_char")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_char.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Char array (C string) insertion.
 set(TEST_NAME "error_insert_char_array")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_char_array.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # String insertion.
 set(TEST_NAME "error_insert_string")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_string.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Mixed insertions.
 set(TEST_NAME "error_insert_mixed")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/insert_mixed.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Copy constructor.
 set(TEST_NAME "error_copy_ctor")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/copy_ctor.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 # Assignment operator.
 set(TEST_NAME "error_assignment")
 add_executable("${TEST_NAME}" "${TEST_DIR}/error/assignment.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_NAME}")
 
 #
 # Stats tests.
@@ -100,16 +100,16 @@ add_test("${TEST_NAME}" "${TEST_NAME}")
 # Non-existent configuration file.
 set(TEST_NAME "running_stats_no_config_file")
 add_test(
-  "${TEST_NAME}"
-  "${centenginestats}" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
 # Non-existent status file.
 set(TEST_NAME "running_stats_no_status_file")
 add_test(
-  "${TEST_NAME}"
-  "${centenginestats}" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -125,15 +125,15 @@ add_executable(
 target_link_libraries("${CENTENGINE_RUNNER}" "cce_core")
 
 # Help flag.
-add_test("running_engine_help" "centengine" "-h")
+add_test(NAME "running_engine_help" COMMAND "centengine" "-h")
 
 # License flag.
-add_test("running_engine_license" "centengine" "-V")
+add_test(NAME "running_engine_license" COMMAND "centengine" "-V")
 
 # Without any service.
 add_test(
-  "running_engine_no_service"
-  "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg"
+  NAME "running_engine_no_service"
+  COMMAND "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg"
 )
 set_tests_properties(
   "running_engine_no_service"
@@ -143,8 +143,8 @@ set_tests_properties(
 # broker_module with only path to module.
 set(TEST_NAME "running_engine_broker_module_without_args")
 add_test(
-  "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg"
 )
 
 # Check that all symbols required by modules are present.
@@ -188,8 +188,8 @@ configure_file(
   "${TEST_DIR}/running/etc/modules_symbols.cfg"
 )
 add_test(
-  "${TEST_NAME}"
-  "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg"
 )
 # Check that the webservice module can be loaded.
 if (WITH_WEBSERVICE)
@@ -205,8 +205,8 @@ broker_module=${MODULE_PATH} ${MODULE_ARGS}"
     "${TEST_DIR}/running/etc/minimal.cfg.in"
     "${TEST_DIR}/running/etc/modules_webservice.cfg")
   add_test(
-    "${TEST_NAME}"
-    "centengine" "${TEST_DIR}/running/etc/modules_webservice.cfg"
+    NAME "${TEST_NAME}"
+    COMMAND "centengine" "${TEST_DIR}/running/etc/modules_webservice.cfg"
   )
 endif ()
 
@@ -221,8 +221,8 @@ configure_file(
 )
 set(TEST_NAME "running_host_check_with_no_check_cmd")
 add_test(
-  "${TEST_NAME}"
-  "centengine" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centengine" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -237,8 +237,8 @@ configure_file(
 )
 set(TEST_NAME "running_service_check_with_no_check_cmd")
 add_test(
-  "${TEST_NAME}"
-  "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg"
 )
 set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 
@@ -257,8 +257,8 @@ configure_file(
   "${TEST_DIR}/running/etc/logs_for_modules.cfg"
 )
 add_test(
-  "${TEST_NAME}"
-  "centengine" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "centengine" "${TEST_DIR}/running/etc/logs_for_modules.cfg"
 )
 # log without pid
 set(TEST_NAME "running_log_without_pid")
@@ -267,7 +267,6 @@ add_executable(
   "${TEST_DIR}/running/log_without_pid.cc")
 target_link_libraries("${TEST_NAME}" "cce_core")
 add_test(
-  "${TEST_NAME}"
-  "${TEST_NAME}"
-  "${TEST_DIR}/running/etc/log_without_pid/main.cfg"
+  NAME "${TEST_NAME}"
+  COMMAND "${TEST_NAME}" "${TEST_DIR}/running/etc/log_without_pid/main.cfg"
 )

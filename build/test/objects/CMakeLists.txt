@@ -27,88 +27,88 @@ target_link_libraries("${TEST_BIN_NAME}" "cce_core")
 
 # command_dump
 set(TEST_NAME "command_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "command")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "command")
 
 # commandsmember_dump
 set(TEST_NAME "commandsmember_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "commandsmember")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "commandsmember")
 
 # comment_dump
 set(TEST_NAME "comment_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "comment")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "comment")
 
 # contactgroup_dump
 set(TEST_NAME "contactgroup_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactgroup")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "contactgroup")
 
 # contactgroupsmember_dump
 set(TEST_NAME "contactgroupsmember_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactgroupsmember")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "contactgroupsmember")
 
 # contact_dump
 set(TEST_NAME "contact_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contact")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "contact")
 
 # customvariablesmember_dump
 set(TEST_NAME "customvariablesmember_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "customvariablesmember")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "customvariablesmember")
 
 # contactsmember_dump
 set(TEST_NAME "contactsmember_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "contactsmember")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "contactsmember")
 
 # daterange_dump
 set(TEST_NAME "daterange_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "daterange")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "daterange")
 
 # hostdependency_dump
 set(TEST_NAME "hostdependency_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostdependency")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "hostdependency")
 
 # hostescalation_dump
 set(TEST_NAME "hostescalation_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostescalation")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "hostescalation")
 
 # hostgroup_dump
 set(TEST_NAME "hostgroup_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostgroup")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "hostgroup")
 
 # host_dump
 set(TEST_NAME "host_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "host")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "host")
 
 # hostsmember_dump
 set(TEST_NAME "hostsmember_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "hostsmember")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "hostsmember")
 
 # servicedependency_dump
 set(TEST_NAME "servicedependency_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "servicedependency")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "servicedependency")
 
 # serviceescalation_dump
 set(TEST_NAME "serviceescalation_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "serviceescalation")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "serviceescalation")
 
 # servicegroup_dump
 set(TEST_NAME "servicegroup_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "servicegroup")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "servicegroup")
 
 # service_dump
 set(TEST_NAME "service_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "service")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "service")
 
 # servicesmember_dump
 set(TEST_NAME "servicesmember_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "servicesmember")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "servicesmember")
 
 # timeperiod_dump
 set(TEST_NAME "timeperiod_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timeperiod")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "timeperiod")
 
 # timeperiodexclusion_dump
 set(TEST_NAME "timeperiodexclusion_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timeperiodexclusion")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "timeperiodexclusion")
 
 # timerange_dump
 set(TEST_NAME "timerange_dump")
-add_test("${TEST_NAME}" "${TEST_BIN_NAME}" "timerange")
+add_test(NAME "${TEST_NAME}" COMMAND "${TEST_BIN_NAME}" "timerange")
