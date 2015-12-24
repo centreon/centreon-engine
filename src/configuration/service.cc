@@ -133,9 +133,9 @@ service::service()
     _is_volatile(default_is_volatile),
     _low_flap_threshold(default_low_flap_threshold),
     _max_check_attempts(default_max_check_attempts),
-    _service_id(0),
     _obsess_over_service(default_obsess_over_service),
-    _retry_interval(default_retry_interval) {}
+    _retry_interval(default_retry_interval),
+    _service_id(0) {}
 
 /**
  *  Copy constructor.

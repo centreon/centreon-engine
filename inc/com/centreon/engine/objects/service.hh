@@ -110,7 +110,7 @@ extern "C" {
 service* add_service(
            unsigned int host_id,
            char const* host_name,
-           unsigned int id,
+           unsigned int service_id,
            char const* description,
            char const* check_period,
            int initial_state,

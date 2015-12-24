@@ -122,7 +122,7 @@ extern "C" {
 #  endif /* C++ */
 
 host* add_host(
-        unsigned int id,
+        unsigned int host_id,
         char const* name,
         char const* alias,
         char const* address,

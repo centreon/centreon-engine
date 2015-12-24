@@ -29,6 +29,7 @@ using namespace com::centreon::engine;
 void com::centreon::engine::test::minimal_setup() {
   // Add host.
   host* hst(add_host(
+    1,                              // Host ID
     const_cast<char*>("myhost"),    // Name
     const_cast<char*>("MyAlias"),   // Alias
     const_cast<char*>("127.0.0.1"), // Address
@@ -61,7 +62,9 @@ void com::centreon::engine::test::minimal_setup() {
 
   // Add service.
   service* svc(add_service(
+    1,                              // Host ID
     const_cast<char*>("myhost"),    // Host name
+    1,                              // Service ID
     const_cast<char*>("myservice"), // Service description
     NULL,                           // Check period
     0,                              // Initial state

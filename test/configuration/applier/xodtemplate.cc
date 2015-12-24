@@ -839,11 +839,17 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_service->host_name = string::dup(value);
       temp_service->have_host_name = true;
     }
+    else if (!strcmp(variable, "host_id")) {
+      temp_service->host_id = atoi(value);
+    }
     else if (!strcmp(variable, "service_description")
              || !strcmp(variable, "description")) {
       if (strcmp(value, XODTEMPLATE_NULL))
         temp_service->service_description = string::dup(value);
       temp_service->have_service_description = true;
+    }
+    else if (!strcmp(variable, "service_id")) {
+      temp_service->service_id = atoi(value);
     }
     else if (!strcmp(variable, "check_command")) {
       if (strcmp(value, XODTEMPLATE_NULL)) {
@@ -1081,6 +1087,8 @@ int xodtemplate_add_object_property(char* input, int options) {
         break;
       }
     }
+    else if (!strcmp(variable, "host_id"))
+      temp_host->host_id = atoi(value);
     else if (!strcmp(variable, "alias"))
       temp_host->alias = string::dup(value);
     else if (!strcmp(variable, "address"))
@@ -4770,6 +4778,7 @@ int xodtemplate_register_host(xodtemplate_host* this_host) {
 
   /* add the host definition */
   new_host = add_host(
+               this_host->host_id,
                this_host->host_name,
                this_host->alias,
                (this_host->address == NULL) ? this_host->host_name : this_host->address,
@@ -4853,7 +4862,9 @@ int xodtemplate_register_service(xodtemplate_service* this_service) {
 
   /* add the service */
   new_service = add_service(
+                  this_service->host_id,
                   this_service->host_name,
+                  this_service->service_id,
                   this_service->service_description,
                   this_service->check_period,
                   this_service->initial_state,

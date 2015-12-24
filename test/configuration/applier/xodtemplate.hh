@@ -131,6 +131,7 @@ typedef struct xodtemplate_host_struct{
   int          _config_file;
   int          _start_line;
 
+  unsigned int host_id;
   char*        host_name;
   char*        alias;
   char*        address;
@@ -204,7 +205,9 @@ typedef struct xodtemplate_service_struct{
   int          _config_file;
   int          _start_line;
 
+  unsigned int host_id;
   char*        host_name;
+  unsigned int service_id;
   char*        service_description;
   char*        check_command;
   int          initial_state;
