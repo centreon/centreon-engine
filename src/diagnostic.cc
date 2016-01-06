@@ -1,5 +1,5 @@
 /*
-** Copyright 2013 Merethis
+** Copyright 2013,2015 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -80,17 +80,11 @@ void diagnostic::generate(
   // Destination directory.
   std::string tmp_dir;
   {
-    char const* tmp_dir_ptr(tmpnam(NULL));
-    if (!tmp_dir_ptr)
+    char tmp_dir_ptr[] = "/tmp/brokerXXXXXX";
+    if (!mkdtemp(tmp_dir_ptr))
       throw (engine_error()
              << "Cannot generate diagnostic temporary directory path.");
     tmp_dir = tmp_dir_ptr;
-    if (mkdir(tmp_dir.c_str(), S_IRWXU)) {
-      char const* msg(strerror(errno));
-      throw (engine_error()
-             << "Cannot create temporary directory '" << tmp_dir
-             << "': " << msg);
-    }
   }
 
   // Files to remove.
