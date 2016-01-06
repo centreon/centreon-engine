@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2016 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -182,6 +182,7 @@ static char* get_host_total_services(host& hst, nagios_macros* mac) {
  *  @return Newly allocated string with requested value in plain text.
  */
 static char* get_host_parents(host& hst, nagios_macros* mac) {
+  (void)mac;
   std::string retval;
   for (hostsmember* it = hst.parent_hosts; it != NULL; it = it->next) {
     if (!retval.empty())
@@ -200,6 +201,7 @@ static char* get_host_parents(host& hst, nagios_macros* mac) {
  *  @return Newly allocated string with requested value in plain text.
  */
 static char* get_host_children(host& hst, nagios_macros* mac) {
+  (void)mac;
   std::string retval;
   for (hostsmember* it = hst.child_hosts; it != NULL; it = it->next) {
     if (!retval.empty())
