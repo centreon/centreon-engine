@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -128,20 +128,20 @@ void applier::contact::_update(
       }
     }
   }
-
-  // adjust modified attributes if necessary.
-  if (!obj.retain_nonstatus_information)
+  // Adjust modified attributes if necessary.
+  else
     obj.modified_attributes = MODATTR_NONE;
 
-  // adjust modified attributes if no custom variables have been changed.
+  // Adjust modified attributes if no custom variable has been changed.
   if (obj.modified_attributes & MODATTR_CUSTOM_VARIABLE) {
+    bool at_least_one_modified(false);
     for (customvariablesmember* member(obj.custom_variables);
          member;
          member = member->next)
-      if (member->has_been_modified) {
-        obj.modified_attributes -= MODATTR_CUSTOM_VARIABLE;
-        break;
-      }
+      if (member->has_been_modified)
+        at_least_one_modified = true;
+    if (!at_least_one_modified)
+      obj.modified_attributes -= MODATTR_CUSTOM_VARIABLE;
   }
 
   // update contact status.
