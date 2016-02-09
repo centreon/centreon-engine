@@ -17,7 +17,8 @@ Using packages
 
 Centreon provides RPM for its products through Centreon Entreprise
 Server (CES). Open source products are freely available from our
-repository. These packages are available for CentOS 6.
+repository. These packages are available for CentOS 6 x86_64, which
+is the sole platform officially supported by Centreon
 
 .. _user_installation_packages_prerequisites:
 
