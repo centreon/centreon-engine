@@ -17,9 +17,7 @@ Using packages
 
 Centreon provides RPM for its products through Centreon Entreprise
 Server (CES). Open source products are freely available from our
-repository.
-
-These packages are available for CentOS 5 and CentOS 6.
+repository. These packages are available for CentOS 6.
 
 .. _user_installation_packages_prerequisites:
 
@@ -28,16 +26,6 @@ Prerequisites
 
 In order to use RPM from the CES repository, you have to install the
 appropriate repository.
-
-CentOS 5
---------
-
-Run the following command as privileged user ::
-
-  $ wget http://yum.centreon.com/standard/2.2/noarch/RPMS/ces-release-2.2-4.noarch.rpm
-  $ yum install --nogpgcheck ces-release-2.2-4.noarch.rpm
-  $ rm -f ces-release-2.2-4.noarch.rpm
-  $ yum clean all
 
 CentOS 6
 --------
