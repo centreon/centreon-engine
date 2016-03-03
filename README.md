@@ -79,7 +79,7 @@ The best way to report a bug or to request a feature is to open an issue
 in GitHub's [issue tracker](https://github.com/centreon/centreon-engine/issues/).
 
 Please note that Centreon Engine follows the
-[same workflow as Centreon](https://github.com/centreon/centreon/project/issues.md)
+[same workflow as Centreon](https://github.com/centreon/centreon/blob/master/project/issues.md)
 to process issues.
 
 For a quick resolution of a bug your message should contain :
