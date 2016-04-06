@@ -3251,7 +3251,7 @@ int process_host_check_result_3x(
     else
       hst->next_check = next_check;
 
-    // Make sure we rescheduled the next service check at a valid time.
+    // Make sure we rescheduled the next host check at a valid time.
     {
       timezone_locker lock(get_host_timezone(hst->name));
       preferred_time = hst->next_check;

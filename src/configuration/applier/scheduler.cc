@@ -144,7 +144,23 @@ void applier::scheduler::apply(
   // Check if we need to add or modify objects into the scheduler.
   if (!hst_to_schedule.empty() || !svc_to_schedule.empty()) {
     // Reset scheduling info.
+    // Keep data that has been set manually by the user
+    // (service interleave and intercheck delays).
+    int old_service_leave_factor = scheduling_info.service_interleave_factor;
+    int old_service_inter_check_delay = scheduling_info.service_inter_check_delay;
+    int old_host_inter_check_delay_method = scheduling_info.host_inter_check_delay;
     memset(&scheduling_info, 0, sizeof(scheduling_info));
+    if (config.service_interleave_factor_method()
+          == configuration::state::ilf_user)
+      scheduling_info.service_interleave_factor = old_service_leave_factor;
+    if (config.service_inter_check_delay_method()
+        == configuration::state::icd_user)
+      scheduling_info.service_inter_check_delay
+        = old_service_inter_check_delay;
+    if (config.host_inter_check_delay_method()
+        == configuration::state::icd_user)
+      scheduling_info.host_inter_check_delay
+        = old_host_inter_check_delay_method;
 
     // Calculate scheduling parameters.
     _calculate_host_scheduling_params();
