@@ -147,8 +147,8 @@ void applier::scheduler::apply(
     // Keep data that has been set manually by the user
     // (service interleave and intercheck delays).
     int old_service_leave_factor = scheduling_info.service_interleave_factor;
-    int old_service_inter_check_delay = scheduling_info.service_inter_check_delay;
-    int old_host_inter_check_delay_method = scheduling_info.host_inter_check_delay;
+    double old_service_inter_check_delay = scheduling_info.service_inter_check_delay;
+    double old_host_inter_check_delay_method = scheduling_info.host_inter_check_delay;
     memset(&scheduling_info, 0, sizeof(scheduling_info));
     if (config.service_interleave_factor_method()
           == configuration::state::ilf_user)
