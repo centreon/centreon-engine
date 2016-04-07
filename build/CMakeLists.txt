@@ -356,7 +356,7 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "systemd")
   endif ()
 
   # Script install rule.
-  install(PROGRAMS "${SCRIPT_DIR}/centengine.script"
+  install(PROGRAMS "${SCRIPT_DIR}/centengine.service"
     DESTINATION "${STARTUP_DIR}"
     COMPONENT "runtime")
 
