@@ -556,6 +556,28 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
   # String printed in summary.
   set(STARTUP_SCRIPT "SysV-style script")
 
+# Create Systemd start script.
+elseif (WITH_STARTUP_SCRIPT STREQUAL "systemd")
+  # Generate Systemd script.
+  message(STATUS "Generating systemd startup script.")
+  configure_file("${SCRIPT_DIR}/centengine.service.in"
+    "${SCRIPT_DIR}/centengine.service")
+
+  # Startup dir.
+  if (WITH_STARTUP_DIR)
+    set(STARTUP_DIR "${WITH_STARTUP_DIR}")
+  else ()
+    set(STARTUP_DIR "/etc/systemd/system")
+  endif ()
+
+  # Script install rule.
+  install(PROGRAMS "${SCRIPT_DIR}/centengine.script"
+    DESTINATION "${STARTUP_DIR}"
+    COMPONENT "runtime")
+
+  # String printed in summary.
+  set(STARTUP_SCRIPT "Systemd script")
+
 else ()
   # Default.
   message(STATUS "Invalid value for option WITH_STARTUP_SCRIPT (must be one of 'auto', 'sysv' or 'upstart').")
