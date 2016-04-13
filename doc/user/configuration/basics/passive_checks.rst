@@ -14,7 +14,7 @@ often. Centreon Engine also supports a way to monitor hosts and services
 passively instead of actively. They key features of passive checks are
 as follows:
 
-  * Passive checks are initiated and performed external
+  * Passive checks are initiated and performed by external
     applications/processes
   * Passive check results are submitted to Centreon Engine for
     processing
