@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -124,6 +124,8 @@ namespace                  configuration {
     void                   timezone(std::string const& time_zone);
     std::string const&     timezone() const throw ();
     bool                   timezone_defined() const throw ();
+    int                    get_acknowledgement_timeout() const throw ();
+    bool                   set_acknowledgement_timeout(int value);
 
   private:
     struct                 setters {
@@ -176,6 +178,7 @@ namespace                  configuration {
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_timezone(std::string const& value);
 
+    opt<int>               _acknowledgement_timeout;
     std::string            _action_url;
     opt<bool>              _checks_active;
     opt<bool>              _checks_passive;

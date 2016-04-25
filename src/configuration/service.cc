@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -41,6 +41,7 @@ service::setters const service::_setters[] = {
   { "service_description",          SETTER(std::string const&, _set_service_description) },
   { "service_id",                   SETTER(unsigned int, _set_service_id) },
   { "_SERVICE_ID",                  SETTER(unsigned int, _set_service_id) },
+  { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
   { "description",                  SETTER(std::string const&, _set_service_description) },
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "hostgroup",                    SETTER(std::string const&, _set_hostgroups) },
@@ -91,6 +92,7 @@ service::setters const service::_setters[] = {
 };
 
 // Default values.
+static int                  default_acknowledgement_timeout(0);
 static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(0);
@@ -131,6 +133,7 @@ static unsigned short const default_stalking_options(service::none);
  */
 service::service()
   : object(object::service),
+    _acknowledgement_timeout(default_acknowledgement_timeout),
     _checks_active(default_checks_active),
     _checks_passive(default_checks_passive),
     _check_command_is_important(false),
@@ -181,6 +184,7 @@ service::~service() throw () {}
 service& service::operator=(service const& other) {
   if (this != &other) {
     object::operator=(other);
+    _acknowledgement_timeout = other._acknowledgement_timeout;
     _action_url = other._action_url;
     _checks_active = other._checks_active;
     _checks_passive = other._checks_passive;
@@ -237,6 +241,7 @@ service& service::operator=(service const& other) {
  */
 bool service::operator==(service const& other) const throw () {
   return (object::operator==(other)
+          && _acknowledgement_timeout == other._acknowledgement_timeout
           && _action_url == other._action_url
           && _checks_active == other._checks_active
           && _checks_passive == other._checks_passive
@@ -307,6 +312,8 @@ bool service::operator<(service const& other) const throw () {
     return (_hosts < other._hosts);
   else if (_service_description != other._service_description)
     return (_service_description < other._service_description);
+  else if (_acknowledgement_timeout != other._acknowledgement_timeout)
+    return (_acknowledgement_timeout < other._acknowledgement_timeout);
   else if (_action_url != other._action_url)
     return (_action_url < other._action_url);
   else if (_checks_active != other._checks_active)
@@ -454,6 +461,7 @@ void service::merge(object const& obj) {
            << obj.type() << "'");
   service const& tmpl(static_cast<service const&>(obj));
 
+  MRG_OPTION(_acknowledgement_timeout);
   MRG_DEFAULT(_action_url);
   MRG_IMPORTANT(_check_command);
   MRG_OPTION(_checks_active);
@@ -1032,6 +1040,29 @@ std::string const& service::timezone() const throw () {
  */
 bool service::timezone_defined() const throw () {
   return (_timezone.is_set());
+}
+
+/**
+ *  Get acknowledgement timeout.
+ *
+ *  @return Acknowledgement timeout.
+ */
+int service::get_acknowledgement_timeout() const throw () {
+  return (_acknowledgement_timeout);
+}
+
+/**
+ *  Set the acknowledgement timeout.
+ *
+ *  @param[in] value  New acknowledgement timeout.
+ *
+ *  @return True on success, false otherwise.
+ */
+bool service::set_acknowledgement_timeout(int value) {
+  bool value_positive(value >= 0);
+  if (value_positive)
+    _acknowledgement_timeout = value;
+  return (value_positive);
 }
 
 /**
