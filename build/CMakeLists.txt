@@ -756,9 +756,8 @@ add_executable("centenginestats" "${SRC_DIR}/centenginestats.cc")
 target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
 get_property(CENTENGINESTATS_BINARY TARGET "centenginestats" PROPERTY LOCATION)
 
-# Unit test.
-enable_testing()
-add_subdirectory("test")
+# Unit tests.
+add_subdirectory("tests")
 
 #
 # Install stuff.
