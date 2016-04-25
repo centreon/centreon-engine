@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -149,6 +149,7 @@ typedef struct                  service_struct {
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
+  int                           acknowledgement_timeout;
   time_t                        initial_notif_time;
   std::string                   timezone;
   unsigned int                  service_id;

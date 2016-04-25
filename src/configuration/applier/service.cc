@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -179,6 +179,10 @@ void applier::service::add_object(
       throw (engine_error() << "Could not register service '"
              << obj->service_description()
              << "' of host '" << obj->hosts().front() << "'");
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].acknowledgement_timeout
+    = obj->get_acknowledgement_timeout();
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].initial_notif_time = 0;
@@ -510,6 +514,10 @@ void applier::service::modify_object(
   modify_if_different(
     s->is_volatile,
     static_cast<int>(obj->is_volatile()));
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].acknowledgement_timeout
+    = obj->get_acknowledgement_timeout();
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].timezone = obj->timezone();

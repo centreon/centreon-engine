@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -159,6 +159,7 @@ typedef struct                  host_struct {
 
 /* Other HOST structure. */
 struct                          host_other_properties {
+  int                           acknowledgement_timeout;
   time_t                        initial_notif_time;
   bool                          should_reschedule_current_check;
   std::string                   timezone;
