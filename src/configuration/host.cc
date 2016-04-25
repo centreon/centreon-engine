@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,6 +40,7 @@ host::setters const host::_setters[] = {
   { "_HOST_ID",                     SETTER(unsigned int, _set_host_id)},
   { "display_name",                 SETTER(std::string const&, _set_display_name) },
   { "alias",                        SETTER(std::string const&, _set_alias) },
+  { "acknowledgement_timeout",      SETTER(int, set_acknowledgement_timeout) },
   { "address",                      SETTER(std::string const&, _set_address) },
   { "parents",                      SETTER(std::string const&, _set_parents) },
   { "host_groups",                  SETTER(std::string const&, _set_hostgroups) },
@@ -90,8 +91,8 @@ host::setters const host::_setters[] = {
   { "timezone",                     SETTER(std::string const&, _set_timezone) }
 };
 
-// XXX: check all default value from xodtemplate_inherit_object_properties !
 // Default values.
+static int const            default_acknowledgement_timeout(0);
 static bool const           default_checks_active(true);
 static bool const           default_checks_passive(true);
 static bool const           default_check_freshness(false);
@@ -124,6 +125,7 @@ static unsigned short const default_stalking_options(host::none);
  */
 host::host(key_type const& key)
   : object(object::host),
+    _acknowledgement_timeout(0),
     _checks_active(default_checks_active),
     _checks_passive(default_checks_passive),
     _check_freshness(default_check_freshness),
@@ -173,6 +175,7 @@ host::~host() throw () {}
 host& host::operator=(host const& other) {
   if (this != &other) {
     object::operator=(other);
+    _acknowledgement_timeout = other._acknowledgement_timeout;
     _action_url = other._action_url;
     _address = other._address;
     _alias = other._alias;
@@ -232,6 +235,7 @@ host& host::operator=(host const& other) {
  */
 bool host::operator==(host const& other) const throw () {
   return (object::operator==(other)
+          && _acknowledgement_timeout == other._acknowledgement_timeout
           && _action_url == other._action_url
           && _address == other._address
           && _alias == other._alias
@@ -303,6 +307,8 @@ bool host::operator<(host const& other) const throw () {
   // The configuration diff mechanism relies on this.
   if (_host_name != other._host_name)
     return (_host_name < other._host_name);
+  else if (_acknowledgement_timeout != other._acknowledgement_timeout)
+    return (_acknowledgement_timeout < other._acknowledgement_timeout);
   else if (_action_url != other._action_url)
     return (_action_url < other._action_url);
   else if (_address != other._address)
@@ -451,6 +457,7 @@ void host::merge(object const& obj) {
            << obj.type() << "'");
   host const& tmpl(static_cast<host const&>(obj));
 
+  MRG_OPTION(_acknowledgement_timeout);
   MRG_DEFAULT(_action_url);
   MRG_DEFAULT(_address);
   MRG_DEFAULT(_alias);
@@ -967,6 +974,29 @@ std::string const& host::timezone() const throw () {
  */
 std::string const& host::vrml_image() const throw () {
   return (_vrml_image);
+}
+
+/**
+ *  Get acknowledgement timeout.
+ *
+ *  @return Acknowledgement timeout.
+ */
+int host::get_acknowledgement_timeout() const throw () {
+  return (_acknowledgement_timeout);
+}
+
+/**
+ *  Set acknowledgement timeout.
+ *
+ *  @param[in] value  The new acknowledgement timeout value.
+ *
+ *  @return True on success, false otherwise.
+ */
+bool host::set_acknowledgement_timeout(int value) {
+  bool value_positive(value >= 0);
+  if (value_positive)
+    _acknowledgement_timeout = value;
+  return (value_positive);
 }
 
 /**

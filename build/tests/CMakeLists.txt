@@ -26,6 +26,7 @@ if (WITH_TESTING)
 
   # Unit test executable.
   add_executable("ut"
+    "${TESTS_DIR}/configuration/host.cc"
   )
   target_link_libraries("ut" "gtest" "gtest_main" "cce_core")
 endif ()

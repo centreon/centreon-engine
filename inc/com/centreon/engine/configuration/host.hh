@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -111,6 +111,8 @@ namespace                  configuration {
     std::string const&     statusmap_image() const throw ();
     std::string const&     timezone() const throw ();
     std::string const&     vrml_image() const throw ();
+    int                    get_acknowledgement_timeout() const throw ();
+    bool                   set_acknowledgement_timeout(int value);
 
   private:
     struct                 setters {
@@ -166,6 +168,7 @@ namespace                  configuration {
     bool                   _set_timezone(std::string const& value);
     bool                   _set_vrml_image(std::string const& value);
 
+    opt<int>               _acknowledgement_timeout;
     std::string            _action_url;
     std::string            _address;
     std::string            _alias;
