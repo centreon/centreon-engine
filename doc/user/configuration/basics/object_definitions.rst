@@ -315,7 +315,8 @@ stalking_options             This directive determines which host states "stalki
                              on state stalking can be found :ref:`here <state_stalking>`.
 notes                        This directive is used to define an optional string of notes pertaining to the host.
 notes_url                    This variable is used to define an optional URL that can be used to provide more information about the host. Any valid
-URL can be used. This can be very useful if you want to make detailed information on the host, emergency contact methods, etc. available to other
+                             URL can be used. This can be very useful if you want to make detailed information on the host, emergency contact methods,
+                             etc. available to other
                              support staff.
 action_url                   This directive is used to define an optional URL that can be used to provide more actions to be performed on the host.
                              Any valid URL can be used.
@@ -347,6 +348,7 @@ statusmap_image              This variable is used to define the name of an imag
                              side (text takes a little more space). The coordinates you specify here are used as the center of the host cube.
 timezone                     Timezone in which the host resides. This will affect its check and notification periods. The timezone must be formatted
                              using the POSIX TZ variable format. That is for most users this will look like *:America/New_York* (notice the colon).
+acknowledgement_timeout      Number of seconds that will elapse before an acknowledgement on this host is removed.
 ============================ =========================================================================================================================
 
 .. _obj_def_hostgroup:
@@ -500,7 +502,8 @@ Directive Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ============================ =========================================================================================================================
-host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is                                   associated with. Multiple hosts should be separated by commas.
+host_name                    This directive is used to specify the short name(s) of the :ref:`host(s) <obj_def_host>` that the service "runs" on or is
+                             associated with. Multiple hosts should be separated by commas.
 hostgroup_name               This directive is used to specify the short name(s) of the :ref:`hostgroup(s) <obj_def_hostgroup>` that the service
                              "runs" on or is associated with.
                              Multiple hostgroups should be separated by commas. The hostgroup_name may be used instead of, or in addition to, the
@@ -637,6 +640,7 @@ icon_image_alt               This variable is used to define an optional string 
 timezone                     Timezone in which the service resides. This will affect its check and notification periods. Services use the timezone
                              of their host if none is set in their definition. The timezone must be formatted using the POSIX TZ variable format.
                              That is for most users this will look like *:America/New_York* (notice the colon).
+acknowledgement_timeout      Number of seconds that will elapse before an acknowledgement on this service is removed.
 ============================ =========================================================================================================================
 
 .. _obj_def_servicegroup:
