@@ -2746,8 +2746,6 @@ void acknowledge_host_problem(
        int type,
        int notify,
        int persistent) {
-  time_t current_time = 0L;
-
   /* cannot acknowledge a non-existent problem */
   if (hst->current_state == HOST_UP)
     return;
@@ -2758,6 +2756,24 @@ void acknowledge_host_problem(
   /* set the acknowledgement type */
   hst->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
     ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
+
+  /* schedule acknowledgement expiration */
+  time_t current_time(time(NULL));
+  host_other_props[hst->name].last_acknowledgement = current_time;
+  int acknowledgement_timeout(
+        host_other_props[hst->name].acknowledgement_timeout);
+  if (acknowledgement_timeout > 0)
+    schedule_new_event(
+      EVENT_EXPIRE_HOST_ACK,
+      false,
+      current_time + acknowledgement_timeout,
+      false,
+      0,
+      NULL,
+      true,
+      hst,
+      NULL,
+      0);
 
   /* send data to event broker */
   broker_acknowledgement_data(
@@ -2786,7 +2802,6 @@ void acknowledge_host_problem(
   update_host_status(hst, false);
 
   /* add a comment for the acknowledgement */
-  time(&current_time);
   add_new_host_comment(
     ACKNOWLEDGEMENT_COMMENT,
     hst->name,
@@ -2808,8 +2823,6 @@ void acknowledge_service_problem(
        int type,
        int notify,
        int persistent) {
-  time_t current_time = 0L;
-
   /* cannot acknowledge a non-existent problem */
   if (svc->current_state == STATE_OK)
     return;
@@ -2820,6 +2833,28 @@ void acknowledge_service_problem(
   /* set the acknowledgement type */
   svc->acknowledgement_type = (type == ACKNOWLEDGEMENT_STICKY)
     ? ACKNOWLEDGEMENT_STICKY : ACKNOWLEDGEMENT_NORMAL;
+
+  /* schedule acknowledgement expiration */
+  time_t current_time(time(NULL));
+  service_other_props[std::make_pair(
+                             svc->host_ptr->name,
+                             svc->description)].last_acknowledgement = current_time;
+  int acknowledgement_timeout(
+        service_other_props[std::make_pair(
+                                   svc->host_ptr->name,
+                                   svc->description)].acknowledgement_timeout);
+  if (acknowledgement_timeout > 0)
+    schedule_new_event(
+      EVENT_EXPIRE_SERVICE_ACK,
+      false,
+      current_time + acknowledgement_timeout,
+      false,
+      0,
+      NULL,
+      true,
+      svc,
+      NULL,
+      0);
 
   /* send data to event broker */
   broker_acknowledgement_data(
