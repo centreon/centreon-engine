@@ -1,8 +1,8 @@
 /*
-** Copyright 2007-2008 Ethan Galstad
-** Copyright 2007,2010 Andreas Ericsson
-** Copyright 2010      Max Schubert
-** Copyright 2011-2013 Merethis
+** Copyright 2007-2008      Ethan Galstad
+** Copyright 2007,2010      Andreas Ericsson
+** Copyright 2010           Max Schubert
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -306,6 +306,32 @@ static void _exec_event_expire_comment(timed_event* event) {
   // check for expired comment.
   check_for_expired_comment((unsigned long)event->event_data);
   return;
+}
+
+/**
+ *  Check for expired host acknowledgement.
+ *
+ *  @param[in] event  Event to execute.
+ */
+static void _exec_event_expire_host_ack(timed_event* event) {
+  logger(dbg_events, basic)
+    << "** Expire Host Acknowledgement Event";
+  check_for_expired_acknowledgement(
+    static_cast<host*>(event->event_data));
+  return ;
+}
+
+/**
+ *  Check for expired service acknowledgement.
+ *
+ *  @param[in] event  Event to execute.
+ */
+static void _exec_event_expire_service_ack(timed_event* event) {
+  logger(dbg_events, basic)
+    << "** Expire Service Acknowledgement Event";
+  check_for_expired_acknowledgement(
+    static_cast<service*>(event->event_data));
+  return ;
 }
 
 /**
@@ -677,6 +703,8 @@ int handle_timed_event(timed_event* event) {
     &_exec_event_hfreshness_check,
     &_exec_event_reschedule_checks,
     &_exec_event_expire_comment,
+    &_exec_event_expire_host_ack,
+    &_exec_event_expire_service_ack,
     NULL
   };
 
@@ -950,7 +978,9 @@ std::string const& events::name(timed_event const& evt) {
     "EVENT_HOST_CHECK",
     "EVENT_HFRESHNESS_CHECK",
     "EVENT_RESCHEDULE_CHECKS",
-    "EVENT_EXPIRE_COMMENT"
+    "EVENT_EXPIRE_COMMENT",
+    "EVENT_EXPIRE_HOST_ACK",
+    "EVENT_EXPIRE_SERVICE_ACK"
   };
 
   if (evt.event_type < sizeof(event_names) / sizeof(event_names[0]))
@@ -977,13 +1007,17 @@ bool operator==(
     return (false);
 
   bool is_not_null(obj1.event_data && obj2.event_data);
-  if (is_not_null && obj1.event_type == EVENT_HOST_CHECK) {
+  if (is_not_null
+      && ((obj1.event_type == EVENT_HOST_CHECK)
+          || (obj1.event_type == EVENT_EXPIRE_HOST_ACK))) {
     host& hst1(*(host*)obj1.event_data);
     host& hst2(*(host*)obj2.event_data);
     if (strcmp(hst1.name, hst2.name))
       return (false);
   }
-  else if (is_not_null && obj1.event_type == EVENT_SERVICE_CHECK) {
+  else if (is_not_null
+           && ((obj1.event_type == EVENT_SERVICE_CHECK)
+               || (obj1.event_type == EVENT_EXPIRE_SERVICE_ACK))) {
     service& svc1(*(service*)obj1.event_data);
     service& svc2(*(service*)obj2.event_data);
     if (strcmp(svc1.host_name, svc2.host_name)
@@ -1043,12 +1077,14 @@ std::ostream& operator<<(std::ostream& os, timed_event const& obj) {
 
   if (!obj.event_data)
     os << "  event_data:                 \"NULL\"\n";
-  else if (obj.event_type == EVENT_HOST_CHECK) {
+  else if (obj.event_type == EVENT_HOST_CHECK
+           || obj.event_type == EVENT_EXPIRE_HOST_ACK) {
     host& hst(*(host*)obj.event_data);
     os << "  event_data:                 "
        << hst.name << "\n";
   }
-  else if (obj.event_type == EVENT_SERVICE_CHECK) {
+  else if (obj.event_type == EVENT_SERVICE_CHECK
+           || obj.event_type == EVENT_EXPIRE_SERVICE_ACK) {
     service& svc(*(service*)obj.event_data);
     os << "  event_data:                 "
        << svc.host_name << ", " << svc.description << "\n";

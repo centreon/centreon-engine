@@ -181,10 +181,6 @@ void applier::service::add_object(
              << "' of host '" << obj->hosts().front() << "'");
   service_other_props[std::make_pair(
                              obj->hosts().front(),
-                             obj->service_description())].acknowledgement_timeout
-    = obj->get_acknowledgement_timeout();
-  service_other_props[std::make_pair(
-                             obj->hosts().front(),
                              obj->service_description())].initial_notif_time = 0;
   service_other_props[std::make_pair(
                              obj->hosts().front(),
@@ -192,6 +188,13 @@ void applier::service::add_object(
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].service_id = obj->service_id();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].acknowledgement_timeout
+    = obj->get_acknowledgement_timeout();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].last_acknowledgement = 0;
 
   // Add contacts.
   for (list_string::const_iterator
@@ -516,15 +519,14 @@ void applier::service::modify_object(
     static_cast<int>(obj->is_volatile()));
   service_other_props[std::make_pair(
                              obj->hosts().front(),
-                             obj->service_description())].acknowledgement_timeout
-    = obj->get_acknowledgement_timeout();
-  service_other_props[std::make_pair(
-                             obj->hosts().front(),
                              obj->service_description())].timezone = obj->timezone();
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].service_id = obj->service_id();
-
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].acknowledgement_timeout
+    = obj->get_acknowledgement_timeout();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

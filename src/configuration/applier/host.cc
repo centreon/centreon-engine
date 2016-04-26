@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -156,12 +156,13 @@ void applier::host::add_object(
   if (!h)
     throw (engine_error() << "Could not register host '"
            << obj->host_name() << "'");
-  host_other_props[obj->host_name()].acknowledgement_timeout
-    = obj->get_acknowledgement_timeout();
   host_other_props[obj->host_name()].initial_notif_time = 0;
   host_other_props[obj->host_name()].should_reschedule_current_check = false;
   host_other_props[obj->host_name()].timezone = obj->timezone();
   host_other_props[obj->host_name()].host_id = obj->host_id();
+  host_other_props[obj->host_name()].acknowledgement_timeout
+    = obj->get_acknowledgement_timeout();
+  host_other_props[obj->host_name()].last_acknowledgement = 0;
 
   // Contacts.
   for (list_string::const_iterator
@@ -437,10 +438,10 @@ void applier::host::modify_object(
   modify_if_different(
     h->obsess_over_host,
     static_cast<int>(obj->obsess_over_host()));
-  host_other_props[obj->host_name()].acknowledgement_timeout
-    = obj->get_acknowledgement_timeout();
   host_other_props[obj->host_name()].timezone = obj->timezone();
   host_other_props[obj->host_name()].host_id = obj->host_id();
+  host_other_props[obj->host_name()].acknowledgement_timeout
+    = obj->get_acknowledgement_timeout();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

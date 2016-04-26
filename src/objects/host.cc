@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,6 +32,7 @@
 #include "com/centreon/engine/objects/servicesmember.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
@@ -810,6 +811,30 @@ int number_of_total_parent_hosts(host* hst) {
     if (is_host_immediate_parent_of_host(hst, tmp))
       parents += number_of_total_parent_hosts(tmp) + 1;
   return (parents);
+}
+
+/**
+ *  Check if acknowledgement on host expired.
+ *
+ *  @param[in] h  Target host.
+ */
+void engine::check_for_expired_acknowledgement(host* h) {
+  if (h->problem_has_been_acknowledged) {
+    int acknowledgement_timeout(
+          host_other_props[h->name].acknowledgement_timeout);
+    if (acknowledgement_timeout > 0) {
+      time_t last_ack(host_other_props[h->name].last_acknowledgement);
+      time_t now(time(NULL));
+      if (last_ack + acknowledgement_timeout >= now) {
+        logger(log_info_message, basic)
+          << "Acknowledgement of host '" << h->name << "' just expired";
+        h->problem_has_been_acknowledged = false;
+        h->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+        update_host_status(h, false);
+      }
+    }
+  }
+  return ;
 }
 
 /**

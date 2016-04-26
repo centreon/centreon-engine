@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,6 +30,7 @@
 #include "com/centreon/engine/objects/service.hh"
 #include "com/centreon/engine/objects/tool.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
 #include "com/centreon/shared_ptr.hh"
 
@@ -658,6 +659,36 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
   }
 
   return (false);
+}
+
+/**
+ *  Check if acknowledgement on service expired.
+ *
+ *  @param[in] s  Target service.
+ */
+void engine::check_for_expired_acknowledgement(service* s) {
+  if (s->problem_has_been_acknowledged) {
+    int acknowledgement_timeout(
+          service_other_props[std::make_pair(
+                                     s->host_ptr->name,
+                                     s->description)].acknowledgement_timeout);
+    if (acknowledgement_timeout > 0) {
+      time_t last_ack(
+               service_other_props[std::make_pair(
+                                          s->host_ptr->name,
+                                          s->description)].last_acknowledgement);
+      time_t now(time(NULL));
+      if (last_ack + acknowledgement_timeout > now) {
+        logger(log_info_message, basic)
+          << "Acknowledgement of service '" << s->description
+          << "' on host '" << s->host_ptr->name << "' just expired";
+        s->problem_has_been_acknowledged = false;
+        s->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
+        update_service_status(s, false);
+      }
+    }
+  }
+  return ;
 }
 
 /**

@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2006      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -38,6 +38,8 @@
 #  define EVENT_HFRESHNESS_CHECK   13  // checks host result "freshness"
 #  define EVENT_RESCHEDULE_CHECKS  14  // adjust scheduling of host and service checks
 #  define EVENT_EXPIRE_COMMENT     15  // removes expired comments
+#  define EVENT_EXPIRE_HOST_ACK    16  // remove expired host acknowledgement
+#  define EVENT_EXPIRE_SERVICE_ACK 17  // remove expired service acknowledgement
 #  define EVENT_SLEEP              98  // asynchronous sleep event that occurs when event queues are empty
 #  define EVENT_USER_FUNCTION      99  // USER-defined function (modules)
 

@@ -149,10 +149,11 @@ typedef struct                  service_struct {
 
 /* Other SERVICE structure. */
 struct                          service_other_properties {
-  int                           acknowledgement_timeout;
   time_t                        initial_notif_time;
   std::string                   timezone;
   unsigned int                  service_id;
+  int                           acknowledgement_timeout;
+  time_t                        last_acknowledgement;
 };
 
 #  ifdef __cplusplus
@@ -234,6 +235,7 @@ std::ostream& operator<<(std::ostream& os, service const& obj);
 
 CCE_BEGIN()
 
+void          check_for_expired_acknowledgement(service* s);
 service&      find_service(
                 std::string const& host_name,
                 std::string const& service_description);
