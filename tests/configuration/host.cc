@@ -25,7 +25,7 @@ using namespace com::centreon::engine;
 
 // configuration::host::get_acknowledgement_timeout()
 // configuration::host::set_acknowledgement_timeout()
-TEST(configuration_host, acknowledgement_timeout) {
+TEST(ConfigurationHostTest, AcknowledgementTimeout) {
   // Given a host configuration object
   // When it is default constructed
   // Then its acknowledgements timeout is set to 0

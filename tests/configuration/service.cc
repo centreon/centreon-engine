@@ -25,7 +25,7 @@ using namespace com::centreon::engine;
 
 // configuration::service::get_acknowledgement_timeout()
 // configuration::service::set_acknowledgement_timeout()
-TEST(configuration_service, acknowledgement_timeout) {
+TEST(ConfigurationServiceTest, AcknowledgementTimeout) {
   // Given a service configuration object
   // When it is default constructed
   // Then its acknowledgements timeout is set to 0
