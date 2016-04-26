@@ -243,6 +243,7 @@ char const*   get_service_timezone(char const* hst, char const* svc);
 bool          is_service_exist(
                 std::pair<std::string, std::string> const& id);
 unsigned int  get_service_id(char const* host, char const* svc);
+void          schedule_acknowledgement_expiration(service* s);
 
 CCE_END()
 

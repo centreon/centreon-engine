@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/host.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
@@ -889,4 +890,29 @@ unsigned int engine::get_host_id(char const* name) {
   std::map<std::string, host_other_properties>::const_iterator
     found = host_other_props.find(name);
   return (found != host_other_props.end() ? found->second.host_id : 0);
+}
+
+/**
+ *  Schedule acknowledgement expiration.
+ *
+ *  @param[in] h  Target host.
+ */
+void engine::schedule_acknowledgement_expiration(host* h) {
+  int acknowledgement_timeout(
+        host_other_props[h->name].acknowledgement_timeout);
+  if (acknowledgement_timeout > 0) {
+    time_t current_time(time(NULL));
+    schedule_new_event(
+      EVENT_EXPIRE_HOST_ACK,
+      false,
+      current_time + acknowledgement_timeout,
+      false,
+      0,
+      NULL,
+      true,
+      h,
+      NULL,
+      0);
+  }
+  return ;
 }

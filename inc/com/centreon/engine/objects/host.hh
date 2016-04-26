@@ -265,6 +265,7 @@ host&         find_host(std::string const& name);
 char const*   get_host_timezone(char const* name);
 bool          is_host_exist(std::string const& name) throw ();
 unsigned int  get_host_id(char const* name);
+void          schedule_acknowledgement_expiration(host* h);
 
 CCE_END()
 

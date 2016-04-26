@@ -2760,20 +2760,7 @@ void acknowledge_host_problem(
   /* schedule acknowledgement expiration */
   time_t current_time(time(NULL));
   host_other_props[hst->name].last_acknowledgement = current_time;
-  int acknowledgement_timeout(
-        host_other_props[hst->name].acknowledgement_timeout);
-  if (acknowledgement_timeout > 0)
-    schedule_new_event(
-      EVENT_EXPIRE_HOST_ACK,
-      false,
-      current_time + acknowledgement_timeout,
-      false,
-      0,
-      NULL,
-      true,
-      hst,
-      NULL,
-      0);
+  schedule_acknowledgement_expiration(hst);
 
   /* send data to event broker */
   broker_acknowledgement_data(
@@ -2839,22 +2826,7 @@ void acknowledge_service_problem(
   service_other_props[std::make_pair(
                              svc->host_ptr->name,
                              svc->description)].last_acknowledgement = current_time;
-  int acknowledgement_timeout(
-        service_other_props[std::make_pair(
-                                   svc->host_ptr->name,
-                                   svc->description)].acknowledgement_timeout);
-  if (acknowledgement_timeout > 0)
-    schedule_new_event(
-      EVENT_EXPIRE_SERVICE_ACK,
-      false,
-      current_time + acknowledgement_timeout,
-      false,
-      0,
-      NULL,
-      true,
-      svc,
-      NULL,
-      0);
+  schedule_acknowledgement_expiration(svc);
 
   /* send data to event broker */
   broker_acknowledgement_data(
@@ -2883,7 +2855,6 @@ void acknowledge_service_problem(
   update_service_status(svc, false);
 
   /* add a comment for the acknowledgement */
-  time(&current_time);
   add_new_service_comment(
     ACKNOWLEDGEMENT_COMMENT,
     svc->host_name,

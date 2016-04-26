@@ -21,6 +21,7 @@
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/deleter/service.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/commandsmember.hh"
@@ -757,4 +758,31 @@ unsigned int engine::get_service_id(char const* host, char const* svc) {
   std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
     found = service_other_props.find(std::make_pair(std::string(host), std::string(svc)));
   return (found != service_other_props.end() ? found->second.service_id : 0);
+}
+
+/**
+ *  Schedule acknowledgement expiration check.
+ *
+ *  @param[in] s  Target service.
+ */
+void engine::schedule_acknowledgement_expiration(service* s) {
+  int acknowledgement_timeout(
+        service_other_props[std::make_pair(
+                                   s->host_ptr->name,
+                                   s->description)].acknowledgement_timeout);
+  if (acknowledgement_timeout > 0) {
+    time_t current_time(time(NULL));
+    schedule_new_event(
+      EVENT_EXPIRE_SERVICE_ACK,
+      false,
+      current_time + acknowledgement_timeout,
+      false,
+      0,
+      NULL,
+      true,
+      s,
+      NULL,
+      0);
+  }
+  return ;
 }
