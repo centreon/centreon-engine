@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -81,13 +81,13 @@ namespace                 configuration {
                             std::vector<service_struct*>& new_services,
                             bool throw_if_not_found = true);
       void                _remove_misc_event(timed_event_struct*& evt);
-      void                _schedule_host_checks(
+      void                _schedule_host_events(
                             std::vector<host_struct*> const& hosts);
-      void                _schedule_service_checks(
+      void                _schedule_service_events(
                             std::vector<service_struct*> const& services);
-      void                _unschedule_host_checks(
+      void                _unschedule_host_events(
                             std::vector<host_struct*> const& hosts);
-      void                _unschedule_service_checks(
+      void                _unschedule_service_events(
                             std::vector<service_struct*> const& services);
 
       state*              _config;

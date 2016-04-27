@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -40,11 +40,15 @@ namespace               events {
   public:
     enum                priority {
       low = 0,
-      high = 1
+      high = 1,
+      priority_num
     };
     enum                type {
       service_check = 0,
-      host_check = 1
+      host_check,
+      expire_service_ack,
+      expire_host_ack,
+      type_num
     };
 
                         hash_timed_event();
@@ -61,7 +65,7 @@ namespace               events {
     hash_timed_event&   _internal_copy(hash_timed_event const& right);
 
     umap<void*, timed_event_struct*>
-                        _hevent[2][2];
+                        _hevent[type_num][priority_num];
   };
 }
 

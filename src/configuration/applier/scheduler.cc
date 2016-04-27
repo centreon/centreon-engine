@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -131,14 +131,14 @@ void applier::scheduler::apply(
   {
     std::vector<host_struct*> old_hosts;
     _get_hosts(hst_to_unschedule, old_hosts, false);
-    _unschedule_host_checks(old_hosts);
+    _unschedule_host_events(old_hosts);
   }
 
   // Remove deleted service check from the scheduler.
   {
     std::vector<service_struct*> old_services;
     _get_services(svc_to_unschedule, old_services, false);
-    _unschedule_service_checks(old_services);
+    _unschedule_service_events(old_services);
   }
 
   // Check if we need to add or modify objects into the scheduler.
@@ -170,14 +170,14 @@ void applier::scheduler::apply(
     {
       std::vector<host_struct*> new_hosts;
       _get_hosts(hst_to_schedule, new_hosts, true);
-      _schedule_host_checks(new_hosts);
+      _schedule_host_events(new_hosts);
     }
 
     // Get and schedule new services.
     {
       std::vector<service_struct*> new_services;
       _get_services(svc_to_schedule, new_services, true);
-      _schedule_service_checks(new_services);
+      _schedule_service_events(new_services);
     }
   }
 }
@@ -212,7 +212,7 @@ void applier::scheduler::remove_host(configuration::host const& h) {
   if (hst != hosts.end()) {
     std::vector<host_struct*> hvec;
     hvec.push_back(hst->second.get());
-    _unschedule_host_checks(hvec);
+    _unschedule_host_events(hvec);
   }
   return ;
 }
@@ -233,7 +233,7 @@ void applier::scheduler::remove_service(
   if (svc != services.end()) {
     std::vector<service_struct*> svec;
     svec.push_back(svc->second.get());
-    _unschedule_service_checks(svec);
+    _unschedule_service_events(svec);
   }
   return ;
 }
@@ -877,11 +877,11 @@ void applier::scheduler::_remove_misc_event(timed_event*& evt) {
 }
 
 /**
- *  Schedule host checks.
+ *  Schedule host events (checks notably).
  *
- *  @param[in] hosts The list of hosts to schedule.
+ *  @param[in] hosts  The list of hosts to schedule.
  */
-void applier::scheduler::_schedule_host_checks(
+void applier::scheduler::_schedule_host_events(
        std::vector<host_struct*> const& hosts) {
   logger(dbg_events, most)
     << "Scheduling host checks...";
@@ -986,15 +986,22 @@ void applier::scheduler::_schedule_host_checks(
               hst.check_options);
   }
 
+  // Schedule acknowledgement expirations.
+  logger(dbg_events, most)
+    << "Scheduling host acknowledgement expirations...";
+  for (int i(0), end(hosts.size()); i < end; ++i)
+    if (hosts[i]->problem_has_been_acknowledged)
+      schedule_acknowledgement_expiration(hosts[i]);
+
   return ;
 }
 
 /**
- *  Schedule service checks.
+ *  Schedule service events (checks notably).
  *
- *  @param[in] services The list of services to schedule.
+ *  @param[in] services  The list of services to schedule.
  */
-void applier::scheduler::_schedule_service_checks(
+void applier::scheduler::_schedule_service_events(
        std::vector<service_struct*> const& services) {
   logger(dbg_events, most)
     << "Scheduling service checks...";
@@ -1104,60 +1111,73 @@ void applier::scheduler::_schedule_service_checks(
               svc.check_options);
   }
 
+  // Schedule acknowledgement expirations.
+  logger(dbg_events, most)
+    << "Scheduling service acknowledgement expirations...";
+  for (int i(0), end(services.size()); i < end; ++i)
+    if (services[i]->problem_has_been_acknowledged)
+      schedule_acknowledgement_expiration(services[i]);
+
   return ;
 }
 
 /**
- *  Unschedule host checks.
+ *  Unschedule host events.
  *
- *  @param[in] hosts The list of hosts to unschedule.
+ *  @param[in] hosts  The list of hosts to unschedule.
  */
-void applier::scheduler::_unschedule_host_checks(
+void applier::scheduler::_unschedule_host_events(
                            std::vector<host_struct*> const& hosts) {
   for (std::vector<host_struct*>::const_iterator
          it(hosts.begin()),
          end(hosts.end());
        it != end;
        ++it) {
-    timed_event* evt(quick_timed_event.find(
-                                         events::hash_timed_event::low,
-                                         events::hash_timed_event::host_check,
-                                         *it));
-    while (evt) {
+    timed_event* evt(NULL);
+    while ((evt = quick_timed_event.find(
+                    events::hash_timed_event::low,
+                    events::hash_timed_event::host_check,
+                    *it))) {
       remove_event(evt, &event_list_low, &event_list_low_tail);
       delete evt;
-      evt = quick_timed_event.find(
-                                events::hash_timed_event::low,
-                                events::hash_timed_event::host_check,
-                                *it);
+    }
+    while ((evt = quick_timed_event.find(
+                    events::hash_timed_event::low,
+                    events::hash_timed_event::expire_host_ack,
+                    *it))) {
+      remove_event(evt, &event_list_low, &event_list_low_tail);
+      delete evt;
     }
   }
   return ;
 }
 
 /**
- *  Schedule service checks.
+ *  Unschedule service events.
  *
- *  @param[in] services The list of services to schedule.
+ *  @param[in] services  The list of services to unschedule.
  */
-void applier::scheduler::_unschedule_service_checks(
+void applier::scheduler::_unschedule_service_events(
                            std::vector<service_struct*> const& services) {
   for (std::vector<service_struct*>::const_iterator
          it(services.begin()),
          end(services.end());
        it != end;
        ++it) {
-    timed_event* evt(quick_timed_event.find(
-                                         events::hash_timed_event::low,
-                                         events::hash_timed_event::service_check,
-                                         *it));
-    while (evt) {
+    timed_event* evt(NULL);
+    while ((evt = quick_timed_event.find(
+                    events::hash_timed_event::low,
+                    events::hash_timed_event::service_check,
+                    *it))) {
       remove_event(evt, &event_list_low, &event_list_low_tail);
       delete evt;
-      evt = quick_timed_event.find(
-                                events::hash_timed_event::low,
-                                events::hash_timed_event::service_check,
-                                *it);
+    }
+    while ((evt = quick_timed_event.find(
+                    events::hash_timed_event::low,
+                    events::hash_timed_event::expire_service_ack,
+                    *it))) {
+      remove_event(evt, &event_list_low, &event_list_low_tail);
+      delete evt;
     }
   }
   return ;

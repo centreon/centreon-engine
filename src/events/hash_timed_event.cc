@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -61,8 +61,8 @@ hash_timed_event& hash_timed_event::operator=(hash_timed_event const& right) {
  *  @param[in] p  The hash list priority to clear.
  */
 void hash_timed_event::clear(priority p) {
-  _hevent[service_check][p].clear();
-  _hevent[host_check][p].clear();
+  for (int i(0); i < type_num; ++i)
+    _hevent[i][p].clear();
   return;
 }
 
@@ -85,12 +85,22 @@ void hash_timed_event::clear(priority p, type t) {
  */
 void hash_timed_event::erase(priority p, timed_event* event) {
   if (!event)
-    return;
-  if (event->event_type == EVENT_SERVICE_CHECK)
+    return ;
+  switch(event->event_type) {
+  case EVENT_SERVICE_CHECK:
     _hevent[service_check][p].erase(event->event_data);
-  else if (event->event_type == EVENT_HOST_CHECK)
+    break ;
+  case EVENT_HOST_CHECK:
     _hevent[host_check][p].erase(event->event_data);
-  return;
+    break ;
+  case EVENT_EXPIRE_SERVICE_ACK:
+    _hevent[expire_service_ack][p].erase(event->event_data);
+    break ;
+  case EVENT_EXPIRE_HOST_ACK:
+    _hevent[expire_host_ack][p].erase(event->event_data);
+    break ;
+  };
+  return ;
 }
 
 /**
@@ -116,26 +126,34 @@ timed_event* hash_timed_event::find(priority p, type t, void* ptr) {
 void hash_timed_event::insert(priority p, timed_event* event) {
   if (!event || !event->event_data)
     return;
-  if (event->event_type == EVENT_SERVICE_CHECK)
+  switch (event->event_type) {
+  case EVENT_SERVICE_CHECK:
     _hevent[service_check][p][event->event_data] = event;
-  else if (event->event_type == EVENT_HOST_CHECK)
+    break ;
+  case EVENT_HOST_CHECK:
     _hevent[host_check][p][event->event_data] = event;
+    break ;
+  case EVENT_EXPIRE_SERVICE_ACK:
+    _hevent[expire_service_ack][p][event->event_data] = event;
+    break ;
+  case EVENT_EXPIRE_HOST_ACK:
+    _hevent[expire_host_ack][p][event->event_data] = event;
+    break ;
+  };
   return;
 }
 
 /**
  *  Internal copy.
  *
- *  @param[in] right  The object to copy.
+ *  @param[in] other  The object to copy.
  *
  *  @return This object.
  */
-hash_timed_event& hash_timed_event::_internal_copy(hash_timed_event const& right) {
-  if (this != &right) {
-    _hevent[service_check][low] = right._hevent[service_check][low];
-    _hevent[service_check][high] = right._hevent[service_check][high];
-    _hevent[host_check][low] = right._hevent[host_check][low];
-    _hevent[host_check][high] = right._hevent[host_check][high];
-  }
+hash_timed_event& hash_timed_event::_internal_copy(hash_timed_event const& other) {
+  if (this != &other)
+    for (int i(0); i < type_num; ++i)
+      for (int j(0); j < priority_num; ++j)
+        _hevent[i][j] = other._hevent[i][j];
   return (*this);
 }
