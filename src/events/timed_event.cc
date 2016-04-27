@@ -445,9 +445,9 @@ void adjust_timestamp_for_time_change(
   logger(dbg_functions, basic)
     << "adjust_timestamp_for_time_change()";
 
-  // we shouldn't do anything with epoch values.
-  if (*ts == (time_t)0)
-    return;
+  // we shouldn't do anything with epoch or invalid values.
+  if ((*ts == (time_t)0) || (*ts == (time_t)-1))
+    return ;
 
   // we moved back in time...
   if (last_time > current_time) {
@@ -601,6 +601,20 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       &svc->last_hard_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &service_other_props[std::make_pair(
+                                  svc->host_ptr->name,
+                                  svc->description)].initial_notif_time);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &service_other_props[std::make_pair(
+                                  svc->host_ptr->name,
+                                  svc->description)].last_acknowledgement);
 
     // recalculate next re-notification time.
     svc->next_notification
@@ -644,6 +658,16 @@ void compensate_for_system_time_change(
       current_time,
       time_difference,
       &hst->last_state_history_update);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &host_other_props[hst->name].initial_notif_time);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &host_other_props[hst->name].last_acknowledgement);
 
     // recalculate next re-notification time.
     hst->next_host_notification
