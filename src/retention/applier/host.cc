@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -95,6 +95,8 @@ void applier::host::_update(
       string::setstr(obj.long_plugin_output, *state.long_plugin_output());
     if (state.performance_data().is_set())
       string::setstr(obj.perf_data, *state.performance_data());
+    if (state.last_acknowledgement().is_set())
+      host_other_props[obj.name].last_acknowledgement = *state.last_acknowledgement();
     if (state.last_check().is_set())
       obj.last_check = *state.last_check();
     if (state.next_check().is_set()

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/configuration/applier/state.hh"
 #include "com/centreon/engine/flapping.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "com/centreon/engine/retention/applier/service.hh"
@@ -122,6 +123,9 @@ void applier::service::_update(
       string::setstr(obj.long_plugin_output, *state.long_plugin_output());
     if (state.performance_data().is_set())
       string::setstr(obj.perf_data, *state.performance_data());
+    if (state.last_acknowledgement().is_set())
+      service_other_props[std::make_pair(obj.host_ptr->name, obj.description)].last_acknowledgement
+        = *state.last_acknowledgement();
     if (state.last_check().is_set())
       obj.last_check = *state.last_check();
     if (state.next_check().is_set()

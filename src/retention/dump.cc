@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -224,6 +224,7 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
+    "last_acknowledgement=" << host_other_props[obj.name].last_acknowledgement << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"
@@ -408,6 +409,7 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "flap_detection_enabled=" << obj.flap_detection_enabled << "\n"
     "has_been_checked=" << obj.has_been_checked << "\n"
     "is_flapping=" << obj.is_flapping << "\n"
+    "last_acknowledgement=" << service_other_props[std::make_pair(obj.host_ptr->name, obj.description)].last_acknowledgement << "\n"
     "last_check=" << static_cast<unsigned long>(obj.last_check) << "\n"
     "last_event_id=" << obj.last_event_id << "\n"
     "last_hard_state=" << obj.last_hard_state << "\n"

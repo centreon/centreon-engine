@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,6 +50,7 @@ service::setters const service::_setters[] = {
   { "has_been_checked",                     SETTER(bool, _set_has_been_checked) },
   { "host_name",                            SETTER(std::string const&, _set_host_name) },
   { "is_flapping",                          SETTER(bool, _set_is_flapping) },
+  { "last_acknowledgement",                 SETTER(time_t, _set_last_acknowledgement) },
   { "last_check",                           SETTER(time_t, _set_last_check) },
   { "last_event_id",                        SETTER(unsigned long, _set_last_event_id) },
   { "last_hard_state",                      SETTER(time_t, _set_last_hard_state) },
@@ -136,6 +137,7 @@ service& service::operator=(service const& right) {
     _has_been_checked = right._has_been_checked;
     _host_name = right._host_name;
     _is_flapping = right._is_flapping;
+    _last_acknowledgement = right._last_acknowledgement;
     _last_check = right._last_check;
     _last_event_id = right._last_event_id;
     _last_hard_state = right._last_hard_state;
@@ -205,6 +207,7 @@ bool service::operator==(service const& right) const throw () {
           && _has_been_checked == right._has_been_checked
           && _host_name == right._host_name
           && _is_flapping == right._is_flapping
+          && _last_acknowledgement == right._last_acknowledgement
           && _last_check == right._last_check
           && _last_event_id == right._last_event_id
           && _last_hard_state == right._last_hard_state
@@ -490,6 +493,15 @@ std::string const& service::host_name() const throw () {
  */
 opt<bool> const& service::is_flapping() const throw () {
   return (_is_flapping);
+}
+
+/**
+ *  Get last_acknowledgement.
+ *
+ *  @return The last acknowledgement.
+ */
+opt<time_t> const& service::last_acknowledgement() const throw () {
+  return (_last_acknowledgement);
 }
 
 /**
@@ -1006,6 +1018,16 @@ bool service::_set_host_name(std::string const& value) {
  */
 bool service::_set_is_flapping(bool value) {
   _is_flapping = value;
+  return (true);
+}
+
+/**
+ *  Set last_acknowledgement.
+ *
+ *  @param[in] value  The new last acknowledgement.
+ */
+bool service::_set_last_acknowledgement(time_t value) {
+  _last_acknowledgement = value;
   return (true);
 }
 

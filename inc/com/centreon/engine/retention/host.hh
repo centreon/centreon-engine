@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -64,6 +64,7 @@ namespace                         retention {
     opt<bool> const&              has_been_checked() const throw ();
     std::string const&            host_name() const throw ();
     opt<bool> const&              is_flapping() const throw ();
+    opt<time_t> const&            last_acknowledgement() const throw ();
     opt<time_t> const&            last_check() const throw ();
     opt<unsigned long> const&     last_event_id() const throw ();
     opt<time_t> const&            last_hard_state() const throw ();
@@ -123,6 +124,7 @@ namespace                         retention {
     bool                          _set_has_been_checked(bool value);
     bool                          _set_host_name(std::string const& value);
     bool                          _set_is_flapping(bool value);
+    bool                          _set_last_acknowledgement(time_t value);
     bool                          _set_last_check(time_t value);
     bool                          _set_last_event_id(unsigned long value);
     bool                          _set_last_hard_state(time_t value);
@@ -176,6 +178,7 @@ namespace                         retention {
     opt<bool>                     _has_been_checked;
     std::string                   _host_name;
     opt<bool>                     _is_flapping;
+    opt<time_t>                   _last_acknowledgement;
     opt<time_t>                   _last_check;
     opt<unsigned long>            _last_event_id;
     opt<time_t>                   _last_hard_state;
