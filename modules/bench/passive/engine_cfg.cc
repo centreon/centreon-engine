@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "engine_cfg.hh"
-#include "test/paths.hh"
+#include "paths.hh"
 
 /**
  *  Generate Centreon Engine configuration files.

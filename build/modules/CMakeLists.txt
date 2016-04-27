@@ -20,3 +20,6 @@
 # External commands module is required.
 add_subdirectory("external_commands")
 set(EXTERNALCMD_MODULE "${EXTERNALCMD_MODULE}" PARENT_SCOPE)
+
+# Benchmark module.
+add_subdirectory("bench")
