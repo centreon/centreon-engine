@@ -161,7 +161,7 @@ void applier::host::add_object(
   host_other_props[obj->host_name()].timezone = obj->timezone();
   host_other_props[obj->host_name()].host_id = obj->host_id();
   host_other_props[obj->host_name()].acknowledgement_timeout
-    = obj->get_acknowledgement_timeout();
+    = obj->get_acknowledgement_timeout() * config->interval_length();
   host_other_props[obj->host_name()].last_acknowledgement = 0;
 
   // Contacts.
@@ -441,7 +441,7 @@ void applier::host::modify_object(
   host_other_props[obj->host_name()].timezone = obj->timezone();
   host_other_props[obj->host_name()].host_id = obj->host_id();
   host_other_props[obj->host_name()].acknowledgement_timeout
-    = obj->get_acknowledgement_timeout();
+    = obj->get_acknowledgement_timeout() * config->interval_length();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {
