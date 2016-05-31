@@ -679,7 +679,7 @@ void engine::check_for_expired_acknowledgement(service* s) {
                                           s->host_ptr->name,
                                           s->description)].last_acknowledgement);
       time_t now(time(NULL));
-      if (last_ack + acknowledgement_timeout > now) {
+      if (last_ack + acknowledgement_timeout >= now) {
         logger(log_info_message, basic)
           << "Acknowledgement of service '" << s->description
           << "' on host '" << s->host_ptr->name << "' just expired";
