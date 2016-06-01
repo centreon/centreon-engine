@@ -766,16 +766,15 @@ unsigned int engine::get_service_id(char const* host, char const* svc) {
  *  @param[in] s  Target service.
  */
 void engine::schedule_acknowledgement_expiration(service* s) {
-  int acknowledgement_timeout(
-        service_other_props[std::make_pair(
-                                   s->host_ptr->name,
-                                   s->description)].acknowledgement_timeout);
-  if (acknowledgement_timeout > 0) {
-    time_t current_time(time(NULL));
+  std::pair<std::string, std::string>
+    hs(std::make_pair(s->host_ptr->name, s->description));
+  int ack_timeout(service_other_props[hs].acknowledgement_timeout);
+  time_t last_ack(service_other_props[hs].last_acknowledgement);
+  if ((ack_timeout > 0) && (last_ack != (time_t)0)) {
     schedule_new_event(
       EVENT_EXPIRE_SERVICE_ACK,
       false,
-      current_time + acknowledgement_timeout,
+      last_ack + ack_timeout,
       false,
       0,
       NULL,

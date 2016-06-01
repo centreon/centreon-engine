@@ -898,14 +898,13 @@ unsigned int engine::get_host_id(char const* name) {
  *  @param[in] h  Target host.
  */
 void engine::schedule_acknowledgement_expiration(host* h) {
-  int acknowledgement_timeout(
-        host_other_props[h->name].acknowledgement_timeout);
-  if (acknowledgement_timeout > 0) {
-    time_t current_time(time(NULL));
+  int ack_timeout(host_other_props[h->name].acknowledgement_timeout);
+  time_t last_ack(host_other_props[h->name].last_acknowledgement);
+  if ((ack_timeout > 0) && (last_ack != (time_t)0)) {
     schedule_new_event(
       EVENT_EXPIRE_HOST_ACK,
       false,
-      current_time + acknowledgement_timeout,
+      last_ack + ack_timeout,
       false,
       0,
       NULL,
