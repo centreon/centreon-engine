@@ -68,7 +68,8 @@ int clear_service_macros_r(nagios_macros* mac) {
     MACRO_SERVICENOTES,
     MACRO_SERVICEGROUPNAMES,
     MACRO_SERVICEPROBLEMID,
-    MACRO_LASTSERVICEPROBLEMID
+    MACRO_LASTSERVICEPROBLEMID,
+    MACRO_SERVICEID
   };
   for (unsigned int i = 0;
        i < sizeof(to_free) / sizeof(*to_free);

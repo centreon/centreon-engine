@@ -1151,6 +1151,8 @@ int init_macrox_names() {
   add_macrox_name(LASTSERVICESTATEID);
   add_macrox_name(HOSTPARENTS);
   add_macrox_name(HOSTCHILDREN);
+  add_macrox_name(HOSTID);
+  add_macrox_name(SERVICEID);
 
   return (OK);
 }

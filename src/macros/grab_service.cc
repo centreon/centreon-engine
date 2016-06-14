@@ -108,6 +108,20 @@ static char* get_service_state(service& svc, nagios_macros* mac) {
   return (string::dup(state));
 }
 
+/**
+ *  Extract the service id.
+ *
+ *  @param[in] svc  The service
+ *  @param[in] mac  Unused.
+ *
+ *  @return  Newly allocated string with the service id.
+ */
+static char* get_service_id(service& svc, nagios_macros* mac) {
+  return (string::dup(string::from(com::centreon::engine::get_service_id(
+                                             svc.host_name,
+                                             svc.description)).c_str()));
+}
+
 /**************************************
 *                                     *
 *         Redirection Object          *
@@ -242,6 +256,9 @@ struct grab_service_redirection {
     // Acknowledgement comment.
     routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
     routines[MACRO_SERVICEACKCOMMENT].second = true;
+    // Service id.
+    routines[MACRO_SERVICEID].first = &get_service_id;
+    routines[MACRO_SERVICEID].second = true;
   }
 } static const redirector;
 
