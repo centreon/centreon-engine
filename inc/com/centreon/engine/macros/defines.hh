@@ -35,7 +35,7 @@
 // Macro Definitions
 # define MACRO_ENV_VAR_PREFIX                   "NAGIOS_"
 # define MAX_USER_MACROS                        256  // maximum number of $USERx$ macros
-# define MACRO_X_COUNT                          155  // size of macro_x[] array
+# define MACRO_X_COUNT                          157  // size of macro_x[] array
 
 # define MACRO_HOSTNAME                         0
 # define MACRO_HOSTALIAS                        1
@@ -192,6 +192,8 @@
 # define MACRO_LASTSERVICESTATEID               152
 # define MACRO_HOSTPARENTS                      153
 # define MACRO_HOSTCHILDREN                     154
+# define MACRO_HOSTID                           155
+# define MACRO_SERVICEID                        156
 
 // Macro Cleaning Options
 # define STRIP_ILLEGAL_MACRO_CHARS              1

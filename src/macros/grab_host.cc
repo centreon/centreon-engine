@@ -211,6 +211,19 @@ static char* get_host_children(host& hst, nagios_macros* mac) {
   return (string::dup(retval.c_str()));
 }
 
+/**
+ *  Extract the host id.
+ *
+ *  @param[in] hst  The host
+ *  @param[in] mac  Unused.
+ *
+ *  @return  Newly allocated string with the host id.
+ */
+static char* get_host_id(host& hst, nagios_macros* mac) {
+  return (string::dup(string::from(
+            com::centreon::engine::get_host_id(hst.name)).c_str()));
+}
+
 /**************************************
 *                                     *
 *         Redirection Object          *
@@ -366,6 +379,9 @@ struct grab_host_redirection {
     // Host children.
     routines[MACRO_HOSTCHILDREN].first = &get_host_children;
     routines[MACRO_HOSTCHILDREN].second = true;
+    // Service id.
+    routines[MACRO_HOSTID].first = &get_host_id;
+    routines[MACRO_HOSTID].second = true;
   }
 } static const redirector;
 
