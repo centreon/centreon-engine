@@ -388,6 +388,7 @@ _`TOTALHOSTSERVICESOK`         The total number of services associated with the 
 _`TOTALHOSTSERVICESWARNING`    The total number of services associated with the host that are in a WARNING state.
 _`TOTALHOSTSERVICESUNKNOWN`    The total number of services associated with the host that are in an UNKNOWN state.
 _`TOTALHOSTSERVICESCRITICAL`   The total number of services associated with the host that are in a CRITICAL state.
+_`HOSTID`                      The id of the host.
 ============================== =========================================================================================================================
 
 Host Group Macros
@@ -492,6 +493,7 @@ _`SERVICENOTESURL`                Notes URL for the service. This macro may cont
                                   useful when you want to pass the service name to a web page.
 _`SERVICENOTES`                   Notes for the service. This macro may contain other macros (e.g. $HOSTNAME$ or $SERVICESTATE$), which can be useful
                                   when you want to service-specific status information, etc. in the description
+_`SERVICEID`                      The id of the service.
 ================================= ======================================================================================================================
 
 Service Group Macros
