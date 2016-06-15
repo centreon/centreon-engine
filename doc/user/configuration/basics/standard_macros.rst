@@ -98,6 +98,7 @@ Macro Name                     Service Checks Service Notifications Host Checks 
 `TOTALHOSTSERVICESWARNING`_    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TOTALHOSTSERVICESUNKNOWN`_    **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 `TOTALHOSTSERVICESCRITICAL`_   **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
+`HOSTID`_                      **Yes**        **Yes**               **Yes**          **Yes**            **Yes**                         **Yes**                      **Yes**           **Yes**
 ============================== ============== ===================== ================ ================== =============================== ============================ ================= ==============
 
 Host Group Macros
@@ -160,6 +161,7 @@ Macro Name                        Service Checks Service Notifications Host Chec
 `SERVICEACTIONURL`_               **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICENOTESURL`_                **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 `SERVICENOTES`_                   **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
+`SERVICEID`_                      **Yes**        **Yes**               No          No                 **Yes**                         No                           **Yes**           No
 ================================= ============== ===================== =========== ================== =============================== ============================ ================= ==============
 
 Service Group Macros
