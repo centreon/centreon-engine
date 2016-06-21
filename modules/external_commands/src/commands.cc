@@ -2070,13 +2070,10 @@ int cmd_change_object_custom_var(int cmd, char* args) {
   varname = string::dup(temp_ptr);
 
   /* get the custom variable value */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
-    delete[] name1;
-    delete[] name2;
-    delete[] varname;
-    return (ERROR);
-  }
-  varvalue = string::dup(temp_ptr);
+  if ((temp_ptr = my_strtok(NULL, ";")) != NULL)
+    varvalue = string::dup(temp_ptr);
+  else
+    varvalue = string::dup("");
 
   /* find the object */
   switch (cmd) {
