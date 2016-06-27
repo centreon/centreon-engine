@@ -6,6 +6,19 @@ It is a low-level component of the [Centreon software suite](https://www.centreo
 Centreon Engine is released under the General Public License version 2
 and is endorsed by the [Centreon company](https://www.centreon.com).
 
+This project was started as a fork of Nagios, the well known open-source
+monitoring application. While keeping its configuration file format and
+its stability we improved it in several ways :
+
+  - reduced startup time
+  - faster standard check execution engine
+  - new light check execution system (connectors)
+  - on-the-fly configuration reload
+  - less obscur configuration options
+  - frequent bugfix releases
+
+Just give it a try !
+
 ## Documentation ##
 
 The full Centreon Engine documentation is available online
