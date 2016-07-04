@@ -23,46 +23,42 @@
 
 using namespace com::centreon::engine;
 
-// configuration::host::get_acknowledgement_timeout()
-// configuration::host::set_acknowledgement_timeout()
-TEST(ConfigurationHostTest, AcknowledgementTimeout) {
-  // Given a host configuration object
-  // When it is default constructed
-  // Then its acknowledgements timeout is set to 0
-  {
-    configuration::host h;
-    ASSERT_EQ(0, h.get_acknowledgement_timeout());
-  }
+// Given a host configuration object
+// When it is default constructed
+// Then its acknowledgements timeout is set to 0
+TEST(ConfigurationHostAcknowledgementTimeoutTest, DefaultConstruction) {
+  configuration::host h;
+  ASSERT_EQ(0, h.get_acknowledgement_timeout());
+}
 
-  // Given a host configuration object
-  // When the acknowledgement timeout is set to a positive value
-  // Then the method returns true
-  // And the value is properly set
-  {
-    configuration::host h;
-    ASSERT_TRUE(h.set_acknowledgement_timeout(42));
-    ASSERT_EQ(42, h.get_acknowledgement_timeout());
-  }
+// Given a host configuration object
+// When the acknowledgement timeout is set to a positive value
+// Then the method returns true
+// And the value is properly set
+TEST(ConfigurationHostAcknowledgementTimeoutTest, SetToPositiveValue) {
+  configuration::host h;
+  ASSERT_TRUE(h.set_acknowledgement_timeout(42));
+  ASSERT_EQ(42, h.get_acknowledgement_timeout());
+}
 
-  // Given a host configuration object
-  // When the acknowledgement timeout is set to 0
-  // Then the method returns true
-  // And the value is properly set
-  {
-    configuration::host h;
-    h.set_acknowledgement_timeout(42);
-    ASSERT_TRUE(h.set_acknowledgement_timeout(0));
-    ASSERT_EQ(0, h.get_acknowledgement_timeout());
-  }
+// Given a host configuration object
+// When the acknowledgement timeout is set to 0
+// Then the method returns true
+// And the value is properly set
+TEST(ConfigurationHostAcknowledgementTimeoutTest, SetToZero) {
+  configuration::host h;
+  h.set_acknowledgement_timeout(42);
+  ASSERT_TRUE(h.set_acknowledgement_timeout(0));
+  ASSERT_EQ(0, h.get_acknowledgement_timeout());
+}
 
-  // Given a host configuration object
-  // When the acknowledgement timeout is set to a negative value
-  // Then the method returns false
-  // And the original value is not changed
-  {
-    configuration::host h;
-    h.set_acknowledgement_timeout(42);
-    ASSERT_FALSE(h.set_acknowledgement_timeout(-36));
-    ASSERT_EQ(42, h.get_acknowledgement_timeout());
-  }
+// Given a host configuration object
+// When the acknowledgement timeout is set to a negative value
+// Then the method returns false
+// And the original value is not changed
+TEST(ConfigurationHostAcknowledgementTimeoutTest, SetToNegativeValue) {
+  configuration::host h;
+  h.set_acknowledgement_timeout(42);
+  ASSERT_FALSE(h.set_acknowledgement_timeout(-36));
+  ASSERT_EQ(42, h.get_acknowledgement_timeout());
 }
