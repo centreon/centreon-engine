@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -242,6 +242,9 @@ processing::processing() {
   _lst_command["DEL_HOST_DOWNTIME"] =
     command_info(CMD_DEL_HOST_DOWNTIME,
                  &_redirector<&cmd_delete_downtime>);
+  _lst_command["DEL_HOST_DOWNTIME_FULL"] =
+    command_info(CMD_DEL_HOST_DOWNTIME_FULL,
+                 &_redirector<&cmd_delete_downtime_full>);
   _lst_command["DEL_DOWNTIME_BY_HOST_NAME"] =
     command_info(CMD_DEL_DOWNTIME_BY_HOST_NAME,
                  &_redirector<&cmd_delete_downtime_by_host_name>);
@@ -410,6 +413,9 @@ processing::processing() {
   _lst_command["DEL_SVC_DOWNTIME"] =
     command_info(CMD_DEL_SVC_DOWNTIME,
                  &_redirector<&cmd_delete_downtime>);
+  _lst_command["DEL_SVC_DOWNTIME_FULL"] =
+    command_info(CMD_DEL_SVC_DOWNTIME_FULL,
+                 &_redirector<&cmd_delete_downtime_full>);
   _lst_command["ACKNOWLEDGE_SVC_PROBLEM"] =
     command_info(CMD_ACKNOWLEDGE_SVC_PROBLEM,
                  &_redirector<&cmd_acknowledge_problem>);

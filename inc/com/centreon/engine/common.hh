@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2009 Ethan Galstad
-** Copyright 2009-2011 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2009      Ethan Galstad
+** Copyright 2009-2011      Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -207,6 +207,8 @@
 #  define CMD_DEL_DOWNTIME_BY_HOST_NAME                      170
 #  define CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME                 171
 #  define CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT             172
+#  define CMD_DEL_HOST_DOWNTIME_FULL                         501
+#  define CMD_DEL_SVC_DOWNTIME_FULL                          502
 #  define CMD_CUSTOM_COMMAND                                 999
 
 /* Service check types. */
