@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006      Ethan Galstad
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2002-2006           Ethan Galstad
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -239,6 +239,8 @@ int process_external_command1(char* cmd) {
     command_type = CMD_SCHEDULE_HOST_SVC_DOWNTIME;
   else if (!strcmp(command_id, "DEL_HOST_DOWNTIME"))
     command_type = CMD_DEL_HOST_DOWNTIME;
+  else if (!strcmp(command_id, "DEL_HOST_DOWNTIME_FULL"))
+    command_type = CMD_DEL_HOST_DOWNTIME_FULL;
   else if (!strcmp(command_id, "DEL_DOWNTIME_BY_HOST_NAME"))
     command_type = CMD_DEL_DOWNTIME_BY_HOST_NAME;
   else if (!strcmp(command_id, "DEL_DOWNTIME_BY_HOSTGROUP_NAME"))
@@ -384,6 +386,8 @@ int process_external_command1(char* cmd) {
     command_type = CMD_SCHEDULE_SVC_DOWNTIME;
   else if (!strcmp(command_id, "DEL_SVC_DOWNTIME"))
     command_type = CMD_DEL_SVC_DOWNTIME;
+  else if (!strcmp(command_id, "DEL_SVC_DOWNTIME_FULL"))
+    command_type = CMD_DEL_SVC_DOWNTIME_FULL;
 
   else if (!strcmp(command_id, "ACKNOWLEDGE_SVC_PROBLEM"))
     command_type = CMD_ACKNOWLEDGE_SVC_PROBLEM;
@@ -902,6 +906,11 @@ int process_external_command2(int cmd,
   case CMD_DEL_SVC_DOWNTIME:
     cmd_delete_downtime(cmd, args);
     break;
+
+  case CMD_DEL_HOST_DOWNTIME_FULL:
+  case CMD_DEL_SVC_DOWNTIME_FULL:
+    cmd_delete_downtime_full(cmd, args);
+    break ;
 
   case CMD_DEL_DOWNTIME_BY_HOST_NAME:
     cmd_delete_downtime_by_host_name(cmd, args);
