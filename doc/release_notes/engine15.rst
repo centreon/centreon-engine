@@ -1,6 +1,27 @@
-===================
-Centreon Engine 1.5
-===================
+=====================
+Centreon Engine 1.5.1
+=====================
+
+**********
+Bugs fixed
+**********
+
+Missing HOSTID and SERVICEID macros
+===================================
+
+When developing the 1.5.0 release of Centreon Engine, Centreon ID were
+promoted to full-class configuration variables. This effectively removed
+them from the list of available macros. This release restore them.
+
+Wrong latency after first startup
+=================================
+
+The latency of newly created objects can be wrongly calculated in rare
+situations where the smart scheduling mode is *not* used.
+
+=====================
+Centreon Engine 1.5.0
+=====================
 
 **********
 What's new
