@@ -67,6 +67,7 @@ service::setters const service::_setters[] = {
   { "normal_check_interval",        SETTER(unsigned int, _set_check_interval) },
   { "retry_interval",               SETTER(unsigned int, _set_retry_interval) },
   { "retry_check_interval",         SETTER(unsigned int, _set_retry_interval) },
+  { "recovery_notification_delay",  SETTER(unsigned int, _set_recovery_notification_delay) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
   { "passive_checks_enabled",       SETTER(bool, _set_checks_passive) },
   { "parallelize_check",            SETTER(bool, _set_parallelize_check) },
@@ -961,6 +962,15 @@ unsigned int service::retry_interval() const throw () {
 }
 
 /**
+ *  Get recovery_notification_delay.
+ *
+ *  @return The recovery_notification_delay.
+ */
+unsigned int service::recovery_notification_delay() const throw() {
+  return (_recovery_notification_delay);
+}
+
+/**
  *  Get service groups.
  *
  *  @return The service groups.
@@ -1611,6 +1621,18 @@ bool service::_set_retry_interval(unsigned int value) {
   if (!value)
     return (false);
   _retry_interval = value;
+  return (true);
+}
+
+/**
+ *  Set recovery_notification_delay value.
+ *
+ *  @param[in] value  The new recovery_notification_delay value.
+ *
+ *  @return  True on success, otherwhise false.
+ */
+bool service::_set_recovery_notification_delay(unsigned int value) {
+  _recovery_notification_delay = value;
   return (true);
 }
 

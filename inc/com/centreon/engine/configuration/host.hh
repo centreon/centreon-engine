@@ -107,6 +107,7 @@ namespace                  configuration {
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
+    unsigned int           recovery_notification_delay() const throw();
     unsigned int           stalking_options() const throw ();
     std::string const&     statusmap_image() const throw ();
     std::string const&     timezone() const throw ();
@@ -163,6 +164,7 @@ namespace                  configuration {
     bool                   _set_retain_nonstatus_information(bool value);
     bool                   _set_retain_status_information(bool value);
     bool                   _set_retry_interval(unsigned int value);
+    bool                   _set_recovery_notification_delay(unsigned int value);
     bool                   _set_stalking_options(std::string const& value);
     bool                   _set_statusmap_image(std::string const& value);
     bool                   _set_timezone(std::string const& value);
@@ -211,6 +213,7 @@ namespace                  configuration {
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
+    opt<unsigned int>      _recovery_notification_delay;
     static setters const   _setters[];
     opt<unsigned int>      _stalking_options;
     std::string            _statusmap_image;

@@ -65,6 +65,7 @@ host::setters const host::_setters[] = {
   { "normal_check_interval",        SETTER(unsigned int, _set_check_interval) },
   { "retry_interval",               SETTER(unsigned int, _set_retry_interval) },
   { "retry_check_interval",         SETTER(unsigned int, _set_retry_interval) },
+  { "recovery_notification_delay",  SETTER(unsigned int, _set_recovery_notification_delay) },
   { "max_check_attempts",           SETTER(unsigned int, _set_max_check_attempts) },
   { "checks_enabled",               SETTER(bool, _set_checks_active) },
   { "active_checks_enabled",        SETTER(bool, _set_checks_active) },
@@ -941,6 +942,15 @@ unsigned int host::retry_interval() const throw () {
 }
 
 /**
+ *  Get recovery_notification_delay.
+ *
+ *  @return The recovery_notification_delay.
+ */
+unsigned int host::recovery_notification_delay() const throw() {
+  return (_recovery_notification_delay);
+}
+
+/**
  *  Get stalking_options.
  *
  *  @return The stalking_options.
@@ -1615,6 +1625,18 @@ bool host::_set_retain_status_information(bool value) {
  */
 bool host::_set_retry_interval(unsigned int value) {
   _retry_interval = value;
+  return (true);
+}
+
+/**
+ *  Set recovery_notification_delay value.
+ *
+ *  @param[in] value  The new recovery_notification_delay value.
+ *
+ *  @return  True on success, otherwhise false.
+ */
+bool host::_set_recovery_notification_delay(unsigned int value) {
+  _recovery_notification_delay = value;
   return (true);
 }
 
