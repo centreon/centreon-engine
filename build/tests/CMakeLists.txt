@@ -28,6 +28,7 @@ if (WITH_TESTING)
   add_executable("ut"
     "${TESTS_DIR}/configuration/host.cc"
     "${TESTS_DIR}/configuration/service.cc"
+    "${TESTS_DIR}/downtime_finder.cc"
   )
   target_link_libraries("ut" "gtest" "gtest_main" "cce_core")
 endif ()

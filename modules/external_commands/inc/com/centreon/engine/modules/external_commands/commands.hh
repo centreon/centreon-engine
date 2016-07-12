@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006      Ethan Galstad
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2002-2006           Ethan Galstad
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -50,6 +50,7 @@ int cmd_acknowledge_problem(int cmd,char* args);                            // a
 int cmd_remove_acknowledgement(int cmd,char* args);                         // removes a host or service acknowledgement
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args);          // schedules host or service downtime
 int cmd_delete_downtime(int cmd, char* args);                               // cancels active/pending host or service scheduled downtime
+int cmd_delete_downtime_full(int cmd, char* args);                          // cancels active/pending host or service scheduled downtime
 int cmd_change_object_int_var(int cmd,char* args);                          // changes host/svc (int) variable
 int cmd_change_object_char_var(int cmd,char* args);                         // changes host/svc (char) variable
 int cmd_change_object_custom_var(int cmd, char* args);                      // changes host/svc custom variable

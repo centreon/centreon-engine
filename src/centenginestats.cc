@@ -1,6 +1,6 @@
 /*
-** Copyright 2003-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2003-2008      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -282,8 +282,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Centreon Engine Statistics Utility "
               << CENTREON_ENGINE_VERSION_STRING << "\n"
               << "\n"
-              << "Copyright 2003-2008 Ethan Galstad\n"
-              << "Copyright 2011-2013 Merethis\n"
+              << "Copyright 2003-2008      Ethan Galstad\n"
+              << "Copyright 2011-2013,2016 Centreon\n"
               << "License: GPLv2\n\n";
 
     // Just display the license.

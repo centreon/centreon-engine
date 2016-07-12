@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2008      Ethan Galstad
-** Copyright 2011-2013,2015 Merethis
+** Copyright 1999-2008           Ethan Galstad
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,6 +25,7 @@
 #include <sys/time.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/downtime_finder.hh"
 #include "com/centreon/engine/events/defines.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
@@ -1213,6 +1214,83 @@ int cmd_delete_downtime(int cmd, char* args) {
     unschedule_downtime(HOST_DOWNTIME, downtime_id);
   else
     unschedule_downtime(SERVICE_DOWNTIME, downtime_id);
+
+  return (OK);
+}
+
+/**
+ *  Delete scheduled host or service downtime, according to some criterias.
+ *
+ *  @param[in] cmd   Command ID.
+ *  @param[in] args  Command arguments.
+ */
+int cmd_delete_downtime_full(int cmd, char* args) {
+  char* temp_ptr(NULL);
+  downtime_finder::criteria_set criterias;
+
+  // Host name.
+  if (!(temp_ptr = my_strtok(args, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("host", temp_ptr));
+  // Service description and downtime type.
+  int downtime_type;
+  if (cmd == CMD_DEL_SVC_DOWNTIME_FULL) {
+    downtime_type = SERVICE_DOWNTIME;
+    if (!(temp_ptr = my_strtok(NULL, ";")))
+      return (ERROR);
+    if (*temp_ptr)
+      criterias.push_back(downtime_finder::criteria("service", temp_ptr));
+  }
+  else {
+    downtime_type = HOST_DOWNTIME;
+    criterias.push_back(downtime_finder::criteria("service", ""));
+  }
+  // Start time.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("start", temp_ptr));
+  // End time.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("end", temp_ptr));
+  // Fixed.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("fixed", temp_ptr));
+  // Trigger ID.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("triggered_by", temp_ptr));
+  // Duration.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("duration", temp_ptr));
+  // Author.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("author", temp_ptr));
+  // Comment.
+  if (!(temp_ptr = my_strtok(NULL, ";")))
+    return (ERROR);
+  if (*temp_ptr)
+    criterias.push_back(downtime_finder::criteria("comment", temp_ptr));
+
+  // Find downtimes.
+  downtime_finder dtf(scheduled_downtime_list);
+  downtime_finder::result_set result(dtf.find_matching_all(criterias));
+  for (downtime_finder::result_set::const_iterator
+         it(result.begin()), end(result.end());
+       it != end;
+       ++it) {
+    unschedule_downtime(downtime_type, *it);
+  }
 
   return (OK);
 }
