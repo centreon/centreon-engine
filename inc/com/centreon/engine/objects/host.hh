@@ -165,6 +165,7 @@ struct                          host_other_properties {
   unsigned int                  host_id;
   int                           acknowledgement_timeout;
   time_t                        last_acknowledgement;
+  unsigned int                  recovery_notification_delay;
 };
 
 /* Hash structures. */

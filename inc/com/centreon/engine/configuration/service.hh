@@ -115,6 +115,7 @@ namespace                  configuration {
     bool                   retain_nonstatus_information() const throw ();
     bool                   retain_status_information() const throw ();
     unsigned int           retry_interval() const throw ();
+    unsigned int           recovery_notification_delay() const throw();
     list_string&           servicegroups() throw ();
     list_string const&     servicegroups() const throw ();
     std::string&           service_description() throw ();
@@ -172,6 +173,7 @@ namespace                  configuration {
     bool                   _set_retain_nonstatus_information(bool value);
     bool                   _set_retain_status_information(bool value);
     bool                   _set_retry_interval(unsigned int value);
+    bool                   _set_recovery_notification_delay(unsigned int value);
     bool                   _set_servicegroups(std::string const& value);
     bool                   _set_service_description(std::string const& value);
     bool                   _set_service_id(unsigned int value);
@@ -217,6 +219,7 @@ namespace                  configuration {
     opt<bool>              _retain_nonstatus_information;
     opt<bool>              _retain_status_information;
     opt<unsigned int>      _retry_interval;
+    opt<unsigned int>      _recovery_notification_delay;
     group                  _servicegroups;
     std::string            _service_description;
     unsigned int           _service_id;

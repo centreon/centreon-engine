@@ -154,6 +154,7 @@ struct                          service_other_properties {
   unsigned int                  service_id;
   int                           acknowledgement_timeout;
   time_t                        last_acknowledgement;
+  unsigned int                  recovery_notification_delay;
 };
 
 #  ifdef __cplusplus

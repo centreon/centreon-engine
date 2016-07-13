@@ -195,6 +195,9 @@ void applier::service::add_object(
   service_other_props[std::make_pair(
                              obj->hosts().front(),
                              obj->service_description())].last_acknowledgement = 0;
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].recovery_notification_delay = obj->recovery_notification_delay();
 
   // Add contacts.
   for (list_string::const_iterator
@@ -527,6 +530,10 @@ void applier::service::modify_object(
                              obj->hosts().front(),
                              obj->service_description())].acknowledgement_timeout
     = obj->get_acknowledgement_timeout() * config->interval_length();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
+                             obj->service_description())].recovery_notification_delay
+    = obj->recovery_notification_delay();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {

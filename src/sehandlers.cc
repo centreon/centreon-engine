@@ -1107,6 +1107,11 @@ int handle_host_state(host* hst) {
     /* handle the host state change */
     handle_host_event(hst);
 
+    /* reset the initial notification time external parameter only if we changed from an UP to a non-UP state */
+    /* (and also to an UP state from a non-UP state, but this particular is managed below) */
+    if(hst->current_state == HOST_DOWN)
+      host_other_props[hst->name].initial_notif_time = 0;
+
     /* the host just recovered, so reset the current host attempt */
     if (hst->current_state == HOST_UP)
       hst->current_attempt = 1;

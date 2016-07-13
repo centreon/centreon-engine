@@ -163,6 +163,8 @@ void applier::host::add_object(
   host_other_props[obj->host_name()].acknowledgement_timeout
     = obj->get_acknowledgement_timeout() * config->interval_length();
   host_other_props[obj->host_name()].last_acknowledgement = 0;
+  host_other_props[obj->host_name()].recovery_notification_delay
+    = obj->recovery_notification_delay();
 
   // Contacts.
   for (list_string::const_iterator
@@ -442,6 +444,8 @@ void applier::host::modify_object(
   host_other_props[obj->host_name()].host_id = obj->host_id();
   host_other_props[obj->host_name()].acknowledgement_timeout
     = obj->get_acknowledgement_timeout() * config->interval_length();
+  host_other_props[obj->host_name()].recovery_notification_delay
+    = obj->recovery_notification_delay();
 
   // Contacts.
   if (obj->contacts() != obj_old->contacts()) {
