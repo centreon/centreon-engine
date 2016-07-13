@@ -621,8 +621,7 @@ int check_service_notification_viability(
 
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
-      && svc->current_notification_number == 0
-      && svc->current_state != STATE_OK) {
+      && svc->current_notification_number == 0) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(
@@ -634,13 +633,24 @@ int check_service_notification_viability(
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
+    double notification_delay = (svc->current_state != STATE_OK ?
+             svc->first_notification_delay
+             : service_other_props[std::make_pair(
+                 svc->host_ptr->name,
+                 svc->description)].recovery_notification_delay)
+        * config->interval_length();
+
     if (current_time
         < (time_t)(initial_notif_time
-                   + (time_t)(svc->first_notification_delay
-                              * config->interval_length()))) {
-      logger(dbg_notifications, more)
-        << "Not enough time has elapsed since the service changed to a "
-        "non-OK state, so we should not notify about this problem yet";
+                   + (time_t)(notification_delay))) {
+      if (svc->current_state == STATE_OK)
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the service changed to a "
+          "OK state, so we should not notify about this problem yet";
+      else
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the service changed to a "
+          "non-OK state, so we should not notify about this problem yet";
       return (ERROR);
     }
   }
@@ -1839,8 +1849,7 @@ int check_host_notification_viability(
 
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
-      && hst->current_notification_number == 0
-      && hst->current_state != HOST_UP) {
+      && hst->current_notification_number == 0) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(host_other_props[hst->name].initial_notif_time);
@@ -1849,14 +1858,24 @@ int check_host_notification_viability(
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
+    double notification_delay = (hst->current_state != HOST_UP ?
+             hst->first_notification_delay
+             : host_other_props[std::string(hst->name)].recovery_notification_delay)
+        * config->interval_length();
+
     if (current_time
         < (time_t)(initial_notif_time
-                   + (time_t)(hst->first_notification_delay
-                              * config->interval_length()))) {
-      logger(dbg_notifications, more)
-        << "Not enough time has elapsed since the host changed to a "
-        "non-UP state (or since program start), so we shouldn't notify "
-        "about this problem yet.";
+                   + (time_t)(notification_delay))) {
+      if (hst->current_state == HOST_UP)
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the host changed to an "
+          "UP state (or since program start), so we shouldn't notify "
+          "about this problem yet.";
+      else
+        logger(dbg_notifications, more)
+          << "Not enough time has elapsed since the host changed to a "
+          "non-UP state (or since program start), so we shouldn't notify "
+          "about this problem yet.";
       return (ERROR);
     }
   }
