@@ -158,6 +158,7 @@ service::service()
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
+    _recovery_notification_delay(0),
     _service_id(0),
     _stalking_options(default_stalking_options) {}
 
@@ -224,6 +225,7 @@ service& service::operator=(service const& other) {
     _retain_nonstatus_information = other._retain_nonstatus_information;
     _retain_status_information = other._retain_status_information;
     _retry_interval = other._retry_interval;
+    _recovery_notification_delay = other._recovery_notification_delay;
     _servicegroups = other._servicegroups;
     _service_description = other._service_description;
     _service_id = other._service_id;
@@ -281,6 +283,7 @@ bool service::operator==(service const& other) const throw () {
           && _retain_nonstatus_information == other._retain_nonstatus_information
           && _retain_status_information == other._retain_status_information
           && _retry_interval == other._retry_interval
+          && _recovery_notification_delay == other._recovery_notification_delay
           && _servicegroups == other._servicegroups
           && _service_description == other._service_description
           && _service_id == other._service_id
@@ -397,6 +400,10 @@ bool service::operator<(service const& other) const throw () {
             < other._retain_status_information);
   else if (_retry_interval != other._retry_interval)
     return (_retry_interval < other._retry_interval);
+  else if (_recovery_notification_delay
+           != other._recovery_notification_delay)
+    return (_recovery_notification_delay
+            < other._recovery_notification_delay);
   else if (_service_id != other._service_id)
     return (_service_id < other._service_id);
   else if (_servicegroups != other._servicegroups)

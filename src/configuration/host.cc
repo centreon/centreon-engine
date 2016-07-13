@@ -150,6 +150,7 @@ host::host(key_type const& key)
     _retain_nonstatus_information(default_retain_nonstatus_information),
     _retain_status_information(default_retain_status_information),
     _retry_interval(default_retry_interval),
+    _recovery_notification_delay(0),
     _stalking_options(default_stalking_options) {}
 
 /**
@@ -219,6 +220,7 @@ host& host::operator=(host const& other) {
     _retain_nonstatus_information = other._retain_nonstatus_information;
     _retain_status_information = other._retain_status_information;
     _retry_interval = other._retry_interval;
+    _recovery_notification_delay = other._recovery_notification_delay;
     _stalking_options = other._stalking_options;
     _statusmap_image = other._statusmap_image;
     _timezone = other._timezone;
@@ -279,6 +281,7 @@ bool host::operator==(host const& other) const throw () {
           && _retain_nonstatus_information == other._retain_nonstatus_information
           && _retain_status_information == other._retain_status_information
           && _retry_interval == other._retry_interval
+          && _recovery_notification_delay == other._recovery_notification_delay
           && _stalking_options == other._stalking_options
           && _statusmap_image == other._statusmap_image
           && _timezone == other._timezone
@@ -398,6 +401,10 @@ bool host::operator<(host const& other) const throw () {
             < other._retain_status_information);
   else if (_retry_interval != other._retry_interval)
     return (_retry_interval < other._retry_interval);
+  else if (_recovery_notification_delay
+           != other._recovery_notification_delay)
+    return (_recovery_notification_delay
+            < other._recovery_notification_delay);
   else if (_stalking_options != other._stalking_options)
     return (_stalking_options < other._stalking_options);
   else if (_statusmap_image != other._statusmap_image)
