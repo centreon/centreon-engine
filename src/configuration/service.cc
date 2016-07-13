@@ -110,7 +110,7 @@ static unsigned int const   default_high_flap_threshold(0);
 static unsigned int const   default_initial_state(STATE_OK);
 static bool const           default_is_volatile(false);
 static unsigned int const   default_low_flap_threshold(0);
-static unsigned int const   default_max_check_attempts(0);
+static unsigned int const   default_max_check_attempts(3);
 static bool const           default_notifications_enabled(true);
 static unsigned int const   default_notification_interval(30);
 static unsigned short const default_notification_options(
