@@ -621,7 +621,8 @@ int check_service_notification_viability(
 
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
-      && svc->current_notification_number == 0) {
+      && (svc->current_notification_number == 0
+          || svc->current_state == STATE_OK)) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(
@@ -1849,7 +1850,8 @@ int check_host_notification_viability(
 
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
-      && hst->current_notification_number == 0) {
+      && (hst->current_notification_number == 0
+         || hst->current_state == HOST_UP)) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(host_other_props[hst->name].initial_notif_time);
