@@ -309,6 +309,10 @@ void applier::host::_update(
   if (!obj.last_hard_state_change)
     obj.last_hard_state_change = obj.last_state_change;
 
+  // Handle recovery been sent
+  if (state.recovery_been_sent().is_set())
+    host_other_props[obj.name].recovery_been_sent = *state.recovery_been_sent();
+
   // update host status.
   update_host_status(&obj, false);
 }

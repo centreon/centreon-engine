@@ -360,6 +360,12 @@ int service_notification(
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);
 
+  /* Update recovery been sent parameter */
+  if (svc->current_state == STATE_OK)
+    service_other_props[std::make_pair(
+                        svc->host_ptr->name,
+                        svc->description)].recovery_been_sent = true;
+
   return (OK);
 }
 
@@ -622,7 +628,10 @@ int check_service_notification_viability(
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
       && (svc->current_notification_number == 0
-          || svc->current_state == STATE_OK)) {
+          || (svc->current_state == STATE_OK
+                && service_other_props[std::make_pair(
+                    svc->host_ptr->name,
+                    svc->description)].recovery_been_sent))) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(
@@ -1625,6 +1634,10 @@ int host_notification(
   /* clear volatile macros */
   clear_volatile_macros_r(&mac);
 
+  /* Update recovery been sent parameter */
+  if (hst->current_state == HOST_UP)
+    host_other_props[hst->name].recovery_been_sent = true;
+
   return (OK);
 }
 
@@ -1851,7 +1864,8 @@ int check_host_notification_viability(
   /* see if enough time has elapsed for first notification */
   if (type == NOTIFICATION_NORMAL
       && (hst->current_notification_number == 0
-         || hst->current_state == HOST_UP)) {
+         || (hst->current_state == HOST_UP &&
+             !host_other_props[std::string(hst->name)].recovery_been_sent))) {
 
     /* get the time at which a notification should have been sent */
     time_t& initial_notif_time(host_other_props[hst->name].initial_notif_time);

@@ -253,7 +253,8 @@ std::ostream& dump::host(std::ostream& os, host_struct const& obj) {
     "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
     "process_performance_data=" << obj.process_performance_data << "\n"
     "retry_check_interval=" << obj.check_interval << "\n"
-    "state_type=" << obj.state_type << "\n";
+    "state_type=" << obj.state_type << "\n"
+    "recovery_been_sent=" << host_other_props[obj.name].recovery_been_sent << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
@@ -440,7 +441,10 @@ std::ostream& dump::service(std::ostream& os, service_struct const& obj) {
     "problem_has_been_acknowledged=" << obj.problem_has_been_acknowledged << "\n"
     "process_performance_data=" << obj.process_performance_data << "\n"
     "retry_check_interval=" << obj.retry_interval << "\n"
-    "state_type=" << obj.state_type << "\n";
+    "state_type=" << obj.state_type << "\n"
+    "recovery_been_sent=" << service_other_props[
+                               std::make_pair(obj.description,
+                                              obj.host_ptr->name)].recovery_been_sent << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)

@@ -683,6 +683,11 @@ int handle_async_service_check_result(
       log_service_event(temp_service);
       state_was_logged = true;
 
+      /* Set the recovery been sent parameter. */
+      service_other_props[std::make_pair(
+            temp_service->host_ptr->name,
+            temp_service->description)].recovery_been_sent = false;
+
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
       check_for_service_flapping(temp_service, true, true);
@@ -722,6 +727,15 @@ int handle_async_service_check_result(
       logger(dbg_checks, more)
         << "Service did not change state.";
 
+    /* Check if we need to send a recovery notification */
+    if(temp_service->current_notification_number == 0 && !hard_state_change)
+      service_notification(
+        temp_service,
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
+
     /* should we obsessive over service checks? */
     if (config->obsess_over_services() == true)
       obsessive_compulsive_service_check_processor(temp_service);
@@ -733,7 +747,10 @@ int handle_async_service_check_result(
     temp_service->last_hard_state = STATE_OK;
     temp_service->last_notification = (time_t)0;
     temp_service->next_notification = (time_t)0;
-    temp_service->current_notification_number = 0;
+    if (service_other_props[std::make_pair(
+          temp_service->host_ptr->name,
+          temp_service->description)].recovery_been_sent)
+      temp_service->current_notification_number = 0;
     temp_service->problem_has_been_acknowledged = false;
     temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
     temp_service->notified_on_unknown = false;

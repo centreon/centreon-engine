@@ -322,6 +322,12 @@ void applier::service::_update(
   if (obj.last_hard_state_change)
     obj.last_hard_state_change = obj.last_state_change;
 
+  // Handle recovery been sent
+  if (state.recovery_been_sent().is_set())
+    service_other_props[std::make_pair(obj.description,
+                                       obj.host_ptr->name)].recovery_been_sent
+      = *state.recovery_been_sent();
+
   // update service status.
   update_service_status(&obj, false);
 }

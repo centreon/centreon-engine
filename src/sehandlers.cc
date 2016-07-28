@@ -1095,6 +1095,9 @@ int handle_host_state(host* hst) {
     /*if(hst->state_type==HARD_STATE) */
     check_pending_flex_host_downtime(hst);
 
+    if (hst->current_state == HOST_UP)
+      host_other_props[hst->name].recovery_been_sent = false;
+
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (hst->state_type == HARD_STATE)
       host_notification(
@@ -1118,7 +1121,8 @@ int handle_host_state(host* hst) {
 
     /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
     if (hst->current_state == HOST_UP) {
-      hst->current_notification_number = 0;
+      if (host_other_props[hst->name].recovery_been_sent)
+        hst->current_notification_number = 0;
       hst->notified_on_down = false;
       hst->notified_on_unreachable = false;
       host_other_props[hst->name].initial_notif_time = 0;
@@ -1128,8 +1132,9 @@ int handle_host_state(host* hst) {
   /* else the host state has not changed */
   else {
 
-    /* notify contacts if host is still down or unreachable */
-    if (hst->current_state != HOST_UP
+    /* notify contacts if needed */
+    if ((hst->current_state != HOST_UP ||
+         (hst->current_state == HOST_UP and hst->current_notification_number == 0))
         && hst->state_type == HARD_STATE)
       host_notification(
         hst,
