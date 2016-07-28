@@ -200,7 +200,7 @@ void applier::service::add_object(
                              obj->service_description())].recovery_notification_delay = obj->recovery_notification_delay();
   service_other_props[std::make_pair(
                              obj->hosts().front(),
-                             obj->service_description())].recovery_been_sent = false;
+                             obj->service_description())].recovery_been_sent = true;
 
   // Add contacts.
   for (list_string::const_iterator

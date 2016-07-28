@@ -166,7 +166,7 @@ void applier::host::add_object(
   host_other_props[obj->host_name()].recovery_notification_delay
     = obj->recovery_notification_delay();
   host_other_props[obj->host_name()].recovery_been_sent
-    = false;
+    = true;
 
   // Contacts.
   for (list_string::const_iterator
