@@ -1131,7 +1131,8 @@ int handle_host_state(host* hst) {
 
     /* notify contacts if needed */
     if ((hst->current_state != HOST_UP ||
-         (hst->current_state == HOST_UP and hst->current_notification_number == 0))
+         (hst->current_state == HOST_UP
+          && !host_other_props[hst->name].recovery_been_sent))
         && hst->state_type == HARD_STATE)
       host_notification(
         hst,

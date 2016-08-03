@@ -722,7 +722,9 @@ int handle_async_service_check_result(
         << "Service did not change state.";
 
     /* Check if we need to send a recovery notification */
-    if(temp_service->current_notification_number == 0 && !hard_state_change)
+    if(!service_other_props[std::make_pair(
+               temp_service->host_ptr->name,
+               temp_service->description)].recovery_been_sent && !hard_state_change)
       service_notification(
         temp_service,
         NOTIFICATION_NORMAL,
