@@ -1095,8 +1095,10 @@ int handle_host_state(host* hst) {
     /*if(hst->state_type==HARD_STATE) */
     check_pending_flex_host_downtime(hst);
 
-    if (hst->current_state == HOST_UP)
+    if (hst->current_state == HOST_UP) {
       host_other_props[hst->name].recovery_been_sent = false;
+      host_other_props[hst->name].initial_notif_time = 0;
+    }
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (hst->state_type == HARD_STATE)
@@ -1109,11 +1111,6 @@ int handle_host_state(host* hst) {
 
     /* handle the host state change */
     handle_host_event(hst);
-
-    /* reset the initial notification time external parameter only if we changed from an UP to a non-UP state */
-    /* (and also to an UP state from a non-UP state, but this particular is managed below) */
-    if(hst->current_state == HOST_DOWN)
-      host_other_props[hst->name].initial_notif_time = 0;
 
     /* the host just recovered, so reset the current host attempt */
     if (hst->current_state == HOST_UP)

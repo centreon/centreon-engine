@@ -538,15 +538,6 @@ int handle_async_service_check_result(
     temp_service->last_notification = (time_t)0;
     temp_service->next_notification = (time_t)0;
 
-    /* reset the initial notification time external parameter only if we changed from an OK to a non-OK state */
-    /* ( and also to an OK state from a non-OK state, but this particular is managed far below) */
-    if (temp_service->last_hard_state == OK)
-      service_other_props[
-        std::make_pair(
-               std::string(temp_service->host_ptr->name),
-               std::string(temp_service->description))].initial_notif_time
-        = 0;
-
     /* reset notification suppression option */
     temp_service->no_more_notifications = false;
 
@@ -687,6 +678,9 @@ int handle_async_service_check_result(
       service_other_props[std::make_pair(
             temp_service->host_ptr->name,
             temp_service->description)].recovery_been_sent = false;
+      service_other_props[std::make_pair(
+            temp_service->host_ptr->name,
+            temp_service->description)].initial_notif_time = 0;
 
       /* 10/04/07 check to see if the service and/or associate host is flapping */
       /* this should be done before a notification is sent out to ensure the host didn't just start flapping */
