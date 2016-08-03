@@ -629,7 +629,7 @@ int check_service_notification_viability(
   if (type == NOTIFICATION_NORMAL
       && (svc->current_notification_number == 0
           || (svc->current_state == STATE_OK
-                && service_other_props[std::make_pair(
+                && !service_other_props[std::make_pair(
                     svc->host_ptr->name,
                     svc->description)].recovery_been_sent))) {
 
