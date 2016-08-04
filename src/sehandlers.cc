@@ -1117,17 +1117,18 @@ int handle_host_state(host* hst) {
       hst->current_attempt = 1;
 
     /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
-    if (hst->current_state == HOST_UP) {
-      if (host_other_props[hst->name].recovery_been_sent)
-        hst->current_notification_number = 0;
+    if (hst->current_state == HOST_UP && host_other_props[hst->name].recovery_been_sent) {
+      hst->current_notification_number = 0;
       hst->notified_on_down = false;
       hst->notified_on_unreachable = false;
-      host_other_props[hst->name].initial_notif_time = 0;
     }
   }
 
   /* else the host state has not changed */
   else {
+
+    bool old_recovery_been_sent
+           = host_other_props[hst->name].recovery_been_sent;
 
     /* notify contacts if needed */
     if ((hst->current_state != HOST_UP ||
@@ -1140,6 +1141,15 @@ int handle_host_state(host* hst) {
         NULL,
         NULL,
         NOTIFICATION_OPTION_NONE);
+
+    /* the host recovered, so reset the current notification number and state flags (after the recovery notification has gone out) */
+    if (!old_recovery_been_sent
+        && host_other_props[hst->name].recovery_been_sent
+        && hst->current_state == HOST_UP) {
+      hst->current_notification_number = 0;
+      hst->notified_on_down = false;
+      hst->notified_on_unreachable = false;
+    }
 
     /* if we're in a soft state and we should log host retries, do so now... */
     if (hst->state_type == SOFT_STATE

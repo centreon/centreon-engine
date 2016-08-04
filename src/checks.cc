@@ -724,13 +724,14 @@ int handle_async_service_check_result(
     /* Check if we need to send a recovery notification */
     if(!service_other_props[std::make_pair(
                temp_service->host_ptr->name,
-               temp_service->description)].recovery_been_sent && !hard_state_change)
+               temp_service->description)].recovery_been_sent && !hard_state_change) {
       service_notification(
         temp_service,
         NOTIFICATION_NORMAL,
         NULL,
         NULL,
         NOTIFICATION_OPTION_NONE);
+    }
 
     /* should we obsessive over service checks? */
     if (config->obsess_over_services() == true)
@@ -745,19 +746,18 @@ int handle_async_service_check_result(
     temp_service->next_notification = (time_t)0;
     if (service_other_props[std::make_pair(
           temp_service->host_ptr->name,
-          temp_service->description)].recovery_been_sent)
+          temp_service->description)].recovery_been_sent) {
       temp_service->current_notification_number = 0;
+      temp_service->notified_on_unknown = false;
+      temp_service->notified_on_warning = false;
+      temp_service->notified_on_critical = false;
+      service_other_props[std::make_pair(
+            temp_service->host_ptr->name,
+            temp_service->description)].initial_notif_time = 0;
+    }
     temp_service->problem_has_been_acknowledged = false;
     temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
-    temp_service->notified_on_unknown = false;
-    temp_service->notified_on_warning = false;
-    temp_service->notified_on_critical = false;
     temp_service->no_more_notifications = false;
-    service_other_props[
-      std::make_pair(
-             std::string(temp_service->host_ptr->name),
-             std::string(temp_service->description))].initial_notif_time
-      = 0;
 
     if (reschedule_check == true)
       next_service_check
