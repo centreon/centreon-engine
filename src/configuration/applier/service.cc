@@ -793,10 +793,10 @@ void applier::service::_inherits_special_vars(
              << obj->hosts().front() << "' does not exist");
 
     // Inherits variables.
-    if (!obj->contacts_defined())
+    if (!obj->contacts_defined() && !obj->contactgroups_defined()) {
       obj->contacts() = (*it)->contacts();
-    if (!obj->contactgroups_defined())
       obj->contactgroups() = (*it)->contactgroups();
+    }
     if (!obj->notification_interval_defined())
       obj->notification_interval((*it)->notification_interval());
     if (!obj->notification_period_defined())
