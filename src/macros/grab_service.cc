@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -117,6 +117,7 @@ static char* get_service_state(service& svc, nagios_macros* mac) {
  *  @return  Newly allocated string with the service id.
  */
 static char* get_service_id(service& svc, nagios_macros* mac) {
+  (void)mac;
   return (string::dup(string::from(com::centreon::engine::get_service_id(
                                              svc.host_name,
                                              svc.description)).c_str()));

@@ -220,6 +220,7 @@ static char* get_host_children(host& hst, nagios_macros* mac) {
  *  @return  Newly allocated string with the host id.
  */
 static char* get_host_id(host& hst, nagios_macros* mac) {
+  (void)mac;
   return (string::dup(string::from(
             com::centreon::engine::get_host_id(hst.name)).c_str()));
 }

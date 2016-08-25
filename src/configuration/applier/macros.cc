@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -79,7 +79,7 @@ void applier::macros::apply(configuration::state& config) {
          end = users.end();
        it != end;
        ++it) {
-    unsigned int val;
+    unsigned int val(1);
     if (is_old_style_user_macro(it->first, val))
       _set_macros_user(val - 1, it->second);
   }
