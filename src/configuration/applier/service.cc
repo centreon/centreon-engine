@@ -631,6 +631,18 @@ void applier::service::remove_object(
   if (it != applier::state::instance().services().end()) {
     service_struct* svc(it->second.get());
 
+    // Remove service comments.
+    delete_all_service_comments(
+      host_name.c_str(),
+      service_description.c_str());
+
+    // Remove service downtimes.
+    delete_downtime_by_hostname_service_description_start_time_comment(
+      host_name.c_str(),
+      service_description.c_str(),
+      (time_t)0,
+      NULL);
+
     // Remove events related to this service.
     applier::scheduler::instance().remove_service(*obj);
 

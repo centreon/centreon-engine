@@ -1,6 +1,6 @@
 /*
-** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2000-2008      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -130,10 +130,10 @@ int                 delete_downtime(
                       int type,
                       unsigned long downtime_id);
 int                 delete_downtime_by_hostname_service_description_start_time_comment(
-                      char const*,
-                      char const*,
-                      time_t,
-                      char const*);
+                      char const* hostname,
+                      char const* service_description,
+                      time_t start_time,
+                      char const* comment);
 int                 delete_host_downtime(unsigned long downtime_id);
 int                 delete_service_downtime(
                       unsigned long downtime_id);
