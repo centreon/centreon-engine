@@ -594,6 +594,11 @@ if (WITH_LOGROTATE_SCRIPT)
       "${SCRIPT_DIR}/logrotate_upstart.conf.in"
       "${SCRIPT_DIR}/logrotate.conf"
       @ONLY)
+  elseif (WITH_STARTUP_SCRIPT STREQUAL "systemd")
+    configure_file(
+      "${SCRIPT_DIR}/logrotate_systemd.conf.in"
+      "${SCRIPT_DIR}/logrotate.conf"
+      @ONLY)
   else ()
     configure_file(
       "${SCRIPT_DIR}/logrotate_sysv.conf.in"
