@@ -27,6 +27,7 @@ if (WITH_TESTING)
   # Unit test executable.
   add_executable("ut"
     "${TESTS_DIR}/configuration/host.cc"
+    "${TESTS_DIR}/configuration/object.cc"
     "${TESTS_DIR}/configuration/service.cc"
     "${TESTS_DIR}/downtime_finder.cc"
   )

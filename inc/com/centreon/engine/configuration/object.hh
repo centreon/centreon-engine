@@ -160,10 +160,9 @@ namespace std {
   do { \
     if (!prop.is_set()) \
       prop = tmpl.prop; \
-    else if (prop.is_inherit()) { \
+    else if (prop.is_inherit()) \
       prop += tmpl.prop; \
-      prop.is_inherit(false); \
-    } \
+    prop.is_inherit(false); \
   } while (false)
 #  define MRG_MAP(prop) \
   prop.insert(tmpl.prop.begin(), tmpl.prop.end())
