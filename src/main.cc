@@ -100,9 +100,7 @@ int main(int argc, char* argv[]) {
     { "dont-verify-paths",     no_argument, NULL, 'x' },
     { "help",                  no_argument, NULL, 'h' },
     { "license",               no_argument, NULL, 'V' },
-    { "precache-objects",      no_argument, NULL, 'p' },
     { "test-scheduling",       no_argument, NULL, 's' },
-    { "use-precached-objects", no_argument, NULL, 'u' },
     { "verify-config",         no_argument, NULL, 'v' },
     { "version",               no_argument, NULL, 'V' },
     { NULL,                    no_argument, NULL, '\0' }
@@ -137,11 +135,11 @@ int main(int argc, char* argv[]) {
     while ((c = getopt_long(
                   argc,
                   argv,
-                  "+hVvsxpuD",
+                  "+hVvsxD",
                   long_options,
                   &option_index)) != -1) {
 #else
-    while ((c = getopt(argc, argv, "+hVvsxpuD")) != -1) {
+    while ((c = getopt(argc, argv, "+hVvsxD")) != -1) {
 #endif // HAVE_GETOPT_H
 
       // Process flag.
@@ -162,12 +160,6 @@ int main(int argc, char* argv[]) {
       case 'x': // Don't verify circular paths.
         verify_circular_paths = false;
         break;
-      case 'p': // Precache object config.
-        precache_objects = true;
-        break;
-      case 'u': // Use precached object config.
-        use_precached_objects = true;
-        break;
       case 'D': // Diagnostic.
         diagnose = true;
         break;
@@ -178,8 +170,6 @@ int main(int argc, char* argv[]) {
 
     // Invalid argument count.
     if ((argc < 2)
-        // Invalid argument combination.
-        || (precache_objects && !test_scheduling && !verify_config)
         // Main configuration file not on command line.
         || (optind >= argc))
       error = true;
@@ -241,9 +231,6 @@ int main(int argc, char* argv[]) {
         << "                              files.\n"
         << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
         << "                              USE WITH CAUTION !\n"
-        << "  -p, --precache-objects      Precache object configuration - use with\n"
-        << "                              -v or -s options.\n"
-        << "  -u, --use-precached-objects Use precached object config file.\n"
         << "  -D, --diagnose              Generate a diagnostic file.\n"
         << "\n"
         << "Online:\n"
@@ -322,12 +309,6 @@ int main(int argc, char* argv[]) {
         configuration::applier::state::instance().apply(config, state);
 
         display_scheduling_info();
-        if (precache_objects)
-          logger(logging::log_info_message, logging::basic)
-            << "\n"
-            << "OBJECT PRECACHING\n"
-            << "-----------------\n"
-            << "Object config files were precached.";
         retval = EXIT_SUCCESS;
       }
       catch (std::exception const& e) {
