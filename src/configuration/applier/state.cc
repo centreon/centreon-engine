@@ -1113,7 +1113,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->max_parallel_service_checks(new_cfg.max_parallel_service_checks());
   config->max_service_check_spread(new_cfg.max_service_check_spread());
   config->notification_timeout(new_cfg.notification_timeout());
-  config->object_cache_file(new_cfg.object_cache_file());
   config->obsess_over_hosts(new_cfg.obsess_over_hosts());
   config->obsess_over_services(new_cfg.obsess_over_services());
   config->ochp_command(new_cfg.ochp_command());

@@ -298,8 +298,6 @@ namespace               configuration {
     void                max_service_check_spread(unsigned int value);
     unsigned int        notification_timeout() const throw ();
     void                notification_timeout(unsigned int value);
-    std::string const&  object_cache_file() const throw ();
-    void                object_cache_file(std::string const& value);
     bool                obsess_over_hosts() const throw ();
     void                obsess_over_hosts(bool value);
     bool                obsess_over_services() const throw ();
@@ -455,6 +453,7 @@ namespace               configuration {
     void                _set_log_rotation_method(std::string const& value);
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
+    void                _set_object_cache_file(std::string const& value);
     void                _set_p1_file(std::string const& value);
     void                _set_precached_object_file(std::string const& value);
     void                _set_resource_file(std::string const& value);
@@ -587,7 +586,6 @@ namespace               configuration {
     unsigned int        _max_parallel_service_checks;
     unsigned int        _max_service_check_spread;
     unsigned int        _notification_timeout;
-    std::string         _object_cache_file;
     bool                _obsess_over_hosts;
     bool                _obsess_over_services;
     std::string         _ochp_command;

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -125,7 +125,7 @@ state::setters const state::_setters[] = {
   { "nagios_group",                                SETTER(std::string const&, _set_nagios_group) },
   { "nagios_user",                                 SETTER(std::string const&, _set_nagios_user) },
   { "notification_timeout",                        SETTER(unsigned int, notification_timeout) },
-  { "object_cache_file",                           SETTER(std::string const&, object_cache_file) },
+  { "object_cache_file",                           SETTER(std::string const&, _set_object_cache_file) },
   { "obsess_over_hosts",                           SETTER(bool, obsess_over_hosts) },
   { "obsess_over_services",                        SETTER(bool, obsess_over_services) },
   { "ochp_command",                                SETTER(std::string const&, ochp_command) },
@@ -252,7 +252,6 @@ static unsigned long const             default_max_log_file_size(0);
 static unsigned int const              default_max_parallel_service_checks(0);
 static unsigned int const              default_max_service_check_spread(5);
 static unsigned int const              default_notification_timeout(30);
-static std::string const               default_object_cache_file("");
 static bool const                      default_obsess_over_hosts(false);
 static bool const                      default_obsess_over_services(false);
 static std::string const               default_ochp_command("");
@@ -390,7 +389,6 @@ state::state()
     _max_parallel_service_checks(default_max_parallel_service_checks),
     _max_service_check_spread(default_max_service_check_spread),
     _notification_timeout(default_notification_timeout),
-    _object_cache_file(default_object_cache_file),
     _obsess_over_hosts(default_obsess_over_hosts),
     _obsess_over_services(default_obsess_over_services),
     _ochp_command(default_ochp_command),
@@ -535,7 +533,6 @@ state& state::operator=(state const& right) {
     _max_parallel_service_checks = right._max_parallel_service_checks;
     _max_service_check_spread = right._max_service_check_spread;
     _notification_timeout = right._notification_timeout;
-    _object_cache_file = right._object_cache_file;
     _obsess_over_hosts = right._obsess_over_hosts;
     _obsess_over_services = right._obsess_over_services;
     _ochp_command = right._ochp_command;
@@ -677,7 +674,6 @@ bool state::operator==(state const& right) const throw () {
           && _max_parallel_service_checks == right._max_parallel_service_checks
           && _max_service_check_spread == right._max_service_check_spread
           && _notification_timeout == right._notification_timeout
-          && _object_cache_file == right._object_cache_file
           && _obsess_over_hosts == right._obsess_over_hosts
           && _obsess_over_services == right._obsess_over_services
           && _ochp_command == right._ochp_command
@@ -2567,24 +2563,6 @@ void state::notification_timeout(unsigned int value) {
 }
 
 /**
- *  Get object_cache_file value.
- *
- *  @return The object_cache_file value.
- */
-std::string const& state::object_cache_file() const throw () {
-  return (_object_cache_file);
-}
-
-/**
- *  Set object_cache_file value.
- *
- *  @param[in] value The new object_cache_file value.
- */
-void state::object_cache_file(std::string const& value) {
-  _object_cache_file = value;
-}
-
-/**
  *  Get obsess_over_hosts value.
  *
  *  @return The obsess_over_hosts value.
@@ -4031,6 +4009,18 @@ void state::_set_nagios_user(std::string const& value) {
 }
 
 /**
+ *  Set object_cache_file value.
+ *
+ *  @param[in] value Unused.
+ */
+void state::_set_object_cache_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: object_cache_file variable ignored";
+  ++config_warnings;
+}
+
+/**
  *  Unused variable p1_file.
  *
  *  @param[in] value Unused.
@@ -4045,7 +4035,7 @@ void state::_set_p1_file(std::string const& value) {
 /**
  *  Set precached_object_file value.
  *
- *  @param[in] value The new precached_object_file value.
+ *  @param[in] value Unused.
  */
 void state::_set_precached_object_file(std::string const& value) {
   (void)value;
