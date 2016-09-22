@@ -135,7 +135,7 @@ state::setters const state::_setters[] = {
   { "p1_file",                                     SETTER(std::string const&, _set_p1_file) },
   { "passive_host_checks_are_soft",                SETTER(bool, passive_host_checks_are_soft) },
   { "perfdata_timeout",                            SETTER(int, perfdata_timeout) },
-  { "precached_object_file",                       SETTER(std::string const&, precached_object_file) },
+  { "precached_object_file",                       SETTER(std::string const&, _set_precached_object_file) },
   { "process_performance_data",                    SETTER(bool, process_performance_data) },
   { "resource_file",                               SETTER(std::string const&, _set_resource_file) },
   { "retained_contact_host_attribute_mask",        SETTER(unsigned long, retained_contact_host_attribute_mask) },
@@ -261,7 +261,6 @@ static std::string const               default_ocsp_command("");
 static unsigned int const              default_ocsp_timeout(15);
 static bool const                      default_passive_host_checks_are_soft(false);
 static int const                       default_perfdata_timeout(5);
-static std::string const               default_precached_object_file(DEFAULT_PRECACHED_OBJECT_FILE);
 static bool const                      default_process_performance_data(false);
 static unsigned long const             default_retained_contact_host_attribute_mask(0L);
 static unsigned long const             default_retained_contact_service_attribute_mask(0L);
@@ -400,7 +399,6 @@ state::state()
     _ocsp_timeout(default_ocsp_timeout),
     _passive_host_checks_are_soft(default_passive_host_checks_are_soft),
     _perfdata_timeout(default_perfdata_timeout),
-    _precached_object_file(default_precached_object_file),
     _process_performance_data(default_process_performance_data),
     _retained_contact_host_attribute_mask(default_retained_contact_host_attribute_mask),
     _retained_contact_service_attribute_mask(default_retained_contact_service_attribute_mask),
@@ -546,7 +544,6 @@ state& state::operator=(state const& right) {
     _ocsp_timeout = right._ocsp_timeout;
     _passive_host_checks_are_soft = right._passive_host_checks_are_soft;
     _perfdata_timeout = right._perfdata_timeout;
-    _precached_object_file = right._precached_object_file;
     _process_performance_data = right._process_performance_data;
     _retained_contact_host_attribute_mask = right._retained_contact_host_attribute_mask;
     _retained_contact_service_attribute_mask = right._retained_contact_service_attribute_mask;
@@ -689,7 +686,6 @@ bool state::operator==(state const& right) const throw () {
           && _ocsp_timeout == right._ocsp_timeout
           && _passive_host_checks_are_soft == right._passive_host_checks_are_soft
           && _perfdata_timeout == right._perfdata_timeout
-          && _precached_object_file == right._precached_object_file
           && _process_performance_data == right._process_performance_data
           && _retained_contact_host_attribute_mask == right._retained_contact_host_attribute_mask
           && _retained_contact_service_attribute_mask == right._retained_contact_service_attribute_mask
@@ -2738,24 +2734,6 @@ void state::perfdata_timeout(int value) {
 }
 
 /**
- *  Get precached_object_file value.
- *
- *  @return The precached_object_file value.
- */
-std::string const& state::precached_object_file() const throw () {
-  return (_precached_object_file);
-}
-
-/**
- *  Set precached_object_file value.
- *
- *  @param[in] value The new precached_object_file value.
- */
-void state::precached_object_file(std::string const& value) {
-  _precached_object_file = value;
-}
-
-/**
  *  Get process_performance_data value.
  *
  *  @return The process_performance_data value.
@@ -4061,6 +4039,18 @@ void state::_set_p1_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "Warning: p1_file variable ignored";
+  ++config_warnings;
+}
+
+/**
+ *  Set precached_object_file value.
+ *
+ *  @param[in] value The new precached_object_file value.
+ */
+void state::_set_precached_object_file(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: precached_object_file variable ignored";
   ++config_warnings;
 }
 

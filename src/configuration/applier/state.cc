@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -1122,7 +1122,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->ocsp_timeout(new_cfg.ocsp_timeout());
   config->passive_host_checks_are_soft(new_cfg.passive_host_checks_are_soft());
   config->perfdata_timeout(new_cfg.perfdata_timeout());
-  config->precached_object_file(new_cfg.precached_object_file());
   config->process_performance_data(new_cfg.process_performance_data());
   config->resource_file(new_cfg.resource_file());
   config->retain_state_information(new_cfg.retain_state_information());

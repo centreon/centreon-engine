@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -316,8 +316,6 @@ namespace               configuration {
     void                passive_host_checks_are_soft(bool value);
     int                 perfdata_timeout() const throw ();
     void                perfdata_timeout(int value);
-    std::string const&  precached_object_file() const throw ();
-    void                precached_object_file(std::string const& value);
     bool                process_performance_data() const throw ();
     void                process_performance_data(bool value);
     std::list<std::string> const&
@@ -458,6 +456,7 @@ namespace               configuration {
     void                _set_nagios_group(std::string const& value);
     void                _set_nagios_user(std::string const& value);
     void                _set_p1_file(std::string const& value);
+    void                _set_precached_object_file(std::string const& value);
     void                _set_resource_file(std::string const& value);
     void                _set_retained_process_service_attribute_mask(std::string const& value);
     void                _set_retained_service_attribute_mask(std::string const& value);
@@ -597,7 +596,6 @@ namespace               configuration {
     unsigned int        _ocsp_timeout;
     bool                _passive_host_checks_are_soft;
     int                 _perfdata_timeout;
-    std::string         _precached_object_file;
     bool                _process_performance_data;
     std::list<std::string>
                         _resource_file;
