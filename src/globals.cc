@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009      Ethan Galstad
 ** Copyright 2009-2010      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -98,14 +98,12 @@ int                 defer_downtime_sorting(0);
 int                 embedded_perl_initialized(false);
 int                 external_command_buffer_slots(4096);
 int                 log_host_retries(false);
-int                 precache_objects(false);
 int                 restarting(false);
 int                 sig_id(0);
 int                 sighup(false);
 int                 sigrestart(false);
 int                 sigshutdown(false);
 int                 test_scheduling(false);
-int                 use_precached_objects(false);
 int                 verify_circular_paths(true);
 int                 verify_config(false);
 nebcallback*        neb_callback_list[NEBCALLBACK_NUMITEMS];

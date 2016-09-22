@@ -66,4 +66,8 @@ extern unsigned int use_embedded_perl_implicitly;
 extern char const* p1_file;
 extern char const* temp_path;
 
+// Precaching.
+extern int precache_objects;
+extern int use_precached_objects;
+
 #endif // !CCE_COMPATIBILITY_GLOBALS_H

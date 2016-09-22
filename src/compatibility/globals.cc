@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -63,3 +63,7 @@ unsigned int use_embedded_perl_implicitly(false);
 // Old path.
 char const* p1_file("");
 char const* temp_path("/tmp");
+
+// Precaching.
+int precache_objects(false);
+int use_precached_objects(false);
