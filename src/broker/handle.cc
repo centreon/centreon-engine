@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -266,13 +266,27 @@ void handle::open(
                std::string const& filename,
                std::string const& args) {
   if (is_loaded())
-    return;
+    return ;
 
   close();
   _filename = filename;
   _args = args;
   open();
   return;
+}
+
+/**
+ *  Reload the module.
+ */
+void handle::reload() {
+  if (!is_loaded())
+    return ;
+  typedef int (*func_reload)();
+  func_reload
+    routine((func_reload)_handle->resolve_proc("nebmodule_reload"));
+  if (routine)
+    routine();
+  return ;
 }
 
 /**

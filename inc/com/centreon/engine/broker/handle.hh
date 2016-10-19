@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -62,6 +62,7 @@ namespace                    broker {
     void                     open(
                                std::string const& filename,
                                std::string const& args);
+    void                     reload();
     void                     set_author(
                                std::string const& author);
     void                     set_copyright(

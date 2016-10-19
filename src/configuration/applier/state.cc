@@ -1707,6 +1707,8 @@ void applier::state::_processing(
         NEBATTR_NONE,
         NULL);
     }
+    else
+      neb_reload_all_modules();
 
     // Timing.
     gettimeofday(tv + 4, NULL);

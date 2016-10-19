@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2008      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -156,6 +156,58 @@ int neb_load_module(void* mod) {
 }
 
 /**
+ *  Reload all modules that are currently loaded.
+ */
+int neb_reload_all_modules() {
+  int retval;
+  try {
+    broker::loader* loader(&broker::loader::instance());
+    if (loader) {
+      std::list<shared_ptr<broker::handle> >
+        modules(loader->get_modules());
+      for (std::list<shared_ptr<broker::handle> >::const_iterator
+             it(modules.begin()), end(modules.end());
+           it != end;
+           ++it) {
+        neb_reload_module(&**it);
+      }
+      logger(dbg_eventbroker, basic)
+        << "All modules got successfully reloaded";
+    }
+    retval = OK;
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "Error: Module reloading failed: " << e.what();
+    retval = ERROR;
+  }
+  catch (...) {
+    logger(log_runtime_error, basic)
+      << "Error: Module reloading failed: unknown error";
+    retval = ERROR;
+  }
+  return (retval);
+}
+
+/* Reload a particular module. */
+int neb_reload_module(void* mod) {
+  if (mod == NULL)
+    return (ERROR);
+
+  broker::handle* module(static_cast<broker::handle*>(mod));
+  if (module->is_loaded() == false)
+    return (OK);
+
+  logger(dbg_eventbroker, basic)
+    << "Attempting to reload module '" << module->get_filename() << "'";
+  module->reload();
+  logger(dbg_eventbroker, basic)
+    << "Module '" << module->get_filename() << "' reloaded successfully";
+
+  return (OK);
+}
+
+/**
  *  Close (unload) all modules that are currently loaded.
  *
  *  @param[in] flags  Unload flags.
@@ -177,7 +229,7 @@ int neb_unload_all_modules(int flags, int reason) {
         neb_unload_module(&**it, flags, reason);
       loader->unload_modules();
       logger(dbg_eventbroker, basic)
-        << "all modules got successfully unloaded";
+        << "All modules got successfully unloaded";
     }
     retval = OK;
   }
@@ -187,7 +239,7 @@ int neb_unload_all_modules(int flags, int reason) {
     retval = ERROR;
   }
   catch (...) {
-    logger(dbg_eventbroker, basic)
+    logger(log_runtime_error, basic)
       << "Error: unloading of all modules failed";
     retval = ERROR;
   }

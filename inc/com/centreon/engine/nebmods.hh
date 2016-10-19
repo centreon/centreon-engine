@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2002-2006      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -46,6 +46,8 @@ int neb_add_module(
 int neb_free_module_list();
 int neb_load_all_modules();
 int neb_load_module(void* mod);
+int neb_reload_all_modules();
+int neb_reload_module(void* mod);
 int neb_unload_all_modules(int flags, int reason);
 int neb_unload_module(void* mod, int flags, int reason);
 
