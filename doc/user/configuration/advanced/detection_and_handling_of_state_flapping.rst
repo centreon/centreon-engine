@@ -52,6 +52,9 @@ The image below shows a chronological history of service states from the
 most recent 21 service checks. OK states are shown in green, WARNING
 states in yellow, CRITICAL states in red, and UNKNOWN states in orange.
 
+.. image:: /_static/images/statetransitions.png
+   :align: center
+
 The historical service check results are examined to determine where
 state changes/transitions occur. State changes occur when an archived
 state is different from the archived state that immediately precedes it
@@ -75,6 +78,9 @@ than the oldest possible state change. The image below shows how recent
 state changes are given more weight than older state changes when
 calculating the overall or total percent state change for a particular
 service.
+
+.. image:: /_static/images/statetransitions2.png
+   :align: center
 
 Using the images above, lets do a calculation of percent state change
 for the service. You will notice that there are a total of 7 state
