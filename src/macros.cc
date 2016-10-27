@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -757,6 +757,11 @@ int grab_standard_contact_macro_r(
   }
     break;
 
+  case MACRO_CONTACTTIMEZONE: {
+    *output = string::dup(get_contact_timezone(temp_contact->name));
+  }
+    break ;
+
   default:
     logger(dbg_macros, basic)
       << "UNHANDLED CONTACT MACRO #" << macro_type
@@ -1153,6 +1158,9 @@ int init_macrox_names() {
   add_macrox_name(HOSTCHILDREN);
   add_macrox_name(HOSTID);
   add_macrox_name(SERVICEID);
+  add_macrox_name(HOSTTIMEZONE);
+  add_macrox_name(SERVICETIMEZONE);
+  add_macrox_name(CONTACTTIMEZONE);
 
   return (OK);
 }

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010      Ethan Galstad
-** Copyright 2011-2013,2016 Merethis
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -225,6 +225,19 @@ static char* get_host_id(host& hst, nagios_macros* mac) {
             com::centreon::engine::get_host_id(hst.name)).c_str()));
 }
 
+/**
+ *  Get the timezone of a host.
+ *
+ *  @param[in] hst Host object.
+ *  @param[in] mac Macro array.
+ *
+ *  @return Newly allocated string with requested value in plain text.
+ */
+static char* get_host_macro_timezone(host& hst, nagios_macros* mac) {
+  (void)mac;
+  return (string::dup(get_host_timezone(hst.name)));
+}
+
 /**************************************
 *                                     *
 *         Redirection Object          *
@@ -380,9 +393,12 @@ struct grab_host_redirection {
     // Host children.
     routines[MACRO_HOSTCHILDREN].first = &get_host_children;
     routines[MACRO_HOSTCHILDREN].second = true;
-    // Service id.
+    // Host ID.
     routines[MACRO_HOSTID].first = &get_host_id;
     routines[MACRO_HOSTID].second = true;
+    // Host timezone.
+    routines[MACRO_HOSTTIMEZONE].first = &get_host_macro_timezone;
+    routines[MACRO_HOSTTIMEZONE].second = true;
   }
 } static const redirector;
 

@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -75,7 +75,8 @@ int clear_host_macros_r(nagios_macros* mac) {
     MACRO_LASTHOSTPROBLEMID,
     MACRO_HOSTPARENTS,
     MACRO_HOSTCHILDREN,
-    MACRO_HOSTID
+    MACRO_HOSTID,
+    MACRO_HOSTTIMEZONE
   };
   for (unsigned int i = 0;
        i < sizeof(to_free) / sizeof(*to_free);

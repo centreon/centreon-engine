@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -194,6 +194,9 @@
 # define MACRO_HOSTCHILDREN                     154
 # define MACRO_HOSTID                           155
 # define MACRO_SERVICEID                        156
+# define MACRO_HOSTTIMEZONE                     157
+# define MACRO_SERVICETIMEZONE                  158
+# define MACRO_CONTACTTIMEZONE                  159
 
 // Macro Cleaning Options
 # define STRIP_ILLEGAL_MACRO_CHARS              1

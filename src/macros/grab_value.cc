@@ -1,6 +1,6 @@
 /*
-** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 1999-2010      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -794,7 +794,8 @@ struct grab_value_redirection {
       MACRO_LASTHOSTSTATEID,
       MACRO_HOSTPARENTS,
       MACRO_HOSTCHILDREN,
-      MACRO_HOSTID
+      MACRO_HOSTID,
+      MACRO_HOSTTIMEZONE
     };
     for (unsigned int i = 0;
          i < sizeof(host_ids) / sizeof(*host_ids);
@@ -858,7 +859,8 @@ struct grab_value_redirection {
       MACRO_LASTSERVICEPROBLEMID,
       MACRO_LASTSERVICESTATE,
       MACRO_LASTSERVICESTATEID,
-      MACRO_SERVICEID
+      MACRO_SERVICEID,
+      MACRO_SERVICETIMEZONE
     };
     for (unsigned int i = 0;
          i < sizeof(service_ids) / sizeof(*service_ids);
@@ -885,7 +887,8 @@ struct grab_value_redirection {
       MACRO_CONTACTALIAS,
       MACRO_CONTACTEMAIL,
       MACRO_CONTACTPAGER,
-      MACRO_CONTACTGROUPNAMES
+      MACRO_CONTACTGROUPNAMES,
+      MACRO_CONTACTTIMEZONE
     };
     for (unsigned int i = 0;
          i < sizeof(contact_ids) / sizeof(*contact_ids);
