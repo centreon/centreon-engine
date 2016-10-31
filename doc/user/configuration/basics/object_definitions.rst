@@ -127,6 +127,7 @@ Definition Format
     contact_groups                 contact_groups
     notification_interval          #
     # first_notification_delay     #
+    # recovery_notification_delay  #
     notification_period            timeperiod_name
     # notification_options         [d,u,r,f,s]
     # notifications_enabled        [0/1]
@@ -296,6 +297,10 @@ first_notification_delay     This directive is used to define the number of "tim
                              :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
                              start sending out notifications immediately.
+recovery_notification_delay  This directive is used to define the number of "time units" to wait in non-UP state before a recovery notification
+                             can be sent out. Unless you've changed the :ref:`interval_length <main_cfg_opt_timing_interval_length>`
+                             directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
+                             allow recovery notification at soon at the host recovers.
 notification_period          This directive is used to specify the short name of the
                              :ref:`time period <obj_def_timeperiod>` during which notifications of events for this host
                              can be sent out to contacts. If a host goes down, becomes unreachable, or recoveries during a time which is not covered
@@ -464,6 +469,7 @@ Definition Format
     # retain_nonstatus_information [0/1]
     notification_interval          #
     # first_notification_delay     #
+    # recovery_notification_delay  #
     notification_period            timeperiod_name
     # notification_options         [w,u,c,r,f,s]
     # notifications_enabled        [0/1]
@@ -600,6 +606,10 @@ first_notification_delay     This directive is used to define the number of "tim
                              :ref:`interval_length <main_cfg_opt_timing_interval_length>`
                              directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
                              start sending out notifications immediately.
+recovery_notification_delay  This directive is used to define the number of "time units" to wait in non-OK state before a recovery notification
+                             can be sent out. Unless you've changed the :ref:`interval_length <main_cfg_opt_timing_interval_length>`
+                             directive from the default value of 60, this number will mean minutes. If you set this value to 0, Centreon Engine will
+                             allow recovery notification at soon at the service recovers.
 notification_period          This directive is used to specify the short name of the
                              :ref:`time period <obj_def_timeperiod>` during which notifications of events for this
                              service can be sent out to contacts. No service notifications will be sent out during times which is not covered by the
