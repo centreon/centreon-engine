@@ -33,7 +33,7 @@ class         GetNextValidTimeCalendarDateTest : public ::testing::Test {
   void        SetUp() {
     _timeperiod = new timeperiod();
     daterange* dr(NULL);
-    // 2016-10-25-2016-10-26 10:45-14:25
+    // 2016-10-25 10:45-14:25
     dr = add_exception_to_timeperiod(
            _timeperiod,
            DATERANGE_CALENDAR_DATE,
@@ -44,7 +44,7 @@ class         GetNextValidTimeCalendarDateTest : public ::testing::Test {
            0,
            2016,
            9,
-           26,
+           25,
            0,
            0,
            0);
@@ -52,13 +52,13 @@ class         GetNextValidTimeCalendarDateTest : public ::testing::Test {
       dr,
       hmtos(10, 45),
       hmtos(14, 25));
-    // 2016-10-28 08:30-12:30,18:30-21:15
+    // 2016-10-272016-10-28 08:30-12:30,18:30-21:15
     dr = add_exception_to_timeperiod(
            _timeperiod,
            DATERANGE_CALENDAR_DATE,
            2016,
            9,
-           28,
+           27,
            0,
            0,
            2016,
@@ -90,7 +90,7 @@ class         GetNextValidTimeCalendarDateTest : public ::testing::Test {
 // Given a timeperiod configured with calendar dates
 // And we are earlier than these dates
 // When get_next_valid_time() is called
-// Then the next valid time is the beginning of the next calendar date's timerange
+// Then the next valid time is the beginning of the next date's timerange
 TEST_F(GetNextValidTimeCalendarDateTest, BeforeCalendarDates) {
   time_t now(strtotimet("2016-10-24 12:00:00"));
   set_time(now);
@@ -102,13 +102,13 @@ TEST_F(GetNextValidTimeCalendarDateTest, BeforeCalendarDates) {
 // Given a timeperiod configured with calendar dates
 // And we are between two calendar dates
 // When get_next_valid_time() is called
-// Then the next valid time is the beginning of the next calendar date's timerange
+// Then the next valid time is the beginning of the next date's timerange
 TEST_F(GetNextValidTimeCalendarDateTest, BetweenCalendarDates) {
-  time_t now(strtotimet("2016-10-27 12:00:00"));
+  time_t now(strtotimet("2016-10-26 12:00:00"));
   set_time(now);
   time_t expected((time_t)-1);
   get_next_valid_time(now, &expected, _timeperiod);
-  ASSERT_EQ(expected, strtotimet("2016-10-28 08:30:00"));
+  ASSERT_EQ(expected, strtotimet("2016-10-27 08:30:00"));
 }
 
 // Given a timeperiod configured with calendar dates
@@ -117,6 +117,18 @@ TEST_F(GetNextValidTimeCalendarDateTest, BetweenCalendarDates) {
 // Then the next valid time is now
 TEST_F(GetNextValidTimeCalendarDateTest, WithinCalendarDate) {
   time_t now(strtotimet("2016-10-28 20:59:00"));
+  set_time(now);
+  time_t expected((time_t)-1);
+  get_next_valid_time(now, &expected, _timeperiod);
+  ASSERT_EQ(expected, now);
+}
+
+// Given a timeperiod configured with calendar dates
+// And we are after the calendar dates
+// When get_next_valid_time() is called
+// Then the next valid time is now
+TEST_F(GetNextValidTimeCalendarDateTest, AfterCalendarDates) {
+  time_t now(strtotimet("2016-10-30 12:00:00"));
   set_time(now);
   time_t expected((time_t)-1);
   get_next_valid_time(now, &expected, _timeperiod);
