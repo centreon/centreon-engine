@@ -20,16 +20,25 @@
 # Enable unit tests or not.
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
+  # Add root inclusion direction.
+  include_directories("${PROJECT_SOURCE_DIR}")
+
   # Set directory.
   set(TESTS_DIR "${PROJECT_SOURCE_DIR}/tests")
   add_subdirectory("googletest")
 
   # Unit test executable.
   add_executable("ut"
+    # Sources.
     "${TESTS_DIR}/configuration/host.cc"
     "${TESTS_DIR}/configuration/object.cc"
     "${TESTS_DIR}/configuration/service.cc"
     "${TESTS_DIR}/downtime_finder.cc"
+    "${TESTS_DIR}/main.cc"
+    "${TESTS_DIR}/timeperiod/get_next_valid_time/normal_weekday.cc"
+    "${TESTS_DIR}/timeperiod/utils.cc"
+    # Headers.
+    "${TESTS_DIR}/timeperiod/utils.hh"
   )
-  target_link_libraries("ut" "gtest" "gtest_main" "cce_core")
+  target_link_libraries("ut" "gtest" "cce_core")
 endif ()
