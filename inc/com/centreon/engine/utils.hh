@@ -82,25 +82,6 @@ int set_environment_var(
       char const* name,
       char const* value,
       int set);
-// check to see if a specific time is covered by a time period
-int check_time_against_period(time_t test_time, timeperiod* tperiod);
-// get the next valid time in a time period
-void get_next_valid_time(
-       time_t pref_time,
-       time_t* valid_time,
-       timeperiod* tperiod);
-int is_daterange_single_day(daterange const* dr);
-// calculate_time_from_day_of_month
-time_t calculate_time_from_day_of_month(
-         int year,
-         int month,
-         int monthday);
-// calculates midnight time of specific (3rd, last, etc.) weekday of a particular month
-time_t calculate_time_from_weekday_of_month(
-         int year,
-         int month,
-         int weekday,
-         int weekday_offset);
 // determine the next time to schedule a log rotation
 time_t get_next_log_rotation_time();
 // trap signals

@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2015 Merethis
+** Copyright 2011-2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,6 +29,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/utils.hh"
 

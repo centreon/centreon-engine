@@ -27,6 +27,7 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;

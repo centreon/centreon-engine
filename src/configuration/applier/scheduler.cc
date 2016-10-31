@@ -31,6 +31,7 @@
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/timeperiod.hh"
 #include "com/centreon/engine/timezone_locker.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/logging/logger.hh"

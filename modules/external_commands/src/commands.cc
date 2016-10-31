@@ -39,6 +39,7 @@
 #include "com/centreon/engine/objects/downtime.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timeperiod.hh"
 #include "mmap.h"
 
 using namespace com::centreon::engine;
