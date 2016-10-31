@@ -36,6 +36,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/downtime_finder.cc"
     "${TESTS_DIR}/main.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/calendar_date.cc"
+    "${TESTS_DIR}/timeperiod/get_next_valid_time/generic_month_date.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/normal_weekday.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/specific_month_date.cc"
     "${TESTS_DIR}/timeperiod/utils.cc"
