@@ -31,23 +31,23 @@ class         GetNextValidTimeNormalWeekdayTest : public ::testing::Test {
  public:
   void        SetUp() {
     _timeperiod = new timeperiod();
-    // tuesday 10:30-11:45
+    // tuesday 10:30-11:45,18:30-23:30
     add_timerange_to_timeperiod(
       _timeperiod,
       2,
       hmtos(10, 30),
       hmtos(11, 45));
-    // wednesday 12:00-13:00,18:30-23:30
     add_timerange_to_timeperiod(
       _timeperiod,
-      3,
-      hmtos(12, 0),
-      hmtos(13, 0));
-    add_timerange_to_timeperiod(
-      _timeperiod,
-      3,
+      2,
       hmtos(18, 30),
       hmtos(23, 30));
+    // thursday 12:00-13:00
+    add_timerange_to_timeperiod(
+      _timeperiod,
+      4,
+      hmtos(12, 0),
+      hmtos(13, 0));
     // friday 08:30-09:15,12:15-12:45,18:30-19:45
     add_timerange_to_timeperiod(
       _timeperiod,
@@ -77,10 +77,10 @@ class         GetNextValidTimeNormalWeekdayTest : public ::testing::Test {
 };
 
 // Given a timeperiod configured with normal weekdays
-// And we are earlier in the week than this weekday
+// And we are earlier in the week than the weekdays
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the weekday's timerange
-TEST_F(GetNextValidTimeNormalWeekdayTest, BeforeWeekday) {
+TEST_F(GetNextValidTimeNormalWeekdayTest, BeforeWeekdays) {
   time_t now(strtotimet("2016-10-24 12:00:00"));
   set_time(now);
   time_t expected((time_t)-1);
@@ -93,11 +93,11 @@ TEST_F(GetNextValidTimeNormalWeekdayTest, BeforeWeekday) {
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the next weekday's timerange
 TEST_F(GetNextValidTimeNormalWeekdayTest, BetweenWeekdays) {
-  time_t now(strtotimet("2016-10-27 12:00:00"));
+  time_t now(strtotimet("2016-10-26 12:00:00"));
   set_time(now);
   time_t expected((time_t)-1);
   get_next_valid_time(now, &expected, _timeperiod);
-  ASSERT_EQ(expected, strtotimet("2016-10-28 08:30:00"));
+  ASSERT_EQ(expected, strtotimet("2016-10-27 12:00:00"));
 }
 
 // Given a timeperiod configured with normal weekdays
@@ -110,4 +110,16 @@ TEST_F(GetNextValidTimeNormalWeekdayTest, WithinWeekday) {
   time_t expected((time_t)-1);
   get_next_valid_time(now, &expected, _timeperiod);
   ASSERT_EQ(expected, now);
+}
+
+// Given a timeperiod configured with normal weekdays
+// And we are after the weekdays but in the same week
+// When get_next_valid_time() is called
+// Then the next valid time is the next week's first week day
+TEST_F(GetNextValidTimeNormalWeekdayTest, AfterWeekdays) {
+  time_t now(strtotimet("2016-10-29 13:37:42"));
+  set_time(now);
+  time_t expected((time_t)-1);
+  get_next_valid_time(now, &expected, _timeperiod);
+  ASSERT_EQ(expected, strtotimet("2016-11-01 10:30:00"));
 }
