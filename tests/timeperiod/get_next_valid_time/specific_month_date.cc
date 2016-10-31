@@ -103,7 +103,7 @@ TEST_F(GetNextValidTimeSpecificMonthDateTest, BeforeSpecificMonthDates) {
 // And we are between two specific month dates
 // When get_next_valid_time() is called
 // Then the next valid time is the beginning of the next date's timerange
-TEST_F(GetNextValidTimeSpecificMonthDateTest, BetweenCalendarDates) {
+TEST_F(GetNextValidTimeSpecificMonthDateTest, BetweenSpecificMonthDates) {
   time_t now(strtotimet("2016-10-26 12:00:00"));
   set_time(now);
   time_t expected((time_t)-1);
@@ -115,7 +115,7 @@ TEST_F(GetNextValidTimeSpecificMonthDateTest, BetweenCalendarDates) {
 // And we are within a specific month date
 // When get_next_valid_time() is called
 // Then the next valid time is now
-TEST_F(GetNextValidTimeSpecificMonthDateTest, WithinCalendarDate) {
+TEST_F(GetNextValidTimeSpecificMonthDateTest, WithinSpecificMonthDate) {
   time_t now(strtotimet("2016-10-28 20:59:00"));
   set_time(now);
   time_t expected((time_t)-1);
@@ -127,7 +127,7 @@ TEST_F(GetNextValidTimeSpecificMonthDateTest, WithinCalendarDate) {
 // And we are after these dates in the month
 // When get_next_valid_time() is called
 // Then the next valid time is the first specific month date in the next month
-TEST_F(GetNextValidTimeSpecificMonthDateTest, AfterCalendarDates) {
+TEST_F(GetNextValidTimeSpecificMonthDateTest, AfterSpecificMonthDates) {
   time_t now(strtotimet("2016-10-30 13:37:42"));
   set_time(now);
   time_t expected((time_t)-1);
