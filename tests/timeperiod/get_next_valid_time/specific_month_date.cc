@@ -132,5 +132,5 @@ TEST_F(GetNextValidTimeSpecificMonthDateTest, AfterSpecificMonthDates) {
   set_time(now);
   time_t expected((time_t)-1);
   get_next_valid_time(now, &expected, _timeperiod);
-  ASSERT_EQ(expected, strtotimet("2016-10-25 10:45:00"));
+  ASSERT_EQ(expected, strtotimet("2017-10-25 10:45:00"));
 }
