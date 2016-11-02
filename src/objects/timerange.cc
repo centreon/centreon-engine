@@ -122,10 +122,12 @@ timerange* add_timerange_to_daterange(
     obj->range_start = start_time;
     obj->range_end = end_time;
 
-    // Add the new time range to the head of the range
-    // list for this date range.
-    obj->next = drange->times;
-    drange->times = obj;
+    // Add timerange sorted.
+    timerange** pos(&drange->times);
+    while (*pos && ((*pos)->range_start < obj->range_start))
+      pos = &(*pos)->next;
+    obj->next = *pos;
+    *pos = obj;
   }
   catch (...) {
     deleter::timerange(obj);
@@ -180,9 +182,12 @@ timerange* add_timerange_to_timeperiod(
     obj->range_start = start_time;
     obj->range_end = end_time;
 
-    // Add the new time range to the head of the range list for this day.
-    obj->next = period->days[day];
-    period->days[day] = obj;
+    // Add timerange sorted.
+    timerange** pos(&period->days[day]);
+    while (*pos && ((*pos)->range_start < obj->range_start))
+      pos = &(*pos)->next;
+    obj->next = *pos;
+    *pos = obj;
   }
   catch (...) {
     deleter::timerange(obj);

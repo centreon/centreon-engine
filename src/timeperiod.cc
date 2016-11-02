@@ -59,7 +59,7 @@ static time_t _add_round_days_to_midnight(time_t midnight, time_t skip) {
     ** be in the proper day (DST shift is +-1h) we only have to reset
     ** time to midnight, convert back and we're done.
     */
-    next_day_time += 12 * 60 * 60 + skip;
+    next_day_time += 12 * 60 * 60;
     localtime_r(&next_day_time, &next_day);
     next_day.tm_hour = 0;
     next_day.tm_min = 0;
