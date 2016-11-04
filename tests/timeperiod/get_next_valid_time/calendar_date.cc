@@ -52,7 +52,7 @@ class         GetNextValidTimeCalendarDateTest : public ::testing::Test {
       dr,
       hmtos(10, 45),
       hmtos(14, 25));
-    // 2016-10-272016-10-28 08:30-12:30,18:30-21:15
+    // 2016-10-27-2016-10-28 08:30-12:30,18:30-21:15
     dr = add_exception_to_timeperiod(
            _timeperiod,
            DATERANGE_CALENDAR_DATE,
