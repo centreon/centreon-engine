@@ -297,35 +297,36 @@ static bool _daterange_month_date_to_time_t(
               time_info const& ti,
               time_t& start,
               time_t& end) {
-  // what year should we use?
+  // What year should we use?
   int year(ti.preftime.tm_year);
-  // advance an additional year if we already passed
-  // the end month date
-  // if (r.emon < ti.curtime.tm_mon
-  //     || (r.emon == ti.curtime.tm_mon
-  //         && r.emday < ti.curtime.tm_mday))
-  //   ++year;
+  // Advance an additional year if we already passed the end month date.
+  if (r.emon < ti.preftime.tm_mon
+      || (r.emon == ti.preftime.tm_mon
+          && r.emday < ti.preftime.tm_mday))
+    ++year;
   start = calculate_time_from_day_of_month(year, r.smon, r.smday);
-
-  // start date was bad.
-  if (!start)
+  if (start == (time_t)-1)
     return (false);
 
-  // use same year as was calculated for start time above
+  // Use same year as was calculated for start time above.
   end = calculate_time_from_day_of_month(year, r.emon, r.emday);
-  // advance a year if necessary: august 5 - february 2
+  // Advance a year if necessary: august 5 - february 2.
   if (end < start)
     end = calculate_time_from_day_of_month( ++year, r.emon, r.emday);
-
-  // end date was bad - see if we can handle the error
-  if (!end) {
-    // end date can't be helped, so skip it
+  // End date was bad - see if we can handle the error.
+  if (end == (time_t)-1) {
+    // End date can't be helped, so skip it.
     if (r.emday < 0)
       return (false);
-    // else end date slipped past end of month, so use last
-    // day of month as end date
+    // Else end date slipped past end of month, so use last
+    // day of month as end date.
     end = calculate_time_from_day_of_month(year, r.emon, -1);
+    if (end == (time_t)-1)
+      return (false);
   }
+  // In all cases, the end date should be moved to the next day to be
+  // used as inclusive interval.
+  end = _add_round_days_to_midnight(end, 24 * 60 * 60);
   return (true);
 }
 
