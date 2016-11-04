@@ -34,7 +34,6 @@ using namespace com::centreon::engine::logging;
 static void _get_next_valid_time_per_timeperiod(
               time_t preferred_time,
               time_t* valid_time,
-              time_t current_time,
               timeperiod* tperiod);
 
 /**
@@ -225,11 +224,9 @@ static time_t calculate_time_from_weekday_of_month(
  *  Internal struct time information.
  */
 struct   time_info {
-  time_t current_time;
-  tm     curtime;
-  time_t midnight;
   time_t preferred_time;
   tm     preftime;
+  time_t midnight;
 };
 
 /**
@@ -301,13 +298,13 @@ static bool _daterange_month_date_to_time_t(
               time_t& start,
               time_t& end) {
   // what year should we use?
-  int year(std::max(ti.preftime.tm_year, ti.curtime.tm_year));
+  int year(ti.preftime.tm_year);
   // advance an additional year if we already passed
   // the end month date
-  if (r.emon < ti.curtime.tm_mon
-      || (r.emon == ti.curtime.tm_mon
-          && r.emday < ti.curtime.tm_mday))
-    ++year;
+  // if (r.emon < ti.curtime.tm_mon
+  //     || (r.emon == ti.curtime.tm_mon
+  //         && r.emday < ti.curtime.tm_mday))
+  //   ++year;
   start = calculate_time_from_day_of_month(year, r.smon, r.smday);
 
   // start date was bad.
@@ -350,32 +347,16 @@ static bool _daterange_month_day_to_time_t(
   // What year/month should we use ?
   int year;
   int month;
-  if (ti.preferred_time > ti.current_time) {
-    year = ti.preftime.tm_year;
-    month = ti.preftime.tm_mon;
-    // Advance an additional month (and possibly the year) if
-    // we already passed the end day of month.
-    if (ti.preftime.tm_mday > r.emday) {
-      if (month != 11)
-        ++month;
-      else {
-        month = 0;
-        ++year;
-      }
-    }
-  }
-  else {
-    year = ti.curtime.tm_year;
-    month = ti.curtime.tm_mon;
-    // Advance an additional month (and possibly the year) if
-    // we already passed the end day of month.
-    if (ti.curtime.tm_mday > r.emday) {
-      if (month != 11)
-        ++month;
-      else {
-        month = 0;
-        ++year;
-      }
+  year = ti.preftime.tm_year;
+  month = ti.preftime.tm_mon;
+  // Advance an additional month (and possibly the year) if
+  // we already passed the end day of month.
+  if (ti.preftime.tm_mday > r.emday) {
+    if (month != 11)
+      ++month;
+    else {
+      month = 0;
+      ++year;
     }
   }
 
@@ -422,7 +403,7 @@ static bool _daterange_month_week_day_to_time_t(
               time_t& start,
               time_t& end) {
   // What year should we use?
-  int year(std::max(ti.preftime.tm_year, ti.curtime.tm_year));
+  int year(ti.preftime.tm_year);
 
   while (true) {
     // Calculate time of specified weekday of specific month.
@@ -508,14 +489,8 @@ static bool _daterange_week_day_to_time_t(
   // What year/month should we use ?
   int year;
   int month;
-  if (ti.preferred_time > ti.current_time) {
-    year = ti.preftime.tm_year;
-    month = ti.preftime.tm_mon;
-  }
-  else {
-    year = ti.curtime.tm_year;
-    month = ti.curtime.tm_mon;
-  }
+  year = ti.preftime.tm_year;
+  month = ti.preftime.tm_mon;
 
   while (true) {
     // Calculate time of specified weekday of month.
@@ -728,7 +703,6 @@ int check_time_against_period(
   _get_next_valid_time_per_timeperiod(
     test_time,
     &next_valid_time,
-    test_time,
     tperiod);
   return ((next_valid_time == test_time) ? OK : ERROR);
 }
@@ -739,16 +713,14 @@ int check_time_against_period(
  *
  *  @param[in]  preferred_time  The preferred time to check.
  *  @param[out] invalid_time    Variable to fill.
- *  @param[in]  current_time    The current time.
  *  @param[in]  tperiod         The time period to use.
  */
 static void _get_min_invalid_time_per_timeperiod(
-       time_t preferred_time,
-       time_t* invalid_time,
-       time_t current_time,
-       timeperiod* tperiod) {
+              time_t preferred_time,
+              time_t* invalid_time,
+              timeperiod* tperiod) {
   logger(dbg_functions, basic)
-    << "get_min_valid_time_per_timeperiod()";
+    << "get_min_invalid_time_per_timeperiod()";
 
   // If no timeperiod, go with preferred time.
   if (!tperiod) {
@@ -771,8 +743,6 @@ static void _get_min_invalid_time_per_timeperiod(
     // Compute time information.
     time_info ti;
     ti.preferred_time = preferred_time;
-    ti.current_time = current_time;
-    localtime_r(&current_time, &ti.curtime);
     localtime_r(&preferred_time, &ti.preftime);
     ti.preftime.tm_sec = 0;
     ti.preftime.tm_min = 0;
@@ -877,7 +847,6 @@ static void _get_min_invalid_time_per_timeperiod(
       _get_next_valid_time_per_timeperiod(
         preferred_time,
         &valid,
-        current_time,
         exclusion->timeperiod_ptr);
       if ((valid != (time_t)-1)
           && (((time_t)-1 == next_exclusion)
@@ -925,13 +894,11 @@ static void _get_min_invalid_time_per_timeperiod(
  *
  *  @param[in]  preferred_time  The preferred time to check.
  *  @param[out] valid_time      Variable to fill.
- *  @param[in]  current_time    The current time.
  *  @param[in]  tperiod         The time period to use.
  */
 static void _get_next_valid_time_per_timeperiod(
               time_t preferred_time,
               time_t* valid_time,
-              time_t current_time,
               timeperiod* tperiod) {
   logger(dbg_functions, basic)
     << "get_next_valid_time_per_timeperiod()";
@@ -954,8 +921,6 @@ static void _get_next_valid_time_per_timeperiod(
     // Compute time information.
     time_info ti;
     ti.preferred_time = preferred_time;
-    ti.current_time = current_time;
-    localtime_r(&current_time, &ti.curtime);
     localtime_r(&preferred_time, &ti.preftime);
     ti.preftime.tm_sec = 0;
     ti.preftime.tm_min = 0;
@@ -1094,7 +1059,6 @@ static void _get_next_valid_time_per_timeperiod(
         _get_min_invalid_time_per_timeperiod(
           earliest_time,
           &invalid,
-          current_time,
           exclusion->timeperiod_ptr);
         if ((invalid != (time_t)-1)
             && (((time_t)-1 == max_invalid)
@@ -1140,8 +1104,7 @@ void get_next_valid_time(
   logger(dbg_functions, basic) << "get_next_valid_time()";
 
   // Preferred time must be now or in the future.
-  time_t current_time(time(NULL));
-  time_t preferred_time(std::max(pref_time, current_time));
+  time_t preferred_time(std::max(pref_time, time(NULL)));
 
   // If no timeperiod, go with the preferred time.
   if (!tperiod) {
@@ -1155,7 +1118,6 @@ void get_next_valid_time(
     _get_next_valid_time_per_timeperiod(
       preferred_time,
       valid_time,
-      current_time,
       tperiod);
   }
 
