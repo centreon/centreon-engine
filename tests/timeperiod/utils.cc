@@ -105,6 +105,41 @@ daterange* timeperiod_creator::new_calendar_date(
 }
 
 /**
+ *  Create a new specific month date range.
+ *
+ *  @param[in]  start_month  Start month.
+ *  @param[in]  start_day    Start day.
+ *  @param[in]  end_month    End month.
+ *  @param[in]  end_day      End day.
+ *  @param[out] target       Target timeperiod.
+ *
+ *  @return The newly created daterange.
+ */
+daterange* timeperiod_creator::new_specific_month_date(
+                                 int start_month,
+                                 int start_day,
+                                 int end_month,
+                                 int end_day,
+                                 timeperiod* target) {
+  if (!target)
+    target = _timeperiods;
+  return (add_exception_to_timeperiod(
+            target,
+            DATERANGE_MONTH_DATE,
+            0,
+            start_month,
+            start_day,
+            0,
+            0,
+            0,
+            end_month,
+            end_day,
+            0,
+            0,
+            0));
+}
+
+/**
  *  Create a new timerange in a daterange.
  *
  *  @param[in]  start_hour    Start hour.
