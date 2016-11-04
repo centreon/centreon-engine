@@ -22,6 +22,51 @@
 
 #  include <ctime>
 #  include <string>
+#  include "com/centreon/engine/objects/daterange.hh"
+#  include "com/centreon/engine/objects/timeperiod.hh"
+
+class         timeperiod_creator
+{
+ public:
+              timeperiod_creator();
+              ~timeperiod_creator();
+  timeperiod* get_timeperiods();
+  timeperiod* new_timeperiod();
+  daterange*  new_calendar_date(
+                int start_year,
+                int start_month,
+                int start_day,
+                int end_year,
+                int end_month,
+                int end_day,
+                timeperiod* target = NULL);
+  daterange*  new_specific_month_date(
+                int start_month,
+                int start_day,
+                int end_month,
+                int end_day,
+                timeperiod* target = NULL);
+  daterange*  new_generic_month_date(
+                int start_day,
+                int end_day,
+                timeperiod* target = NULL);
+  void        new_timerange(
+                int start_hour,
+                int start_minute,
+                int end_hour,
+                int end_minute,
+                daterange* target);
+  void        new_timerange(
+                int start_hour,
+                int start_minute,
+                int end_hour,
+                int end_minute,
+                int day,
+                timeperiod* target = NULL);
+
+ private:
+  timeperiod* _timeperiods;
+};
 
 int    hmtos(int h, int m);
 void   set_time(time_t now);

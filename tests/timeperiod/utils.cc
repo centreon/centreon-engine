@@ -19,11 +19,77 @@
 
 #include <cstring>
 #include <ctime>
+#include "com/centreon/engine/deleter/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/objects/timerange.hh"
 #include "tests/timeperiod/utils.hh"
 
 // Global time.
 static time_t gl_now((time_t)-1);
+
+/**
+ *  Create new timeperiod creator.
+ */
+timeperiod_creator::timeperiod_creator() : _timeperiods(NULL) {}
+
+/**
+ *  Delete timeperiod creator and associated timeperiods.
+ */
+timeperiod_creator::~timeperiod_creator() {
+  while (_timeperiods) {
+    timeperiod* to_delete(_timeperiods);
+    _timeperiods = _timeperiods->next;
+    com::centreon::engine::deleter::timeperiod(to_delete);
+  }
+}
+
+/**
+ *  Get generated timeperiods.
+ *
+ *  @return Timeperiods list.
+ */
+timeperiod* timeperiod_creator::get_timeperiods() {
+  return (_timeperiods);
+}
+
+/**
+ *  Create a new timeperiod.
+ *
+ *  @return The newly created timeperiod.
+ */
+timeperiod* timeperiod_creator::new_timeperiod() {
+  timeperiod* tp(new timeperiod());
+  memset(tp, 0, sizeof(*tp));
+  tp->next = _timeperiods;
+  _timeperiods = tp;
+  return (tp);
+}
+
+/**
+ *  Create a new weekday timerange.
+ *
+ *  @param[in] start_hour    Start hour.
+ *  @param[in] start_minute  Start minute.
+ *  @param[in] end_hour      End hour.
+ *  @param[in] end_minute    End minute.
+ *  @param[in] day           Day.
+ */
+void timeperiod_creator::new_timerange(
+                           int start_hour,
+                           int start_minute,
+                           int end_hour,
+                           int end_minute,
+                           int day,
+                           timeperiod* target) {
+  if (!target)
+    target = _timeperiods;
+  add_timerange_to_timeperiod(
+    target,
+    day,
+    hmtos(start_hour, start_minute),
+    hmtos(end_hour, end_minute));
+  return ;
+}
 
 /**
  *  Convert hour and minutes to a number of seconds.
