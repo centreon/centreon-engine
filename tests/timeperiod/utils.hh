@@ -50,6 +50,14 @@ class         timeperiod_creator
                 int start_day,
                 int end_day,
                 timeperiod* target = NULL);
+  daterange*  new_offset_weekday_of_specific_month(
+                int start_month,
+                int start_day,
+                int start_offset,
+                int end_month,
+                int end_day,
+                int end_offset,
+                timeperiod* target = NULL);
   void        new_timerange(
                 int start_hour,
                 int start_minute,
