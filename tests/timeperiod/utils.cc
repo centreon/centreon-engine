@@ -210,6 +210,41 @@ daterange* timeperiod_creator::new_offset_weekday_of_specific_month(
 }
 
 /**
+ *  Create a new offset weekday daterange.
+ *
+ *  @param[in]  start_wday    Start week day.
+ *  @param[in]  start_offset  Start offset.
+ *  @param[in]  end_wday      End week day.
+ *  @param[in]  end_offset    End offset.
+ *  @param[out] timeperiod    Target timeperiod.
+ *
+ *  @return The newly created daterange.
+ */
+daterange* timeperiod_creator::new_offset_weekday_of_generic_month(
+                                 int start_wday,
+                                 int start_offset,
+                                 int end_wday,
+                                 int end_offset,
+                                 timeperiod* target) {
+  if (!target)
+    target = _timeperiods;
+  return (add_exception_to_timeperiod(
+            target,
+            DATERANGE_WEEK_DAY,
+            0,
+            0,
+            0,
+            start_wday,
+            start_offset,
+            0,
+            0,
+            0,
+            end_wday,
+            end_offset,
+            0));
+}
+
+/**
  *  Create a new timerange in a daterange.
  *
  *  @param[in]  start_hour    Start hour.
