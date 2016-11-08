@@ -399,3 +399,51 @@ TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthWithinDSTNowAtDST
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
 }
+
+//
+// NORMAL WEEKDAY TESTS
+//
+
+TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayIncludeDSTNowAtBeginningOfOverlappedHour) {
+  _creator.new_timerange(1, 0, 4, 0, 0);
+  beginning_of_overlapped_hour();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1);
+}
+
+TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayExcludeDSTNowAtBeginningOfOverlappedHour) {
+  _creator.new_timerange(1, 0, 2, 0, 0);
+  _creator.new_timerange(3, 0, 4, 0, 0);
+  beginning_of_overlapped_hour();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
+}
+
+TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayWithinDSTNowAtBeginningOfOverlappedHour) {
+  _creator.new_timerange(2, 15, 3, 15, 0);
+  beginning_of_overlapped_hour();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
+}
+
+TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayIncludeDSTNowAtDST) {
+  _creator.new_timerange(1, 0, 4, 0, 0);
+  at_dst();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
+}
+
+TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayExcludeDSTNowAtDST) {
+  _creator.new_timerange(1, 0, 2, 0, 0);
+  _creator.new_timerange(3, 0, 4, 0, 0);
+  at_dst();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
+}
+
+TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayWithinDSTNowAtDST) {
+  _creator.new_timerange(2, 15, 2, 45, 0);
+  at_dst();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
+}
