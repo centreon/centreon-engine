@@ -63,6 +63,7 @@ static time_t _add_round_days_to_midnight(time_t midnight, time_t skip) {
     next_day.tm_hour = 0;
     next_day.tm_min = 0;
     next_day.tm_sec = 0;
+    next_day.tm_isdst = -1;
     next_day_time = mktime(&next_day);
   }
 
@@ -259,22 +260,17 @@ static bool _daterange_calendar_date_to_time_t(
     return (false);
 
   if (r.eyear) {
+    t.tm_hour = 0;
+    t.tm_min = 0;
+    t.tm_sec = 0;
+    t.tm_isdst = -1;
+
     t.tm_mday = r.emday;
     t.tm_mon = r.emon;
     t.tm_year = r.eyear - 1900;
-    t.tm_hour = 23;
-    t.tm_min = 59;
-    t.tm_sec = 59;
-    /*
-    ** We don't have to care about DST even if it would occur at
-    ** midnight because end time is used as the upper bound of the date
-    ** range. This make it invalid for use as midnight but perfectly
-    ** valid to check that we're less than or equal to 23:59:59, which
-    ** value is provided by mktime().
-    */
     if ((end = mktime(&t)) == (time_t)-1)
       return (false);
-    ++end;
+    end = _add_round_days_to_midnight(end, 24 * 60 * 60);
   }
   else
     end = (time_t)-1;
@@ -750,6 +746,7 @@ static void _get_min_invalid_time_per_timeperiod(
     ti.preftime.tm_sec = 0;
     ti.preftime.tm_min = 0;
     ti.preftime.tm_hour = 0;
+    ti.preftime.tm_isdst = -1;
     ti.midnight = mktime(&ti.preftime);
 
     // XXX: handle range end reached.
@@ -972,6 +969,7 @@ static void _get_next_valid_time_per_timeperiod(
     ti.preftime.tm_sec = 0;
     ti.preftime.tm_min = 0;
     ti.preftime.tm_hour = 0;
+    ti.preftime.tm_isdst = -1;
     ti.midnight = mktime(&ti.preftime);
 
     // Browse all date range types in precedence order.
