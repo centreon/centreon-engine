@@ -252,7 +252,6 @@ static bool _daterange_calendar_date_to_time_t(
   t.tm_min = 0;
   t.tm_hour = 0;
   t.tm_isdst = -1;
-
   t.tm_mday = r.smday;
   t.tm_mon = r.smon;
   t.tm_year = r.syear - 1900;
@@ -264,7 +263,6 @@ static bool _daterange_calendar_date_to_time_t(
     t.tm_min = 0;
     t.tm_sec = 0;
     t.tm_isdst = -1;
-
     t.tm_mday = r.emday;
     t.tm_mon = r.emon;
     t.tm_year = r.eyear - 1900;
@@ -293,37 +291,30 @@ static bool _daterange_month_date_to_time_t(
               time_info const& ti,
               time_t& start,
               time_t& end) {
-  // What year should we use?
-  int year(ti.preftime.tm_year);
-  // Advance an additional year if we already passed the end month date.
-  if (r.emon < ti.preftime.tm_mon
-      || (r.emon == ti.preftime.tm_mon
-          && r.emday < ti.preftime.tm_mday))
-    ++year;
-  start = calculate_time_from_day_of_month(year, r.smon, r.smday);
-  if (start == (time_t)-1)
-    return (false);
-
-  // Use same year as was calculated for start time above.
-  end = calculate_time_from_day_of_month(year, r.emon, r.emday);
-  // Advance a year if necessary: august 5 - february 2.
-  if (end < start)
-    end = calculate_time_from_day_of_month( ++year, r.emon, r.emday);
-  // End date was bad - see if we can handle the error.
-  if (end == (time_t)-1) {
-    // End date can't be helped, so skip it.
-    if (r.emday < 0)
-      return (false);
-    // Else end date slipped past end of month, so use last
-    // day of month as end date.
-    end = calculate_time_from_day_of_month(year, r.emon, -1);
-    if (end == (time_t)-1)
-      return (false);
+  // End before start ?
+  bool end_before_start(
+         (r.smon > r.emon)
+         || ((r.smon == r.emon) && (r.smday > r.emday)));
+  // At what year should we start ?
+  int year(
+        end_before_start
+        ? ti.preftime.tm_year - 1
+        : ti.preftime.tm_year);
+  bool found(false);
+  for (int i(0); (i < 3) && !found; ++i, ++year) {
+    start = calculate_time_from_day_of_month(year, r.smon, r.smday);
+    end = calculate_time_from_day_of_month(
+            year + (end_before_start ? 1 : 0),
+            r.emon,
+            r.emday);
+    if (end != (time_t)-1) {
+      end = _add_round_days_to_midnight(end, 24 * 60 * 60);
+      if (ti.preferred_time < end)
+        found = true;
+    }
   }
-  // In all cases, the end date should be moved to the next day to be
-  // used as inclusive interval.
-  end = _add_round_days_to_midnight(end, 24 * 60 * 60);
-  return (true);
+
+  return (start < end);
 }
 
 /**

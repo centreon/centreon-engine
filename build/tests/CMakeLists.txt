@@ -35,6 +35,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/configuration/service.cc"
     "${TESTS_DIR}/downtime_finder.cc"
     "${TESTS_DIR}/main.cc"
+    "${TESTS_DIR}/timeperiod/get_next_valid_time/between_two_years.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/calendar_date.cc"
     # "${TESTS_DIR}/timeperiod/get_next_valid_time/dst_backward.cc"
     # "${TESTS_DIR}/timeperiod/get_next_valid_time/dst_forward.cc"
