@@ -75,15 +75,6 @@ class        GetNextValidTimeBetweenTwoYears : public ::testing::Test {
     _creator.new_timerange(0, 0, 24, 0, dr);
   }
 
-  void       offset_weekday_of_generic_month() {
-    daterange* dr(_creator.new_offset_weekday_of_generic_month(
-                             2,
-                             3,
-                             2,
-                             2));
-    _creator.new_timerange(0, 0, 24, 0, dr);
-  }
-
   //
   // CURRENT TIME
   //
@@ -123,6 +114,8 @@ class        GetNextValidTimeBetweenTwoYears : public ::testing::Test {
 // RESULTS WILL BE MOSTLY THE SAME FOR ALL DATE RANGES
 //
 // So instead of writing all Given/When/Then, here are the common cases.
+// A notable exception is the offset weekdays of generic months that
+// cannot span on multiple months.
 //
 // Given a timeperiod covering a year change
 // And we are before the timeperiod
@@ -265,4 +258,43 @@ TEST_F(GetNextValidTimeBetweenTwoYears, GenericMonthDateAfterTimeperiod) {
   after_timeperiod();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2017-01-20 00:00:00"));
+}
+
+//
+// OFFSET WEEKDAY OF SPECIFIC MONTH TESTS
+//
+
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthBeforeTimeperiod) {
+  offset_weekday_of_specific_month();
+  before_timeperiod();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-12-20 00:00:00"));
+}
+
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthBeforeNewYear) {
+  offset_weekday_of_specific_month();
+  before_new_year();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2016-12-25 12:00:00"));
+}
+
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthAtNewYear) {
+  offset_weekday_of_specific_month();
+  at_new_year();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2017-01-01 00:00:00"));
+}
+
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthAfterNewYear) {
+  offset_weekday_of_specific_month();
+  after_new_year();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2017-01-02 12:00:00"));
+}
+
+TEST_F(GetNextValidTimeBetweenTwoYears, OffsetWeekdayOfSpecificMonthAfterTimeperiod) {
+  offset_weekday_of_specific_month();
+  after_timeperiod();
+  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
+  ASSERT_EQ(_computed, strtotimet("2017-12-19 00:00:00"));
 }

@@ -433,73 +433,63 @@ static bool _daterange_month_week_day_to_time_t(
               time_info const& ti,
               time_t& start,
               time_t& end) {
-  // What year should we use?
-  int year(ti.preftime.tm_year);
+  // Check if there is a year decay between start and end.
+  bool decay(r.smon > r.emon);
 
-  while (true) {
-    // Calculate time of specified weekday of specific month.
+  // No decay, check current year only.
+  if (!decay) {
     start = calculate_time_from_weekday_of_month(
-              year,
+              ti.preftime.tm_year,
               r.smon,
               r.swday,
               r.swday_offset);
-    if ((time_t)-1 == start)
-      return (false);
-
-    // Use same year as was calculated for start time above.
     end = calculate_time_from_weekday_of_month(
-            year,
+            ti.preftime.tm_year,
             r.emon,
             r.ewday,
             r.ewday_offset);
+    if ((start == (time_t)-1) || (end == (time_t)-1))
+      return (false);
+    end = _add_round_days_to_midnight(end, 24 * 60 * 60);
+  }
+  // Decay, check previous year -> current year and
+  // current year -> next year intervals.
+  else {
+    // Check previous year -> current year.
+    start = calculate_time_from_weekday_of_month(
+              ti.preftime.tm_year - 1,
+              r.smon,
+              r.swday,
+              r.swday_offset);
+    end = calculate_time_from_weekday_of_month(
+            ti.preftime.tm_year,
+            r.emon,
+            r.ewday,
+            r.ewday_offset);
+    if ((start == (time_t)-1) || (end == (time_t)-1))
+      return (false);
+    end = _add_round_days_to_midnight(end, 24 * 60 * 60);
 
-    // Advance a year if necessary :
-    // thursday 2 august - monday 3 february
-    if ((end != (time_t)-1) && (end < start))
+    // If interval is invalid, we need to check
+    // current year -> next year.
+    if (ti.preferred_time >= end) {
+      start = calculate_time_from_weekday_of_month(
+                ti.preftime.tm_year,
+                r.smon,
+                r.swday,
+                r.swday_offset);
       end = calculate_time_from_weekday_of_month(
-              year + 1,
+              ti.preftime.tm_year + 1,
               r.emon,
               r.ewday,
               r.ewday_offset);
-
-    if ((time_t)-1 == end) {
-      // End date can't be helped, so skip it.
-      if (r.ewday_offset < 0)
+      if ((start == (time_t)-1) || (end == (time_t)-1))
         return (false);
-
-      // Else end date slipped past end of month, so use last day
-      // of month as end date.
-      int end_month;
-      int end_year;
-      if (r.emon != 11) {
-        end_month = r.emon + 1;
-        end_year = year;
-      }
-      else {
-        end_month = 0;
-        end_year = year + 1;
-      }
-      end = calculate_time_from_day_of_month(
-              end_year,
-              end_month,
-              0);
-      if ((time_t)-1 == end)
-        return (false);
-    }
-    else
       end = _add_round_days_to_midnight(end, 24 * 60 * 60);
-
-    // We should have an interval that includes or is above
-    // preferred time.
-    if (ti.preferred_time < end)
-      break ;
-    // Advance to next year if we've passed this month
-    // weekday already this year.
-    else
-      ++year;
+    }
   }
 
-  return (true);
+  return (start < end);
 }
 
 /**
