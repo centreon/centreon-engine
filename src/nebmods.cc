@@ -512,7 +512,7 @@ int neb_make_callbacks(int callback_type, void* data) {
     logger(dbg_eventbroker, most)
       << "Callback #" << total_callbacks
       << " (type " << callback_type
-      << ") return (code = " << cbresult;
+      << ") return (code = " << cbresult << ")";
 
     /* module wants to cancel callbacks to other modules (and potentially cancel the default handling of an event) */
     if (cbresult == NEBERROR_CALLBACKCANCEL)
