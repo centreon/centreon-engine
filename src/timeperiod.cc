@@ -332,47 +332,90 @@ static bool _daterange_month_day_to_time_t(
               time_info const& ti,
               time_t& start,
               time_t& end) {
-  // What year/month should we use ?
-  int year;
-  int month;
-  year = ti.preftime.tm_year;
-  month = ti.preftime.tm_mon;
-  // Advance an additional month (and possibly the year) if
-  // we already passed the end day of month.
-  if (ti.preftime.tm_mday > r.emday) {
-    if (month != 11)
-      ++month;
-    else {
-      month = 0;
-      ++year;
-    }
+  // Check if there is a month decay between start and end.
+  bool decay;
+  if (r.smday >= 0) {
+    if (r.emday >= 0)
+      decay = (r.emday < r.smday);
+    else
+      decay = false;
+  }
+  else {
+    if (r.emday >= 0)
+      decay = (r.smday > r.emday);
+    else
+      decay = true;
   }
 
-  // Compute start date.
-  start = calculate_time_from_day_of_month(year, month, r.smday);
-  if (start == (time_t)-1)
-    return (false);
+  // To get an interval covering the preferred time, we need two check
+  // three different cases. First if there is no month decay, the we
+  // check the current month only. If there is a month decay then we
+  // need to check last month -> current month and current month -> next
+  // month intervals.
 
-  // Use same year and month as was calculated for start time above.
-  end = calculate_time_from_day_of_month(year, month, r.emday);
-  if (end == (time_t)-1) {
-    // End date can't be helped, so skip it.
-    if (r.emday < 0)
+  // No decay, current month only.
+  if (!decay) {
+    start = calculate_time_from_day_of_month(
+              ti.preftime.tm_year,
+              ti.preftime.tm_mon,
+              r.smday);
+    end = calculate_time_from_day_of_month(
+            ti.preftime.tm_year,
+            ti.preftime.tm_mon,
+            r.emday);
+    if ((start == (time_t)-1) || (end == (time_t)-1))
       return (false);
-
-    // Else end date slipped past end of month,
-    // so use first day of next month.
-    if (month != 11)
-      ++month;
-    else {
-      month = 0;
-      ++year;
-    }
-    end = calculate_time_from_day_of_month(year, month, 0);
-  }
-  else
     end = _add_round_days_to_midnight(end, 24 * 60 * 60);
-  return (true);
+  }
+  // Decay.
+  else {
+    // Check previous month -> current month.
+    int year(ti.preftime.tm_year);
+    int month(ti.preftime.tm_mon);
+    if (month == 0) {
+      --year;
+      month = 11;
+    }
+    else
+      --month;
+    start = calculate_time_from_day_of_month(
+              year,
+              month,
+              r.smday);
+    end = calculate_time_from_day_of_month(
+            ti.preftime.tm_year,
+            ti.preftime.tm_mon,
+            r.emday);
+    if ((start == (time_t)-1) || (end == (time_t)-1))
+      return (false);
+    end = _add_round_days_to_midnight(end, 24 * 60 * 60);
+
+    // If interval is invalid, we need to check
+    // current month -> next month.
+    if (ti.preferred_time >= end) {
+      year = ti.preftime.tm_year;
+      month = ti.preftime.tm_mon;
+      if (month == 11) {
+        ++year;
+        month = 0;
+      }
+      else
+        ++month;
+      start = calculate_time_from_day_of_month(
+                ti.preftime.tm_year,
+                ti.preftime.tm_mon,
+                r.smday);
+      end = calculate_time_from_day_of_month(
+              year,
+              month,
+              r.emday);
+      if ((start == (time_t)-1) || (end == (time_t)-1))
+        return (false);
+      end = _add_round_days_to_midnight(end, 24 * 60 * 60);
+    }
+  }
+
+  return (start < end);
 }
 
 /**

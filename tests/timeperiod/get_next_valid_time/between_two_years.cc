@@ -264,5 +264,5 @@ TEST_F(GetNextValidTimeBetweenTwoYears, GenericMonthDateAfterTimeperiod) {
   generic_month_date();
   after_timeperiod();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2017-12-20 00:00:00"));
+  ASSERT_EQ(_computed, strtotimet("2017-01-20 00:00:00"));
 }
