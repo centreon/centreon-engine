@@ -555,16 +555,12 @@ umultimap<std::string, shared_ptr<hostescalation_struct> >::iterator applier::st
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_ptr
-                                   ? m->contact_ptr->name
-                                   : m->contact_name);
+      current.contacts().push_front(m->contact_name);
     current.contacts().sort();
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_ptr
-                                        ? m->group_ptr->group_name
-                                        : m->group_name);
+      current.contactgroups().push_front(m->group_name);
     current.contactgroups().sort();
 
     // Found !
@@ -829,16 +825,12 @@ umultimap<std::pair<std::string, std::string>, shared_ptr<serviceescalation_stru
     for (contactsmember_struct* m(p.first->second->contacts);
          m;
          m = m->next)
-      current.contacts().push_front(m->contact_ptr
-                                   ? m->contact_ptr->name
-                                   : m->contact_name);
+      current.contacts().push_front(m->contact_name);
     current.contacts().sort();
     for (contactgroupsmember_struct* m(p.first->second->contact_groups);
          m;
          m = m->next)
-      current.contactgroups().push_front(m->group_ptr
-                                        ? m->group_ptr->group_name
-                                        : m->group_name);
+      current.contactgroups().push_front(m->group_name);
     current.contactgroups().sort();
 
     // Found !
