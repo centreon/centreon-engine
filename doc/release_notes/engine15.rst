@@ -1,4 +1,19 @@
 =====================
+Centreon Engine 1.5.2
+=====================
+
+**********
+Bugs fixed
+**********
+
+Crash when reloading escalation configuration
+=============================================
+
+In some cases, the configuration reload mechanism can lead Centreon
+Engine to crash. This was caused by invalid links in the escalation
+objects that were accessed before relinking occured.
+
+=====================
 Centreon Engine 1.5.1
 =====================
 
