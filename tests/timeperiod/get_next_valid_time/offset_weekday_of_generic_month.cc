@@ -39,6 +39,18 @@ class         GetNextValidTimeOffsetWeekdayOfGenericMonthTest : public ::testing
     _creator.new_timerange(18, 30, 21, 15, dr);
   }
 
+  void        negative_offset_data_set() {
+    _creator.new_timeperiod();
+    daterange* dr(NULL);
+    // tuesday -4 10:45-14:25
+    dr = _creator.new_offset_weekday_of_generic_month(2, -4, 2, -4);
+    _creator.new_timerange(10, 45, 14, 25, dr);
+    // thursday -3 - friday -3 08:30-12:30,18:30,21:15
+    dr = _creator.new_offset_weekday_of_generic_month(4, -3, 5, -3);
+    _creator.new_timerange(8, 30, 12, 30, dr);
+    _creator.new_timerange(18, 30, 21, 15, dr);
+  }
+
  protected:
   timeperiod_creator _creator;
 };
@@ -85,7 +97,7 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, WithinRange) {
 // Given a timeperiod configured with offset weekdays of generic month
 // And we are after these dates in the year
 // When get_next_valid_time() is called
-// Then the next valid time is the first month with offset weekdays in next year
+// Then the next valid time is the first month with offset weekdays in next month
 TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, AfterRanges) {
   default_data_set();
   time_t now(strtotimet("2016-10-30 13:37:42"));
@@ -93,4 +105,56 @@ TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, AfterRanges) {
   time_t computed((time_t)-1);
   get_next_valid_time(now, &computed, _creator.get_timeperiods());
   ASSERT_EQ(computed, strtotimet("2016-11-22 10:45:00"));
+}
+
+// Given a timeperiod configured with negative offset weekdays of generic month
+// And we are earlier than these dates
+// When get_next_valid_time() is called
+// Then the next valid time is the beginning of the next date's timerange
+TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, BeforeNegativeDateRanges) {
+  negative_offset_data_set();
+  time_t now(strtotimet("2016-10-03 12:00:00"));
+  set_time(now);
+  time_t computed((time_t)-1);
+  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  ASSERT_EQ(computed, strtotimet("2016-10-04 10:45:00"));
+}
+
+// Given a timeperiod configured with negative offset weekdays of generic month
+// And we are between two offset weekdays ranges
+// When get_next_valid_time() is called
+// Then the next valid time is the beginning of the next daterange's timerange
+TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, BetweenNegativeDateRanges) {
+  negative_offset_data_set();
+  time_t now(strtotimet("2016-10-08 12:00:00"));
+  set_time(now);
+  time_t computed((time_t)-1);
+  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  ASSERT_EQ(computed, strtotimet("2016-10-13 08:30:00"));
+}
+
+// Given a timeperiod configured with negative offset weekdays of generic month
+// And we are within an offset weekday daterange
+// When get_next_valid_time() is called
+// Then the next valid time is now
+TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, WithinNegativeRange) {
+  negative_offset_data_set();
+  time_t now(strtotimet("2016-10-13 20:59:00"));
+  set_time(now);
+  time_t computed((time_t)-1);
+  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  ASSERT_EQ(computed, now);
+}
+
+// Given a timeperiod configured with negative offset weekdays of generic month
+// And we are after these dates in the year
+// When get_next_valid_time() is called
+// Then the next valid time is the first month with offset weekdays in next month
+TEST_F(GetNextValidTimeOffsetWeekdayOfGenericMonthTest, AfterNegativeRanges) {
+  negative_offset_data_set();
+  time_t now(strtotimet("2016-10-30 13:37:42"));
+  set_time(now);
+  time_t computed((time_t)-1);
+  get_next_valid_time(now, &computed, _creator.get_timeperiods());
+  ASSERT_EQ(computed, strtotimet("2016-11-08 10:45:00"));
 }
