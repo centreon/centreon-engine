@@ -187,6 +187,9 @@ void applier::service::add_object(
                              obj->service_description())].timezone = obj->timezone();
   service_other_props[std::make_pair(
                              obj->hosts().front(),
+                             obj->service_description())].host_id = obj->host_id();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
                              obj->service_description())].service_id = obj->service_id();
 
   // Add contacts.
@@ -515,6 +518,9 @@ void applier::service::modify_object(
                              obj->service_description())].timezone = obj->timezone();
   service_other_props[std::make_pair(
                              obj->hosts().front(),
+                             obj->service_description())].host_id = obj->host_id();
+  service_other_props[std::make_pair(
+                             obj->hosts().front(),
                              obj->service_description())].service_id = obj->service_id();
 
 
@@ -748,7 +754,8 @@ void applier::service::_inherits_special_vars(
                          shared_ptr<configuration::service> obj,
                          configuration::state& s) {
   // Detect if any special variable has not been defined.
-  if (!obj->contacts_defined()
+  if (!obj->host_id()
+      || !obj->contacts_defined()
       || !obj->contactgroups_defined()
       || !obj->notification_interval_defined()
       || !obj->notification_period_defined()
@@ -773,6 +780,8 @@ void applier::service::_inherits_special_vars(
              << obj->hosts().front() << "' does not exist");
 
     // Inherits variables.
+    if (!obj->host_id())
+      obj->host_id((*it)->host_id());
     if (!obj->contacts_defined())
       obj->contacts() = (*it)->contacts();
     if (!obj->contactgroups_defined())

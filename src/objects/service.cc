@@ -715,15 +715,31 @@ bool engine::is_service_exist(
 }
 
 /**
- * Get the service id of a service.
+ * Get the host and service IDs of a service.
  *
- *  @param[in] host  The host.
- *  @param[in] svc   The service.
+ *  @param[in] host  The host name.
+ *  @param[in] svc   The service description.
  *
- *  @return  The service id or 0.
+ *  @return  Pair of ID if found, pair of 0 otherwise.
  */
-unsigned int engine::get_service_id(char const* host, char const* svc) {
+std::pair<unsigned int, unsigned int> engine::get_host_and_service_id(
+                                                char const* host,
+                                                char const* svc) {
   std::map<std::pair<std::string, std::string>, service_other_properties>::const_iterator
     found = service_other_props.find(std::make_pair(std::string(host), std::string(svc)));
-  return (found != service_other_props.end() ? found->second.service_id : 0);
+  return (found != service_other_props.end()
+          ? std::make_pair(found->second.host_id, found->second.service_id)
+          : std::make_pair(0u, 0u));
+}
+
+/**
+ *  Get a service' ID.
+ *
+ *  @param[in] host  The host name.
+ *  @param[in] svc   The service description.
+ *
+ *  @return The service ID if found, 0 otherwise.
+ */
+unsigned int engine::get_service_id(char const* host, char const* svc) {
+  return (get_host_and_service_id(host, svc).second);
 }

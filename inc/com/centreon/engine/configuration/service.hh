@@ -92,6 +92,8 @@ namespace                  configuration {
     list_string const&     hostgroups() const throw ();
     list_string&           hosts() throw ();
     list_string const&     hosts() const throw ();
+    unsigned int           host_id() const throw ();
+    void                   host_id(unsigned int id);
     std::string const&     icon_image() const throw ();
     std::string const&     icon_image_alt() const throw ();
     unsigned int           initial_state() const throw ();
@@ -197,6 +199,7 @@ namespace                  configuration {
     opt<unsigned int>      _high_flap_threshold;
     group                  _hostgroups;
     group                  _hosts;
+    unsigned int           _host_id;
     std::string            _icon_image;
     std::string            _icon_image_alt;
     opt<unsigned int>      _initial_state;
