@@ -111,6 +111,9 @@ class        GetNextValidTimeBackwardDST : public ::testing::Test {
 // RESULTS WILL BE MOSTLY THE SAME FOR ALL DATE RANGES
 //
 // So instead of writing all Given/When/Then, here are the common cases.
+// Please note that no test with timeranges starting in, stopping in or
+// within the DST hour exist. This is because no assumption can be made
+// on such ranges.
 //
 // Given a timeperiod covering a backward DST change
 // And the timeranges includes the DST change
@@ -125,18 +128,6 @@ class        GetNextValidTimeBackwardDST : public ::testing::Test {
 // Then the next valid time is the beginning of the timerange in the new timezone
 //
 // Given a timeperiod covering a backward DST change
-// And the timeranges are within the overlapped hour
-// And we are at the beginning of the hour that will be overlapped, still in the original timezone
-// When get_next_valid_time() is called
-// Then the next valid time is the beginning of the timerange in the original timezone
-//
-// Given a timeperiod covering a backward DST change
-// And the timeranges are within the overlapped hour
-// And we are at the end of the timerange in the original timezone
-// When get_next_valid_time() is called
-// Then the next valid time is the beginning of the timerange in the new timezone
-//
-// Given a timeperiod covering a backward DST change
 // And the timeranges includes the DST range
 // And we are at DST
 // When get_next_valid_time() is called
@@ -147,18 +138,6 @@ class        GetNextValidTimeBackwardDST : public ::testing::Test {
 // And we are at DST
 // When get_next_valid_time() is callled
 // Then the next valid time is the beginning of the timerange in the new timezone
-//
-// Given a timeperiod covering a backward DST change
-// And the timeranges are within the DST range
-// And we are at DST
-// When get_next_valid_time() is called
-// Then the next valid time is the beginning of the timerange in the new timezone
-//
-// Given a timeperiod covering a backward DST change
-// And the timeranges stop during the overlapped hour
-// And we are at the end of the timerange in the original timezone
-// When get_next_valid_time() is called
-// Then the next valid time is the DST change
 
 
 //
@@ -181,22 +160,6 @@ TEST_F(GetNextValidTimeBackwardDST, CalendarDateExcludeDSTNowAtBeginningOfOverla
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeBackwardDST, CalendarDateWithinDSTNowAtBeginningOfOverlappedHour) {
-  daterange* dr(dst_calendar_date());
-  timerange_within_dst(dr);
-  beginning_of_overlapped_hour();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, CalendarDateWithinDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_calendar_date());
-  timerange_within_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
 TEST_F(GetNextValidTimeBackwardDST, CalendarDateIncludeDSTNowAtDST) {
   daterange* dr(dst_calendar_date());
   timerange_includes_dst(dr);
@@ -211,22 +174,6 @@ TEST_F(GetNextValidTimeBackwardDST, CalendarDateExcludeDSTNowAtDST) {
   at_dst();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
-}
-
-TEST_F(GetNextValidTimeBackwardDST, CalendarDateWithinDSTNowAtDST) {
-  daterange* dr(dst_calendar_date());
-  timerange_within_dst(dr);
-  at_dst();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, CalendarDateStopInDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_calendar_date());
-  timerange_stop_in_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
 }
 
 //
@@ -249,22 +196,6 @@ TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateExcludeDSTNowAtBeginningOfO
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateWithinDSTNowAtBeginningOfOverlappedHour) {
-  daterange* dr(dst_specific_month_date());
-  timerange_within_dst(dr);
-  beginning_of_overlapped_hour();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateWithinDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_specific_month_date());
-  timerange_within_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
 TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateIncludeDSTNowAtDST) {
   daterange* dr(dst_specific_month_date());
   timerange_includes_dst(dr);
@@ -279,22 +210,6 @@ TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateExcludeDSTNowAtDST) {
   at_dst();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
-}
-
-TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateWithinDSTNowAtDST) {
-  daterange* dr(dst_specific_month_date());
-  timerange_within_dst(dr);
-  at_dst();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, SpecificMonthDateStopInDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_specific_month_date());
-  timerange_stop_in_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
 }
 
 //
@@ -317,22 +232,6 @@ TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateExcludeDSTNowAtBeginningOfOv
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateWithinDSTNowAtBeginningOfOverlappedHour) {
-  daterange* dr(dst_generic_month_date());
-  timerange_within_dst(dr);
-  beginning_of_overlapped_hour();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateWithinDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_generic_month_date());
-  timerange_within_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
 TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateIncludeDSTNowAtDST) {
   daterange* dr(dst_generic_month_date());
   timerange_includes_dst(dr);
@@ -347,22 +246,6 @@ TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateExcludeDSTNowAtDST) {
   at_dst();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
-}
-
-TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateWithinDSTNowAtDST) {
-  daterange* dr(dst_generic_month_date());
-  timerange_within_dst(dr);
-  at_dst();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, GenericMonthDateStopInDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_generic_month_date());
-  timerange_stop_in_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
 }
 
 //
@@ -385,22 +268,6 @@ TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthExcludeDSTNowAtB
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthWithinDSTNowAtBeginningOfOverlappedHour) {
-  daterange* dr(dst_offset_weekday_of_specific_month());
-  timerange_within_dst(dr);
-  beginning_of_overlapped_hour();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthWithinDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_offset_weekday_of_specific_month());
-  timerange_within_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
 TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthIncludeDSTNowAtDST) {
   daterange* dr(dst_offset_weekday_of_specific_month());
   timerange_includes_dst(dr);
@@ -415,22 +282,6 @@ TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthExcludeDSTNowAtD
   at_dst();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
-}
-
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthWithinDSTNowAtDST) {
-  daterange* dr(dst_offset_weekday_of_specific_month());
-  timerange_within_dst(dr);
-  at_dst();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfSpecificMonthStopInDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_offset_weekday_of_specific_month());
-  timerange_stop_in_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
 }
 
 //
@@ -453,22 +304,6 @@ TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthExcludeDSTNowAtBe
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthWithinDSTNowAtBeginningOfOverlappedHour) {
-  daterange* dr(dst_offset_weekday_of_generic_month());
-  timerange_within_dst(dr);
-  beginning_of_overlapped_hour();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthWithinDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_offset_weekday_of_generic_month());
-  timerange_within_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
 TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthIncludeDSTNowAtDST) {
   daterange* dr(dst_offset_weekday_of_generic_month());
   timerange_includes_dst(dr);
@@ -483,22 +318,6 @@ TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthExcludeDSTNowAtDS
   at_dst();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
-}
-
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthWithinDSTNowAtDST) {
-  daterange* dr(dst_offset_weekday_of_generic_month());
-  timerange_within_dst(dr);
-  at_dst();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, OffsetWeekdayOfGenericMonthStopInDSTNowAtEndOfTimerange) {
-  daterange* dr(dst_offset_weekday_of_generic_month());
-  timerange_stop_in_dst(dr);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
 }
 
 //
@@ -520,20 +339,6 @@ TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayExcludeDSTNowAtBeginningOfOverl
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
 }
 
-TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayWithinDSTNowAtBeginningOfOverlappedHour) {
-  _creator.new_timerange(2, 15, 2, 45, 0);
-  beginning_of_overlapped_hour();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 01:59:59") + 1 + 15 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayWithinDSTNowAtEndOfTimerange) {
-  _creator.new_timerange(2, 15, 2, 45, 0);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
 TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayIncludeDSTNowAtDST) {
   _creator.new_timerange(1, 0, 4, 0, 0);
   at_dst();
@@ -547,18 +352,4 @@ TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayExcludeDSTNowAtDST) {
   at_dst();
   get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
   ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00"));
-}
-
-TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayWithinDSTNowAtDST) {
-  _creator.new_timerange(2, 15, 2, 45, 0);
-  at_dst();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 45 * 60);
-}
-
-TEST_F(GetNextValidTimeBackwardDST, NormalWeekdayStopInDSTNowAtEndOfTimerange) {
-  _creator.new_timerange(1, 0, 2, 30, 0);
-  end_of_timerange();
-  get_next_valid_time(_now, &_computed, _creator.get_timeperiods());
-  ASSERT_EQ(_computed, strtotimet("2016-10-30 03:00:00") - 3600);
 }
