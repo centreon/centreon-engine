@@ -40,6 +40,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/get_next_valid_time/dst_backward.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/dst_forward.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/earliest_daterange_first.cc"
+    "${TESTS_DIR}/timeperiod/get_next_valid_time/exclusion.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/generic_month_date.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/normal_weekday.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/offset_weekday_of_generic_month.cc"

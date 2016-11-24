@@ -21,6 +21,7 @@
 #include <ctime>
 #include "com/centreon/engine/deleter/timeperiod.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #include "com/centreon/engine/objects/timerange.hh"
 #include "tests/timeperiod/utils.hh"
 
@@ -63,6 +64,25 @@ timeperiod* timeperiod_creator::new_timeperiod() {
   tp->next = _timeperiods;
   _timeperiods = tp;
   return (tp);
+}
+
+/**
+ *  Create a new exclusion on the timeperiod.
+ *
+ *  @param[in]  excluded  Excluded timeperiod.
+ *  @param[out] target    Target timeperiod.
+ */
+void timeperiod_creator::new_exclusion(
+                           timeperiod* excluded,
+                           timeperiod* target) {
+  if (!target)
+    target = _timeperiods;
+  timeperiodexclusion* exclusion(new timeperiodexclusion());
+  memset(exclusion, 0, sizeof(*exclusion));
+  exclusion->timeperiod_ptr = excluded;
+  exclusion->next = target->exclusions;
+  target->exclusions = exclusion;
+  return ;
 }
 
 /**

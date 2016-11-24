@@ -32,6 +32,9 @@ class         timeperiod_creator
               ~timeperiod_creator();
   timeperiod* get_timeperiods();
   timeperiod* new_timeperiod();
+  void        new_exclusion(
+                timeperiod* excluded,
+                timeperiod* target = NULL);
   daterange*  new_calendar_date(
                 int start_year,
                 int start_month,
