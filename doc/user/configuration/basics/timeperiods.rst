@@ -38,9 +38,8 @@ Examples of different timeperiod directives can be found
 Timeperiods and Daylight Savings Time (DST)
 ===========================================
 
-Timezones can be defined at global, host, service or contact level and
-timeperiods handle them properly along with DST changes. There are
-however some edge cases with some timeranges around DST changes.
+Timezones can be defined at global, host, service or contact level.
+There are however some edge cases with timeranges around DST changes.
 
 The behavior of timeranges which either start or end during DST 'gap'
 (forward change) or 'overlap' (backward change) is operating-system
@@ -48,9 +47,14 @@ defined. Specifically it is mktime implementation defined. So as a rule
 of thumb you should avoid timeranges that might start or end during DST.
 
 In the Europe/Paris timezone for example, you need to avoid using
-timeranges that might start in DST (02:30-04:00) as well as timeranges
-that might end in DST (00:00-02:30). Timeranges that cover the entire
+timeranges that might start in DST (02:30-*) as well as timeranges
+that might end in DST (*-02:30). Timeranges that cover the entire
 02:00-03:00 range are OK (00:00-06:00).
+
+If you use timeranges that start or end within a DST, no guess can
+be made on how the timeperiod will behave until one hour after the
+end of the DST hour (4 o'clock if the DST occured at 3 o'clock).
+After this delay, timeperiods should work again as expected.
 
 How Time Periods Work With Host and Service Checks
 ==================================================
