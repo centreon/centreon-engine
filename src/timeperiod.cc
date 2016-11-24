@@ -738,12 +738,12 @@ int check_time_against_period(
  *  @param[out] invalid_time    Variable to fill.
  *  @param[in]  tperiod         The time period to use.
  */
-static void _get_min_invalid_time_per_timeperiod(
+static void _get_next_invalid_time_per_timeperiod(
               time_t preferred_time,
               time_t* invalid_time,
               timeperiod* tperiod) {
   logger(dbg_functions, basic)
-    << "get_min_invalid_time_per_timeperiod()";
+    << "get_next_invalid_time_per_timeperiod()";
 
   // If no timeperiod, go with preferred time.
   if (!tperiod) {
@@ -984,10 +984,7 @@ static void _get_next_valid_time_per_timeperiod(
   ti.preferred_time = preferred_time;
   for (time_t in_one_year(ti.preferred_time + 366 * 24 * 60 * 60);
        (earliest_time == (time_t)-1)
-       && (ti.preferred_time < in_one_year);
-       ti.preferred_time = _add_round_days_to_midnight(
-                             ti.midnight,
-                             24 * 60 * 60)) {
+       && (ti.preferred_time < in_one_year);) {
     // Compute time information.
     localtime_r(&ti.preferred_time, &ti.preftime);
     ti.preftime.tm_sec = 0;
@@ -1046,46 +1043,53 @@ static void _get_next_valid_time_per_timeperiod(
     }
 
     // Check if we should skip this day.
-    if (skip_this_day)
-      continue ;
-
-    // Try the weekly schedule only if no valid time was found in
-    // exceptions for this day.
-    if (earliest_time == (time_t)-1) {
-      time_t potential_time(_get_next_valid_time_in_timeranges(
-                              ti.preferred_time,
-                              tperiod->days[ti.preftime.tm_wday]));
-      if ((potential_time != (time_t)-1)
-          && ((earliest_time == (time_t)-1)
-              || (potential_time < earliest_time)))
-        earliest_time = potential_time;
+    if (!skip_this_day) {
+      // Try the weekly schedule only if no valid time was found in
+      // exceptions for this day.
+      if (earliest_time == (time_t)-1) {
+        time_t potential_time(_get_next_valid_time_in_timeranges(
+                                ti.preferred_time,
+                                tperiod->days[ti.preftime.tm_wday]));
+        if ((potential_time != (time_t)-1)
+            && ((earliest_time == (time_t)-1)
+                || (potential_time < earliest_time)))
+          earliest_time = potential_time;
+      }
     }
 
-    // // Check exclusions.
-    // if (earliest_time != (time_t)-1) {
-    //   timeperiodexclusion* first_exclusion(tperiod->exclusions);
-    //   tperiod->exclusions = NULL;
-    //   time_t max_invalid((time_t)-1);
-    //   for (timeperiodexclusion* exclusion(first_exclusion);
-    //        exclusion;
-    //        exclusion = exclusion->next) {
-    //     time_t invalid((time_t)-1);
-    //     _get_min_invalid_time_per_timeperiod(
-    //       earliest_time,
-    //       &invalid,
-    //       exclusion->timeperiod_ptr);
-    //     if ((invalid != (time_t)-1)
-    //         && (((time_t)-1 == max_invalid)
-    //             || (invalid > max_invalid)))
-    //       max_invalid = invalid;
-    //   }
-    //   tperiod->exclusions = first_exclusion;
-    //   if ((max_invalid != (time_t)-1)
-    //       && (max_invalid != earliest_time)) {
-    //     earliest_time = (time_t)-1;
-    //     preferred_time = max_invalid;
-    //   }
-    // }
+    // Check exclusions.
+    bool skipped(false);
+    if (earliest_time != (time_t)-1) {
+      timeperiodexclusion* first_exclusion(tperiod->exclusions);
+      tperiod->exclusions = NULL;
+      time_t max_invalid((time_t)-1);
+      for (timeperiodexclusion* exclusion(first_exclusion);
+           exclusion;
+           exclusion = exclusion->next) {
+        time_t invalid((time_t)-1);
+        _get_next_invalid_time_per_timeperiod(
+          earliest_time,
+          &invalid,
+          exclusion->timeperiod_ptr);
+        if ((invalid != (time_t)-1)
+            && (((time_t)-1 == max_invalid)
+                || (invalid > max_invalid)))
+          max_invalid = invalid;
+      }
+      tperiod->exclusions = first_exclusion;
+      if ((max_invalid != (time_t)-1)
+          && (max_invalid != earliest_time)) {
+        earliest_time = (time_t)-1;
+        ti.preferred_time = max_invalid;
+        skipped = true;
+      }
+    }
+
+    // Skip if not already done through exceptions.
+    if (!skipped)
+      ti.preferred_time = _add_round_days_to_midnight(
+                             ti.midnight,
+                             24 * 60 * 60);
   }
 
   // If we couldn't find a time period there must be none defined.
