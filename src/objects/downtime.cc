@@ -1,6 +1,6 @@
 /*
-** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011-2013 Merethis
+** Copyright 2000-2008      Ethan Galstad
+** Copyright 2011-2013,2016 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -378,26 +378,25 @@ int register_downtime(int type, unsigned long downtime_id) {
         << minutes << " minutes. Notifications for the " << type_string
         << " will not be sent out during that time period.";
 
-  logger(dbg_downtime, basic)
-    << "Scheduled Downtime Details:";
+  logger(dbg_downtime, basic) << "Scheduled Downtime Details:";
   if (temp_downtime->type == HOST_DOWNTIME) {
     logger(dbg_downtime, basic)
       << " Type:        Host Downtime\n"
-      " Host:        " << hst->name;
+         " Host:        " << hst->name;
   }
   else {
     logger(dbg_downtime, basic)
       << " Type:        Service Downtime\n"
-      " Host:        " << svc->host_name << "\n"
-      " Service:     " << svc->description;
+         " Host:        " << svc->host_name << "\n"
+         " Service:     " << svc->description;
   }
   logger(dbg_downtime, basic)
     << " Fixed/Flex:  " << (temp_downtime->fixed == true ? "Fixed\n" : "Flexible\n")
-    << " Start:       " << temp_downtime->downtime_id << "\n"
-    " End:         " << temp_downtime->downtime_id << "\n"
-    " Duration:    " << hours << "h " << minutes << "m " << seconds << "s\n"
-    " Downtime ID: " << temp_downtime->downtime_id << "\n"
-    " Trigger ID:  " << temp_downtime->triggered_by;
+    << " Start:       " << start_time_string << "\n"
+       " End:         " << end_time_string << "\n"
+       " Duration:    " << hours << "h " << minutes << "m " << seconds << "s\n"
+       " Downtime ID: " << temp_downtime->downtime_id << "\n"
+       " Trigger ID:  " << temp_downtime->triggered_by;
 
   /* add a non-persistent comment to the host or service regarding the scheduled outage */
   if (temp_downtime->type == SERVICE_DOWNTIME)
