@@ -641,8 +641,6 @@ add_definitions(-DDEFAULT_DEBUG_FILE="${VAR_DIR}/centengine.debug")
 add_definitions(-DDEFAULT_RETENTION_FILE="${VAR_DIR}/retention.dat")
 add_definitions(-DDEFAULT_COMMAND_FILE="${RW_DIR}/centengine.cmd")
 add_definitions(-DDEFAULT_CONFIG_FILE="${PREFIX_CONF}/centengine.cfg")
-add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${VAR_DIR}/objects.cache")
-add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 
 # Add specific linker flags for Mac OS to build correctly shared libraries.
 if (APPLE)
@@ -822,8 +820,6 @@ if (CREATE_FILES)
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/centengine.log\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/centengine.debug\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/retention.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.cache\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.precache\")
   ")
 endif ()
 
