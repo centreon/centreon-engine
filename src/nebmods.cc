@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2008      Ethan Galstad
-** Copyright 2011-2013,2016 Centreon
+** Copyright 2002-2008           Ethan Galstad
+** Copyright 2011-2013,2016-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -178,12 +178,12 @@ int neb_reload_all_modules() {
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "Error: Module reloading failed: " << e.what();
+      << "Warning: Module reloading failed: " << e.what();
     retval = ERROR;
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "Error: Module reloading failed: unknown error";
+      << "Warning: Module reloading failed: unknown error";
     retval = ERROR;
   }
   return (retval);
