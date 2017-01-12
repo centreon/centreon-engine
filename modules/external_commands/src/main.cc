@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -208,3 +208,12 @@ extern "C" int nebmodule_init(
   return (0);
 }
 
+/**
+ *  @brief Module reloading.
+ *
+ *  This function is a placeholder to prevent Centreon Engine from
+ *  complaining about impossible module reload.
+ */
+extern "C" int nebmodule_reload() {
+  return (0);
+}
