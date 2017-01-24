@@ -1,7 +1,7 @@
 /*
-** Copyright 1999-2009      Ethan Galstad
-** Copyright 2009-2010      Nagios Core Development Team and Community Contributors
-** Copyright 2011-2013,2016 Centreon
+** Copyright 1999-2009           Ethan Galstad
+** Copyright 2009-2010           Nagios Core Development Team and Community Contributors
+** Copyright 2011-2013,2016-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -134,7 +134,7 @@ timeperiod*         timeperiod_list_tail(NULL);
 unsigned int        accept_passive_host_checks(true);
 unsigned int        accept_passive_service_checks(true);
 unsigned int        auto_reschedule_checks(false);
-unsigned int        auto_rescheduling_interval(30);
+unsigned int        auto_rescheduling_interval(3600);
 unsigned int        auto_rescheduling_window(180);
 unsigned int        check_external_commands(true);
 unsigned int        check_host_freshness(false);
