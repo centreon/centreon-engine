@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008           Ethan Galstad
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -691,15 +691,16 @@ int check_service(service* svc, int* w, int* e) {
   /* save the pointer to the check command for later */
   svc->check_command_ptr = temp_command;
 
-  /* check for sane recovery options */
-  if (svc->notify_on_recovery == true
-      && svc->notify_on_warning == false
-      && svc->notify_on_critical == false) {
+  // Check for sane recovery options.
+  if (svc->notifications_enabled
+      && svc->notify_on_recovery
+      && !svc->notify_on_warning
+      && !svc->notify_on_critical) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
       << svc->description << "' for host '" << svc->host_name
       << "' doesn't make any sense - specify warning and/or critical "
-      "options as well";
+         "options as well";
     warnings++;
   }
 
@@ -764,19 +765,11 @@ int check_service(service* svc, int* w, int* e) {
     svc->check_period_ptr = temp_timeperiod;
   }
 
-  /* check service notification timeperiod */
-  if (svc->notification_period == NULL) {
-    logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host "
-      "'" << svc->host_name << "' has no notification time period "
-      "defined!";
-    warnings++;
-  }
-
-  else {
-    timeperiod* temp_timeperiod
-      = find_timeperiod(svc->notification_period);
-    if (temp_timeperiod == NULL) {
+  // Check service notification timeperiod.
+  if (svc->notification_period) {
+    timeperiod* temp_timeperiod(
+      find_timeperiod(svc->notification_period));
+    if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << svc->notification_period
         << "' specified for service '" << svc->description << "' on "
@@ -784,19 +777,27 @@ int check_service(service* svc, int* w, int* e) {
       errors++;
     }
 
-    /* save the pointer to the notification timeperiod for later */
+    // Save the pointer to the notification timeperiod for later.
     svc->notification_period_ptr = temp_timeperiod;
   }
+  else if (svc->notifications_enabled) {
+    logger(log_verification_error, basic)
+      << "Warning: Service '" << svc->description << "' on host "
+      "'" << svc->host_name << "' has no notification time period "
+      "defined!";
+    warnings++;
+  }
 
-  /* see if the notification interval is less than the check interval */
-  if (svc->notification_interval < svc->check_interval
-      && svc->notification_interval != 0) {
+  // See if the notification interval is less than the check interval.
+  if (svc->notifications_enabled
+      && svc->notification_interval
+      && (svc->notification_interval < svc->check_interval)) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->description << "' on host '"
       << svc->host_name << "'  has a notification interval less than "
-      "its check interval!  Notifications are only re-sent after "
-      "checks are made, so the effective notification interval will "
-      "be that of the check interval.";
+         "its check interval!  Notifications are only re-sent after "
+         "checks are made, so the effective notification interval will "
+         "be that of the check interval.";
     warnings++;
   }
 
@@ -947,10 +948,11 @@ int check_host(host* hst, int* w, int* e) {
     temp_contactgroupsmember->group_ptr = temp_contactgroup;
   }
 
-  /* check notification timeperiod */
-  if (hst->notification_period != NULL) {
-    timeperiod* temp_timeperiod = find_timeperiod(hst->notification_period);
-    if (temp_timeperiod == NULL) {
+  // Check notification timeperiod.
+  if (hst->notification_period) {
+    timeperiod* temp_timeperiod(
+                  find_timeperiod(hst->notification_period));
+    if (!temp_timeperiod) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << hst->notification_period
         << "' specified for host '" << hst->name
@@ -958,7 +960,7 @@ int check_host(host* hst, int* w, int* e) {
       errors++;
     }
 
-    /* save the pointer to the notification timeperiod for later */
+    // Save the pointer to the notification timeperiod for later.
     hst->notification_period_ptr = temp_timeperiod;
   }
 
@@ -982,14 +984,15 @@ int check_host(host* hst, int* w, int* e) {
     add_child_link_to_host(hst2, hst);
   }
 
-  /* check for sane recovery options */
-  if (hst->notify_on_recovery == true
-      && hst->notify_on_down == false
-      && hst->notify_on_unreachable == false) {
+  // Check for sane recovery options.
+  if (hst->notifications_enabled
+      && hst->notify_on_recovery
+      && !hst->notify_on_down
+      && !hst->notify_on_unreachable) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in host '" << hst->name
       << "' definition doesn't make any sense - specify down and/or "
-      "unreachable options as well";
+         "unreachable options as well";
     warnings++;
   }
 
