@@ -139,17 +139,6 @@ for returning performance data:
   * You can return performance data in both the first line and
     subsequent lines (as shown above)
 
-Plugin Output Length Restrictions
-=================================
-
-Centreon Engine will only read the first 4 KB of data that a plugin
-returns. This is done in order to prevent runaway plugins from dumping
-megs or gigs of data back to Centreon Engine. This 4 KB output limit is
-fairly easy to change if you need. Simply edit the value of the
-MAX_PLUGIN_OUTPUT_LENGTH definition in the ``include/centengine.h.in``
-file of the source code distribution and recompile Centreon
-Engine. There's nothing else you need to change!
-
 Examples
 ========
 
@@ -158,4 +147,3 @@ that you download the official Centreon Engine plugins and look through
 the code for various C, Perl, and shell script plugins. Information on
 obtaining the official Centreon Engine plugins can be found
 :ref:`here <exploit_plugins>`.
-
