@@ -821,26 +821,29 @@ int check_host(host* hst, int* w, int* e) {
   int warnings(0);
   int errors(0);
 
-  /* make sure each host has at least one service associated with it */
-  /* 02/21/08 NOTE: this is extremely inefficient */
-  if (config->use_large_installation_tweaks() == false) {
-
-    bool found = false;
-    for (service* temp_service = service_list;
-	 temp_service != NULL;
-	 temp_service = temp_service->next) {
+  // Make sure each host has at least one service associated with it.
+  // Note that this is extremely inefficient. Also note that we are
+  // using the global variable /use_large_installation_tweaks/ instead
+  // of the global /config/ object because we are in the middle of the
+  // configuration application. Therefore the global variable already
+  // has its correct value whereas the global object is not yet
+  // modified.
+  if (!use_large_installation_tweaks) {
+    bool found(false);
+    for (service* temp_service(service_list);
+	 temp_service;
+	 temp_service = temp_service->next)
       if (!strcmp(temp_service->host_name, hst->name)) {
 	found = true;
-	break;
+	break ;
       }
-    }
 
-    /* we couldn't find a service associated with this host! */
-    if (found == false) {
+    // We couldn't find a service associated with this host!
+    if (!found) {
       logger(log_verification_error, basic)
         << "Warning: Host '" << hst->name
         << "' has no services associated with it!";
-      warnings++;
+      ++warnings;
     }
   }
 
