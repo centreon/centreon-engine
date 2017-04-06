@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -387,14 +387,8 @@ void applier::servicedependency::_expand_services(
        ++it) {
     // Find host group.
     std::set<shared_ptr<configuration::hostgroup> >::iterator
-      it_group(s.hostgroups().begin()),
-      end_group(s.hostgroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->hostgroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
+      it_group(s.hostgroups_find(*it));
+    if (it_group == s.hostgroups().end())
       throw (engine_error() << "Could not resolve host group '"
              << *it << "'");
 
@@ -428,14 +422,8 @@ void applier::servicedependency::_expand_services(
        ++it) {
     // Find service group.
     std::set<shared_ptr<configuration::servicegroup> >::iterator
-      it_group(s.servicegroups().begin()),
-      end_group(s.servicegroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->servicegroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
+      it_group(s.servicegroups_find(*it));
+    if (it_group == s.servicegroups().end())
       throw (engine_error() << "Could not resolve service group '"
              << *it << "'");
 

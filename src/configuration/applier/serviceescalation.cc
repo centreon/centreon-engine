@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -333,14 +333,8 @@ void applier::serviceescalation::_expand_services(
        ++it) {
     // Find host group.
     std::set<shared_ptr<configuration::hostgroup> >::iterator
-      it_group(s.hostgroups().begin()),
-      end_group(s.hostgroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->hostgroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
+      it_group(s.hostgroups_find(*it));
+    if (it_group == s.hostgroups().end())
       throw (engine_error() << "Could not resolve host group '"
              << *it << "'");
 
@@ -374,14 +368,8 @@ void applier::serviceescalation::_expand_services(
        ++it) {
     // Find service group.
     std::set<shared_ptr<configuration::servicegroup> >::iterator
-      it_group(s.servicegroups().begin()),
-      end_group(s.servicegroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->servicegroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
+      it_group(s.servicegroups_find(*it));
+    if (it_group == s.servicegroups().end())
       throw (engine_error() << "Could not resolve service group '"
              << *it << "'");
 
@@ -417,16 +405,10 @@ void applier::serviceescalation::_inherits_special_vars(
 
     // Find service.
     std::set<shared_ptr<configuration::service> >::const_iterator
-      it(s.services().begin()),
-      end(s.services().end());
-    while (it != end) {
-      if (((*it)->hosts().front() == obj->hosts().front())
-          && ((*it)->service_description()
-              == obj->service_description().front()))
-        break ;
-      ++it;
-    }
-    if (it == end)
+      it(s.services_find(std::make_pair(
+                                obj->hosts().front(),
+                                obj->service_description().front())));
+    if (it == s.services().end())
       throw (engine_error() << "Could not inherit special "
              << "variables from service '"
              << obj->service_description().front() << "' of host '"

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -340,14 +340,7 @@ void applier::servicegroup::_resolve_members(
          it != end;
          ++it) {
       // Find servicegroup entry.
-      set_servicegroup::iterator
-        it2(s.servicegroups().begin()),
-        end2(s.servicegroups().end());
-      while (it2 != end2) {
-        if ((*it2)->servicegroup_name() == *it)
-          break ;
-        ++it2;
-      }
+      set_servicegroup::iterator it2(s.servicegroups_find(*it));
       if (it2 == s.servicegroups().end())
         throw (engine_error()
                << "Could not add non-existing service group member '"

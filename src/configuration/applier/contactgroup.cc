@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -288,14 +288,7 @@ void applier::contactgroup::_resolve_members(
          it != end;
          ++it) {
       // Find contactgroup entry.
-      set_contactgroup::iterator
-        it2(s.contactgroups().begin()),
-        end2(s.contactgroups().end());
-      while (it2 != end2) {
-        if ((*it2)->contactgroup_name() == *it)
-          break ;
-        ++it2;
-      }
+      set_contactgroup::iterator it2(s.contactgroups_find(*it));
       if (it2 == s.contactgroups().end())
         throw (engine_error()
                << "Error: Could not add non-existing contact group member '"

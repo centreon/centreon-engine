@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -335,15 +335,8 @@ void applier::hostdependency::_expand_hosts(
        it != end;
        ++it) {
     // Find host group.
-    set_hostgroup::iterator
-      it_group(s.hostgroups().begin()),
-      end_group(s.hostgroups().end());
-    while (it_group != end_group) {
-      if ((*it_group)->hostgroup_name() == *it)
-        break ;
-      ++it_group;
-    }
-    if (it_group == end_group)
+    set_hostgroup::iterator it_group(s.hostgroups_find(*it));
+    if (it_group == s.hostgroups().end())
       throw (engine_error()
              << "Could not expand non-existing host group '"
              << *it << "'");

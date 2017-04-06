@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -327,14 +327,7 @@ void applier::hostgroup::_resolve_members(
          it != end;
          ++it) {
       // Find hostgroup entry.
-      set_hostgroup::iterator
-        it2(s.hostgroups().begin()),
-        end2(s.hostgroups().end());
-      while (it2 != end2) {
-        if ((*it2)->hostgroup_name() == *it)
-          break ;
-        ++it2;
-      }
+      set_hostgroup::iterator it2(s.hostgroups_find(*it));
       if (it2 == s.hostgroups().end())
         throw (engine_error()
                << "Could not add non-existing host group member '"

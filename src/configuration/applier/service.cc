@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2016 Centreon
+** Copyright 2011-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -295,14 +295,8 @@ void applier::service::expand_object(
          ++it) {
       // Find host group.
       set_hostgroup::iterator
-        it2(s.hostgroups().begin()),
-        end2(s.hostgroups().end());
-      while (it2 != end2) {
-        if (*it == (*it2)->hostgroup_name())
-          break ;
-        ++it2;
-      }
-      if (it2 == end2)
+        it2(s.hostgroups_find(*it));
+      if (it2 == s.hostgroups().end())
         throw (engine_error() << "Could not find host group '"
                << *it << "' on which to apply service '"
                << obj->service_description() << "'");
@@ -798,14 +792,8 @@ void applier::service::_inherits_special_vars(
 
     // Find host.
     std::set<shared_ptr<configuration::host> >::const_iterator
-      it(s.hosts().begin()),
-      end(s.hosts().end());
-    while (it != end) {
-      if ((*it)->host_name() == obj->hosts().front())
-        break ;
-      ++it;
-    }
-    if (it == end)
+      it(s.hosts_find(obj->hosts().front()));
+    if (it == s.hosts().end())
       throw (engine_error()
              << "Could not inherit special variables for service '"
              << obj->service_description() << "': host '"
