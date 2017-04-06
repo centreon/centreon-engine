@@ -64,5 +64,5 @@ stage('Package') {
 }
 
 if (env.BRANCH_NAME == '1.7') {
-  build job: 'centreon-web/2.8.x', wait: false
+  build job: 'centreon-web/master', wait: false
 }
