@@ -178,7 +178,7 @@ void diagnostic::generate(
   }
   catch (std::exception const& e) {
     logger(logging::log_runtime_error, logging::basic)
-      << "Diagnostic: configuraion file '" << cfg_file
+      << "Diagnostic: configuration file '" << cfg_file
       << "' parsing failed: " << e.what();
   }
 
