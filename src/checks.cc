@@ -847,7 +847,7 @@ int handle_async_service_check_result(
       /* we're using aggressive host checking, so really do recheck the host... */
       if (config->use_aggressive_host_checking() == true) {
         logger(dbg_checks, more)
-          << "Agressive host checking is enabled, so we'll recheck the "
+          << "Aggressive host checking is enabled, so we'll recheck the "
           "host state...";
         perform_on_demand_host_check(
           temp_host,
