@@ -16,7 +16,7 @@
 # Short-Description: Start and stop Centreon Engine
 ### END INIT INFO
 
-prefix=@CMAKE_INSTALL_PREFIX@
+prefix=@PREFIX@
 var_dir=@VAR_DIR@
 rw_dir=@RW_DIR@
 binary=@PREFIX_BIN@/centengine
