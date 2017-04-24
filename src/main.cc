@@ -74,7 +74,7 @@ using namespace com::centreon::engine;
 // Error message when configuration parsing fail.
 #define ERROR_CONFIGURATION \
   "    Check your configuration file(s) to ensure that they contain valid\n" \
-  "    directives and data defintions. If you are upgrading from a\n" \
+  "    directives and data definitions. If you are upgrading from a\n" \
   "    previous version of Centreon Engine, you should be aware that some\n" \
   "    variables/definitions may have been removed or modified in this\n" \
   "    version. Make sure to read the documentation regarding the config\n" \
