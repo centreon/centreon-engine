@@ -34,7 +34,7 @@ include_directories("${INC_DIR}/compatibility")
 # Version.
 set(CENTREON_ENGINE_MAJOR 1)
 set(CENTREON_ENGINE_MINOR 7)
-set(CENTREON_ENGINE_PATCH 2)
+set(CENTREON_ENGINE_PATCH 3)
 set(CENTREON_ENGINE_VERSION "${CENTREON_ENGINE_MAJOR}.${CENTREON_ENGINE_MINOR}.${CENTREON_ENGINE_PATCH}")
 message(STATUS "Generating version header (${CENTREON_ENGINE_VERSION}).")
 configure_file("${INC_DIR}/com/centreon/engine/version.hh.in"
