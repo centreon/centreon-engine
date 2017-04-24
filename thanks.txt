@@ -55,6 +55,7 @@ since 1999.  If I missed your name, let me know.
 * John Calcote
 * Don Carroll
 * Ian Cass
+* Adam Cécile
 * Alexios Chouhoulas
 * Allan Clark
 * Jonathan Clarke
