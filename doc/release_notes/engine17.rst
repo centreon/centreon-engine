@@ -1,4 +1,28 @@
 =====================
+Centreon Engine 1.7.3
+=====================
+
+*********
+Bug fixes
+*********
+
+=====================
+Centreon Engine 1.7.2
+=====================
+
+************
+Enhancements
+************
+
+Improve configuration loading time
+==================================
+
+In the configuration resolution phase, the object lookup mechanism was
+mostly based on object iteration (ie. O(n)). This was replaced by
+key-based lookup (either O(1) or O(ln n), based on searched object
+type).
+
+=====================
 Centreon Engine 1.7.1
 =====================
 
