@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -245,6 +245,30 @@ int log_host_event(host const* hst) {
 }
 
 /**
+ *  Log host state information.
+ *
+ *  @param[in] type  State logging type.
+ *  @param[in] hst   Host object.
+ */
+void log_host_state(unsigned int type, host* hst) {
+  if (hst->name) {
+    char const* type_str(tab_initial_state[type]);
+    char const* state("UP");
+    if ((hst->current_state > 0)
+        && ((unsigned int)hst->current_state
+            < sizeof(tab_host_states) / sizeof(*tab_host_states)))
+      state = tab_host_states[hst->current_state].str;
+    char const* state_type(tab_state_type[hst->state_type]);
+    char const* output(hst->plugin_output ? hst->plugin_output : "");
+    logger(log_info_message, basic)
+      << type_str << " HOST STATE: " << hst->name << ";" << state
+      << ";" << state_type << ";" << hst->current_attempt << ";"
+      << output;
+  }
+  return ;
+}
+
+/**
  *  Log host states information.
  *  This function has been DEPRECATED.
  *
@@ -255,30 +279,33 @@ int log_host_event(host const* hst) {
  */
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-
-  if (type == INITIAL_STATES && !config->log_initial_states())
-    return (OK);
-
-  char const* type_str(tab_initial_state[type]);
-  for (host* hst = host_list; hst; hst = hst->next) {
-    if (!hst->name)
-      continue;
-
-    char const* state("UP");
-    if (hst->current_state > 0
-        && (unsigned int)hst->current_state
-        < sizeof(tab_host_states) / sizeof(*tab_host_states))
-      state = tab_host_states[hst->current_state].str;
-
-    char const* state_type(tab_state_type[hst->state_type]);
-    char const* output(hst->plugin_output ? hst->plugin_output : "");
-
-    logger(log_info_message, basic)
-      << type_str << " HOST STATE: " << hst->name << ";" << state
-      << ";" << state_type << ";" << hst->current_attempt << ";"
-      << output;
-  }
+  for (host* hst(host_list); hst; hst = hst->next)
+    log_host_state(type, hst);
   return (OK);
+}
+
+/**
+ *  Log service state information.
+ *
+ *  @param[in] type  State logging type.
+ *  @param[in] svc   Service object.
+ */
+void log_service_state(unsigned int type, service* svc) {
+  if (svc->host_name && svc->description) {
+    char const* type_str(tab_initial_state[type]);
+    char const* state("UNKNOWN");
+    if ((svc->current_state >= 0)
+        && ((unsigned int)svc->current_state
+            < sizeof(tab_service_states) / sizeof(*tab_service_states)))
+      state = tab_service_states[svc->current_state].str;
+    char const* state_type(tab_state_type[svc->state_type]);
+    char const* output(svc->plugin_output ? svc->plugin_output : "");
+    logger(log_info_message, basic)
+      << type_str << " SERVICE STATE: " << svc->host_name << ";"
+      << svc->description << ";" << state << ";" << state_type
+      << ";" << svc->current_attempt << ";" << output;
+  }
+  return ;
 }
 
 /**
@@ -292,29 +319,8 @@ int log_host_states(unsigned int type, time_t* timestamp) {
  */
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
-
-  if (type == INITIAL_STATES && !config->log_initial_states())
-    return (OK);
-
-  char const* type_str(tab_initial_state[type]);
-  for (service* svc = service_list; svc; svc = svc->next) {
-    if (!svc->host_ptr || !svc->host_name || !svc->description)
-      continue;
-
-    char const* state("UNKNOWN");
-    if (svc->current_state >= 0
-        && (unsigned int)svc->current_state
-        < sizeof(tab_service_states) / sizeof(*tab_service_states))
-      state = tab_service_states[svc->current_state].str;
-
-    char const* state_type(tab_state_type[svc->state_type]);
-    char const* output(svc->plugin_output ? svc->plugin_output : "");
-
-    logger(log_info_message, basic)
-      << type_str << " SERVICE STATE: " << svc->host_name << ";"
-      << svc->description << ";" << state << ";" << state_type
-      << ";" << svc->current_attempt << ";" << output;
-  }
+  for (service* svc(service_list); svc; svc = svc->next)
+    log_service_state(type, svc);
   return (OK);
 }
 
@@ -366,4 +372,3 @@ int open_debug_log() {
 int close_debug_log() {
   return (OK);
 }
-

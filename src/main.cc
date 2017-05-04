@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2016 Centreon
+** Copyright 2011-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -364,14 +364,14 @@ int main(int argc, char* argv[]) {
         }
         neb_init_callback_list();
 
-        // Apply configuration.
-        configuration::applier::state::instance().apply(config, state);
-
         // Add broker backend.
         com::centreon::logging::engine::instance().add(
           &backend_broker_log,
           logging::log_all,
           logging::basic);
+
+        // Apply configuration.
+        configuration::applier::state::instance().apply(config, state);
 
         // This must be logged after we read config data,
         // as user may have changed location of main log file.
@@ -402,10 +402,6 @@ int main(int argc, char* argv[]) {
 
         // Update all status data (with retained information).
         update_all_status_data();
-
-        // Log initial host and service state.
-        log_host_states(INITIAL_STATES, NULL);
-        log_service_states(INITIAL_STATES, NULL);
 
         // Send program data to broker.
         broker_program_state(

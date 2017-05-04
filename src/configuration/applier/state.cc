@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -42,6 +42,7 @@
 #include "com/centreon/engine/configuration/command.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
@@ -1701,6 +1702,30 @@ void applier::state::_processing(
     }
     else
       neb_reload_all_modules();
+
+    // Print initial states of new hosts and services.
+    for (set_host::iterator
+           it(diff_hosts.added().begin()),
+           end(diff_hosts.added().end());
+         it != end;
+         ++it) {
+      umap<std::string, shared_ptr<host_struct> >::const_iterator
+        hst(hosts().find((*it)->host_name()));
+      if (hst != hosts().end())
+        log_host_state(INITIAL_STATES, hst->second.get());
+    }
+    for (set_service::iterator
+           it(diff_services.added().begin()),
+           end(diff_services.added().end());
+         it != end;
+         ++it) {
+      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+        svc(services().find(std::make_pair(
+                                   (*it)->hosts().front(),
+                                   (*it)->service_description())));
+      if (svc != services().end())
+        log_service_state(INITIAL_STATES, svc->second.get());
+    }
 
     // Timing.
     gettimeofday(tv + 4, NULL);
