@@ -83,7 +83,6 @@ void applier::globals::apply(state& config) {
   ::log_event_handlers = config.log_event_handlers();
   ::log_external_commands = config.log_external_commands();
   ::log_host_retries = config.log_host_retries();
-  ::log_initial_states = config.log_initial_states();
   ::log_notifications = config.log_notifications();
   ::log_passive_checks = config.log_passive_checks();
   ::log_service_retries = config.log_service_retries();

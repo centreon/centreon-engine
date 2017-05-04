@@ -163,7 +163,6 @@ unsigned int        host_inter_check_delay_method(ICD_SMART);
 unsigned int        interval_length(60);
 unsigned int        log_event_handlers(true);
 unsigned int        log_external_commands(true);
-unsigned int        log_initial_states(false);
 unsigned int        log_notifications(true);
 unsigned int        log_passive_checks(true);
 unsigned int        log_service_retries(false);

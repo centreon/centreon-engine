@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2016 Centreon
+** Copyright 2011-2013,2016-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,9 +21,10 @@
 #include <cstddef>
 #include "globals.h"
 
-// Log rotation.
+// Log.
 char const* log_archive_path("");
 unsigned int log_rotation_method(0);
+unsigned int log_initial_states(1);
 
 // Free memory option.
 unsigned int free_child_process_memory(-1);

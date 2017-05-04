@@ -1091,7 +1091,6 @@ void applier::state::_apply(configuration::state const& new_cfg) {
   config->log_external_commands(new_cfg.log_external_commands());
   config->log_file(new_cfg.log_file());
   config->log_host_retries(new_cfg.log_host_retries());
-  config->log_initial_states(new_cfg.log_initial_states());
   config->log_notifications(new_cfg.log_notifications());
   config->log_passive_checks(new_cfg.log_passive_checks());
   config->log_service_retries(new_cfg.log_service_retries());

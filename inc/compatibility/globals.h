@@ -1,5 +1,5 @@
 /*
-** Copyright 2012-2013 Merethis
+** Copyright 2012-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,9 +23,10 @@
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
 
-// Log rotation.
+// Log.
 extern char const* log_archive_path;
 extern unsigned int log_rotation_method;
+extern unsigned int log_initial_states;
 
 // Free memory option.
 extern unsigned int free_child_process_memory;

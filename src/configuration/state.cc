@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015-2016 Centreon
+** Copyright 2011-2013,2015-2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -107,7 +107,7 @@ state::setters const state::_setters[] = {
   { "log_external_commands",                       SETTER(bool, log_external_commands) },
   { "log_file",                                    SETTER(std::string const&, log_file) },
   { "log_host_retries",                            SETTER(bool, log_host_retries) },
-  { "log_initial_states",                          SETTER(bool, log_initial_states) },
+  { "log_initial_states",                          SETTER(std::string const&, _set_log_initial_states) },
   { "log_notifications",                           SETTER(bool, log_notifications) },
   { "log_passive_checks",                          SETTER(bool, log_passive_checks) },
   { "log_pid",                                     SETTER(bool, log_pid) },
@@ -237,7 +237,6 @@ static bool const                      default_log_event_handlers(true);
 static bool const                      default_log_external_commands(true);
 static std::string const               default_log_file(DEFAULT_LOG_FILE);
 static bool const                      default_log_host_retries(false);
-static bool const                      default_log_initial_states(false);
 static bool const                      default_log_notifications(true);
 static bool const                      default_log_passive_checks(true);
 static bool const                      default_log_pid(true);
@@ -374,7 +373,6 @@ state::state()
     _log_external_commands(default_log_external_commands),
     _log_file(default_log_file),
     _log_host_retries(default_log_host_retries),
-    _log_initial_states(default_log_initial_states),
     _log_notifications(default_log_notifications),
     _log_passive_checks(default_log_passive_checks),
     _log_pid(default_log_pid),
@@ -518,7 +516,6 @@ state& state::operator=(state const& right) {
     _log_external_commands = right._log_external_commands;
     _log_file = right._log_file;
     _log_host_retries = right._log_host_retries;
-    _log_initial_states = right._log_initial_states;
     _log_notifications = right._log_notifications;
     _log_passive_checks = right._log_passive_checks;
     _log_pid = right._log_pid;
@@ -659,7 +656,6 @@ bool state::operator==(state const& right) const throw () {
           && _log_external_commands == right._log_external_commands
           && _log_file == right._log_file
           && _log_host_retries == right._log_host_retries
-          && _log_initial_states == right._log_initial_states
           && _log_notifications == right._log_notifications
           && _log_passive_checks == right._log_passive_checks
           && _log_pid == right._log_pid
@@ -2273,24 +2269,6 @@ bool state::log_host_retries() const throw () {
  */
 void state::log_host_retries(bool value) {
   _log_host_retries = value;
-}
-
-/**
- *  Get log_initial_states value.
- *
- *  @return The log_initial_states value.
- */
-bool state::log_initial_states() const throw () {
-  return (_log_initial_states);
-}
-
-/**
- *  Set log_initial_states value.
- *
- *  @param[in] value The new log_initial_states value.
- */
-void state::log_initial_states(bool value) {
-  _log_initial_states = value;
 }
 
 /**
@@ -3970,6 +3948,19 @@ void state::_set_log_archive_path(std::string const& value) {
   logger(log_config_warning, basic)
     << "Warning: log_archive_path variable ignored";
   ++config_warnings;
+}
+
+/**
+ *  Unused variable log_initial_states.
+ *
+ *  @param[in] value  Unused.
+ */
+void state::_set_log_initial_states(std::string const& value) {
+  (void)value;
+  logger(log_config_warning, basic)
+    << "Warning: log_initial_states variable ignored";
+  ++config_warnings;
+  return ;
 }
 
 /**
