@@ -373,18 +373,6 @@ int main(int argc, char* argv[]) {
         // Apply configuration.
         configuration::applier::state::instance().apply(config, state);
 
-        // This must be logged after we read config data,
-        // as user may have changed location of main log file.
-        logger(logging::log_process_info, logging::basic)
-          << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
-          << " starting ... (PID=" << getpid() << ")";
-
-        // Log the local time - may be different than clock
-        // time due to timezone offset.
-        logger(logging::log_process_info, logging::basic)
-          << "Local time is " << string::ctime(program_start) << "\n"
-          << "LOG VERSION: " << LOG_VERSION_2;
-
         // Handle signals (interrupts).
         setup_sighandler();
 

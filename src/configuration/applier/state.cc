@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <unistd.h>
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/commands/connector.hh"
@@ -47,6 +48,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/retention/applier/state.hh"
 #include "com/centreon/engine/retention/state.hh"
+#include "com/centreon/engine/version.hh"
 #include "com/centreon/engine/xpddefault.hh"
 #include "com/centreon/engine/xsddefault.hh"
 
@@ -1580,6 +1582,22 @@ void applier::state::_processing(
     // Timing.
     gettimeofday(tv + 2, NULL);
 
+    if (!has_already_been_loaded
+        && !verify_config
+        && !test_scheduling) {
+      // This must be logged after we read config data,
+      // as user may have changed location of main log file.
+      logger(log_process_info, basic)
+        << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
+        << " starting ... (PID=" << getpid() << ")";
+
+      // Log the local time - may be different than clock
+      // time due to timezone offset.
+      logger(log_process_info, basic)
+        << "Local time is " << string::ctime(program_start) << "\n"
+        << "LOG VERSION: " << LOG_VERSION_2;
+    }
+
     //
     //  Apply and resolve all objects.
     //
@@ -1703,27 +1721,29 @@ void applier::state::_processing(
       neb_reload_all_modules();
 
     // Print initial states of new hosts and services.
-    for (set_host::iterator
-           it(diff_hosts.added().begin()),
-           end(diff_hosts.added().end());
-         it != end;
-         ++it) {
-      umap<std::string, shared_ptr<host_struct> >::const_iterator
-        hst(hosts().find((*it)->host_name()));
-      if (hst != hosts().end())
-        log_host_state(INITIAL_STATES, hst->second.get());
-    }
-    for (set_service::iterator
-           it(diff_services.added().begin()),
-           end(diff_services.added().end());
-         it != end;
-         ++it) {
-      umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
-        svc(services().find(std::make_pair(
-                                   (*it)->hosts().front(),
-                                   (*it)->service_description())));
-      if (svc != services().end())
-        log_service_state(INITIAL_STATES, svc->second.get());
+    if (!verify_config && !test_scheduling) {
+      for (set_host::iterator
+             it(diff_hosts.added().begin()),
+             end(diff_hosts.added().end());
+           it != end;
+           ++it) {
+        umap<std::string, shared_ptr<host_struct> >::const_iterator
+          hst(hosts().find((*it)->host_name()));
+        if (hst != hosts().end())
+          log_host_state(INITIAL_STATES, hst->second.get());
+      }
+      for (set_service::iterator
+             it(diff_services.added().begin()),
+             end(diff_services.added().end());
+           it != end;
+           ++it) {
+        umap<std::pair<std::string, std::string>, shared_ptr<service_struct> >::const_iterator
+          svc(services().find(std::make_pair(
+                                     (*it)->hosts().front(),
+                                     (*it)->service_description())));
+        if (svc != services().end())
+          log_service_state(INITIAL_STATES, svc->second.get());
+      }
     }
 
     // Timing.
