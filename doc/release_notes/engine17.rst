@@ -6,6 +6,14 @@ Centreon Engine 1.7.3
 Bug fixes
 *********
 
+Print initial states when creating new objects at reload
+========================================================
+
+Initial host and service states are not printed when new objects are
+created during a configuration reload. This prevented Centreon Web's
+reporting dashboard to work properly on such hosts and services until
+a process restart occured.
+
 =====================
 Centreon Engine 1.7.2
 =====================
