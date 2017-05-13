@@ -23,7 +23,7 @@ Just give it a try !
 
 The full Centreon Engine documentation is available online
 [here](http://documentation.centreon.com/docs/centreon-engine/en/). It
-is generated from ReST files located in the *./doc/* directory of
+is generated from [reStructuredText](http://docutils.sourceforge.net/rst.html) files located in the *./doc/* directory of
 Centreon Engine sources.
 
 The documentation extensively covers all aspects of Centreon Engine such
