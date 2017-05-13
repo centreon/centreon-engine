@@ -14,7 +14,7 @@ its stability we improved it in several ways :
   - faster standard check execution engine
   - new light check execution system (connectors)
   - on-the-fly configuration reload
-  - less obscur configuration options
+  - less obscure configuration options
   - frequent bugfix releases
 
 Just give it a try !
