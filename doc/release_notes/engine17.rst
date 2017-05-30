@@ -6,6 +6,13 @@ Centreon Engine 1.7.3
 Bug fixes
 *********
 
+Make timezone macros work
+=========================
+
+The $HOSTTIMEZONE$, $SERVICETIMEZONE$ and $CONTACTTIMEZONE$ macros were
+not included in the generated macro array. As the array size was
+increased, these macros are now working.
+
 Print initial states when creating new objects at reload
 ========================================================
 
