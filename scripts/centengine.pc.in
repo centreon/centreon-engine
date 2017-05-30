@@ -17,7 +17,7 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-prefix=@CMAKE_INSTALL_PREFIX@
+prefix=@PREFIX@
 exec_prefix=@PREFIX_BIN@
 libdir=@PREFIX_LIB@
 includedir=@PREFIX_INC@
