@@ -1208,8 +1208,8 @@ int grab_macro_value_r(
     configuration::applier::state::instance().user_macros().find(macro_name)
       != configuration::applier::state::instance().user_macros().end()) {
     /*** New style user macros ***/
-    *output = ::strdup(configuration::applier::state::instance()
-                         .user_macros_find(macro_name)->second.c_str());
+    *output = string::dup(
+      configuration::applier::state::instance().user_macros_find(macro_name)->second.c_str());
     result = true;
   }
   /* no macro matched... */
