@@ -610,7 +610,7 @@ bool state::operator==(state const& right) const throw () {
           && _check_reaper_interval == right._check_reaper_interval
           && _check_result_path == right._check_result_path
           && _check_service_freshness == right._check_service_freshness
-          && cmp_set_ptr(_commands, right._commands)
+          && _commands == right._commands
           && _command_check_interval == right._command_check_interval
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
@@ -1172,14 +1172,13 @@ set_command& state::commands() throw () {
  */
 set_command::const_iterator state::commands_find(
                                      command::key_type const& k) const {
-  shared_ptr<configuration::command>
-    below_searched(new configuration::command(k));
+  configuration::command below_searched(k);
   set_command::const_iterator
     it(_commands.upper_bound(below_searched));
-  if ((it != _commands.end()) && ((*it)->command_name() == k))
+  if ((it != _commands.end()) && (it->command_name() == k))
     return (it);
   else if ((it != _commands.begin())
-           && ((*--it)->command_name() == k))
+           && ((--it)->command_name() == k))
     return (it);
   return (_commands.end());
 }
@@ -1194,14 +1193,13 @@ set_command::const_iterator state::commands_find(
  */
 set_command::iterator state::commands_find(
                                command::key_type const& k) {
-  shared_ptr<configuration::command>
-    below_searched(new configuration::command(k));
+  configuration::command below_searched(k);
   set_command::iterator
     it(_commands.upper_bound(below_searched));
-  if ((it != _commands.end()) && ((*it)->command_name() == k))
+  if ((it != _commands.end()) && (it->command_name() == k))
     return (it);
   else if ((it != _commands.begin())
-           && ((*--it)->command_name() == k))
+           && ((--it)->command_name() == k))
     return (it);
   return (_commands.end());
 }

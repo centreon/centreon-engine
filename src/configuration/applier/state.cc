@@ -1421,10 +1421,10 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.connectors());
 
-  // // Expand commands.
-  // _expand<configuration::command, applier::command>(
-  //   new_cfg,
-  //   new_cfg.commands());
+  // Expand commands.
+  _expand<configuration::command, applier::command>(
+    new_cfg,
+    new_cfg.commands());
 
   // // Expand contacts.
   // _expand<configuration::contact, applier::contact>(
@@ -1494,9 +1494,9 @@ void applier::state::_processing(
 
   // Build difference for commands.
   difference<set_command> diff_commands;
-  // diff_commands.parse(
-  //   config->commands(),
-  //   new_cfg.commands());
+  diff_commands.parse(
+    config->commands(),
+    new_cfg.commands());
 
   // Build difference for contacts.
   difference<set_contact> diff_contacts;
@@ -1614,11 +1614,11 @@ void applier::state::_processing(
     _resolve<configuration::connector, applier::connector>(
       config->connectors());
 
-    // // Apply commands.
-    // _apply<configuration::command, applier::command>(
-    //   diff_commands);
-    // _resolve<configuration::command, applier::command>(
-    //   config->commands());
+    // Apply commands.
+    _apply<configuration::command, applier::command>(
+      diff_commands);
+    _resolve<configuration::command, applier::command>(
+      config->commands());
 
     // // Apply contacts and contactgroups.
     // _apply<configuration::contact, applier::contact>(
