@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,8 +20,8 @@
 #ifndef CCE_CONFIGURATION_APPLIER_CONNECTOR_HH
 #  define CCE_CONFIGURATION_APPLIER_CONNECTOR_HH
 
+#  include <set>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -32,22 +32,23 @@ namespace               configuration {
 
   namespace             applier {
     class               connector {
-    public:
+     public:
                         connector();
                         connector(connector const& right);
                         ~connector() throw ();
       connector&        operator=(connector const& right);
       void              add_object(
-                          shared_ptr<configuration::connector> obj);
+                          configuration::connector const& obj);
       void              expand_object(
-                          shared_ptr<configuration::connector> obj,
+                          std::set<configuration::connector>& expanded,
+                          configuration::connector const& obj,
                           configuration::state& s);
       void              modify_object(
-                          shared_ptr<configuration::connector> obj);
+                          configuration::connector const& obj);
       void              remove_object(
-                          shared_ptr<configuration::connector> obj);
+                          configuration::connector const& obj);
       void              resolve_object(
-                          shared_ptr<configuration::connector> obj);
+                          configuration::connector const& obj);
     };
   }
 }

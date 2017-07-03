@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2014 Merethis
+** Copyright 2011-2014,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -87,7 +87,7 @@ void parser::parse(std::string const& path, state& config) {
 
   // Fill state.
   // _insert(_map_objects[object::command], config.commands());
-  // _insert(_map_objects[object::connector], config.connectors());
+  _insert(_map_objects[object::connector], config.connectors());
   // _insert(_map_objects[object::contact], config.contacts());
   // _insert(_map_objects[object::contactgroup], config.contactgroups());
   // _insert(_lst_objects[object::hostdependency], config.hostdependencies());

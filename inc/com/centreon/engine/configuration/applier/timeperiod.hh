@@ -25,7 +25,6 @@
 #  include <string>
 #  include <vector>
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
 
 // Forward declaration.
 struct            timeperiod_struct;

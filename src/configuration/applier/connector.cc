@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -64,20 +64,20 @@ applier::connector& applier::connector::operator=(
 /**
  *  Add new connector.
  *
- *  @param[in] obj The new connector to add into the monitoring engine.
+ *  @param[in] obj  The new connector to add into the monitoring engine.
  */
 void applier::connector::add_object(
-                           shared_ptr<configuration::connector> obj) {
+                           configuration::connector const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Creating new connector '" << obj->connector_name() << "'.";
+    << "Creating new connector '" << obj.connector_name() << "'.";
 
   // Expand command line.
   nagios_macros* macros(get_global_macros());
   char* command_line(NULL);
   process_macros_r(
     macros,
-    obj->connector_line().c_str(),
+    obj.connector_line().c_str(),
     &command_line,
     0);
   std::string processed_cmd(command_line);
@@ -89,10 +89,10 @@ void applier::connector::add_object(
   // Create connector.
   shared_ptr<commands::command>
     cmd(new commands::connector(
-                        obj->connector_name(),
+                        obj.connector_name(),
                         processed_cmd,
                         &checks::checker::instance()));
-  state::instance().connectors()[obj->connector_name()] = cmd;
+  state::instance().connectors()[obj.connector_name()] = cmd;
   commands::set::instance().add_command(cmd);
   return ;
 }
@@ -101,46 +101,47 @@ void applier::connector::add_object(
  *  @brief Expand connector.
  *
  *  Connector configuration objects do not need expansion. Therefore
- *  this method does nothing.
+ *  this method only copy obj to expanded.
  *
- *  @param[in] obj Unused.
- *  @param[in] s   Unused.
+ *  @param[out] expanded  Output set.
+ *  @param[in]  obj       Base object.
+ *  @param[in]  s         Unused.
  */
 void applier::connector::expand_object(
-                           shared_ptr<configuration::connector> obj,
+                           std::set<configuration::connector>& expanded,
+                           configuration::connector const& obj,
                            configuration::state& s) {
-  (void)obj;
   (void)s;
+  expanded.insert(obj);
   return ;
 }
 
 /**
  *  Modify connector.
  *
- *  @param[in] obj The connector to modify in the monitoring engine.
+ *  @param[in] obj  The connector to modify in the monitoring engine.
  */
 void applier::connector::modify_object(
-                           shared_ptr<configuration::connector> obj) {
+                           configuration::connector const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Modifying connector '" << obj->connector_name() << "'.";
+    << "Modifying connector '" << obj.connector_name() << "'.";
 
   // Find old configuration.
-  set_connector::iterator it_cfg(config->connectors_find(obj->key()));
+  set_connector::iterator it_cfg(config->connectors_find(obj.key()));
   if (it_cfg == config->connectors().end())
     throw (engine_error() << "Cannot modify non-existing connector '"
-           << obj->connector_name() << "'");
+           << obj.connector_name() << "'");
 
   // Find connector object.
   umap<std::string, shared_ptr<commands::connector> >::iterator
-    it_obj(applier::state::instance().connectors_find(obj->key()));
+    it_obj(applier::state::instance().connectors_find(obj.key()));
   if (it_obj == applier::state::instance().connectors().end())
     throw (engine_error() << "Could not modify non-existing "
-           << "connector object '" << obj->connector_name() << "'");
+           << "connector object '" << obj.connector_name() << "'");
   commands::connector* c(it_obj->second.get());
 
   // Update the global configuration set.
-  shared_ptr<configuration::connector> old_cfg(*it_cfg);
   config->connectors().erase(it_cfg);
   config->connectors().insert(obj);
 
@@ -149,7 +150,7 @@ void applier::connector::modify_object(
   char* command_line(NULL);
   process_macros_r(
     macros,
-    obj->connector_line().c_str(),
+    obj.connector_line().c_str(),
     &command_line,
     0);
   std::string processed_cmd(command_line);
@@ -163,21 +164,21 @@ void applier::connector::modify_object(
 /**
  *  Remove old connector.
  *
- *  @param[in] obj The new connector to remove from the monitoring
- *                 engine.
+ *  @param[in] obj  The new connector to remove from the monitoring
+ *                  engine.
  */
 void applier::connector::remove_object(
-                           shared_ptr<configuration::connector> obj) {
+                           configuration::connector const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
-    << "Removing connector '" << obj->connector_name() << "'.";
+    << "Removing connector '" << obj.connector_name() << "'.";
 
   // Find connector.
   umap<std::string, shared_ptr<commands::connector> >::iterator
-    it(applier::state::instance().connectors_find(obj->key()));
+    it(applier::state::instance().connectors_find(obj.key()));
   if (it != applier::state::instance().connectors().end()) {
     // Remove connector object.
-    commands::set::instance().remove_command(obj->connector_name());
+    commands::set::instance().remove_command(obj.connector_name());
     state::instance().connectors().erase(it);
   }
 
@@ -196,7 +197,7 @@ void applier::connector::remove_object(
  *  @param[in] obj Unused.
  */
 void applier::connector::resolve_object(
-                           shared_ptr<configuration::connector> obj) {
+                           configuration::connector const& obj) {
   (void)obj;
   return ;
 }

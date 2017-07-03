@@ -1416,10 +1416,10 @@ void applier::state::_processing(
     new_cfg,
     new_cfg.timeperiods());
 
-  // // Expand connectors.
-  // _expand<configuration::connector, applier::connector>(
-  //   new_cfg,
-  //   new_cfg.connectors());
+  // Expand connectors.
+  _expand<configuration::connector, applier::connector>(
+    new_cfg,
+    new_cfg.connectors());
 
   // // Expand commands.
   // _expand<configuration::command, applier::command>(
@@ -1488,9 +1488,9 @@ void applier::state::_processing(
 
   // Build difference for connectors.
   difference<set_connector> diff_connectors;
-  // diff_connectors.parse(
-  //   config->connectors(),
-  //   new_cfg.connectors());
+  diff_connectors.parse(
+    config->connectors(),
+    new_cfg.connectors());
 
   // Build difference for commands.
   difference<set_command> diff_commands;
@@ -1608,11 +1608,11 @@ void applier::state::_processing(
     _resolve<configuration::timeperiod, applier::timeperiod>(
       config->timeperiods());
 
-    // // Apply connectors.
-    // _apply<configuration::connector, applier::connector>(
-    //   diff_connectors);
-    // _resolve<configuration::connector, applier::connector>(
-    //   config->connectors());
+    // Apply connectors.
+    _apply<configuration::connector, applier::connector>(
+      diff_connectors);
+    _resolve<configuration::connector, applier::connector>(
+      config->connectors());
 
     // // Apply commands.
     // _apply<configuration::command, applier::command>(

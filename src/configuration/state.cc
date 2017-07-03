@@ -614,7 +614,7 @@ bool state::operator==(state const& right) const throw () {
           && _command_check_interval == right._command_check_interval
           && _command_check_interval_is_seconds == right._command_check_interval_is_seconds
           && _command_file == right._command_file
-          && cmp_set_ptr(_connectors, right._connectors)
+          && _connectors == right._connectors
           && cmp_set_ptr(_contactgroups, right._contactgroups)
           && cmp_set_ptr(_contacts, right._contacts)
           && _date_format == right._date_format
@@ -1300,14 +1300,13 @@ set_connector& state::connectors() throw () {
  */
 set_connector::const_iterator state::connectors_find(
                                      connector::key_type const& k) const {
-  shared_ptr<configuration::connector>
-    below_searched(new configuration::connector(k));
+  configuration::connector below_searched(k);
   set_connector::const_iterator
     it(_connectors.upper_bound(below_searched));
-  if ((it != _connectors.end()) && ((*it)->connector_name() == k))
+  if ((it != _connectors.end()) && (it->connector_name() == k))
     return (it);
   else if ((it != _connectors.begin())
-           && ((*--it)->connector_name() == k))
+           && ((--it)->connector_name() == k))
     return (it);
   return (_connectors.end());
 }
@@ -1322,14 +1321,13 @@ set_connector::const_iterator state::connectors_find(
  */
 set_connector::iterator state::connectors_find(
                                connector::key_type const& k) {
-  shared_ptr<configuration::connector>
-    below_searched(new configuration::connector(k));
+  configuration::connector below_searched(k);
   set_connector::iterator
     it(_connectors.upper_bound(below_searched));
-  if ((it != _connectors.end()) && ((*it)->connector_name() == k))
+  if ((it != _connectors.end()) && (it->connector_name() == k))
     return (it);
   else if ((it != _connectors.begin())
-           && ((*--it)->connector_name() == k))
+           && ((--it)->connector_name() == k))
     return (it);
   return (_connectors.end());
 }
