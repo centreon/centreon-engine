@@ -86,18 +86,18 @@ void parser::parse(std::string const& path, state& config) {
   _apply_serviceextinfo();
 
   // Fill state.
-  _insert(_map_objects[object::command], config.commands());
-  _insert(_map_objects[object::connector], config.connectors());
-  _insert(_map_objects[object::contact], config.contacts());
-  _insert(_map_objects[object::contactgroup], config.contactgroups());
-  _insert(_lst_objects[object::hostdependency], config.hostdependencies());
-  _insert(_lst_objects[object::hostescalation], config.hostescalations());
-  _insert(_map_objects[object::hostgroup], config.hostgroups());
-  _insert(_map_objects[object::host], config.hosts());
-  _insert(_lst_objects[object::servicedependency], config.servicedependencies());
-  _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
-  _insert(_map_objects[object::servicegroup], config.servicegroups());
-  _insert(_lst_objects[object::service], config.services());
+  // _insert(_map_objects[object::command], config.commands());
+  // _insert(_map_objects[object::connector], config.connectors());
+  // _insert(_map_objects[object::contact], config.contacts());
+  // _insert(_map_objects[object::contactgroup], config.contactgroups());
+  // _insert(_lst_objects[object::hostdependency], config.hostdependencies());
+  // _insert(_lst_objects[object::hostescalation], config.hostescalations());
+  // _insert(_map_objects[object::hostgroup], config.hostgroups());
+  // _insert(_map_objects[object::host], config.hosts());
+  // _insert(_lst_objects[object::servicedependency], config.servicedependencies());
+  // _insert(_lst_objects[object::serviceescalation], config.serviceescalations());
+  // _insert(_map_objects[object::servicegroup], config.servicegroups());
+  // _insert(_lst_objects[object::service], config.services());
   _insert(_map_objects[object::timeperiod], config.timeperiods());
 
   // cleanup.
@@ -324,7 +324,7 @@ void parser::_get_objects_by_list_name(
 template<typename T>
 void parser::_insert(
        list_object const& from,
-       std::set<shared_ptr<T> >& to) {
+       std::set<T>& to) {
   for (list_object::const_iterator it(from.begin()), end(from.end());
        it != end;
        ++it)
@@ -341,11 +341,11 @@ void parser::_insert(
 template<typename T>
 void parser::_insert(
        map_object const& from,
-       std::set<shared_ptr<T> >& to) {
+       std::set<T>& to) {
   for (map_object::const_iterator it(from.begin()), end(from.end());
        it != end;
        ++it)
-    to.insert(it->second);
+    to.insert(*static_cast<T*>(it->second.get()));
   return ;
 }
 

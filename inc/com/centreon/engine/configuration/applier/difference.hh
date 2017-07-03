@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,7 +29,7 @@ namespace      configuration {
   namespace    applier {
     template<typename T>
     class      difference {
-    public:
+     public:
                difference() {}
                difference(T const& old_data, T const& new_data) {
         parse(old_data, new_data);
@@ -72,11 +72,11 @@ namespace      configuration {
             break;
           }
 
-          if ((*first1)->key() < (*first2)->key())
+          if (first1->key() < first2->key())
             *del++ = *first1++;
-          else if ((*first1)->key() != (*first2)->key())
+          else if (first1->key() != first2->key())
             *add++ = *first2++;
-          else if (**first1 != **first2) {
+          else if (*first1 != *first2) {
             *modif++ = *first2++;
             ++first1;
           }
@@ -90,7 +90,7 @@ namespace      configuration {
           std::copy(first2, last2, add);
       }
 
-    private:
+     private:
       T        _added;
       T        _deleted;
       T        _modified;

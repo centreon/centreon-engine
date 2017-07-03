@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -98,11 +98,11 @@ namespace              configuration {
     template<typename T>
     static void        _insert(
                          list_object const& from,
-                         std::set<shared_ptr<T> >& to);
+                         std::set<T>& to);
     template<typename T>
     static void        _insert(
                          map_object const& from,
-                         std::set<shared_ptr<T> >& to);
+                         std::set<T>& to);
     std::string const& _map_object_type(
                          map_object const& objects) const throw ();
     void               _parse_directory_configuration(std::string const& path);
