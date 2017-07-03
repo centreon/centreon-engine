@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2015 Merethis
+** Copyright 2011-2013,2015,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -35,7 +35,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    contact : public object {
-  public:
+   public:
     typedef std::string    key_type;
 
                            contact(key_type const& key = "");
@@ -74,7 +74,7 @@ namespace                  configuration {
     bool                   service_notifications_enabled() const throw ();
     std::string const&     timezone() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(contact&, char const*);
@@ -123,8 +123,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<contact>   contact_ptr;
-  typedef std::set<contact_ptr> set_contact;
+  typedef shared_ptr<contact> contact_ptr;
+  typedef std::set<contact>   set_contact;
 }
 
 CCE_END()

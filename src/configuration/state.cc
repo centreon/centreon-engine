@@ -616,7 +616,7 @@ bool state::operator==(state const& right) const throw () {
           && _command_file == right._command_file
           && _connectors == right._connectors
           && cmp_set_ptr(_contactgroups, right._contactgroups)
-          && cmp_set_ptr(_contacts, right._contacts)
+          && _contacts == right._contacts
           && _date_format == right._date_format
           && _debug_file == right._debug_file
           && _debug_level == right._debug_level
@@ -1358,14 +1358,13 @@ set_contact& state::contacts() throw () {
  */
 set_contact::const_iterator state::contacts_find(
                                      contact::key_type const& k) const {
-  shared_ptr<configuration::contact>
-    below_searched(new configuration::contact(k));
+  configuration::contact below_searched(k);
   set_contact::const_iterator
     it(_contacts.upper_bound(below_searched));
-  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
+  if ((it != _contacts.end()) && (it->contact_name() == k))
     return (it);
   else if ((it != _contacts.begin())
-           && ((*--it)->contact_name() == k))
+           && ((--it)->contact_name() == k))
     return (it);
   return (_contacts.end());
 }
@@ -1380,14 +1379,13 @@ set_contact::const_iterator state::contacts_find(
  */
 set_contact::iterator state::contacts_find(
                                contact::key_type const& k) {
-  shared_ptr<configuration::contact>
-    below_searched(new configuration::contact(k));
+  configuration::contact below_searched(k);
   set_contact::iterator
     it(_contacts.upper_bound(below_searched));
-  if ((it != _contacts.end()) && ((*it)->contact_name() == k))
+  if ((it != _contacts.end()) && (it->contact_name() == k))
     return (it);
   else if ((it != _contacts.begin())
-           && ((*--it)->contact_name() == k))
+           && ((--it)->contact_name() == k))
     return (it);
   return (_contacts.end());
 }
