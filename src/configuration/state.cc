@@ -705,7 +705,7 @@ bool state::operator==(state const& right) const throw () {
           && _state_retention_file == right._state_retention_file
           && _status_file == right._status_file
           && _status_update_interval == right._status_update_interval
-          && cmp_set_ptr(_timeperiods, right._timeperiods)
+          && _timeperiods == right._timeperiods
           && _time_change_threshold == right._time_change_threshold
           && _translate_passive_host_checks == right._translate_passive_host_checks
           && _users == right._users
@@ -3365,14 +3365,13 @@ set_timeperiod& state::timeperiods() throw () {
  *          otherwise.
  */
 set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type const& k) const {
-  shared_ptr<configuration::timeperiod>
-    below_searched(new configuration::timeperiod(k));
+  configuration::timeperiod below_searched(k);
   set_timeperiod::const_iterator
     it(_timeperiods.upper_bound(below_searched));
-  if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
+  if ((it != _timeperiods.end()) && (it->timeperiod_name() == k))
     return (it);
   else if ((it != _timeperiods.begin())
-           && ((*--it)->timeperiod_name() == k))
+           && ((--it)->timeperiod_name() == k))
     return (it);
   return (_timeperiods.end());
 }
@@ -3386,14 +3385,13 @@ set_timeperiod::const_iterator state::timeperiods_find(timeperiod::key_type cons
  *          otherwise.
  */
 set_timeperiod::iterator state::timeperiods_find(timeperiod::key_type const& k) {
-  shared_ptr<configuration::timeperiod>
-    below_searched(new configuration::timeperiod(k));
+  configuration::timeperiod below_searched(k);
   set_timeperiod::iterator
     it(_timeperiods.upper_bound(below_searched));
-  if ((it != _timeperiods.end()) && ((*it)->timeperiod_name() == k))
+  if ((it != _timeperiods.end()) && (it->timeperiod_name() == k))
     return (it);
   else if ((it != _timeperiods.begin())
-           && ((*--it)->timeperiod_name() == k))
+           && ((--it)->timeperiod_name() == k))
     return (it);
   return (_timeperiods.end());
 }

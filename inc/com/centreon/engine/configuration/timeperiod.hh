@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -101,8 +101,8 @@ namespace                  configuration {
                            _timeranges;
   };
 
-  typedef shared_ptr<timeperiod>   timeperiod_ptr;
-  typedef std::set<timeperiod_ptr> set_timeperiod;
+  typedef shared_ptr<timeperiod> timeperiod_ptr;
+  typedef std::set<timeperiod>   set_timeperiod;
 }
 
 CCE_END()
