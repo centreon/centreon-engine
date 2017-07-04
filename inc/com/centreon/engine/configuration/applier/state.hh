@@ -206,12 +206,8 @@ namespace           configuration {
       void          _apply(
                       configuration::state& new_cfg,
                       retention::state& state);
+      template      <typename ConfigurationType, typename ApplierType>
       void          _expand(configuration::state& new_state);
-      template      <typename ConfigurationType,
-                     typename ApplierType>
-      void          _expand(
-                      configuration::state& new_state,
-                      std::set<ConfigurationType>& cfg);
       void          _processing(
                       configuration::state& new_cfg,
                       bool waiting_thread,

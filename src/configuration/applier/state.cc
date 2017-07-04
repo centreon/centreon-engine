@@ -1358,28 +1358,18 @@ void applier::state::_apply(
  *  @param[in,out] cfg       Configuration objects.
  */
 template <typename ConfigurationType, typename ApplierType>
-void applier::state::_expand(
-                       configuration::state& new_state,
-                       std::set<ConfigurationType>& cfg) {
+void applier::state::_expand(configuration::state& new_state) {
   ApplierType aplyr;
-  std::set<ConfigurationType> to_expand;
-  to_expand.swap(cfg);
-  for (typename std::set<ConfigurationType>::iterator
-         it(to_expand.begin()),
-         end(to_expand.end());
-       it != end;
-       ++it) {
-    try {
-      aplyr.expand_object(cfg, *it, new_state);
+  try {
+    aplyr.expand_objects(new_state);
+  }
+  catch (std::exception const& e) {
+    if (verify_config) {
+      ++config_errors;
+      logger(log_info_message, basic) << e.what();
     }
-    catch (std::exception const& e) {
-      if (verify_config) {
-        ++config_errors;
-        logger(log_info_message, basic) << e.what();
-      }
-      else
-        throw ;
-    }
+    else
+      throw ;
   }
   return ;
 }
@@ -1413,68 +1403,55 @@ void applier::state::_processing(
 
   // Expand timeperiods.
   _expand<configuration::timeperiod, applier::timeperiod>(
-    new_cfg,
-    new_cfg.timeperiods());
+    new_cfg);
 
   // Expand connectors.
   _expand<configuration::connector, applier::connector>(
-    new_cfg,
-    new_cfg.connectors());
+    new_cfg);
 
   // Expand commands.
   _expand<configuration::command, applier::command>(
-    new_cfg,
-    new_cfg.commands());
+    new_cfg);
 
   // Expand contacts.
   _expand<configuration::contact, applier::contact>(
-    new_cfg,
-    new_cfg.contacts());
+    new_cfg);
 
   // // Expand contactgroups.
   // _expand<configuration::contactgroup, applier::contactgroup>(
-  //   new_cfg,
-  //   new_cfg.contactgroups());
+  //   new_cfg);
 
   // // Expand hosts.
   // _expand<configuration::host, applier::host>(
-  //   new_cfg,
-  //   new_cfg.hosts());
+  //   new_cfg);
 
   // // Expand hostgroups.
   // _expand<configuration::hostgroup, applier::hostgroup>(
-  //   new_cfg,
-  //   new_cfg.hostgroups());
+  //   new_cfg);
 
   // // Expand services.
   // _expand<configuration::service, applier::service>(
-  //   new_cfg,
-  //   new_cfg.services());
+  //   new_cfg);
 
   // // Expand servicegroups.
   // _expand<configuration::servicegroup, applier::servicegroup>(
-  //   new_cfg,
-  //   new_cfg.servicegroups());
+  //   new_cfg);
 
   // // Expand hostdependencies.
   // _expand<configuration::hostdependency, applier::hostdependency>(
-  //   new_cfg,
-  //   new_cfg.hostdependencies());
+  //   new_cfg);
 
   // // Expand servicedependencies.
   // _expand<configuration::servicedependency, applier::servicedependency>(
-  //   new_cfg,
-  //   new_cfg.servicedependencies());
+  //   new_cfg);
 
   // // Expand hostescalations.
   // _expand<configuration::hostescalation, applier::hostescalation>(
-  //   new_cfg,
-  //   new_cfg.hostescalations());
+  //   new_cfg);
 
   // // Expand serviceescalations.
   // _expand<configuration::serviceescalation, applier::serviceescalation>(
-  //   new_cfg,
-  //   new_cfg.serviceescalations());
+  //   new_cfg);
 
   //
   //  Build difference for all objects.
