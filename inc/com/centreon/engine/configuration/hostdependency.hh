@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2011-2013,2017 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ CCE_BEGIN()
 
 namespace                  configuration {
   class                    hostdependency : public object {
-  public:
+   public:
     enum                   action_on {
       none = 0,
       up = (1 << 0),
@@ -81,7 +81,7 @@ namespace                  configuration {
                              unsigned int options) throw ();
     unsigned int           notification_failure_options() const throw ();
 
-  private:
+   private:
     struct                 setters {
       char const*          name;
       bool                 (*func)(hostdependency&, char const*);
@@ -108,8 +108,8 @@ namespace                  configuration {
     static setters const   _setters[];
   };
 
-  typedef shared_ptr<hostdependency>    hostdependency_ptr;
-  typedef std::set<hostdependency_ptr>  set_hostdependency;
+  typedef shared_ptr<hostdependency>  hostdependency_ptr;
+  typedef std::set<hostdependency>    set_hostdependency;
 }
 
 CCE_END()

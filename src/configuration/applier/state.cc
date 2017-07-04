@@ -1437,9 +1437,9 @@ void applier::state::_processing(
   // _expand<configuration::servicegroup, applier::servicegroup>(
   //   new_cfg);
 
-  // // Expand hostdependencies.
-  // _expand<configuration::hostdependency, applier::hostdependency>(
-  //   new_cfg);
+  // Expand hostdependencies.
+  _expand<configuration::hostdependency, applier::hostdependency>(
+    new_cfg);
 
   // // Expand servicedependencies.
   // _expand<configuration::servicedependency, applier::servicedependency>(
@@ -1513,9 +1513,9 @@ void applier::state::_processing(
 
   // Build difference for hostdependencies.
   difference<set_hostdependency> diff_hostdependencies;
-  // diff_hostdependencies.parse(
-  //   config->hostdependencies(),
-  //   new_cfg.hostdependencies());
+  diff_hostdependencies.parse(
+    config->hostdependencies(),
+    new_cfg.hostdependencies());
 
   // Build difference for servicedependencies.
   difference<set_servicedependency> diff_servicedependencies;
@@ -1629,11 +1629,11 @@ void applier::state::_processing(
     // _resolve<configuration::servicegroup, applier::servicegroup>(
     //   config->servicegroups());
 
-    // // Apply host dependencies.
-    // _apply<configuration::hostdependency, applier::hostdependency>(
-    //   diff_hostdependencies);
-    // _resolve<configuration::hostdependency, applier::hostdependency>(
-    //   config->hostdependencies());
+    // Apply host dependencies.
+    _apply<configuration::hostdependency, applier::hostdependency>(
+      diff_hostdependencies);
+    _resolve<configuration::hostdependency, applier::hostdependency>(
+      config->hostdependencies());
 
     // // Apply service dependencies.
     // _apply<configuration::servicedependency, applier::servicedependency>(

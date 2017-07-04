@@ -63,157 +63,161 @@ applier::hostdependency& applier::hostdependency::operator=(
 /**
  *  Add new hostdependency.
  *
- *  @param[in] obj The new host dependency to add into the monitoring
- *                 engine.
+ *  @param[in] obj  The new host dependency to add into the monitoring
+ *                  engine.
  */
 void applier::hostdependency::add_object(
-                                shared_ptr<configuration::hostdependency> obj) {
+                                configuration::hostdependency const& obj) {
   // Check host dependency.
-  if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty())
+  if ((obj.hosts().size() != 1)
+      || !obj.hostgroups().empty()
+      || (obj.dependent_hosts().size() != 1)
+      || !obj.dependent_hostgroups().empty())
     throw (engine_error() << "Could not create host dependency "
            "with multiple (dependent) host / host groups");
-  if ((obj->dependency_type()
+  if ((obj.dependency_type()
        != configuration::hostdependency::execution_dependency)
-      && (obj->dependency_type()
+      && (obj.dependency_type()
           != configuration::hostdependency::notification_dependency))
     throw (engine_error() << "Could not create unexpanded "
-           << "host dependency of '" << obj->dependent_hosts().front()
-           << "' on '" << obj->hosts().front() << "'");
+           << "host dependency of '" << obj.dependent_hosts().front()
+           << "' on '" << obj.hosts().front() << "'");
 
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Creating new host dependency of host '"
-    << obj->dependent_hosts().front() << "' on host '"
-    << obj->hosts().front() << "'.";
+    << obj.dependent_hosts().front() << "' on host '"
+    << obj.hosts().front() << "'.";
 
   // Add dependency to the global configuration set.
   config->hostdependencies().insert(obj);
 
   // Create execution dependency.
-  if (obj->dependency_type()
+  if (obj.dependency_type()
       == configuration::hostdependency::execution_dependency) {
     if (!add_host_dependency(
-           obj->dependent_hosts().front().c_str(),
-           obj->hosts().front().c_str(),
+           obj.dependent_hosts().front().c_str(),
+           obj.hosts().front().c_str(),
            EXECUTION_DEPENDENCY,
-           obj->inherits_parent(),
+           obj.inherits_parent(),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::hostdependency::up),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::hostdependency::down),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::hostdependency::unreachable),
            static_cast<bool>(
-             obj->execution_failure_options()
+             obj.execution_failure_options()
              & configuration::hostdependency::pending),
-           NULL_IF_EMPTY(obj->dependency_period())))
+           NULL_IF_EMPTY(obj.dependency_period())))
       throw (engine_error() << "Could not create host execution "
-             << "dependency of '" << obj->dependent_hosts().front()
-             << "' on '" << obj->hosts().front() << "'");
+             << "dependency of '" << obj.dependent_hosts().front()
+             << "' on '" << obj.hosts().front() << "'");
   }
   // Create notification dependency.
   else
     if (!add_host_dependency(
-           obj->dependent_hosts().front().c_str(),
-           obj->hosts().front().c_str(),
+           obj.dependent_hosts().front().c_str(),
+           obj.hosts().front().c_str(),
            NOTIFICATION_DEPENDENCY,
-           obj->inherits_parent(),
+           obj.inherits_parent(),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::hostdependency::up),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::hostdependency::down),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::hostdependency::unreachable),
            static_cast<bool>(
-             obj->notification_failure_options()
+             obj.notification_failure_options()
              & configuration::hostdependency::pending),
-           NULL_IF_EMPTY(obj->dependency_period())))
+           NULL_IF_EMPTY(obj.dependency_period())))
       throw (engine_error() << "Could not create host "
              << "notification dependency of '"
-             << obj->dependent_hosts().front() << "' on '"
-             << obj->hosts().front() << "'");
+             << obj.dependent_hosts().front() << "' on '"
+             << obj.hosts().front() << "'");
 
   return ;
 }
 
 /**
- *  Expand host dependency.
+ *  Expand host dependencies.
  *
- *  @param[in]     obj Host dependency object.
- *  @param[in,out] s   Configuration being applied.
+ *  @param[in,out] s  Configuration being applied.
  */
-void applier::hostdependency::expand_object(
-                                shared_ptr<configuration::hostdependency> obj,
-                                configuration::state& s) {
-  // Expand host dependency instances.
-  if ((obj->hosts().size() != 1)
-      || !obj->hostgroups().empty()
-      || (obj->dependent_hosts().size() != 1)
-      || !obj->dependent_hostgroups().empty()
-      || (obj->dependency_type()
-          == configuration::hostdependency::unknown)) {
-    // Expanded depended hosts.
-    std::set<std::string> depended_hosts;
-    _expand_hosts(
-      obj->hosts(),
-      obj->hostgroups(),
-      s,
-      depended_hosts);
+void applier::hostdependency::expand_objects(configuration::state& s) {
+  // Browse all dependencies.
+  configuration::set_hostdependency expanded;
+  for (configuration::set_hostdependency::const_iterator
+         it_dep(s.hostdependencies().begin()),
+         end_dep(s.hostdependencies().end());
+       it_dep != end_dep;
+       ++it_dep) {
+    // Expand host dependency instances.
+    if ((it_dep->hosts().size() != 1)
+        || !it_dep->hostgroups().empty()
+        || (it_dep->dependent_hosts().size() != 1)
+        || !it_dep->dependent_hostgroups().empty()
+        || (it_dep->dependency_type()
+            == configuration::hostdependency::unknown)) {
+      // Expanded depended hosts.
+      std::set<std::string> depended_hosts;
+      _expand_hosts(
+        it_dep->hosts(),
+        it_dep->hostgroups(),
+        s,
+        depended_hosts);
 
-    // Expanded dependent hosts.
-    std::set<std::string> dependent_hosts;
-    _expand_hosts(
-      obj->dependent_hosts(),
-      obj->dependent_hostgroups(),
-      s,
-      dependent_hosts);
+      // Expanded dependent hosts.
+      std::set<std::string> dependent_hosts;
+      _expand_hosts(
+        it_dep->dependent_hosts(),
+        it_dep->dependent_hostgroups(),
+        s,
+        dependent_hosts);
 
-    // Remove current host dependency.
-    s.hostdependencies().erase(obj);
-
-    // Browse all depended and dependent hosts.
-    for (std::set<std::string>::const_iterator
-           it1(depended_hosts.begin()),
-           end1(depended_hosts.end());
-         it1 != end1;
-         ++it1)
+      // Browse all depended and dependent hosts.
       for (std::set<std::string>::const_iterator
-             it2(dependent_hosts.begin()),
-             end2(dependent_hosts.end());
-           it2 != end2;
-           ++it2)
-        for (unsigned int i(0); i < 2; ++i) {
-          // Create host dependency instance.
-          shared_ptr<configuration::hostdependency>
-            hdep(new configuration::hostdependency(*obj));
-          hdep->hostgroups().clear();
-          hdep->hosts().clear();
-          hdep->hosts().push_back(*it1);
-          hdep->dependent_hostgroups().clear();
-          hdep->dependent_hosts().clear();
-          hdep->dependent_hosts().push_back(*it2);
-          hdep->dependency_type(
-           !i
-           ? configuration::hostdependency::execution_dependency
-           : configuration::hostdependency::notification_dependency);
-          if (i)
-            hdep->execution_failure_options(0);
-          else
-            hdep->notification_failure_options(0);
+             it1(depended_hosts.begin()),
+             end1(depended_hosts.end());
+           it1 != end1;
+           ++it1)
+        for (std::set<std::string>::const_iterator
+               it2(dependent_hosts.begin()),
+               end2(dependent_hosts.end());
+             it2 != end2;
+             ++it2)
+          for (unsigned int i(0); i < 2; ++i) {
+            // Create host dependency instance.
+            configuration::hostdependency hdep(*it_dep);
+            hdep.hostgroups().clear();
+            hdep.hosts().clear();
+            hdep.hosts().push_back(*it1);
+            hdep.dependent_hostgroups().clear();
+            hdep.dependent_hosts().clear();
+            hdep.dependent_hosts().push_back(*it2);
+            hdep.dependency_type(
+              !i
+              ? configuration::hostdependency::execution_dependency
+              : configuration::hostdependency::notification_dependency);
+            if (i)
+              hdep.execution_failure_options(0);
+            else
+              hdep.notification_failure_options(0);
 
-          // Insert new host dependency. We do not need to expand it
-          // because no expansion is made on 1->1 dependency.
-          s.hostdependencies().insert(hdep);
-        }
+            // Insert new host dependency. We do not need to expand it
+            // because no expansion is made on 1->1 dependency.
+            expanded.insert(hdep);
+          }
+    }
+    // Insert dependency if already good to go.
+    else
+      expanded.insert(*it_dep);
   }
 
   return ;
@@ -225,10 +229,10 @@ void applier::hostdependency::expand_object(
  *  Host dependencies cannot be defined with anything else than their
  *  full content. Therefore no modification can occur.
  *
- *  @param[in] obj Unused.
+ *  @param[in] obj  Unused.
  */
 void applier::hostdependency::modify_object(
-                                shared_ptr<configuration::hostdependency> obj) {
+       configuration::hostdependency const& obj) {
   (void)obj;
   throw (engine_error() << "Could not modify a host dependency: "
          << "Host dependency objects can only be added or removed, "
@@ -240,18 +244,18 @@ void applier::hostdependency::modify_object(
 /**
  *  Remove old host dependency.
  *
- *  @param[in] obj The host dependency to remove from the monitoring
- *                 engine.
+ *  @param[in] obj  The host dependency to remove from the monitoring
+ *                  engine.
  */
 void applier::hostdependency::remove_object(
-                                shared_ptr<configuration::hostdependency> obj) {
+       configuration::hostdependency const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Removing a host dependency.";
 
   // Find host dependency.
   umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
-    it(applier::state::instance().hostdependencies_find(obj->key()));
+    it(applier::state::instance().hostdependencies_find(obj.key()));
   if (it != applier::state::instance().hostdependencies().end()) {
     hostdependency_struct* dependency(it->second.get());
 
@@ -282,17 +286,17 @@ void applier::hostdependency::remove_object(
 /**
  *  Resolve a hostdependency.
  *
- *  @param[in] obj Hostdependency object.
+ *  @param[in] obj  Hostdependency object.
  */
 void applier::hostdependency::resolve_object(
-                shared_ptr<configuration::hostdependency> obj) {
+       configuration::hostdependency const& obj) {
   // Logging.
   logger(logging::dbg_config, logging::more)
     << "Resolving a host dependency.";
 
   // Find host dependency.
   umultimap<std::string, shared_ptr<hostdependency_struct> >::iterator
-    it(applier::state::instance().hostdependencies_find(obj->key()));
+    it(applier::state::instance().hostdependencies_find(obj.key()));
   if (applier::state::instance().hostdependencies().end() == it)
     throw (engine_error() << "Cannot resolve non-existing "
            << "host dependency");
@@ -342,9 +346,9 @@ void applier::hostdependency::_expand_hosts(
              << *it << "'");
 
     // Add host group members.
-    for (std::set<std::string>::const_iterator
-           it_member((*it_group)->resolved_members().begin()),
-           end_member((*it_group)->resolved_members().end());
+    for (list_string::const_iterator
+           it_member(it_group->members().begin()),
+           end_member(it_group->members().end());
          it_member != end_member;
          ++it_member)
       expanded.insert(*it_member);
